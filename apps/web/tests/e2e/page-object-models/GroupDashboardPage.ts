@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage, handleMultiSelect } from "./CommonPage"
+import { CommonPage} from "./CommonPage"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
@@ -284,10 +284,9 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async updateCompanyLocation(country: string) {
-      return handleMultiSelect(
+      return this.handleMultiSelect(
          country,
-         this.companyInformationLocationInput,
-         this.page
+         this.companyInformationLocationInput
       )
    }
 
@@ -303,15 +302,13 @@ export class GroupDashboardPage extends CommonPage {
       await this.companyInformationAboutInput.fill(
          "CareerFairy is the only graduate career portal that gives graduates access to speak to companies before applying for a job. We find and share valuable insights about the job market, career choices and, most importantly, employers."
       )
-      await handleMultiSelect(
+      await this.handleMultiSelect(
          correctCompany.location,
-         this.companyInformationLocationInput,
-         this.page
+         this.companyInformationLocationInput
       )
-      await handleMultiSelect(
+      await this.handleMultiSelect(
          correctCompany.industry,
-         this.companyInformationIndustriesInput,
-         this.page
+         this.companyInformationIndustriesInput
       )
 
       await this.companyInformationSizeInput.click()

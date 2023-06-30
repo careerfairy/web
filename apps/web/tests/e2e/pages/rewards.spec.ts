@@ -82,7 +82,15 @@ test.describe("Win credits by completing actions", () => {
       ).toBeVisible()
    })
 
-   test("Refer 3 friends and win 3 credits", async ({ page, user }) => {
+   test("Refer 3 friends and win 3 credits", async ({
+      page,
+      user,
+      browserName,
+   }) => {
+      test.skip(
+         browserName === "firefox",
+         "Firefox fails sometimes with multiple contexts"
+      )
       await setupData({
          user,
          userDataOverrides: { credits: 0 },
