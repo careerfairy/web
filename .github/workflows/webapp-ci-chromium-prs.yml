@@ -149,6 +149,7 @@ jobs:
            with:
               name: ${{ matrix.shard }}-chromium-playwright-report
               path: apps/web/playwright-report
+              retention-days: 30
 
          - name: Upload debug logs
            if: ${{ failure() }}
@@ -156,6 +157,7 @@ jobs:
            with:
               name: ${{ matrix.shard }}-chromium-debug-logs
               path: firebase-debug.log
+              retention-days: 30
 
    # Deploy
    deploy:

@@ -202,12 +202,15 @@ export const handleMultiSelect = async (
    page: Page
 ) => {
    if (!stringToSelect) return
-   await elementLocator.click()
-   await elementLocator.focus()
-   await elementLocator.fill(stringToSelect)
+
+   const locator = elementLocator.first()
+
+   await locator.click()
+   await locator.focus()
+   await locator.fill(stringToSelect)
    // give time for the dropdown to update the suggestions
    await sleep(250)
-   expect(await elementLocator.inputValue()).toBe(stringToSelect)
+   expect(await locator.inputValue()).toBe(stringToSelect)
    await page
       .locator('div[role="presentation"]', { hasText: stringToSelect })
       .click()
