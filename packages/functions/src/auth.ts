@@ -1,5 +1,4 @@
 import functions = require("firebase-functions")
-import { admin } from "./api/firestoreAdmin"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { generateReferralCode } from "./util"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
@@ -13,6 +12,7 @@ import config from "./config"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
 import { userUpdateFields } from "./lib/user"
 import { client } from "./api/postmark"
+import { auth, FieldValue, firestore } from "./api/firestoreAdmin"
 
 export const createNewUserAccount = functions
    .region(config.region)
@@ -44,8 +44,7 @@ export const createNewUserAccount = functions
       console.log(
          `Starting auth account creation process for ${recipientEmail}`
       )
-      await admin
-         .auth()
+      await auth
          .createUser({ email: recipientEmail, password: password })
          .then(async (user) => {
             console.log(
@@ -57,8 +56,7 @@ export const createNewUserAccount = functions
                   ? { accountCreationUTMParams }
                   : {}
 
-            await admin
-               .firestore()
+            await firestore
                .collection("userData")
                .doc(recipientEmail)
                .set(
@@ -79,9 +77,8 @@ export const createNewUserAccount = functions
                      isStudent: true,
                      credits: INITIAL_CREDITS,
                      welcomeDialogComplete: false,
-                     lastActivityAt:
-                        admin.firestore.FieldValue.serverTimestamp(),
-                     createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                     lastActivityAt: FieldValue.serverTimestamp(),
+                     createdAt: FieldValue.serverTimestamp(),
                      ...registrationUTMsToSave,
                   })
                )
@@ -121,9 +118,8 @@ export const createNewUserAccount = functions
                         `Starting auth and firestore user deletion ${recipientEmail}`,
                         error
                      )
-                     await admin.auth().deleteUser(user.uid)
-                     await admin
-                        .firestore()
+                     await auth.deleteUser(user.uid)
+                     await firestore
                         .collection("userData")
                         .doc(recipientEmail)
                         .delete()
@@ -139,7 +135,7 @@ export const createNewUserAccount = functions
                         `Starting auth user deletion ${recipientEmail}`,
                         error
                      )
-                     await admin.auth().deleteUser(user.uid)
+                     await auth.deleteUser(user.uid)
                   }
                   console.error(
                      `Error creating user ${recipientEmail} in firestore`,
@@ -196,7 +192,7 @@ export const createNewGroupAdminUserAccount = functions
          }
 
          // Create user in firebase auth
-         const userRecord = await admin.auth().createUser({
+         const userRecord = await auth.createUser({
             displayName: [firstName, lastName].filter((name) => name).join(" "),
             email: recipientEmail,
             password: password,
@@ -204,7 +200,7 @@ export const createNewGroupAdminUserAccount = functions
          })
 
          // set the group role to the user
-         await admin.auth().setCustomUserClaims(userRecord.uid, {
+         await auth.setCustomUserClaims(userRecord.uid, {
             adminGroups: {
                [invitation.groupId]: {
                   role: invitation.role,
@@ -223,12 +219,11 @@ export const createNewGroupAdminUserAccount = functions
             userEmail: recipientEmail,
             unsubscribed: !subscribed,
             referralCode: generateReferralCode(),
-            lastActivityAt: admin.firestore.FieldValue.serverTimestamp(),
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastActivityAt: FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
          }
          // create the user in firestore, if it fails, delete the user from firebase auth
-         await admin
-            .firestore()
+         await firestore
             .collection("userData")
             .doc(recipientEmail)
             .set(Object.assign(userData))
@@ -271,16 +266,12 @@ export const createNewGroupAdminUserAccount = functions
 
          if (emailToDelete) {
             deletePromises.push(
-               admin
-                  .firestore()
-                  .collection("userData")
-                  .doc(recipientEmail)
-                  .delete()
+               firestore.collection("userData").doc(recipientEmail).delete()
             )
          }
          if (uidToDelete) {
             // if we have a UID to delete, we delete the auth record
-            deletePromises.push(admin.auth().deleteUser(uidToDelete))
+            deletePromises.push(auth.deleteUser(uidToDelete))
          }
          // wait for all the promises to resolve
          await Promise.all(deletePromises)
@@ -297,8 +288,7 @@ export const resendPostmarkEmailVerificationEmailWithPin = functions
       const recipientEmail = data.recipientEmail
       const pinCode = getRandomInt(9999)
 
-      await admin
-         .firestore()
+      await firestore
          .collection("userData")
          .doc(recipientEmail)
          .update({ validationPin: pinCode })
@@ -331,8 +321,7 @@ export const validateUserEmailWithPin = functions
       )
 
       try {
-         const querySnapshot = await admin
-            .firestore()
+         const querySnapshot = await firestore
             .collection("userData")
             .doc(recipientEmail)
             .get()
@@ -343,15 +332,11 @@ export const validateUserEmailWithPin = functions
                functions.logger.log(
                   `Provided Pin code for ${recipientEmail} is correct`
                )
-               const userRecord = await admin
-                  .auth()
-                  .getUserByEmail(recipientEmail)
+               const userRecord = await auth.getUserByEmail(recipientEmail)
 
-               const updatedUserRecord = await admin
-                  .auth()
-                  .updateUser(userRecord.uid, {
-                     emailVerified: true,
-                  })
+               const updatedUserRecord = await auth.updateUser(userRecord.uid, {
+                  emailVerified: true,
+               })
 
                functions.logger.log(
                   `Auth user ${recipientEmail} has been validated`
@@ -449,9 +434,10 @@ export const sendPostmarkResetPasswordEmail = functions
          functions.logger.info("recipientEmail", recipientEmail)
          functions.logger.info("actionCodeSettings", actionCodeSettings)
 
-         const link = await admin
-            .auth()
-            .generatePasswordResetLink(recipientEmail, actionCodeSettings)
+         const link = await auth.generatePasswordResetLink(
+            recipientEmail,
+            actionCodeSettings
+         )
 
          const email = {
             TemplateId: Number(process.env.POSTMARK_TEMPLATE_PASSWORD_RESET),
@@ -520,10 +506,10 @@ export const backfillUserData = functions
 export const deleteLoggedInUserAccount = functions
    .region(config.region)
    .https.onCall(async (_, context) => {
-      const { auth } = context
+      const { auth: authContext } = context
       const {
          token: { email: userEmail, uid: userId },
-      } = auth
+      } = authContext
 
       if (!auth || !userEmail || !userId) {
          // Throwing an HttpsError so that the client gets the error details.
@@ -534,19 +520,18 @@ export const deleteLoggedInUserAccount = functions
       }
 
       try {
-         await admin.auth().deleteUser(userId)
-         await admin.firestore().collection("userData").doc(userEmail).delete()
+         await auth.deleteUser(userId)
+         await firestore.collection("userData").doc(userEmail).delete()
 
          // add userId and timestamp on analytics collection
-         await admin
-            .firestore()
+         await firestore
             .collection("analytics")
             .doc("deletedUsers")
             .collection("deletedUsers")
             .doc(userId)
             .set({
                userId: userId,
-               timeStamp: admin.firestore.FieldValue.serverTimestamp(),
+               timeStamp: FieldValue.serverTimestamp(),
             })
 
          functions.logger.info(

@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 import config from "./config"
 import { Rating, Wish } from "@careerfairy/shared-lib/wishes"
-import { admin } from "./api/firestoreAdmin"
+import { FieldValue, firestore } from "./api/firestoreAdmin"
 
 // Listen for changes in all documents in the 'users' collection
 const maxNumberOfUpvoterUids = 50
@@ -16,15 +16,12 @@ export const onUserRateWish = functions
       const userId = change.after.id
       const prevRatingType = oldDocument?.type || null
       const currentRatingType = document?.type || null
-      const wishRef = admin
-         .firestore()
-         .collection("wishes")
-         .doc(context.params.wishId)
+      const wishRef = firestore.collection("wishes").doc(context.params.wishId)
       let wishUpdateData: Partial<Wish> = {}
       // if the rating hasn't changed, do nothing
       if (prevRatingType === currentRatingType) return null
       // run transaction to update the wish
-      return admin.firestore().runTransaction(async (transaction) => {
+      return firestore.runTransaction(async (transaction) => {
          const wish = await transaction.get(wishRef)
          if (!wish.exists) return
          const wishData = wish.data() as Wish
@@ -37,20 +34,18 @@ export const onUserRateWish = functions
                -maxNumberOfUpvoterUids - 1
             )
             wishUpdateData = {
-               uidsOfRecentUpvoters: admin.firestore.FieldValue.arrayUnion(
+               uidsOfRecentUpvoters: FieldValue.arrayUnion(
                   ...limitedUpvoterUids,
                   userId
                ) as unknown as string[],
-               numberOfUpvotes: admin.firestore.FieldValue.increment(1),
+               numberOfUpvotes: FieldValue.increment(1),
             }
          }
          if (prevRatingType === "downvote") {
-            wishUpdateData.numberOfDownvotes =
-               admin.firestore.FieldValue.increment(-1)
+            wishUpdateData.numberOfDownvotes = FieldValue.increment(-1)
          }
          if (prevRatingType === "upvote") {
-            wishUpdateData.numberOfUpvotes =
-               admin.firestore.FieldValue.increment(-1)
+            wishUpdateData.numberOfUpvotes = FieldValue.increment(-1)
          }
          // remove user uid from array of upvoterUids
          // if the user has downvoted the wish
@@ -62,13 +57,11 @@ export const onUserRateWish = functions
             document === null
          ) {
             if (currentRatingType === "downvote") {
-               wishUpdateData.numberOfDownvotes =
-                  admin.firestore.FieldValue.increment(1)
+               wishUpdateData.numberOfDownvotes = FieldValue.increment(1)
             }
-            wishUpdateData.uidsOfRecentUpvoters =
-               admin.firestore.FieldValue.arrayRemove(
-                  userId
-               ) as unknown as string[]
+            wishUpdateData.uidsOfRecentUpvoters = FieldValue.arrayRemove(
+               userId
+            ) as unknown as string[]
          }
          // update the wish
          if (wishUpdateData) {

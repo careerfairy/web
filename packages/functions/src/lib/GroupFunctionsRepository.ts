@@ -24,10 +24,11 @@ import {
 } from "./stats/group"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import type { FunctionsLogger } from "../util"
-import { admin } from "../api/firestoreAdmin"
 
 import DocumentSnapshot = firestore.DocumentSnapshot
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
+import { auth } from "../api/firestoreAdmin"
+import { UserRecord } from "firebase-admin/auth"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -132,7 +133,7 @@ export class GroupFunctionsRepository
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
-      const user = await admin.auth().getUserByEmail(userEmail)
+      const user = await auth.getUserByEmail(userEmail)
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
@@ -156,7 +157,7 @@ export class GroupFunctionsRepository
 
       const userData = this.addIdToDoc<UserData>(userSnap)
 
-      const user = await admin.auth().getUserByEmail(targetEmail)
+      const user = await auth.getUserByEmail(targetEmail)
 
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
@@ -177,7 +178,7 @@ export class GroupFunctionsRepository
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            admin.auth().setCustomUserClaims(user.uid, user.customClaims)
+            auth.setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
@@ -187,7 +188,7 @@ export class GroupFunctionsRepository
     * Stores the group admin role in the user's custom claims
     * */
    protected async setGroupAdminRoleInClaims(
-      authUser: admin.auth.UserRecord,
+      authUser: UserRecord,
       newRole: GROUP_DASHBOARD_ROLE | null,
       group: Group
    ) {
@@ -211,7 +212,7 @@ export class GroupFunctionsRepository
          }
       }
 
-      return admin.auth().setCustomUserClaims(authUser.uid, newClaims)
+      return auth.setCustomUserClaims(authUser.uid, newClaims)
    }
 
    async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
