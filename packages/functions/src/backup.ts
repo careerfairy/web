@@ -5,7 +5,7 @@ import config from "./config"
 // Run this function every hour
 export const exportFirestoreBackup = functions
    .region(config.region)
-   .pubsub.schedule("every 1 hours")
+   .pubsub.schedule("0 0,12 * * *") // midnight and noon every day
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       const client = new firestore.v1.FirestoreAdminClient()
