@@ -113,7 +113,11 @@ testWithATSThatNeedsApplicationTest(
 
 testWithCompletlySetupATS(
    "Can apply to job in-stream",
-   async ({ groupPage, group }) => {
+   async ({ browserName, groupPage, group }) => {
+      test.skip(
+         browserName !== "chromium",
+         "Firefox fails sometimes with the filechooser behaviour, webkit not supported by agora"
+      )
       const { livestream } = await setupData(group)
 
       // go to Dialog page

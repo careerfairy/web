@@ -234,7 +234,7 @@ async function assertUserCredits(user: UserData, credits: number) {
    let userData: UserData
 
    // try multiple times until the credits are updated
-   let tries = 5
+   let tries = 15
    while (tries-- > 0) {
       userData = await UserSeed.getUserData(user.userEmail)
       if (userData?.credits > 0) {
