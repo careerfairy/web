@@ -1,5 +1,5 @@
 import { Locator, expect } from "@playwright/test"
-import { CommonPage, handleMultiSelect } from "../CommonPage"
+import { CommonPage } from "../CommonPage"
 import { GroupDashboardPage } from "../GroupDashboardPage"
 import greenhouseResponse from "../../assets/greenhouseResponse.json"
 import linkInitiateResponse from "../../assets/mergeLinkInitiate.json"
@@ -131,11 +131,7 @@ export class ATSAdminPage extends CommonPage {
    }
 
    public async selectJobForApplicationTest(jobName: string) {
-      await handleMultiSelect(
-         jobName,
-         this.testApplicationJobsSelect,
-         this.page
-      )
+      await this.handleMultiSelect(jobName, this.testApplicationJobsSelect)
    }
 
    public async completeApplicationTest() {

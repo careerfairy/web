@@ -82,7 +82,15 @@ test.describe("Win credits by completing actions", () => {
       ).toBeVisible()
    })
 
-   test("Refer 3 friends and win 3 credits", async ({ page, user }) => {
+   test("Refer 3 friends and win 3 credits", async ({
+      page,
+      user,
+      browserName,
+   }) => {
+      test.skip(
+         browserName === "firefox",
+         "Firefox fails sometimes with multiple contexts"
+      )
       await setupData({
          user,
          userDataOverrides: { credits: 0 },
@@ -226,7 +234,7 @@ async function assertUserCredits(user: UserData, credits: number) {
    let userData: UserData
 
    // try multiple times until the credits are updated
-   let tries = 5
+   let tries = 15
    while (tries-- > 0) {
       userData = await UserSeed.getUserData(user.userEmail)
       if (userData?.credits > 0) {

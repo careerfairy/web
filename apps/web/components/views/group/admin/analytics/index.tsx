@@ -121,6 +121,7 @@ const streamsSelector = createSelector(
    (livestreams, userDataSetDictionary, streamsMounted, setStreamsMounted) => {
       let streams = []
       if (livestreams) {
+         // @ts-ignore
          streams = livestreams.map((streamObj) => {
             const livestream = {
                ...streamObj,
@@ -155,6 +156,7 @@ const streamsSelector = createSelector(
             return livestream
          })
          if (!streamsMounted) {
+            // @ts-ignore
             setStreamsMounted(true)
          }
       }
@@ -253,6 +255,7 @@ const AnalyticsOverview = () => {
    const userDataSet = useUserDataSet(currentUserDataSet)
 
    const livestreams = useSelector(({ firestore: { ordered } }: RootState) =>
+      // @ts-ignore
       streamsSelector(ordered[`livestreams of ${group.groupId}`], {
          userDataSetDictionary,
          streamsMounted,

@@ -1,7 +1,7 @@
 import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from "agora-access-token"
 import functions = require("firebase-functions")
 import { agoraCredentials } from "./api/agora"
-import { admin } from "./api/firestoreAdmin"
+import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
 
 export const fetchAgoraRtcToken = functions
@@ -16,15 +16,11 @@ export const fetchAgoraRtcToken = functions
 
       // Build token with uid
       if (rtcRole === RtcRole.PUBLISHER) {
-         const livestreamDoc = await admin
-            .firestore()
-            .doc(streamDocumentPath)
-            .get()
+         const livestreamDoc = await firestore.doc(streamDocumentPath).get()
          const livestream = livestreamDoc.data()
 
          if (!livestream.test) {
-            const storedTokenDoc = await admin
-               .firestore()
+            const storedTokenDoc = await firestore
                .doc(streamDocumentPath)
                .collection("tokens")
                .doc("secureToken")

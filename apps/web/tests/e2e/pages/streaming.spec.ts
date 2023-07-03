@@ -112,7 +112,6 @@ test.describe("Streaming Journey", () => {
       const question = "My viewer question"
       await viewerPage.askQuestion(question)
 
-      await viewerPage.page.pause()
       // Streamer should see the question
       await streamerPage.clickQuestions()
       await expect(streamerPage.exactText(question)).toBeVisible()

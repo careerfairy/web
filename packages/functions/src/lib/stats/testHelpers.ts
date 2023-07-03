@@ -1,7 +1,7 @@
-import { admin } from "../../api/firestoreAdmin"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { v4 as uuidv4 } from "uuid"
+import { Timestamp } from "../../api/firestoreAdmin"
 
 type NewAndOldUserLivestreamDataOptions = {
    registered?: boolean
@@ -79,8 +79,8 @@ const generateUserLivestreamDataObj = (
       livestreamId: options.livestreamId,
    }
 }
-const timestampFromDate = (date: Date): admin.firestore.Timestamp => {
-   return admin.firestore.Timestamp.fromDate(date)
+const timestampFromDate = (date: Date) => {
+   return Timestamp.fromDate(date)
 }
 
 type GenerateUserDataOptions = {
