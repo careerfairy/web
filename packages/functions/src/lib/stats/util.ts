@@ -1,8 +1,8 @@
-import { admin } from "../../api/firestoreAdmin"
+import { FieldValue } from "../../api/firestoreAdmin"
 
 export type OperationsToMake = {
    // The operations to make to the nested properties on the livestreamStats document
-   [stringToPropertyInDotNotation: string]: admin.firestore.FieldValue
+   [stringToPropertyInDotNotation: string]: FieldValue
 }
 
 /**
@@ -54,5 +54,4 @@ export const addOperationWithNumberCheck = (
    }
 }
 
-export const increment = (amount: number) =>
-   admin.firestore.FieldValue.increment(amount)
+export const increment = (amount: number) => FieldValue.increment(amount)

@@ -1,6 +1,6 @@
 import config from "../config"
 import * as functions from "firebase-functions"
-import { admin } from "../api/firestoreAdmin"
+import { firestore } from "../api/firestoreAdmin"
 
 export type BundleQueryFetcher = (
    firestore: FirebaseFirestore.Firestore
@@ -40,8 +40,6 @@ export function generateFunctionsFromBundles(bundles: Record<string, Bundle>) {
             memory: "512MB",
          })
          .https.onRequest(async (_, res) => {
-            const firestore = admin.firestore()
-
             // Build the bundle from the query results
             const bundleCreator = firestore.bundle(bundleName)
 

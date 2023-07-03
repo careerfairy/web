@@ -13,7 +13,7 @@
    "devDependencies": {
       "@types/cross-spawn": "^6.0.2",
       "rimraf": "^3.0.2",
-      "typescript": "^4.5.4"
+      "typescript": "^5.1.6"
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",

@@ -20,7 +20,7 @@ import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import dynamic from "next/dynamic"
 import CircularProgress from "@mui/material/CircularProgress"
-import { LoadableBaseOptions } from "next/dist/shared/lib/dynamic"
+import { LoadableOptions } from "next/dist/shared/lib/dynamic"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
@@ -108,13 +108,13 @@ export type ViewKey =
 type ViewProps = {
    key: ViewKey
    viewPath: string
-   loadingComponent?: LoadableBaseOptions["loading"]
+   loadingComponent?: LoadableOptions["loading"]
 }
 
 type View = {
    key: ViewKey
    component: ComponentType
-   skeleton: LoadableBaseOptions["loading"]
+   skeleton: LoadableOptions["loading"]
 }
 
 const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({

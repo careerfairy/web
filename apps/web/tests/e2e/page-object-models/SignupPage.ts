@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
-import { CommonPage, handleMultiSelect } from "./CommonPage"
+import { CommonPage } from "./CommonPage"
 import { credentials } from "../../constants"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 
@@ -153,29 +153,17 @@ export class SignupPage extends CommonPage {
    }
 
    async selectUniversityCountry(country: string) {
-      return handleMultiSelect(
-         country,
-         this.universityCountrySelector,
-         this.page
-      )
+      return this.handleMultiSelect(country, this.universityCountrySelector)
    }
    async selectFieldOfStudy(fieldOfStudyName: string) {
-      return handleMultiSelect(
-         fieldOfStudyName,
-         this.fieldOfStudySelector,
-         this.page
-      )
+      return this.handleMultiSelect(fieldOfStudyName, this.fieldOfStudySelector)
    }
    async selectLevelOfStudy(levelOfStudyName: string) {
-      return handleMultiSelect(
-         levelOfStudyName,
-         this.levelOfStudySelector,
-         this.page
-      )
+      return this.handleMultiSelect(levelOfStudyName, this.levelOfStudySelector)
    }
 
    async selectUniversity(university: string) {
-      return handleMultiSelect(university, this.universitySelector, this.page)
+      return this.handleMultiSelect(university, this.universitySelector)
    }
 
    async enterEmail(email?: string) {
@@ -277,7 +265,6 @@ export class SignupPage extends CommonPage {
       await this.enterPassword(formData.password)
       await this.enterConfirmPassword(formData.confirmPassword)
       await this.agreeToTerms(formData.agreeToTerms ?? false)
-      await sleep(300)
       await this.subscribeToEmails(formData.subscribeEmails ?? false)
    }
 
