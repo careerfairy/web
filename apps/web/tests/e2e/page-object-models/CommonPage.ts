@@ -160,8 +160,11 @@ export class CommonPage {
 
       const locator = elementLocator.first()
       await locator.click()
+      await locator.focus()
 
-      await this.page.getByRole("option", { name: stringToSelect }).click()
+      await this.page
+         .getByRole("option", { name: stringToSelect, exact: true })
+         .click()
    }
 }
 
