@@ -12,6 +12,9 @@ import { correctCompany, imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
+import { FeedbackPage } from "./admin/FeedbackPage"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -122,6 +125,26 @@ export class GroupDashboardPage extends CommonPage {
       await this.goToPage("ATS Integration")
 
       return new ATSAdminPage(this)
+   }
+
+   // Analytics page
+
+   public async goToAnalyticsPage() {
+      await this.goToPage("Analytics")
+   }
+
+   public async goToTalentPoolAnalyticsPage() {
+      await this.goToPage("Talent pool")
+   }
+
+   public async goToLivestreamAnalyticsPage() {
+      await this.goToPage("Live stream analytics")
+   }
+
+   public async goToFeedbackAnalyticsPage() {
+      await this.goToPage("Feedback")
+
+      return new FeedbackPage(this)
    }
 
    // Team Members page
@@ -272,10 +295,16 @@ export class GroupDashboardPage extends CommonPage {
          | "Live streams"
          | "Company page"
          | "ATS Integration"
+         | "Analytics"
+         | "Talent pool"
+         | "Live stream analytics"
+         | "Registration sources"
+         | "Feedback"
+         | "All live streams on CareerFairy"
    ) {
       await Promise.all([
          this.page.waitForNavigation(),
-         this.page.getByRole("link", { name }).click(),
+         this.page.getByRole("link", { name }).first().click(),
       ])
    }
 
@@ -378,5 +407,48 @@ export class GroupDashboardPage extends CommonPage {
 
    async clickOnFollowOnCompaniesPage() {
       await this.companyFollowButton.click()
+   }
+
+   /**
+    * Shared method that xhecks to see if a given analytic card is visible
+    * */
+   public async waitForAnalyticsCardVisible(options: {
+      fields: {
+         title?: string
+         subheader?: string
+         value?: string
+      }
+      simpleCard?: boolean
+   }): Promise<void> {
+      let filteredCards = this.page.getByTestId("card-custom")
+
+      for (const field in options.fields) {
+         const baseIdentifier = options.simpleCard ? "simple-card" : "card"
+         const fullTestId = `${baseIdentifier}-${field}`
+
+         // Filter the cards by the given fields
+         filteredCards = filteredCards.filter({
+            has: this.page.getByTestId(fullTestId).filter({
+               hasText: new RegExp(`\\b${options.fields[field]}\\b`), // \b is a word boundary to prevent partial matches
+            }),
+         })
+      }
+
+      await expect(filteredCards).toBeVisible({
+         timeout: 15000,
+      })
+   }
+
+   /**
+    * Shared method that checks to see if a user's entry exists in an analytics table
+    * */
+   public async assertUserIsInAnalyticsTable(user: UserData) {
+      const userFullName = `${user.firstName} ${user.lastName}`
+      const userUniversityCountry =
+         universityCountryMap?.[user.universityCountryCode] || ""
+
+      const userRowSelector = `tr:has(div:has-text("${userFullName}")):has(td:has-text("${userUniversityCountry}")):has(td:has-text("${user.university.name}")):has(td:has-text("${user.fieldOfStudy.name}")):has(td:has-text("${user.levelOfStudy.name}"))`
+
+      expect(this.page.locator(userRowSelector)).toBeVisible()
    }
 }

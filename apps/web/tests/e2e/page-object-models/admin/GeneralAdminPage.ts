@@ -4,8 +4,6 @@ import { GroupDashboardPage } from "../GroupDashboardPage"
 export class GeneralAdminPage extends CommonPage {
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
-
-      this.signupButton = page.locator("data-testid=signup-button")
    }
 
    public async clickDraftsTab() {
@@ -29,14 +27,5 @@ export class GeneralAdminPage extends CommonPage {
 
    public async publish() {
       await this.parent.clickPublish()
-   }
-
-   public assertAnalyticsCardIsVisible(
-      cardName: string,
-      cardDescription: string
-   ) {
-      // const card = await this.page.getByTestId("card-custom")
-      // this.page.getByRole("heading", { name: cardName })
-      // this.page.getByText(cardDescription)
    }
 }
