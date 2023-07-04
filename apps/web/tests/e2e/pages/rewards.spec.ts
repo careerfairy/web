@@ -195,13 +195,12 @@ async function setupData(opts: SetupDataOptions): Promise<SetupDataResult> {
 
    if (opts.livestream) {
       // create a livestream and make the user registered
-      const { livestream } = await setupLivestreamData(
-         undefined,
-         {
+      const { livestream } = await setupLivestreamData(undefined, {
+         overrideLivestreamDetails: {
             groupQuestionsMap: null,
          },
-         "createLive"
-      )
+         livestreamType: "createLive",
+      })
 
       await LivestreamSeed.userData({
          user: opts.user,
