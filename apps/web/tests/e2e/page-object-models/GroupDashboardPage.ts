@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage} from "./CommonPage"
+import { CommonPage } from "./CommonPage"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
@@ -435,7 +435,7 @@ export class GroupDashboardPage extends CommonPage {
       }
 
       await expect(filteredCards).toBeVisible({
-         timeout: 15000,
+         timeout: 15000, // Give the trigger functions some time buffer to sync the live stream stats
       })
    }
 
