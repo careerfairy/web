@@ -410,7 +410,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    /**
-    * Shared method that xhecks to see if a given analytic card is visible
+    * Shared method that checks to see if a given analytic card is visible
     * */
    public async waitForAnalyticsCardVisible(options: {
       fields: {
