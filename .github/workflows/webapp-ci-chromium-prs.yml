@@ -1,8 +1,21 @@
+# This CI runs E2E tests only against chromium to be faster
+# It's main purpose is to run on stacked PRs and pushes to branches other than
+# main and develop
 name: "Build, Test and Deploy - Pull Requests"
 on:
-   # Triggers on all pull requests, limited pipeline that runs faster
+   # Triggers on pushes
+   push:
+      branches-ignore:
+         # on branches different than:
+         - main
+         - develop
+
+   # Triggers on opened/reopened PRs
    pull_request:
-      types: [opened, synchronize, reopened]
+      branches-ignore:
+         # on branches different than:
+         - main
+         - develop
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:

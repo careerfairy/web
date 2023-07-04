@@ -1,7 +1,15 @@
+# This CI runs the E2E tests against all browsers
 name: "Build, Test and Deploy - Main/Develop"
 on:
-   # Trigger on pushes targeting these branches
+   # Triggers on pushes targeting these branches
    push:
+      branches:
+         - main
+         - develop
+
+   # Triggers on opened/reopened PRs
+   pull_request:
+      # against these:
       branches:
          - main
          - develop
