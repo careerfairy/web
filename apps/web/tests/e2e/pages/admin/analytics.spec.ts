@@ -98,7 +98,7 @@ test.describe("Group Analytics", () => {
       groupPage,
       group,
    }) => {
-      const questions = [
+      const userQuestions = [
          "What is the interview process like?",
          "What is the company culture like?",
          "Are there any specific skills you look for in candidates?",
@@ -111,7 +111,7 @@ test.describe("Group Analytics", () => {
 
       const { livestream } = await setupData(group, {
          livestreamType: "createPast",
-         userQuestions: questions,
+         userQuestions,
          feedbackQuestions,
       })
 
@@ -121,7 +121,7 @@ test.describe("Group Analytics", () => {
       await feedbackPage.openFeedbackCard(livestream.title)
 
       // Check the feedback dialog for each question
-      for (const question of questions) {
+      for (const question of userQuestions) {
          await expect(feedbackPage.page.getByText(question)).toBeVisible()
       }
 
