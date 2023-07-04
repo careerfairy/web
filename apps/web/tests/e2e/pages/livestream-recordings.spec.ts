@@ -159,9 +159,11 @@ async function setupData(opts: SetupDataOptions) {
    pastDate.setDate(pastDate.getDate() - numDaysToSubtract)
 
    const { livestream } = await setupLivestreamData(undefined, {
-      // @ts-ignore seed data accepts a date object
-      start: pastDate,
-      groupQuestionsMap: null,
+      overrideLivestreamDetails: {
+         // @ts-ignore seed data accepts a date object
+         start: pastDate,
+         groupQuestionsMap: null,
+      },
    })
 
    await Promise.all([

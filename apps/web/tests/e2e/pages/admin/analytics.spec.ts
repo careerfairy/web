@@ -1,12 +1,9 @@
-import LivestreamSeed, {
-   createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { BrowserContext, expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
+import { setupLivestreamData } from "../../setupData"
 
 const testWithPrivacyPolicyActive = test.extend({
    options: async ({}, use) => {
@@ -24,7 +21,7 @@ test.describe("Group Analytics", () => {
       group,
       context,
    }) => {
-      const { livestream } = await setupData(group)
+      const { livestream } = await setupLivestreamData(group)
 
       await Promise.all([
          verifyAnalyticsCard(groupPage, "Total registrations", "0"),
@@ -47,7 +44,7 @@ test.describe("Group Analytics", () => {
    testWithPrivacyPolicyActive(
       "Talent pool analytics are visible and update when user registers",
       async ({ groupPage, group, context, user }) => {
-         const { livestream } = await setupData(group)
+         const { livestream } = await setupLivestreamData(group)
 
          await groupPage.goToAnalyticsPage()
          await groupPage.goToTalentPoolAnalyticsPage()
@@ -73,7 +70,7 @@ test.describe("Group Analytics", () => {
    testWithPrivacyPolicyActive(
       "Live stream analytics update when user registers to live stream",
       async ({ groupPage, group, context, user }) => {
-         const { livestream } = await setupData(group)
+         const { livestream } = await setupLivestreamData(group)
 
          await groupPage.goToAnalyticsPage()
          await groupPage.goToLivestreamAnalyticsPage()
@@ -109,7 +106,7 @@ test.describe("Group Analytics", () => {
          "Are you happy with the quality of the live stream?",
       ]
 
-      const { livestream } = await setupData(group, {
+      const { livestream } = await setupLivestreamData(group, {
          livestreamType: "createPast",
          userQuestions,
          feedbackQuestions,
@@ -161,44 +158,6 @@ async function verifyAnalyticsCard(
          value,
       },
    })
-}
-
-async function setupData(
-   group: Group,
-   options: {
-      livestreamType?: "create" | "createPast" | "createLive"
-      userQuestions?: string[]
-      feedbackQuestions?: string[]
-   } = {
-      livestreamType: "create",
-      userQuestions: [],
-      feedbackQuestions: [],
-   }
-) {
-   const groupQuestions = createLivestreamGroupQuestions(group.id)
-
-   const livestream = await LivestreamSeed[options.livestreamType]({
-      groupIds: [group.id],
-      groupQuestionsMap: {
-         [group.id]: groupQuestions,
-      },
-   })
-
-   if (options.userQuestions.length) {
-      await LivestreamSeed.addUserQuestionsToLivestream(
-         livestream.id,
-         options.userQuestions
-      )
-   }
-
-   if (options.feedbackQuestions.length) {
-      await LivestreamSeed.addFeedbackQuestionsToLivestream(
-         livestream.id,
-         options.feedbackQuestions
-      )
-   }
-
-   return { livestream }
 }
 
 /**
