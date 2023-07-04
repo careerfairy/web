@@ -1,4 +1,5 @@
 import {
+   EventRating,
    LivestreamEvent,
    LivestreamQuestion,
    Speaker,
@@ -33,6 +34,10 @@ interface LivestreamSeed {
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent>
 
+   createUpcoming(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent>
+
    getWithSubcollections(
       livestreamId: string,
       subCollections?: string[]
@@ -59,6 +64,22 @@ interface LivestreamSeed {
     * Setup the required documents for the recording access
     */
    setRecordingSid(livestreamId: string): Promise<void>
+
+   /**
+    * Add questions to a livestream/id/questions sub-collection
+    **/
+   addUserQuestionsToLivestream(
+      livestreamId: string,
+      questions: string[]
+   ): Promise<void>
+
+   /**
+    * Add ratings to a livestream/id/ratings sub-collection
+    **/
+   addFeedbackQuestionsToLivestream(
+      livestreamId: string,
+      ratings: string[]
+   ): Promise<void>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -198,9 +219,25 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       )
    }
 
+   createUpcoming(
+      overrideFields?: Partial<LivestreamEvent>
+   ): Promise<LivestreamEvent> {
+      return this.create(
+         Object.assign(
+            {
+               start: admin.firestore.Timestamp.fromDate(
+                  faker.date.future(faker.datatype.number({ min: 1, max: 60 }))
+               ),
+            },
+            overrideFields
+         )
+      )
+   }
+
    async create(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
+      const batch = firestore.batch()
       const registeredUsers = Array.from(
          {
             length: faker.datatype.number({ min: 0, max: 100 }),
@@ -224,9 +261,59 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          ...overrideFields,
       })
 
-      await firestore.collection("livestreams").doc(data.id).set(data)
+      const livestreamRef = firestore.collection("livestreams").doc(data.id)
+
+      batch.set(livestreamRef, data)
+
+      await batch.commit()
 
       return data
+   }
+
+   async addUserQuestionsToLivestream(
+      livestreamId: string,
+      userQuestions: string[]
+   ): Promise<void> {
+      const batch = firestore.batch()
+
+      userQuestions.forEach((question) => {
+         const newQuestion = generateLiveStreamUserQuestion(question)
+         batch.set(
+            firestore
+               .collection("livestreams")
+               .doc(livestreamId)
+               .collection("questions")
+               .doc(newQuestion.id),
+            newQuestion
+         )
+      })
+
+      await batch.commit()
+
+      return
+   }
+
+   async addFeedbackQuestionsToLivestream(
+      livestreamId: string,
+      feedbackQuestions: string[]
+   ): Promise<void> {
+      const batch = firestore.batch()
+
+      feedbackQuestions.forEach((rating) => {
+         const newRating = generateLivestreamFeedbackQuestion(rating)
+         batch.set(
+            firestore
+               .collection("livestreams")
+               .doc(livestreamId)
+               .collection("rating")
+               .doc(newRating.id),
+            newRating
+         )
+      })
+
+      await batch.commit()
+
+      return
    }
 
    async setRecordingSid(livestreamId: string) {
@@ -315,6 +402,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       }
    }
 }
+
 export const createLivestreamGroupQuestions = (groupId: string = uuidv4()) => {
    return {
       groupId: groupId,
@@ -325,6 +413,32 @@ export const createLivestreamGroupQuestions = (groupId: string = uuidv4()) => {
       }, {}),
    }
 }
+
+export const generateLivestreamFeedbackQuestion = (
+   name: string
+): EventRating => ({
+   question: name,
+   appearAfter: faker.datatype.number({ min: 5, max: 60 }),
+   id: uuidv4(),
+   hasText: true,
+   isForEnd: false,
+   noStars: true,
+   isSentimentRating: false,
+   title: name,
+})
+
+export const generateLiveStreamUserQuestion = (
+   question: string
+): LivestreamQuestion => ({
+   author: "test",
+   id: uuidv4(),
+   timestamp: admin.firestore.Timestamp.fromDate(faker.date.recent()),
+   badges: [],
+   title: question,
+   type: "new",
+   votes: 0,
+})
+
 const generateSpeaker = (): Speaker => ({
    id: uuidv4(),
    avatar: faker.image.people(),

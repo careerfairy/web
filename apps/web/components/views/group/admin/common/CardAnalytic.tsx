@@ -62,10 +62,18 @@ export const SimpleCardAnalytic: FC<SimpleCardAnalyticProps> = ({
    return (
       <CardCustom sx={styles.simpleAnalyticRoot}>
          <Stack direction="row" justifyContent="space-between" spacing={1}>
-            <Typography variant="h5" fontWeight={500}>
+            <Typography
+               data-testid="simple-card-title"
+               variant="h5"
+               fontWeight={500}
+            >
                {title}
             </Typography>
-            <Typography variant="h4" fontWeight={600}>
+            <Typography
+               data-testid="simple-card-value"
+               variant="h4"
+               fontWeight={600}
+            >
                {value}
             </Typography>
          </Stack>

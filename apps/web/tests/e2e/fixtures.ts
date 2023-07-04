@@ -29,6 +29,11 @@ type GroupAdminFixtureOptions = {
     *
     * */
    atsGroupType?: "COMPLETE" | "NEEDS_APPLICATION_TEST" | "NONE"
+
+   /**
+    * Whether or not to set the privacy policy for the group
+    */
+   privacyPolicy?: boolean
 }
 
 /**
@@ -47,17 +52,30 @@ export const groupAdminFixture = base.extend<{
       createUser: true,
       completedGroup: false,
       atsGroupType: "NONE",
+      privacyPolicy: false,
    },
    group: async ({ options }, use) => {
       await clearAuthData()
       await clearFirestoreData()
 
+      let overrideFields: Partial<Group> = {}
+
+      if (options.privacyPolicy === true) {
+         overrideFields = {
+            privacyPolicyActive: true,
+            privacyPolicyUrl: "https://careerfairy.io",
+         }
+      }
+
       let group: Group
       if (options.completedGroup === true) {
          const completeCompanyData = GroupSeed.generateCompleteCompanyData()
-         group = await GroupSeed.createGroup(completeCompanyData)
+         group = await GroupSeed.createGroup({
+            ...overrideFields,
+            ...completeCompanyData,
+         })
       } else {
-         group = await GroupSeed.createGroup()
+         group = await GroupSeed.createGroup(overrideFields)
       }
 
       switch (options.atsGroupType) {
