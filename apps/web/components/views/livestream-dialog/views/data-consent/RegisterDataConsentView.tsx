@@ -266,7 +266,7 @@ const ConsentText = ({
    return (
       <Box>
          <Typography sx={styles.consentText}>
-            Your information (first name, last name, university affiliation)
+            Your information (full name, email address, university affiliation)
             will be transferred to the organiser when you register to one or
             more of their live streams. The data protection notice of the
             organiser applies:
