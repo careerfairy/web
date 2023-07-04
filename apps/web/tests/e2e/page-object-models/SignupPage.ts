@@ -1,6 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
-import { CommonPage, handleMultiSelect } from "./CommonPage"
+import { CommonPage } from "./CommonPage"
+import { credentials } from "../../constants"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 
 export class SignupPage extends CommonPage {
    readonly page: Page
@@ -151,29 +153,17 @@ export class SignupPage extends CommonPage {
    }
 
    async selectUniversityCountry(country: string) {
-      return handleMultiSelect(
-         country,
-         this.universityCountrySelector,
-         this.page
-      )
+      return this.handleMultiSelect(country, this.universityCountrySelector)
    }
    async selectFieldOfStudy(fieldOfStudyName: string) {
-      return handleMultiSelect(
-         fieldOfStudyName,
-         this.fieldOfStudySelector,
-         this.page
-      )
+      return this.handleMultiSelect(fieldOfStudyName, this.fieldOfStudySelector)
    }
    async selectLevelOfStudy(levelOfStudyName: string) {
-      return handleMultiSelect(
-         levelOfStudyName,
-         this.levelOfStudySelector,
-         this.page
-      )
+      return this.handleMultiSelect(levelOfStudyName, this.levelOfStudySelector)
    }
 
    async selectUniversity(university: string) {
-      return handleMultiSelect(university, this.universitySelector, this.page)
+      return this.handleMultiSelect(university, this.universitySelector)
    }
 
    async enterEmail(email?: string) {
@@ -275,8 +265,54 @@ export class SignupPage extends CommonPage {
       await this.enterPassword(formData.password)
       await this.enterConfirmPassword(formData.confirmPassword)
       await this.agreeToTerms(formData.agreeToTerms ?? false)
-      await sleep(300)
       await this.subscribeToEmails(formData.subscribeEmails ?? false)
+   }
+
+   async fillReferralCode(referralCode: string) {
+      await Promise.all([
+         this.page.getByPlaceholder("Enter a Referral Code").fill(referralCode),
+         this.page.waitForResponse(`**/applyReferralCode_eu`),
+      ])
+   }
+
+   async signupUser(email?: string) {
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         correctFieldOfStudyName,
+         correctLevelOfStudyName,
+      } = credentials
+
+      const usedEmail = email ?? correctEmail
+
+      await this.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: usedEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
+      })
+
+      await this.clickSignup()
+      await expect(this.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(usedEmail)
+      const validationPin = userData.validationPin
+      await this.enterPinCode(`${validationPin}`)
+      await this.clickValidateEmail()
+
+      await this.clickContinueButton()
+      await this.clickContinueButton()
+      await this.clickContinueButton()
    }
 
    async clickOnMultipleInterests(interests: string[]) {

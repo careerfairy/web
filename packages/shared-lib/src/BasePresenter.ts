@@ -10,7 +10,7 @@ export default class BasePresenter<T> {
     * Access a Model property by name
     * @param property
     */
-   public get(property: keyof T): T[keyof T] {
+   public get<K extends keyof T>(property: K): T[K] {
       return this.model[property]
    }
 }

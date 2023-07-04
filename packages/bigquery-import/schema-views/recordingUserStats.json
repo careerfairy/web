@@ -1,0 +1,32 @@
+{
+   "fields": [
+      {
+         "name": "documentType",
+         "type": "string"
+      },
+      {
+         "name": "livestreamId",
+         "type": "string"
+      },
+      {
+         "name": "livestreamStartDate",
+         "type": "timestamp"
+      },
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "recordingBought",
+         "type": "boolean"
+      },
+      {
+         "name": "minutesWatched",
+         "type": "number"
+      },
+      {
+         "name": "date",
+         "type": "timestamp"
+      }
+   ]
+}

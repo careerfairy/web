@@ -1,0 +1,266 @@
+{
+   "integrations": [
+      {
+         "id": "a4372668-0db5-4fdb-ac67-e0c6b92b7bc5",
+         "name": "Greenhouse",
+         "abbreviated_name": null,
+         "image": "https://merge-api-production.s3.amazonaws.com/media/Greenhouse_Logo_oZ1SOIi.png",
+         "api_documentation_url": "https://developers.greenhouse.io/harvest.html#introduction",
+         "square_image": "https://merge-api-production.s3.amazonaws.com/media/Greenhouse_Square_Logo.jpg",
+         "dark_grey_image": "https://merge-api-production.s3.amazonaws.com/media/greenhouse_zPsPQmo.svg",
+         "light_grey_image": "https://merge-api-production.s3.amazonaws.com/media/greenhouse_x0C8JIC.svg",
+         "color": "#037A56",
+         "active": true,
+         "categories": ["ats"],
+         "coverage": "83%",
+         "base_api_url": "https://harvest.greenhouse.io",
+         "step_config": {
+            "initial_setup_set": "MANUAL_LINKING",
+            "setup_step_sets": {
+               "MANUAL_LINKING": [
+                  {
+                     "id": "3aa9e8e2-3fee-4e8f-8ebd-3d7bc13030dc",
+                     "is_oauth": false,
+                     "custom_auth_choice_text": null,
+                     "steps": [
+                        {
+                           "id": "bfad3e13-e85b-4b7b-9593-a20434e6ce70",
+                           "step_number": 21,
+                           "step_type": "STEP_TYPE_API_KEY",
+                           "title": "",
+                           "sub_header": "",
+                           "description": "<ol>\r\n<li>Sign in to Greenhouse</li>\r\n<li>Click the <b>Settings</b> icon in the upper right</li>\r\n<li>Open the <b>Dev Center</b> from the left menu</li>\r\n<li>Select <b>API Credential Management</b></li>\r\n<li>Press the <b>Create New API Key</b> button</li>\r\n<li>Select <b>Harvest</b> for API Type, add a description and press <b>Manage Permissions</b></li>\r\n<li>Select the necessary permissions (if unsure, we recommend selecting all)</li>\r\n<li>Copy and add the <b>API Key</b> below</li>\r\n</ol>",
+                           "additional_auth_field_keys": null,
+                           "input_prefix": "",
+                           "input_suffix": "",
+                           "input_placeholder": "Select...",
+                           "example": "",
+                           "additional_auth_display_names": {},
+                           "expand_instructions_by_default": false,
+                           "help_guide_url": "https://help.merge.dev/en/articles/5431484-greenhouse"
+                        }
+                     ],
+                     "should_show_requested_data_on_link": true
+                  }
+               ]
+            }
+         },
+         "is_enabled": null,
+         "is_auto_webhook_setup_enabled": false,
+         "organization_config_status": [],
+         "help_center_auth_guide_url": "",
+         "is_custom": false,
+         "is_in_beta": false,
+         "slug": "greenhouse",
+         "has_sandbox_link_choice_step_option": false,
+         "selective_sync_availability": {
+            "ats": false
+         }
+      },
+      {
+         "id": "9d819e93-6216-41bc-99a5-f07acfcb7d20",
+         "name": "Workable",
+         "abbreviated_name": null,
+         "image": "https://merge-api-production.s3.amazonaws.com/media/Workable_Logo_HWZFYNd.png",
+         "api_documentation_url": "https://workable.readme.io/reference/generate-an-access-token",
+         "square_image": "https://merge-api-production.s3.amazonaws.com/media/Workable_Square_Logo_OvllNl9.jpg",
+         "dark_grey_image": "https://merge-api-production.s3.amazonaws.com/media/workable_ej5HuGA.svg",
+         "light_grey_image": "https://merge-api-production.s3.amazonaws.com/media/workable_0oLixkc.svg",
+         "color": "#00756A",
+         "active": true,
+         "categories": ["ats"],
+         "coverage": "71%",
+         "base_api_url": "https://{DOMAIN}.workable.com/spi/v3",
+         "step_config": {
+            "initial_setup_set": "MANUAL_LINKING",
+            "setup_step_sets": {
+               "MANUAL_LINKING": [
+                  {
+                     "id": "b5a51624-e82a-4221-acd7-e2b585b4279f",
+                     "is_oauth": false,
+                     "custom_auth_choice_text": null,
+                     "steps": [
+                        {
+                           "id": "7a4decbb-cbe1-4a0d-9a5f-b27f38270e0a",
+                           "step_number": 44,
+                           "step_type": "STEP_TYPE_CUSTOM_DOMAIN",
+                           "title": "",
+                           "sub_header": "",
+                           "description": "<p>Enter the subdomain for your Workable account below.</p>\r\n\r\n<p>For example, if you sign in at \"acme.workable.com\", enter \"<b>acme</b>\".</p>\r\n\r\n<p>Do not enter the full \"acme.workable.com\".</p>",
+                           "additional_auth_field_keys": null,
+                           "input_prefix": "https://",
+                           "input_suffix": ".workable.com",
+                           "input_placeholder": "Select...",
+                           "example": "",
+                           "additional_auth_display_names": {},
+                           "expand_instructions_by_default": false,
+                           "help_guide_url": "https://help.merge.dev/en/articles/5442252-workable"
+                        },
+                        {
+                           "id": "c76549d6-dbf7-473e-9d57-a30f6d1974b6",
+                           "step_number": 45,
+                           "step_type": "STEP_TYPE_API_KEY",
+                           "title": "",
+                           "sub_header": "",
+                           "description": "<ol>\r\n<li>Click on your profile picture in the upper right</li>\r\n<li>Select <b>Settings</b> in the dropdown menu</li>\r\n<li>Choose <b>Integrations</b> in the left menu</li>\r\n<li>Find <b>API Key</b> under the <b>Access Token</b> section</li>\r\n<li>If needed, click <b>Generate new token</b></li>\r\n<li>Copy and add the <b>API Key</b> below</li>\r\n</ol>",
+                           "additional_auth_field_keys": null,
+                           "input_prefix": "",
+                           "input_suffix": "",
+                           "input_placeholder": "Select...",
+                           "example": "",
+                           "additional_auth_display_names": {},
+                           "expand_instructions_by_default": false,
+                           "help_guide_url": "https://help.merge.dev/en/articles/5442252-workable"
+                        }
+                     ],
+                     "should_show_requested_data_on_link": true
+                  },
+                  {
+                     "id": "395312b9-1214-404c-9834-279202b9514e",
+                     "is_oauth": true,
+                     "custom_auth_choice_text": null,
+                     "steps": [
+                        {
+                           "id": "b5e04971-b1bf-42e9-871f-c2ff8ca57362",
+                           "step_number": 366,
+                           "step_type": "STEP_TYPE_CUSTOM_DOMAIN",
+                           "title": "",
+                           "sub_header": "",
+                           "description": "<p>Enter the subdomain for your Workable account below.</p>\r\n\r\n<p>For example, if you sign in at \"acme.workable.com\", enter \"<b>acme</b>\".</p>\r\n\r\n<p>Do not enter the full \"acme.workable.com\".</p>",
+                           "additional_auth_field_keys": null,
+                           "input_prefix": "https://",
+                           "input_suffix": ".workable.com",
+                           "input_placeholder": "Select...",
+                           "example": "",
+                           "additional_auth_display_names": {},
+                           "expand_instructions_by_default": false,
+                           "help_guide_url": null
+                        },
+                        {
+                           "id": "c9d5f123-51b6-4fa7-b610-0248f6b2b633",
+                           "step_number": 367,
+                           "step_type": "STEP_TYPE_OAUTH",
+                           "title": "",
+                           "sub_header": "",
+                           "description": "",
+                           "additional_auth_field_keys": null,
+                           "input_prefix": "",
+                           "input_suffix": "",
+                           "input_placeholder": "Select...",
+                           "example": "",
+                           "additional_auth_display_names": {},
+                           "expand_instructions_by_default": false,
+                           "help_guide_url": null
+                        }
+                     ],
+                     "should_show_requested_data_on_link": true
+                  }
+               ]
+            }
+         },
+         "is_enabled": null,
+         "is_auto_webhook_setup_enabled": false,
+         "organization_config_status": [],
+         "help_center_auth_guide_url": "",
+         "is_custom": false,
+         "is_in_beta": false,
+         "slug": "workable",
+         "has_sandbox_link_choice_step_option": false,
+         "selective_sync_availability": {
+            "ats": false
+         }
+      }
+   ],
+   "custom_integrations": [],
+   "organization": {
+      "id": "43ea1499-d77d-4868-8feb-c29fa0865037",
+      "name": "CareerFairy AG",
+      "logo": null,
+      "should_show_requested_data_in_linking_flow": false,
+      "show_selective_sync": false,
+      "show_end_user_sandbox_config": false,
+      "allow_end_user_to_link_with_validation_errors": false,
+      "merge_link_error_remediation_enabled": true
+   },
+   "should_hide_merge_logo": false,
+   "is_pre_selected_integration": false,
+   "is_multi_category": false,
+   "linked_account_category_map": {
+      "ats": {
+         "can_map_custom_fields": false,
+         "id": "aeec36c0-6077-46f1-93da-c30c5eac2b7b",
+         "integration": {
+            "name": "",
+            "abbreviated_name": "",
+            "image": null,
+            "api_documentation_url": "",
+            "square_image": null,
+            "dark_grey_image": null,
+            "light_grey_image": null,
+            "color": "",
+            "active": false,
+            "base_api_url": "",
+            "is_auto_webhook_setup_enabled": false,
+            "help_center_auth_guide_url": "",
+            "is_in_beta": false
+         },
+         "created_at": "2023-06-21T12:20:55.086584Z",
+         "organization": {
+            "id": "43ea1499-d77d-4868-8feb-c29fa0865037",
+            "name": "CareerFairy AG",
+            "logo": null,
+            "auto_enable_new_integrations": true,
+            "enable_auto_webhook_setup": false,
+            "linking_flow_authentication_method_preference": "LOGIN_DEFAULT_WITH_MANUAL_FALLBACK",
+            "can_regenerate_keys": true,
+            "is_mfa_required": false,
+            "should_show_requested_data_in_linking_flow": false,
+            "preexisting_production_linked_account_preference": "CREATE_AS_NEW_END_USER",
+            "show_selective_sync": false,
+            "show_end_user_sandbox_config": false,
+            "allow_end_user_to_link_with_validation_errors": false,
+            "merge_link_error_remediation_enabled": true,
+            "created_past_april_billing_overhaul": false
+         },
+         "account_token": null,
+         "override_base_api_url": null,
+         "completed_at": null,
+         "category": "ats",
+         "public_token": "Mib_hbAIVFfyzOoKyEWzgCiEPDZDP3X6Red_ITcs_EmPaW23KZLfBA",
+         "end_user": {
+            "id": "81c200ec-bbd9-413e-88e9-3b498efa21b8",
+            "origin_id": "2d62e80c0e0c4537ab17b1b375c5f038",
+            "organization_name": "Your Career Center here",
+            "organization_logo": null,
+            "email_address": "habib@careerfairy.io",
+            "organization": {
+               "id": "43ea1499-d77d-4868-8feb-c29fa0865037",
+               "name": "CareerFairy AG",
+               "logo": null,
+               "auto_enable_new_integrations": true,
+               "enable_auto_webhook_setup": false,
+               "linking_flow_authentication_method_preference": "LOGIN_DEFAULT_WITH_MANUAL_FALLBACK",
+               "can_regenerate_keys": true,
+               "is_mfa_required": false,
+               "should_show_requested_data_in_linking_flow": false,
+               "preexisting_production_linked_account_preference": "CREATE_AS_NEW_END_USER",
+               "show_selective_sync": false,
+               "show_end_user_sandbox_config": false,
+               "allow_end_user_to_link_with_validation_errors": false,
+               "merge_link_error_remediation_enabled": true,
+               "created_past_april_billing_overhaul": false
+            }
+         },
+         "is_complete": false,
+         "is_csv_upload": false,
+         "is_test_account": false,
+         "is_relink_needed": false,
+         "is_duplicate": null,
+         "status": "INCOMPLETE",
+         "status_detail": null,
+         "pause_reason": null,
+         "custom_mapping_instance_count": null
+      }
+   },
+   "show_csv_upload": false
+}

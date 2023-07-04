@@ -268,10 +268,11 @@ export const useRecordingControls = (
             livestreamId: stream.id,
             minutesWatched: 1,
             onlyIncrementMinutes: true,
+            userId: userData?.userEmail,
          })
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [minutesWatched])
+   }, [minutesWatched, userData?.userEmail])
 
    const [videoPaused, setVideoPaused] = useState(true)
 

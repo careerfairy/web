@@ -61,7 +61,7 @@ jobs:
            with:
               filters: |
                  workflow:
-                  - '.github/workflows/webapp-ci-full-develop.yml'
+                  - '.github/workflows/webapp-ci-chromium-prs.yml'
                  webapp:
                    - 'apps/web/**'
                    - 'packages/shared-lib/**'
@@ -113,9 +113,9 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            shard: [1, 2, 3, 4]
-            total: [4]
-      runs-on: ubuntu-20.04
+            shard: [1, 2, 3, 4, 5]
+            total: [5]
+      runs-on: ubuntu-22.04
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v3
@@ -134,10 +134,6 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
-         # Azure repo is flaky atm - https://github.com/actions/runner-images/issues/675
-         - name: Disable Azure repository
-           run: sudo sed -i 's/azure\./de\./' /etc/apt/sources.list
-
          - name: Install Playwright's dependencies
            run: npx playwright install --with-deps
 
@@ -145,7 +141,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --project=chromium --shard=${{matrix.shard}}/${{ matrix.total }}
+           run: npm run test:e2e-webapp -- --  --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() }}
@@ -153,6 +149,7 @@ jobs:
            with:
               name: ${{ matrix.shard }}-chromium-playwright-report
               path: apps/web/playwright-report
+              retention-days: 30
 
          - name: Upload debug logs
            if: ${{ failure() }}
@@ -160,6 +157,7 @@ jobs:
            with:
               name: ${{ matrix.shard }}-chromium-debug-logs
               path: firebase-debug.log
+              retention-days: 30
 
    # Deploy
    deploy:

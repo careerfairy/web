@@ -154,7 +154,7 @@ export const NavLink = ({
                />
                <Box my="auto">{rightElement}</Box>
             </ListItemButton>
-            {isNavLinkGroup && (
+            {isNavLinkGroup ? (
                <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                      {childLinks?.map((link) => (
@@ -162,7 +162,7 @@ export const NavLink = ({
                      ))}
                   </List>
                </Collapse>
-            )}
+            ) : null}
          </span>
       </Wrapper>
    )

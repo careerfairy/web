@@ -1,27 +1,29 @@
-import React from "react"
-import CompanyPageOverview from "../../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { groupRepo, livestreamRepo } from "../../../data/RepositoryInstances"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
+import * as Sentry from "@sentry/nextjs"
 import {
    GetStaticPaths,
    GetStaticProps,
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import { mapFromServerSide } from "../../../util/serverUtil"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import React from "react"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import * as Sentry from "@sentry/nextjs"
-import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import SEO from "../../../components/util/SEO"
+import CompanyPageOverview from "../../../components/views/company-page"
 import {
-   getLivestreamDialogData,
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "../../../components/views/livestream-dialog"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { groupRepo } from "../../../data/RepositoryInstances"
+import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
+import {
+   getLivestreamsAndDialogData,
+   mapFromServerSide,
+} from "../../../util/serverUtil"
 
 type TrackProps = {
    id: string
@@ -31,6 +33,7 @@ type TrackProps = {
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
+   serverSidePastLivestreams,
    livestreamDialogData,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
@@ -59,6 +62,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                   upcomingLivestreams={mapFromServerSide(
                      serverSideUpcomingLivestreams
                   )}
+                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
                   editMode={false}
                />
             </Box>
@@ -70,6 +74,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 export const getStaticProps: GetStaticProps<{
    serverSideGroup: Group
    serverSideUpcomingLivestreams: { [p: string]: any }[]
+   serverSidePastLivestreams: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
 }> = async (ctx) => {
    const { params } = ctx
@@ -81,34 +86,22 @@ export const getStaticProps: GetStaticProps<{
 
       if (serverSideGroup) {
          if (serverSideGroup.publicProfile) {
-            const results = await Promise.allSettled([
-               livestreamRepo.getEventsOfGroup(
-                  serverSideGroup?.groupId,
-                  "upcoming",
-                  { limit: 10 }
-               ),
-               getLivestreamDialogData(ctx),
-            ])
-            const [
-               serverSideUpcomingLivestreamsResult,
-               livestreamDialogDataResult,
-            ] = results
-
-            const serverSideUpcomingLivestreams =
-               serverSideUpcomingLivestreamsResult.status === "fulfilled"
-                  ? serverSideUpcomingLivestreamsResult.value
-                  : []
-
-            const livestreamDialogData =
-               livestreamDialogDataResult.status === "fulfilled"
-                  ? livestreamDialogDataResult.value
-                  : null
+            const {
+               serverSideUpcomingLivestreams,
+               serverSidePastLivestreams,
+               livestreamDialogData,
+            } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, ctx)
 
             return {
                props: {
                   serverSideGroup,
                   serverSideUpcomingLivestreams:
                      serverSideUpcomingLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
+
+                  serverSidePastLivestreams:
+                     serverSidePastLivestreams?.map(
                         LivestreamPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,

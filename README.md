@@ -80,6 +80,14 @@ There are two ways in which you can open up the report:
 -  running the root script `npm run webapp:report`
 -  Running the index.html file within `./apps/web/playwright-report`
 
+## Storybook
+
+Run Storybook UI:
+
+```shell
+npm run storybook
+```
+
 ## CI
 
 The CI Pipeline now runs on every push/pull_request test results are always uploaded through a GitHub action and are

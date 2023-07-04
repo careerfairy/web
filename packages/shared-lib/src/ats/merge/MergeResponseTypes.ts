@@ -84,7 +84,13 @@ export interface MergeSyncStatus {
    model_id: string
    last_sync_start: string
    next_sync_start: string
-   status: "DISABLED" | "DONE" | "FAILED" | "PAUSED" | "SYNCING"
+   status:
+      | "DISABLED"
+      | "DONE"
+      | "FAILED"
+      | "PAUSED"
+      | "SYNCING"
+      | "PARTIALLY_SYNCED" // Merge has failed to sync at least 1 field in this model, but some fields have successfully synced.
    is_initial_sync: boolean
 }
 
@@ -113,6 +119,7 @@ export interface MergeCandidate {
    urls?: MergeUrl[]
    applications?: MergeApplication[] | string[]
    attachments?: MergeAttachment[]
+   tags?: string[]
 }
 
 /**
@@ -269,7 +276,7 @@ export type MergePaginatedResponse<T> = {
 
 export type MergeLinkTokenResponse = {
    link_token: string
-   integration_name: string
+   integration_name: string | null
 }
 
 export type MergeAccountTokenResponse = {
@@ -281,4 +288,8 @@ export type MergeAccountTokenResponse = {
       color?: string
       slug?: string
    }
+}
+
+export type MergeRemoveAccountResponse = {
+   status: string
 }

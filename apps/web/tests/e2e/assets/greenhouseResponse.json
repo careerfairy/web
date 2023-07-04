@@ -1,0 +1,173 @@
+{
+   "result": "SUCCESS",
+   "new_step_path_id": null,
+   "validation_errors": [],
+   "validation_successes": [
+      {
+         "common_model": "Office",
+         "field_names": [
+            {
+               "field_name": "jobs"
+            },
+            {
+               "field_name": "name"
+            },
+            {
+               "field_name": "location"
+            }
+         ]
+      },
+      {
+         "common_model": "Job",
+         "field_names": [
+            {
+               "field_name": "name"
+            },
+            {
+               "field_name": "confidential"
+            },
+            {
+               "field_name": "status"
+            },
+            {
+               "field_name": "description"
+            },
+            {
+               "field_name": "code"
+            }
+         ]
+      },
+      {
+         "common_model": "RemoteUser",
+         "field_names": [
+            {
+               "field_name": "access_role"
+            },
+            {
+               "field_name": "hiring_manager_for_jobs"
+            },
+            {
+               "field_name": "email"
+            },
+            {
+               "field_name": "disabled"
+            },
+            {
+               "field_name": "last_name"
+            },
+            {
+               "field_name": "first_name"
+            },
+            {
+               "field_name": "recruiter_for_jobs"
+            }
+         ]
+      },
+      {
+         "common_model": "Department",
+         "field_names": [
+            {
+               "field_name": "name"
+            },
+            {
+               "field_name": "jobs"
+            }
+         ]
+      },
+      {
+         "common_model": "Tag",
+         "field_names": [
+            {
+               "field_name": "name"
+            },
+            {
+               "field_name": "candidates"
+            }
+         ]
+      },
+      {
+         "common_model": "Candidate",
+         "field_names": [
+            {
+               "field_name": "last_interaction_at"
+            },
+            {
+               "field_name": "is_private"
+            },
+            {
+               "field_name": "last_name"
+            },
+            {
+               "field_name": "first_name"
+            },
+            {
+               "field_name": "company"
+            },
+            {
+               "field_name": "title"
+            },
+            {
+               "field_name": "can_email"
+            }
+         ]
+      },
+      {
+         "common_model": "Application",
+         "field_names": [
+            {
+               "field_name": "candidate"
+            },
+            {
+               "field_name": "job"
+            },
+            {
+               "field_name": "source"
+            },
+            {
+               "field_name": "rejected_at"
+            },
+            {
+               "field_name": "credited_to"
+            },
+            {
+               "field_name": "applied_at"
+            },
+            {
+               "field_name": "current_stage"
+            }
+         ]
+      },
+      {
+         "common_model": "Attachment",
+         "field_names": [
+            {
+               "field_name": "file_url"
+            },
+            {
+               "field_name": "attachment_type"
+            },
+            {
+               "field_name": "file_name"
+            },
+            {
+               "field_name": "candidate"
+            }
+         ]
+      },
+      {
+         "common_model": "JobInterviewStage",
+         "field_names": [
+            {
+               "field_name": "stage_order"
+            },
+            {
+               "field_name": "job"
+            },
+            {
+               "field_name": "name"
+            }
+         ]
+      }
+   ],
+   "is_relink": false
+}

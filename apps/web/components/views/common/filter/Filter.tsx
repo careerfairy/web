@@ -12,6 +12,10 @@ export enum FilterEnum {
    companyCountries = "companyCountries",
    companySizes = "companySizes",
    companyIndustries = "companyIndustries",
+   /**
+    * If this filter is active, it means we are filtering by company
+    * */
+   companyId = "companyId",
    recordedOnly = "recordedOnly",
 }
 
@@ -47,6 +51,7 @@ const Filter = ({ filtersToShow, numberOfResults }: Props) => {
             query.companyIndustries,
             query.recordedOnly === "true" ? query.recordedOnly : null,
             query.fieldsOfStudy,
+            query.companyId,
          ].filter((value) => value).length,
       [query]
    )

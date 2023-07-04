@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions"
-import { admin } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import config from "./config"
 import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
@@ -10,6 +9,7 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { FieldValue, firestore } from "./api/firestoreAdmin"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -20,8 +20,7 @@ export const getLivestreamICalendarEvent = functions
       if (livestreamId) {
          try {
             // get the livestream
-            const querySnapshot = await admin
-               .firestore()
+            const querySnapshot = await firestore
                .collection("livestreams")
                .doc(livestreamId)
                .get()
@@ -200,7 +199,7 @@ export const setFirstCommentOfQuestionOnCreate = functions
          if (questionSnap.exists) {
             const questionData = questionSnap.data()
             const questionDataToUpdate: any = {
-               numberOfComments: admin.firestore.FieldValue.increment(1),
+               numberOfComments: FieldValue.increment(1),
             }
             if (!questionData.firstComment) {
                questionDataToUpdate.firstComment = commentData
@@ -279,8 +278,7 @@ export const notifySlackWhenALivestreamIsCreated = functions
       try {
          // Fetch the author details
          if (publisherEmailOrName) {
-            const userDoc = await admin
-               .firestore()
+            const userDoc = await firestore
                .collection("userData")
                .doc(publisherEmailOrName)
                .get()

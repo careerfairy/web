@@ -12,6 +12,7 @@
       "test": "turbo run test",
       "clean": "turbo run clean",
       "start": "turbo run start --parallel",
+      "storybook": "cd apps/web && npm run storybook",
       "test:e2e-webapp": "cross-env NODE_ENV=test turbo run test:e2e-webapp --filter=@careerfairy/webapp --filter=@careerfairy/functions",
       "test:e2e-webapp-debug": "cross-env NODE_ENV=test turbo run test:e2e-webapp-debug --filter=@careerfairy/webapp --filter=@careerfairy/functions",
       "webapp:report": "npm run playwright:report -w @careerfairy/webapp",
@@ -31,14 +32,14 @@
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions"
    },
    "devDependencies": {
-      "@rxdi/firelink": "^0.9.1",
+      "@rxdi/firelink": "^0.9.2",
       "cross-env": "^7.0.3",
-      "firebase-tools": "^11.29.1",
+      "firebase-tools": "^12.4.2",
       "husky": "^7.0.4",
       "lint-staged": "^12.4.1",
-      "prettier": "^2.8.1",
-      "turbo": "^1.6.3",
-      "vercel": "^24.2.0"
+      "prettier": "^2.8.8",
+      "turbo": "^1.10.6",
+      "vercel": "^31.0.1"
    },
    "lint-staged": {
       "**/*": "prettier --write --ignore-unknown"

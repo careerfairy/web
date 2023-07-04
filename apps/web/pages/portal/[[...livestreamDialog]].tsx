@@ -32,6 +32,7 @@ import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
+import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -73,35 +74,42 @@ const PortalPage = ({
             topBarFixed={carouselContent?.length > 0}
             headerScrollThreshold={carouselContent?.length ? 250 : 10}
          >
-            <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-               <>
-                  <Box position="relative" mb={4}>
-                     <ContentCarousel
-                        content={carouselContent}
-                        serverUserStats={serverUserStats}
-                     />
-                  </Box>
-                  <Container disableGutters>
-                     <WidgetsWrapper>
-                        {hasInterests ? <RecommendedEvents limit={10} /> : null}
-                        <ComingUpNextEvents
-                           serverSideEvents={comingUpNext}
-                           limit={20}
+            <>
+               <LivestreamDialogLayout
+                  livestreamDialogData={livestreamDialogData}
+               >
+                  <>
+                     <Box position="relative" mb={4}>
+                        <ContentCarousel
+                           content={carouselContent}
+                           serverUserStats={serverUserStats}
                         />
-                        <MyNextEvents limit={20} />
-                        <EventsPreview
-                           id={"past-events"}
-                           title={"PAST EVENTS"}
-                           type={EventsTypes.pastEvents}
-                           events={events}
-                           seeMoreLink={"/next-livestreams?type=pastEvents"}
-                           // No need to show loading as these events have already been queried server side
-                           loading={false}
-                        />
-                     </WidgetsWrapper>
-                  </Container>
-               </>
-            </LivestreamDialogLayout>
+                     </Box>
+                     <Container disableGutters>
+                        <WidgetsWrapper>
+                           {hasInterests ? (
+                              <RecommendedEvents limit={10} />
+                           ) : null}
+                           <ComingUpNextEvents
+                              serverSideEvents={comingUpNext}
+                              limit={20}
+                           />
+                           <MyNextEvents limit={20} />
+                           <EventsPreview
+                              id={"past-events"}
+                              title={"PAST EVENTS"}
+                              type={EventsTypes.pastEvents}
+                              events={events}
+                              seeMoreLink={"/next-livestreams?type=pastEvents"}
+                              // No need to show loading as these events have already been queried server side
+                              loading={false}
+                           />
+                        </WidgetsWrapper>
+                     </Container>
+                  </>
+               </LivestreamDialogLayout>
+               <WelcomeDialogContainer />
+            </>
          </GenericDashboardLayout>
       </>
    )

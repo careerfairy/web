@@ -72,9 +72,10 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             livestreamId: active.id,
             minutesWatched: 1,
             onlyIncrementMinutes: true,
+            userId: userData?.userEmail,
          })
       }
-   }, [minutesWatched])
+   }, [minutesWatched, userData?.userEmail])
 
    const handleStepChange = useCallback(
       (step) => {

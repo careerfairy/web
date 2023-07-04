@@ -25,7 +25,7 @@ const NotEnoughCreditsButton: FC = () => {
             sx={styles.btn}
             onClick={handleClick}
             disableElevation
-            data-testid="livestream-registration-button"
+            data-testid="livestream-not-enough-credits-button"
             size="large"
          >
             Not enough CareerCoins to unlock
