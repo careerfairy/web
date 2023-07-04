@@ -14,15 +14,15 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { alpha } from "@mui/material/styles"
 import Skeleton from "@mui/material/Skeleton"
 
-const styles = sxStyles({
-   pollEntryRoot: {
+export const cardVotesStyles = sxStyles({
+   entryRoot: {
       border: (theme) =>
          `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
       borderRadius: 4,
       p: 2,
       flex: 1,
    },
-   pollOptionProgress: {
+   optionProgress: {
       borderRadius: 2,
       backgroundColor: "transparent",
       border: `1px solid #EDE7FD`,
@@ -36,18 +36,18 @@ const styles = sxStyles({
       right: 0,
       height: "100%",
    },
-   pollOptionRoot: {
+   optionRoot: {
       minHeight: 50,
       position: "relative",
    },
-   pollOptionDetails: {
+   optionDetails: {
       display: "flex",
       position: "relative",
       py: 1,
       px: 1.5,
       zIndex: 1,
    },
-   pollCount: {
+   count: {
       borderRadius: "50%",
       position: "relative",
       backgroundColor: "white",
@@ -66,7 +66,7 @@ const styles = sxStyles({
    gridItem: {
       display: "flex",
    },
-   pollOptionSkeleton: {
+   optionSkeleton: {
       borderRadius: 2,
    },
 })
@@ -112,7 +112,7 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
 
    if (loading) {
       return (
-         <Grid sx={styles.gridItem} item xs={12} md={6} lg={4}>
+         <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
             <PollSkeleton />
          </Grid>
       )
@@ -121,8 +121,8 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
    if (count === 0) return null // no votes, so don't show
 
    return (
-      <Grid sx={styles.gridItem} item xs={12} md={6} lg={4}>
-         <Stack spacing={1} sx={styles.pollEntryRoot}>
+      <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
+         <Stack spacing={1} sx={cardVotesStyles.entryRoot}>
             <Typography variant="body2">
                {loading ? "..." : count || 0} votes
             </Typography>
@@ -161,14 +161,14 @@ const PollOption: FC<PollOptionProps> = ({
    const { count } = usePollVotersCount(livestreamId, pollId, pollOption.id)
 
    return (
-      <Box sx={styles.pollOptionRoot}>
+      <Box sx={cardVotesStyles.optionRoot}>
          <Stack
             spacing={1.1}
             direction="row"
             alignItems="center"
-            sx={styles.pollOptionDetails}
+            sx={cardVotesStyles.optionDetails}
          >
-            <Box sx={styles.pollCount}>
+            <Box sx={cardVotesStyles.count}>
                <Typography variant="body2" fontWeight={600}>
                   {count ?? 0}
                </Typography>
@@ -178,7 +178,7 @@ const PollOption: FC<PollOptionProps> = ({
             </Typography>
          </Stack>
          <LinearProgress
-            sx={styles.pollOptionProgress}
+            sx={cardVotesStyles.optionProgress}
             variant="determinate"
             value={count ? (count / totalVotes) * 100 : 0}
          />
@@ -186,7 +186,7 @@ const PollOption: FC<PollOptionProps> = ({
    )
 }
 
-export const PollsSkeleton = () => {
+export const CardVotersSkeleton = () => {
    return (
       <Stack spacing={2}>
          <Stack direction="row" alignItems="center" spacing={2}>
@@ -195,7 +195,14 @@ export const PollsSkeleton = () => {
          <Box>
             <Grid container spacing={2}>
                {Array.from({ length: 3 }).map((_, i) => (
-                  <Grid sx={styles.gridItem} key={i} item xs={12} md={6} lg={4}>
+                  <Grid
+                     sx={cardVotesStyles.gridItem}
+                     key={i}
+                     item
+                     xs={12}
+                     md={6}
+                     lg={4}
+                  >
                      <PollSkeleton />
                   </Grid>
                ))}
@@ -207,7 +214,7 @@ export const PollsSkeleton = () => {
 
 const PollSkeleton = () => {
    return (
-      <Stack spacing={1} sx={styles.pollEntryRoot}>
+      <Stack spacing={1} sx={cardVotesStyles.entryRoot}>
          <Typography variant="body2">
             <Skeleton variant="text" width={40} />
          </Typography>
@@ -218,7 +225,7 @@ const PollSkeleton = () => {
             {Array.from({ length: 3 }).map((_, i) => (
                <Skeleton
                   key={i}
-                  sx={styles.pollOptionSkeleton}
+                  sx={cardVotesStyles.optionSkeleton}
                   variant="rectangular"
                   width={`calc(100% * ${Math.random() * (1 - 0.5) + 0.5})`}
                   height={50}
