@@ -27,6 +27,7 @@ export async function setupLivestreamData(
       overrideLivestreamDetails: {},
    }
 ) {
+   const type = options.livestreamType || "create"
    if (!group) {
       group = await GroupSeed.createGroup(
          Object.assign({}, options.overrideGroupDetails)
@@ -35,7 +36,7 @@ export async function setupLivestreamData(
 
    const groupQuestions = createLivestreamGroupQuestions(group.id)
 
-   const livestream = await LivestreamSeed[options.livestreamType](
+   const livestream = await LivestreamSeed[type](
       Object.assign(
          {
             groupIds: [group.id],
@@ -47,14 +48,14 @@ export async function setupLivestreamData(
       )
    )
 
-   if (options.userQuestions.length) {
+   if (options.userQuestions?.length) {
       await LivestreamSeed.addUserQuestionsToLivestream(
          livestream.id,
          options.userQuestions
       )
    }
 
-   if (options.feedbackQuestions.length) {
+   if (options.feedbackQuestions?.length) {
       await LivestreamSeed.addFeedbackQuestionsToLivestream(
          livestream.id,
          options.feedbackQuestions
