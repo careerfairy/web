@@ -208,6 +208,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          location = ImpressionLocation.unknown,
          isEmbedded = false,
          bottomElement,
+         hideChipLabels,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -425,14 +426,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            )}
                         </Box>
 
-                        <EventPreviewCardChipLabels
-                           hasParticipated={hasParticipated}
-                           isPast={isPast}
-                           isLive={isLive}
-                           hasRegistered={hasRegistered}
-                           hasJobToApply={hasJobsToApply}
-                           recordingAvailableDays={getRecordingAvailableDays}
-                        />
+                        {hideChipLabels ? null : (
+                           <EventPreviewCardChipLabels
+                              hasParticipated={hasParticipated}
+                              isPast={isPast}
+                              isLive={isLive}
+                              hasRegistered={hasRegistered}
+                              hasJobToApply={hasJobsToApply}
+                              recordingAvailableDays={getRecordingAvailableDays}
+                           />
+                        )}
 
                         <Box
                            className="hideOnHoverContent"
@@ -688,6 +691,8 @@ interface EventPreviewCardProps {
    ref?: React.Ref<HTMLDivElement>
    isEmbedded?: boolean
    bottomElement?: React.ReactNode
+   // If true, the chip labels will be hidden
+   hideChipLabels?: boolean
 }
 
 EventPreviewCard.displayName = "EventPreviewCard"
