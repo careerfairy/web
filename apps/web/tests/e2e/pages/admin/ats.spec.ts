@@ -32,8 +32,13 @@ const testWithCompletlySetupATS = test.extend({
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
       groupPage,
+      browserName,
    }) => {
       const atsPage = await groupPage.goToATSPage()
+      test.skip(
+         browserName !== "chromium",
+         "This test can only run once because of merge pop-up dialog, let's run it on chromium for now"
+      )
 
       /**
        * Be sure to setup all the route interceptors at the start of
@@ -49,16 +54,7 @@ test.describe("ATS Integration", () => {
       /**
        * Merge Pop-up dialog flow
        */
-      try {
-         await atsPage.selectATS()
-      } catch (e) {
-         /**
-          * Sometimes the Merge Link dialog doesn't open up when running the
-          * tests in sequential order, don't mark the test as failed if this
-          * happens
-          */
-         return
-      }
+      await atsPage.selectATS()
       await atsPage.enterAPIKey(variables.apiKey)
       await atsPage.submitAPIKey()
       await atsPage.finishAndCloseMergeDialog()
