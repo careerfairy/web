@@ -95,7 +95,7 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
       }
 
       // !isUpcoming && !editMode
-      return `Have you missed a live stream from ${group.universityName} Corporation? Don't worry, you can re-watch them all here.`
+      return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
    }, [isUpcoming, editMode, group.universityName])
 
    const link = useMemo(() => {
@@ -147,6 +147,7 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                            <Box key={event.id} px={0.75}>
                               <EventPreviewCard
                                  event={event}
+                                 hideChipLabels={editMode}
                                  bottomElement={
                                     editMode && isUpcoming ? (
                                        <Box
