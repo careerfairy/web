@@ -111,7 +111,7 @@ test.describe("Group Analytics", () => {
       const { livestream } = await setupData(group, {
          livestreamType: "createPast",
          questions,
-         feedbackQuestions: feedbackQuestions,
+         feedbackQuestions,
       })
 
       await groupPage.goToAnalyticsPage()
