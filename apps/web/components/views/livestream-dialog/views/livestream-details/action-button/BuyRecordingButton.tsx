@@ -36,7 +36,7 @@ const BuyRecordingButton: FC = () => {
             onClick={handleClick}
             disableElevation
             loading={isLoading}
-            data-testid="livestream-registration-button"
+            data-testid="livestream-unlock-recording-button"
             size="large"
             endIcon={isLoading ? undefined : <CareerCoinIcon />}
          >

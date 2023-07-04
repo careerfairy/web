@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { admin } from "./api/firestoreAdmin"
+import { FieldValue, firestore } from "./api/firestoreAdmin"
 import config from "./config"
 
 export const updateUserDataAnalyticsOnWrite = functions
@@ -20,8 +20,7 @@ export const updateUserDataAnalyticsOnWrite = functions
          if (universityCountryCodeHasChanged) {
             let newData = {}
 
-            const analyticsUserDataRef = admin
-               .firestore()
+            const analyticsUserDataRef = firestore
                .collection("analytics")
                .doc("userData")
             if (oldUniCountryCode) {
@@ -29,7 +28,7 @@ export const updateUserDataAnalyticsOnWrite = functions
                newData = {
                   ...newData,
                   [`totalByCountry.${oldUniCountryCode}`]:
-                     admin.firestore.FieldValue.increment(-1),
+                     FieldValue.increment(-1),
                }
             }
             if (newUniCountryCode) {
@@ -37,7 +36,7 @@ export const updateUserDataAnalyticsOnWrite = functions
                newData = {
                   ...newData,
                   [`totalByCountry.${newUniCountryCode}`]:
-                     admin.firestore.FieldValue.increment(1),
+                     FieldValue.increment(1),
                }
             }
 
@@ -45,13 +44,13 @@ export const updateUserDataAnalyticsOnWrite = functions
                // Increment total field if you previously didn't have any university country
                newData = {
                   ...newData,
-                  total: admin.firestore.FieldValue.increment(1),
+                  total: FieldValue.increment(1),
                }
             } else if (oldUniCountryCode && !newUniCountryCode) {
                // Decrement total field if you previously did have a university country but now you dont
                newData = {
                   ...newData,
-                  total: admin.firestore.FieldValue.increment(-1),
+                  total: FieldValue.increment(-1),
                }
             }
             await analyticsUserDataRef.update(newData)

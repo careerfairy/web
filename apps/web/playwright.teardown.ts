@@ -6,7 +6,7 @@ const exec = require("child_process").execSync
  * This scripts tries to kill the firebase emulators if they are running
  */
 function globalTearDown() {
-   if (process.platform === "darwin") {
+   if (["linux", "darwin"].includes(process.platform)) {
       try {
          // Find pid of the firebase emulators suite
          const pids = exec(

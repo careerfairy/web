@@ -1,13 +1,17 @@
 import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage, handleMultiSelect } from "./CommonPage"
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { CommonPage} from "./CommonPage"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { correctCompany, imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
+import { ATSAdminPage } from "./admin/ATSAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -49,7 +53,7 @@ export class GroupDashboardPage extends CommonPage {
          name: "Company size *",
       })
 
-      this.companyInformationAboutInput = this.page.getByLabel("About")
+      this.companyInformationAboutInput = this.page.getByLabel("About *")
 
       this.companyPageTestimonialSectionEditButton = this.page.locator(
          "data-testid=testimonial-section-edit-button"
@@ -114,6 +118,12 @@ export class GroupDashboardPage extends CommonPage {
       return new LivestreamsAdminPage(this)
    }
 
+   public async goToATSPage() {
+      await this.goToPage("ATS Integration")
+
+      return new ATSAdminPage(this)
+   }
+
    // Team Members page
 
    public async goToCompanyPageAdmin() {
@@ -172,6 +182,10 @@ export class GroupDashboardPage extends CommonPage {
       if (data.interestsIds?.length > 0) {
          await this.selectInterests(data.interestsIds)
       }
+
+      if (data.jobs?.length > 0) {
+         await this.selectJobs(data.jobs)
+      }
    }
 
    public async selectInterests(interests: string[]) {
@@ -181,6 +195,17 @@ export class GroupDashboardPage extends CommonPage {
 
       for (const interest of interests) {
          await this.page.getByTestId(`interestsIds_${interest}_option`).click()
+      }
+   }
+
+   /**
+    * Selects the jobs from the dropdown, currently you can only select one job
+    * */
+   public async selectJobs(jobs: LivestreamJobAssociation[]) {
+      await this.page.getByPlaceholder("Select one job").click()
+
+      for (const job of jobs) {
+         await this.page.getByTestId(`jobIds_${job.jobId}_option`).click()
       }
    }
 
@@ -227,7 +252,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async clickPublish() {
-      await this.resilientClick("text=publish as stream")
+      await this.page.locator("text=publish as stream").click()
    }
 
    public async clickManageLivestream() {
@@ -241,7 +266,12 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    private async goToPage(
-      name: "Company" | "Team members" | "Live streams" | "Company page"
+      name:
+         | "Company"
+         | "Team members"
+         | "Live streams"
+         | "Company page"
+         | "ATS Integration"
    ) {
       await Promise.all([
          this.page.waitForNavigation(),
@@ -254,10 +284,9 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async updateCompanyLocation(country: string) {
-      return handleMultiSelect(
+      return this.handleMultiSelect(
          country,
-         this.companyInformationLocationInput,
-         this.page
+         this.companyInformationLocationInput
       )
    }
 
@@ -273,15 +302,13 @@ export class GroupDashboardPage extends CommonPage {
       await this.companyInformationAboutInput.fill(
          "CareerFairy is the only graduate career portal that gives graduates access to speak to companies before applying for a job. We find and share valuable insights about the job market, career choices and, most importantly, employers."
       )
-      await handleMultiSelect(
+      await this.handleMultiSelect(
          correctCompany.location,
-         this.companyInformationLocationInput,
-         this.page
+         this.companyInformationLocationInput
       )
-      await handleMultiSelect(
+      await this.handleMultiSelect(
          correctCompany.industry,
-         this.companyInformationIndustriesInput,
-         this.page
+         this.companyInformationIndustriesInput
       )
 
       await this.companyInformationSizeInput.click()
@@ -302,7 +329,7 @@ export class GroupDashboardPage extends CommonPage {
       await sleep(1000)
 
       await this.page
-         .getByLabel("Testimonial")
+         .getByPlaceholder("Say something about their story")
          .fill(
             "I am about to finish my Bachelor’s degree in Applied Linguistics at ZHAW. I wanted to start my professional career in an environment that values my ideas and ultimately helps students, like me, to make their first steps in their professional world."
          )

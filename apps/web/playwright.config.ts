@@ -47,7 +47,7 @@ const config: PlaywrightTestConfig = {
       // baseURL: 'http://localhost:3000',
 
       /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-      trace: "on-first-retry",
+      trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
       screenshot: "only-on-failure",
       video: "retain-on-failure",
    },
@@ -105,6 +105,7 @@ const config: PlaywrightTestConfig = {
          FIREBASE_STORAGE_EMULATOR_HOST: "localhost:9199",
          FIRESTORE_EMULATOR_HOST: "localhost:8080",
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
+         APP_ENV: "test",
       },
       port: 3000,
       // emulators need some time to boot

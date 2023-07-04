@@ -1,31 +1,33 @@
 import functions = require("firebase-functions")
-import { boolean, object, string } from "yup"
-import { atsRepo, groupRepo } from "./api/repositories"
-import {
-   logAxiosErrorAndThrow,
-   serializeModels,
-   serializePaginatedModels,
-} from "./util"
-import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
-import {
-   atsRequestValidation,
-   atsRequestValidationWithAccountToken,
-   createJobApplication,
-} from "./lib/ats"
-import { MergeATSRepository, TEST_CV } from "./lib/merge/MergeATSRepository"
 import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
    RecruitersFunctionCallOptions,
 } from "@careerfairy/shared-lib/ats/Functions"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 import {
    MergeExtraRequiredData,
    MergeMetaEntities,
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
-import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { boolean, object, string } from "yup"
+import { atsRepo, groupRepo } from "./api/repositories"
 import config from "./config"
+import {
+   atsRequestValidation,
+   atsRequestValidationWithAccountToken,
+   createJobApplication,
+} from "./lib/ats"
+import { TEST_CV } from "./lib/merge/MergeATSRepository"
+import { getATSRepository } from "./lib/merge/util"
+import {
+   logAxiosErrorAndThrow,
+   serializeModels,
+   serializePaginatedModels,
+} from "./util"
+import { DateTime } from "luxon"
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +49,7 @@ export const mergeGenerateLinkToken = functions
       })
 
       try {
-         const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
+         const mergeATS = getATSRepository(process.env.MERGE_ACCESS_KEY)
 
          // Temporary token initializing the user’s integration authorization session
          // We'll be able to open the Merge Link dialog to choose the integration
@@ -82,7 +84,7 @@ export const mergeGetAccountToken = functions
       })
 
       try {
-         const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
+         const mergeATS = getATSRepository(process.env.MERGE_ACCESS_KEY)
 
          const mergeResponse = await mergeATS.exchangeAccountToken(
             requestData.publicToken
@@ -146,7 +148,7 @@ export const mergeMetaEndpoint = functions
       })
 
       try {
-         const mergeATS = new MergeATSRepository(
+         const mergeATS = getATSRepository(
             process.env.MERGE_ACCESS_KEY,
             requestData.tokens.merge.account_token
          )
@@ -242,12 +244,15 @@ export const candidateApplicationTest = functions
          // @ts-ignore Set the extra data received
          atsAccount.extraRequiredData = requestData.mergeExtraRequiredData
 
+         // Generate timestamp based unique identifier in the format yyyymmddHHMMSS (e.g., 20230626130555)
+         const timestamp = DateTime.utc().toFormat("yyyyMMddHHmmss")
+
          // Dummy candidate that we'll create
          const userData = {
             firstName: "User",
             lastName: "CareerFairy",
             userResume: TEST_CV,
-            userEmail: "application-test@careerfairy.io",
+            userEmail: `application-test-${timestamp}@careerfairy.io`,
          } as UserData
 
          let relations: UserATSRelations = {}
@@ -364,7 +369,7 @@ export const mergeRemoveAccount = functions
       })
 
       try {
-         const mergeATS = new MergeATSRepository(
+         const mergeATS = getATSRepository(
             process.env.MERGE_ACCESS_KEY,
             requestData.tokens.merge.account_token
          )

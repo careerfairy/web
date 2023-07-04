@@ -53,6 +53,7 @@ const JobList = ({ onChange, disabled = false }: Props) => {
                   label={isLoading ? "Loading Jobs.." : "Select Job"}
                   variant="outlined"
                   fullWidth
+                  name="application-test-jobs"
                />
             )}
          />

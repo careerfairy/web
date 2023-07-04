@@ -35,8 +35,8 @@ test.describe("Company page creation", () => {
       const updatedGroup = await GroupSeed.getGroup(group.groupId)
 
       // expect the group document has the fields updated
-      await expect(updatedGroup.extraInfo).toBe(summary)
-      await expect(updatedGroup.companyCountry.name).toBe(location)
+      expect(updatedGroup.extraInfo).toBe(summary)
+      expect(updatedGroup.companyCountry.name).toBe(location)
    })
    test("Create add publish company page", async ({ groupPage, group }) => {
       await groupPage.goToCompanyPage()

@@ -11,6 +11,16 @@ import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
 import { firestore } from "./lib/firebase"
 import { groupQuestions } from "./groups"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+
+type SetupUserLivestreamDataOptions = {
+   user: UserData
+   livestream: LivestreamEvent
+   userLivestreamDataOverride?: Partial<UserLivestreamData>
+   registered?: boolean
+   joinedTalentPool?: boolean
+   participated?: boolean
+}
 
 interface LivestreamSeed {
    create(overrideFields?: Partial<LivestreamEvent>): Promise<LivestreamEvent>
@@ -35,10 +45,87 @@ interface LivestreamSeed {
     *
     * Does not save to the database, used to fill forms
     */
-   random(overrideFields?: Partial<LivestreamEvent>): Partial<LivestreamEvent>
+   random(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
+
+   /**
+    * Make a user as registered/participated to the livestream
+    * Updates his userLivestreamData
+    */
+   userData(
+      options: SetupUserLivestreamDataOptions
+   ): Promise<Partial<UserLivestreamData>>
+
+   /**
+    * Setup the required documents for the recording access
+    */
+   setRecordingSid(livestreamId: string): Promise<void>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
+   async userData(
+      options: SetupUserLivestreamDataOptions
+   ): Promise<Partial<UserLivestreamData>> {
+      const livestreamRef = firestore
+         .collection("livestreams")
+         .doc(options.livestream.id)
+
+      if (options.registered) {
+         await livestreamRef.update({
+            registeredUsers: admin.firestore.FieldValue.arrayUnion(
+               options.user.userEmail
+            ),
+         })
+      }
+
+      const userLivestreamDataRef = livestreamRef
+         .collection("userLivestreamData")
+         .doc(options.user.userEmail)
+
+      const partialData: Partial<UserLivestreamData> = {
+         livestreamId: options.livestream.id,
+         userId: options.user.authId,
+         user: options.user,
+      }
+
+      // user registration/participation date is a bit behind the livestream date
+      const relativeDate = options.livestream.start.toDate()
+      relativeDate.setDate(relativeDate.getDate() - 1)
+
+      if (options.registered) {
+         partialData.registered = {
+            date: admin.firestore.Timestamp.fromDate(relativeDate),
+         }
+      } else {
+         partialData.registered = null
+      }
+
+      if (options.joinedTalentPool) {
+         partialData.talentPool = {
+            date: admin.firestore.Timestamp.fromDate(relativeDate),
+            companyId: options.livestream.groupIds?.[0],
+         }
+      } else {
+         partialData.talentPool = null
+      }
+
+      if (options.participated) {
+         partialData.participated = {
+            date: admin.firestore.Timestamp.fromDate(relativeDate),
+         }
+      } else {
+         partialData.participated = null
+      }
+
+      const finalData: Partial<UserLivestreamData> = Object.assign(
+         partialData,
+         options.userLivestreamDataOverride
+      )
+
+      await userLivestreamDataRef.set(finalData, { merge: true })
+
+      return finalData
+   }
+
    async getWithSubcollections(
       livestreamId: string,
       subCollections = ["userLivestreamData", "questions"]
@@ -142,6 +229,19 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return data
    }
 
+   async setRecordingSid(livestreamId: string) {
+      const livestreamRef = firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      await livestreamRef.collection("recordingToken").doc("token").set(
+         {
+            sid: uuidv4(),
+         },
+         { merge: true }
+      )
+   }
+
    async generateSecureToken(livestreamId: string): Promise<string> {
       const token = uuidv4()
       await firestore
@@ -195,9 +295,23 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          triGrams: livestreamTriGrams(title, company),
       }
 
+      const overrideFieldsCopy = { ...overrideFields }
+
+      // override the start date if present
+      if (
+         overrideFieldsCopy?.start &&
+         overrideFieldsCopy.start instanceof Date
+      ) {
+         data.start = admin.firestore.Timestamp.fromDate(
+            // @ts-ignore start should be a date object
+            overrideFieldsCopy.start
+         )
+         delete overrideFieldsCopy.start
+      }
+
       return {
          ...data,
-         ...overrideFields,
+         ...overrideFieldsCopy,
       }
    }
 }

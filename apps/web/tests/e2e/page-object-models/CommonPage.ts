@@ -136,6 +136,36 @@ export class CommonPage {
    public enterEvent() {
       return this.resilientClick("text=Enter event")
    }
+
+   public async openProfileMenu() {
+      await this.page.getByRole("button", { name: "Account settings" }).click()
+   }
+
+   public async openGetMoreCreditsDialog() {
+      await this.openProfileMenu()
+      await this.page.getByText("Get more now").click()
+   }
+
+   /**
+    * Select option from a MaterialUI Autocomplete multi-select input
+    * @param stringToSelect
+    * @param elementLocator
+    * @param page
+    */
+   public handleMultiSelect = async (
+      stringToSelect: string,
+      elementLocator: Locator
+   ) => {
+      if (!stringToSelect) return
+
+      const locator = elementLocator.first()
+      await locator.click()
+      await locator.focus()
+
+      await this.page
+         .getByRole("option", { name: stringToSelect, exact: true })
+         .click()
+   }
 }
 
 /**
@@ -148,7 +178,11 @@ export class CommonPage {
  * @param cssSelector
  * @constructor
  */
-const materialSelectOption = async (page, newSelectedValue, cssSelector) => {
+export const materialSelectOption = async (
+   page: Page,
+   newSelectedValue: string,
+   cssSelector: string
+) => {
    return page.evaluate(
       ({ newSelectedValue, cssSelector }) => {
          let clickEvent = document.createEvent("MouseEvents")
@@ -166,36 +200,16 @@ const materialSelectOption = async (page, newSelectedValue, cssSelector) => {
    )
 }
 
-const promiseTimeout = (promise, timeoutInMilliseconds) => {
+const promiseTimeout = (
+   promise: Promise<unknown>,
+   timeoutInMilliseconds: number
+) => {
    return Promise.race([
       promise,
-      new Promise(function (resolve, reject) {
+      new Promise(function (_, reject) {
          setTimeout(function () {
             reject("timeout")
          }, timeoutInMilliseconds)
       }),
    ])
-}
-
-/**
- * Select option from a MaterialUI Autocomplete multi-select input
- * @param stringToSelect
- * @param elementLocator
- * @param page
- */
-export const handleMultiSelect = async (
-   stringToSelect: string,
-   elementLocator: Locator,
-   page: Page
-) => {
-   if (!stringToSelect) return
-   await elementLocator.click()
-   await elementLocator.focus()
-   await elementLocator.fill(stringToSelect)
-   // give time for the dropdown to update the suggestions
-   await sleep(250)
-   expect(await elementLocator.inputValue()).toBe(stringToSelect)
-   await page
-      .locator('div[role="presentation"]', { hasText: stringToSelect })
-      .click()
 }

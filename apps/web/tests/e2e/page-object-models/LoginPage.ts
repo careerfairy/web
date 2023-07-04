@@ -72,14 +72,18 @@ export class LoginPage {
             password: credentials.defaultPassword,
             waitForURL: "/portal",
             loginPath: "/login",
+            openPage: true,
          },
          options
       )
       const handler = new LoginPage(page)
 
-      await handler.open(options.loginPath)
-      await handler.enterEmail(credentials.correctEmail)
-      await handler.enterPassword(credentials.defaultPassword)
+      if (options.openPage) {
+         await handler.open(options.loginPath)
+      }
+
+      await handler.enterEmail(options.email)
+      await handler.enterPassword(options.password)
       await handler.clickLogin()
 
       await page.waitForURL(options.waitForURL)
@@ -91,4 +95,5 @@ type LoginOptions = {
    password?: string
    waitForURL?: string
    loginPath?: string
+   openPage?: boolean
 }

@@ -1,5 +1,6 @@
 import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
+import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
 import {
    Box,
    Button,
@@ -19,6 +20,7 @@ import {
    MultiStepContext,
 } from "../../common/MultiStepWrapper"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { useDispatch } from "react-redux"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -37,6 +39,7 @@ const SignUpPinForm = () => {
    const [generalLoading, setGeneralLoading] = useState(false)
    const { authenticatedUser: user } = useAuth()
    const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   const dispatch = useDispatch()
 
    async function resendVerificationEmail() {
       setGeneralLoading(true)
@@ -67,8 +70,12 @@ const SignUpPinForm = () => {
       }
       try {
          await firebase.validateUserEmailWithPin(userInfo)
-         updateActiveStep()
+
+         // reload user auth on both redux state and firebase instance
          await firebase.auth.currentUser.reload()
+         await reloadAuth(dispatch, firebase.app) // redux action
+
+         updateActiveStep()
          dataLayerEvent("signup_pin_complete")
       } catch (error) {
          console.log("error", error)

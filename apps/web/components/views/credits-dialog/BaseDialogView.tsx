@@ -123,7 +123,10 @@ const BaseDialogView: Props = ({
          ) : null}
          {handleBack ? (
             <Box sx={styles.topLeft}>
-               <IconButton onClick={handleBack}>
+               <IconButton
+                  data-testid="credits-dialog-back-button"
+                  onClick={handleBack}
+               >
                   <BackIcon />
                </IconButton>
             </Box>
