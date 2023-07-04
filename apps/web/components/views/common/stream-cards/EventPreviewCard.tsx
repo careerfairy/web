@@ -13,6 +13,7 @@ import LanguageIcon from "@mui/icons-material/Language"
 import {
    getMaxLineStyles,
    getResizedUrl,
+   isInIframe,
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
 import Image from "next/image"
@@ -379,6 +380,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   component={event ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
                   ref={trackImpressionsRef}
+                  target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
                >
