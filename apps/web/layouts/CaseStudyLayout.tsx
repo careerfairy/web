@@ -28,7 +28,7 @@ const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
          <GeneralNavDrawer />
          {preview && <Alert />}
          <Box component={"main"}>{children}</Box>
-         <Footer sx={{ mt: "auto" }} />
+         <Footer />
       </Box>
    )
 }
