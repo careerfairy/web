@@ -374,7 +374,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   component={event ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
                   ref={trackImpressionsRef}
-                  target={isInIframe ? "_blank" : undefined}
+                  target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                >
                   <Box
