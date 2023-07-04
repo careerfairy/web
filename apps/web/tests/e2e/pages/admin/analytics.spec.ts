@@ -52,6 +52,7 @@ test.describe("Group Analytics", () => {
          await groupPage.goToAnalyticsPage()
          await groupPage.goToTalentPoolAnalyticsPage()
 
+         // Expect the table of talents to be empty
          await expect(
             groupPage.page.getByText(
                "Create a live stream to allow young talent to join your talent pool."
@@ -84,7 +85,7 @@ test.describe("Group Analytics", () => {
 
          await completeRegistration(livestreamDialogPage, true, true)
 
-         // Reload the page to make the live stream analytics fetch the newly created live stream
+         // Reload the page to make the live stream analytics fetch(swr) the newly created live stream
          await groupPage.page.reload()
 
          await verifyAnalyticsCard(groupPage, "Registrations", "1", true)
@@ -110,7 +111,7 @@ test.describe("Group Analytics", () => {
 
       const { livestream } = await setupData(group, {
          livestreamType: "createPast",
-         questions,
+         userQuestions: questions,
          feedbackQuestions,
       })
 
@@ -166,11 +167,11 @@ async function setupData(
    group: Group,
    options: {
       livestreamType?: "create" | "createPast" | "createLive"
-      questions?: string[]
+      userQuestions?: string[]
       feedbackQuestions?: string[]
    } = {
       livestreamType: "create",
-      questions: [],
+      userQuestions: [],
       feedbackQuestions: [],
    }
 ) {
@@ -183,10 +184,10 @@ async function setupData(
       },
    })
 
-   if (options.questions.length) {
-      await LivestreamSeed.addQuestionsToLivestream(
+   if (options.userQuestions.length) {
+      await LivestreamSeed.addUserQuestionsToLivestream(
          livestream.id,
-         options.questions
+         options.userQuestions
       )
    }
 
@@ -200,6 +201,9 @@ async function setupData(
    return { livestream }
 }
 
+/**
+ * Helper that goes through the registration process for a livestream
+ * */
 async function completeRegistration(
    livestreamDialogPage: LivestreamDialogPage,
    joinTalentPool: boolean,

@@ -68,7 +68,7 @@ interface LivestreamSeed {
    /**
     * Add questions to a livestream/id/questions sub-collection
     **/
-   addQuestionsToLivestream(
+   addUserQuestionsToLivestream(
       livestreamId: string,
       questions: string[]
    ): Promise<void>
@@ -270,14 +270,14 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return data
    }
 
-   async addQuestionsToLivestream(
+   async addUserQuestionsToLivestream(
       livestreamId: string,
-      questions: string[]
+      userQuestions: string[]
    ): Promise<void> {
       const batch = firestore.batch()
 
-      questions.forEach((question) => {
-         const newQuestion = generateLiveStreamQuestion(question)
+      userQuestions.forEach((question) => {
+         const newQuestion = generateLiveStreamUserQuestion(question)
          batch.set(
             firestore
                .collection("livestreams")
@@ -427,7 +427,7 @@ export const generateLivestreamFeedbackQuestion = (
    title: name,
 })
 
-export const generateLiveStreamQuestion = (
+export const generateLiveStreamUserQuestion = (
    question: string
 ): LivestreamQuestion => ({
    author: "test",
