@@ -1,10 +1,19 @@
 import React from "react"
 import { useRouter } from "next/router"
-import { Theme } from "@mui/material/styles"
+import { alpha, Theme } from "@mui/material/styles"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import { sxStyles } from "types/commonTypes"
 import { MAIL_TO_ADDRESS } from "../../../constants/links"
 import CareerInspiration from "./CareerInpiration"
+
+const styles = sxStyles({
+   container: {
+      color: (theme) => alpha(theme.palette.text.secondary, 0.5),
+      "& > *": {},
+      marginBottom: 3,
+   },
+})
 
 type FooterProps = {
    background?: string
@@ -26,7 +35,7 @@ const Footer = ({ background, bottom }: FooterProps) => {
          id="page-footer"
       >
          {shouldDisplayCareerInspiration ? <CareerInspiration /> : null}
-         <Typography align="center">
+         <Typography align="center" sx={styles.container}>
             {new Date().getFullYear()} - CareerFairy AG - Made in Zurich,
             Switzerland - Contact:
             <Box component="a" ml={5} href={`mailto:${MAIL_TO_ADDRESS}`}>
