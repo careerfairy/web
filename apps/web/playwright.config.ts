@@ -83,12 +83,15 @@ const config: PlaywrightTestConfig = {
             },
          },
       },
-      {
-         name: "webkit",
-         use: {
-            ...devices["Desktop Safari"],
-         },
-      },
+      // Since playwright 1.35.1 (webkit 16.4) we have issues with the webkit browser
+      // Some tests fail randomly and the traces/videos have a black screen
+      // Uncomment as soon as webkit is more stable
+      // {
+      //    name: "webkit",
+      //    use: {
+      //       ...devices["Desktop Safari"],
+      //    },
+      // },
    ],
 
    /* Folder for test artifacts such as screenshots, videos, traces, etc. */
