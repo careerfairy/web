@@ -162,9 +162,7 @@ export class CommonPage {
       await locator.click()
       await locator.focus()
 
-      await this.page
-         .getByRole("option", { name: stringToSelect, exact: true })
-         .click()
+      await this.page.getByRole("option", { name: stringToSelect }).click()
    }
 }
 
