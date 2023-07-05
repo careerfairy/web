@@ -1,6 +1,6 @@
 import { linearProgressClasses } from "@mui/material/LinearProgress"
 import { alpha } from "@mui/material/styles"
-import { FC } from "react"
+import { FC, useState } from "react"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
 import { collection, query, QueryConstraint, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
@@ -12,10 +12,13 @@ import { GroupQuestionOption } from "@careerfairy/shared-lib/src/groups"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import {
    CardVotes,
-   CardVotesSectionSkeleton,
    CardVotesOption,
    SectionContainer,
+   VoteOptionSkeleton,
 } from "./CardVotes"
+import { Button } from "@mui/material"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 
 const styles = sxStyles({
    entryRoot: {
@@ -30,6 +33,14 @@ const styles = sxStyles({
    },
    count: {
       color: "primary.main",
+   },
+   expandButton: {
+      borderRadius: 4,
+      color: "black !important",
+      textTransform: "none",
+      fontSize: 13,
+      fontWeight: "normal",
+      border: `1px solid #E3F8F5 !important`,
    },
 })
 
@@ -80,11 +91,20 @@ const QuestionEntry: FC<QuestionEntryProps> = ({
       question.id
    )
 
+   const [showAll, setShowAll] = useState(false)
+
    if (loading) {
-      return <CardVotesSectionSkeleton />
+      return <VoteOptionSkeleton />
    }
 
    if (count === 0) return null // no votes, so don't show
+
+   const onClick = () => setShowAll((prev) => !prev)
+
+   const optionsEntries = Object.entries(question.options).slice(
+      0,
+      showAll ? undefined : 4
+   )
 
    return (
       <CardVotes
@@ -92,7 +112,7 @@ const QuestionEntry: FC<QuestionEntryProps> = ({
          totalVotes={loading ? "..." : count || 0}
          sxRoot={styles.entryRoot}
       >
-         {Object.entries(question.options).map(([id, option]) => (
+         {optionsEntries.map(([id, option]) => (
             <QuestionOption
                key={id}
                option={option}
@@ -102,7 +122,27 @@ const QuestionEntry: FC<QuestionEntryProps> = ({
                totalVotes={count ?? 0}
             />
          ))}
+         <ExpandButton expanded={showAll} onClick={onClick} />
       </CardVotes>
+   )
+}
+
+type ExpandButtonProps = {
+   expanded: boolean
+   onClick(): void
+}
+
+const ExpandButton = ({ expanded, onClick }: ExpandButtonProps) => {
+   const icon = expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+   return (
+      <Button
+         sx={styles.expandButton}
+         variant="outlined"
+         endIcon={icon}
+         onClick={onClick}
+      >
+         Show all answers
+      </Button>
    )
 }
 
