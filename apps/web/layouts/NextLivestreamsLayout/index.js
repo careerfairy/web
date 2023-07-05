@@ -4,7 +4,7 @@ import NavBar from "./NavBar"
 import { styles } from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles"
 import TopBar from "./TopBar"
 import useGeneralLinks from "../../components/custom-hook/useGeneralLinks"
-import FooterV2 from "../../components/views/footer/FooterV2"
+import Footer from "../../components/views/footer/Footer"
 import { Box } from "@mui/material"
 import Page from "../../components/views/common/Page"
 
@@ -40,7 +40,7 @@ const NextLivestreamsLayout = (props) => {
             <Box sx={styles.contentContainer}>
                <Box sx={styles.content}>
                   {children}
-                  <FooterV2 />
+                  <Footer />
                </Box>
             </Box>
          </Box>

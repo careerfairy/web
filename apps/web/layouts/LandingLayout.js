@@ -1,6 +1,6 @@
 import React from "react"
 import { styles } from "../materialUI/styles/layoutStyles/landingLayoutStyles"
-import FooterV2 from "../components/views/footer/FooterV2"
+import Footer from "../components/views/footer/Footer"
 import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { Box } from "@mui/material"
 import GeneralNavDrawer from "../components/views/navbar/GeneralNavDrawer"
@@ -21,7 +21,7 @@ const LandingLayout = ({ topImage, bottomImage, children }) => {
                <Box sx={stylesWithProps.content}>
                   <GeneralNavDrawer />
                   {children}
-                  <FooterV2 background={"transparent"} />
+                  <Footer background={"transparent"} />
                </Box>
             </Box>
          </Box>

@@ -1,7 +1,7 @@
 import React from "react"
 import { useTheme } from "@mui/material/styles"
 import TopBar from "./TopBar"
-import FooterV2 from "../../components/views/footer/FooterV2"
+import Footer from "../../components/views/footer/Footer"
 import GeneralNavDrawer from "../../components/views/navbar/GeneralNavDrawer"
 import Page, {
    PageChildrenWrapper,
@@ -20,7 +20,7 @@ const UpcomingLayout = ({ children, viewRef = undefined }) => {
                <GeneralNavDrawer />
                <PageChildrenWrapper>{children}</PageChildrenWrapper>
             </PageContentWrapper>
-            <FooterV2 background={theme.palette.common.white} />
+            <Footer background={theme.palette.common.white} />
          </Page>
       </CreditsDialogLayout>
    )

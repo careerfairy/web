@@ -1,5 +1,5 @@
 import React from "react"
-import FooterV2 from "../components/views/footer/FooterV2"
+import Footer from "../components/views/footer/Footer"
 import GeneralNavDrawer from "../components/views/navbar/GeneralNavDrawer"
 import GenericHeader from "../components/views/header/GenericHeader"
 import Page, {
@@ -45,7 +45,7 @@ const GeneralLayout = ({
             <GeneralNavDrawer isPersistent={isDesktop ? persistent : null} />
             <PageChildrenWrapper>
                {children}
-               <FooterV2 bottom={fullScreen} />
+               <Footer bottom={fullScreen} />
             </PageChildrenWrapper>
          </PageContentWrapper>
       </Page>
