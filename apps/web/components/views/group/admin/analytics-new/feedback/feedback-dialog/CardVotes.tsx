@@ -171,52 +171,43 @@ export const CardVotesOption = ({
 
 export const CardVotesSectionSkeleton = () => {
    return (
-      <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
-         <Stack spacing={2}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-               <Skeleton variant="text" width={200} height={40} />
-            </Stack>
-            <Box>
-               <Grid container spacing={2}>
-                  {Array.from({ length: 3 }).map((_, i) => (
-                     <Grid
-                        sx={cardVotesStyles.gridItem}
-                        key={i}
-                        item
-                        xs={12}
-                        md={6}
-                        lg={4}
-                     >
-                        <VoteOptionSkeleton />
-                     </Grid>
-                  ))}
-               </Grid>
-            </Box>
+      <Stack spacing={2}>
+         <Stack direction="row" alignItems="center" spacing={2}>
+            <Skeleton variant="text" width={200} height={40} />
          </Stack>
-      </Grid>
+         <Box>
+            <Grid container spacing={2}>
+               {Array.from({ length: 3 }).map((_, i) => (
+                  <VoteOptionSkeleton key={i} />
+               ))}
+            </Grid>
+         </Box>
+      </Stack>
    )
 }
 
-const VoteOptionSkeleton = () => {
+export const VoteOptionSkeleton = () => {
    return (
-      <Stack spacing={1} sx={cardVotesStyles.entryRoot}>
-         <Typography variant="body2">
-            <Skeleton variant="text" width={40} />
-         </Typography>
-         <Typography variant="h6" width="80%">
-            <Skeleton width="100%" />
-         </Typography>
-         <Stack spacing={2}>
-            {Array.from({ length: 3 }).map((_, i) => (
-               <Skeleton
-                  key={i}
-                  sx={cardVotesStyles.optionSkeleton}
-                  variant="rectangular"
-                  width={`calc(100% * ${Math.random() * (1 - 0.5) + 0.5})`}
-                  height={50}
-               />
-            ))}
+      <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
+         <Stack spacing={1} sx={cardVotesStyles.entryRoot}>
+            <Typography variant="body2">
+               <Skeleton variant="text" width={40} />
+            </Typography>
+            <Typography variant="h6" width="80%">
+               <Skeleton width="100%" />
+            </Typography>
+            <Stack spacing={2}>
+               {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton
+                     key={i}
+                     sx={cardVotesStyles.optionSkeleton}
+                     variant="rectangular"
+                     width={`calc(100% * ${Math.random() * (1 - 0.5) + 0.5})`}
+                     height={50}
+                  />
+               ))}
+            </Stack>
          </Stack>
-      </Stack>
+      </Grid>
    )
 }

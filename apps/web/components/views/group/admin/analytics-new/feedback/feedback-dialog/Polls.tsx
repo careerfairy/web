@@ -7,9 +7,9 @@ import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useF
 import useCountQuery from "../../../../../../custom-hook/useCountQuery"
 import {
    CardVotes,
-   CardVotesSectionSkeleton,
    CardVotesOption,
    SectionContainer,
+   VoteOptionSkeleton,
 } from "./CardVotes"
 
 type PollsProps = {
@@ -45,7 +45,7 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
    const { count, loading } = usePollVotersCount(livestreamId, poll.id)
 
    if (loading) {
-      return <CardVotesSectionSkeleton />
+      return <VoteOptionSkeleton />
    }
 
    if (count === 0) return null // no votes, so don't show
