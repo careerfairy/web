@@ -120,7 +120,7 @@
    ],
    "devDependencies": {
       "@careerfairy/seed-data": "*",
-      "@playwright/test": "^1.35.1",
+      "@playwright/test": "^1.27.1",
       "@storybook/addon-a11y": "^7.0.23",
       "@storybook/addon-essentials": "^7.0.22",
       "@storybook/addon-interactions": "^7.0.22",
