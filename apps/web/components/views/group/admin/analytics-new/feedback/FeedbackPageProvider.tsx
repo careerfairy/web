@@ -17,6 +17,7 @@ export const SORT_DIRECTIONS = {
 } as const
 
 type IFeedbackPageContext = {
+   livestreamId: string
    handleOpenFeedbackDialog: (livestreamId: string) => void
    handleCloseFeedbackDialog: () => void
    sortDirection: keyof typeof SORT_DIRECTIONS
@@ -24,6 +25,7 @@ type IFeedbackPageContext = {
 }
 
 const initialValues: IFeedbackPageContext = {
+   livestreamId: "",
    handleOpenFeedbackDialog: () => {},
    handleCloseFeedbackDialog: () => {},
    sortDirection: "Latest",
@@ -66,8 +68,14 @@ export const FeedbackPageProvider: FC = ({ children }) => {
          handleCloseFeedbackDialog,
          sortDirection,
          setSortDirection,
+         livestreamId,
       }),
-      [handleCloseFeedbackDialog, handleOpenFeedbackDialog, sortDirection]
+      [
+         handleCloseFeedbackDialog,
+         handleOpenFeedbackDialog,
+         livestreamId,
+         sortDirection,
+      ]
    )
 
    return (
