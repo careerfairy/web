@@ -1,10 +1,6 @@
-import Stack from "@mui/material/Stack"
-import LinearProgress, {
-   linearProgressClasses,
-} from "@mui/material/LinearProgress"
-import { Box, Grid, Typography } from "@mui/material"
+import { linearProgressClasses } from "@mui/material/LinearProgress"
 import { alpha } from "@mui/material/styles"
-import { FC, useMemo } from "react"
+import { FC } from "react"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
 import { collection, query, QueryConstraint, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
@@ -12,10 +8,14 @@ import useCountQuery from "../../../../../../custom-hook/useCountQuery"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import useLivestream from "../../../../../../custom-hook/live-stream/useLivestream"
 import { useFeedbackPageContext } from "../FeedbackPageProvider"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/src/livestreams/LivestreamPresenter"
-import { CardVotersSkeleton, cardVotesStyles } from "./Polls"
 import { GroupQuestionOption } from "@careerfairy/shared-lib/src/groups"
 import { sxStyles } from "../../../../../../../types/commonTypes"
+import {
+   CardVotes,
+   CardVotesSectionSkeleton,
+   CardVotesOption,
+   SectionContainer,
+} from "./CardVotes"
 
 const styles = sxStyles({
    entryRoot: {
@@ -38,39 +38,28 @@ type GroupQuestionsProps = {}
 const GroupQuestions: FC<GroupQuestionsProps> = () => {
    const { livestreamId } = useFeedbackPageContext()
    const { group } = useGroup()
-   const { data: livestream, status, error } = useLivestream(livestreamId)
+   const { data: livestream, status } = useLivestream(livestreamId)
 
    if (status === "loading") return null
 
    const groupQuestions = livestream?.groupQuestionsMap?.[group.id]
 
-   if (!Object.keys(groupQuestions?.questions).length) {
+   if (!groupQuestions || Object.keys(groupQuestions?.questions).length === 0) {
       // no questions, no UI
       return null
    }
 
    return (
-      <Stack spacing={2}>
-         <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="h5" fontWeight={600}>
-               Registration Questions
-            </Typography>
-         </Stack>
-         <Box>
-            <Grid container spacing={2}>
-               {Object.entries(groupQuestions.questions).map(
-                  ([id, question]) => (
-                     <QuestionEntry
-                        key={id}
-                        question={question}
-                        groupId={group.id}
-                        livestreamId={livestreamId}
-                     />
-                  )
-               )}
-            </Grid>
-         </Box>
-      </Stack>
+      <SectionContainer title="Registration Questions">
+         {Object.entries(groupQuestions.questions).map(([id, question]) => (
+            <QuestionEntry
+               key={id}
+               question={question}
+               groupId={group.id}
+               livestreamId={livestreamId}
+            />
+         ))}
+      </SectionContainer>
    )
 }
 
@@ -92,38 +81,28 @@ const QuestionEntry: FC<QuestionEntryProps> = ({
    )
 
    if (loading) {
-      return (
-         <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
-            <CardVotersSkeleton />
-         </Grid>
-      )
+      return <CardVotesSectionSkeleton />
    }
 
    if (count === 0) return null // no votes, so don't show
 
    return (
-      <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
-         <Stack spacing={1} sx={[cardVotesStyles.entryRoot, styles.entryRoot]}>
-            <Typography variant="body2">
-               {loading ? "..." : count || 0} votes
-            </Typography>
-            <Typography variant="h6" fontWeight={600}>
-               {question.name}
-            </Typography>
-            <Stack spacing={2}>
-               {Object.entries(question.options).map(([id, option]) => (
-                  <QuestionOption
-                     key={id}
-                     option={option}
-                     questionId={question.id}
-                     groupId={groupId}
-                     livestreamId={livestreamId}
-                     totalVotes={count ?? 0}
-                  />
-               ))}
-            </Stack>
-         </Stack>
-      </Grid>
+      <CardVotes
+         title={question.name}
+         totalVotes={loading ? "..." : count || 0}
+         sxRoot={styles.entryRoot}
+      >
+         {Object.entries(question.options).map(([id, option]) => (
+            <QuestionOption
+               key={id}
+               option={option}
+               questionId={question.id}
+               groupId={groupId}
+               livestreamId={livestreamId}
+               totalVotes={count ?? 0}
+            />
+         ))}
+      </CardVotes>
    )
 }
 
@@ -150,28 +129,13 @@ const QuestionOption: FC<QuestionOptionProps> = ({
    )
 
    return (
-      <Box sx={cardVotesStyles.optionRoot}>
-         <Stack
-            spacing={1.1}
-            direction="row"
-            alignItems="center"
-            sx={cardVotesStyles.optionDetails}
-         >
-            <Box sx={[cardVotesStyles.count, styles.count]}>
-               <Typography variant="body2" fontWeight={600}>
-                  {count ?? 0}
-               </Typography>
-            </Box>
-            <Typography fontSize="0.95rem" lineHeight="1.5rem" variant="body2">
-               {option.name}
-            </Typography>
-         </Stack>
-         <LinearProgress
-            sx={[cardVotesStyles.optionProgress, styles.optionProgress]}
-            variant="determinate"
-            value={count ? (count / totalVotes) * 100 : 0}
-         />
-      </Box>
+      <CardVotesOption
+         count={count}
+         title={option.name}
+         total={totalVotes}
+         sxProgress={styles.optionProgress}
+         sxText={styles.count}
+      />
    )
 }
 
