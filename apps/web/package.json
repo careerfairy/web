@@ -3,7 +3,7 @@
    "version": "0.0.0",
    "private": true,
    "scripts": {
-      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next",
+      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true rimraf .next && next dev",
       "build": "next build --debug",
       "start": "next start",
       "lint": "next lint",
@@ -88,6 +88,7 @@
       "react-pdf": "^5.6.0",
       "react-photo-album": "^2.0.2",
       "react-player": "^2.12.0",
+      "react-quill": "^2.0.0",
       "react-redux": "^7.2.3",
       "react-redux-firebase": "^3.10.0",
       "react-responsive-masonry": "^2.1.4",

@@ -21,9 +21,9 @@ import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
-import CloseIcon from "@mui/icons-material/Close"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import DateUtil from "../../../../util/DateUtil"
+import QuillField from "components/views/common/rich-text/QuillField"
 
 type Props = {
    isGroupsSelected: boolean
@@ -291,38 +291,6 @@ const StreamInfo = ({
                   inputFormat={"dd/MM/yyyy HH:mm"}
                   disablePast
                   ampm={false}
-                  // renderInput={(params) => (
-                  //    <Tooltip
-                  //       placement="top"
-                  //       arrow
-                  //       open={showStartTooltip && !startDatePickerOpen}
-                  //       title={
-                  //          <Box display="flex">
-                  //             <Typography>
-                  //                Promotion won’t available if the event happens
-                  //                within 30 days
-                  //             </Typography>
-                  //             <IconButton
-                  //                onClick={() => setShowStartToolTip(false)}
-                  //                size="small"
-                  //                color="info"
-                  //             >
-                  //                <CloseIcon />
-                  //             </IconButton>
-                  //          </Box>
-                  //       }
-                  //    >
-                  //       <TextField
-                  //          fullWidth
-                  //          {...params}
-                  //          id="start"
-                  //          onBlur={handleBlur}
-                  //          sx={{ svg: { color: palette.secondary.main } }}
-                  //          error={Boolean(errors.start && touched.start)}
-                  //          disabled={disableStartDatePicker}
-                  //       />
-                  //    </Tooltip>
-                  // )}
                   renderInput={(params) => (
                      <TextField
                         fullWidth
@@ -396,7 +364,8 @@ const StreamInfo = ({
 
             <Grid xs={12} item>
                <FormControl fullWidth>
-                  <TextField
+                  <QuillField name="summary" />
+                  {/* <TextField
                      className="multiLineInput"
                      name="summary"
                      variant="outlined"
@@ -418,7 +387,7 @@ const StreamInfo = ({
                         "  - Agenda: 30 minutes presentation and 30 minutes Q&A"
                      }
                      sx={{ minHeight: "100px", textAlign: "start" }}
-                  />
+                  /> */}
                   <Collapse
                      className={classes.errorMessage}
                      in={Boolean(errors.summary && touched.summary)}
