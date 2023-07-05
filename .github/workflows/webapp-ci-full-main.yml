@@ -1,10 +1,18 @@
-name: "Build, Test and Deploy - Main/Develop"
+name: "Build, Test and Deploy"
 on:
-   # Trigger on pushes targeting these branches
+   # Triggers on pushes targeting these branches
    push:
       branches:
          - main
-         - develop
+         # - develop
+         # we almost never use the staging env, no need to waste
+         # minutes by deploying there every time if we don't use it
+
+   # Triggers on opened/reopened PRs
+   pull_request:
+
+   # Allow manually trigger the CI in github
+   workflow_dispatch:
 
 env:
    # https://turborepo.org/docs/guides/continuous-integration
