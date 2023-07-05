@@ -49,7 +49,9 @@ test.describe("Livestream Registration Signed In", () => {
       user,
    }) => {
       const { livestream } = await setupLivestreamData(undefined, {
-         groupQuestionsMap: null,
+         overrideLivestreamDetails: {
+            groupQuestionsMap: null,
+         },
       })
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
@@ -62,15 +64,15 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupLivestreamData(
-         {
+      const { livestream } = await setupLivestreamData(undefined, {
+         overrideGroupDetails: {
             privacyPolicyActive: true,
             privacyPolicyUrl: "https://careerfairy.io",
          },
-         {
+         overrideLivestreamDetails: {
             groupQuestionsMap: null,
-         }
-      )
+         },
+      })
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
@@ -84,9 +86,11 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupLivestreamData({
-         privacyPolicyActive: true,
-         privacyPolicyUrl: "https://careerfairy.io",
+      const { livestream } = await setupLivestreamData(undefined, {
+         overrideGroupDetails: {
+            privacyPolicyActive: true,
+            privacyPolicyUrl: "https://careerfairy.io",
+         },
       })
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
@@ -138,11 +142,13 @@ test.describe("Livestream Registration Signed In", () => {
          "Temporarily disabled on WebKit until Agora supports Webkit 16.x"
       )
 
-      const { livestream } = await setupLivestreamData(
-         {},
-         { groupQuestionsMap: null },
-         "createLive"
-      )
+      const { livestream } = await setupLivestreamData(undefined, {
+         overrideLivestreamDetails: {
+            groupQuestionsMap: null,
+         },
+         livestreamType: "createLive",
+      })
+
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       // open page
@@ -165,7 +171,9 @@ test.describe("Livestream Registration Signed Out", () => {
    test("past event without login should request the user to login to access the recording", async ({
       page,
    }) => {
-      const { livestream } = await setupLivestreamData({}, {}, "createPast")
+      const { livestream } = await setupLivestreamData(undefined, {
+         livestreamType: "createPast",
+      })
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await page.goto("/past-livestreams")

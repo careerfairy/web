@@ -108,16 +108,18 @@ const CardCustom: FC<Props> = ({
    )
 
    return (
-      <Card sx={mergedSxProps}>
+      <Card data-testid="card-custom" sx={mergedSxProps}>
          <CardHeader
             sx={styles.cardHeader}
-            title={title}
+            title={<span data-testid="card-title">{title}</span>}
             action={action}
             titleTypographyProps={styles.cardTitleTypographyProps}
             disableTypography={disableTypography}
-            subheader={subHeader}
+            subheader={<span data-testid="card-subheader">{subHeader}</span>}
          />
-         <CardContent sx={styles.cardContent}>{children}</CardContent>
+         <CardContent sx={styles.cardContent}>
+            <span data-testid="card-value">{children}</span>
+         </CardContent>
       </Card>
    )
 }
