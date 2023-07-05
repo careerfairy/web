@@ -92,10 +92,18 @@ class UserFirebaseSeed implements UserSeed {
                code: "other",
             },
             universityCountryCode: "CH",
+            fieldOfStudy: {
+               name: "Computer science",
+               id: "computer_science",
+            },
+            levelOfStudy: {
+               name: "Bachelor",
+               id: "bachelor",
+            },
             unsubscribed: false,
             referralCode: uuidv4(),
             welcomeDialogComplete: true, // hidden
-         },
+         } as UserData,
          extraUserData
       ) as UserData
 

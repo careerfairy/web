@@ -1,7 +1,7 @@
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import Ratings, { RatingsSkeleton } from "./Ratings"
 import Questions from "./Questions"
-import Polls, { PollsSkeleton } from "./Polls"
+import Polls from "./Polls"
 import Stack from "@mui/material/Stack"
 import React, { FC } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
@@ -12,6 +12,8 @@ import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { getMaxLineStyles } from "../../../../../../helperFunctions/HelperFunctions"
 import Collapse from "@mui/material/Collapse"
+import GroupQuestions from "./GroupQuestions"
+import { CardVotesSectionSkeleton } from "./CardVotes"
 
 const styles = sxStyles({
    time: {
@@ -30,10 +32,12 @@ const styles = sxStyles({
       alignItems: "flex-end",
    },
 })
+
 type OverviewContentProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
+
 export const GeneralOverviewContent: FC<OverviewContentProps> = ({
    livestreamStats,
    groupId,
@@ -45,7 +49,12 @@ export const GeneralOverviewContent: FC<OverviewContentProps> = ({
                <Ratings groupId={groupId} livestreamStats={livestreamStats} />
             </SuspenseWithBoundary>
             <Questions livestreamStats={livestreamStats} />
-            <SuspenseWithBoundary fallback={<PollsSkeleton />}>
+
+            <SuspenseWithBoundary fallback={<CardVotesSectionSkeleton />}>
+               <GroupQuestions />
+            </SuspenseWithBoundary>
+
+            <SuspenseWithBoundary fallback={<CardVotesSectionSkeleton />}>
                <Polls livestreamStats={livestreamStats} />
             </SuspenseWithBoundary>
          </Stack>

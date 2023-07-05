@@ -198,7 +198,7 @@ const UserLivestreamDataTable: FC<TableProps> = ({
    }
 
    return (
-      <Box sx={styles.root}>
+      <Box data-testid="user-livestream-data-table" sx={styles.root}>
          {hideToolbar ? null : <Toolbar />}
          <MaterialTable
             data={data}
