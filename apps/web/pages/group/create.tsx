@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react"
 import Head from "next/head"
 import { useRouter } from "next/router"
+import { v4 as uuidv4 } from "uuid"
+import { Container, Step, StepLabel, Stepper } from "@mui/material"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import {
+   Group,
+   GroupQuestion,
+   sortGroupQuestionOptionsByName,
+} from "@careerfairy/shared-lib/dist/groups"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import Header from "../../components/views/header/Header"
 import Footer from "../../components/views/footer/Footer"
@@ -12,19 +23,8 @@ import CompleteGroup from "../../components/views/group/create/CompleteGroup"
 import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 import Loader from "../../components/views/loader/Loader"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { v4 as uuidv4 } from "uuid"
-
-import { Container, Step, StepLabel, Stepper } from "@mui/material"
-import {
-   Group,
-   GroupQuestion,
-   sortGroupQuestionOptionsByName,
-} from "@careerfairy/shared-lib/dist/groups"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { fieldOfStudyRepo } from "../../data/RepositoryInstances"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 function getSteps() {
    return [
