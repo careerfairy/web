@@ -6,12 +6,14 @@ export class PortalPage extends CommonPage {
    readonly UpcomingEventsHeader: Locator
    readonly NextEventsHeader: Locator
    readonly skipVideoButton: Locator
+   readonly logo: Locator
 
    constructor(page: Page) {
       super(page)
       this.UpcomingEventsHeader = page.locator("text=COMING UP NEXT")
       this.NextEventsHeader = page.locator("text=MY NEXT EVENTS")
       this.cookieAcceptButton = page.locator("id=rcc-confirm-button")
+      this.logo = page.locator("href=/")
       this.skipVideoButton = this.page.getByRole("button", {
          name: "Skip video",
       })
@@ -23,5 +25,9 @@ export class PortalPage extends CommonPage {
 
       // welcome view
       await expect(this.page.getByText("Welcome to CareerFairy!")).toBeVisible()
+   }
+
+   async clickLogo() {
+      return this.logo?.click()
    }
 }
