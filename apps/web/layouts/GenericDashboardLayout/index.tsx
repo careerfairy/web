@@ -4,7 +4,7 @@ import TopBar from "./TopBar"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import GenericNavList from "./GenericNavList"
 import { createContext, useContext, useMemo } from "react"
-import FooterV2 from "../../components/views/footer/FooterV2"
+import Footer from "../../components/views/footer/Footer"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import DropdownNavigator from "./DropdownNavigator"
 import { INavLink } from "../types"
@@ -159,7 +159,7 @@ const GenericDashboardLayout = ({
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
             >
                {children}
-               <FooterV2 background={bgColor || "#F7F8FC"} />
+               <Footer background={bgColor || "#F7F8FC"} />
                <CreditsDialog
                   onClose={handleCloseCreditsDialog}
                   open={creditsDialogOpen}
