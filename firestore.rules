@@ -545,6 +545,15 @@ service cloud.firestore {
                 allow read, write: if request.auth.uid == uid || isCFAdmin();
             }
         }
+        match /timelineUniversities/{timelineUniversity}{
+            allow read: if true;
+            allow write: if isCFAdmin();
+            
+            match /periods/{period}{
+                allow read: if true;
+                allow write: if isCFAdmin();
+            }
+        }
         match /{somePath=**}/userLivestreamData/{userEmail} {
             allow read: if true;
             allow write: if isSignedInAndIsSameUser(userEmail);
