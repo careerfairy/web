@@ -19,13 +19,13 @@ export class UniversityTimelineService {
     * A promise will be created but not awaited
     *
     * @param name - university name
-    * @param country - university country location
+    * @param countryCode - university country location
     * @returns A promise to a DocumentReference of the newly created document
     */
-   addTimelineUniversity(name: string, country: string) {
+   addTimelineUniversity(name: string, countryCode: string) {
       return addDoc(collection(this.firestore, "timelineUniversities"), {
          name: name,
-         country: country,
+         countryCode: countryCode,
       })
    }
 
@@ -35,13 +35,13 @@ export class UniversityTimelineService {
     * A promise will be created but not awaited
     *
     * @param name - name of the university
-    * @param country - country of the university
-    * @param docId - firestore document id of the university
+    * @param countryCode - country of the university
+    * @param uniId - firestore document id of the university
     */
-   updateTimelineUniversity(name: string, country: string, uniId: string) {
+   updateTimelineUniversity(name: string, countryCode: string, uniId: string) {
       setDoc(doc(this.firestore, "timelineUniversities", uniId), {
          name: name,
-         country: country,
+         countryCode: countryCode,
       })
    }
 
@@ -83,6 +83,7 @@ export class UniversityTimelineService {
          type: type,
          start: Timestamp.fromDate(start),
          end: Timestamp.fromDate(end),
+         timelineUniversityId: uniId,
       }
       return addDoc(periodRef, data)
    }
@@ -116,6 +117,7 @@ export class UniversityTimelineService {
          type: type,
          start: Timestamp.fromDate(start),
          end: Timestamp.fromDate(end),
+         timelineUniversityId: uniId,
       }
       setDoc(period, data)
    }

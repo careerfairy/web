@@ -1,11 +1,14 @@
 import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 
-export enum UniversityPeriodType {
-   Exam = "exam",
-   Vacation = "vacation",
-   Lecture = "lecture",
-}
+export const UniversityPeriodObject = {
+   Exam: "exam",
+   Vacation: "vacation",
+   Lecture: "lecture",
+} as const
+
+export type UniversityPeriodType =
+   (typeof UniversityPeriodObject)[keyof typeof UniversityPeriodObject]
 
 export interface TimelineUniversity extends Identifiable {
    name: string
