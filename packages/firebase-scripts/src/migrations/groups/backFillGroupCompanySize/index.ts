@@ -70,7 +70,7 @@ const saveGroups = async (groups: Group[]) => {
 
          batch.update(groupRef, {
             companySize: NEW_COMPANY_SIZE,
-         })
+         } as Partial<Group>)
 
          counter.writeIncrement() // Increment write counter
       }
