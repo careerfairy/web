@@ -104,12 +104,6 @@ const saveLivestreams = async (livestreams: DeepPartial<LivestreamEvent>[]) => {
             .collection("livestreams")
             .doc(livestream.id)
 
-         if (!livestreamRef) {
-            Counter.log(
-               `Livestream with id ${livestream.id} does not exist, skipping...`
-            )
-            continue
-         }
 
          const companySizes = livestream.companySizes.filter(
             (size) => size !== COMPANY_SIZE
