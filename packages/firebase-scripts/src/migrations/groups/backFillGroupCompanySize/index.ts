@@ -32,7 +32,7 @@ export async function run() {
 
       counter.addToReadCount((livestreams?.length ?? 0) + (groups?.length ?? 0))
 
-      await [saveGroups(groups), saveLivestreams(livestreams)]
+      await Promise.all([saveGroups(groups), saveLivestreams(livestreams)])
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -116,8 +116,8 @@ const saveLivestreams = async (livestreams: DeepPartial<LivestreamEvent>[]) => {
          )
 
          batch.update(livestreamRef, {
-            companySizes: [...companySizes, NEW_COMPANY_SIZE],
-         })
+            companySizes: [...new Set([...companySizes, NEW_COMPANY_SIZE])],
+         } as Partial<LivestreamEvent>)
 
          counter.writeIncrement() // Increment write counter
       }
