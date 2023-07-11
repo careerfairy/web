@@ -213,7 +213,7 @@ export class LivestreamScriptsRepository
       } else {
          snaps = await this.firestore
             .collection("livestreams")
-            .where("companySize", "in", [companySize])
+            .where("companySizes", "array-contains-any", [companySize])
             .get()
       }
       return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
