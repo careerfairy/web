@@ -15,20 +15,22 @@ const NEW_COMPANY_SIZE = "1001-3000"
 
 export async function run() {
    try {
-      const [livestreams, groups] = await logAction(
-         () =>
-            Promise.all([
-               livestreamRepo.getAllLivestreamsWithCompanySize(COMPANY_SIZE),
-               groupRepo.getAllGroupsWithCompanySize(COMPANY_SIZE),
-            ]),
-         "Fetching all livestream and groups"
-      )
+      const [livestreams, groups] = await Promise.all([
+         logAction(
+            () => livestreamRepo.getAllLivestreamsWithCompanySize(COMPANY_SIZE),
+            "Fetching Livestreams"
+         ),
+         logAction(
+            () => groupRepo.getAllGroupsWithCompanySize(COMPANY_SIZE),
+            "Fetching Groups"
+         ),
+      ])
 
       Counter.log(
-         `Fetched ${livestreams.length} livestream and ${groups.length} groups`
+         `Fetched ${livestreams?.length} livestream and ${groups?.length} groups`
       )
 
-      counter.addToReadCount(livestreams.length + groups.length)
+      counter.addToReadCount((livestreams?.length ?? 0) + (groups?.length ?? 0))
 
       await [saveGroups(groups), saveLivestreams(livestreams)]
    } catch (error) {
@@ -42,7 +44,10 @@ export async function run() {
 const saveGroups = async (groups: Group[]) => {
    let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
-   const totalNumDocs = groups.length
+   const totalNumDocs = groups?.length ?? 0
+
+   if (!totalNumDocs)
+      return Counter.log(`No Groups to be processed, skipping...`)
 
    writeProgressBar.start(totalNumDocs, 0)
 
@@ -56,19 +61,15 @@ const saveGroups = async (groups: Group[]) => {
 
          const groupRef = firestore.collection("careerCenterData").doc(groupId)
 
-         const group = groups[groupId]
+         const group = groups.filter((group) => group.id === groupId)
 
          if (!group) {
             Counter.log(`Group with id ${groupId} does not exist, skipping...`)
             continue
          }
 
-         const companySizes = group.companySizes.filter(
-            (size) => size !== COMPANY_SIZE
-         )
-
          batch.update(groupRef, {
-            companySize: [...companySizes, NEW_COMPANY_SIZE],
+            companySize: NEW_COMPANY_SIZE,
          })
 
          counter.writeIncrement() // Increment write counter
@@ -78,13 +79,16 @@ const saveGroups = async (groups: Group[]) => {
    }
 
    writeProgressBar.stop()
-   Counter.log("All batches committed! :)")
+   Counter.log("All Groups batches committed! :)")
 }
 
 const saveLivestreams = async (livestreams: DeepPartial<LivestreamEvent>[]) => {
    let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
-   const totalNumDocs = livestreams.length
+   const totalNumDocs = livestreams?.length
+
+   if (!totalNumDocs)
+      return Counter.log(`No Livestreams to be processed, skipping...`)
 
    writeProgressBar.start(totalNumDocs, 0)
 
@@ -112,7 +116,7 @@ const saveLivestreams = async (livestreams: DeepPartial<LivestreamEvent>[]) => {
          )
 
          batch.update(livestreamRef, {
-            companySize: [...companySizes, NEW_COMPANY_SIZE],
+            companySizes: [...companySizes, NEW_COMPANY_SIZE],
          })
 
          counter.writeIncrement() // Increment write counter
@@ -122,5 +126,5 @@ const saveLivestreams = async (livestreams: DeepPartial<LivestreamEvent>[]) => {
    }
 
    writeProgressBar.stop()
-   Counter.log("All batches committed! :)")
+   Counter.log("All Livestreams batches committed! :)")
 }
