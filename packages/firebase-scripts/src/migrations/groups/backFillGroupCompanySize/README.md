@@ -1,17 +1,9 @@
 # Back-fill Group Stats
 
-Will fetch all the livestream stats in memory, loop through all the connected groups and
-sum up the stats for each group. The stats that are not set by this script will not be overwritten by this merge :).
-
-### Group Stats that are updated (general and per university code):
-
--  numberOfParticipants
--  numberOfRegistrations
--  numberOfApplications
--  numberOfPeopleReached
+We are required to modify all entries in the database related to groups and livestreams, specifically where the company size is marked as "1001+". The new value to be set for these records should be "1001-3000". :).
 
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupStats
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupCompanySize
 ```
