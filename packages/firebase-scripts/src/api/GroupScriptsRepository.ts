@@ -212,7 +212,7 @@ export class GroupScriptsRepository
    ) {
       const groups = await this.firestore
          .collection("careerCenterData")
-         .where("companySize", "in", [companySize])
+         .where("companySize", "==", companySize)
          .get()
       return mapFirestoreDocuments<Group, T>(groups, withRef)
    }
