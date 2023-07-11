@@ -4,11 +4,14 @@ import {
    deleteDoc,
    doc,
    Firestore,
-   Timestamp,
-   setDoc,
+   updateDoc,
 } from "firebase/firestore"
 import { FirestoreInstance } from "./FirebaseInstance"
-import { UniversityPeriodType } from "@careerfairy/shared-lib/universities/universityTimeline"
+import {
+   TimelineUniversity,
+   UniversityPeriod,
+} from "@careerfairy/shared-lib/universities/universityTimeline"
+import { Create } from "@careerfairy/shared-lib/commonTypes"
 
 export class UniversityTimelineService {
    constructor(private readonly firestore: Firestore) {}
@@ -18,15 +21,11 @@ export class UniversityTimelineService {
     *
     * A promise will be created but not awaited
     *
-    * @param name - university name
-    * @param countryCode - university country location
+    * @param uni - the university data to add
     * @returns A promise to a DocumentReference of the newly created document
     */
-   addTimelineUniversity(name: string, countryCode: string) {
-      return addDoc(collection(this.firestore, "timelineUniversities"), {
-         name: name,
-         countryCode: countryCode,
-      })
+   addTimelineUniversity(uni: Create<TimelineUniversity>) {
+      return addDoc(collection(this.firestore, "timelineUniversities"), uni)
    }
 
    /**
@@ -34,19 +33,15 @@ export class UniversityTimelineService {
     *
     * A promise will be created but not awaited
     *
-    * @param name - name of the university
-    * @param countryCode - country of the university
-    * @param uniId - firestore document id of the university
+    * @param uniId - document id of the university
+    * @param uni - the university data to update
     */
-   updateTimelineUniversity(name: string, countryCode: string, uniId: string) {
-      setDoc(doc(this.firestore, "timelineUniversities", uniId), {
-         name: name,
-         countryCode: countryCode,
-      })
+   updateTimelineUniversity(uniId: string, uni: Partial<TimelineUniversity>) {
+      updateDoc(doc(this.firestore, "timelineUniversities", uniId), uni)
    }
 
    /**
-    * Updates a TimelineUniversity in the database
+    * Removes a TimelineUniversity from the database
     *
     * A promise will be created but not awaited
     *
@@ -62,30 +57,17 @@ export class UniversityTimelineService {
     * A promise will be created but not awaited
     *
     * @param uniId - the university document id
-    * @param type - the type of the period
-    * @param start - the start date of the period
-    * @param end - the end date of the period
+    * @param period - the period data to add
     * @returns A promise to a DocumentReference to the newly created document
     */
-   addUniversityPeriod(
-      uniId: string,
-      type: UniversityPeriodType,
-      start: Date,
-      end: Date
-   ) {
+   addUniversityPeriod(uniId: string, period: Create<UniversityPeriod>) {
       const periodRef = collection(
          this.firestore,
          "timelineUniversities",
          uniId,
          "periods"
       )
-      const data = {
-         type: type,
-         start: Timestamp.fromDate(start),
-         end: Timestamp.fromDate(end),
-         timelineUniversityId: uniId,
-      }
-      return addDoc(periodRef, data)
+      return addDoc(periodRef, period)
    }
 
    /**
@@ -94,32 +76,22 @@ export class UniversityTimelineService {
     * A promise will be created but not awaited
     *
     * @param uniId - the TimelineUniversity's document id
-    * @param type - the new type of the period
-    * @param start - the new start date of the period
-    * @param end - the new end date of the period
-    * @param periodId - the id of the period to update
+    * @param periodId - the document id of the period to update
+    * @param period - the period data to update
     */
    updateUniversityPeriod(
       uniId: string,
-      type: UniversityPeriodType,
-      start: Date,
-      end: Date,
-      periodId: string
+      periodId: string,
+      period: Partial<UniversityPeriod>
    ) {
-      const period = doc(
+      const periodRef = doc(
          this.firestore,
          "timelineUniversities",
          uniId,
          "periods",
          periodId
       )
-      const data = {
-         type: type,
-         start: Timestamp.fromDate(start),
-         end: Timestamp.fromDate(end),
-         timelineUniversityId: uniId,
-      }
-      setDoc(period, data)
+      updateDoc(periodRef, period)
    }
 
    /**
