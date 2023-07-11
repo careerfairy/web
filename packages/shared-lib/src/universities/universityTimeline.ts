@@ -12,11 +12,12 @@ export type UniversityPeriodType =
 
 export interface TimelineUniversity extends Identifiable {
    name: string
-   country: string
+   countryCode: string
 }
 
 export interface UniversityPeriod extends Identifiable {
    type: UniversityPeriodType
    start: Timestamp
    end: Timestamp
+   timelineUniversityId: string
 }

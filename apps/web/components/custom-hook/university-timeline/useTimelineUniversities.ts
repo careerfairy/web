@@ -17,10 +17,10 @@ export const useTimelineUniversities = () => {
 /**
  * Custom hook to get timeline universities for a given country from the database
  **/
-export const useTimelineUniversitiesByCountry = (country: string) => {
+export const useTimelineUniversitiesByCountry = (countryCode: string) => {
    const uniQuery = query(
       collection(FirestoreInstance, "timelineUniversities"),
-      where("country", "==", country)
+      where("country", "==", countryCode)
    )
    return useFirestoreCollection<TimelineUniversity>(uniQuery, {
       idField: "id",
