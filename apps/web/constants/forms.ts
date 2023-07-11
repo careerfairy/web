@@ -1378,9 +1378,19 @@ export const CompanySizesCodes: DropdownItem[] = [
       label: "101-1000 employees",
    },
    {
-      id: "1001+",
-      value: "1001+",
-      label: "1001+ employees",
+      id: "1001-3000",
+      value: "1001-3000",
+      label: "1001-3000 employees",
+   },
+   {
+      id: "1001-3000",
+      value: "1001-3000",
+      label: "1001-3000 employees",
+   },
+   {
+      id: "10000+",
+      value: "10000+",
+      label: "10000+ employees",
    },
 ]
 
