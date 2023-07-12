@@ -19,7 +19,7 @@ import { buildDialogLink } from "../../livestream-dialog"
 const styles = sxStyles({
    noResultsMessage: {
       maxWidth: "800px",
-      margin: "0 auto",
+      margin: "0px auto",
       color: "rgb(130,130,130)",
       textAlign: "center",
    },
@@ -171,11 +171,7 @@ const NextLiveStreamsWithFilter = ({
 
    return (
       <>
-         <Container
-            maxWidth="xl"
-            disableGutters
-            sx={{ flex: 1, display: "flex" }}
-         >
+         <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
