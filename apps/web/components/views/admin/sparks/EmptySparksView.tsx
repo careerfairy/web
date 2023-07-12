@@ -31,6 +31,7 @@ const styles = sxStyles({
       fontSize: "1.71429rem",
       position: "relative",
       fontWeight: 700,
+      letterSpacing: "-0.03121rem",
    },
    btn: {
       textTransform: "none",
@@ -47,7 +48,12 @@ const EmptySparksView: FC<Props> = () => {
             Your company hasn’t created any{" "}
             <TitleText color="secondary.main">Sparks</TitleText> yet.
          </TitleText>
-         <Typography mt={1.5} fontSize="1.14286rem" fontWeight={400}>
+         <Typography
+            mt={1.5}
+            fontSize="1.14286rem"
+            letterSpacing="-0.03121rem"
+            fontWeight={400}
+         >
             Getting ready to start with the right content?
             <br /> We collected talent&apos;s most requested questions to
             inspire you
@@ -65,7 +71,7 @@ const EmptySparksView: FC<Props> = () => {
                Get inspired
             </Button>
             <Button sx={styles.btn} color="secondary" variant="contained">
-               Upload a spark
+               Upload a Spark
             </Button>
          </Stack>
       </Box>
