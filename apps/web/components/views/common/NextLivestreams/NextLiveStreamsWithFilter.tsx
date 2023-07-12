@@ -19,7 +19,7 @@ import { buildDialogLink } from "../../livestream-dialog"
 const styles = sxStyles({
    noResultsMessage: {
       maxWidth: "800px",
-      margin: "0px auto",
+      margin: "0 auto",
       color: "rgb(130,130,130)",
       textAlign: "center",
    },
