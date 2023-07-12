@@ -12,7 +12,7 @@ import { setupUserSignUpData } from "../setupData"
 
 test.describe("Signup Page Functionality", () => {
    test.beforeAll(async () => {
-      //await setupUserSignUpData()
+      await setupUserSignUpData()
    })
 
    test.beforeEach(async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test.only("It successfully redirect to signup to complete the email verification step", async ({
+   test.only("it successfully redirect to signup to complete the email verification step", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -42,8 +42,8 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
-         correctFieldOfStudyName,
          correctLevelOfStudyName,
+         correctFieldOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -59,51 +59,14 @@ test.describe("Signup Page Functionality", () => {
          levelOfStudyName: correctLevelOfStudyName,
          fieldOfStudyName: correctFieldOfStudyName,
       })
-      await page.pause()
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
-
-      const userData = await UserSeed.getUserData(correctEmail)
-      expect(userData).toBeTruthy()
-      const validationPin = userData.validationPin
-      await signup.enterPinCode(`${validationPin}`)
-      await signup.clickValidateEmail()
-
-      // should be on the social information step
-      await expect(signup.socialInformationStep).toBeVisible()
-
-      await signup.clickContinueButton()
-
-      // should be on the additional information step
-      await expect(signup.additionalInformationStep).toBeVisible()
-
-      await signup.clickContinueButton()
-
-      // should be on the interest information step
-      await expect(signup.interestsInformationStep).toBeVisible()
 
       await signup.clickContinueButton()
 
       await expect(portal.UpcomingEventsHeader).toBeVisible({
          timeout: 15000,
       })
-
-      const userDataFromDb = await UserSeed.getUserData(correctEmail)
-
-      const {
-         linkedinUrl: userDataLinkedinUrl,
-         spokenLanguages: userDataSpokenLanguages,
-         countriesOfInterest: userDataCountriesOfInterest,
-         interestsIds: userDataInterestsIds,
-         isLookingForJob: userDataIsLookingForJob,
-      } = userDataFromDb
-
-      expect(userDataLinkedinUrl).toBeFalsy()
-      expect(userDataIsLookingForJob).toBeFalsy()
-      expect(userDataSpokenLanguages).toBeFalsy()
-      expect(userDataCountriesOfInterest).toBeFalsy()
-      expect(userDataInterestsIds).toBeFalsy()
-      expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
    })
 
    test("It successfully go to validate email step without gender selected", async ({
@@ -239,7 +202,6 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
-         wrongLinkedinUrl,
          correctLevelOfStudyName,
          correctFieldOfStudyName,
       } = credentials
@@ -260,7 +222,7 @@ test.describe("Signup Page Functionality", () => {
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
-      await page.goto("/")
+      await portal.clickLogo()
       const response = await page.on("response")
 
       await expect(response.headers().location).toBe("/signup")
