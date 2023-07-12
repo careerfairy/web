@@ -59,6 +59,11 @@ export interface IGroupScriptsRepository extends IGroupRepository {
    getAllGroups<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, Group>[]>
+
+   getAllGroupsWithCompanySize<T extends boolean>(
+      companySize: string,
+      withRef?: T
+   ): Promise<DataWithRef<T, Group>[]>
 }
 
 export class GroupScriptsRepository
@@ -198,6 +203,17 @@ export class GroupScriptsRepository
 
    async getAllGroups<T extends boolean>(withRef?: T) {
       const groups = await this.firestore.collection("careerCenterData").get()
+      return mapFirestoreDocuments<Group, T>(groups, withRef)
+   }
+
+   async getAllGroupsWithCompanySize<T extends boolean>(
+      companySize,
+      withRef?: T
+   ) {
+      const groups = await this.firestore
+         .collection("careerCenterData")
+         .where("companySize", "==", companySize)
+         .get()
       return mapFirestoreDocuments<Group, T>(groups, withRef)
    }
 }
