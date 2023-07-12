@@ -171,11 +171,7 @@ const NextLiveStreamsWithFilter = ({
 
    return (
       <>
-         <Container
-            maxWidth="xl"
-            disableGutters
-            sx={{ flex: 1, display: "flex" }}
-         >
+         <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
