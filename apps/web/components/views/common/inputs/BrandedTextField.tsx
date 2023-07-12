@@ -4,11 +4,7 @@ import { styled } from "@mui/material/styles"
 
 const BrandedTextField = styled(
    (props: Omit<FilledTextFieldProps, "variant">) => (
-      <TextField
-         variant="filled"
-         InputProps={{ disableUnderline: true } as Partial<FilledInputProps>}
-         {...props}
-      />
+      <TextField variant="filled" InputProps={inputProps} {...props} />
    )
 )(({ theme }) => ({
    "& label": {
@@ -24,5 +20,7 @@ const BrandedTextField = styled(
       backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
    },
 }))
+
+const inputProps: Partial<FilledInputProps> = { disableUnderline: true }
 
 export default BrandedTextField
