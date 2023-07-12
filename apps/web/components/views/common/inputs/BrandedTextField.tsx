@@ -1,6 +1,6 @@
 import { FilledInputProps } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
-import { darken, styled } from "@mui/material/styles"
+import { styled } from "@mui/material/styles"
 
 const BrandedTextField = styled(
    (props: Omit<FilledTextFieldProps, "variant">) => (
@@ -12,7 +12,7 @@ const BrandedTextField = styled(
    )
 )(({ theme }) => ({
    "& label": {
-      color: "#9999B1",
+      color: theme.palette.mode === "dark" ? undefined : "#9999B1",
    },
    "& label.Mui-focused": {
       color: "#9999B1",
@@ -20,11 +20,8 @@ const BrandedTextField = styled(
    "& .MuiFilledInput-root": {
       borderRadius: theme.spacing(1),
       border: "1px solid",
-      borderColor: "#EDE7FD",
-      "&:hover": {
-         backgroundColor: darken("#F7F8FC", 0.015),
-      },
-      backgroundColor: "#F7F8FC",
+      borderColor: theme.palette.mode === "dark" ? "#EDE7FD" : "#ccc",
+      backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
    },
 }))
 
