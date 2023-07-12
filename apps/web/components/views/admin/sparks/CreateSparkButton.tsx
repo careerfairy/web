@@ -13,7 +13,7 @@ const styles = sxStyles({
 const CreateSparkButton: FC<Props> = () => {
    return (
       <Button color="secondary" sx={styles.root} variant="contained">
-         Upload a new spark
+         Upload a new Spark
       </Button>
    )
 }
