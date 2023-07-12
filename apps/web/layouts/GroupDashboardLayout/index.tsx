@@ -50,6 +50,7 @@ type GroupDashboardLayoutProps = {
    groupId: string
    pageDisplayName: string
    children: React.ReactNode
+   topBarCta?: React.ReactNode
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, pageDisplayName } = props
@@ -160,7 +161,10 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    return (
       <Outlet empty={empty} loading={loading}>
          <GroupContext.Provider value={contextValues}>
-            <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
+            <GroupDashboardLayoutProvider
+               topBarCta={props.topBarCta}
+               pageDisplayName={pageDisplayName}
+            >
                {children}
                {livestreamDialog.StreamCreationDialog}
             </GroupDashboardLayoutProvider>
