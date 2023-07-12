@@ -47,6 +47,9 @@ const GroupNavList = () => {
          !layout.leftDrawerOpen // they are not on mobile
    )
 
+   const hasAccessToSparks =
+      featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
+
    const navLinks = useMemo(() => {
       // Declare hrefs here if you are using them in multiple places
       const companyPageHref = `/${baseHrefPath}/${group.id}/admin/page`
@@ -75,13 +78,17 @@ const GroupNavList = () => {
                },
             ],
          },
-         {
-            id: "sparks",
-            href: `/${baseHrefPath}/${group.id}/admin/sparks`,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
-            Icon: SparksIcon,
-            title: "Sparks",
-         },
+         ...(hasAccessToSparks
+            ? [
+                 {
+                    id: "sparks",
+                    href: `/${baseHrefPath}/${group.id}/admin/sparks`,
+                    pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
+                    Icon: SparksIcon,
+                    title: "Sparks",
+                 },
+              ]
+            : []),
          {
             id: "company",
             title: "Company",
@@ -182,6 +189,7 @@ const GroupNavList = () => {
       group.id,
       group.universityCode,
       group.atsAdminPageFlag,
+      hasAccessToSparks,
       featureFlags.atsAdminPageFlag,
       showCompanyPageCTA,
       push,
