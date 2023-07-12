@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
 import { sparksGetInspiredPdf } from "constants/files"
 import { FC } from "react"
-import { PlayCircle as SparksIcon } from "react-feather"
+import SparksIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { sxStyles } from "types/commonTypes"
 
 const sparkIconSize = 61
@@ -24,6 +24,7 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       mx: "auto",
+      fontSize: sparkIconSize,
    },
    title: {
       display: "inline-block",
@@ -47,8 +48,9 @@ const EmptySparksView: FC<Props> = () => {
             <TitleText color="secondary.main">Sparks</TitleText> yet.
          </TitleText>
          <Typography mt={1.5} fontSize="1.14286rem" fontWeight={400}>
-            Getting ready to start with the right content? We collected
-            talent&apos;s most requested questions to inspire you
+            Getting ready to start with the right content?
+            <br /> We collected talent&apos;s most requested questions to
+            inspire you
          </Typography>
          <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
             <Button
@@ -73,7 +75,7 @@ const EmptySparksView: FC<Props> = () => {
 const SparkIllustration = () => {
    return (
       <Box sx={styles.icon}>
-         <SparksIcon width={sparkIconSize} height={sparkIconSize} />
+         <SparksIcon fontSize={"inherit"} />
       </Box>
    )
 }
