@@ -1,15 +1,15 @@
 import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-interface NextLivestreamsReducer {
+interface INextLivestreamsState {
    filterOpen: boolean
 }
 
-const initialState: NextLivestreamsReducer = {
+const initialState: INextLivestreamsState = {
    filterOpen: false,
 }
 
-const nextLivestreamsReducer: Reducer<NextLivestreamsReducer> = (
+const nextLivestreamsReducer: Reducer<INextLivestreamsState> = (
    state = initialState,
    { type, payload }
 ) => {

@@ -1,29 +1,29 @@
 // sparksSlice.ts
 import { createSlice } from "@reduxjs/toolkit"
 
-interface SparksState {
-   dialogOpen: boolean
+interface ISparksState {
+   sparkDialogOpen: boolean
 }
 
-const initialState: SparksState = {
-   dialogOpen: false,
+const initialState: ISparksState = {
+   sparkDialogOpen: false,
 }
 
 export const adminSparksSlice = createSlice({
    name: "Admin Sparks",
    initialState,
    reducers: {
-      openDialog: (state) => {
-         state.dialogOpen = true
+      openSparkDialog: (state) => {
+         state.sparkDialogOpen = true
       },
-      closeDialog: (state) => {
-         state.dialogOpen = false
+      closeSparkDialog: (state) => {
+         state.sparkDialogOpen = false
       },
    },
 })
 
 // Export actions
-export const { openDialog, closeDialog } = adminSparksSlice.actions
+export const { openSparkDialog, closeSparkDialog } = adminSparksSlice.actions
 
 // Export reducer
 export default adminSparksSlice.reducer

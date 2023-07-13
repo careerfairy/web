@@ -1,11 +1,11 @@
-import { getFirebase } from "react-redux-firebase"
-import { applyMiddleware, compose, createStore } from "redux"
-import { getFirestore, reduxFirestore } from "redux-firestore"
+import rootReducer from "./reducers"
 
+import thunk from "redux-thunk"
+import { applyMiddleware, compose, createStore } from "redux"
+import { getFirebase } from "react-redux-firebase"
+import { getFirestore, reduxFirestore } from "redux-firestore"
 import { createWrapper } from "next-redux-wrapper"
 import firebaseApp from "../data/firebase/FirebaseInstance"
-import rootReducer from "./reducers"
-import thunk from "redux-thunk"
 
 const initialState = {}
 

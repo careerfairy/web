@@ -5,7 +5,7 @@ import {
    REMOVE_SNACKBAR,
 } from "../actions/actionTypes"
 
-interface SnackbarReducer {
+interface ISnackbarState {
    notifications: {
       key: string
       message: string
@@ -14,11 +14,11 @@ interface SnackbarReducer {
    }[]
 }
 
-const defaultState = {
+const defaultState: ISnackbarState = {
    notifications: [],
 }
 
-const snackbarReducer: Reducer<SnackbarReducer> = (
+const snackbarReducer: Reducer<ISnackbarState> = (
    state = defaultState,
    action
 ) => {

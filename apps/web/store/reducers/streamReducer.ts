@@ -3,7 +3,7 @@ import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
 import { Reducer } from "redux"
 
-interface StreamReducer {
+interface IStreamState {
    layout: {
       streamerBreakoutRoomModalOpen: boolean
       viewerBreakoutRoomModalOpen: boolean
@@ -52,7 +52,7 @@ interface StreamReducer {
    }
 }
 
-const initialState: StreamReducer = {
+const initialState: IStreamState = {
    layout: {
       streamerBreakoutRoomModalOpen: false,
       viewerBreakoutRoomModalOpen: false,
@@ -112,7 +112,7 @@ const initialState: StreamReducer = {
    },
 }
 
-const streamReducer: Reducer<StreamReducer> = (
+const streamReducer: Reducer<IStreamState> = (
    state = initialState,
    { type, payload }
 ) => {
