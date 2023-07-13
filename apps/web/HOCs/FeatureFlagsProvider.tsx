@@ -4,6 +4,12 @@ import { ParsedUrlQuery } from "querystring"
 
 type FlagKeys = "atsAdminPageFlag" | "sparksAdminPageFlag"
 
+const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
+
+const paramsHaveGroupIds = (params: ParsedUrlQuery, groupIds: string[]) => {
+   return groupIds.includes(params?.groupId?.toString())
+}
+
 /**
  * All feature flags with initial state
  *
@@ -20,20 +26,14 @@ export const flagsInitialState: Record<FlagKeys, FeatureFlag> = {
       enabled: false,
       conditionalEnable: (path: string, params: ParsedUrlQuery) => {
          // Enable ATS for the following groups
-         // rTUGXDAG2XAtpVcgvAcc and qENR2aNDhehkLDYryTRN are test groups
-         return ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"].includes(
-            params?.groupId?.toString()
-         )
+         return paramsHaveGroupIds(params, testGoups)
       },
    },
    sparksAdminPageFlag: {
       enabled: false,
       conditionalEnable: (path: string, params: ParsedUrlQuery) => {
          // Enable Sparks for the following groups
-         // rTUGXDAG2XAtpVcgvAcc and qENR2aNDhehkLDYryTRN are test groups
-         return ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"].includes(
-            params?.groupId?.toString()
-         )
+         return paramsHaveGroupIds(params, testGoups)
       },
    },
 }
