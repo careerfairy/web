@@ -29,7 +29,6 @@ const styles = sxStyles({
    title: {
       display: "inline-block",
       fontSize: "1.71429rem",
-      position: "relative",
       fontWeight: 700,
       letterSpacing: "-0.03121rem",
    },
@@ -40,39 +39,42 @@ const styles = sxStyles({
 
 const EmptySparksView: FC = () => {
    return (
-      <Box sx={styles.root}>
-         <SparkIllustration />
-         <TitleText mt={2.5} maxWidth={380}>
-            Your company hasn’t created any{" "}
-            <TitleText color="secondary.main">Sparks</TitleText> yet.
-         </TitleText>
-         <Typography
-            mt={1.5}
-            fontSize="1.14286rem"
-            letterSpacing="-0.03121rem"
-            fontWeight={400}
-         >
-            Getting ready to start with the right content?
-            <br /> We collected talent&apos;s most requested questions to
-            inspire you
-         </Typography>
-         <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
-            <Button
-               sx={styles.btn}
-               color="secondary"
-               variant="outlined"
-               component="a"
-               download
-               href={sparksGetInspiredPdf}
-               target="_blank"
+      <>
+         <Box sx={styles.root}>
+            <SparkIllustration />
+            <TitleText mt={2.5} maxWidth={380}>
+               Your company hasn’t created any{" "}
+               <HighlightedText color="secondary.main">Sparks</HighlightedText>{" "}
+               yet.
+            </TitleText>
+            <Typography
+               mt={1.5}
+               fontSize="1.14286rem"
+               letterSpacing="-0.03121rem"
+               fontWeight={400}
             >
-               Get inspired
-            </Button>
-            <Button sx={styles.btn} color="secondary" variant="contained">
-               Upload a Spark
-            </Button>
-         </Stack>
-      </Box>
+               Getting ready to start with the right content?
+               <br /> We collected talent&apos;s most requested questions to
+               inspire you
+            </Typography>
+            <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
+               <Button
+                  sx={styles.btn}
+                  color="secondary"
+                  variant="outlined"
+                  component="a"
+                  download
+                  href={sparksGetInspiredPdf}
+                  target="_blank"
+               >
+                  Get inspired
+               </Button>
+               <Button sx={styles.btn} color="secondary" variant="contained">
+                  Upload a Spark
+               </Button>
+            </Stack>
+         </Box>
+      </>
    )
 }
 
@@ -86,6 +88,19 @@ const SparkIllustration = () => {
 
 export const TitleText: FC<TypographyProps<"h1">> = (props) => {
    return <Typography sx={styles.title} component="h1" {...props} />
+}
+
+export const HighlightedText: FC<TypographyProps<"span">> = (props) => {
+   return (
+      <Typography
+         fontWeight="inherit"
+         fontStyle="inherit"
+         letterSpacing="inherit"
+         fontSize="inherit"
+         component="span"
+         {...props}
+      />
+   )
 }
 
 export default EmptySparksView
