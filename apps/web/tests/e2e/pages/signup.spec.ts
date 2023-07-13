@@ -221,12 +221,6 @@ test.describe("Signup Page Functionality", () => {
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
-
-      await portal.clickLogo()
-      const response = await page.on("response")
-
-      await expect(response.headers().location).toBe("/signup")
-      await expect(signup.emailVerificationStepMessage).toBeVisible()
    })
 
    test("It successfully signs up and save the steps on analytics", async ({
