@@ -38,9 +38,7 @@ const styles = sxStyles({
    },
 })
 
-type Props = {}
-
-const EmptySparksView: FC<Props> = () => {
+const EmptySparksView: FC = () => {
    return (
       <Box sx={styles.root}>
          <SparkIllustration />
