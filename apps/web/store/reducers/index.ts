@@ -1,19 +1,20 @@
 import { combineReducers } from "redux"
-import { firebaseReducer } from "react-redux-firebase"
 import { firestoreReducer } from "redux-firestore"
 
+import adminSparksReducer from "./adminSparksReducer"
 import authReducer from "./authReducer"
-import todosReducer from "./todosReducer"
 import emotesReducer from "./emotesReducer"
-import snackbarReducer from "./snackbarReducer"
-import userDataSetReducer from "./userDataSetReducer"
-import nextLivestreamsReducer from "./nextLivestreamsReducer"
-import streamReducer from "./streamReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
 import groupAnalyticsReducer from "./groupAnalyticsReducer"
+import nextLivestreamsReducer from "./nextLivestreamsReducer"
+import snackbarReducer from "./snackbarReducer"
 import streamAdminReducer from "./streamAdminReducer"
+import streamReducer from "./streamReducer"
+import todosReducer from "./todosReducer"
+import userDataSetReducer from "./userDataSetReducer"
+import firebaseReducer from "./firebaseReducer"
 
-export default combineReducers({
+const reducers = {
    auth: authReducer,
    todos: todosReducer,
    firebase: firebaseReducer,
@@ -26,4 +27,7 @@ export default combineReducers({
    analyticsReducer: groupAnalyticsReducer,
    stream: streamReducer,
    streamAdmin: streamAdminReducer,
-})
+   adminSparks: adminSparksReducer,
+} as const // only way to get type inference on firebaseReducer
+
+export default combineReducers<typeof reducers>(reducers)

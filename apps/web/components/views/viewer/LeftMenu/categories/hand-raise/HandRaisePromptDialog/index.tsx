@@ -12,7 +12,7 @@ import {
 import { useCurrentStream } from "context/stream/StreamContext"
 import { useAuth } from "HOCs/AuthProvider"
 import { useDispatch, useSelector } from "react-redux"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
 import * as actions from "store/actions"

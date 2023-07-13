@@ -1,4 +1,6 @@
+import { EmoteMessage } from "context/agora/RTMContext"
 import * as actions from "../actions/actionTypes"
+import { Reducer } from "redux"
 
 const initialState = {
    error: null,
@@ -6,7 +8,16 @@ const initialState = {
    emotesData: [],
 }
 
-const emotesReducer = (state = initialState, { type, payload }) => {
+interface EmotesReducer {
+   error: null | string
+   loading: boolean
+   emotesData: EmoteMessage[]
+}
+
+const emotesReducer: Reducer<EmotesReducer> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.CLEAR_ALL_EMOTES:
          return { ...state, emotesData: [] }

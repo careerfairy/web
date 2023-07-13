@@ -28,7 +28,7 @@ import {
    LocalStream,
    MediaControls,
 } from "types/streaming"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import DeviceSelect from "../sharedComponents/DeviceSelect"
 import { rtcConnectionStateSelector } from "../../../../store/selectors/streamSelectors"
 import { useMountedState } from "react-use"

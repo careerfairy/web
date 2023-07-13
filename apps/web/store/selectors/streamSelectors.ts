@@ -1,4 +1,4 @@
-import RootState from "../reducers"
+import { RootState } from "../"
 import { RTCConnectionState } from "../../types/streaming"
 
 export const rtcConnectionStateSelector = (
