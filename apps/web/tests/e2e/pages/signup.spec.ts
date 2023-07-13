@@ -30,7 +30,7 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test.only("it successfully redirect to signup to complete the email verification step", async ({
+   test("it successfully redirect to signup to complete the email verification step", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -62,11 +62,11 @@ test.describe("Signup Page Functionality", () => {
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
-      await signup.clickContinueButton()
+      // Navigate to a /portal URL and wait for navigation to finish until redirect
+      await page.goto("/portal", { waitUntil: "load", timeout: 2000 })
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      // Expecting to be redirected to the email verification step
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
    })
 
    test("It successfully go to validate email step without gender selected", async ({
