@@ -1,6 +1,12 @@
 import { Container } from "@mui/material"
-import EmptySparksView from "./EmptySparksView"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupSparks from "components/custom-hook/sparks/useGroupSparks"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
+import EmptySparksPage from "./EmptySparksPage"
+import GeneralSparksPage from "./GeneralSparksPage"
+import { Fragment } from "react"
+import SparksDialog from "./sparks-dialog/SparksDialog"
 
 const styles = sxStyles({
    root: {
@@ -12,9 +18,25 @@ const styles = sxStyles({
 
 const Sparks = () => {
    return (
-      <Container sx={styles.root} maxWidth="xl">
-         <EmptySparksView />
-      </Container>
+      <SuspenseWithBoundary fallback="Loading...">
+         <SparksComponent />
+      </SuspenseWithBoundary>
+   )
+}
+
+const SparksComponent = () => {
+   const { group } = useGroup()
+   const { data } = useGroupSparks(group.id)
+
+   const groupHasSparks = data.length > 0
+
+   return (
+      <Fragment>
+         <Container sx={styles.root} maxWidth="xl">
+            {groupHasSparks ? <GeneralSparksPage /> : <EmptySparksPage />}
+         </Container>
+         <SparksDialog />
+      </Fragment>
    )
 }
 
