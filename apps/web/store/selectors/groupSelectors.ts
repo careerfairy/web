@@ -1,4 +1,4 @@
-import RootState from "../reducers"
+import { RootState } from "../"
 
 export const groupSelector = (state: RootState) => state.firestore.data.group
 

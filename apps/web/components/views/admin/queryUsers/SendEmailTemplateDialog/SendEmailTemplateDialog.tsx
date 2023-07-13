@@ -26,7 +26,7 @@ import useTemplates from "./templates"
 import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview"
 import EventAutoSelect from "../../../common/EventAutoSelect"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import RootState from "../../../../../store/reducers"
+import { RootState } from "../../../../../store"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 function getSteps() {

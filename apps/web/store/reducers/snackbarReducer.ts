@@ -1,14 +1,27 @@
+import { Reducer } from "redux"
 import {
    ENQUEUE_SNACKBAR,
    CLOSE_SNACKBAR,
    REMOVE_SNACKBAR,
 } from "../actions/actionTypes"
 
+interface SnackbarReducer {
+   notifications: {
+      key: string
+      message: string
+      options: any
+      dismissed: boolean
+   }[]
+}
+
 const defaultState = {
    notifications: [],
 }
 
-const snackbarReducer = (state = defaultState, action) => {
+const snackbarReducer: Reducer<SnackbarReducer> = (
+   state = defaultState,
+   action
+) => {
    switch (action.type) {
       case ENQUEUE_SNACKBAR:
          return {

@@ -40,7 +40,7 @@ import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { TOP_BAR_HEIGHT } from "constants/streamLayout"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
-import RootState from "../../../store/reducers"
+import { RootState } from "../../../store"
 import { useNumberOfViewers } from "context/stream/useNumberOfViewers"
 
 const styles = {

@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useMemo } from "react"
 import { useSelector } from "react-redux"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import { sessionRTMFailedToJoin } from "store/selectors/streamSelectors"
 
 /**
