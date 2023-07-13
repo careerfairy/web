@@ -26,6 +26,8 @@ import {
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
 import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
+import { Create } from "../commonTypes"
+import { Creator, UpdateCreatorData } from "./creators"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -163,6 +165,26 @@ export interface IGroupRepository {
    updateGroupBannerPhoto(
       groupId: string,
       bannerImageUrl: string
+   ): Promise<void>
+
+   // Creator Actions
+
+   /**
+    * Adds a creator to a group
+    */
+   addCreatorToGroup(groupId: string, creator: Create<Creator>): Promise<void>
+
+   /**
+    * Removes a creator from a group
+    */
+   removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void>
+
+   /**
+    * Updates a creator in a group
+    */
+   updateCreatorInGroup(
+      groupId: string,
+      creator: UpdateCreatorData
    ): Promise<void>
 }
 
@@ -838,6 +860,45 @@ export class FirebaseGroupRepository
       }
 
       return groupRef.update(toUpdate)
+   }
+
+   /*
+   |--------------------------------------------------------------------------
+   | Mappings and Filters
+   |--------------------------------------------------------------------------
+   */
+
+   addCreatorToGroup(groupId: string, creator: Creator): Promise<void> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creator.id) // We use the email as the id and not firestore's auto generated id
+
+      return creatorRef.set(creator, { merge: true })
+   }
+
+   updateCreatorInGroup(
+      groupId: string,
+      creator: UpdateCreatorData
+   ): Promise<void> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creator.id) // We use the email as the id and not firestore's auto generated id
+
+      return creatorRef.update(creator)
+   }
+
+   removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creatorId)
+
+      return creatorRef.delete()
    }
 }
 
