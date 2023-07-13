@@ -1,20 +1,19 @@
 import { EmoteMessage } from "context/agora/RTMContext"
 import * as actions from "../actions/actionTypes"
 import { Reducer } from "redux"
-
-const initialState = {
-   error: null,
-   loading: false,
-   emotesData: [],
-}
-
-interface EmotesReducer {
+interface IEmotesState {
    error: null | string
    loading: boolean
    emotesData: EmoteMessage[]
 }
 
-const emotesReducer: Reducer<EmotesReducer> = (
+const initialState: IEmotesState = {
+   error: null,
+   loading: false,
+   emotesData: [],
+}
+
+const emotesReducer: Reducer<IEmotesState> = (
    state = initialState,
    { type, payload }
 ) => {

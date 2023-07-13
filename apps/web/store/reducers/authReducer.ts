@@ -1,7 +1,7 @@
 import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-interface AuthReducer {
+interface IAuthState {
    error: null | string
    loading: boolean
    verifyEmail: {
@@ -22,7 +22,7 @@ interface AuthReducer {
    }
 }
 
-const initialState = {
+const initialState: IAuthState = {
    error: null,
    loading: false,
    verifyEmail: {
@@ -41,7 +41,7 @@ const initialState = {
       loading: false,
       error: null,
    },
-} as AuthReducer
+}
 
 // HELPER FUNCTIONS
 
@@ -181,7 +181,7 @@ const cleanUp = (state) => {
    }
 }
 
-const authReducer: Reducer<AuthReducer> = (
+const authReducer: Reducer<IAuthState> = (
    state = initialState,
    { type, payload }
 ) => {

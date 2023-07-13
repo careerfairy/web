@@ -1,7 +1,7 @@
 import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-interface IState {
+interface ITodosSate {
    error: null | string
    loading: boolean
    deleteTodo: {
@@ -10,7 +10,7 @@ interface IState {
    }
 }
 
-const initialState = {
+const initialState: ITodosSate = {
    error: null,
    loading: false,
    deleteTodo: {
@@ -19,7 +19,7 @@ const initialState = {
    },
 }
 
-const todosReducer: Reducer<IState> = (
+const todosReducer: Reducer<ITodosSate> = (
    state = initialState,
    { type, payload }
 ) => {
