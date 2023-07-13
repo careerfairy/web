@@ -1,10 +1,18 @@
+import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-const initialState = {
+interface NextLivestreamsReducer {
+   filterOpen: boolean
+}
+
+const initialState: NextLivestreamsReducer = {
    filterOpen: false,
 }
 
-const nextLivestreamsReducer = (state = initialState, { type, payload }) => {
+const nextLivestreamsReducer: Reducer<NextLivestreamsReducer> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.TOGGLE_NEXT_LIVESTREAMS_FILTER:
          return { ...state, filterOpen: !state.filterOpen }

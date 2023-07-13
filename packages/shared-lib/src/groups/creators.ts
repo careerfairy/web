@@ -44,6 +44,20 @@ export type PublicCreator = Pick<
    | "story"
 >
 
+export type UpdateCreatorData = Partial<
+   Pick<
+      Creator,
+      | "firstName"
+      | "lastName"
+      | "position"
+      | "email"
+      | "avatarUrl"
+      | "roles"
+      | "story"
+      | "id"
+   >
+>
+
 export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
    return {
       firstName: creator.firstName ?? null,

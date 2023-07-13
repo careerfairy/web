@@ -21,7 +21,7 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { GlobalTimeFrame } from "../../../../../custom-hook/useTimeFrames"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserDataSet, UserType } from "../index"
-import RootState from "../../../../../../store/reducers"
+import { RootState } from "../../../../../../store"
 
 const styles = sxStyles({
    root: {

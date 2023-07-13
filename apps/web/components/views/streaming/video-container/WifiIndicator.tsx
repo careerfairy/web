@@ -17,7 +17,7 @@ import * as actions from "store/actions"
 import { useDispatch, useSelector } from "react-redux"
 import InternetIcon from "@mui/icons-material/Wifi"
 import ServerIcon from "@mui/icons-material/CheckCircleOutline"
-import RootState from "../../../../store/reducers"
+import { RootState } from "../../../../store"
 import { ConnectionState, NetworkQuality } from "agora-rtc-sdk-ng"
 import { rtcConnectionStateSelector } from "../../../../store/selectors/streamSelectors"
 

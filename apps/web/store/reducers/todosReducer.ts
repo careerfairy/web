@@ -1,4 +1,14 @@
+import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
+
+interface IState {
+   error: null | string
+   loading: boolean
+   deleteTodo: {
+      error: null | string
+      loading: boolean
+   }
+}
 
 const initialState = {
    error: null,
@@ -9,7 +19,10 @@ const initialState = {
    },
 }
 
-const todosReducer = (state = initialState, { type, payload }) => {
+const todosReducer: Reducer<IState> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.ADD_TODO_START:
          return { ...state, loading: true }

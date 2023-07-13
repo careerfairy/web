@@ -1,6 +1,16 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import * as actions from "../actions/actionTypes"
+import { Reducer } from "redux"
 
-const initialState = {
+interface GroupAnalyticsReducer {
+   streams: {
+      fromTimeframeAndFuture: LivestreamEvent[]
+   }
+   hiddenStreamIds: Record<string, boolean>
+   visibleStreamIds: string[]
+}
+
+const initialState: GroupAnalyticsReducer = {
    streams: {
       fromTimeframeAndFuture: [],
    },
@@ -8,7 +18,10 @@ const initialState = {
    visibleStreamIds: [],
 }
 
-const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
+const groupAnalyticsReducer: Reducer<GroupAnalyticsReducer> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.SET_STREAMS_FROM_TIMEFRAME_AND_FUTURE:
          return {

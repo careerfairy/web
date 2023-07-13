@@ -1,5 +1,10 @@
 import * as actions from "../actions/actionTypes"
-import { GeneralLayoutState } from "./index"
+
+interface GeneralLayoutState {
+   layout: {
+      drawerOpen: boolean
+   }
+}
 
 const initialState = {
    layout: {
@@ -10,7 +15,7 @@ const initialState = {
 
 const generalLayoutReducer = (
    state: GeneralLayoutState = initialState,
-   { type}
+   { type }
 ) => {
    switch (type) {
       case actions.OPEN_NAV_DRAWER:

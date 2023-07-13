@@ -1,6 +1,19 @@
+import { UserData } from "@careerfairy/shared-lib/users"
 import * as actions from "../actions/actionTypes"
+import { Reducer } from "redux"
 
-const initialState = {
+interface UserDataSetReducer {
+   total: {
+      ordered: UserData[]
+      mapped: Record<UserData["id"], UserData>
+   }
+   filtered: {
+      ordered: UserData[]
+      mapped: Record<UserData["id"], UserData>
+   }
+}
+
+const initialState: UserDataSetReducer = {
    total: {
       ordered: undefined,
       mapped: undefined,
@@ -11,7 +24,10 @@ const initialState = {
    },
 }
 
-const userDataSetReducer = (state = initialState, { type, payload }) => {
+const userDataSetReducer: Reducer<UserDataSetReducer> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.SET_USER_DATA_SET:
          return {

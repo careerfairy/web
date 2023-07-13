@@ -1,7 +1,7 @@
 import React, { FC, memo, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import { ConnectionState } from "agora-rtc-sdk-ng"
 import ConnectionStateModal from "./ModalViews/ConnectionStateModal"
 import DebugModal from "./ModalViews/DebugModal"
