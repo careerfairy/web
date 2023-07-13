@@ -3,6 +3,8 @@
 import {
    alpha,
    createTheme,
+   darken,
+   lighten,
    PaletteColorOptions,
    styled,
    Theme,
@@ -88,9 +90,9 @@ declare module "@mui/material/styles" {
 }
 
 const secondary: PaletteColorOptions = {
-   light: "#b4a8ff",
-   main: "#7431e2",
-   dark: "#590db6",
+   light: lighten("#6749EA", 0.2),
+   main: "#6749EA",
+   dark: darken("#6749EA", 0.2),
    gradient: "#644eec",
    contrastText: "#FFFFFF",
 }
@@ -406,25 +408,10 @@ const getComponents = (theme: DefaultTheme): Components => ({
             borderRadius: 30,
          },
       },
+      defaultProps: {
+         disableElevation: true,
+      },
       variants: [
-         {
-            props: {
-               variant: "contained",
-               color: "primary",
-            },
-            style: {
-               boxShadow: theme.boxShadows.primary_5_15_50,
-            },
-         },
-         {
-            props: {
-               variant: "contained",
-               color: "secondary",
-            },
-            style: {
-               boxShadow: theme.boxShadows.secondary_5_15_50,
-            },
-         },
          {
             props: {
                variant: "contained",
@@ -506,6 +493,16 @@ const getComponents = (theme: DefaultTheme): Components => ({
                boxShadow: "none",
                backgroundColor: theme.palette.navyBlue.main,
                color: "#D5F6F1",
+            },
+         },
+         {
+            props: {
+               size: "medium",
+            },
+            style: {
+               fontSize: "1rem",
+               fontWeight: 400,
+               padding: "12px 30px",
             },
          },
       ],
