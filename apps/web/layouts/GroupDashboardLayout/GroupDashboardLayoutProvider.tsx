@@ -69,6 +69,7 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
 type Props = {
    children: ReactNode
    pageDisplayName: string
+   topBarCta?: ReactNode
 }
 
 /**
@@ -78,7 +79,11 @@ type Props = {
  * @param pageDisplayName
  * @constructor
  */
-const GroupDashboardLayoutProvider = ({ children, pageDisplayName }: Props) => {
+const GroupDashboardLayoutProvider = ({
+   children,
+   pageDisplayName,
+   topBarCta,
+}: Props) => {
    const [state, dispatch] = useReducer(reducer, initialState)
 
    const toggleLeftDrawer = useCallback(
@@ -111,7 +116,7 @@ const GroupDashboardLayoutProvider = ({ children, pageDisplayName }: Props) => {
       <GroupDashboardContext.Provider value={value}>
          <AdminGenericLayout
             bgColor="#F7F8FC"
-            headerContent={<TopBar title={pageDisplayName} />}
+            headerContent={<TopBar cta={topBarCta} title={pageDisplayName} />}
             drawerContent={<NavBar />}
             drawerOpen={state.layout.leftDrawerOpen}
             setDrawer={setLeftDrawer}
