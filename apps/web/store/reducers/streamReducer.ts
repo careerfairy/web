@@ -1,4 +1,4 @@
-import { RTCConnectionState } from "types/streaming"
+import { RTCConnectionState, RTCError } from "types/streaming"
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
 import { Reducer } from "redux"
@@ -95,8 +95,9 @@ const initialState: StreamReducer = {
          code: undefined,
          message: undefined,
          name: undefined,
-         // @ts-ignore
          data: undefined,
+         cause: undefined,
+         stack: undefined,
       },
       deviceErrors: {
          cameraDenied: false,
