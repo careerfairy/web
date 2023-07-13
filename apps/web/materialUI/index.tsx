@@ -14,6 +14,7 @@ import { grey, red } from "@mui/material/colors"
 import React from "react"
 import { Components, PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
 
 interface CustomThemeProps {
    drawerWidth?: { small: string; medium: string }
@@ -564,6 +565,11 @@ const getComponents = (theme: DefaultTheme): Components => ({
             filter: theme.dropShadows.dark_6_12_12,
             boxShadow: "none",
          },
+      },
+   },
+   MuiSelect: {
+      defaultProps: {
+         IconComponent: KeyboardArrowDownRoundedIcon, // You can replace this with the icon you prefer
       },
    },
 })

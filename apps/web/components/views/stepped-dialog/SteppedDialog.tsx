@@ -20,6 +20,8 @@ const styles = sxStyles({
    },
    slide: {
       overflow: "overlay",
+      display: "flex",
+      flexDirection: "column",
    },
    swipeableViewsContainer: {
       height: "100%",
@@ -62,6 +64,7 @@ interface StepperDialogProps {
    handleClose: () => void
    open: boolean
    views: ReadonlyArray<View>
+   bgcolor?: string
 }
 
 /**
@@ -125,6 +128,7 @@ const SteppedDialog = <K extends string>({
    handleClose,
    open,
    views,
+   bgcolor,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -184,7 +188,12 @@ const SteppedDialog = <K extends string>({
          fullScreen={isMobile}
          closeAfterTransition={true}
          PaperProps={{
-            sx: styles.dialogPaper,
+            sx: [
+               styles.dialogPaper,
+               {
+                  bgcolor,
+               },
+            ],
          }}
       >
          <DialogContent>
