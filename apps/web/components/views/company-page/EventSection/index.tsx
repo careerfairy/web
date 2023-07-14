@@ -81,7 +81,7 @@ const EventSection = () => {
                hasMore={upcomingHasMore}
             />
 
-            {Boolean(pastLivestreams?.length) && (
+            {Boolean(pastLivestreams?.length) ? (
                <StreamCarousel
                   livestreams={pastLivestreams ?? []}
                   type="past"
@@ -89,6 +89,8 @@ const EventSection = () => {
                   handleOpenEvent={handleOpenEvent}
                   hasMore={pastHasMore}
                />
+            ) : (
+               <></>
             )}
          </Stack>
          {isDialogOpen ? (
