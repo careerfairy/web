@@ -65,6 +65,9 @@ const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
          {...field}
          {...props}
          onChange={handleChange}
+         InputLabelProps={{
+            shrink: false,
+         }}
       >
          <MenuItem
             value={addNewCreatorId}

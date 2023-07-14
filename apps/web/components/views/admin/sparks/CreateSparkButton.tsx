@@ -16,7 +16,7 @@ const CreateSparkButton: FC<Props> = () => {
    const dispatch = useDispatch()
 
    const handleOpen = useCallback(() => {
-      dispatch(openSparkDialog())
+      dispatch(openSparkDialog(null))
    }, [dispatch])
 
    return (
