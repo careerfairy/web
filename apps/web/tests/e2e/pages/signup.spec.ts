@@ -12,7 +12,7 @@ import { setupUserSignUpData } from "../setupData"
 
 test.describe("Signup Page Functionality", () => {
    test.beforeAll(async () => {
-      //await setupUserSignUpData()
+      await setupUserSignUpData()
    })
 
    test.beforeEach(async ({ page }) => {
@@ -30,11 +30,12 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test.only("It successfully redirect to signup to complete the email verification step", async ({
+   test("It successfully signs up without additional information", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
       const portal = new PortalPage(page)
+
       const {
          correctPassword,
          correctUniversityCountry,
@@ -58,7 +59,6 @@ test.describe("Signup Page Functionality", () => {
          levelOfStudyName: correctLevelOfStudyName,
          fieldOfStudyName: correctFieldOfStudyName,
       })
-      await page.pause()
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
@@ -105,7 +105,7 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
    })
 
-   test("it successfully redirect to signup to complete the email verification step", async ({
+   test("It successfully redirect to signup to complete the email verification step", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -276,6 +276,7 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
+         wrongLinkedinUrl,
          correctLevelOfStudyName,
          correctFieldOfStudyName,
       } = credentials
@@ -296,11 +297,37 @@ test.describe("Signup Page Functionality", () => {
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
-      await page.goto("/")
-      const response = await page.on("response")
+      const userData = await UserSeed.getUserData(correctEmail)
+      expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
 
-      await expect(response.headers().location).toBe("/signup")
-      await expect(signup.emailVerificationStepMessage).toBeVisible()
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.enterLinkedInLinkInput(wrongLinkedinUrl)
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const { linkedinUrl: userDataLinkedinUrl } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toBeFalsy()
    })
 
    test("It successfully signs up and save the steps on analytics", async ({
