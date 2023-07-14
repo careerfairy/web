@@ -1,14 +1,12 @@
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
+   BoxProps,
    CircularProgress,
    ContainerProps,
    Container as MuiContainer,
+   Stack,
    Typography,
    TypographyProps,
-   Box,
-   BoxProps,
-   ButtonProps,
-   Button,
-   Stack,
 } from "@mui/material"
 import SteppedDialog, {
    useStepper,
@@ -20,9 +18,13 @@ import {
    CreatorOrNew,
    SparkOrNew,
    closeSparkDialog,
+   setCreator as setCreatorAction,
+   setSpark as setSparkAction,
 } from "store/reducers/adminSparksReducer"
 import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+
+const actionsHeight = 87
 
 const styles = sxStyles({
    root: {},
@@ -47,6 +49,9 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
    },
+   containerWithActionsOffset: {
+      pb: `${actionsHeight * 1.2}px !important`,
+   },
    fixedBottomContent: {
       position: "fixed",
       bottom: 0,
@@ -54,7 +59,11 @@ const styles = sxStyles({
       width: "100%",
       p: 2.5,
       borderTop: "1px solid #F0F0F0",
-      height: 87,
+      height: actionsHeight,
+      bgcolor: "#FCFCFC",
+   },
+   button: {
+      textTransform: "none",
    },
 })
 
@@ -84,19 +93,20 @@ const views = [
 export type SparkDialogStep = (typeof views)[number]["key"]
 
 export const useSparksForm = () => {
+   console.count("useSparksForm")
    const stepper = useStepper<SparkDialogStep>()
    const dispatch = useDispatch()
 
    const setCreator = useCallback(
       (creator: CreatorOrNew) => {
-         dispatch(setCreator(creator))
+         dispatch(setCreatorAction(creator))
       },
       [dispatch]
    )
 
    const setSpark = useCallback(
       (spark: SparkOrNew) => {
-         dispatch(setSpark(spark))
+         dispatch(setSparkAction(spark))
       },
       [dispatch]
    )
@@ -145,8 +155,26 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
    )
 }
 
-const Container: FC<ContainerProps> = (props) => {
-   return <MuiContainer maxWidth="sm" sx={styles.container} {...props} />
+type SparksDialogContainerProps = ContainerProps & {
+   withActionsOffset?: boolean
+}
+
+const Container: FC<SparksDialogContainerProps> = ({
+   withActionsOffset,
+   sx,
+   ...props
+}) => {
+   return (
+      <MuiContainer
+         maxWidth="sm"
+         sx={[
+            styles.container,
+            withActionsOffset && styles.containerWithActionsOffset,
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
+         {...props}
+      />
+   )
 }
 
 const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
@@ -155,6 +183,7 @@ const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
          justifyContent={"flex-end"}
          direction="row"
          alignItems="center"
+         spacing={2}
          sx={[...(Array.isArray(sx) ? sx : [sx]), styles.fixedBottomContent]}
          {...props}
       >
@@ -163,12 +192,16 @@ const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
    )
 }
 
-const CustomButton: FC<ButtonProps> = ({ children, sx, ...props }) => {
+const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
    return (
       <span>
-         <Button color="secondary" {...props}>
+         <LoadingButton
+            sx={[...(Array.isArray(sx) ? sx : [sx]), styles.button]}
+            color="secondary"
+            {...props}
+         >
             {children}
-         </Button>
+         </LoadingButton>
       </span>
    )
 }

@@ -41,11 +41,13 @@ const SelectCreatorView = () => {
          <Formik
             initialValues={initialValues}
             validationSchema={SelectCreatorSchema}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values, { setSubmitting, resetForm }) => {
                if (values.creatorId === addNewCreatorId) {
                   stepper.goToStep("create-creator")
                }
                setSubmitting(false)
+
+               resetForm()
             }}
             validateOnBlur={false}
             validateOnChange={true}

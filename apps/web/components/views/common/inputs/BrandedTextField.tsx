@@ -1,6 +1,8 @@
 import { FilledInputProps, InputLabelProps } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
+import { Field, FieldProps, useField } from "formik"
+import { FC } from "react"
 
 export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
 
@@ -36,6 +38,22 @@ const inputProps: Partial<FilledInputProps> = {
 }
 const inputLabelProps: Partial<InputLabelProps> = {
    shrink: true,
+}
+
+export const BrandedTextFieldField: FC<BrandedTextFieldProps> = ({
+   name,
+   ...props
+}) => {
+   const [field, meta] = useField(name)
+
+   return (
+      <BrandedTextField
+         {...field}
+         {...props}
+         error={meta.touched ? Boolean(meta.error) : null}
+         helperText={meta.touched ? meta.error : null}
+      />
+   )
 }
 
 export default BrandedTextField
