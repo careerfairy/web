@@ -30,11 +30,84 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test("it successfully redirect to signup to complete the email verification step", async ({
+   test("It successfully signs up without additional information", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
       const portal = new PortalPage(page)
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         correctFieldOfStudyName,
+         correctLevelOfStudyName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const {
+         linkedinUrl: userDataLinkedinUrl,
+         spokenLanguages: userDataSpokenLanguages,
+         countriesOfInterest: userDataCountriesOfInterest,
+         interestsIds: userDataInterestsIds,
+         isLookingForJob: userDataIsLookingForJob,
+      } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toBeFalsy()
+      expect(userDataIsLookingForJob).toBeFalsy()
+      expect(userDataSpokenLanguages).toBeFalsy()
+      expect(userDataCountriesOfInterest).toBeFalsy()
+      expect(userDataInterestsIds).toBeFalsy()
+      expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
+   })
+
+   test("it successfully redirect to signup to complete the email verification step", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
 
       const {
          correctPassword,
