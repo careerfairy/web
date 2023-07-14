@@ -81,13 +81,17 @@ const EventSection = () => {
                hasMore={upcomingHasMore}
             />
 
-            <StreamCarousel
-               livestreams={pastLivestreams ?? []}
-               type="past"
-               title="Past Live Streams"
-               handleOpenEvent={handleOpenEvent}
-               hasMore={pastHasMore}
-            />
+            {Boolean(pastLivestreams?.length) ? (
+               <StreamCarousel
+                  livestreams={pastLivestreams ?? []}
+                  type="past"
+                  title="Past Live Streams"
+                  handleOpenEvent={handleOpenEvent}
+                  hasMore={pastHasMore}
+               />
+            ) : (
+               <></>
+            )}
          </Stack>
          {isDialogOpen ? (
             <StreamCreationProvider>
