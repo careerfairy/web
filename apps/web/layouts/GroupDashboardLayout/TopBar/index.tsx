@@ -59,9 +59,10 @@ const styles = sxStyles({
 
 type Props = {
    title: string
+   cta?: React.ReactNode
 }
 
-const TopBar = ({ title }: Props) => {
+const TopBar = ({ title, cta }: Props) => {
    const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
 
@@ -96,16 +97,20 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            {isMobile ? null : (
-               <Button
-                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
-                  size={"small"}
-                  variant={"outlined"}
-                  color={"secondary"}
-               >
-                  Create New Live Stream
-               </Button>
-            )}
+            {isMobile
+               ? null
+               : cta || (
+                    <Button
+                       onClick={() =>
+                          livestreamDialog.handleOpenNewStreamModal()
+                       }
+                       size={"small"}
+                       variant={"outlined"}
+                       color={"secondary"}
+                    >
+                       Create New Live Stream
+                    </Button>
+                 )}
             {/* notification & profile */}
             <UserAvatarWithDetails />
             <NotificationsButton />

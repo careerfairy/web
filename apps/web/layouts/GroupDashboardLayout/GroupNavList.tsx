@@ -7,6 +7,7 @@ import {
    Radio as LiveStreamsIcon,
    Sliders as ATSIcon,
    Home as HomeIcon,
+   PlayCircle as SparksIcon,
 } from "react-feather"
 
 // material-ui
@@ -73,6 +74,13 @@ const GroupNavList = () => {
                   title: "All live streams on CareerFairy",
                },
             ],
+         },
+         {
+            id: "sparks",
+            href: `/${baseHrefPath}/${group.id}/admin/sparks`,
+            pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
+            Icon: SparksIcon,
+            title: "Sparks",
          },
          {
             id: "company",
