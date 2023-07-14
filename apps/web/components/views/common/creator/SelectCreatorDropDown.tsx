@@ -1,93 +1,106 @@
-import { Avatar, ListItemIcon, ListItemText, MenuItem } from "@mui/material"
-import Image from "next/image"
-import React, { FC } from "react"
-import BrandedTextField, {
-   type BrandedTextFieldProps,
-} from "../inputs/BrandedTextField"
-import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import { Divider } from "@mui/material"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import AddRoundedIcon from "@mui/icons-material/AddRounded"
+import {
+   Avatar,
+   Divider,
+   ListItemIcon,
+   ListItemText,
+   MenuItem,
+} from "@mui/material"
+import { FieldProps } from "formik"
+import Image from "next/image"
+import React, { FC, useCallback } from "react"
+import { sxStyles } from "types/commonTypes"
+import BrandedTextField from "../inputs/BrandedTextField"
 
-type Props = {
-   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
-   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
-   value?: string
+export const addNewCreatorId = "add-new-creator"
+
+const styles = sxStyles({
+   menuItem: {
+      p: 2,
+   },
+   listicon: {
+      mr: 1,
+   },
+})
+
+type SelectCreatorDropDownProps = {
    creators: Creator[]
-} & BrandedTextFieldProps
+   submitForm?: () => void
+   onClickAddNewCreator?: () => void
+} & FieldProps<
+   string,
+   {
+      creatorId: string
+   }
+>
 
-const SelectCreatorDropDown: FC<Props> = (props) => {
+const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
+   field,
+   form,
+   creators,
+   submitForm,
+   onClickAddNewCreator,
+   ...props
+}) => {
+   const handleChange = useCallback(
+      async (event: React.ChangeEvent<HTMLInputElement>) => {
+         const newValue = event.target.value
+
+         // Use Formik's setFieldValue to change value
+         // Second parameter to setFieldValue is 'shouldValidate', if true it triggers a validation
+         // @ts-ignore
+         await form.setFieldValue(field.name, newValue, false)
+
+         submitForm?.()
+      },
+      [field, form, submitForm]
+   )
+
    return (
       <BrandedTextField
          id="creator-select"
          select
-         label="Search, select or create a new creator"
          fullWidth
+         {...field}
          {...props}
+         onChange={handleChange}
       >
-         <CreatorMenuItem
-            key={"999"}
-            value={"999"}
-            primaryText={"Create a new creator"}
-            icon={<AddRoundedIcon />}
-         />
+         <MenuItem
+            value={addNewCreatorId}
+            key={addNewCreatorId}
+            sx={styles.menuItem}
+         >
+            <ListItemIcon sx={styles.listicon}>
+               <Avatar>
+                  <AddRoundedIcon />
+               </Avatar>
+            </ListItemIcon>
+            <ListItemText primary={"Create a new creator"} />
+         </MenuItem>
          <Divider />
-         {props.creators.map((option) => (
-            <CreatorMenuItem
-               key={option.id}
-               value={option.id}
-               primaryText={`${option.firstName} ${option.lastName}`}
-               secondaryText={option.position}
-               avatarUrl={option.avatarUrl}
-            />
-         ))}
+         {creators.map(renderCreatorMenuItem)}
       </BrandedTextField>
    )
 }
 
-type CreatorMenuItemProps = {
-   primaryText: string
-   secondaryText?: string
-   avatarUrl?: string
-   icon?: React.ReactNode
-   value: string
-}
-
-const CreatorMenuItem: FC<CreatorMenuItemProps> = ({
-   primaryText,
-   secondaryText,
-   avatarUrl,
-   icon,
-   value,
-}) => {
-   const hasAvatar = avatarUrl || icon
+const renderCreatorMenuItem = (creator: Creator) => {
    return (
-      <MenuItem
-         sx={{
-            p: 2,
-         }}
-         value={value}
-      >
-         {hasAvatar ? (
-            <ListItemIcon
-               sx={{
-                  mr: 1,
-               }}
-            >
-               <Avatar>
-                  {avatarUrl ? (
-                     <Image
-                        width={40}
-                        height={40}
-                        src={avatarUrl}
-                        alt="avatar"
-                     />
-                  ) : (
-                     icon
-                  )}
-               </Avatar>
-            </ListItemIcon>
-         ) : null}
-         <ListItemText primary={primaryText} secondary={secondaryText} />
+      <MenuItem key={creator.id} sx={styles.menuItem} value={creator.id}>
+         <ListItemIcon sx={styles.listicon}>
+            <Avatar>
+               <Image
+                  width={40}
+                  height={40}
+                  src={creator.avatarUrl}
+                  alt="avatar"
+               />
+            </Avatar>
+         </ListItemIcon>
+         <ListItemText
+            primary={`${creator.firstName} ${creator.lastName}`}
+            secondary={creator.position}
+         />
       </MenuItem>
    )
 }
