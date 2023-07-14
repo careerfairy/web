@@ -12,7 +12,7 @@ import { setupUserSignUpData } from "../setupData"
 
 test.describe("Signup Page Functionality", () => {
    test.beforeAll(async () => {
-      await setupUserSignUpData()
+      //await setupUserSignUpData()
    })
 
    test.beforeEach(async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test("It successfully signs up without additional information", async ({
+   test.only("It successfully redirect to signup to complete the email verification step", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
@@ -58,6 +58,7 @@ test.describe("Signup Page Functionality", () => {
          levelOfStudyName: correctLevelOfStudyName,
          fieldOfStudyName: correctFieldOfStudyName,
       })
+      await page.pause()
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
@@ -293,6 +294,12 @@ test.describe("Signup Page Functionality", () => {
          fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      await page.goto("/")
+      const response = await page.on("response")
+
+      await expect(response.headers().location).toBe("/signup")
       await expect(signup.emailVerificationStepMessage).toBeVisible()
    })
 
