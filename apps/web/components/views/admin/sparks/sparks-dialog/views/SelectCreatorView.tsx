@@ -1,9 +1,14 @@
 import { Box } from "@mui/material"
-import SelectCreatorDropDown from "components/views/common/creator/SelectCreatorDropDown"
-import React from "react"
+import SelectCreatorDropDown, {
+   addNewCreatorId,
+} from "components/views/common/creator/SelectCreatorDropDown"
+import React, { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
-import SparksDialog from "../SparksDialog"
-import { Creator, dummyCreators } from "@careerfairy/shared-lib/groups/creators"
+import SparksDialog, { SparkDialogStep } from "../SparksDialog"
+import { dummyCreators } from "@careerfairy/shared-lib/groups/creators"
+import * as yup from "yup"
+import { Field, Form, Formik } from "formik"
+import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
 
 const styles = sxStyles({
    root: {
@@ -14,7 +19,16 @@ const styles = sxStyles({
 
 type Props = {}
 
+export type SelectCreatorFormValues = {
+   creatorId: string
+}
+const initialValues: SelectCreatorFormValues = {
+   creatorId: "",
+} as const
+
 const SelectCreatorView = (props: Props) => {
+   const { goToStep } = useStepper<SparkDialogStep>()
+
    return (
       <SparksDialog.Container sx={styles.root}>
          <SparksDialog.Title>
@@ -28,9 +42,42 @@ const SelectCreatorView = (props: Props) => {
             featured in a Spark.
          </SparksDialog.Subtitle>
          <Box mt={5} />
-         <SelectCreatorDropDown creators={dummyCreators} />
+         <Formik
+            initialValues={initialValues}
+            validationSchema={SelectCreatorSchema}
+            onSubmit={(values, { setSubmitting }) => {
+               if (values.creatorId === addNewCreatorId) {
+                  goToStep("create-creator")
+               }
+               setSubmitting(false)
+            }}
+            validateOnBlur={false}
+            validateOnChange={true}
+         >
+            {({ submitForm, isSubmitting, touched, errors }) => (
+               <Form>
+                  <Field
+                     component={SelectCreatorDropDown}
+                     name="creatorId"
+                     type="select"
+                     label="Search, select or create a new creator"
+                     error={
+                        touched.creatorId ? Boolean(errors.creatorId) : null
+                     }
+                     helperText={touched.creatorId ? errors.creatorId : null}
+                     creators={dummyCreators}
+                     submitForm={submitForm}
+                     disabled={isSubmitting}
+                  />
+               </Form>
+            )}
+         </Formik>
       </SparksDialog.Container>
    )
 }
+
+const SelectCreatorSchema = yup.object().shape({
+   creatorId: yup.string().required("Required"),
+})
 
 export default SelectCreatorView
