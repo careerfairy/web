@@ -26,4 +26,8 @@ export class PortalPage extends CommonPage {
       // welcome view
       await expect(this.page.getByText("Welcome to CareerFairy!")).toBeVisible()
    }
+
+   async clickLogo() {
+      return this.logo?.click()
+   }
 }
