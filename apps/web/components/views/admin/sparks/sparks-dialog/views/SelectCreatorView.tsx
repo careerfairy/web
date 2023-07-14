@@ -1,14 +1,12 @@
+import { dummyCreators } from "@careerfairy/shared-lib/groups/creators"
 import { Box } from "@mui/material"
 import SelectCreatorDropDown, {
    addNewCreatorId,
 } from "components/views/common/creator/SelectCreatorDropDown"
-import React, { useCallback } from "react"
-import { sxStyles } from "types/commonTypes"
-import SparksDialog, { SparkDialogStep } from "../SparksDialog"
-import { dummyCreators } from "@careerfairy/shared-lib/groups/creators"
-import * as yup from "yup"
 import { Field, Form, Formik } from "formik"
-import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
+import { sxStyles } from "types/commonTypes"
+import * as yup from "yup"
+import SparksDialog, { useSparksForm } from "../SparksDialog"
 
 const styles = sxStyles({
    root: {
@@ -17,8 +15,6 @@ const styles = sxStyles({
    },
 })
 
-type Props = {}
-
 export type SelectCreatorFormValues = {
    creatorId: string
 }
@@ -26,8 +22,8 @@ const initialValues: SelectCreatorFormValues = {
    creatorId: "",
 } as const
 
-const SelectCreatorView = (props: Props) => {
-   const { goToStep } = useStepper<SparkDialogStep>()
+const SelectCreatorView = () => {
+   const { stepper } = useSparksForm()
 
    return (
       <SparksDialog.Container sx={styles.root}>
@@ -47,7 +43,7 @@ const SelectCreatorView = (props: Props) => {
             validationSchema={SelectCreatorSchema}
             onSubmit={(values, { setSubmitting }) => {
                if (values.creatorId === addNewCreatorId) {
-                  goToStep("create-creator")
+                  stepper.goToStep("create-creator")
                }
                setSubmitting(false)
             }}

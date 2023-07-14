@@ -36,6 +36,11 @@ const styles = sxStyles({
       },
       maxWidth: 915,
       height: "100%",
+      display: "flex",
+      flexDirection: "column",
+   },
+   content: {
+      p: 0,
    },
 })
 
@@ -196,7 +201,7 @@ const SteppedDialog = <K extends string>({
             ],
          }}
       >
-         <DialogContent>
+         <DialogContent sx={styles.content}>
             <StepperContext.Provider value={value}>
                <SwipeableViews
                   style={styles.swipeableViews}

@@ -4,18 +4,25 @@ import {
    Container as MuiContainer,
    Typography,
    TypographyProps,
+   Box,
+   BoxProps,
+   ButtonProps,
+   Button,
+   Stack,
 } from "@mui/material"
-import { type Create } from "@careerfairy/shared-lib/commonTypes"
-import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import SteppedDialog, {
+   useStepper,
+} from "components/views/stepped-dialog/SteppedDialog"
 import dynamic from "next/dynamic"
-import { FC, useCallback, useMemo, useReducer } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { closeSparkDialog } from "store/reducers/adminSparksReducer"
+import {
+   CreatorOrNew,
+   SparkOrNew,
+   closeSparkDialog,
+} from "store/reducers/adminSparksReducer"
 import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 const styles = sxStyles({
    root: {},
@@ -39,6 +46,15 @@ const styles = sxStyles({
    container: {
       display: "flex",
       flexDirection: "column",
+   },
+   fixedBottomContent: {
+      position: "fixed",
+      bottom: 0,
+      left: "100%",
+      width: "100%",
+      p: 2.5,
+      borderTop: "1px solid #F0F0F0",
+      height: 87,
    },
 })
 
@@ -67,55 +83,31 @@ const views = [
 
 export type SparkDialogStep = (typeof views)[number]["key"]
 
-type State = {
-   creator: Creator | Create<Creator> // Could be a Create<Creator> if we're creating a new creator
-   spark: Spark | Create<Spark> // Could be a Create<Spark> if we're creating a new spark
-}
-
-const initialState: State = {
-   creator: null,
-   spark: null,
-}
-
-const sparksFormSlice = createSlice({
-   name: "sparksForm",
-   initialState,
-   reducers: {
-      setCreator: (state, action: PayloadAction<State["creator"]>) => {
-         state.creator = action.payload
-      },
-      setSpark: (state, action: PayloadAction<State["spark"]>) => {
-         state.spark = action.payload
-      },
-   },
-})
-
-export const { setCreator, setSpark } = sparksFormSlice.actions
-
 export const useSparksForm = () => {
-   const [state, dispatch] = useReducer(sparksFormSlice.reducer, initialState)
+   const stepper = useStepper<SparkDialogStep>()
+   const dispatch = useDispatch()
 
    const setCreator = useCallback(
-      (creator: State["creator"]) => {
-         dispatch(sparksFormSlice.actions.setCreator(creator))
+      (creator: CreatorOrNew) => {
+         dispatch(setCreator(creator))
       },
       [dispatch]
    )
 
    const setSpark = useCallback(
-      (spark: State["spark"]) => {
-         dispatch(sparksFormSlice.actions.setSpark(spark))
+      (spark: SparkOrNew) => {
+         dispatch(setSpark(spark))
       },
       [dispatch]
    )
 
    return useMemo(() => {
       return {
-         state,
          setCreator,
          setSpark,
+         stepper,
       }
-   }, [state, setCreator, setSpark])
+   }, [setCreator, setSpark, stepper])
 }
 
 const SparksDialog = () => {
@@ -157,8 +149,34 @@ const Container: FC<ContainerProps> = (props) => {
    return <MuiContainer maxWidth="sm" sx={styles.container} {...props} />
 }
 
+const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
+   return (
+      <Stack
+         justifyContent={"flex-end"}
+         direction="row"
+         alignItems="center"
+         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.fixedBottomContent]}
+         {...props}
+      >
+         {children}
+      </Stack>
+   )
+}
+
+const CustomButton: FC<ButtonProps> = ({ children, sx, ...props }) => {
+   return (
+      <span>
+         <Button color="secondary" {...props}>
+            {children}
+         </Button>
+      </span>
+   )
+}
+
 SparksDialog.Title = Title
 SparksDialog.Subtitle = Subtitle
 SparksDialog.Container = Container
+SparksDialog.Actions = Actions
+SparksDialog.Button = CustomButton
 
 export default SparksDialog

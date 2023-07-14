@@ -1,11 +1,20 @@
-import { FilledInputProps } from "@mui/material"
+import { FilledInputProps, InputLabelProps } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
 
 export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
 
 const BrandedTextField = styled((props: BrandedTextFieldProps) => (
-   <TextField variant="filled" InputProps={inputProps} {...props} />
+   <TextField
+      variant="filled"
+      InputProps={Object.assign({}, props.InputProps, inputProps)}
+      InputLabelProps={Object.assign(
+         {},
+         props.InputLabelProps,
+         inputLabelProps
+      )}
+      {...props}
+   />
 ))(({ theme }) => ({
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
@@ -24,6 +33,9 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
 
 const inputProps: Partial<FilledInputProps> = {
    disableUnderline: true,
+}
+const inputLabelProps: Partial<InputLabelProps> = {
+   shrink: true,
 }
 
 export default BrandedTextField
