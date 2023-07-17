@@ -25,7 +25,7 @@ const useFileUploader = ({
 
    const handleError = useCallback(
       (errorMsg: string) => {
-         errorNotification(errorMsg)
+         errorNotification(errorMsg, errorMsg)
       },
       [errorNotification]
    )
@@ -39,7 +39,7 @@ const useFileUploader = ({
             multiple: multiple,
             maxSize: maxFileSize,
             onDraggingStateChange: setDragActive,
-            onSelect,
+            handleChange: onSelect,
          },
          dragActive,
       }),

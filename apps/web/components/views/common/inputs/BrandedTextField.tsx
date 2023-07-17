@@ -1,7 +1,7 @@
 import { FilledInputProps, InputLabelProps } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
-import { Field, FieldProps, useField } from "formik"
+import { useField } from "formik"
 import { FC } from "react"
 
 export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
@@ -17,7 +17,7 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
       )}
       {...props}
    />
-))(({ theme }) => ({
+))(({ theme, error }) => ({
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
@@ -28,7 +28,11 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    "& .MuiFilledInput-root": {
       borderRadius: theme.spacing(1),
       border: "1px solid",
-      borderColor: theme.palette.mode === "dark" ? "#EDE7FD" : "#ccc",
+      borderColor: error
+         ? theme.palette.error.main
+         : theme.palette.mode === "dark"
+         ? "#EDE7FD"
+         : "#ccc",
       backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
    },
 }))

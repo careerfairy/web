@@ -116,10 +116,7 @@ const CreateCreatorView = () => {
          shouldFetch={Boolean(selectedCreatorId)}
       >
          {(creator) => (
-            <SparksDialog.Container
-               onMobileBack={() => handleBack()}
-               withActionsOffset
-            >
+            <SparksDialog.Container onMobileBack={() => handleBack()}>
                {creator ? (
                   <SparksDialog.Title pl={2}>
                      <Box component="span" color="secondary.main">
@@ -210,7 +207,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="firstName"
                                  type="text"
-                                 label="First Name"
+                                 label="First Name *"
                                  placeholder="John"
                                  fullWidth
                               />
@@ -219,7 +216,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="lastName"
                                  type="text"
-                                 label="Last Name"
+                                 label="Last Name *"
                                  placeholder="Doe"
                                  fullWidth
                               />
@@ -228,7 +225,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="position"
                                  type="text"
-                                 label="Position"
+                                 label="Position *"
                                  placeholder="Ex: Marketing Manager"
                                  autoComplete="organization-title"
                                  fullWidth
@@ -248,7 +245,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="email"
                                  type="text"
-                                 label="Email address"
+                                 label="Email address *"
                                  placeholder="ex: John@careerfairy.io"
                                  disabled={Boolean(selectedCreatorId)} // if we are editing a creator, we don't want to allow changing the email
                                  fullWidth
@@ -268,6 +265,7 @@ const CreateCreatorView = () => {
                               />
                            </Grid>
                         </Grid>
+                        <SparksDialog.ActionsOffset />
                         <SparksDialog.Actions>
                            <SparksDialog.Button
                               color="grey"
@@ -361,7 +359,12 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
    }, [field.value])
 
    return (
-      <>
+      <Box
+         display="flex"
+         flexDirection="column"
+         alignItems="center"
+         justifyContent="center"
+      >
          <FileUploader {...fileUploaderProps}>
             <CardActionArea sx={styles.avaRoot}>
                <Avatar
@@ -386,7 +389,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
                {meta.error}
             </FormHelperText>
          ) : null}
-      </>
+      </Box>
    )
 }
 

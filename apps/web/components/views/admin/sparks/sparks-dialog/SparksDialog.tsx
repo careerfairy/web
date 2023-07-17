@@ -2,6 +2,7 @@ import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
+   Box,
    BoxProps,
    CircularProgress,
    ContainerProps,
@@ -28,22 +29,23 @@ import { sxStyles } from "types/commonTypes"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
+const mobileBreakpoint = "md"
 
 const styles = sxStyles({
    root: {},
    title: {
       letterSpacing: {
          xs: "-0.04343rem",
-         mobile: "-0.04886rem",
+         [mobileBreakpoint]: "-0.04886rem",
       },
       fontSize: {
          xs: "2.28571rem", // 32px
-         mobile: "2.57143rem", // 36px
+         [mobileBreakpoint]: "2.57143rem", // 36px
       },
       fontWeight: 600,
       lineHeight: "150%",
       textAlign: {
-         mobile: "center",
+         [mobileBreakpoint]: "center",
       },
    },
    subtitle: {
@@ -54,25 +56,30 @@ const styles = sxStyles({
       lineHeight: "150%",
       letterSpacing: "-0.02171rem",
       mx: {
-         mobile: "auto",
+         [mobileBreakpoint]: "auto",
       },
       textAlign: {
          mobile: "center",
       },
    },
    container: {
-      display: "flex",
       flexDirection: "column",
       py: `${mobileTopPadding}px`,
       position: "relative",
-      height: "100%",
+      height: {
+         xs: "100vh",
+         [mobileBreakpoint]: "clamp(0px, calc(100vh - 200px), 778px)",
+      },
       justifyContent: {
          xs: "flex-start",
-         mobile: "center",
+         [mobileBreakpoint]: "center",
       },
-   },
-   containerWithActionsOffset: {
-      pb: `${actionsHeight * 1.2}px !important`,
+      display: {
+         [mobileBreakpoint]: "grid",
+      },
+      placeItems: {
+         [mobileBreakpoint]: "center",
+      },
    },
    fixedBottomContent: {
       position: "fixed",
@@ -242,13 +249,11 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 }
 
 type SparksDialogContainerProps = ContainerProps & {
-   withActionsOffset?: boolean
-   showMobileCloseButton?: boolean
    onMobileBack?: () => void
+   showMobileCloseButton?: boolean
 }
 
 const Container: FC<SparksDialogContainerProps> = ({
-   withActionsOffset,
    onMobileBack,
    showMobileCloseButton,
    sx,
@@ -263,25 +268,26 @@ const Container: FC<SparksDialogContainerProps> = ({
 
    return (
       <MuiContainer
-         maxWidth="sm"
-         sx={[
-            styles.container,
-            withActionsOffset && styles.containerWithActionsOffset,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+         maxWidth="md"
+         sx={[styles.container, ...(Array.isArray(sx) ? sx : [sx])]}
          {...props}
       >
-         {onMobileBack && isMobile ? (
-            <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
-               <BackIcon />
-            </IconButton>
-         ) : null}
-         {props.children}
-         {showMobileCloseButton && isMobile ? (
-            <IconButton sx={styles.mobileCloseBtn} onClick={handleCloseClick}>
-               <CloseIcon />
-            </IconButton>
-         ) : null}
+         <Box>
+            {onMobileBack && isMobile ? (
+               <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
+                  <BackIcon />
+               </IconButton>
+            ) : null}
+            {props.children}
+            {showMobileCloseButton && isMobile ? (
+               <IconButton
+                  sx={styles.mobileCloseBtn}
+                  onClick={handleCloseClick}
+               >
+                  <CloseIcon />
+               </IconButton>
+            ) : null}
+         </Box>
       </MuiContainer>
    )
 }
@@ -300,6 +306,10 @@ const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
          {children}
       </Stack>
    )
+}
+
+const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
+   return <Box mt={2} height={height} />
 }
 
 const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
@@ -321,5 +331,6 @@ SparksDialog.Subtitle = Subtitle
 SparksDialog.Container = Container
 SparksDialog.Actions = Actions
 SparksDialog.Button = CustomButton
+SparksDialog.ActionsOffset = ActionsOffset
 
 export default SparksDialog
