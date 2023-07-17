@@ -6,19 +6,8 @@ import SelectCreatorDropDown, {
 } from "components/views/common/creator/SelectCreatorDropDown"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { sxStyles } from "types/commonTypes"
 import * as yup from "yup"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
-
-const styles = sxStyles({
-   root: {
-      m: {
-         xs: 0,
-         mobile: "auto",
-      },
-      width: "100%",
-   },
-})
 
 export type SelectCreatorFormValues = {
    creatorId: string
@@ -42,7 +31,7 @@ const View = () => {
    const { data: creators } = useGroupCreators(group.id)
 
    return (
-      <SparksDialog.Container onMobileBack={handleClose} sx={styles.root}>
+      <SparksDialog.Container onMobileBack={handleClose}>
          <SparksDialog.Title pl={2}>
             Select a{" "}
             <Box component="span" color="secondary.main">
@@ -71,14 +60,13 @@ const View = () => {
             validateOnBlur={false}
             validateOnChange={true}
          >
-            {({ submitForm, isSubmitting }) => (
+            {({ isSubmitting }) => (
                <Form>
                   <SelectCreatorDropDown
                      name="creatorId"
                      type="select"
                      label="Search, select or create a new creator"
                      creators={creators}
-                     submitForm={submitForm}
                      disabled={isSubmitting}
                   />
                </Form>
