@@ -13,6 +13,7 @@ import {
 import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 
 const styles = sxStyles({
    swipeableViews: {
@@ -41,6 +42,9 @@ const styles = sxStyles({
    },
    content: {
       p: 0,
+   },
+   fullHeight: {
+      height: "100%",
    },
 })
 
@@ -211,8 +215,15 @@ const SteppedDialog = <K extends string>({
                   axis={theme.direction === "rtl" ? "x-reverse" : "x"}
                   index={currentStep}
                >
-                  {views.map(({ Component, key }) => (
-                     <Component key={key} />
+                  {views.map(({ Component, key }, index) => (
+                     <AnimatedTabPanel
+                        sx={styles.fullHeight}
+                        key={key}
+                        value={index}
+                        activeValue={currentStep}
+                     >
+                        <Component />
+                     </AnimatedTabPanel>
                   ))}
                </SwipeableViews>
             </StepperContext.Provider>

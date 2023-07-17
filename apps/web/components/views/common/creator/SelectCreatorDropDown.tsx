@@ -7,11 +7,13 @@ import {
    ListItemText,
    MenuItem,
 } from "@mui/material"
-import { FieldProps } from "formik"
+import { useField } from "formik"
 import Image from "next/image"
 import React, { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
-import BrandedTextField from "../inputs/BrandedTextField"
+import BrandedTextField, {
+   type BrandedTextFieldProps,
+} from "../inputs/BrandedTextField"
 
 export const addNewCreatorId = "add-new-creator"
 
@@ -22,39 +24,42 @@ const styles = sxStyles({
    listicon: {
       mr: 1,
    },
+   addNewCreatorAvatar: {
+      bgcolor: "#EFEFEF",
+      color: "#9E9E9E",
+      "& svg": {
+         width: 24,
+         height: 24,
+      },
+   },
 })
 
-type SelectCreatorDropDownProps = {
+type SelectCreatorDropDownProps = BrandedTextFieldProps & {
    creators: Creator[]
    submitForm?: () => void
    onClickAddNewCreator?: () => void
-} & FieldProps<
-   string,
-   {
-      creatorId: string
-   }
->
+}
 
 const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
-   field,
-   form,
    creators,
    submitForm,
    onClickAddNewCreator,
+   name,
    ...props
 }) => {
+   const [field, meta, helpers] = useField<string>(name)
+
    const handleChange = useCallback(
       async (event: React.ChangeEvent<HTMLInputElement>) => {
          const newValue = event.target.value
 
          // Use Formik's setFieldValue to change value
          // Second parameter to setFieldValue is 'shouldValidate', if true it triggers a validation
-         // @ts-ignore
-         await form.setFieldValue(field.name, newValue, false)
+         await helpers.setValue(newValue)
 
          submitForm?.()
       },
-      [field, form, submitForm]
+      [helpers, submitForm]
    )
 
    return (
@@ -65,6 +70,8 @@ const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
          {...field}
          {...props}
          onChange={handleChange}
+         error={meta.touched ? Boolean(meta.error) : null}
+         helperText={meta.touched ? meta.error : null}
          InputLabelProps={{
             shrink: false,
          }}
@@ -75,13 +82,13 @@ const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
             sx={styles.menuItem}
          >
             <ListItemIcon sx={styles.listicon}>
-               <Avatar>
+               <Avatar sx={styles.addNewCreatorAvatar}>
                   <AddRoundedIcon />
                </Avatar>
             </ListItemIcon>
             <ListItemText primary={"Create a new creator"} />
          </MenuItem>
-         <Divider />
+         {creators.length ? <Divider /> : null}
          {creators.map(renderCreatorMenuItem)}
       </BrandedTextField>
    )

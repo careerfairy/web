@@ -91,19 +91,17 @@ export interface Spark extends Identifiable {
     * - homepage: visible only in the homepage
     * - etc
     */
-   // visiblity: {} // {place: boolean}
+   visiblity: {
+      public: boolean // true if visible in the place
+   } // {place: boolean}
 }
 
-export type CreateSpark = Omit<
+export type AddSparkSparkData = Pick<
    Spark,
-   | "id"
-   | "createdAt"
-   | "updatedAt"
-   | "publishedAt"
-   | "likes"
-   | "impressions"
-   | "uniquePlays"
-   | "plays"
-   | "totalWatchedMinutes"
-   | "state"
+   "title" | "category" | "visiblity" | "videoId" | "videoUrl" | "creator"
+>
+
+export type UpdateSparkData = Pick<
+   Spark,
+   "title" | "category" | "visiblity" | "id"
 >

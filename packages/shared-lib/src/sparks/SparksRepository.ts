@@ -2,8 +2,9 @@ import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
-import { CreateSpark, Spark } from "./sparks"
+import { AddSparkSparkData, Spark } from "./sparks"
 import { Create } from "../commonTypes"
+import { Group, pickPublicDataFromGroup } from "../groups"
 
 export interface ISparksRepository {
    /**
@@ -22,7 +23,7 @@ export interface ISparksRepository {
     *  Create a spark
     * @param spark  The spark to create
     */
-   create(spark: CreateSpark): Promise<void>
+   create(spark: AddSparkSparkData, group: Group): Promise<void>
 }
 
 export class SparksRepository
@@ -51,7 +52,7 @@ export class SparksRepository
       return this.firestore.collection("sparks").doc(id).delete()
    }
 
-   async create(spark: CreateSpark): Promise<void> {
+   async create(spark: AddSparkSparkData, group: Group): Promise<void> {
       const doc: Create<Spark> = {
          ...spark,
          createdAt: this.fieldValue.serverTimestamp() as any,
@@ -63,6 +64,8 @@ export class SparksRepository
          plays: 0,
          totalWatchedMinutes: 0,
          uniquePlays: 0,
+         shareCTA: 0,
+         group: pickPublicDataFromGroup(group),
       }
 
       return void this.firestore.collection("sparks").add(doc)
