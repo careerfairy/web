@@ -8,7 +8,7 @@ export class SparksService {
       private readonly repository: ISparksRepository,
       private readonly functions: Functions
    ) {
-      // client methods for Sparks go here...
+      // TODO:  client methods for Sparks go here...
    }
 }
 

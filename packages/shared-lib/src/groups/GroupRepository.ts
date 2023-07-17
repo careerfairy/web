@@ -167,20 +167,30 @@ export interface IGroupRepository {
       bannerImageUrl: string
    ): Promise<void>
 
-   // Creator Actions
-
    /**
-    * Adds a creator to a group
+    * Adds a creator to a group.
+    *
+    * @param {string} groupId - The ID of the group.
+    * @param {Create<Creator>} creator - The creator to be added.
+    * @returns {Promise<void>} A Promise that resolves when the creator is successfully added to the group.
     */
    addCreatorToGroup(groupId: string, creator: Create<Creator>): Promise<void>
 
    /**
-    * Removes a creator from a group
+    * Removes a creator from a group.
+    *
+    * @param {string} groupId - The ID of the group.
+    * @param {string} creatorId - The ID of the creator to be removed.
+    * @returns {Promise<void>} A Promise that resolves when the creator is successfully removed from the group.
     */
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void>
 
    /**
-    * Updates a creator in a group
+    * Updates a creator in a group.
+    *
+    * @param {string} groupId - The ID of the group.
+    * @param {UpdateCreatorData} creator - The updated data for the creator.
+    * @returns {Promise<void>} A Promise that resolves when the creator is successfully updated in the group.
     */
    updateCreatorInGroup(
       groupId: string,
