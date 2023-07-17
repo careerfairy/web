@@ -25,9 +25,9 @@ import * as yup from "yup"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 
 const styles = sxStyles({
-   root: {
-      m: "auto",
-      width: "100%",
+   avaGrid: {
+      display: "flex",
+      justifyContent: "center",
    },
    avaRoot: {
       mx: "auto",
@@ -72,6 +72,28 @@ const styles = sxStyles({
    },
 })
 
+type FormValues = {
+   avatarUrl: string
+   avatarFile: File | null
+   firstName: string
+   lastName: string
+   position: string
+   linkedInUrl: string
+   story: string
+   email: string
+}
+
+const getInitialValues = (creator?: Creator): FormValues => ({
+   avatarUrl: creator?.avatarUrl || "",
+   avatarFile: null,
+   firstName: creator?.firstName || "",
+   lastName: creator?.lastName || "",
+   position: creator?.position || "",
+   linkedInUrl: creator?.linkedInUrl || "",
+   story: creator?.story || "",
+   email: creator?.email || "",
+})
+
 const CreateCreatorView = () => {
    const { goToSelectCreatorView, goToCreatorSelectedView } = useSparksForm()
    const { group } = useGroup()
@@ -97,7 +119,6 @@ const CreateCreatorView = () => {
             <SparksDialog.Container
                onMobileBack={() => handleBack()}
                withActionsOffset
-               sx={styles.root}
             >
                {creator ? (
                   <SparksDialog.Title pl={2}>
@@ -121,16 +142,7 @@ const CreateCreatorView = () => {
                </SparksDialog.Subtitle>
                <Box mt={4} />
                <Formik
-                  initialValues={{
-                     avatarUrl: creator?.avatarUrl || "",
-                     avatarFile: null,
-                     firstName: creator?.firstName || "",
-                     lastName: creator?.lastName || "",
-                     position: creator?.position || "",
-                     linkedInUrl: creator?.linkedInUrl || "",
-                     story: creator?.story || "",
-                     email: creator?.email || "",
-                  }}
+                  initialValues={getInitialValues(creator)}
                   // Don't validate email uniqueness if editing creator
                   validationSchema={getCreateCreatorSchema(group.id, !creator)}
                   enableReinitialize
@@ -186,7 +198,7 @@ const CreateCreatorView = () => {
                   }) => (
                      <Form>
                         <Grid container spacing={2}>
-                           <Grid item xs={12}>
+                           <Grid sx={styles.avaGrid} item xs={12}>
                               <AvatarUpload
                                  name="avatarFile"
                                  groupId={group.id}

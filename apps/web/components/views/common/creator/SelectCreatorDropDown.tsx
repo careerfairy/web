@@ -7,7 +7,7 @@ import {
    ListItemText,
    MenuItem,
 } from "@mui/material"
-import { useField } from "formik"
+import { useField, useFormikContext } from "formik"
 import Image from "next/image"
 import React, { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -36,28 +36,23 @@ const styles = sxStyles({
 
 type SelectCreatorDropDownProps = BrandedTextFieldProps & {
    creators: Creator[]
-   submitForm?: () => void
-   onClickAddNewCreator?: () => void
 }
 
 const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
    creators,
-   submitForm,
-   onClickAddNewCreator,
    name,
    ...props
 }) => {
    const [field, meta, helpers] = useField<string>(name)
+   const { submitForm } = useFormikContext()
 
    const handleChange = useCallback(
       async (event: React.ChangeEvent<HTMLInputElement>) => {
          const newValue = event.target.value
 
-         // Use Formik's setFieldValue to change value
-         // Second parameter to setFieldValue is 'shouldValidate', if true it triggers a validation
          await helpers.setValue(newValue)
 
-         submitForm?.()
+         submitForm() // This invokes the formik submit handler
       },
       [helpers, submitForm]
    )
@@ -89,6 +84,9 @@ const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
             <ListItemText primary={"Create a new creator"} />
          </MenuItem>
          {creators.length ? <Divider /> : null}
+         {/**
+          * Select options only become accessible with this render method
+          */}
          {creators.map(renderCreatorMenuItem)}
       </BrandedTextField>
    )

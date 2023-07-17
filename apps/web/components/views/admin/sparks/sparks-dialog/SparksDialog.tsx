@@ -1,3 +1,5 @@
+import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    BoxProps,
@@ -17,19 +19,15 @@ import dynamic from "next/dynamic"
 import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   CreatorOrNew,
-   SparkOrNew,
    closeSparkDialog,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
 } from "store/reducers/adminSparksReducer"
 import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
-import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
-import CloseIcon from "@mui/icons-material/CloseRounded"
 
 const actionsHeight = 87
-const mobileTopPadding = 30
+const mobileTopPadding = 20
 
 const styles = sxStyles({
    root: {},
@@ -67,6 +65,11 @@ const styles = sxStyles({
       flexDirection: "column",
       py: `${mobileTopPadding}px`,
       position: "relative",
+      height: "100%",
+      justifyContent: {
+         xs: "flex-start",
+         mobile: "center",
+      },
    },
    containerWithActionsOffset: {
       pb: `${actionsHeight * 1.2}px !important`,
@@ -86,7 +89,7 @@ const styles = sxStyles({
    },
    mobileBackBtn: {
       position: "absolute",
-      top: `${mobileTopPadding * 1.15}px`,
+      top: `${mobileTopPadding * 1.25}px`,
       left: 0,
       zIndex: 1,
       p: 1,
@@ -95,7 +98,7 @@ const styles = sxStyles({
    },
    mobileCloseBtn: {
       position: "absolute",
-      top: `${mobileTopPadding * 1.15}px`,
+      top: `${mobileTopPadding * 1.25}px`,
       right: 0,
       zIndex: 1,
       p: 1,

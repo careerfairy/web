@@ -1,38 +1,4 @@
-import {
-   AddCreatorData,
-   UpdateCreatorData,
-} from "@careerfairy/shared-lib/groups/creators"
-import {
-   AddSparkSparkData,
-   UpdateSparkData,
-} from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
-
-type AvatarFile = {
-   avatarFile: File
-}
-
-// Type alias for Creator | AddCreatorData
-export type CreatorOrNew =
-   | {
-        type: "create"
-        initialData: AddCreatorData & AvatarFile
-     }
-   | {
-        type: "update"
-        initialData: UpdateCreatorData & AvatarFile
-     }
-
-// Type alias for Spark | Create<Spark>
-export type SparkOrNew =
-   | {
-        type: "create"
-        initialData: AddSparkSparkData
-     }
-   | {
-        type: "update"
-        initialData: UpdateSparkData
-     }
 
 interface ISparksState {
    sparkDialogOpen: boolean
