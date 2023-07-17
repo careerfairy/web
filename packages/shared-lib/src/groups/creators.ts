@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 
 export const CreatorRoles = {
@@ -24,6 +25,9 @@ export interface Creator extends Identifiable {
    email: string
    avatarUrl: string
 
+   createdAt: Timestamp
+   updatedAt: Timestamp
+
    // optional fields
    linkedInUrl?: string
    story?: string
@@ -44,19 +48,30 @@ export type PublicCreator = Pick<
    | "story"
 >
 
+export type AddCreatorData = Pick<
+   Creator,
+   | "firstName"
+   | "lastName"
+   | "position"
+   | "email"
+   | "avatarUrl"
+   | "linkedInUrl"
+   | "story"
+>
+
 export type UpdateCreatorData = Partial<
    Pick<
       Creator,
       | "firstName"
       | "lastName"
       | "position"
-      | "email"
       | "avatarUrl"
-      | "roles"
+      | "linkedInUrl"
       | "story"
-      | "id"
+      | "email"
    >
->
+> &
+   Identifiable
 
 export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
    return {
@@ -86,6 +101,8 @@ export const dummyCreators: Creator[] = [
       linkedInUrl: "https://www.linkedin.com/in/john-doe/",
       story: "Hello, I am John Doe.",
       roles: [CreatorRoles.Spark],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
    },
    {
       id: "2",
@@ -99,6 +116,8 @@ export const dummyCreators: Creator[] = [
       linkedInUrl: "https://www.linkedin.com/in/jane-smith/",
       story: "Hello, I am Jane Smith.",
       roles: [CreatorRoles.Spark, CreatorRoles.Speaker],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
    },
    {
       id: "3",
@@ -111,6 +130,8 @@ export const dummyCreators: Creator[] = [
       avatarUrl: creatorAvatarUrl,
       linkedInUrl: "https://www.linkedin.com/in/bob-brown/",
       roles: [CreatorRoles.Speaker],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
    },
    {
       id: "4",
@@ -122,6 +143,8 @@ export const dummyCreators: Creator[] = [
       email: "alice.green@example.com",
       avatarUrl: creatorAvatarUrl,
       roles: [CreatorRoles.Spark],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
    },
    {
       id: "5",
@@ -135,5 +158,7 @@ export const dummyCreators: Creator[] = [
       linkedInUrl: "https://www.linkedin.com/in/charlie-black/",
       story: "Hello, I am Charlie Black.",
       roles: [CreatorRoles.Speaker],
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
    },
 ]

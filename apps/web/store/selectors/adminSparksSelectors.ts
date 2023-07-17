@@ -2,3 +2,6 @@ import { RootState } from "../"
 
 export const sparksDialogOpenSelector = (state: RootState) =>
    state.adminSparks.sparkDialogOpen
+
+export const sparksSelectedCreatorId = (state: RootState) =>
+   state.adminSparks.sparksForm.selectedCreatorId

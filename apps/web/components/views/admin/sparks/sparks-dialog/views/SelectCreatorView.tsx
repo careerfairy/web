@@ -1,16 +1,21 @@
-import { dummyCreators } from "@careerfairy/shared-lib/groups/creators"
-import { Box } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import SelectCreatorDropDown, {
    addNewCreatorId,
 } from "components/views/common/creator/SelectCreatorDropDown"
-import { Field, Form, Formik } from "formik"
+import { Form, Formik } from "formik"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import * as yup from "yup"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 
 const styles = sxStyles({
    root: {
-      m: "auto",
+      m: {
+         xs: 0,
+         mobile: "auto",
+      },
       width: "100%",
    },
 })
@@ -23,11 +28,22 @@ const initialValues: SelectCreatorFormValues = {
 } as const
 
 const SelectCreatorView = () => {
-   const { stepper } = useSparksForm()
+   return (
+      <SuspenseWithBoundary fallback={<CircularProgress />}>
+         <View />
+      </SuspenseWithBoundary>
+   )
+}
+
+const View = () => {
+   const { goToCreateOrEditCreatorView, handleClose, goToCreatorSelectedView } =
+      useSparksForm()
+   const { group } = useGroup()
+   const { data: creators } = useGroupCreators(group.id)
 
    return (
-      <SparksDialog.Container sx={styles.root}>
-         <SparksDialog.Title>
+      <SparksDialog.Container onMobileBack={handleClose} sx={styles.root}>
+         <SparksDialog.Title pl={2}>
             Select a{" "}
             <Box component="span" color="secondary.main">
                creator
@@ -43,8 +59,11 @@ const SelectCreatorView = () => {
             validationSchema={SelectCreatorSchema}
             onSubmit={(values, { setSubmitting, resetForm }) => {
                if (values.creatorId === addNewCreatorId) {
-                  stepper.goToStep("create-creator")
+                  goToCreateOrEditCreatorView(null)
+               } else {
+                  goToCreatorSelectedView(values.creatorId)
                }
+
                setSubmitting(false)
 
                resetForm()
@@ -52,18 +71,13 @@ const SelectCreatorView = () => {
             validateOnBlur={false}
             validateOnChange={true}
          >
-            {({ submitForm, isSubmitting, touched, errors }) => (
+            {({ submitForm, isSubmitting }) => (
                <Form>
-                  <Field
-                     component={SelectCreatorDropDown}
+                  <SelectCreatorDropDown
                      name="creatorId"
                      type="select"
                      label="Search, select or create a new creator"
-                     error={
-                        touched.creatorId ? Boolean(errors.creatorId) : null
-                     }
-                     helperText={touched.creatorId ? errors.creatorId : null}
-                     creators={dummyCreators}
+                     creators={creators}
                      submitForm={submitForm}
                      disabled={isSubmitting}
                   />

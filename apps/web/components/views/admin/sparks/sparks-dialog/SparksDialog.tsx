@@ -3,11 +3,13 @@ import {
    BoxProps,
    CircularProgress,
    ContainerProps,
+   IconButton,
    Container as MuiContainer,
    Stack,
    Typography,
    TypographyProps,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
@@ -23,31 +25,48 @@ import {
 } from "store/reducers/adminSparksReducer"
 import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import CloseIcon from "@mui/icons-material/CloseRounded"
 
 const actionsHeight = 87
+const mobileTopPadding = 30
 
 const styles = sxStyles({
    root: {},
    title: {
-      letterSpacing: "-0.04886rem",
-      fontSize: "2.57143rem",
+      letterSpacing: {
+         xs: "-0.04343rem",
+         mobile: "-0.04886rem",
+      },
+      fontSize: {
+         xs: "2.28571rem", // 32px
+         mobile: "2.57143rem", // 36px
+      },
       fontWeight: 600,
       lineHeight: "150%",
-      textAlign: "center",
+      textAlign: {
+         mobile: "center",
+      },
    },
    subtitle: {
       color: "text.secondary",
-      textAlign: "center",
       fontSize: "1.14286rem",
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "150%",
       letterSpacing: "-0.02171rem",
-      mx: "auto",
+      mx: {
+         mobile: "auto",
+      },
+      textAlign: {
+         mobile: "center",
+      },
    },
    container: {
       display: "flex",
       flexDirection: "column",
+      py: `${mobileTopPadding}px`,
+      position: "relative",
    },
    containerWithActionsOffset: {
       pb: `${actionsHeight * 1.2}px !important`,
@@ -64,6 +83,24 @@ const styles = sxStyles({
    },
    button: {
       textTransform: "none",
+   },
+   mobileBackBtn: {
+      position: "absolute",
+      top: `${mobileTopPadding * 1.15}px`,
+      left: 0,
+      zIndex: 1,
+      p: 1,
+      color: "text.primary",
+      fontSize: "2rem",
+   },
+   mobileCloseBtn: {
+      position: "absolute",
+      top: `${mobileTopPadding * 1.15}px`,
+      right: 0,
+      zIndex: 1,
+      p: 1,
+      color: "text.primary",
+      fontSize: "2rem",
    },
 })
 
@@ -88,46 +125,92 @@ const views = [
          { loading: () => <CircularProgress /> }
       ),
    },
+   {
+      key: "creator-selected",
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/sparks/sparks-dialog/views/CreatorSelectedView"
+            ),
+         { loading: () => <CircularProgress /> }
+      ),
+   },
 ] as const
 
 export type SparkDialogStep = (typeof views)[number]["key"]
 
 export const useSparksForm = () => {
-   console.count("useSparksForm")
    const stepper = useStepper<SparkDialogStep>()
    const dispatch = useDispatch()
 
    const setCreator = useCallback(
-      (creator: CreatorOrNew) => {
-         dispatch(setCreatorAction(creator))
+      (creatorId: string) => {
+         dispatch(setCreatorAction(creatorId))
       },
       [dispatch]
    )
 
    const setSpark = useCallback(
-      (spark: SparkOrNew) => {
-         dispatch(setSparkAction(spark))
+      (sparkId: string) => {
+         dispatch(setSparkAction(sparkId))
       },
       [dispatch]
    )
+
+   const handleClose = useCallback(() => {
+      dispatch(closeSparkDialog())
+   }, [dispatch])
+
+   const goToCreatorSelectedView = useCallback(
+      (creatorId: string) => {
+         setCreator(creatorId)
+         stepper.goToStep("creator-selected")
+      },
+      [setCreator, stepper]
+   )
+
+   const goToCreateOrEditCreatorView = useCallback(
+      (creatorId: string) => {
+         stepper.goToStep("create-creator")
+         setCreator(creatorId)
+      },
+      [setCreator, stepper]
+   )
+
+   const goToSelectCreatorView = useCallback(() => {
+      stepper.goToStep("select-creator")
+      setCreator(null)
+   }, [setCreator, stepper])
 
    return useMemo(() => {
       return {
          setCreator,
          setSpark,
          stepper,
+         handleClose,
+         goToCreatorSelectedView,
+         goToCreateOrEditCreatorView,
+         goToSelectCreatorView,
       }
-   }, [setCreator, setSpark, stepper])
+   }, [
+      goToCreateOrEditCreatorView,
+      goToCreatorSelectedView,
+      goToSelectCreatorView,
+      handleClose,
+      setCreator,
+      setSpark,
+      stepper,
+   ])
 }
 
 const SparksDialog = () => {
    const open = useSelector(sparksDialogOpenSelector)
 
-   const reduxDispatch = useDispatch()
+   const dispatch = useDispatch()
 
    const handleClose = useCallback(() => {
-      reduxDispatch(closeSparkDialog())
-   }, [reduxDispatch])
+      dispatch(closeSparkDialog())
+   }, [dispatch])
 
    return (
       <SteppedDialog
@@ -157,13 +240,24 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 
 type SparksDialogContainerProps = ContainerProps & {
    withActionsOffset?: boolean
+   showMobileCloseButton?: boolean
+   onMobileBack?: () => void
 }
 
 const Container: FC<SparksDialogContainerProps> = ({
    withActionsOffset,
+   onMobileBack,
+   showMobileCloseButton,
    sx,
    ...props
 }) => {
+   const isMobile = useIsMobile()
+   const dispatch = useDispatch()
+
+   const handleCloseClick = useCallback(() => {
+      dispatch(closeSparkDialog())
+   }, [dispatch])
+
    return (
       <MuiContainer
          maxWidth="sm"
@@ -173,7 +267,19 @@ const Container: FC<SparksDialogContainerProps> = ({
             ...(Array.isArray(sx) ? sx : [sx]),
          ]}
          {...props}
-      />
+      >
+         {onMobileBack && isMobile ? (
+            <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
+               <BackIcon />
+            </IconButton>
+         ) : null}
+         {props.children}
+         {showMobileCloseButton && isMobile ? (
+            <IconButton sx={styles.mobileCloseBtn} onClick={handleCloseClick}>
+               <CloseIcon />
+            </IconButton>
+         ) : null}
+      </MuiContainer>
    )
 }
 
@@ -184,6 +290,7 @@ const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
          direction="row"
          alignItems="center"
          spacing={2}
+         zIndex={1}
          sx={[...(Array.isArray(sx) ? sx : [sx]), styles.fixedBottomContent]}
          {...props}
       >

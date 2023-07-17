@@ -1,32 +1,57 @@
-import { Create } from "@careerfairy/shared-lib/commonTypes"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   AddCreatorData,
+   UpdateCreatorData,
+} from "@careerfairy/shared-lib/groups/creators"
+import {
+   AddSparkSparkData,
+   UpdateSparkData,
+} from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-// Type alias for Creator | Create<Creator>
-export type CreatorOrNew = Creator | Create<Creator>
+type AvatarFile = {
+   avatarFile: File
+}
+
+// Type alias for Creator | AddCreatorData
+export type CreatorOrNew =
+   | {
+        type: "create"
+        initialData: AddCreatorData & AvatarFile
+     }
+   | {
+        type: "update"
+        initialData: UpdateCreatorData & AvatarFile
+     }
 
 // Type alias for Spark | Create<Spark>
-export type SparkOrNew = Spark | Create<Spark>
+export type SparkOrNew =
+   | {
+        type: "create"
+        initialData: AddSparkSparkData
+     }
+   | {
+        type: "update"
+        initialData: UpdateSparkData
+     }
 
 interface ISparksState {
    sparkDialogOpen: boolean
    sparksForm: {
-      creator: CreatorOrNew // Could be a Create<Creator> if we're creating a new creator
-      spark: SparkOrNew // Could be a Create<Spark> if we're creating a new spark
+      selectedCreatorId: string | null
+      selectedSparkId: string | null
    }
 }
 
 type OpenDialogPayload = {
-   creator?: CreatorOrNew
-   spark?: SparkOrNew
+   selectedCreatorId: string
+   selectedSparkId: string
 } | null
 
 const initialState: ISparksState = {
    sparkDialogOpen: false,
    sparksForm: {
-      creator: null,
-      spark: null,
+      selectedCreatorId: null,
+      selectedSparkId: null,
    },
 }
 
@@ -39,20 +64,32 @@ export const adminSparksSlice = createSlice({
          action: PayloadAction<OpenDialogPayload> = null
       ) => {
          state.sparkDialogOpen = true
-         state.sparksForm.creator = action.payload?.creator || null
-         state.sparksForm.spark = action.payload?.spark || null
+
+         if (action.payload) {
+            state.sparksForm.selectedCreatorId =
+               action.payload.selectedCreatorId
+            state.sparksForm.selectedSparkId = action.payload.selectedSparkId
+         }
       },
       closeSparkDialog: (state) => {
          state.sparkDialogOpen = false
-         state.sparksForm.creator = null
-         state.sparksForm.spark = null
+         state.sparksForm.selectedCreatorId = null
+         state.sparksForm.selectedSparkId = null
       },
       // Actions for setting values on the form
-      setCreator: (state, action: PayloadAction<CreatorOrNew>) => {
-         state.sparksForm.creator = action.payload
+      setCreator: (
+         state,
+         action: PayloadAction<ISparksState["sparksForm"]["selectedCreatorId"]>
+      ) => {
+         state.sparksForm.selectedCreatorId =
+            action.payload || initialState.sparksForm.selectedCreatorId
       },
-      setSpark: (state, action: PayloadAction<SparkOrNew>) => {
-         state.sparksForm.spark = action.payload
+      setSpark: (
+         state,
+         action: PayloadAction<ISparksState["sparksForm"]["selectedSparkId"]>
+      ) => {
+         state.sparksForm.selectedSparkId =
+            action.payload || initialState.sparksForm.selectedSparkId
       },
    },
 })
