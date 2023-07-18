@@ -68,7 +68,7 @@ const styles = sxStyles({
       position: "relative",
       height: {
          xs: "100vh",
-         [mobileBreakpoint]: "clamp(0px, calc(100vh - 200px), 778px)",
+         [mobileBreakpoint]: "clamp(0px, calc(100vh - 50px), 778px)",
       },
       justifyContent: {
          xs: "flex-start",

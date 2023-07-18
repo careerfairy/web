@@ -16,7 +16,6 @@ import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTex
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik, useField } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import debounce from "lodash.debounce"
 import { FC, Fragment, ReactNode, useCallback, useMemo } from "react"
 import { useSelector } from "react-redux"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
@@ -140,15 +139,32 @@ const CreateCreatorView = () => {
                <Box mt={4} />
                <Formik
                   initialValues={getInitialValues(creator)}
-                  // Don't validate email uniqueness if editing creator
-                  validationSchema={getCreateCreatorSchema(group.id, !creator)}
+                  validationSchema={CreateCreatorSchema}
                   enableReinitialize
-                  onSubmit={async (values, { setSubmitting }) => {
+                  onSubmit={async (
+                     values,
+                     { setSubmitting, setFieldError }
+                  ) => {
                      let avatarUrl = values.avatarUrl
                      let creatorId = creator?.id
 
                      if (values.avatarFile) {
                         avatarUrl = await handleUploadFile(values.avatarFile)
+                     }
+
+                     // Before making the request, we validate if the email is unique
+                     if (
+                        !creator &&
+                        !(await groupRepo.creatorEmailIsUnique(
+                           group.id,
+                           values.email
+                        ))
+                     ) {
+                        // If the email is not unique and we are trying to create a new creator
+                        // we set an error to the email field and prevent the form from being submitted
+                        setFieldError("email", "Email has already been taken")
+                        setSubmitting(false)
+                        return
                      }
 
                      if (creator) {
@@ -191,7 +207,6 @@ const CreateCreatorView = () => {
                      dirty,
                      isValid,
                      resetForm,
-                     errors,
                   }) => (
                      <Form>
                         <Grid container spacing={2}>
@@ -207,7 +222,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="firstName"
                                  type="text"
-                                 label="First Name *"
+                                 label="First Name"
                                  placeholder="John"
                                  fullWidth
                               />
@@ -216,7 +231,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="lastName"
                                  type="text"
-                                 label="Last Name *"
+                                 label="Last Name"
                                  placeholder="Doe"
                                  fullWidth
                               />
@@ -225,7 +240,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="position"
                                  type="text"
-                                 label="Position *"
+                                 label="Position"
                                  placeholder="Ex: Marketing Manager"
                                  autoComplete="organization-title"
                                  fullWidth
@@ -249,8 +264,6 @@ const CreateCreatorView = () => {
                                  placeholder="ex: John@careerfairy.io"
                                  disabled={Boolean(selectedCreatorId)} // if we are editing a creator, we don't want to allow changing the email
                                  fullWidth
-                                 error={Boolean(errors.email)}
-                                 helperText={errors.email}
                               />
                            </Grid>
                            <Grid item xs={12}>
@@ -340,6 +353,10 @@ type AvatarUploadProps = {
 const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
    const [field, meta, helpers] = useField<File>(name)
 
+   const handleTouched = useCallback(() => {
+      helpers.setTouched(true, false)
+   }, [helpers])
+
    const { fileUploaderProps, dragActive } = useFileUploader({
       acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
       maxFileSize: 10, // MB
@@ -347,7 +364,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
       onValidated: (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
          helpers.setValue(newFile, false)
-         helpers.setTouched(true, false)
+         handleTouched()
          helpers.setError("")
       },
    })
@@ -366,7 +383,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
          justifyContent="center"
       >
          <FileUploader {...fileUploaderProps}>
-            <CardActionArea sx={styles.avaRoot}>
+            <CardActionArea onClick={handleTouched} sx={styles.avaRoot}>
                <Avatar
                   src={remoteUrl || blobUrl}
                   sx={[styles.avatar, dragActive && styles.dragActive]}
@@ -384,7 +401,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
                </Avatar>
             </CardActionArea>
          </FileUploader>
-         {meta.error ? (
+         {meta.touched && meta.error ? (
             <FormHelperText sx={styles.helperText} error>
                {meta.error}
             </FormHelperText>
@@ -393,69 +410,41 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
    )
 }
 
-const getCreateCreatorSchema = (
-   groupId: string,
-   shouldValidateEmailUniqueness: boolean
-) =>
-   yup.object().shape({
-      firstName: yup
-         .string()
-         .max(50, "First Name must be less than 50 characters")
-         .required("First Name is required"),
-      lastName: yup
-         .string()
-         .max(50, "Last Name must be less than 50 characters")
-         .required("Last Name is required"),
-      position: yup
-         .string()
-         .max(50, "Position must be less than 50 characters")
-         .required("Position is required"),
-      email: yup
-         .string()
-         .email("Invalid email")
-         .required("Email is required")
-         .test("email", "Email has already been taken", function (value) {
-            return shouldValidateEmailUniqueness
-               ? validateEmailUniqueness(groupId, value)
-               : true
-         }),
-      linkedInUrl: yup
-         .string()
-         .url()
-         .matches(/linkedin.com/),
-      story: yup.string().max(500, "Story must be less than 500 characters"),
+const CreateCreatorSchema = yup.object().shape({
+   firstName: yup
+      .string()
+      .max(50, "First Name must be less than 50 characters")
+      .required("First Name is required"),
+   lastName: yup
+      .string()
+      .max(50, "Last Name must be less than 50 characters")
+      .required("Last Name is required"),
+   position: yup
+      .string()
+      .max(50, "Position must be less than 50 characters")
+      .required("Position is required"),
+   email: yup.string().email("Invalid email").required("Email is required"),
+   linkedInUrl: yup
+      .string()
+      .url()
+      .matches(/linkedin.com/),
+   story: yup.string().max(500, "Story must be less than 500 characters"),
 
-      avatarUrl: yup
-         .string()
-         .test("avatarFile", "Avatar is required", function (value) {
-            const { avatarFile } = this.parent
-            return Boolean(value || avatarFile)
-         }),
-      avatarFile: yup.mixed<File>().when("avatarUrl", {
-         is: (avatarUrl: string) => !avatarUrl, // if avatarUrl is empty
-         then: yup // then avatarFile is required
-            .mixed<File>()
-            .required("Avatar file is required")
-            .test("avatarFile", "Avatar is required", function (value) {
-               return Boolean(value)
-            }),
+   avatarUrl: yup
+      .string()
+      .test("avatarFile", "Avatar is required", function (value) {
+         const { avatarFile } = this.parent
+         return Boolean(value || avatarFile)
       }),
-   })
-
-const validateEmailUniqueness = debounce(
-   async (groupId: string, value: string) => {
-      if (!value) {
-         return true // If the value is undefined or null, it's considered valid here, because we have `.required` above
-      }
-      try {
-         const isUnique = await groupRepo.creatorEmailIsUnique(groupId, value)
-         return isUnique // The server should respond with a boolean indicating if the email is unique
-      } catch (error) {
-         // Handle error appropriately in your app
-         return false // If the server request fails, we can consider the validation to have failed
-      }
-   },
-   400
-) // 400ms debounce
+   avatarFile: yup.mixed<File>().when("avatarUrl", {
+      is: (avatarUrl: string) => !avatarUrl, // if avatarUrl is empty
+      then: yup // then avatarFile is required
+         .mixed<File>()
+         .required("Avatar file is required")
+         .test("avatarFile", "Avatar is required", function (value) {
+            return Boolean(value)
+         }),
+   }),
+})
 
 export default CreateCreatorView
