@@ -260,7 +260,7 @@ const CreateCreatorView = () => {
                               <BrandedTextFieldField
                                  name="email"
                                  type="text"
-                                 label="Email address *"
+                                 label="Email address"
                                  placeholder="ex: John@careerfairy.io"
                                  disabled={Boolean(selectedCreatorId)} // if we are editing a creator, we don't want to allow changing the email
                                  fullWidth
