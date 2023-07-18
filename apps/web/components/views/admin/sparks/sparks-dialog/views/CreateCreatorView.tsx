@@ -396,7 +396,7 @@ const CreateCreatorSchema = yup.object().shape({
       is: (avatarUrl: string) => !avatarUrl, // if avatarUrl is empty
       then: yup // then avatarFile is required
          .mixed<File>()
-         .test("avatarFile", "Avatar is required123", function (value) {
+         .test("avatarFile", "Avatar is required", function (value) {
             return Boolean(value)
          }),
    }),

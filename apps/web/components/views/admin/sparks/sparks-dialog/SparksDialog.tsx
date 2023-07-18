@@ -62,7 +62,7 @@ const styles = sxStyles({
          mobile: "center",
       },
    },
-   container: {
+   containerWrapper: {
       flexDirection: "column",
       py: `${mobileTopPadding}px`,
       position: "relative",
@@ -79,6 +79,12 @@ const styles = sxStyles({
       },
       placeItems: {
          [mobileBreakpoint]: "center",
+      },
+   },
+   container: {
+      width: {
+         xs: "100%",
+         [mobileBreakpoint]: 535,
       },
    },
    fixedBottomContent: {
@@ -248,7 +254,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
    )
 }
 
-type SparksDialogContainerProps = ContainerProps & {
+type SparksDialogContainerProps = BoxProps & {
    onMobileBack?: () => void
    showMobileCloseButton?: boolean
 }
@@ -267,12 +273,8 @@ const Container: FC<SparksDialogContainerProps> = ({
    }, [dispatch])
 
    return (
-      <MuiContainer
-         maxWidth="md"
-         sx={[styles.container, ...(Array.isArray(sx) ? sx : [sx])]}
-         {...props}
-      >
-         <Box>
+      <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
+         <MuiContainer sx={styles.container} maxWidth="sm">
             {onMobileBack && isMobile ? (
                <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
                   <BackIcon />
@@ -287,8 +289,8 @@ const Container: FC<SparksDialogContainerProps> = ({
                   <CloseIcon />
                </IconButton>
             ) : null}
-         </Box>
-      </MuiContainer>
+         </MuiContainer>
+      </Box>
    )
 }
 
