@@ -1,26 +1,39 @@
-import { Box, Stack } from "@mui/material"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined"
+import {
+   Avatar,
+   Box,
+   Chip,
+   CircularProgress,
+   Divider,
+   Stack,
+   Typography,
+} from "@mui/material"
+import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC, useCallback } from "react"
+import { useSelector } from "react-redux"
+import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
-import { Chip } from "@mui/material"
-import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
-import { useSelector } from "react-redux"
-import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
-import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined"
-import { useCallback } from "react"
-import { Avatar } from "@mui/material"
 
 const styles = sxStyles({
    root: {},
    cretaorDetailsWrapper: {
       display: "flex",
       height: 488,
-      backgroundColor: "background.paper",
+      backgroundColor: "#FCFCFC",
       position: "relative",
-      width: 494,
+      width: {
+         xs: "100%",
+         md: 494,
+      },
       borderRadius: 2,
       border: "1px solid #F8F8F8",
+      p: 3.5,
+      flexDirection: "column",
+      alignItems: "center",
+      overflow: "auto",
    },
    editButton: {
       top: 0,
@@ -37,10 +50,40 @@ const styles = sxStyles({
       width: 136,
       height: 136,
    },
+   fullName: {
+      fontSize: "1.71429rem",
+      fontWeight: 600,
+      lineHeight: "1.42857rem",
+   },
+   details: {
+      fontSize: "1.14286rem",
+      fontWeight: 400,
+      lineHeight: "1.42857rem",
+   },
+   linkedIn: {
+      color: "#0066C8",
+      flexWrap: "nowrap",
+      display: "flex",
+      alignItems: "center",
+      "& p": {
+         color: "inherit",
+         ml: 1,
+      },
+   },
+   story: {
+      fontSize: "1.14286rem",
+      fontStyle: "normal",
+      fontWeight: 400,
+      lineHeight: "normal",
+      letterSpacing: "0.00821rem",
+      textAlign: "center",
+      whiteSpace: "pre-wrap",
+   },
 })
 
 const CreatorSelectedView = () => {
-   const { stepper, goToCreateOrEditCreatorView } = useSparksForm()
+   const { goToCreateOrEditCreatorView, goToSelectCreatorView } =
+      useSparksForm()
    const { group } = useGroup()
 
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
@@ -52,52 +95,108 @@ const CreatorSelectedView = () => {
       [goToCreateOrEditCreatorView]
    )
 
+   const handleBack = useCallback(() => {
+      goToSelectCreatorView()
+   }, [goToSelectCreatorView])
+
+   const handleNext = () => {}
+
    return (
       <CreatorFetchWrapper
          selectedCreatorId={selectedCreatorId}
          groupId={group.id}
          shouldFetch={Boolean(selectedCreatorId)}
       >
-         {(creator) => (
-            <SparksDialog.Container
-               onMobileBack={() => stepper.goToStep("select-creator")}
-               sx={styles.root}
-            >
-               <SparksDialog.Title pl={2}>
-                  <Box component="span" color="secondary.main">
-                     Creator
-                  </Box>{" "}
-                  selected!
-               </SparksDialog.Title>
-               <SparksDialog.Subtitle>
-                  Please check if that’s the correct creator
-               </SparksDialog.Subtitle>
-               <Stack
-                  spacing={1}
-                  p={3.5}
-                  alignItems="center"
-                  sx={styles.cretaorDetailsWrapper}
+         {(creator) =>
+            creator ? (
+               <SparksDialog.Container
+                  onMobileBack={handleBack}
+                  sx={styles.root}
                >
-                  <Box sx={styles.editButton}>
-                     <Chip
-                        label="Edit"
-                        onDelete={() => handleClickEdit(creator.id)}
-                        onClick={() => handleClickEdit(creator.id)}
-                        deleteIcon={<EditIcon />}
-                     />
+                  <SparksDialog.Title pl={2}>
+                     <Box component="span" color="secondary.main">
+                        Creator
+                     </Box>{" "}
+                     selected!
+                  </SparksDialog.Title>
+                  <SparksDialog.Subtitle>
+                     Please check if that’s the correct creator
+                  </SparksDialog.Subtitle>
+                  <Box sx={styles.cretaorDetailsWrapper}>
+                     <Box sx={styles.editButton}>
+                        <Chip
+                           label="Edit"
+                           onDelete={() => handleClickEdit(creator.id)}
+                           onClick={() => handleClickEdit(creator.id)}
+                           deleteIcon={<EditIcon />}
+                        />
+                     </Box>
+                     <Avatar
+                        alt={`${creator.firstName} ${creator.lastName}`}
+                        src={creator.avatarUrl}
+                        sx={styles.avatar}
+                     >
+                        {creator.firstName[0]} {creator.lastName[0]}
+                     </Avatar>
+                     <Box mt={2.85} />
+                     <Typography sx={styles.fullName} component="h4">
+                        {creator.firstName} {creator.lastName}
+                     </Typography>
+                     <Box mt={2} />
+                     <Stack
+                        direction="row"
+                        divider={<Divider orientation="vertical" flexItem />}
+                        spacing={1.5}
+                     >
+                        <Details>{creator.position}</Details>
+                        {creator.linkedInUrl ? (
+                           <Box
+                              component="a"
+                              target="_blank"
+                              href={creator.linkedInUrl}
+                              sx={styles.linkedIn}
+                           >
+                              <LinkedInIcon />
+                              <Typography>Linked</Typography>
+                           </Box>
+                        ) : null}
+                     </Stack>
+                     <Box mt={2} />
+                     <Details>{creator.email}</Details>
+                     <Box mt={2} />
+                     <Typography sx={styles.story}>
+                        {creator.story || "No story"}
+                     </Typography>
                   </Box>
-                  <Avatar
-                     alt={`${creator.firstName} ${creator.lastName}`}
-                     src={creator.avatarUrl}
-                     sx={styles.avatar}
-                  >
-                     {creator.firstName[0]} {creator.lastName[0]}
-                  </Avatar>
-               </Stack>
-            </SparksDialog.Container>
-         )}
+                  <SparksDialog.ActionsOffset />
+                  <SparksDialog.Actions>
+                     <SparksDialog.Button
+                        color="grey"
+                        variant="outlined"
+                        onClick={handleBack}
+                     >
+                        Back
+                     </SparksDialog.Button>
+                     <SparksDialog.Button
+                        variant="contained"
+                        onClick={handleNext}
+                     >
+                        Next
+                     </SparksDialog.Button>
+                  </SparksDialog.Actions>
+               </SparksDialog.Container>
+            ) : (
+               <CircularProgress /> // TODO: Add loading skeleton UI
+            )
+         }
       </CreatorFetchWrapper>
    )
 }
+
+const Details: FC = ({ children }) => (
+   <Typography variant="body2" color="text.secondary" sx={styles.details}>
+      {children}
+   </Typography>
+)
 
 export default CreatorSelectedView

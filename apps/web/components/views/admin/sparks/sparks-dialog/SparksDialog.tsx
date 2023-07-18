@@ -90,7 +90,6 @@ const styles = sxStyles({
    fixedBottomContent: {
       position: "fixed",
       bottom: 0,
-      left: "100%",
       width: "100%",
       p: 2.5,
       borderTop: "1px solid #F0F0F0",
@@ -295,10 +294,14 @@ const Container: FC<SparksDialogContainerProps> = ({
 }
 
 const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
+   const {
+      stepper: { currentStep },
+   } = useSparksForm()
    return (
       <Stack
          justifyContent={"flex-end"}
          direction="row"
+         left={`${currentStep * 100}%`}
          alignItems="center"
          spacing={2}
          zIndex={1}
