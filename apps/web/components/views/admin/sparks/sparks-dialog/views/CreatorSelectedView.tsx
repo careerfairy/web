@@ -18,11 +18,10 @@ import { sxStyles } from "types/commonTypes"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 
 const styles = sxStyles({
-   root: {},
    cretaorDetailsWrapper: {
       display: "flex",
       height: 488,
-      backgroundColor: "#FCFCFC",
+      backgroundColor: "#FEFEFE",
       position: "relative",
       width: {
          xs: "100%",
@@ -109,10 +108,7 @@ const CreatorSelectedView = () => {
       >
          {(creator) =>
             creator ? (
-               <SparksDialog.Container
-                  onMobileBack={handleBack}
-                  sx={styles.root}
-               >
+               <SparksDialog.Container onMobileBack={handleBack}>
                   <SparksDialog.Title pl={2}>
                      <Box component="span" color="secondary.main">
                         Creator
