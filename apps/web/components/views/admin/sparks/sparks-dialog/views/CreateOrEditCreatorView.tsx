@@ -151,10 +151,6 @@ const CreateOrEditCreatorView = () => {
                      if (values.avatarFile) {
                         avatarUrl = await handleUploadFile(values.avatarFile)
                      }
-                     console.log(
-                        "🚀 ~ file: CreateCreatorView.tsx:149 ~ CreateCreatorView ~ avatarUrl:",
-                        avatarUrl
-                     )
 
                      // Before making the request, we validate if the email is unique
                      if (
