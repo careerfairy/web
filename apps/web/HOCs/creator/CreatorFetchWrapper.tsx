@@ -1,5 +1,5 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import useGroupCreatorOnce from "components/custom-hook/creator/useGroupCreator"
+import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
 import { FC, ReactNode } from "react"
 
 /**
@@ -16,7 +16,7 @@ type CreatorFetcherProps = {
 }
 
 /**
- * Fetches the creator once using the provided group and creator IDs.
+ * Fetches the creator using the provided group and creator IDs.
  * @param {CreatorFetcherProps} props - The props for the component.
  * @returns {ReactNode} - The child components.
  */
@@ -25,7 +25,7 @@ const CreatorFetcher: FC<CreatorFetcherProps> = ({
    selectedCreatorId,
    children,
 }) => {
-   const { data: creator } = useGroupCreatorOnce(groupId, selectedCreatorId)
+   const { data: creator } = useGroupCreator(groupId, selectedCreatorId)
    return <>{children(creator)}</>
 }
 

@@ -1,24 +1,14 @@
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { doc } from "firebase/firestore"
-import { useMemo } from "react"
-import { useFirestoreDocDataOnce } from "reactfire"
+import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
-const useGroupCreatorOnce = (groupId: string, creatorId: string) => {
-   const groupSparksQuery = useMemo(() => {
-      return doc(
-         FirestoreInstance,
-         "careerCenterData",
-         groupId,
-         "creators",
-         creatorId
-      ).withConverter(createGenericConverter<Creator>())
-   }, [creatorId, groupId])
-
-   return useFirestoreDocDataOnce(groupSparksQuery, {
-      idField: "id",
-   })
+const useGroupCreator = (groupId: string, creatorId: string) => {
+   return useFirestoreDocument<Creator>(
+      "careerCenterData",
+      [groupId, "creators", creatorId],
+      {
+         idField: "id",
+      }
+   )
 }
 
-export default useGroupCreatorOnce
+export default useGroupCreator
