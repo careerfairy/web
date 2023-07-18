@@ -8,7 +8,7 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
-import useGroupCreatorOnce from "components/custom-hook/creator/useGroupCreator"
+import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
 import useFileUploader from "components/custom-hook/useFileUploader"
 import FileUploader from "components/views/common/FileUploader"
@@ -16,7 +16,7 @@ import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTex
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik, useField } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, Fragment, ReactNode, useCallback, useMemo } from "react"
+import { FC, Fragment, useCallback, useMemo } from "react"
 import { useSelector } from "react-redux"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -109,7 +109,7 @@ const CreateCreatorView = () => {
    )
 
    return (
-      <Wrapper
+      <CreatorFetchWrapper
          selectedCreatorId={selectedCreatorId}
          groupId={group.id}
          shouldFetch={Boolean(selectedCreatorId)}
@@ -301,47 +301,8 @@ const CreateCreatorView = () => {
                </Formik>
             </SparksDialog.Container>
          )}
-      </Wrapper>
+      </CreatorFetchWrapper>
    )
-}
-
-type CreatorFetchWrapperProps = {
-   groupId: string
-   selectedCreatorId?: string
-   children: (creator: Creator | null) => ReactNode
-}
-
-const CreatorFetchWrapper: FC<CreatorFetchWrapperProps> = ({
-   groupId,
-   selectedCreatorId,
-   children,
-}) => {
-   const { data: creator } = useGroupCreatorOnce(groupId, selectedCreatorId)
-   return <>{children(creator)}</>
-}
-
-type WrapperProps = {
-   shouldFetch: boolean
-}
-
-const Wrapper: FC<WrapperProps & CreatorFetchWrapperProps> = ({
-   shouldFetch,
-   groupId,
-   selectedCreatorId,
-   children,
-}) => {
-   if (shouldFetch) {
-      return (
-         <CreatorFetchWrapper
-            groupId={groupId}
-            selectedCreatorId={selectedCreatorId}
-         >
-            {children}
-         </CreatorFetchWrapper>
-      )
-   } else {
-      return <>{children(null)}</>
-   }
 }
 
 type AvatarUploadProps = {
@@ -361,11 +322,11 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
       acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
       maxFileSize: 10, // MB
       multiple: false,
-      onValidated: (file) => {
+      onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
-         helpers.setValue(newFile, false)
+         await helpers.setValue(newFile, false)
          handleTouched()
-         helpers.setError("")
+         helpers.setError(undefined)
       },
    })
 
@@ -430,18 +391,12 @@ const CreateCreatorSchema = yup.object().shape({
       .matches(/linkedin.com/),
    story: yup.string().max(500, "Story must be less than 500 characters"),
 
-   avatarUrl: yup
-      .string()
-      .test("avatarFile", "Avatar is required", function (value) {
-         const { avatarFile } = this.parent
-         return Boolean(value || avatarFile)
-      }),
+   avatarUrl: yup.string(),
    avatarFile: yup.mixed<File>().when("avatarUrl", {
       is: (avatarUrl: string) => !avatarUrl, // if avatarUrl is empty
       then: yup // then avatarFile is required
          .mixed<File>()
-         .required("Avatar file is required")
-         .test("avatarFile", "Avatar is required", function (value) {
+         .test("avatarFile", "Avatar is required123", function (value) {
             return Boolean(value)
          }),
    }),
