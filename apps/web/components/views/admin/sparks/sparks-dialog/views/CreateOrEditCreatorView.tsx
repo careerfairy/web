@@ -93,7 +93,7 @@ const getInitialValues = (creator?: Creator): FormValues => ({
    email: creator?.email || "",
 })
 
-const CreateCreatorView = () => {
+const CreateOrEditCreatorView = () => {
    const { goToSelectCreatorView, goToCreatorSelectedView } = useSparksForm()
    const { group } = useGroup()
    const { handleUploadFile } = useUploadCreatorAvatar(group.id)
@@ -402,4 +402,4 @@ const CreateCreatorSchema = yup.object().shape({
    }),
 })
 
-export default CreateCreatorView
+export default CreateOrEditCreatorView
