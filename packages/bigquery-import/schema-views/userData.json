@@ -65,6 +65,34 @@
       {
          "fields": [
             {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "fieldOfStudy",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "levelOfStudy",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
                "name": "name",
                "type": "string"
             },
