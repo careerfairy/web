@@ -311,7 +311,7 @@ const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
 }
 
 const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
-   return <Box mt={2} height={height} />
+   return <Box height={height} />
 }
 
 const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
