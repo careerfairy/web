@@ -30,6 +30,7 @@ import { dataLayerUser } from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
 import { errorLogAndNotify } from "util/CommonUtil"
 import CookiesUtil from "../util/CookiesUtil"
+import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -62,37 +63,6 @@ const AuthContext = createContext<DefaultContext>({
    isLoadingAuth: true,
    isLoadingUserData: true,
 })
-
-/**
- * Paths that require sign in
- */
-const securePaths = [
-   "/profile",
-   "/groups",
-   "/group/[groupId]/admin",
-   "/group/[groupId]/admin/page/[[...livestreamDialog]]",
-   "/group/[groupId]/admin/past-livestreams",
-   "/group/[groupId]/admin/upcoming-livestreams",
-   "/group/[groupId]/admin/drafts",
-   "/group/[groupId]/admin/events",
-   "/group/[groupId]/admin/events/all/[[...livestreamDialog]]",
-   "/group/[groupId]/admin/roles",
-   "/group/[groupId]/admin/edit",
-   "/group/[groupId]/admin/sparks",
-   "/group/[groupId]/admin/analytics",
-   "/group/[groupId]/admin/analytics/talent-pool",
-   "/group/[groupId]/admin/analytics/live-stream",
-   "/group/[groupId]/admin/analytics/live-stream/[[...livestreamId]]",
-   "/group/[groupId]/admin/analytics/feedback/[[...feedback]]",
-   "/group/[groupId]/admin/analytics/registration-sources",
-   "/group/[groupId]/admin/ats-integration",
-   "/new-livestream",
-   "/group/create",
-   "/next-livestreams/my-registrations",
-   "/past-livestreams/unlocked-content",
-]
-
-const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
@@ -135,12 +105,14 @@ const AuthProvider = ({ children }) => {
 
    useEffect(() => {
       // Check that initial route is OK
-      if (isSecurePath() && isLoggedOut) {
+      if (isSecurePath(pathname) && isLoggedOut) {
          void replace({
             pathname: `/login`,
             query: { absolutePath: asPath },
          })
-      } else if (isAdminPath() && userData && !userData.isAdmin) {
+      } else if (!isSignupPath(pathname) && userData && !auth.emailVerified) {
+         void replace(`/signup`)
+      } else if (isAdminPath(pathname) && userData && !userData.isAdmin) {
          void replace(`/`)
       }
 
@@ -177,7 +149,7 @@ const AuthProvider = ({ children }) => {
                console.error(e)
             })
       }
-   }, [userData, firebaseService])
+   }, [userData])
 
    const refetchClaims = useCallback(async () => {
       if (!firebaseService.auth.currentUser) return null
@@ -282,14 +254,7 @@ const AuthProvider = ({ children }) => {
       ]
    )
 
-   const isSecurePath = () => {
-      return Boolean(securePaths.includes(pathname))
-   }
-   const isAdminPath = () => {
-      return Boolean(adminPaths.includes(pathname))
-   }
-
-   if ((isSecurePath() || isAdminPath()) && !auth.isLoaded) {
+   if ((isSecurePath(pathname) || isAdminPath(pathname)) && !auth.isLoaded) {
       return <Loader />
    }
 

@@ -105,6 +105,44 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
    })
 
+   test("It successfully redirect to signup to complete the email verification step", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         correctLevelOfStudyName,
+         correctFieldOfStudyName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      // Navigate to a /portal URL and wait for navigation to finish until redirect
+      await page.goto("/portal", { waitUntil: "load", timeout: 2000 })
+
+      // Expecting to be redirected to the email verification step
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+   })
+
    test("It successfully go to validate email step without gender selected", async ({
       page,
    }) => {
