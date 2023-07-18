@@ -151,6 +151,10 @@ const CreateOrEditCreatorView = () => {
                      if (values.avatarFile) {
                         avatarUrl = await handleUploadFile(values.avatarFile)
                      }
+                     console.log(
+                        "🚀 ~ file: CreateCreatorView.tsx:149 ~ CreateCreatorView ~ avatarUrl:",
+                        avatarUrl
+                     )
 
                      // Before making the request, we validate if the email is unique
                      if (
@@ -346,7 +350,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
          <FileUploader {...fileUploaderProps}>
             <CardActionArea onClick={handleTouched} sx={styles.avaRoot}>
                <Avatar
-                  src={remoteUrl || blobUrl}
+                  src={blobUrl || remoteUrl}
                   sx={[styles.avatar, dragActive && styles.dragActive]}
                >
                   <Fragment>
