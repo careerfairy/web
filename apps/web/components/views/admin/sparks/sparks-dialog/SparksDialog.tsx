@@ -132,11 +132,11 @@ const views = [
       ),
    },
    {
-      key: "create-creator",
+      key: "create-or-edit-creator",
       Component: dynamic(
          () =>
             import(
-               "components/views/admin/sparks/sparks-dialog/views/CreateCreatorView"
+               "components/views/admin/sparks/sparks-dialog/views/CreateOrEditCreatorView"
             ),
          { loading: () => <CircularProgress /> }
       ),
@@ -187,7 +187,7 @@ export const useSparksForm = () => {
 
    const goToCreateOrEditCreatorView = useCallback(
       (creatorId: string) => {
-         stepper.goToStep("create-creator")
+         stepper.goToStep("create-or-edit-creator")
          setCreator(creatorId)
       },
       [setCreator, stepper]
