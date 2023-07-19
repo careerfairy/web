@@ -19,7 +19,6 @@ import { useRouter } from "next/router"
 import AboutSection from "../../components/views/upcoming-livestream/AboutSection"
 import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection"
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
-import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection"
 import { useTheme } from "@mui/material/styles"
 import ContactSection from "../../components/views/upcoming-livestream/ContactSection"
 import Navigation from "../../components/views/upcoming-livestream/Navigation"
@@ -32,7 +31,6 @@ import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchem
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
-import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -45,12 +43,7 @@ import useRegistrationData from "../../components/views/livestream-dialog/views/
 import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
-
-type TrackProps = {
-   id: string
-   visitorId: string
-   extraData: LivestreamEvent
-}
+import useTrackLivestreamView from "../../components/custom-hook/live-stream/useTrackLivestreamView"
 
 const UpcomingLivestreamPage = ({
    serverStream,
@@ -60,25 +53,9 @@ const UpcomingLivestreamPage = ({
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
-   const { trackDetailPageView, deregisterFromLivestream } =
-      useFirebaseService()
+   const { deregisterFromLivestream } = useFirebaseService()
 
-   const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
-      if (stream) {
-         // increase event popularity
-         recommendationServiceInstance.visitDetailPage(
-            stream as LivestreamEvent,
-            visitorId
-         )
-      }
-      return trackDetailPageView(id, visitorId)
-   }
-
-   const viewRef = useTrackPageView({
-      trackDocumentId: serverStream.id,
-      extraData: serverStream,
-      handleTrack,
-   })
+   const viewRef = useTrackLivestreamView(serverStream)
 
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -94,7 +71,7 @@ const UpcomingLivestreamPage = ({
 
    const { filteredGroups, unfilteredGroups } = useRegistrationData(stream)
 
-   const { push, asPath, query, pathname, replace } = useRouter()
+   const { push, asPath, query, pathname } = useRouter()
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const { data: totalInterests } = useInterests()
