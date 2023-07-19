@@ -125,7 +125,7 @@ const AuthProvider = ({ children }) => {
             console.error(e)
          }
       }
-   }, [auth, userData, pathname])
+   }, [auth, isLoggedIn, userData, pathname])
 
    // Backfill missing userData fields (if they don't exist)
    useEffect(() => {
