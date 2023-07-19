@@ -26,6 +26,7 @@ import useRegistrationHandler from "../../useRegistrationHandler"
 import HeroTags from "./HeroTags"
 import { sxStyles } from "types/commonTypes"
 import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
+import useTrackLivestreamView from "../../../../custom-hook/live-stream/useTrackLivestreamView"
 
 const styles = sxStyles({
    liveHeroContent: {
@@ -48,6 +49,8 @@ const LivestreamDetailsView: FC = () => {
    const [heroRef, heroInView] = useInView()
 
    const isMobile = useIsMobile()
+
+   const viewRef = useTrackLivestreamView(livestream)
 
    const { showRecording, userHasBoughtRecording } = useRecordingAccess(
       authenticatedUser.email || serverUserEmail,
@@ -75,6 +78,7 @@ const LivestreamDetailsView: FC = () => {
                <HeroTags />
                <ShareButton livestream={livestream} />
                <Stack
+                  ref={viewRef}
                   alignItems="center"
                   justifyContent={"center"}
                   spacing={2.5}
