@@ -150,6 +150,16 @@ const views = [
          { loading: () => <CircularProgress /> }
       ),
    },
+   {
+      key: "create-or-edit-spark",
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/sparks/sparks-dialog/views/CreateOrEditSparkView"
+            ),
+         { loading: () => <CircularProgress /> }
+      ),
+   },
 ] as const
 
 export type SparkDialogStep = (typeof views)[number]["key"]
@@ -197,6 +207,10 @@ export const useSparksForm = () => {
       setCreator(null)
    }, [setCreator, stepper])
 
+   const goToCreateSparkView = useCallback(() => {
+      stepper.goToStep("create-or-edit-spark")
+   }, [stepper])
+
    return useMemo(() => {
       return {
          setCreator,
@@ -206,9 +220,11 @@ export const useSparksForm = () => {
          goToCreatorSelectedView,
          goToCreateOrEditCreatorView,
          goToSelectCreatorView,
+         goToCreateSparkView,
       }
    }, [
       goToCreateOrEditCreatorView,
+      goToCreateSparkView,
       goToCreatorSelectedView,
       goToSelectCreatorView,
       handleClose,
@@ -256,11 +272,13 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 type SparksDialogContainerProps = BoxProps & {
    onMobileBack?: () => void
    showMobileCloseButton?: boolean
+   width?: number
 }
 
 const Container: FC<SparksDialogContainerProps> = ({
    onMobileBack,
    showMobileCloseButton,
+   width,
    sx,
    ...props
 }) => {
@@ -273,7 +291,19 @@ const Container: FC<SparksDialogContainerProps> = ({
 
    return (
       <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
-         <MuiContainer sx={styles.container} maxWidth="sm">
+         <MuiContainer
+            sx={[
+               styles.container,
+               width
+                  ? {
+                       width: {
+                          [mobileBreakpoint]: width,
+                       },
+                    }
+                  : null,
+            ]}
+            maxWidth="sm"
+         >
             {onMobileBack && isMobile ? (
                <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
                   <BackIcon />

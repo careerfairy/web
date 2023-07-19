@@ -5,3 +5,6 @@ export const sparksDialogOpenSelector = (state: RootState) =>
 
 export const sparksSelectedCreatorId = (state: RootState) =>
    state.adminSparks.sparksForm.selectedCreatorId
+
+export const sparksSelectedSparkId = (state: RootState) =>
+   state.adminSparks.sparksForm.selectedSparkId

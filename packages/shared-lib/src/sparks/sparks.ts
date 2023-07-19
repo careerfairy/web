@@ -18,28 +18,22 @@ export interface Spark extends Identifiable {
    publishedAt: Timestamp
 
    /**
-    * We can filter sparks by state:
-    * - created: spark is created but not published
-    * - published: spark is ready
-    *
-    * Other possible future states:
-    * - uploading / processing / error
+    * We can filter sparks by its published state:
+    * - false: spark is created but not published
+    * - true: spark is ready
     */
-   state: "published" // string
+   published: boolean
 
    /**
     * Category
     * e.g: Day in the life, Jobs, Role, Application
     */
-   category: {
-      id: string // slug
-      name: string // display name
-   }
+   category: SparkCategory
 
    /**
     * Description / Question of the spark
     */
-   title: string
+   question: string
 
    /**
     * Video Identifier
@@ -82,26 +76,56 @@ export interface Spark extends Identifiable {
    // video metadata
    // videoDurationMs?: number
    // videoSizeBytes?: number
-
-   /**
-    * Visibility of the spark
-    *
-    * In the future we might add more visibilities, e.g:
-    * - companyPage: visible only in the company page
-    * - homepage: visible only in the homepage
-    * - etc
-    */
-   visiblity: {
-      public: boolean // true if visible in the place
-   } // {place: boolean}
 }
+
+export type SparkVisibility = "public" | "private"
 
 export type AddSparkSparkData = Pick<
    Spark,
-   "title" | "category" | "visiblity" | "videoId" | "videoUrl" | "creator"
+   "question" | "category" | "videoId" | "videoUrl" | "creator"
 >
 
-export type UpdateSparkData = Pick<
-   Spark,
-   "title" | "category" | "visiblity" | "id"
->
+export type UpdateSparkData = Pick<Spark, "question" | "category" | "id">
+
+export const SparksCategories = {
+   CompanyCulture: {
+      id: "company-culture",
+      name: "Company Culture",
+   },
+   Application: {
+      id: "application",
+      name: "Application",
+   },
+   DayInTheLife: {
+      id: "day-in-the-life",
+      name: "Day in the Life",
+   },
+   Jobs: {
+      id: "jobs",
+      name: "Jobs",
+   },
+   Role: {
+      id: "role",
+      name: "Role",
+   },
+} as const
+
+export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
+   switch (categoryId) {
+      case SparksCategories.Application.id:
+         return "🚀"
+      case SparksCategories.CompanyCulture.id:
+         return "👨‍🎤"
+      case SparksCategories.DayInTheLife.id:
+         return "😎"
+      case SparksCategories.Jobs.id:
+         return "💼"
+      case SparksCategories.Role.id:
+         return "🧑‍💼"
+      default:
+         return ""
+   }
+}
+
+export type SparkCategory =
+   (typeof SparksCategories)[keyof typeof SparksCategories]

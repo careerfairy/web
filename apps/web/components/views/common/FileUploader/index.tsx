@@ -9,9 +9,6 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 const styles = sxStyles({
    root: {
       position: "relative",
-      "&:focus-within": {
-         outline: "2px solid black",
-      },
       "& > input": {
          display: "block",
          opacity: 0,
