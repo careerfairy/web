@@ -110,7 +110,7 @@ const AuthProvider = ({ children }) => {
             pathname: `/login`,
             query: { absolutePath: asPath },
          })
-      } else if (!isSignupPath(pathname) && userData && !auth.emailVerified) {
+      } else if (!isSignupPath(pathname) && isLoggedIn && !auth.emailVerified) {
          void replace(`/signup`)
       } else if (isAdminPath(pathname) && userData && !userData.isAdmin) {
          void replace(`/`)
