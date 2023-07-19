@@ -102,6 +102,7 @@ export class LivestreamScriptsRepository
    > {
       const docs = await this.firestore
          .collectionGroup("recordingStatsUser")
+         .where("documentType", "==", "recordingStatsUser")
          .get()
 
       return mapFirestoreDocuments<RecordingStatsUser, true>(docs, true)
