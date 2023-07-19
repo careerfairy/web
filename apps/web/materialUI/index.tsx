@@ -506,6 +506,17 @@ const getComponents = (theme: DefaultTheme): Components => ({
                padding: "12px 30px",
             },
          },
+         {
+            props: {
+               size: "small",
+            },
+            style: {
+               padding: "8px 16px",
+               fontWeight: 400,
+               fontSize: "1rem",
+               letterSpacing: "-0.011rem",
+            },
+         },
       ],
    },
    MuiChip: {
