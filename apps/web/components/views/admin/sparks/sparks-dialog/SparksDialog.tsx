@@ -20,12 +20,14 @@ import dynamic from "next/dynamic"
 import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
+   setCachedSparksFormValues,
    closeSparkDialog,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
 } from "store/reducers/adminSparksReducer"
 import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -211,6 +213,13 @@ export const useSparksForm = () => {
       stepper.goToStep("create-or-edit-spark")
    }, [stepper])
 
+   const handleCacheSparksFormValues = useCallback(
+      (value: SparkFormValues | null) => {
+         dispatch(setCachedSparksFormValues(value))
+      },
+      [dispatch]
+   )
+
    return useMemo(() => {
       return {
          setCreator,
@@ -221,12 +230,14 @@ export const useSparksForm = () => {
          goToCreateOrEditCreatorView,
          goToSelectCreatorView,
          goToCreateSparkView,
+         handleCacheSparksFormValues,
       }
    }, [
       goToCreateOrEditCreatorView,
       goToCreateSparkView,
       goToCreatorSelectedView,
       goToSelectCreatorView,
+      handleCacheSparksFormValues,
       handleClose,
       setCreator,
       setSpark,

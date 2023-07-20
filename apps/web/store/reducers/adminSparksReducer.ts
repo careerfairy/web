@@ -1,10 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { SparkFormValues } from "components/views/admin/sparks/sparks-dialog/views/hooks/useSparkFormSubmit"
 
 interface ISparksState {
    sparkDialogOpen: boolean
    sparksForm: {
       selectedCreatorId: string | null
       selectedSparkId: string | null
+      cachedSparkFormValues: SparkFormValues | null
    }
 }
 
@@ -18,6 +20,7 @@ const initialState: ISparksState = {
    sparksForm: {
       selectedCreatorId: null,
       selectedSparkId: null,
+      cachedSparkFormValues: null,
    },
 }
 
@@ -41,6 +44,7 @@ export const adminSparksSlice = createSlice({
          state.sparkDialogOpen = false
          state.sparksForm.selectedCreatorId = null
          state.sparksForm.selectedSparkId = null
+         state.sparksForm.cachedSparkFormValues = null
       },
       // Actions for setting values on the form
       setCreator: (
@@ -56,13 +60,27 @@ export const adminSparksSlice = createSlice({
       ) => {
          state.sparksForm.selectedSparkId =
             action.payload || initialState.sparksForm.selectedSparkId
+
+         // Reset the cached form values when the spark changes
+         state.sparksForm.cachedSparkFormValues = null
+      },
+      setCachedSparksFormValues: (
+         state,
+         action: PayloadAction<SparkFormValues | null>
+      ) => {
+         state.sparksForm.cachedSparkFormValues = action.payload
       },
    },
 })
 
 // Export actions
-export const { openSparkDialog, closeSparkDialog, setCreator, setSpark } =
-   adminSparksSlice.actions
+export const {
+   openSparkDialog,
+   closeSparkDialog,
+   setCreator,
+   setSpark,
+   setCachedSparksFormValues,
+} = adminSparksSlice.actions
 
 // Export reducer
 export default adminSparksSlice.reducer

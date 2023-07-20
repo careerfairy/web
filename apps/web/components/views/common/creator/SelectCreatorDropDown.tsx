@@ -44,7 +44,6 @@ const SelectCreatorDropDown: FC<SelectCreatorDropDownProps> = ({
    ...props
 }) => {
    const [field, meta, helpers] = useField<string>(name)
-   console.log("🚀 ~ file: SelectCreatorDropDown.tsx:47 ~ field:", field)
    const { submitForm } = useFormikContext()
 
    const handleChange = useCallback(

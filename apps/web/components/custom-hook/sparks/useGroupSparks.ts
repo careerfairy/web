@@ -8,7 +8,7 @@ const useGroupSparks = (groupId: string) => {
    const groupSparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
-         where("groupIds", "array-contains", groupId)
+         where("group.id", "==", groupId)
       )
    }, [groupId])
 

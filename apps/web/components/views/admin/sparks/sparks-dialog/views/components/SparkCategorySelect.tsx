@@ -75,13 +75,14 @@ type ValueType = SparkCategory["id"]
 
 const SparkCategorySelect: FC<Props> = ({ name }) => {
    const [anchorEl, setAnchorEl] = useState(null)
-   const [field, meta, helpers] = useField<ValueType>(name)
+   const [{ onBlur, ...field }, meta, helpers] = useField<ValueType>(name)
 
    const handleClick = (event) => {
       setAnchorEl(event.currentTarget)
    }
 
    const handleClose = (option: ValueType) => {
+      onBlur({ target: { name } }) // Call onBlur when the popover is closed
       helpers.setValue(option)
       setAnchorEl(null)
    }

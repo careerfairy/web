@@ -46,6 +46,7 @@ export type PublicCreator = Pick<
    | "roles"
    | "groupId"
    | "story"
+   | "id"
 >
 
 export type AddCreatorData = Pick<
@@ -82,5 +83,6 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
       roles: creator.roles ?? [],
       groupId: creator.groupId ?? null,
       story: creator.story ?? null,
+      id: creator.id ?? null,
    }
 }
