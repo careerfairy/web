@@ -89,10 +89,6 @@ const CreatorSelectedView = () => {
    const { group } = useGroup()
 
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
-   console.log(
-      "🚀 ~ file: CreatorSelectedView.tsx:92 ~ CreatorSelectedView ~ selectedCreatorId:",
-      selectedCreatorId
-   )
 
    const handleClickEdit = useCallback(
       (creatorId: string) => {
@@ -106,7 +102,7 @@ const CreatorSelectedView = () => {
    }, [goToSelectCreatorView])
 
    const handleNext = useCallback(() => {
-      goToCreateSparkView(null)
+      goToCreateSparkView()
    }, [goToCreateSparkView])
 
    return (

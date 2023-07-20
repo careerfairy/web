@@ -1,18 +1,20 @@
 import { ISparksRepository } from "@careerfairy/shared-lib/sparks/SparksRepository"
 import { sparksRepo } from "data/RepositoryInstances"
-import { Functions } from "firebase/functions"
+import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
+import { AddSparkSparkData } from "@careerfairy/shared-lib/sparks/sparks"
 
 export class SparksService {
    constructor(
       private readonly repository: ISparksRepository,
       private readonly functions: Functions
-   ) {
-      // TODO:  client methods for Sparks go here...
+   ) {}
+   async createSpark(data: AddSparkSparkData) {
+      return httpsCallable(this.functions, "createSpark")(data)
    }
 }
 
-export const rewardService = new SparksService(
+export const sparkService = new SparksService(
    sparksRepo,
    FunctionsInstance as any
 )

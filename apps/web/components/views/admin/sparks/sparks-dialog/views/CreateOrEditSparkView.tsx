@@ -1,31 +1,27 @@
-import {
-   Spark,
-   SparkCategory,
-   SparksCategories,
-} from "@careerfairy/shared-lib/sparks/sparks"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Grid } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
-import useUploadSparkVideo from "components/custom-hook/sparks/useUploadSparkVideo"
-import { getVideoFileDuration } from "components/helperFunctions/validators/video"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
-import { Form, Formik } from "formik"
+import { Form, Formik, useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
 import { useCallback } from "react"
 import { useSelector } from "react-redux"
 import {
+   sparksCachedSparkFormValues,
    sparksSelectedCreatorId,
    sparksSelectedSparkId,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
-import * as yup from "yup"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import CreatorCard from "./components/CreatorCard"
 import SparkCategorySelect from "./components/SparkCategorySelect"
-import SparkVisibilitySelect, {
-   publishedOptions,
-} from "./components/SparkVisibilitySelect"
+import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
 import VideoUpload from "./components/VideoUpload"
+import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
+import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
 
 const styles = sxStyles({
    flex: {
@@ -37,39 +33,36 @@ const styles = sxStyles({
       backgroundColor: "white",
       p: 1.5,
    },
+   questionTextField: {
+      "& textarea": {
+         height: "182px !important",
+      },
+   },
 })
 
-type FormValues = {
-   category: SparkCategory["id"] | ""
-   question: string
-   videoFile: File
-   videoId: string
-   published: "true" | "false" // visibility
-}
-
-const getInitialSparkValues = (spark?: Spark): FormValues => ({
-   category: spark?.category.id ?? "",
+const getInitialSparkValues = (spark?: Spark): SparkFormValues => ({
+   categoryId: spark?.category.id ?? "",
    question: spark?.question ?? "",
    videoFile: null,
    published: spark?.published ? "true" : "false",
    videoId: spark?.videoId ?? "",
+   id: spark?.id ?? "",
+   videoUrl: spark?.videoUrl ?? "",
 })
 
 const CreateOrEditSparkView = () => {
-   const { goToSelectCreatorView, goToCreatorSelectedView } = useSparksForm()
+   const { goToSelectCreatorView } = useSparksForm()
    const { group } = useGroup()
-   const { handleUploadFile } = useUploadSparkVideo()
 
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const selectedSparkId = useSelector(sparksSelectedSparkId)
+   const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
-   const handleBack = useCallback(
-      (callback?: () => void) => {
-         goToSelectCreatorView()
-         if (callback) callback()
-      },
-      [goToSelectCreatorView]
-   )
+   const { handleSubmit } = useSparkFormSubmit(group.id)
+
+   const handleBack = useCallback(() => {
+      goToSelectCreatorView()
+   }, [goToSelectCreatorView])
 
    return (
       <CreatorFetchWrapper
@@ -119,93 +112,14 @@ const CreateOrEditSparkView = () => {
                      )}
                      <Box pt={2} />
                      <Formik
-                        initialValues={getInitialSparkValues(spark)}
+                        initialValues={
+                           cachedFormValues || getInitialSparkValues(spark)
+                        }
                         validationSchema={CreateOrEditSparkViewSchema}
                         enableReinitialize
-                        onSubmit={async (
-                           values,
-                           { setSubmitting, setFieldError }
-                        ) => {
-                           let videoUrl = spark.videoUrl
-                           let sparkVideoId = spark.videoId
-
-                           let creatorId = spark?.id
-                           const isPublished = values.published === "true"
-
-                           if (values.videoFile) {
-                              const { url, videoId } = await handleUploadFile(
-                                 values.videoFile
-                              )
-
-                              videoUrl = url
-                              sparkVideoId = videoId
-                           }
-
-                           if (spark) {
-                              // update spark
-                           } else {
-                              // create new spark
-                           }
-
-                           setSubmitting(false)
-
-                           goToCreatorSelectedView(creatorId)
-                        }}
+                        onSubmit={handleSubmit}
                      >
-                        {({
-                           submitForm,
-                           isSubmitting,
-                           dirty,
-                           isValid,
-                           resetForm,
-                        }) => (
-                           <Box component={Form} sx={styles.formWrapper}>
-                              <Grid container spacing={1.5}>
-                                 <Grid sx={styles.flex} item xs={12} md={4.75}>
-                                    <VideoUpload name="videoFile" />
-                                 </Grid>
-                                 <Grid item xs={12} md={7.25}>
-                                    <Grid container spacing={1.5}>
-                                       <Grid item xs={12}>
-                                          <SparkCategorySelect name="category" />
-                                       </Grid>
-                                       <Grid item xs={12}>
-                                          <BrandedTextFieldField
-                                             name="question"
-                                             label="Question"
-                                             placeholder="Insert Spark question"
-                                             fullWidth
-                                             multiline
-                                             rows={10}
-                                          />
-                                       </Grid>
-                                       <Grid item xs={12}>
-                                          <SparkVisibilitySelect name="published" />
-                                       </Grid>
-                                    </Grid>
-                                 </Grid>
-                              </Grid>
-                              <SparksDialog.Actions>
-                                 <SparksDialog.Button
-                                    color="grey"
-                                    variant="outlined"
-                                    onClick={() => handleBack(resetForm)}
-                                 >
-                                    Back
-                                 </SparksDialog.Button>
-                                 <SparksDialog.Button
-                                    variant="contained"
-                                    onClick={submitForm}
-                                    disabled={
-                                       isSubmitting || !dirty || !isValid
-                                    }
-                                    loading={isSubmitting}
-                                 >
-                                    {spark ? "Save changes" : "Create"}
-                                 </SparksDialog.Button>
-                              </SparksDialog.Actions>
-                           </Box>
-                        )}
+                        <FormComponent />
                      </Formik>
                      <SparksDialog.ActionsOffset />
                   </SparksDialog.Container>
@@ -216,50 +130,86 @@ const CreateOrEditSparkView = () => {
    )
 }
 
-const categories = Object.values(SparksCategories).map(
-   (category) => category.id
-)
+const FormComponent = () => {
+   const { values, dirty, isSubmitting, isValid, submitForm } =
+      useFormikContext<SparkFormValues>()
 
-const publishedValues = publishedOptions.map((option) => option.value)
+   const { goToSelectCreatorView, handleCacheSparksFormValues } =
+      useSparksForm()
 
-const CreateOrEditSparkViewSchema = yup.object().shape({
-   categoryId: yup.string().oneOf(categories).required(),
-   question: yup.string().required().max(100).min(10),
-   videoFile: yup.mixed<File>().when("videoId", {
-      is: (videoId: string) => {
-         return !videoId
-      }, // if videoId is not set
-      then: yup // then videoFile is required
-         .mixed<File>()
-         .required("Video is required")
-         .test("videoFile", "Video is required", function (value) {
-            return Boolean(value)
-         })
-         .test(
-            "videoFile",
-            "Video length should be between 10 and 60 seconds",
-            async function (value) {
-               try {
-                  const duration = await getVideoFileDuration(value)
-                  if (duration < 10 || duration > 60) {
-                     // min 10 seconds, max 60 seconds
-                     return this.createError({
-                        message: `Invalid video length. Your video is ${duration.toFixed(
-                           2
-                        )} seconds long, but it should be between 10 and 60 seconds.`,
-                     })
-                  }
-                  return true
-               } catch (err) {
-                  return this.createError({
-                     message: err,
-                  })
-               }
-            }
-         ),
-   }),
-   videoId: yup.string().nullable(),
-   published: yup.string().oneOf(publishedValues).required(),
-})
+   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+
+   const handleBack = useCallback(
+      (shouldSave: boolean) => {
+         if (shouldSave) {
+            handleCacheSparksFormValues(values)
+         } else {
+            handleCacheSparksFormValues(null)
+         }
+         goToSelectCreatorView()
+         handleClose()
+      },
+      [goToSelectCreatorView, handleCacheSparksFormValues, handleClose, values]
+   )
+
+   return (
+      <>
+         <Box component={Form} sx={styles.formWrapper}>
+            <Grid container spacing={1.5}>
+               <Grid item xs={12} md={4.7}>
+                  <VideoUpload name="videoFile" />
+               </Grid>
+               <Grid item xs={12} md={7.2}>
+                  <Grid container spacing={1.5} alignItems="stretch">
+                     <Grid item xs={12}>
+                        <SparkCategorySelect name="categoryId" />
+                     </Grid>
+                     <Grid item xs={12}>
+                        <BrandedTextFieldField
+                           name="question"
+                           label="Question"
+                           placeholder="Insert Spark question"
+                           fullWidth
+                           multiline
+                           rows={8}
+                           sx={styles.questionTextField}
+                        />
+                     </Grid>
+                     <Grid item xs={12}>
+                        <SparkVisibilitySelect name="published" />
+                     </Grid>
+                  </Grid>
+               </Grid>
+            </Grid>
+            <SparksDialog.Actions>
+               <SparksDialog.Button
+                  color="grey"
+                  variant="outlined"
+                  onClick={handleOpen}
+               >
+                  Back
+               </SparksDialog.Button>
+               <SparksDialog.Button
+                  variant="contained"
+                  onClick={submitForm}
+                  disabled={isSubmitting || !dirty || !isValid}
+                  loading={isSubmitting}
+               >
+                  {values.id ? "Save changes" : "Create"}
+               </SparksDialog.Button>
+            </SparksDialog.Actions>
+         </Box>
+         <AreYouSureModal
+            open={isOpen}
+            handleClose={() => handleBack(false)}
+            handleConfirm={() => handleBack(true)}
+            confirmButtonText="Yes, keep progress"
+            closeButtonText="No, don't save"
+            title="You’ve started your creation"
+            message="We understand that sometimes we need to take a step back. For it, would you like to keep your current progress?"
+         />
+      </>
+   )
+}
 
 export default CreateOrEditSparkView

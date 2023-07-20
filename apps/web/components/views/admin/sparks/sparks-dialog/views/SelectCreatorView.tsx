@@ -64,7 +64,6 @@ const View = () => {
                <Form>
                   <SelectCreatorDropDown
                      name="creatorId"
-                     type="select"
                      label="Search, select or create a new creator"
                      creators={creators}
                      disabled={isSubmitting}

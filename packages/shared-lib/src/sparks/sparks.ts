@@ -44,7 +44,7 @@ export interface Spark extends Identifiable {
    videoId: string // uuid generated during upload
 
    // in case we want to override the video with an external one
-   videoUrl: string | null // we can have a default video while in the processing state
+   videoUrl: string // we can have a default video while in the processing state
 
    /**
     * KPIs
@@ -80,10 +80,15 @@ export interface Spark extends Identifiable {
 
 export type SparkVisibility = "public" | "private"
 
-export type AddSparkSparkData = Pick<
-   Spark,
-   "question" | "category" | "videoId" | "videoUrl" | "creator"
->
+export type AddSparkSparkData = {
+   categoryId: Spark["category"]["id"]
+   question: Spark["question"]
+   videoId: Spark["videoId"]
+   published: Spark["published"]
+   videoUrl: Spark["videoUrl"]
+   groupId: Spark["group"]["id"]
+   creatorId: Spark["creator"]["id"]
+}
 
 export type UpdateSparkData = Pick<Spark, "question" | "category" | "id">
 
@@ -110,6 +115,8 @@ export const SparksCategories = {
    },
 } as const
 
+export const sparksCategoriesArray = Object.values(SparksCategories)
+
 export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
    switch (categoryId) {
       case SparksCategories.Application.id:
@@ -124,6 +131,23 @@ export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
          return "🧑‍💼"
       default:
          return ""
+   }
+}
+
+export const getCategoryById = (categoryId: SparkCategory["id"]) => {
+   switch (categoryId) {
+      case SparksCategories.Application.id:
+         return SparksCategories.Application
+      case SparksCategories.CompanyCulture.id:
+         return SparksCategories.CompanyCulture
+      case SparksCategories.DayInTheLife.id:
+         return SparksCategories.DayInTheLife
+      case SparksCategories.Jobs.id:
+         return SparksCategories.Jobs
+      case SparksCategories.Role.id:
+         return SparksCategories.Role
+      default:
+         throw new Error(`Invalid category id: ${categoryId}`)
    }
 }
 

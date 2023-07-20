@@ -1,9 +1,13 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { Avatar, Box, CardMedia } from "@mui/material"
-import { CardContent } from "@mui/material"
-import { Typography } from "@mui/material"
-import { CardActionArea } from "@mui/material"
-import { Card } from "@mui/material"
+import {
+   Avatar,
+   Box,
+   Card,
+   CardActionArea,
+   CardContent,
+   CardMedia,
+   Typography,
+} from "@mui/material"
 import Image from "next/image"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"

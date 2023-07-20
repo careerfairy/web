@@ -1,13 +1,8 @@
-import { MenuItem } from "@mui/material"
-import { ListItemText } from "@mui/material"
-import { SelectProps } from "@mui/material"
-import { Box } from "@mui/material"
+import { Box, ListItemText, MenuItem, SelectProps } from "@mui/material"
 import BrandedRadio from "components/views/common/inputs/BrandedRadio"
-import BrandedTextField, {
-   BrandedTextFieldField,
-} from "components/views/common/inputs/BrandedTextField"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
-import React, { FC } from "react"
+import { FC } from "react"
 
 type Props = {
    name: string

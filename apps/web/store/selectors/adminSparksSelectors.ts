@@ -8,3 +8,6 @@ export const sparksSelectedCreatorId = (state: RootState) =>
 
 export const sparksSelectedSparkId = (state: RootState) =>
    state.adminSparks.sparksForm.selectedSparkId
+
+export const sparksCachedSparkFormValues = (state: RootState) =>
+   state.adminSparks.sparksForm.cachedSparkFormValues

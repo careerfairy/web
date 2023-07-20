@@ -1,9 +1,11 @@
-import { FilledInputProps, InputLabelProps, SelectProps } from "@mui/material"
-import TextField, {
-   FilledTextFieldProps,
-   textFieldClasses,
-} from "@mui/material/TextField"
-import { alpha, styled } from "@mui/material/styles"
+import {
+   FilledInputProps,
+   InputLabelProps,
+   SelectProps,
+   lighten,
+} from "@mui/material"
+import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
+import { styled } from "@mui/material/styles"
 import { useField } from "formik"
 import { FC } from "react"
 
@@ -13,13 +15,13 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    <TextField
       variant="filled"
       {...props}
-      InputProps={Object.assign({}, props.InputProps, inputProps)}
+      InputProps={Object.assign({}, inputProps, props.InputProps)}
       InputLabelProps={Object.assign(
          {},
-         props.InputLabelProps,
-         inputLabelProps
+         inputLabelProps,
+         props.InputLabelProps
       )}
-      SelectProps={Object.assign({}, props.SelectProps, selectProps)}
+      SelectProps={Object.assign({}, selectProps, props.SelectProps)}
    />
 ))(({ theme, error, size }) => ({
    "& label": {
@@ -51,11 +53,12 @@ const selectProps: Partial<SelectProps> = {
    MenuProps: {
       sx: {
          "& .Mui-selected": {
-            backgroundColor: (theme) => alpha(theme.palette.grey.main, 0.2),
+            backgroundColor: `#FCFCFC !important`,
          },
          "& .MuiMenuItem-root": {
+            backgroundColor: "white",
             ":hover": {
-               backgroundColor: (theme) => alpha(theme.palette.grey.main, 0.5),
+               backgroundColor: `${lighten("#FCFCFC", 0.1)} !important}`,
             },
          },
       },
