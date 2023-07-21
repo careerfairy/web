@@ -1,4 +1,4 @@
-import { ISparkRepository } from "@careerfairy/shared-lib/sparks/SparksRepository"
+import { ISparkRepository } from "@careerfairy/shared-lib/sparks/SparkRepository"
 import { sparkRepo } from "data/RepositoryInstances"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"

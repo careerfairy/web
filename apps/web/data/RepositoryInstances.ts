@@ -36,7 +36,7 @@ import {
 import {
    ISparkRepository,
    SparkRepository,
-} from "@careerfairy/shared-lib/sparks/SparksRepository"
+} from "@careerfairy/shared-lib/sparks/SparkRepository"
 
 const firestoreInstance = firebaseApp.firestore()
 
