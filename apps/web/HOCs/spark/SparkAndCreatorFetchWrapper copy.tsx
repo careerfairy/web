@@ -1,7 +1,7 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
-import useGroupSpark from "components/custom-hook/sparks/useGroupSpark"
+import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import { FC, ReactNode, useMemo } from "react"
 
 type ReturnType = {

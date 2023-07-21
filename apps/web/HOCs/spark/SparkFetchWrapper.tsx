@@ -1,5 +1,5 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useGroupSpark from "components/custom-hook/sparks/useGroupSpark"
+import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import { FC, ReactNode } from "react"
 
 /**

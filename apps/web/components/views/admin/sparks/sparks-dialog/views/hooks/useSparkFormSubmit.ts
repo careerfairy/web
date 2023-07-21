@@ -1,5 +1,5 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useUploadSparkVideo from "components/custom-hook/sparks/useUploadSparkVideo"
+import useUploadSparkVideo from "components/custom-hook/spark/useUploadSparkVideo"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
@@ -61,10 +61,10 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
             let sparkId = values?.id
 
             if (values.videoFile) {
-               const { url, videoId } = await handleUploadFile(values.videoFile)
+               const { url, uid } = await handleUploadFile(values.videoFile)
 
                videoUrl = url
-               sparkVideoId = videoId
+               sparkVideoId = uid
             }
 
             if (sparkId) {
