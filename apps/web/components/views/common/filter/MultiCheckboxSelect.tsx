@@ -9,6 +9,7 @@ import {
 } from "@mui/material"
 import isEqual from "react-fast-compare"
 import { Box } from "@mui/system"
+import { StyledCheckbox } from "components/views/group/admin/common/inputs"
 
 const MultiCheckboxSelect = ({
    inputName,
@@ -19,6 +20,8 @@ const MultiCheckboxSelect = ({
    setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
    getKeyFn = (option) => option.id, // field id
+   isSingleColumn = false,
+   useStyledCheckbox = false,
 }: Props) => {
    const handleChange = useCallback(
       (event, checked) => {
@@ -51,13 +54,41 @@ const MultiCheckboxSelect = ({
       [selectedItems]
    )
 
-   const leftRowValues = useMemo(
-      () => allValues.slice(0, allValues.length / 2),
-      [allValues]
+   const firstColumnValues = useMemo(
+      () =>
+         isSingleColumn
+            ? allValues
+            : allValues.slice(0, allValues.length / 2 + 1),
+      [allValues, isSingleColumn]
    )
-   const rightValues = useMemo(
-      () => allValues.slice(allValues.length / 2),
-      [allValues]
+
+   const secondColumnValues = useMemo(
+      () =>
+         isSingleColumn ? undefined : allValues.slice(allValues.length / 2 + 1),
+      [allValues, isSingleColumn]
+   )
+
+   const formControl = useCallback(
+      (option) => (
+         <FormControlLabel
+            key={getKeyFn(option)}
+            onChange={handleChange}
+            name={getKeyFn(option)}
+            control={useStyledCheckbox ? <StyledCheckbox /> : <Checkbox />}
+            label={
+               <Typography fontWeight={400} fontSize={"18px"}>
+                  {getLabelFn(option)}
+               </Typography>
+            }
+            labelPlacement={"start"}
+            sx={{
+               display: "flex",
+               justifyContent: "space-between",
+            }}
+            checked={isChecked(getKeyFn(option))}
+         />
+      ),
+      [getKeyFn, getLabelFn, handleChange, isChecked, useStyledCheckbox]
    )
 
    return allValues.length ? (
@@ -69,43 +100,19 @@ const MultiCheckboxSelect = ({
             <Box
                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
             >
-               {leftRowValues.map((option) => (
-                  <FormControlLabel
-                     key={getKeyFn(option)}
-                     onChange={handleChange}
-                     name={getKeyFn(option)}
-                     control={<Checkbox />}
-                     label={
-                        <Typography fontWeight={400} fontSize={"18px"}>
-                           {getLabelFn(option)}
-                        </Typography>
-                     }
-                     labelPlacement="start"
-                     sx={{ display: "flex", justifyContent: "space-between" }}
-                     checked={isChecked(getKeyFn(option))}
-                  />
-               ))}
+               {firstColumnValues.map(formControl)}
             </Box>
-            <Box
-               sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-            >
-               {rightValues.map((option) => (
-                  <FormControlLabel
-                     key={getKeyFn(option)}
-                     name={getKeyFn(option)}
-                     onChange={handleChange}
-                     control={<Checkbox />}
-                     label={
-                        <Typography fontWeight={400} fontSize={"18px"}>
-                           {getLabelFn(option)}
-                        </Typography>
-                     }
-                     labelPlacement="start"
-                     sx={{ display: "flex", justifyContent: "space-between" }}
-                     checked={isChecked(getKeyFn(option))}
-                  />
-               ))}
-            </Box>
+            {isSingleColumn ? null : (
+               <Box
+                  sx={{
+                     display: "flex",
+                     flexDirection: "column",
+                     width: "100%",
+                  }}
+               >
+                  {secondColumnValues.map(formControl)}
+               </Box>
+            )}
          </Stack>
       </FormGroup>
    ) : (
@@ -122,6 +129,8 @@ type Props = {
    getLabelFn?: (obj: any) => string
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
+   isSingleColumn?: boolean
+   useStyledCheckbox?: boolean
 }
 
 export default memo(MultiCheckboxSelect, isEqual)
