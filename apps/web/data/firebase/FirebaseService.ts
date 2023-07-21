@@ -2529,35 +2529,36 @@ class FirebaseService {
             }
          }
 
-         // const batch = this.firestore.batch()
+         const batch = this.firestore.batch()
 
          // Set the user Participating data in the userLivestreamData collection
-         // batch.set(participantsRef, data, { merge: true })
+         batch.set(participantsRef, data, { merge: true })
 
          // Set the user's email in the participants array of the livestream document
-         // batch.update(streamRef, {
-         //    participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-         //       userData.userEmail
-         //    ),
-         // })
+         batch.update(streamRef, {
+            participatingStudents: firebase.firestore.FieldValue.arrayUnion(
+               userData.userEmail
+            ),
+         })
 
-         // await batch.commit()
+         await batch.commit()
 
-         await participantsRef.set(data, { merge: true })
+         // Events with huge number of participants
+         //
+         // await participantsRef.set(data, { merge: true })
+         // const futureIntervalMs = getRandomInt(2500, 30000)
 
-         const futureIntervalMs = getRandomInt(2500, 30000)
-
-         // distribute writes to the single livestream doc
-         setTimeout(() => {
-            streamRef
-               .update({
-                  participatingStudents:
-                     firebase.firestore.FieldValue.arrayUnion(
-                        userData.userEmail
-                     ),
-               })
-               .catch(console.error)
-         }, futureIntervalMs)
+         // // distribute writes to the single livestream doc
+         // setTimeout(() => {
+         //    streamRef
+         //       .update({
+         //          participatingStudents:
+         //             firebase.firestore.FieldValue.arrayUnion(
+         //                userData.userEmail
+         //             ),
+         //       })
+         //       .catch(console.error)
+         // }, futureIntervalMs)
       }
    }
 
