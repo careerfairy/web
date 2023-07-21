@@ -2549,11 +2549,14 @@ class FirebaseService {
 
          // distribute writes to the single livestream doc
          setTimeout(() => {
-            streamRef.update({
-               participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-                  userData.userEmail
-               ),
-            })
+            streamRef
+               .update({
+                  participatingStudents:
+                     firebase.firestore.FieldValue.arrayUnion(
+                        userData.userEmail
+                     ),
+               })
+               .catch(console.error)
          }, futureIntervalMs)
       }
    }
