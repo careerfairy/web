@@ -37,8 +37,8 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
       borderColor: error
          ? theme.palette.error.main
          : theme.palette.mode === "dark"
-         ? "#EDE7FD"
-         : "#ccc",
+         ? "#ccc"
+         : "#EDE7FD",
       backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
    },
 }))

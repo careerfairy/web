@@ -10,7 +10,10 @@ export class SparksService {
       private readonly functions: Functions
    ) {}
    async createSpark(data: AddSparkSparkData) {
-      return httpsCallable(this.functions, "createSpark")(data)
+      return httpsCallable<AddSparkSparkData, void>(
+         this.functions,
+         "createSpark"
+      )(data)
    }
 }
 
