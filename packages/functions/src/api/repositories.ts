@@ -11,9 +11,9 @@ import {
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
 import {
-   SparksRepository,
-   ISparksRepository,
-} from "@careerfairy/shared-lib/sparks/SparksRepository"
+   SparkRepository,
+   ISparkRepository,
+} from "@careerfairy/shared-lib/sparks/SparkRepository"
 import {
    ILivestreamFunctionsRepository,
    LivestreamFunctionsRepository,
@@ -71,7 +71,7 @@ export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
 )
 
-export const sparkRepo: ISparksRepository = new SparksRepository(
+export const sparkRepo: ISparkRepository = new SparkRepository(
    firestore as any,
    FieldValue,
    Timestamp
