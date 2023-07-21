@@ -1,6 +1,6 @@
 import { Container } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupSparks from "components/custom-hook/sparks/useGroupSparks"
+import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import EmptySparksPage from "./EmptySparksPage"

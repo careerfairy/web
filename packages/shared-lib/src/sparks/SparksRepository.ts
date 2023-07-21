@@ -7,7 +7,7 @@ import { Create } from "../commonTypes"
 import { Group, pickPublicDataFromGroup } from "../groups"
 import { Creator, pickPublicDataFromCreator } from "../groups/creators"
 
-export interface ISparksRepository {
+export interface ISparkRepository {
    /**
     *  Get a spark
     * @param id  The id of the spark
@@ -31,9 +31,9 @@ export interface ISparksRepository {
    ): Promise<void>
 }
 
-export class SparksRepository
+export class SparkRepository
    extends BaseFirebaseRepository
-   implements ISparksRepository
+   implements ISparkRepository
 {
    constructor(
       readonly firestore: firebase.firestore.Firestore,

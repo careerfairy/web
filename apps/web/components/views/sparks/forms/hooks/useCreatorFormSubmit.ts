@@ -2,7 +2,6 @@ import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCrea
 import { groupRepo } from "data/RepositoryInstances"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo } from "react"
-import { useSparksForm } from "../../SparksDialog"
 
 export type CreatorFormValues = {
    avatarUrl: string
@@ -37,10 +36,12 @@ type UseCreatorFormSubmit = {
  * - `uploading`: Boolean indicating if the avatar is being uploaded.
  * - `isLoading`: Boolean indicating if the handleSubmit operation is loading.
  */
-const useCreatorFormSubmit = (groupId: string): UseCreatorFormSubmit => {
+const useCreatorFormSubmit = (
+   groupId: string,
+   onSubmited: (creatorId: string) => void
+): UseCreatorFormSubmit => {
    const { handleUploadFile, isLoading, uploading, progress } =
       useUploadCreatorAvatar(groupId)
-   const { goToCreatorSelectedView } = useSparksForm()
 
    const handleSubmit = useCallback<UseCreatorFormSubmit["handleSubmit"]>(
       async (values, { setSubmitting, setFieldError }) => {
@@ -48,7 +49,7 @@ const useCreatorFormSubmit = (groupId: string): UseCreatorFormSubmit => {
          let creatorId = values?.id
 
          if (values.avatarFile) {
-            avatarUrl = await handleUploadFile(values.avatarFile)
+            avatarUrl = (await handleUploadFile(values.avatarFile)).url
          }
 
          // Before making the request, we validate if the email is unique
@@ -87,9 +88,11 @@ const useCreatorFormSubmit = (groupId: string): UseCreatorFormSubmit => {
 
          setSubmitting(false)
 
-         goToCreatorSelectedView(creatorId)
+         if (onSubmited) {
+            onSubmited(creatorId)
+         }
       },
-      [goToCreatorSelectedView, groupId, handleUploadFile]
+      [groupId, handleUploadFile, onSubmited]
    )
 
    return useMemo<UseCreatorFormSubmit>(
