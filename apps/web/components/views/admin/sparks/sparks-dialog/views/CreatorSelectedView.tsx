@@ -18,7 +18,7 @@ import { sxStyles } from "types/commonTypes"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 
 const styles = sxStyles({
-   cretaorDetailsWrapper: {
+   creatorDetailsWrapper: {
       display: "flex",
       height: 488,
       backgroundColor: "#FEFEFE",
@@ -123,7 +123,7 @@ const CreatorSelectedView = () => {
                   <SparksDialog.Subtitle>
                      Please check if that’s the correct creator
                   </SparksDialog.Subtitle>
-                  <Box sx={styles.cretaorDetailsWrapper}>
+                  <Box sx={styles.creatorDetailsWrapper}>
                      <Box sx={styles.editButton}>
                         <Chip
                            label="Edit"
