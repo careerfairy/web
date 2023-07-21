@@ -2529,7 +2529,7 @@ class FirebaseService {
             }
          }
 
-         const batch = this.firestore.batch()
+         // const batch = this.firestore.batch()
 
          // Set the user Participating data in the userLivestreamData collection
          // batch.set(participantsRef, data, { merge: true })
