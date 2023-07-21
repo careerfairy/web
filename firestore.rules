@@ -564,6 +564,10 @@ service cloud.firestore {
                 allow write: if isCFAdmin();
             }
         }
+        match /{somePath=**}/periods/{period} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
         match /{somePath=**}/userLivestreamData/{userEmail} {
             allow read: if true;
             allow write: if isSignedInAndIsSameUser(userEmail);
