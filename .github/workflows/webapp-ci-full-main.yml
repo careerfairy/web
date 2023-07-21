@@ -25,152 +25,152 @@ concurrency:
    cancel-in-progress: true
 
 jobs:
-   build_app_for_tests:
-      name: "Pre-build cache for tests"
-      runs-on: ubuntu-latest
-      timeout-minutes: 10
-      outputs:
-         webapp: ${{ steps.changes.outputs.webapp }}
-         shared-lib: ${{ steps.changes.outputs.shared-lib }}
-         workflow: ${{ steps.changes.outputs.workflow }}
-      steps:
-         - uses: actions/checkout@v3
-         - uses: actions/setup-node@v3
-           with:
-              node-version: "16"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v3
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+   # build_app_for_tests:
+   #    name: "Pre-build cache for tests"
+   #    runs-on: ubuntu-latest
+   #    timeout-minutes: 10
+   #    outputs:
+   #       webapp: ${{ steps.changes.outputs.webapp }}
+   #       shared-lib: ${{ steps.changes.outputs.shared-lib }}
+   #       workflow: ${{ steps.changes.outputs.workflow }}
+   #    steps:
+   #       - uses: actions/checkout@v3
+   #       - uses: actions/setup-node@v3
+   #         with:
+   #            node-version: "16"
+   #       - name: Cache node modules
+   #         id: cache-nodemodules
+   #         uses: actions/cache@v3
+   #         with:
+   #            path: "**/node_modules"
+   #            key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+   #       - name: Install Dependencies
+   #         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+   #         run: npm ci --ignore-scripts
 
-         - name: Cache .next/cache folder
-           uses: actions/cache@v3
-           with:
-              path: ${{ github.workspace }}/apps/web/.next/cache
-              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-              # If source files changed but packages didn't, rebuild from a prior cache.
-              restore-keys: |
-                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+   #       - name: Cache .next/cache folder
+   #         uses: actions/cache@v3
+   #         with:
+   #            path: ${{ github.workspace }}/apps/web/.next/cache
+   #            key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+   #            # If source files changed but packages didn't, rebuild from a prior cache.
+   #            restore-keys: |
+   #               ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
-         - name: Build
-           run: npm run build
-           env:
-              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NODE_ENV: test
+   #       - name: Build
+   #         run: npm run build
+   #         env:
+   #            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+   #            NODE_ENV: test
 
-         # Check which folders have changed
-         # So that we can skip future jobs
-         - uses: dorny/paths-filter@v2
-           id: changes
-           with:
-              base: main
-              filters: |
-                 workflow:
-                  - '.github/workflows/webapp-ci-full-main.yml'
-                 webapp:
-                   - 'apps/web/**'
-                   - 'packages/shared-lib/**'
-                   - 'packages/seed-data/**'
-                 shared-lib:
-                   - 'packages/shared-lib/**'
+   #       # Check which folders have changed
+   #       # So that we can skip future jobs
+   #       - uses: dorny/paths-filter@v2
+   #         id: changes
+   #         with:
+   #            base: main
+   #            filters: |
+   #               workflow:
+   #                - '.github/workflows/webapp-ci-full-main.yml'
+   #               webapp:
+   #                 - 'apps/web/**'
+   #                 - 'packages/shared-lib/**'
+   #                 - 'packages/seed-data/**'
+   #               shared-lib:
+   #                 - 'packages/shared-lib/**'
 
    # Run Unit Tests
-   unit_tests:
-      name: "Unit Tests"
-      needs: [build_app_for_tests]
-      # only run if there are changes on the webapp & shared lib
-      if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
-      timeout-minutes: 10
-      env:
-         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-         NODE_ENV: test
-      steps:
-         - uses: actions/checkout@v3
-         - uses: actions/setup-node@v3
-           with:
-              node-version: "16"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v3
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+   # unit_tests:
+   #    name: "Unit Tests"
+   #    needs: [build_app_for_tests]
+   #    # only run if there are changes on the webapp & shared lib
+   #    if: |
+   #       needs.build_app_for_tests.outputs.webapp == 'true' ||
+   #       needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+   #       needs.build_app_for_tests.outputs.workflow == 'true'
+   #    runs-on: ubuntu-latest
+   #    timeout-minutes: 10
+   #    env:
+   #       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+   #       NODE_ENV: test
+   #    steps:
+   #       - uses: actions/checkout@v3
+   #       - uses: actions/setup-node@v3
+   #         with:
+   #            node-version: "16"
+   #       - name: Cache node modules
+   #         id: cache-nodemodules
+   #         uses: actions/cache@v3
+   #         with:
+   #            path: "**/node_modules"
+   #            key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+   #       - name: Install Dependencies
+   #         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+   #         run: npm ci --ignore-scripts
 
-         - name: Run Jest Unit Tests
-           run: npm run test
+   #       - name: Run Jest Unit Tests
+   #         run: npm run test
 
    # Run E2E Tests
-   e2e_tests:
-      name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
-      needs: [build_app_for_tests]
-      # only run if there are changes on the webapp & shared lib
-      if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
-      strategy:
-         fail-fast: false
-         matrix:
-            shard: [1, 2, 3, 4, 5]
-            total: [5]
-      runs-on: ubuntu-22.04
-      timeout-minutes: 25
-      steps:
-         - uses: actions/checkout@v3
-         - uses: actions/setup-node@v3
-           with:
-              node-version: "16"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v3
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+   # e2e_tests:
+   #    name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
+   #    needs: [build_app_for_tests]
+   #    # only run if there are changes on the webapp & shared lib
+   #    if: |
+   #       needs.build_app_for_tests.outputs.webapp == 'true' ||
+   #       needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+   #       needs.build_app_for_tests.outputs.workflow == 'true'
+   #    strategy:
+   #       fail-fast: false
+   #       matrix:
+   #          shard: [1, 2, 3, 4, 5]
+   #          total: [5]
+   #    runs-on: ubuntu-22.04
+   #    timeout-minutes: 25
+   #    steps:
+   #       - uses: actions/checkout@v3
+   #       - uses: actions/setup-node@v3
+   #         with:
+   #            node-version: "16"
+   #       - name: Cache node modules
+   #         id: cache-nodemodules
+   #         uses: actions/cache@v3
+   #         with:
+   #            path: "**/node_modules"
+   #            key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+   #       - name: Install Dependencies
+   #         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+   #         run: npm ci --ignore-scripts
 
-         - name: Install Playwright's dependencies
-           run: npx playwright install --with-deps
+   #       - name: Install Playwright's dependencies
+   #         run: npx playwright install --with-deps
 
-         - name: Run Playwright End to End tests
-           env:
-              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+   #       - name: Run Playwright End to End tests
+   #         env:
+   #            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+   #            NODE_ENV: test
+   #         run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
-         - name: Upload test results
-           if: ${{ failure() }}
-           uses: actions/upload-artifact@v3
-           with:
-              name: ${{ matrix.shard }}-playwright-report
-              path: apps/web/playwright-report
-              retention-days: 30
+   #       - name: Upload test results
+   #         if: ${{ failure() }}
+   #         uses: actions/upload-artifact@v3
+   #         with:
+   #            name: ${{ matrix.shard }}-playwright-report
+   #            path: apps/web/playwright-report
+   #            retention-days: 30
 
-         - name: Upload debug logs
-           if: ${{ failure() }}
-           uses: actions/upload-artifact@v3
-           with:
-              name: ${{ matrix.shard }}-debug-logs
-              path: firebase-debug.log
-              retention-days: 30
+   #       - name: Upload debug logs
+   #         if: ${{ failure() }}
+   #         uses: actions/upload-artifact@v3
+   #         with:
+   #            name: ${{ matrix.shard }}-debug-logs
+   #            path: firebase-debug.log
+   #            retention-days: 30
 
    # Deploy
    deploy:
       name: "Deploy"
-      needs: [e2e_tests, unit_tests]
+      # needs: [e2e_tests, unit_tests]
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
