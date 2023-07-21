@@ -1,3 +1,4 @@
+import CompanyInformationPageContent from "components/views/group/admin/company-information"
 import MainPageContent from "components/views/group/admin/main"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
@@ -15,7 +16,7 @@ const MainPage = () => {
       >
          <DashboardHead title="CareerFairy | Main Page of" />
 
-         <MainPageContent />
+         <CompanyInformationPageContent />
       </GroupDashboardLayout>
    )
 }
