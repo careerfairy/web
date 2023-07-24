@@ -1,11 +1,11 @@
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    Box,
    BoxProps,
    CircularProgress,
-   ContainerProps,
    IconButton,
    Container as MuiContainer,
    Stack,
@@ -16,16 +16,19 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
 import dynamic from "next/dynamic"
 import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   setCachedSparksFormValues,
+   closeConfirmCloseSparksDialog,
    closeSparkDialog,
+   openConfirmCloseSparksDialog,
+   setCachedSparksFormValues,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
-   openConfirmCloseSparksDialog,
-   closeConfirmCloseSparksDialog,
 } from "store/reducers/adminSparksReducer"
 import {
    sparksConfirmCloseSparksDialogOpen,
@@ -33,8 +36,6 @@ import {
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
-import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
-import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -76,8 +77,8 @@ const styles = sxStyles({
       py: `${mobileTopPadding}px`,
       position: "relative",
       height: {
-         xs: "100vh",
-         [mobileBreakpoint]: "clamp(0px, calc(100vh - 50px), 778px)",
+         xs: "100dvh",
+         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
       },
       justifyContent: {
          xs: "flex-start",
@@ -125,6 +126,9 @@ const styles = sxStyles({
       p: 1,
       color: "text.primary",
       fontSize: "2rem",
+   },
+   warningIcon: {
+      fontSize: 62,
    },
 })
 
@@ -192,9 +196,7 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
-      if (stepper.currentStep === "") {
-      }
-      dispatch(closeSparkDialog())
+      dispatch(openConfirmCloseSparksDialog())
    }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
@@ -262,7 +264,7 @@ const SparksDialog = () => {
 
    const dispatch = useDispatch()
 
-   const handleClose = useCallback(() => {
+   const hanldeCloseSparksDialog = useCallback(() => {
       dispatch(closeSparkDialog())
    }, [dispatch])
 
@@ -278,6 +280,26 @@ const SparksDialog = () => {
       handleOpenConfirmCloseDialog()
    }, [handleOpenConfirmCloseDialog])
 
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "No, stay here",
+         callback: handleCloseConfirmCloseDialog,
+         color: "grey",
+         variant: "outlined",
+      }),
+      [handleCloseConfirmCloseDialog]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Yes, close",
+         callback: hanldeCloseSparksDialog,
+         color: "error",
+         variant: "contained",
+      }),
+      [hanldeCloseSparksDialog]
+   )
+
    return (
       <>
          <SteppedDialog
@@ -286,31 +308,21 @@ const SparksDialog = () => {
             handleClose={handleCloseClick}
             open={open}
             views={views}
-         />{" "}
+         />
          {confirmCloseDialogOpen ? (
             <ConfirmationDialog
                open={confirmCloseDialogOpen}
-               handleClose={handleClose}
+               handleClose={handleCloseConfirmCloseDialog}
                description="If you close this window now the info that you inserted will be lost. Are you sure you want to proceed?"
                title="Close window?"
                icon={
                   <ErrorOutlineRoundedIcon
-                     sx={{ fontSize: 40 }}
+                     sx={styles.warningIcon}
                      color="error"
                   />
                }
-               primaryAction={{
-                  text: "No, stay here",
-                  callback: handleCloseConfirmCloseDialog,
-                  color: "grey",
-                  variant: "outlined",
-               }}
-               secondaryAction={{
-                  text: "Yes, close",
-                  callback: handleClose,
-                  color: "error",
-                  variant: "contained",
-               }}
+               primaryAction={primaryAction}
+               secondaryAction={secondaryAction}
             />
          ) : null}
       </>
@@ -346,11 +358,8 @@ const Container: FC<SparksDialogContainerProps> = ({
    ...props
 }) => {
    const isMobile = useIsMobile()
-   const dispatch = useDispatch()
 
-   const handleCloseClick = useCallback(() => {
-      dispatch(closeSparkDialog())
-   }, [dispatch])
+   const { handleClose } = useSparksForm()
 
    return (
       <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
@@ -374,10 +383,7 @@ const Container: FC<SparksDialogContainerProps> = ({
             ) : null}
             {props.children}
             {showMobileCloseButton && isMobile ? (
-               <IconButton
-                  sx={styles.mobileCloseBtn}
-                  onClick={handleCloseClick}
-               >
+               <IconButton sx={styles.mobileCloseBtn} onClick={handleClose}>
                   <CloseIcon />
                </IconButton>
             ) : null}

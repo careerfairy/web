@@ -45,7 +45,7 @@ const selectProps: Partial<SelectProps> = {
 
 export const publishedOptions = [
    { value: "true", label: "Public on CareerFairy" },
-   { value: "false", label: "Private" },
+   { value: "false", label: "Hiden" },
 ] as const
 
 export default SparkVisibilitySelect

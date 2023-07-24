@@ -8,8 +8,54 @@ import IconButton from "@mui/material/IconButton"
 import CloseIcon from "@mui/icons-material/Close"
 import { Box } from "@mui/system"
 import { ReactNode, FC } from "react"
+import { sxStyles } from "types/commonTypes"
+import { Stack } from "@mui/material"
+import { Typography } from "@mui/material"
 
-type Action = {
+const styles = sxStyles({
+   icon: {},
+   closeIcon: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      p: 2.5,
+      "& svg": {
+         width: 32,
+         height: 32,
+      },
+   },
+   titleWrapper: {
+      position: "relative",
+      pt: 3,
+      px: 3,
+      pb: 2,
+   },
+   titleText: {
+      textAlign: "center",
+      fontSize: "1.71429rem",
+      fontWeight: 600,
+   },
+   description: {
+      textAlign: "center",
+      color: "text.secondary",
+      fontSize: "1.14286rem",
+      fontWeight: 400,
+   },
+   actions: {
+      justifyContent: "center",
+      "& button": {
+         textTransform: "none",
+         boxShadow: "none",
+      },
+      pt: 4,
+      pb: 3,
+   },
+   content: {
+      pb: 0,
+   },
+})
+
+export type ConfirmationDialogAction = {
    text: string
    color?: ButtonProps["color"]
    callback: () => void
@@ -22,8 +68,8 @@ type Props = {
    title: string
    description: string
    icon: ReactNode
-   primaryAction: Action
-   secondaryAction: Action
+   primaryAction: ConfirmationDialogAction
+   secondaryAction: ConfirmationDialogAction
 }
 
 const ConfirmationDialog: FC<Props> = ({
@@ -51,19 +97,17 @@ const ConfirmationDialog: FC<Props> = ({
          onClose={handleClose}
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
+         maxWidth="xs"
       >
-         <DialogTitle id="confirmation-dialog-title">
-            <Box
-               display="flex"
-               justifyContent="space-between"
-               alignItems="center"
-            >
-               <Box display="flex" flexDirection="column" alignItems="center">
-                  {icon}
+         <DialogTitle sx={styles.titleWrapper} id="confirmation-dialog-title">
+            <Stack alignItems="center" spacing={2}>
+               {icon}
+               <Typography sx={styles.titleText} component="h6">
                   {title}
-               </Box>
+               </Typography>
+            </Stack>
+            <Box sx={styles.closeIcon}>
                <IconButton
-                  edge="end"
                   color="inherit"
                   onClick={handleClose}
                   aria-label="close"
@@ -72,15 +116,15 @@ const ConfirmationDialog: FC<Props> = ({
                </IconButton>
             </Box>
          </DialogTitle>
-         <DialogContent>
+         <DialogContent sx={styles.content}>
             <DialogContentText
                id="confirmation-dialog-description"
-               sx={{ color: "text.secondary" }}
+               sx={styles.description}
             >
                {description}
             </DialogContentText>
          </DialogContent>
-         <DialogActions>
+         <DialogActions sx={styles.actions}>
             <Button
                onClick={secondaryActionCallback}
                color={secondaryActionColor}

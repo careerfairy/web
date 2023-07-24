@@ -95,15 +95,15 @@ export type UpdateSparkData = Pick<Spark, "question" | "category" | "id">
 export const SparksCategories = {
    CompanyCulture: {
       id: "company-culture",
-      name: "Company Culture",
+      name: "Company culture",
    },
    Application: {
       id: "application",
-      name: "Application",
+      name: "Application process",
    },
    DayInTheLife: {
       id: "day-in-the-life",
-      name: "Day in the Life",
+      name: "Day in the life",
    },
    Jobs: {
       id: "jobs",
