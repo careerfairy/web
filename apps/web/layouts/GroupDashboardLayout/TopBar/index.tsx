@@ -1,4 +1,4 @@
-// material-ui
+// material-u
 import { Box, Button, Typography } from "@mui/material"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import IconButton from "@mui/material/IconButton"
@@ -13,6 +13,9 @@ import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunc
 import { alpha } from "@mui/material/styles"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 import { useGroup } from ".."
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import { useCallback } from "react"
 
 const styles = sxStyles({
    root: {
@@ -63,26 +66,15 @@ type Props = {
 }
 
 const TopBar = ({ title, cta }: Props) => {
-   const { livestreamDialog } = useGroup()
+   const { livestreamDialog, shrunkLeftMenuState } = useGroup()
    const isMobile = useIsMobile()
 
-   const { toggleLeftDrawer, layout } = useGroupDashboard()
-   const drawerPresent = !isMobile && layout.leftDrawerOpen
+   const drawerPresent = isMobile || shrunkLeftMenuState !== "disabled"
 
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
-         {!drawerPresent && (
-            <Box sx={styles.btnWrapper}>
-               <IconButton
-                  onClick={toggleLeftDrawer}
-                  sx={styles.menuButton}
-                  edge={"start"}
-               >
-                  <MenuRoundedIcon />
-               </IconButton>
-            </Box>
-         )}
+         {drawerPresent ? <DrawerToggleButton /> : null}
          <Box sx={styles.leftSection}>
             <Typography fontWeight={600} sx={styles.title}>
                {title}
@@ -115,6 +107,58 @@ const TopBar = ({ title, cta }: Props) => {
             <UserAvatarWithDetails />
             <NotificationsButton />
          </Stack>
+      </Box>
+   )
+}
+
+const DrawerToggleButton = () => {
+   const isMobile = useIsMobile()
+   const { shrunkLeftMenuState } = useGroup()
+
+   if (shrunkLeftMenuState === "disabled" || isMobile) {
+      return <MobileToggleButton />
+   }
+
+   return <ShrunkToggleButton />
+}
+
+const MobileToggleButton = () => {
+   const { toggleLeftDrawer } = useGroupDashboard()
+
+   return (
+      <Box sx={styles.btnWrapper}>
+         <IconButton
+            onClick={toggleLeftDrawer}
+            sx={styles.menuButton}
+            edge={"start"}
+         >
+            <MenuRoundedIcon />
+         </IconButton>
+      </Box>
+   )
+}
+
+const ShrunkToggleButton = () => {
+   const { shrunkLeftMenuState, setShrunkLeftMenuState } = useGroup()
+
+   const onClick = useCallback(() => {
+      setShrunkLeftMenuState(
+         shrunkLeftMenuState === "shrunk" ? "open" : "shrunk"
+      )
+   }, [setShrunkLeftMenuState, shrunkLeftMenuState])
+
+   const Icon =
+      shrunkLeftMenuState === "shrunk" ? (
+         <ArrowBackIosIcon />
+      ) : (
+         <ArrowForwardIosIcon />
+      )
+
+   return (
+      <Box sx={styles.btnWrapper}>
+         <IconButton onClick={onClick} sx={styles.menuButton} edge={"start"}>
+            {Icon}
+         </IconButton>
       </Box>
    )
 }

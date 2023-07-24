@@ -1,6 +1,7 @@
 import React, {
    createContext,
    FC,
+   SetStateAction,
    useContext,
    useEffect,
    useMemo,
@@ -25,6 +26,16 @@ import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNo
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 import { useLivestreamDialog } from "./useLivestreamDialog"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
+import { useSessionStorage } from "react-use"
+
+/**
+ * The shrunk state of the left menu
+ * disabled: The current page doesn't need shrinking
+ * open: The left menu is open (fully expanded)
+ * shrunk: The left menu is shrunk
+ */
+export type shrunkState = "disabled" | "open" | "shrunk"
 
 type GroupAdminContext = {
    group: Group
@@ -34,8 +45,8 @@ type GroupAdminContext = {
    groupPresenter?: GroupPresenter
    role: GROUP_DASHBOARD_ROLE
    livestreamDialog: ReturnType<typeof useLivestreamDialog>
-   shrunkLeftMenu: boolean
-   setShrunkLeftMenu: (value: boolean) => void
+   shrunkLeftMenuState: shrunkState
+   setShrunkLeftMenuState: React.Dispatch<SetStateAction<shrunkState>>
 }
 
 const GroupContext = createContext<GroupAdminContext>({
@@ -46,8 +57,8 @@ const GroupContext = createContext<GroupAdminContext>({
    groupPresenter: undefined,
    role: undefined,
    livestreamDialog: undefined,
-   shrunkLeftMenu: true,
-   setShrunkLeftMenu: () => {},
+   shrunkLeftMenuState: "disabled",
+   setShrunkLeftMenuState: () => {},
 })
 
 type GroupDashboardLayoutProps = {
@@ -58,6 +69,7 @@ type GroupDashboardLayoutProps = {
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, pageDisplayName } = props
+   const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
    const { replace, push } = useRouter()
@@ -82,7 +94,20 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   const [shrunkLeftMenu, setShrunkLeftMenu] = useState(true)
+   const shrunkInitialState = "shrunk"
+   const [shrunkLeftMenuState, setShrunkLeftMenuState] =
+      useSessionStorage<shrunkState>("shrunkLeftMenuState", shrunkInitialState)
+
+   // on mobile, we don't want to shrunk the left menu
+   useEffect(() => {
+      if (isMobile) {
+         setShrunkLeftMenuState("disabled")
+      } else {
+         if (shrunkLeftMenuState === "disabled") {
+            setShrunkLeftMenuState(shrunkInitialState)
+         }
+      }
+   }, [isMobile, setShrunkLeftMenuState, shrunkLeftMenuState])
 
    useEffect(() => {
       if (
@@ -148,8 +173,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          groupPresenter,
          role: adminGroups?.[group?.id]?.role,
          livestreamDialog,
-         shrunkLeftMenu,
-         setShrunkLeftMenu,
+         shrunkLeftMenuState,
+         setShrunkLeftMenuState,
       }),
       [
          adminGroups,
@@ -158,7 +183,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          groupPresenter,
          groupQuestions,
          livestreamDialog,
-         shrunkLeftMenu,
+         shrunkLeftMenuState,
+         setShrunkLeftMenuState,
          stats,
       ]
    )
