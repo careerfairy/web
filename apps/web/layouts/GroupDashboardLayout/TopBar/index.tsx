@@ -1,4 +1,4 @@
-// material-u
+// material-ui
 import { Box, Button, Typography } from "@mui/material"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import IconButton from "@mui/material/IconButton"
