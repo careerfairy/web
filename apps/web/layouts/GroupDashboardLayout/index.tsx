@@ -34,6 +34,8 @@ type GroupAdminContext = {
    groupPresenter?: GroupPresenter
    role: GROUP_DASHBOARD_ROLE
    livestreamDialog: ReturnType<typeof useLivestreamDialog>
+   shrunkLeftMenu: boolean
+   setShrunkLeftMenu: (value: boolean) => void
 }
 
 const GroupContext = createContext<GroupAdminContext>({
@@ -44,6 +46,8 @@ const GroupContext = createContext<GroupAdminContext>({
    groupPresenter: undefined,
    role: undefined,
    livestreamDialog: undefined,
+   shrunkLeftMenu: true,
+   setShrunkLeftMenu: () => {},
 })
 
 type GroupDashboardLayoutProps = {
@@ -77,6 +81,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const loadingGroup = !isLoaded(group) || !isLoaded(stats)
 
    const isCorrectGroup = groupId === group?.id
+
+   const [shrunkLeftMenu, setShrunkLeftMenu] = useState(true)
 
    useEffect(() => {
       if (
@@ -142,6 +148,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          groupPresenter,
          role: adminGroups?.[group?.id]?.role,
          livestreamDialog,
+         shrunkLeftMenu,
+         setShrunkLeftMenu,
       }),
       [
          adminGroups,
@@ -150,6 +158,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          groupPresenter,
          groupQuestions,
          livestreamDialog,
+         shrunkLeftMenu,
          stats,
       ]
    )
