@@ -1,4 +1,6 @@
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import ExitIcon from "@mui/icons-material/Logout"
 import { Box, Grid } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
@@ -6,8 +8,10 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import { Form, Formik, useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
-import { FC, useCallback } from "react"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
+import { FC, useCallback, useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
    sparksCachedSparkFormValues,
@@ -22,7 +26,6 @@ import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    flex: {
@@ -39,13 +42,22 @@ const styles = sxStyles({
          height: "182px !important",
       },
    },
+   exitIcon: {
+      width: 68,
+      height: 68,
+   },
 })
 
 const getInitialSparkValues = (spark?: Spark): SparkFormValues => ({
    categoryId: spark?.category.id ?? "",
    question: spark?.question ?? "",
    videoFile: null,
-   published: spark?.published ? "true" : "false",
+   published:
+      spark?.published !== undefined
+         ? spark.published
+            ? "true"
+            : "false"
+         : "true",
    videoId: spark?.videoId ?? "",
    id: spark?.id ?? "",
    videoUrl: spark?.videoUrl ?? "",
@@ -98,12 +110,9 @@ const CreateOrEditSparkView = () => {
                         </SparksDialog.Title>
                      )}
                      <SparksDialog.Subtitle>
-                        {spark
-                           ? "Please check if that’s the correct creator"
-                           : "Insert your new creator details!"}
+                        It’s time to upload and set up your Spark
                      </SparksDialog.Subtitle>
-
-                     {/* <Box pt={2} />  */}
+                     <Box mt={3.375} />
                      <Formik
                         initialValues={
                            cachedFormValues || getInitialSparkValues(spark)
@@ -147,6 +156,26 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
          handleClose()
       },
       [goToSelectCreatorView, handleCacheSparksFormValues, handleClose, values]
+   )
+
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Yes, keep progress",
+         callback: () => handleBack(true),
+         color: "secondary",
+         variant: "contained",
+      }),
+      [handleBack]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "No, don’t save",
+         callback: () => handleBack(false),
+         color: "grey",
+         variant: "outlined",
+      }),
+      [handleBack]
    )
 
    return (
@@ -202,14 +231,14 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
                </SparksDialog.Button>
             </SparksDialog.Actions>
          </Box>
-         <AreYouSureModal
+         <ConfirmationDialog
             open={isOpen}
-            handleClose={() => handleBack(false)}
-            handleConfirm={() => handleBack(true)}
-            confirmButtonText="Yes, keep progress"
-            closeButtonText="No, don't save"
+            handleClose={handleClose}
+            description="We understand that sometimes we need to take a step back. For it, would you like to keep your current progress?"
             title="You’ve started your creation"
-            message="We understand that sometimes we need to take a step back. For it, would you like to keep your current progress?"
+            icon={<ExitIcon sx={styles.exitIcon} color="secondary" />}
+            primaryAction={primaryAction}
+            secondaryAction={secondaryAction}
          />
       </>
    )
