@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react"
+import React, { memo, useEffect, useMemo } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
@@ -8,78 +8,97 @@ import Drawer from "@mui/material/Drawer"
 
 // project imports
 import useIsMobile from "../components/custom-hook/useIsMobile"
-import { DRAWER_WIDTH, NICE_SCROLLBAR_STYLES } from "../constants/layout"
+import {
+   DRAWER_WIDTH,
+   DRAWER_WIDTH_SHRUNK,
+   NICE_SCROLLBAR_STYLES,
+} from "../constants/layout"
 import { sxStyles } from "../types/commonTypes"
 import { useGenericDashboard } from "./GenericDashboardLayout"
+import { useGroup } from "./GroupDashboardLayout"
 
-const styles = sxStyles({
-   root: {
-      display: "flex",
-      minHeight: "100vh",
-   },
-   inner: {
-      flexGrow: 1,
-      display: "flex",
-      flexDirection: "column",
-      maxWidth: "fill-available",
-   },
-   innerDesktop: {
-      width: `calc(100% - ${DRAWER_WIDTH}px)`,
-   },
-   main: {
-      flexGrow: 1,
-      display: "flex",
-      flexDirection: "column",
-   },
-   animateWidth: {
-      transition: (theme) => theme.transitions.create("width"),
-   },
-   appBar: {
-      backdropFilter: "blur(8px)",
-      transition: (theme) =>
-         theme.transitions.create([
-            "backdrop-filter",
-            "background-color",
-            "width",
-         ]),
-   },
-   toolbar: {
-      backgroundColor: "none",
-   },
-   drawerWrapper: {
-      flexShrink: { md: 0 },
-   },
-   drawer: {
-      "& .MuiDrawer-paper": {
-         width: DRAWER_WIDTH,
-         background: "white",
-         borderRight: "none",
+const baseStyles = (drawerWidth: number) => {
+   return sxStyles({
+      root: {
+         display: "flex",
+         minHeight: "100vh",
       },
-      ...NICE_SCROLLBAR_STYLES,
-   },
-   drawerWrapperOpen: {
-      width: {
-         xs: "auto",
-         md: DRAWER_WIDTH,
+      inner: {
+         flexGrow: 1,
+         display: "flex",
+         flexDirection: "column",
+         maxWidth: "fill-available",
       },
-   },
-   drawerWrapperClosed: {
-      width: 0,
-   },
-   noBackdrop: {
-      backdropFilter: "none",
-      backgroundColor: "transparent",
-   },
-   topBarFixed: {
-      position: "fixed",
-   },
-   borderBottom: {
-      borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
-      backdropFilter: "blur(8px)",
-   },
-})
-
+      innerDesktop: {
+         width: `calc(100% - ${drawerWidth}px)`,
+      },
+      main: {
+         flexGrow: 1,
+         display: "flex",
+         flexDirection: "column",
+      },
+      animateWidth: {
+         transition: (theme) => theme.transitions.create("width"),
+      },
+      appBar: {
+         backdropFilter: "blur(8px)",
+         transition: (theme) =>
+            theme.transitions.create([
+               "backdrop-filter",
+               "background-color",
+               "width",
+            ]),
+      },
+      toolbar: {
+         backgroundColor: "none",
+      },
+      drawerWrapper: {
+         flexShrink: { md: 0 },
+      },
+      drawer: {
+         "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            background: "white",
+            borderRight: "none",
+         },
+         ...NICE_SCROLLBAR_STYLES,
+      },
+      drawerWrapperOpen: {
+         width: {
+            xs: "auto",
+            md: drawerWidth,
+         },
+      },
+      drawerWrapperClosed: {
+         width: 0,
+      },
+      noBackdrop: {
+         backdropFilter: "none",
+         backgroundColor: "transparent",
+      },
+      topBarFixed: {
+         position: "fixed",
+      },
+      borderBottom: {
+         borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
+         backdropFilter: "blur(8px)",
+      },
+   })
+}
 // ==============================|| MAIN LAYOUT ||============================== //
+
+const useStyles = () => {
+   const { shrunkLeftMenuState } = useGroup()
+
+   let drawerWidth = DRAWER_WIDTH
+
+   if (shrunkLeftMenuState !== "disabled") {
+      drawerWidth =
+         shrunkLeftMenuState === "shrunk" ? DRAWER_WIDTH_SHRUNK : DRAWER_WIDTH
+   }
+
+   return useMemo(() => baseStyles(drawerWidth), [drawerWidth])
+}
 
 type Props = {
    children: React.ReactNode
@@ -106,6 +125,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
    const isMobile = useIsMobile()
+   const styles = useStyles()
 
    useEffect(() => {
       // Dynamically set drawerOpen based on screen size
@@ -167,6 +187,8 @@ const DrawerComponent = ({
    children,
 }: DrawerProps) => {
    const isMobile = useIsMobile()
+   const styles = useStyles()
+
    return (
       <Box
          component="nav"
@@ -200,6 +222,7 @@ const HeaderComponent = ({
    headerBgColor = "#F7F8FC",
 }: HeaderProps) => {
    const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
+   const styles = useStyles()
 
    const isScrolling = useScrollTrigger({
       disableHysteresis: true,
