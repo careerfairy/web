@@ -3,6 +3,7 @@ import { SparkFormValues } from "components/views/admin/sparks/sparks-dialog/vie
 
 interface ISparksState {
    sparkDialogOpen: boolean
+   confirmCloseSparksDialogOpen: boolean
    sparksForm: {
       selectedCreatorId: string | null
       selectedSparkId: string | null
@@ -17,6 +18,7 @@ type OpenDialogPayload = {
 
 const initialState: ISparksState = {
    sparkDialogOpen: false,
+   confirmCloseSparksDialogOpen: false,
    sparksForm: {
       selectedCreatorId: null,
       selectedSparkId: null,
@@ -40,11 +42,18 @@ export const adminSparksSlice = createSlice({
             state.sparksForm.selectedSparkId = action.payload.selectedSparkId
          }
       },
+      openConfirmCloseSparksDialog: (state) => {
+         state.confirmCloseSparksDialogOpen = true
+      },
+      closeConfirmCloseSparksDialog: (state) => {
+         state.confirmCloseSparksDialogOpen = false
+      },
       closeSparkDialog: (state) => {
          state.sparkDialogOpen = false
          state.sparksForm.selectedCreatorId = null
          state.sparksForm.selectedSparkId = null
          state.sparksForm.cachedSparkFormValues = null
+         state.confirmCloseSparksDialogOpen = false
       },
       // Actions for setting values on the form
       setCreator: (
@@ -80,6 +89,8 @@ export const {
    setCreator,
    setSpark,
    setCachedSparksFormValues,
+   openConfirmCloseSparksDialog,
+   closeConfirmCloseSparksDialog,
 } = adminSparksSlice.actions
 
 // Export reducer
