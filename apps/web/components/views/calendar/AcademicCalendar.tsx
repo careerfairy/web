@@ -7,6 +7,16 @@ import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import CalendarLanding from "./CalendarLanding"
 import CalendarChart from "./CalendarChart"
 import { Box } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   container: {
+      height: "100%",
+      width: "100%",
+      maxHeight: "487px",
+      maxWidth: "822px",
+   },
+})
 
 const AcademicCalendar = () => {
    const [selectedUniversities, setSelectedUniversities] = useState<
@@ -107,7 +117,7 @@ const AcademicCalendar = () => {
    }, [selectedPeriods, selectedUniversities])
 
    return (
-      <Box height={"100%"}>
+      <Box sx={styles.container}>
          <CalendarFilter
             allUniversityOptions={allUniversityOptions}
             selectedUniversities={selectedUniversities}
@@ -123,6 +133,7 @@ const AcademicCalendar = () => {
                anchorEl: anchorEl,
                onClose: () => setAnchorEl(null),
                anchorOrigin: { horizontal: "right", vertical: "top" },
+               transformOrigin: { vertical: "top", horizontal: "right" },
                keepMounted: false, // Does not mount the children when dialog is closed
             }}
          ></CalendarFilter>

@@ -1,11 +1,19 @@
 import React from "react"
 import AcademicCalendar from "../../components/views/calendar/AcademicCalendar"
 import { Box } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
 
-// example
+const styles = sxStyles({
+   container: {
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+})
 const AcademicCalendarPage = () => {
    return (
-      <Box height="100vh">
+      <Box sx={styles.container}>
          <AcademicCalendar />
       </Box>
    )
