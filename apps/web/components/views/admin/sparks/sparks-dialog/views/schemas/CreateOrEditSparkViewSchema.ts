@@ -31,9 +31,9 @@ const CreateOrEditSparkViewSchema = yup.object().shape({
                   if (duration < 10 || duration > 60) {
                      // min 10 seconds, max 60 seconds
                      return this.createError({
-                        message: `Invalid video length. Your video is ${duration.toFixed(
-                           2
-                        )} seconds long, but it should be between 10 and 60 seconds.`,
+                        message: `Your video is ${
+                           Math.round(duration * 10) / 10 // round to 1 decimal
+                        } seconds long, a Spark should be between 10 and 60 seconds`,
                      })
                   }
                   return true
