@@ -41,7 +41,6 @@ const AreYouSureModal = ({
    handleClose,
    loading,
    confirmButtonText = "Confirm",
-   closeButtonText = "Cancel",
    confirmSecurityText,
 }) => {
    const classes = useStyles()
@@ -104,7 +103,7 @@ const AreYouSureModal = ({
             )}
             <DialogActions>
                <Button color="grey" onClick={onClose}>
-                  {closeButtonText}
+                  Cancel
                </Button>
                <Button
                   disabled={loading}

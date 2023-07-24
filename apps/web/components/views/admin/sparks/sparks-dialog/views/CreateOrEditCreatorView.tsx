@@ -1,5 +1,6 @@
 import { Box } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CreateOrEditCreatorForm from "components/views/sparks/forms/CreateOrEditCreatorForm"
 import { useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -12,6 +13,7 @@ import { SparkFormValues } from "./hooks/useSparkFormSubmit"
 const CreateOrEditCreatorView = () => {
    const { goToSelectCreatorView, goToCreatorSelectedView } = useSparksForm()
    const { group } = useGroup()
+   const isMobile = useIsMobile()
 
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
 
@@ -28,15 +30,15 @@ const CreateOrEditCreatorView = () => {
          {(creator) => (
             <SparksDialog.Container onMobileBack={() => handleBack()}>
                {creator ? (
-                  <SparksDialog.Title pl={2}>
+                  <SparksDialog.Title>
                      <Box component="span" color="secondary.main">
                         Editing
                      </Box>{" "}
                      creator
                   </SparksDialog.Title>
                ) : (
-                  <SparksDialog.Title pl={2}>
-                     Create a new{" "}
+                  <SparksDialog.Title>
+                     Create {isMobile ? "" : "a"} new{" "}
                      <Box component="span" color="secondary.main">
                         profile
                      </Box>
