@@ -3,12 +3,14 @@ import PhoneIcon from "@mui/icons-material/PhoneIphone"
 import VideoFileIcon from "@mui/icons-material/VideoFileOutlined"
 import { Box, Button, FormHelperText, Stack, Typography } from "@mui/material"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import FileUploader from "components/views/common/FileUploader"
+import FileUploader, {
+   FileUploaderProps,
+} from "components/views/common/FileUploader"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import { imagePlaceholder } from "constants/images"
 import { useField } from "formik"
 import Image from "next/image"
-import { FC, ReactNode, useCallback, useMemo } from "react"
+import { FC, Fragment, ReactNode, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
 
@@ -75,7 +77,7 @@ const VideoUpload: FC<Props> = ({ name }) => {
    const [field, meta, helpers] = useField<File>(name)
 
    const { fileUploaderProps, dragActive } = useFileUploader({
-      acceptedFileTypes: ["mp4", "webm"],
+      acceptedFileTypes: ["mp4", "webm", "mov"],
       maxFileSize: 150, // MB
       multiple: false,
       onValidated: (file) => {
@@ -97,20 +99,17 @@ const VideoUpload: FC<Props> = ({ name }) => {
    }, [field.value, meta.error])
 
    return (
-      <Box>
+      <Box display="flex" flexDirection="column" height="100%">
          {blobUrl ? (
             <SparkVideoPreview
                url={blobUrl}
                fileUploaderProps={fileUploaderProps}
             />
          ) : (
-            <SparkAspectRatioBox
-               sx={[styles.root, dragActive && styles.hovered]}
-            >
-               <FileUploader {...fileUploaderProps}>
-                  <UploadPromptDisplay />
-               </FileUploader>
-            </SparkAspectRatioBox>
+            <UploadPromptDisplay
+               dragActive={dragActive}
+               fileUploaderProps={fileUploaderProps}
+            />
          )}
          {meta.touched && meta.error ? (
             <FormHelperText error>{meta.error}</FormHelperText>
@@ -133,37 +132,49 @@ const VideoSpecText: FC<VideoSpecTextProps> = ({ icon, text }) => {
    )
 }
 
-export default VideoUpload
+type UploadPromptDisplayProps = {
+   fileUploaderProps: FileUploaderProps
+   dragActive: boolean
+}
 
-const UploadPromptDisplay: FC = () => {
+const UploadPromptDisplay: FC<UploadPromptDisplayProps> = ({
+   fileUploaderProps,
+   dragActive,
+}) => {
    return (
-      <>
-         <Box sx={styles.placeholderWrapper}>
-            <Image
-               alt="placeholder"
-               src={imagePlaceholder}
-               width={124}
-               height={150}
-               objectFit="contain"
-            />
-         </Box>
-         <Typography mt={2} mb={1} sx={styles.placeholderText}>
-            Upload your Spark
-         </Typography>
-         <Button
-            sx={styles.uploadBtn}
-            color="secondary"
-            variant="contained"
-            size="small"
-         >
-            Upload video
-         </Button>
+      <SparkAspectRatioBox sx={[styles.root, dragActive && styles.hovered]}>
+         <FileUploader {...fileUploaderProps}>
+            <Fragment>
+               <Box sx={styles.placeholderWrapper}>
+                  <Image
+                     alt="placeholder"
+                     src={imagePlaceholder}
+                     width={124}
+                     height={150}
+                     objectFit="contain"
+                  />
+               </Box>
+               <Typography mt={2} mb={1} sx={styles.placeholderText}>
+                  Upload your Spark
+               </Typography>
+               <Button
+                  sx={styles.uploadBtn}
+                  color="secondary"
+                  variant="contained"
+                  size="small"
+               >
+                  Upload video
+               </Button>
 
-         <Stack spacing={1} mt={3}>
-            <VideoSpecText icon={<PhoneIcon />} text="9:16 format" />
-            <VideoSpecText icon={<VideoFileIcon />} text="Max 150MB" />
-            <VideoSpecText icon={<TimeIcon />} text="Max 1 minute" />
-         </Stack>
-      </>
+               <Stack spacing={1} mt={3}>
+                  <VideoSpecText icon={<PhoneIcon />} text="9:16 format" />
+                  <VideoSpecText icon={<VideoFileIcon />} text="Max 150MB" />
+                  <VideoSpecText icon={<TimeIcon />} text="Max 1 minute" />
+               </Stack>
+            </Fragment>
+         </FileUploader>
+      </SparkAspectRatioBox>
    )
 }
+
+export default VideoUpload
