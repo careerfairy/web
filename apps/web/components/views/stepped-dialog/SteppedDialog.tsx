@@ -1,19 +1,19 @@
-import { Dialog, DialogContent, useTheme } from "@mui/material"
+import { Dialog, useTheme } from "@mui/material"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import SwipeableViews from "react-swipeable-views"
 
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 import {
-   createContext,
    ComponentType,
-   useContext,
-   useState,
+   createContext,
    useCallback,
+   useContext,
    useMemo,
+   useState,
 } from "react"
 import { sxStyles } from "types/commonTypes"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 
 const styles = sxStyles({
    slide: {
@@ -162,10 +162,6 @@ const SteppedDialog = <K extends string>({
       },
       [stepIndices]
    )
-
-   const getCurrentStepKey = useCallback<() => K>(() => {
-      return views[currentStep].key
-   }, [currentStep, views])
 
    const value = useMemo<StepperContextValue<K>>(
       () => ({
