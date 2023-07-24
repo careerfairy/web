@@ -163,6 +163,10 @@ const SteppedDialog = <K extends string>({
       [stepIndices]
    )
 
+   const getCurrentStepKey = useCallback<() => K>(() => {
+      return views[currentStep].key
+   }, [currentStep, views])
+
    const value = useMemo<StepperContextValue<K>>(
       () => ({
          currentStep,

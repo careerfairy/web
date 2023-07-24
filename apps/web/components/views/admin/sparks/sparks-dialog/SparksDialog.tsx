@@ -24,10 +24,17 @@ import {
    closeSparkDialog,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
+   openConfirmCloseSparksDialog,
+   closeConfirmCloseSparksDialog,
 } from "store/reducers/adminSparksReducer"
-import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
+import {
+   sparksConfirmCloseSparksDialogOpen,
+   sparksDialogOpenSelector,
+} from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
+import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -185,6 +192,8 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
+      if (stepper.currentStep === "") {
+      }
       dispatch(closeSparkDialog())
    }, [dispatch])
 
@@ -247,6 +256,9 @@ export const useSparksForm = () => {
 
 const SparksDialog = () => {
    const open = useSelector(sparksDialogOpenSelector)
+   const confirmCloseDialogOpen = useSelector(
+      sparksConfirmCloseSparksDialogOpen
+   )
 
    const dispatch = useDispatch()
 
@@ -254,14 +266,54 @@ const SparksDialog = () => {
       dispatch(closeSparkDialog())
    }, [dispatch])
 
+   const handleOpenConfirmCloseDialog = useCallback(() => {
+      dispatch(openConfirmCloseSparksDialog())
+   }, [dispatch])
+
+   const handleCloseConfirmCloseDialog = useCallback(() => {
+      dispatch(closeConfirmCloseSparksDialog())
+   }, [dispatch])
+
+   const handleCloseClick = useCallback(() => {
+      handleOpenConfirmCloseDialog()
+   }, [handleOpenConfirmCloseDialog])
+
    return (
-      <SteppedDialog
-         key={open ? "open" : "closed"}
-         bgcolor="#FCFCFC"
-         handleClose={handleClose}
-         open={open}
-         views={views}
-      />
+      <>
+         <SteppedDialog
+            key={open ? "open" : "closed"}
+            bgcolor="#FCFCFC"
+            handleClose={handleCloseClick}
+            open={open}
+            views={views}
+         />{" "}
+         {confirmCloseDialogOpen ? (
+            <ConfirmationDialog
+               open={confirmCloseDialogOpen}
+               handleClose={handleClose}
+               description="If you close this window now the info that you inserted will be lost. Are you sure you want to proceed?"
+               title="Close window?"
+               icon={
+                  <ErrorOutlineRoundedIcon
+                     sx={{ fontSize: 40 }}
+                     color="error"
+                  />
+               }
+               primaryAction={{
+                  text: "No, stay here",
+                  callback: handleCloseConfirmCloseDialog,
+                  color: "grey",
+                  variant: "outlined",
+               }}
+               secondaryAction={{
+                  text: "Yes, close",
+                  callback: handleClose,
+                  color: "error",
+                  variant: "contained",
+               }}
+            />
+         ) : null}
+      </>
    )
 }
 

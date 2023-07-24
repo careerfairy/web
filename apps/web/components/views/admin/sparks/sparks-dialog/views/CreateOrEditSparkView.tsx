@@ -7,7 +7,7 @@ import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTex
 import { Form, Formik, useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
-import { useCallback } from "react"
+import { FC, useCallback } from "react"
 import { useSelector } from "react-redux"
 import {
    sparksCachedSparkFormValues,
@@ -22,6 +22,7 @@ import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    flex: {
@@ -101,16 +102,8 @@ const CreateOrEditSparkView = () => {
                            ? "Please check if that’s the correct creator"
                            : "Insert your new creator details!"}
                      </SparksDialog.Subtitle>
-                     <Box mt={4} />
-                     {creator ? (
-                        <CreatorCard
-                           onClick={goToSelectCreatorView}
-                           creator={creator}
-                        />
-                     ) : (
-                        "No creator found"
-                     )}
-                     <Box pt={2} />
+
+                     {/* <Box pt={2} />  */}
                      <Formik
                         initialValues={
                            cachedFormValues || getInitialSparkValues(spark)
@@ -119,7 +112,7 @@ const CreateOrEditSparkView = () => {
                         enableReinitialize
                         onSubmit={handleSubmit}
                      >
-                        <FormComponent />
+                        <FormComponent creator={creator} />
                      </Formik>
                      <SparksDialog.ActionsOffset />
                   </SparksDialog.Container>
@@ -130,7 +123,11 @@ const CreateOrEditSparkView = () => {
    )
 }
 
-const FormComponent = () => {
+type FormComponentProps = {
+   creator: Creator | null
+}
+
+const FormComponent: FC<FormComponentProps> = ({ creator }) => {
    const { values, dirty, isSubmitting, isValid, submitForm } =
       useFormikContext<SparkFormValues>()
 
@@ -154,6 +151,12 @@ const FormComponent = () => {
 
    return (
       <>
+         {creator ? (
+            <CreatorCard onClick={() => handleBack(true)} creator={creator} />
+         ) : (
+            "No creator found"
+         )}
+         <Box mt={2} />
          <Box component={Form} sx={styles.formWrapper}>
             <Grid container spacing={1.5}>
                <Grid item xs={12} md={4.7}>

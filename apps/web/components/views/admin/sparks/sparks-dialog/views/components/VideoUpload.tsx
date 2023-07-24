@@ -69,6 +69,7 @@ const styles = sxStyles({
       lineHeight: "1.14286rem",
    },
 })
+
 type Props = {
    name: string
 }
