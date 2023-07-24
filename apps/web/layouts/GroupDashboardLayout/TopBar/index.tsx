@@ -111,6 +111,9 @@ const TopBar = ({ title, cta }: Props) => {
    )
 }
 
+/**
+ * Decide between Shrunk or Mobile toggle button
+ */
 const DrawerToggleButton = () => {
    const isMobile = useIsMobile()
    const { shrunkLeftMenuState } = useGroup()
