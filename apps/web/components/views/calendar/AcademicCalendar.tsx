@@ -23,17 +23,17 @@ const AcademicCalendar = () => {
    const currentDate = useMemo(() => new Date(), [])
    const start = useMemo(
       () =>
-         currentDate.getMonth() <= 8
-            ? new Date(currentDate.getFullYear() - 1, 1, 1)
+         currentDate.getMonth() <= 7
+            ? new Date(currentDate.getFullYear() - 2, 8, 1)
             : new Date(currentDate.getFullYear() - 1, 8, 1),
       [currentDate]
    )
 
    const end = useMemo(
       () =>
-         currentDate.getMonth() <= 8
-            ? new Date(currentDate.getFullYear() + 1, 1, 1)
-            : new Date(currentDate.getFullYear() + 1, 8, 1),
+         currentDate.getMonth() <= 7
+            ? new Date(currentDate.getFullYear() + 1, 8, 1)
+            : new Date(currentDate.getFullYear() + 2, 8, 1),
       [currentDate]
    )
 
@@ -45,7 +45,7 @@ const AcademicCalendar = () => {
 
    periods = useMemo(
       () =>
-         periods ? periods.filter((period) => period.end.toDate() <= end) : [],
+         periods ? periods.filter((period) => period.end.toDate() < end) : [],
       [end, periods]
    )
 
@@ -107,7 +107,7 @@ const AcademicCalendar = () => {
    }, [selectedPeriods, selectedUniversities])
 
    return (
-      <Box height="100%">
+      <Box height={"100%"}>
          <CalendarFilter
             allUniversityOptions={allUniversityOptions}
             selectedUniversities={selectedUniversities}
