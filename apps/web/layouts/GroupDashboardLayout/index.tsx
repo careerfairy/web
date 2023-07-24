@@ -94,7 +94,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   const shrunkInitialState = "shrunk"
+   const shrunkInitialState = "disabled" // enable this for certain pages
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
       useSessionStorage<shrunkState>("shrunkLeftMenuState", shrunkInitialState)
 
