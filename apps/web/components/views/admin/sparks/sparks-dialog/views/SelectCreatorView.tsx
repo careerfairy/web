@@ -32,7 +32,7 @@ const View = () => {
 
    return (
       <SparksDialog.Container onMobileBack={handleClose}>
-         <SparksDialog.Title pl={2}>
+         <SparksDialog.Title>
             Select a{" "}
             <Box component="span" color="secondary.main">
                creator

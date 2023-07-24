@@ -1,16 +1,16 @@
+import CloseIcon from "@mui/icons-material/Close"
+import { Stack, Typography } from "@mui/material"
 import Button, { ButtonProps } from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
-import DialogTitle from "@mui/material/DialogTitle"
+import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
-import DialogActions from "@mui/material/DialogActions"
+import DialogTitle from "@mui/material/DialogTitle"
 import IconButton from "@mui/material/IconButton"
-import CloseIcon from "@mui/icons-material/Close"
 import { Box } from "@mui/system"
-import { ReactNode, FC } from "react"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { FC, ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
-import { Stack } from "@mui/material"
-import { Typography } from "@mui/material"
 
 const styles = sxStyles({
    icon: {},
@@ -91,6 +91,8 @@ const ConfirmationDialog: FC<Props> = ({
       variant: secondaryActionVariant,
    },
 }) => {
+   const isMobile = useIsMobile()
+
    return (
       <Dialog
          open={open}
@@ -98,6 +100,7 @@ const ConfirmationDialog: FC<Props> = ({
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
          maxWidth="xs"
+         fullScreen={isMobile}
       >
          <DialogTitle sx={styles.titleWrapper} id="confirmation-dialog-title">
             <Stack alignItems="center" spacing={2}>

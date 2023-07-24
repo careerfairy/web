@@ -95,14 +95,14 @@ const CreateOrEditSparkView = () => {
                      onMobileBack={() => handleBack()}
                   >
                      {spark ? (
-                        <SparksDialog.Title pl={2}>
+                        <SparksDialog.Title>
                            Edit your{" "}
                            <Box component="span" color="secondary.main">
                               Spark
                            </Box>
                         </SparksDialog.Title>
                      ) : (
-                        <SparksDialog.Title pl={2}>
+                        <SparksDialog.Title>
                            Spark{" "}
                            <Box component="span" color="secondary.main">
                               details

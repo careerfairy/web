@@ -1,4 +1,3 @@
-import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
@@ -12,7 +11,6 @@ import {
    Typography,
    TypographyProps,
 } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
@@ -118,14 +116,25 @@ const styles = sxStyles({
       color: "text.primary",
       fontSize: "2rem",
    },
-   mobileCloseBtn: {
+   closeBtn: {
       position: "absolute",
-      top: `${mobileTopPadding * 1.25}px`,
+      top: 0,
       right: 0,
       zIndex: 1,
-      p: 1,
+      pt: {
+         xs: 2.5,
+         [mobileBreakpoint]: 2.125,
+      },
+      pr: {
+         xs: 2,
+         [mobileBreakpoint]: 2.5,
+      },
       color: "text.primary",
-      fontSize: "2rem",
+      "& svg": {
+         width: 32,
+         height: 32,
+         color: "text.primary",
+      },
    },
    warningIcon: {
       fontSize: 62,
@@ -346,19 +355,16 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 
 type SparksDialogContainerProps = BoxProps & {
    onMobileBack?: () => void
-   showMobileCloseButton?: boolean
    width?: number
+   hideCloseButton?: boolean
 }
 
 const Container: FC<SparksDialogContainerProps> = ({
-   onMobileBack,
-   showMobileCloseButton,
    width,
    sx,
+   hideCloseButton,
    ...props
 }) => {
-   const isMobile = useIsMobile()
-
    const { handleClose } = useSparksForm()
 
    return (
@@ -376,17 +382,14 @@ const Container: FC<SparksDialogContainerProps> = ({
             ]}
             maxWidth="sm"
          >
-            {onMobileBack && isMobile ? (
-               <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
-                  <BackIcon />
-               </IconButton>
-            ) : null}
             {props.children}
-            {showMobileCloseButton && isMobile ? (
-               <IconButton sx={styles.mobileCloseBtn} onClick={handleClose}>
-                  <CloseIcon />
-               </IconButton>
-            ) : null}
+            {hideCloseButton ? null : (
+               <Box sx={styles.closeBtn}>
+                  <IconButton onClick={handleClose}>
+                     <CloseIcon />
+                  </IconButton>
+               </Box>
+            )}
          </MuiContainer>
       </Box>
    )
