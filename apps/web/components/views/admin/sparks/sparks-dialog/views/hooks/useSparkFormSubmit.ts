@@ -4,9 +4,9 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { closeSparkDialog } from "store/reducers/adminSparksReducer"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
-import { useSparksForm } from "../../SparksDialog"
 
 export type SparkFormValues = {
    categoryId: Spark["category"]["id"] | ""
@@ -42,9 +42,14 @@ type UseSparkFormSubmit = {
 const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    const { handleUploadFile, progress, uploading, isLoading } =
       useUploadSparkVideo()
-   const { handleClose } = useSparksForm()
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const { errorNotification, successNotification } = useSnackbarNotifications()
+
+   const dispatch = useDispatch()
+
+   const handleClose = useCallback(() => {
+      dispatch(closeSparkDialog())
+   }, [dispatch])
 
    const handleSubmit = useCallback<UseSparkFormSubmit["handleSubmit"]>(
       async (values, { setSubmitting, setFieldError }) => {
