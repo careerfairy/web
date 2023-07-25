@@ -23,6 +23,7 @@ import SparksDialog, { useSparksForm } from "../SparksDialog"
 import CreatorCard from "./components/CreatorCard"
 import SparkCategorySelect from "./components/SparkCategorySelect"
 import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
+import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
@@ -71,11 +72,17 @@ const CreateOrEditSparkView = () => {
    const selectedSparkId = useSelector(sparksSelectedSparkId)
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
-   const { handleSubmit } = useSparkFormSubmit(group.id)
+   const { handleSubmit, isLoading, progress, uploading } = useSparkFormSubmit(
+      group.id
+   )
 
    const handleBack = useCallback(() => {
       goToSelectCreatorView()
    }, [goToSelectCreatorView])
+
+   if (isLoading) {
+      return <SubmittingOverlay progress={progress} uploading={uploading} />
+   }
 
    return (
       <CreatorFetchWrapper
