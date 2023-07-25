@@ -1,6 +1,5 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import ExitIcon from "@mui/icons-material/Logout"
 import { Box, Grid } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
@@ -27,6 +26,7 @@ import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
+import ExitIcon from "components/views/common/icons/ExitIcon"
 
 const styles = sxStyles({
    flex: {
@@ -37,11 +37,6 @@ const styles = sxStyles({
       borderRadius: 4,
       backgroundColor: "white",
       p: 1.5,
-   },
-   questionTextField: {
-      "& textarea": {
-         height: "182px !important",
-      },
    },
    exitIcon: {
       width: 68,
@@ -98,39 +93,43 @@ const CreateOrEditSparkView = () => {
             >
                {(spark) => (
                   <SparksDialog.Container
-                     width={652}
+                     width={"calc(100% - 46px)"}
                      onMobileBack={() => handleBack()}
                   >
-                     {spark ? (
-                        <SparksDialog.Title>
-                           Edit your{" "}
-                           <Box component="span" color="secondary.main">
-                              Spark
-                           </Box>
-                        </SparksDialog.Title>
-                     ) : (
-                        <SparksDialog.Title>
-                           Spark{" "}
-                           <Box component="span" color="secondary.main">
-                              details
-                           </Box>
-                        </SparksDialog.Title>
-                     )}
-                     <SparksDialog.Subtitle>
-                        It’s time to upload and set up your Spark
-                     </SparksDialog.Subtitle>
-                     <Box mt={3.375} />
-                     <Formik
-                        initialValues={
-                           cachedFormValues || getInitialSparkValues(spark)
-                        }
-                        validationSchema={CreateOrEditSparkViewSchema}
-                        enableReinitialize
-                        onSubmit={handleSubmit}
-                     >
-                        <FormComponent creator={creator} />
-                     </Formik>
-                     <SparksDialog.ActionsOffset />
+                     <SparksDialog.Content>
+                        {spark ? (
+                           <SparksDialog.Title>
+                              Edit your{" "}
+                              <Box component="span" color="secondary.main">
+                                 Spark
+                              </Box>
+                           </SparksDialog.Title>
+                        ) : (
+                           <SparksDialog.Title>
+                              Spark{" "}
+                              <Box component="span" color="secondary.main">
+                                 details
+                              </Box>
+                           </SparksDialog.Title>
+                        )}
+                        <SparksDialog.Subtitle>
+                           It’s time to upload and set up your Spark
+                        </SparksDialog.Subtitle>
+                        <Box mt={3} />
+                        <Box mt={"auto"} />
+                        <Formik
+                           initialValues={
+                              cachedFormValues || getInitialSparkValues(spark)
+                           }
+                           validationSchema={CreateOrEditSparkViewSchema}
+                           enableReinitialize
+                           onSubmit={handleSubmit}
+                        >
+                           <FormComponent creator={creator} />
+                        </Formik>
+                        <SparksDialog.ActionsOffset />
+                        <Box mb={"auto"} />
+                     </SparksDialog.Content>
                   </SparksDialog.Container>
                )}
             </SparkFetchWrapper>
@@ -151,6 +150,8 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
       useSparksForm()
 
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+
+   const isEditing = Boolean(values.id)
 
    const handleBack = useCallback(
       (shouldSave: boolean) => {
@@ -195,10 +196,10 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
          <Box mt={2} />
          <Box component={Form} sx={styles.formWrapper}>
             <Grid container spacing={1.5}>
-               <Grid item xs={12} md={4.7}>
+               <Grid item xs={12} md={4}>
                   <VideoUpload name="videoFile" />
                </Grid>
-               <Grid item xs={12} md={7.2}>
+               <Grid item xs={12} md={8}>
                   <Grid container spacing={1.5} alignItems="stretch">
                      <Grid item xs={12}>
                         <SparkCategorySelect name="categoryId" />
@@ -210,8 +211,7 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
                            placeholder="Insert Spark question"
                            fullWidth
                            multiline
-                           rows={8}
-                           sx={styles.questionTextField}
+                           rows={10}
                         />
                      </Grid>
                      <Grid item xs={12}>
@@ -231,7 +231,11 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
                <SparksDialog.Button
                   variant="contained"
                   onClick={submitForm}
-                  disabled={isSubmitting || !dirty || !isValid}
+                  // Disable the button if:
+                  // 1. A submit action is ongoing (isSubmitting === true),
+                  // 2. The form is invalid (!isValid), or
+                  // 3. The form is in edit mode and no changes have been made (isEditing && !dirty)
+                  disabled={isSubmitting || !isValid || (isEditing && !dirty)}
                   loading={isSubmitting}
                >
                   {values.id ? "Save changes" : "Create"}

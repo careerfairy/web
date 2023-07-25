@@ -129,14 +129,14 @@ const ConfirmationDialog: FC<Props> = ({
          </DialogContent>
          <DialogActions sx={styles.actions}>
             <Button
-               onClick={secondaryActionCallback}
+               onClick={() => secondaryActionCallback()}
                color={secondaryActionColor}
                variant={secondaryActionVariant}
             >
                {secondaryActionText}
             </Button>
             <Button
-               onClick={primaryActionCallback}
+               onClick={() => primaryActionCallback()}
                color={primaryActionColor}
                variant={primaryActionVariant}
                autoFocus
