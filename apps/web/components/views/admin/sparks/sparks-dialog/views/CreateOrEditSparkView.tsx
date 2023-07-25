@@ -124,6 +124,7 @@ const CreateOrEditSparkView = () => {
                            validationSchema={CreateOrEditSparkViewSchema}
                            enableReinitialize
                            onSubmit={handleSubmit}
+                           validateOnMount
                         >
                            <FormComponent creator={creator} />
                         </Formik>

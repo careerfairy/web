@@ -112,6 +112,10 @@ const styles = sxStyles({
    },
    button: {
       textTransform: "none",
+      "&:disabled": {
+         bgcolor: "#EDEDED",
+         color: "#BBBBBB",
+      },
    },
    mobileBackBtn: {
       position: "absolute",
