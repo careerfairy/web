@@ -25,10 +25,10 @@ export const useUniversityPeriods = (uniId: string) => {
 /**
  * Custom hook to get all periods for a set of timeline universities from the database
  **/
-export const useUniversityPeriodsByIds = (uniIds: string[]) => {
+export const useUniversityPeriodsByIds = (universitiesIds: string[]) => {
    const periodQuery = query(
       collectionGroup(FirestoreInstance, "periods"),
-      where("timelineUniversityId", "in", uniIds)
+      where("timelineUniversityId", "in", universitiesIds)
    )
    return useFirestoreCollection<UniversityPeriod>(periodQuery, {
       idField: "id",
@@ -40,18 +40,17 @@ export const useUniversityPeriodsByIds = (uniIds: string[]) => {
  * Custom hook to get all periods after a certain date for a set of timeline universities from the database
  **/
 export const useUniversityPeriodsByIdsAndStart = (
-   uniIds: string[],
+   universityIds: string[],
    start: Date
 ) => {
-   //dummy query since no conditonal hooks allowed, and "in" does not allow empty arrays
-   let ids = uniIds
-   if (!ids || ids.length <= 0) {
-      ids = ["filler"]
-   }
    const periodQuery = query(
       collectionGroup(FirestoreInstance, "periods"),
-      where("timelineUniversityId", "in", ids),
-      where("start", ">=", Timestamp.fromDate(start))
+      where(
+         "timelineUniversityId",
+         "in",
+         universityIds?.length ? universityIds : ["filler"]
+      ),
+      where("start", ">=", start)
    )
    return useFirestoreCollection<UniversityPeriod>(periodQuery, {
       idField: "id",
