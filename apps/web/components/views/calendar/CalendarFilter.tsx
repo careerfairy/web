@@ -68,54 +68,57 @@ const CalendarFilter = ({
    } = useContext(CalendarContext)
 
    const countryOptions = useMemo(() => {
-      const uniqueOptions = allUniversityOptions
+      const uniqueCountryOptions = allUniversityOptions
          ?.filter(
-            (uni, index, self) =>
+            (universityOption, index, self) =>
                self.findIndex(
-                  (first) => first.countryCode === uni.countryCode
+                  (firstUniversity) =>
+                     firstUniversity.countryCode ===
+                     universityOption.countryCode
                ) === index
          )
-         .sort((uni1, uni2) => uni2.name.localeCompare(uni1.name))
-         .map((uni) => {
-            const option = {
-               id: uni.countryCode,
-               name: universityCountriesMap[uni.countryCode],
-            }
-            return option
-         })
-      return uniqueOptions ? uniqueOptions : []
+         .map((universityOption) => ({
+            id: universityOption.countryCode,
+            name: universityCountriesMap[universityOption.countryCode],
+         }))
+         .sort((countryOption1, countryOption2) =>
+            countryOption1.name.localeCompare(countryOption2.name)
+         )
+      return uniqueCountryOptions ? uniqueCountryOptions : []
    }, [allUniversityOptions])
 
    const handleChangeFilterCountries = useCallback(
-      (selectedOptions: OptionGroup[]) => {
-         setSelectedCountries(selectedOptions)
-         const countryIds = selectedOptions.map((sel) => sel.id)
-         const newOptions = allUniversityOptions
-            .filter((uni) => countryIds.includes(uni.countryCode))
-            .map((uni) => {
-               const option = {
-                  id: uni.id,
-                  name: uni.name,
-                  groupId: uni.countryCode,
-               }
-               return option
-            })
-         setUniversityOptions(newOptions)
+      (selectedCountryOptions: OptionGroup[]) => {
+         setSelectedCountries(selectedCountryOptions)
+
+         const countryIds = selectedCountryOptions.map(
+            (countryOption) => countryOption.id
+         )
+         const newUniversityOptions = allUniversityOptions
+            .filter((universityOptions) =>
+               countryIds.includes(universityOptions.countryCode)
+            )
+            .map((universityOption) => ({
+               id: universityOption.id,
+               name: universityOption.name,
+               groupId: universityOption.countryCode,
+            }))
+         setUniversityOptions(newUniversityOptions)
       },
       [setSelectedCountries, setUniversityOptions, allUniversityOptions]
    )
 
-   const isUniListDisabled = useMemo(
+   const isUniveristyListDisabled = useMemo(
       () => (selectedCountries ? selectedCountries.length <= 0 : true),
       [selectedCountries]
    )
 
-   const uniListValues = useMemo(
+   const universityListValues = useMemo(
       () => (universityOptions ? universityOptions : []),
       [universityOptions]
    )
 
-   const getUniListLabel = useCallback(
+   const getUniversityListLabel = useCallback(
       (option) => (
          <Typography>
             {option.name}
@@ -181,17 +184,17 @@ const CalendarFilter = ({
                            </Box>
                            <MultiListSelect
                               inputName={"universities"}
-                              disabled={isUniListDisabled}
+                              disabled={isUniveristyListDisabled}
                               isCheckbox
                               checkboxColor={"secondary"}
                               selectedItems={selectedUniversities}
-                              allValues={uniListValues}
+                              allValues={universityListValues}
                               onSelectItems={setSelectedUniversities}
                               inputProps={{
                                  placeholder: "Select your target universities",
                               }}
                               getValueFn={multiListSelectMapValueFn}
-                              getListLabelFn={getUniListLabel}
+                              getListLabelFn={getUniversityListLabel}
                               chipProps={{
                                  color: "secondary",
                               }}
@@ -208,15 +211,15 @@ const CalendarFilter = ({
       ),
       [
          countryOptions,
-         getUniListLabel,
+         getUniversityListLabel,
          handleChangeFilterCountries,
-         isUniListDisabled,
+         isUniveristyListDisabled,
          multiCheckboxSelectType,
          selectedCountries,
          selectedUniversities,
          setSelectedUniversities,
          showTitle,
-         uniListValues,
+         universityListValues,
       ]
    )
 
