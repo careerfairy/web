@@ -1,11 +1,14 @@
 import React, { Dispatch, memo, useCallback, useEffect, useState } from "react"
 import {
    Autocomplete,
+   Box,
    Checkbox,
+   CheckboxProps,
    Chip,
    Collapse,
    FormControl,
    TextField,
+   TextFieldProps,
 } from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
@@ -51,7 +54,7 @@ const MultiListSelect = ({
    errorMessage = "",
    errorMessageClassName = "",
    handleBlur = () => {},
-   useBrandedTextfield = false,
+   useStyledTextfield = false,
    useStyledCheckbox = false,
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
@@ -190,7 +193,12 @@ const MultiListSelect = ({
                      {...props}
                      data-testid={`${inputName}_${getKeyFn(option)}_option`}
                      key={getKeyFn(option)}
-                     style={{ justifyContent: "space-between" }}
+                     style={{
+                        justifyContent: "space-between",
+                        backgroundColor: useStyledTextfield
+                           ? "white"
+                           : undefined,
+                     }}
                   >
                      {getListLabelFn(option)}
                      {useStyledCheckbox ? (
@@ -221,8 +229,8 @@ const MultiListSelect = ({
             getOptionDisabled={getOptionDisabled}
             renderInput={(params) => (
                <FormControl fullWidth>
-                  {useBrandedTextfield ? (
-                     <BrandedTextField
+                  {useStyledTextfield ? (
+                     <CustomTextField
                         {...params}
                         {...inputProps}
                         name={inputName}
@@ -245,9 +253,7 @@ const MultiListSelect = ({
                </FormControl>
             )}
             renderTags={(value, getTagProps) => {
-               if (isChipUnderTextfield) {
-                  return undefined
-               } else {
+               if (!isChipUnderTextfield) {
                   return value.map((option, index) => (
                      <Chip
                         key={getKeyFn(option)}
@@ -262,28 +268,49 @@ const MultiListSelect = ({
             groupBy={getGroupByFn}
             {...extraOptions}
          />
-         {isChipUnderTextfield
-            ? selectedItemsLocal.map((option, index) => (
-                 <CustomChip
-                    key={getKeyFn(option)}
-                    sx={{ m: 0.5, mt: 2 }}
-                    label={getLabelFn(option)}
-                    deleteIcon={<ChipDeleteIcon />}
-                    onDelete={() => {
-                       const newSelection = selectedItemsLocal.filter(
-                          (item) => getKeyFn(item) != getKeyFn(option)
-                       )
-                       onSelectItems(newSelection)
-                       setSelectedItemsLocal(newSelection)
-                    }}
-                    {...chipProps}
-                    disabled={getOptionDisabled(option)}
-                 />
-              ))
-            : null}
+         {isChipUnderTextfield ? (
+            <Box mt={2}>
+               {selectedItemsLocal.map((option, index) => (
+                  <CustomChip
+                     key={getKeyFn(option)}
+                     sx={{ m: 0.5 }}
+                     label={getLabelFn(option)}
+                     deleteIcon={<ChipDeleteIcon />}
+                     onDelete={() => {
+                        const newSelection = selectedItemsLocal.filter(
+                           (item) => getKeyFn(item) != getKeyFn(option)
+                        )
+                        onSelectItems(newSelection)
+                        setSelectedItemsLocal(newSelection)
+                     }}
+                     {...chipProps}
+                     disabled={getOptionDisabled(option)}
+                  />
+               ))}
+            </Box>
+         ) : null}
       </>
    )
 }
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+   backgroundColor: "#F7F8FC",
+   "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.2),
+      },
+      "&:hover fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.4),
+      },
+      "&.Mui-focused fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.4),
+         borderWidth: "1px",
+      },
+      "&.Mui-disabled": {
+         backgroundColor: theme.palette.grey.main,
+      },
+   },
+}))
 
 const CustomChip = styled(Chip)(({ theme }) => ({
    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
@@ -325,7 +352,7 @@ type Props = {
    errorMessage?: string
    errorMessageClassName?: string
    handleBlur?: (e) => void
-   useBrandedTextfield?: boolean
+   useStyledTextfield?: boolean
    useStyledCheckbox?: boolean
 }
 

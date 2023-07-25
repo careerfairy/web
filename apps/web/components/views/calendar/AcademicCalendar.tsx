@@ -127,7 +127,6 @@ const AcademicCalendar = () => {
             universityOptions={universityOptions}
             setUniversityOptions={setUniversityOptions}
             showTitle={true}
-            isSingleColumnChecklist={true}
             popoverProps={{
                open: Boolean(anchorEl),
                anchorEl: anchorEl,
