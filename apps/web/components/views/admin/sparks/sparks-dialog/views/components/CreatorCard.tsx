@@ -14,6 +14,8 @@ const styles = sxStyles({
       border: "1px solid #ECECEC",
       p: 2,
       alignItems: "center",
+      bgcolor: "background.paper",
+      justifyContent: "space-between",
    },
    creatorCardActionArea: {
       display: "flex",
@@ -64,6 +66,17 @@ const styles = sxStyles({
          sm: "8px 16px",
       },
       textTransform: "none",
+      width: {
+         xs: "100%",
+         sm: "auto",
+      },
+   },
+   creatorDetailsWrapper: {
+      display: "flex",
+      width: {
+         xs: "100%",
+         md: "auto",
+      },
    },
 })
 
@@ -77,40 +90,52 @@ const CreatorCard: FC<Props> = ({ creator, onClick }) => {
    const isMobile = useIsMobile()
 
    return (
-      <Stack direction="row" sx={styles.creatorCard}>
-         <Avatar alt={displayName} sx={styles.creatorCardAvatar}>
-            {creator.avatarUrl ? (
-               <Image
-                  src={getResizedUrl(creator.avatarUrl, "sm")}
-                  alt={displayName}
-                  layout="fill"
-               />
-            ) : (
-               `${creator.firstName[0]} ${creator.lastName[0]}`
-            )}
-         </Avatar>
-         <Box sx={styles.creatorCardContent}>
-            <Typography sx={styles.displayName} component="h2">
-               {displayName}
-            </Typography>
-            <Box mt={0.75} />
-            <Typography sx={styles.position} component="p">
-               {creator.position}
-            </Typography>
-            <Box mt={1} />
-            <Typography sx={styles.email} component="p">
-               {creator.email}
-            </Typography>
+      <Stack
+         direction={{
+            xs: "column",
+            md: "row",
+         }}
+         sx={styles.creatorCard}
+         spacing={3}
+      >
+         <Box sx={styles.creatorDetailsWrapper}>
+            <Avatar alt={displayName} sx={styles.creatorCardAvatar}>
+               {creator.avatarUrl ? (
+                  <Image
+                     src={getResizedUrl(creator.avatarUrl, "sm")}
+                     alt={displayName}
+                     layout="fill"
+                     objectFit="cover"
+                  />
+               ) : (
+                  `${creator.firstName[0]} ${creator.lastName[0]}`
+               )}
+            </Avatar>
+            <Box sx={styles.creatorCardContent}>
+               <Typography sx={styles.displayName} component="h2">
+                  {displayName}
+               </Typography>
+               <Box mt={0.75} />
+               <Typography sx={styles.position} component="p">
+                  {creator.position}
+               </Typography>
+               <Box mt={1} />
+               <Typography sx={styles.email} component="p">
+                  {creator.email}
+               </Typography>
+            </Box>
          </Box>
-         <Button
-            sx={styles.creatorCardBtn}
-            variant="outlined"
-            color="secondary"
-            onClick={onClick}
-            size="small"
-         >
-            {isMobile ? "change" : "change creator"}
-         </Button>
+         <Box>
+            <Button
+               sx={styles.creatorCardBtn}
+               variant="outlined"
+               color="secondary"
+               onClick={onClick}
+               size="small"
+            >
+               Change creator
+            </Button>
+         </Box>
       </Stack>
    )
 }

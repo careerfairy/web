@@ -51,11 +51,15 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    const dispatch = useDispatch()
 
    const handleClose = useCallback(() => {
-      dispatch(closeSparkDialog())
+      dispatch(
+         closeSparkDialog({
+            forceClose: true,
+         })
+      )
    }, [dispatch])
 
    const handleSubmit = useCallback<UseSparkFormSubmit["handleSubmit"]>(
-      async (values, { setSubmitting, setFieldError }) => {
+      async (values, { setSubmitting, setFieldError, resetForm }) => {
          try {
             setFormSubmitting(true)
             let videoUrl = values.videoUrl

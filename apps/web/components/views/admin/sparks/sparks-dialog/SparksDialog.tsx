@@ -23,7 +23,6 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    closeConfirmCloseSparksDialog,
    closeSparkDialog,
-   openConfirmCloseSparksDialog,
    setCachedSparksFormValues,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
@@ -94,6 +93,13 @@ const styles = sxStyles({
          xs: "100%",
          [mobileBreakpoint]: 535,
       },
+      height: "100%",
+      display: "grid",
+      flexDirection: "column",
+   },
+   content: {
+      display: "flex",
+      flexDirection: "column",
    },
    fixedBottomContent: {
       position: "fixed",
@@ -153,21 +159,21 @@ const views = [
       ),
    },
    {
-      key: "create-or-edit-creator",
-      Component: dynamic(
-         () =>
-            import(
-               "components/views/admin/sparks/sparks-dialog/views/CreateOrEditCreatorView"
-            ),
-         { loading: () => <CircularProgress /> }
-      ),
-   },
-   {
       key: "creator-selected",
       Component: dynamic(
          () =>
             import(
                "components/views/admin/sparks/sparks-dialog/views/CreatorSelectedView"
+            ),
+         { loading: () => <CircularProgress /> }
+      ),
+   },
+   {
+      key: "create-or-edit-creator",
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/sparks/sparks-dialog/views/CreateOrEditCreatorView"
             ),
          { loading: () => <CircularProgress /> }
       ),
@@ -205,7 +211,7 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
-      dispatch(openConfirmCloseSparksDialog())
+      dispatch(closeSparkDialog())
    }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
@@ -273,21 +279,20 @@ const SparksDialog = () => {
 
    const dispatch = useDispatch()
 
-   const hanldeCloseSparksDialog = useCallback(() => {
-      dispatch(closeSparkDialog())
-   }, [dispatch])
-
-   const handleOpenConfirmCloseDialog = useCallback(() => {
-      dispatch(openConfirmCloseSparksDialog())
-   }, [dispatch])
+   const hanldeCloseSparksDialog = useCallback(
+      (forceClose: boolean = false) => {
+         dispatch(
+            closeSparkDialog({
+               forceClose,
+            })
+         )
+      },
+      [dispatch]
+   )
 
    const handleCloseConfirmCloseDialog = useCallback(() => {
       dispatch(closeConfirmCloseSparksDialog())
    }, [dispatch])
-
-   const handleCloseClick = useCallback(() => {
-      handleOpenConfirmCloseDialog()
-   }, [handleOpenConfirmCloseDialog])
 
    const primaryAction = useMemo<ConfirmationDialogAction>(
       () => ({
@@ -302,7 +307,7 @@ const SparksDialog = () => {
    const secondaryAction = useMemo<ConfirmationDialogAction>(
       () => ({
          text: "Yes, close",
-         callback: hanldeCloseSparksDialog,
+         callback: () => hanldeCloseSparksDialog(true),
          color: "error",
          variant: "contained",
       }),
@@ -314,7 +319,7 @@ const SparksDialog = () => {
          <SteppedDialog
             key={open ? "open" : "closed"}
             bgcolor="#FCFCFC"
-            handleClose={handleCloseClick}
+            handleClose={() => hanldeCloseSparksDialog()}
             open={open}
             views={views}
          />
@@ -355,7 +360,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 
 type SparksDialogContainerProps = BoxProps & {
    onMobileBack?: () => void
-   width?: number
+   width?: string | number
    hideCloseButton?: boolean
 }
 
@@ -380,7 +385,7 @@ const Container: FC<SparksDialogContainerProps> = ({
                     }
                   : null,
             ]}
-            maxWidth="sm"
+            maxWidth="md"
          >
             {props.children}
             {hideCloseButton ? null : (
@@ -392,6 +397,18 @@ const Container: FC<SparksDialogContainerProps> = ({
             )}
          </MuiContainer>
       </Box>
+   )
+}
+
+type ContentProps = BoxProps<"span"> & {}
+
+const Content: FC<ContentProps> = ({ sx, ...props }) => {
+   return (
+      <Box
+         component="span"
+         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.content]}
+         {...props}
+      />
    )
 }
 
@@ -439,5 +456,6 @@ SparksDialog.Container = Container
 SparksDialog.Actions = Actions
 SparksDialog.Button = CustomButton
 SparksDialog.ActionsOffset = ActionsOffset
+SparksDialog.Content = Content
 
 export default SparksDialog
