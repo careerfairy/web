@@ -10,6 +10,26 @@ import {
 import isEqual from "react-fast-compare"
 import { Box } from "@mui/system"
 import { StyledCheckbox } from "components/views/group/admin/common/inputs"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   justifiedLabel: {
+      display: "flex",
+      justifyContent: "space-between",
+   },
+   unjustifiedLabel: {
+      mr: 5,
+   },
+   labelText: {
+      fontWeight: 400,
+      fontSize: "18px",
+   },
+   column: {
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+   },
+})
 
 const MultiCheckboxSelect = ({
    inputName,
@@ -20,7 +40,7 @@ const MultiCheckboxSelect = ({
    setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
    getKeyFn = (option) => option.id, // field id
-   isSingleColumn = false,
+   type = "doubleColumn", // whether the checklist is shown in a single justified/unjustified column or in two columns
    useStyledCheckbox = false,
 }: Props) => {
    const handleChange = useCallback(
@@ -56,16 +76,18 @@ const MultiCheckboxSelect = ({
 
    const firstColumnValues = useMemo(
       () =>
-         isSingleColumn
+         type !== "doubleColumn"
             ? allValues
             : allValues.slice(0, allValues.length / 2 + 1),
-      [allValues, isSingleColumn]
+      [allValues, type]
    )
 
    const secondColumnValues = useMemo(
       () =>
-         isSingleColumn ? undefined : allValues.slice(allValues.length / 2 + 1),
-      [allValues, isSingleColumn]
+         type !== "doubleColumn"
+            ? undefined
+            : allValues.slice(allValues.length / 2 + 1),
+      [allValues, type]
    )
 
    const formControl = useCallback(
@@ -76,19 +98,20 @@ const MultiCheckboxSelect = ({
             name={getKeyFn(option)}
             control={useStyledCheckbox ? <StyledCheckbox /> : <Checkbox />}
             label={
-               <Typography fontWeight={400} fontSize={"18px"}>
+               <Typography sx={styles.labelText}>
                   {getLabelFn(option)}
                </Typography>
             }
-            labelPlacement={"start"}
-            sx={{
-               display: "flex",
-               justifyContent: "space-between",
-            }}
+            labelPlacement={type === "unjustified" ? "end" : "start"}
+            sx={
+               type === "unjustified"
+                  ? styles.unjustifiedLabel
+                  : styles.justifiedLabel
+            }
             checked={isChecked(getKeyFn(option))}
          />
       ),
-      [getKeyFn, getLabelFn, handleChange, isChecked, useStyledCheckbox]
+      [getKeyFn, getLabelFn, handleChange, isChecked, type, useStyledCheckbox]
    )
 
    return allValues.length ? (
@@ -97,19 +120,11 @@ const MultiCheckboxSelect = ({
             direction={{ xs: "column", md: "row" }}
             spacing={{ xs: 0, md: 8 }}
          >
-            <Box
-               sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-            >
+            <Box sx={type === "unjustified" ? {} : styles.column}>
                {firstColumnValues.map(formControl)}
             </Box>
-            {isSingleColumn ? null : (
-               <Box
-                  sx={{
-                     display: "flex",
-                     flexDirection: "column",
-                     width: "100%",
-                  }}
-               >
+            {type !== "doubleColumn" ? null : (
+               <Box sx={styles.column}>
                   {secondColumnValues.map(formControl)}
                </Box>
             )}
@@ -129,8 +144,13 @@ type Props = {
    getLabelFn?: (obj: any) => string
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
-   isSingleColumn?: boolean
+   type?: MultiCheckboxSelectType
    useStyledCheckbox?: boolean
 }
+
+export type MultiCheckboxSelectType =
+   | "singleColumn"
+   | "doubleColumn"
+   | "unjustified"
 
 export default memo(MultiCheckboxSelect, isEqual)

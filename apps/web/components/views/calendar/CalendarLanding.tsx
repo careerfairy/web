@@ -4,6 +4,33 @@ import { Box, Stack, Typography } from "@mui/material"
 import CalendarFilter from "components/views/calendar/CalendarFilter"
 import ContentButton from "components/views/portal/content-carousel/ContentButton"
 import React from "react"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   stack: { height: "100%", backgroundColor: "white", borderRadius: "5px" },
+   textDisplay: {
+      width: "42%",
+      backgroundColor: "secondary.main",
+      borderRadius: "5px",
+   },
+   title: {
+      mt: "61px",
+      ml: "25px",
+      mr: "25px",
+      fontWeight: 900,
+      color: "white",
+   },
+   text: { mt: "16px", fontSize: 16 },
+   filterDisplay: {
+      width: "58%",
+      mt: "30px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+   },
+   buttonContainer: { mb: "60px" },
+   button: { ml: 4, mt: "auto", width: 150 },
+})
 
 const CalendarLanding = ({
    allUniversityOptions, // all universities to be considered
@@ -16,22 +43,17 @@ const CalendarLanding = ({
    setIsCalendarView,
 }: Props) => {
    return (
-      <Stack height="100%" direction="row" sx={{ backgroundColor: "white" }}>
-         <Box sx={{ width: "40%", backgroundColor: "secondary.main" }}>
-            <Typography
-               sx={{ m: 5 }}
-               variant="h2"
-               fontWeight={900}
-               color="white"
-            >
+      <Stack direction={"row"} sx={styles.stack}>
+         <Box sx={styles.textDisplay}>
+            <Typography variant="h2" sx={styles.title}>
                Academic Calendar
-               <Typography sx={{ mt: 3 }} fontSize={20}>
+               <Typography sx={styles.text}>
                   Select your preferences and browse through the academic
                   calendars of your target audience
                </Typography>
             </Typography>
          </Box>
-         <Box sx={{ width: "60%" }}>
+         <Box sx={styles.filterDisplay}>
             <CalendarFilter
                allUniversityOptions={allUniversityOptions}
                selectedUniversities={selectedUniversities}
@@ -41,15 +63,18 @@ const CalendarLanding = ({
                universityOptions={universityOptions}
                setUniversityOptions={setUniversityOptions}
                isTextRightOfCheckbox={true}
+               multiCheckboxSelectType={"unjustified"}
             ></CalendarFilter>
-            <ContentButton
-               sx={{ ml: 4, mt: 4, width: 150 }}
-               onClick={() => setIsCalendarView(true)}
-               color="secondary"
-               disabled={selectedUniversities.length <= 0}
-            >
-               Next
-            </ContentButton>
+            <Box sx={styles.buttonContainer}>
+               <ContentButton
+                  sx={styles.button}
+                  color={"secondary"}
+                  onClick={() => setIsCalendarView(true)}
+                  disabled={selectedUniversities.length <= 0}
+               >
+                  Next
+               </ContentButton>
+            </Box>
          </Box>
       </Stack>
    )
