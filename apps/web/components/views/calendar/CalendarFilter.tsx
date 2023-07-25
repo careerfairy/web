@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useContext, useMemo } from "react"
 import {
    Box,
    DialogContent,
@@ -6,9 +6,7 @@ import {
    FormControl,
    Popover,
    PopoverProps,
-   TextField,
    Typography,
-   alpha,
 } from "@mui/material"
 import { DialogTitle } from "@mui/material"
 import { Stack } from "@mui/material"
@@ -22,20 +20,11 @@ import MultiCheckboxSelect, {
 import MultiListSelect from "../common/MultiListSelect"
 import { TimelineUniversity } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { useTheme } from "@mui/material"
-import { StyledCheckbox } from "../group/admin/common/inputs"
-import { styled } from "@mui/material/styles"
+import { CalendarContext } from "./AcademicCalendar"
 
 type Props = {
-   allUniversityOptions: TimelineUniversity[]
-   selectedUniversities: OptionGroup[]
-   setSelectedUniversities: (options: OptionGroup[]) => void
-   selectedCountries: OptionGroup[]
-   setSelectedCountries: (options: OptionGroup[]) => void
-   universityOptions: OptionGroup[]
-   setUniversityOptions: (options: OptionGroup[]) => void
    showTitle?: boolean
    multiCheckboxSelectType?: MultiCheckboxSelectType
-   isTextRightOfCheckbox?: boolean
    popoverProps?: PopoverProps
 }
 
@@ -53,22 +42,31 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
    },
+   label: { fontWeight: 600 },
+   labelContainer: { mb: 1 },
+   listLabel: { fontSize: "12px" },
+   title: { fontWeight: 600, fontSize: "24px" },
+   universityContainer: { mt: 2 },
+   popover: { zIndex: 3 },
 })
 
 const CalendarFilter = ({
-   allUniversityOptions, // all universities to be considered
-   selectedUniversities,
-   setSelectedUniversities,
-   selectedCountries,
-   setSelectedCountries,
-   universityOptions,
-   setUniversityOptions,
    showTitle = false,
    multiCheckboxSelectType = "singleColumn", // whether the checklist is shown in a single justified/unjustified column or in two columns
-   isTextRightOfCheckbox = false,
    popoverProps, // to add if we want the filter to be a popover
 }: Props) => {
    const theme = useTheme()
+
+   const {
+      allUniversityOptions,
+      selectedUniversities,
+      setSelectedUniversities,
+      selectedCountries,
+      setSelectedCountries,
+      universityOptions,
+      setUniversityOptions,
+   } = useContext(CalendarContext)
+
    const countryOptions = useMemo(() => {
       const uniqueOptions = allUniversityOptions
          ?.filter(
@@ -121,7 +119,7 @@ const CalendarFilter = ({
       (option) => (
          <Typography>
             {option.name}
-            <Typography fontSize={"12px"}>
+            <Typography sx={styles.listLabel}>
                {universityCountriesMap[option.groupId]}
             </Typography>
          </Typography>
@@ -134,9 +132,7 @@ const CalendarFilter = ({
          <Box sx={styles.container}>
             {showTitle ? (
                <DialogTitle sx={styles.header}>
-                  <Typography fontWeight={600} fontSize={"24px"}>
-                     Filters
-                  </Typography>
+                  <Typography sx={styles.title}>Filters</Typography>
                </DialogTitle>
             ) : null}
             <DialogContent sx={styles.content}>
@@ -147,18 +143,12 @@ const CalendarFilter = ({
                         variant={"outlined"}
                         fullWidth
                      >
-                        <Stack
-                           direction={"row"}
-                           justifyContent={"space-between"}
-                           alignItems={"center"}
-                           spacing={2}
-                        ></Stack>
                         <Box id={`country-select`}>
                            <Typography
+                              sx={styles.label}
                               htmlFor={`country-select`}
                               component={"label"}
                               variant={"h6"}
-                              fontWeight={600}
                               id={`country-select-label`}
                            >
                               Countries
@@ -174,13 +164,16 @@ const CalendarFilter = ({
                               useStyledCheckbox={true}
                            />
                         </Box>
-                        <Box id={`university-select`} mt={2}>
-                           <Box mb={1}>
+                        <Box
+                           id={`university-select`}
+                           sx={styles.universityContainer}
+                        >
+                           <Box sx={styles.labelContainer}>
                               <Typography
+                                 sx={styles.label}
                                  htmlFor={`university-select`}
                                  component={"label"}
                                  variant={"h6"}
-                                 fontWeight={600}
                                  id={`university-select-label`}
                               >
                                  Universities
@@ -230,7 +223,7 @@ const CalendarFilter = ({
    if (popoverProps) {
       filterContent = (
          <Popover
-            sx={{ zIndex: 3 }}
+            sx={styles.popover}
             PaperProps={{ style: { width: "28%" } }}
             {...popoverProps}
          >

@@ -30,6 +30,7 @@ const styles = sxStyles({
       padding: 2,
       borderRadius: "5px",
    },
+   sadIcon: { fontSize: "80px" },
 })
 
 type Props = {
@@ -178,7 +179,7 @@ const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
 const EmptyDataDisplay = () => (
    <Box sx={styles.emptyDisplayContainer}>
       <Typography align="center">
-         <SadIcon sx={{ fontSize: "80px" }} color="secondary"></SadIcon>
+         <SadIcon sx={styles.sadIcon} color={"secondary"}></SadIcon>
          <Typography variant="h4" fontWeight={600}>
             No data selected
          </Typography>

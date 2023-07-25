@@ -1,7 +1,10 @@
-import React, { useMemo, useState } from "react"
+import React, { createContext, useCallback, useMemo, useState } from "react"
 import { useUniversityPeriodsByIdsAndStart } from "components/custom-hook/university-timeline/useUniversityPeriods"
 import { useTimelineUniversities } from "components/custom-hook/university-timeline/useTimelineUniversities"
-import { UniversityPeriodObject } from "@careerfairy/shared-lib/universities/universityTimeline"
+import {
+   TimelineUniversity,
+   UniversityPeriodObject,
+} from "@careerfairy/shared-lib/universities/universityTimeline"
 import CalendarFilter from "components/views/calendar/CalendarFilter"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import CalendarLanding from "./CalendarLanding"
@@ -16,6 +19,26 @@ const styles = sxStyles({
       maxHeight: "487px",
       maxWidth: "822px",
    },
+})
+
+type CalendarContextType = {
+   allUniversityOptions: TimelineUniversity[]
+   selectedUniversities: OptionGroup[]
+   setSelectedUniversities: (options: OptionGroup[]) => void
+   selectedCountries: OptionGroup[]
+   setSelectedCountries: (options: OptionGroup[]) => void
+   universityOptions: OptionGroup[]
+   setUniversityOptions: (options: OptionGroup[]) => void
+}
+
+export const CalendarContext = createContext<CalendarContextType>({
+   allUniversityOptions: [],
+   selectedUniversities: [],
+   setSelectedUniversities: () => {},
+   selectedCountries: [],
+   setSelectedCountries: () => {},
+   universityOptions: [],
+   setUniversityOptions: () => {},
 })
 
 const AcademicCalendar = () => {
@@ -49,7 +72,7 @@ const AcademicCalendar = () => {
 
    // need to filter timeframe in 2 steps since firestore does not support inequalities on several fields
    let { data: periods } = useUniversityPeriodsByIdsAndStart(
-      allUniversityOptions?.map((uni) => uni.id),
+      allUniversityOptions?.map((universityOption) => universityOption.id),
       start
    )
 
@@ -63,10 +86,10 @@ const AcademicCalendar = () => {
    allUniversityOptions = useMemo(
       () =>
          allUniversityOptions
-            ? allUniversityOptions.filter((uni) =>
+            ? allUniversityOptions.filter((universityOption) =>
                  periods
                     .map((period) => period.timelineUniversityId)
-                    .includes(uni.id)
+                    .includes(universityOption.id)
               )
             : [],
       [periods, allUniversityOptions]
@@ -77,10 +100,26 @@ const AcademicCalendar = () => {
       () =>
          periods.filter((period) =>
             selectedUniversities
-               .map((sel) => sel.id)
+               .map((university) => university.id)
                .includes(period.timelineUniversityId)
          ),
       [periods, selectedUniversities]
+   )
+
+   const getUniversityName = useCallback(
+      (id: string, universities: OptionGroup[]) => {
+         const university = universities.find((uni) => uni.id === id)
+         return university ? university.name : undefined
+      },
+      []
+   )
+
+   const periodToDataPoint = useCallback(
+      (period, universities) => ({
+         x: getUniversityName(period.timelineUniversityId, universities),
+         y: [period.start.toMillis(), period.end.toMillis()],
+      }),
+      [getUniversityName]
    )
 
    const seriesData = useMemo(() => {
@@ -96,64 +135,62 @@ const AcademicCalendar = () => {
       }
       Object.values(UniversityPeriodObject).forEach(function (type) {
          let dataArray = []
-         if (selectedPeriods) {
-            dataArray = selectedPeriods
-               .filter((period) => period.type == type)
-               .map(function (period) {
-                  return {
-                     x: selectedUniversities.find(
-                        (uni) => uni.id == period.timelineUniversityId
-                     )?.name,
-                     y: [period.start.toMillis(), period.end.toMillis()],
-                  }
-               })
-         }
+         dataArray = selectedPeriods
+            .filter((period) => period.type == type)
+            .map((period) => periodToDataPoint(period, selectedUniversities))
          seriesData.push({
             name: type.charAt(0).toUpperCase() + type.slice(1),
             data: dataArray,
          })
       })
       return seriesData
-   }, [selectedPeriods, selectedUniversities])
+   }, [periodToDataPoint, selectedPeriods, selectedUniversities])
+
+   const contextValues = useMemo<CalendarContextType>(
+      () => ({
+         allUniversityOptions,
+         selectedUniversities,
+         setSelectedUniversities,
+         selectedCountries,
+         setSelectedCountries,
+         universityOptions,
+         setUniversityOptions,
+      }),
+      [
+         allUniversityOptions,
+         selectedCountries,
+         selectedUniversities,
+         universityOptions,
+      ]
+   )
 
    return (
-      <Box sx={styles.container}>
-         <CalendarFilter
-            allUniversityOptions={allUniversityOptions}
-            selectedUniversities={selectedUniversities}
-            setSelectedUniversities={setSelectedUniversities}
-            selectedCountries={selectedCountries}
-            setSelectedCountries={setSelectedCountries}
-            universityOptions={universityOptions}
-            setUniversityOptions={setUniversityOptions}
-            showTitle={true}
-            popoverProps={{
-               open: Boolean(anchorEl),
-               anchorEl: anchorEl,
-               onClose: () => setAnchorEl(null),
-               anchorOrigin: { horizontal: "right", vertical: "top" },
-               transformOrigin: { vertical: "top", horizontal: "right" },
-               keepMounted: false, // Does not mount the children when dialog is closed
-            }}
-         ></CalendarFilter>
-         {isCalendarView ? (
-            <CalendarChart
-               seriesData={seriesData}
-               setAnchorEl={setAnchorEl}
-            ></CalendarChart>
-         ) : (
-            <CalendarLanding
-               allUniversityOptions={allUniversityOptions}
-               selectedUniversities={selectedUniversities}
-               setSelectedUniversities={setSelectedUniversities}
-               selectedCountries={selectedCountries}
-               setSelectedCountries={setSelectedCountries}
-               universityOptions={universityOptions}
-               setUniversityOptions={setUniversityOptions}
-               setIsCalendarView={setIsCalendarView}
-            ></CalendarLanding>
-         )}
-      </Box>
+      <CalendarContext.Provider value={contextValues}>
+         <Box sx={styles.container}>
+            <CalendarFilter
+               showTitle={true}
+               popoverProps={{
+                  open: Boolean(anchorEl),
+                  anchorEl: anchorEl,
+                  onClose: () => setAnchorEl(null),
+                  anchorOrigin: { horizontal: "right", vertical: "top" },
+                  transformOrigin: { vertical: "top", horizontal: "right" },
+                  keepMounted: false, // Does not mount the children when dialog is closed
+               }}
+            ></CalendarFilter>
+            {isCalendarView ? (
+               <CalendarChart
+                  seriesData={seriesData}
+                  setAnchorEl={setAnchorEl}
+               ></CalendarChart>
+            ) : (
+               <CalendarLanding
+                  selectedUniversities={selectedUniversities}
+                  setIsCalendarView={setIsCalendarView}
+               ></CalendarLanding>
+            )}
+         </Box>
+      </CalendarContext.Provider>
    )
 }
 

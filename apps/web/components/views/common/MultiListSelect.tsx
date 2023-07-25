@@ -3,19 +3,16 @@ import {
    Autocomplete,
    Box,
    Checkbox,
-   CheckboxProps,
    Chip,
    Collapse,
    FormControl,
    TextField,
-   TextFieldProps,
 } from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
 import { IColors } from "../../../types/commonTypes"
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace"
-import BrandedTextField from "./inputs/BrandedTextField"
 import { styled } from "@mui/material/styles"
 import { StyledCheckbox } from "../group/admin/common/inputs"
 import { alpha } from "@mui/material/styles"
@@ -184,7 +181,7 @@ const MultiListSelect = ({
             disabled={disabled}
             onChange={handleMultiSelect}
             isOptionEqualToValue={isOptionEqualToValue}
-            disableCloseOnSelect={isCheckbox ? true : undefined}
+            disableCloseOnSelect={Boolean(isCheckbox)}
             options={allValuesLocal}
             getOptionLabel={getLabelFn}
             renderOption={(props, option, { selected }) =>

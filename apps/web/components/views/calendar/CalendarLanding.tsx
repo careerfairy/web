@@ -1,5 +1,4 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { TimelineUniversity } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { Box, Stack, Typography } from "@mui/material"
 import CalendarFilter from "components/views/calendar/CalendarFilter"
 import ContentButton from "components/views/portal/content-carousel/ContentButton"
@@ -32,14 +31,13 @@ const styles = sxStyles({
    button: { ml: 4, mt: "auto", width: 150 },
 })
 
+type Props = {
+   selectedUniversities: OptionGroup[]
+   setIsCalendarView: (val: boolean) => void
+}
+
 const CalendarLanding = ({
-   allUniversityOptions, // all universities to be considered
    selectedUniversities,
-   setSelectedUniversities,
-   selectedCountries,
-   setSelectedCountries,
-   universityOptions,
-   setUniversityOptions,
    setIsCalendarView,
 }: Props) => {
    return (
@@ -55,14 +53,6 @@ const CalendarLanding = ({
          </Box>
          <Box sx={styles.filterDisplay}>
             <CalendarFilter
-               allUniversityOptions={allUniversityOptions}
-               selectedUniversities={selectedUniversities}
-               setSelectedUniversities={setSelectedUniversities}
-               selectedCountries={selectedCountries}
-               setSelectedCountries={setSelectedCountries}
-               universityOptions={universityOptions}
-               setUniversityOptions={setUniversityOptions}
-               isTextRightOfCheckbox={true}
                multiCheckboxSelectType={"unjustified"}
             ></CalendarFilter>
             <Box sx={styles.buttonContainer}>
@@ -78,17 +68,6 @@ const CalendarLanding = ({
          </Box>
       </Stack>
    )
-}
-
-type Props = {
-   allUniversityOptions: TimelineUniversity[]
-   selectedUniversities: OptionGroup[]
-   setSelectedUniversities: (options: OptionGroup[]) => void
-   selectedCountries: OptionGroup[]
-   setSelectedCountries: (options: OptionGroup[]) => void
-   universityOptions: OptionGroup[]
-   setUniversityOptions: (options: OptionGroup[]) => void
-   setIsCalendarView: (val: boolean) => void
 }
 
 export default CalendarLanding
