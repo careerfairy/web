@@ -14,10 +14,12 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    justifiedLabel: {
+      ml: 0,
       display: "flex",
       justifyContent: "space-between",
    },
    unjustifiedLabel: {
+      ml: 0,
       mr: 5,
    },
    labelText: {

@@ -18,7 +18,6 @@ import MultiCheckboxSelect, {
    MultiCheckboxSelectType,
 } from "../common/filter/MultiCheckboxSelect"
 import MultiListSelect from "../common/MultiListSelect"
-import { TimelineUniversity } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { useTheme } from "@mui/material"
 import { CalendarContext } from "./AcademicCalendar"
 

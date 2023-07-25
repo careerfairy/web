@@ -181,7 +181,7 @@ const EmptyDataDisplay = () => (
       <Typography align="center">
          <SadIcon sx={styles.sadIcon} color={"secondary"}></SadIcon>
          <Typography variant="h4" fontWeight={600}>
-            No data selected
+            No university selected
          </Typography>
          <Typography>
             Select a country and university from the filters to render the
