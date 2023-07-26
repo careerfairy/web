@@ -346,7 +346,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, remoteUrl }) => {
          <FileUploader {...fileUploaderProps}>
             <CardActionArea onClick={handleTouched} sx={styles.avaRoot}>
                <Avatar
-                  src={remoteUrl || blobUrl}
+                  src={blobUrl || remoteUrl}
                   sx={[styles.avatar, dragActive && styles.dragActive]}
                >
                   <Fragment>
