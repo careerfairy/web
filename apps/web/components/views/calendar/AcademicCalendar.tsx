@@ -5,7 +5,6 @@ import {
    TimelineUniversity,
    UniversityPeriodObject,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
-import CalendarFilter from "components/views/calendar/CalendarFilter"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import CalendarLanding from "./CalendarLanding"
 import CalendarChart from "./CalendarChart"
@@ -48,7 +47,6 @@ const AcademicCalendar = () => {
    const [selectedCountries, setSelectedCountries] = useState<OptionGroup[]>([])
    const [universityOptions, setUniversityOptions] = useState<OptionGroup[]>([])
    const [isCalendarView, setIsCalendarView] = useState(false)
-   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
    let { data: allUniversityOptions } = useTimelineUniversities()
 
@@ -167,22 +165,8 @@ const AcademicCalendar = () => {
    return (
       <CalendarContext.Provider value={contextValues}>
          <Box sx={styles.container}>
-            <CalendarFilter
-               showTitle={true}
-               popoverProps={{
-                  open: Boolean(anchorEl),
-                  anchorEl: anchorEl,
-                  onClose: () => setAnchorEl(null),
-                  anchorOrigin: { horizontal: "right", vertical: "top" },
-                  transformOrigin: { vertical: "top", horizontal: "right" },
-                  keepMounted: false, // Does not mount the children when dialog is closed
-               }}
-            ></CalendarFilter>
             {isCalendarView ? (
-               <CalendarChart
-                  seriesData={seriesData}
-                  setAnchorEl={setAnchorEl}
-               ></CalendarChart>
+               <CalendarChart seriesData={seriesData}></CalendarChart>
             ) : (
                <CalendarLanding
                   selectedUniversities={selectedUniversities}

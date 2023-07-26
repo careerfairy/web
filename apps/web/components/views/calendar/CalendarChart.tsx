@@ -2,11 +2,12 @@ import { Typography } from "@mui/material"
 import { Box } from "@mui/material"
 import SadIcon from "@mui/icons-material/SentimentDissatisfiedRounded"
 import dynamic from "next/dynamic"
-import React, { useMemo, useRef, useCallback } from "react"
+import React, { useMemo, useRef, useCallback, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import { sxStyles } from "types/commonTypes"
 import { DateTimeFormatOptions } from "luxon"
 import { ApexOptions } from "apexcharts"
+import CalendarFilter from "./CalendarFilter"
 
 const Chart = dynamic(() => import("react-apexcharts"), {
    ssr: false,
@@ -35,12 +36,12 @@ const styles = sxStyles({
 
 type Props = {
    seriesData: { name: string; data: { x: any; y: any[] }[] }[]
-   setAnchorEl: (anchor: null | HTMLElement) => void
 }
 
-const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
+const CalendarChart = ({ seriesData }: Props) => {
    const chartRef = useRef()
    const theme = useTheme()
+   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
    const colorArray = useMemo(
       () => [
@@ -53,14 +54,6 @@ const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
          theme.palette.primary.main,
          theme.palette.secondary.main,
       ]
-   )
-
-   const isEmptyData = useMemo(
-      () =>
-         seriesData
-            ? seriesData.length <= 0 || seriesData[0].name == "empty"
-            : true,
-      [seriesData]
    )
 
    const renderTooltip = useCallback(
@@ -100,6 +93,10 @@ const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
       [colorArray, seriesData]
    )
 
+   const handleFilterClick = useCallback(() => {
+      setAnchorEl((anchor) => (anchor == null ? chartRef.current : null))
+   }, [])
+
    const chartOptions = useMemo(
       () =>
          ({
@@ -115,9 +112,7 @@ const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
                            index: 5,
                            title: "filter",
                            class: "custom-icon-filter",
-                           click: function () {
-                              setAnchorEl(chartRef.current)
-                           },
+                           click: handleFilterClick,
                         },
                      ],
                   },
@@ -160,12 +155,42 @@ const CalendarChart = ({ seriesData, setAnchorEl }: Props) => {
                },
             },
          } as ApexOptions),
-      [colorArray, renderTooltip, setAnchorEl, theme.typography.fontFamily]
+      [
+         colorArray,
+         handleFilterClick,
+         renderTooltip,
+         theme.typography.fontFamily,
+      ]
+   )
+
+   const isEmptyData = useMemo(
+      () =>
+         seriesData
+            ? seriesData.length <= 0 || seriesData[0].name == "empty"
+            : true,
+      [seriesData]
+   )
+
+   const popoverProps = useMemo(
+      () =>
+         ({
+            open: Boolean(anchorEl),
+            anchorEl: anchorEl,
+            onClose: () => setAnchorEl(null),
+            anchorOrigin: { horizontal: "right", vertical: "top" },
+            transformOrigin: { vertical: "top", horizontal: "right" },
+            keepMounted: false, // Does not mount the children when dialog is closed
+         } as const),
+      [anchorEl]
    )
 
    return (
       <Box component={"span"} ref={chartRef} sx={styles.chartContainer}>
          {isEmptyData ? <EmptyDataDisplay /> : null}
+         <CalendarFilter
+            showTitle={true}
+            popoverProps={popoverProps}
+         ></CalendarFilter>
          <Chart
             type="rangeBar"
             series={seriesData}
