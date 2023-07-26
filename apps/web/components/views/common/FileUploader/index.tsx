@@ -28,7 +28,7 @@ export type FileUploaderProps = {
    /*
     * ['png', 'jpeg', ...]
     * */
-   types?: Array<string>
+   types?: Array<string> | ReadonlyArray<string>
    sx?: SxProps<DefaultTheme>
    classes?: string
    children?: JSX.Element

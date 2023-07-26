@@ -242,7 +242,7 @@ service cloud.firestore {
 
         match /sparks/{sparkId} {
             allow read: if isAnyGroupAdmin();
-            allow write: if isAnyGroupAdmin();
+            allow write: if false;
         }
 
         match /videos/{video} {
