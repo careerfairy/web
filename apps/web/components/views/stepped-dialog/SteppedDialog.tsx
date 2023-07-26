@@ -13,27 +13,26 @@ import {
 import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 
 const styles = sxStyles({
-   swipeableViews: {
-      height: "100%",
-   },
    slide: {
       overflow: "overlay",
-   },
-   swipeableViewsContainer: {
-      height: "100%",
-      "& > *": {
-         height: "100%",
-      },
+      display: "flex",
+      flexDirection: "column",
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
       },
-      maxWidth: 915,
-      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      maxHeight: "none",
+      maxWidth: 770,
+   },
+   content: {
+      p: 0,
    },
 })
 
@@ -62,6 +61,7 @@ interface StepperDialogProps {
    handleClose: () => void
    open: boolean
    views: ReadonlyArray<View>
+   bgcolor?: string
 }
 
 /**
@@ -125,6 +125,7 @@ const SteppedDialog = <K extends string>({
    handleClose,
    open,
    views,
+   bgcolor,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -184,25 +185,32 @@ const SteppedDialog = <K extends string>({
          fullScreen={isMobile}
          closeAfterTransition={true}
          PaperProps={{
-            sx: styles.dialogPaper,
+            sx: [
+               styles.dialogPaper,
+               {
+                  bgcolor,
+               },
+            ],
          }}
       >
-         <DialogContent>
-            <StepperContext.Provider value={value}>
-               <SwipeableViews
-                  style={styles.swipeableViews}
-                  containerStyle={styles.swipeableViewsContainer}
-                  slideStyle={styles.slide}
-                  disabled
-                  axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-                  index={currentStep}
-               >
-                  {views.map(({ Component, key }) => (
-                     <Component key={key} />
-                  ))}
-               </SwipeableViews>
-            </StepperContext.Provider>
-         </DialogContent>
+         <StepperContext.Provider value={value}>
+            <SwipeableViews
+               slideStyle={styles.slide}
+               disabled
+               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+               index={currentStep}
+            >
+               {views.map(({ Component, key }, index) => (
+                  <AnimatedTabPanel
+                     key={key}
+                     value={index}
+                     activeValue={currentStep}
+                  >
+                     <Component />
+                  </AnimatedTabPanel>
+               ))}
+            </SwipeableViews>
+         </StepperContext.Provider>
       </Dialog>
    )
 }

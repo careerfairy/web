@@ -1,3 +1,24 @@
+import firebase from "firebase/compat/app"
+import BaseFirebaseRepository, {
+   mapFirestoreDocuments,
+   OnSnapshotCallback,
+   Unsubscribe,
+} from "../BaseFirebaseRepository"
+import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import {
+   CompanyFollowed,
+   pickPublicDataFromUser,
+   UserAdminGroup,
+   UserData,
+} from "../users"
+import {
+   AddCreatorData,
+   Creator,
+   CreatorRoles,
+   UpdateCreatorData,
+} from "./creators"
+import { GroupDashboardInvite } from "./GroupDashboardInvite"
+import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
@@ -11,23 +32,6 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
-import BaseFirebaseRepository, {
-   mapFirestoreDocuments,
-   OnSnapshotCallback,
-   Unsubscribe,
-} from "../BaseFirebaseRepository"
-import firebase from "firebase/compat/app"
-import {
-   CompanyFollowed,
-   pickPublicDataFromUser,
-   UserAdminGroup,
-   UserData,
-} from "../users"
-import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
-import { GroupDashboardInvite } from "./GroupDashboardInvite"
-import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
-import { Create } from "../commonTypes"
-import { Creator, UpdateCreatorData } from "./creators"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -174,7 +178,7 @@ export interface IGroupRepository {
     * @param {Create<Creator>} creator - The creator to be added.
     * @returns {Promise<void>} A Promise that resolves when the creator is successfully added to the group.
     */
-   addCreatorToGroup(groupId: string, creator: Create<Creator>): Promise<void>
+   addCreatorToGroup(groupId: string, creator: AddCreatorData): Promise<string>
 
    /**
     * Removes a creator from a group.
@@ -194,8 +198,17 @@ export interface IGroupRepository {
     */
    updateCreatorInGroup(
       groupId: string,
+      creatorId: string,
       creator: UpdateCreatorData
    ): Promise<void>
+
+   /**
+    * Checks if a creator's email is unique in a group
+    * @param groupId the group to check
+    * @param email the email to check
+    * @returns true if the email is unique, false otherwise
+    */
+   creatorEmailIsUnique(groupId: string, email: string): Promise<boolean>
 }
 
 export class FirebaseGroupRepository
@@ -878,27 +891,49 @@ export class FirebaseGroupRepository
    |--------------------------------------------------------------------------
    */
 
-   addCreatorToGroup(groupId: string, creator: Creator): Promise<void> {
+   addCreatorToGroup(
+      groupId: string,
+      creator: AddCreatorData
+   ): Promise<string> {
+      const creatorData: Creator = {
+         ...creator,
+         createdAt: this.fieldValue.serverTimestamp() as any,
+         updatedAt: this.fieldValue.serverTimestamp() as any,
+         id: creator.email, // We use the email as the id and not firestore's auto generated id
+         documentType: "groupCreator",
+         groupId,
+         roles: [CreatorRoles.Spark], // By default, all creators are sparks for now
+      }
+
       const creatorRef = this.firestore
          .collection("careerCenterData")
-         .doc(groupId)
+         .doc(creatorData.groupId)
          .collection("creators")
-         .doc(creator.id) // We use the email as the id and not firestore's auto generated id
+         .doc(creatorData.id)
 
-      return creatorRef.set(creator, { merge: true })
+      return creatorRef.set(creatorData, { merge: true }).then(() => {
+         return creatorData.id
+      })
    }
 
    updateCreatorInGroup(
       groupId: string,
+      creatorId: string,
       creator: UpdateCreatorData
    ): Promise<void> {
+      const updateCreatorData: UpdateCreatorData & Pick<Creator, "updatedAt"> =
+         {
+            ...creator,
+            updatedAt: this.fieldValue.serverTimestamp() as any,
+         }
+
       const creatorRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("creators")
-         .doc(creator.id) // We use the email as the id and not firestore's auto generated id
+         .doc(creatorId) // We use the email as the id and not firestore's auto generated id
 
-      return creatorRef.update(creator)
+      return creatorRef.update(updateCreatorData)
    }
 
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {
@@ -909,6 +944,16 @@ export class FirebaseGroupRepository
          .doc(creatorId)
 
       return creatorRef.delete()
+   }
+
+   creatorEmailIsUnique(groupId: string, email: string): Promise<boolean> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(email)
+
+      return creatorRef.get().then((snap) => !snap.exists)
    }
 }
 
