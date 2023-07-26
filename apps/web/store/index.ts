@@ -15,6 +15,7 @@ export const newStore = () => {
    //Check if function running on the sever or client
    if (!isServer) {
       //Setup Redux Debugger
+      // @ts-ignore
       composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
    }
 
@@ -29,6 +30,11 @@ export const newStore = () => {
       )
    )
 }
+
+// Optional: You can define the schema of your Firebase Redux store.
+// This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
+
+export type RootState = ReturnType<typeof rootReducer>
 
 export const wrapper = createWrapper(
    newStore

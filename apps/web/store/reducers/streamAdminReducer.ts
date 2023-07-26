@@ -1,12 +1,22 @@
+import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-const initialState = {
+interface IStreamAdminState {
+   recording: {
+      recordingRequestOngoing: boolean
+   }
+}
+
+const initialState: IStreamAdminState = {
    recording: {
       recordingRequestOngoing: false,
    },
 }
 
-const streamAdminReducer = (state = initialState, { type, payload }) => {
+const streamAdminReducer: Reducer<IStreamAdminState> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.SET_RECORDING_REQUEST_STARTED:
          return {

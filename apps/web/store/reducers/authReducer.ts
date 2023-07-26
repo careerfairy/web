@@ -1,6 +1,28 @@
+import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
 
-const initialState = {
+interface IAuthState {
+   error: null | string
+   loading: boolean
+   verifyEmail: {
+      error: null | string
+      loading: boolean
+   }
+   recoverPassword: {
+      error: null | string
+      loading: boolean
+   }
+   profileEdit: {
+      error: null | string
+      loading: boolean
+   }
+   deleteUser: {
+      loading: boolean
+      error: null | string
+   }
+}
+
+const initialState: IAuthState = {
    error: null,
    loading: false,
    verifyEmail: {
@@ -159,7 +181,10 @@ const cleanUp = (state) => {
    }
 }
 
-const authReducer = (state = initialState, { type, payload }) => {
+const authReducer: Reducer<IAuthState> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.CLEAN_UP:
          return cleanUp(state)
