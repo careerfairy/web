@@ -1,12 +1,16 @@
 import { Container } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
+import {
+   containerDesktopHorizontalPadding,
+   containerMobileHorizontalPadding,
+} from "./general-sparks-view/OverflowWrapper"
 
 const styles = sxStyles({
    root: {
@@ -14,7 +18,14 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       pt: 2.875,
+      position: "relative",
+      overflow: "visible",
+      px: {
+         xs: `${containerMobileHorizontalPadding}px !important`,
+         md: `${containerDesktopHorizontalPadding}px !important`,
+      },
    },
+   container: {},
 })
 
 const Sparks = () => {
@@ -27,7 +38,7 @@ const Sparks = () => {
 
 const SparksComponent = () => {
    const { group } = useGroup()
-   const { data } = useGroupSparks(group.id)
+   const { data } = useGroupCreators(group.id)
 
    const groupHasSparks = data.length > 0
 

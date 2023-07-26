@@ -1,11 +1,17 @@
-import { FC, Fragment } from "react"
+import { Stack } from "@mui/material"
+import { FC } from "react"
+import CreatorSparksCollection from "./CreatorSparksCollection"
 import HeaderActions from "./HeaderActions"
+import OverflowWrapper from "./OverflowWrapper"
 
 const GeneralSparksView: FC = () => {
    return (
-      <Fragment>
+      <Stack spacing={4.125}>
          <HeaderActions />
-      </Fragment>
+         <OverflowWrapper>
+            <CreatorSparksCollection />
+         </OverflowWrapper>
+      </Stack>
    )
 }
 

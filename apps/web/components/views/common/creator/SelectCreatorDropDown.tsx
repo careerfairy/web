@@ -7,8 +7,8 @@ import {
    ListItemText,
    MenuItem,
 } from "@mui/material"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { useField, useFormikContext } from "formik"
-import Image from "next/image"
 import React, { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import BrandedTextField, {
@@ -31,6 +31,10 @@ const styles = sxStyles({
          width: 24,
          height: 24,
       },
+   },
+   avatar: {
+      width: 40,
+      height: 40,
    },
 })
 
@@ -96,14 +100,7 @@ const renderCreatorMenuItem = (creator: Creator) => {
    return (
       <MenuItem key={creator.id} sx={styles.menuItem} value={creator.id}>
          <ListItemIcon sx={styles.listicon}>
-            <Avatar>
-               <Image
-                  width={40}
-                  height={40}
-                  src={creator.avatarUrl}
-                  alt="avatar"
-               />
-            </Avatar>
+            <CreatorAvatar creator={creator} sx={styles.avatar} />
          </ListItemIcon>
          <ListItemText
             primary={`${creator.firstName} ${creator.lastName}`}
