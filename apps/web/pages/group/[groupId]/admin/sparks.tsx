@@ -1,5 +1,5 @@
 import Sparks from "components/views/admin/sparks"
-import CreateSparkButton from "components/views/admin/sparks/CreateSparkButton"
+import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import { useRouter } from "next/router"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
