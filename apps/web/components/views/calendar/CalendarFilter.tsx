@@ -21,12 +21,6 @@ import MultiListSelect from "../common/MultiListSelect"
 import { useTheme } from "@mui/material"
 import { CalendarContext } from "./AcademicCalendar"
 
-type Props = {
-   showTitle?: boolean
-   multiCheckboxSelectType?: MultiCheckboxSelectType
-   popoverProps?: PopoverProps
-}
-
 const styles = sxStyles({
    container: {
       backgroundColor: "white",
@@ -46,8 +40,14 @@ const styles = sxStyles({
    listLabel: { fontSize: "12px" },
    title: { fontWeight: 600, fontSize: "24px" },
    universityContainer: { mt: 2 },
-   popover: { zIndex: 3 },
+   popover: { zIndex: 1 }, //zIndex: 0
 })
+
+type Props = {
+   showTitle?: boolean
+   multiCheckboxSelectType?: MultiCheckboxSelectType
+   popoverProps?: PopoverProps
+}
 
 const CalendarFilter = ({
    showTitle = false,
@@ -129,7 +129,7 @@ const CalendarFilter = ({
       []
    )
 
-   let filterContent = useMemo(
+   const filterContent = useMemo(
       () => (
          <Box sx={styles.container}>
             {showTitle ? (
@@ -222,19 +222,23 @@ const CalendarFilter = ({
       ]
    )
 
-   if (popoverProps) {
-      filterContent = (
-         <Popover
-            sx={styles.popover}
-            PaperProps={{ style: { width: "28%" } }}
-            {...popoverProps}
-         >
-            {filterContent}
-         </Popover>
-      )
-   }
+   const filter = useMemo(
+      () =>
+         popoverProps ? (
+            <Popover
+               sx={styles.popover}
+               PaperProps={{ style: { width: "28%" } }}
+               {...popoverProps}
+            >
+               {filterContent}
+            </Popover>
+         ) : (
+            filterContent
+         ),
+      [filterContent, popoverProps]
+   )
 
-   return filterContent
+   return filter
 }
 
 export default CalendarFilter
