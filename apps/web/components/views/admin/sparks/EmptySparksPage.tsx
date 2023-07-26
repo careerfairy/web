@@ -1,8 +1,10 @@
 import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
 import { sparksGetInspiredPdf } from "constants/files"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import SparksIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { sxStyles } from "types/commonTypes"
+import { useDispatch } from "react-redux"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -37,14 +39,22 @@ const styles = sxStyles({
    },
 })
 
-const EmptySparksView: FC = () => {
+const EmptySparksPage: FC = () => {
+   const dispatch = useDispatch()
+
+   const handleOpen = useCallback(() => {
+      dispatch(openSparkDialog(null))
+   }, [dispatch])
+
    return (
       <>
          <Box sx={styles.root}>
             <SparkIllustration />
             <TitleText mt={2.5} maxWidth={380}>
                Your company hasn’t created any{" "}
-               <HighlightedText color="secondary.main">Sparks</HighlightedText>{" "}
+               <Box component="span" color="secondary.main">
+                  Sparks
+               </Box>{" "}
                yet.
             </TitleText>
             <Typography
@@ -69,7 +79,12 @@ const EmptySparksView: FC = () => {
                >
                   Get inspired
                </Button>
-               <Button sx={styles.btn} color="secondary" variant="contained">
+               <Button
+                  onClick={handleOpen}
+                  sx={styles.btn}
+                  color="secondary"
+                  variant="contained"
+               >
                   Upload a Spark
                </Button>
             </Stack>
@@ -90,17 +105,4 @@ export const TitleText: FC<TypographyProps<"h1">> = (props) => {
    return <Typography sx={styles.title} component="h1" {...props} />
 }
 
-export const HighlightedText: FC<TypographyProps<"span">> = (props) => {
-   return (
-      <Typography
-         fontWeight="inherit"
-         fontStyle="inherit"
-         letterSpacing="inherit"
-         fontSize="inherit"
-         component="span"
-         {...props}
-      />
-   )
-}
-
-export default EmptySparksView
+export default EmptySparksPage

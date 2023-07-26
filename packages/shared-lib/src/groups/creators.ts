@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 
 export const CreatorRoles = {
@@ -24,6 +25,9 @@ export interface Creator extends Identifiable {
    email: string
    avatarUrl: string
 
+   createdAt: Timestamp
+   updatedAt: Timestamp
+
    // optional fields
    linkedInUrl?: string
    story?: string
@@ -44,19 +48,30 @@ export type PublicCreator = Pick<
    | "story"
 >
 
+export type AddCreatorData = Pick<
+   Creator,
+   | "firstName"
+   | "lastName"
+   | "position"
+   | "email"
+   | "avatarUrl"
+   | "linkedInUrl"
+   | "story"
+>
+
 export type UpdateCreatorData = Partial<
    Pick<
       Creator,
       | "firstName"
       | "lastName"
       | "position"
-      | "email"
       | "avatarUrl"
-      | "roles"
+      | "linkedInUrl"
       | "story"
-      | "id"
+      | "email"
    >
->
+> &
+   Identifiable
 
 export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
    return {
