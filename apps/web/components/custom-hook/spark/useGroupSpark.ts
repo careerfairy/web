@@ -14,7 +14,7 @@ const useGroupSpark = (groupId: string, sparkId: string) => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where(documentId(), "==", sparkId),
-         where("group.id", "array-contains", groupId),
+         where("group.id", "==", groupId),
          limit(1) // we only want the first result
       )
    }, [groupId, sparkId])

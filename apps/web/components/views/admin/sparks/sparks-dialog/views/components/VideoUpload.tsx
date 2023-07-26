@@ -1,16 +1,18 @@
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import TimeIcon from "@mui/icons-material/AccessTimeRounded"
 import PhoneIcon from "@mui/icons-material/PhoneIphone"
 import VideoFileIcon from "@mui/icons-material/VideoFileOutlined"
 import { Box, Button, FormHelperText, Stack, Typography } from "@mui/material"
 import useFileUploader from "components/custom-hook/useFileUploader"
+import { getVideoFileDuration } from "components/helperFunctions/validators/video"
 import FileUploader, {
    FileUploaderProps,
 } from "components/views/common/FileUploader"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import { imagePlaceholder } from "constants/images"
-import { useField } from "formik"
+import { FieldHelperProps, useField } from "formik"
 import Image from "next/image"
-import { FC, Fragment, ReactNode, useCallback, useMemo } from "react"
+import { FC, Fragment, ReactNode, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
 
@@ -74,24 +76,22 @@ type Props = {
    name: string
 }
 
+const maxSeconds = SPARK_CONSTANTS.MAX_DURATION_SECONDS
+const minSeconds = SPARK_CONSTANTS.MIN_DURATION_SECONDS
+const maxMinutes = Math.round(maxSeconds / 60)
+const maxFileSize = SPARK_CONSTANTS.MAX_FILE_SIZE_MB
+
 const VideoUpload: FC<Props> = ({ name }) => {
    const [field, meta, helpers] = useField<File>(name)
 
    const { fileUploaderProps, dragActive } = useFileUploader({
-      acceptedFileTypes: ["mp4", "webm", "mov"],
-      maxFileSize: 150, // MB
+      acceptedFileTypes: SPARK_CONSTANTS.ALLOWED_FILE_FORMATS,
+      maxFileSize: maxFileSize, // MB
       multiple: false,
-      onValidated: (file) => {
-         const newFile = Array.isArray(file) ? file[0] : file
-
-         helpers.setValue(newFile)
-         handleTouched()
+      onValidated: async (file) => {
+         validateVideo(file, helpers)
       },
    })
-
-   const handleTouched = useCallback(() => {
-      helpers.setTouched(true, false)
-   }, [helpers])
 
    const blobUrl = useMemo(() => {
       if (field.value && !meta.error) {
@@ -169,13 +169,40 @@ const UploadPromptDisplay: FC<UploadPromptDisplayProps> = ({
 
                <Stack spacing={1} mt={3}>
                   <VideoSpecText icon={<PhoneIcon />} text="9:16 format" />
-                  <VideoSpecText icon={<VideoFileIcon />} text="Max 150MB" />
-                  <VideoSpecText icon={<TimeIcon />} text="Max 1 minute" />
+                  <VideoSpecText
+                     icon={<VideoFileIcon />}
+                     text={`Max ${maxFileSize}MB`}
+                  />
+                  <VideoSpecText
+                     icon={<TimeIcon />}
+                     text={`Max ${maxMinutes} minute`}
+                  />
                </Stack>
             </Fragment>
          </FileUploader>
       </SparkAspectRatioBox>
    )
+}
+
+const validateVideo = async (
+   file: File | File[],
+   helpers: FieldHelperProps<File>
+) => {
+   const newFile = Array.isArray(file) ? file[0] : file
+   const duration = await getVideoFileDuration(newFile)
+
+   if (duration < minSeconds || duration > maxSeconds) {
+      const roundedDuration = Math.round(duration * 10) / 10 // round to 1 decimal
+
+      const message = `Your video is ${roundedDuration} seconds long, a Spark should be between ${minSeconds} and ${maxSeconds} seconds`
+
+      helpers.setValue(null, false) // set value to null but don't trigger validation because we already setting an error
+      helpers.setError(message) // set error message
+      helpers.setTouched(true, false) // set touched to true but don't trigger validation because we already set an error
+   } else {
+      helpers.setTouched(true)
+      helpers.setValue(newFile)
+   }
 }
 
 export default VideoUpload

@@ -12,12 +12,16 @@ import {
    sparksCategoriesArray,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { groupRepo, sparkRepo } from "./api/repositories"
 
 export const createSpark = functions.region(config.region).https.onCall(
    middlewares(
       dataValidation({
-         question: string().required().max(100).min(10),
+         question: string()
+            .required()
+            .max(SPARK_CONSTANTS.MAX_DURATION_SECONDS)
+            .min(SPARK_CONSTANTS.MIN_DURATION_SECONDS),
          categoryId: string()
             .oneOf(sparksCategoriesArray.map((category) => category.id))
             .required("Category is required"),

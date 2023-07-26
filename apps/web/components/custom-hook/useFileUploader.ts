@@ -3,7 +3,7 @@ import { useCallback, useState, useMemo } from "react"
 import useSnackbarNotifications from "./useSnackbarNotifications"
 
 type UseFileUploaderParams = {
-   acceptedFileTypes: string[]
+   acceptedFileTypes: FileUploaderProps["types"]
    maxFileSize: number
    multiple?: boolean
    onValidated: (file: File | File[]) => void
