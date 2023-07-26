@@ -14,7 +14,7 @@ import {
    isLoaded,
    useFirestoreConnect,
 } from "react-redux-firebase"
-import RootState from "../store/reducers"
+import { RootState } from "../store"
 import * as Sentry from "@sentry/nextjs"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"

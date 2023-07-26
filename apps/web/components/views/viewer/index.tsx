@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useRouter } from "next/router"
 import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
-import RootState from "../../../store/reducers"
+import { RootState } from "../../../store"
 
 const useStyles = makeStyles((theme) => ({
    iconsContainer: {

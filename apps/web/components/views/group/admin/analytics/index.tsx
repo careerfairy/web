@@ -35,7 +35,7 @@ import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDict
 import StreamFilterModal from "./StreamFilterModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
-import RootState from "../../../../../store/reducers"
+import { RootState } from "../../../../../store/"
 import Sources from "./RegistrationSources"
 import { useRouter } from "next/router"
 
