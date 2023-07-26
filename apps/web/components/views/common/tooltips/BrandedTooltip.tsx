@@ -26,6 +26,7 @@ const BrandedTooltip = styled(({ className, ...props }: TooltipProps) => (
             : theme.palette.common.black,
       border: "1px solid #BCBCBC",
       borderRadius: 7,
+      fontSize: "0.85714rem",
    },
 }))
 
