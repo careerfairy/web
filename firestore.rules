@@ -188,6 +188,11 @@ service cloud.firestore {
                 return careerCenter in request.auth.token.adminGroups.keys();
             }
 
+            match /creators/{creatorEmail} {
+                allow read: if true;
+                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            }
+
             match /ats/{integrationId} {
                 allow read, write: if isSignedIn() && (isCareerCenterAdmin() || isCFAdmin());
             }
@@ -233,6 +238,11 @@ service cloud.firestore {
                 }
 
             }
+        }
+
+        match /sparks/{sparkId} {
+            allow read: if isAnyGroupAdmin();
+            allow write: if isAnyGroupAdmin();
         }
 
         match /videos/{video} {
