@@ -14,3 +14,6 @@ export const sparksCachedSparkFormValues = (state: RootState) =>
 
 export const sparksConfirmCloseSparksDialogOpen = (state: RootState) =>
    state.adminSparks.confirmCloseSparksDialogOpen
+
+export const sparksShowHiddenSparks = (state: RootState) =>
+   state.adminSparks.showHiddenSparks
