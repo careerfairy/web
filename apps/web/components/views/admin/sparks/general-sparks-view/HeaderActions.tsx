@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material"
+import { Box, Button, Stack, tooltipClasses } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import DividerWithText from "components/views/common/misc/DividerWithText"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
@@ -39,6 +39,12 @@ const styles = sxStyles({
          height: "1.71429rem",
       },
    },
+   tooltip: {
+      maxWidth: 350,
+      [`& .${tooltipClasses.tooltip}`]: {
+         maxWidth: 350,
+      },
+   },
 })
 
 const HeaderActions = () => {
@@ -50,13 +56,20 @@ const HeaderActions = () => {
             <Stack sx={styles.mobileRoot} spacing={1}>
                <CreateSparkButton>Create a new Spark</CreateSparkButton>
                <DividerWithText maxWidth={"50%"}>Or</DividerWithText>
-               <GetInspiredButton
-                  sx={styles.mobileGetInspiredBtn}
-                  variant="text"
-                  color="grey"
-                  endIcon={<InfoTooltip />}
-                  size="small"
-               />
+               <Stack
+                  sx={styles.getInspiredBtnWrapper}
+                  spacing={1.25}
+                  alignItems="center"
+                  direction="row"
+               >
+                  <GetInspiredButton
+                     sx={styles.mobileGetInspiredBtn}
+                     variant="text"
+                     color="grey"
+                     size="small"
+                  />
+                  <InfoTooltip />
+               </Stack>
             </Stack>
             <span>
                <ToggleHiddenSparksButton />
@@ -111,6 +124,7 @@ const InfoTooltip = () => {
          title={
             "Lacking ideas for your content? We collected talent's most requested questions to inspire you."
          }
+         sx={styles.tooltip}
       >
          <InfoIcon />
       </BrandedTooltip>
