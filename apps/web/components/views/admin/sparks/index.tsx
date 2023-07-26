@@ -5,7 +5,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
-import GeneralSparksPage from "./general-sparks-view/GeneralSparksView"
+import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
 
 const styles = sxStyles({
@@ -34,7 +34,7 @@ const SparksComponent = () => {
    return (
       <Fragment>
          <Container sx={styles.root} maxWidth="xl">
-            {groupHasSparks ? <GeneralSparksPage /> : <EmptySparksView />}
+            {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
          </Container>
          <SparksDialog />
       </Fragment>
