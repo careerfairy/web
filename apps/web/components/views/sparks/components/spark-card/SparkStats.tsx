@@ -72,7 +72,7 @@ type StatChipProps = {
 const StatChip: FC<StatChipProps> = ({ icon, value, tooltip }) => {
    return (
       <span>
-         <BrandedTooltip placement="right" title={tooltip || ""}>
+         <BrandedTooltip title={tooltip || ""}>
             <Chip sx={styles.chip} icon={icon} label={numberToString(value)} />
          </BrandedTooltip>
       </span>
