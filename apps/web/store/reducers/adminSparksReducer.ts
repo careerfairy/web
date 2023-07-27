@@ -29,7 +29,7 @@ const initialState: ISparksState = {
       selectedSparkId: null,
       cachedSparkFormValues: null,
    },
-   showHiddenSparks: false,
+   showHiddenSparks: true,
 }
 
 export const adminSparksSlice = createSlice({

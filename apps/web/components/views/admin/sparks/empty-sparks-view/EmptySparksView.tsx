@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
+import SparksContainer from "../components/SparksContainer"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -47,7 +48,7 @@ const EmptySparksView: FC = () => {
    }, [dispatch])
 
    return (
-      <>
+      <SparksContainer>
          <Box sx={styles.root}>
             <SparkIllustration />
             <TitleText mt={2.5} maxWidth={380}>
@@ -79,7 +80,7 @@ const EmptySparksView: FC = () => {
                </Button>
             </Stack>
          </Box>
-      </>
+      </SparksContainer>
    )
 }
 
