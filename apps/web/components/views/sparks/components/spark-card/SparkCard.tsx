@@ -1,5 +1,4 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { Button } from "@mui/material"
 import Box from "@mui/material/Box"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -17,6 +16,7 @@ const styles = sxStyles({
       borderRadius: 3,
       overflow: "hidden",
       position: "relative",
+      p: 2,
 
       "&::after": {
          content: '""',
