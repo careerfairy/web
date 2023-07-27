@@ -37,7 +37,7 @@ const styles = sxStyles({
       fontWeight: 500,
       lineHeight: "117.5%",
       letterSpacing: "-0.03121rem",
-      bgcolor: "primary.main",
+      bgcolor: "primary.600",
       borderRadius: 0.5,
       mb: "auto",
    },
