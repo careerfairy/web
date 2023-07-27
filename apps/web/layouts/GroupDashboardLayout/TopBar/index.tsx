@@ -142,20 +142,17 @@ const MobileToggleButton = () => {
 }
 
 const ShrunkToggleButton = () => {
-   const { shrunkLeftMenuState, setShrunkLeftMenuState } = useGroup()
+   const { shrunkLeftMenuIsActive, setShrunkLeftMenuState } = useGroup()
 
    const onClick = useCallback(() => {
-      setShrunkLeftMenuState(
-         shrunkLeftMenuState === "shrunk" ? "open" : "shrunk"
-      )
-   }, [setShrunkLeftMenuState, shrunkLeftMenuState])
+      setShrunkLeftMenuState(shrunkLeftMenuIsActive ? "open" : "shrunk")
+   }, [setShrunkLeftMenuState, shrunkLeftMenuIsActive])
 
-   const Icon =
-      shrunkLeftMenuState === "shrunk" ? (
-         <ArrowBackIosIcon />
-      ) : (
-         <ArrowForwardIosIcon />
-      )
+   const Icon = shrunkLeftMenuIsActive ? (
+      <ArrowBackIosIcon />
+   ) : (
+      <ArrowForwardIosIcon />
+   )
 
    return (
       <Box sx={styles.btnWrapper}>

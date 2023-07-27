@@ -102,7 +102,7 @@ export const NavLink = ({
    wrapper,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
-   const { shrunkLeftMenuState } = useGroup()
+   const { shrunkLeftMenuState, shrunkLeftMenuIsActive } = useGroup()
 
    const isNavLinkGroup = Boolean(childLinks?.length)
 
@@ -142,7 +142,7 @@ export const NavLink = ({
                >
                   <Box sx={styles.icon} component={Icon} />
                </ListItemIcon>
-               {shrunkLeftMenuState === "shrunk" ? null : (
+               {shrunkLeftMenuIsActive ? null : (
                   <ListItemText
                      primary={
                         <Typography
