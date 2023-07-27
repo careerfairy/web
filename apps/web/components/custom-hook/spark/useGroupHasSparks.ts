@@ -12,16 +12,16 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
  */
 const useGroupHasSparks = (
    groupId: string,
-   showHiddenSparks: boolean = false
+   includeHiddenSparks: boolean = false
 ) => {
    const groupSparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where("group.id", "==", groupId),
-         ...(showHiddenSparks ? [] : [where("published", "==", true)]),
+         ...(includeHiddenSparks ? [] : [where("published", "==", true)]),
          limit(1)
       )
-   }, [groupId, showHiddenSparks])
+   }, [groupId, includeHiddenSparks])
 
    return (
       useFirestoreCollection<Spark>(groupSparksQuery, {
