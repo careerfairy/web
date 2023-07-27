@@ -46,6 +46,7 @@ type GroupAdminContext = {
    role: GROUP_DASHBOARD_ROLE
    livestreamDialog: ReturnType<typeof useLivestreamDialog>
    shrunkLeftMenuState: shrunkState
+   shrunkLeftMenuIsActive: boolean
    setShrunkLeftMenuState: React.Dispatch<SetStateAction<shrunkState>>
 }
 
@@ -58,6 +59,7 @@ const GroupContext = createContext<GroupAdminContext>({
    role: undefined,
    livestreamDialog: undefined,
    shrunkLeftMenuState: "disabled",
+   shrunkLeftMenuIsActive: false,
    setShrunkLeftMenuState: () => {},
 })
 
@@ -94,7 +96,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   const shrunkInitialState = "disabled" // enable this for certain pages
+   const shrunkInitialState: shrunkState = "shrunk" // enable this for certain pages
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
       useSessionStorage<shrunkState>("shrunkLeftMenuState", shrunkInitialState)
 
@@ -174,6 +176,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          role: adminGroups?.[group?.id]?.role,
          livestreamDialog,
          shrunkLeftMenuState,
+         shrunkLeftMenuIsActive: shrunkLeftMenuState === "shrunk",
          setShrunkLeftMenuState,
       }),
       [

@@ -88,13 +88,12 @@ const baseStyles = (drawerWidth: number) => {
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const useStyles = () => {
-   const { shrunkLeftMenuState } = useGroup()
+   const { shrunkLeftMenuState, shrunkLeftMenuIsActive } = useGroup()
 
    let drawerWidth = DRAWER_WIDTH
 
    if (shrunkLeftMenuState !== "disabled") {
-      drawerWidth =
-         shrunkLeftMenuState === "shrunk" ? DRAWER_WIDTH_SHRUNK : DRAWER_WIDTH
+      drawerWidth = shrunkLeftMenuIsActive ? DRAWER_WIDTH_SHRUNK : DRAWER_WIDTH
    }
 
    return useMemo(() => baseStyles(drawerWidth), [drawerWidth])

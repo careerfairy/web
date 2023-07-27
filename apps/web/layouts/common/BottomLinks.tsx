@@ -25,7 +25,7 @@ type Props = {
 }
 
 const BottomLinks = ({ hideMainLogo }: Props) => {
-   const { shrunkLeftMenuState } = useGroup()
+   const { shrunkLeftMenuIsActive } = useGroup()
 
    return (
       <Stack
@@ -43,7 +43,7 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             <></>
          ) : (
             <Box px={5}>
-               {shrunkLeftMenuState === "shrunk" ? (
+               {shrunkLeftMenuIsActive ? (
                   <MiniLogoGreenBg />
                ) : (
                   <MainLogo sx={styles.logo} />
@@ -55,7 +55,7 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             href={supportPageLink}
             id={"support-page"}
             baseTextColor={"text.primary"}
-            title={shrunkLeftMenuState === "shrunk" ? "" : "Support"}
+            title={shrunkLeftMenuIsActive ? "" : "Support"}
             Icon={HelpCircle}
             external
          />
