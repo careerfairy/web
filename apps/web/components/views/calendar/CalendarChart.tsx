@@ -3,7 +3,7 @@ import { Box } from "@mui/material"
 import SadIcon from "@mui/icons-material/SentimentDissatisfiedRounded"
 import dynamic from "next/dynamic"
 import React, { useMemo, useRef, useCallback, useState } from "react"
-import { useTheme } from "@mui/material/styles"
+import { darken, useTheme } from "@mui/material/styles"
 import { sxStyles } from "types/commonTypes"
 import { DateTimeFormatOptions } from "luxon"
 import { ApexOptions } from "apexcharts"
@@ -154,6 +154,14 @@ const CalendarChart = ({ seriesData }: Props) => {
                horizontalAlign: "left",
             },
             colors: colorArray,
+            states: {
+               hover: {
+                  filter: {
+                     type: "darken",
+                     value: 0.4,
+                  },
+               },
+            },
             tooltip: {
                custom: renderTooltip,
                x: {
@@ -193,10 +201,7 @@ const CalendarChart = ({ seriesData }: Props) => {
    return (
       <Box component={"span"} ref={chartRef} sx={styles.chartContainer}>
          {isEmptyData ? <EmptyDataDisplay /> : null}
-         <CalendarFilter
-            showTitle={true}
-            popoverProps={popoverProps}
-         ></CalendarFilter>
+         <CalendarFilter showTitle={true} popoverProps={popoverProps} />
          <Chart
             type="rangeBar"
             series={seriesData}
