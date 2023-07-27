@@ -25,6 +25,7 @@ const SparksContainer: FC<ContainerProps> = ({ children, sx, ...props }) => {
       <Container
          sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
          maxWidth="xl"
+         {...props}
       >
          {children}
       </Container>
