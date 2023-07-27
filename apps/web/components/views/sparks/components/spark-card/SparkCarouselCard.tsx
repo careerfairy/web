@@ -5,6 +5,9 @@ import { sxStyles } from "types/commonTypes"
 import HiddenStatus from "./HiddenStatus"
 import SparkHeader from "./SparkHeader"
 import VideoPreview from "./VideoPreview"
+import SparkStats from "./SparkStats"
+import SparkCategoryChip from "./SparkCategoryChip"
+import SparkQuestion from "./SparkQuestion"
 
 const styles = sxStyles({
    root: {
@@ -52,6 +55,12 @@ const SparkCarouselCard: FC<Props> = ({ spark }) => {
          <HiddenStatus sparkPublished={spark.published} />
          <Box sx={styles.cardContent}>
             <SparkHeader spark={spark} />
+            <Box flexGrow={1} />
+            <SparkStats spark={spark} />
+            <Box mt={1.5} />
+            <SparkCategoryChip categoryId={spark.category.id} />
+            <Box mt={1.5} />
+            <SparkQuestion limitLines question={spark.question} />
          </Box>
          <VideoPreview videoUrl={spark.videoUrl} />
       </Box>
