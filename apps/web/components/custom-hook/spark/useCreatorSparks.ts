@@ -4,14 +4,18 @@ import { collection, orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
-const useCreatorSparks = (creatorId: string) => {
+const useCreatorSparks = (
+   creatorId: string,
+   showHiddenSparks: boolean = false
+) => {
    const creatorSparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where("creator.id", "==", creatorId),
+         ...(showHiddenSparks ? [] : [where("published", "==", true)]),
          orderBy("createdAt", "desc")
       )
-   }, [creatorId])
+   }, [creatorId, showHiddenSparks])
 
    return useFirestoreCollection<Spark>(creatorSparksQuery, {
       idField: "id",

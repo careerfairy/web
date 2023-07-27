@@ -1,10 +1,9 @@
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { Button } from "@mui/material"
 import Box from "@mui/material/Box"
-import Image from "next/image"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
-
-const placeholder =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-pages%2F1dGZnHVaeYaz1KuLHvei%2Fphotos%2F210124b5-b6cb-43b9-b78a-47c4560ece42?alt=media&token=def000b4-0357-4607-ab3c-8ffb3eae1b0a"
+import VideoPreview from "./VideoPreview"
 
 const styles = sxStyles({
    root: {
@@ -30,25 +29,16 @@ const styles = sxStyles({
          zIndex: -1,
       },
    },
-   img: {
-      zIndex: -1,
-      objectPosition: "top",
-   },
 })
 
-type Props = {}
+type Props = {
+   spark: Spark
+}
 
-const SparkCard: FC<Props> = (props) => {
+const SparkCard: FC<Props> = ({ spark }) => {
    return (
       <Box sx={styles.root}>
-         <Box
-            component={Image}
-            src={placeholder}
-            alt="Your alt text"
-            objectFit="cover"
-            layout="fill"
-            sx={styles.img}
-         />
+         <VideoPreview videoUrl={spark.videoUrl} />
       </Box>
    )
 }

@@ -11,22 +11,9 @@ import {
    containerDesktopHorizontalPadding,
    containerMobileHorizontalPadding,
 } from "./general-sparks-view/OverflowWrapper"
-
-const styles = sxStyles({
-   root: {
-      flexGrow: 1,
-      display: "flex",
-      flexDirection: "column",
-      pt: 2.875,
-      position: "relative",
-      overflow: "visible",
-      px: {
-         xs: `${containerMobileHorizontalPadding}px !important`,
-         md: `${containerDesktopHorizontalPadding}px !important`,
-      },
-   },
-   container: {},
-})
+import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
+import { useSelector } from "react-redux"
+import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 
 const Sparks = () => {
    return (
@@ -38,15 +25,13 @@ const Sparks = () => {
 
 const SparksComponent = () => {
    const { group } = useGroup()
-   const { data } = useGroupCreators(group.id)
+   const showHiddenSparks = useSelector(sparksShowHiddenSparks)
 
-   const groupHasSparks = data.length > 0
+   const groupHasSparks = useGroupHasSparks(group.id, showHiddenSparks)
 
    return (
       <Fragment>
-         <Container sx={styles.root} maxWidth="xl">
-            {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
-         </Container>
+         {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
          <SparksDialog />
       </Fragment>
    )

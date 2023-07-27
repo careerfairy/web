@@ -5,6 +5,9 @@ import CreatorDetails from "./CreatorDetails"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCreatorSparks from "components/custom-hook/spark/useCreatorSparks"
 import SparksCarousel from "./SparksCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
+import { useSelector } from "react-redux"
+import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 
 type Props = {
    creator: Creator
@@ -19,21 +22,22 @@ const CreatorSparks: FC<Props> = ({ creator }) => {
 }
 
 const Component: FC<Props> = ({ creator }) => {
-   const { data: sparks } = useCreatorSparks(creator.id)
+   const showHiddenSparks = useSelector(sparksShowHiddenSparks)
+
+   const { data: sparks } = useCreatorSparks(creator.id, showHiddenSparks)
 
    if (!sparks.length) return null
 
    return (
-      <Stack spacing={1.25}>
+      <Stack spacing={4}>
          <CreatorDetails creator={creator} />
-         <SparksCarousel
-            options={{
-               align: "start",
-            }}
-            sparks={sparks}
-         />
+         <SparksCarousel options={options} sparks={sparks} />
       </Stack>
    )
+}
+
+const options: EmblaOptionsType = {
+   align: "start",
 }
 
 export default CreatorSparks

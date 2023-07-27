@@ -47,7 +47,7 @@ const SparksCarousel: FC<PropType> = (props) => {
          <Box sx={styles.container}>
             {sparks.map((spark) => (
                <Box key={spark.id} sx={styles.slide}>
-                  <SparkCard />
+                  <SparkCard spark={spark} />
                </Box>
             ))}
             {/**
