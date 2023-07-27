@@ -10,7 +10,7 @@ const RegistrationSourcesPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Registration Sources"}
+         titleComponent={"Registration Sources"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Registration Sources of" />
