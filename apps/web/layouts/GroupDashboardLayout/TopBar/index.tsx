@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
@@ -13,6 +14,8 @@ import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunc
 import { alpha } from "@mui/material/styles"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 import { useGroup } from ".."
+import { ReactNode } from "react"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    root: {
@@ -58,7 +61,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   title: string
+   title: ReactNode
    cta?: React.ReactNode
 }
 
@@ -109,6 +112,7 @@ const TopBar = ({ title, cta }: Props) => {
    )
 }
 
+<<<<<<< HEAD
 const MobileToggleButton = () => {
    const { toggleLeftDrawer } = useGroupDashboard()
 
@@ -125,4 +129,25 @@ const MobileToggleButton = () => {
    )
 }
 
+||||||| parent of 15aeddccc (feat: new back link feature)
+=======
+export const BackLink = ({ children }: { children: ReactNode }) => {
+   const router = useRouter()
+
+   return (
+      <Box
+         sx={{
+            cursor: "pointer",
+         }}
+         onClick={() => {
+            router.back()
+         }}
+      >
+         <ArrowBackIosIcon />
+         {children}
+      </Box>
+   )
+}
+
+>>>>>>> 15aeddccc (feat: new back link feature)
 export default TopBar

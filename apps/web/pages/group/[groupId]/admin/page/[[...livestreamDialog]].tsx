@@ -27,7 +27,7 @@ const CompanyPage: NextPage<
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <GroupDashboardLayout
-            pageDisplayName={"Company Page"}
+            titleComponent={"Company Page"}
             groupId={groupId}
          >
             <DashboardHead title={`CareerFairy | ${universityName}`} />

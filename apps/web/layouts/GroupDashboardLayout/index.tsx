@@ -65,12 +65,12 @@ const GroupContext = createContext<GroupAdminContext>({
 
 type GroupDashboardLayoutProps = {
    groupId: string
-   pageDisplayName: string
+   titleComponent: React.ReactNode
    children: React.ReactNode
    topBarCta?: React.ReactNode
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
-   const { children, groupId, pageDisplayName } = props
+   const { children, groupId, titleComponent } = props
    const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
@@ -210,7 +210,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider
                topBarCta={props.topBarCta}
-               pageDisplayName={pageDisplayName}
+               titleComponent={titleComponent}
             >
                {children}
                {livestreamDialog.StreamCreationDialog}

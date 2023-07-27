@@ -1,4 +1,3 @@
-import React from "react"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
@@ -6,7 +5,7 @@ import { SkeletonAdminPage } from "../../../../components/util/Skeletons"
 import AtsIntegrationContent from "../../../../components/views/group/admin/ats-integration"
 
 const AtsIntegration = ({ groupId }) => (
-   <GroupDashboardLayout pageDisplayName={"ATS Integration"} groupId={groupId}>
+   <GroupDashboardLayout titleComponent={"ATS Integration"} groupId={groupId}>
       <DashboardHead title="CareerFairy | ATS Integration" />
       <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
          <AtsIntegrationContent />
