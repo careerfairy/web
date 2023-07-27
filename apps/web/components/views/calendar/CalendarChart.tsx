@@ -8,6 +8,8 @@ import { sxStyles } from "types/commonTypes"
 import { DateTimeFormatOptions } from "luxon"
 import { ApexOptions } from "apexcharts"
 import CalendarFilter from "./CalendarFilter"
+import { renderToString } from "react-dom/server"
+import { Filter as FilterIcon } from "react-feather"
 
 const Chart = dynamic(() => import("react-apexcharts"), {
    ssr: false,
@@ -37,6 +39,10 @@ const styles = sxStyles({
 type Props = {
    seriesData: { name: string; data: { x: any; y: any[] }[] }[]
 }
+
+const iconString = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+   renderToString(<FilterIcon color={"#6F8193"} />)
+)}`
 
 const CalendarChart = ({ seriesData }: Props) => {
    const chartRef = useRef()
@@ -108,7 +114,7 @@ const CalendarChart = ({ seriesData }: Props) => {
                      download: false,
                      customIcons: [
                         {
-                           icon: "<img src='https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/timeline-university-assets%2FFilter.svg?alt=media&token=16c14c52-a49d-41f7-826a-a6308834d64b' style='margin-top: 3px'/>",
+                           icon: `<img src=${iconString} style='height: 18px; margin-top: 2.5px; margin-left: 3px;'>`,
                            index: 5,
                            title: "filter",
                            class: "custom-icon-filter",

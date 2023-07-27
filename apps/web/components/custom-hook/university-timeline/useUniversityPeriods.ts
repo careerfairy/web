@@ -28,7 +28,7 @@ export const useUniversityPeriods = (uniId: string) => {
 export const useUniversityPeriodsByIds = (universitiesIds: string[]) => {
    const periodQuery = query(
       collectionGroup(FirestoreInstance, "periods"),
-      where("timelineUniversityId", "in", universitiesIds)
+      where("timelineUniversityId", "in", universitiesIds.slice(0, 30))
    )
    return useFirestoreCollection<UniversityPeriod>(periodQuery, {
       idField: "id",
