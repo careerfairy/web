@@ -3,10 +3,11 @@ import Box from "@mui/material/Box"
 import { sxStyles } from "types/commonTypes"
 import { FC } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import SparksCard from "components/views/sparks/components/SparksCard"
+import SparkCard from "components/views/sparks/components/spark-card/SparkCard"
 
-const slideSpacing = "21px"
-const slideSize = "306px"
+const slideSpacing = 21
+const desktopSlideWidth = 306 + slideSpacing
+const mobileSlideWidth = 280 + slideSpacing
 
 const styles = sxStyles({
    viewport: {
@@ -16,13 +17,19 @@ const styles = sxStyles({
       backfaceVisibility: "hidden",
       display: "flex",
       touchAction: "pan-y",
-      marginLeft: `calc(${slideSpacing} * -1)`,
+      marginLeft: `calc(${slideSpacing}px * -1)`,
    },
    slide: {
-      flex: `0 0 ${slideSize}`,
+      flex: {
+         xs: `0 0 ${mobileSlideWidth}px`,
+         md: `0 0 ${desktopSlideWidth}px`,
+      },
       minWidth: 0,
-      paddingLeft: slideSpacing,
+      paddingLeft: `${slideSpacing}px`,
       position: "relative",
+   },
+   paddingSlide: {
+      flex: `0 0 ${slideSpacing}px`,
    },
 })
 
@@ -40,9 +47,13 @@ const SparksCarousel: FC<PropType> = (props) => {
          <Box sx={styles.container}>
             {sparks.map((spark) => (
                <Box key={spark.id} sx={styles.slide}>
-                  <SparksCard />
+                  <SparkCard />
                </Box>
             ))}
+            {/**
+             * This prevents the last slide from touching the right edge of the viewport.
+             */}
+            <Box sx={styles.paddingSlide}></Box>
          </Box>
       </Box>
    )
