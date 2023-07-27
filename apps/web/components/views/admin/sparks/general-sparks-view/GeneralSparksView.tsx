@@ -13,7 +13,7 @@ const styles = sxStyles({
 
 const GeneralSparksView: FC = () => {
    return (
-      <Stack alignItems="center" spacing={4.125}>
+      <Stack pb={4} alignItems="center" spacing={4.125}>
          <SparksContainer>
             <HeaderActions />
          </SparksContainer>

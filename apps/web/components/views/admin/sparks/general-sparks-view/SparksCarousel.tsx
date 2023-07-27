@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import { sxStyles } from "types/commonTypes"
 import { FC } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import SparkCard from "components/views/sparks/components/spark-card/SparkCard"
+import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 
 const slideSpacing = 21
 const desktopSlideWidth = 306 + slideSpacing
@@ -47,7 +47,7 @@ const SparksCarousel: FC<PropType> = (props) => {
          <Box sx={styles.container}>
             {sparks.map((spark) => (
                <Box key={spark.id} sx={styles.slide}>
-                  <SparkCard spark={spark} />
+                  <SparkCarouselCard spark={spark} />
                </Box>
             ))}
             {/**

@@ -35,7 +35,7 @@ type Props = {
    spark: Spark
 }
 
-const SparkCard: FC<Props> = ({ spark }) => {
+const SparkCarouselCard: FC<Props> = ({ spark }) => {
    return (
       <Box sx={styles.root}>
          <VideoPreview videoUrl={spark.videoUrl} />
@@ -43,4 +43,4 @@ const SparkCard: FC<Props> = ({ spark }) => {
    )
 }
 
-export default SparkCard
+export default SparkCarouselCard
