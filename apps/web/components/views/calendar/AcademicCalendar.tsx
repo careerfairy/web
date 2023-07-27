@@ -55,16 +55,16 @@ const AcademicCalendar = () => {
    const start = useMemo(
       () =>
          currentDate.getMonth() <= 7
-            ? new Date(currentDate.getFullYear() - 2, 8, 1)
-            : new Date(currentDate.getFullYear() - 1, 8, 1),
+            ? new Date(currentDate.getFullYear() - 2, 8, 1) // September, 2 years ago after January (previous academic period start)
+            : new Date(currentDate.getFullYear() - 1, 8, 1), // September, 1 year ago
       [currentDate]
    )
 
    const end = useMemo(
       () =>
          currentDate.getMonth() <= 7
-            ? new Date(currentDate.getFullYear() + 1, 8, 1)
-            : new Date(currentDate.getFullYear() + 2, 8, 1),
+            ? new Date(currentDate.getFullYear() + 1, 8, 1) // September, 1 year later (next academic period end)
+            : new Date(currentDate.getFullYear() + 2, 8, 1), // September, 2 years later before January
       [currentDate]
    )
 
