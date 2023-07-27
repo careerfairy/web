@@ -32,7 +32,7 @@ const baseParam = "[groupId]"
 const companyPagePathName = `/${baseHrefPath}/${baseParam}/admin/page/[[...livestreamDialog]]`
 
 const GroupNavList = () => {
-   const { group, groupPresenter } = useGroup()
+   const { group, groupPresenter, shrunkLeftMenuIsActive } = useGroup()
 
    const { push, pathname } = useRouter()
 
@@ -184,7 +184,10 @@ const GroupNavList = () => {
          })
       }
 
-      return links
+      return links.map((link) => ({
+         ...link,
+         shrunk: shrunkLeftMenuIsActive,
+      }))
    }, [
       group.id,
       group.universityCode,
@@ -193,6 +196,7 @@ const GroupNavList = () => {
       featureFlags.atsAdminPageFlag,
       showCompanyPageCTA,
       push,
+      shrunkLeftMenuIsActive,
    ])
 
    return <NavList links={navLinks} />

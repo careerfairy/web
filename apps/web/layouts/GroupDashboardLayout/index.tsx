@@ -232,6 +232,12 @@ const Outlet = ({ children, empty, loading }: OutletProps) => {
    return <>{children}</>
 }
 
-export const useGroup = () => useContext<GroupAdminContext>(GroupContext)
+export const useGroup = () => {
+   const context = useContext(GroupContext)
+   if (context === undefined) {
+      throw new Error("useGroup must be used within a GroupAdminContext")
+   }
+   return context
+}
 
 export default GroupDashboardLayout

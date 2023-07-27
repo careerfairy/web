@@ -88,6 +88,7 @@ type NavLinkProps = INavLink & {
    baseTextColor?: string
    external?: boolean
    isNested?: boolean
+   shrunk?: boolean
 }
 export const NavLink = ({
    href,
@@ -95,6 +96,7 @@ export const NavLink = ({
    title,
    pathname,
    childLinks,
+   shrunk,
    external = false,
    baseTextColor,
    rightElement,
@@ -102,7 +104,6 @@ export const NavLink = ({
    wrapper,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
-   const { shrunkLeftMenuState, shrunkLeftMenuIsActive } = useGroup()
 
    const isNavLinkGroup = Boolean(childLinks?.length)
 
@@ -142,7 +143,7 @@ export const NavLink = ({
                >
                   <Box sx={styles.icon} component={Icon} />
                </ListItemIcon>
-               {shrunkLeftMenuIsActive ? null : (
+               {shrunk ? null : (
                   <ListItemText
                      primary={
                         <Typography
@@ -158,7 +159,7 @@ export const NavLink = ({
                )}
                <Box my="auto">{rightElement}</Box>
             </ListItemButton>
-            {isNavLinkGroup && shrunkLeftMenuState !== "shrunk" ? (
+            {isNavLinkGroup && !shrunk ? (
                <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                      {childLinks?.map((link) => (
