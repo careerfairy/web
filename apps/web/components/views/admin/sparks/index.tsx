@@ -1,19 +1,12 @@
-import { Container } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
-import { sxStyles } from "types/commonTypes"
+import { useSelector } from "react-redux"
+import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
-import {
-   containerDesktopHorizontalPadding,
-   containerMobileHorizontalPadding,
-} from "./general-sparks-view/OverflowWrapper"
-import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
-import { useSelector } from "react-redux"
-import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 
 const Sparks = () => {
    return (
