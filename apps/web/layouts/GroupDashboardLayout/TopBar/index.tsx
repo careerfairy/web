@@ -112,7 +112,6 @@ const TopBar = ({ title, cta }: Props) => {
    )
 }
 
-<<<<<<< HEAD
 const MobileToggleButton = () => {
    const { toggleLeftDrawer } = useGroupDashboard()
 
@@ -129,8 +128,6 @@ const MobileToggleButton = () => {
    )
 }
 
-||||||| parent of 15aeddccc (feat: new back link feature)
-=======
 export const BackLink = ({ children }: { children: ReactNode }) => {
    const router = useRouter()
 
@@ -149,5 +146,4 @@ export const BackLink = ({ children }: { children: ReactNode }) => {
    )
 }
 
->>>>>>> 15aeddccc (feat: new back link feature)
 export default TopBar
