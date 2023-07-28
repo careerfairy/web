@@ -2,8 +2,6 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
-import { useSelector } from "react-redux"
-import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
@@ -18,9 +16,8 @@ const Sparks = () => {
 
 const SparksComponent = () => {
    const { group } = useGroup()
-   const showHiddenSparks = useSelector(sparksShowHiddenSparks)
 
-   const groupHasSparks = useGroupHasSparks(group.id, showHiddenSparks)
+   const groupHasSparks = useGroupHasSparks(group.id)
 
    return (
       <Fragment>
