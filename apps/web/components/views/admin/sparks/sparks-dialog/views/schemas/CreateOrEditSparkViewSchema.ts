@@ -16,15 +16,15 @@ const CreateOrEditSparkViewSchema = yup.object().shape({
       .required()
       .max(SPARK_CONSTANTS.QUESTION_MAX_LENGTH)
       .min(SPARK_CONSTANTS.QUESTION_MIN_LENGTH),
-   videoFile: yup.mixed<File>().when("videoId", {
-      is: (videoId: string) => {
-         return !videoId
-      }, // if videoId is not set
-      then: yup // then videoFile is required
-         .mixed<File>()
-         .required("Video is required"),
-   }),
-   videoId: yup.string().nullable(),
+   video: yup
+      .object()
+      .shape({
+         uid: yup.string().required(),
+         fileExtension: yup.string().required(),
+         url: yup.string().required(),
+         thumbnailUrl: yup.string().required(),
+      })
+      .required(),
    published: yup.string().oneOf(publishedValues).required(),
 })
 
