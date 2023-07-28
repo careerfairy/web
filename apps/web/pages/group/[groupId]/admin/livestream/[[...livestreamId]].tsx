@@ -1,4 +1,4 @@
-import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
+import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { BackLink } from "layouts/GroupDashboardLayout/TopBar"
@@ -13,7 +13,7 @@ const AdminLivestreamPage = () => {
       <GroupDashboardLayout
          titleComponent={<BackLink>Live Stream Details</BackLink>}
          groupId={groupId as string}
-         topBarCta={<CreateSparkButton />}
+         topBarCta={<LivestreamButtonActions />}
       >
          <DashboardHead title="CareerFairy | Live Stream Details" />
       </GroupDashboardLayout>
