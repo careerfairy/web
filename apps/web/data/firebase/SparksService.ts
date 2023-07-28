@@ -2,7 +2,11 @@ import { ISparkRepository } from "@careerfairy/shared-lib/sparks/SparkRepository
 import { sparkRepo } from "data/RepositoryInstances"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
-import { AddSparkSparkData } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   AddSparkSparkData,
+   DeleteSparkData,
+   UpdateSparkData,
+} from "@careerfairy/shared-lib/sparks/sparks"
 
 export class SparksService {
    constructor(
@@ -13,6 +17,20 @@ export class SparksService {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
          "createSpark"
+      )(data)
+   }
+
+   async updateSpark(data: UpdateSparkData) {
+      return httpsCallable<UpdateSparkData, void>(
+         this.functions,
+         "updateSpark"
+      )(data)
+   }
+
+   async deleteSpark(data: DeleteSparkData) {
+      return httpsCallable<DeleteSparkData, void>(
+         this.functions,
+         "deleteSpark"
       )(data)
    }
 }

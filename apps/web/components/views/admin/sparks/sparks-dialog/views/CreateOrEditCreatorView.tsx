@@ -32,7 +32,7 @@ const CreateOrEditCreatorView = () => {
          shouldFetch={Boolean(selectedCreatorId)}
       >
          {(creator) => (
-            <SparksDialog.Container onMobileBack={() => handleBack()}>
+            <SparksDialog.Container>
                <SparksDialog.Content>
                   {creator ? (
                      <SparksDialog.Title>

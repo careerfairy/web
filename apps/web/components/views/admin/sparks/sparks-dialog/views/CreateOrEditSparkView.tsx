@@ -74,7 +74,6 @@ const getInitialSparkValues = (
 }
 
 const CreateOrEditSparkView = () => {
-   const { goToSelectCreatorView } = useSparksForm()
    const { group } = useGroup()
 
    const selectedCreator = useSelector(sparksFormSelectedCreator)
@@ -83,12 +82,8 @@ const CreateOrEditSparkView = () => {
 
    const { handleSubmit, isLoading } = useSparkFormSubmit(group.id)
 
-   const handleBack = useCallback(() => {
-      goToSelectCreatorView()
-   }, [goToSelectCreatorView])
-
    if (isLoading) {
-      return <SubmittingOverlay />
+      return <SubmittingOverlay isUpdatingSpark={Boolean(selectedSparkId)} />
    }
 
    return (
@@ -98,10 +93,7 @@ const CreateOrEditSparkView = () => {
          shouldFetch={Boolean(selectedSparkId)}
       >
          {(spark) => (
-            <SparksDialog.Container
-               width={"calc(100% - 46px)"}
-               onMobileBack={() => handleBack()}
-            >
+            <SparksDialog.Container width={"calc(100% - 46px)"}>
                <SparksDialog.Content>
                   {spark ? (
                      <SparksDialog.Title>
@@ -153,10 +145,14 @@ const FormComponent: FC = () => {
 
    const [deleteFiles] = useFirebaseDelete()
 
-   const { goToSelectCreatorView, handleCacheSparksFormValues } =
+   const { goToSelectCreatorView, handleCacheSparksFormValues, handleClose } =
       useSparksForm()
 
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+   const [
+      isConfirmationDialogOpen,
+      handleOpenConfirmationDialog,
+      handleCloseConfirmationDialog,
+   ] = useDialogStateHandler()
 
    const isEditing = Boolean(values.id)
 
@@ -176,13 +172,13 @@ const FormComponent: FC = () => {
             handleCacheSparksFormValues(null)
          }
          goToSelectCreatorView()
-         handleClose()
+         handleCloseConfirmationDialog()
       },
       [
          deleteFiles,
          goToSelectCreatorView,
          handleCacheSparksFormValues,
-         handleClose,
+         handleCloseConfirmationDialog,
          isEditing,
          values,
       ]
@@ -255,9 +251,11 @@ const FormComponent: FC = () => {
                <SparksDialog.Button
                   color="grey"
                   variant="outlined"
-                  onClick={handleOpen}
+                  onClick={
+                     isEditing ? handleClose : handleOpenConfirmationDialog
+                  }
                >
-                  Back
+                  {isEditing ? "Cancel" : "Back"}
                </SparksDialog.Button>
                <SparksDialog.Button
                   variant="contained"
@@ -277,8 +275,8 @@ const FormComponent: FC = () => {
             </SparksDialog.Actions>
          </Box>
          <ConfirmationDialog
-            open={isOpen}
-            handleClose={handleClose}
+            open={isConfirmationDialogOpen}
+            handleClose={handleCloseConfirmationDialog}
             description="We understand that sometimes we need to take a step back. For it, would you like to keep your current progress?"
             title="You’ve started your creation"
             icon={<ExitIcon sx={styles.exitIcon} color="secondary" />}

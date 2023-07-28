@@ -378,7 +378,6 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 }
 
 type SparksDialogContainerProps = BoxProps & {
-   onMobileBack?: () => void
    width?: string | number
    hideCloseButton?: boolean
 }
@@ -387,7 +386,7 @@ const Container: FC<SparksDialogContainerProps> = ({
    width,
    sx,
    hideCloseButton,
-   ...props
+   children,
 }) => {
    const { handleClose } = useSparksForm()
 
@@ -406,7 +405,7 @@ const Container: FC<SparksDialogContainerProps> = ({
             ]}
             maxWidth="md"
          >
-            {props.children}
+            {children}
             {hideCloseButton ? null : (
                <Box sx={styles.closeBtn}>
                   <IconButton onClick={handleClose}>

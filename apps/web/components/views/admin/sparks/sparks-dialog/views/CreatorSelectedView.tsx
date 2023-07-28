@@ -118,7 +118,7 @@ const CreatorSelectedView = () => {
       >
          {(creator) =>
             creator ? (
-               <SparksDialog.Container onMobileBack={handleBack}>
+               <SparksDialog.Container>
                   <SparksDialog.Content>
                      <SparksDialog.Title>
                         <Box component="span" color="secondary.main">
