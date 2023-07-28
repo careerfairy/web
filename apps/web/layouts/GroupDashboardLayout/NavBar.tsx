@@ -55,7 +55,7 @@ const ShrunkToggleButton = () => {
    }
 
    const Icon = shrunkLeftMenuIsActive ? (
-      <Maximize2 width={15} />
+      <Maximize width={15} />
    ) : (
       <Minimize width={15} />
    )
