@@ -65,7 +65,15 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
             let sparkId = values?.id
 
             if (sparkId) {
-               // TODO: update spark
+               // update spark
+               await sparkService.updateSpark({
+                  categoryId: values.categoryId,
+                  question: values.question,
+                  published,
+                  creatorId: values.creator.id,
+                  id: sparkId,
+                  groupId,
+               })
             } else {
                // create new spark
                await sparkService.createSpark({

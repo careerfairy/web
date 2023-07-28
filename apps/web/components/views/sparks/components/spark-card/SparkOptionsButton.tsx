@@ -4,11 +4,13 @@ import { IconButton, MenuItem } from "@mui/material"
 import Divider from "@mui/material/Divider"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useMenuState from "components/custom-hook/useMenuState"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
+import { sparkService } from "data/firebase/SparksService"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
-import { FC, Fragment, useCallback, useMemo } from "react"
+import { FC, Fragment, useCallback, useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
@@ -33,10 +35,14 @@ const styles = sxStyles({
 
 type Props = {
    sparkId: string
+   groupId: string
 }
 
-const SparkOptionsButton: FC<Props> = ({ sparkId }) => {
+const SparkOptionsButton: FC<Props> = ({ sparkId, groupId }) => {
    const dispatch = useDispatch()
+
+   const [isDeletingSpark, setIsDeletingSpark] = useState(false)
+   const { errorNotification } = useSnackbarNotifications()
 
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const [confirmDialogOpen, handleOpenConfirm, handleCloseConfirm] =
@@ -44,15 +50,30 @@ const SparkOptionsButton: FC<Props> = ({ sparkId }) => {
 
    const primaryAction = useMemo<ConfirmationDialogAction>(
       () => ({
-         callback: () => {
-            // TODO: Delete Spark
-            handleCloseConfirm()
+         callback: async () => {
+            // Delete Spark
+            setIsDeletingSpark(true)
+            try {
+               await sparkService.deleteSpark({
+                  id: sparkId,
+                  groupId,
+               })
+            } catch (error) {
+               errorNotification(error, "Error deleting Spark", {
+                  sparkId,
+                  groupId,
+               })
+            } finally {
+               setIsDeletingSpark(false)
+               handleCloseConfirm()
+            }
          },
          text: "Delete",
          color: "error",
          variant: "contained",
+         loading: isDeletingSpark,
       }),
-      [handleCloseConfirm]
+      [errorNotification, groupId, handleCloseConfirm, isDeletingSpark, sparkId]
    )
 
    const secondaryAction = useMemo<ConfirmationDialogAction>(

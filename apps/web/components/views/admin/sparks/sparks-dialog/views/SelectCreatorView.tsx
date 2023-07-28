@@ -37,13 +37,13 @@ const SelectCreatorView = () => {
 }
 
 const View = () => {
-   const { goToCreateOrEditCreatorView, handleClose, goToCreatorSelectedView } =
+   const { goToCreateOrEditCreatorView, goToCreatorSelectedView } =
       useSparksForm()
    const { group } = useGroup()
    const { data: creators } = useGroupCreators(group.id)
 
    return (
-      <SparksDialog.Container onMobileBack={handleClose}>
+      <SparksDialog.Container>
          <SparksDialog.Content sx={styles.content}>
             <SparksDialog.Title>
                Select a{" "}
