@@ -43,14 +43,18 @@ const NavBar = () => {
 }
 
 const ShrunkToggleButton = () => {
-   const { shrunkLeftMenuIsActive, setShrunkLeftMenuState } = useGroup()
+   const {
+      shrunkLeftMenuIsActive,
+      shrunkLeftMenuState,
+      setShrunkLeftMenuState,
+   } = useGroup()
    const isMobile = useIsMobile()
 
    const onClick = useCallback(() => {
       setShrunkLeftMenuState(shrunkLeftMenuIsActive ? "open" : "shrunk")
    }, [setShrunkLeftMenuState, shrunkLeftMenuIsActive])
 
-   if (isMobile) {
+   if (isMobile || shrunkLeftMenuState === "disabled") {
       return null
    }
 
