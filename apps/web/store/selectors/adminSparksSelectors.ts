@@ -20,3 +20,6 @@ export const sparksShowHiddenSparks = (state: RootState) =>
 
 export const sparksFormSelectedCreator = (state: RootState) =>
    state.adminSparks.sparksForm.selectedPublicCreator
+
+export const sparksDialogInitialStepSelector = (state: RootState) =>
+   state.adminSparks.sparksForm.initialStep

@@ -29,6 +29,7 @@ import {
 } from "store/reducers/adminSparksReducer"
 import {
    sparksConfirmCloseSparksDialogOpen,
+   sparksDialogInitialStepSelector,
    sparksDialogOpenSelector,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -277,6 +278,8 @@ export const useSparksForm = () => {
 }
 
 const SparksDialog = () => {
+   const initialStepKey = useSelector(sparksDialogInitialStepSelector)
+
    const open = useSelector(sparksDialogOpenSelector)
    const confirmCloseDialogOpen = useSelector(
       sparksConfirmCloseSparksDialogOpen
@@ -319,6 +322,16 @@ const SparksDialog = () => {
       [hanldeCloseSparksDialog]
    )
 
+   const initialStep = useMemo(() => {
+      if (initialStepKey) {
+         const index = views.findIndex((view) => view.key === initialStepKey)
+         if (index !== -1) {
+            return index
+         }
+      }
+      return 0
+   }, [initialStepKey])
+
    return (
       <>
          <SteppedDialog
@@ -327,6 +340,7 @@ const SparksDialog = () => {
             handleClose={() => hanldeCloseSparksDialog()}
             open={open}
             views={views}
+            initialStep={initialStep}
          />
          {confirmCloseDialogOpen ? (
             <ConfirmationDialog
