@@ -1,13 +1,13 @@
-import React, { FC, useCallback, useRef, useState } from "react"
-import ReactPlayer from "react-player/file"
-import { sxStyles } from "types/commonTypes"
+import ChangeIcon from "@mui/icons-material/AutorenewRounded"
+import { Button } from "@mui/material"
 import FileUploader, {
    FileUploaderProps,
 } from "components/views/common/FileUploader"
-import { Button } from "@mui/material"
-import ChangeIcon from "@mui/icons-material/AutorenewRounded"
-import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import PlayIcon from "components/views/common/icons/PlayIcon"
+import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
+import { FC } from "react"
+import ReactPlayer from "react-player/file"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -35,31 +35,21 @@ const styles = sxStyles({
       py: 0.5,
    },
    playIcon: {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
       fontSize: 70, // or any size you want for the icon
-      zIndex: 2,
-      cursor: "pointer",
    },
 })
 
 type Props = {
    url: string
    fileUploaderProps: FileUploaderProps
+   thumbnailUrl: string
 }
 
-const SparkVideoPreview: FC<Props> = ({ url, fileUploaderProps }) => {
-   const [playing, setPlaying] = useState(false)
-   const playerRef = useRef(null)
-
-   const handlePlayIconClick = useCallback(() => {
-      if (playerRef && playerRef.current) {
-         setPlaying(true)
-      }
-   }, [])
-
+const SparkVideoPreview: FC<Props> = ({
+   url,
+   fileUploaderProps,
+   thumbnailUrl,
+}) => {
    return (
       <SparkAspectRatioBox sx={styles.root}>
          <FileUploader {...fileUploaderProps}>
@@ -74,23 +64,18 @@ const SparkVideoPreview: FC<Props> = ({ url, fileUploaderProps }) => {
             </Button>
          </FileUploader>
          <ReactPlayer
-            playing={playing}
-            ref={playerRef}
             url={url}
             className="react-player"
             width="100%"
             height="100%"
             playsinline
+            playing
+            light={thumbnailUrl}
+            playIcon={<PlayIcon sx={styles.playIcon} />}
             config={config}
-            controls={playing}
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-            onEnded={() => setPlaying(false)}
+            controls
             loop
          />
-         {!playing && (
-            <PlayIcon sx={styles.playIcon} onClick={handlePlayIconClick} />
-         )}
       </SparkAspectRatioBox>
    )
 }

@@ -4,6 +4,8 @@ import { Box, Grid } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
+import ExitIcon from "components/views/common/icons/ExitIcon"
 import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import { Form, Formik, useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -26,7 +28,6 @@ import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
-import ExitIcon from "components/views/common/icons/ExitIcon"
 
 const styles = sxStyles({
    flex: {
@@ -47,16 +48,14 @@ const styles = sxStyles({
 const getInitialSparkValues = (spark?: Spark): SparkFormValues => ({
    categoryId: spark?.category.id ?? "",
    question: spark?.question ?? "",
-   videoFile: null,
+   video: spark?.video ?? null,
    published:
       spark?.published !== undefined
          ? spark.published
             ? "true"
             : "false"
          : "true",
-   videoId: spark?.videoId ?? "",
    id: spark?.id ?? "",
-   videoUrl: spark?.videoUrl ?? "",
 })
 
 const CreateOrEditSparkView = () => {
@@ -67,16 +66,14 @@ const CreateOrEditSparkView = () => {
    const selectedSparkId = useSelector(sparksSelectedSparkId)
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
-   const { handleSubmit, isLoading, progress, uploading } = useSparkFormSubmit(
-      group.id
-   )
+   const { handleSubmit, isLoading } = useSparkFormSubmit(group.id)
 
    const handleBack = useCallback(() => {
       goToSelectCreatorView()
    }, [goToSelectCreatorView])
 
    if (isLoading) {
-      return <SubmittingOverlay progress={progress} uploading={uploading} />
+      return <SubmittingOverlay />
    }
 
    return (
@@ -144,8 +141,10 @@ type FormComponentProps = {
 }
 
 const FormComponent: FC<FormComponentProps> = ({ creator }) => {
-   const { values, dirty, isSubmitting, isValid, submitForm } =
+   const { values, dirty, isSubmitting, isValid, submitForm, errors } =
       useFormikContext<SparkFormValues>()
+
+   const [deleteFiles] = useFirebaseDelete()
 
    const { goToSelectCreatorView, handleCacheSparksFormValues } =
       useSparksForm()
@@ -159,12 +158,27 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
          if (shouldSave) {
             handleCacheSparksFormValues(values)
          } else {
+            const isCreatingNewSpark = !isEditing
+            if (isCreatingNewSpark) {
+               // Delete the video that were uploaded since we are not saving the spark
+               deleteFiles([
+                  values.video?.url,
+                  values.video?.thumbnailUrl,
+               ]).catch(console.error)
+            }
             handleCacheSparksFormValues(null)
          }
          goToSelectCreatorView()
          handleClose()
       },
-      [goToSelectCreatorView, handleCacheSparksFormValues, handleClose, values]
+      [
+         deleteFiles,
+         goToSelectCreatorView,
+         handleCacheSparksFormValues,
+         handleClose,
+         isEditing,
+         values,
+      ]
    )
 
    const primaryAction = useMemo<ConfirmationDialogAction>(
@@ -198,7 +212,7 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
          <Box component={Form} sx={styles.formWrapper}>
             <Grid container spacing={1.5}>
                <Grid item xs={12} md={4}>
-                  <VideoUpload name="videoFile" />
+                  <VideoUpload editing={isEditing} name="video" />
                </Grid>
                <Grid item xs={12} md={8}>
                   <Grid container spacing={1.5} alignItems="stretch">

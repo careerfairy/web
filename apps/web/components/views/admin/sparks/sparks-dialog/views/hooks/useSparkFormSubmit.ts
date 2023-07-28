@@ -1,5 +1,4 @@
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useUploadSparkVideo from "components/custom-hook/spark/useUploadSparkVideo"
+import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { sleep } from "components/helperFunctions/HelperFunctions"
 import { sparkService } from "data/firebase/SparksService"
@@ -12,10 +11,8 @@ import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 export type SparkFormValues = {
    categoryId: Spark["category"]["id"] | ""
    question: string
-   videoFile: File
-   videoId: string
    published: "true" | "false" // visibility
-   videoUrl?: string
+   video: SparkVideo
    id?: string
 }
 
@@ -24,8 +21,6 @@ type UseSparkFormSubmit = {
       values: SparkFormValues,
       formikHelpers: FormikHelpers<SparkFormValues>
    ) => Promise<void>
-   progress: number
-   uploading: boolean
    isLoading: boolean
 }
 
@@ -41,8 +36,6 @@ type UseSparkFormSubmit = {
  * - `isLoading`: Boolean indicating if the handleUploadFile operation is loading.
  */
 const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
-   const { handleUploadFile, progress, uploading, isLoading } =
-      useUploadSparkVideo()
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -62,8 +55,6 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
       async (values, { setSubmitting, setFieldError, resetForm }) => {
          try {
             setFormSubmitting(true)
-            let videoUrl = values.videoUrl
-            let sparkVideoId = values.videoId
             const published = values.published === "true"
 
             if (!values.categoryId) {
@@ -73,13 +64,6 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
 
             let sparkId = values?.id
 
-            if (values.videoFile) {
-               const { url, uid } = await handleUploadFile(values.videoFile)
-
-               videoUrl = url
-               sparkVideoId = uid
-            }
-
             if (sparkId) {
                // TODO: update spark
             } else {
@@ -87,9 +71,8 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                await sparkService.createSpark({
                   categoryId: values.categoryId,
                   question: values.question,
-                  videoId: sparkVideoId,
+                  video: values.video,
                   published,
-                  videoUrl,
                   groupId,
                   creatorId: selectedCreatorId,
                })
@@ -110,7 +93,6 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
          errorNotification,
          groupId,
          handleClose,
-         handleUploadFile,
          selectedCreatorId,
          successNotification,
       ]
@@ -119,11 +101,9 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    return useMemo<UseSparkFormSubmit>(
       () => ({
          handleSubmit,
-         progress,
-         uploading,
-         isLoading: formSubmitting || isLoading,
+         isLoading: formSubmitting,
       }),
-      [formSubmitting, handleSubmit, isLoading, progress, uploading]
+      [formSubmitting, handleSubmit]
    )
 }
 

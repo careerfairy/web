@@ -64,8 +64,7 @@ export class SparkRepository
    ): Promise<void> {
       const doc: Create<Spark> = {
          question: data.question,
-         videoId: data.videoId,
-         videoUrl: data.videoUrl,
+         video: data.video,
          category: getCategoryById(data.categoryId),
          createdAt: this.fieldValue.serverTimestamp() as any,
          publishedAt: data.published

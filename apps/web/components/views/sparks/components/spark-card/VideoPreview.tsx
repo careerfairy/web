@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import { FC } from "react"
+import { FC, Fragment } from "react"
 import ReactPlayer from "react-player/file"
 import { sxStyles } from "types/commonTypes"
 
@@ -19,9 +19,10 @@ const styles = sxStyles({
 
 type Props = {
    videoUrl: string
+   thumbnailUrl: string
 }
 
-const VideoPreview: FC<Props> = ({ videoUrl }) => {
+const VideoPreview: FC<Props> = ({ videoUrl, thumbnailUrl }) => {
    return (
       <Box sx={styles.root}>
          <ReactPlayer
@@ -29,6 +30,8 @@ const VideoPreview: FC<Props> = ({ videoUrl }) => {
             height="100%"
             className="player"
             url={videoUrl}
+            light={thumbnailUrl}
+            playIcon={<Fragment />}
          />
       </Box>
    )
