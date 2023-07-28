@@ -96,7 +96,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   const shrunkInitialState: shrunkState = "disabled" // enable this for certain pages
+   let shrunkInitialState: shrunkState = "disabled" // enable this for certain pages
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
       useSessionStorage<shrunkState>("shrunkLeftMenuState", shrunkInitialState)
 
@@ -105,11 +105,20 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       if (isMobile) {
          setShrunkLeftMenuState("disabled")
       } else {
-         if (shrunkLeftMenuState === "disabled") {
+         if (
+            shrunkInitialState !== "disabled" &&
+            shrunkLeftMenuState === "disabled"
+         ) {
+            // reset user state if some page activates the shrinking
             setShrunkLeftMenuState(shrunkInitialState)
          }
       }
-   }, [isMobile, setShrunkLeftMenuState, shrunkLeftMenuState])
+   }, [
+      isMobile,
+      setShrunkLeftMenuState,
+      shrunkInitialState,
+      shrunkLeftMenuState,
+   ])
 
    useEffect(() => {
       if (
