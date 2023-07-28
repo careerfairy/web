@@ -16,6 +16,10 @@ import { useSelector } from "react-redux"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
+import {
+   Creator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    creatorDetailsWrapper: {
@@ -92,8 +96,8 @@ const CreatorSelectedView = () => {
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
 
    const handleClickEdit = useCallback(
-      (creatorId: string) => {
-         goToCreateOrEditCreatorView(creatorId)
+      (creator: Creator) => {
+         goToCreateOrEditCreatorView(pickPublicDataFromCreator(creator))
       },
       [goToCreateOrEditCreatorView]
    )
@@ -129,8 +133,8 @@ const CreatorSelectedView = () => {
                         <Box sx={styles.editButton}>
                            <Chip
                               label="Edit"
-                              onDelete={() => handleClickEdit(creator.id)}
-                              onClick={() => handleClickEdit(creator.id)}
+                              onDelete={() => handleClickEdit(creator)}
+                              onClick={() => handleClickEdit(creator)}
                               deleteIcon={<EditIcon />}
                            />
                         </Box>

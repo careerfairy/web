@@ -33,6 +33,7 @@ import {
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -201,8 +202,8 @@ export const useSparksForm = () => {
    const dispatch = useDispatch()
 
    const setCreator = useCallback(
-      (creatorId: string) => {
-         dispatch(setCreatorAction(creatorId))
+      (creator: PublicCreator) => {
+         dispatch(setCreatorAction(creator))
       },
       [dispatch]
    )
@@ -219,17 +220,17 @@ export const useSparksForm = () => {
    }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
-      (creatorId: string) => {
-         setCreator(creatorId)
+      (creator: PublicCreator) => {
+         setCreator(creator)
          stepper.goToStep("creator-selected")
       },
       [setCreator, stepper]
    )
 
    const goToCreateOrEditCreatorView = useCallback(
-      (creatorId: string) => {
+      (creator: PublicCreator) => {
          stepper.goToStep("create-or-edit-creator")
-         setCreator(creatorId)
+         setCreator(creator)
       },
       [setCreator, stepper]
    )
