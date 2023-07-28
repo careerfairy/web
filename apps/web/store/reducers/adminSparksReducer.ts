@@ -1,5 +1,6 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { SparkDialogStep } from "components/views/admin/sparks/sparks-dialog/SparksDialog"
 import { SparkFormValues } from "components/views/admin/sparks/sparks-dialog/views/hooks/useSparkFormSubmit"
 
 interface ISparksState {
@@ -9,6 +10,7 @@ interface ISparksState {
       selectedPublicCreator: PublicCreator | null
       selectedSparkId: string | null
       cachedSparkFormValues: SparkFormValues | null
+      initialStep: SparkDialogStep
    }
    showHiddenSparks: boolean
 }
@@ -33,6 +35,7 @@ const initialState: ISparksState = {
       selectedPublicCreator: null,
       selectedSparkId: null,
       cachedSparkFormValues: null,
+      initialStep: "select-creator",
    },
    showHiddenSparks: true,
 }
@@ -50,11 +53,14 @@ export const adminSparksSlice = createSlice({
          if (action.payload) {
             if ("selectedSparkId" in action.payload) {
                state.sparksForm.selectedSparkId = action.payload.selectedSparkId
+               state.sparksForm.initialStep = "create-or-edit-spark"
             }
 
             if ("selectedPublicCreator" in action.payload) {
                state.sparksForm.selectedPublicCreator =
                   action.payload.selectedPublicCreator
+
+               state.sparksForm.initialStep = "create-or-edit-creator"
             }
 
             state.sparksForm.cachedSparkFormValues = null
@@ -82,6 +88,7 @@ export const adminSparksSlice = createSlice({
          state.sparksForm.selectedSparkId = null
          state.sparksForm.cachedSparkFormValues = null
          state.confirmCloseSparksDialogOpen = false
+         state.sparksForm.initialStep = initialState.sparksForm.initialStep // Reset the initial step
       },
       // Actions for setting values on the form
       setCreator: (
