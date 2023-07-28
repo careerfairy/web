@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { Maximize2: Maximize, Minimize2: Minimize } from "react-feather"
+import { Maximize2 as Maximize, Minimize2 as Minimize } from "react-feather"
 
 // material-ui
 import { Box, IconButton } from "@mui/material"
