@@ -74,7 +74,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
-   const { replace, push } = useRouter()
+   const { replace, push, pathname } = useRouter()
+   const pathShouldShrink = usePathShouldShrink()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
    const { group, stats } = useAdminGroup(groupId)
@@ -96,7 +97,9 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   let shrunkInitialState: shrunkState = "disabled" // enable this for certain pages
+   let shrunkInitialState: shrunkState = pathShouldShrink
+      ? "shrunk"
+      : "disabled"
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
       useSessionStorage<shrunkState>("shrunkLeftMenuState", shrunkInitialState)
 
@@ -218,6 +221,21 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          </GroupContext.Provider>
       </Outlet>
    )
+}
+
+/**
+ * Paths that should have the shrunk left menu functionality
+ */
+const pathsThatShouldShrink = [
+   "/group/[groupId]/admin/livestream/[[...livestreamId]]",
+]
+
+const usePathShouldShrink = () => {
+   const { pathname } = useRouter()
+
+   return useMemo(() => {
+      return pathsThatShouldShrink.some((path) => path === pathname)
+   }, [pathname])
 }
 
 type OutletProps = {
