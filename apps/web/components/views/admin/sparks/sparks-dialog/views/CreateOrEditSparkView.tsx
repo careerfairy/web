@@ -1,7 +1,6 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Grid } from "@mui/material"
-import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
@@ -16,7 +15,7 @@ import { FC, useCallback, useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
    sparksCachedSparkFormValues,
-   sparksSelectedCreatorId,
+   sparksFormSelectedCreator,
    sparksSelectedSparkId,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
@@ -62,7 +61,7 @@ const CreateOrEditSparkView = () => {
    const { goToSelectCreatorView } = useSparksForm()
    const { group } = useGroup()
 
-   const selectedCreatorId = useSelector(sparksSelectedCreatorId)
+   const selectedCreator = useSelector(sparksFormSelectedCreator)
    const selectedSparkId = useSelector(sparksSelectedSparkId)
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
@@ -77,71 +76,65 @@ const CreateOrEditSparkView = () => {
    }
 
    return (
-      <CreatorFetchWrapper
+      <SparkFetchWrapper
+         sparkId={selectedSparkId}
          groupId={group.id}
-         selectedCreatorId={selectedCreatorId}
-         shouldFetch={Boolean(selectedCreatorId)}
+         shouldFetch={Boolean(selectedSparkId)}
       >
-         {(creator) => (
-            <SparkFetchWrapper
-               sparkId={selectedSparkId}
-               groupId={group.id}
-               shouldFetch={Boolean(selectedSparkId)}
+         {(spark) => (
+            <SparksDialog.Container
+               width={"calc(100% - 46px)"}
+               onMobileBack={() => handleBack()}
             >
-               {(spark) => (
-                  <SparksDialog.Container
-                     width={"calc(100% - 46px)"}
-                     onMobileBack={() => handleBack()}
+               <SparksDialog.Content>
+                  {spark ? (
+                     <SparksDialog.Title>
+                        Edit your{" "}
+                        <Box component="span" color="secondary.main">
+                           Spark
+                        </Box>
+                     </SparksDialog.Title>
+                  ) : (
+                     <SparksDialog.Title>
+                        Spark{" "}
+                        <Box component="span" color="secondary.main">
+                           details
+                        </Box>
+                     </SparksDialog.Title>
+                  )}
+                  <SparksDialog.Subtitle>
+                     It’s time to upload and set up your Spark
+                  </SparksDialog.Subtitle>
+                  <Box mt={3} />
+                  <Box mt={"auto"} />
+                  <Formik
+                     initialValues={
+                        cachedFormValues || getInitialSparkValues(spark)
+                     }
+                     validationSchema={CreateOrEditSparkViewSchema}
+                     enableReinitialize
+                     onSubmit={handleSubmit}
+                     validateOnMount
                   >
-                     <SparksDialog.Content>
-                        {spark ? (
-                           <SparksDialog.Title>
-                              Edit your{" "}
-                              <Box component="span" color="secondary.main">
-                                 Spark
-                              </Box>
-                           </SparksDialog.Title>
-                        ) : (
-                           <SparksDialog.Title>
-                              Spark{" "}
-                              <Box component="span" color="secondary.main">
-                                 details
-                              </Box>
-                           </SparksDialog.Title>
-                        )}
-                        <SparksDialog.Subtitle>
-                           It’s time to upload and set up your Spark
-                        </SparksDialog.Subtitle>
-                        <Box mt={3} />
-                        <Box mt={"auto"} />
-                        <Formik
-                           initialValues={
-                              cachedFormValues || getInitialSparkValues(spark)
-                           }
-                           validationSchema={CreateOrEditSparkViewSchema}
-                           enableReinitialize
-                           onSubmit={handleSubmit}
-                           validateOnMount
-                        >
-                           <FormComponent creator={creator} />
-                        </Formik>
-                        <SparksDialog.ActionsOffset />
-                        <Box mb={"auto"} />
-                     </SparksDialog.Content>
-                  </SparksDialog.Container>
-               )}
-            </SparkFetchWrapper>
+                     <FormComponent
+                        creator={spark?.creator ?? selectedCreator ?? null}
+                     />
+                  </Formik>
+                  <SparksDialog.ActionsOffset />
+                  <Box mb={"auto"} />
+               </SparksDialog.Content>
+            </SparksDialog.Container>
          )}
-      </CreatorFetchWrapper>
+      </SparkFetchWrapper>
    )
 }
 
 type FormComponentProps = {
-   creator: Creator | null
+   creator: PublicCreator | null
 }
 
 const FormComponent: FC<FormComponentProps> = ({ creator }) => {
-   const { values, dirty, isSubmitting, isValid, submitForm, errors } =
+   const { values, dirty, isSubmitting, isValid, submitForm } =
       useFormikContext<SparkFormValues>()
 
    const [deleteFiles] = useFirebaseDelete()

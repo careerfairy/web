@@ -9,6 +9,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import * as yup from "yup"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import { sxStyles } from "types/commonTypes"
+import { pickPublicDataFromCreator } from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    content: {
@@ -67,7 +68,14 @@ const View = () => {
                   if (values.creatorId === addNewCreatorId) {
                      goToCreateOrEditCreatorView(null)
                   } else {
-                     goToCreatorSelectedView(values.creatorId)
+                     const creator = creators.find(
+                        (creator) => creator.id === values.creatorId
+                     )
+                     if (creator) {
+                        goToCreatorSelectedView(
+                           pickPublicDataFromCreator(creator)
+                        )
+                     }
                   }
 
                   setSubmitting(false)

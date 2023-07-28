@@ -178,7 +178,7 @@ export interface IGroupRepository {
     * @param {Create<Creator>} creator - The creator to be added.
     * @returns {Promise<void>} A Promise that resolves when the creator is successfully added to the group.
     */
-   addCreatorToGroup(groupId: string, creator: AddCreatorData): Promise<string>
+   addCreatorToGroup(groupId: string, creator: AddCreatorData): Promise<Creator>
 
    /**
     * Removes a creator from a group.
@@ -200,7 +200,7 @@ export interface IGroupRepository {
       groupId: string,
       creatorId: string,
       creator: UpdateCreatorData
-   ): Promise<void>
+   ): Promise<Creator>
 
    /**
     * Checks if a creator's email is unique in a group
@@ -899,10 +899,10 @@ export class FirebaseGroupRepository
    |--------------------------------------------------------------------------
    */
 
-   addCreatorToGroup(
+   async addCreatorToGroup(
       groupId: string,
       creator: AddCreatorData
-   ): Promise<string> {
+   ): Promise<Creator> {
       const creatorData: Creator = {
          ...creator,
          createdAt: this.fieldValue.serverTimestamp() as any,
@@ -919,16 +919,18 @@ export class FirebaseGroupRepository
          .collection("creators")
          .doc(creatorData.id)
 
-      return creatorRef.set(creatorData, { merge: true }).then(() => {
+      creatorRef.set(creatorData, { merge: true }).then(() => {
          return creatorData.id
       })
+
+      return creatorData
    }
 
-   updateCreatorInGroup(
+   async updateCreatorInGroup(
       groupId: string,
       creatorId: string,
       creator: UpdateCreatorData
-   ): Promise<void> {
+   ): Promise<Creator> {
       const updateCreatorData: UpdateCreatorData & Pick<Creator, "updatedAt"> =
          {
             ...creator,
@@ -941,7 +943,11 @@ export class FirebaseGroupRepository
          .collection("creators")
          .doc(creatorId) // We use the email as the id and not firestore's auto generated id
 
-      return creatorRef.update(updateCreatorData)
+      await creatorRef.update(updateCreatorData)
+
+      const creatorSnap = await creatorRef.get()
+
+      return this.addIdToDoc<Creator>(creatorSnap)
    }
 
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {

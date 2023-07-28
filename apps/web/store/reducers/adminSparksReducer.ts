@@ -1,3 +1,4 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { SparkFormValues } from "components/views/admin/sparks/sparks-dialog/views/hooks/useSparkFormSubmit"
 
@@ -5,17 +6,21 @@ interface ISparksState {
    sparkDialogOpen: boolean
    confirmCloseSparksDialogOpen: boolean
    sparksForm: {
-      selectedCreatorId: string | null
+      selectedPublicCreator: PublicCreator | null
       selectedSparkId: string | null
       cachedSparkFormValues: SparkFormValues | null
    }
    showHiddenSparks: boolean
 }
 
-type OpenDialogPayload = {
-   selectedCreatorId: string
-   selectedSparkId: string
-} | null
+type OpenDialogPayload =
+   | {
+        selectedSparkId: string
+     }
+   | {
+        selectedPublicCreator: PublicCreator
+     }
+   | null
 
 type CloseDialogPayload = {
    forceClose: boolean // If true, close the dialog without asking for confirmation
@@ -25,7 +30,7 @@ const initialState: ISparksState = {
    sparkDialogOpen: false,
    confirmCloseSparksDialogOpen: false,
    sparksForm: {
-      selectedCreatorId: null,
+      selectedPublicCreator: null,
       selectedSparkId: null,
       cachedSparkFormValues: null,
    },
@@ -43,9 +48,16 @@ export const adminSparksSlice = createSlice({
          state.sparkDialogOpen = true
 
          if (action.payload) {
-            state.sparksForm.selectedCreatorId =
-               action.payload.selectedCreatorId
-            state.sparksForm.selectedSparkId = action.payload.selectedSparkId
+            if ("selectedSparkId" in action.payload) {
+               state.sparksForm.selectedSparkId = action.payload.selectedSparkId
+            }
+
+            if ("selectedPublicCreator" in action.payload) {
+               state.sparksForm.selectedPublicCreator =
+                  action.payload.selectedPublicCreator
+            }
+
+            state.sparksForm.cachedSparkFormValues = null
          }
       },
       closeConfirmCloseSparksDialog: (state) => {
@@ -55,7 +67,7 @@ export const adminSparksSlice = createSlice({
          const shoudlForceClose = action.payload?.forceClose
 
          const isEditting = Boolean(
-            state.sparksForm.selectedCreatorId ||
+            state.sparksForm.selectedPublicCreator ||
                state.sparksForm.selectedSparkId
          )
 
@@ -66,7 +78,7 @@ export const adminSparksSlice = createSlice({
          }
 
          state.sparkDialogOpen = false
-         state.sparksForm.selectedCreatorId = null
+         state.sparksForm.selectedPublicCreator = null
          state.sparksForm.selectedSparkId = null
          state.sparksForm.cachedSparkFormValues = null
          state.confirmCloseSparksDialogOpen = false
@@ -74,10 +86,12 @@ export const adminSparksSlice = createSlice({
       // Actions for setting values on the form
       setCreator: (
          state,
-         action: PayloadAction<ISparksState["sparksForm"]["selectedCreatorId"]>
+         action: PayloadAction<
+            ISparksState["sparksForm"]["selectedPublicCreator"]
+         >
       ) => {
-         state.sparksForm.selectedCreatorId =
-            action.payload || initialState.sparksForm.selectedCreatorId
+         state.sparksForm.selectedPublicCreator =
+            action.payload || initialState.sparksForm.selectedPublicCreator
       },
       setSpark: (
          state,
