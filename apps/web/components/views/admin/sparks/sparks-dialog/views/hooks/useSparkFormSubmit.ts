@@ -1,12 +1,12 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { sleep } from "components/helperFunctions/HelperFunctions"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { closeSparkDialog } from "store/reducers/adminSparksReducer"
-import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 
 export type SparkFormValues = {
    categoryId: Spark["category"]["id"] | ""
@@ -14,6 +14,7 @@ export type SparkFormValues = {
    published: "true" | "false" // visibility
    video: SparkVideo
    id?: string
+   creator: PublicCreator
 }
 
 type UseSparkFormSubmit = {
@@ -36,7 +37,6 @@ type UseSparkFormSubmit = {
  * - `isLoading`: Boolean indicating if the handleUploadFile operation is loading.
  */
 const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
-   const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const [formSubmitting, setFormSubmitting] = useState(false)
@@ -74,7 +74,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                   video: values.video,
                   published,
                   groupId,
-                  creatorId: selectedCreatorId,
+                  creatorId: values.creator.id,
                })
             }
 
@@ -89,13 +89,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
             setFormSubmitting(false)
          }
       },
-      [
-         errorNotification,
-         groupId,
-         handleClose,
-         selectedCreatorId,
-         successNotification,
-      ]
+      [errorNotification, groupId, handleClose, successNotification]
    )
 
    return useMemo<UseSparkFormSubmit>(

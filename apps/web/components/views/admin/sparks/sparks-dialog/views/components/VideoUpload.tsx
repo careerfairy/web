@@ -206,6 +206,16 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
       onValidated: validateVideo,
    })
 
+   // You can't edit the video of an existing Spark
+   if (editing) {
+      return (
+         <SparkVideoPreview
+            url={field.value.url}
+            thumbnailUrl={field.value.thumbnailUrl}
+         />
+      )
+   }
+
    return (
       <Box display="flex" flexDirection="column" height="100%">
          {thumbnailIsLoading ? (

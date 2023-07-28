@@ -41,7 +41,7 @@ const styles = sxStyles({
 
 type Props = {
    url: string
-   fileUploaderProps: FileUploaderProps
+   fileUploaderProps?: FileUploaderProps
    thumbnailUrl: string
 }
 
@@ -52,17 +52,19 @@ const SparkVideoPreview: FC<Props> = ({
 }) => {
    return (
       <SparkAspectRatioBox sx={styles.root}>
-         <FileUploader {...fileUploaderProps}>
-            <Button
-               variant="outlined"
-               color="info"
-               size="small"
-               sx={styles.uploadBtn}
-               startIcon={<ChangeIcon />}
-            >
-               Change video
-            </Button>
-         </FileUploader>
+         {fileUploaderProps ? (
+            <FileUploader {...fileUploaderProps}>
+               <Button
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  sx={styles.uploadBtn}
+                  startIcon={<ChangeIcon />}
+               >
+                  Change video
+               </Button>
+            </FileUploader>
+         ) : null}
          <ReactPlayer
             url={url}
             className="react-player"
