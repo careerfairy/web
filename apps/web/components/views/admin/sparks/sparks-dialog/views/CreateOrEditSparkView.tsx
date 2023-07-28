@@ -11,14 +11,17 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
-import { FC, useCallback, useMemo } from "react"
-import { useSelector } from "react-redux"
+import { FC, Fragment, useCallback, useMemo } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useDispatch, useSelector } from "react-redux"
+import { closeSparkDialog } from "store/reducers/adminSparksReducer"
 import {
    sparksCachedSparkFormValues,
    sparksFormSelectedCreator,
    sparksSelectedSparkId,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import ConfirmDeleteSparkDialog from "../../components/ConfirmDeleteSparkDialog"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import CreatorCard from "./components/CreatorCard"
 import SparkCategorySelect from "./components/SparkCategorySelect"
@@ -138,6 +141,9 @@ const CreateOrEditSparkView = () => {
 }
 
 const FormComponent: FC = () => {
+   const { group } = useGroup()
+
+   const dispatch = useDispatch()
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
    const { values, dirty, isSubmitting, isValid, submitForm } =
@@ -154,7 +160,17 @@ const FormComponent: FC = () => {
       handleCloseConfirmationDialog,
    ] = useDialogStateHandler()
 
+   const [
+      isDeleteSparkDialogOpen,
+      handleOpenDeleteSparkDialog,
+      handleCloseDeleteSparkDialog,
+   ] = useDialogStateHandler()
+
    const isEditing = Boolean(values.id)
+
+   const handleForceCloseDialog = useCallback(() => {
+      dispatch(closeSparkDialog({ forceClose: true }))
+   }, [dispatch])
 
    const handleBack = useCallback(
       (shouldSave: boolean) => {
@@ -248,6 +264,19 @@ const FormComponent: FC = () => {
                </Grid>
             </Grid>
             <SparksDialog.Actions>
+               {isEditing ? (
+                  <Fragment>
+                     <SparksDialog.Button
+                        color="error"
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        onClick={handleOpenDeleteSparkDialog}
+                     >
+                        Delete Spark
+                     </SparksDialog.Button>
+                     <Box flexGrow={1} />
+                  </Fragment>
+               ) : null}
                <SparksDialog.Button
                   color="grey"
                   variant="outlined"
@@ -283,6 +312,15 @@ const FormComponent: FC = () => {
             primaryAction={primaryAction}
             secondaryAction={secondaryAction}
          />
+         {isEditing ? (
+            <ConfirmDeleteSparkDialog
+               sparkId={values.id}
+               groupId={group.id}
+               open={isDeleteSparkDialogOpen}
+               handleClose={handleCloseDeleteSparkDialog}
+               onDeleted={handleForceCloseDialog}
+            />
+         ) : null}
       </>
    )
 }

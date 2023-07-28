@@ -1,6 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, limit, orderBy, query, where } from "firebase/firestore"
+import { collection, limit, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
@@ -10,18 +10,14 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
  *
  * @returns {boolean} true if the group has sparks, false otherwise
  */
-const useGroupHasSparks = (
-   groupId: string,
-   includeHiddenSparks: boolean = false
-) => {
+const useGroupHasSparks = (groupId: string) => {
    const groupSparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where("group.id", "==", groupId),
-         ...(includeHiddenSparks ? [] : [where("published", "==", true)]),
          limit(1)
       )
-   }, [groupId, includeHiddenSparks])
+   }, [groupId])
 
    return (
       useFirestoreCollection<Spark>(groupSparksQuery, {
