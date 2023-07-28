@@ -44,18 +44,34 @@ const styles = sxStyles({
    },
 })
 
-const getInitialSparkValues = (spark?: Spark): SparkFormValues => ({
-   categoryId: spark?.category.id ?? "",
-   question: spark?.question ?? "",
-   video: spark?.video ?? null,
-   published:
-      spark?.published !== undefined
-         ? spark.published
-            ? "true"
-            : "false"
-         : "true",
-   id: spark?.id ?? "",
-})
+const getInitialSparkValues = (
+   spark: Spark,
+   selectedCreator: PublicCreator,
+   cachedFormValues: SparkFormValues
+): SparkFormValues => {
+   if (cachedFormValues) {
+      return {
+         ...cachedFormValues,
+         // If the user has selected a creator, that creator has priority over the cached creator
+         creator: selectedCreator ?? cachedFormValues.creator ?? null,
+      }
+   }
+
+   return {
+      categoryId: spark?.category.id ?? "",
+      question: spark?.question ?? "",
+      video: spark?.video ?? null,
+      published:
+         spark?.published !== undefined
+            ? spark.published
+               ? "true"
+               : "false"
+            : "true",
+      id: spark?.id ?? "",
+      // If the user has selected a creator, that creator has priority over the current Spark's creator
+      creator: selectedCreator ?? spark?.creator ?? null,
+   }
+}
 
 const CreateOrEditSparkView = () => {
    const { goToSelectCreatorView } = useSparksForm()
@@ -108,17 +124,17 @@ const CreateOrEditSparkView = () => {
                   <Box mt={3} />
                   <Box mt={"auto"} />
                   <Formik
-                     initialValues={
-                        cachedFormValues || getInitialSparkValues(spark)
-                     }
+                     initialValues={getInitialSparkValues(
+                        spark,
+                        selectedCreator,
+                        cachedFormValues
+                     )}
                      validationSchema={CreateOrEditSparkViewSchema}
                      enableReinitialize
                      onSubmit={handleSubmit}
                      validateOnMount
                   >
-                     <FormComponent
-                        creator={spark?.creator ?? selectedCreator ?? null}
-                     />
+                     <FormComponent />
                   </Formik>
                   <SparksDialog.ActionsOffset />
                   <Box mb={"auto"} />
@@ -129,11 +145,9 @@ const CreateOrEditSparkView = () => {
    )
 }
 
-type FormComponentProps = {
-   creator: PublicCreator | null
-}
+const FormComponent: FC = () => {
+   const cachedFormValues = useSelector(sparksCachedSparkFormValues)
 
-const FormComponent: FC<FormComponentProps> = ({ creator }) => {
    const { values, dirty, isSubmitting, isValid, submitForm } =
       useFormikContext<SparkFormValues>()
 
@@ -196,10 +210,19 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
 
    return (
       <>
-         {creator ? (
-            <CreatorCard onClick={() => handleBack(true)} creator={creator} />
+         {values.creator ? (
+            <CreatorCard
+               onClick={() => handleBack(true)}
+               creator={values.creator}
+            />
          ) : (
-            "No creator found"
+            <SparksDialog.Button
+               variant="contained"
+               color="secondary"
+               onClick={() => handleBack(true)}
+            >
+               Choose Creator
+            </SparksDialog.Button>
          )}
          <Box mt={2} />
          <Box component={Form} sx={styles.formWrapper}>
@@ -242,8 +265,11 @@ const FormComponent: FC<FormComponentProps> = ({ creator }) => {
                   // Disable the button if:
                   // 1. A submit action is ongoing (isSubmitting === true),
                   // 2. The form is invalid (!isValid), or
-                  // 3. The form is in edit mode and no changes have been made (isEditing && !dirty)
-                  disabled={isSubmitting || !isValid || (isEditing && !dirty)}
+                  // 3. There are no changes to the form and the cachedFormValues are null
+                  // which means that the user has not started editing the form yet
+                  disabled={
+                     isSubmitting || !isValid || (!dirty && !cachedFormValues)
+                  }
                   loading={isSubmitting}
                >
                   {values.id ? "Save changes" : "Create"}

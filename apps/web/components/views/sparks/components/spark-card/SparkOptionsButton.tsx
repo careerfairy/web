@@ -9,6 +9,8 @@ import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
 import { FC, Fragment, useCallback, useMemo } from "react"
+import { useDispatch } from "react-redux"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -29,7 +31,13 @@ const styles = sxStyles({
    },
 })
 
-const SparkOptionsButton: FC = () => {
+type Props = {
+   sparkId: string
+}
+
+const SparkOptionsButton: FC<Props> = ({ sparkId }) => {
+   const dispatch = useDispatch()
+
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const [confirmDialogOpen, handleOpenConfirm, handleCloseConfirm] =
       useDialogStateHandler()
@@ -65,9 +73,13 @@ const SparkOptionsButton: FC = () => {
    }, [handleClose, handleOpenConfirm])
 
    const handleClickEdit = useCallback(() => {
-      // TODO: Open Edit Spark Dialog
+      dispatch(
+         openSparkDialog({
+            selectedSparkId: sparkId,
+         })
+      )
       handleClose()
-   }, [handleClose])
+   }, [dispatch, handleClose, sparkId])
 
    return (
       <Fragment>
