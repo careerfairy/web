@@ -432,7 +432,10 @@ export const shuffleArray = (array) =>
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value)
 
-export const dataURLtoFile = (dataUrl, filename = new Date().getTime()) => {
+export const dataURLtoFile = (
+   dataUrl,
+   filename = new Date().getTime().toString()
+) => {
    let arr = dataUrl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]),
