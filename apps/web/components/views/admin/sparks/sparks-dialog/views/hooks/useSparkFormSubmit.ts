@@ -1,7 +1,6 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { sleep } from "components/helperFunctions/HelperFunctions"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
@@ -52,7 +51,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    }, [dispatch])
 
    const handleSubmit = useCallback<UseSparkFormSubmit["handleSubmit"]>(
-      async (values, { setSubmitting, setFieldError, resetForm }) => {
+      async (values, { setSubmitting, setFieldError }) => {
          try {
             setFormSubmitting(true)
             const published = values.published === "true"
@@ -86,15 +85,13 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                })
             }
 
-            await sleep(2000) // wait for 2 seconds for UX purposes
-
             setSubmitting(false)
             successNotification("Spark created successfully")
+            setFormSubmitting(false)
             handleClose()
          } catch (err) {
-            errorNotification(err, "Error creating spark, please try again")
-         } finally {
             setFormSubmitting(false)
+            errorNotification(err, "Error creating spark, please try again")
          }
       },
       [errorNotification, groupId, handleClose, successNotification]

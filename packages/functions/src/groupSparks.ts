@@ -1,21 +1,21 @@
 import functions = require("firebase-functions")
-import config from "./config"
-import { MiddlewareContext, middlewares } from "./middlewares/middlewares"
-import {
-   dataValidation,
-   userShouldBeGroupAdmin,
-} from "./middlewares/validations"
-import { logAndThrow } from "./lib/validations"
-import { boolean, string, object } from "yup"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import {
    AddSparkSparkData,
    DeleteSparkData,
    UpdateSparkData,
    sparksCategoriesArray,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { boolean, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
+import config from "./config"
+import { logAndThrow } from "./lib/validations"
+import { middlewares } from "./middlewares/middlewares"
+import {
+   dataValidation,
+   userShouldBeGroupAdmin,
+} from "./middlewares/validations"
 
 const sparkDataValidator = {
    question: string()
@@ -131,21 +131,3 @@ export const deleteSpark = functions.region(config.region).https.onCall(
       }
    )
 )
-
-const commonSparkActions = async (
-   data: any,
-   context: MiddlewareContext<Record<string, unknown>>
-) => {
-   const group = context.middlewares.group as Group
-
-   const creator = await groupRepo.getCreatorById(group.id, data.creatorId)
-
-   if (!creator) {
-      logAndThrow("Creator not found", {
-         data,
-         context,
-      })
-   }
-
-   return { group, creator }
-}

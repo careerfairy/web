@@ -13,6 +13,11 @@ export class SparksService {
       private readonly repository: ISparkRepository,
       private readonly functions: Functions
    ) {}
+
+   /**
+    * Create a spark
+    * @param data  The spark to create
+    * */
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
@@ -20,6 +25,10 @@ export class SparksService {
       )(data)
    }
 
+   /**
+    * Update a spark
+    * @param data  The spark to update
+    * */
    async updateSpark(data: UpdateSparkData) {
       return httpsCallable<UpdateSparkData, void>(
          this.functions,
@@ -27,6 +36,10 @@ export class SparksService {
       )(data)
    }
 
+   /**
+    * Deletes a spark and moves it to the deletedSparks collection
+    * @param data  The spark to delete
+    * */
    async deleteSpark(data: DeleteSparkData) {
       return httpsCallable<DeleteSparkData, void>(
          this.functions,
