@@ -13,6 +13,7 @@ export interface Group extends Identifiable {
    logoUrl: string
 
    // optional
+   webSiteUrl?: string
    extraInfo?: string
    partnerGroupIds?: string[]
    rank?: number

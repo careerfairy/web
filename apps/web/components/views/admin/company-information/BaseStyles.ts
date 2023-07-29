@@ -12,6 +12,7 @@ export default sxStyles({
       width: "fit-content",
       ":child": {
          flexGrow: 1,
+         flex: 1,
       },
       h3: {
          color: "#2C2C2C",
@@ -53,21 +54,33 @@ export default sxStyles({
             width: "36px",
             height: "36px",
          },
+         ".MuiTypography-button": {
+            color: "#9999B1",
+            textAlign: "center",
+            fontFamily: "Poppins",
+            fontSize: "12px",
+            fontStyle: "normal",
+            fontWeight: 400,
+            lineHeight: "141%",
+         },
       },
-      companyBannerUploadArea: {
+      companyBannerUploadArea: (_, backgroundImage: string) => ({
          display: "flex",
          flexDirection: "column",
          justifyContent: "center",
          alignItems: "center",
          gap: "12px",
-         width: "620px",
+         width: "-webkit-fill-available;",
          height: "124px",
          flexShrink: 0,
          borderRadius: "4px",
          border: "1px solid var(--tertiary-e, #EDE7FD)",
          background: "#F7F8FC",
          marginY: "10px",
-      },
+         backgroundImage: `url(${backgroundImage})`,
+         backgroundSize: "cover",
+         backgroundPosition: "center",
+      }),
       companyBannerUploadButton: {
          display: "flex",
          padding: "8px 16px",
@@ -96,6 +109,16 @@ export default sxStyles({
          fontSize: "12px",
          fontWeight: 400,
          lineHeight: "141%",
+      },
+      ".section-left_column": {
+         width: "400px",
+         marginRight: "16px",
+      },
+      form: {
+         display: "flex",
+         flexDirection: "column",
+         width: "-webkit-fill-available",
+         gap: "12px",
       },
    },
 })

@@ -269,30 +269,6 @@ const GroupQuestionEdit = ({
                {touched && !localGroupQuestion.name?.length && "Required"}
             </FormHelperText>
             <Card>
-               {/*TODO we might not need this anymore as questions are opt in per event*/}
-               {/*   <Tooltip*/}
-               {/*      title={*/}
-               {/*         localGroupQuestion.hidden*/}
-               {/*            ? "Re-enable this question so that users will be prompted to fill it in when registering for your events."*/}
-               {/*            : "Don’t ask this question when users register to your events."*/}
-               {/*      }*/}
-               {/*   >*/}
-               {/*      <FormControlLabel*/}
-               {/*         control={*/}
-               {/*            <Switch*/}
-               {/*               checked={Boolean(localGroupQuestion.hidden)}*/}
-               {/*               onChange={toggleGroupQuestionHidden}*/}
-               {/*               name="question-visibility-toggle"*/}
-               {/*               color="primary"*/}
-               {/*            />*/}
-               {/*         }*/}
-               {/*         label={*/}
-               {/*            localGroupQuestion.hidden*/}
-               {/*               ? "Hidden"*/}
-               {/*               : "Hide Question"*/}
-               {/*         }*/}
-               {/*      />*/}
-               {/*   </Tooltip>*/}
                <CardHeader subheader="Question Options" />
                <Divider />
                <CardActions>

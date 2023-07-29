@@ -4,11 +4,11 @@ import { Box } from "@mui/system"
 
 import { sxStyles } from "types/commonTypes"
 import { CompanyInformationProvider } from "./CompanyInformationProvider"
-import CompanyIdentity from "../../../admin/companyInformation/CompanyIdentity"
-import CompanyDetails from "../../../admin/companyInformation/CompanyDetails"
-import TargetTalent from "../../../admin/companyInformation/TargetTalent"
-import LiveStreamRegistrationQuestions from "../../../admin/companyInformation/LiveStreamRegistrationQuestions"
-import PrivacyPolicy from "../../../admin/companyInformation/PrivacyPolicy"
+import CompanyIdentity from "../../../admin/company-information/CompanyIdentity"
+import CompanyDetails from "../../../admin/company-information/CompanyDetails"
+import TargetTalent from "../../../admin/company-information/TargetTalent"
+import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
+import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
 
 const styles = sxStyles({
    content: {
@@ -28,6 +28,7 @@ const styles = sxStyles({
    },
    gridItem: {
       display: "flex",
+      width: "-webkit-fill-available",
    },
 })
 
@@ -49,7 +50,7 @@ const PageContent = () => {
                </Grid>
 
                <Grid item style={styles.gridItem}>
-                  <CompanyIdentity />
+                  <CompanyDetails />
                </Grid>
 
                <Grid item style={styles.gridItem}>
