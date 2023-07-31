@@ -3,6 +3,7 @@ import CreateSparkButton from "components/views/admin/sparks/components/CreateSp
 import { useRouter } from "next/router"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 
 const AdminSparksPage = () => {
    const {
@@ -17,6 +18,7 @@ const AdminSparksPage = () => {
       >
          <DashboardHead title="CareerFairy | My Sparks" />
          <Sparks />
+         <SparkPreviewDialog />
       </GroupDashboardLayout>
    )
 }

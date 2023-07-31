@@ -7,7 +7,7 @@ const styles = sxStyles({
    root: {
       color: "white",
       width: "100%",
-      background: "rgba(58, 58, 58, 0.80)",
+      background: "rgba(58, 58, 58, 1)",
       fontSize: "0.85714rem",
       py: 1,
       "& svg": {
@@ -20,6 +20,9 @@ const styles = sxStyles({
       lineHeight: "117.5%",
       letterSpacing: "-0.03121rem",
    },
+   collapsed: {
+      zIndex: 1,
+   },
 })
 
 type Props = {
@@ -28,7 +31,7 @@ type Props = {
 
 const HiddenStatus: FC<Props> = ({ sparkPublished }) => {
    return (
-      <Collapse in={!sparkPublished}>
+      <Collapse sx={styles.collapsed} in={!sparkPublished}>
          <Stack
             spacing={0.5625}
             justifyContent="center"

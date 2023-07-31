@@ -13,6 +13,7 @@ interface ISparksState {
       initialStep: SparkDialogStep
    }
    showHiddenSparks: boolean
+   sparkToPreview: string | null
 }
 
 type OpenDialogPayload =
@@ -38,6 +39,7 @@ const initialState: ISparksState = {
       initialStep: "select-creator",
    },
    showHiddenSparks: true,
+   sparkToPreview: null,
 }
 
 export const adminSparksSlice = createSlice({
@@ -121,6 +123,14 @@ export const adminSparksSlice = createSlice({
       toggleShowHiddenSparks: (state) => {
          state.showHiddenSparks = !state.showHiddenSparks
       },
+
+      // Actions for previewing sparks
+      setSparkToPreview: (
+         state,
+         action: PayloadAction<ISparksState["sparkToPreview"]>
+      ) => {
+         state.sparkToPreview = action.payload
+      },
    },
 })
 
@@ -133,6 +143,7 @@ export const {
    setCachedSparksFormValues,
    closeConfirmCloseSparksDialog,
    toggleShowHiddenSparks,
+   setSparkToPreview,
 } = adminSparksSlice.actions
 
 // Export reducer

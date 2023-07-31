@@ -5,7 +5,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import RoundedLogo from "components/views/common/RoundedLogo"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import { DateTime } from "luxon"
-import { FC } from "react"
+import { FC, Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkOptionsButton from "./SparkOptionsButton"
 
@@ -14,6 +14,7 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       flexDirection: "row",
+      justifyContent: "space-between",
    },
    displayName: {
       fontSize: "1.14286rem",
@@ -41,37 +42,42 @@ const styles = sxStyles({
       borderRadius: 0.5,
       mb: "auto",
    },
-   creatorDetailsWrapper: {
-      maxWidth: {
-         xs: "50%",
-         md: "55%",
-      },
-   },
 })
 
 type Props = {
    spark: Spark
+   showAdminOptions?: boolean
 }
 
-const SparkHeader: FC<Props> = ({ spark }) => {
+const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
    return (
-      <Box sx={styles.root}>
-         <RoundedLogo
-            src={spark.group.logoUrl}
-            alt={spark.group.universityName}
-            size={36}
-            borderRadius={1.5}
-         />
-         <Box mr={0.75} />
-         <SparkCreatorDetails
-            displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
-            companyName={spark.group.universityName}
-         />
-         <Box mr={1.25} />
-         <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
-         <Box flexGrow={1} />
-         <SparkOptionsButton groupId={spark.group.id} sparkId={spark.id} />
-      </Box>
+      <Fragment>
+         <Box sx={styles.root}>
+            <RoundedLogo
+               src={spark.group.logoUrl}
+               alt={spark.group.universityName}
+               size={36}
+               borderRadius={1.5}
+            />
+            <Box mr={0.75} />
+            <SparkCreatorDetails
+               displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
+               companyName={spark.group.universityName}
+            />
+            <Box mr={1.25} />
+            <Box flexGrow={1} />
+            <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
+            {showAdminOptions ? (
+               <Fragment>
+                  <Box width={20} />
+                  <SparkOptionsButton
+                     groupId={spark.group.id}
+                     sparkId={spark.id}
+                  />
+               </Fragment>
+            ) : null}
+         </Box>
+      </Fragment>
    )
 }
 
@@ -85,7 +91,7 @@ const SparkCreatorDetails: FC<SparkCreatorDetailsProps> = ({
    displayName,
 }) => {
    return (
-      <Box sx={styles.creatorDetailsWrapper}>
+      <Box>
          <BrandedTooltip title={displayName.length > 20 ? displayName : ""}>
             <Typography sx={styles.displayName} component={"h5"}>
                {displayName}

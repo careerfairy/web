@@ -97,7 +97,7 @@ const CreateOrEditSparkView = () => {
          shouldFetch={Boolean(selectedSparkId)}
       >
          {(spark) => (
-            <SparksDialog.Container width={"calc(100% - 46px)"}>
+            <SparksDialog.Container width={725}>
                <SparksDialog.Content>
                   {spark ? (
                      <SparksDialog.Title>
