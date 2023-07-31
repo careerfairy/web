@@ -70,7 +70,7 @@ const SparkHeader: FC<Props> = ({ spark }) => {
          <Box mr={1.25} />
          <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
          <Box flexGrow={1} />
-         <SparkOptionsButton />
+         <SparkOptionsButton groupId={spark.group.id} sparkId={spark.id} />
       </Box>
    )
 }

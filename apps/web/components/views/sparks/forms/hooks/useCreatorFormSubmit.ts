@@ -1,3 +1,4 @@
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
 import { groupRepo } from "data/RepositoryInstances"
 import { FormikHelpers } from "formik"
@@ -38,7 +39,7 @@ type UseCreatorFormSubmit = {
  */
 const useCreatorFormSubmit = (
    groupId: string,
-   onSubmited: (creatorId: string) => void
+   onSubmited: (creator: Creator) => void
 ): UseCreatorFormSubmit => {
    const { handleUploadFile, isLoading, uploading, progress } =
       useUploadCreatorAvatar(groupId)
@@ -46,7 +47,9 @@ const useCreatorFormSubmit = (
    const handleSubmit = useCallback<UseCreatorFormSubmit["handleSubmit"]>(
       async (values, { setSubmitting, setFieldError }) => {
          let avatarUrl = values.avatarUrl
-         let creatorId = values?.id
+         const isEditing = Boolean(values?.id)
+
+         let creator: Creator
 
          if (values.avatarFile) {
             avatarUrl = (await handleUploadFile(values.avatarFile)).url
@@ -54,7 +57,7 @@ const useCreatorFormSubmit = (
 
          // Before making the request, we validate if the email is unique
          if (
-            !creatorId &&
+            !isEditing &&
             !(await groupRepo.creatorEmailIsUnique(groupId, values.email))
          ) {
             // If the email is not unique and we are trying to create a new creator
@@ -64,18 +67,18 @@ const useCreatorFormSubmit = (
             return
          }
 
-         if (creatorId) {
-            await groupRepo.updateCreatorInGroup(groupId, creatorId, {
+         if (isEditing) {
+            creator = await groupRepo.updateCreatorInGroup(groupId, values.id, {
                avatarUrl,
                firstName: values.firstName,
                lastName: values.lastName,
                position: values.position,
                linkedInUrl: values.linkedInUrl,
                story: values.story,
-               id: creatorId,
+               id: values.id,
             })
          } else {
-            creatorId = await groupRepo.addCreatorToGroup(groupId, {
+            creator = await groupRepo.addCreatorToGroup(groupId, {
                avatarUrl,
                email: values.email,
                firstName: values.firstName,
@@ -89,7 +92,7 @@ const useCreatorFormSubmit = (
          setSubmitting(false)
 
          if (onSubmited) {
-            onSubmited(creatorId)
+            onSubmited(creator)
          }
       },
       [groupId, handleUploadFile, onSubmited]

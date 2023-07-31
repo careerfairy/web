@@ -1,14 +1,13 @@
-import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { IconButton, MenuItem } from "@mui/material"
 import Divider from "@mui/material/Divider"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useMenuState from "components/custom-hook/useMenuState"
+import ConfirmDeleteSparkDialog from "components/views/admin/sparks/components/ConfirmDeleteSparkDialog"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
-import ConfirmationDialog, {
-   ConfirmationDialogAction,
-} from "materialUI/GlobalModals/ConfirmationDialog"
-import { FC, Fragment, useCallback, useMemo } from "react"
+import { FC, Fragment, useCallback } from "react"
+import { useDispatch } from "react-redux"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -29,35 +28,17 @@ const styles = sxStyles({
    },
 })
 
-const SparkOptionsButton: FC = () => {
+type Props = {
+   sparkId: string
+   groupId: string
+}
+
+const SparkOptionsButton: FC<Props> = ({ sparkId, groupId }) => {
+   const dispatch = useDispatch()
+
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const [confirmDialogOpen, handleOpenConfirm, handleCloseConfirm] =
       useDialogStateHandler()
-
-   const primaryAction = useMemo<ConfirmationDialogAction>(
-      () => ({
-         callback: () => {
-            // TODO: Delete Spark
-            handleCloseConfirm()
-         },
-         text: "Delete",
-         color: "error",
-         variant: "contained",
-      }),
-      [handleCloseConfirm]
-   )
-
-   const secondaryAction = useMemo<ConfirmationDialogAction>(
-      () => ({
-         callback: () => {
-            handleCloseConfirm()
-         },
-         text: "Cancel",
-         color: "grey",
-         variant: "outlined",
-      }),
-      [handleCloseConfirm]
-   )
 
    const handleClickDelete = useCallback(() => {
       handleOpenConfirm()
@@ -65,9 +46,13 @@ const SparkOptionsButton: FC = () => {
    }, [handleClose, handleOpenConfirm])
 
    const handleClickEdit = useCallback(() => {
-      // TODO: Open Edit Spark Dialog
+      dispatch(
+         openSparkDialog({
+            selectedSparkId: sparkId,
+         })
+      )
       handleClose()
-   }, [handleClose])
+   }, [dispatch, handleClose, sparkId])
 
    return (
       <Fragment>
@@ -81,16 +66,12 @@ const SparkOptionsButton: FC = () => {
                Delete Spark
             </MenuItem>
          </BrandedMenu>
-         <ConfirmationDialog
+         <ConfirmDeleteSparkDialog
+            sparkId={sparkId}
+            groupId={groupId}
             open={confirmDialogOpen}
             handleClose={handleCloseConfirm}
-            icon={
-               <DeleteForeverRoundedIcon color="error" sx={styles.deleteIcon} />
-            }
-            title="Delete Spark"
-            description="Are you sure you want to delete this Spark? This action cannot be undone."
-            primaryAction={primaryAction}
-            secondaryAction={secondaryAction}
+            onDeleted={handleCloseConfirm}
          />
       </Fragment>
    )

@@ -41,16 +41,20 @@ const styles = sxStyles({
    },
 })
 
-export type SubmittingOverlayProps = {}
+export type SubmittingOverlayProps = {
+   isUpdatingSpark: boolean
+}
 
-export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({}) => {
+export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({
+   isUpdatingSpark,
+}) => {
    return (
       <SparksDialog.Container hideCloseButton width={652}>
          <Box sx={styles.root}>
             <ThumbsUpIcon sx={styles.thumbsUpIcon} />
             <Box mt={4} />
             <SparksDialog.Title>
-               Uploading your{" "}
+               {isUpdatingSpark ? "Updating" : "Uploading"} your{" "}
                <Box component="span" color="secondary.main">
                   Spark
                </Box>
@@ -58,7 +62,7 @@ export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({}) => {
             <Box mt={10.5} />
             <Stack sx={styles.progressWrapper} spacing={1} alignItems="center">
                <Typography sx={styles.percentText}>
-                  Your Spark is being created
+                  Your Spark is being {isUpdatingSpark ? "updated" : "created"}
                </Typography>
                <LinearProgress
                   variant={"indeterminate"}

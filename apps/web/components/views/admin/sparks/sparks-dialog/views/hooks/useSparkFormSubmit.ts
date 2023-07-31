@@ -1,12 +1,11 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { sleep } from "components/helperFunctions/HelperFunctions"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { closeSparkDialog } from "store/reducers/adminSparksReducer"
-import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 
 export type SparkFormValues = {
    categoryId: Spark["category"]["id"] | ""
@@ -14,6 +13,7 @@ export type SparkFormValues = {
    published: "true" | "false" // visibility
    video: SparkVideo
    id?: string
+   creator: PublicCreator
 }
 
 type UseSparkFormSubmit = {
@@ -36,7 +36,6 @@ type UseSparkFormSubmit = {
  * - `isLoading`: Boolean indicating if the handleUploadFile operation is loading.
  */
 const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
-   const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const [formSubmitting, setFormSubmitting] = useState(false)
@@ -52,7 +51,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    }, [dispatch])
 
    const handleSubmit = useCallback<UseSparkFormSubmit["handleSubmit"]>(
-      async (values, { setSubmitting, setFieldError, resetForm }) => {
+      async (values, { setSubmitting, setFieldError }) => {
          try {
             setFormSubmitting(true)
             const published = values.published === "true"
@@ -65,7 +64,15 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
             let sparkId = values?.id
 
             if (sparkId) {
-               // TODO: update spark
+               // update spark
+               await sparkService.updateSpark({
+                  categoryId: values.categoryId,
+                  question: values.question,
+                  published,
+                  creatorId: values.creator.id,
+                  id: sparkId,
+                  groupId,
+               })
             } else {
                // create new spark
                await sparkService.createSpark({
@@ -74,28 +81,20 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                   video: values.video,
                   published,
                   groupId,
-                  creatorId: selectedCreatorId,
+                  creatorId: values.creator.id,
                })
             }
 
-            await sleep(2000) // wait for 2 seconds for UX purposes
-
             setSubmitting(false)
             successNotification("Spark created successfully")
+            setFormSubmitting(false)
             handleClose()
          } catch (err) {
-            errorNotification(err, "Error creating spark, please try again")
-         } finally {
             setFormSubmitting(false)
+            errorNotification(err, "Error creating spark, please try again")
          }
       },
-      [
-         errorNotification,
-         groupId,
-         handleClose,
-         selectedCreatorId,
-         successNotification,
-      ]
+      [errorNotification, groupId, handleClose, successNotification]
    )
 
    return useMemo<UseSparkFormSubmit>(

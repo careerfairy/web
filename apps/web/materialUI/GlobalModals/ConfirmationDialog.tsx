@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close"
+import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
 import { Stack, Typography } from "@mui/material"
-import Button, { ButtonProps } from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -57,9 +57,10 @@ const styles = sxStyles({
 
 export type ConfirmationDialogAction = {
    text: string
-   color?: ButtonProps["color"]
+   color?: LoadingButtonProps["color"]
    callback: () => void
-   variant?: ButtonProps["variant"]
+   variant?: LoadingButtonProps["variant"]
+   loading?: LoadingButtonProps["loading"]
 }
 
 type Props = {
@@ -83,12 +84,14 @@ const ConfirmationDialog: FC<Props> = ({
       color: primaryActionColor,
       callback: primaryActionCallback,
       variant: primaryActionVariant,
+      loading: primaryActionLoading,
    },
    secondaryAction: {
       text: secondaryActionText,
       color: secondaryActionColor,
       callback: secondaryActionCallback,
       variant: secondaryActionVariant,
+      loading: secondaryActionLoading,
    },
 }) => {
    const isMobile = useIsMobile()
@@ -128,21 +131,23 @@ const ConfirmationDialog: FC<Props> = ({
             </DialogContentText>
          </DialogContent>
          <DialogActions sx={styles.actions}>
-            <Button
+            <LoadingButton
                onClick={() => secondaryActionCallback()}
                color={secondaryActionColor}
                variant={secondaryActionVariant}
+               loading={secondaryActionLoading}
             >
                {secondaryActionText}
-            </Button>
-            <Button
+            </LoadingButton>
+            <LoadingButton
                onClick={() => primaryActionCallback()}
                color={primaryActionColor}
                variant={primaryActionVariant}
+               loading={primaryActionLoading}
                autoFocus
             >
                {primaryActionText}
-            </Button>
+            </LoadingButton>
          </DialogActions>
       </Dialog>
    )

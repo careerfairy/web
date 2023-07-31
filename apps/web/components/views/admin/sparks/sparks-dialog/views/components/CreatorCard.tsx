@@ -1,4 +1,4 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { FC } from "react"
@@ -79,7 +79,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   creator: Creator
+   creator: PublicCreator
    onClick: () => void
 }
 
@@ -107,7 +107,7 @@ const CreatorCard: FC<Props> = ({ creator, onClick }) => {
                </Typography>
                <Box mt={1} />
                <Typography sx={styles.email} component="p">
-                  {creator.email}
+                  {creator.id}
                </Typography>
             </Box>
          </Box>

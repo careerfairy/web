@@ -4,7 +4,7 @@ export const sparksDialogOpenSelector = (state: RootState) =>
    state.adminSparks.sparkDialogOpen
 
 export const sparksSelectedCreatorId = (state: RootState) =>
-   state.adminSparks.sparksForm.selectedCreatorId
+   state.adminSparks.sparksForm.selectedPublicCreator?.id ?? null
 
 export const sparksSelectedSparkId = (state: RootState) =>
    state.adminSparks.sparksForm.selectedSparkId
@@ -17,3 +17,9 @@ export const sparksConfirmCloseSparksDialogOpen = (state: RootState) =>
 
 export const sparksShowHiddenSparks = (state: RootState) =>
    state.adminSparks.showHiddenSparks
+
+export const sparksFormSelectedCreator = (state: RootState) =>
+   state.adminSparks.sparksForm.selectedPublicCreator
+
+export const sparksDialogInitialStepSelector = (state: RootState) =>
+   state.adminSparks.sparksForm.initialStep
