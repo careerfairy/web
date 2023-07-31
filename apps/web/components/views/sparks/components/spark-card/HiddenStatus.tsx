@@ -7,7 +7,7 @@ const styles = sxStyles({
    root: {
       color: "white",
       width: "100%",
-      background: "rgba(58, 58, 58, 0.80)",
+      background: "rgba(58, 58, 58, 1)",
       fontSize: "0.85714rem",
       py: 1,
       "& svg": {
