@@ -1,21 +1,12 @@
-import { Container } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
-import { sxStyles } from "types/commonTypes"
+import { useSelector } from "react-redux"
+import { sparksShowHiddenSparks } from "store/selectors/adminSparksSelectors"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
-
-const styles = sxStyles({
-   root: {
-      flexGrow: 1,
-      display: "flex",
-      flexDirection: "column",
-      pt: 2.875,
-   },
-})
 
 const Sparks = () => {
    return (
@@ -27,15 +18,13 @@ const Sparks = () => {
 
 const SparksComponent = () => {
    const { group } = useGroup()
-   const { data } = useGroupSparks(group.id)
+   const showHiddenSparks = useSelector(sparksShowHiddenSparks)
 
-   const groupHasSparks = data.length > 0
+   const groupHasSparks = useGroupHasSparks(group.id, showHiddenSparks)
 
    return (
       <Fragment>
-         <Container sx={styles.root} maxWidth="xl">
-            {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
-         </Container>
+         {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
          <SparksDialog />
       </Fragment>
    )

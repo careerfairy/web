@@ -1,7 +1,6 @@
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined"
 import {
-   Avatar,
    Box,
    Chip,
    CircularProgress,
@@ -10,6 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC, useCallback } from "react"
 import { useSelector } from "react-redux"
@@ -134,13 +134,7 @@ const CreatorSelectedView = () => {
                               deleteIcon={<EditIcon />}
                            />
                         </Box>
-                        <Avatar
-                           alt={`${creator.firstName} ${creator.lastName}`}
-                           src={creator.avatarUrl}
-                           sx={styles.avatar}
-                        >
-                           {creator.firstName[0]} {creator.lastName[0]}
-                        </Avatar>
+                        <CreatorAvatar creator={creator} sx={styles.avatar} />
                         <Box mt={2.85} />
                         <Typography sx={styles.fullName} component="h4">
                            {creator.firstName} {creator.lastName}

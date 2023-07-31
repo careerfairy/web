@@ -1,8 +1,6 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import Image from "next/image"
+import { Box, Button, Stack, Typography } from "@mui/material"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -87,7 +85,6 @@ type Props = {
 
 const CreatorCard: FC<Props> = ({ creator, onClick }) => {
    const displayName = `${creator.firstName} ${creator.lastName}`
-   const isMobile = useIsMobile()
 
    return (
       <Stack
@@ -99,18 +96,7 @@ const CreatorCard: FC<Props> = ({ creator, onClick }) => {
          spacing={3}
       >
          <Box sx={styles.creatorDetailsWrapper}>
-            <Avatar alt={displayName} sx={styles.creatorCardAvatar}>
-               {creator.avatarUrl ? (
-                  <Image
-                     src={getResizedUrl(creator.avatarUrl, "sm")}
-                     alt={displayName}
-                     layout="fill"
-                     objectFit="cover"
-                  />
-               ) : (
-                  `${creator.firstName[0]} ${creator.lastName[0]}`
-               )}
-            </Avatar>
+            <CreatorAvatar creator={creator} sx={styles.creatorCardAvatar} />
             <Box sx={styles.creatorCardContent}>
                <Typography sx={styles.displayName} component="h2">
                   {displayName}
