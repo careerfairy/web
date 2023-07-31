@@ -1,10 +1,10 @@
-import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
-import { sparksGetInspiredPdf } from "constants/files"
-import { FC, useCallback } from "react"
 import SparksIcon from "@mui/icons-material/PlayCircleOutlineRounded"
-import { sxStyles } from "types/commonTypes"
+import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
+import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
+import { sxStyles } from "types/commonTypes"
+import GetInspiredButton from "../components/GetInspiredButton"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -39,7 +39,7 @@ const styles = sxStyles({
    },
 })
 
-const EmptySparksPage: FC = () => {
+const EmptySparksView: FC = () => {
    const dispatch = useDispatch()
 
    const handleOpen = useCallback(() => {
@@ -68,17 +68,7 @@ const EmptySparksPage: FC = () => {
                inspire you
             </Typography>
             <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
-               <Button
-                  sx={styles.btn}
-                  color="secondary"
-                  variant="outlined"
-                  component="a"
-                  download
-                  href={sparksGetInspiredPdf}
-                  target="_blank"
-               >
-                  Get inspired
-               </Button>
+               <GetInspiredButton />
                <Button
                   onClick={handleOpen}
                   sx={styles.btn}
@@ -105,4 +95,4 @@ export const TitleText: FC<TypographyProps<"h1">> = (props) => {
    return <Typography sx={styles.title} component="h1" {...props} />
 }
 
-export default EmptySparksPage
+export default EmptySparksView

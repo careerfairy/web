@@ -9,6 +9,7 @@ interface ISparksState {
       selectedSparkId: string | null
       cachedSparkFormValues: SparkFormValues | null
    }
+   showHiddenSparks: boolean
 }
 
 type OpenDialogPayload = {
@@ -28,6 +29,7 @@ const initialState: ISparksState = {
       selectedSparkId: null,
       cachedSparkFormValues: null,
    },
+   showHiddenSparks: false,
 }
 
 export const adminSparksSlice = createSlice({
@@ -93,6 +95,11 @@ export const adminSparksSlice = createSlice({
       ) => {
          state.sparksForm.cachedSparkFormValues = action.payload
       },
+
+      // Actions for toggling visibility
+      toggleShowHiddenSparks: (state) => {
+         state.showHiddenSparks = !state.showHiddenSparks
+      },
    },
 })
 
@@ -104,6 +111,7 @@ export const {
    setSpark,
    setCachedSparksFormValues,
    closeConfirmCloseSparksDialog,
+   toggleShowHiddenSparks,
 } = adminSparksSlice.actions
 
 // Export reducer
