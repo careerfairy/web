@@ -1,5 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close"
-import { Box, IconButton } from "@mui/material"
+import { Box, Grow, IconButton, Zoom } from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
@@ -20,19 +20,16 @@ const styles = sxStyles({
          md: 400,
       },
    },
-   root: {
-      position: "relative",
-      pt: 4,
-   },
    closeButton: {
       position: "absolute",
-      right: 0,
-      top: 0,
+      display: "flex",
+      right: -35,
+      top: -35,
       zIndex: 1,
       color: "white",
    },
    dialogPaper: {
-      backgroundColor: "transparent",
+      overflowY: "unset",
    },
 })
 
@@ -53,6 +50,7 @@ const SparkPreviewDialog: FC = () => {
          }}
          onClose={handleClose}
          open={open}
+         TransitionComponent={Zoom}
       >
          <SuspenseWithBoundary fallback={<SparkCarouselCardSkeleton />}>
             {sparkId ? (
@@ -76,18 +74,21 @@ const Component: FC<Props> = ({ sparkId, onClose }) => {
    const spark = useGroupSpark(group.id, sparkId)
 
    return (
-      <Box sx={styles.root}>
+      <>
          <IconButton
-            aria-label="close"
-            onClick={onClose}
             sx={styles.closeButton}
+            aria-label="close"
+            color="inherit"
+            onClick={onClose}
          >
-            <CloseIcon />
+            <CloseIcon fontSize="large" />
          </IconButton>
-         <SparkAspectRatioBox sx={styles.aspectRoot}>
-            <SparkCarouselCard preview={false} spark={spark} />
-         </SparkAspectRatioBox>
-      </Box>
+         <Box>
+            <SparkAspectRatioBox sx={styles.aspectRoot}>
+               <SparkCarouselCard preview={false} spark={spark} />
+            </SparkAspectRatioBox>
+         </Box>
+      </>
    )
 }
 
