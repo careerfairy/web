@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { groupRepo, livestreamsRepo } from "./api/repositories"
+import { groupRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
    handleSideEffects,
@@ -111,6 +111,53 @@ export const syncUserStats = functions
       sideEffectPromises.push(
          handleUserStatsBadges(userEmail, change.after.data() as UserStats)
       )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onWriteCreator = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("careerCenterData/{groupId}/creators/{creatorId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncUserStatsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all creator changes
+      sideEffectPromises.push(sparkRepo.syncCreatorDataToSpark(change))
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onWriteGroup = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("careerCenterData/{groupId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      // We need the groupId from here since some groups don't have an id field
+      const groupId = context.params.groupId
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncUserStatsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all creator changes
+      sideEffectPromises.push(sparkRepo.syncGroupDataToSpark(change, groupId))
 
       return handleSideEffects(sideEffectPromises)
    })
