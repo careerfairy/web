@@ -47,8 +47,8 @@ const SparkStats: FC<Props> = ({ spark }) => {
          />
          <StatChip
             icon={<TotalPlaysIcon />}
-            value={spark.plays}
-            tooltip={`This Spark has been played ${spark.plays} times.`}
+            value={spark.numberOfCareerPageClicks}
+            tooltip={`Your Career Page has been viewed ${spark.numberOfCareerPageClicks} times from this Spark.`}
          />
          <StatChip
             icon={<LikesIcon />}

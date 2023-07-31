@@ -62,6 +62,12 @@ export interface Spark extends Identifiable {
    // how many times the share action is clicked
    shareCTA: number
 
+   /**
+    * How many times the career page icon is clicked
+    * on the Spark card
+    */
+   numberOfCareerPageClicks: number
+
    // possible future fields
 
    // video metadata

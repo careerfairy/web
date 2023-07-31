@@ -119,6 +119,7 @@ export class SparkFunctionsRepository
          totalWatchedMinutes: 0,
          uniquePlays: 0,
          shareCTA: 0,
+         numberOfCareerPageClicks: 0,
          group: pickPublicDataFromGroup(group),
          creator: pickPublicDataFromCreator(creator),
       }
