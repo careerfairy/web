@@ -14,6 +14,7 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       "& .player": {
+         background: "black",
          position: "absolute",
          top: 0,
          left: 0,
