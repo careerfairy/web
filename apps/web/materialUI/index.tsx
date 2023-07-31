@@ -103,6 +103,7 @@ const primary: PaletteColorOptions = {
    dark: "#00b08f",
    contrastText: "#FFFFFF",
    gradient: "#07c1a7",
+   "600": "#2ABAA5",
 }
 
 const tertiary: PaletteColorOptions = {
