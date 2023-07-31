@@ -94,7 +94,13 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
             </Box>
          }
          title="Delete Spark"
-         description="Are you sure you want to delete this Spark? This action cannot be undone."
+         description={
+            <>
+               Are you sure you want to delete this Spark?
+               <br />
+               This action cannot be undone.
+            </>
+         }
          primaryAction={primaryAction}
          secondaryAction={secondaryAction}
       />

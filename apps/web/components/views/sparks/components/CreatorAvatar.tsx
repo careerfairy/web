@@ -1,7 +1,7 @@
 import { Avatar, AvatarProps } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import Image from "next/image"
-import { FC, useMemo } from "react"
+import { FC, useMemo, useState } from "react"
 
 type Props = {
    /**
@@ -14,6 +14,7 @@ type Props = {
 
 const CreatorAvatar: FC<Props> = ({ creator, size, sx, ...props }) => {
    const displayName = `${creator.firstName} ${creator.lastName}`
+   const [imgSrc, setImgSrc] = useState(getResizedUrl(creator.avatarUrl, "md"))
 
    const styles = useMemo<AvatarProps["sx"]>(
       () => [
@@ -30,9 +31,13 @@ const CreatorAvatar: FC<Props> = ({ creator, size, sx, ...props }) => {
       <Avatar alt={displayName} sx={styles} {...props}>
          {creator.avatarUrl ? (
             <Image
-               src={getResizedUrl(creator.avatarUrl, "md")}
+               src={imgSrc}
                alt={displayName}
                layout="fill"
+               onError={() => {
+                  // The resized image might not have been created yet, so we try the original image
+                  setImgSrc(creator.avatarUrl)
+               }}
                objectFit="cover"
             />
          ) : (

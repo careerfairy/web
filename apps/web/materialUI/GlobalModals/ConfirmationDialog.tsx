@@ -67,7 +67,7 @@ type Props = {
    open: boolean
    handleClose: () => void
    title: string
-   description: string
+   description: string | ReactNode
    icon: ReactNode
    primaryAction: ConfirmationDialogAction
    secondaryAction: ConfirmationDialogAction
