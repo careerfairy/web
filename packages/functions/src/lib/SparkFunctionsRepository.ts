@@ -1,19 +1,22 @@
-import firebase from "firebase/compat/app"
-import BaseFirebaseRepository, {
-   createCompatGenericConverter,
-} from "../BaseFirebaseRepository"
+import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Create } from "@careerfairy/shared-lib/commonTypes"
+import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
+import {
+   Creator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import {
    AddSparkSparkData,
    DeletedSpark,
    Spark,
    UpdateSparkData,
    getCategoryById,
-} from "./sparks"
-import { Create } from "../commonTypes"
-import { Group, pickPublicDataFromGroup } from "../groups"
-import { Creator, pickPublicDataFromCreator } from "../groups/creators"
+} from "@careerfairy/shared-lib/sparks/sparks"
+import { createGenericConverter } from "../util/firestore-admin"
+import { Timestamp, Storage, Firestore } from "../api/firestoreAdmin"
+import { FunctionsLogger } from "src/util"
 
-export interface ISparkRepository {
+export interface ISparkFunctionsRepository {
    /**
     *  Get a spark
     * @param id  The id of the spark
@@ -44,14 +47,14 @@ export interface ISparkRepository {
    update(spark: UpdateSparkData, creator: Creator): Promise<void>
 }
 
-export class SparkRepository
+export class SparkFunctionsRepository
    extends BaseFirebaseRepository
-   implements ISparkRepository
+   implements ISparkFunctionsRepository
 {
    constructor(
-      readonly firestore: firebase.firestore.Firestore,
-      readonly fieldValue: typeof firebase.firestore.FieldValue,
-      readonly timestamp: typeof firebase.firestore.Timestamp
+      readonly firestore: Firestore,
+      readonly storage: Storage,
+      readonly logger: FunctionsLogger
    ) {
       super()
    }
@@ -59,7 +62,7 @@ export class SparkRepository
    async get(id: string): Promise<Spark | null> {
       const doc = await this.firestore
          .collection("sparks")
-         .withConverter(createCompatGenericConverter<Spark>())
+         .withConverter(createGenericConverter<Spark>())
          .doc(id)
          .get()
 
@@ -67,15 +70,13 @@ export class SparkRepository
    }
 
    async delete(id: string): Promise<void> {
-      const sparkRef = this.firestore
-         .collection("sparks")
-         .withConverter(createCompatGenericConverter<Spark>())
-         .doc(id)
+      const sparkRef = this.firestore.collection("sparks").doc(id)
 
       const sparkDeletedRef = this.firestore.collection("deletedSparks").doc(id)
 
       // Get the document
       const sparkSnap = await sparkRef.get()
+      const sparkData = sparkSnap.data() as Spark
 
       if (!sparkSnap.exists) {
          throw new Error("Spark does not exist")
@@ -88,12 +89,15 @@ export class SparkRepository
 
       // Create a new document in the deleted collection
       const deletedSpark: DeletedSpark = {
-         ...sparkSnap.data()!,
-         deletedAt: this.timestamp.now(),
+         ...sparkData,
+         deletedAt: Timestamp.now(),
       }
       batch.set(sparkDeletedRef, deletedSpark)
 
-      return batch.commit()
+      // Delete the files in storage
+      this.deleteSparkFiles(sparkData).catch(this.logger.error)
+
+      return void batch.commit()
    }
 
    async create(
@@ -105,10 +109,8 @@ export class SparkRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
-         createdAt: this.fieldValue.serverTimestamp() as any,
-         publishedAt: data.published
-            ? (this.fieldValue.serverTimestamp() as any)
-            : null,
+         createdAt: Timestamp.now(),
+         publishedAt: data.published ? Timestamp.now() : null,
          updatedAt: null,
          published: data.published,
          likes: 0,
@@ -136,14 +138,28 @@ export class SparkRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
-         updatedAt: this.fieldValue.serverTimestamp() as any,
+         updatedAt: Timestamp.now(),
          published: data.published,
          creator: pickPublicDataFromCreator(creator),
          ...(data.published && {
-            publishedAt: this.fieldValue.serverTimestamp() as any,
+            publishedAt: Timestamp.now(),
          }),
       }
 
       return void this.firestore.collection("sparks").doc(data.id).update(doc)
    }
+
+   private async deleteSparkFiles(spark: Spark): Promise<void> {
+      const bucket = this.storage.bucket()
+
+      await bucket
+         .file(`sparks/videos/${spark.video.uid}.${spark.video.fileExtension}`)
+         .delete(deleteOptions)
+
+      return
+   }
 }
+
+const deleteOptions = {
+   ignoreNotFound: true,
+} as const
