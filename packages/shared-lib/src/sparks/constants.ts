@@ -18,4 +18,14 @@ export const SPARK_CONSTANTS = {
     * The allowed file formats for a spark
     */
    ALLOWED_FILE_FORMATS: ["mp4", "mov", "webm"],
+
+   /**
+    * The maximum length of a spark question
+    */
+   QUESTION_MAX_LENGTH: 100,
+
+   /**
+    * The minimum length of a spark question
+    */
+   QUESTION_MIN_LENGTH: 10,
 }

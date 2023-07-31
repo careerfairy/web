@@ -20,8 +20,8 @@ export const createSpark = functions.region(config.region).https.onCall(
       dataValidation({
          question: string()
             .required()
-            .max(SPARK_CONSTANTS.MAX_DURATION_SECONDS)
-            .min(SPARK_CONSTANTS.MIN_DURATION_SECONDS),
+            .max(SPARK_CONSTANTS.QUESTION_MAX_LENGTH)
+            .min(SPARK_CONSTANTS.QUESTION_MIN_LENGTH),
          categoryId: string()
             .oneOf(sparksCategoriesArray.map((category) => category.id))
             .required("Category is required"),
