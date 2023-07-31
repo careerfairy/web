@@ -1,20 +1,29 @@
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import TimeIcon from "@mui/icons-material/AccessTimeRounded"
 import PhoneIcon from "@mui/icons-material/PhoneIphone"
 import VideoFileIcon from "@mui/icons-material/VideoFileOutlined"
 import { Box, Button, FormHelperText, Stack, Typography } from "@mui/material"
+import useUploadSparkThumbnail from "components/custom-hook/spark/useUploadSparkThumbnail"
+import useUploadSparkVideo from "components/custom-hook/spark/useUploadSparkVideo"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { getVideoFileDuration } from "components/helperFunctions/validators/video"
+import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
+import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
+import {
+   generateVideoThumbnails,
+   getVideoFileDuration,
+} from "components/util/video"
 import FileUploader, {
    FileUploaderProps,
 } from "components/views/common/FileUploader"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import { imagePlaceholder } from "constants/images"
-import { FieldHelperProps, useField } from "formik"
+import { useField } from "formik"
 import Image from "next/image"
-import { FC, Fragment, ReactNode, useMemo } from "react"
+import { FC, Fragment, ReactNode, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
+import UploadOverlay from "./UploadOverlay"
 
 const styles = sxStyles({
    root: {
@@ -74,6 +83,7 @@ const styles = sxStyles({
 
 type Props = {
    name: string
+   editing: boolean
 }
 
 const maxSeconds = SPARK_CONSTANTS.MAX_DURATION_SECONDS
@@ -81,30 +91,144 @@ const minSeconds = SPARK_CONSTANTS.MIN_DURATION_SECONDS
 const maxMinutes = Math.round(maxSeconds / 60)
 const maxFileSize = SPARK_CONSTANTS.MAX_FILE_SIZE_MB
 
-const VideoUpload: FC<Props> = ({ name }) => {
-   const [field, meta, helpers] = useField<File>(name)
+const VideoUpload: FC<Props> = ({ name, editing }) => {
+   const {
+      handleUploadFile: uploadVideo,
+      progress: videoUploadProgress,
+      uploading: videoUploading,
+      isLoading: videoIsLoading,
+   } = useUploadSparkVideo()
+
+   const {
+      handleUploadFile: uploadThumbnail,
+      progress: thumbnailUploadProgress,
+      uploading: thumbnailUploading,
+      isLoading: thumbnailIsLoading,
+   } = useUploadSparkThumbnail()
+
+   const [deleteFiles] = useFirebaseDelete()
+
+   const [field, meta, helpers] = useField<SparkVideo>(name)
+
+   const handleError = useCallback(
+      (message: string) => {
+         helpers.setValue(null, false) // set value to null but don't trigger validation because we already setting an error
+         helpers.setError(message) // set error message
+         helpers.setTouched(true, false) // set touched to true but don't trigger validation because we already set an error
+      },
+      [helpers]
+   )
+
+   const validateVideo = useCallback(
+      async (file: File | File[]) => {
+         const newFile = Array.isArray(file) ? file[0] : file
+
+         let duration
+         try {
+            duration = await getVideoFileDuration(newFile)
+         } catch (error) {
+            handleError("Error getting video duration")
+            return
+         }
+
+         if (duration < minSeconds || duration > maxSeconds) {
+            const roundedDuration = Math.round(duration * 10) / 10 // round to 1 decimal
+            const message = `Your video is ${roundedDuration} seconds long, a Spark should be between ${minSeconds} and ${maxSeconds} seconds`
+
+            handleError(message)
+            return
+         }
+
+         if (!editing && field.value) {
+            // Delete existing video and thumbnail before uploading the new ones
+            // Don't await because we don't want to wait for the delete to finish before uploading the new ones
+            deleteFiles([field.value.url, field.value.thumbnailUrl]).catch(
+               console.error
+            )
+         }
+
+         let videoData,
+            thumbnailsInBase64,
+            thumbnail64,
+            thumbnailFile,
+            thumbnailData
+
+         try {
+            // upload file
+            videoData = await uploadVideo(newFile)
+         } catch (error) {
+            handleError("Error uploading video")
+            return
+         }
+
+         try {
+            thumbnailsInBase64 = await generateVideoThumbnails(newFile, 1)
+            thumbnail64 = thumbnailsInBase64[0]
+            thumbnailFile = dataURLtoFile(thumbnail64)
+         } catch (error) {
+            handleError("Error generating video thumbnails")
+            return
+         }
+
+         try {
+            // upload thumbnail
+            thumbnailData = await uploadThumbnail(thumbnailFile)
+         } catch (error) {
+            handleError("Error uploading video thumbnail")
+            return
+         }
+
+         helpers.setTouched(true)
+
+         const newValue: SparkVideo = {
+            uid: videoData.uid,
+            url: videoData.url,
+            fileExtension: videoData.fileExtension,
+            thumbnailUrl: thumbnailData.url,
+         }
+         helpers.setValue(newValue)
+      },
+      [
+         editing,
+         field.value,
+         helpers,
+         handleError,
+         deleteFiles,
+         uploadVideo,
+         uploadThumbnail,
+      ]
+   )
 
    const { fileUploaderProps, dragActive } = useFileUploader({
       acceptedFileTypes: SPARK_CONSTANTS.ALLOWED_FILE_FORMATS,
       maxFileSize: maxFileSize, // MB
       multiple: false,
-      onValidated: async (file) => {
-         validateVideo(file, helpers)
-      },
+      onValidated: validateVideo,
    })
-
-   const blobUrl = useMemo(() => {
-      if (field.value && !meta.error) {
-         return URL.createObjectURL(field.value)
-      }
-   }, [field.value, meta.error])
 
    return (
       <Box display="flex" flexDirection="column" height="100%">
-         {blobUrl ? (
+         {thumbnailIsLoading ? (
+            <SparkAspectRatioBox sx={styles.root}>
+               <UploadOverlay
+                  progress={thumbnailUploadProgress}
+                  uploading={thumbnailUploading}
+                  name={"thumbnail"}
+               />
+            </SparkAspectRatioBox>
+         ) : videoIsLoading ? (
+            <SparkAspectRatioBox sx={styles.root}>
+               <UploadOverlay
+                  progress={videoUploadProgress}
+                  uploading={videoUploading}
+                  name={"video"}
+               />
+            </SparkAspectRatioBox>
+         ) : field.value ? (
             <SparkVideoPreview
-               url={blobUrl}
+               url={field.value.url}
                fileUploaderProps={fileUploaderProps}
+               thumbnailUrl={field.value.thumbnailUrl}
             />
          ) : (
             <UploadPromptDisplay
@@ -182,27 +306,6 @@ const UploadPromptDisplay: FC<UploadPromptDisplayProps> = ({
          </FileUploader>
       </SparkAspectRatioBox>
    )
-}
-
-const validateVideo = async (
-   file: File | File[],
-   helpers: FieldHelperProps<File>
-) => {
-   const newFile = Array.isArray(file) ? file[0] : file
-   const duration = await getVideoFileDuration(newFile)
-
-   if (duration < minSeconds || duration > maxSeconds) {
-      const roundedDuration = Math.round(duration * 10) / 10 // round to 1 decimal
-
-      const message = `Your video is ${roundedDuration} seconds long, a Spark should be between ${minSeconds} and ${maxSeconds} seconds`
-
-      helpers.setValue(null, false) // set value to null but don't trigger validation because we already setting an error
-      helpers.setError(message) // set error message
-      helpers.setTouched(true, false) // set touched to true but don't trigger validation because we already set an error
-   } else {
-      helpers.setTouched(true)
-      helpers.setValue(newFile)
-   }
 }
 
 export default VideoUpload

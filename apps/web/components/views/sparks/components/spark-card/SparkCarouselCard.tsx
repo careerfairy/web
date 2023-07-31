@@ -8,6 +8,7 @@ import VideoPreview from "./VideoPreview"
 import SparkStats from "./SparkStats"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkQuestion from "./SparkQuestion"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -62,7 +63,10 @@ const SparkCarouselCard: FC<Props> = ({ spark }) => {
             <Box mt={1.5} />
             <SparkQuestion limitLines question={spark.question} />
          </Box>
-         <VideoPreview videoUrl={spark.videoUrl} />
+         <VideoPreview
+            thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
+            videoUrl={spark.video.url}
+         />
       </Box>
    )
 }

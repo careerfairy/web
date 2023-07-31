@@ -6,7 +6,7 @@ import {
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
 import { logAndThrow } from "./lib/validations"
-import { boolean, string } from "yup"
+import { boolean, string, object } from "yup"
 import {
    AddSparkSparkData,
    sparksCategoriesArray,
@@ -25,11 +25,17 @@ export const createSpark = functions.region(config.region).https.onCall(
          categoryId: string()
             .oneOf(sparksCategoriesArray.map((category) => category.id))
             .required("Category is required"),
-         videoId: string().required(),
          published: boolean().required(),
-         videoUrl: string().required(),
          creatorId: string().required(),
          groupId: string().required(),
+         video: object()
+            .shape({
+               uid: string().required(),
+               fileExtension: string().required(),
+               url: string().required(),
+               thumbnailUrl: string().required(),
+            })
+            .required(),
       }),
       userShouldBeGroupAdmin(),
       async (data: AddSparkSparkData, context) => {

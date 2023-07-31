@@ -41,15 +41,9 @@ const styles = sxStyles({
    },
 })
 
-export type SubmittingOverlayProps = {
-   progress: number // progress of the file upload
-   uploading: boolean // weather a file is uploading
-}
+export type SubmittingOverlayProps = {}
 
-export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({
-   progress,
-   uploading,
-}) => {
+export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({}) => {
    return (
       <SparksDialog.Container hideCloseButton width={652}>
          <Box sx={styles.root}>
@@ -64,13 +58,10 @@ export const SubmittingOverlay: FC<SubmittingOverlayProps> = ({
             <Box mt={10.5} />
             <Stack sx={styles.progressWrapper} spacing={1} alignItems="center">
                <Typography sx={styles.percentText}>
-                  {uploading
-                     ? `${Math.round(progress)}% • uploading video file`
-                     : "Your Spark is being created"}
+                  Your Spark is being created
                </Typography>
                <LinearProgress
-                  value={uploading ? progress : undefined}
-                  variant={uploading ? "determinate" : "indeterminate"}
+                  variant={"indeterminate"}
                   color="secondary"
                   sx={styles.progressBar}
                />
