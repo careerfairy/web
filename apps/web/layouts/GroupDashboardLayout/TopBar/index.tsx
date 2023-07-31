@@ -59,29 +59,20 @@ const styles = sxStyles({
 
 type Props = {
    title: string
+   cta?: React.ReactNode
 }
 
-const TopBar = ({ title }: Props) => {
-   const { livestreamDialog } = useGroup()
+const TopBar = ({ title, cta }: Props) => {
+   const { livestreamDialog, shrunkLeftMenuState } = useGroup()
    const isMobile = useIsMobile()
+   const { layout } = useGroupDashboard()
 
-   const { toggleLeftDrawer, layout } = useGroupDashboard()
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
-         {!drawerPresent && (
-            <Box sx={styles.btnWrapper}>
-               <IconButton
-                  onClick={toggleLeftDrawer}
-                  sx={styles.menuButton}
-                  edge={"start"}
-               >
-                  <MenuRoundedIcon />
-               </IconButton>
-            </Box>
-         )}
+         {!drawerPresent ? <MobileToggleButton /> : null}
          <Box sx={styles.leftSection}>
             <Typography fontWeight={600} sx={styles.title}>
                {title}
@@ -96,20 +87,40 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            {isMobile ? null : (
-               <Button
-                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
-                  size={"small"}
-                  variant={"outlined"}
-                  color={"secondary"}
-               >
-                  Create New Live Stream
-               </Button>
-            )}
+            {isMobile
+               ? null
+               : cta || (
+                    <Button
+                       onClick={() =>
+                          livestreamDialog.handleOpenNewStreamModal()
+                       }
+                       size={"small"}
+                       variant={"outlined"}
+                       color={"secondary"}
+                    >
+                       Create New Live Stream
+                    </Button>
+                 )}
             {/* notification & profile */}
             <UserAvatarWithDetails />
             <NotificationsButton />
          </Stack>
+      </Box>
+   )
+}
+
+const MobileToggleButton = () => {
+   const { toggleLeftDrawer } = useGroupDashboard()
+
+   return (
+      <Box sx={styles.btnWrapper}>
+         <IconButton
+            onClick={toggleLeftDrawer}
+            sx={styles.menuButton}
+            edge={"start"}
+         >
+            <MenuRoundedIcon />
+         </IconButton>
       </Box>
    )
 }

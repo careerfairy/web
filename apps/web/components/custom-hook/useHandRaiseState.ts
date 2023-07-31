@@ -5,7 +5,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import useStreamRef from "./useStreamRef"
 import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import { HandRaise } from "types/handraise"
 import { rewardService } from "data/firebase/RewardService"
 

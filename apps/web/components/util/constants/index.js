@@ -17,6 +17,8 @@ export const EMAIL_REGEX =
 export const YOUTUBE_URL_REGEX =
    /^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/
 
+export const LINKEDIN_URL_REGEX = /^(https?\:\/\/)?(www\.linkedin\.com)\/.+$/
+
 export const logoPlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 

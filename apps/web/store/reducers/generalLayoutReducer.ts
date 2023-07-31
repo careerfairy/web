@@ -1,16 +1,23 @@
+import { Reducer } from "redux"
 import * as actions from "../actions/actionTypes"
-import { GeneralLayoutState } from "./index"
 
-const initialState = {
+interface IGeneralLayoutState {
+   layout: {
+      drawerOpen: boolean
+      isOnLandingPage: boolean
+   }
+}
+
+const initialState: IGeneralLayoutState = {
    layout: {
       drawerOpen: false,
       isOnLandingPage: false,
    },
-} as GeneralLayoutState
+}
 
-const generalLayoutReducer = (
-   state: GeneralLayoutState = initialState,
-   { type}
+const generalLayoutReducer: Reducer<IGeneralLayoutState> = (
+   state = initialState,
+   { type }
 ) => {
    switch (type) {
       case actions.OPEN_NAV_DRAWER:

@@ -30,7 +30,14 @@ import {
    IUserFunctionsRepository,
    UserFunctionsRepository,
 } from "../lib/UserFunctionsRepository"
-import { FieldValue, firestore, Timestamp } from "./firestoreAdmin"
+import {
+   ISparkFunctionsRepository,
+   SparkFunctionsRepository,
+} from "../lib/SparkFunctionsRepository"
+
+import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
+
+import logger = require("firebase-functions/logger")
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -66,3 +73,6 @@ export const marketingUsersRepo: IMarketingUsersRepository =
 export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
 )
+
+export const sparkRepo: ISparkFunctionsRepository =
+   new SparkFunctionsRepository(firestore, storage, logger)

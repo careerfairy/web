@@ -37,7 +37,7 @@ import { errorLogAndNotify } from "../../util/CommonUtil"
 import GroupsUtil from "../../data/util/GroupsUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { sxStyles } from "../../types/commonTypes"
-import RootState from "../../store/reducers"
+import { RootState } from "../../store"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 

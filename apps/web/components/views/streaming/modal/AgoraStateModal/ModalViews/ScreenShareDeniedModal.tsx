@@ -6,7 +6,7 @@ import { Button, DialogActions, DialogContentText } from "@mui/material"
 import ScreenShareIcon from "@mui/icons-material/ScreenShare"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import RootState from "store/reducers"
+import { RootState } from "store"
 import Box from "@mui/material/Box"
 import { sxStyles } from "../../../../../../types/commonTypes"
 

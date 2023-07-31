@@ -46,6 +46,7 @@ import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
+import groupSparks = require("./groupSparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -203,3 +204,8 @@ exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
+
+// Sparks
+exports.createSpark = groupSparks.createSpark
+exports.updateSpark = groupSparks.updateSpark
+exports.deleteSpark = groupSparks.deleteSpark

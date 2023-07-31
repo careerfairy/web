@@ -283,3 +283,44 @@ export const sha1 = async (str: string) => {
 
    return hexCodes.join("")
 }
+
+/**
+ * Convert a number to a string representation. If the number is greater than or equal to 1000,
+ * it is abbreviated as 'k' for thousands, 'm' for millions, or 'b' for billions.
+ *
+ * For numbers between 1000 and 10,000, between 1,000,000 and 10,000,000, or between 1,000,000,000 and 10,000,000,000,
+ * the string representation is rounded to the nearest tenth.
+ * For numbers greater than or equal to 10,000 and less than 100,000, it is rounded to the nearest hundred.
+ * For numbers greater than or equal to 100,000 and less than a billion, or greater than or equal to 10 billion,
+ * it is rounded to the nearest whole number.
+ *
+ * The returned string is always 3 characters long or less.
+ *
+ * @param {number} num - The number to convert to a string.
+ * @returns {string} The string representation of the number.
+ */
+export const numberToString = (num: number): string => {
+   if (num >= 1e9) {
+      if (num >= 1e10) {
+         return (num / 1e9).toFixed(0) + "b"
+      }
+      return (num / 1e9).toFixed(1) + "b"
+   } else if (num >= 1e6) {
+      if (num >= 1e7) {
+         return (num / 1e6).toFixed(0) + "m"
+      }
+      return (num / 1e6).toFixed(1) + "m"
+   } else if (num >= 1e3) {
+      if (num >= 1e5) {
+         return (num / 1e3).toFixed(0) + "k"
+      } else if (num >= 1e4) {
+         return (
+            (num % 1e4 === 0
+               ? (num / 1e3).toFixed(0)
+               : (Math.round(num / 100) / 10).toFixed(1)) + "k"
+         )
+      }
+      return (num / 1e3).toFixed(1) + "k"
+   }
+   return num.toString()
+}

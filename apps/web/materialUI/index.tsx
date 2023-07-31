@@ -3,6 +3,8 @@
 import {
    alpha,
    createTheme,
+   darken,
+   lighten,
    PaletteColorOptions,
    styled,
    Theme,
@@ -12,6 +14,7 @@ import { grey, red } from "@mui/material/colors"
 import React from "react"
 import { Components, PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
 
 interface CustomThemeProps {
    drawerWidth?: { small: string; medium: string }
@@ -88,9 +91,9 @@ declare module "@mui/material/styles" {
 }
 
 const secondary: PaletteColorOptions = {
-   light: "#b4a8ff",
-   main: "#7431e2",
-   dark: "#590db6",
+   light: lighten("#6749EA", 0.2),
+   main: "#6749EA",
+   dark: darken("#6749EA", 0.2),
    gradient: "#644eec",
    contrastText: "#FFFFFF",
 }
@@ -100,6 +103,7 @@ const primary: PaletteColorOptions = {
    dark: "#00b08f",
    contrastText: "#FFFFFF",
    gradient: "#07c1a7",
+   "600": "#2ABAA5",
 }
 
 const tertiary: PaletteColorOptions = {
@@ -406,25 +410,10 @@ const getComponents = (theme: DefaultTheme): Components => ({
             borderRadius: 30,
          },
       },
+      defaultProps: {
+         disableElevation: true,
+      },
       variants: [
-         {
-            props: {
-               variant: "contained",
-               color: "primary",
-            },
-            style: {
-               boxShadow: theme.boxShadows.primary_5_15_50,
-            },
-         },
-         {
-            props: {
-               variant: "contained",
-               color: "secondary",
-            },
-            style: {
-               boxShadow: theme.boxShadows.secondary_5_15_50,
-            },
-         },
          {
             props: {
                variant: "contained",
@@ -508,6 +497,27 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: "#D5F6F1",
             },
          },
+         {
+            props: {
+               size: "medium",
+            },
+            style: {
+               fontSize: "1rem",
+               fontWeight: 400,
+               padding: "12px 30px",
+            },
+         },
+         {
+            props: {
+               size: "small",
+            },
+            style: {
+               padding: "8px 16px",
+               fontWeight: 400,
+               fontSize: "1rem",
+               letterSpacing: "-0.011rem",
+            },
+         },
       ],
    },
    MuiChip: {
@@ -567,6 +577,11 @@ const getComponents = (theme: DefaultTheme): Components => ({
             filter: theme.dropShadows.dark_6_12_12,
             boxShadow: "none",
          },
+      },
+   },
+   MuiSelect: {
+      defaultProps: {
+         IconComponent: KeyboardArrowDownRoundedIcon, // You can replace this with the icon you prefer
       },
    },
 })

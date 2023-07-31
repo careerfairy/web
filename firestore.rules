@@ -188,6 +188,11 @@ service cloud.firestore {
                 return careerCenter in request.auth.token.adminGroups.keys();
             }
 
+            match /creators/{creatorEmail} {
+                allow read: if true;
+                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            }
+
             match /ats/{integrationId} {
                 allow read, write: if isSignedIn() && (isCareerCenterAdmin() || isCFAdmin());
             }
@@ -233,6 +238,11 @@ service cloud.firestore {
                 }
 
             }
+        }
+
+        match /sparks/{sparkId} {
+            allow read: if isAnyGroupAdmin();
+            allow write: if false;
         }
 
         match /videos/{video} {
@@ -543,6 +553,15 @@ service cloud.firestore {
 
             match /ratings/{uid} {
                 allow read, write: if request.auth.uid == uid || isCFAdmin();
+            }
+        }
+        match /timelineUniversities/{timelineUniversity}{
+            allow read: if true;
+            allow write: if isCFAdmin();
+            
+            match /periods/{period}{
+                allow read: if true;
+                allow write: if isCFAdmin();
             }
         }
         match /{somePath=**}/userLivestreamData/{userEmail} {
