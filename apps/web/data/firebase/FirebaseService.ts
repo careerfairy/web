@@ -61,6 +61,7 @@ import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { getRandomInt } from "../../components/helperFunctions/HelperFunctions"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2541,6 +2542,23 @@ class FirebaseService {
          })
 
          await batch.commit()
+
+         // Events with huge number of participants
+         //
+         // await participantsRef.set(data, { merge: true })
+         // const futureIntervalMs = getRandomInt(2500, 30000)
+
+         // // distribute writes to the single livestream doc
+         // setTimeout(() => {
+         //    streamRef
+         //       .update({
+         //          participatingStudents:
+         //             firebase.firestore.FieldValue.arrayUnion(
+         //                userData.userEmail
+         //             ),
+         //       })
+         //       .catch(console.error)
+         // }, futureIntervalMs)
       }
    }
 
