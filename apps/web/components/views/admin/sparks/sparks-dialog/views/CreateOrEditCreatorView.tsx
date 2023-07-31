@@ -29,33 +29,37 @@ const CreateOrEditCreatorView = () => {
       >
          {(creator) => (
             <SparksDialog.Container onMobileBack={() => handleBack()}>
-               {creator ? (
-                  <SparksDialog.Title>
-                     <Box component="span" color="secondary.main">
-                        Editing
-                     </Box>{" "}
-                     creator
-                  </SparksDialog.Title>
-               ) : (
-                  <SparksDialog.Title>
-                     Create {isMobile ? "" : "a"} new{" "}
-                     <Box component="span" color="secondary.main">
-                        profile
-                     </Box>
-                  </SparksDialog.Title>
-               )}
-               <SparksDialog.Subtitle>
-                  {creator
-                     ? "Please check if that’s the correct creator"
-                     : "Insert your new creator details!"}
-               </SparksDialog.Subtitle>
-               <Box mt={4} />
-               <CreateOrEditCreatorForm
-                  groupId={group.id}
-                  actions={<Actions handleBack={handleBack} />}
-                  creator={creator}
-                  onSuccessfulSubmit={goToCreatorSelectedView}
-               />
+               <SparksDialog.Content>
+                  {creator ? (
+                     <SparksDialog.Title>
+                        <Box component="span" color="secondary.main">
+                           Editing
+                        </Box>{" "}
+                        creator
+                     </SparksDialog.Title>
+                  ) : (
+                     <SparksDialog.Title>
+                        Create {isMobile ? "" : "a"} new{" "}
+                        <Box component="span" color="secondary.main">
+                           profile
+                        </Box>
+                     </SparksDialog.Title>
+                  )}
+                  <SparksDialog.Subtitle>
+                     {creator
+                        ? "Please check if that’s the correct creator"
+                        : "Insert your new creator details!"}
+                  </SparksDialog.Subtitle>
+                  <Box mt={4} />
+                  <Box mt={"auto"} />
+                  <CreateOrEditCreatorForm
+                     groupId={group.id}
+                     actions={<Actions handleBack={handleBack} />}
+                     creator={creator}
+                     onSuccessfulSubmit={goToCreatorSelectedView}
+                  />
+                  <Box mb={"auto"} />
+               </SparksDialog.Content>
             </SparksDialog.Container>
          )}
       </CreatorFetchWrapper>
@@ -70,6 +74,10 @@ const Actions: FC<ActionsProps> = ({ handleBack }) => {
    const { submitForm, isSubmitting, dirty, isValid, resetForm, values } =
       useFormikContext<SparkFormValues>()
 
+   const isEditing = Boolean(values.id)
+
+   const { goToCreatorSelectedView } = useSparksForm()
+
    return (
       <>
          <SparksDialog.ActionsOffset />
@@ -79,18 +87,22 @@ const Actions: FC<ActionsProps> = ({ handleBack }) => {
                variant="outlined"
                onClick={() => {
                   resetForm()
-                  handleBack()
+                  if (isEditing) {
+                     goToCreatorSelectedView(values.id)
+                  } else {
+                     handleBack() // go back to select another creator view
+                  }
                }}
             >
-               Back
+               {isEditing ? "Cancel" : "Back"}
             </SparksDialog.Button>
             <SparksDialog.Button
                variant="contained"
                onClick={submitForm}
-               disabled={isSubmitting || !dirty || !isValid}
+               disabled={isSubmitting || !isValid || !dirty}
                loading={isSubmitting}
             >
-               {values.id ? "Save changes" : "Create"}
+               {isEditing ? "Save changes" : "Create"}
             </SparksDialog.Button>
          </SparksDialog.Actions>
       </>

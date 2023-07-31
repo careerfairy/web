@@ -15,6 +15,8 @@ import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
 import { FC, useState } from "react"
 import { sxStyles } from "types/commonTypes"
+import DropDownUpIcon from "@mui/icons-material/KeyboardArrowDownRounded"
+import DropDownDownIcon from "@mui/icons-material/KeyboardArrowUpRounded"
 
 const styles = sxStyles({
    chip: {
@@ -100,6 +102,7 @@ const SparkCategorySelect: FC<Props> = ({ name }) => {
             select={Boolean(field.value)} // Placeholder is not shown if select is true
             InputProps={{
                readOnly: true,
+               endAdornment: open ? <DropDownDownIcon /> : <DropDownUpIcon />,
             }}
             onClick={handleClick}
             fullWidth
@@ -108,7 +111,11 @@ const SparkCategorySelect: FC<Props> = ({ name }) => {
             error={meta.touched ? Boolean(meta.error) : null}
             helperText={meta.touched ? meta.error : null}
          >
-            <MenuItem />
+            {/**
+             * To match the Figma design, we created a custom select component.
+             * These menu items is to prevent the console warning, they are never shown
+             */}
+            {categories.map(renderHiddenMenuItem)}
          </BrandedTextField>
          <Popover
             id={id}
@@ -141,6 +148,12 @@ const SparkCategorySelect: FC<Props> = ({ name }) => {
       </div>
    )
 }
+
+const renderHiddenMenuItem = (category: SparkCategory) => (
+   <MenuItem key={category.id} value={category.id} sx={{ display: "none" }}>
+      {category.name}
+   </MenuItem>
+)
 
 const acnchorOrigin = {
    vertical: "bottom",

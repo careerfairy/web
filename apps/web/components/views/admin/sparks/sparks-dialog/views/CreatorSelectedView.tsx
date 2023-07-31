@@ -33,6 +33,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       overflow: "auto",
+      my: "auto",
    },
    editButton: {
       top: 0,
@@ -114,63 +115,64 @@ const CreatorSelectedView = () => {
          {(creator) =>
             creator ? (
                <SparksDialog.Container onMobileBack={handleBack}>
-                  <SparksDialog.Title>
-                     <Box component="span" color="secondary.main">
-                        Creator
-                     </Box>{" "}
-                     selected!
-                  </SparksDialog.Title>
-                  <SparksDialog.Subtitle>
-                     Please check if that’s the correct creator
-                  </SparksDialog.Subtitle>
-                  <Box mt={4} />
-                  <Box sx={styles.creatorDetailsWrapper}>
-                     <Box sx={styles.editButton}>
-                        <Chip
-                           label="Edit"
-                           onDelete={() => handleClickEdit(creator.id)}
-                           onClick={() => handleClickEdit(creator.id)}
-                           deleteIcon={<EditIcon />}
-                        />
+                  <SparksDialog.Content>
+                     <SparksDialog.Title>
+                        <Box component="span" color="secondary.main">
+                           Creator
+                        </Box>{" "}
+                        selected!
+                     </SparksDialog.Title>
+                     <SparksDialog.Subtitle>
+                        Please check if that’s the correct creator
+                     </SparksDialog.Subtitle>
+                     <Box sx={styles.creatorDetailsWrapper}>
+                        <Box sx={styles.editButton}>
+                           <Chip
+                              label="Edit"
+                              onDelete={() => handleClickEdit(creator.id)}
+                              onClick={() => handleClickEdit(creator.id)}
+                              deleteIcon={<EditIcon />}
+                           />
+                        </Box>
+                        <Avatar
+                           alt={`${creator.firstName} ${creator.lastName}`}
+                           src={creator.avatarUrl}
+                           sx={styles.avatar}
+                        >
+                           {creator.firstName[0]} {creator.lastName[0]}
+                        </Avatar>
+                        <Box mt={2.85} />
+                        <Typography sx={styles.fullName} component="h4">
+                           {creator.firstName} {creator.lastName}
+                        </Typography>
+                        <Box mt={2} />
+                        <Stack
+                           direction="row"
+                           divider={<Divider orientation="vertical" flexItem />}
+                           spacing={1.5}
+                        >
+                           <Details>{creator.position}</Details>
+                           {creator.linkedInUrl ? (
+                              <Box
+                                 component="a"
+                                 target="_blank"
+                                 href={creator.linkedInUrl}
+                                 sx={styles.linkedIn}
+                              >
+                                 <LinkedInIcon />
+                                 <Typography>Linked</Typography>
+                              </Box>
+                           ) : null}
+                        </Stack>
+                        <Box mt={2} />
+                        <Details>{creator.email}</Details>
+                        <Box mt={2} />
+                        <Typography sx={styles.story}>
+                           {creator.story || "No story"}
+                        </Typography>
                      </Box>
-                     <Avatar
-                        alt={`${creator.firstName} ${creator.lastName}`}
-                        src={creator.avatarUrl}
-                        sx={styles.avatar}
-                     >
-                        {creator.firstName[0]} {creator.lastName[0]}
-                     </Avatar>
-                     <Box mt={2.85} />
-                     <Typography sx={styles.fullName} component="h4">
-                        {creator.firstName} {creator.lastName}
-                     </Typography>
-                     <Box mt={2} />
-                     <Stack
-                        direction="row"
-                        divider={<Divider orientation="vertical" flexItem />}
-                        spacing={1.5}
-                     >
-                        <Details>{creator.position}</Details>
-                        {creator.linkedInUrl ? (
-                           <Box
-                              component="a"
-                              target="_blank"
-                              href={creator.linkedInUrl}
-                              sx={styles.linkedIn}
-                           >
-                              <LinkedInIcon />
-                              <Typography>Linked</Typography>
-                           </Box>
-                        ) : null}
-                     </Stack>
-                     <Box mt={2} />
-                     <Details>{creator.email}</Details>
-                     <Box mt={2} />
-                     <Typography sx={styles.story}>
-                        {creator.story || "No story"}
-                     </Typography>
-                  </Box>
-                  <SparksDialog.ActionsOffset />
+                     <SparksDialog.ActionsOffset />
+                  </SparksDialog.Content>
                   <SparksDialog.Actions>
                      <SparksDialog.Button
                         color="grey"

@@ -16,6 +16,10 @@ type OpenDialogPayload = {
    selectedSparkId: string
 } | null
 
+type CloseDialogPayload = {
+   forceClose: boolean // If true, close the dialog without asking for confirmation
+} | null
+
 const initialState: ISparksState = {
    sparkDialogOpen: false,
    confirmCloseSparksDialogOpen: false,
@@ -42,13 +46,23 @@ export const adminSparksSlice = createSlice({
             state.sparksForm.selectedSparkId = action.payload.selectedSparkId
          }
       },
-      openConfirmCloseSparksDialog: (state) => {
-         state.confirmCloseSparksDialogOpen = true
-      },
       closeConfirmCloseSparksDialog: (state) => {
          state.confirmCloseSparksDialogOpen = false
       },
-      closeSparkDialog: (state) => {
+      closeSparkDialog: (state, action: PayloadAction<CloseDialogPayload>) => {
+         const shoudlForceClose = action.payload?.forceClose
+
+         const isEditting = Boolean(
+            state.sparksForm.selectedCreatorId ||
+               state.sparksForm.selectedSparkId
+         )
+
+         // If the user is editting a spark and the dialog is not being force closed,
+         if (isEditting && !shoudlForceClose) {
+            state.confirmCloseSparksDialogOpen = true
+            return
+         }
+
          state.sparkDialogOpen = false
          state.sparksForm.selectedCreatorId = null
          state.sparksForm.selectedSparkId = null
@@ -89,7 +103,6 @@ export const {
    setCreator,
    setSpark,
    setCachedSparksFormValues,
-   openConfirmCloseSparksDialog,
    closeConfirmCloseSparksDialog,
 } = adminSparksSlice.actions
 

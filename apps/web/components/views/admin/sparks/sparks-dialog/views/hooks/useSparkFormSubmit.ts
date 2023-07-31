@@ -1,9 +1,10 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import useUploadSparkVideo from "components/custom-hook/spark/useUploadSparkVideo"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { sleep } from "components/helperFunctions/HelperFunctions"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { closeSparkDialog } from "store/reducers/adminSparksReducer"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
@@ -45,15 +46,22 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    const selectedCreatorId = useSelector(sparksSelectedCreatorId)
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
+   const [formSubmitting, setFormSubmitting] = useState(false)
+
    const dispatch = useDispatch()
 
    const handleClose = useCallback(() => {
-      dispatch(closeSparkDialog())
+      dispatch(
+         closeSparkDialog({
+            forceClose: true,
+         })
+      )
    }, [dispatch])
 
    const handleSubmit = useCallback<UseSparkFormSubmit["handleSubmit"]>(
-      async (values, { setSubmitting, setFieldError }) => {
+      async (values, { setSubmitting, setFieldError, resetForm }) => {
          try {
+            setFormSubmitting(true)
             let videoUrl = values.videoUrl
             let sparkVideoId = values.videoId
             const published = values.published === "true"
@@ -87,11 +95,15 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                })
             }
 
+            await sleep(2000) // wait for 2 seconds for UX purposes
+
             setSubmitting(false)
             successNotification("Spark created successfully")
             handleClose()
          } catch (err) {
             errorNotification(err, "Error creating spark, please try again")
+         } finally {
+            setFormSubmitting(false)
          }
       },
       [
@@ -109,9 +121,9 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
          handleSubmit,
          progress,
          uploading,
-         isLoading,
+         isLoading: formSubmitting || isLoading,
       }),
-      [handleSubmit, isLoading, progress, uploading]
+      [formSubmitting, handleSubmit, isLoading, progress, uploading]
    )
 }
 

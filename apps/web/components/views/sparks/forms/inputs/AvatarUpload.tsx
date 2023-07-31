@@ -75,7 +75,7 @@ const AvatarUpload: FC<Props> = ({ name, remoteUrl }) => {
       multiple: false,
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
-         await helpers.setValue(newFile, false)
+         await helpers.setValue(newFile)
          handleTouched()
          helpers.setError(undefined)
       },
