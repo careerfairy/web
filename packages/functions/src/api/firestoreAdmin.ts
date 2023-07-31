@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
-import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore"
+import { getStorage, Storage } from "firebase-admin/storage"
+import {
+   FieldValue,
+   getFirestore,
+   Timestamp,
+   Firestore,
+} from "firebase-admin/firestore"
 
 /**
  * Firebase Admin SDK
@@ -15,5 +21,6 @@ initializeApp()
 
 export const firestore = getFirestore()
 export const auth = getAuth()
+export const storage = getStorage()
 
-export { FieldValue, Timestamp }
+export { FieldValue, Timestamp, Storage, Firestore }

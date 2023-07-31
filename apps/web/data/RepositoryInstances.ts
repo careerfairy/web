@@ -33,10 +33,6 @@ import {
    FirebaseRewardRepository,
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
-import {
-   ISparkRepository,
-   SparkRepository,
-} from "@careerfairy/shared-lib/sparks/SparkRepository"
 
 const firestoreInstance = firebaseApp.firestore()
 
@@ -72,12 +68,6 @@ export const universityRepo: IUniversityRepository =
    new FirebaseUniversityRepository(firestoreInstance)
 
 export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
-   firestoreInstance,
-   FieldValue,
-   Timestamp
-)
-
-export const sparkRepo: ISparkRepository = new SparkRepository(
    firestoreInstance,
    FieldValue,
    Timestamp
