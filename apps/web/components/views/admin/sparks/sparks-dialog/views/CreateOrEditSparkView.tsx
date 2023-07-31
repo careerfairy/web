@@ -1,0 +1,332 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { Box, Grid } from "@mui/material"
+import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
+import ExitIcon from "components/views/common/icons/ExitIcon"
+import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { Form, Formik, useFormikContext } from "formik"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
+import { FC, Fragment, useCallback, useMemo } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useDispatch, useSelector } from "react-redux"
+import { closeSparkDialog } from "store/reducers/adminSparksReducer"
+import {
+   sparksCachedSparkFormValues,
+   sparksFormSelectedCreator,
+   sparksSelectedSparkId,
+} from "store/selectors/adminSparksSelectors"
+import { sxStyles } from "types/commonTypes"
+import ConfirmDeleteSparkDialog from "../../components/ConfirmDeleteSparkDialog"
+import SparksDialog, { useSparksForm } from "../SparksDialog"
+import CreatorCard from "./components/CreatorCard"
+import SparkCategorySelect from "./components/SparkCategorySelect"
+import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
+import { SubmittingOverlay } from "./components/SubmittingOverlay"
+import VideoUpload from "./components/VideoUpload"
+import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
+import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
+import useIsMobile from "components/custom-hook/useIsMobile"
+
+const styles = sxStyles({
+   flex: {
+      display: "flex",
+   },
+   formWrapper: {
+      border: "1px solid #ECECEC",
+      borderRadius: 4,
+      backgroundColor: "white",
+      p: 1.5,
+   },
+   exitIcon: {
+      width: 68,
+      height: 68,
+   },
+})
+
+const getInitialSparkValues = (
+   spark: Spark,
+   selectedCreator: PublicCreator,
+   cachedFormValues: SparkFormValues
+): SparkFormValues => {
+   if (cachedFormValues) {
+      return {
+         ...cachedFormValues,
+         // If the user has selected a creator, that creator has priority over the cached creator
+         creator: selectedCreator ?? cachedFormValues.creator ?? null,
+      }
+   }
+
+   return {
+      categoryId: spark?.category.id ?? "",
+      question: spark?.question ?? "",
+      video: spark?.video ?? null,
+      published:
+         spark?.published !== undefined
+            ? spark.published
+               ? "true"
+               : "false"
+            : "true",
+      id: spark?.id ?? "",
+      // If the user has selected a creator, that creator has priority over the current Spark's creator
+      creator: selectedCreator ?? spark?.creator ?? null,
+   }
+}
+
+const CreateOrEditSparkView = () => {
+   const { group } = useGroup()
+
+   const selectedCreator = useSelector(sparksFormSelectedCreator)
+   const selectedSparkId = useSelector(sparksSelectedSparkId)
+   const cachedFormValues = useSelector(sparksCachedSparkFormValues)
+
+   const { handleSubmit, isLoading } = useSparkFormSubmit(group.id)
+
+   if (isLoading) {
+      return <SubmittingOverlay isUpdatingSpark={Boolean(selectedSparkId)} />
+   }
+
+   return (
+      <SparkFetchWrapper
+         sparkId={selectedSparkId}
+         groupId={group.id}
+         shouldFetch={Boolean(selectedSparkId)}
+      >
+         {(spark) => (
+            <SparksDialog.Container width={725}>
+               <SparksDialog.Content>
+                  {spark ? (
+                     <SparksDialog.Title>
+                        Edit your{" "}
+                        <Box component="span" color="secondary.main">
+                           Spark
+                        </Box>
+                     </SparksDialog.Title>
+                  ) : (
+                     <>
+                        <SparksDialog.Title>
+                           Spark{" "}
+                           <Box component="span" color="secondary.main">
+                              details
+                           </Box>
+                        </SparksDialog.Title>
+                        <SparksDialog.Subtitle>
+                           It’s time to upload and set up your Spark
+                        </SparksDialog.Subtitle>
+                     </>
+                  )}
+                  <Box mt={3} />
+                  <Box mt={"auto"} />
+                  <Formik
+                     initialValues={getInitialSparkValues(
+                        spark,
+                        selectedCreator,
+                        cachedFormValues
+                     )}
+                     validationSchema={CreateOrEditSparkViewSchema}
+                     enableReinitialize
+                     onSubmit={handleSubmit}
+                     validateOnMount
+                  >
+                     <FormComponent />
+                  </Formik>
+                  <SparksDialog.ActionsOffset />
+                  <Box mb={"auto"} />
+               </SparksDialog.Content>
+            </SparksDialog.Container>
+         )}
+      </SparkFetchWrapper>
+   )
+}
+
+const FormComponent: FC = () => {
+   const isMobile = useIsMobile()
+   const { group } = useGroup()
+
+   const dispatch = useDispatch()
+   const cachedFormValues = useSelector(sparksCachedSparkFormValues)
+
+   const { values, dirty, isSubmitting, isValid, submitForm } =
+      useFormikContext<SparkFormValues>()
+
+   const [deleteFiles] = useFirebaseDelete()
+
+   const { goToSelectCreatorView, handleCacheSparksFormValues, handleClose } =
+      useSparksForm()
+
+   const [
+      isConfirmationDialogOpen,
+      handleOpenConfirmationDialog,
+      handleCloseConfirmationDialog,
+   ] = useDialogStateHandler()
+
+   const [
+      isDeleteSparkDialogOpen,
+      handleOpenDeleteSparkDialog,
+      handleCloseDeleteSparkDialog,
+   ] = useDialogStateHandler()
+
+   const isEditing = Boolean(values.id)
+
+   const handleForceCloseDialog = useCallback(() => {
+      dispatch(closeSparkDialog({ forceClose: true }))
+   }, [dispatch])
+
+   const handleBack = useCallback(
+      (shouldSave: boolean) => {
+         if (shouldSave) {
+            handleCacheSparksFormValues(values)
+         } else {
+            const isCreatingNewSpark = !isEditing
+            if (isCreatingNewSpark) {
+               // Delete the video that were uploaded since we are not saving the spark
+               deleteFiles([
+                  values.video?.url,
+                  values.video?.thumbnailUrl,
+               ]).catch(console.error)
+            }
+            handleCacheSparksFormValues(null)
+         }
+         goToSelectCreatorView()
+         handleCloseConfirmationDialog()
+      },
+      [
+         deleteFiles,
+         goToSelectCreatorView,
+         handleCacheSparksFormValues,
+         handleCloseConfirmationDialog,
+         isEditing,
+         values,
+      ]
+   )
+
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Yes, keep progress",
+         callback: () => handleBack(true),
+         color: "secondary",
+         variant: "contained",
+      }),
+      [handleBack]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "No, don’t save",
+         callback: () => handleBack(false),
+         color: "grey",
+         variant: "outlined",
+      }),
+      [handleBack]
+   )
+
+   return (
+      <>
+         {values.creator ? (
+            <CreatorCard
+               onClick={() => handleBack(true)}
+               creator={values.creator}
+            />
+         ) : (
+            <SparksDialog.Button
+               variant="contained"
+               color="secondary"
+               onClick={() => handleBack(true)}
+            >
+               Choose Creator
+            </SparksDialog.Button>
+         )}
+         <Box mt={2} />
+         <Box component={Form} sx={styles.formWrapper}>
+            <Grid container spacing={1.5}>
+               <Grid item xs={12} md={4}>
+                  <VideoUpload editing={isEditing} name="video" />
+               </Grid>
+               <Grid item xs={12} md={8}>
+                  <Grid container spacing={1.5} alignItems="stretch">
+                     <Grid item xs={12}>
+                        <SparkCategorySelect name="categoryId" />
+                     </Grid>
+                     <Grid item xs={12}>
+                        <BrandedTextFieldField
+                           name="question"
+                           label="Question"
+                           placeholder="Insert Spark question"
+                           fullWidth
+                           multiline
+                           rows={10}
+                        />
+                     </Grid>
+                     <Grid item xs={12}>
+                        <SparkVisibilitySelect name="published" />
+                     </Grid>
+                  </Grid>
+               </Grid>
+            </Grid>
+            <SparksDialog.Actions>
+               {isEditing && !isMobile ? (
+                  <Fragment>
+                     <SparksDialog.Button
+                        color="error"
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        onClick={handleOpenDeleteSparkDialog}
+                     >
+                        Delete Spark
+                     </SparksDialog.Button>
+                     <Box flexGrow={1} />
+                  </Fragment>
+               ) : null}
+               <SparksDialog.Button
+                  color="grey"
+                  variant="outlined"
+                  onClick={
+                     isEditing ? handleClose : handleOpenConfirmationDialog
+                  }
+               >
+                  {isEditing ? "Cancel" : "Back"}
+               </SparksDialog.Button>
+               <SparksDialog.Button
+                  variant="contained"
+                  onClick={submitForm}
+                  // Disable the button if:
+                  // 1. A submit action is ongoing (isSubmitting === true),
+                  // 2. The form is invalid (!isValid), or
+                  // 3. There are no changes to the form and the cachedFormValues are null
+                  // which means that the user has not started editing the form yet
+                  disabled={
+                     isSubmitting || !isValid || (!dirty && !cachedFormValues)
+                  }
+                  loading={isSubmitting}
+               >
+                  {values.id ? "Save" : "Create"}
+               </SparksDialog.Button>
+            </SparksDialog.Actions>
+         </Box>
+         <ConfirmationDialog
+            open={isConfirmationDialogOpen}
+            handleClose={handleCloseConfirmationDialog}
+            description="We understand that sometimes we need to take a step back. For it, would you like to keep your current progress?"
+            title="You’ve started your creation"
+            icon={<ExitIcon sx={styles.exitIcon} color="secondary" />}
+            primaryAction={primaryAction}
+            secondaryAction={secondaryAction}
+         />
+         {isEditing ? (
+            <ConfirmDeleteSparkDialog
+               sparkId={values.id}
+               groupId={group.id}
+               open={isDeleteSparkDialogOpen}
+               handleClose={handleCloseDeleteSparkDialog}
+               onDeleted={handleForceCloseDialog}
+            />
+         ) : null}
+      </>
+   )
+}
+
+export default CreateOrEditSparkView

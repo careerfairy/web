@@ -1,7 +1,58 @@
+import { RTCConnectionState, RTCError } from "types/streaming"
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
+import { Reducer } from "redux"
 
-const initialState = {
+interface IStreamState {
+   layout: {
+      streamerBreakoutRoomModalOpen: boolean
+      viewerBreakoutRoomModalOpen: boolean
+      viewerCtaModalOpen: boolean
+      leftMenuOpen: boolean
+      focusModeEnabled: boolean
+      animateProfileIcons: boolean
+      showActionButtons: boolean
+   }
+   stats: {
+      numberOfViewers: number
+   }
+   streaming: {
+      isPublished: boolean
+      videoIsPaused: boolean
+      videoIsMuted: boolean
+      muteAllRemoteVideos: boolean
+      playLocalVideo: boolean
+      playLocalAudio: boolean
+      unmuteFailedMutedRemoteVideos: boolean
+      unpauseFailedPlayRemoteVideos: boolean
+      spyModeEnabled: boolean
+   }
+   videoOptions: {
+      isBlurEnabled: boolean
+      isBlurLoading: boolean
+      hasErrored: boolean
+      backgroundImage: string | undefined
+      isBackgroundImageLoading: boolean
+   }
+   agoraState: {
+      rtcConnectionState?: RTCConnectionState
+      rtcError?: RTCError
+      // The rtc client is successfully connected with the cloud proxy
+      sessionIsUsingCloudProxy: boolean
+      // rtm probably has firewall issues
+      sessionRTMFailedToJoin: boolean
+      primaryClientJoined: boolean
+      screenSharePermissionDenied: boolean
+      deviceErrors: {
+         cameraDenied: boolean
+         microphoneDenied: boolean
+         cameraIsUsedByOtherApp: boolean
+         microphoneIsUsedByOtherApp: boolean
+      }
+   }
+}
+
+const initialState: IStreamState = {
    layout: {
       streamerBreakoutRoomModalOpen: false,
       viewerBreakoutRoomModalOpen: false,
@@ -45,6 +96,8 @@ const initialState = {
          message: undefined,
          name: undefined,
          data: undefined,
+         cause: undefined,
+         stack: undefined,
       },
       deviceErrors: {
          cameraDenied: false,
@@ -59,7 +112,10 @@ const initialState = {
    },
 }
 
-const streamReducer = (state = initialState, { type, payload }) => {
+const streamReducer: Reducer<IStreamState> = (
+   state = initialState,
+   { type, payload }
+) => {
    switch (type) {
       case actions.SET_STREAMER_PUBLISHED:
          return {

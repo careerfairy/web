@@ -1,7 +1,7 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { Create } from "@careerfairy/shared-lib/dist/commonTypes"
 import {
-   RecordingStats,
+   LivestreamRecordingDetails,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import {
@@ -31,7 +31,7 @@ const bar = new cliProgress.SingleBar(
 // cached globally
 let users: Record<string, UserData>
 let userLivestreamData: UserLivestreamData[]
-let recordingStats: RecordingStats[]
+let recordingStats: LivestreamRecordingDetails[]
 let bulkWriter: BulkWriter
 
 let activitiesToCreate: Create<UserActivity>[] = []
@@ -127,7 +127,7 @@ function processUsers(users: UserData[]) {
 /**
  * Create activities for each recording view
  */
-function processRecordingStats(data: RecordingStats[]) {
+function processRecordingStats(data: LivestreamRecordingDetails[]) {
    for (const recording of data) {
       const futureDate = recording.livestreamStartDate.toDate()
       futureDate.setDate(futureDate.getDate() + 3)

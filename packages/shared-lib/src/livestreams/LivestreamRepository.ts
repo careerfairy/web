@@ -15,7 +15,6 @@ import {
    LivestreamRecordingDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
-   RecordingStats,
    RecordingStatsUser,
    RecordingToken,
    UserLivestreamData,
@@ -199,7 +198,9 @@ export interface ILivestreamRepository {
 
    getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
 
-   getLivestreamRecordingStats(livestreamId: string): Promise<RecordingStats>
+   getLivestreamRecordingStats(
+      livestreamId: string
+   ): Promise<LivestreamRecordingDetails>
 
    getRecordedEventsByUserId(
       userId: string,
@@ -924,7 +925,7 @@ export class FirebaseLivestreamRepository
    }
    async getLivestreamRecordingStats(
       livestreamId: string
-   ): Promise<RecordingStats> {
+   ): Promise<LivestreamRecordingDetails> {
       const snap = await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -933,7 +934,7 @@ export class FirebaseLivestreamRepository
          .get()
 
       if (snap.exists) {
-         return snap.data() as RecordingStats
+         return snap.data() as LivestreamRecordingDetails
       }
       return null
    }

@@ -13,7 +13,8 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    LivestreamUserAction,
-   RecordingStats,
+   LivestreamRecordingDetails,
+   RecordingStatsUser,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import {
@@ -55,6 +56,12 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]>
 
+   getAllLivestreamsWithCompanySize<T extends boolean>(
+      companySize: string,
+      withTest?: boolean,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]>
+
    getAllFutureLivestreams<T extends boolean>(
       withTest?: boolean,
       withRef?: T
@@ -73,7 +80,9 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       withRef?: T
    ): Promise<DataWithRef<T, LiveStreamStats>[]>
 
-   getAllLivestreamRecordingStats(): Promise<RecordingStats[]>
+   getAllLivestreamRecordingStats(): Promise<LivestreamRecordingDetails[]>
+
+   getAllLivestreamUserRecordingStats(): Promise<RecordingStatsUser[]>
 }
 
 export class LivestreamScriptsRepository
@@ -81,11 +90,22 @@ export class LivestreamScriptsRepository
    implements ILivestreamScriptsRepository
 {
    async getAllLivestreamRecordingStats(): Promise<
-      DataWithRef<true, RecordingStats>[]
+      DataWithRef<true, LivestreamRecordingDetails>[]
    > {
       const docs = await this.firestore.collectionGroup("recordingStats").get()
 
-      return mapFirestoreDocuments<RecordingStats, true>(docs, true)
+      return mapFirestoreDocuments<LivestreamRecordingDetails, true>(docs, true)
+   }
+
+   async getAllLivestreamUserRecordingStats(): Promise<
+      DataWithRef<true, RecordingStatsUser>[]
+   > {
+      const docs = await this.firestore
+         .collectionGroup("recordingStatsUser")
+         .where("documentType", "==", "recordingStatsUser")
+         .get()
+
+      return mapFirestoreDocuments<RecordingStatsUser, true>(docs, true)
    }
 
    async getAllRatings(): Promise<DataWithRef<true, EventRating>[]> {
@@ -191,6 +211,23 @@ export class LivestreamScriptsRepository
          snaps = await this.firestore
             .collection("livestreams")
             .where("test", "==", false)
+            .get()
+      }
+      return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+   }
+
+   async getAllLivestreamsWithCompanySize<T extends boolean>(
+      companySize: string,
+      withTest: boolean = false,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]> {
+      let snaps
+      if (withTest) {
+         snaps = await this.firestore.collection("livestreams").get()
+      } else {
+         snaps = await this.firestore
+            .collection("livestreams")
+            .where("companySizes", "array-contains-any", [companySize])
             .get()
       }
       return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)

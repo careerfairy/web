@@ -27,6 +27,10 @@ export interface Group extends Identifiable {
    bannerImageUrl?: string
    atsAdminPageFlag?: boolean
    /*
+    * This flag is used to determine if the group has access to sparks
+    * */
+   sparksAdminPageFlag?: boolean
+   /*
     * Metadata for the group
     * */
    companyCountry?: GroupOption

@@ -3,7 +3,7 @@
    "version": "0.0.0",
    "private": true,
    "scripts": {
-      "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next",
+      "dev": "cross-env rimraf .next && NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next",
       "build": "next build --debug",
       "start": "next start",
       "lint": "next lint",
@@ -50,6 +50,7 @@
       "chartjs-plugin-labels": "^1.1.0",
       "dayjs": "^1.11.7",
       "dompurify": "^2.4.1",
+      "embla-carousel-react": "^8.0.0-rc11",
       "file-loader": "^6.2.0",
       "filefy": "^0.1.10",
       "firebase": "^9.23.0",

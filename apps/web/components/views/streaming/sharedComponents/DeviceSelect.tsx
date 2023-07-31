@@ -30,7 +30,7 @@ import {
 } from "../../../../types/streaming"
 import { Theme } from "@mui/system"
 import { useSelector } from "react-redux"
-import RootState from "../../../../store/reducers"
+import { RootState } from "../../../../store"
 import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 import MicOffIcon from "@mui/icons-material/MicOff"
 import BlurOnIcon from "@mui/icons-material/BlurOn"
