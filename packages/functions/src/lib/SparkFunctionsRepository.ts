@@ -15,6 +15,8 @@ import {
 import { createGenericConverter } from "../util/firestore-admin"
 import { Timestamp, Storage, Firestore } from "../api/firestoreAdmin"
 import { FunctionsLogger } from "src/util"
+import { Change } from "firebase-functions"
+import { DocumentSnapshot } from "firebase-admin/firestore"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -45,6 +47,21 @@ export interface ISparkFunctionsRepository {
     * @param creator  The creator of the spark
     */
    update(spark: UpdateSparkData, creator: Creator): Promise<void>
+
+   /**
+    * Sync creator data to the spark
+    */
+   syncCreatorDataToSpark(creator: Change<DocumentSnapshot>): Promise<void>
+
+   /**
+    * Sync group data to the spark
+    * @param group  The group to sync
+    * @param groupId  The id of the group since some group DocumentSnapshots don't have an id field
+    */
+   syncGroupDataToSpark(
+      group: Change<DocumentSnapshot>,
+      groupId: string
+   ): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -158,6 +175,68 @@ export class SparkFunctionsRepository
          .delete(deleteOptions)
 
       return
+   }
+
+   async syncCreatorDataToSpark(
+      creatorChange: Change<DocumentSnapshot<Creator>>
+   ): Promise<void> {
+      if (!creatorChange.after.exists) {
+         // Creator was deleted, so we don't need to update the sparks
+         // unless we want to remove the creator data from the sparks
+         return
+      }
+
+      const newCreator = creatorChange.after.data()
+
+      const sparksSnap = await this.firestore
+         .collection("sparks")
+         .where("creator.id", "==", newCreator.id)
+         .get()
+
+      const batch = this.firestore.batch()
+
+      const toUpdate: Pick<Spark, "creator"> = {
+         creator: pickPublicDataFromCreator(newCreator),
+      }
+
+      sparksSnap.forEach((doc) => {
+         batch.update(doc.ref, toUpdate)
+      })
+
+      return void batch.commit()
+   }
+
+   async syncGroupDataToSpark(
+      groupChange: Change<DocumentSnapshot>,
+      groupId: string
+   ): Promise<void> {
+      if (!groupChange.after.exists) {
+         // Group was deleted, so we don't need to update the sparks
+         // unless we want to remove the group data from the sparks
+         return
+      }
+
+      const newGroup = {
+         ...groupChange.after.data(),
+         id: groupChange.after.id,
+      } as Group
+
+      const sparksSnap = await this.firestore
+         .collection("sparks")
+         .where("group.id", "==", groupId)
+         .get()
+
+      const batch = this.firestore.batch()
+
+      const toUpdate: Pick<Spark, "group"> = {
+         group: pickPublicDataFromGroup(newGroup),
+      }
+
+      sparksSnap.forEach((doc) => {
+         batch.update(doc.ref, toUpdate)
+      })
+
+      return void batch.commit()
    }
 }
 
