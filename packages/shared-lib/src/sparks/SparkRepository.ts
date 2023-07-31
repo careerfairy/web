@@ -2,11 +2,12 @@ import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
-import { AddSparkSparkData, Spark } from "./sparks"
+import { AddSparkSparkData, Spark, getCategoryById } from "./sparks"
 import { Create } from "../commonTypes"
 import { Group, pickPublicDataFromGroup } from "../groups"
+import { Creator, pickPublicDataFromCreator } from "../groups/creators"
 
-export interface ISparksRepository {
+export interface ISparkRepository {
    /**
     *  Get a spark
     * @param id  The id of the spark
@@ -23,12 +24,16 @@ export interface ISparksRepository {
     *  Create a spark
     * @param spark  The spark to create
     */
-   create(spark: AddSparkSparkData, group: Group): Promise<void>
+   create(
+      spark: AddSparkSparkData,
+      group: Group,
+      creator: Creator
+   ): Promise<void>
 }
 
-export class SparksRepository
+export class SparkRepository
    extends BaseFirebaseRepository
-   implements ISparksRepository
+   implements ISparkRepository
 {
    constructor(
       readonly firestore: firebase.firestore.Firestore,
@@ -52,13 +57,22 @@ export class SparksRepository
       return this.firestore.collection("sparks").doc(id).delete()
    }
 
-   async create(spark: AddSparkSparkData, group: Group): Promise<void> {
+   async create(
+      data: AddSparkSparkData,
+      group: Group,
+      creator: Creator
+   ): Promise<void> {
       const doc: Create<Spark> = {
-         ...spark,
+         question: data.question,
+         videoId: data.videoId,
+         videoUrl: data.videoUrl,
+         category: getCategoryById(data.categoryId),
          createdAt: this.fieldValue.serverTimestamp() as any,
-         publishedAt: this.fieldValue.serverTimestamp() as any,
+         publishedAt: data.published
+            ? (this.fieldValue.serverTimestamp() as any)
+            : null,
          updatedAt: null,
-         state: "published",
+         published: data.published,
          likes: 0,
          impressions: 0,
          plays: 0,
@@ -66,6 +80,7 @@ export class SparksRepository
          uniquePlays: 0,
          shareCTA: 0,
          group: pickPublicDataFromGroup(group),
+         creator: pickPublicDataFromCreator(creator),
       }
 
       return void this.firestore.collection("sparks").add(doc)

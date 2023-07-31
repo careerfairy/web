@@ -32,7 +32,7 @@ const View = () => {
 
    return (
       <SparksDialog.Container onMobileBack={handleClose}>
-         <SparksDialog.Title pl={2}>
+         <SparksDialog.Title>
             Select a{" "}
             <Box component="span" color="secondary.main">
                creator
@@ -64,7 +64,6 @@ const View = () => {
                <Form>
                   <SelectCreatorDropDown
                      name="creatorId"
-                     type="select"
                      label="Search, select or create a new creator"
                      creators={creators}
                      disabled={isSubmitting}

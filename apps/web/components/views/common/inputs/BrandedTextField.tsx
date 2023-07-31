@@ -1,4 +1,9 @@
-import { FilledInputProps, InputLabelProps } from "@mui/material"
+import {
+   FilledInputProps,
+   InputLabelProps,
+   SelectProps,
+   lighten,
+} from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
 import { useField } from "formik"
@@ -9,15 +14,16 @@ export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
 const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    <TextField
       variant="filled"
-      InputProps={Object.assign({}, props.InputProps, inputProps)}
+      {...props}
+      InputProps={Object.assign({}, inputProps, props.InputProps)}
       InputLabelProps={Object.assign(
          {},
-         props.InputLabelProps,
-         inputLabelProps
+         inputLabelProps,
+         props.InputLabelProps
       )}
-      {...props}
+      SelectProps={Object.assign({}, selectProps, props.SelectProps)}
    />
-))(({ theme, error }) => ({
+))(({ theme, error, size }) => ({
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
@@ -31,8 +37,8 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
       borderColor: error
          ? theme.palette.error.main
          : theme.palette.mode === "dark"
-         ? "#EDE7FD"
-         : "#ccc",
+         ? "#ccc"
+         : "#EDE7FD",
       backgroundColor: theme.palette.mode === "dark" ? undefined : "#F7F8FC",
    },
 }))
@@ -42,6 +48,21 @@ const inputProps: Partial<FilledInputProps> = {
 }
 const inputLabelProps: Partial<InputLabelProps> = {
    shrink: true,
+}
+const selectProps: Partial<SelectProps> = {
+   MenuProps: {
+      sx: {
+         "& .Mui-selected": {
+            backgroundColor: `#FCFCFC !important`,
+         },
+         "& .MuiMenuItem-root": {
+            backgroundColor: "white",
+            ":hover": {
+               backgroundColor: `${lighten("#FCFCFC", 0.1)} !important}`,
+            },
+         },
+      },
+   },
 }
 
 export const BrandedTextFieldField: FC<BrandedTextFieldProps> = ({
