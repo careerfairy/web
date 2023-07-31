@@ -9,6 +9,7 @@ import {
    createContext,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -61,6 +62,7 @@ interface StepperDialogProps {
    handleClose: () => void
    open: boolean
    views: ReadonlyArray<View>
+   initialStep?: number
    bgcolor?: string
 }
 
@@ -126,12 +128,19 @@ const SteppedDialog = <K extends string>({
    open,
    views,
    bgcolor,
+   initialStep = 0,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
 
    const steps = views.length
-   const [currentStep, setCurrentStep] = useState(0)
+   const [currentStep, setCurrentStep] = useState(initialStep)
+
+   useEffect(() => {
+      if (open) {
+         setCurrentStep(initialStep) // reset currentStep to initialStep when dialog is opened
+      }
+   }, [open, initialStep])
 
    const moveToNext = useCallback(() => {
       if (currentStep < steps - 1) {

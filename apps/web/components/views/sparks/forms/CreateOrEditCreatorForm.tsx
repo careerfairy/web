@@ -34,7 +34,7 @@ type Props = {
    /**
     * The callback to be invoked when the form is successfully submitted
     */
-   onSuccessfulSubmit: (creatorId: string) => void
+   onSuccessfulSubmit: (creator: Creator) => void
 }
 
 const CreateOrEditCreatorForm: FC<Props> = ({

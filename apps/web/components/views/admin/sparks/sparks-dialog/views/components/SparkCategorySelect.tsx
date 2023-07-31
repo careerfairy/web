@@ -102,7 +102,12 @@ const SparkCategorySelect: FC<Props> = ({ name }) => {
             select={Boolean(field.value)} // Placeholder is not shown if select is true
             InputProps={{
                readOnly: true,
-               endAdornment: open ? <DropDownDownIcon /> : <DropDownUpIcon />,
+               // Hide the dropdown icon if select is true as it has its own icon
+               endAdornment: field.value ? null : open ? (
+                  <DropDownDownIcon />
+               ) : (
+                  <DropDownUpIcon />
+               ),
             }}
             onClick={handleClick}
             fullWidth

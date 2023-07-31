@@ -174,33 +174,33 @@ export interface IGroupRepository {
    /**
     * Adds a creator to a group.
     *
-    * @param {string} groupId - The ID of the group.
-    * @param {Create<Creator>} creator - The creator to be added.
-    * @returns {Promise<void>} A Promise that resolves when the creator is successfully added to the group.
+    * @param  groupId - The ID of the group.
+    * @param  creatorData - The creator to be added.
+    * @returns  A Promise that resolves when the creator is successfully added to the group.
     */
-   addCreatorToGroup(groupId: string, creator: AddCreatorData): Promise<string>
+   addCreatorToGroup(groupId: string, creator: AddCreatorData): Promise<Creator>
 
    /**
     * Removes a creator from a group.
     *
-    * @param {string} groupId - The ID of the group.
-    * @param {string} creatorId - The ID of the creator to be removed.
-    * @returns {Promise<void>} A Promise that resolves when the creator is successfully removed from the group.
+    * @param  groupId - The ID of the group.
+    * @param  creatorId - The ID of the creator to be removed.
+    * @returns  A Promise that resolves when the creator is successfully removed from the group.
     */
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void>
 
    /**
     * Updates a creator in a group.
     *
-    * @param {string} groupId - The ID of the group.
-    * @param {UpdateCreatorData} creator - The updated data for the creator.
-    * @returns {Promise<void>} A Promise that resolves when the creator is successfully updated in the group.
+    * @param  groupId - The ID of the group.
+    * @param  creatorData - The updated data for the creator.
+    * @returns A Promise that resolves with the updated creator.
     */
    updateCreatorInGroup(
       groupId: string,
       creatorId: string,
       creator: UpdateCreatorData
-   ): Promise<void>
+   ): Promise<Creator>
 
    /**
     * Checks if a creator's email is unique in a group
@@ -214,7 +214,7 @@ export interface IGroupRepository {
     * Gets a creator by their ID
     * @param groupId the group to get creators from
     * @param creatorId the creator to get
-    * @returns the creator
+    * @returns A Promise that resolves with the creator.
     */
    getCreatorById(groupId: string, creatorId: string): Promise<Creator>
 }
@@ -899,10 +899,10 @@ export class FirebaseGroupRepository
    |--------------------------------------------------------------------------
    */
 
-   addCreatorToGroup(
+   async addCreatorToGroup(
       groupId: string,
       creator: AddCreatorData
-   ): Promise<string> {
+   ): Promise<Creator> {
       const creatorData: Creator = {
          ...creator,
          createdAt: this.fieldValue.serverTimestamp() as any,
@@ -919,16 +919,18 @@ export class FirebaseGroupRepository
          .collection("creators")
          .doc(creatorData.id)
 
-      return creatorRef.set(creatorData, { merge: true }).then(() => {
+      creatorRef.set(creatorData, { merge: true }).then(() => {
          return creatorData.id
       })
+
+      return creatorData
    }
 
-   updateCreatorInGroup(
+   async updateCreatorInGroup(
       groupId: string,
       creatorId: string,
       creator: UpdateCreatorData
-   ): Promise<void> {
+   ): Promise<Creator> {
       const updateCreatorData: UpdateCreatorData & Pick<Creator, "updatedAt"> =
          {
             ...creator,
@@ -941,7 +943,11 @@ export class FirebaseGroupRepository
          .collection("creators")
          .doc(creatorId) // We use the email as the id and not firestore's auto generated id
 
-      return creatorRef.update(updateCreatorData)
+      await creatorRef.update(updateCreatorData)
+
+      const creatorSnap = await creatorRef.get()
+
+      return this.addIdToDoc<Creator>(creatorSnap)
    }
 
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {

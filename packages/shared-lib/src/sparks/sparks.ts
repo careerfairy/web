@@ -69,6 +69,13 @@ export interface Spark extends Identifiable {
    // videoSizeBytes?: number
 }
 
+/**
+ * Collection path: /deletedSparks
+ */
+export interface DeletedSpark extends Spark {
+   deletedAt: Timestamp
+}
+
 export type SparkVideo = {
    /**
     * Video Identifier
@@ -114,7 +121,19 @@ export type AddSparkSparkData = {
    creatorId: Spark["creator"]["id"]
 }
 
-export type UpdateSparkData = Pick<Spark, "question" | "category" | "id">
+export type UpdateSparkData = {
+   id: Spark["id"]
+   categoryId: Spark["category"]["id"]
+   groupId: Spark["group"]["id"]
+   question: Spark["question"]
+   published: Spark["published"]
+   creatorId: Spark["creator"]["id"]
+}
+
+export type DeleteSparkData = {
+   id: Spark["id"]
+   groupId: Spark["group"]["id"]
+}
 
 export const SparksCategories = {
    CompanyCulture: {

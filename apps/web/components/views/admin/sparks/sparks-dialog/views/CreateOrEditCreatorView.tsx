@@ -9,6 +9,10 @@ import { useSelector } from "react-redux"
 import { sparksSelectedCreatorId } from "store/selectors/adminSparksSelectors"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import { SparkFormValues } from "./hooks/useSparkFormSubmit"
+import {
+   Creator,
+   pickPublicDataFromCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 
 const CreateOrEditCreatorView = () => {
    const { goToSelectCreatorView, goToCreatorSelectedView } = useSparksForm()
@@ -28,7 +32,7 @@ const CreateOrEditCreatorView = () => {
          shouldFetch={Boolean(selectedCreatorId)}
       >
          {(creator) => (
-            <SparksDialog.Container onMobileBack={() => handleBack()}>
+            <SparksDialog.Container>
                <SparksDialog.Content>
                   {creator ? (
                      <SparksDialog.Title>
@@ -54,7 +58,9 @@ const CreateOrEditCreatorView = () => {
                   <Box mt={"auto"} />
                   <CreateOrEditCreatorForm
                      groupId={group.id}
-                     actions={<Actions handleBack={handleBack} />}
+                     actions={
+                        <Actions handleBack={handleBack} creator={creator} />
+                     }
                      creator={creator}
                      onSuccessfulSubmit={goToCreatorSelectedView}
                   />
@@ -68,9 +74,10 @@ const CreateOrEditCreatorView = () => {
 
 type ActionsProps = {
    handleBack: () => void
+   creator: Creator
 }
 
-const Actions: FC<ActionsProps> = ({ handleBack }) => {
+const Actions: FC<ActionsProps> = ({ handleBack, creator }) => {
    const { submitForm, isSubmitting, dirty, isValid, resetForm, values } =
       useFormikContext<SparkFormValues>()
 
@@ -88,7 +95,7 @@ const Actions: FC<ActionsProps> = ({ handleBack }) => {
                onClick={() => {
                   resetForm()
                   if (isEditing) {
-                     goToCreatorSelectedView(values.id)
+                     goToCreatorSelectedView(pickPublicDataFromCreator(creator))
                   } else {
                      handleBack() // go back to select another creator view
                   }

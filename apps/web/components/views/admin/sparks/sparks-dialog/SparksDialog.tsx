@@ -29,10 +29,12 @@ import {
 } from "store/reducers/adminSparksReducer"
 import {
    sparksConfirmCloseSparksDialogOpen,
+   sparksDialogInitialStepSelector,
    sparksDialogOpenSelector,
 } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -201,8 +203,8 @@ export const useSparksForm = () => {
    const dispatch = useDispatch()
 
    const setCreator = useCallback(
-      (creatorId: string) => {
-         dispatch(setCreatorAction(creatorId))
+      (creator: PublicCreator) => {
+         dispatch(setCreatorAction(creator))
       },
       [dispatch]
    )
@@ -219,17 +221,17 @@ export const useSparksForm = () => {
    }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
-      (creatorId: string) => {
-         setCreator(creatorId)
+      (creator: PublicCreator) => {
+         setCreator(creator)
          stepper.goToStep("creator-selected")
       },
       [setCreator, stepper]
    )
 
    const goToCreateOrEditCreatorView = useCallback(
-      (creatorId: string) => {
+      (creator: PublicCreator) => {
          stepper.goToStep("create-or-edit-creator")
-         setCreator(creatorId)
+         setCreator(creator)
       },
       [setCreator, stepper]
    )
@@ -276,6 +278,8 @@ export const useSparksForm = () => {
 }
 
 const SparksDialog = () => {
+   const initialStepKey = useSelector(sparksDialogInitialStepSelector)
+
    const open = useSelector(sparksDialogOpenSelector)
    const confirmCloseDialogOpen = useSelector(
       sparksConfirmCloseSparksDialogOpen
@@ -318,6 +322,16 @@ const SparksDialog = () => {
       [hanldeCloseSparksDialog]
    )
 
+   const initialStep = useMemo(() => {
+      if (initialStepKey) {
+         const index = views.findIndex((view) => view.key === initialStepKey)
+         if (index !== -1) {
+            return index
+         }
+      }
+      return 0
+   }, [initialStepKey])
+
    return (
       <>
          <SteppedDialog
@@ -326,6 +340,7 @@ const SparksDialog = () => {
             handleClose={() => hanldeCloseSparksDialog()}
             open={open}
             views={views}
+            initialStep={initialStep}
          />
          {confirmCloseDialogOpen ? (
             <ConfirmationDialog
@@ -363,7 +378,6 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 }
 
 type SparksDialogContainerProps = BoxProps & {
-   onMobileBack?: () => void
    width?: string | number
    hideCloseButton?: boolean
 }
@@ -372,7 +386,7 @@ const Container: FC<SparksDialogContainerProps> = ({
    width,
    sx,
    hideCloseButton,
-   ...props
+   children,
 }) => {
    const { handleClose } = useSparksForm()
 
@@ -391,7 +405,7 @@ const Container: FC<SparksDialogContainerProps> = ({
             ]}
             maxWidth="md"
          >
-            {props.children}
+            {children}
             {hideCloseButton ? null : (
                <Box sx={styles.closeBtn}>
                   <IconButton onClick={handleClose}>
