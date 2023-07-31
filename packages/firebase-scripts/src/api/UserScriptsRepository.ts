@@ -20,7 +20,6 @@ export class UserScriptsRepository
       withRef?: T
    ): Promise<DataWithRef<T, UserData>[]> {
       const users = await this.firestore.collection("userData").get()
-      this.fieldValue
       return mapFirestoreDocuments<UserData, T>(users, withRef)
    }
 }
