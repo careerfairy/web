@@ -16,10 +16,7 @@ const styles = sxStyles({
    root: {
       color: "white",
       display: "flex",
-      height: {
-         xs: 405,
-         md: 443,
-      },
+      height: "100%",
       width: "100%",
       objectFit: "cover",
       borderRadius: 3,
@@ -50,28 +47,30 @@ const styles = sxStyles({
 
 type Props = {
    spark: Spark
+   preview?: boolean
    onClick?: () => void
 }
 
-const SparkCarouselCard: FC<Props> = ({ spark, onClick }) => {
+const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = true }) => {
    return (
       <Box sx={styles.root}>
          <HiddenStatus sparkPublished={spark.published} />
          <Box sx={styles.cardContent}>
             <Box px={cardPadding} pt={cardPadding}>
-               <SparkHeader spark={spark} />
+               <SparkHeader showAdminOptions={preview} spark={spark} />
             </Box>
             <Box p={cardPadding} onClick={onClick} mt="auto" component={"span"}>
                <SparkStats spark={spark} />
                <Box mt={1.5} />
                <SparkCategoryChip categoryId={spark.category.id} />
                <Box mt={1.5} />
-               <SparkQuestion limitLines question={spark.question} />
+               <SparkQuestion limitLines={preview} question={spark.question} />
             </Box>
          </Box>
          <VideoPreview
             thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
             videoUrl={spark.video.url}
+            playing={!preview}
          />
       </Box>
    )
