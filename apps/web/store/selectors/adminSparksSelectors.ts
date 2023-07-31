@@ -23,3 +23,6 @@ export const sparksFormSelectedCreator = (state: RootState) =>
 
 export const sparksDialogInitialStepSelector = (state: RootState) =>
    state.adminSparks.sparksForm.initialStep
+
+export const sparkToPreviewSelector = (state: RootState) =>
+   state.adminSparks.sparkToPreview

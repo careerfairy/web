@@ -10,6 +10,8 @@ import SparkCategoryChip from "./SparkCategoryChip"
 import SparkQuestion from "./SparkQuestion"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 
+const cardPadding = 2
+
 const styles = sxStyles({
    root: {
       color: "white",
@@ -24,6 +26,7 @@ const styles = sxStyles({
       position: "relative",
       flexDirection: "column",
       overflow: "hidden",
+      cursor: "pointer",
    },
    cardContent: {
       "&::after": {
@@ -41,27 +44,30 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       flex: 1,
-      p: 2,
       position: "relative",
    },
 })
 
 type Props = {
    spark: Spark
+   onClick?: () => void
 }
 
-const SparkCarouselCard: FC<Props> = ({ spark }) => {
+const SparkCarouselCard: FC<Props> = ({ spark, onClick }) => {
    return (
       <Box sx={styles.root}>
          <HiddenStatus sparkPublished={spark.published} />
          <Box sx={styles.cardContent}>
-            <SparkHeader spark={spark} />
-            <Box flexGrow={1} />
-            <SparkStats spark={spark} />
-            <Box mt={1.5} />
-            <SparkCategoryChip categoryId={spark.category.id} />
-            <Box mt={1.5} />
-            <SparkQuestion limitLines question={spark.question} />
+            <Box px={cardPadding} pt={cardPadding}>
+               <SparkHeader spark={spark} />
+            </Box>
+            <Box p={cardPadding} onClick={onClick} mt="auto" component={"span"}>
+               <SparkStats spark={spark} />
+               <Box mt={1.5} />
+               <SparkCategoryChip categoryId={spark.category.id} />
+               <Box mt={1.5} />
+               <SparkQuestion limitLines question={spark.question} />
+            </Box>
          </Box>
          <VideoPreview
             thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
