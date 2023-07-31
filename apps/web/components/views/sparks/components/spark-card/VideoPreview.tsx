@@ -7,32 +7,46 @@ const styles = sxStyles({
    root: {
       position: "absolute",
       inset: 0,
-      zIndex: -1,
+      background: "black",
+   },
+   playerWrapper: {
+      position: "relative",
+      width: "100%",
+      height: "100%",
       "& .player": {
-         "& video": {
-            objectFit: "cover",
-            objectPosition: "center",
-         },
+         position: "absolute",
+         top: 0,
+         left: 0,
       },
+   },
+   withAspectRatio: {
+      // Portrait aspect ratio, e.g., 9:16
+      paddingTop: "177.77%", // (16 / 9) * 100%
    },
 })
 
 type Props = {
    videoUrl: string
    thumbnailUrl: string
+   playing?: boolean
 }
 
-const VideoPreview: FC<Props> = ({ videoUrl, thumbnailUrl }) => {
+const VideoPreview: FC<Props> = ({ videoUrl, thumbnailUrl, playing }) => {
    return (
       <Box sx={styles.root}>
-         <ReactPlayer
-            width="100%"
-            height="100%"
-            className="player"
-            url={videoUrl}
-            light={thumbnailUrl}
-            playIcon={<Fragment />}
-         />
+         <Box sx={[styles.playerWrapper, playing && styles.withAspectRatio]}>
+            <ReactPlayer
+               playing={playing}
+               playsinline={playing}
+               loop={playing}
+               width="100%"
+               height="100%"
+               className="player"
+               url={videoUrl}
+               light={!playing && thumbnailUrl}
+               playIcon={<Fragment />}
+            />
+         </Box>
       </Box>
    )
 }

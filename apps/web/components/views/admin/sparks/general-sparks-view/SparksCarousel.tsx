@@ -1,9 +1,9 @@
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import Box from "@mui/material/Box"
-import { sxStyles } from "types/commonTypes"
-import { FC, ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import Box from "@mui/material/Box"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
+import { FC, ReactNode } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
 const desktopSlideWidth = 306 + slideSpacing
@@ -27,6 +27,10 @@ const styles = sxStyles({
       minWidth: 0,
       paddingLeft: `${slideSpacing}px`,
       position: "relative",
+      height: {
+         xs: 405,
+         md: 443,
+      },
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,

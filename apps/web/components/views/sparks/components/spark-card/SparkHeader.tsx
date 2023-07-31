@@ -51,9 +51,10 @@ const styles = sxStyles({
 
 type Props = {
    spark: Spark
+   showAdminOptions?: boolean
 }
 
-const SparkHeader: FC<Props> = ({ spark }) => {
+const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
    return (
       <Box sx={styles.root}>
          <RoundedLogo
@@ -70,7 +71,9 @@ const SparkHeader: FC<Props> = ({ spark }) => {
          <Box mr={1.25} />
          <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
          <Box flexGrow={1} />
-         <SparkOptionsButton groupId={spark.group.id} sparkId={spark.id} />
+         {showAdminOptions ? (
+            <SparkOptionsButton groupId={spark.group.id} sparkId={spark.id} />
+         ) : null}
       </Box>
    )
 }
