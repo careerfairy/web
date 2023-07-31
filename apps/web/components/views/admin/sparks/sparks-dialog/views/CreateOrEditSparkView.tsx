@@ -30,6 +30,7 @@ import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    flex: {
@@ -106,16 +107,18 @@ const CreateOrEditSparkView = () => {
                         </Box>
                      </SparksDialog.Title>
                   ) : (
-                     <SparksDialog.Title>
-                        Spark{" "}
-                        <Box component="span" color="secondary.main">
-                           details
-                        </Box>
-                     </SparksDialog.Title>
+                     <>
+                        <SparksDialog.Title>
+                           Spark{" "}
+                           <Box component="span" color="secondary.main">
+                              details
+                           </Box>
+                        </SparksDialog.Title>
+                        <SparksDialog.Subtitle>
+                           It’s time to upload and set up your Spark
+                        </SparksDialog.Subtitle>
+                     </>
                   )}
-                  <SparksDialog.Subtitle>
-                     It’s time to upload and set up your Spark
-                  </SparksDialog.Subtitle>
                   <Box mt={3} />
                   <Box mt={"auto"} />
                   <Formik
@@ -141,6 +144,7 @@ const CreateOrEditSparkView = () => {
 }
 
 const FormComponent: FC = () => {
+   const isMobile = useIsMobile()
    const { group } = useGroup()
 
    const dispatch = useDispatch()
@@ -264,7 +268,7 @@ const FormComponent: FC = () => {
                </Grid>
             </Grid>
             <SparksDialog.Actions>
-               {isEditing ? (
+               {isEditing && !isMobile ? (
                   <Fragment>
                      <SparksDialog.Button
                         color="error"
@@ -299,7 +303,7 @@ const FormComponent: FC = () => {
                   }
                   loading={isSubmitting}
                >
-                  {values.id ? "Save changes" : "Create"}
+                  {values.id ? "Save" : "Create"}
                </SparksDialog.Button>
             </SparksDialog.Actions>
          </Box>
