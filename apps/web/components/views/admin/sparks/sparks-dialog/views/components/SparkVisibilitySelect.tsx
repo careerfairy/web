@@ -37,7 +37,7 @@ const selectProps: Partial<SelectProps> = {
    renderValue: (value) => {
       return (
          <Box component="span">
-            {value === "true" ? "Public on CareerFairy" : "Private"}
+            {value === "true" ? "Public on CareerFairy" : "Hidden"}
          </Box>
       )
    },
@@ -45,7 +45,7 @@ const selectProps: Partial<SelectProps> = {
 
 export const publishedOptions = [
    { value: "true", label: "Public on CareerFairy" },
-   { value: "false", label: "Hiden" },
+   { value: "false", label: "Hidden" },
 ] as const
 
 export default SparkVisibilitySelect
