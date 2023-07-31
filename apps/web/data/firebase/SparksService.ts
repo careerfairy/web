@@ -1,5 +1,3 @@
-import { ISparkRepository } from "@careerfairy/shared-lib/sparks/SparkRepository"
-import { sparkRepo } from "data/RepositoryInstances"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
 import {
@@ -9,10 +7,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/sparks"
 
 export class SparksService {
-   constructor(
-      private readonly repository: ISparkRepository,
-      private readonly functions: Functions
-   ) {}
+   constructor(private readonly functions: Functions) {}
 
    /**
     * Create a spark
@@ -48,9 +43,6 @@ export class SparksService {
    }
 }
 
-export const sparkService = new SparksService(
-   sparkRepo,
-   FunctionsInstance as any
-)
+export const sparkService = new SparksService(FunctionsInstance as any)
 
 export default SparksService
