@@ -35,16 +35,7 @@ export interface Spark extends Identifiable {
     */
    question: string
 
-   /**
-    * Video Identifier
-    *
-    * Used to construct the video url
-    * https://firebase.storage/sparks/[videoId]/[videoId].mp4
-    */
-   videoId: string // uuid generated during upload
-
-   // in case we want to override the video with an external one
-   videoUrl: string // we can have a default video while in the processing state
+   video: SparkVideo
 
    /**
     * KPIs
@@ -78,14 +69,47 @@ export interface Spark extends Identifiable {
    // videoSizeBytes?: number
 }
 
+export type SparkVideo = {
+   /**
+    * Video Identifier
+    *
+    * Used to construct the video url
+    * /sparks/videos/[videoUid].mp4
+    */
+   uid: string
+
+   /**
+    * Video format
+    *
+    * Used to construct the video url
+    * /sparks/[videoUid].[videoFormat]
+    */
+   fileExtension: string
+
+   /**
+    * Video url
+    *
+    * Used to construct the video url
+    * https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/storage/careerfairy-e1fd9.appspot.com/files/~2Fsparks~2Fvideos /[id]
+    */
+   url: string
+
+   /**
+    * Video thumbnail url
+    *
+    * Used to construct the video url
+    * https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/storage/careerfairy-e1fd9.appspot.com/files/~2Fsparks~2Fthumbnails /[id]
+    */
+   thumbnailUrl: string
+}
+
 export type SparkVisibility = "public" | "private"
 
 export type AddSparkSparkData = {
    categoryId: Spark["category"]["id"]
    question: Spark["question"]
-   videoId: Spark["videoId"]
+   video: Spark["video"]
    published: Spark["published"]
-   videoUrl: Spark["videoUrl"]
    groupId: Spark["group"]["id"]
    creatorId: Spark["creator"]["id"]
 }

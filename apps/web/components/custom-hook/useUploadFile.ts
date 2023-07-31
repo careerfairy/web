@@ -15,6 +15,7 @@ type UseUploadFile = {
    handleUploadFile: (file: File) => Promise<{
       url: string
       uid: string
+      fileExtension: string
    }>
 
    /**
@@ -54,7 +55,11 @@ type UseUploadFile = {
  */
 const useUploadFile = (
    storagePath: string,
-   onUploadComplete?: (url: string, fileName: string) => void
+   onUploadComplete?: (
+      url: string,
+      fileName: string,
+      fileExtension: string
+   ) => void
 ): UseUploadFile => {
    const { errorNotification } = useSnackbarNotifications()
    const [loading, setLoading] = useState(false)
@@ -79,11 +84,11 @@ const useUploadFile = (
 
             // Call the provided callback function with the URL and UUID of the uploaded file
             if (onUploadComplete) {
-               onUploadComplete(url, fileName)
+               onUploadComplete(url, fileName, fileExtension)
             }
 
             setFileUploaded(true)
-            return { url, uid: fileName }
+            return { url, uid: fileName, fileExtension }
          } catch (error) {
             errorNotification(error, "Error uploading file", {
                storagePath,
