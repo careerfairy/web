@@ -1,31 +1,39 @@
-import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
+import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    Box,
    BoxProps,
    CircularProgress,
-   ContainerProps,
    IconButton,
    Container as MuiContainer,
    Stack,
    Typography,
    TypographyProps,
 } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
 import dynamic from "next/dynamic"
 import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
+   closeConfirmCloseSparksDialog,
    closeSparkDialog,
+   openConfirmCloseSparksDialog,
+   setCachedSparksFormValues,
    setCreator as setCreatorAction,
    setSpark as setSparkAction,
 } from "store/reducers/adminSparksReducer"
-import { sparksDialogOpenSelector } from "store/selectors/adminSparksSelectors"
+import {
+   sparksConfirmCloseSparksDialogOpen,
+   sparksDialogOpenSelector,
+} from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -67,8 +75,8 @@ const styles = sxStyles({
       py: `${mobileTopPadding}px`,
       position: "relative",
       height: {
-         xs: "100vh",
-         [mobileBreakpoint]: "clamp(0px, calc(100vh - 50px), 778px)",
+         xs: "100dvh",
+         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
       },
       justifyContent: {
          xs: "flex-start",
@@ -108,14 +116,28 @@ const styles = sxStyles({
       color: "text.primary",
       fontSize: "2rem",
    },
-   mobileCloseBtn: {
+   closeBtn: {
       position: "absolute",
-      top: `${mobileTopPadding * 1.25}px`,
+      top: 0,
       right: 0,
       zIndex: 1,
-      p: 1,
+      pt: {
+         xs: 2.5,
+         [mobileBreakpoint]: 2.125,
+      },
+      pr: {
+         xs: 2,
+         [mobileBreakpoint]: 2.5,
+      },
       color: "text.primary",
-      fontSize: "2rem",
+      "& svg": {
+         width: 32,
+         height: 32,
+         color: "text.primary",
+      },
+   },
+   warningIcon: {
+      fontSize: 62,
    },
 })
 
@@ -150,6 +172,16 @@ const views = [
          { loading: () => <CircularProgress /> }
       ),
    },
+   {
+      key: "create-or-edit-spark",
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/sparks/sparks-dialog/views/CreateOrEditSparkView"
+            ),
+         { loading: () => <CircularProgress /> }
+      ),
+   },
 ] as const
 
 export type SparkDialogStep = (typeof views)[number]["key"]
@@ -173,7 +205,7 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
-      dispatch(closeSparkDialog())
+      dispatch(openConfirmCloseSparksDialog())
    }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
@@ -197,6 +229,17 @@ export const useSparksForm = () => {
       setCreator(null)
    }, [setCreator, stepper])
 
+   const goToCreateSparkView = useCallback(() => {
+      stepper.goToStep("create-or-edit-spark")
+   }, [stepper])
+
+   const handleCacheSparksFormValues = useCallback(
+      (value: SparkFormValues | null) => {
+         dispatch(setCachedSparksFormValues(value))
+      },
+      [dispatch]
+   )
+
    return useMemo(() => {
       return {
          setCreator,
@@ -206,11 +249,15 @@ export const useSparksForm = () => {
          goToCreatorSelectedView,
          goToCreateOrEditCreatorView,
          goToSelectCreatorView,
+         goToCreateSparkView,
+         handleCacheSparksFormValues,
       }
    }, [
       goToCreateOrEditCreatorView,
+      goToCreateSparkView,
       goToCreatorSelectedView,
       goToSelectCreatorView,
+      handleCacheSparksFormValues,
       handleClose,
       setCreator,
       setSpark,
@@ -220,21 +267,74 @@ export const useSparksForm = () => {
 
 const SparksDialog = () => {
    const open = useSelector(sparksDialogOpenSelector)
+   const confirmCloseDialogOpen = useSelector(
+      sparksConfirmCloseSparksDialogOpen
+   )
 
    const dispatch = useDispatch()
 
-   const handleClose = useCallback(() => {
+   const hanldeCloseSparksDialog = useCallback(() => {
       dispatch(closeSparkDialog())
    }, [dispatch])
 
+   const handleOpenConfirmCloseDialog = useCallback(() => {
+      dispatch(openConfirmCloseSparksDialog())
+   }, [dispatch])
+
+   const handleCloseConfirmCloseDialog = useCallback(() => {
+      dispatch(closeConfirmCloseSparksDialog())
+   }, [dispatch])
+
+   const handleCloseClick = useCallback(() => {
+      handleOpenConfirmCloseDialog()
+   }, [handleOpenConfirmCloseDialog])
+
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "No, stay here",
+         callback: handleCloseConfirmCloseDialog,
+         color: "grey",
+         variant: "outlined",
+      }),
+      [handleCloseConfirmCloseDialog]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Yes, close",
+         callback: hanldeCloseSparksDialog,
+         color: "error",
+         variant: "contained",
+      }),
+      [hanldeCloseSparksDialog]
+   )
+
    return (
-      <SteppedDialog
-         key={open ? "open" : "closed"}
-         bgcolor="#FCFCFC"
-         handleClose={handleClose}
-         open={open}
-         views={views}
-      />
+      <>
+         <SteppedDialog
+            key={open ? "open" : "closed"}
+            bgcolor="#FCFCFC"
+            handleClose={handleCloseClick}
+            open={open}
+            views={views}
+         />
+         {confirmCloseDialogOpen ? (
+            <ConfirmationDialog
+               open={confirmCloseDialogOpen}
+               handleClose={handleCloseConfirmCloseDialog}
+               description="If you close this window now the info that you inserted will be lost. Are you sure you want to proceed?"
+               title="Close window?"
+               icon={
+                  <ErrorOutlineRoundedIcon
+                     sx={styles.warningIcon}
+                     color="error"
+                  />
+               }
+               primaryAction={primaryAction}
+               secondaryAction={secondaryAction}
+            />
+         ) : null}
+      </>
    )
 }
 
@@ -255,39 +355,41 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 
 type SparksDialogContainerProps = BoxProps & {
    onMobileBack?: () => void
-   showMobileCloseButton?: boolean
+   width?: number
+   hideCloseButton?: boolean
 }
 
 const Container: FC<SparksDialogContainerProps> = ({
-   onMobileBack,
-   showMobileCloseButton,
+   width,
    sx,
+   hideCloseButton,
    ...props
 }) => {
-   const isMobile = useIsMobile()
-   const dispatch = useDispatch()
-
-   const handleCloseClick = useCallback(() => {
-      dispatch(closeSparkDialog())
-   }, [dispatch])
+   const { handleClose } = useSparksForm()
 
    return (
       <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
-         <MuiContainer sx={styles.container} maxWidth="sm">
-            {onMobileBack && isMobile ? (
-               <IconButton sx={styles.mobileBackBtn} onClick={onMobileBack}>
-                  <BackIcon />
-               </IconButton>
-            ) : null}
+         <MuiContainer
+            sx={[
+               styles.container,
+               width
+                  ? {
+                       width: {
+                          [mobileBreakpoint]: width,
+                       },
+                    }
+                  : null,
+            ]}
+            maxWidth="sm"
+         >
             {props.children}
-            {showMobileCloseButton && isMobile ? (
-               <IconButton
-                  sx={styles.mobileCloseBtn}
-                  onClick={handleCloseClick}
-               >
-                  <CloseIcon />
-               </IconButton>
-            ) : null}
+            {hideCloseButton ? null : (
+               <Box sx={styles.closeBtn}>
+                  <IconButton onClick={handleClose}>
+                     <CloseIcon />
+                  </IconButton>
+               </Box>
+            )}
          </MuiContainer>
       </Box>
    )

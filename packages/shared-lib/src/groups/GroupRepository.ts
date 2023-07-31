@@ -209,6 +209,14 @@ export interface IGroupRepository {
     * @returns true if the email is unique, false otherwise
     */
    creatorEmailIsUnique(groupId: string, email: string): Promise<boolean>
+
+   /**
+    * Gets a creator by their ID
+    * @param groupId the group to get creators from
+    * @param creatorId the creator to get
+    * @returns the creator
+    */
+   getCreatorById(groupId: string, creatorId: string): Promise<Creator>
 }
 
 export class FirebaseGroupRepository
@@ -954,6 +962,21 @@ export class FirebaseGroupRepository
          .doc(email)
 
       return creatorRef.get().then((snap) => !snap.exists)
+   }
+
+   async getCreatorById(groupId: string, creatorId: string): Promise<Creator> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creatorId)
+
+      const snapshot = await creatorRef.get()
+
+      if (snapshot.exists) {
+         return this.addIdToDoc<Creator>(snapshot)
+      }
+      return null
    }
 }
 

@@ -11,6 +11,10 @@ import {
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
 import {
+   SparkRepository,
+   ISparkRepository,
+} from "@careerfairy/shared-lib/sparks/SparkRepository"
+import {
    ILivestreamFunctionsRepository,
    LivestreamFunctionsRepository,
 } from "../lib/LivestreamFunctionsRepository"
@@ -65,4 +69,10 @@ export const marketingUsersRepo: IMarketingUsersRepository =
 
 export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
+)
+
+export const sparkRepo: ISparkRepository = new SparkRepository(
+   firestore as any,
+   FieldValue,
+   Timestamp
 )
