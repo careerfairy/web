@@ -63,26 +63,16 @@ type Props = {
 }
 
 const TopBar = ({ title, cta }: Props) => {
-   const { livestreamDialog } = useGroup()
+   const { livestreamDialog, shrunkLeftMenuState } = useGroup()
    const isMobile = useIsMobile()
+   const { layout } = useGroupDashboard()
 
-   const { toggleLeftDrawer, layout } = useGroupDashboard()
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
-         {!drawerPresent && (
-            <Box sx={styles.btnWrapper}>
-               <IconButton
-                  onClick={toggleLeftDrawer}
-                  sx={styles.menuButton}
-                  edge={"start"}
-               >
-                  <MenuRoundedIcon />
-               </IconButton>
-            </Box>
-         )}
+         {!drawerPresent ? <MobileToggleButton /> : null}
          <Box sx={styles.leftSection}>
             <Typography fontWeight={600} sx={styles.title}>
                {title}
@@ -115,6 +105,22 @@ const TopBar = ({ title, cta }: Props) => {
             <UserAvatarWithDetails />
             <NotificationsButton />
          </Stack>
+      </Box>
+   )
+}
+
+const MobileToggleButton = () => {
+   const { toggleLeftDrawer } = useGroupDashboard()
+
+   return (
+      <Box sx={styles.btnWrapper}>
+         <IconButton
+            onClick={toggleLeftDrawer}
+            sx={styles.menuButton}
+            edge={"start"}
+         >
+            <MenuRoundedIcon />
+         </IconButton>
       </Box>
    )
 }

@@ -1,4 +1,3 @@
-import React from "react"
 import Image from "next/image"
 
 // material-ui
@@ -20,6 +19,12 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       position: "relative",
+   },
+   logoWrapperHeightNormal: {
+      height: 180,
+   },
+   logoWrapperHeightCompact: {
+      height: 100,
    },
    hoverOverlay: (theme) => ({
       position: "absolute",
@@ -52,10 +57,16 @@ const styles = sxStyles({
 })
 
 const EditGroupLogo = () => {
-   const { group } = useGroup()
-
+   const { group, shrunkLeftMenuState } = useGroup()
    return (
-      <Box sx={styles.logoWrapper}>
+      <Box
+         sx={[
+            styles.logoWrapper,
+            shrunkLeftMenuState !== "disabled"
+               ? styles.logoWrapperHeightCompact
+               : styles.logoWrapperHeightNormal,
+         ]}
+      >
          <Avatar
             title={`${group.universityName} logo`}
             variant="rounded"
