@@ -9,6 +9,7 @@ import SparkStats from "./SparkStats"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkQuestion from "./SparkQuestion"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import { Stack } from "@mui/material"
 
 const cardPadding = 2
 
@@ -23,7 +24,6 @@ const styles = sxStyles({
       position: "relative",
       flexDirection: "column",
       overflow: "hidden",
-      cursor: "pointer",
    },
    cardContent: {
       "&::after": {
@@ -43,6 +43,9 @@ const styles = sxStyles({
       flex: 1,
       position: "relative",
    },
+   cardDetails: {
+      cursor: "pointer",
+   },
 })
 
 type Props = {
@@ -59,13 +62,19 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = true }) => {
             <Box px={cardPadding} pt={cardPadding}>
                <SparkHeader showAdminOptions={preview} spark={spark} />
             </Box>
-            <Box p={cardPadding} onClick={onClick} mt="auto" component={"span"}>
+            <Stack
+               sx={styles.cardDetails}
+               p={cardPadding}
+               onClick={onClick}
+               flexGrow={1}
+            >
+               <Box mt="auto" />
                <SparkStats spark={spark} />
                <Box mt={1.5} />
                <SparkCategoryChip categoryId={spark.category.id} />
                <Box mt={1.5} />
                <SparkQuestion limitLines={preview} question={spark.question} />
-            </Box>
+            </Stack>
          </Box>
          <VideoPreview
             thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}

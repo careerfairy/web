@@ -52,11 +52,11 @@ const SparkPreviewDialog: FC = () => {
          open={open}
          TransitionComponent={Zoom}
       >
-         <SuspenseWithBoundary fallback={<SparkCarouselCardSkeleton />}>
+         <SuspenseWithBoundary fallback={<SkeletonComponent />}>
             {sparkId ? (
                <Component onClose={handleClose} sparkId={sparkId} />
             ) : (
-               <SparkCarouselCardSkeleton />
+               <SkeletonComponent />
             )}
          </SuspenseWithBoundary>
       </Dialog>
@@ -89,6 +89,14 @@ const Component: FC<Props> = ({ sparkId, onClose }) => {
             </SparkAspectRatioBox>
          </Box>
       </>
+   )
+}
+
+const SkeletonComponent: FC = () => {
+   return (
+      <SparkAspectRatioBox sx={styles.aspectRoot}>
+         <SparkCarouselCardSkeleton />
+      </SparkAspectRatioBox>
    )
 }
 
