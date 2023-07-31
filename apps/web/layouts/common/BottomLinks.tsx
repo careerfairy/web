@@ -11,7 +11,8 @@ import { HelpCircle } from "react-feather"
 import { NavLink } from "./NavList"
 import { sxStyles } from "../../types/commonTypes"
 import { supportPageLink } from "../../constants/links"
-import { MainLogo } from "../../components/logos"
+import { MainLogo, MiniLogo, MiniLogoGreenBg } from "../../components/logos"
+import { useGroup } from "../GroupDashboardLayout"
 
 const styles = sxStyles({
    logo: {
@@ -24,6 +25,8 @@ type Props = {
 }
 
 const BottomLinks = ({ hideMainLogo }: Props) => {
+   const { shrunkLeftMenuIsActive } = useGroup()
+
    return (
       <Stack
          spacing={2}
@@ -40,7 +43,11 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             <></>
          ) : (
             <Box px={5}>
-               <MainLogo sx={styles.logo} />
+               {shrunkLeftMenuIsActive ? (
+                  <MiniLogoGreenBg />
+               ) : (
+                  <MainLogo sx={styles.logo} />
+               )}
             </Box>
          )}
 
@@ -48,7 +55,7 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             href={supportPageLink}
             id={"support-page"}
             baseTextColor={"text.primary"}
-            title={"Support"}
+            title={shrunkLeftMenuIsActive ? "" : "Support"}
             Icon={HelpCircle}
             external
          />

@@ -1,4 +1,5 @@
 export const DRAWER_WIDTH = 240
+export const DRAWER_WIDTH_SHRUNK = 100
 
 export const NICE_SCROLLBAR_STYLES = {
    "& ::-webkit-scrollbar": {

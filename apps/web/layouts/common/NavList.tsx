@@ -18,6 +18,7 @@ import Stack from "@mui/material/Stack"
 import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
 import Collapse from "@mui/material/Collapse"
+import { useGroup } from "../GroupDashboardLayout"
 
 const leftPadding = 5
 const iconSize = 24
@@ -87,6 +88,7 @@ type NavLinkProps = INavLink & {
    baseTextColor?: string
    external?: boolean
    isNested?: boolean
+   shrunk?: boolean
 }
 export const NavLink = ({
    href,
@@ -94,6 +96,7 @@ export const NavLink = ({
    title,
    pathname,
    childLinks,
+   shrunk,
    external = false,
    baseTextColor,
    rightElement,
@@ -140,21 +143,23 @@ export const NavLink = ({
                >
                   <Box sx={styles.icon} component={Icon} />
                </ListItemIcon>
-               <ListItemText
-                  primary={
-                     <Typography
-                        variant={"body1"}
-                        fontWeight={"inherit"}
-                        fontSize={"inherit"}
-                        color="inherit"
-                     >
-                        {title}
-                     </Typography>
-                  }
-               />
+               {shrunk ? null : (
+                  <ListItemText
+                     primary={
+                        <Typography
+                           variant={"body1"}
+                           fontWeight={"inherit"}
+                           fontSize={"inherit"}
+                           color="inherit"
+                        >
+                           {title}
+                        </Typography>
+                     }
+                  />
+               )}
                <Box my="auto">{rightElement}</Box>
             </ListItemButton>
-            {isNavLinkGroup ? (
+            {isNavLinkGroup && !shrunk ? (
                <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                      {childLinks?.map((link) => (
