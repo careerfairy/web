@@ -65,6 +65,7 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
                companyName={spark.group.universityName}
             />
             <Box mr={1.25} />
+            <Box flexGrow={1} />
             <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
             {showAdminOptions ? (
                <Fragment>
