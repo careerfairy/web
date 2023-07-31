@@ -1,10 +1,8 @@
-import { Button } from "@mui/material"
-import React, { FC, useCallback } from "react"
+import { Button, ButtonProps } from "@mui/material"
+import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
-
-type Props = {}
 
 const styles = sxStyles({
    root: {
@@ -12,7 +10,7 @@ const styles = sxStyles({
    },
 })
 
-const CreateSparkButton: FC<Props> = () => {
+const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
    const dispatch = useDispatch()
 
    const handleOpen = useCallback(() => {
@@ -23,10 +21,11 @@ const CreateSparkButton: FC<Props> = () => {
       <Button
          onClick={handleOpen}
          color="secondary"
-         sx={styles.root}
+         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
          variant="contained"
+         {...props}
       >
-         Upload a new Spark
+         {children || "Upload a new Spark"}
       </Button>
    )
 }
