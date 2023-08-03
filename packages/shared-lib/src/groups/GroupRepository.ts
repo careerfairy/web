@@ -143,12 +143,16 @@ export interface IGroupRepository {
       groupId: string,
       metadata: Pick<
          Group,
+         | "careerPageUrl"
          | "webSiteUrl"
          | "universityName"
          | "extraInfo"
          | "companySize"
          | "companyIndustries"
          | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
          | "privacyPolicyActive"
          | "privacyPolicyUrl"
       >
@@ -777,12 +781,16 @@ export class FirebaseGroupRepository
       groupId: string,
       metadata: Pick<
          Group,
+         | "careerPageUrl"
          | "webSiteUrl"
          | "universityName"
          | "extraInfo"
          | "companySize"
          | "companyIndustries"
          | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
          | "privacyPolicyActive"
          | "privacyPolicyUrl"
       >
