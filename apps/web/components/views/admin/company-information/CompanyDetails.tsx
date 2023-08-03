@@ -64,6 +64,8 @@ const CompanyDetails = () => {
          companyIndustries: company.companyIndustries,
          companySize: company.companySize,
          description: company.description,
+         careerPageUrl: company.careerPageUrl,
+         extraInfo: company.extraInfo,
       }),
       [
          company.universityName,
@@ -71,6 +73,8 @@ const CompanyDetails = () => {
          company.companyIndustries,
          company.companySize,
          company.description,
+         company.careerPageUrl,
+         company.extraInfo,
       ]
    )
 
@@ -114,12 +118,9 @@ const CompanyDetails = () => {
                values,
                errors,
                touched,
-               handleChange,
-               handleSubmit,
                handleBlur,
                isSubmitting,
                setFieldValue,
-               setFieldError,
             }) => (
                <Form>
                   <Stack
@@ -137,16 +138,24 @@ const CompanyDetails = () => {
                         }
                      />
                      <BrandedTextField
-                        name="companyWebsite"
+                        name="careerPageUrl"
                         label="Career page URL"
                         placeholder="Ex: company.io/careers"
+                        value={values.careerPageUrl}
+                        onChange={(e) =>
+                           setFieldValue("careerPageUrl", e.target.value)
+                        }
                      />
                      <BrandedTextField
-                        name="description"
+                        name="extraInfo"
                         multiline={true}
                         rows={4}
                         label="Describe your company"
                         placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
+                        value={values.extraInfo}
+                        onChange={(e) =>
+                           setFieldValue("extraInfo", e.target.value)
+                        }
                      />
                      <>
                         <Box>
