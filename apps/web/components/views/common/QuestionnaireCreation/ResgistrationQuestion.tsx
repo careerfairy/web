@@ -77,10 +77,10 @@ const styles = sxStyles({
       padding: "8px 16px",
       justifyContent: "center",
       alignItems: "center",
-      gap: "10px",
       borderRadius: "32px",
       border: "1px solid #FF4A4A",
       color: "#FF4A4A",
+      marginRight: "20px",
    },
    addNewQuestionButton: {
       display: "flex",
@@ -219,6 +219,7 @@ const RegistrationQuestion: React.FC<Props> = ({
                               width: "-webkit-fill-available",
                               alignItems: "flex-end",
                               justifyContent: "flex-end",
+                              mt: "16px",
                               mb: "16px",
                            }}
                         >
