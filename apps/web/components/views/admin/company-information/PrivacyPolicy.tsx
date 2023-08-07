@@ -30,7 +30,6 @@ const PrivacyPolicy = () => {
 
    const handleSubmit = (values) => {
       try {
-         debugger
          const privacyPolicy: Pick<
             Group,
             "privacyPolicyActive" | "privacyPolicyUrl"

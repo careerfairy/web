@@ -28,6 +28,7 @@ import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiChe
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import Styles from "./BaseStyles"
 
 const schema = yup.object().shape({
    logoUrl: yup.string().trim().required("URL is required").url("Invalid URL"),
@@ -36,6 +37,7 @@ const schema = yup.object().shape({
 
 const styles = sxStyles({
    selectBox: {
+      width: "-webkit-fill-available",
       color: "#B0B0B0",
       ".MuiOutlinedInput-root": {
          display: "flex",
@@ -48,6 +50,9 @@ const styles = sxStyles({
          border: "1px solid var(--tertiary-e, #EDE7FD)",
          background: "#F7F8FC",
          color: "#B0B0B0",
+         width: "-webkit-fill-available",
+      },
+      "#branded-multi-checkbox": {
          width: "-webkit-fill-available",
       },
    },
@@ -93,11 +98,8 @@ const CompanyDetails = () => {
    )
 
    return (
-      <Box
-         sx={{ display: "flex", flexDirection: "row", flex: 1 }}
-         width={"-webkit-fill-available"}
-      >
-         <Box sx={{ width: "400px", mr: "16px" }}>
+      <Box sx={Styles.section}>
+         <div className="section-left_column">
             <Typography sx={{ fontSize: "24px", fontWeight: 600, mb: "12px" }}>
                Details
             </Typography>
@@ -108,7 +110,7 @@ const CompanyDetails = () => {
                talent. This information will be visible on your company profile,
                as well as your live streams, and can be edited at any time.
             </Typography>
-         </Box>
+         </div>
          <Formik
             initialValues={initialValues}
             enableReinitialize
@@ -200,6 +202,7 @@ const CompanyDetails = () => {
                               onChange={(values) => {
                                  setFieldValue("companyIndustries", values)
                               }}
+                              sx={styles.selectBox}
                            />
                         </Box>
 

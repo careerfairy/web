@@ -30,9 +30,7 @@ const styles = sxStyles({
       alignItems: "flex-end",
       gap: "24px",
       alignSelf: "stretch",
-      borderRadius: "10px",
-      border: "1px solid #EBEBEB",
-      background: "#FEFEFE",
+      width: "-webkit-fill-available",
    },
    addOptionButton: {
       display: "flex",
@@ -60,7 +58,6 @@ const styles = sxStyles({
       borderRadius: "8px",
       border: "1px solid #ECECEC",
       background: "#FEFEFE",
-      color: "#D9D9D9",
       fontSize: "18px",
       fontStyle: "normal",
       fontWeight: 600,
@@ -117,6 +114,7 @@ type Props = {
 }
 
 const QuestionarieCreation = ({ initialData }: Props) => {
+   const [inputMode, setInputMode] = useState(false)
    const [questions, setQuestions] = useState(initialData.questions ?? [])
 
    useEffect(() => {
@@ -131,10 +129,18 @@ const QuestionarieCreation = ({ initialData }: Props) => {
    return (
       <Stack sx={styles.stack}>
          {questions.map((question) => (
-            <RegistrationQuestion key={question.id} initialValues={question} />
+            <RegistrationQuestion
+               key={question.id}
+               initialValues={question}
+               inputMode={inputMode}
+               setInputMode={setInputMode}
+            />
          ))}
          <Button
-            sx={styles.addNewQuestionButton}
+            sx={{
+               ...styles.addNewQuestionButton,
+               color: inputMode ? "#D9D9D9" : "#6749EA",
+            }}
             onClick={() => addQuestionnarieQuestion()}
          >
             <PlusCircle />

@@ -22,7 +22,11 @@ const QuestionName: React.FC<Props> = ({
          onChange={(e) => setValue(e.target.value)}
       ></BrandedTextField>
    ) : (
-      <Typography>{value}</Typography>
+      <Typography
+         sx={{ color: "#212020", fontWeight: 600, fontSize: "18px", m: 1 }}
+      >
+         {value}
+      </Typography>
    )
 }
 

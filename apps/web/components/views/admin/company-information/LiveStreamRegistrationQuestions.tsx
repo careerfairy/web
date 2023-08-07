@@ -15,8 +15,7 @@ import { groupRepo } from "data/RepositoryInstances"
 import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 
 const LiveStreamRegistrationQuestions = () => {
-   const { group, groupQuestions } = useGroup()
-   const [values, setValues] = useState(groupQuestions)
+   const { groupQuestions } = useGroup()
 
    const initialValues = useMemo(
       () => ({
@@ -24,53 +23,7 @@ const LiveStreamRegistrationQuestions = () => {
       }),
       [groupQuestions]
    )
-   const handleSubmit = useCallback(
-      async ({ questions }: { questions: GroupQuestion[] }) => {
-         debugger
-         try {
-            const promises = []
-            const initialQuestionsIds = groupQuestions.map(
-               (question) => question.id
-            )
-            const questionsToBeCreated = []
-            const questionsToBeupdated = []
-            questions.forEach((question) => {
-               if (!initialQuestionsIds.includes(question.id)) {
-                  questionsToBeCreated.push({ ...question })
-               } else {
-                  questionsToBeupdated.push({ ...question })
-               }
-            })
 
-            if (questionsToBeCreated.length > 0) {
-               promises.push(
-                  ...questionsToBeCreated.map(
-                     ({ options, name, questionType }) => {
-                        return groupRepo.addNewGroupQuestion(group.id, {
-                           options,
-                           name,
-                           questionType,
-                        })
-                     }
-                  )
-               )
-            }
-            if (questionsToBeupdated) {
-               promises.push(
-                  ...questionsToBeupdated.map((question) => {
-                     return groupRepo.updateGroupQuestion(group.id, question)
-                  })
-               )
-            }
-            await Promise.all(promises)
-            console.log("saved")
-         } catch (e) {
-            console.log(e)
-            // errorLogAndNotify(e)
-         }
-      },
-      [values, setValues]
-   )
    return (
       <Box sx={Styles.section}>
          <div className="section-left_column">
@@ -81,11 +34,9 @@ const LiveStreamRegistrationQuestions = () => {
                be edited.
             </p>
          </div>
-
-         <QuestionnaireCreation
-            initialData={initialValues}
-            handleSubmit={handleSubmit}
-         />
+         <Box sx={{ gap: "12px", width: "-webkit-fill-available" }}>
+            <QuestionnaireCreation initialData={initialValues} />
+         </Box>
       </Box>
    )
 }

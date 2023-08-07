@@ -11,23 +11,11 @@ import { Form, Formik, useFormik } from "formik"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import QuestionName from "./QuestionName"
-import { convertDictToDocArray } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuidv4 } from "uuid"
 import { createAGroupQuestion } from "./createAGroupQuestion"
-import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { createAGroupQuestionOption } from "./createAGroupQuestionOption"
-import { convertArrayOfObjectsToDictionaryByProp } from "data/util/AnalyticsUtil"
-import { Preview } from "@mui/icons-material"
-
-type QuestionDeleteParams = {
-   groupQuestionId: Pick<GroupQuestion, "id">
-}
-
-type Props = {
-   initialValues?: GroupQuestion
-   editing?: boolean
-}
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const getInitialGroupQuestion = (
    groupQuestion?: GroupQuestion
@@ -48,15 +36,26 @@ const getInitialGroupQuestion = (
 
 const styles = sxStyles({
    stack: {
+      color: "#212020",
       display: "flex",
-      padding: "16px",
       flexDirection: "column",
-      alignItems: "flex-end",
-      gap: "24px",
+      alignItems: "flex-start",
+      padding: 1,
       alignSelf: "stretch",
       borderRadius: "10px",
       border: "1px solid #EBEBEB",
       background: "#FEFEFE",
+      width: "-webkit-fill-available",
+      "#registration-question-name-field": {
+         display: "flex",
+         alignItems: "flex-end",
+         width: "-webkit-fill-available",
+         m: 1,
+         justifyContent: "space-between",
+      },
+      "#registration-question-action-buttons": {
+         width: "-webkit-fill-available",
+      },
    },
    addOptionButton: {
       display: "flex",
@@ -72,6 +71,16 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: 400,
       lineHeight: "normal",
+   },
+   removeOptionButton: {
+      display: "flex",
+      padding: "8px 16px",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "10px",
+      borderRadius: "32px",
+      border: "1px solid #FF4A4A",
+      color: "#FF4A4A",
    },
    addNewQuestionButton: {
       display: "flex",
@@ -92,13 +101,23 @@ const styles = sxStyles({
    },
 })
 
+type QuestionDeleteParams = {
+   groupQuestionId: Pick<GroupQuestion, "id">
+}
+
+type Props = {
+   initialValues?: GroupQuestion
+   inputMode?: boolean
+   setInputMode?: (values: boolean) => void
+}
+
 const RegistrationQuestion: React.FC<Props> = ({
    initialValues,
-   editing,
+   inputMode,
+   setInputMode,
 }): ReactElement => {
    const { group } = useGroup()
-   const [isNew, setIsNew] = useState(!editing)
-   const [inputMode, setInputMode] = useState(false)
+   const [isNew, setIsNew] = useState(!inputMode)
 
    const [localGroupQuestion, setLocalGroupQuestion] = useState<GroupQuestion>(
       getInitialGroupQuestion(initialValues)
@@ -131,7 +150,6 @@ const RegistrationQuestion: React.FC<Props> = ({
    }
 
    const handleSubmit = (question): void => {
-      debugger
       try {
          if (isNew) {
             groupRepo.addNewGroupQuestion(group.id, { ...question })
@@ -141,8 +159,7 @@ const RegistrationQuestion: React.FC<Props> = ({
 
          setInputMode(false)
       } catch (e) {
-         console.log(e)
-         // errorLogAndNotify(e)
+         errorLogAndNotify(e)
       }
    }
 
@@ -152,25 +169,26 @@ const RegistrationQuestion: React.FC<Props> = ({
          onSubmit={handleSubmit}
          enableReinitialize
       >
-         {({ handleReset, values, setFieldValue }) => (
+         {({ values, setFieldValue }) => (
             <form onSubmit={() => handleSubmit(values)}>
-               <Stack>
-                  <Box>
+               <Stack sx={styles.stack}>
+                  <Box id="registration-question-name-field">
                      <QuestionName
                         editing={inputMode}
                         value={values.name}
                         setValue={(value) => setFieldValue(`name`, value)}
                      />
                      {!inputMode && (
-                        <Button onClick={(prev) => setInputMode(true)}>
-                           <Edit2 />
+                        <Button onClick={() => setInputMode(true)}>
+                           <Edit2 color="#A0A0A0" width={16} />
                         </Button>
                      )}
                   </Box>
                   {Object.values(values.options).map(
                      (option: GroupQuestionOption, cardinal) => (
                         <QuestionOption
-                           cardinal={cardinal}
+                           key={`${values.id}${cardinal}`}
+                           cardinal={cardinal + 1}
                            editing={inputMode}
                            value={option.name}
                            setValue={(newValue) =>
@@ -182,21 +200,44 @@ const RegistrationQuestion: React.FC<Props> = ({
                         />
                      )
                   )}
-                  <Button
-                     sx={styles.addOptionButton}
-                     onClick={() => handleAddOption(values, setFieldValue)}
-                  >
-                     <PlusCircle />
-                     <Typography variant="button">Add an option</Typography>
-                  </Button>
-                  <Button
-                     onClick={() =>
-                        deleteQuestion({ groupQuestionId: values.id })
-                     }
-                  >
-                     remove question
-                  </Button>
-                  <Button onClick={() => handleSubmit(values)}>Save</Button>
+                  {inputMode && (
+                     <Stack id="registration-question-action-buttons">
+                        <Button
+                           sx={styles.addOptionButton}
+                           onClick={() =>
+                              handleAddOption(values, setFieldValue)
+                           }
+                        >
+                           <PlusCircle />
+                           <Typography variant="button">
+                              Add an option
+                           </Typography>
+                        </Button>
+                        <Box
+                           sx={{
+                              display: "flex",
+                              width: "-webkit-fill-available",
+                              alignItems: "flex-end",
+                              justifyContent: "flex-end",
+                              mb: "16px",
+                           }}
+                        >
+                           <Button
+                              sx={styles.removeOptionButton}
+                              onClick={() =>
+                                 deleteQuestion({ groupQuestionId: values.id })
+                              }
+                           >
+                              remove question
+                           </Button>
+                           <SaveChangesButton
+                              onClick={() => handleSubmit(values)}
+                           >
+                              Save
+                           </SaveChangesButton>
+                        </Box>
+                     </Stack>
+                  )}
                </Stack>
             </form>
          )}
