@@ -124,7 +124,7 @@ export const ImageCropperDialog = ({
                   {Boolean(title) ? title : "Edit picture"}
                </Typography>
             </Box>
-            <Button>
+            <Button onClick={() => handleClose()}>
                <X color="#000000" />
             </Button>
          </DialogTitle>

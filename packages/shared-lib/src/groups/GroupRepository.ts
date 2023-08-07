@@ -182,6 +182,7 @@ export interface IGroupRepository {
       bannerImageUrl: string
    ): Promise<void>
 
+   updateGroupLogoUrl(groupId: string, logoUrl: string): Promise<void>
    /**
     * Adds a creator to a group.
     *
@@ -910,6 +911,18 @@ export class FirebaseGroupRepository
 
       const toUpdate: Pick<Group, "bannerImageUrl"> = {
          bannerImageUrl,
+      }
+
+      return groupRef.update(toUpdate)
+   }
+
+   updateGroupLogoUrl(groupId: string, logoUrl: string): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "logoUrl"> = {
+         logoUrl,
       }
 
       return groupRef.update(toUpdate)

@@ -9,7 +9,7 @@ export default sxStyles({
       paddingY: 2,
       fontFamily: "Poppins",
       flexDirection: "row",
-      width: "fit-content",
+      width: "-webkit-fill-available",
       ":child": {
          flexGrow: 1,
          flex: 1,

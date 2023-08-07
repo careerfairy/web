@@ -10,16 +10,12 @@ import {
 import { Box } from "@mui/system"
 
 import Styles from "./BaseStyles"
-import FilePickerContainer from "components/ssr/FilePickerContainer"
-import { BaseGroupInfo } from "pages/group/create"
 import { Form, Formik } from "formik"
 import * as yup from "yup"
 import SaveChangesButton from "./SaveChangesButton"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiCheckBox"
 import {
    CompanyCountryValues,
-   CompanyIndustryValues,
    RelevantCompanyIndustryValues,
 } from "constants/forms"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -29,10 +25,29 @@ import VirtualizedAutocomplete from "components/views/common/VirtualizedAutocomp
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { sxStyles } from "types/commonTypes"
 
-const schema = yup.object().shape({
-   logoUrl: yup.string().trim().required("URL is required").url("Invalid URL"),
-   logoFileObj: yup.mixed().required("Image file is required"),
+const styles = sxStyles({
+   selectBox: {
+      width: "-webkit-fill-available",
+      color: "#B0B0B0",
+      ".MuiOutlinedInput-root": {
+         display: "flex",
+         padding: "12px 15px",
+         flexDirection: "column",
+         alignItems: "flex-start",
+         gap: "10px",
+         alignSelf: "stretch",
+         borderRadius: "8px",
+         border: "1px solid var(--tertiary-e, #EDE7FD)",
+         background: "#F7F8FC",
+         color: "#B0B0B0",
+         width: "-webkit-fill-available",
+      },
+      "#branded-multi-checkbox": {
+         width: "-webkit-fill-available",
+      },
+   },
 })
 
 const TargetTalent = () => {
@@ -79,7 +94,6 @@ const TargetTalent = () => {
    }, [])
 
    const handleSubmit = (values) => {
-      debugger
       try {
          const targets: Pick<
             Group,
@@ -98,11 +112,8 @@ const TargetTalent = () => {
       }
    }
    return (
-      <Box
-         sx={{ display: "flex", flexDirection: "row", flex: 1 }}
-         width={"-webkit-fill-available"}
-      >
-         <Box sx={{ width: "400px", mr: "16px" }}>
+      <Box sx={Styles.section}>
+         <div className="section-left_column">
             <Typography sx={{ fontSize: "24px", fontWeight: 600, mb: "12px" }}>
                Target talent
             </Typography>
@@ -112,7 +123,7 @@ const TargetTalent = () => {
                Tell us which talent you’re targeting so that we can present them
                your content.
             </Typography>
-         </Box>
+         </div>
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
             {({
                values,
@@ -138,6 +149,7 @@ const TargetTalent = () => {
                         onChange={(values) => {
                            setFieldValue("targetedCountries", values)
                         }}
+                        sx={styles.selectBox}
                      />
                      <VirtualizedAutocomplete
                         options={groupedUniversities}
@@ -174,6 +186,7 @@ const TargetTalent = () => {
                               }
                            />
                         )}
+                        sx={styles.selectBox}
                      />
                      <BrandedMultiCheckBox
                         label="Targeted fields of study"
@@ -182,6 +195,7 @@ const TargetTalent = () => {
                         onChange={(values) => {
                            setFieldValue("targetedFieldsOfStudy", values)
                         }}
+                        sx={styles.selectBox}
                      />
                      <SaveChangesButton type="submit" />
                   </Stack>

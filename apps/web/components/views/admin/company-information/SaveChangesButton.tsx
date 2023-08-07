@@ -4,17 +4,29 @@ import { sxStyles } from "types/commonTypes"
 import { Icon } from "react-feather"
 
 const styles = sxStyles({
-   root: {
+   active: {
       display: "flex",
-      height: "34px",
       padding: "8px 16px",
       justifyContent: "center",
       alignItems: "center",
-      gap: "8px",
-      borderRadius: "53px",
+      gap: "10px",
+      borderRadius: "32px",
+      background: "#6749EA",
+   },
+   inactive: {
+      display: "flex",
+      padding: "8px 16px",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "10px",
+      borderRadius: "32px",
       background: "#EDEDED",
-      border: "none",
-      minWidth: "130px",
+      color: "#BBB",
+      fontFamily: "Poppins",
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: 400,
+      lineHeight: "20px",
    },
    caption: {
       color: "#BBB",
@@ -29,23 +41,27 @@ const styles = sxStyles({
 })
 
 type Props = {
-   label?: string
+   children?: string
    icon?: Icon
    type?: "submit" | "button" | "reset" | undefined
+   active?: boolean
    onClick?: React.MouseEventHandler<HTMLButtonElement>
 }
 
 const SaveChangesButton = ({
    icon,
-   label = "Save changes",
+   children = "Save changes",
    type = "button",
+   active = false,
    onClick,
 }: Props) => {
    return (
-      <Button sx={styles.root} type={type ? type : "button"} onClick={onClick}>
-         <Typography variant="caption" sx={styles.caption}>
-            {label}
-         </Typography>
+      <Button
+         sx={active ? styles.active : styles.inactive}
+         type={type ? type : "button"}
+         onClick={onClick}
+      >
+         <Typography>{children}</Typography>
          {Boolean(icon) ? icon : <></>}
       </Button>
    )

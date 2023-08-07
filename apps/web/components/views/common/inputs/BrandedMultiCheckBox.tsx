@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Theme, useTheme } from "@mui/material/styles"
+import { SxProps, Theme, useTheme } from "@mui/material/styles"
 import Box from "@mui/material/Box"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import InputLabel from "@mui/material/InputLabel"
@@ -38,6 +38,7 @@ type Props = {
    label: string
    options: OptionGroup[]
    value: OptionGroup[]
+   sx?: SxProps
    onChange: (values: OptionGroup[]) => void
 }
 
@@ -48,7 +49,13 @@ type OnChangeValue = Event & {
    }
 }
 
-const BrandedMultiCheckBox = ({ label, options, value, onChange }: Props) => {
+const BrandedMultiCheckBox = ({
+   label,
+   options,
+   value,
+   sx = { width: 300, m: 1 },
+   onChange,
+}: Props) => {
    const theme = useTheme()
 
    const handleChange = (event: OnChangeValue) => {
@@ -63,7 +70,7 @@ const BrandedMultiCheckBox = ({ label, options, value, onChange }: Props) => {
 
    return (
       <div>
-         <FormControl sx={{ m: 1, width: 300 }}>
+         <FormControl sx={sx}>
             <InputLabel id="branded-multi-checkbox-label">{label}</InputLabel>
             <Select
                labelId="branded-multi-checkbox-label"
