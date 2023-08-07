@@ -91,8 +91,11 @@ const PrivacyPolicy = () => {
                            onChange={(e) =>
                               setFieldValue("privacyPolicyUrl", e.target.value)
                            }
+                           sx={{ mb: "12px" }}
                         ></BrandedTextField>
-                        <Button type="submit">Save</Button>
+                        <SaveChangesButton type="submit">
+                           Save
+                        </SaveChangesButton>
                      </Stack>
                   </Box>
                </Form>

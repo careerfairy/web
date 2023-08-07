@@ -72,6 +72,14 @@ const styles = sxStyles({
       fontWeight: 400,
       lineHeight: "normal",
    },
+   actionButtons: {
+      display: "flex",
+      width: "-webkit-fill-available",
+      alignItems: "flex-end",
+      justifyContent: "flex-end",
+      mt: "16px",
+      mb: "16px",
+   },
    removeOptionButton: {
       display: "flex",
       padding: "8px 16px",
@@ -213,16 +221,7 @@ const RegistrationQuestion: React.FC<Props> = ({
                               Add an option
                            </Typography>
                         </Button>
-                        <Box
-                           sx={{
-                              display: "flex",
-                              width: "-webkit-fill-available",
-                              alignItems: "flex-end",
-                              justifyContent: "flex-end",
-                              mt: "16px",
-                              mb: "16px",
-                           }}
-                        >
+                        <Box sx={styles.actionButtons}>
                            <Button
                               sx={styles.removeOptionButton}
                               onClick={() =>
