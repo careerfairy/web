@@ -20,6 +20,7 @@ const QuestionName: React.FC<Props> = ({
          placeholder="Insert your question here"
          value={value}
          onChange={(e) => setValue(e.target.value)}
+         sx={{ width: "-webkit-fill-available" }}
       ></BrandedTextField>
    ) : (
       <Typography

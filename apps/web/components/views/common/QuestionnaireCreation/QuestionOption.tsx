@@ -21,7 +21,7 @@ const QuestionOption: React.FC<Props> = ({
          placeholder="Insert your question here"
          value={value}
          onChange={(event) => setValue(event.target.value)}
-         sx={{ m: 1 }}
+         sx={{ m: 1, width: "-webkit-fill-available" }}
       ></BrandedTextField>
    ) : (
       <Stack
