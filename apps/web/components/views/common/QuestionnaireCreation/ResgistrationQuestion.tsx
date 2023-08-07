@@ -117,15 +117,17 @@ type Props = {
    initialValues?: GroupQuestion
    inputMode?: boolean
    setInputMode?: (values: boolean) => void
+   onRemove?: (questionId: Pick<GroupQuestion, "id">) => void
 }
 
 const RegistrationQuestion: React.FC<Props> = ({
    initialValues,
    inputMode,
    setInputMode,
+   onRemove,
 }): ReactElement => {
    const { group } = useGroup()
-   const [isNew, setIsNew] = useState(!inputMode)
+   const [isNew, setIsNew] = useState(true)
 
    const [localGroupQuestion, setLocalGroupQuestion] = useState<GroupQuestion>(
       getInitialGroupQuestion(initialValues)
@@ -141,13 +143,14 @@ const RegistrationQuestion: React.FC<Props> = ({
       }
    }, [initialValues])
 
-   const handleValuesReset = (): GroupQuestion => {
-      return createAGroupQuestion()
-   }
-
    const deleteQuestion = async ({ groupQuestionId }: QuestionDeleteParams) => {
-      await groupRepo.deleteGroupQuestion(group.id, groupQuestionId.toString())
-      return setInputMode(false)
+      if (!isNew) {
+         await groupRepo.deleteGroupQuestion(
+            group.id,
+            groupQuestionId.toString()
+         )
+      }
+      return onRemove(groupQuestionId)
    }
 
    const handleAddOption = (question, setFieldValue) => {

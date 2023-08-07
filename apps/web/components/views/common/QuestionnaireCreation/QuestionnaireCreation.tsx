@@ -126,6 +126,14 @@ const QuestionarieCreation = ({ initialData }: Props) => {
       newQuestionsList.push(createAGroupQuestion())
       setQuestions(newQuestionsList)
    }
+
+   const handleQuestionRemove = (questionId) => {
+      const newQuestionsList = [
+         ...questions.filter((question) => question.id !== questionId),
+      ]
+      setQuestions(newQuestionsList)
+   }
+
    return (
       <Stack sx={styles.stack}>
          {questions.map((question) => (
@@ -134,6 +142,7 @@ const QuestionarieCreation = ({ initialData }: Props) => {
                initialValues={question}
                inputMode={inputMode}
                setInputMode={setInputMode}
+               onRemove={handleQuestionRemove}
             />
          ))}
          <Button
