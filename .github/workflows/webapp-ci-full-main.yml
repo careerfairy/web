@@ -174,11 +174,6 @@ jobs:
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
-         - run: |
-              echo ${{ secrets.GITHUB_TOKEN }}
-              echo ${{ secrets.VERCEL_TOKEN }}
-              echo ${{ secrets.VERCEL_ORG_ID }}
-              echo ${{ secrets.VERCEL_PROJECT_ID }}
          - uses: actions/checkout@v3
          - name: Deploy to Vercel
            uses: BetaHuhn/deploy-to-vercel-action@v1
