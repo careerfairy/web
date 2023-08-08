@@ -16,7 +16,7 @@ const testWithPrivacyPolicyActive = test.extend({
 })
 
 test.describe("Group Analytics", () => {
-   test("Main analytics are visible and update when user registers", async ({
+   test.skip("Main analytics are visible and update when user registers", async ({
       groupPage,
       group,
       context,

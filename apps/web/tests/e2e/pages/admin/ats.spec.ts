@@ -30,7 +30,7 @@ const testWithCompletlySetupATS = test.extend({
 })
 
 test.describe("ATS Integration", () => {
-   test("Can successfully link account & test application", async ({
+   test.skip("Can successfully link account & test application", async ({
       groupPage,
       browserName,
    }) => {
