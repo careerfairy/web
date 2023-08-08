@@ -164,7 +164,7 @@
       "webpack": "^5.88.1"
    },
    "engines": {
-      "node": "16.x"
+      "node": "18.x"
    },
    "copyFiles": [
       {
