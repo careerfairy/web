@@ -16,8 +16,8 @@ import { universityCountriesMap } from "components/util/constants/universityCoun
 import { multiListSelectMapValueFn } from "components/views/signup/utils"
 import MultiCheckboxSelect, {
    MultiCheckboxSelectType,
-} from "../common/filter/MultiCheckboxSelect"
-import MultiListSelect from "../common/MultiListSelect"
+} from "../../common/filter/MultiCheckboxSelect"
+import MultiListSelect from "../../common/MultiListSelect"
 import { useTheme } from "@mui/material"
 import { CalendarContext } from "./AcademicCalendar"
 
@@ -200,6 +200,7 @@ const CalendarFilter = ({
                               isChipUnderTextfield={true}
                               useStyledTextfield={true}
                               useStyledCheckbox={true}
+                              noColorOnSelect
                            />
                         </Box>
                      </FormControl>,

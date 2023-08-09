@@ -4,6 +4,7 @@ import {
    Film as StreamIcon,
    User as ProfileIcon,
    Search as FindIcon,
+   Calendar as CalendarIcon,
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
@@ -92,6 +93,12 @@ const useAdminLinks = () => {
                icon: FindIcon,
                title: "Query Users",
                basePath: `/admin/query-users`,
+            },
+            {
+               href: `/admin/academic-calendar-manager`,
+               icon: CalendarIcon,
+               title: "Academic Calendar",
+               basePath: `/admin/academic-calendar-manager`,
             },
          ])
       } else {

@@ -10,6 +10,7 @@ import CalendarLanding from "./CalendarLanding"
 import CalendarChart from "./CalendarChart"
 import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import { getAcademicYears } from "../utils"
 
 const styles = sxStyles({
    container: {
@@ -51,36 +52,24 @@ const AcademicCalendar = () => {
    let { data: allUniversityOptions } = useTimelineUniversities()
 
    // take only periods from the last academic year to the next one
-   const currentDate = useMemo(() => new Date(), [])
-   const start = useMemo(
-      () =>
-         currentDate.getMonth() <= 7
-            ? new Date(currentDate.getFullYear() - 2, 8, 1) // September, 2 years ago after January (previous academic period start)
-            : new Date(currentDate.getFullYear() - 1, 8, 1), // September, 1 year ago
-      [currentDate]
-   )
-
-   const end = useMemo(
-      () =>
-         currentDate.getMonth() <= 7
-            ? new Date(currentDate.getFullYear() + 1, 8, 1) // September, 1 year later (next academic period end)
-            : new Date(currentDate.getFullYear() + 2, 8, 1), // September, 2 years later before January
-      [currentDate]
-   )
+   const academicYears = useMemo(() => getAcademicYears(), [])
 
    // need to filter timeframe in 2 steps since firestore does not support inequalities on several fields
    let { data: periods } = useUniversityPeriodsByIdsAndStart(
       allUniversityOptions?.map((universityOption) => universityOption.id),
-      start
+      academicYears.previousYear.start
    )
-
    periods = useMemo(
       () =>
-         periods ? periods.filter((period) => period.end.toDate() < end) : [],
-      [end, periods]
+         periods
+            ? periods.filter(
+                 (period) => period.start.toDate() <= academicYears.nextYear.end
+              )
+            : [],
+      [academicYears.nextYear.end, periods]
    )
 
-   // update to only include those that have periods in the timeframe
+   // update to only include universities that have periods in the timeframe
    allUniversityOptions = useMemo(
       () =>
          allUniversityOptions
@@ -93,7 +82,7 @@ const AcademicCalendar = () => {
       [periods, allUniversityOptions]
    )
 
-   // update to only include those in the current selection
+   // update to only include periods in the current selection
    const selectedPeriods = useMemo(
       () =>
          periods.filter((period) =>

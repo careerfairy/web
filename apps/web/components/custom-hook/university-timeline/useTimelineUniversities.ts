@@ -24,7 +24,8 @@ export const useTimelineUniversities = () => {
 export const useTimelineUniversitiesByCountry = (countryCode: string) => {
    const uniQuery = query(
       collection(FirestoreInstance, "timelineUniversities"),
-      where("country", "==", countryCode)
+      where("countryCode", "==", countryCode),
+      orderBy("name")
    )
    return useFirestoreCollection<TimelineUniversity>(uniQuery, {
       idField: "id",
