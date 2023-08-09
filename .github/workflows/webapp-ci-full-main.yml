@@ -34,6 +34,8 @@ jobs:
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
+         - name: Install turbo Dependencies
+           run: npm install turbo-linux-64
          - uses: actions/checkout@v3
          - uses: actions/setup-node@v3
            with:
