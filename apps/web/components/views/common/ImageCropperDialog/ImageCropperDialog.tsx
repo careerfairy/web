@@ -4,14 +4,13 @@ import {
    Dialog,
    DialogActions,
    DialogContent,
-   DialogContentText,
    DialogTitle,
    Slider,
    Stack,
    Typography,
 } from "@mui/material"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import "cropperjs/dist/cropper.css"
 import Cropper, { ReactCropperElement } from "react-cropper"
 import { Image, X } from "react-feather"
@@ -19,6 +18,7 @@ import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { sxStyles } from "types/commonTypes"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
+import SaveChangesButton from "components/views/admin/company-information/SaveChangesButton"
 
 type Props = {
    title?: string
@@ -46,6 +46,7 @@ export const ImageCropperDialog = ({
          color: "#000000",
          height: "64px",
          alignItems: "stretch",
+         width: "-webkit-fill-available",
       },
       button: {
          display: "flex",
@@ -87,7 +88,7 @@ export const ImageCropperDialog = ({
          await uploadTask.then()
          return uploadTask.snapshot.ref.getDownloadURL()
       } catch (e) {
-         console.log("error in async", e)
+         dispatch(actions.sendGeneralError(e))
       }
    }
 
@@ -108,6 +109,16 @@ export const ImageCropperDialog = ({
       }
    }
 
+   const zoomIn = () => {
+      const cropper = cropperRef.current.cropper
+      cropper.zoom(0.1) // zoom in by 10%
+   }
+
+   const zoomOut = () => {
+      const cropper = cropperRef.current.cropper
+      cropper.zoom(-0.1) // zoom out by 10%
+   }
+
    return (
       <Dialog open={open} onClose={handleClose}>
          <DialogTitle sx={styles.dialogHeader}>
@@ -119,6 +130,7 @@ export const ImageCropperDialog = ({
                      fontSize: "16px",
                      fontWeight: 400,
                      letterSpacing: "-0.176px",
+                     width: "-webkit-fill-available",
                   }}
                >
                   {Boolean(title) ? title : "Edit picture"}
@@ -134,14 +146,12 @@ export const ImageCropperDialog = ({
                   viewMode={3}
                   dragMode={"none"}
                   src={imageSrc}
-                  aspectRatio={242 / 242}
-                  // Cropper.js options
+                  aspectRatio={1}
                   guides={false}
                   center={true}
                   ref={cropperRef}
                   movable={true}
-                  width={"569px"}
-                  height={"317px"}
+                  width={"-webkit-fill-available"}
                />
             </Box>
             <Stack
@@ -149,7 +159,7 @@ export const ImageCropperDialog = ({
                direction="row"
                sx={{ mb: 1, mr: "auto", ml: "auto", color: "#686868" }}
                alignItems="center"
-               width={"347px"}
+               width={"-webkit-fill-available"}
             >
                <Image width={"24px"} height={"24px"} />
                <Slider
@@ -173,13 +183,12 @@ export const ImageCropperDialog = ({
             >
                Back
             </Button>
-            <Button
-               sx={styles.button}
-               className={"primary"}
+            <SaveChangesButton
+               active={Boolean(cropperRef)}
                onClick={handleSubmit}
             >
                Apply
-            </Button>
+            </SaveChangesButton>
          </DialogActions>
       </Dialog>
    )
