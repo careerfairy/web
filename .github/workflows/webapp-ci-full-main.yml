@@ -34,8 +34,6 @@ jobs:
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
-         - name: Install turbo Dependencies
-           run: npm install turbo-linux-64
          - uses: actions/checkout@v3
          - uses: actions/setup-node@v3
            with:
@@ -60,7 +58,8 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Build
-           run: npm run build
+           run: npm install turbo-linux-64 |
+              npm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
