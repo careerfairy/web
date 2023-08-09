@@ -58,7 +58,7 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Build
-           run: npm install turbo-linux-64 |
+           run: npm install turbo-linux-64 &&
               npm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
