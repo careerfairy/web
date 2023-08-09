@@ -1,24 +1,9 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react"
-import * as yup from "yup"
-import Question from "./QuestionName"
-import QuestionOption from "./QuestionOption"
-import { Box, Button, Stack, Typography } from "@mui/material"
 import { PlusCircle } from "react-feather"
-import SaveChangesButton from "components/views/admin/company-information/SaveChangesButton"
+import { useEffect, useState } from "react"
+import { Button, Stack, Typography } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useStreamRef from "components/custom-hook/useStreamRef"
-import { Form, useFormik } from "formik"
-import { v4 as uuidv4 } from "uuid"
-import {
-   GroupQuestion,
-   GroupQuestionOption,
-   convertGroupQuestionOptionsToSortedArray,
-} from "@careerfairy/shared-lib/groups"
-import { groupRepo } from "data/RepositoryInstances"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { convertDictToDocArray } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 import RegistrationQuestion from "./ResgistrationQuestion"
 import { createAGroupQuestion } from "./createAGroupQuestion"
 
@@ -65,46 +50,6 @@ const styles = sxStyles({
    },
 })
 
-const validationSchema = yup.object({
-   question: yup
-      .string()
-      .trim()
-      .min(3, "Question must be at least 3 characters long")
-      .required("Question is required"),
-   options: yup
-      .array()
-      .of(
-         yup.object({
-            text: yup
-               .string()
-               .trim()
-               .min(1, "Option must be at least 1 character")
-               .required("Option is required"),
-         })
-      )
-      .min(2, "At least 2 options are required")
-      .max(5, "Max 5 options are allowed"),
-})
-
-const INITIAL_QUESTION_OPTIONS: GroupQuestionOption[] = [
-   {
-      id: uuidv4(),
-      name: "",
-   },
-   {
-      id: uuidv4(),
-      name: "",
-   },
-]
-
-const initialOptionsObject: Record<
-   GroupQuestionOption["id"],
-   GroupQuestionOption
-> = INITIAL_QUESTION_OPTIONS.reduce((acc, option) => {
-   acc[option.id] = option
-   return acc
-}, {} as Record<GroupQuestionOption["id"], GroupQuestionOption>)
-
 type Questionnaire = {
    questions: GroupQuestion[]
 }
@@ -114,7 +59,9 @@ type Props = {
 }
 
 const QuestionarieCreation = ({ initialData }: Props) => {
-   const [inputMode, setInputMode] = useState(false)
+   const [inputMode, setInputMode] = useState<boolean[]>(
+      Array(initialData.questions.length).fill(false)
+   )
    const [questions, setQuestions] = useState(initialData.questions ?? [])
 
    useEffect(() => {
@@ -125,6 +72,9 @@ const QuestionarieCreation = ({ initialData }: Props) => {
       const newQuestionsList = [...questions]
       newQuestionsList.push(createAGroupQuestion())
       setQuestions(newQuestionsList)
+      const newInputMode = [...inputMode]
+      newInputMode.push(true)
+      setInputMode([...newInputMode])
    }
 
    const handleQuestionRemove = (questionId) => {
@@ -134,14 +84,20 @@ const QuestionarieCreation = ({ initialData }: Props) => {
       setQuestions(newQuestionsList)
    }
 
+   const handleSetInputMode = (value, questionId) => {
+      const newInputModeList = [...inputMode]
+      newInputModeList[questionId] = value
+      setInputMode([...newInputModeList])
+   }
+
    return (
       <Stack sx={styles.stack}>
-         {questions.map((question) => (
+         {questions.map((question, index) => (
             <RegistrationQuestion
                key={question.id}
                initialValues={question}
-               inputMode={inputMode}
-               setInputMode={setInputMode}
+               inputMode={inputMode[index]}
+               setInputMode={(value) => handleSetInputMode(value, index)}
                onRemove={handleQuestionRemove}
             />
          ))}

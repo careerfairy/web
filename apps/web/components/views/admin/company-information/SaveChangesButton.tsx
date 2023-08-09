@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactElement } from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { Icon } from "react-feather"
@@ -6,32 +6,56 @@ import { Icon } from "react-feather"
 const styles = sxStyles({
    active: {
       display: "flex",
+      height: "34px",
       padding: "8px 16px",
       justifyContent: "center",
       alignItems: "center",
-      gap: "10px",
-      borderRadius: "32px",
+      alignSelf: "flex-end",
+      gap: "8px",
+      borderRadius: "53px",
       background: "#6749EA",
+      ".MuiTypography-button": {
+         textTransform: "none",
+      },
+      ":hover": {
+         ".MuiTypography-button": {
+            color: "#6749EA",
+         },
+      },
    },
    inactive: {
       display: "flex",
       padding: "8px 16px",
       justifyContent: "center",
       alignItems: "center",
+      alignSelf: "flex-end",
       gap: "10px",
       borderRadius: "32px",
       background: "#EDEDED",
-      color: "#BBB",
+      ".MuiTypography-button": {
+         textTransform: "none",
+      },
+      ":hover": {
+         background: "#EDEDED",
+         cursor: "not-allowed",
+      },
+   },
+   textActive: {
+      color: "#FFF",
+      leadingTrim: "both",
+      textEdge: "cap",
       fontFamily: "Poppins",
-      fontSize: "16px",
+      fontSize: "14px",
       fontStyle: "normal",
       fontWeight: 400,
-      lineHeight: "20px",
+      lineHeight: "150%",
+      letterSpacing: "-0.154px",
    },
-   caption: {
+   textInactive: {
       color: "#BBB",
       leadingTrim: "both",
       textEdge: "cap",
+      fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: 400,
@@ -42,7 +66,7 @@ const styles = sxStyles({
 
 type Props = {
    children?: string
-   icon?: Icon
+   icon?: Icon | Element | ReactElement<any, any>
    type?: "submit" | "button" | "reset" | undefined
    active?: boolean
    onClick?: React.MouseEventHandler<HTMLButtonElement>
@@ -61,8 +85,17 @@ const SaveChangesButton = ({
          type={type ? type : "button"}
          onClick={onClick}
       >
-         <Typography>{children}</Typography>
-         {Boolean(icon) ? icon : <></>}
+         <Typography
+            variant="button"
+            sx={active ? styles.textActive : styles.textInactive}
+         >
+            {children}
+         </Typography>
+         {Boolean(icon) && (
+            <Box sx={{ width: "16px", height: "16px", alignSelf: "baseline" }}>
+               {icon}
+            </Box>
+         )}
       </Button>
    )
 }

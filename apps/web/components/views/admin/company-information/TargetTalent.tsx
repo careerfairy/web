@@ -1,17 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import {
-   Button,
-   Container,
-   Grid,
-   Stack,
-   TextField,
-   Typography,
-} from "@mui/material"
+import React, { useEffect, useMemo, useState } from "react"
+import { Stack, TextField } from "@mui/material"
 import { Box } from "@mui/system"
 
 import Styles from "./BaseStyles"
 import { Form, Formik } from "formik"
-import * as yup from "yup"
 import SaveChangesButton from "./SaveChangesButton"
 import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiCheckBox"
 import {
@@ -26,6 +18,8 @@ import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "types/commonTypes"
+import LeftColumn from "./LeftColumn"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    selectBox: {
@@ -55,6 +49,7 @@ const TargetTalent = () => {
    const [groupedUniversities, setGroupedUniversities] = useState<
       GroupedUniversity[]
    >([])
+   const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const initialValues = useMemo(
       () => ({
@@ -106,35 +101,28 @@ const TargetTalent = () => {
             targetedFieldsOfStudy: values.targetedFieldsOfStudy,
          }
          groupRepo.updateGroupMetadata(company.id, { ...targets })
-         console.log("saved")
-      } catch (error) {
-         console.log(error)
+         successNotification("saved")
+      } catch (e) {
+         errorNotification(e, "An error has occurred during the save")
       }
    }
+
+   const [title, description] = [
+      "Target talent",
+      `Tell us which talent you’re targeting so that we can present them
+      your content.`,
+   ]
    return (
       <Box sx={Styles.section}>
-         <div className="section-left_column">
-            <Typography sx={{ fontSize: "24px", fontWeight: 600, mb: "12px" }}>
-               Target talent
-            </Typography>
-            <Typography
-               sx={{ fontSize: "16px", fontWeight: 400, color: "#5F5F5F" }}
-            >
-               Tell us which talent you’re targeting so that we can present them
-               your content.
-            </Typography>
-         </div>
+         <LeftColumn title={title} description={description} />
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
             {({
                values,
                errors,
                touched,
-               handleChange,
                handleBlur,
-               handleSubmit,
                isSubmitting,
                setFieldValue,
-               setFieldError,
             }) => (
                <Form>
                   <Stack

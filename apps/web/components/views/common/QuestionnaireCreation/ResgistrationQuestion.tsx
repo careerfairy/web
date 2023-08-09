@@ -1,21 +1,20 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
 import SaveChangesButton from "components/views/admin/company-information/SaveChangesButton"
-import { Edit2, PlusCircle } from "react-feather"
+import { Edit2, PlusCircle, Save } from "react-feather"
 import QuestionOption from "./QuestionOption"
 import {
    GroupQuestion,
    GroupQuestionOption,
 } from "@careerfairy/shared-lib/groups"
 import { ReactElement, useEffect, useState } from "react"
-import { Form, Formik, useFormik } from "formik"
+import { Formik } from "formik"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import QuestionName from "./QuestionName"
 import { sxStyles } from "types/commonTypes"
 import { v4 as uuidv4 } from "uuid"
-import { createAGroupQuestion } from "./createAGroupQuestion"
 import { createAGroupQuestionOption } from "./createAGroupQuestionOption"
-import { errorLogAndNotify } from "util/CommonUtil"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const getInitialGroupQuestion = (
    groupQuestion?: GroupQuestion
@@ -89,6 +88,7 @@ const styles = sxStyles({
       border: "1px solid #FF4A4A",
       color: "#FF4A4A",
       marginRight: "20px",
+      textTransform: "none",
    },
    addNewQuestionButton: {
       display: "flex",
@@ -116,7 +116,7 @@ type QuestionDeleteParams = {
 type Props = {
    initialValues?: GroupQuestion
    inputMode?: boolean
-   setInputMode?: (values: boolean) => void
+   setInputMode?: (value: boolean) => void
    onRemove?: (questionId: Pick<GroupQuestion, "id">) => void
 }
 
@@ -128,10 +128,8 @@ const RegistrationQuestion: React.FC<Props> = ({
 }): ReactElement => {
    const { group } = useGroup()
    const [isNew, setIsNew] = useState(true)
-
-   const [localGroupQuestion, setLocalGroupQuestion] = useState<GroupQuestion>(
-      getInitialGroupQuestion(initialValues)
-   )
+   const { successNotification, errorNotification } = useSnackbarNotifications()
+   const localGroupQuestion = getInitialGroupQuestion(initialValues)
 
    useEffect(() => {
       if (
@@ -164,13 +162,15 @@ const RegistrationQuestion: React.FC<Props> = ({
       try {
          if (isNew) {
             groupRepo.addNewGroupQuestion(group.id, { ...question })
+            successNotification("New Question added")
          } else {
+            successNotification("Question updated")
             groupRepo.updateGroupQuestion(group.id, { ...question })
          }
 
          setInputMode(false)
       } catch (e) {
-         errorLogAndNotify(e)
+         errorNotification(e, "An error has occured")
       }
    }
 
@@ -180,7 +180,7 @@ const RegistrationQuestion: React.FC<Props> = ({
          onSubmit={handleSubmit}
          enableReinitialize
       >
-         {({ values, setFieldValue }) => (
+         {({ dirty, values, setFieldValue }) => (
             <form onSubmit={() => handleSubmit(values)}>
                <Stack sx={styles.stack}>
                   <Box id="registration-question-name-field">
@@ -231,10 +231,12 @@ const RegistrationQuestion: React.FC<Props> = ({
                                  deleteQuestion({ groupQuestionId: values.id })
                               }
                            >
-                              remove question
+                              Remove question
                            </Button>
                            <SaveChangesButton
-                              onClick={() => handleSubmit(values)}
+                              icon={<Save color={dirty ? "#FFF" : "#BBBBBB"} />}
+                              active={dirty}
+                              onClick={() => dirty && handleSubmit(values)}
                            >
                               Save
                            </SaveChangesButton>
