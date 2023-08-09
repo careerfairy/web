@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useState } from "react"
 import { Form, Formik } from "formik"
-import * as yup from "yup"
 import { Image, Upload } from "react-feather"
 import { Avatar, Button, Typography } from "@mui/material"
 import { Box } from "@mui/system"
-import FilePickerContainer from "components/ssr/FilePickerContainer"
 import { BaseGroupInfo } from "pages/group/create"
 
 import Styles from "./BaseStyles"
@@ -13,11 +11,6 @@ import { ImageCropperDialog } from "components/views/common/ImageCropperDialog"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
-
-const schema = yup.object().shape({
-   logoUrl: yup.string().trim().required("URL is required").url("Invalid URL"),
-   logoFileObj: yup.mixed().required("Image file is required"),
-})
 
 type Logo = Pick<BaseGroupInfo, "logoUrl" | "logoFileObj">
 type Banner = Pick<Group, "bannerImageUrl">
@@ -28,9 +21,9 @@ const CompanyIdentity = () => {
 
    const initialValues = {
       logoUrl: company.logoUrl,
-      logoFileObj: company.logoFileObj,
+      logoFileObj: {} as File,
       bannerImageUrl: company.bannerImageUrl,
-   } as Logo & Banner
+   }
 
    const saveLogoUrl = (newLogoUrl: string) => {
       if (newLogoUrl) {

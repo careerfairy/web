@@ -17,7 +17,7 @@ const Template: StoryFn = (args) => {
    return (
       <BrandedMultiCheckBox
          {...args}
-         options={CompanyIndustryValues.map((industry) => industry.name)}
+         options={CompanyIndustryValues}
          value={value}
          label="Company Industries"
          onChange={(values) => setValue(values)}
