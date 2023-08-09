@@ -1,17 +1,8 @@
-import React, { useCallback, useMemo, useState } from "react"
-import {
-   Autocomplete,
-   Collapse,
-   Stack,
-   TextField,
-   Typography,
-} from "@mui/material"
+import React, { useCallback, useMemo } from "react"
+import { Autocomplete, Stack } from "@mui/material"
 import { Box } from "@mui/system"
 
-import BaseStyles from "./BaseStyles"
-import { BaseGroupInfo } from "pages/group/create"
 import { Form, Formik } from "formik"
-import * as yup from "yup"
 import { sxStyles } from "types/commonTypes"
 import SaveChangesButton from "./SaveChangesButton"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
@@ -20,20 +11,13 @@ import {
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "constants/forms"
-import MultiListSelect from "components/views/common/MultiListSelect"
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { multiListSelectMapValueFn } from "components/views/signup/utils"
 import GenericDropdown from "components/views/common/GenericDropdown"
 import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiCheckBox"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import Styles from "./BaseStyles"
-
-const schema = yup.object().shape({
-   logoUrl: yup.string().trim().required("URL is required").url("Invalid URL"),
-   logoFileObj: yup.mixed().required("Image file is required"),
-})
+import LeftColumn from "./LeftColumn"
 
 const styles = sxStyles({
    selectBox: {
@@ -97,38 +81,25 @@ const CompanyDetails = () => {
       [errorNotification, successNotification, company.id]
    )
 
+   const [title, description] = [
+      "Details",
+      `Share information about your company to the next generation of
+      talent. This information will be visible on your company profile,
+      as well as your live streams, and can be edited at any time.`,
+   ]
    return (
       <Box sx={Styles.section}>
-         <div className="section-left_column">
-            <Typography sx={{ fontSize: "24px", fontWeight: 600, mb: "12px" }}>
-               Details
-            </Typography>
-            <Typography
-               sx={{ fontSize: "16px", fontWeight: 400, color: "#5F5F5F" }}
-            >
-               Share information about your company to the next generation of
-               talent. This information will be visible on your company profile,
-               as well as your live streams, and can be edited at any time.
-            </Typography>
-         </div>
+         <LeftColumn title={title} description={description} />
          <Formik
             initialValues={initialValues}
             enableReinitialize
             onSubmit={handleSubmit}
          >
-            {({
-               values,
-               errors,
-               touched,
-               handleBlur,
-               isSubmitting,
-               setFieldValue,
-            }) => (
+            {({ values, dirty, handleBlur, isSubmitting, setFieldValue }) => (
                <Form>
                   <Stack
                      direction={"column"}
-                     sx={{ gap: "12px" }}
-                     width={"-webkit-fill-available"}
+                     sx={{ gap: "12px", width: "-webkit-fill-available" }}
                   >
                      <BrandedTextField
                         name="companyName"
@@ -175,23 +146,11 @@ const CompanyDetails = () => {
                                  <BrandedTextField
                                     {...params}
                                     label={`Company location`}
-                                    error={Boolean(
-                                       errors.companyCountry &&
-                                          touched.companyCountry
-                                    )}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                  />
                               )}
                            />
-                           <Collapse
-                              in={Boolean(
-                                 errors.companyCountry && touched.companyCountry
-                              )}
-                              style={{ color: "red" }}
-                           >
-                              {errors.companyCountry}
-                           </Collapse>
                         </Box>
 
                         <Box sx={styles.selectBox}>
@@ -217,23 +176,12 @@ const CompanyDetails = () => {
                               value={values.companySize}
                               label={`Company size`}
                               list={CompanySizesCodes}
-                              error={Boolean(
-                                 errors.companySize && touched.companySize
-                              )}
                               onBlur={handleBlur}
                               disabled={isSubmitting}
                            />
-                           <Collapse
-                              in={Boolean(
-                                 errors.companySize && touched.companySize
-                              )}
-                              style={{ color: "red" }}
-                           >
-                              {errors.companySize}
-                           </Collapse>
                         </Box>
                      </>
-                     <SaveChangesButton type="submit" />
+                     <SaveChangesButton active={dirty} type="submit" />
                   </Stack>
                </Form>
             )}

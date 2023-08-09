@@ -11,6 +11,8 @@ import { ImageCropperDialog } from "components/views/common/ImageCropperDialog"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import LeftColumn from "./LeftColumn"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 type Logo = Pick<BaseGroupInfo, "logoUrl" | "logoFileObj">
 type Banner = Pick<Group, "bannerImageUrl">
@@ -18,6 +20,7 @@ type Banner = Pick<Group, "bannerImageUrl">
 const CompanyIdentity = () => {
    const { group: company } = useGroup()
    const [imageCropperDialog, setImageCropperDialog] = useState(false)
+   const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const initialValues = {
       logoUrl: company.logoUrl,
@@ -32,8 +35,13 @@ const CompanyIdentity = () => {
    }
 
    const saveBannerImageUrl = (bannerImageUrl: string) => {
-      if (bannerImageUrl) {
-         groupRepo.updateGroupBannerPhoto(company.id, bannerImageUrl)
+      try {
+         if (bannerImageUrl) {
+            groupRepo.updateGroupBannerPhoto(company.id, bannerImageUrl)
+            successNotification("Updated successfull")
+         }
+      } catch (e) {
+         errorNotification(e, "An error has occured")
       }
    }
 
@@ -44,27 +52,15 @@ const CompanyIdentity = () => {
       setImageCropperDialog((prev) => !prev)
    }
 
+   const [title, description] = [
+      "Company identity",
+      "Choose your brand visuals so that talent can easily recognise you.",
+   ]
    return (
       <Box sx={Styles.section}>
-         <div className="section-left_column">
-            <h3>Company identity</h3>
-            <p>
-               Choose your brand visuals so that talent can easily recognise
-               you.
-            </p>
-         </div>
+         <LeftColumn title={title} description={description} />
          <Formik initialValues={initialValues} onSubmit={() => {}}>
-            {({
-               values,
-               errors,
-               touched,
-               handleChange,
-               handleBlur,
-               handleSubmit,
-               isSubmitting,
-               setFieldValue,
-               setFieldError,
-            }) => (
+            {({ values, setFieldValue }) => (
                <Form>
                   <Typography
                      variant="h4"
