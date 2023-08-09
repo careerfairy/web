@@ -1,6 +1,6 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { Box, Stack, Typography } from "@mui/material"
-import CalendarFilter from "components/views/calendar/CalendarFilter"
+import CalendarFilter from "./CalendarFilter"
 import ContentButton from "components/views/portal/content-carousel/ContentButton"
 import React from "react"
 import { sxStyles } from "types/commonTypes"

@@ -21,3 +21,5 @@ export interface UniversityPeriod extends Identifiable {
    end: Timestamp
    timelineUniversityId: string
 }
+
+export interface TimelineCountry extends Identifiable {}

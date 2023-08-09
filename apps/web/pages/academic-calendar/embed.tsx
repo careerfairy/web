@@ -1,5 +1,5 @@
 import React from "react"
-import AcademicCalendar from "../../components/views/calendar/AcademicCalendar"
+import AcademicCalendar from "../../components/views/calendar/chart/AcademicCalendar"
 import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
