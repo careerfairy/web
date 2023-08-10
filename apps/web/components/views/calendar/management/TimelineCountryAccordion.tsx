@@ -21,7 +21,7 @@ import { PlusCircle as AddIcon, UploadCloud as UploadIcon } from "react-feather"
 import TimelineUniversityInfo from "./TimelineUniversityInfo"
 import { AcademicYearType } from "../utils"
 import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
-import UniversityIcon from "@mui/icons-material/AccountBalanceRounded"
+import UniversityIcon from "@mui/icons-material/AccountBalanceOutlined"
 import EditUniversityDialog from "./EditUniversityDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { StyledTextField } from "components/views/group/admin/common/inputs"
@@ -31,6 +31,7 @@ const styles = sxStyles({
       borderRadius: "30px!important",
       boxShadow: "none",
       border: (theme) => `1px solid ${theme.palette.grey.main}`,
+      backgroundColor: "#FFFFF",
    },
    summary: {
       fontSize: "18px",

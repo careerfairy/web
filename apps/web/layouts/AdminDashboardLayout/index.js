@@ -51,7 +51,7 @@ const AdminDashboardLayout = (props) => {
    return (
       <Page>
          <GenericHeader position={"sticky"} />
-         <PageContentWrapper>
+         <PageContentWrapper sx={{ backgroundColor: "#F7F8FC" }}>
             {isAdmin && (
                <NavBar
                   drawerTopLinks={drawerTopLinks}
