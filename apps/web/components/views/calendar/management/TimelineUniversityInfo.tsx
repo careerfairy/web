@@ -13,7 +13,12 @@ import EditUniversityDialog from "./EditUniversityDialog"
 import { CalendarManagerContext } from "./TimelineCountriesManager"
 
 const styles = sxStyles({
-   container: { padding: "10px", textAlign: "left", borderRadius: "5px" },
+   container: {
+      padding: "10px",
+      textAlign: "left",
+      borderRadius: "10px",
+      backgroundColor: "#FDFDFD",
+   },
    title: {
       fontWeight: 500,
       mb: "5px",

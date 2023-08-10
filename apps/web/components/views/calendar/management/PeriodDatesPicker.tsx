@@ -25,6 +25,7 @@ import ConfirmationDialog, {
 } from "materialUI/GlobalModals/ConfirmationDialog"
 import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
 
 const styles = sxStyles({
    datePicker: {
@@ -80,7 +81,14 @@ const styles = sxStyles({
       pl: "10px",
       pr: "10px",
    },
-   calendarIcon: {},
+   calendarIcon: {
+      "& svg": {
+         mt: "50px",
+         mb: "0px",
+         fontSize: "150px",
+         color: "#505050",
+      },
+   },
 })
 
 type Props = {
@@ -318,12 +326,19 @@ const ConfirmDeletePeriodDialog = ({
          handleClose={handleCloseDialog}
          icon={
             <Box sx={styles.calendarIcon}>
-               <CalendarIcon />
+               <DeleteCalendarIcon />
             </Box>
          }
-         title=""
+         title={null}
          description={
-            <Typography>
+            <Typography
+               sx={{
+                  fontWeight: 500,
+                  fontSize: "25px",
+                  color: "black.main",
+                  mt: 0,
+               }}
+            >
                Are you sure you want to delete this period?
             </Typography>
          }

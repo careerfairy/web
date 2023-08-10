@@ -33,7 +33,7 @@ import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import UniversityIcon from "@mui/icons-material/AccountBalanceRounded"
+import UniversityIcon from "@mui/icons-material/AccountBalanceOutlined"
 
 const styles = sxStyles({
    dialogRoot: {
@@ -299,6 +299,7 @@ const EditUniversityDialog = ({
                         sx={styles.button}
                         color={"secondary"}
                         onClick={handleConfirmButton}
+                        disabled={!universityName || universityName == ""}
                      >
                         {university ? "Save changes" : "Add university"}
                      </ContentButton>

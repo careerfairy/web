@@ -153,13 +153,13 @@ export class UniversityTimelineService {
    handleDownloadBatchPeriodsTemplate() {
       const workbook = utils.book_new()
       const worksheet_data = [
-         ["University", "Type", "Start", "End"], // This is the header row
+         ["University_name", "Period_type", "Period_start", "Period_end"], // This is the header row
       ]
       const worksheet = utils.aoa_to_sheet(worksheet_data)
       utils.book_append_sheet(workbook, worksheet, "Sheet1")
 
       // Write the workbook to a file and trigger a download
-      const filename = "template.xlsx"
+      const filename = "AcademicCalendar_BatchUpload_template.xlsx"
       writeFile(workbook, filename)
    }
 
@@ -207,7 +207,7 @@ export class UniversityTimelineService {
 
          // add universities in database when needed
          const newUniversityNames: string[] = jsonData
-            .map((row) => row["University"])
+            .map((row) => row["University_name"])
             .reduce((acc, uniName) => {
                if (
                   !acc.includes(uniName) &&
@@ -243,11 +243,11 @@ export class UniversityTimelineService {
             (row: any) => {
                const period = {
                   timelineUniversityId: updatedUniversities.find(
-                     (university) => university.name == row["University"]
+                     (university) => university.name == row["University_name"]
                   ).id,
-                  type: row["Type"],
-                  start: Timestamp.fromDate(new Date(row["Start"])),
-                  end: Timestamp.fromDate(new Date(row["End"])),
+                  type: row["Period_type"],
+                  start: Timestamp.fromDate(new Date(row["Period_start"])),
+                  end: Timestamp.fromDate(new Date(row["Period_end"])),
                }
 
                return period
