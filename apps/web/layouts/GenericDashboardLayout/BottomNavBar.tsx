@@ -21,7 +21,8 @@ const styles = sxStyles({
    navLink: {
       display: "flex",
       flexDirection: "column",
-      width: "25%",
+      minWidth: 0,
+      width: "20%",
       backgroundColor: "transparent !important",
       color: (theme) => alpha(theme.palette.text.secondary, 0.3),
       fontWeight: 500,
@@ -49,7 +50,7 @@ const BottomNavBar = ({ links }: Props) => {
    return (
       <Tabs
          sx={styles.wrapper}
-         TabIndicatorProps={{ sx: { justifyContent: "space-around" } } as any}
+         //TabIndicatorProps={{ sx: { justifyContent: "space-around" } } as any}
       >
          {links.map(
             ({ id, href, Icon, title, mobileTitle, pathname, childLinks }) => {
