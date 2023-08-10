@@ -8,7 +8,11 @@ import Footer from "../../components/views/footer/Footer"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import DropdownNavigator from "./DropdownNavigator"
 import { INavLink } from "../types"
-import { Home as HomeIcon, Radio as LiveStreamsIcon } from "react-feather"
+import {
+   Home as HomeIcon,
+   Radio as LiveStreamsIcon,
+   PlayCircle as SparksIcon,
+} from "react-feather"
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
 import { useAuth } from "../../HOCs/AuthProvider"
@@ -117,6 +121,13 @@ const GenericDashboardLayout = ({
                PastLivestreamsPath,
                ...(isLoggedIn ? [UnlockedContentPath] : []),
             ],
+         },
+         {
+            id: "sparks",
+            href: `/sparks`,
+            pathname: `/sparks`,
+            Icon: SparksIcon,
+            title: "Sparks",
          },
          {
             id: "company",
