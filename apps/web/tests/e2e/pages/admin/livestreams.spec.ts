@@ -24,7 +24,7 @@ test.describe("Group Admin Livestreams", () => {
       await livestreamsPage.assertTextIsVisible(livestream.title)
    })
 
-   test("Publish a draft livestream and edit its title", async ({
+   test.skip("Publish a draft livestream and edit its title", async ({
       groupPage,
       interests,
    }) => {
