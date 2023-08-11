@@ -54,7 +54,7 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
    const eventsQuery = useMemo<firebase.firestore.Query>(() => {
       let query = listenToPastEvents
          ? livestreamRepo.getPastEventsFromQuery({
-              fromDate: TimeFrames["Last 2 years"].start,
+              fromDate: TimeFrames["Last 6 months"].start,
            })
          : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
