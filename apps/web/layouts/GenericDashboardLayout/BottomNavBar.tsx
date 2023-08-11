@@ -50,7 +50,7 @@ const BottomNavBar = ({ links }: Props) => {
    return (
       <Tabs
          sx={styles.wrapper}
-         //TabIndicatorProps={{ sx: { justifyContent: "space-around" } } as any}
+         TabIndicatorProps={{ sx: { justifyContent: "space-around" } } as any}
       >
          {links.map(
             ({ id, href, Icon, title, mobileTitle, pathname, childLinks }) => {
