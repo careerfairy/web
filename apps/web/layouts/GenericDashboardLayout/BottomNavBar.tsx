@@ -37,6 +37,9 @@ const styles = sxStyles({
    activeNavLink: {
       color: "text.primary",
    },
+   icon: {
+      fontSize: "24px",
+   },
 })
 
 type Props = {
@@ -63,7 +66,7 @@ const BottomNavBar = ({ links }: Props) => {
                return (
                   <Tab
                      key={id}
-                     icon={<Box component={Icon} />}
+                     icon={<Box component={Icon} sx={styles.icon} />}
                      component={Link}
                      href={href}
                      label={isMobile ? mobileTitle || title : title}
