@@ -1,8 +1,8 @@
 import { INavLink } from "../types"
-import { Tab, Tabs } from "@mui/material"
+import { Tab, Tabs, Typography } from "@mui/material"
 import Link from "../../components/views/common/Link"
 import Box from "@mui/material/Box"
-import React from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import { sxStyles } from "../../types/commonTypes"
 import { alpha } from "@mui/material/styles"
@@ -17,19 +17,20 @@ const styles = sxStyles({
       zIndex: 999,
       background: "white",
       borderTop: "1px solid #F3F3F3",
+      " .MuiTabs-flexContainer": {
+         justifyContent: "space-evenly",
+      },
    },
    navLink: {
       display: "flex",
       flexDirection: "column",
+      justifyContent: "flex-start",
       minWidth: 0,
-      width: "20%",
+      maxWidth: "20%",
       backgroundColor: "transparent !important",
       color: (theme) => alpha(theme.palette.text.secondary, 0.3),
-      fontWeight: 500,
-      fontSize: "10px",
-      px: 0,
-      py: 2,
-
+      px: "0px",
+      py: "12px",
       "&:hover , &:focus": {
          color: "text.primary",
       },
@@ -38,7 +39,16 @@ const styles = sxStyles({
       color: "text.primary",
    },
    icon: {
-      fontSize: "24px",
+      "& .MuiSvgIcon-root": {
+         fontSize: "24px",
+      },
+   },
+   iconLabel: {
+      textTransform: "none",
+      fontSize: "10px",
+      display: "flex",
+      height: "100%",
+      alignItems: "center",
    },
 })
 
@@ -66,10 +76,18 @@ const BottomNavBar = ({ links }: Props) => {
                return (
                   <Tab
                      key={id}
-                     icon={<Box component={Icon} sx={styles.icon} />}
+                     icon={
+                        <Box sx={styles.icon}>
+                           <Icon />
+                        </Box>
+                     }
                      component={Link}
                      href={href}
-                     label={isMobile ? mobileTitle || title : title}
+                     label={
+                        <Box sx={styles.iconLabel}>
+                           {isMobile ? mobileTitle || title : title}
+                        </Box>
+                     }
                      sx={[
                         styles.navLink,
                         (isActivePath || isChildrenActive) &&
