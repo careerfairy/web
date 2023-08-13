@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
@@ -7,7 +7,7 @@ import WidgetsWrapper from "../../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../../components/util/SEO"
-import { livestreamRepo } from "../../data/RepositoryInstances"
+import { livestreamRepo, sparksRepo } from "../../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
@@ -33,6 +33,10 @@ import {
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
+import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { usePagination } from "use-pagination-firestore"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -42,10 +46,33 @@ const PortalPage = ({
    livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
+   const [sparks, setSparks] = useState<Spark[]>([])
+
+   // const sparksQuery = useMemo(() => {
+   //    return sparksRepo.getSparks({ limit: 8 })
+   // }, [])
+
+   // const loadSparks = async () => {
+   //    sparksRepo.getSparks({ limit: 8 }).then(sparks => {
+   //       debugger
+   //       console.log('<<<<<<<<<<<<<<<<<<')
+   //       setSparks(sparks)
+   //    })
+   //    .catch(e => {
+   //       debugger
+   //       console.log('>>>>>>>>>>>>>>>>>',e)
+   //    })
+   // }
+
+   // useEffect(() => {
+   //    loadSparks()
+   // }, [userData])
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
+
+   const hasSparks = Boolean(sparks.length)
 
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
 
@@ -59,6 +86,10 @@ const PortalPage = ({
          serializedCarouselContent
       )
    }, [serializedCarouselContent])
+
+   const handleSparksClicked = () => {
+      console.log("clicked")
+   }
 
    return (
       <>
@@ -89,6 +120,12 @@ const PortalPage = ({
                         <WidgetsWrapper>
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
+                           ) : null}
+                           {hasSparks ? (
+                              <SparksCarousel
+                                 sparks={sparks}
+                                 onSparkClick={handleSparksClicked}
+                              />
                            ) : null}
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
