@@ -1,5 +1,5 @@
 import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { StreamsSection } from "./StreamsSection"
 import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
@@ -15,6 +15,7 @@ import { wishListBorderRadius } from "../../../../constants/pages"
 import NoResultsMessage from "./NoResultsMessage"
 import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { buildDialogLink } from "../../livestream-dialog"
+import CustomInfiniteScroll from "../CustomInfiniteScroll"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -65,6 +66,9 @@ const NextLiveStreamsWithFilter = ({
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
+
+   const [limit, setLimit] = useState(10)
+
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const {
       languages,
@@ -107,6 +111,7 @@ const NextLiveStreamsWithFilter = ({
       listenToPastEvents: hasPastEvents,
       filterByGroupId: companyId,
       getHiddenEvents: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
+      limit,
    })
 
    const noResultsMessage = useMemo<JSX.Element>(
@@ -169,8 +174,16 @@ const NextLiveStreamsWithFilter = ({
       [push, router]
    )
 
+   const handleFetchMoreLivestreams = useCallback(async () => {
+      setLimit((prev) => prev + 10)
+   }, [])
+
    return (
-      <>
+      <CustomInfiniteScroll
+         hasMore={livestreams?.length > limit}
+         next={handleFetchMoreLivestreams}
+         loading={!livestreams?.length}
+      >
          <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
@@ -200,7 +213,7 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
-      </>
+      </CustomInfiniteScroll>
    )
 }
 
