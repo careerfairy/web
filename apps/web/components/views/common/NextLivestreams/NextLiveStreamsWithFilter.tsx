@@ -183,6 +183,7 @@ const NextLiveStreamsWithFilter = ({
          hasMore={livestreams?.length > limit}
          next={handleFetchMoreLivestreams}
          loading={!livestreams?.length}
+         offset={100}
       >
          <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
