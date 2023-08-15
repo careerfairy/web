@@ -1,7 +1,6 @@
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import CalendarFilter from "./CalendarFilter"
-import ContentButton from "components/views/portal/content-carousel/ContentButton"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -52,18 +51,17 @@ const CalendarLanding = ({
             </Typography>
          </Box>
          <Box sx={styles.filterDisplay}>
-            <CalendarFilter
-               multiCheckboxSelectType={"unjustified"}
-            ></CalendarFilter>
+            <CalendarFilter multiCheckboxSelectType={"unjustified"} />
             <Box sx={styles.buttonContainer}>
-               <ContentButton
+               <Button
                   sx={styles.button}
+                  variant={"contained"}
                   color={"secondary"}
                   onClick={() => setIsCalendarView(true)}
                   disabled={selectedUniversities.length <= 0}
                >
                   Next
-               </ContentButton>
+               </Button>
             </Box>
          </Box>
       </Stack>

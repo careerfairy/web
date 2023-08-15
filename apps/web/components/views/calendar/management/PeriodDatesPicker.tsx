@@ -3,13 +3,7 @@ import {
    UniversityPeriod,
    UniversityPeriodType,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
-import React, {
-   useCallback,
-   useContext,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import React, { useCallback, useMemo, useRef, useState } from "react"
 import { lighten, useTheme } from "@mui/material/styles"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { Calendar as CalendarIcon, PlusCircle as PlusIcon } from "react-feather"
@@ -17,8 +11,7 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { sxStyles } from "types/commonTypes"
 import { Box, Button, Typography } from "@mui/material"
-import ContentButton from "components/views/portal/content-carousel/ContentButton"
-import { CalendarManagerContext } from "./TimelineCountriesManager"
+import { useCalendarManager } from "./TimelineCountriesManager"
 import { Timestamp } from "firebase/firestore"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
@@ -26,6 +19,7 @@ import ConfirmationDialog, {
 import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
+import GBLocale from "date-fns/locale/en-GB"
 
 const styles = sxStyles({
    datePicker: {
@@ -69,8 +63,6 @@ const styles = sxStyles({
       },
    },
    buttonsContainer: {
-      display: "flex",
-      justifyContent: "space-between",
       pt: "10px",
    },
    button: {
@@ -80,6 +72,9 @@ const styles = sxStyles({
       p: "5px",
       pl: "10px",
       pr: "10px",
+   },
+   buttonRight: {
+      ml: "38px",
    },
    calendarIcon: {
       "& svg": {
@@ -109,7 +104,7 @@ const PeriodDatesPicker = ({
    setDeletedPeriodIds,
 }: Props) => {
    const theme = useTheme()
-   const { academicYear, academicYears } = useContext(CalendarManagerContext)
+   const { academicYear, academicYears } = useCalendarManager()
    const [startDate, setStartDate] = useState(
       period ? period.start.toDate() : null
    )
@@ -220,12 +215,14 @@ const PeriodDatesPicker = ({
             minDate={academicYears[academicYear].start}
             maxDate={academicYears[academicYear].end}
             dateFormat={"dd MMM yy"}
+            locale={GBLocale}
             formatWeekDay={(nameOfDay) => nameOfDay.substr(0, 1)}
             placeholderText="Insert dates"
             shouldCloseOnSelect={false}
             selectsRange
             customInput={
                <BrandedTextField
+                  fullWidth
                   inputProps={{ sx: { pt: "10px" } }}
                   InputProps={{
                      endAdornment: period ? (
@@ -258,14 +255,15 @@ const PeriodDatesPicker = ({
                      Delete
                   </Button>
                )}
-               <ContentButton
-                  sx={styles.button}
+               <Button
+                  sx={[styles.button, styles.buttonRight]}
+                  variant={"contained"}
                   color={"secondary"}
                   onClick={handleSelectButton}
                   disabled={!modified || !endDate}
                >
                   Select dates
-               </ContentButton>
+               </Button>
             </Box>
          </DatePicker>
          <ConfirmDeletePeriodDialog
@@ -302,7 +300,7 @@ const ConfirmDeletePeriodDialog = ({
             handleCloseDialog()
             handleDeletePeriod()
          },
-         text: "Yes, Delete",
+         text: "Yes, delete",
          color: "error",
          variant: "contained",
       }),
@@ -314,7 +312,7 @@ const ConfirmDeletePeriodDialog = ({
          callback: () => {
             handleCloseDialog()
          },
-         text: "Go Back",
+         text: "Go back",
          color: "black",
          variant: "outlined",
       }),

@@ -25,6 +25,7 @@ import UniversityIcon from "@mui/icons-material/AccountBalanceOutlined"
 import EditUniversityDialog from "./EditUniversityDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { StyledTextField } from "components/views/group/admin/common/inputs"
+import { ConfirmationDialogAction } from "materialUI/GlobalModals/ConfirmationDialog"
 
 const styles = sxStyles({
    accordion: {
@@ -115,11 +116,17 @@ const TimelineCountryAccordion = ({ countryCode, academicYear }: Props) => {
       [searchInputValue, universities]
    )
 
+   const handleBatchUploadError = useCallback((error: Error) => {}, [])
+
    const handleBatchUpload = useCallback(
       (event) => {
-         timelineService.handleAddBatchPeriods(event, countryCode)
+         timelineService.handleAddBatchPeriods(
+            event,
+            countryCode,
+            handleBatchUploadError
+         )
       },
-      [countryCode, timelineService]
+      [countryCode, handleBatchUploadError, timelineService]
    )
 
    const handleDownloadTemplate = useCallback(() => {

@@ -1,9 +1,9 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Input, MenuItem } from "@mui/material"
 import { Select } from "@mui/material"
 import { FormControl } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import { CalendarManagerContext } from "./TimelineCountriesManager"
+import { useCalendarManager } from "./TimelineCountriesManager"
 
 const styles = sxStyles({
    select: {
@@ -21,9 +21,7 @@ const styles = sxStyles({
 })
 
 const AcademicYearSelector = () => {
-   const { academicYear, setAcademicYear, academicYears } = useContext(
-      CalendarManagerContext
-   )
+   const { academicYear, setAcademicYear, academicYears } = useCalendarManager()
 
    const handleYearChange = (event) => {
       setAcademicYear(event.target.value)
@@ -37,7 +35,7 @@ const AcademicYearSelector = () => {
             input={<Input />}
             disableUnderline
             onChange={handleYearChange}
-            inputProps={{ MenuProps: { sx: styles.selectList } }}
+            inputProps={selectListCustomProps}
          >
             <MenuItem value={"previousYear"}>
                {academicYears.previousYear.name}
@@ -52,5 +50,7 @@ const AcademicYearSelector = () => {
       </FormControl>
    )
 }
+
+const selectListCustomProps = { MenuProps: { sx: styles.selectList } }
 
 export default AcademicYearSelector

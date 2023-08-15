@@ -1,5 +1,5 @@
 import { Button, Grid, Paper, Typography } from "@mui/material"
-import React, { useCallback, useContext, useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import {
    TimelineUniversity,
@@ -10,7 +10,7 @@ import { useUniversityPeriodsByIds } from "components/custom-hook/university-tim
 import { DateTimeFormatOptions } from "luxon"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import EditUniversityDialog from "./EditUniversityDialog"
-import { CalendarManagerContext } from "./TimelineCountriesManager"
+import { useCalendarManager } from "./TimelineCountriesManager"
 
 const styles = sxStyles({
    container: {
@@ -37,7 +37,7 @@ const TimelineUniversityInfo = ({ university }: Props) => {
       useDialogStateHandler()
 
    // get and filter periods not in academic year (2 steps because of firebase not supporting inequalities on > 1 fields)
-   const { academicYear, academicYears } = useContext(CalendarManagerContext)
+   const { academicYear, academicYears } = useCalendarManager()
    const universityPeriodsUnsorted = useUniversityPeriodsByIds([university.id])
 
    const universityPeriods = useMemo(
@@ -125,10 +125,10 @@ const TimelineUniversityInfo = ({ university }: Props) => {
    )
 }
 
-const dateOptions = {
+const dateOptions: DateTimeFormatOptions = {
    year: "2-digit",
    month: "short",
    day: "2-digit",
-} as DateTimeFormatOptions
+}
 
 export default TimelineUniversityInfo
