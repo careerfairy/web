@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import {
    Box,
@@ -17,14 +17,14 @@ import {
    TimelineUniversity,
    UniversityPeriod,
    UniversityPeriodObject,
+   UniversityPeriodType,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 import PeriodDatesPicker from "./PeriodDatesPicker"
 import { SlideUpTransition } from "components/views/common/transitions"
 import CloseIcon from "@mui/icons-material/Close"
 import AcademicYearSelector from "./AcademicYearSelector"
-import { CalendarManagerContext } from "./TimelineCountriesManager"
+import { useCalendarManager } from "./TimelineCountriesManager"
 import { isPeriodInInterval } from "../utils"
-import ContentButton from "components/views/portal/content-carousel/ContentButton"
 import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
 import { getDoc } from "firebase/firestore"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
@@ -40,13 +40,12 @@ const styles = sxStyles({
       "& .MuiPaper-root": {
          overflowY: "visible",
       },
-   },
-   content: {
-      p: { xs: 1, md: 2 },
+      px: "28px",
+      pt: "20px",
+      pb: "2p4x",
       minWidth: 200,
    },
    header: {
-      px: { xs: 2, md: 4 },
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -62,8 +61,16 @@ const styles = sxStyles({
       color: "tertiary.dark",
       mt: "10px",
    },
-   outerButtonsContainer: { display: "flex", justifyContent: "space-between" },
-   innerButtonsContainer: { display: "flex", justifyContent: "flex-end" },
+   outerButtonsContainer: {
+      mt: "17px",
+      display: "flex",
+      justifyContent: "space-between",
+   },
+   innerButtonsContainer: {
+      display: "flex",
+      justifyContent: "flex-end!important",
+      width: "100%",
+   },
    button: {
       fontWeight: 300,
       textTransform: "none",
@@ -97,7 +104,7 @@ const EditUniversityDialog = ({
    periods,
 }: Props) => {
    const timelineService = UniversityTimelineInstance
-   const { academicYear, academicYears } = useContext(CalendarManagerContext)
+   const { academicYear, academicYears } = useCalendarManager()
    const [universityName, setUniversityName] = useState<string>(
       university?.name
    )
@@ -196,12 +203,12 @@ const EditUniversityDialog = ({
    )
 
    const renderOriginalPeriods = useCallback(
-      (periodType) => renderPeriods(periods, periodType),
+      (periodType: UniversityPeriodType) => renderPeriods(periods, periodType),
       [periods, renderPeriods]
    )
 
    const renderNewPeriods = useCallback(
-      (periodType) => {
+      (periodType: UniversityPeriodType) => {
          return renderPeriods(
             modifiedPeriods.filter((period) => !period.id),
             periodType
@@ -237,7 +244,7 @@ const EditUniversityDialog = ({
                </IconButton>
             </DialogTitle>
 
-            <DialogContent sx={styles.content}>
+            <DialogContent>
                <BrandedTextField
                   fullWidth
                   label={"University Name"}
@@ -283,7 +290,7 @@ const EditUniversityDialog = ({
                         onClick={handleOpenDeleteDialog}
                         endIcon={<TrashIcon />}
                      >
-                        Delete University
+                        Delete university
                      </Button>
                   ) : null}
                   <Box sx={styles.innerButtonsContainer}>
@@ -295,14 +302,15 @@ const EditUniversityDialog = ({
                      >
                         Cancel
                      </Button>
-                     <ContentButton
+                     <Button
                         sx={styles.button}
                         color={"secondary"}
+                        variant={"contained"}
                         onClick={handleConfirmButton}
                         disabled={!universityName || universityName == ""}
                      >
                         {university ? "Save changes" : "Add university"}
-                     </ContentButton>
+                     </Button>
                   </Box>
                </Box>
             </DialogContent>

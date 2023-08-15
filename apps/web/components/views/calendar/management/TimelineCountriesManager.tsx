@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useMemo, useState } from "react"
+import React, {
+   createContext,
+   useCallback,
+   useContext,
+   useMemo,
+   useState,
+} from "react"
 import { Box, Button, IconButton, Paper, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { PlusCircle as AddIcon } from "react-feather"
@@ -45,8 +51,9 @@ const styles = sxStyles({
    addCountryContainer: {
       borderRadius: "30px!important",
       p: "10px",
-      "& .MuiAutocomplete-listbox": {
-         backgroundColor: "red",
+      display: "flex",
+      "& .MuiAutocomplete-root": {
+         width: "100%",
       },
    },
    addCountry: {
@@ -95,13 +102,23 @@ type CalendarManagerContextType = {
    academicYears: AcademicYears | null
 }
 
-export const CalendarManagerContext = createContext<CalendarManagerContextType>(
-   {
-      academicYear: "currentYear",
-      setAcademicYear: () => {},
-      academicYears: null,
+const CalendarManagerContext = createContext<CalendarManagerContextType>({
+   academicYear: "currentYear",
+   setAcademicYear: () => {},
+   academicYears: null,
+})
+
+export const useCalendarManager = () => {
+   const context = useContext(CalendarManagerContext)
+
+   if (!context) {
+      throw new Error(
+         "useCalendarManager must be used within a CalendarManagerProvider"
+      )
    }
-)
+
+   return context
+}
 
 const TimelineCountriesManager = () => {
    const [academicYear, setAcademicYear] =
@@ -211,54 +228,52 @@ const AddTimelineCountrySlot = ({
 
    return (
       <Paper variant={"outlined"} sx={styles.addCountryContainer}>
-         <Grid container spacing={1}>
-            <Grid item xs>
-               <SingleListSelect
-                  inputName={"newCountry"}
-                  inputProps={{
-                     placeholder: "Search country",
-                     variant: "filled",
-                     sx: styles.addCountryInput,
-                  }}
-                  isCheckbox
-                  checkboxProps={{
-                     icon: <Box sx={styles.addCountryCheckbox} />,
-                     checkedIcon: (
-                        <Box sx={styles.addCountryCheckbox}>
-                           <Box sx={styles.addCountryCheck}></Box>
-                        </Box>
-                     ),
-                     color: "default",
-                  }}
-                  selectedItem={selectedCountry}
-                  options={options}
-                  getLabelFn={(option) => universityCountriesMap[option.id]}
-                  onSelectItem={(option) => setSelectedCountry(option)}
-                  disabledValues={disabledOptions}
-                  noColorOnSelect
-               />
-            </Grid>
-            <Grid item xs={1.5}>
-               <IconButton sx={styles.iconButton} onClick={handleCancel}>
-                  <XIcon color={theme.palette.tertiary.dark} />
-               </IconButton>
-               <IconButton
-                  sx={styles.iconButton}
-                  onClick={handleConfirm}
-                  disabled={!selectedCountry}
-               >
-                  <CheckIcon
-                     color={
-                        selectedCountry
-                           ? theme.palette.primary.main
-                           : theme.palette.grey.main
-                     }
-                  />
-               </IconButton>
-            </Grid>
-         </Grid>
+         <SingleListSelect
+            inputName={"newCountry"}
+            inputProps={customAddCountryInputProps}
+            isCheckbox
+            checkboxProps={customCheckboxProps}
+            selectedItem={selectedCountry}
+            options={options}
+            getLabelFn={(option) => universityCountriesMap[option.id]}
+            onSelectItem={(option) => setSelectedCountry(option)}
+            disabledValues={disabledOptions}
+            noColorOnSelect
+         />
+         <IconButton sx={styles.iconButton} onClick={handleCancel}>
+            <XIcon color={theme.palette.tertiary.dark} />
+         </IconButton>
+         <IconButton
+            sx={styles.iconButton}
+            onClick={handleConfirm}
+            disabled={!selectedCountry}
+         >
+            <CheckIcon
+               color={
+                  selectedCountry
+                     ? theme.palette.primary.main
+                     : theme.palette.grey.main
+               }
+            />
+         </IconButton>
       </Paper>
    )
+}
+
+const customCheckboxProps = {
+   icon: <Box sx={styles.addCountryCheckbox} />,
+   checkedIcon: (
+      <Box sx={styles.addCountryCheckbox}>
+         <Box sx={styles.addCountryCheck}></Box>
+      </Box>
+   ),
+   color: "default",
+}
+
+const customAddCountryInputProps = {
+   placeholder: "Search country",
+   variant: "filled",
+   sx: styles.addCountryInput,
 }
 
 export default TimelineCountriesManager

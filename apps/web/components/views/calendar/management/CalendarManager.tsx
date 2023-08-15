@@ -1,7 +1,6 @@
 import React from "react"
-import { Box, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import ContentButton from "components/views/portal/content-carousel/ContentButton"
 import { ExternalLink as LinkIcon } from "react-feather"
 import TimelineCountriesManager from "./TimelineCountriesManager"
 
@@ -33,14 +32,16 @@ const CalendarManager = () => {
                vacations. Keep our clients informed with accurate and up-to-date
                information.
             </Typography>
-            <ContentButton
+            <Button
                sx={styles.calendarButton}
+               variant={"contained"}
                color={"secondary"}
-               href={"/admin/academic-calendar"}
+               href={"/academic-calendar/embed"}
+               target={"_blank"}
                endIcon={<LinkIcon />}
             >
                View Academic Calendar
-            </ContentButton>
+            </Button>
             <TimelineCountriesManager />
          </Box>
       </>

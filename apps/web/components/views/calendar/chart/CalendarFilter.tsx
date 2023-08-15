@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import {
    Box,
    DialogContent,
@@ -19,7 +19,7 @@ import MultiCheckboxSelect, {
 } from "../../common/filter/MultiCheckboxSelect"
 import MultiListSelect from "../../common/MultiListSelect"
 import { useTheme } from "@mui/material"
-import { CalendarContext } from "./AcademicCalendar"
+import { useCalendar } from "./AcademicCalendar"
 
 const styles = sxStyles({
    container: {
@@ -64,7 +64,7 @@ const CalendarFilter = ({
       setSelectedCountries,
       universityOptions,
       setUniversityOptions,
-   } = useContext(CalendarContext)
+   } = useCalendar()
 
    const countryOptions = useMemo(() => {
       const uniqueCountryOptions = allUniversityOptions

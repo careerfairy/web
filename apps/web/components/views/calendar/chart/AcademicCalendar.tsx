@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useMemo, useState } from "react"
+import React, {
+   createContext,
+   useCallback,
+   useContext,
+   useMemo,
+   useState,
+} from "react"
 import { useUniversityPeriodsByIdsAndStart } from "components/custom-hook/university-timeline/useUniversityPeriods"
 import { useTimelineUniversities } from "components/custom-hook/university-timeline/useTimelineUniversities"
 import {
@@ -21,6 +27,11 @@ const styles = sxStyles({
    },
 })
 
+export type CalendarChartDataType = {
+   name: string
+   data: { x: any; y: any[] }[]
+}[]
+
 type CalendarContextType = {
    allUniversityOptions: TimelineUniversity[]
    selectedUniversities: OptionGroup[]
@@ -31,7 +42,7 @@ type CalendarContextType = {
    setUniversityOptions: (options: OptionGroup[]) => void
 }
 
-export const CalendarContext = createContext<CalendarContextType>({
+const CalendarContext = createContext<CalendarContextType>({
    allUniversityOptions: [],
    selectedUniversities: [],
    setSelectedUniversities: () => {},
@@ -40,6 +51,16 @@ export const CalendarContext = createContext<CalendarContextType>({
    universityOptions: [],
    setUniversityOptions: () => {},
 })
+
+export const useCalendar = () => {
+   const context = useContext(CalendarContext)
+
+   if (!context) {
+      throw new Error("useCalendar must be used within a CalendarProvider")
+   }
+
+   return context
+}
 
 const AcademicCalendar = () => {
    const [selectedUniversities, setSelectedUniversities] = useState<
@@ -109,7 +130,7 @@ const AcademicCalendar = () => {
       [getUniversityName]
    )
 
-   const seriesData = useMemo(() => {
+   const seriesData: CalendarChartDataType = useMemo(() => {
       const seriesData = []
       if (!selectedPeriods || selectedPeriods.length <= 0) {
          // need at least one element for the graph to display at all
@@ -155,12 +176,12 @@ const AcademicCalendar = () => {
       <CalendarContext.Provider value={contextValues}>
          <Box sx={styles.container}>
             {isCalendarView ? (
-               <CalendarChart seriesData={seriesData}></CalendarChart>
+               <CalendarChart seriesData={seriesData} />
             ) : (
                <CalendarLanding
                   selectedUniversities={selectedUniversities}
                   setIsCalendarView={setIsCalendarView}
-               ></CalendarLanding>
+               />
             )}
          </Box>
       </CalendarContext.Provider>

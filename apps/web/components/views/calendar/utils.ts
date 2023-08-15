@@ -1,4 +1,5 @@
 import { UniversityPeriod } from "@careerfairy/shared-lib/universities/universityTimeline"
+import { DateTime } from "luxon"
 
 export type AcademicYears = {
    previousYear: {
@@ -26,28 +27,28 @@ export type AcademicYearType = "previousYear" | "currentYear" | "nextYear"
  * @returns name, start and end date of the previous, current and next academic year
  */
 export const getAcademicYears = (): AcademicYears => {
-   const currentDate = new Date()
-   const year = currentDate.getFullYear()
+   const currentDate = DateTime.now()
+   const currentYear = currentDate.year
 
    let academicYears: AcademicYears
 
    // currently January - August
-   if (currentDate.getMonth() <= 7) {
+   if (currentDate.month <= 8) {
       academicYears = {
          previousYear: {
-            name: `${year - 2}/${year - 1}`,
-            start: new Date(currentDate.getFullYear() - 2, 8, 1), // September 1st, 2 years ago
-            end: new Date(currentDate.getFullYear() - 1, 7, 31), // August 31st, 1 year ago
+            name: `${currentYear - 2}/${currentYear - 1}`,
+            start: DateTime.local(currentYear - 2, 9, 1).toJSDate(), // 1st September
+            end: DateTime.local(currentYear - 1, 8, 31).toJSDate(), // 31st August
          },
          currentYear: {
-            name: `${year - 1}/${year}`,
-            start: new Date(currentDate.getFullYear() - 1, 8, 1), // September, 1 year ago
-            end: new Date(currentDate.getFullYear(), 7, 31), // August 31st, this year
+            name: `${currentYear - 1}/${currentYear}`,
+            start: DateTime.local(currentYear - 1, 9, 1).toJSDate(),
+            end: DateTime.local(currentYear, 8, 31).toJSDate(),
          },
          nextYear: {
-            name: `${year}/${year + 1}`,
-            start: new Date(currentDate.getFullYear(), 8, 1), // September, this year
-            end: new Date(currentDate.getFullYear() + 1, 7, 31), // September, 1 year later
+            name: `${currentYear}/${currentYear + 1}`,
+            start: DateTime.local(currentYear, 9, 1).toJSDate(),
+            end: DateTime.local(currentYear + 1, 8, 31).toJSDate(),
          },
       }
    }
@@ -55,19 +56,19 @@ export const getAcademicYears = (): AcademicYears => {
    else {
       academicYears = {
          previousYear: {
-            name: `${year - 1}/${year}`,
-            start: new Date(currentDate.getFullYear() - 1, 8, 1), // September, 1 year ago
-            end: new Date(currentDate.getFullYear(), 7, 31), // August 31st, this year
+            name: `${currentYear - 1}/${currentYear}`,
+            start: DateTime.local(currentYear - 1, 9, 1).toJSDate(),
+            end: DateTime.local(currentYear, 8, 31).toJSDate(),
          },
          currentYear: {
-            name: `${year}/${year + 1}`,
-            start: new Date(currentDate.getFullYear(), 8, 1), // September, this year
-            end: new Date(currentDate.getFullYear() + 1, 7, 31), // August 31st, 1 year later
+            name: `${currentYear}/${currentYear + 1}`,
+            start: DateTime.local(currentYear, 9, 1).toJSDate(),
+            end: DateTime.local(currentYear + 1, 8, 31).toJSDate(),
          },
          nextYear: {
-            name: `${year + 1}/${year + 2}`,
-            start: new Date(currentDate.getFullYear() + 1, 8, 1), // September, 1 year later
-            end: new Date(currentDate.getFullYear() + 2, 7, 31), // August 31st, 2 years later
+            name: `${currentYear + 1}/${currentYear + 2}`,
+            start: DateTime.local(currentYear + 1, 9, 1).toJSDate(),
+            end: DateTime.local(currentYear + 2, 8, 31).toJSDate(),
          },
       }
    }

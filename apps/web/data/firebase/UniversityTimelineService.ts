@@ -16,6 +16,7 @@ import { FirestoreInstance } from "./FirebaseInstance"
 import {
    TimelineUniversity,
    UniversityPeriod,
+   UniversityPeriodObject,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { utils, writeFile, read } from "xlsx"
@@ -165,7 +166,8 @@ export class UniversityTimelineService {
 
    handleAddBatchPeriods(
       event: React.ChangeEvent<HTMLInputElement>,
-      countryCode: string
+      countryCode: string,
+      handleError: (error: Error) => void
    ) {
       // get the file
       const file = event.target.files?.[0]
@@ -207,7 +209,18 @@ export class UniversityTimelineService {
 
          // add universities in database when needed
          const newUniversityNames: string[] = jsonData
-            .map((row) => row["University_name"])
+            .map((row, index) => {
+               const name: string = row["University_name"]
+               if (name?.length) {
+                  return name
+               } else {
+                  throw new Error(
+                     `Make sure the name of the university on line ${
+                        index + 1
+                     } is not empty`
+                  )
+               }
+            })
             .reduce((acc, uniName) => {
                if (
                   !acc.includes(uniName) &&
@@ -235,19 +248,50 @@ export class UniversityTimelineService {
          )
          const updatedUniversities = []
          updatedUniversitiesSnapshot.forEach((doc) =>
-            updatedUniversities.push({ name: doc.data().name, id: doc.id })
+            updatedUniversities.push({
+               name: doc.data().name,
+               id: doc.id,
+            })
          )
 
          // Get the period data from the file
+         const validPeriodValues = Object.values(UniversityPeriodObject)
          const periods: Create<UniversityPeriod>[] = jsonData.map(
-            (row: any) => {
+            (row, index) => {
+               const type = row["Period_type"]
+               if (!validPeriodValues.includes(type)) {
+                  throw new Error(
+                     `Make sure the type of the period on line ${
+                        index + 1
+                     } is exactly one of: ${validPeriodValues.join(", ")}`
+                  )
+               }
+
+               const start = new Date(row["Period_start"])
+               const end = new Date(row["Period_end"])
+               if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                  throw new Error(
+                     `Make sure your period's start and end on line ${
+                        index + 1
+                     } are valid dates`
+                  )
+               }
+
+               if (start >= end) {
+                  throw new Error(
+                     `Make sure your period on line ${
+                        index + 1
+                     } starts before it ends`
+                  )
+               }
+
                const period = {
                   timelineUniversityId: updatedUniversities.find(
                      (university) => university.name == row["University_name"]
                   ).id,
-                  type: row["Period_type"],
-                  start: Timestamp.fromDate(new Date(row["Period_start"])),
-                  end: Timestamp.fromDate(new Date(row["Period_end"])),
+                  type: type,
+                  start: Timestamp.fromDate(start),
+                  end: Timestamp.fromDate(end),
                }
 
                return period
