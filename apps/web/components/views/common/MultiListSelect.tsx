@@ -1,6 +1,7 @@
 import React, { Dispatch, memo, useCallback, useEffect, useState } from "react"
 import {
    Autocomplete,
+   Box,
    Checkbox,
    Chip,
    Collapse,
@@ -11,6 +12,11 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
 import { IColors } from "../../../types/commonTypes"
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace"
+import { styled } from "@mui/material/styles"
+import { StyledCheckbox } from "../group/admin/common/inputs"
+import { alpha } from "@mui/material/styles"
+import ChipDeleteIcon from "@mui/icons-material/HighlightOffRounded"
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -22,8 +28,10 @@ const MultiListSelect = ({
    onSelectItems = () => {},
    disabled = false,
    getLabelFn = (option) => option.name, // displayed name
+   getListLabelFn = (option) => option.name, // display name in the option list
    inputProps = {},
    isCheckbox = false, // Select items are checkboxes
+   isChipUnderTextfield = false,
    chipProps = {},
    extraOptions = {}, // props to pass to autocomplete
    setFieldValue = () => {}, // formik field
@@ -43,6 +51,8 @@ const MultiListSelect = ({
    errorMessage = "",
    errorMessageClassName = "",
    handleBlur = () => {},
+   useStyledTextfield = false,
+   useStyledCheckbox = false,
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
    const [selectedItemsLocal, setSelectedItemsLocal] = useState([])
@@ -163,74 +173,153 @@ const MultiListSelect = ({
    )
 
    return (
-      <Autocomplete
-         id={inputName}
-         multiple
-         value={selectedItemsLocal}
-         disabled={disabled}
-         onChange={handleMultiSelect}
-         isOptionEqualToValue={isOptionEqualToValue}
-         disableCloseOnSelect={isCheckbox ? true : undefined}
-         options={allValuesLocal}
-         getOptionLabel={getLabelFn}
-         renderOption={(props, option, { selected }) =>
-            isCheckbox ? (
-               <li
-                  {...props}
-                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
-                  key={getKeyFn(option)}
-                  style={{ justifyContent: "space-between" }}
-               >
-                  {getLabelFn(option)}
-                  <Checkbox
+      <>
+         <Autocomplete
+            id={inputName}
+            multiple
+            value={selectedItemsLocal}
+            disabled={disabled}
+            onChange={handleMultiSelect}
+            isOptionEqualToValue={isOptionEqualToValue}
+            disableCloseOnSelect={Boolean(isCheckbox)}
+            options={allValuesLocal}
+            getOptionLabel={getLabelFn}
+            renderOption={(props, option, { selected }) =>
+               isCheckbox ? (
+                  <li
+                     {...props}
+                     data-testid={`${inputName}_${getKeyFn(option)}_option`}
                      key={getKeyFn(option)}
-                     icon={icon}
-                     checkedIcon={checkedIcon}
-                     checked={selected}
-                     color={checkboxColor}
+                     style={{
+                        justifyContent: "space-between",
+                        backgroundColor: useStyledTextfield
+                           ? "white"
+                           : undefined,
+                     }}
+                  >
+                     {getListLabelFn(option)}
+                     {useStyledCheckbox ? (
+                        <StyledCheckbox
+                           key={getKeyFn(option)}
+                           checked={selected}
+                        />
+                     ) : (
+                        <Checkbox
+                           key={getKeyFn(option)}
+                           icon={icon}
+                           checkedIcon={checkedIcon}
+                           checked={selected}
+                           color={checkboxColor}
+                        />
+                     )}
+                  </li>
+               ) : (
+                  <li
+                     {...props}
+                     data-testid={`${inputName}_${getKeyFn(option)}_option`}
+                     key={getKeyFn(option)}
+                  >
+                     {getLabelFn(option)}
+                  </li>
+               )
+            }
+            getOptionDisabled={getOptionDisabled}
+            renderInput={(params) => (
+               <FormControl fullWidth>
+                  {useStyledTextfield ? (
+                     <CustomTextField
+                        {...params}
+                        {...inputProps}
+                        name={inputName}
+                        error={hasError}
+                        onBlur={handleBlur}
+                        color={"info"}
+                     />
+                  ) : (
+                     <TextField
+                        {...params}
+                        {...inputProps}
+                        name={inputName}
+                        error={hasError}
+                        onBlur={handleBlur}
+                     />
+                  )}
+                  <Collapse className={errorMessageClassName} in={hasError}>
+                     {errorMessage}
+                  </Collapse>
+               </FormControl>
+            )}
+            renderTags={(value, getTagProps) => {
+               if (!isChipUnderTextfield) {
+                  return value.map((option, index) => (
+                     <Chip
+                        key={getKeyFn(option)}
+                        label={getLabelFn(option)}
+                        {...getTagProps({ index })}
+                        {...chipProps}
+                        disabled={getOptionDisabled(option)}
+                     />
+                  ))
+               }
+            }}
+            groupBy={getGroupByFn}
+            {...extraOptions}
+         />
+         {isChipUnderTextfield ? (
+            <Box mt={2}>
+               {selectedItemsLocal.map((option, index) => (
+                  <CustomChip
+                     key={getKeyFn(option)}
+                     sx={{ m: 0.5 }}
+                     label={getLabelFn(option)}
+                     deleteIcon={<ChipDeleteIcon />}
+                     onDelete={() => {
+                        const newSelection = selectedItemsLocal.filter(
+                           (item) => getKeyFn(item) != getKeyFn(option)
+                        )
+                        onSelectItems(newSelection)
+                        setSelectedItemsLocal(newSelection)
+                     }}
+                     {...chipProps}
+                     disabled={getOptionDisabled(option)}
                   />
-               </li>
-            ) : (
-               <li
-                  {...props}
-                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
-                  key={getKeyFn(option)}
-               >
-                  {getLabelFn(option)}
-               </li>
-            )
-         }
-         getOptionDisabled={getOptionDisabled}
-         renderInput={(params) => (
-            <FormControl fullWidth>
-               <TextField
-                  {...params}
-                  {...inputProps}
-                  name={inputName}
-                  error={hasError}
-                  onBlur={handleBlur}
-               />
-               <Collapse className={errorMessageClassName} in={hasError}>
-                  {errorMessage}
-               </Collapse>
-            </FormControl>
-         )}
-         renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-               <Chip
-                  key={getKeyFn(option)}
-                  label={getLabelFn(option)}
-                  {...getTagProps({ index })}
-                  {...chipProps}
-                  disabled={getOptionDisabled(option)}
-               />
-            ))
-         }
-         groupBy={getGroupByFn}
-         {...extraOptions}
-      />
+               ))}
+            </Box>
+         ) : null}
+      </>
    )
 }
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+   backgroundColor: "#F7F8FC",
+   "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.2),
+      },
+      "&:hover fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.4),
+      },
+      "&.Mui-focused fieldset": {
+         borderColor: alpha(theme.palette.secondary.main, 0.4),
+         borderWidth: "1px",
+      },
+      "&.Mui-disabled": {
+         backgroundColor: theme.palette.grey.main,
+      },
+   },
+}))
+
+const CustomChip = styled(Chip)(({ theme }) => ({
+   backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+   border: "1px solid " + alpha(theme.palette.secondary.main, 0.3),
+   color: "black",
+   "& .MuiChip-deleteIcon": {
+      color: theme.palette.grey.dark,
+      "&:hover": {
+         color: "black",
+      },
+   },
+}))
 
 type ICheckBoxColors = Exclude<IColors, "inherit" | "action" | "disabled">
 
@@ -241,11 +330,13 @@ type Props = {
    selectedItems: any[]
    disabled?: boolean
    getLabelFn?: (obj: any) => string
+   getListLabelFn?: (obj: any) => string | ReactJSXElement
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
    getGroupByFn?: (obj: any) => string
    getDisabledFn?: (obj: any) => string
    inputProps?: object
+   isChipUnderTextfield?: boolean
    chipProps?: object
    isCheckbox?: boolean
    allValues: any[]
@@ -258,6 +349,8 @@ type Props = {
    errorMessage?: string
    errorMessageClassName?: string
    handleBlur?: (e) => void
+   useStyledTextfield?: boolean
+   useStyledCheckbox?: boolean
 }
 
 type SelectAllOption = {

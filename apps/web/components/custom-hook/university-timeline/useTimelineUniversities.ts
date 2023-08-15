@@ -1,4 +1,4 @@
-import { collection, query, where } from "firebase/firestore"
+import { collection, query, where, orderBy } from "firebase/firestore"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
@@ -8,7 +8,11 @@ import { TimelineUniversity } from "@careerfairy/shared-lib/universities/univers
  * Custom hook to get timeline universities from the database
  **/
 export const useTimelineUniversities = () => {
-   return useFirestoreCollection<TimelineUniversity>("timelineUniversities", {
+   const uniQuery = query(
+      collection(FirestoreInstance, "timelineUniversities"),
+      orderBy("name")
+   )
+   return useFirestoreCollection<TimelineUniversity>(uniQuery, {
       idField: "id",
       suspense: false,
    })
