@@ -69,7 +69,6 @@ const styles = sxStyles({
    innerButtonsContainer: {
       display: "flex",
       justifyContent: "flex-end!important",
-      width: "100%",
    },
    button: {
       fontWeight: 300,
