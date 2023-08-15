@@ -23,6 +23,7 @@ import { TimelineCountry } from "@careerfairy/shared-lib/universities/university
 const styles = sxStyles({
    headerContainer: {
       m: "20px",
+      mr: "0px",
       mt: "50px",
       display: "flex",
       justifyContent: "space-between",

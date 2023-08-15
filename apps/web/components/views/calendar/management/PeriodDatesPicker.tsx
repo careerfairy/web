@@ -27,6 +27,9 @@ const styles = sxStyles({
       "& .react-datepicker": {
          fontFamily: (theme) => theme.typography.fontFamily + "!important",
       },
+      "& .react-datepicker-wrapper": {
+         width: "100%",
+      },
       "& .react-datepicker__header": {
          backgroundColor: "white",
          borderBlockColor: "transparent",

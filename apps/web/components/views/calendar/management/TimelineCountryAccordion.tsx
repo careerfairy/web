@@ -37,11 +37,19 @@ const styles = sxStyles({
    summary: {
       fontSize: "18px",
    },
+   header: {
+      display: "flex",
+      "& .MuiPaper-root": {
+         width: "100%",
+      },
+   },
    button: {
       textTransform: "none",
+      ml: "15px",
       pl: "15px",
       pr: "15px",
       color: "tertiary.dark",
+      flexShrink: 0,
    },
    search: {
       borderRadius: "30px",
@@ -142,57 +150,52 @@ const TimelineCountryAccordion = ({ countryCode, academicYear }: Props) => {
                </Typography>
             </AccordionSummary>
             <AccordionDetails>
-               <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                     <Paper variant={"outlined"} sx={styles.search}>
-                        <StyledTextField
-                           fullWidth
-                           placeholder={"Search for a university"}
-                           InputProps={{
-                              endAdornment: (
-                                 <Box sx={{ mr: "10px", mt: "5px" }}>
-                                    <FindIcon />
-                                 </Box>
-                              ),
-                           }}
-                           value={searchInputValue}
-                           onChange={(
-                              event: React.ChangeEvent<HTMLInputElement>
-                           ) => {
-                              setSearchInputValue(event.target.value)
-                           }}
-                        />
-                     </Paper>
-                  </Grid>
-                  <Grid item xs>
-                     <Button
-                        variant={"outlined"}
-                        component={"label"}
-                        sx={styles.button}
-                        color={"grey"}
-                        endIcon={<UploadIcon />}
-                     >
-                        <input
-                           hidden
-                           type="file"
-                           accept=".xlsx"
-                           onChange={handleBatchUpload}
-                        />
-                        Batch upload
-                     </Button>
-                  </Grid>
-                  <Grid item xs>
-                     <Button
-                        onClick={handleOpenAddDialog}
-                        variant={"outlined"}
-                        sx={styles.button}
-                        color={"grey"}
-                        endIcon={<AddIcon />}
-                     >
-                        Add new university
-                     </Button>
-                  </Grid>
-               </Grid>
+               <Box sx={styles.header}>
+                  <Paper variant={"outlined"} sx={styles.search}>
+                     <StyledTextField
+                        fullWidth
+                        placeholder={"Search for a university"}
+                        InputProps={{
+                           endAdornment: (
+                              <Box sx={{ mr: "10px", mt: "5px" }}>
+                                 <FindIcon />
+                              </Box>
+                           ),
+                        }}
+                        value={searchInputValue}
+                        onChange={(
+                           event: React.ChangeEvent<HTMLInputElement>
+                        ) => {
+                           setSearchInputValue(event.target.value)
+                        }}
+                     />
+                  </Paper>
+                  <Button
+                     variant={"outlined"}
+                     component={"label"}
+                     sx={styles.button}
+                     color={"grey"}
+                     endIcon={<UploadIcon />}
+                  >
+                     <input
+                        hidden
+                        type="file"
+                        accept=".xlsx"
+                        onChange={handleBatchUpload}
+                     />
+                     Batch upload
+                  </Button>
+                  <Button
+                     onClick={handleOpenAddDialog}
+                     variant={"outlined"}
+                     sx={styles.button}
+                     color={"grey"}
+                     endIcon={<AddIcon />}
+                  >
+                     Add new university
+                  </Button>
+               </Box>
+
                {universities?.length ? (
                   <TimelineUniversitiesList
                      universities={searchedUniversities}
