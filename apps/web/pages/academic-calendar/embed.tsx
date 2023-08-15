@@ -11,7 +11,7 @@ const styles = sxStyles({
       alignItems: "center",
    },
 })
-const AcademicCalendarPage = () => {
+const AcademicCalendarEmbed = () => {
    return (
       <Box sx={styles.container}>
          <AcademicCalendar />
@@ -19,4 +19,4 @@ const AcademicCalendarPage = () => {
    )
 }
 
-export default AcademicCalendarPage
+export default AcademicCalendarEmbed
