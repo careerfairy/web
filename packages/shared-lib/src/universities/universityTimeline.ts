@@ -2,9 +2,9 @@ import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 
 export const UniversityPeriodObject = {
+   Lecture: "lecture",
    Exam: "exam",
    Vacation: "vacation",
-   Lecture: "lecture",
 } as const
 
 export type UniversityPeriodType =
