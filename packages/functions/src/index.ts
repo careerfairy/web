@@ -211,3 +211,4 @@ exports.onDeleteLivestreamPopularityEvents =
 exports.createSpark = groupSparks.createSpark
 exports.updateSpark = groupSparks.updateSpark
 exports.deleteSpark = groupSparks.deleteSpark
+exports.validateGroupSparks = groupSparks.validateGroupSparks

@@ -62,6 +62,8 @@ export interface ISparkFunctionsRepository {
       group: Change<DocumentSnapshot>,
       groupId: string
    ): Promise<void>
+
+   getSparksByGroupId(groupId: string): Promise<Spark[]>
 }
 
 export class SparkFunctionsRepository
@@ -237,6 +239,26 @@ export class SparkFunctionsRepository
       })
 
       return void batch.commit()
+   }
+
+   async getSparksByGroupId(groupId: string): Promise<Spark[]> {
+      const snapshot = await this.firestore
+         .collection("sparks")
+         .where("group.id", "==", groupId)
+         .orderBy("createdAt", "desc")
+         .get()
+
+      if (!snapshot.empty) {
+         return snapshot.docs?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as Spark)
+         )
+      }
+
+      return []
    }
 }
 
