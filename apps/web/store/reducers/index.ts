@@ -2,6 +2,7 @@ import { combineReducers } from "redux"
 import { firestoreReducer } from "redux-firestore"
 
 import adminSparksReducer from "./adminSparksReducer"
+import sparksFeedReducer from "./sparksFeedReducer"
 import authReducer from "./authReducer"
 import emotesReducer from "./emotesReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
@@ -28,6 +29,7 @@ const reducers = {
    stream: streamReducer,
    streamAdmin: streamAdminReducer,
    adminSparks: adminSparksReducer,
+   sparksFeed: sparksFeedReducer,
 } as const // only way to get type inference on firebaseReducer
 
 export default combineReducers<typeof reducers>(reducers)

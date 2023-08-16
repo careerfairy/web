@@ -1,10 +1,26 @@
-import { Functions, httpsCallable } from "firebase/functions"
-import { FunctionsInstance } from "./FirebaseInstance"
+import {
+   SparkPresenter,
+   sparkPresenterConverter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import {
    AddSparkSparkData,
    DeleteSparkData,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   Query,
+   collection,
+   getDocs,
+   limit,
+   orderBy,
+   query,
+   startAfter,
+   where,
+   getDoc,
+   doc,
+} from "firebase/firestore"
+import { Functions, httpsCallable } from "firebase/functions"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -41,6 +57,78 @@ export class SparksService {
          "deleteSpark_v2"
       )(data)
    }
+
+   /**
+    * Fetch the next batch of sparks
+    * @param lastSpark  The last retrieved spark to determine the starting point for the next batch
+    * If null, the first batch will be retrieved
+    *
+    * @param options - The options for the fetch
+    * */
+   async fetchNextSparks(
+      lastSpark: SparkPresenter | null,
+      options: FetchNextSparkOptions = {}
+   ): Promise<SparkPresenter[]> {
+      const { numberOfSparks = 10, groupId } = options
+
+      const db = FirestoreInstance
+
+      // Starting with base collection.
+      let baseQuery: Query = collection(db, "sparks")
+
+      // If a group (company) is specified.
+      if (groupId) {
+         baseQuery = query(baseQuery, where("group.id", "==", groupId)) // Adjust the field path as necessary.
+      }
+
+      // Apply order.
+      baseQuery = query(baseQuery, orderBy("publishedAt", "desc"))
+
+      // Apply the limit and startAfter if a lastSpark is provided.
+      if (lastSpark) {
+         baseQuery = query(
+            baseQuery,
+            startAfter(lastSpark.publishedAt),
+            limit(numberOfSparks)
+         )
+      } else {
+         baseQuery = query(baseQuery, limit(numberOfSparks))
+      }
+
+      const snapshot = await getDocs(
+         baseQuery.withConverter(sparkPresenterConverter)
+      )
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Get spark by Id
+    *
+    * @param sparkId - The id of the spark to fetch
+    * */
+   async getSparkById(sparkId: string): Promise<SparkPresenter | null> {
+      const docRef = doc(FirestoreInstance, "sparks", sparkId)
+      const docSnap = await getDoc(
+         docRef.withConverter(sparkPresenterConverter)
+      )
+      if (docSnap.exists()) {
+         return docSnap.data()
+      } else {
+         return null
+      }
+   }
+}
+
+export type FetchNextSparkOptions = {
+   /**
+    * The number of sparks to fetch, defaults to 10
+    */
+   numberOfSparks?: number
+   /**
+    * The group ID to fetch sparks for
+    * */
+   groupId?: string
 }
 
 export const sparkService = new SparksService(FunctionsInstance as any)
