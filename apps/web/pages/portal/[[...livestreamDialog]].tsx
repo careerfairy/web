@@ -16,7 +16,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import DateUtil from "../../util/DateUtil"
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import {
    getServerSideUserData,
@@ -37,6 +37,7 @@ import SparksCarousel from "components/views/admin/sparks/general-sparks-view/Sp
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { usePagination } from "use-pagination-firestore"
+import Heading from "components/views/portal/common/Heading"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -48,25 +49,22 @@ const PortalPage = ({
    const { authenticatedUser, userData } = useAuth()
    const [sparks, setSparks] = useState<Spark[]>([])
 
-   // const sparksQuery = useMemo(() => {
-   //    return sparksRepo.getSparks({ limit: 8 })
-   // }, [])
+   const sparksQuery = useMemo(() => {
+      return sparksRepo.getSparks({ limit: 8 })
+   }, [])
 
-   // const loadSparks = async () => {
-   //    sparksRepo.getSparks({ limit: 8 }).then(sparks => {
-   //       debugger
-   //       console.log('<<<<<<<<<<<<<<<<<<')
-   //       setSparks(sparks)
-   //    })
-   //    .catch(e => {
-   //       debugger
-   //       console.log('>>>>>>>>>>>>>>>>>',e)
-   //    })
-   // }
+   const loadSparks = async () => {
+      try {
+         const sparks = await sparksRepo.getSparks({ limit: 8 })
+         setSparks(sparks)
+      } catch (error) {
+         console.log(error)
+      }
+   }
 
-   // useEffect(() => {
-   //    loadSparks()
-   // }, [userData])
+   useEffect(() => {
+      loadSparks()
+   }, [userData])
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -87,8 +85,12 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
-   const handleSparksClicked = () => {
-      console.log("clicked")
+   const handleSparksClicked = (sparkId) => {
+      const updatedSparks = sparks.map((spark) => {
+         if (spark.id === sparkId) {
+            spark
+         }
+      })
    }
 
    return (
@@ -122,10 +124,23 @@ const PortalPage = ({
                               <RecommendedEvents limit={10} />
                            ) : null}
                            {hasSparks ? (
-                              <SparksCarousel
-                                 sparks={sparks}
-                                 onSparkClick={handleSparksClicked}
-                              />
+                              <Box sx={{ px: 2 }}>
+                                 <Stack
+                                    direction={"column"}
+                                    sx={{ gap: "10px" }}
+                                 >
+                                    <Heading
+                                       sx={{ textTransform: "uppercase" }}
+                                    >
+                                       Sparks
+                                    </Heading>
+                                    <SparksCarousel
+                                       sparks={sparks}
+                                       onSparkClick={handleSparksClicked}
+                                       isAdmin={false}
+                                    />
+                                 </Stack>
+                              </Box>
                            ) : null}
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
