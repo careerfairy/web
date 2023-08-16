@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/router"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
@@ -34,10 +35,9 @@ import {
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { usePagination } from "use-pagination-firestore"
 import Heading from "components/views/portal/common/Heading"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -48,6 +48,7 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const [sparks, setSparks] = useState<Spark[]>([])
+   const router = useRouter()
 
    const sparksQuery = useMemo(() => {
       return sparksRepo.getSparks({ limit: 8 })
@@ -55,10 +56,10 @@ const PortalPage = ({
 
    const loadSparks = async () => {
       try {
-         const sparks = await sparksRepo.getSparks({ limit: 8 })
+         const sparks = await sparksQuery
          setSparks(sparks)
       } catch (error) {
-         console.log(error)
+         errorLogAndNotify(error)
       }
    }
 
@@ -85,12 +86,9 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
-   const handleSparksClicked = (sparkId) => {
-      const updatedSparks = sparks.map((spark) => {
-         if (spark.id === sparkId) {
-            spark
-         }
-      })
+   const handleSparksClicked = (spark: Spark) => {
+      if (!spark) return
+      return router.push(`/sparks/${spark.id}`)
    }
 
    return (
