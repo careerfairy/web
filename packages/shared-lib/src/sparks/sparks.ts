@@ -76,6 +76,54 @@ export interface Spark extends Identifiable {
 }
 
 /**
+ * Collection path: /sparksFeed/{userId}
+ */
+export interface SparksFeed extends Identifiable {
+   userId: string
+   /**
+    * Spark ids for the user feed
+    */
+   sparkIds: string[]
+   /**
+    * The number of sparks in the feed, should be equal to sparkIds.length
+    */
+   numberOfSparks: number
+   /**
+    * When last the feed was updated
+    */
+   lastUpdated: Timestamp
+}
+
+/**
+ * Collection path: /userData/{userId}/seenSparks/2022
+ * - The seen sparks are partitioned by year, so we will never hit the 1MB limit
+ * - From my estimates we can have about 20'000 seen sparks on a single document before we hit the 1MB limit
+ *
+ * - e.g: /userData/{userId}/seenSparks/2022
+ * - e.g: /userData/{userId}/seenSparks/2023
+ *
+ *
+ * This will allow us to scale indefinitely, with very little storage cost
+ */
+export interface SeenSparks extends Identifiable {
+   documentType: "seenSparks"
+   userId: string
+   sparks: {
+      [sparkId: string]: Timestamp
+   }
+}
+
+export const createSeenSparksDocument = (
+   userId: string,
+   year: string | number
+): SeenSparks => ({
+   documentType: "seenSparks",
+   userId,
+   sparks: {},
+   id: year.toString(),
+})
+
+/**
  * Collection path: /deletedSparks
  */
 export interface DeletedSpark extends Spark {
