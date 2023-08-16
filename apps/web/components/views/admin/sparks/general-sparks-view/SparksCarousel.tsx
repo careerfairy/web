@@ -1,8 +1,9 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
+import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { FC, ReactNode } from "react"
+import { FC, ReactNode, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -42,11 +43,22 @@ type PropType = {
    sparks?: Spark[]
    onSparkClick?: (spark: Spark) => void
    children?: ReactNode[]
+   isAdmin?: boolean
 }
 
 const SparksCarousel: FC<PropType> = (props) => {
-   const { options, sparks, onSparkClick, children } = props
+   const [clickedSpark, setClickedSpark] = useState<Spark | null>()
+   const { options, sparks, onSparkClick, children, isAdmin } = props
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
+
+   const handleSparkClicked = (spark: Spark): void => {
+      if (clickedSpark?.id === spark.id) {
+         setClickedSpark(null)
+         return onSparkClick(spark)
+      }
+      setClickedSpark(spark)
+      return onSparkClick(spark)
+   }
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
@@ -54,10 +66,19 @@ const SparksCarousel: FC<PropType> = (props) => {
             {sparks?.length
                ? sparks.map((spark) => (
                     <Box key={spark.id} sx={styles.slide}>
-                       <SparkCarouselCard
-                          onClick={() => onSparkClick(spark)}
-                          spark={spark}
-                       />
+                       {isAdmin ? (
+                          <SparkCarouselCardForAdmin
+                             onClick={() => handleSparkClicked(spark)}
+                             spark={spark}
+                             preview={clickedSpark?.id === spark.id}
+                          />
+                       ) : (
+                          <SparkCarouselCard
+                             onClick={() => handleSparkClicked(spark)}
+                             spark={spark}
+                             preview={clickedSpark?.id === spark.id}
+                          />
+                       )}
                     </Box>
                  ))
                : children.map((child, i) => (

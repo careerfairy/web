@@ -78,6 +78,5 @@ export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
 )
 
 export const sparksRepo: ISparksRepository = new FirebaseSpaksRepository(
-   firestoreInstance,
-   FieldValue
+   firestoreInstance
 )

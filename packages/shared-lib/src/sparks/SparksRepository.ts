@@ -5,31 +5,26 @@ import BaseFirebaseRepository, {
 import { Spark } from "./sparks"
 
 const SPARKS_COLLECTION = "sparks"
+const DEFAULT_SPARKS_FETCH_LIMIT = 8
 
 export interface ISparksRepository {
-   getSparks(qs: { limit: number }): Promise<Spark[]>
+   getSparks({ limit }: { limit?: number }): Promise<Spark[] | null>
 }
 
 export class FirebaseSpaksRepository
    extends BaseFirebaseRepository
    implements ISparksRepository
 {
-   constructor(
-      protected readonly firestore: firebase.firestore.Firestore,
-      protected readonly fieldValue: typeof firebase.firestore.FieldValue
-   ) {
+   constructor(protected readonly firestore: firebase.firestore.Firestore) {
       super()
    }
 
-   async getSparks({ limit = 8 }): Promise<Spark[]> {
-      const sparksRef = this.firestore
+   async getSparks({ limit }): Promise<Spark[]> {
+      const snapshots = await this.firestore
          .collection(SPARKS_COLLECTION)
-         .limit(limit)
-         .orderBy("createdAt", "desc")
+         .limit(limit ?? DEFAULT_SPARKS_FETCH_LIMIT)
+         .get()
 
-      const snapshots = await sparksRef.get()
-      const sparks = mapFirestoreDocuments<Spark>(snapshots)
-      console.log("----------------------", sparks)
-      return sparks
+      return snapshots ? mapFirestoreDocuments<Spark>(snapshots) : []
    }
 }

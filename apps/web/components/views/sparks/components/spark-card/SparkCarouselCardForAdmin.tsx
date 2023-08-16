@@ -46,8 +46,6 @@ const styles = sxStyles({
    },
    cardDetails: {
       cursor: "pointer",
-      justifyContent: "flex-end",
-      gap: "6px",
    },
 })
 
@@ -60,19 +58,20 @@ type Props = {
 const SparkCarouselCardForAdmin: FC<Props> = ({
    spark,
    onClick,
-   preview = false,
+   preview = true,
 }) => {
    return (
       <SparkCarouselCardContainer
+         componentHeader={<HiddenStatus sparkPublished={spark.published} />}
          video={{
-            thumbnailUrl: spark.video.thumbnailUrl,
+            thumbnailUrl: getResizedUrl(spark.video.thumbnailUrl, "lg"),
             url: spark.video.url,
             preview: !preview,
          }}
       >
          <Box sx={styles.cardContent}>
             <Box px={cardPadding} pt={cardPadding}>
-               <SparkHeader showAdminOptions={false} spark={spark} />
+               <SparkHeader showAdminOptions={preview} spark={spark} />
             </Box>
             <Stack
                sx={styles.cardDetails}
@@ -80,8 +79,12 @@ const SparkCarouselCardForAdmin: FC<Props> = ({
                onClick={onClick}
                flexGrow={1}
             >
+               <Box mt="auto" />
+               <SparkStats spark={spark} />
+               <Box mt={1.5} />
                <SparkCategoryChip categoryId={spark.category.id} />
-               <SparkQuestion question={spark.question}></SparkQuestion>
+               <Box mt={1.5} />
+               <SparkQuestion limitLines={preview} question={spark.question} />
             </Stack>
          </Box>
       </SparkCarouselCardContainer>
