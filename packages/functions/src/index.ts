@@ -47,6 +47,7 @@ import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
+import userSparks = require("./userSparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -207,7 +208,11 @@ exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 
-// Sparks
+// Group Spark Functions
 exports.createSpark_v2 = groupSparks.createSpark
 exports.updateSpark_v2 = groupSparks.updateSpark
 exports.deleteSpark_v2 = groupSparks.deleteSpark
+
+// User Spark Functions
+exports.getSparksFeed = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
