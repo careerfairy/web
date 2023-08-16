@@ -51,15 +51,6 @@ const SparksCarousel: FC<PropType> = (props) => {
    const { options, sparks, onSparkClick, children, isAdmin } = props
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
 
-   const handleSparkClicked = (spark: Spark): void => {
-      if (clickedSpark?.id === spark.id) {
-         setClickedSpark(null)
-         return onSparkClick(spark)
-      }
-      setClickedSpark(spark)
-      return onSparkClick(spark)
-   }
-
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
          <Box sx={styles.container}>
@@ -68,13 +59,13 @@ const SparksCarousel: FC<PropType> = (props) => {
                     <Box key={spark.id} sx={styles.slide}>
                        {isAdmin ? (
                           <SparkCarouselCardForAdmin
-                             onClick={() => handleSparkClicked(spark)}
+                             onClick={() => onSparkClick(spark)}
                              spark={spark}
                              preview={clickedSpark?.id === spark.id}
                           />
                        ) : (
                           <SparkCarouselCard
-                             onClick={() => handleSparkClicked(spark)}
+                             onClick={() => onSparkClick(spark)}
                              spark={spark}
                              preview={clickedSpark?.id === spark.id}
                           />
