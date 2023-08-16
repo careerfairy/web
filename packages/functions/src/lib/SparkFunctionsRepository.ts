@@ -15,16 +15,12 @@ import {
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
-import {
-   FieldValue,
-   Firestore,
-   Storage,
-   Timestamp,
-} from "../api/firestoreAdmin"
+import { Firestore, Storage, Timestamp } from "../api/firestoreAdmin"
 import { createGenericConverter } from "../util/firestore-admin"
 
 export interface ISparkFunctionsRepository {
@@ -82,6 +78,8 @@ export interface ISparkFunctionsRepository {
 
    /**
     * Gets a user's feed
+    * @param userId The id of the user
+    * @returns The user feed
     * - If the user doesn't have a feed, it will lazily generate one and store it in the database
     */
    getUserFeed(userId: string): Promise<SparksFeed>
@@ -89,8 +87,9 @@ export interface ISparkFunctionsRepository {
    /**
     * Method to replenish a user's feed, when the number of sparks in the feed is less than x
     * @param userId The id of the user
+    * @param feed The user's feed if provided, we won't fetch it again
     */
-   replenishUserFeed(userId: string): Promise<void>
+   replenishUserFeed(userId: string, feed?: SparksFeed): Promise<void>
 
    /**
     * Get all the sparks that a user has seen over the years
@@ -105,7 +104,7 @@ export interface ISparkFunctionsRepository {
     * @param userId The ID of the user.
     * @param sparkId The ID of the spark.
     */
-   markSparkAsSeen(userId: string, sparkId: string): Promise<void>
+   markSparkAsSeenByUser(userId: string, sparkId: string): Promise<void>
 
    /**
     * Checks if a user has seen a particular spark.
@@ -114,6 +113,14 @@ export interface ISparkFunctionsRepository {
     * @returns Boolean indicating if the spark has been seen by the user.
     */
    hasUserSeenSpark(userId: string, sparkId: string): Promise<boolean>
+
+   /**
+    * Removes a spark from a user's feed
+    * @param userId The ID of the user.
+    * @param sparkId The ID of the spark.
+    * @returns The updated user feed
+    */
+   removeSparkFromUserFeed(userId: string, sparkId: string): Promise<SparksFeed>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
 }
@@ -351,8 +358,8 @@ export class SparkFunctionsRepository
       return seenSparksSnap.docs.map((doc) => doc.data())
    }
 
-   async replenishUserFeed(userId: string): Promise<void> {
-      const userFeed = await this.getUserFeed(userId)
+   async replenishUserFeed(userId: string, feed?: SparksFeed): Promise<void> {
+      const userFeed = feed ? feed : await this.getUserFeed(userId)
       const currentSparkCount = userFeed.numberOfSparks
 
       if (currentSparkCount < this.TARGET_SPARK_COUNT) {
@@ -379,20 +386,28 @@ export class SparkFunctionsRepository
          })
 
          // Update the user's feed with the new sparks
+         userFeed.sparkIds = removeDuplicates([
+            ...userFeed.sparkIds,
+            ...newSparkIds,
+         ])
+
+         userFeed.numberOfSparks = userFeed.sparkIds.length
+
+         userFeed.lastUpdated = Timestamp.now()
+
          await this.firestore
             .collection("sparksFeed")
             .doc(userId)
-            .update({
-               sparkIds: FieldValue.arrayUnion(
-                  ...newSparkIds.slice(0, neededSparks)
-               ),
-               numberOfSparks: FieldValue.increment(newSparkIds.length),
-               lastUpdated: Timestamp.now(),
-            })
+            .update({ ...userFeed })
       }
    }
 
-   async markSparkAsSeen(userId: string, sparkId: string): Promise<void> {
+   async markSparkAsSeenByUser(userId: string, sparkId: string): Promise<void> {
+      // check if the spark has already been seen by the user
+      if (await this.hasUserSeenSpark(userId, sparkId)) {
+         return
+      }
+
       const currentYear = DateTime.now().year // 2023
       const seenSparkDocRef = this.firestore
          .doc(`userData/${userId}/seenSparks/${currentYear}`)
@@ -413,8 +428,6 @@ export class SparkFunctionsRepository
 
          await seenSparkDocRef.set(currentSeenSparks, { merge: true })
       }
-
-      // TODO: Call the distributed counter to increment the spark.plays field
    }
 
    async hasUserSeenSpark(userId: string, sparkId: string): Promise<boolean> {
@@ -425,6 +438,29 @@ export class SparkFunctionsRepository
          .get()
 
       return !seenSparksDocsSnap.empty
+   }
+
+   async removeSparkFromUserFeed(
+      userId: string,
+      sparkId: string
+   ): Promise<SparksFeed> {
+      const userFeed = await this.getUserFeed(userId)
+
+      // Remove the sparkId from the array
+      userFeed.sparkIds = userFeed.sparkIds.filter((id) => id !== sparkId)
+
+      // Update the number of sparks
+      userFeed.numberOfSparks = userFeed.sparkIds.length
+
+      // Update the lastUpdated field
+      userFeed.lastUpdated = Timestamp.now()
+
+      await this.firestore
+         .collection("sparksFeed")
+         .doc(userId)
+         .update({ ...userFeed })
+
+      return userFeed
    }
 
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {
