@@ -30,6 +30,8 @@ export interface Group extends Identifiable {
     * This flag is used to determine if the group has access to sparks
     * */
    sparksAdminPageFlag?: boolean
+   maxPublicSparks?: number
+   publicSparks?: boolean
    /*
     * Metadata for the group
     * */
