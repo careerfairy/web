@@ -299,7 +299,7 @@ export class SparkFunctionsRepository
       const sparksSnap = await this.firestore
          .collection("sparks")
          .orderBy("publishedAt", "desc")
-         .limit(100)
+         .limit(this.TARGET_SPARK_COUNT)
          .get()
 
       const sparkIds = sparksSnap.docs.map((doc) => doc.id)
@@ -314,10 +314,10 @@ export class SparkFunctionsRepository
 
       // Store in UserFeed
       const userFeed: SparksFeed = {
+         id: userId,
          userId,
          sparkIds,
          lastUpdated: Timestamp.now(),
-         id: userId,
          numberOfSparks: sparkIds.length,
       }
       const feedRef = this.firestore.collection("sparksFeed").doc(userId)
