@@ -5,6 +5,8 @@ import {
 import {
    AddSparkSparkData,
    DeleteSparkData,
+   GetFeedData,
+   SparksFeed,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -55,6 +57,19 @@ export class SparksService {
       return httpsCallable<DeleteSparkData, void>(
          this.functions,
          "deleteSpark_v2"
+      )(data)
+   }
+
+   /**
+    * Fetch the user's feed of sparks
+    * @param userId  The user to fetch the feed for, if not provided, the public feed will be fetched
+    * - If the user is not authenticated, the public feed will be fetched
+    * - If the user does not have a feed, a feed will be lazily created and returned
+    */
+   async fetchFeed(data: GetFeedData) {
+      return httpsCallable<GetFeedData, SparksFeed>(
+         this.functions,
+         "getSparksFeed"
       )(data)
    }
 

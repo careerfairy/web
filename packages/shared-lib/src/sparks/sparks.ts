@@ -189,6 +189,19 @@ export type DeleteSparkData = {
    groupId: Spark["group"]["id"]
 }
 
+export type GetFeedData = {
+   /**
+    * If provided, we will only return sparks from this user
+    * If not provided, we will return sparks from all users
+    * (e.g: the public feed)
+    */
+   userId?: string
+   /**
+    * If provided, we will only return sparks from this group
+    */
+   groupId?: string
+}
+
 export const SparksCategories = {
    CompanyCulture: {
       id: "company-culture",

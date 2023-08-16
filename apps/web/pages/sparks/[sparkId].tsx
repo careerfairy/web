@@ -51,27 +51,18 @@ export const getServerSideProps: GetServerSideProps<
    SparksPageProps,
    {
       // next params go here
-      id: string
+      sparkId: string
    }
 > = async (context) => {
    const groupId = context.query.groupId
       ? context.query.groupId.toString()
       : null
 
-   const sparkId = context.params.id
+   const sparkId = context.params.sparkId
 
    const sparkFromService = await sparkService.getSparkById(sparkId) // This is a method you'd need to implement
-   console.log(
-      "🚀 ~ file: [id].tsx:64 ~ >= ~ sparkFromService:",
-      sparkFromService.id
-   )
 
-   const sparksFromService = await sparkService.fetchNextSparks(
-      sparkFromService,
-      {
-         groupId,
-      }
-   ) // Fetch the first batch.
+   const sparksFromService = await sparkService.fetchFeed() // Fetch the first batch.
 
    const initialSparks = [sparkFromService, ...sparksFromService].map(
       SparkPresenter.toPlainObject
