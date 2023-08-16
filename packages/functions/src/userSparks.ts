@@ -6,22 +6,30 @@ import { middlewares } from "./middlewares/middlewares"
 import { sparkRepo } from "./api/repositories"
 
 import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 
-export const getSparksFeed = functions
-   .region(config.region)
-   .https.onCall(async (data, context) => {
-      // If the user is not authenticated, then we will generate a public feed
-      const userEmail = context.auth?.token?.email || "public"
-      try {
-         return sparkRepo.getUserFeed(userEmail)
-      } catch (error) {
-         logAndThrow("Error in generating user feed", {
-            data,
-            error,
-            context,
-         })
+export const getSparksFeed = functions.region(config.region).https.onCall(
+   middlewares(
+      dataValidation({
+         userId: string().optional(),
+         groupId: string().optional(),
+      }),
+      async (data: GetFeedData, context) => {
+         // If the user is not authenticated, then we will generate a public feed
+         const userEmail = data.userId || "public"
+         const groupId = data.groupId
+         try {
+            return sparkRepo.getUserFeed(userEmail)
+         } catch (error) {
+            logAndThrow("Error in generating user feed", {
+               data,
+               error,
+               context,
+            })
+         }
       }
-   })
+   )
+)
 
 export const markSparkAsSeenByUser = functions
    .region(config.region)
