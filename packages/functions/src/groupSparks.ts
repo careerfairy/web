@@ -6,6 +6,7 @@ import {
    DeleteSparkData,
    UpdateSparkData,
    sparksCategoriesArray,
+   Spark,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { boolean, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
@@ -16,6 +17,7 @@ import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const sparkDataValidator = {
    question: string()
@@ -131,3 +133,114 @@ export const deleteSpark = functions.region(config.region).https.onCall(
       }
    )
 )
+
+export const validateGroupSparks = functions
+   .region(config.region)
+   .firestore.document("sparks/{sparkId}")
+   .onWrite(async (change, context) => {
+      try {
+         const previousValue = (change.before.data() as Spark) || null
+         const newValue = (change.after.data() as Spark) || null
+
+         const sparkQuestion = previousValue?.question || newValue?.question
+         const groupId = previousValue?.group.id || newValue?.group.id
+
+         // if the spark is created, deleted or its visibility has changed
+         if (
+            !previousValue ||
+            !newValue ||
+            newValue.published !== previousValue.published
+         ) {
+            // get all the creators from a group
+            const creators: Creator[] = await groupRepo.getCreators(groupId)
+            // get all the group data
+            const group: Group = await groupRepo.getGroupById(groupId)
+
+            // if the groups has 3 or more creators, validation continues
+            if (
+               creators?.length >=
+               SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+            ) {
+               // get all the sparks from a Group
+               const sparks = await sparkRepo.getSparksByGroupId(groupId)
+               let sparksPerCreatorCounter = 0
+
+               const isValid = creators?.some(({ id: creatorId }) => {
+                  // filter all the public sparks per Creator
+                  const numberOfPublicSparks = sparks?.filter(
+                     (spark: Spark) =>
+                        spark.creator.id === creatorId &&
+                        spark.published === true
+                  ).length
+
+                  functions.logger.log(
+                     `Creator ${creatorId}, has ${numberOfPublicSparks} public Sparks`
+                  )
+
+                  if (
+                     numberOfPublicSparks >=
+                     SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+                  ) {
+                     sparksPerCreatorCounter++
+                  }
+
+                  return (
+                     sparksPerCreatorCounter ===
+                     SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+                  )
+               })
+
+               if (isValid) {
+                  if (group?.publicSparks) {
+                     return functions.logger.log(
+                        `After updating the Spark '${sparkQuestion}', the group ${groupId} continues to have public sparks`
+                     )
+                  }
+
+                  functions.logger.log(
+                     `After updating the Spark '${sparkQuestion}', the group ${groupId} is able to have public sparks`
+                  )
+                  return groupRepo.updatePublicSparks(groupId, true)
+               }
+
+               if (
+                  sparksPerCreatorCounter <
+                  SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+               ) {
+                  // To be here, it means that the group has {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} or more creators
+                  // but does not have at least {MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} sparks for {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} different creators
+                  // which means this group should not have their sparks public
+
+                  // only update if needed
+                  if (group?.publicSparks) {
+                     functions.logger.log(
+                        `After updating the Spark '${sparkQuestion}', the group ${groupId} does no longer have public sparks`
+                     )
+                     return groupRepo.updatePublicSparks(groupId, false)
+                  }
+
+                  return functions.logger.log(
+                     `After updating the Spark '${sparkQuestion}', the group ${groupId} has more than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators but less than ${SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS} Sparks per Creator`
+                  )
+               }
+            }
+
+            // To be here, it means that the group has less than {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} creators
+            // which means this group should not have their sparks public
+
+            // only update if needed
+            if (group?.publicSparks) {
+               return groupRepo.updatePublicSparks(groupId, false)
+            }
+
+            functions.logger.log(
+               `After updating the Spark '${sparkQuestion}', the group ${groupId} has less than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators`
+            )
+         }
+      } catch (error) {
+         logAndThrow("Error during Spark validation", {
+            error,
+            context,
+         })
+      }
+   })

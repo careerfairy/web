@@ -28,4 +28,14 @@ export const SPARK_CONSTANTS = {
     * The minimum length of a spark question
     */
    QUESTION_MIN_LENGTH: 10,
+
+   /**
+    * The minimum creators for a group to publish sparks
+    */
+   MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 3,
+
+   /**
+    * The minimum sparks per creator for a group to publish sparks
+    */
+   MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
 }
