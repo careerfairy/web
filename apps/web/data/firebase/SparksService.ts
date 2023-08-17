@@ -1,4 +1,5 @@
 import {
+   SerializedSpark,
    SparkPresenter,
    sparkPresenterConverter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
@@ -8,7 +9,6 @@ import {
    GetFeedData,
    Spark,
    UpdateSparkData,
-   UserSparksFeedMetrics,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    Query,
@@ -68,12 +68,15 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      const { data: sparks } = await httpsCallable<GetFeedData, Spark[]>(
+      const { data: sparks } = await httpsCallable<
+         GetFeedData,
+         SerializedSpark[]
+      >(
          this.functions,
          "getSparksFeed"
       )(data)
 
-      return sparks.map(SparkPresenter.createFromFirebaseObject)
+      return sparks.map(SparkPresenter.deserialize)
    }
 
    /**
@@ -85,7 +88,9 @@ export class SparksService {
     * */
    async fetchNextSparks(
       lastSpark: SparkPresenter | Spark | null,
-      options: FetchNextSparkOptions = {}
+      options: FetchNextSparkOptions = {
+         userId: null,
+      }
    ): Promise<SparkPresenter[]> {
       const { numberOfSparks = 10 } = options
 
@@ -101,18 +106,13 @@ export class SparksService {
             where("group.id", "==", options.groupId) // Adjust the field path as necessary.
          )
       } else if ("userId" in options) {
-         switch (options.userId) {
-            case "public":
-               // If the public feed is specified.
-               baseQuery = query(collection(db, "sparks"))
-               break
-            default:
-               // If a user is specified.
-               baseQuery = query(
-                  collection(db, "userData", options.userId, "sparksFeed")
-               )
-               break
-         }
+         // If a user is specified.
+         baseQuery = query(
+            collection(db, "userData", options.userId, "sparksFeed")
+         )
+      } else {
+         // If no user or group is specified, then use the public feed.
+         baseQuery = query(collection(db, "sparks"))
       }
 
       // Apply order.

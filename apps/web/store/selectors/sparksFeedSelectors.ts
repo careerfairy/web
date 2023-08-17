@@ -11,7 +11,25 @@ export const isOnLastSparkSelector = (state: RootState) => {
 }
 
 export const isFetchingNextSparksSelector = (state: RootState) =>
-   state.sparksFeed.status === "loading"
+   state.sparksFeed.fetchNextSparksStatus === "loading"
+
+export const initialSparksFetchedSelector = (state: RootState) =>
+   state.sparksFeed.initialSparksFetched === true
 
 export const hasNoMoreSparksSelector = (state: RootState) =>
    state.sparksFeed.hasMoreSparks === false
+
+export const totalNumberOfSparksSelector = (state: RootState) =>
+   state.sparksFeed.sparks.length
+
+export const activeSparkSelector = (state: RootState) => {
+   const sparks = state.sparksFeed.sparks
+   const index = state.sparksFeed.currentPlayingIndex
+   return sparks[index] || null
+}
+
+export const currentSparkIndexSelector = (state: RootState) =>
+   state.sparksFeed.currentPlayingIndex
+
+export const numberOfSparksToFetchSelector = (state: RootState) =>
+   state.sparksFeed.currentPlayingIndex

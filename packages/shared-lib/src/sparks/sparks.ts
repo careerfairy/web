@@ -190,21 +190,27 @@ export type DeleteSparkData = {
    groupId: Spark["group"]["id"]
 }
 
-export type GetFeedData =
+export type GetFeedData = {
+   /**
+    * The number of sparks to fetch (default: 10)
+    */
+   numberOfSparks?: number
+} & (
    | {
         /**
          * If provided, we will only return sparks from this user
          * If not provided, we will return sparks from all users
          * (e.g: the public feed)
          */
-        userId?: (string & {}) | "public"
+        userId: string | null
      }
    | {
         /**
          * If provided, we will only return sparks from this group
          */
-        groupId?: string
+        groupId: string
      }
+)
 
 export const SparksCategories = {
    CompanyCulture: {

@@ -3,14 +3,19 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
 
+type Status = "idle" | "loading" | "failed"
+
 // Initial state
 interface SparksState {
    sparks: SparkPresenter[]
    currentPlayingIndex: number
    hasMoreSparks: boolean
    groupId: string | null
+   userEmail: string | null
    numberOfSparksToFetch: number
-   status: "idle" | "loading" | "failed"
+   fetchNextSparksStatus: Status
+   initialFetchStatus: Status
+   initialSparksFetched: boolean
    error: string | null
 }
 
@@ -19,8 +24,11 @@ const initialState: SparksState = {
    currentPlayingIndex: 0,
    hasMoreSparks: true,
    groupId: null,
+   userEmail: null,
    numberOfSparksToFetch: 3,
-   status: "idle",
+   initialFetchStatus: "loading",
+   fetchNextSparksStatus: "idle",
+   initialSparksFetched: false,
    error: null,
 }
 
@@ -33,32 +41,46 @@ export const fetchNextSparks = createAsyncThunk(
          state.sparksFeed.sparks[state.sparksFeed.sparks.length - 1]
       const hasMoreSparks = state.sparksFeed.hasMoreSparks
 
+      const groupId = state.sparksFeed.groupId
+      const userId = state.sparksFeed.userEmail
+
       if (!hasMoreSparks) {
          return []
       }
 
+      if (groupId) {
+         return sparkService.fetchNextSparks(lastSpark, {
+            groupId,
+            numberOfSparks: state.sparksFeed.numberOfSparksToFetch,
+         })
+      }
+
       return sparkService.fetchNextSparks(lastSpark, {
-         groupId: state.sparksFeed.groupId,
          numberOfSparks: state.sparksFeed.numberOfSparksToFetch,
+         userId: userId || "public", // If the user is not logged in, then use the public feed
       })
    }
 )
 // Async thunk to fetch the next spark IDs
 export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
-   async (userId: string, { getState }) => {
+   async (_, { getState }) => {
       const state = getState() as RootState
 
       const groupId = state.sparksFeed.groupId
+      const userEmail = state.sparksFeed.userEmail
+      const numberOfSparks = state.sparksFeed.numberOfSparksToFetch
 
       if (groupId) {
          return sparkService.fetchFeed({
             groupId,
+            numberOfSparks,
          })
       }
 
       return sparkService.fetchFeed({
-         userId,
+         userId: userEmail || "public", // If the user is not logged in, then use the public feed
+         numberOfSparks,
       })
    }
 )
@@ -72,6 +94,9 @@ const sparksFeedSlice = createSlice({
       },
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
+      },
+      setUserEmail: (state, action: PayloadAction<string>) => {
+         state.userEmail = action.payload
       },
       swipeNextSpark: (state) => {
          // Check if it's not the last spark
@@ -89,12 +114,12 @@ const sparksFeedSlice = createSlice({
    extraReducers: (builder) => {
       builder
          .addCase(fetchNextSparks.pending, (state) => {
-            state.status = "loading"
+            state.fetchNextSparksStatus = "loading"
          })
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               state.status = "idle"
+               state.fetchNextSparksStatus = "idle"
                // Add the sparks to the list
                state.sparks = [...state.sparks, ...action.payload]
 
@@ -105,13 +130,44 @@ const sparksFeedSlice = createSlice({
             }
          )
          .addCase(fetchNextSparks.rejected, (state, action) => {
-            state.status = "failed"
+            state.fetchNextSparksStatus = "failed"
+            state.error = action.error.message
+         })
+         .addCase(fetchInitialSparksFeed.pending, (state) => {
+            state.initialFetchStatus = "loading"
+         })
+         .addCase(
+            fetchInitialSparksFeed.fulfilled,
+            (state, action: PayloadAction<SparkPresenter[]>) => {
+               state.initialFetchStatus = "idle"
+               state.initialSparksFetched = true
+
+               // If there are no spark, then there are no more sparks
+               if (action.payload.length < state.numberOfSparksToFetch) {
+                  state.hasMoreSparks = false
+               }
+
+               state.sparks = [
+                  ...state.sparks,
+                  ...action.payload.filter(
+                     (spark) => !state.sparks.find((s) => s.id === spark.id)
+                  ),
+               ]
+            }
+         )
+         .addCase(fetchInitialSparksFeed.rejected, (state, action) => {
+            state.initialFetchStatus = "failed"
             state.error = action.error.message
          })
    },
 })
 
-export const { setSparks, setGroupId, swipeNextSpark, swipePreviousSpark } =
-   sparksFeedSlice.actions
+export const {
+   setSparks,
+   setGroupId,
+   swipeNextSpark,
+   swipePreviousSpark,
+   setUserEmail,
+} = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

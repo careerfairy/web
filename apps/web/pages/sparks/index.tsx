@@ -12,6 +12,7 @@ export default function Sparks() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
+      userId: null,
    })
 
    if (sparks.length > 0) {
