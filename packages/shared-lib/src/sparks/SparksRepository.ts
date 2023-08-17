@@ -25,6 +25,6 @@ export class FirebaseSpaksRepository
          .limit(limit ?? DEFAULT_SPARKS_FETCH_LIMIT)
          .get()
 
-      return snapshots ? mapFirestoreDocuments<Spark>(snapshots) : []
+      return !snapshots.empty ? mapFirestoreDocuments<Spark>(snapshots) : []
    }
 }
