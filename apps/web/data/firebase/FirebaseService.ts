@@ -3277,6 +3277,26 @@ class FirebaseService {
       return docRef.update(toUpdate)
    }
 
+   /**
+    * Increments the counter for the number of times a user has seen the Sparks Call-to-Action (CTA) banner,
+    * and updates the last time the user has seen the banner with the current server timestamp.
+    *
+    * @param {string} userEmail - The email of the user whose record is to be updated.
+    * @returns {Promise<void>} - A promise that resolves when the user data is successfully updated.
+    */
+   addDateUserHasSeenSparksCTABanner(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+      const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
+
+      const toUpdate: Pick<UserData, "sparksBannerCTADates"> = {
+         sparksBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
+            today
+         ) as any,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
    // Backfill user data
    backfillUserData = async ({ timezone }) => {
       return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
