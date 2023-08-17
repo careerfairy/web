@@ -20,12 +20,13 @@ import { universityCountriesMap } from "components/util/constants/universityCoun
 import { PlusCircle as AddIcon, UploadCloud as UploadIcon } from "react-feather"
 import TimelineUniversityInfo from "./TimelineUniversityInfo"
 import { AcademicYearType } from "../utils"
-import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
+import { UniversityTimelineInstance as timelineService } from "data/firebase/UniversityTimelineService"
 import UniversityIcon from "@mui/icons-material/AccountBalanceOutlined"
 import EditUniversityDialog from "./EditUniversityDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { StyledTextField } from "components/views/group/admin/common/inputs"
-import { ConfirmationDialogAction } from "materialUI/GlobalModals/ConfirmationDialog"
+import { useSnackbar } from "notistack"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    accordion: {
@@ -106,13 +107,14 @@ type Props = {
 }
 
 const TimelineCountryAccordion = ({ countryCode, academicYear }: Props) => {
-   const timelineService = UniversityTimelineInstance
    const { data: universities } = useTimelineUniversitiesByCountry(
       countryCode ? countryCode : ""
    )
    const [searchInputValue, setSearchInputValue] = useState("")
    const [isAddDialogOpen, handleOpenAddDialog, handleCloseAddDialog] =
       useDialogStateHandler()
+
+   const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const searchedUniversities = useMemo(
       () =>
@@ -124,22 +126,21 @@ const TimelineCountryAccordion = ({ countryCode, academicYear }: Props) => {
       [searchInputValue, universities]
    )
 
-   const handleBatchUploadError = useCallback((error: Error) => {}, [])
-
    const handleBatchUpload = useCallback(
       (event) => {
          timelineService.handleAddBatchPeriods(
             event,
             countryCode,
-            handleBatchUploadError
+            successNotification,
+            errorNotification
          )
       },
-      [countryCode, handleBatchUploadError, timelineService]
+      [countryCode, errorNotification, successNotification]
    )
 
    const handleDownloadTemplate = useCallback(() => {
       timelineService.handleDownloadBatchPeriodsTemplate()
-   }, [timelineService])
+   }, [])
 
    return (
       <Box>

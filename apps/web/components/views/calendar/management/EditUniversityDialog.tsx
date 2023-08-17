@@ -25,7 +25,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import AcademicYearSelector from "./AcademicYearSelector"
 import { useCalendarManager } from "./TimelineCountriesManager"
 import { isPeriodInInterval } from "../utils"
-import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
+import { UniversityTimelineInstance as timelineService } from "data/firebase/UniversityTimelineService"
 import { getDoc } from "firebase/firestore"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { Trash as TrashIcon } from "react-feather"
@@ -64,19 +64,12 @@ const styles = sxStyles({
    outerButtonsContainer: {
       mt: "17px",
       display: "flex",
-      justifyContent: "space-between",
-   },
-   innerButtonsContainer: {
-      display: "flex",
-      justifyContent: "flex-end!important",
    },
    button: {
       fontWeight: 300,
       textTransform: "none",
-      pt: "5px",
-      pb: "5px",
-      pr: "20px",
-      pl: "20px",
+      py: "5px",
+      px: "20px",
       m: "10px",
    },
    deleteIcon: {
@@ -102,7 +95,6 @@ const EditUniversityDialog = ({
    university,
    periods,
 }: Props) => {
-   const timelineService = UniversityTimelineInstance
    const { academicYear, academicYears } = useCalendarManager()
    const [universityName, setUniversityName] = useState<string>(
       university?.name
@@ -140,7 +132,7 @@ const EditUniversityDialog = ({
             name: universityName,
             countryCode: countryCode,
          })
-         const universityDoc = await getDoc(universityRef)
+         const universityDoc = await getDoc(universityRef[1])
          universityId = universityDoc.id
       }
       modifiedPeriods.forEach((period) => {
@@ -163,7 +155,6 @@ const EditUniversityDialog = ({
       deletedPeriodIds,
       modifiedPeriods,
       resetState,
-      timelineService,
       university,
       universityName,
    ])
@@ -280,7 +271,16 @@ const EditUniversityDialog = ({
                      )}
                   </Grid>
                </Paper>
-               <Box sx={styles.outerButtonsContainer}>
+               <Box
+                  sx={[
+                     styles.outerButtonsContainer,
+                     {
+                        justifyContent: university
+                           ? "space-between"
+                           : "flex-end",
+                     },
+                  ]}
+               >
                   {university ? (
                      <Button
                         variant={"outlined"}
@@ -292,7 +292,7 @@ const EditUniversityDialog = ({
                         Delete university
                      </Button>
                   ) : null}
-                  <Box sx={styles.innerButtonsContainer}>
+                  <Box>
                      <Button
                         variant={"outlined"}
                         sx={styles.button}
@@ -337,12 +337,10 @@ const ConfirmDeleteUniversityDialog = ({
    handleCloseDialog,
    isDialogOpen,
 }: DeleteUniversityProps) => {
-   const timelineService = UniversityTimelineInstance
-
    const handleDeleteUniversity = useCallback(() => {
       resetState()
       timelineService.removeTimelineUniversity(university.id)
-   }, [resetState, timelineService, university])
+   }, [resetState, university])
 
    const deleteAction = useMemo<ConfirmationDialogAction>(
       () => ({
@@ -350,7 +348,7 @@ const ConfirmDeleteUniversityDialog = ({
             handleDeleteUniversity()
             handleCloseDialog()
          },
-         text: "Yes, Delete",
+         text: "Yes, delete",
          color: "error",
          variant: "contained",
       }),
@@ -362,7 +360,7 @@ const ConfirmDeleteUniversityDialog = ({
          callback: () => {
             handleCloseDialog()
          },
-         text: "Go Back",
+         text: "Go back",
          color: "black",
          variant: "outlined",
       }),

@@ -15,9 +15,8 @@ import TimelineCountryAccordion from "./TimelineCountryAccordion"
 import SingleListSelect from "components/views/common/SingleListSelect"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 import { Check as CheckIcon, X as XIcon } from "react-feather"
-import { Grid } from "@mui/material"
 import { useTheme } from "@mui/styles"
-import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
+import { UniversityTimelineInstance as timelineService } from "data/firebase/UniversityTimelineService"
 import { TimelineCountry } from "@careerfairy/shared-lib/universities/universityTimeline"
 
 const styles = sxStyles({
@@ -194,7 +193,6 @@ const AddTimelineCountrySlot = ({
 }: AddProps) => {
    const theme = useTheme()
    const [selectedCountry, setSelectedCountry] = useState(null)
-   const timelineService = UniversityTimelineInstance
 
    const options = useMemo(
       () =>
@@ -225,7 +223,7 @@ const AddTimelineCountrySlot = ({
          timelineService.addTimelineCountry(selectedCountry.id)
       }
       setAddingCountry(false)
-   }, [selectedCountry, setAddingCountry, timelineService])
+   }, [selectedCountry, setAddingCountry])
 
    return (
       <Paper variant={"outlined"} sx={styles.addCountryContainer}>

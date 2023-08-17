@@ -36,7 +36,7 @@ const CalendarManager = () => {
                sx={styles.calendarButton}
                variant={"contained"}
                color={"secondary"}
-               href={"/academic-calendar/embed"}
+               href={"https://companies.careerfairy.io/academic-calendar"}
                target={"_blank"}
                endIcon={<LinkIcon />}
             >

@@ -16,7 +16,6 @@ import { Timestamp } from "firebase/firestore"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
-import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
 import GBLocale from "date-fns/locale/en-GB"
@@ -295,8 +294,6 @@ const ConfirmDeletePeriodDialog = ({
    handleDeletePeriod,
    isDialogOpen,
 }: DeletePeriodProps) => {
-   const timelineService = UniversityTimelineInstance
-
    const deleteAction = useMemo<ConfirmationDialogAction>(
       () => ({
          callback: () => {
