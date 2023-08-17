@@ -6,6 +6,10 @@ import {
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import {
+   SerializedSpark,
+   SparkPresenter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import {
    AddSparkSparkData,
    DeletedSpark,
    SeenSparks,
@@ -19,7 +23,7 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
-import { Firestore, Storage, Timestamp, FieldPath } from "../api/firestoreAdmin"
+import { FieldPath, Firestore, Storage, Timestamp } from "../api/firestoreAdmin"
 import { createGenericConverter } from "../util/firestore-admin"
 
 export interface ISparkFunctionsRepository {
@@ -73,7 +77,7 @@ export interface ISparkFunctionsRepository {
     * @param userId  The id of the user
     * @returns The user feed
     */
-   generateSparksFeed(userId: string): Promise<Spark[]>
+   generateSparksFeed(userId: string): Promise<SerializedSpark[]>
 
    /**
     * Gets a user's feed
@@ -90,7 +94,7 @@ export interface ISparkFunctionsRepository {
     *
     * - If the user doesn't have a feed, it will lazily generate one and store it in the database, then return it
     */
-   getUserSparksFeed(userId: string, limit?: number): Promise<Spark[]>
+   getUserSparksFeed(userId: string, limit?: number): Promise<SerializedSpark[]>
 
    /**
     * Get the public feed of Sparks
@@ -103,7 +107,10 @@ export interface ISparkFunctionsRepository {
     * @param groupId ${groupId} The id of the group
     * @param limit ${limit} The number of sparks to fetch (default: 10)
     */
-   getGroupSparksFeed(groupId: string, limit?: number): Promise<Spark[]>
+   getGroupSparksFeed(
+      groupId: string,
+      limit?: number
+   ): Promise<SerializedSpark[]>
 
    /**
     * Method to replenish a user's feed, when the number of sparks in the feed is less than x
@@ -346,7 +353,7 @@ export class SparkFunctionsRepository
       return void batch.commit()
    }
 
-   async generateSparksFeed(userId: string): Promise<Spark[]> {
+   async generateSparksFeed(userId: string): Promise<SerializedSpark[]> {
       const batch = this.firestore.batch()
 
       const sparksSnap = await this.firestore
@@ -390,10 +397,13 @@ export class SparkFunctionsRepository
 
       await batch.commit()
 
-      return sparks
+      return sparks.map(SparkPresenter.serialize)
    }
 
-   async getUserSparksFeed(userId: string, limit = 10): Promise<Spark[]> {
+   async getUserSparksFeed(
+      userId: string,
+      limit = 10
+   ): Promise<SerializedSpark[]> {
       const userFeedRef = this.firestore
          .collection("userData")
          .doc(userId)
@@ -409,7 +419,9 @@ export class SparkFunctionsRepository
          return this.generateSparksFeed(userId)
       }
 
-      return userFeedSnap.docs.map((doc) => doc.data())
+      return userFeedSnap.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
    }
 
    async getPublicSparksFeed(limit = 10): Promise<Spark[]> {
@@ -424,7 +436,10 @@ export class SparkFunctionsRepository
       return publicFeedSnap.docs.map((doc) => doc.data())
    }
 
-   async getGroupSparksFeed(groupId: string, limit = 10): Promise<Spark[]> {
+   async getGroupSparksFeed(
+      groupId: string,
+      limit = 10
+   ): Promise<SerializedSpark[]> {
       const groupFeedRef = this.firestore
          .collection("sparks")
          .where("group.id", "==", groupId)
@@ -434,7 +449,9 @@ export class SparkFunctionsRepository
 
       const groupFeedSnap = await groupFeedRef.get()
 
-      return groupFeedSnap.docs.map((doc) => doc.data())
+      return groupFeedSnap.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
    }
 
    async getUserFeedMetrics(userId: string): Promise<UserSparksFeedMetrics> {

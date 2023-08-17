@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { string } from "yup"
+import { string, number } from "yup"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
@@ -13,19 +13,26 @@ export const getSparksFeed = functions.region(config.region).https.onCall(
       dataValidation({
          userId: string().trim().min(1).optional(),
          groupId: string().trim().min(1).optional(),
+         numberOfSparks: number().min(1).optional(),
       }),
       async (data: GetFeedData, context) => {
          try {
             if ("userId" in data) {
-               if (data.userId === "public") {
-                  return sparkRepo.getPublicSparksFeed()
+               if (data.userId) {
+                  return sparkRepo.getUserSparksFeed(
+                     data.userId,
+                     data.numberOfSparks
+                  )
                } else {
-                  return sparkRepo.getUserSparksFeed(data.userId)
+                  return sparkRepo.getPublicSparksFeed(data.numberOfSparks)
                }
             }
 
             if ("groupId" in data) {
-               return sparkRepo.getGroupSparksFeed(data.groupId)
+               return sparkRepo.getGroupSparksFeed(
+                  data.groupId,
+                  data.numberOfSparks
+               )
             }
 
             throw new functions.https.HttpsError(

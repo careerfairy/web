@@ -85,6 +85,10 @@ service cloud.firestore {
 
         match /userData/{userId} {
 
+            match /sparksFeed/{sparkId} {
+                allow read: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
             match /companiesUserFollows/{groupId} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }

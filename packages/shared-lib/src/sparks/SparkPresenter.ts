@@ -49,7 +49,7 @@ export class SparkPresenter implements SparkPresenterInterface {
    /**
     * Convert from plain objects (json/object) into SparkPresenter class instance
     */
-   static createFromPlainObject(plainObject: SerializedSpark): SparkPresenter {
+   static deserialize(plainObject: SerializedSpark): SparkPresenter {
       return new SparkPresenter({
          ...plainObject,
          createdAt: fromSerializedDate(plainObject.createdAt),
