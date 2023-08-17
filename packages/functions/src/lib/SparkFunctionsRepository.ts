@@ -19,7 +19,7 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
-import { Firestore, Storage, Timestamp } from "../api/firestoreAdmin"
+import { Firestore, Storage, Timestamp, FieldPath } from "../api/firestoreAdmin"
 import { createGenericConverter } from "../util/firestore-admin"
 
 export interface ISparkFunctionsRepository {
@@ -146,6 +146,27 @@ export interface ISparkFunctionsRepository {
     */
    removeSparkFromUserFeed(userId: string, sparkId: string): Promise<void>
 
+   /**
+    * Removes a spark from all user feeds
+    * @param sparkId The ID of the spark.
+    * @returns void
+    */
+   removeSparkFromAllUserFeeds(sparkId: string): Promise<void>
+
+   /**
+    * Adds a spark to all user feeds
+    * @param spark The spark to add.
+    * @returns void
+    */
+   addSparkToAllUserFeeds(spark: Spark): Promise<void>
+
+   /**
+    * Updates a spark in all user feeds
+    * @param spark The spark to update.
+    * @returns void
+    */
+   updateSparkInAllUserFeeds(spark: Spark): Promise<void>
+
    getSparksByGroupId(groupId: string): Promise<Spark[]>
 }
 
@@ -175,7 +196,6 @@ export class SparkFunctionsRepository
 
    async delete(id: string): Promise<void> {
       const sparkRef = this.firestore.collection("sparks").doc(id)
-
       const sparkDeletedRef = this.firestore.collection("deletedSparks").doc(id)
 
       // Get the document
@@ -534,6 +554,59 @@ export class SparkFunctionsRepository
          .doc(sparkId)
 
       await sparkRef.delete()
+   }
+
+   async removeSparkFromAllUserFeeds(sparkId: string): Promise<void> {
+      const sparksFromFeedToBeDeletedSnap = await this.firestore
+         .collectionGroup("sparksFeed")
+         .where(FieldPath.documentId(), "==", sparkId)
+         .get()
+      const bulkWriter = this.firestore.bulkWriter()
+
+      sparksFromFeedToBeDeletedSnap.docs.forEach((sparkDoc) => {
+         bulkWriter.delete(sparkDoc.ref)
+      })
+
+      await bulkWriter.close()
+   }
+
+   async addSparkToAllUserFeeds(spark: Spark): Promise<void> {
+      const bulkWriter = this.firestore.bulkWriter()
+
+      const allUsersWithAFeedSnap = await this.firestore
+         .collection("sparksFeedMetrics")
+         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .get()
+
+      allUsersWithAFeedSnap.docs.forEach((sparkDoc) => {
+         const userId = sparkDoc.data().userId
+
+         const userSparkFeedRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+            .collection("sparksFeed")
+            .doc(spark.id)
+
+         bulkWriter.set(userSparkFeedRef, spark, { merge: true })
+      })
+
+      await bulkWriter.close()
+   }
+
+   async updateSparkInAllUserFeeds(spark: Spark): Promise<void> {
+      const bulkWriter = this.firestore.bulkWriter()
+
+      const allUserMatchingSparksSnap = await this.firestore
+         .collectionGroup("sparksFeed")
+         .withConverter(createGenericConverter<Spark>())
+         .where(FieldPath.documentId(), "==", spark.id)
+         .get()
+
+      allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
+         bulkWriter.update(sparkDoc.ref, spark)
+      })
+
+      await bulkWriter.close()
    }
 
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {

@@ -68,10 +68,12 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      return httpsCallable<GetFeedData, UserSparksFeedMetrics>(
+      const { data: sparks } = await httpsCallable<GetFeedData, Spark[]>(
          this.functions,
          "getSparksFeed"
       )(data)
+
+      return sparks.map(SparkPresenter.createFromFirebaseObject)
    }
 
    /**
@@ -85,16 +87,32 @@ export class SparksService {
       lastSpark: SparkPresenter | Spark | null,
       options: FetchNextSparkOptions = {}
    ): Promise<SparkPresenter[]> {
-      const { numberOfSparks = 10, groupId } = options
+      const { numberOfSparks = 10 } = options
 
       const db = FirestoreInstance
 
       // Starting with base collection.
-      let baseQuery: Query = collection(db, "sparks")
+      let baseQuery: Query
 
-      // If a group (company) is specified.
-      if (groupId) {
-         baseQuery = query(baseQuery, where("group.id", "==", groupId)) // Adjust the field path as necessary.
+      if ("groupId" in options) {
+         // If a group (company) is specified.
+         baseQuery = query(
+            collection(db, "sparks"),
+            where("group.id", "==", options.groupId) // Adjust the field path as necessary.
+         )
+      } else if ("userId" in options) {
+         switch (options.userId) {
+            case "public":
+               // If the public feed is specified.
+               baseQuery = query(collection(db, "sparks"))
+               break
+            default:
+               // If a user is specified.
+               baseQuery = query(
+                  collection(db, "userData", options.userId, "sparksFeed")
+               )
+               break
+         }
       }
 
       // Apply order.
@@ -138,14 +156,10 @@ export class SparksService {
 
 export type FetchNextSparkOptions = {
    /**
-    * The group ID to fetch sparks for
-    * */
-   groupId?: string
-   /**
     * The number of sparks to fetch (default: 10)
     */
    numberOfSparks?: number
-}
+} & GetFeedData
 
 export const sparkService = new SparksService(FunctionsInstance as any)
 
