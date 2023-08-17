@@ -71,7 +71,7 @@ const PortalPage = ({
       authenticatedUser.email || userData?.interestsIds
    )
 
-   const hasSparks = Boolean(sparks.length)
+   const hasSparks = Boolean(sparks?.length)
 
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
 
