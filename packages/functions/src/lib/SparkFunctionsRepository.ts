@@ -10,12 +10,11 @@ import {
    DeletedSpark,
    SeenSparks,
    Spark,
-   SparksFeed,
    UpdateSparkData,
+   UserSparksFeedMetrics,
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
@@ -74,7 +73,7 @@ export interface ISparkFunctionsRepository {
     * @param userId  The id of the user
     * @returns The user feed
     */
-   generateSparksFeed(userId: string): Promise<SparksFeed>
+   generateSparksFeed(userId: string): Promise<Spark[]>
 
    /**
     * Gets a user's feed
@@ -82,14 +81,39 @@ export interface ISparkFunctionsRepository {
     * @returns The user feed
     * - If the user doesn't have a feed, it will lazily generate one and store it in the database
     */
-   getUserFeed(userId: string): Promise<SparksFeed>
+   getUserFeedMetrics(userId: string): Promise<UserSparksFeedMetrics>
+
+   /**
+    * Get the user's feed of Sparks
+    * @param userId ${userId} The id of the user
+    * @param limit ${limit} The number of sparks to fetch (default: 10)
+    *
+    * - If the user doesn't have a feed, it will lazily generate one and store it in the database, then return it
+    */
+   getUserSparksFeed(userId: string, limit?: number): Promise<Spark[]>
+
+   /**
+    * Get the public feed of Sparks
+    * @param limit ${limit} The number of sparks to fetch (default: 10)
+    */
+   getPublicSparksFeed(limit?: number): Promise<Spark[]>
+
+   /**
+    * Get the group's feed of Sparks
+    * @param groupId ${groupId} The id of the group
+    * @param limit ${limit} The number of sparks to fetch (default: 10)
+    */
+   getGroupSparksFeed(groupId: string, limit?: number): Promise<Spark[]>
 
    /**
     * Method to replenish a user's feed, when the number of sparks in the feed is less than x
     * @param userId The id of the user
     * @param feed The user's feed if provided, we won't fetch it again
     */
-   replenishUserFeed(userId: string, feed?: SparksFeed): Promise<void>
+   replenishUserFeed(
+      userId: string,
+      feed?: UserSparksFeedMetrics
+   ): Promise<void>
 
    /**
     * Get all the sparks that a user has seen over the years
@@ -118,9 +142,9 @@ export interface ISparkFunctionsRepository {
     * Removes a spark from a user's feed
     * @param userId The ID of the user.
     * @param sparkId The ID of the spark.
-    * @returns The updated user feed
+    * @returns void
     */
-   removeSparkFromUserFeed(userId: string, sparkId: string): Promise<SparksFeed>
+   removeSparkFromUserFeed(userId: string, sparkId: string): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
 }
@@ -302,51 +326,105 @@ export class SparkFunctionsRepository
       return void batch.commit()
    }
 
-   async generateSparksFeed(userId: string): Promise<SparksFeed> {
+   async generateSparksFeed(userId: string): Promise<Spark[]> {
+      const batch = this.firestore.batch()
+
       const sparksSnap = await this.firestore
          .collection("sparks")
+         .withConverter(createGenericConverter<Spark>())
          .orderBy("publishedAt", "desc")
          .limit(this.TARGET_SPARK_COUNT)
          .get()
 
-      const sparkIds = sparksSnap.docs.map((doc) => doc.id)
+      const sparks = sparksSnap.docs.map((doc) => doc.data())
 
       // Randomize sparkIds array
       // TODO: Should be replaced with recommendation engine dependency injection in the future
       // This is a simple shuffle using the Fisher-Yates algorithm
-      for (let i = sparkIds.length - 1; i > 0; i--) {
+      for (let i = sparks.length - 1; i > 0; i--) {
          const j = Math.floor(Math.random() * (i + 1))
-         ;[sparkIds[i], sparkIds[j]] = [sparkIds[j], sparkIds[i]]
+         ;[sparks[i], sparks[j]] = [sparks[j], sparks[i]]
       }
 
       // Store in UserFeed
-      const userFeed: SparksFeed = {
+      const userFeed: UserSparksFeedMetrics = {
          id: userId,
          userId,
-         sparkIds,
          lastUpdated: Timestamp.now(),
-         numberOfSparks: sparkIds.length,
+         numberOfSparks: sparks.length,
       }
-      const feedRef = this.firestore.collection("sparksFeed").doc(userId)
+      const feedRef = this.firestore.collection("sparksFeedMetrics").doc(userId)
 
-      await feedRef.set(userFeed)
+      await batch.set(feedRef, userFeed, { merge: true })
 
-      return userFeed
+      // Store in UserFeed
+      sparks.forEach((spark) => {
+         const sparkRef = this.firestore
+            .collection("userData")
+            .doc(userId)
+            .collection("sparksFeed")
+            .doc(spark.id)
+
+         batch.set(sparkRef, spark, { merge: true })
+      })
+
+      await batch.commit()
+
+      return sparks
    }
 
-   async getUserFeed(userId: string): Promise<SparksFeed> {
+   async getUserSparksFeed(userId: string, limit = 10): Promise<Spark[]> {
       const userFeedRef = this.firestore
-         .collection("sparksFeed")
-         .withConverter(createGenericConverter<SparksFeed>())
+         .collection("userData")
          .doc(userId)
+         .collection("sparksFeed")
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter(createGenericConverter<Spark>())
 
-      const userFeed = await userFeedRef.get()
+      const userFeedSnap = await userFeedRef.get()
 
-      if (!userFeed.exists) {
+      // If the user doesn't have a feed, we will generate one
+      if (userFeedSnap.empty) {
          return this.generateSparksFeed(userId)
       }
 
-      return userFeed.data()
+      return userFeedSnap.docs.map((doc) => doc.data())
+   }
+
+   async getPublicSparksFeed(limit = 10): Promise<Spark[]> {
+      const publicFeedRef = this.firestore
+         .collection("sparks")
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter(createGenericConverter<Spark>())
+
+      const publicFeedSnap = await publicFeedRef.get()
+
+      return publicFeedSnap.docs.map((doc) => doc.data())
+   }
+
+   async getGroupSparksFeed(groupId: string, limit = 10): Promise<Spark[]> {
+      const groupFeedRef = this.firestore
+         .collection("sparks")
+         .where("group.id", "==", groupId)
+         .orderBy("publishedAt", "desc")
+         .limit(limit)
+         .withConverter(createGenericConverter<Spark>())
+
+      const groupFeedSnap = await groupFeedRef.get()
+
+      return groupFeedSnap.docs.map((doc) => doc.data())
+   }
+
+   async getUserFeedMetrics(userId: string): Promise<UserSparksFeedMetrics> {
+      const userFeedSnap = await this.firestore
+         .collection("sparksFeed")
+         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .doc(userId)
+         .get()
+
+      return userFeedSnap.data()
    }
 
    async getUserSeenSparks(userId: string): Promise<SeenSparks[]> {
@@ -358,9 +436,14 @@ export class SparkFunctionsRepository
       return seenSparksSnap.docs.map((doc) => doc.data())
    }
 
-   async replenishUserFeed(userId: string, feed?: SparksFeed): Promise<void> {
-      const userFeed = feed ? feed : await this.getUserFeed(userId)
-      const currentSparkCount = userFeed.numberOfSparks
+   async replenishUserFeed(
+      userId: string,
+      feed?: UserSparksFeedMetrics
+   ): Promise<void> {
+      const userSparkFeedMetrics = feed
+         ? feed
+         : await this.getUserFeedMetrics(userId)
+      const currentSparkCount = userSparkFeedMetrics.numberOfSparks
 
       if (currentSparkCount < this.TARGET_SPARK_COUNT) {
          const neededSparks = this.TARGET_SPARK_COUNT - currentSparkCount
@@ -372,33 +455,33 @@ export class SparkFunctionsRepository
 
          const sparksSnap = await this.firestore
             .collection("sparks")
+            .withConverter(createGenericConverter<Spark>())
             .orderBy("publishedAt", "desc")
             .limit(seenSparkIds.length + neededSparks)
             .get()
 
-         const newSparkIds: string[] = []
+         const newSparks: Spark[] = []
 
          // Only add the spark if the user hasn't seen it
          sparksSnap.docs.forEach((doc) => {
             if (!seenSparkIds.includes(doc.id)) {
-               newSparkIds.push(doc.id)
+               newSparks.push(doc.data())
             }
          })
 
-         // Update the user's feed with the new sparks
-         userFeed.sparkIds = removeDuplicates([
-            ...userFeed.sparkIds,
-            ...newSparkIds,
-         ])
+         // store the new sparks in the user's feed
+         const batch = this.firestore.batch()
+         newSparks.forEach((spark) => {
+            const sparkRef = this.firestore
+               .collection("userData")
+               .doc(userId)
+               .collection("sparksFeed")
+               .doc(spark.id)
 
-         userFeed.numberOfSparks = userFeed.sparkIds.length
+            batch.set(sparkRef, spark, { merge: true })
+         })
 
-         userFeed.lastUpdated = Timestamp.now()
-
-         await this.firestore
-            .collection("sparksFeed")
-            .doc(userId)
-            .update({ ...userFeed })
+         return void batch.commit()
       }
    }
 
@@ -443,24 +526,14 @@ export class SparkFunctionsRepository
    async removeSparkFromUserFeed(
       userId: string,
       sparkId: string
-   ): Promise<SparksFeed> {
-      const userFeed = await this.getUserFeed(userId)
-
-      // Remove the sparkId from the array
-      userFeed.sparkIds = userFeed.sparkIds.filter((id) => id !== sparkId)
-
-      // Update the number of sparks
-      userFeed.numberOfSparks = userFeed.sparkIds.length
-
-      // Update the lastUpdated field
-      userFeed.lastUpdated = Timestamp.now()
-
-      await this.firestore
-         .collection("sparksFeed")
+   ): Promise<void> {
+      const sparkRef = this.firestore
+         .collection("userData")
          .doc(userId)
-         .update({ ...userFeed })
+         .collection("sparksFeed")
+         .doc(sparkId)
 
-      return userFeed
+      await sparkRef.delete()
    }
 
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {

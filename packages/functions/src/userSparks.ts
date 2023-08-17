@@ -11,15 +11,27 @@ import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 export const getSparksFeed = functions.region(config.region).https.onCall(
    middlewares(
       dataValidation({
-         userId: string().optional(),
-         groupId: string().optional(),
+         userId: string().trim().min(1).optional(),
+         groupId: string().trim().min(1).optional(),
       }),
       async (data: GetFeedData, context) => {
-         // If the user is not authenticated, then we will generate a public feed
-         const userEmail = data.userId || "public"
-         const groupId = data.groupId
          try {
-            return sparkRepo.getUserFeed(userEmail)
+            if ("userId" in data) {
+               if (data.userId === "public") {
+                  return sparkRepo.getPublicSparksFeed()
+               } else {
+                  return sparkRepo.getUserSparksFeed(data.userId)
+               }
+            }
+
+            if ("groupId" in data) {
+               return sparkRepo.getGroupSparksFeed(data.groupId)
+            }
+
+            throw new functions.https.HttpsError(
+               "invalid-argument",
+               "No userId or groupId provided"
+            )
          } catch (error) {
             logAndThrow("Error in generating user feed", {
                data,
@@ -51,12 +63,7 @@ export const markSparkAsSeenByUser = functions
 
                await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
 
-               const userFeed = await sparkRepo.removeSparkFromUserFeed(
-                  userEmail,
-                  sparkId
-               )
-
-               await sparkRepo.replenishUserFeed(userEmail, userFeed)
+               await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
             } catch (error) {
                logAndThrow("Error in marking spark as seen by user", {
                   data,

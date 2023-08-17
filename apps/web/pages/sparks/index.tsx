@@ -10,7 +10,9 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-   const sparks = await sparkService.fetchNextSparks(null)
+   const sparks = await sparkService.fetchNextSparks(null, {
+      numberOfSparks: 1,
+   })
 
    if (sparks.length > 0) {
       const ttl = process.env.NODE_ENV === "development" ? 1 : 60 * 60 * 24 * 1 // 1 day in production, 1 second in development

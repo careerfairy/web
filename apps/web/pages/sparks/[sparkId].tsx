@@ -6,34 +6,41 @@ import { Box } from "@mui/material"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import {
-   setCurrentOptions,
-   setInitialSparks,
+   fetchNextSparks,
+   setGroupId,
+   setSparks,
 } from "store/reducers/sparksFeedReducer"
+import {
+   hasNoMoreSparksSelector,
+   isFetchingNextSparksSelector,
+   isOnLastSparkSelector,
+} from "store/selectors/sparksFeedSelectors"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ initialSparks, groupId }) => {
+> = ({ serializedSpark, groupId }) => {
    const dispatch = useDispatch()
-
-   console.table(initialSparks.map((s) => s.id))
+   const isOnLastSpark = useSelector(isOnLastSparkSelector)
+   const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
+   const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
 
    // Store initial sparks in Redux store upon page mount
    useEffect(() => {
-      dispatch(
-         setCurrentOptions({
-            groupId,
-         })
-      )
+      dispatch(setGroupId(groupId))
 
       dispatch(
-         setInitialSparks(
-            initialSparks.map(SparkPresenter.createFromPlainObject)
-         )
+         setSparks([SparkPresenter.createFromPlainObject(serializedSpark)])
       )
-   }, [dispatch, groupId, initialSparks])
+   }, [dispatch, groupId, serializedSpark])
+
+   useEffect(() => {
+      if (isOnLastSpark && !isFetchingNextSparks && !hasNoMoreSparks) {
+         dispatch(fetchNextSparks())
+      }
+   }, [dispatch, hasNoMoreSparks, isFetchingNextSparks, isOnLastSpark])
 
    return (
       <GenericDashboardLayout pageDisplayName={""}>
@@ -43,7 +50,7 @@ const SparksPage: NextPage<
 }
 
 type SparksPageProps = {
-   initialSparks: SerializedSpark[] // Replace `Spark` with the type of your spark
+   serializedSpark: SerializedSpark
    groupId: string | null
 }
 
@@ -62,15 +69,9 @@ export const getServerSideProps: GetServerSideProps<
 
    const sparkFromService = await sparkService.getSparkById(sparkId) // This is a method you'd need to implement
 
-   const sparksFromService = await sparkService.fetchFeed() // Fetch the first batch.
-
-   const initialSparks = [sparkFromService, ...sparksFromService].map(
-      SparkPresenter.toPlainObject
-   )
-
    return {
       props: {
-         initialSparks,
+         serializedSpark: SparkPresenter.serialize(sparkFromService),
          groupId,
       },
    }
