@@ -79,12 +79,11 @@ export class SparkPresenter implements SparkPresenterInterface {
    }
 
    /**
-    * Convert from SparkPresenter or Spark to plain object
+    * Serialize from SparkPresenter or Spark to allow passing it from the server to the client
     * @param sparkPresenterOrSpark
-    * @returns plain object
-    * @example
+    * @returns  SerializedSpark
     */
-   static toPlainObject(
+   static serialize(
       sparkPresenterOrSpark: SparkPresenter | Spark
    ): SerializedSpark {
       const spark =

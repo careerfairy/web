@@ -6,20 +6,21 @@ import {
    AddSparkSparkData,
    DeleteSparkData,
    GetFeedData,
-   SparksFeed,
+   Spark,
    UpdateSparkData,
+   UserSparksFeedMetrics,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    Query,
    collection,
+   doc,
+   getDoc,
    getDocs,
    limit,
    orderBy,
    query,
    startAfter,
    where,
-   getDoc,
-   doc,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
@@ -67,7 +68,7 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      return httpsCallable<GetFeedData, SparksFeed>(
+      return httpsCallable<GetFeedData, UserSparksFeedMetrics>(
          this.functions,
          "getSparksFeed"
       )(data)
@@ -81,7 +82,7 @@ export class SparksService {
     * @param options - The options for the fetch
     * */
    async fetchNextSparks(
-      lastSpark: SparkPresenter | null,
+      lastSpark: SparkPresenter | Spark | null,
       options: FetchNextSparkOptions = {}
    ): Promise<SparkPresenter[]> {
       const { numberOfSparks = 10, groupId } = options
@@ -137,13 +138,13 @@ export class SparksService {
 
 export type FetchNextSparkOptions = {
    /**
-    * The number of sparks to fetch, defaults to 10
-    */
-   numberOfSparks?: number
-   /**
     * The group ID to fetch sparks for
     * */
    groupId?: string
+   /**
+    * The number of sparks to fetch (default: 10)
+    */
+   numberOfSparks?: number
 }
 
 export const sparkService = new SparksService(FunctionsInstance as any)

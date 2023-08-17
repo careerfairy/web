@@ -4,7 +4,9 @@ import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
 
 /**
- * Collection path: /sparks
+ * Collection path:
+ * - /sparks (public)
+ * - /userData/{userId}/sparksFeed (private)
  */
 export interface Spark extends Identifiable {
    // embedded group public information
@@ -76,22 +78,21 @@ export interface Spark extends Identifiable {
 }
 
 /**
- * Collection path: /sparksFeed/{userId}
+ * Collection path: /sparksFeedMetrics/{userId}
  */
-export interface SparksFeed extends Identifiable {
+export interface UserSparksFeedMetrics extends Identifiable {
    userId: string
-   /**
-    * Spark ids for the user feed
-    */
-   sparkIds: string[]
-   /**
-    * The number of sparks in the feed, should be equal to sparkIds.length
-    */
-   numberOfSparks: number
    /**
     * When last the feed was updated
     */
    lastUpdated: Timestamp
+   /**
+    * The number of sparks in the feed
+    * - This is used to determine if we need to replenish the feed
+    * - If the number of sparks in the feed is less than the threshold, we will replenish the feed
+    * - This is to prevent us from replenishing the feed too often
+    */
+   numberOfSparks: number
 }
 
 /**
@@ -189,18 +190,21 @@ export type DeleteSparkData = {
    groupId: Spark["group"]["id"]
 }
 
-export type GetFeedData = {
-   /**
-    * If provided, we will only return sparks from this user
-    * If not provided, we will return sparks from all users
-    * (e.g: the public feed)
-    */
-   userId?: string
-   /**
-    * If provided, we will only return sparks from this group
-    */
-   groupId?: string
-}
+export type GetFeedData =
+   | {
+        /**
+         * If provided, we will only return sparks from this user
+         * If not provided, we will return sparks from all users
+         * (e.g: the public feed)
+         */
+        userId?: (string & {}) | "public"
+     }
+   | {
+        /**
+         * If provided, we will only return sparks from this group
+         */
+        groupId?: string
+     }
 
 export const SparksCategories = {
    CompanyCulture: {

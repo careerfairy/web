@@ -1,9 +1,6 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import {
-   FetchNextSparkOptions,
-   sparkService,
-} from "data/firebase/SparksService"
+import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
 
 // Initial state
@@ -11,7 +8,8 @@ interface SparksState {
    sparks: SparkPresenter[]
    currentPlayingIndex: number
    hasMoreSparks: boolean
-   currentOptions: FetchNextSparkOptions | null
+   groupId: string | null
+   numberOfSparksToFetch: number
    status: "idle" | "loading" | "failed"
    error: string | null
 }
@@ -20,18 +18,29 @@ const initialState: SparksState = {
    sparks: [],
    currentPlayingIndex: 0,
    hasMoreSparks: true,
-   currentOptions: null,
+   groupId: null,
+   numberOfSparksToFetch: 3,
    status: "idle",
    error: null,
 }
 
-// Async thunk to fetch the next sparks
+// Async thunk to fetch the next spark IDs
 export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
-   async (lastSpark: SparkPresenter | null, { getState }) => {
+   async (_, { getState }) => {
       const state = getState() as RootState
-      const currentOptions = state.sparksFeed.currentOptions
-      return sparkService.fetchNextSparks(lastSpark, currentOptions)
+      const lastSpark =
+         state.sparksFeed.sparks[state.sparksFeed.sparks.length - 1]
+      const hasMoreSparks = state.sparksFeed.hasMoreSparks
+
+      if (!hasMoreSparks) {
+         return []
+      }
+
+      return sparkService.fetchNextSparks(lastSpark, {
+         groupId: state.sparksFeed.groupId,
+         numberOfSparks: state.sparksFeed.numberOfSparksToFetch,
+      })
    }
 )
 
@@ -39,14 +48,11 @@ const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
    reducers: {
-      setInitialSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
+      setSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
          state.sparks = action.payload
       },
-      setCurrentOptions: (
-         state,
-         action: PayloadAction<FetchNextSparkOptions | null>
-      ) => {
-         state.currentOptions = action.payload
+      setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
+         state.groupId = action.payload
       },
       swipeNextSpark: (state) => {
          // Check if it's not the last spark
@@ -70,12 +76,12 @@ const sparksFeedSlice = createSlice({
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
                state.status = "idle"
-               // If there are no sparks, then there are no more sparks
-               if (action.payload.length === 0) {
+               // Add the sparks to the list
+               state.sparks = [...state.sparks, ...action.payload]
+
+               // If there are no spark, then there are no more sparks
+               if (action.payload.length < state.numberOfSparksToFetch) {
                   state.hasMoreSparks = false
-               } else {
-                  // Otherwise, add the sparks to the list
-                  state.sparks = [...state.sparks, ...action.payload]
                }
             }
          )
@@ -86,11 +92,7 @@ const sparksFeedSlice = createSlice({
    },
 })
 
-export const {
-   setInitialSparks,
-   setCurrentOptions,
-   swipeNextSpark,
-   swipePreviousSpark,
-} = sparksFeedSlice.actions
+export const { setSparks, setGroupId, swipeNextSpark, swipePreviousSpark } =
+   sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
