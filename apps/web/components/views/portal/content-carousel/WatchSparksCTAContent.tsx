@@ -35,7 +35,7 @@ const styles = sxStyles({
    button: {
       textTransform: "none",
       fontWeight: 500,
-      fontSize: { xs: "15px", md: "18px" },
+      fontSize: "15px",
       py: "8px",
       px: "20px",
    },
@@ -92,7 +92,6 @@ const WatchSparksCTAContent: FC<Props> = () => {
             }
             title={
                <ContentTitle
-                  sx={{ fontWeight: 400 }}
                   maxWidth={isMobile ? "50%!important" : "70%!important"}
                   color="black"
                >
