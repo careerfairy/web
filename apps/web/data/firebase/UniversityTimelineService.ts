@@ -190,7 +190,8 @@ export class UniversityTimelineService {
          message: string
       ) => (dispatch: any) => Promise<void>,
       errorNotification: (
-         error: string | Error
+         error: string | Error,
+         message: string
       ) => (dispatch: any) => Promise<void>
    ) {
       // get the file
@@ -319,7 +320,7 @@ export class UniversityTimelineService {
             await periodsBatch.commit()
             successNotification("Batch upload successful")
          } catch (e) {
-            errorNotification(e)
+            errorNotification(e, e)
          }
       }
 
