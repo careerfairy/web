@@ -10,6 +10,7 @@ import { ApexOptions } from "apexcharts"
 import CalendarFilter from "./CalendarFilter"
 import { renderToString } from "react-dom/server"
 import { Filter as FilterIcon } from "react-feather"
+import { CalendarChartDataType } from "./AcademicCalendar"
 
 const Chart = dynamic(() => import("react-apexcharts"), {
    ssr: false,
@@ -37,7 +38,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   seriesData: { name: string; data: { x: any; y: any[] }[] }[]
+   seriesData: CalendarChartDataType
 }
 
 const iconString = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
