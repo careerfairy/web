@@ -194,6 +194,7 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
 exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
+exports.onWriteSpark = onWriteTriggers.onWriteSpark
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
