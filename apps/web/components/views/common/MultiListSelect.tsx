@@ -17,6 +17,21 @@ import { styled } from "@mui/material/styles"
 import { StyledCheckbox } from "../group/admin/common/inputs"
 import { alpha } from "@mui/material/styles"
 import ChipDeleteIcon from "@mui/icons-material/HighlightOffRounded"
+import { makeStyles } from "@mui/styles"
+
+const useStyles = makeStyles({
+   option: {
+      '&[aria-selected="true"]': {
+         backgroundColor: "white!important",
+      },
+      '&[aria-selected="true"].Mui-focused': {
+         backgroundColor: "white!important",
+      },
+      "&:hover": {
+         backgroundColor: "action.hover",
+      },
+   },
+})
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -53,7 +68,9 @@ const MultiListSelect = ({
    handleBlur = () => {},
    useStyledTextfield = false,
    useStyledCheckbox = false,
+   noColorOnSelect = false,
 }: Props) => {
+   const styles = useStyles()
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
    const [selectedItemsLocal, setSelectedItemsLocal] = useState([])
 
@@ -179,6 +196,9 @@ const MultiListSelect = ({
             multiple
             value={selectedItemsLocal}
             disabled={disabled}
+            classes={{
+               option: noColorOnSelect ? styles.option : null,
+            }}
             onChange={handleMultiSelect}
             isOptionEqualToValue={isOptionEqualToValue}
             disableCloseOnSelect={Boolean(isCheckbox)}
@@ -192,9 +212,6 @@ const MultiListSelect = ({
                      key={getKeyFn(option)}
                      style={{
                         justifyContent: "space-between",
-                        backgroundColor: useStyledTextfield
-                           ? "white"
-                           : undefined,
                      }}
                   >
                      {getListLabelFn(option)}
@@ -351,6 +368,7 @@ type Props = {
    handleBlur?: (e) => void
    useStyledTextfield?: boolean
    useStyledCheckbox?: boolean
+   noColorOnSelect?: boolean
 }
 
 type SelectAllOption = {

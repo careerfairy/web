@@ -2,7 +2,6 @@ import React, { Dispatch, memo } from "react"
 import Autocomplete from "@mui/material/Autocomplete"
 import {
    Checkbox,
-   Chip,
    ChipProps,
    CircularProgress,
    Collapse,
@@ -13,9 +12,25 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
+import { makeStyles } from "@mui/styles"
+import { sxStyles } from "types/commonTypes"
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
+
+const useStyles = makeStyles({
+   option: {
+      '&[aria-selected="true"]': {
+         backgroundColor: "white!important",
+      },
+      '&[aria-selected="true"].Mui-focused': {
+         backgroundColor: "white!important",
+      },
+      "&:hover": {
+         backgroundColor: "action.hover",
+      },
+   },
+})
 
 const SingleListSelect = <T extends { [key: string]: any }>({
    inputName,
@@ -26,6 +41,7 @@ const SingleListSelect = <T extends { [key: string]: any }>({
    getLabelFn = (option: T) => option.name, // displayed name
    inputProps,
    isCheckbox = false, // Select items are checkboxes
+   checkboxProps,
    chipProps = {},
    extraOptions = {}, // props to pass to autocomplete
    setFieldValue = () => {}, // formik field
@@ -34,7 +50,9 @@ const SingleListSelect = <T extends { [key: string]: any }>({
    getGroupByFn = () => "",
    disabledValues = [],
    loading,
+   noColorOnSelect,
 }: Props<T>) => {
+   const styles = useStyles()
    const handleSelect = (event, selectedOption) => {
       if (onSelectItem) {
          onSelectItem(selectedOption)
@@ -57,6 +75,9 @@ const SingleListSelect = <T extends { [key: string]: any }>({
 
    return (
       <Autocomplete
+         classes={{
+            option: noColorOnSelect ? styles.option : null,
+         }}
          id={inputName}
          multiple={false}
          value={selectedItem}
@@ -82,6 +103,7 @@ const SingleListSelect = <T extends { [key: string]: any }>({
                      icon={icon}
                      checkedIcon={checkedIcon}
                      checked={selected}
+                     {...checkboxProps}
                   />
                </li>
             ) : (
@@ -102,6 +124,7 @@ const SingleListSelect = <T extends { [key: string]: any }>({
                   {...inputProps}
                   name={inputName}
                   InputProps={{
+                     disableUnderline: true,
                      ...params.InputProps,
                      endAdornment: (
                         <React.Fragment>
@@ -118,17 +141,6 @@ const SingleListSelect = <T extends { [key: string]: any }>({
                </Collapse>
             </FormControl>
          )}
-         renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-               <Chip
-                  key={getKeyFn(option)}
-                  label={getLabelFn(option)}
-                  {...getTagProps({ index })}
-                  {...chipProps}
-                  disabled={getOptionDisabled(option)}
-               />
-            ))
-         }
          groupBy={getGroupByFn}
          {...extraOptions}
       />
@@ -148,10 +160,12 @@ interface Props<T> {
    inputProps?: any
    chipProps?: ChipProps
    isCheckbox?: boolean
+   checkboxProps?: any
    options: T[]
    extraOptions?: object
    disabledValues?: string[]
    loading?: boolean
+   noColorOnSelect?: boolean
 }
 
 export default memo(SingleListSelect, isEqual)
