@@ -62,6 +62,25 @@ export const fetchInitialSparksFeed = createAsyncThunk(
       return sparkService.fetchFeed(sparkOptions)
    }
 )
+// Async thunk to fetch the next spark IDs
+export const fetchInitialSparksFeed = createAsyncThunk(
+   "sparks/fetchInitial",
+   async (userId: string, { getState }) => {
+      const state = getState() as RootState
+
+      const groupId = state.sparksFeed.groupId
+
+      if (groupId) {
+         return sparkService.fetchFeed({
+            groupId,
+         })
+      }
+
+      return sparkService.fetchFeed({
+         userId,
+      })
+   }
+)
 
 const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
