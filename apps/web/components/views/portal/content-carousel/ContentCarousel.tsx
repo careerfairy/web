@@ -2,7 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
-import { darken, useTheme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import { FC, useCallback, useEffect, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
@@ -17,12 +17,14 @@ import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
 import { CarouselContent } from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import LivestreamContent from "./LivestreamContent"
+import WatchSparksCTAContent from "./WatchSparksCTAContent"
 
 const styles = sxStyles({
    wrapper: {
       width: "100%",
       height: { xs: "55vh", md: "40vh" },
       minHeight: "470px",
+      position: "relative",
    },
    paginationWrapper: (theme) => ({
       mx: "auto",
@@ -136,7 +138,11 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                if (contentItem.contentType === "CTASlide") {
                   return (
                      <Box sx={styles.wrapper} key={index}>
-                        <BuyCreditsCTAContent cta={contentItem} />
+                        {contentItem.topic == "CareerCoins" ? (
+                           <BuyCreditsCTAContent cta={contentItem} />
+                        ) : (
+                           <WatchSparksCTAContent cta={contentItem} />
+                        )}
                      </Box>
                   )
                }

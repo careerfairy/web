@@ -18,9 +18,11 @@ export type GetContentOptions = {
 export type LivestreamEventWithType = LivestreamEvent & {
    contentType: "LivestreamEvent"
 }
+
+export type CTASlideTopic = "CareerCoins" | "Sparks"
 export type CTASlide = {
    contentType: "CTASlide"
-   // other fields
+   topic: CTASlideTopic
 }
 
 export type CarouselContent = CTASlide | LivestreamEventWithType
@@ -154,15 +156,34 @@ export class CarouselContentService {
             contentType: "LivestreamEvent",
          }
       })
-      const shouldSeeCreditsCTABanner = userShouldSeeCreditsCTABannerToday(
-         this.options.userData
-      )
 
-      // If the user has not bought the recording, add a CTASlide before the content
+      // check whether to add Credits CTA
+      const shouldSeeCreditsCTABanner = userShouldSeeCTABannerToday(
+         this.options.userData,
+         "CareerCoins"
+      )
+      // If the user has not bought a recording, add slide before the content
       if (!this.userHasBoughtRecording() && shouldSeeCreditsCTABanner) {
          content = [
             {
                contentType: "CTASlide",
+               topic: "CareerCoins",
+            },
+            ...content,
+         ]
+      }
+
+      // check whether to add Sparks CTA
+      const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
+         this.options.userData,
+         "Sparks"
+      )
+      // TODO: add check for whether user has watched any sparks yet (from Habib's PR)
+      if (shouldSeeSparksCTABanner) {
+         content = [
+            {
+               contentType: "CTASlide",
+               topic: "Sparks",
             },
             ...content,
          ]
@@ -259,26 +280,32 @@ export const filterNonRegisteredStreams = (
    })
 }
 
-export const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
+export const MAX_CTA_DISPLAY_COUNT = 5
 
 /**
- * Determines whether the user should see the credits CTA (Call-to-Action) banner today.
+ * Determines whether the user should see the given CTA (Call-to-Action) banner today.
  *
  * @param {UserData} userData - The user data containing the credits banner CTA dates.
  * @returns {boolean} - `true` if the user should see the credits CTA banner today, `false` otherwise.
  */
-const userShouldSeeCreditsCTABannerToday = (userData: UserData): boolean => {
-   const creditsBannerCTADates = userData?.creditsBannerCTADates || []
+const userShouldSeeCTABannerToday = (
+   userData: UserData,
+   bannerType: CTASlideTopic
+): boolean => {
+   const creditsBannerCTADates =
+      (bannerType == "CareerCoins"
+         ? userData?.creditsBannerCTADates
+         : userData?.sparksBannerCTADates) || []
    const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
 
    const numberOfTimesBannerDisplayed = creditsBannerCTADates.length
 
    const isBelowMaxDisplayCount =
-      numberOfTimesBannerDisplayed < MAX_CREDITS_CTA_DISPLAY_COUNT
+      numberOfTimesBannerDisplayed < MAX_CTA_DISPLAY_COUNT
 
    const todayIsTheLastDisplayDate =
       creditsBannerCTADates.includes(today) &&
-      numberOfTimesBannerDisplayed === MAX_CREDITS_CTA_DISPLAY_COUNT
+      numberOfTimesBannerDisplayed === MAX_CTA_DISPLAY_COUNT
 
    return isBelowMaxDisplayCount || todayIsTheLastDisplayDate
 }
