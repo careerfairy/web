@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material"
+import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
@@ -9,6 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { CTASlide, MAX_CTA_DISPLAY_COUNT } from "./CarouselContentService"
 import Content, { ContentHeaderTitle, ContentTitle } from "./Content"
+import ContentButton from "./ContentButton"
 
 const styles = sxStyles({
    centeredHeaderTitle: {
@@ -31,13 +32,6 @@ const styles = sxStyles({
             md: "top 0px left 0px",
          },
       },
-   },
-   button: {
-      textTransform: "none",
-      fontWeight: 500,
-      fontSize: "15px",
-      py: "8px",
-      px: "20px",
    },
 })
 
@@ -106,14 +100,13 @@ const WatchSparksCTAContent: FC<Props> = () => {
             }
             backgroundImageAlt="backgroundImageAlt"
             actionItem={
-               <Button
+               <ContentButton
                   variant="contained"
-                  sx={styles.button}
                   href={"/sparks"}
                   color={"secondary"}
                >
                   {isMobile ? "Discover Sparks " : "Watch Sparks"}
-               </Button>
+               </ContentButton>
             }
             withBackgroundOverlay={false}
          />
