@@ -21,6 +21,8 @@ import {
    query,
    startAfter,
    where,
+   getCountFromServer,
+   collectionGroup,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
@@ -151,6 +153,25 @@ export class SparksService {
       } else {
          return null
       }
+   }
+
+   /**
+    * Check if a user has ever seen any Spark
+    * @param userId The user to check
+    *
+    * @returns true if the user has seen the Spark, false otherwise
+    **/
+   async hasUserSeenAnySpark(userId: string): Promise<boolean> {
+      const q = query(
+         collectionGroup(FirestoreInstance, "seenSparks"),
+         where(`documentType`, "==", "seenSparks"),
+         where(`userId`, "==", userId),
+         limit(1)
+      )
+
+      const r = await getCountFromServer(q)
+
+      return r.data().count > 0
    }
 }
 

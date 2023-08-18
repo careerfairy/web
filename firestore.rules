@@ -594,5 +594,13 @@ service cloud.firestore {
         match /{somePath=**}/companiesUserFollows/{groupId} {
             allow read: if isAdminOfGroup(groupId);
         }
+
+        // User -> Seen Sparks Count query
+        match /{somePath=**}/seenSparks/{year} {
+            // Should be isSignedInAndIsSameUser(userId) but we can't 
+            // access the userId as we don't have proper auth in the server 
+            // fix would be to use admin sdk on the server side
+            allow read: if true;
+        }
     }
 }
