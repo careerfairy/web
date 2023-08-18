@@ -2,14 +2,30 @@ import { Box, ListItemText, MenuItem, SelectProps } from "@mui/material"
 import BrandedRadio from "components/views/common/inputs/BrandedRadio"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 
 type Props = {
    name: string
+   canPublishMoreSparks?: boolean
 }
 
-const SparkVisibilitySelect: FC<Props> = ({ name }) => {
+const SparkVisibilitySelect: FC<Props> = ({
+   name,
+   canPublishMoreSparks = true,
+}) => {
    const [field, meta] = useField<"true" | "false">(name)
+
+   const isOptionDisabled = useCallback(
+      (option) => {
+         // We only want to disable the option 'public on careerFairy' when the selected option is the 'hidden'
+         return (
+            option.value === "true" &&
+            field.value === "false" &&
+            !canPublishMoreSparks
+         )
+      },
+      [canPublishMoreSparks, field]
+   )
 
    return (
       <BrandedTextField
@@ -24,7 +40,11 @@ const SparkVisibilitySelect: FC<Props> = ({ name }) => {
          helperText={meta.touched ? meta.error : null}
       >
          {publishedOptions.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem
+               key={option.value}
+               value={option.value}
+               disabled={isOptionDisabled(option)}
+            >
                <ListItemText primary={option.label} />
                <BrandedRadio checked={field.value === option.value} />
             </MenuItem>
@@ -44,8 +64,8 @@ const selectProps: Partial<SelectProps> = {
 }
 
 export const publishedOptions = [
-   { value: "true", label: "Public on CareerFairy" },
-   { value: "false", label: "Hidden" },
+   { value: "true", label: "Public on CareerFairy", disabled: false },
+   { value: "false", label: "Hidden", disabled: false },
 ] as const
 
 export default SparkVisibilitySelect
