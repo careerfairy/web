@@ -13,6 +13,9 @@ export const isOnLastSparkSelector = (state: RootState) => {
 export const isFetchingNextSparksSelector = (state: RootState) =>
    state.sparksFeed.fetchNextSparksStatus === "loading"
 
+export const isFetchingInitialSparksSelector = (state: RootState) =>
+   state.sparksFeed.initialFetchStatus === "loading"
+
 export const initialSparksFetchedSelector = (state: RootState) =>
    state.sparksFeed.initialSparksFetched === true
 
