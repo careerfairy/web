@@ -24,6 +24,7 @@ import {
    fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
+   isFetchingInitialSparksSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
    numberOfSparksToFetchSelector,
@@ -31,14 +32,18 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import { useRouter } from "next/router"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedSpark, groupId, userEmail }) => {
    const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
+   const { replace } = useRouter()
+
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
+   const isFetchingInitialSparks = useSelector(isFetchingInitialSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
    const totalNumberOfSparks = useSelector(totalNumberOfSparksSelector)
@@ -101,6 +106,13 @@ const SparksPage: NextPage<
       }
    }, [closeSnackbar, dispatch, enqueueSnackbar, fetchNextError])
 
+   useEffect(() => {
+      if (activeSpark?.id) {
+         replace(`/sparks/${activeSpark.id}`, undefined, { shallow: true })
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [activeSpark?.id])
+
    return (
       <GenericDashboardLayout pageDisplayName={""}>
          <Box>
@@ -123,8 +135,11 @@ const SparksPage: NextPage<
             ) : null}
             {isFetchingNextSparks ? (
                <Typography>
-                  Fetching next {numberOfSparksToFetch} sparks...
+                  Fetching another {numberOfSparksToFetch} sparks...
                </Typography>
+            ) : null}
+            {isFetchingInitialSparks ? (
+               <Typography>Fetching initial feed...</Typography>
             ) : null}
             {hasNoMoreSparks ? (
                <Typography>There are no more sparks to fetch.</Typography>

@@ -125,7 +125,12 @@ const sparksFeedSlice = createSlice({
             (state, action: PayloadAction<SparkPresenter[]>) => {
                state.fetchNextSparksStatus = "idle"
                // Add the sparks to the list
-               state.sparks = [...state.sparks, ...action.payload]
+               state.sparks = [
+                  ...state.sparks,
+                  ...action.payload.filter(
+                     (spark) => !state.sparks.find((s) => s.id === spark.id)
+                  ),
+               ]
 
                // If there are no spark, then there are no more sparks
                if (action.payload.length < state.numberOfSparksToFetch) {
