@@ -40,7 +40,7 @@ const SparksPage: NextPage<
 > = ({ serializedSpark, groupId, userEmail }) => {
    const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
-   const { replace } = useRouter()
+   const { replace, query } = useRouter()
 
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
@@ -107,6 +107,11 @@ const SparksPage: NextPage<
       }
    }, [closeSnackbar, dispatch, enqueueSnackbar, fetchNextError])
 
+   const sparkForSeo = useMemo(() => {
+      const serverSideSpark = SparkPresenter.deserialize(serializedSpark)
+      return activeSpark ?? serverSideSpark
+   }, [activeSpark, serializedSpark])
+
    /**
     * This effect is used to update the URL when the active spark changes.
     * - We use the `replace` method to avoid adding a new entry to the history stack,
@@ -114,16 +119,16 @@ const SparksPage: NextPage<
     * - We use the `shallow` option to avoid re-rendering the page.
     */
    useEffect(() => {
-      if (activeSpark?.id) {
-         replace(`/sparks/${activeSpark.id}`, undefined, { shallow: true })
+      const currentSparkId = query.sparkId
+      const newSparkId = sparkForSeo?.id
+
+      if (newSparkId && currentSparkId !== newSparkId) {
+         replace(`/sparks/${newSparkId}`, undefined, {
+            shallow: true,
+         })
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [activeSpark?.id])
-
-   const sparkForSeo = useMemo(() => {
-      const serverSideSpark = SparkPresenter.deserialize(serializedSpark)
-      return activeSpark ?? serverSideSpark
-   }, [activeSpark, serializedSpark])
+   }, [sparkForSeo?.id])
 
    return (
       <GenericDashboardLayout topBarFixed topBarTransparent>
