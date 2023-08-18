@@ -9,6 +9,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      backgroundColor: "#F8F8F8",
    },
 })
 const AcademicCalendarEmbed = () => {
