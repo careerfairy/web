@@ -3,10 +3,12 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Box, Button, Card, Stack, Typography } from "@mui/material"
+import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
@@ -32,7 +34,6 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import { useRouter } from "next/router"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -106,12 +107,23 @@ const SparksPage: NextPage<
       }
    }, [closeSnackbar, dispatch, enqueueSnackbar, fetchNextError])
 
+   /**
+    * This effect is used to update the URL when the active spark changes.
+    * - We use the `replace` method to avoid adding a new entry to the history stack,
+    *   allowing the user to use the back button to go back to the page before the sparks page.
+    * - We use the `shallow` option to avoid re-rendering the page.
+    */
    useEffect(() => {
       if (activeSpark?.id) {
          replace(`/sparks/${activeSpark.id}`, undefined, { shallow: true })
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [activeSpark?.id])
+
+   const sparkForSeo = useMemo(() => {
+      const serverSideSpark = SparkPresenter.deserialize(serializedSpark)
+      return activeSpark ?? serverSideSpark
+   }, [activeSpark, serializedSpark])
 
    return (
       <GenericDashboardLayout topBarFixed topBarTransparent>
@@ -144,6 +156,7 @@ const SparksPage: NextPage<
                   Next Slide
                </Button>
             </Stack>
+            <SparkSeo spark={sparkForSeo} />
          </Box>
       </GenericDashboardLayout>
    )
