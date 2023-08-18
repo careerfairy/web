@@ -68,7 +68,7 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      const { data: sparks } = await httpsCallable<
+      const { data: serializedSparks } = await httpsCallable<
          GetFeedData,
          SerializedSpark[]
       >(
@@ -76,7 +76,7 @@ export class SparksService {
          "getSparksFeed"
       )(data)
 
-      return sparks.map(SparkPresenter.deserialize)
+      return serializedSparks.map(SparkPresenter.deserialize)
    }
 
    /**

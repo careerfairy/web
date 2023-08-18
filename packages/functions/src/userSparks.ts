@@ -11,7 +11,7 @@ import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 export const getSparksFeed = functions.region(config.region).https.onCall(
    middlewares(
       dataValidation({
-         userId: string().trim().min(1).optional(),
+         userId: string().trim().min(1).optional().nullable(),
          groupId: string().trim().min(1).optional(),
          numberOfSparks: number().min(1).optional(),
       }),

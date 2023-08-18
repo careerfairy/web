@@ -100,7 +100,7 @@ export interface ISparkFunctionsRepository {
     * Get the public feed of Sparks
     * @param limit ${limit} The number of sparks to fetch (default: 10)
     */
-   getPublicSparksFeed(limit?: number): Promise<Spark[]>
+   getPublicSparksFeed(limit?: number): Promise<SerializedSpark[]>
 
    /**
     * Get the group's feed of Sparks
@@ -424,7 +424,7 @@ export class SparkFunctionsRepository
       )
    }
 
-   async getPublicSparksFeed(limit = 10): Promise<Spark[]> {
+   async getPublicSparksFeed(limit = 10): Promise<SerializedSpark[]> {
       const publicFeedRef = this.firestore
          .collection("sparks")
          .orderBy("publishedAt", "desc")
@@ -433,7 +433,9 @@ export class SparkFunctionsRepository
 
       const publicFeedSnap = await publicFeedRef.get()
 
-      return publicFeedSnap.docs.map((doc) => doc.data())
+      return publicFeedSnap.docs.map((doc) =>
+         SparkPresenter.serialize(doc.data())
+      )
    }
 
    async getGroupSparksFeed(
