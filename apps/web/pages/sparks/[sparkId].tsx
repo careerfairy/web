@@ -15,6 +15,7 @@ import {
    setUserEmail,
    swipeNextSpark,
    swipePreviousSpark,
+   resetSparksFeed,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -42,22 +43,19 @@ const SparksPage: NextPage<
    const curentIndex = useSelector(currentSparkIndexSelector)
    const numberOfSparksToFetch = useSelector(numberOfSparksToFetchSelector)
 
-   // Store initial sparks in Redux store upon page mount
    useEffect(() => {
       dispatch(setGroupId(groupId))
       dispatch(setUserEmail(userEmail))
 
       dispatch(setSparks([SparkPresenter.deserialize(serializedSpark)]))
-
-      return () => {
-         dispatch(setSparks([]))
-         dispatch(setGroupId(null))
-         dispatch(setUserEmail(null))
-      }
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
       dispatch(fetchInitialSparksFeed())
+
+      return () => {
+         dispatch(resetSparksFeed())
+      }
    }, [dispatch])
 
    useEffect(() => {

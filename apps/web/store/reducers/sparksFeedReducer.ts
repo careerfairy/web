@@ -32,33 +32,32 @@ const initialState: SparksState = {
    error: null,
 }
 
-// Async thunk to fetch the next spark IDs
+// Async thunk to fetch the next sparks
 export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
    async (_, { getState }) => {
-      const state = getState() as RootState
-      const lastSpark =
-         state.sparksFeed.sparks[state.sparksFeed.sparks.length - 1]
-      const hasMoreSparks = state.sparksFeed.hasMoreSparks
+      const {
+         sparksFeed: {
+            sparks,
+            hasMoreSparks,
+            groupId,
+            userEmail,
+            numberOfSparksToFetch,
+         },
+      } = getState() as RootState
 
-      const groupId = state.sparksFeed.groupId
-      const userId = state.sparksFeed.userEmail
+      const lastSpark = sparks[sparks.length - 1]
 
       if (!hasMoreSparks) {
          return []
       }
 
-      if (groupId) {
-         return sparkService.fetchNextSparks(lastSpark, {
-            groupId,
-            numberOfSparks: state.sparksFeed.numberOfSparksToFetch,
-         })
+      const sparkOptions = {
+         numberOfSparks: numberOfSparksToFetch,
+         ...(groupId ? { groupId } : { userId: userEmail || null }),
       }
 
-      return sparkService.fetchNextSparks(lastSpark, {
-         numberOfSparks: state.sparksFeed.numberOfSparksToFetch,
-         userId: userId || "public", // If the user is not logged in, then use the public feed
-      })
+      return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
 )
 // Async thunk to fetch the next spark IDs
@@ -109,6 +108,14 @@ const sparksFeedSlice = createSlice({
          if (state.currentPlayingIndex > 0) {
             state.currentPlayingIndex -= 1
          }
+      },
+      resetSparksFeed: (state) => {
+         state.sparks = []
+         state.currentPlayingIndex = 0
+         state.hasMoreSparks = true
+         state.initialFetchStatus = "loading"
+         state.initialSparksFetched = false
+         state.error = null
       },
    },
    extraReducers: (builder) => {
@@ -168,6 +175,7 @@ export const {
    swipeNextSpark,
    swipePreviousSpark,
    setUserEmail,
+   resetSparksFeed,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
