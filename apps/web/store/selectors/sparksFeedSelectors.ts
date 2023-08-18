@@ -33,3 +33,6 @@ export const currentSparkIndexSelector = (state: RootState) =>
 
 export const numberOfSparksToFetchSelector = (state: RootState) =>
    state.sparksFeed.currentPlayingIndex
+
+export const fetchNextErrorSelector = (state: RootState) =>
+   state.sparksFeed.fetchNexterror

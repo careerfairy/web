@@ -16,7 +16,8 @@ interface SparksState {
    fetchNextSparksStatus: Status
    initialFetchStatus: Status
    initialSparksFetched: boolean
-   error: string | null
+   fetchNexterror: string | null
+   initialFetchError: string | null
 }
 
 const initialState: SparksState = {
@@ -29,7 +30,8 @@ const initialState: SparksState = {
    initialFetchStatus: "loading",
    fetchNextSparksStatus: "idle",
    initialSparksFetched: false,
-   error: null,
+   fetchNexterror: null,
+   initialFetchError: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -64,23 +66,16 @@ export const fetchNextSparks = createAsyncThunk(
 export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
    async (_, { getState }) => {
-      const state = getState() as RootState
+      const {
+         sparksFeed: { numberOfSparksToFetch, groupId, userEmail },
+      } = getState() as RootState
 
-      const groupId = state.sparksFeed.groupId
-      const userEmail = state.sparksFeed.userEmail
-      const numberOfSparks = state.sparksFeed.numberOfSparksToFetch
-
-      if (groupId) {
-         return sparkService.fetchFeed({
-            groupId,
-            numberOfSparks,
-         })
+      const sparkOptions = {
+         numberOfSparks: numberOfSparksToFetch,
+         ...(groupId ? { groupId } : { userId: userEmail || null }),
       }
 
-      return sparkService.fetchFeed({
-         userId: userEmail || "public", // If the user is not logged in, then use the public feed
-         numberOfSparks,
-      })
+      return sparkService.fetchFeed(sparkOptions)
    }
 )
 
@@ -115,7 +110,9 @@ const sparksFeedSlice = createSlice({
          state.hasMoreSparks = true
          state.initialFetchStatus = "loading"
          state.initialSparksFetched = false
-         state.error = null
+         state.fetchNextSparksStatus = "idle"
+         state.fetchNexterror = null
+         state.initialFetchError = null
       },
    },
    extraReducers: (builder) => {
@@ -138,7 +135,7 @@ const sparksFeedSlice = createSlice({
          )
          .addCase(fetchNextSparks.rejected, (state, action) => {
             state.fetchNextSparksStatus = "failed"
-            state.error = action.error.message
+            state.fetchNexterror = action.error.message
          })
          .addCase(fetchInitialSparksFeed.pending, (state) => {
             state.initialFetchStatus = "loading"
@@ -164,7 +161,7 @@ const sparksFeedSlice = createSlice({
          )
          .addCase(fetchInitialSparksFeed.rejected, (state, action) => {
             state.initialFetchStatus = "failed"
-            state.error = action.error.message
+            state.initialFetchError = action.error.message
          })
    },
 })

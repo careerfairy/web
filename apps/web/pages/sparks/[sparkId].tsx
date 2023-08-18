@@ -5,21 +5,23 @@ import {
 import { Box, Button, Card, Stack, Typography } from "@mui/material"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { useSnackbar } from "notistack"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
    fetchNextSparks,
+   resetSparksFeed,
    setGroupId,
    setSparks,
    setUserEmail,
    swipeNextSpark,
    swipePreviousSpark,
-   resetSparksFeed,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
    currentSparkIndexSelector,
+   fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
@@ -33,6 +35,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedSpark, groupId, userEmail }) => {
+   const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
@@ -42,6 +45,7 @@ const SparksPage: NextPage<
    const activeSpark = useSelector(activeSparkSelector)
    const curentIndex = useSelector(currentSparkIndexSelector)
    const numberOfSparksToFetch = useSelector(numberOfSparksToFetchSelector)
+   const fetchNextError = useSelector(fetchNextErrorSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -63,17 +67,39 @@ const SparksPage: NextPage<
          initalSparksFetched &&
          isOnLastSpark &&
          !isFetchingNextSparks &&
-         !hasNoMoreSparks
+         !hasNoMoreSparks &&
+         !fetchNextError
       ) {
          dispatch(fetchNextSparks())
       }
    }, [
       dispatch,
+      fetchNextError,
       hasNoMoreSparks,
       initalSparksFetched,
       isFetchingNextSparks,
       isOnLastSpark,
    ])
+
+   useEffect(() => {
+      if (fetchNextError) {
+         enqueueSnackbar("Error fetching next sparks. Click here to retry.", {
+            variant: "error",
+            action: (key) => (
+               <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                     dispatch(fetchNextSparks())
+                     closeSnackbar(key)
+                  }}
+               >
+                  Retry
+               </Button>
+            ),
+         })
+      }
+   }, [closeSnackbar, dispatch, enqueueSnackbar, fetchNextError])
 
    return (
       <GenericDashboardLayout pageDisplayName={""}>
