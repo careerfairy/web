@@ -55,7 +55,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
          {componentHeader && <Box>{componentHeader}</Box>}
          <Box sx={styles.cardContent}>{children}</Box>
          <VideoPreview
-            thumbnailUrl={getResizedUrl(video.thumbnailUrl, "lg")}
+            thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
             playing={video.preview}
          />
