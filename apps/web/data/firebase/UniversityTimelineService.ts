@@ -287,7 +287,7 @@ export class UniversityTimelineService {
                   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
                      throwBatchError(index, "has valid start and end dates")
                   }
-                  if (start >= end) {
+                  if (start > end) {
                      throwBatchError(index, "starts before it ends")
                   }
 
