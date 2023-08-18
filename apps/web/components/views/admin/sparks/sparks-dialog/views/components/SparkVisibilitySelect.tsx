@@ -9,10 +9,7 @@ type Props = {
    canPublishMoreSparks?: boolean
 }
 
-const SparkVisibilitySelect: FC<Props> = ({
-   name,
-   canPublishMoreSparks = true,
-}) => {
+const SparkVisibilitySelect: FC<Props> = ({ name, canPublishMoreSparks }) => {
    const [field, meta] = useField<"true" | "false">(name)
 
    const isOptionDisabled = useCallback(
