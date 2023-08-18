@@ -142,7 +142,8 @@ export type SparkVideo = {
 
    /**
     * Video format
-    *
+    * - mp4
+    * - mov
     * Used to construct the video url
     * /sparks/[videoUid].[videoFormat]
     */
