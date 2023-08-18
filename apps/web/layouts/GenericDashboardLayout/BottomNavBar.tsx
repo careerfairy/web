@@ -17,24 +17,38 @@ const styles = sxStyles({
       zIndex: 999,
       background: "white",
       borderTop: "1px solid #F3F3F3",
+      " .MuiTabs-flexContainer": {
+         justifyContent: "space-evenly",
+      },
    },
    navLink: {
       display: "flex",
       flexDirection: "column",
-      width: "25%",
+      justifyContent: "flex-start",
+      minWidth: 0,
+      maxWidth: "20%",
       backgroundColor: "transparent !important",
       color: (theme) => alpha(theme.palette.text.secondary, 0.3),
-      fontWeight: 500,
-      fontSize: "10px",
-      px: 0,
-      py: 2,
-
+      px: "0px",
+      py: "12px",
       "&:hover , &:focus": {
          color: "text.primary",
       },
    },
    activeNavLink: {
       color: "text.primary",
+   },
+   icon: {
+      "& .MuiSvgIcon-root": {
+         fontSize: "24px",
+      },
+   },
+   iconLabel: {
+      textTransform: "none",
+      fontSize: "10px",
+      display: "flex",
+      height: "100%",
+      alignItems: "center",
    },
 })
 
@@ -62,10 +76,18 @@ const BottomNavBar = ({ links }: Props) => {
                return (
                   <Tab
                      key={id}
-                     icon={<Box component={Icon} />}
+                     icon={
+                        <Box sx={styles.icon}>
+                           <Icon />
+                        </Box>
+                     }
                      component={Link}
                      href={href}
-                     label={isMobile ? mobileTitle || title : title}
+                     label={
+                        <Box sx={styles.iconLabel}>
+                           {isMobile ? mobileTitle || title : title}
+                        </Box>
+                     }
                      sx={[
                         styles.navLink,
                         (isActivePath || isChildrenActive) &&
