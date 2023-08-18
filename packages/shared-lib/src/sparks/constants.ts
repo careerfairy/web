@@ -38,4 +38,9 @@ export const SPARK_CONSTANTS = {
     * The minimum sparks per creator for a group to publish sparks
     */
    MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
+
+   /**
+    * The minimum sparks per creator for a group to publish sparks
+    */
+   MAX_PUBLIC_SPARKS: 15,
 }
