@@ -188,7 +188,7 @@ export const getServerSideProps: GetServerSideProps<
 
    const sparkId = context.params.sparkId
 
-   const sparkFromService = await sparkService.getSparkById(sparkId) // This is a method you'd need to implement
+   const sparkFromService = await sparkService.getSparkById(sparkId)
 
    return {
       props: {
