@@ -3,8 +3,8 @@ import {
    FirestoreDataConverter,
    Timestamp,
 } from "firebase/firestore"
-import { fromSerializedDate } from "../BaseModel" // Adjust the import path as needed
-import { Spark, SparkCategory, SparkVideo } from "./sparks" // Adjust the import path
+import { fromSerializedDate } from "../BaseModel"
+import { Spark, SparkCategory, SparkVideo } from "./sparks"
 
 interface SparkPresenterInterface
    extends Omit<Spark, "createdAt" | "updatedAt" | "publishedAt"> {
@@ -20,6 +20,21 @@ export interface SerializedSpark
    publishedAt: number
 }
 
+/**
+ * `SparkPresenter` bridges Firestore's `Spark` document and client-side needs.
+ * It handles data conversions, offers utility methods for specific Spark operations,
+ * and ensures data consistency when interacting with Firestore.
+ *
+ * Features:
+ * - Converts Firestore Timestamps to JavaScript Dates and vice-versa.
+ * - Provides utility methods like formatting video URLs and extracting creator display names.
+ *
+ * @example
+ * const sparkPresenter = SparkPresenter.createFromFirebaseObject(firestoreObject);
+ * const displayName = sparkPresenter.getCreatorDisplayName();
+ *
+ * @class
+ */
 export class SparkPresenter implements SparkPresenterInterface {
    id: string
    group: Spark["group"]
@@ -44,6 +59,14 @@ export class SparkPresenter implements SparkPresenterInterface {
    // The SparkPresenter constructor
    constructor(data: Partial<SparkPresenter>) {
       Object.assign(this, data)
+   }
+
+   /**
+    * Retrieves the display name for the spark's creator.
+    * @returns {string} Creator's display name.
+    */
+   getCreatorDisplayName(): string {
+      return `${this.creator.firstName} ${this.creator.lastName}`
    }
 
    /**
