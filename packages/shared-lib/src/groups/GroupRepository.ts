@@ -1016,7 +1016,10 @@ export class FirebaseGroupRepository
          .collection("careerCenterData")
          .doc(groupId)
 
-      return groupRef.set({ publicSparks: isPublic }, { merge: true })
+      const toUpdate: Pick<Group, "publicSparks"> = {
+         publicSparks: isPublic,
+      }
+      return groupRef.update(toUpdate)
    }
 }
 
