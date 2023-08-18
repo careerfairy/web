@@ -32,8 +32,6 @@ export interface SerializedSpark
  * @example
  * const sparkPresenter = SparkPresenter.createFromFirebaseObject(firestoreObject);
  * const displayName = sparkPresenter.getCreatorDisplayName();
- *
- * @class
  */
 export class SparkPresenter implements SparkPresenterInterface {
    id: string
@@ -70,14 +68,16 @@ export class SparkPresenter implements SparkPresenterInterface {
    }
 
    /**
-    * Convert from plain objects (json/object) into SparkPresenter class instance
+    * Converts plain objects to SparkPresenter class instances, transforming serialized dates back into Date objects.
+    * @param serializedSpark Plain object with serialized dates.
+    * @returns {SparkPresenter} SparkPresenter instance.
     */
-   static deserialize(plainObject: SerializedSpark): SparkPresenter {
+   static deserialize(serializedSpark: SerializedSpark): SparkPresenter {
       return new SparkPresenter({
-         ...plainObject,
-         createdAt: fromSerializedDate(plainObject.createdAt),
-         updatedAt: fromSerializedDate(plainObject.updatedAt),
-         publishedAt: fromSerializedDate(plainObject.publishedAt),
+         ...serializedSpark,
+         createdAt: fromSerializedDate(serializedSpark.createdAt),
+         updatedAt: fromSerializedDate(serializedSpark.updatedAt),
+         publishedAt: fromSerializedDate(serializedSpark.publishedAt),
       })
    }
 
@@ -102,9 +102,9 @@ export class SparkPresenter implements SparkPresenterInterface {
    }
 
    /**
-    * Serialize from SparkPresenter or Spark to allow passing it from the server to the client
-    * @param sparkPresenterOrSpark
-    * @returns  SerializedSpark
+    * Converts a SparkPresenter instance (or a Spark) to a serialized format suitable for client-server communication.
+    * @param sparkPresenterOrSpark SparkPresenter instance or Spark.
+    * @returns {SerializedSpark} Serialized version of the input.
     */
    static serialize(
       sparkPresenterOrSpark: SparkPresenter | Spark
@@ -122,10 +122,10 @@ export class SparkPresenter implements SparkPresenterInterface {
    }
 
    /**
-    * Convert from SparkPresenter or Spark to firebase document data
-    * @param sparkPresenter
-    * @returns firebase document data
-    * @example
+    * Converts a SparkPresenter instance to a format that's compatible with Firestore's storage,
+    * specifically transforming JavaScript Dates into Firestore Timestamps.
+    * @param sparkPresenter SparkPresenter instance.
+    * @returns {Spark} Converted Spark for Firestore storage.
     */
    static toFirebaseObject(sparkPresenter: SparkPresenter): Spark {
       return {
