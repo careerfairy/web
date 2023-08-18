@@ -244,6 +244,7 @@ export class SparkFunctionsRepository
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {
       const snapshot = await this.firestore
          .collection("sparks")
+         .withConverter(createGenericConverter<Spark>())
          .where("group.id", "==", groupId)
          .orderBy("createdAt", "desc")
          .get()
@@ -258,7 +259,7 @@ export class SparkFunctionsRepository
          )
       }
 
-      return []
+      return snapshot.docs?.map((doc) => doc.data())
    }
 }
 
