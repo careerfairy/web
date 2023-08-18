@@ -109,6 +109,7 @@ type Props = {
    setDrawer?: (open: boolean) => void
    toggleDrawer?: () => void
    bgColor?: string
+   topBarTransparent?: boolean
 }
 const AdminGenericLayout: React.FC<Props> = ({
    children,
@@ -120,6 +121,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    setDrawer,
    toggleDrawer,
    bgColor,
+   topBarTransparent = false,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -153,7 +155,9 @@ const AdminGenericLayout: React.FC<Props> = ({
             ]}
          >
             {/* header */}
-            <HeaderComponent>{headerContent}</HeaderComponent>
+            <HeaderComponent topBarTransparent={topBarTransparent}>
+               {headerContent}
+            </HeaderComponent>
 
             {/* mobile dropdown navigation content*/}
             {dropdownNav}
@@ -215,10 +219,12 @@ const DrawerComponent = ({
 type HeaderProps = {
    children: React.ReactNode
    headerBgColor?: string
+   topBarTransparent?: boolean
 }
 const HeaderComponent = ({
    children,
    headerBgColor = "#F7F8FC",
+   topBarTransparent = false,
 }: HeaderProps) => {
    const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
    const styles = useStyles()
@@ -240,6 +246,11 @@ const HeaderComponent = ({
             topBarFixed && styles.topBarFixed,
             isScrolling && {
                backgroundColor: alpha(headerBgColor, 0.9),
+            },
+            topBarTransparent && {
+               backgroundColor: "transparent",
+               borderBottom: "none",
+               backdropFilter: "none",
             },
          ]}
       >

@@ -114,16 +114,8 @@ const SparksPage: NextPage<
    }, [activeSpark?.id])
 
    return (
-      <GenericDashboardLayout pageDisplayName={""}>
+      <GenericDashboardLayout topBarFixed topBarTransparent>
          <Box>
-            <Stack direction="row">
-               <Button onClick={() => dispatch(swipePreviousSpark())}>
-                  Prev Slide
-               </Button>
-               <Button onClick={() => dispatch(swipeNextSpark())}>
-                  Next Slide
-               </Button>
-            </Stack>
             <Typography>
                Spark: {curentIndex + 1} / {totalNumberOfSparks}
             </Typography>
@@ -144,6 +136,14 @@ const SparksPage: NextPage<
             {hasNoMoreSparks ? (
                <Typography>There are no more sparks to fetch.</Typography>
             ) : null}
+            <Stack direction="row">
+               <Button onClick={() => dispatch(swipePreviousSpark())}>
+                  Prev Slide
+               </Button>
+               <Button onClick={() => dispatch(swipeNextSpark())}>
+                  Next Slide
+               </Button>
+            </Stack>
          </Box>
       </GenericDashboardLayout>
    )
