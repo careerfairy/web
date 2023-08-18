@@ -80,59 +80,59 @@ export class SparksService {
    }
 
    /**
-    * Fetch the next batch of sparks
-    * @param lastSpark  The last retrieved spark to determine the starting point for the next batch
-    * If null, the first batch will be retrieved
+    * Fetches the next batch of sparks based on provided options.
     *
-    * @param options - The options for the fetch
-    * */
+    * @param lastSpark - The last retrieved spark to determine the starting point for the next batch.
+    *                    If null, the first batch will be retrieved.
+    * @param options - The options for the fetch. This can either specify a `userId` or a `groupId`,
+    *                  but not both. It also optionally specifies the number of sparks to fetch.
+    *
+    * @returns A promise that resolves to an array of SparkPresenter objects.
+    */
    async fetchNextSparks(
       lastSpark: SparkPresenter | Spark | null,
-      options: FetchNextSparkOptions = {
-         userId: null,
-      }
+      options: GetFeedData = { userId: null }
    ): Promise<SparkPresenter[]> {
       const { numberOfSparks = 10 } = options
 
       const db = FirestoreInstance
 
-      // Starting with base collection.
+      // Determine the base query depending on the provided options.
       let baseQuery: Query
 
       if ("groupId" in options) {
-         // If a group (company) is specified.
+         // Query sparks based on the specified group.
          baseQuery = query(
             collection(db, "sparks"),
-            where("group.id", "==", options.groupId) // Adjust the field path as necessary.
+            where("group.id", "==", options.groupId!)
          )
-      } else if ("userId" in options) {
-         // If a user is specified.
+         // Check if options specify a userId and ensure it's not null.
+      } else if ("userId" in options && options.userId !== null) {
+         // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
          )
       } else {
-         // If no user or group is specified, then use the public feed.
+         // If neither userId nor groupId are specified, query the public sparks feed.
          baseQuery = query(collection(db, "sparks"))
       }
 
-      // Apply order.
+      // Order the results by their publication date in descending order.
       baseQuery = query(baseQuery, orderBy("publishedAt", "desc"))
 
-      // Apply the limit and startAfter if a lastSpark is provided.
-      if (lastSpark) {
-         baseQuery = query(
-            baseQuery,
-            startAfter(lastSpark.publishedAt),
-            limit(numberOfSparks)
-         )
-      } else {
-         baseQuery = query(baseQuery, limit(numberOfSparks))
-      }
+      // If a lastSpark is provided, apply pagination logic to start after that spark.
+      // Additionally, apply the limit to get only the specified number of sparks.
+      baseQuery = query(
+         baseQuery,
+         ...(lastSpark ? [startAfter(lastSpark.publishedAt)] : []),
+         limit(numberOfSparks)
+      )
 
       const snapshot = await getDocs(
          baseQuery.withConverter(sparkPresenterConverter)
       )
 
+      // Convert the fetched data to SparkPresenter objects and return.
       return snapshot.docs.map((doc) => doc.data())
    }
 
@@ -153,13 +153,6 @@ export class SparksService {
       }
    }
 }
-
-export type FetchNextSparkOptions = {
-   /**
-    * The number of sparks to fetch (default: 10)
-    */
-   numberOfSparks?: number
-} & GetFeedData
 
 export const sparkService = new SparksService(FunctionsInstance as any)
 
