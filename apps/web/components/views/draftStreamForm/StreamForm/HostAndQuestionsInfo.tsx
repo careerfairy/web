@@ -76,6 +76,7 @@ const HostAndQuestionsInfo = ({
                            variant: "contained",
                            color: "secondary",
                         }}
+                        getListLabelFn={mapGroupLabel}
                         checkboxColor="secondary"
                      />
                   </Grid>
