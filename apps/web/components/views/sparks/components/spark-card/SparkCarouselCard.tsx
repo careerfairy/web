@@ -67,7 +67,7 @@ const SparkCarouselCardForAdmin: FC<Props> = ({
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
             url: spark.video.url,
-            preview: !preview,
+            preview,
          }}
       >
          <Box sx={styles.cardContent}>
