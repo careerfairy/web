@@ -16,7 +16,7 @@ interface SparksState {
    fetchNextSparksStatus: Status
    initialFetchStatus: Status
    initialSparksFetched: boolean
-   fetchNexterror: string | null
+   fetchNextError: string | null
    initialFetchError: string | null
 }
 
@@ -30,7 +30,7 @@ const initialState: SparksState = {
    initialFetchStatus: "loading",
    fetchNextSparksStatus: "idle",
    initialSparksFetched: false,
-   fetchNexterror: null,
+   fetchNextError: null,
    initialFetchError: null,
 }
 
@@ -38,26 +38,15 @@ const initialState: SparksState = {
 export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
    async (_, { getState }) => {
-      const {
-         sparksFeed: {
-            sparks,
-            hasMoreSparks,
-            groupId,
-            userEmail,
-            numberOfSparksToFetch,
-         },
-      } = getState() as RootState
-
-      const lastSpark = sparks[sparks.length - 1]
+      const state = getState() as RootState
+      const { sparks, hasMoreSparks } = state.sparksFeed
 
       if (!hasMoreSparks) {
          return []
       }
 
-      const sparkOptions = {
-         numberOfSparks: numberOfSparksToFetch,
-         ...(groupId ? { groupId } : { userId: userEmail || null }),
-      }
+      const lastSpark = sparks[sparks.length - 1]
+      const sparkOptions = getSparkOptions(state)
 
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
@@ -66,14 +55,9 @@ export const fetchNextSparks = createAsyncThunk(
 export const fetchInitialSparksFeed = createAsyncThunk(
    "sparks/fetchInitial",
    async (_, { getState }) => {
-      const {
-         sparksFeed: { numberOfSparksToFetch, groupId, userEmail },
-      } = getState() as RootState
+      const state = getState() as RootState
 
-      const sparkOptions = {
-         numberOfSparks: numberOfSparksToFetch,
-         ...(groupId ? { groupId } : { userId: userEmail || null }),
-      }
+      const sparkOptions = getSparkOptions(state)
 
       return sparkService.fetchFeed(sparkOptions)
    }
@@ -111,7 +95,7 @@ const sparksFeedSlice = createSlice({
          state.initialFetchStatus = "loading"
          state.initialSparksFetched = false
          state.fetchNextSparksStatus = "idle"
-         state.fetchNexterror = null
+         state.fetchNextError = null
          state.initialFetchError = null
       },
    },
@@ -123,24 +107,20 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               state.fetchNextSparksStatus = "idle"
-               // Add the sparks to the list
-               state.sparks = [
-                  ...state.sparks,
-                  ...action.payload.filter(
-                     (spark) => !state.sparks.find((s) => s.id === spark.id)
-                  ),
-               ]
+               const { sparks, numberOfSparksToFetch } = state
 
-               // If there are no spark, then there are no more sparks
-               if (action.payload.length < state.numberOfSparksToFetch) {
+               state.fetchNextSparksStatus = "idle"
+
+               state.sparks = mergeSparks(sparks, action.payload)
+
+               if (action.payload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
                }
             }
          )
          .addCase(fetchNextSparks.rejected, (state, action) => {
             state.fetchNextSparksStatus = "failed"
-            state.fetchNexterror = action.error.message
+            state.fetchNextError = action.error.message
          })
          .addCase(fetchInitialSparksFeed.pending, (state) => {
             state.initialFetchStatus = "loading"
@@ -148,20 +128,16 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchInitialSparksFeed.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
+               const { sparks, numberOfSparksToFetch } = state
+
                state.initialFetchStatus = "idle"
                state.initialSparksFetched = true
 
-               // If there are no spark, then there are no more sparks
-               if (action.payload.length < state.numberOfSparksToFetch) {
+               state.sparks = mergeSparks(sparks, action.payload)
+
+               if (action.payload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
                }
-
-               state.sparks = [
-                  ...state.sparks,
-                  ...action.payload.filter(
-                     (spark) => !state.sparks.find((s) => s.id === spark.id)
-                  ),
-               ]
             }
          )
          .addCase(fetchInitialSparksFeed.rejected, (state, action) => {
@@ -170,6 +146,34 @@ const sparksFeedSlice = createSlice({
          })
    },
 })
+
+/**
+ * Merge the existing sparks with the new sparks and remove duplicates
+ */
+const mergeSparks = (
+   existingSparks: SparkPresenter[],
+   newSparks: SparkPresenter[]
+) => {
+   return [
+      ...existingSparks,
+      ...newSparks.filter(
+         (spark) => !existingSparks.find((s) => s.id === spark.id)
+      ),
+   ]
+}
+
+/**
+ * Get the spark options from the state
+ * @param state - The redux state
+ * @returns spark options
+ */
+const getSparkOptions = (state: RootState) => {
+   const { numberOfSparksToFetch, groupId, userEmail } = state.sparksFeed
+   return {
+      numberOfSparks: numberOfSparksToFetch,
+      ...(groupId ? { groupId } : { userId: userEmail || null }),
+   }
+}
 
 export const {
    setSparks,
