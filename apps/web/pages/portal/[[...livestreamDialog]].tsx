@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
@@ -20,6 +20,7 @@ import DateUtil from "../../util/DateUtil"
 import { Box, Stack } from "@mui/material"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import {
+   getServerSideSparks,
    getServerSideUserData,
    getServerSideUserStats,
    getUserTokenFromCookie,
@@ -38,6 +39,10 @@ import SparksCarousel from "components/views/admin/sparks/general-sparks-view/Sp
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Heading from "components/views/portal/common/Heading"
 import { errorLogAndNotify } from "util/CommonUtil"
+import useSparks from "components/custom-hook/spark/useSparks"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import SparkSkeletonComponent from "components/views/admin/sparks/general-sparks-view/SparkSkeletonComponent"
+import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -45,27 +50,10 @@ const PortalPage = ({
    serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
+   sparks,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
-   const [sparks, setSparks] = useState<Spark[]>([])
    const router = useRouter()
-
-   const sparksQuery = useMemo(() => {
-      return sparksRepo.getSparks({ limit: 8 })
-   }, [])
-
-   const loadSparks = async () => {
-      try {
-         const sparks = await sparksQuery
-         setSparks(sparks)
-      } catch (error) {
-         errorLogAndNotify(error)
-      }
-   }
-
-   useEffect(() => {
-      loadSparks()
-   }, [userData])
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -133,7 +121,7 @@ const PortalPage = ({
                                        Sparks
                                     </Heading>
                                     <SparksCarousel
-                                       sparks={sparks}
+                                       sparks={JSON.parse(sparks) as Spark[]}
                                        onSparkClick={handleSparksClicked}
                                        isAdmin={false}
                                     />
@@ -177,7 +165,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
          limit: 6,
       }),
-      getLivestreamDialogData(ctx)
+      getLivestreamDialogData(ctx),
+      getServerSideSparks(8)
    )
 
    // only adds recording request if token has email
@@ -195,6 +184,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       comingUpNextEvents,
       pastEvents,
       livestreamDialogData,
+      sparks,
       recordedEvents,
       userStats,
       userData,
@@ -234,6 +224,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
                CarouselContentService.serializeContent(carouselContent),
          }),
          livestreamDialogData,
+         sparks: sparks ? JSON.stringify(sparks) : null,
       },
    }
 }

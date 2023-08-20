@@ -1,10 +1,9 @@
+import { FC, ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
 import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { FC, ReactNode, useState } from "react"
-import { deleteUserFailSelector } from "store/selectors/authSelectors"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -49,7 +48,7 @@ type PropType = {
 
 const SparksCarousel: FC<PropType> = (props) => {
    const { options, sparks, onSparkClick, children, isAdmin } = props
-   const [emblaRef, emblaApi] = useEmblaCarousel(options)
+   const [emblaRef] = useEmblaCarousel(options)
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>

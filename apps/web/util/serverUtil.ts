@@ -12,8 +12,9 @@ import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
 } from "components/views/company-page/EventSection"
-import { livestreamRepo } from "data/RepositoryInstances"
+import { livestreamRepo, sparksRepo } from "data/RepositoryInstances"
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -205,4 +206,9 @@ export const getLivestreamsAndDialogData = async (
       serverSidePastLivestreams,
       livestreamDialogData,
    }
+}
+
+export const getServerSideSparks = async (limit?: number): Promise<Spark[]> => {
+   // @ts-ignore
+   return sparksRepo.getSparks(limit)
 }
