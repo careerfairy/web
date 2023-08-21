@@ -17,10 +17,9 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import DateUtil from "../../util/DateUtil"
-import { Box, Stack } from "@mui/material"
+import { Box } from "@mui/material"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import {
-   getServerSideSparks,
    getServerSideUserData,
    getServerSideUserStats,
    getUserTokenFromCookie,
@@ -35,10 +34,8 @@ import {
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
-import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import Heading from "components/views/portal/common/Heading"
-import PortalSparksContentCarousel from "components/views/portal/sparks/PortalSparksContentCarousel"
+import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -46,7 +43,6 @@ const PortalPage = ({
    serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
-   sparks,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
@@ -68,16 +64,10 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
-   const sparksContent = useMemo<Spark[]>(() => {
-      return JSON.parse(sparks)
-   }, [sparks])
-
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
       return router.push(`/sparks/${spark.id}`)
    }
-
-   const hasSparks = Boolean(sparksContent?.length)
 
    return (
       <>
@@ -109,12 +99,9 @@ const PortalPage = ({
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
                            ) : null}
-                           {hasSparks ? (
-                              <PortalSparksContentCarousel
-                                 sparksContent={sparksContent}
-                                 handleSparksClicked={handleSparksClicked}
-                              />
-                           ) : null}
+                           <SparksCarouselWithSuspenseComponent
+                              handleSparksClicked={handleSparksClicked}
+                           />
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
                               limit={20}
@@ -152,8 +139,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
          limit: 6,
       }),
-      getLivestreamDialogData(ctx),
-      getServerSideSparks(8)
+      getLivestreamDialogData(ctx)
    )
 
    // only adds recording request if token has email
@@ -171,7 +157,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       comingUpNextEvents,
       pastEvents,
       livestreamDialogData,
-      sparks,
       recordedEvents,
       userStats,
       userData,
@@ -211,7 +196,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
                CarouselContentService.serializeContent(carouselContent),
          }),
          livestreamDialogData,
-         sparks: sparks ? JSON.stringify(sparks) : null,
       },
    }
 }

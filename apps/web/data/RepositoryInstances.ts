@@ -76,7 +76,3 @@ export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
    FieldValue,
    Timestamp
 )
-
-export const sparksRepo: ISparksRepository = new FirebaseSpaksRepository(
-   firestoreInstance
-)
