@@ -69,7 +69,7 @@ const SparksCarousel: FC<PropType> = (props) => {
                        )}
                     </Box>
                  ))
-               : children.map((child, i) => (
+               : children?.map((child, i) => (
                     <Box key={i} sx={styles.slide}>
                        {child}
                     </Box>

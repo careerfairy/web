@@ -210,5 +210,6 @@ export const getLivestreamsAndDialogData = async (
 
 export const getServerSideSparks = async (limit?: number): Promise<Spark[]> => {
    // @ts-ignore
-   return sparksRepo.getSparks(limit)
+   const sparks = await sparksRepo.getSparks(limit)
+   return []
 }
