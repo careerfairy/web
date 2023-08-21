@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { useRouter } from "next/router"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
@@ -8,7 +8,7 @@ import WidgetsWrapper from "../../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../../components/util/SEO"
-import { livestreamRepo, sparksRepo } from "../../data/RepositoryInstances"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
@@ -38,11 +38,6 @@ import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/We
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Heading from "components/views/portal/common/Heading"
-import { errorLogAndNotify } from "util/CommonUtil"
-import useSparks from "components/custom-hook/spark/useSparks"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import SparkSkeletonComponent from "components/views/admin/sparks/general-sparks-view/SparkSkeletonComponent"
-import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -121,7 +116,11 @@ const PortalPage = ({
                                        Sparks
                                     </Heading>
                                     <SparksCarousel
-                                       sparks={JSON.parse(sparks) as Spark[]}
+                                       sparks={
+                                          sparks
+                                             ? (JSON.parse(sparks) as Spark[])
+                                             : []
+                                       }
                                        onSparkClick={handleSparksClicked}
                                        isAdmin={false}
                                     />
