@@ -2,13 +2,13 @@ import {
    SerializedSpark,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Box, Button, Card, Stack, Typography } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import { useEffect, useMemo } from "react"
+import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
@@ -17,23 +17,20 @@ import {
    setGroupId,
    setSparks,
    setUserEmail,
-   swipeNextSpark,
-   swipePreviousSpark,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
-   currentSparkIndexSelector,
    fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
-   isFetchingInitialSparksSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
-   numberOfSparksToFetchSelector,
-   totalNumberOfSparksSelector,
+   sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
+import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -44,14 +41,11 @@ const SparksPage: NextPage<
 
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
-   const isFetchingInitialSparks = useSelector(isFetchingInitialSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
-   const totalNumberOfSparks = useSelector(totalNumberOfSparksSelector)
    const activeSpark = useSelector(activeSparkSelector)
-   const curentIndex = useSelector(currentSparkIndexSelector)
-   const numberOfSparksToFetch = useSelector(numberOfSparksToFetchSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
+   const sparks = useSelector(sparksSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -131,39 +125,12 @@ const SparksPage: NextPage<
    }, [sparkForSeo?.id])
 
    return (
-      <GenericDashboardLayout topBarFixed topBarTransparent>
-         <Box>
-            <Typography>
-               Spark: {curentIndex + 1} / {totalNumberOfSparks}
-            </Typography>
-            {activeSpark ? (
-               <Card>
-                  <Box>{activeSpark?.question}</Box>
-                  <Box>{activeSpark?.id}</Box>
-               </Card>
-            ) : null}
-            {isFetchingNextSparks ? (
-               <Typography>
-                  Fetching another {numberOfSparksToFetch} sparks...
-               </Typography>
-            ) : null}
-            {isFetchingInitialSparks ? (
-               <Typography>Fetching initial feed...</Typography>
-            ) : null}
-            {hasNoMoreSparks ? (
-               <Typography>There are no more sparks to fetch.</Typography>
-            ) : null}
-            <Stack direction="row">
-               <Button onClick={() => dispatch(swipePreviousSpark())}>
-                  Prev Slide
-               </Button>
-               <Button onClick={() => dispatch(swipeNextSpark())}>
-                  Next Slide
-               </Button>
-            </Stack>
-            <SparkSeo spark={sparkForSeo} />
-         </Box>
-      </GenericDashboardLayout>
+      <Fragment>
+         <GenericDashboardLayout topBarFixed topBarTransparent>
+            <SparksFeedCarousel />
+         </GenericDashboardLayout>
+         <SparkSeo spark={sparkForSeo} />
+      </Fragment>
    )
 }
 

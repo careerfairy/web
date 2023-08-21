@@ -39,3 +39,5 @@ export const numberOfSparksToFetchSelector = (state: RootState) =>
 
 export const fetchNextErrorSelector = (state: RootState) =>
    state.sparksFeed.fetchNextError
+
+export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
