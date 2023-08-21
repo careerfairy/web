@@ -2,12 +2,13 @@ import {
    SerializedSpark,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Box, Button } from "@mui/material"
+import { Button } from "@mui/material"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
+import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -29,8 +30,6 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -156,6 +155,12 @@ export const getServerSideProps: GetServerSideProps<
    const sparkId = context.params.sparkId
 
    const sparkFromService = await sparkService.getSparkById(sparkId)
+
+   if (!sparkFromService) {
+      return {
+         notFound: true,
+      }
+   }
 
    return {
       props: {
