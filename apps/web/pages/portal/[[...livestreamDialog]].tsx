@@ -38,6 +38,7 @@ import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/We
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Heading from "components/views/portal/common/Heading"
+import PortalSparksContentCarousel from "components/views/portal/sparks/PortalSparksContentCarousel"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -54,8 +55,6 @@ const PortalPage = ({
       authenticatedUser.email || userData?.interestsIds
    )
 
-   const hasSparks = Boolean(sparks?.length)
-
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
 
    const comingUpNext = useMemo(
@@ -69,10 +68,16 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
+   const sparksContent = useMemo<Spark[]>(() => {
+      return JSON.parse(sparks)
+   }, [sparks])
+
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
       return router.push(`/sparks/${spark.id}`)
    }
+
+   const hasSparks = Boolean(sparksContent?.length)
 
    return (
       <>
@@ -105,27 +110,10 @@ const PortalPage = ({
                               <RecommendedEvents limit={10} />
                            ) : null}
                            {hasSparks ? (
-                              <Box sx={{ px: 2 }}>
-                                 <Stack
-                                    direction={"column"}
-                                    sx={{ gap: "10px" }}
-                                 >
-                                    <Heading
-                                       sx={{ textTransform: "uppercase" }}
-                                    >
-                                       Sparks
-                                    </Heading>
-                                    <SparksCarousel
-                                       sparks={
-                                          sparks
-                                             ? (JSON.parse(sparks) as Spark[])
-                                             : []
-                                       }
-                                       onSparkClick={handleSparksClicked}
-                                       isAdmin={false}
-                                    />
-                                 </Stack>
-                              </Box>
+                              <PortalSparksContentCarousel
+                                 sparksContent={sparksContent}
+                                 handleSparksClicked={handleSparksClicked}
+                              />
                            ) : null}
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
