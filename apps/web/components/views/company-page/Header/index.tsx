@@ -181,7 +181,7 @@ const Header = () => {
    const { group, editMode, sectionRefs } = useCompanyPage()
    const theme = useTheme()
 
-   const { logoUrl, universityName, publicSparks = true } = group
+   const { logoUrl, universityName, publicSparks } = group
 
    const isSticky =
       elementIsTop &&
