@@ -14,10 +14,11 @@ import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
 import HighlightVideoDialog from "../HighlightVideoDialog"
 import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
-import { CarouselContent } from "./CarouselContentService"
+import { CTASlide, CarouselContent } from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import LivestreamContent from "./LivestreamContent"
 import WatchSparksCTAContent from "./WatchSparksCTAContent"
+import { getCtaSnackBarProps } from "components/util/constants/callToActions"
 
 const styles = sxStyles({
    wrapper: {
@@ -119,6 +120,20 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
       resetMinutes()
    }, [resetMinutes])
 
+   const getCTASlide = useCallback((contentItem: CTASlide) => {
+      switch (contentItem.topic) {
+         case "CareerCoins": {
+            return <BuyCreditsCTAContent cta={contentItem} />
+         }
+         case "Sparks": {
+            return <WatchSparksCTAContent cta={contentItem} />
+         }
+         default: {
+            return null
+         }
+      }
+   }, [])
+
    return (
       <>
          <AutoPlaySwipeableViews
@@ -138,11 +153,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                if (contentItem.contentType === "CTASlide") {
                   return (
                      <Box sx={styles.wrapper} key={index}>
-                        {contentItem.topic == "CareerCoins" ? (
-                           <BuyCreditsCTAContent cta={contentItem} />
-                        ) : (
-                           <WatchSparksCTAContent cta={contentItem} />
-                        )}
+                        {getCTASlide(contentItem)}
                      </Box>
                   )
                }
