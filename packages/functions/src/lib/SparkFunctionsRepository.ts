@@ -249,17 +249,7 @@ export class SparkFunctionsRepository
          .orderBy("createdAt", "desc")
          .get()
 
-      if (!snapshot.empty) {
-         return snapshot.docs?.map(
-            (doc) =>
-               ({
-                  id: doc.id,
-                  ...doc.data(),
-               } as Spark)
-         )
-      }
-
-      return snapshot.docs?.map((doc) => doc.data())
+      return snapshot.docs.map((doc) => doc.data())
    }
 }
 
