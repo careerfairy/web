@@ -26,7 +26,6 @@ import {
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
-   sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
@@ -44,7 +43,6 @@ const SparksPage: NextPage<
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
-   const sparks = useSelector(sparksSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -125,7 +123,7 @@ const SparksPage: NextPage<
 
    return (
       <Fragment>
-         <GenericDashboardLayout topBarFixed topBarTransparent>
+         <GenericDashboardLayout topBarFixed topBarTransparent hideFooter>
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />

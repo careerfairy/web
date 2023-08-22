@@ -16,6 +16,10 @@ export const isFetchingNextSparksSelector = (state: RootState) =>
 export const isFetchingInitialSparksSelector = (state: RootState) =>
    state.sparksFeed.initialFetchStatus === "loading"
 
+export const isFetchingSparksSelector = (state: RootState) =>
+   state.sparksFeed.initialFetchStatus === "loading" ||
+   state.sparksFeed.fetchNextSparksStatus === "loading"
+
 export const initialSparksFetchedSelector = (state: RootState) =>
    state.sparksFeed.initialSparksFetched === true
 
