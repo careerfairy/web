@@ -1,9 +1,10 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import Box from "@mui/material/Box"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import SparksFeedCard from "components/views/sparks/components/spark-card/SparksFeedCard"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import FeedCardActions from "./FeedCardActions"
+import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const styles = sxStyles({
    root: {},
@@ -12,9 +13,9 @@ const styles = sxStyles({
       bottom: "0",
       right: "0",
       transform: "translate(100%, 0)",
-      border: "2px solid purple",
+      pl: 2.25,
    },
-   mobileActionsWrapper: {
+   fullScreenActionsWrapper: {
       position: "absolute",
       bottom: "0",
       right: "0",
@@ -22,10 +23,9 @@ const styles = sxStyles({
    },
    aspectRatioBox: {
       aspectRatio: "9 / 16",
-      backgroundColor: "red",
       position: "relative",
    },
-   mobileAspectRatioBox: {
+   fullScreenAspectRatioBox: {
       aspectRatio: "auto",
       width: "100%",
    },
@@ -36,8 +36,8 @@ type Props = {
    playing: boolean
 }
 
-const FeedCard: FC<Props> = ({ spark, playing }) => {
-   const isMobile = useIsMobile()
+const FeedCardSlide: FC<Props> = ({ spark, playing }) => {
+   const isFullScreen = useSparksFeedIsFullScreen()
 
    return (
       <Box
@@ -49,10 +49,11 @@ const FeedCard: FC<Props> = ({ spark, playing }) => {
          <Box
             sx={[
                styles.aspectRatioBox,
-               isMobile && styles.mobileAspectRatioBox,
+               isFullScreen && styles.fullScreenAspectRatioBox,
             ]}
          >
-            <ActionsWrapper mobile={isMobile}>
+            <SparksFeedCard spark={spark} />
+            <ActionsWrapper fullScreen={isFullScreen}>
                <FeedCardActions />
             </ActionsWrapper>
          </Box>
@@ -61,15 +62,20 @@ const FeedCard: FC<Props> = ({ spark, playing }) => {
 }
 
 type ActionsWrapperProps = {
-   mobile: boolean
+   fullScreen: boolean
 }
 
-const ActionsWrapper: FC<ActionsWrapperProps> = ({ children, mobile }) => {
+const ActionsWrapper: FC<ActionsWrapperProps> = ({ children, fullScreen }) => {
    return (
-      <Box sx={[styles.actionsWrapper, mobile && styles.mobileActionsWrapper]}>
+      <Box
+         sx={[
+            styles.actionsWrapper,
+            fullScreen && styles.fullScreenActionsWrapper,
+         ]}
+      >
          {children}
       </Box>
    )
 }
 
-export default FeedCard
+export default FeedCardSlide

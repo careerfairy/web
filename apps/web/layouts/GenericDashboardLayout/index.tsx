@@ -76,6 +76,10 @@ type Props = {
     * If true, the footer will be hidden
     */
    hideFooter?: boolean
+   /**
+    * If true, the left drawer will be hidden
+    */
+   hideDrawer?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -87,6 +91,7 @@ const GenericDashboardLayout = ({
    headerScrollThreshold = 10,
    topBarTransparent,
    hideFooter,
+   hideDrawer,
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -172,6 +177,7 @@ const GenericDashboardLayout = ({
                bgColor={bgColor || "#F7F8FC"}
                headerContent={<TopBar title={pageDisplayName} />}
                drawerContent={<NavBar />}
+               hideDrawer={hideDrawer}
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
