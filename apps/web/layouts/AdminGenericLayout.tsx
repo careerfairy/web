@@ -110,6 +110,7 @@ type Props = {
    toggleDrawer?: () => void
    bgColor?: string
    topBarTransparent?: boolean
+   hideDrawer?: boolean
 }
 const AdminGenericLayout: React.FC<Props> = ({
    children,
@@ -122,6 +123,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    toggleDrawer,
    bgColor,
    topBarTransparent = false,
+   hideDrawer,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -143,9 +145,14 @@ const AdminGenericLayout: React.FC<Props> = ({
          ]}
       >
          {/* drawer */}
-         <DrawerComponent drawerOpen={drawerOpen} drawerToggle={toggleDrawer}>
-            {drawerContent}
-         </DrawerComponent>
+         {hideDrawer ? null : (
+            <DrawerComponent
+               drawerOpen={drawerOpen}
+               drawerToggle={toggleDrawer}
+            >
+               {drawerContent}
+            </DrawerComponent>
+         )}
 
          <Box
             sx={[

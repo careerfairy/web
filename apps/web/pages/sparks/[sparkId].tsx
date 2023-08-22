@@ -9,6 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
+import useSparksFeedIsFullScreen from "pages/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -33,6 +34,8 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedSpark, groupId, userEmail }) => {
+   const isFullScreen = useSparksFeedIsFullScreen()
+
    const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
    const { replace, query } = useRouter()
@@ -123,7 +126,12 @@ const SparksPage: NextPage<
 
    return (
       <Fragment>
-         <GenericDashboardLayout topBarFixed topBarTransparent hideFooter>
+         <GenericDashboardLayout
+            hideDrawer={isFullScreen}
+            topBarFixed
+            topBarTransparent
+            hideFooter
+         >
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />

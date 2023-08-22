@@ -9,15 +9,15 @@ import { FC, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { swipeNextSparkByIndex } from "store/reducers/sparksFeedReducer"
 
-import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    currentSparkIndexSelector,
    isFetchingSparksSelector,
    sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../components/custom-hook/embla-carousel/useKeyboardNavigation"
-import FeedCard from "./FeedCard"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
+import FeedCardSlide from "./FeedCardSlide"
+import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const slideSpacing = 32 // in pixels, equivalent to 1rem
 const slideHeight = "90%" // in pixels, equivalent to 19rem
@@ -36,7 +36,7 @@ const styles = sxStyles({
       position: "relative",
       backgroundColor: "#F7F8FC",
    },
-   mobileViewport: {
+   fullScreenViewport: {
       height: "100dvh",
       position: "fixed",
       width: "100%",
@@ -52,7 +52,7 @@ const styles = sxStyles({
       flexDirection: "column",
       width: "100%",
    },
-   mobileContainer: {
+   fullScreenContainer: {
       height: "100%",
       marginTop: 0,
    },
@@ -65,7 +65,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
    },
-   mobileSlide: {
+   fullScreenSlide: {
       flex: "1 0 auto",
       height: "100%",
       paddingTop: 0,
@@ -86,7 +86,7 @@ const styles = sxStyles({
 })
 
 const SparksFeedCarousel: FC = () => {
-   const isMobile = useIsMobile()
+   const isFullScreen = useSparksFeedIsFullScreen()
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
 
    const dispatch = useDispatch()
@@ -147,28 +147,30 @@ const SparksFeedCarousel: FC = () => {
 
    return (
       <Box
-         sx={[styles.viewport, isMobile && styles.mobileViewport]}
+         sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
          ref={emblaRef}
       >
-         <Box sx={[styles.container, isMobile && styles.mobileContainer]}>
+         <Box
+            sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
+         >
             {sparks.map((spark, index) => (
                <Box
-                  sx={[styles.slide, isMobile && styles.mobileSlide]}
+                  sx={[styles.slide, isFullScreen && styles.fullScreenSlide]}
                   key={spark.id}
                >
-                  <FeedCard
+                  <FeedCardSlide
                      playing={index === currentPlayingIndex}
                      spark={spark}
                   />
                </Box>
             ))}
             <Collapse in={isFetchingSparks} unmountOnExit>
-               <Box sx={[styles.slide, isMobile && styles.mobileSlide]}>
+               <Box sx={[styles.slide, isFullScreen && styles.fullScreenSlide]}>
                   <CircularProgress />
                </Box>
             </Collapse>
          </Box>
-         {isMobile ? (
+         {isFullScreen ? (
             <Box sx={styles.closeBtn}>
                <CloseSparksFeedButton />
             </Box>
