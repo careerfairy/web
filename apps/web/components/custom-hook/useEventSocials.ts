@@ -10,13 +10,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { makeLivestreamEventDetailsInviteUrl } from "../../util/makeUrls"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-
-export interface SocialIconProps {
-   icon: typeof LinkedInIcon
-   name: string
-   onClick?: () => any
-   href?: string
-}
+import { SocialIconProps, SocialPlatformObject } from "./useSocials"
 
 const useEventSocials = (event: LivestreamEvent) => {
    const { userData } = useAuth()
@@ -59,6 +53,7 @@ const useEventSocials = (event: LivestreamEvent) => {
                   medium: "LinkedIn",
                })
             },
+            type: SocialPlatformObject.Linkedin,
          },
          {
             icon: FacebookIcon,
@@ -73,6 +68,7 @@ A redirect uri can be added to track where users are coming from internally or f
                   medium: "Facebook",
                })
             },
+            type: SocialPlatformObject.Facebook,
          },
          {
             icon: TwitterIcon,
@@ -83,11 +79,13 @@ A redirect uri can be added to track where users are coming from internally or f
                   medium: "Twitter",
                })
             },
+            type: SocialPlatformObject.X,
          },
          {
             icon: EmailIcon,
             name: "Email",
             href: `mailto:?subject=${event?.title}&body=${encodedEventUrl}`,
+            type: SocialPlatformObject.Email,
          },
          {
             icon: ShareIcon,
@@ -99,6 +97,7 @@ A redirect uri can be added to track where users are coming from internally or f
                   medium: "Copy Link",
                })
             },
+            type: SocialPlatformObject.Copy,
          },
       ]
    }, [
