@@ -66,7 +66,10 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
             />
             <Box mr={1.25} />
             <Box flexGrow={1} />
-            <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
+            <NewTag
+               sparkCreatedDate={spark.createdAt.toDate()}
+               visible={showAdminOptions}
+            />
             {showAdminOptions ? (
                <Fragment>
                   <Box width={20} />

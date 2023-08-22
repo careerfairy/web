@@ -24,11 +24,7 @@ type Props = {
    onClick?: () => void
 }
 
-const SparkCarouselCardForAdmin: FC<Props> = ({
-   spark,
-   onClick,
-   preview = false,
-}) => {
+const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
    return (
       <SparkCarouselCardContainer
          video={{
@@ -53,4 +49,4 @@ const SparkCarouselCardForAdmin: FC<Props> = ({
    )
 }
 
-export default SparkCarouselCardForAdmin
+export default SparkCarouselCard
