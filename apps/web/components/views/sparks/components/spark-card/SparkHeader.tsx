@@ -8,7 +8,6 @@ import { DateTime } from "luxon"
 import { FC, Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkOptionsButton from "./SparkOptionsButton"
-import { Timestamp } from "data/firebase/FirebaseInstance"
 
 const styles = sxStyles({
    root: {
@@ -51,18 +50,6 @@ type Props = {
 }
 
 const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
-   const handleSparkCreatedDate = () => {
-      // Convert the timestamp string to a Date object
-      const date = new Date(`${spark.createdAt}`)
-
-      // Get the time in milliseconds since the epoch
-      const millisecondsSinceEpoch = date.getTime()
-
-      // Convert the milliseconds to seconds
-      const secondsSinceEpoch = Math.floor(millisecondsSinceEpoch / 1000)
-
-      return new Timestamp(secondsSinceEpoch, 0)
-   }
    return (
       <Fragment>
          <Box sx={styles.root}>
@@ -79,7 +66,7 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
             />
             <Box mr={1.25} />
             <Box flexGrow={1} />
-            <NewTag sparkCreatedDate={handleSparkCreatedDate().toDate()} />
+            <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
             {showAdminOptions ? (
                <Fragment>
                   <Box width={20} />
@@ -119,11 +106,14 @@ const SparkCreatorDetails: FC<SparkCreatorDetailsProps> = ({
 
 type NewTagProps = {
    sparkCreatedDate: Date
+   visible?: boolean
 }
 
 const oneDayAgo = DateTime.now().minus({ days: 1 }).toJSDate()
 
-const NewTag: FC<NewTagProps> = ({ sparkCreatedDate }) => {
+const NewTag: FC<NewTagProps> = ({ sparkCreatedDate, visible = false }) => {
+   // Display only where is necessary
+   if (!visible) return null
    // only show new tag if spark was created within the last 1 day
    if (sparkCreatedDate < oneDayAgo) {
       return null
