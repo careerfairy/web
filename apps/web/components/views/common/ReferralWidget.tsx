@@ -3,13 +3,12 @@ import Stack, { StackProps } from "@mui/material/Stack"
 import { alpha, useTheme } from "@mui/material/styles"
 import {
    Box,
-   Button,
    IconButton,
    Tooltip,
    Typography,
    useMediaQuery,
 } from "@mui/material"
-import { StylesProps, sxStyles } from "../../../types/commonTypes"
+import { sxStyles } from "../../../types/commonTypes"
 import { SocialIconProps } from "../../custom-hook/useSocials"
 import Image from "next/image"
 
