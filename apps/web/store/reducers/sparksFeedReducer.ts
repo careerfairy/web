@@ -96,8 +96,9 @@ const sparksFeedSlice = createSlice({
          state.userEmail = action.payload
       },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
-         if (action.payload <= state.sparks.length) {
-            state.currentPlayingIndex = action.payload
+         const newIndex = action.payload
+         if (newIndex >= 0 && newIndex < state.sparks.length) {
+            state.currentPlayingIndex = newIndex
          }
       },
       resetSparksFeed: (state) => {
