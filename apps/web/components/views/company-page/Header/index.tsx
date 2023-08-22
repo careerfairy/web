@@ -22,6 +22,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import Link from "../../common/Link"
 import BannerIllustration from "./BannerIllustration"
+import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -156,6 +157,16 @@ const styles = sxStyles({
    headerWrapper: {
       border: "2px solid red",
    },
+   badge: {
+      bgcolor: "unset",
+      color: "unset",
+      ml: 1,
+
+      "& svg": {
+         width: 32,
+         height: 32,
+      },
+   },
 })
 
 const ToolbarOffset = styled("div")(({ theme }) => theme.mixins.toolbar)
@@ -170,7 +181,7 @@ const Header = () => {
    const { group, editMode, sectionRefs } = useCompanyPage()
    const theme = useTheme()
 
-   const { logoUrl, universityName } = group
+   const { logoUrl, universityName, publicSparks = true } = group
 
    const isSticky =
       elementIsTop &&
@@ -282,6 +293,11 @@ const Header = () => {
                         >
                            {universityName}
                         </Typography>
+                        {!isSticky && publicSparks ? (
+                           <Avatar sx={styles.badge}>
+                              <PublicSparksBadge />
+                           </Avatar>
+                        ) : null}
                      </Box>
                      <Box sx={styles.navigatorTabs}>
                         <Box
