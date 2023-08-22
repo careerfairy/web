@@ -14,12 +14,15 @@ const styles = sxStyles({
       right: "0",
       transform: "translate(100%, 0)",
       pl: 2.25,
+      pb: 4,
    },
    fullScreenActionsWrapper: {
       position: "absolute",
       bottom: "0",
       right: "0",
       transform: "none",
+      pr: 1.5,
+      pb: 3.25,
    },
    aspectRatioBox: {
       aspectRatio: "9 / 16",

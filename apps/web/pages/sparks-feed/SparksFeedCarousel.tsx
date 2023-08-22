@@ -19,8 +19,8 @@ import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
-const slideSpacing = 32 // in pixels, equivalent to 1rem
-const slideHeight = "90%" // in pixels, equivalent to 19rem
+const slideSpacing = 32 // in pixels
+const slideHeight = "90%"
 const slideSize = "100%"
 
 const styles = sxStyles({
@@ -141,7 +141,7 @@ const SparksFeedCarousel: FC = () => {
             emblaApi.off("select", onSelect)
          }
       }
-   }, [emblaApi, dispatch, sparks.length])
+   }, [emblaApi, dispatch])
 
    useKeyboardNavigation(emblaApi, "upDown")
 
@@ -154,20 +154,17 @@ const SparksFeedCarousel: FC = () => {
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
             {sparks.map((spark, index) => (
-               <Box
-                  sx={[styles.slide, isFullScreen && styles.fullScreenSlide]}
-                  key={spark.id}
-               >
+               <Slide fullScreen={isFullScreen} key={spark.id}>
                   <FeedCardSlide
                      playing={index === currentPlayingIndex}
                      spark={spark}
                   />
-               </Box>
+               </Slide>
             ))}
             <Collapse in={isFetchingSparks} unmountOnExit>
-               <Box sx={[styles.slide, isFullScreen && styles.fullScreenSlide]}>
+               <Slide fullScreen={isFullScreen}>
                   <CircularProgress />
-               </Box>
+               </Slide>
             </Collapse>
          </Box>
          {isFullScreen ? (
@@ -175,6 +172,17 @@ const SparksFeedCarousel: FC = () => {
                <CloseSparksFeedButton />
             </Box>
          ) : null}
+      </Box>
+   )
+}
+
+type SlideProps = {
+   fullScreen: boolean
+}
+const Slide: FC<SlideProps> = ({ children, fullScreen }) => {
+   return (
+      <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]}>
+         {children}
       </Box>
    )
 }
