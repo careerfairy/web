@@ -6,6 +6,8 @@ import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import { sparkService } from "data/firebase/SparksService"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -24,6 +26,7 @@ export type CTASlide = {
    contentType: "CTASlide"
    topic: CTASlideTopic
 }
+export const MAX_CTA_DISPLAY_COUNT = 5
 
 export type CarouselContent = CTASlide | LivestreamEventWithType
 export type SerializedContent =
@@ -162,6 +165,7 @@ export class CarouselContentService {
          this.options.userData,
          "CareerCoins"
       )
+
       // If the user has not bought a recording, add slide before the content
       if (!this.userHasBoughtRecording() && shouldSeeCreditsCTABanner) {
          content = [
@@ -178,8 +182,8 @@ export class CarouselContentService {
          this.options.userData,
          "Sparks"
       )
-      // TODO: add check for whether user has watched any sparks yet (from Habib's PR)
-      if (shouldSeeSparksCTABanner) {
+      const userHasSeenASpark = await this.userHasSeenASpark()
+      if (!userHasSeenASpark && shouldSeeSparksCTABanner) {
          content = [
             {
                contentType: "CTASlide",
@@ -205,6 +209,15 @@ export class CarouselContentService {
 
    private userHasBoughtRecording(): boolean {
       return Boolean(this.options.userStats?.recordingsBought?.length)
+   }
+
+   private async userHasSeenASpark(): Promise<boolean> {
+      const userId = this.options.userData?.authId
+      if (userId) {
+         return await sparkService.hasUserSeenAnySpark(userId)
+      } else {
+         return false
+      }
    }
 
    static serializeContent(content: CarouselContent[]): SerializedContent[] {
@@ -243,6 +256,57 @@ export class CarouselContentService {
          })
          .filter(Boolean)
    }
+
+   static incrementCTABannerViewCount(
+      inView: boolean,
+      userData: UserData,
+      bannerType: CTASlideTopic
+   ) {
+      if (inView) {
+         let userDates
+         if (userData) {
+            switch (bannerType) {
+               case "CareerCoins": {
+                  userDates = userData.creditsBannerCTADates
+                  break
+               }
+               case "Sparks": {
+                  userDates = userData.sparksBannerCTADates
+                  break
+               }
+            }
+         }
+         userDates = userDates ? userDates : []
+         const today = DateUtil.formatDateToString(new Date())
+
+         const shouldIncrementBannerDisplayCount =
+            // Only increment if user hasn't seen the banner today
+            !userDates.includes(today) &&
+            // Only increment if user hasn't seen the banner 5 times
+            userDates.length < MAX_CTA_DISPLAY_COUNT
+
+         if (shouldIncrementBannerDisplayCount) {
+            let addDatePromise: Promise<void>
+            switch (bannerType) {
+               case "CareerCoins": {
+                  addDatePromise =
+                     firebaseServiceInstance.addDateUserHasSeenCreditsCTABanner(
+                        userData.userEmail
+                     )
+                  break
+               }
+               case "Sparks": {
+                  addDatePromise =
+                     firebaseServiceInstance.addDateUserHasSeenSparksCTABanner(
+                        userData.userEmail
+                     )
+                  break
+               }
+            }
+            addDatePromise.catch(console.error)
+         }
+      }
+   }
 }
 
 const filterStreamsForUnregisteredUsersAndNonBuyers = (
@@ -280,8 +344,6 @@ export const filterNonRegisteredStreams = (
    })
 }
 
-export const MAX_CTA_DISPLAY_COUNT = 5
-
 /**
  * Determines whether the user should see the given CTA (Call-to-Action) banner today.
  *
@@ -292,19 +354,29 @@ const userShouldSeeCTABannerToday = (
    userData: UserData,
    bannerType: CTASlideTopic
 ): boolean => {
-   const creditsBannerCTADates =
-      (bannerType == "CareerCoins"
-         ? userData?.creditsBannerCTADates
-         : userData?.sparksBannerCTADates) || []
+   let bannerCTADates
+   if (userData) {
+      switch (bannerType) {
+         case "CareerCoins": {
+            bannerCTADates = userData.creditsBannerCTADates
+            break
+         }
+         case "Sparks": {
+            bannerCTADates = userData.sparksBannerCTADates
+            break
+         }
+      }
+   }
+   bannerCTADates = bannerCTADates ? bannerCTADates : []
    const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
 
-   const numberOfTimesBannerDisplayed = creditsBannerCTADates.length
+   const numberOfTimesBannerDisplayed = bannerCTADates.length
 
    const isBelowMaxDisplayCount =
       numberOfTimesBannerDisplayed < MAX_CTA_DISPLAY_COUNT
 
    const todayIsTheLastDisplayDate =
-      creditsBannerCTADates.includes(today) &&
+      bannerCTADates.includes(today) &&
       numberOfTimesBannerDisplayed === MAX_CTA_DISPLAY_COUNT
 
    return isBelowMaxDisplayCount || todayIsTheLastDisplayDate
