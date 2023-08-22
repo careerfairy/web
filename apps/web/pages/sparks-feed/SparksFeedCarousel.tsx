@@ -17,6 +17,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../components/custom-hook/embla-carousel/useKeyboardNavigation"
 import FeedCard from "./FeedCard"
+import CloseSparksFeedButton from "./CloseSparksFeedButton"
 
 const slideSpacing = 32 // in pixels, equivalent to 1rem
 const slideHeight = "90%" // in pixels, equivalent to 19rem
@@ -32,6 +33,8 @@ const styles = sxStyles({
       display: "flex",
       flexGrow: 1,
       height: "calc(100dvh - 64px - 3.2rem)",
+      position: "relative",
+      backgroundColor: "#F7F8FC",
    },
    mobileViewport: {
       height: "100dvh",
@@ -72,6 +75,13 @@ const styles = sxStyles({
       height: "100%",
       width: "100%",
       objectFit: "cover",
+   },
+   closeBtn: {
+      position: "fixed",
+      top: 0,
+      right: 0,
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      p: 1.5,
    },
 })
 
@@ -121,11 +131,7 @@ const SparksFeedCarousel: FC = () => {
       if (emblaApi) {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
-            if (index >= 0 && index < sparks.length) {
-               dispatch(swipeNextSparkByIndex(index))
-            } else {
-               console.log("Index out of bounds:", index)
-            }
+            dispatch(swipeNextSparkByIndex(index))
          }
 
          emblaApi.on("select", onSelect)
@@ -157,11 +163,16 @@ const SparksFeedCarousel: FC = () => {
                </Box>
             ))}
             <Collapse in={isFetchingSparks} unmountOnExit>
-               <Box sx={styles.slide}>
+               <Box sx={[styles.slide, isMobile && styles.mobileSlide]}>
                   <CircularProgress />
                </Box>
             </Collapse>
          </Box>
+         {isMobile ? (
+            <Box sx={styles.closeBtn}>
+               <CloseSparksFeedButton />
+            </Box>
+         ) : null}
       </Box>
    )
 }
