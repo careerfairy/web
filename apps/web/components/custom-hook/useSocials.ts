@@ -6,13 +6,28 @@ import { facebookAppId } from "../../constants/links"
 import TwitterIcon from "@mui/icons-material/Twitter"
 import EmailIcon from "@mui/icons-material/Email"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
+import WhatsAppIcon from "@mui/icons-material/WhatsApp"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+
+export const SocialPlatformObject = {
+   Facebook: "facebook",
+   X: "x",
+   Whatsapp: "whatsapp",
+   Email: "email",
+   Linkedin: "linkedin",
+   Copy: "copy",
+} as const
+
+export type SocialPlatformType =
+   (typeof SocialPlatformObject)[keyof typeof SocialPlatformObject]
 
 export interface SocialIconProps {
    icon: typeof LinkedInIcon
+   imageLink?: string
    name: string
    onClick?: () => any
    href?: string
+   type: SocialPlatformType
 }
 
 type Props = {
@@ -20,9 +35,17 @@ type Props = {
    title: string
    linkedinMessage: string
    twitterMessage: string
-   dataLayerEntityName: "company_page"
+   dataLayerEntityName: "company_page" | "sparks"
+   platforms?: SocialPlatformType[]
 }
-const useSocials = (props: Props) => {
+const useSocials = ({
+   url,
+   title,
+   linkedinMessage,
+   twitterMessage,
+   dataLayerEntityName,
+   platforms,
+}: Props) => {
    const [shareLinkTooltipMessage, setShareLinkTooltipMessage] =
       useState("Share")
 
@@ -43,19 +66,30 @@ const useSocials = (props: Props) => {
       }
    }, [state.value, clicked])
    return useMemo<SocialIconProps[]>(() => {
-      const linkedinMessage = encodeURIComponent(props?.linkedinMessage)
-      const twitterMessage = encodeURIComponent(props?.twitterMessage)
-      const encodedUrl = encodeURIComponent(props.url)
-      const encodedTitle = encodeURIComponent(props?.title)
+      const encodedLinkedinMessage = encodeURIComponent(linkedinMessage)
+      const encodedTwitterMessage = encodeURIComponent(twitterMessage)
+      const encodedUrl = encodeURIComponent(url)
+      const encodedTitle = encodeURIComponent(title)
 
-      const linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}%27s%20${linkedinMessage}&source=CareerFairy`
-      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedUrl}`
-      const twitterLink = `https://twitter.com/intent/tweet?url=${encodedUrl}&via=CareerFairy&related=CareerFairy&text=${twitterMessage}`
+      const linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${
+         encodedUrl + "UTM_source=LinkedIn"
+      }&title=${encodedTitle}%27s%20${encodedLinkedinMessage}&source=CareerFairy`
+      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${
+         encodedUrl + "UTM_source=Facebook"
+      }`
+      const twitterLink = `https://twitter.com/intent/tweet?url=${
+         encodedUrl + "UTM_source=X"
+      }&via=CareerFairy&related=CareerFairy&text=${encodedTwitterMessage}`
+      const whatsappLink = `whatsapp://send?text=${
+         encodedUrl + "UTM_source=WhatsApp"
+      }`
 
-      const eventName = `${props.dataLayerEntityName}_share`
-      return [
+      const eventName = `${dataLayerEntityName}_share`
+      const socials = [
          {
             icon: LinkedInIcon,
+            imageLink:
+               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Flinkedin.png?alt=media&token=6c3fea64-5ff3-45ef-b6c2-a3b5e3ba4c60",
             name: "LinkedIn",
             onClick: () => {
                window.open(linkedinLink, "_blank").focus()
@@ -63,9 +97,12 @@ const useSocials = (props: Props) => {
                   medium: "LinkedIn",
                })
             },
+            type: SocialPlatformObject.Linkedin,
          },
          {
             icon: FacebookIcon,
+            imageLink:
+               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Ffacebook.png?alt=media&token=e8be60d2-f445-4d21-ad19-2ba24af9c36e",
             name: "Facebook",
             onClick: () => {
                /*
@@ -77,41 +114,72 @@ A redirect uri can be added to track where users are coming from internally or f
                   medium: "Facebook",
                })
             },
+            type: SocialPlatformObject.Facebook,
          },
          {
             icon: TwitterIcon,
-            name: "Twitter",
+            imageLink:
+               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Fx.png?alt=media&token=d0605e29-6627-4510-8b80-31e84c3e6894",
+            name: "χ",
             onClick: () => {
                window.open(twitterLink, "_blank").focus()
                dataLayerEvent(eventName, {
                   medium: "Twitter",
                })
             },
+            type: SocialPlatformObject.X,
          },
          {
             icon: EmailIcon,
             name: "Email",
-            href: `mailto:?subject=${props?.title}&body=${encodedUrl}`,
+            href: `mailto:?subject=${title}&body=${encodedUrl}`,
+            type: SocialPlatformObject.Email,
          },
          {
             icon: ShareIcon,
             name: shareLinkTooltipMessage,
             onClick: () => {
                setClicked((prev) => !prev)
-               copyLinkToClipboard(props.url)
+               copyLinkToClipboard(url)
                dataLayerEvent(eventName, {
                   medium: "Copy Link",
                })
             },
+            type: SocialPlatformObject.Copy,
+         },
+         {
+            icon: WhatsAppIcon,
+            imageLink:
+               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Fwhatsapp.png?alt=media&token=54cac0cc-4640-463b-a6c7-35315663e6b6",
+            name: "WhatsApp",
+            onClick: () => {
+               window.open(whatsappLink, "_blank").focus()
+               dataLayerEvent(eventName, {
+                  medium: "WhatsApp",
+               })
+            },
+            type: SocialPlatformObject.Whatsapp,
          },
       ]
+
+      return platforms
+         ? socials
+              .filter((social) => platforms.includes(social.type))
+              .sort((social1, social2) =>
+                 platforms.indexOf(social1.type) <
+                 platforms.indexOf(social2.type)
+                    ? -1
+                    : 1
+              )
+         : socials
    }, [
-      props?.linkedinMessage,
-      props?.twitterMessage,
-      props.url,
-      props?.title,
-      props.dataLayerEntityName,
+      linkedinMessage,
+      twitterMessage,
+      url,
+      title,
+      dataLayerEntityName,
       shareLinkTooltipMessage,
+      platforms,
       copyLinkToClipboard,
    ])
 }
