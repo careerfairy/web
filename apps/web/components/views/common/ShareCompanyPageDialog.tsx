@@ -23,7 +23,7 @@ import { dataLayerEvent } from "../../../util/analyticsUtils"
 import { Group } from "@careerfairy/shared-lib/groups"
 import Image from "next/image"
 import ReferralWidget from "./ReferralWidget"
-import useSocials from "../../custom-hook/useSocials"
+import useSocials, { SocialPlatformObject } from "../../custom-hook/useSocials"
 import { sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
@@ -71,6 +71,13 @@ const ShareCompanyPageDialog: FC<Props> = ({
       dataLayerEntityName: datalayerEntityName,
       linkedinMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
       twitterMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
+      platforms: [
+         SocialPlatformObject.Linkedin,
+         SocialPlatformObject.Facebook,
+         SocialPlatformObject.X,
+         SocialPlatformObject.Email,
+         SocialPlatformObject.Copy,
+      ],
    })
 
    const companyPageLink = useMemo(() => {
