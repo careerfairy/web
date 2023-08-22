@@ -23,11 +23,7 @@ type Props = {
 const SparksFeedCard: FC<Props> = ({ spark }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
 
-   return (
-      <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
-         SparksFeedCard
-      </Box>
-   )
+   return <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}></Box>
 }
 
 export default SparksFeedCard
