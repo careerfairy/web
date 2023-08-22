@@ -1,21 +1,25 @@
 import { sxStyles } from "types/commonTypes"
 
-import { Typography } from "@mui/material"
+import { Collapse } from "@mui/material"
 import Box from "@mui/material/Box"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
 import useEmblaCarousel from "embla-carousel-react"
+import { EngineType } from "embla-carousel/components/Engine"
 import { FC, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { swipeNextSparkByIndex } from "store/reducers/sparksFeedReducer"
+
+import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    currentSparkIndexSelector,
-   isFetchingNextSparksSelector,
+   isFetchingSparksSelector,
    sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
-import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
+import useKeyboardNavigation from "../../components/custom-hook/embla-carousel/useKeyboardNavigation"
+import FeedCard from "./FeedCard"
 
-const slideSpacing = 16 // in pixels, equivalent to 1rem
-const slideHeight = 600 // in pixels, equivalent to 19rem
+const slideSpacing = 32 // in pixels, equivalent to 1rem
+const slideHeight = "90%" // in pixels, equivalent to 19rem
 const slideSize = "100%"
 
 const styles = sxStyles({
@@ -24,18 +28,30 @@ const styles = sxStyles({
    },
    viewport: {
       padding: "1.6rem",
-      border: "1px solid red",
       overflow: "hidden",
       display: "flex",
       flexGrow: 1,
+      height: "calc(100dvh - 64px - 3.2rem)",
+   },
+   mobileViewport: {
+      height: "100dvh",
+      position: "fixed",
+      width: "100%",
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      padding: 0,
    },
    container: {
       backfaceVisibility: "hidden",
       display: "flex",
       touchAction: "pan-x",
       marginTop: `calc(${slideSpacing}px * -1)`,
-      height: `calc(${slideSpacing}px + ${slideHeight}px)`,
+      height: `calc(${slideSpacing}px + ${slideHeight})`,
       flexDirection: "column",
+      width: "100%",
+   },
+   mobileContainer: {
+      height: "100%",
+      marginTop: 0,
    },
    slide: {
       flex: `0 0 ${slideSize}`,
@@ -43,6 +59,13 @@ const styles = sxStyles({
       paddingTop: `${slideSpacing}px`,
       position: "relative",
       color: "white",
+      display: "flex",
+      justifyContent: "center",
+   },
+   mobileSlide: {
+      flex: "1 0 auto",
+      height: "100%",
+      paddingTop: 0,
    },
    slideImg: {
       display: "block",
@@ -53,15 +76,39 @@ const styles = sxStyles({
 })
 
 const SparksFeedCarousel: FC = () => {
+   const isMobile = useIsMobile()
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
 
    const dispatch = useDispatch()
    const sparks = useSelector(sparksSelector)
-   const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
+   const isFetchingSparks = useSelector(isFetchingSparksSelector)
 
    const [emblaRef, emblaApi] = useEmblaCarousel({
       axis: "y",
       loop: false,
+      align: "center",
+      watchSlides: (emblaApi) => {
+         // Reload Embla Carousel whenever sparks slides are updated, to avoid flickering
+         const reloadEmbla = (): void => {
+            const oldEngine = emblaApi.internalEngine()
+            emblaApi.reInit()
+            const newEngine = emblaApi.internalEngine()
+            const copyEngineModules: (keyof EngineType)[] = [
+               "location",
+               "target",
+               "scrollBody",
+            ]
+            copyEngineModules.forEach((engineModule) => {
+               Object.assign(newEngine[engineModule], oldEngine[engineModule])
+            })
+            newEngine.translate.to(oldEngine.location.get())
+            const { index } = newEngine.scrollTarget.byDistance(0, false)
+            newEngine.index.set(index)
+            newEngine.animation.start()
+         }
+
+         reloadEmbla()
+      },
    })
 
    useEffect(() => {
@@ -83,47 +130,37 @@ const SparksFeedCarousel: FC = () => {
 
          emblaApi.on("select", onSelect)
 
-         // // Cleanup: remove the event listener if the component unmounts or sparks changes
+         // Cleanup: remove the event listener if the component unmounts or sparks changes
          return () => {
             emblaApi.off("select", onSelect)
          }
       }
    }, [emblaApi, dispatch, sparks.length])
 
+   useKeyboardNavigation(emblaApi, "upDown")
+
    return (
-      <Box sx={styles.viewport} ref={emblaRef}>
-         <Box sx={styles.container}>
+      <Box
+         sx={[styles.viewport, isMobile && styles.mobileViewport]}
+         ref={emblaRef}
+      >
+         <Box sx={[styles.container, isMobile && styles.mobileContainer]}>
             {sparks.map((spark, index) => (
-               <Box sx={styles.slide} key={spark.id}>
-                  <Box
-                     position="absolute"
-                     top="0"
-                     left="0"
-                     padding={`${slideSpacing}px`}
-                  >
-                     <Typography variant="h6">{spark.id}</Typography>
-                     <Typography variant="body1">{spark.question}</Typography>
-                  </Box>
-                  <Box
-                     component="img"
-                     sx={styles.slideImg}
-                     src={spark.video.thumbnailUrl}
-                     // src={getResizedUrl(spark.video.thumbnailUrl)}
-                     alt="Your alt text"
+               <Box
+                  sx={[styles.slide, isMobile && styles.mobileSlide]}
+                  key={spark.id}
+               >
+                  <FeedCard
+                     playing={index === currentPlayingIndex}
+                     spark={spark}
                   />
                </Box>
             ))}
-            {isFetchingNextSparks ? (
-               <Box
-                  className="embla-infinite-scroll"
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100%"
-               >
-                  <CircularProgress /> {/* Loading indicator */}
+            <Collapse in={isFetchingSparks} unmountOnExit>
+               <Box sx={styles.slide}>
+                  <CircularProgress />
                </Box>
-            ) : null}
+            </Collapse>
          </Box>
       </Box>
    )

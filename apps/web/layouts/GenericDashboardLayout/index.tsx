@@ -72,6 +72,10 @@ type Props = {
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
    topBarTransparent?: boolean
+   /**
+    * If true, the footer will be hidden
+    */
+   hideFooter?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -82,6 +86,7 @@ const GenericDashboardLayout = ({
    topBarFixed,
    headerScrollThreshold = 10,
    topBarTransparent,
+   hideFooter,
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -173,7 +178,9 @@ const GenericDashboardLayout = ({
                topBarTransparent={topBarTransparent}
             >
                {children}
-               <Footer background={bgColor || "#F7F8FC"} />
+               {hideFooter ? null : (
+                  <Footer background={bgColor || "#F7F8FC"} />
+               )}
                <CreditsDialog
                   onClose={handleCloseCreditsDialog}
                   open={creditsDialogOpen}

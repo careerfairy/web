@@ -26,7 +26,7 @@ const initialState: SparksState = {
    hasMoreSparks: true,
    groupId: null,
    userEmail: null,
-   numberOfSparksToFetch: 4,
+   numberOfSparksToFetch: 10,
    initialFetchStatus: "loading",
    fetchNextSparksStatus: "idle",
    initialSparksFetched: false,
