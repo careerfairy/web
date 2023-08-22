@@ -71,7 +71,7 @@ export const createSpark = functions.region(config.region).https.onCall(
             functions.logger.log(
                `Create Spark '${data.question}' completed, start validation`
             )
-            return validateGroupSparks(group.id)
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in creating spark", {
                data,
@@ -111,7 +111,7 @@ export const updateSpark = functions.region(config.region).https.onCall(
             functions.logger.log(
                `Update Spark '${data.id}' completed, start validation`
             )
-            return validateGroupSparks(group.id)
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in updating spark", {
                data,
@@ -138,7 +138,7 @@ export const deleteSpark = functions.region(config.region).https.onCall(
             functions.logger.log(
                `Delete Spark '${data.id}' completed, start validation`
             )
-            return validateGroupSparks(group.id)
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in deleting spark", {
                data,
@@ -150,12 +150,12 @@ export const deleteSpark = functions.region(config.region).https.onCall(
    )
 )
 
-const validateGroupSparks = async (groupId: string) => {
+const validateGroupSparks = async (group: Group) => {
    try {
+      const { groupId, publicSparks } = group
+
       // get all the creators from a group
       const creators: Creator[] = await groupRepo.getCreators(groupId)
-      // get all the group data
-      const group: Group = await groupRepo.getGroupById(groupId)
 
       // if the groups has 3 or more creators, validation continues
       if (
@@ -190,7 +190,7 @@ const validateGroupSparks = async (groupId: string) => {
          })
 
          if (isValid) {
-            if (group?.publicSparks) {
+            if (publicSparks) {
                return functions.logger.log(
                   `After validation, the group ${groupId} continues to have public sparks`
                )
@@ -211,7 +211,7 @@ const validateGroupSparks = async (groupId: string) => {
             // which means this group should not have their sparks public
 
             // only update if needed
-            if (group?.publicSparks) {
+            if (publicSparks) {
                functions.logger.log(
                   `After validation, the group ${groupId} does no longer have public sparks`
                )
@@ -228,7 +228,7 @@ const validateGroupSparks = async (groupId: string) => {
       // which means this group should not have their sparks public
 
       // only update if needed
-      if (group?.publicSparks) {
+      if (publicSparks) {
          return groupRepo.updatePublicSparks(groupId, false)
       }
 
