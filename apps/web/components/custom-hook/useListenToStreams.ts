@@ -1,11 +1,12 @@
-import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { useFirestoreCollection } from "./utils/useFirestoreCollection"
-import firebase from "firebase/compat/app"
+import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
+import { FirestoreInstance } from "data/firebase/FirebaseInstance"
+import { collection, limit, orderBy, query, where } from "firebase/firestore"
+import { useMemo } from "react"
 import { TimeFrames } from "../views/group/admin/analytics-new/general/GeneralPageProvider"
+import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 
 type Props = {
    filterByGroupId?: string
@@ -21,10 +22,6 @@ type Props = {
    fieldsOfStudy?: FieldOfStudy[]
    recordedOnly?: boolean
    listenToPastEvents?: boolean
-   /**
-    * The maximum number of LivestreamEvents to return. Will return `limit + 1` in case we want to know if there are more events.
-    */
-   limit?: number
 }
 
 /**
@@ -53,78 +50,66 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
       fieldsOfStudy,
       recordedOnly,
       listenToPastEvents,
-      limit,
    } = props
 
-   const eventsQuery = useMemo<firebase.firestore.Query>(() => {
-      let query = listenToPastEvents
-         ? livestreamRepo.getPastEventsFromQuery({
+   const eventsQuery = useMemo(() => {
+      let q = listenToPastEvents
+         ? getPastEventsQuery({
+              // Make sure this returns a Query object in modular style
               fromDate: TimeFrames["Last 2 years"].start,
            })
-         : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
+         : getUpcomingEventsQuery(!!filterByGroupId) // Make sure this returns a Query object in modular style
 
       if (filterByGroupId) {
-         query = query.where("groupIds", "array-contains", filterByGroupId)
+         q = query(q, where("groupIds", "array-contains", filterByGroupId))
       } else {
          if (interestsIds) {
-            query = query.where(
-               "interestsIds",
-               "array-contains-any",
-               interestsIds
+            q = query(
+               q,
+               where("interestsIds", "array-contains-any", interestsIds)
             )
          }
-
          if (registeredUserEmail) {
-            query = query.where(
-               "registeredUsers",
-               "array-contains",
-               registeredUserEmail
+            q = query(
+               q,
+               where("registeredUsers", "array-contains", registeredUserEmail)
             )
          }
-
          if (fieldsOfStudy?.length) {
-            query = query.where(
-               "targetFieldsOfStudy",
-               "array-contains-any",
-               fieldsOfStudy
+            q = query(
+               q,
+               where("targetFieldsOfStudy", "array-contains-any", fieldsOfStudy)
             )
          }
       }
 
-      // only do this query if no interests IDs
-      // since firestore does not support in and array-container-any on the same query
       if (languagesIds && !interestsIds) {
-         query = query.where("language.code", "in", languagesIds)
+         q = query(q, where("language.code", "in", languagesIds))
       }
 
       if (!getHiddenEvents) {
-         query = query.where("hidden", "==", false)
+         q = query(q, where("hidden", "==", false))
       }
 
       if (from) {
-         query = query.where("start", ">", from)
+         q = query(q, where("start", ">", from))
       }
 
       if (recordedOnly) {
-         query = query.where("denyRecordingAccess", "==", false)
+         q = query(q, where("denyRecordingAccess", "==", false))
       }
 
-      if (limit) {
-         query = query.limit(limit + 1) // +1 to check if there are more events
-      }
-
-      return query
+      return q
    }, [
-      listenToPastEvents,
-      filterByGroupId,
-      languagesIds,
-      interestsIds,
-      getHiddenEvents,
-      from,
-      recordedOnly,
-      limit,
-      registeredUserEmail,
       fieldsOfStudy,
+      filterByGroupId,
+      from,
+      getHiddenEvents,
+      interestsIds,
+      languagesIds,
+      listenToPastEvents,
+      recordedOnly,
+      registeredUserEmail,
    ])
 
    let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {
@@ -181,6 +166,53 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
    }
 
    return res.complementaryFields().get()
+}
+
+type PastEventsOptions = {
+   fromDate: Date
+   limit?: number
+   filterByGroupId?: string
+   showHidden?: boolean
+}
+const getPastEventsQuery = (options: PastEventsOptions) => {
+   let baseQuery = collection(FirestoreInstance, "livestreams")
+   let q = query(
+      baseQuery,
+      where("start", ">", options.fromDate),
+      where("start", "<", new Date()),
+      where("test", "==", false),
+      orderBy("start", "desc")
+   )
+
+   if (options.limit) {
+      q = query(q, limit(options.limit))
+   }
+
+   if (options.filterByGroupId) {
+      q = query(q, where("groupIds", "array-contains", options.filterByGroupId))
+   }
+
+   if (options.showHidden === false) {
+      q = query(q, where("hidden", "==", false))
+   }
+
+   return q
+}
+
+const getUpcomingEventsQuery = (showHidden: boolean = false) => {
+   const baseQuery = collection(FirestoreInstance, "livestreams")
+   let q = query(
+      baseQuery,
+      where("start", ">", getEarliestEventBufferTime()),
+      where("test", "==", false),
+      orderBy("start", "asc")
+   )
+
+   if (showHidden === false) {
+      q = query(q, where("hidden", "==", false))
+   }
+
+   return q
 }
 
 export default useListenToStreams

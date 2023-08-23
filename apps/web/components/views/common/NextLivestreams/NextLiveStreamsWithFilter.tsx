@@ -67,7 +67,7 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
 
-   const [limit, setLimit] = useState(10)
+   const [limit, setLimit] = useState(50)
 
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const {
