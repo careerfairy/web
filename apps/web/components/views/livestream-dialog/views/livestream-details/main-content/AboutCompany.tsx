@@ -107,6 +107,11 @@ const styles = sxStyles({
          transition: (theme) => theme.transitions.create("margin-right"),
       },
    },
+   badge: {
+      height: 32,
+      width: 32,
+      ml: 1,
+   },
 })
 
 interface Props {
@@ -174,9 +179,7 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                      </Typography>
 
                      {company.publicSparks ? (
-                        <PublicSparksBadge
-                           sx={{ height: 32, width: 32, ml: 1 }}
-                        />
+                        <PublicSparksBadge sx={styles.badge} />
                      ) : null}
                   </Stack>
 
