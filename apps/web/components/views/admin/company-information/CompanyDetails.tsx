@@ -16,8 +16,7 @@ import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiChe
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import Styles from "./BaseStyles"
-import LeftColumn from "./LeftColumn"
+import SectionComponent from "./SectionComponent"
 
 const styles = sxStyles({
    selectBox: {
@@ -88,8 +87,7 @@ const CompanyDetails = () => {
       as well as your live streams, and can be edited at any time.`,
    ]
    return (
-      <Box sx={Styles.section}>
-         <LeftColumn title={title} description={description} />
+      <SectionComponent title={title} description={description}>
          <Formik
             initialValues={initialValues}
             enableReinitialize
@@ -186,7 +184,7 @@ const CompanyDetails = () => {
                </Form>
             )}
          </Formik>
-      </Box>
+      </SectionComponent>
    )
 }
 

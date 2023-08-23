@@ -20,6 +20,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "types/commonTypes"
 import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import SectionComponent from "./SectionComponent"
 
 const styles = sxStyles({
    selectBox: {
@@ -113,8 +114,7 @@ const TargetTalent = () => {
       your content.`,
    ]
    return (
-      <Box sx={Styles.section}>
-         <LeftColumn title={title} description={description} />
+      <SectionComponent title={title} description={description}>
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
             {({
                values,
@@ -190,7 +190,7 @@ const TargetTalent = () => {
                </Form>
             )}
          </Formik>
-      </Box>
+      </SectionComponent>
    )
 }
 

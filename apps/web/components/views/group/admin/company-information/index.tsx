@@ -42,14 +42,14 @@ const CompanyInformationPageContent = () => {
 
 const PageContent = () => {
    return (
-      <Box sx={styles.content}>
+      <Box>
          <Container maxWidth={false}>
-            <Grid container spacing={3}>
-               <Grid item style={styles.gridItem}>
+            <Grid container>
+               <Grid item>
                   <CompanyIdentity />
                </Grid>
 
-               <Grid item style={styles.gridItem}>
+               <Grid item>
                   <CompanyDetails />
                </Grid>
 
