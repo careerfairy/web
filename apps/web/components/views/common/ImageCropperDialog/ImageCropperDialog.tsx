@@ -50,11 +50,14 @@ export const ImageCropperDialog = ({
       },
       button: {
          display: "flex",
-         padding: "13px 38px",
-         justifyContent: "center",
          alignItems: "center",
          gap: "10px",
          borderRadius: "52px",
+         textTransform: "none",
+         justifyContent: "flex-end",
+         "@media (max-width: 768px)": {
+            justifyContent: "center",
+         },
          ".secondary": {
             color: "#888",
             fontFamily: "Poppins",
@@ -71,6 +74,10 @@ export const ImageCropperDialog = ({
             fontWeight: 400,
             lineHeight: "16px",
             background: "#6749EA",
+            ":hover": {
+               background: "#6749EA",
+               color: "#FFF",
+            },
          },
       },
    })
@@ -92,10 +99,6 @@ export const ImageCropperDialog = ({
       }
    }
 
-   const handleChange = (_: Event, newValue: number | number[]) => {
-      setScale(newValue as number)
-   }
-
    const handleSubmit = async (e) => {
       e.preventDefault()
       try {
@@ -111,12 +114,21 @@ export const ImageCropperDialog = ({
 
    const zoomIn = () => {
       const cropper = cropperRef.current.cropper
-      cropper.zoom(0.1) // zoom in by 10%
+      cropper.zoom(0.07) // zoom in by 10%
    }
 
    const zoomOut = () => {
       const cropper = cropperRef.current.cropper
-      cropper.zoom(-0.1) // zoom out by 10%
+      cropper.zoom(-0.07) // zoom out by 10%
+   }
+
+   const handleChange = (_: Event, newValue: number) => {
+      if (newValue > scale) {
+         zoomIn()
+      } else if (newValue < scale) {
+         zoomOut()
+      }
+      setScale(newValue as number)
    }
 
    return (
@@ -152,6 +164,7 @@ export const ImageCropperDialog = ({
                   ref={cropperRef}
                   movable={true}
                   width={"-webkit-fill-available"}
+                  zoomable={true}
                />
             </Box>
             <Stack
@@ -183,12 +196,13 @@ export const ImageCropperDialog = ({
             >
                Back
             </Button>
-            <SaveChangesButton
-               active={Boolean(cropperRef)}
+            <Button
+               sx={styles.button}
+               className="primary"
                onClick={handleSubmit}
             >
                Apply
-            </SaveChangesButton>
+            </Button>
          </DialogActions>
       </Dialog>
    )
