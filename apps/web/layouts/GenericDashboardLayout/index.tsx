@@ -80,6 +80,10 @@ type Props = {
     * If true, the left drawer will be hidden
     */
    hideDrawer?: boolean
+   /**
+    * The width of the header. Default is 100%
+    */
+   headerWidth?: string
 }
 
 const GenericDashboardLayout = ({
@@ -92,6 +96,7 @@ const GenericDashboardLayout = ({
    topBarTransparent,
    hideFooter,
    hideDrawer,
+   headerWidth = "100%",
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -182,6 +187,7 @@ const GenericDashboardLayout = ({
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                topBarTransparent={topBarTransparent}
+               headerWidth={headerWidth}
             >
                {children}
                {hideFooter ? null : (

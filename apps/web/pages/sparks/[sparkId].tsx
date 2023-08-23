@@ -131,6 +131,7 @@ const SparksPage: NextPage<
             topBarFixed
             topBarTransparent
             hideFooter
+            headerWidth="auto"
          >
             <SparksFeedCarousel />
          </GenericDashboardLayout>
