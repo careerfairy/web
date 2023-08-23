@@ -111,7 +111,9 @@ type Props = {
    bgColor?: string
    topBarTransparent?: boolean
    hideDrawer?: boolean
+   headerWidth?: string
 }
+
 const AdminGenericLayout: React.FC<Props> = ({
    children,
    drawerContent,
@@ -124,6 +126,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    bgColor,
    topBarTransparent = false,
    hideDrawer,
+   headerWidth,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -162,7 +165,10 @@ const AdminGenericLayout: React.FC<Props> = ({
             ]}
          >
             {/* header */}
-            <HeaderComponent topBarTransparent={topBarTransparent}>
+            <HeaderComponent
+               width={headerWidth}
+               topBarTransparent={topBarTransparent}
+            >
                {headerContent}
             </HeaderComponent>
 
@@ -227,11 +233,13 @@ type HeaderProps = {
    children: React.ReactNode
    headerBgColor?: string
    topBarTransparent?: boolean
+   width?: string
 }
 const HeaderComponent = ({
    children,
    headerBgColor = "#F7F8FC",
    topBarTransparent = false,
+   width,
 }: HeaderProps) => {
    const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
    const styles = useStyles()
@@ -259,6 +267,7 @@ const HeaderComponent = ({
                borderBottom: "none",
                backdropFilter: "none",
             },
+            width && { width },
          ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>

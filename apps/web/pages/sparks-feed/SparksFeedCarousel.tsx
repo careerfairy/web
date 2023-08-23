@@ -3,12 +3,13 @@ import { sxStyles } from "types/commonTypes"
 import { Collapse } from "@mui/material"
 import Box from "@mui/material/Box"
 import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
-import useEmblaCarousel from "embla-carousel-react"
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
-import { FC, useEffect } from "react"
+import { FC, useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { swipeNextSparkByIndex } from "store/reducers/sparksFeedReducer"
 
+import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
 import {
    currentSparkIndexSelector,
    isFetchingSparksSelector,
@@ -35,6 +36,8 @@ const styles = sxStyles({
       height: "calc(100dvh - 64px - 3.2rem)",
       position: "relative",
       backgroundColor: "#F7F8FC",
+      justifyContent: "center",
+      alignItems: "center",
    },
    fullScreenViewport: {
       height: "100dvh",
@@ -85,6 +88,38 @@ const styles = sxStyles({
    },
 })
 
+const options: EmblaOptionsType = {
+   axis: "y",
+   loop: false,
+   align: "center",
+   /**
+    * Custom function to watch for changes to the slides.
+    * Reloads the Embla Carousel whenever the slides (sparks) are updated,
+    * to prevent flickering.
+    */
+   watchSlides: (emblaApi) => {
+      const reloadEmbla = (): void => {
+         const oldEngine = emblaApi.internalEngine()
+         emblaApi.reInit()
+         const newEngine = emblaApi.internalEngine()
+         const copyEngineModules: (keyof EngineType)[] = [
+            "location",
+            "target",
+            "scrollBody",
+         ]
+         copyEngineModules.forEach((engineModule) => {
+            Object.assign(newEngine[engineModule], oldEngine[engineModule])
+         })
+         newEngine.translate.to(oldEngine.location.get())
+         const { index } = newEngine.scrollTarget.byDistance(0, false)
+         newEngine.index.set(index)
+         newEngine.animation.start()
+      }
+
+      reloadEmbla()
+   },
+}
+
 const SparksFeedCarousel: FC = () => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
@@ -93,40 +128,28 @@ const SparksFeedCarousel: FC = () => {
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
 
-   const [emblaRef, emblaApi] = useEmblaCarousel({
-      axis: "y",
-      loop: false,
-      align: "center",
-      watchSlides: (emblaApi) => {
-         // Reload Embla Carousel whenever sparks slides are updated, to avoid flickering
-         const reloadEmbla = (): void => {
-            const oldEngine = emblaApi.internalEngine()
-            emblaApi.reInit()
-            const newEngine = emblaApi.internalEngine()
-            const copyEngineModules: (keyof EngineType)[] = [
-               "location",
-               "target",
-               "scrollBody",
-            ]
-            copyEngineModules.forEach((engineModule) => {
-               Object.assign(newEngine[engineModule], oldEngine[engineModule])
-            })
-            newEngine.translate.to(oldEngine.location.get())
-            const { index } = newEngine.scrollTarget.byDistance(0, false)
-            newEngine.index.set(index)
-            newEngine.animation.start()
-         }
+   const [emblaRef, emblaApi] = useEmblaCarousel(options)
 
-         reloadEmbla()
-      },
-   })
+   /**
+    * Custom plugin hooks for Embla Carousel
+    */
+   useKeyboardNavigation(emblaApi, "upDown")
+   useVerticalMouseScrollNavigation(emblaApi)
 
+   /**
+    * When the current playing spark changes,
+    * scroll to the new slide
+    */
    useEffect(() => {
       if (emblaApi) {
          emblaApi.scrollTo(currentPlayingIndex)
       }
    }, [emblaApi, currentPlayingIndex])
 
+   /**
+    * When the user swipes to a new slide,
+    * update the current playing spark in redux
+    */
    useEffect(() => {
       if (emblaApi) {
          const onSelect = () => {
@@ -143,7 +166,12 @@ const SparksFeedCarousel: FC = () => {
       }
    }, [emblaApi, dispatch])
 
-   useKeyboardNavigation(emblaApi, "upDown")
+   const handlClickSlide = useCallback(
+      (index: number) => {
+         dispatch(swipeNextSparkByIndex(index))
+      },
+      [dispatch]
+   )
 
    return (
       <Box
@@ -154,7 +182,15 @@ const SparksFeedCarousel: FC = () => {
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
             {sparks.map((spark, index) => (
-               <Slide fullScreen={isFullScreen} key={spark.id}>
+               <Slide
+                  onClick={
+                     index === currentPlayingIndex
+                        ? undefined // Prevents propagating the click event to children
+                        : () => handlClickSlide(index)
+                  }
+                  fullScreen={isFullScreen}
+                  key={spark.id}
+               >
                   <FeedCardSlide
                      playing={index === currentPlayingIndex}
                      spark={spark}
@@ -178,10 +214,11 @@ const SparksFeedCarousel: FC = () => {
 
 type SlideProps = {
    fullScreen: boolean
-}
-const Slide: FC<SlideProps> = ({ children, fullScreen }) => {
+} & React.HTMLAttributes<HTMLDivElement>
+
+const Slide: FC<SlideProps> = ({ children, fullScreen, ...props }) => {
    return (
-      <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]}>
+      <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]} {...props}>
          {children}
       </Box>
    )
