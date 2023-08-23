@@ -103,6 +103,11 @@ const styles = sxStyles({
       zIndex: 1,
       textDecoration: "none !important",
    },
+   badge: {
+      height: 32,
+      width: 32,
+      ml: 1,
+   },
 })
 
 type Props = {
@@ -161,7 +166,7 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   </Typography>
 
                   {company.publicSparks ? (
-                     <PublicSparksBadge sx={{ height: 32, width: 32, ml: 1 }} />
+                     <PublicSparksBadge sx={styles.badge} />
                   ) : null}
                </Stack>
                <Stack spacing={1}>
