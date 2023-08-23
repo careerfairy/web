@@ -48,7 +48,7 @@ const Component: FC<Props> = ({ handleSparksClicked }) => {
    const { data: sparksContent } = useSparks(8)
    return (
       <Box sx={{ pl: 2 }}>
-         <Stack direction={"column"} sx={{ gap: "10px" }}>
+         <Stack spacing={1.25}>
             <Heading sx={{ textTransform: "uppercase" }}>
                {HEADING_TEXT}
             </Heading>
