@@ -31,7 +31,7 @@ const useVerticalMouseScrollNavigation = (emblaApi: EmblaCarouselType) => {
       }
 
       // Attach the event listener with throttling
-      const throttledHandleWheel = throttle(handleWheel, 300)
+      const throttledHandleWheel = throttle(handleWheel, 1000)
       window.addEventListener("wheel", throttledHandleWheel, { passive: true })
 
       // Cleanup: Remove the event listener when the component unmounts
