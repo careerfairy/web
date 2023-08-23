@@ -5,6 +5,7 @@ import Styles from "./BaseStyles"
 import QuestionnaireCreation from "components/views/common/QuestionnaireCreation/QuestionnaireCreation"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import LeftColumn from "./LeftColumn"
+import SectionComponent from "./SectionComponent"
 
 const LiveStreamRegistrationQuestions = () => {
    const { groupQuestions } = useGroup()
@@ -23,12 +24,11 @@ const LiveStreamRegistrationQuestions = () => {
       be edited.`,
    ]
    return (
-      <Box sx={Styles.section}>
-         <LeftColumn title={title} description={description} />
+      <SectionComponent title={title} description={description}>
          <Box sx={{ gap: "12px", width: "-webkit-fill-available" }}>
             <QuestionnaireCreation initialData={initialValues} />
          </Box>
-      </Box>
+      </SectionComponent>
    )
 }
 

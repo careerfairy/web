@@ -11,6 +11,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "data/RepositoryInstances"
 import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import SectionComponent from "./SectionComponent"
 
 const PrivacyPolicy = () => {
    const { group } = useGroup()
@@ -46,8 +47,7 @@ const PrivacyPolicy = () => {
       the registration process.`,
    ]
    return (
-      <Box sx={Styles.section}>
-         <LeftColumn title={title} description={description} />
+      <SectionComponent title={title} description={description}>
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
             {({ values, dirty, setFieldValue }) => (
                <Form>
@@ -70,7 +70,7 @@ const PrivacyPolicy = () => {
                </Form>
             )}
          </Formik>
-      </Box>
+      </SectionComponent>
    )
 }
 

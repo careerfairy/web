@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Form, Formik } from "formik"
 import { Image, Upload } from "react-feather"
-import { Avatar, Button, Typography } from "@mui/material"
+import { Avatar, Button, Grid, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { BaseGroupInfo } from "pages/group/create"
 
@@ -13,6 +13,7 @@ import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import SectionComponent from "./SectionComponent"
 
 type Logo = Pick<BaseGroupInfo, "logoUrl" | "logoFileObj">
 type Banner = Pick<Group, "bannerImageUrl">
@@ -57,117 +58,141 @@ const CompanyIdentity = () => {
       "Choose your brand visuals so that talent can easily recognise you.",
    ]
    return (
-      <Box sx={Styles.section}>
-         <LeftColumn title={title} description={description} />
+      <SectionComponent title={title} description={description}>
          <Formik initialValues={initialValues} onSubmit={() => {}}>
             {({ values, setFieldValue }) => (
                <Form>
-                  <Typography
-                     variant="h4"
-                     component="h4"
-                     sx={[Styles.section.h4]}
-                  >
-                     Upload your company profile picture
-                  </Typography>
-                  <Typography variant="h5" color="text.secondary">
-                     The optimal size for this picture is 1080x1080 pixels
-                  </Typography>
-                  {/* Uploading && Cropping Company logo image */}
-                  <ImageCropperDialog
-                     title={"Edit company picture"}
-                     key={values?.logoFileObj?.name}
-                     fileName={values?.logoFileObj?.name}
-                     imageSrc={values?.logoUrl}
-                     open={imageCropperDialog}
-                     handleClose={handleCloseCropImageDialog}
-                  />
-                  <FileDropZone
-                     onChange={(acceptedFiles) => {
-                        const file = acceptedFiles?.[0]
-                        const logo: Logo = {
-                           logoUrl: URL.createObjectURL(file),
-                           logoFileObj: file,
-                        }
+                  <Grid container spacing={3}>
+                     <Grid item xs={12}>
+                        <Typography
+                           variant="h4"
+                           component="h4"
+                           sx={[Styles.section.h4]}
+                        >
+                           Upload your company profile picture
+                        </Typography>
+                     </Grid>
+                     <Grid item xs={12}>
+                        <Typography variant="h5" color="text.secondary">
+                           The optimal size for this picture is 1080x1080 pixels
+                        </Typography>
+                     </Grid>
+                     {/* Uploading && Cropping Company logo image */}
+                     <ImageCropperDialog
+                        title={"Edit company picture"}
+                        key={values?.logoFileObj?.name}
+                        fileName={values?.logoFileObj?.name}
+                        imageSrc={values?.logoUrl}
+                        open={imageCropperDialog}
+                        handleClose={handleCloseCropImageDialog}
+                     />
 
-                        setFieldValue("logoUrl", logo.logoUrl)
-                        setFieldValue("logoFileObj", logo.logoFileObj)
-                        setImageCropperDialog(true)
-                     }}
-                  >
-                     <Button sx={Styles.section.companyLogoUploadButton}>
-                        {Boolean(values.logoUrl) ? (
-                           <Avatar
-                              alt="Company Logo"
-                              src={values.logoUrl}
-                              sx={{ width: 140, height: 140 }}
-                           />
-                        ) : (
-                           <>
-                              <Image />
-                              <Typography variant="button">
-                                 Upload company picture
-                              </Typography>
-                           </>
-                        )}
-                     </Button>
-                  </FileDropZone>
-                  <Typography
-                     variant="h4"
-                     component="h4"
-                     sx={[Styles.section.h4]}
-                  >
-                     Company banner
-                  </Typography>
-                  <Typography variant="h5" color="text.secondary">
-                     This image is going to be used as the banner on your
-                     company page. It can always be changed.
-                  </Typography>
-                  {/* Uploading banner image */}
-                  <FileDropZone
-                     onChange={(acceptedFiles) => {
-                        const file = acceptedFiles?.[0]
-                        const banner: Banner = {
-                           bannerImageUrl: URL.createObjectURL(file),
-                        }
+                     <Grid item xs={12}>
+                        <FileDropZone
+                           onChange={(acceptedFiles) => {
+                              const file = acceptedFiles?.[0]
+                              const logo: Logo = {
+                                 logoUrl: URL.createObjectURL(file),
+                                 logoFileObj: file,
+                              }
 
-                        setFieldValue("bannerImageUrl", banner.bannerImageUrl)
-                        saveBannerImageUrl(banner.bannerImageUrl)
-                     }}
-                     sx={(theme) =>
-                        Styles.section.companyBannerUploadArea(
-                           theme,
-                           values.bannerImageUrl
-                        )
-                     }
-                     label={values.bannerImageUrl ? "" : "Upload picture"}
-                  >
-                     {!Boolean(values.bannerImageUrl) && (
-                        <>
-                           <Typography
-                              variant="caption"
-                              sx={Styles.section.caption}
-                           >
-                              Recommended size: 2880x576px
-                           </Typography>
-                           <Box sx={Styles.section.companyBannerUploadButton}>
-                              <Typography
-                                 variant="caption"
-                                 sx={
-                                    Styles.section.companyBannerUploadButton
-                                       .caption
-                                 }
-                              >
-                                 Upload picture
-                              </Typography>
-                              <Upload />
-                           </Box>
-                        </>
-                     )}
-                  </FileDropZone>
+                              setFieldValue("logoUrl", logo.logoUrl)
+                              setFieldValue("logoFileObj", logo.logoFileObj)
+                              setImageCropperDialog(true)
+                           }}
+                        >
+                           <Button sx={Styles.section.companyLogoUploadButton}>
+                              {Boolean(values.logoUrl) ? (
+                                 <Avatar
+                                    alt="Company Logo"
+                                    src={values.logoUrl}
+                                    sx={{ width: 140, height: 140 }}
+                                 />
+                              ) : (
+                                 <>
+                                    <Image />
+                                    <Typography variant="button">
+                                       Upload company picture
+                                    </Typography>
+                                 </>
+                              )}
+                           </Button>
+                        </FileDropZone>
+                     </Grid>
+
+                     <Grid item xs={12}>
+                        <Typography
+                           variant="h4"
+                           component="h4"
+                           sx={[Styles.section.h4]}
+                        >
+                           Company banner
+                        </Typography>
+                     </Grid>
+
+                     <Grid item xs={12}>
+                        <Typography variant="h5" color="text.secondary">
+                           This image is going to be used as the banner on your
+                           company page. It can always be changed.
+                        </Typography>
+                     </Grid>
+
+                     {/* Uploading banner image */}
+                     <Grid item xs={12}>
+                        <FileDropZone
+                           onChange={(acceptedFiles) => {
+                              const file = acceptedFiles?.[0]
+                              const banner: Banner = {
+                                 bannerImageUrl: URL.createObjectURL(file),
+                              }
+
+                              setFieldValue(
+                                 "bannerImageUrl",
+                                 banner.bannerImageUrl
+                              )
+                              saveBannerImageUrl(banner.bannerImageUrl)
+                           }}
+                           sx={(theme) =>
+                              Styles.section.companyBannerUploadArea(
+                                 theme,
+                                 values.bannerImageUrl
+                              )
+                           }
+                           label={values.bannerImageUrl ? "" : "Upload picture"}
+                        >
+                           {!Boolean(values.bannerImageUrl) && (
+                              <>
+                                 <Typography
+                                    variant="caption"
+                                    sx={Styles.section.caption}
+                                 >
+                                    Recommended size: 2880x576px
+                                 </Typography>
+                                 <Box
+                                    sx={
+                                       Styles.section.companyBannerUploadButton
+                                    }
+                                 >
+                                    <Typography
+                                       variant="caption"
+                                       sx={
+                                          Styles.section
+                                             .companyBannerUploadButton.caption
+                                       }
+                                    >
+                                       Upload picture
+                                    </Typography>
+                                    <Upload />
+                                 </Box>
+                              </>
+                           )}
+                        </FileDropZone>
+                     </Grid>
+                  </Grid>
                </Form>
             )}
          </Formik>
-      </Box>
+      </SectionComponent>
    )
 }
 
