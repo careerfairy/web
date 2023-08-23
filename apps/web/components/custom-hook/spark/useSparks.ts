@@ -11,7 +11,10 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
  **/
 const useSparks = (totalItems?: number) => {
    const sparksQuery = useMemo(() => {
-      return query(collection(FirestoreInstance, "sparks"), limit(totalItems))
+      return query(
+         collection(FirestoreInstance, "sparks"),
+         ...(totalItems ? [limit(totalItems)] : [])
+      )
    }, [totalItems])
 
    return useFirestoreCollection<Spark>(sparksQuery)

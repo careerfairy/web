@@ -1,7 +1,7 @@
 import { FC } from "react"
+import { SxProps } from "@mui/material"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
-import { SxProps } from "@mui/material"
 
 type Props = {
    sx?: SxProps
