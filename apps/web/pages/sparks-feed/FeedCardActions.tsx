@@ -9,6 +9,7 @@ const styles = sxStyles({
       /**
        * Demo props
        */
+      maxHeight: "80vh",
       border: "1px solid purple",
       height: 402,
       borderRadius: 3.25,

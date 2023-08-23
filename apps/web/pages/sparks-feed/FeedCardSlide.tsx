@@ -3,11 +3,17 @@ import Box from "@mui/material/Box"
 import SparksFeedCard from "components/views/sparks/components/spark-card/SparksFeedCard"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
+import AspectRatio from "../../components/views/common/AspectRatio"
 import FeedCardActions from "./FeedCardActions"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const styles = sxStyles({
-   root: {},
+   root: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      position: "relative",
+   },
    actionsWrapper: {
       position: "absolute",
       bottom: "0",
@@ -24,14 +30,6 @@ const styles = sxStyles({
       pr: 1.5,
       pb: 3.25,
    },
-   aspectRatioBox: {
-      aspectRatio: "9 / 16",
-      position: "relative",
-   },
-   fullScreenAspectRatioBox: {
-      aspectRatio: "auto",
-      width: "100%",
-   },
 })
 
 type Props = {
@@ -43,23 +41,13 @@ const FeedCardSlide: FC<Props> = ({ spark, playing }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
 
    return (
-      <Box
-         width="100%"
-         display="flex"
-         justifyContent="center"
-         position="relative"
-      >
-         <Box
-            sx={[
-               styles.aspectRatioBox,
-               isFullScreen && styles.fullScreenAspectRatioBox,
-            ]}
-         >
+      <Box sx={styles.root}>
+         <AspectRatio aspectRatio={isFullScreen ? null : "9:16"}>
             <SparksFeedCard spark={spark} />
             <ActionsWrapper fullScreen={isFullScreen}>
                <FeedCardActions />
             </ActionsWrapper>
-         </Box>
+         </AspectRatio>
       </Box>
    )
 }
