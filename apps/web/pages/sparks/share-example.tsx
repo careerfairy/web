@@ -22,7 +22,7 @@ const SparksPage = () => {
    const shareData = useMemo(() => {
       return {
          title: "CareerFairy",
-         text: "Sparks",
+         text: "Check out this Spark on CareerFairy!",
          url: shareUrl,
       }
    }, [shareUrl])
