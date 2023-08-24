@@ -21,7 +21,13 @@ export type LivestreamEventWithType = LivestreamEvent & {
    contentType: "LivestreamEvent"
 }
 
-export type CTASlideTopic = "CareerCoins" | "Sparks"
+export const CTASlideTopics = {
+   CareerCoins: "CareerCoins",
+   Sparks: "Sparks",
+} as const
+
+export type CTASlideTopic = (typeof CTASlideTopics)[keyof typeof CTASlideTopics]
+
 export type CTASlide = {
    contentType: "CTASlide"
    topic: CTASlideTopic
@@ -163,7 +169,7 @@ export class CarouselContentService {
       // check whether to add Credits CTA
       const shouldSeeCreditsCTABanner = userShouldSeeCTABannerToday(
          this.options.userData,
-         "CareerCoins"
+         CTASlideTopics.CareerCoins
       )
 
       // If the user has not bought a recording, add slide before the content
@@ -171,7 +177,7 @@ export class CarouselContentService {
          content = [
             {
                contentType: "CTASlide",
-               topic: "CareerCoins",
+               topic: CTASlideTopics.CareerCoins,
             },
             ...content,
          ]
@@ -180,14 +186,14 @@ export class CarouselContentService {
       // check whether to add Sparks CTA
       const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
          this.options.userData,
-         "Sparks"
+         CTASlideTopics.Sparks
       )
       const userHasSeenASpark = await this.userHasSeenASpark()
       if (!userHasSeenASpark && shouldSeeSparksCTABanner) {
          content = [
             {
                contentType: "CTASlide",
-               topic: "Sparks",
+               topic: CTASlideTopics.Sparks,
             },
             ...content,
          ]
@@ -213,11 +219,7 @@ export class CarouselContentService {
 
    private async userHasSeenASpark(): Promise<boolean> {
       const userId = this.options.userData?.authId
-      if (userId) {
-         return await sparkService.hasUserSeenAnySpark(userId)
-      } else {
-         return false
-      }
+      return userId ? sparkService.hasUserSeenAnySpark(userId) : false
    }
 
    static serializeContent(content: CarouselContent[]): SerializedContent[] {
@@ -266,11 +268,11 @@ export class CarouselContentService {
          let userDates
          if (userData) {
             switch (bannerType) {
-               case "CareerCoins": {
+               case CTASlideTopics.CareerCoins: {
                   userDates = userData.creditsBannerCTADates
                   break
                }
-               case "Sparks": {
+               case CTASlideTopics.Sparks: {
                   userDates = userData.sparksBannerCTADates
                   break
                }
@@ -288,14 +290,14 @@ export class CarouselContentService {
          if (shouldIncrementBannerDisplayCount) {
             let addDatePromise: Promise<void>
             switch (bannerType) {
-               case "CareerCoins": {
+               case CTASlideTopics.CareerCoins: {
                   addDatePromise =
                      firebaseServiceInstance.addDateUserHasSeenCreditsCTABanner(
                         userData.userEmail
                      )
                   break
                }
-               case "Sparks": {
+               case CTASlideTopics.Sparks: {
                   addDatePromise =
                      firebaseServiceInstance.addDateUserHasSeenSparksCTABanner(
                         userData.userEmail
@@ -357,11 +359,11 @@ const userShouldSeeCTABannerToday = (
    let bannerCTADates
    if (userData) {
       switch (bannerType) {
-         case "CareerCoins": {
+         case CTASlideTopics.CareerCoins: {
             bannerCTADates = userData.creditsBannerCTADates
             break
          }
-         case "Sparks": {
+         case CTASlideTopics.Sparks: {
             bannerCTADates = userData.sparksBannerCTADates
             break
          }

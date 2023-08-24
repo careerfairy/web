@@ -5,7 +5,10 @@ import Image from "next/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
-import CarouselContentService, { CTASlide } from "./CarouselContentService"
+import CarouselContentService, {
+   CTASlide,
+   CTASlideTopics,
+} from "./CarouselContentService"
 import Content, { ContentHeaderTitle, ContentTitle } from "./Content"
 import ContentButton from "./ContentButton"
 
@@ -50,7 +53,7 @@ const WatchSparksCTAContent: FC<Props> = () => {
          CarouselContentService.incrementCTABannerViewCount(
             inView,
             userData,
-            "Sparks"
+            CTASlideTopics.Sparks
          ),
    })
 
