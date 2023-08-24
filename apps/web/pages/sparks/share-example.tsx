@@ -6,6 +6,7 @@ import SparksShareDialog from "../../components/views/sparks/components/SparksSh
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import { useAuth } from "HOCs/AuthProvider"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
 
 const SparksPage = () => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -16,7 +17,9 @@ const SparksPage = () => {
 
    const shareUrl = useMemo(() => {
       const sparkId = pathname.split("/").slice(-1)[0]
-      return `https://www.careerfairy.io/sparks/${sparkId}?referral=${userData?.referralCode}&invite=${sparkId}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
+      return `${getHost()}/sparks/${sparkId}?referral=${
+         userData?.referralCode
+      }&invite=${sparkId}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
    }, [pathname, userData?.referralCode])
 
    const shareData = useMemo(() => {
