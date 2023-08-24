@@ -69,8 +69,7 @@ const ShareCompanyPageDialog: FC<Props> = ({
       title: group.universityName,
       url: makeGroupCompanyPageUrl(group),
       dataLayerEntityName: datalayerEntityName,
-      linkedinMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
-      twitterMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
+      message: `Check out ${group.universityName}'s company page on CareerFairy!`,
       platforms: [
          SocialPlatformObject.Linkedin,
          SocialPlatformObject.Facebook,
