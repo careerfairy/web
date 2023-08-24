@@ -33,16 +33,14 @@ export interface SocialIconProps {
 type Props = {
    url: string
    title: string
-   linkedinMessage: string
-   twitterMessage: string
+   message: string
    dataLayerEntityName: "company_page" | "sparks"
    platforms?: SocialPlatformType[]
 }
 const useSocials = ({
    url,
    title,
-   linkedinMessage,
-   twitterMessage,
+   message,
    dataLayerEntityName,
    platforms,
 }: Props) => {
@@ -66,23 +64,13 @@ const useSocials = ({
       }
    }, [state.value, clicked])
    return useMemo<SocialIconProps[]>(() => {
-      const encodedLinkedinMessage = encodeURIComponent(linkedinMessage)
-      const encodedTwitterMessage = encodeURIComponent(twitterMessage)
+      const encodedMessage = encodeURIComponent(message)
       const encodedUrl = encodeURIComponent(url)
-      const encodedTitle = encodeURIComponent(title)
 
-      const linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${
-         encodedUrl + "UTM_source=LinkedIn"
-      }&title=${encodedTitle}%27s%20${encodedLinkedinMessage}&source=CareerFairy`
-      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${
-         encodedUrl + "UTM_source=Facebook"
-      }`
-      const twitterLink = `https://twitter.com/intent/tweet?url=${
-         encodedUrl + "UTM_source=X"
-      }&via=CareerFairy&related=CareerFairy&text=${encodedTwitterMessage}`
-      const whatsappLink = `whatsapp://send?text=${
-         encodedUrl + "UTM_source=WhatsApp"
-      }`
+      const linkedinLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}%26UTM_source=LinkedIn`
+      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedUrl}%26UTM_source=Facebook`
+      const twitterLink = `https://twitter.com/intent/tweet?url=${encodedUrl}%26UTM_source=X&via=CareerFairy&related=CareerFairy&text=${encodedMessage}`
+      const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrl}%26UTM_source=WhatsApp`
 
       const eventName = `${dataLayerEntityName}_share`
       const socials = [
@@ -173,8 +161,7 @@ A redirect uri can be added to track where users are coming from internally or f
               )
          : socials
    }, [
-      linkedinMessage,
-      twitterMessage,
+      message,
       url,
       title,
       dataLayerEntityName,

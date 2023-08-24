@@ -96,11 +96,10 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
    }, [handleClose])
 
    const socials = useSocials({
-      title: "spark",
+      title: "Sparks",
       url: shareUrl,
       dataLayerEntityName: datalayerEntityName,
-      linkedinMessage: `Check out this spark on CareerFairy!`,
-      twitterMessage: `Check out this spark on CareerFairy!`,
+      message: `Check out this Spark on CareerFairy!`,
       platforms: [
          SocialPlatformObject.Whatsapp,
          SocialPlatformObject.Linkedin,
