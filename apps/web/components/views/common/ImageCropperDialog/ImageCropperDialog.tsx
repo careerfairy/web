@@ -32,9 +32,18 @@ const styles = sxStyles({
          height: "100%",
          marginX: "-50%",
          marginY: "-50%",
-         borderRadius: " ",
-         border: "4px solid white",
+         borderRadius: "50% 50%",
+         border: "0px solid white",
          opacity: 1,
+      },
+      ".cropper-face": {
+         borderRadius: "50% 50%",
+      },
+      ".cropper-move": {
+         borderRadius: "50% 50%",
+      },
+      ".cropper-view-box": {
+         borderRadius: "50% 50%",
       },
       img: {
          display: "block",
