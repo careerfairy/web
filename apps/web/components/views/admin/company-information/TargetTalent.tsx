@@ -127,7 +127,7 @@ const TargetTalent = () => {
                   <Stack
                      direction={"column"}
                      sx={{
-                        display: "grid",
+                        display: "flex",
                         width: "100%",
                         gap: "12px",
                      }}
@@ -187,7 +187,7 @@ const TargetTalent = () => {
                         }}
                         sx={styles.selectBox}
                      />
-                     <Box sx={{ justifySelf: "flex-end" }}>
+                     <Box sx={{ justifyContent: "flex-start" }}>
                         <SaveChangesButton type="submit" />
                      </Box>
                   </Stack>
