@@ -1,5 +1,5 @@
 import { PlusCircle } from "react-feather"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { Button, Stack, Typography } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
@@ -15,7 +15,7 @@ const styles = sxStyles({
       alignItems: "flex-end",
       gap: "24px",
       alignSelf: "stretch",
-      width: "-webkit-fill-available",
+      width: "inherit",
    },
    addOptionButton: {
       display: "flex",
@@ -58,7 +58,7 @@ type Props = {
    initialData?: Questionnaire
 }
 
-const QuestionarieCreation = ({ initialData }: Props) => {
+const QuestionarieCreation: FC<Props> = ({ initialData }) => {
    const [inputMode, setInputMode] = useState<boolean[]>(
       Array(initialData.questions.length).fill(false)
    )

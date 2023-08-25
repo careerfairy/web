@@ -25,9 +25,7 @@ const LiveStreamRegistrationQuestions = () => {
    ]
    return (
       <SectionComponent title={title} description={description}>
-         <Box sx={{ gap: "12px", width: "-webkit-fill-available" }}>
-            <QuestionnaireCreation initialData={initialValues} />
-         </Box>
+         <QuestionnaireCreation initialData={initialValues} />
       </SectionComponent>
    )
 }

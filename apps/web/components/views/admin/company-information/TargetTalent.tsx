@@ -18,13 +18,12 @@ import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "types/commonTypes"
-import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
 
 const styles = sxStyles({
    selectBox: {
-      width: "-webkit-fill-available",
+      width: "100%",
       color: "#B0B0B0",
       ".MuiOutlinedInput-root": {
          display: "flex",
@@ -37,10 +36,10 @@ const styles = sxStyles({
          border: "1px solid var(--tertiary-e, #EDE7FD)",
          background: "#F7F8FC",
          color: "#B0B0B0",
-         width: "-webkit-fill-available",
+         width: "100%",
       },
       "#branded-multi-checkbox": {
-         width: "-webkit-fill-available",
+         width: "100%",
       },
    },
 })
@@ -127,8 +126,11 @@ const TargetTalent = () => {
                <Form>
                   <Stack
                      direction={"column"}
-                     sx={{ gap: "12px" }}
-                     width={"-webkit-fill-available"}
+                     sx={{
+                        display: "grid",
+                        width: "100%",
+                        gap: "12px",
+                     }}
                   >
                      <BrandedMultiCheckBox
                         label="Targeted countries"
@@ -185,7 +187,9 @@ const TargetTalent = () => {
                         }}
                         sx={styles.selectBox}
                      />
-                     <SaveChangesButton type="submit" />
+                     <Box sx={{ justifySelf: "flex-end" }}>
+                        <SaveChangesButton type="submit" />
+                     </Box>
                   </Stack>
                </Form>
             )}

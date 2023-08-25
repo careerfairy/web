@@ -7,7 +7,7 @@ import {
    GroupQuestionOption,
 } from "@careerfairy/shared-lib/groups"
 import { ReactElement, useEffect, useState } from "react"
-import { Formik } from "formik"
+import { Form, Formik } from "formik"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import QuestionName from "./QuestionName"
@@ -34,6 +34,9 @@ const getInitialGroupQuestion = (
 }
 
 const styles = sxStyles({
+   form: {
+      width: "100%",
+   },
    stack: {
       color: "#212020",
       display: "flex",
@@ -181,7 +184,7 @@ const RegistrationQuestion: React.FC<Props> = ({
          enableReinitialize
       >
          {({ dirty, values, setFieldValue }) => (
-            <form onSubmit={() => handleSubmit(values)}>
+            <Form style={styles.form}>
                <Stack sx={styles.stack}>
                   <Box id="registration-question-name-field">
                      <QuestionName
@@ -244,7 +247,7 @@ const RegistrationQuestion: React.FC<Props> = ({
                      </Stack>
                   )}
                </Stack>
-            </form>
+            </Form>
          )}
       </Formik>
    )

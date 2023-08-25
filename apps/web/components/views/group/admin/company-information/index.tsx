@@ -1,4 +1,4 @@
-import { memo } from "react"
+import { FC, memo } from "react"
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 
@@ -11,28 +11,29 @@ import LiveStreamRegistrationQuestions from "../../../admin/company-information/
 import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
 
 const styles = sxStyles({
-   content: {
-      alignSelf: "center",
+   root: (theme) => ({
       display: "flex",
-      width: "1100px",
-      padding: "32px",
+      minHeight: "fit-content",
+      width: "stretch",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      gap: "48px",
       flexShrink: 0,
-      paddingY: 2,
       borderRadius: "16px",
-      background: "#FDFDFD",
-      marginTop: "32px",
-   },
-   gridItem: {
-      display: "flex",
-      width: "-webkit-fill-available",
+      background: theme.palette.background.paper,
+      padding: theme.spacing(3),
+      margin: theme.spacing(3, 2, 3, 2),
+      "> div": {
+         display: "flex",
+         width: "100%",
+      },
+   }),
+   container: {
+      gap: "96px",
    },
 })
 
-const CompanyInformationPageContent = () => {
+const CompanyInformationPageContent: FC = () => {
    return (
       <CompanyInformationProvider>
          <MemoizedPageContent />
@@ -42,31 +43,29 @@ const CompanyInformationPageContent = () => {
 
 const PageContent = () => {
    return (
-      <Box>
-         <Container maxWidth={false}>
-            <Grid container>
-               <Grid item>
-                  <CompanyIdentity />
-               </Grid>
-
-               <Grid item>
-                  <CompanyDetails />
-               </Grid>
-
-               <Grid item style={styles.gridItem}>
-                  <TargetTalent />
-               </Grid>
-
-               <Grid item style={styles.gridItem}>
-                  <LiveStreamRegistrationQuestions />
-               </Grid>
-
-               <Grid item style={styles.gridItem}>
-                  <PrivacyPolicy />
-               </Grid>
+      <Container sx={styles.root} maxWidth="lg">
+         <Grid container style={styles.container}>
+            <Grid item>
+               <CompanyIdentity />
             </Grid>
-         </Container>
-      </Box>
+
+            <Grid item>
+               <CompanyDetails />
+            </Grid>
+
+            <Grid item>
+               <TargetTalent />
+            </Grid>
+
+            <Grid item>
+               <LiveStreamRegistrationQuestions />
+            </Grid>
+
+            <Grid item>
+               <PrivacyPolicy />
+            </Grid>
+         </Grid>
+      </Container>
    )
 }
 
