@@ -51,22 +51,20 @@ const PrivacyPolicy = () => {
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
             {({ values, dirty, setFieldValue }) => (
                <Form>
-                  <Box>
-                     <Stack>
-                        <BrandedTextField
-                           label="Link to privacy policy"
-                           placeholder="Insert privacy policy URL link"
-                           value={values.privacyPolicyUrl}
-                           onChange={(e) =>
-                              setFieldValue("privacyPolicyUrl", e.target.value)
-                           }
-                           sx={{ mb: "12px" }}
-                        ></BrandedTextField>
-                        <SaveChangesButton type="submit" active={dirty}>
-                           Save Policy
-                        </SaveChangesButton>
-                     </Stack>
-                  </Box>
+                  <Stack>
+                     <BrandedTextField
+                        label="Link to privacy policy"
+                        placeholder="Insert privacy policy URL link"
+                        value={values.privacyPolicyUrl}
+                        onChange={(e) =>
+                           setFieldValue("privacyPolicyUrl", e.target.value)
+                        }
+                        sx={{ mb: "12px" }}
+                     ></BrandedTextField>
+                     <SaveChangesButton type="submit" active={dirty}>
+                        Save Policy
+                     </SaveChangesButton>
+                  </Stack>
                </Form>
             )}
          </Formik>

@@ -18,7 +18,70 @@ import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { sxStyles } from "types/commonTypes"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
-import SaveChangesButton from "components/views/admin/company-information/SaveChangesButton"
+
+const styles = sxStyles({
+   circleOutline: {
+      width: "100px",
+      height: "100px",
+      borderRadius: "50%",
+      border: "2px solid blue",
+   },
+   cropper: {
+      ".cropper-center": {
+         width: "100%",
+         height: "100%",
+         marginX: "-50%",
+         marginY: "-50%",
+         borderRadius: " ",
+         border: "4px solid white",
+         opacity: 1,
+      },
+      img: {
+         display: "block",
+         maxWidth: "100%",
+      },
+   },
+   dialogHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      color: "#000000",
+      height: "64px",
+      alignItems: "stretch",
+      width: "stretch",
+   },
+   button: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      borderRadius: "52px",
+      textTransform: "none",
+      justifyContent: "flex-end",
+      "@media (max-width: 768px)": {
+         justifyContent: "center",
+      },
+      ".secondary": {
+         color: "#888",
+         fontFamily: "Poppins",
+         fontSize: "18px",
+         fontStyle: "normal",
+         fontWeight: 400,
+         lineHeight: "16px",
+         border: "1px solid #EDEDED",
+      },
+      ".primary": {
+         color: "#FFF",
+         fontSize: "18px",
+         fontStyle: "normal",
+         fontWeight: 400,
+         lineHeight: "16px",
+         background: "#6749EA",
+         ":hover": {
+            background: "#6749EA",
+            color: "#FFF",
+         },
+      },
+   },
+})
 
 type Props = {
    title?: string
@@ -35,52 +98,9 @@ export const ImageCropperDialog = ({
    handleClose,
 }: Props) => {
    const firebase = useFirebaseService()
-   const [scale, setScale] = useState(50)
+   const [scale, setScale] = useState(0)
    const cropperRef = useRef<ReactCropperElement>(null)
    const dispatch = useDispatch()
-
-   const styles = sxStyles({
-      dialogHeader: {
-         display: "flex",
-         justifyContent: "space-between",
-         color: "#000000",
-         height: "64px",
-         alignItems: "stretch",
-         width: "-webkit-fill-available",
-      },
-      button: {
-         display: "flex",
-         alignItems: "center",
-         gap: "10px",
-         borderRadius: "52px",
-         textTransform: "none",
-         justifyContent: "flex-end",
-         "@media (max-width: 768px)": {
-            justifyContent: "center",
-         },
-         ".secondary": {
-            color: "#888",
-            fontFamily: "Poppins",
-            fontSize: "18px",
-            fontStyle: "normal",
-            fontWeight: 400,
-            lineHeight: "16px",
-            border: "1px solid #EDEDED",
-         },
-         ".primary": {
-            color: "#FFF",
-            fontSize: "18px",
-            fontStyle: "normal",
-            fontWeight: 400,
-            lineHeight: "16px",
-            background: "#6749EA",
-            ":hover": {
-               background: "#6749EA",
-               color: "#FFF",
-            },
-         },
-      },
-   })
 
    const uploadLogo = async (fileObjectString: string) => {
       try {
@@ -93,8 +113,11 @@ export const ImageCropperDialog = ({
          const companyLogoRef = storageRef.child(fullPath)
          const uploadTask = companyLogoRef.put(newFileObject)
          await uploadTask.then()
-         return uploadTask.snapshot.ref.getDownloadURL()
+         const url = await uploadTask.snapshot.ref.getDownloadURL()
+         debugger
+         return url
       } catch (e) {
+         debugger
          dispatch(actions.sendGeneralError(e))
       }
    }
@@ -112,22 +135,21 @@ export const ImageCropperDialog = ({
       }
    }
 
-   const zoomIn = () => {
-      const cropper = cropperRef.current.cropper
-      cropper.zoom(0.07) // zoom in by 10%
-   }
+   const zoomIn = (cropper: Cropper) => cropper.zoom(0.1)
 
-   const zoomOut = () => {
-      const cropper = cropperRef.current.cropper
-      cropper.zoom(-0.07) // zoom out by 10%
-   }
+   const zoomOut = (cropper: Cropper) => cropper.zoom(-0.1)
 
    const handleChange = (_: Event, newValue: number) => {
+      const cropper = cropperRef.current.cropper
+
       if (newValue > scale) {
-         zoomIn()
+         zoomIn(cropper)
       } else if (newValue < scale) {
-         zoomOut()
+         zoomOut(cropper)
+      } else if (newValue === 1) {
+         zoomOut(cropper)
       }
+
       setScale(newValue as number)
    }
 
@@ -142,7 +164,7 @@ export const ImageCropperDialog = ({
                      fontSize: "16px",
                      fontWeight: 400,
                      letterSpacing: "-0.176px",
-                     width: "-webkit-fill-available",
+                     width: "stretch",
                   }}
                >
                   {Boolean(title) ? title : "Edit picture"}
@@ -153,18 +175,20 @@ export const ImageCropperDialog = ({
             </Button>
          </DialogTitle>
          <DialogContent>
-            <Box>
+            <Box sx={styles.cropper}>
                <Cropper
-                  viewMode={3}
+                  viewMode={1}
                   dragMode={"none"}
                   src={imageSrc}
                   aspectRatio={1}
                   guides={false}
                   center={true}
                   ref={cropperRef}
-                  movable={true}
-                  width={"-webkit-fill-available"}
+                  width={"stretch"}
                   zoomable={true}
+                  responsive={true}
+                  movable={false}
+                  cropBoxResizable={false}
                />
             </Box>
             <Stack
@@ -172,16 +196,14 @@ export const ImageCropperDialog = ({
                direction="row"
                sx={{ mb: 1, mr: "auto", ml: "auto", color: "#686868" }}
                alignItems="center"
-               width={"-webkit-fill-available"}
+               width={"stretch"}
             >
                <Image width={"24px"} height={"24px"} />
                <Slider
                   sx={{ color: "#6749EA" }}
-                  min={10}
-                  max={110}
-                  step={5}
-                  defaultValue={50}
-                  value={scale}
+                  min={1}
+                  max={10}
+                  step={1}
                   aria-label="Scale"
                   onChange={handleChange}
                />

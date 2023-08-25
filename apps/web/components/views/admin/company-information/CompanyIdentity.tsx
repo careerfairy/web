@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { FC, useState } from "react"
 import { Form, Formik } from "formik"
 import { Image, Upload } from "react-feather"
 import { Avatar, Button, Grid, Typography } from "@mui/material"
@@ -18,7 +18,7 @@ import SectionComponent from "./SectionComponent"
 type Logo = Pick<BaseGroupInfo, "logoUrl" | "logoFileObj">
 type Banner = Pick<Group, "bannerImageUrl">
 
-const CompanyIdentity = () => {
+const CompanyIdentity: FC = () => {
    const { group: company } = useGroup()
    const [imageCropperDialog, setImageCropperDialog] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()

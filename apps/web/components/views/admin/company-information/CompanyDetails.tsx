@@ -97,7 +97,7 @@ const CompanyDetails = () => {
                <Form>
                   <Stack
                      direction={"column"}
-                     sx={{ gap: "12px", width: "-webkit-fill-available" }}
+                     sx={{ gap: "12px", width: "100%" }}
                   >
                      <BrandedTextField
                         name="companyName"

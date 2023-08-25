@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import React from "react"
 
 type ConditionalWrapperProps = {
@@ -10,7 +10,7 @@ const LeftColumn: React.FC<ConditionalWrapperProps> = ({
    description,
 }) => {
    return (
-      <Box>
+      <Stack>
          <Typography
             sx={{
                color: "#2C2C2C",
@@ -26,7 +26,7 @@ const LeftColumn: React.FC<ConditionalWrapperProps> = ({
          >
             {description}
          </Typography>
-      </Box>
+      </Stack>
    )
 }
 export default LeftColumn
