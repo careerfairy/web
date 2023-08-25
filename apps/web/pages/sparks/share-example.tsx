@@ -31,12 +31,8 @@ const SparksPage = () => {
    }, [shareUrl])
 
    const handleShare = useCallback(async () => {
-      if (isMobile) {
-         if (navigator?.share) {
-            await navigator.share(shareData)
-         } else {
-            handleOpenDialog()
-         }
+      if (isMobile && navigator?.share) {
+         await navigator.share(shareData)
       } else {
          handleOpenDialog()
       }

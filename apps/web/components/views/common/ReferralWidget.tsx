@@ -45,6 +45,9 @@ const styles = sxStyles({
       flexDirection: "column",
       textAlign: "center",
       alignItems: "center",
+      "&:hover": {
+         cursor: "pointer",
+      },
    },
    imageBox: {
       width: "48px",
@@ -69,26 +72,28 @@ export const ReferralWidget = ({
 
    const getIconButton = useCallback(
       (icon) => (
-         <IconButton
-            sx={[
-               styles.iconButton,
-               {
-                  color:
-                     iconsColor === "grey"
-                        ? "common.black"
-                        : `${iconsColor}.main`,
-                  width: mobile ? "15%" : "unset",
-               },
-            ]}
-            size={"large"}
-            onClick={icon.onClick}
-            href={icon.href}
-         >
-            <icon.icon
-               color={"inherit"}
-               sx={[styles.icon, iconStyle && { ...iconStyle }]}
-            />
-         </IconButton>
+         <Tooltip key={icon.name} arrow title={icon.name}>
+            <IconButton
+               sx={[
+                  styles.iconButton,
+                  {
+                     color:
+                        iconsColor === "grey"
+                           ? "common.black"
+                           : `${iconsColor}.main`,
+                     width: mobile ? "15%" : "unset",
+                  },
+               ]}
+               size={"large"}
+               onClick={icon.onClick}
+               href={icon.href}
+            >
+               <icon.icon
+                  color={"inherit"}
+                  sx={[styles.icon, iconStyle && { ...iconStyle }]}
+               />
+            </IconButton>
+         </Tooltip>
       ),
       [iconStyle, iconsColor, mobile]
    )
@@ -122,11 +127,9 @@ export const ReferralWidget = ({
          spacing={1}
          {...rest}
       >
-         {socials.map((icon) => (
-            <Tooltip key={icon.name} arrow title={icon.name}>
-               {isImageIcon ? getImageButton(icon) : getIconButton(icon)}
-            </Tooltip>
-         ))}
+         {socials.map((icon) =>
+            isImageIcon ? getImageButton(icon) : getIconButton(icon)
+         )}
       </Stack>
    )
 }

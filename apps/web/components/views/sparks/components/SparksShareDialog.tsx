@@ -59,6 +59,7 @@ const styles = sxStyles({
       "&.MuiBox-root": {
          "&:hover": {
             backgroundColor: "grey.main",
+            cursor: "pointer",
          },
       },
    },
@@ -108,11 +109,11 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
       ],
    })
 
-   const copySparkLinkToClipboard = (link: string) => {
+   const copySparkLinkToClipboard = useCallback(() => {
       setIsCopied(true)
-      const sourceLink = link + "&UTM_source=CareerFairy"
+      const sourceLink = shareUrl + "&UTM_source=CareerFairy"
       copyStringToClipboard(sourceLink)
-   }
+   }, [shareUrl])
 
    return (
       <Dialog
@@ -145,10 +146,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
             <ReferralWidget socials={socials} noBackgroundColor isImageIcon />
          </DialogContent>
          <DialogActions sx={styles.dialogActions}>
-            <Box
-               sx={styles.copyContainer}
-               onClick={() => copySparkLinkToClipboard(shareUrl)}
-            >
+            <Box sx={styles.copyContainer} onClick={copySparkLinkToClipboard}>
                {isCopied ? (
                   <>
                      <CheckIcon color={theme.palette.success.main} />
