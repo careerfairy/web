@@ -16,7 +16,7 @@ export class SparksService {
    async createSpark(data: AddSparkSparkData) {
       return httpsCallable<AddSparkSparkData, void>(
          this.functions,
-         "createSpark"
+         "createSpark_v2"
       )(data)
    }
 
@@ -27,7 +27,7 @@ export class SparksService {
    async updateSpark(data: UpdateSparkData) {
       return httpsCallable<UpdateSparkData, void>(
          this.functions,
-         "updateSpark"
+         "updateSpark_v2"
       )(data)
    }
 
@@ -38,7 +38,7 @@ export class SparksService {
    async deleteSpark(data: DeleteSparkData) {
       return httpsCallable<DeleteSparkData, void>(
          this.functions,
-         "deleteSpark"
+         "deleteSpark_v2"
       )(data)
    }
 }
