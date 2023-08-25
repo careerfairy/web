@@ -208,6 +208,6 @@ exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 
 // Sparks
-exports.createSpark = groupSparks.createSpark
-exports.updateSpark = groupSparks.updateSpark
-exports.deleteSpark = groupSparks.deleteSpark
+exports.createSpark_v2 = groupSparks.createSpark
+exports.updateSpark_v2 = groupSparks.updateSpark
+exports.deleteSpark_v2 = groupSparks.deleteSpark
