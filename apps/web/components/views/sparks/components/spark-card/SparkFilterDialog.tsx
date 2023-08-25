@@ -10,24 +10,16 @@ import {
    Typography,
    useMediaQuery,
 } from "@mui/material"
-
 import React, { FC, useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import SparkleIcon from "@mui/icons-material/AutoAwesomeOutlined"
-import {
-   Copy as CopyIcon,
-   CheckCircle as CheckIcon,
-   X as CloseIcon,
-} from "react-feather"
+import { X as CloseIcon } from "react-feather"
 import { useTheme } from "@mui/styles"
 import {
    SparkCategory,
-   SparksCategories,
    getCategoryEmoji,
    sparksCategoriesArray,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { Button } from "@mui/material"
-import createTypography from "@mui/material/styles/createTypography"
 import { useFormik } from "formik"
 import SparkIcon from "components/views/common/icons/SparkIcon"
 
