@@ -123,10 +123,8 @@ export const ImageCropperDialog = ({
          const uploadTask = companyLogoRef.put(newFileObject)
          await uploadTask.then()
          const url = await uploadTask.snapshot.ref.getDownloadURL()
-         debugger
          return url
       } catch (e) {
-         debugger
          dispatch(actions.sendGeneralError(e))
       }
    }
