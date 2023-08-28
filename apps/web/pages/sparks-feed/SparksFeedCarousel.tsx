@@ -168,6 +168,7 @@ const SparksFeedCarousel: FC = () => {
 
    const handlClickSlide = useCallback(
       (index: number) => {
+         console.log("🚀 ~ file: SparksFeedCarousel.tsx:171 ~ index:", index)
          dispatch(swipeNextSparkByIndex(index))
       },
       [dispatch]

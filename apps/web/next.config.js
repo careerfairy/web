@@ -95,6 +95,7 @@ const csp = {
       "vitals.vercel-insights.com",
       "ws:",
       "wss:",
+      "https://noembed.com", // for react-player thumbnail
    ],
    "img-src": [
       "'self'",
