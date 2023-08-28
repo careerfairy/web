@@ -63,10 +63,30 @@ type Props = {
 const FeedCardActions: FC<Props> = ({ spark }) => {
    return (
       <Stack spacing={3} sx={styles.root}>
-         <Action icon={<LikesIcon />} onClick={() => {}} label="Like" />
-         <Action icon={<ShareIcon />} onClick={() => {}} label="Share" />
-         <Action icon={<GlobeIcon />} onClick={() => {}} label="Cereer Page" />
-         <Action icon={<FilterIcon />} onClick={() => {}} label="Filter" />
+         <Action
+            sparkId={spark.id}
+            icon={<LikesIcon />}
+            onClick={() => {}}
+            label="Like"
+         />
+         <Action
+            sparkId={spark.id}
+            icon={<ShareIcon />}
+            onClick={() => {}}
+            label="Share"
+         />
+         <Action
+            sparkId={spark.id}
+            icon={<GlobeIcon />}
+            onClick={() => {}}
+            label="Cereer Page"
+         />
+         <Action
+            sparkId={spark.id}
+            icon={<FilterIcon />}
+            onClick={() => {}}
+            label="Filter"
+         />
       </Stack>
    )
 }
@@ -75,8 +95,9 @@ type ActionProps = {
    icon: React.ReactNode
    onClick: () => void
    label: string
+   sparkId: string
 }
-const Action: FC<ActionProps> = ({ icon, onClick, label }) => {
+const Action: FC<ActionProps> = ({ icon, onClick, label, sparkId }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
 
    const actionLabel = (
@@ -89,12 +110,12 @@ const Action: FC<ActionProps> = ({ icon, onClick, label }) => {
 
    return (
       <Box
-         htmlFor={`action-button-${label}`}
+         htmlFor={`action-button-${label}-${sparkId}`}
          component="label"
          sx={[styles.actionRoot, isFullScreen && styles.fullScreenActionRoot]}
       >
          <IconButton
-            id={`action-button-${label}`}
+            id={`action-button-${label}-${sparkId}`}
             sx={[styles.actionBtn, isFullScreen && styles.fullScreenActionBtn]}
             color="inherit"
             onClick={onClick}
