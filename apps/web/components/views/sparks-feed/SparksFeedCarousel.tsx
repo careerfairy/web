@@ -15,7 +15,7 @@ import {
    isFetchingSparksSelector,
    sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
-import useKeyboardNavigation from "../../components/custom-hook/embla-carousel/useKeyboardNavigation"
+import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"

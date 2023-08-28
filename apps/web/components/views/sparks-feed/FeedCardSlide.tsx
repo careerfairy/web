@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import SparksFeedCard from "components/views/sparks/components/spark-card/SparksFeedCard"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
-import AspectRatio from "../../components/views/common/AspectRatio"
+import AspectRatio from "../common/AspectRatio"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const styles = sxStyles({
