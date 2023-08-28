@@ -24,6 +24,7 @@ import { FC, Fragment, ReactNode, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
 import UploadOverlay from "./UploadOverlay"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    root: {
@@ -92,6 +93,7 @@ const maxMinutes = Math.round(maxSeconds / 60)
 const maxFileSize = SPARK_CONSTANTS.MAX_FILE_SIZE_MB
 
 const VideoUpload: FC<Props> = ({ name, editing }) => {
+   const { errorNotification } = useSnackbarNotifications()
    const {
       handleUploadFile: uploadVideo,
       progress: videoUploadProgress,
@@ -112,21 +114,27 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
 
    const handleError = useCallback(
       (message: string) => {
+         console.log(message)
+         errorNotification(message)
+
          helpers.setValue(null, false) // set value to null but don't trigger validation because we already setting an error
          helpers.setError(message) // set error message
          helpers.setTouched(true, false) // set touched to true but don't trigger validation because we already set an error
       },
-      [helpers]
+      [errorNotification, helpers]
    )
 
    const validateVideo = useCallback(
       async (file: File | File[]) => {
+         console.log("🚀 ~ file: VideoUpload.tsx:124 ~ file:", file)
          const newFile = Array.isArray(file) ? file[0] : file
+         console.log("🚀 ~ file: VideoUpload.tsx:131 ~ newFile:", newFile)
 
          let duration
          try {
             duration = await getVideoFileDuration(newFile)
          } catch (error) {
+            console.error(error)
             handleError("Error getting video duration")
             return
          }
@@ -157,6 +165,8 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             // upload file
             videoData = await uploadVideo(newFile)
          } catch (error) {
+            console.error(error)
+
             handleError("Error uploading video")
             return
          }
@@ -166,6 +176,8 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             thumbnail64 = thumbnailsInBase64[0]
             thumbnailFile = dataURLtoFile(thumbnail64)
          } catch (error) {
+            console.error(error)
+
             handleError("Error generating video thumbnails")
             return
          }
@@ -174,6 +186,8 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             // upload thumbnail
             thumbnailData = await uploadThumbnail(thumbnailFile)
          } catch (error) {
+            console.error(error)
+
             handleError("Error uploading video thumbnail")
             return
          }
