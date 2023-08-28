@@ -1,8 +1,9 @@
+import { FC, ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
+import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { FC, ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
@@ -42,11 +43,12 @@ type PropType = {
    sparks?: Spark[]
    onSparkClick?: (spark: Spark) => void
    children?: ReactNode[]
+   isAdmin?: boolean
 }
 
 const SparksCarousel: FC<PropType> = (props) => {
-   const { options, sparks, onSparkClick, children } = props
-   const [emblaRef, emblaApi] = useEmblaCarousel(options)
+   const { options, sparks, onSparkClick, children, isAdmin } = props
+   const [emblaRef] = useEmblaCarousel(options)
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
@@ -54,13 +56,20 @@ const SparksCarousel: FC<PropType> = (props) => {
             {sparks?.length
                ? sparks.map((spark) => (
                     <Box key={spark.id} sx={styles.slide}>
-                       <SparkCarouselCard
-                          onClick={() => onSparkClick(spark)}
-                          spark={spark}
-                       />
+                       {isAdmin ? (
+                          <SparkCarouselCardForAdmin
+                             onClick={() => onSparkClick(spark)}
+                             spark={spark}
+                          />
+                       ) : (
+                          <SparkCarouselCard
+                             onClick={() => onSparkClick(spark)}
+                             spark={spark}
+                          />
+                       )}
                     </Box>
                  ))
-               : children.map((child, i) => (
+               : children?.map((child, i) => (
                     <Box key={i} sx={styles.slide}>
                        {child}
                     </Box>

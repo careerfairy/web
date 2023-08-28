@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { sparkToPreviewSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import SparkSkeletonComponent from "./SparkSkeletonComponent"
 
 const styles = sxStyles({
    aspectRoot: {
@@ -52,11 +53,13 @@ const SparkPreviewDialog: FC = () => {
          open={open}
          TransitionComponent={Zoom}
       >
-         <SuspenseWithBoundary fallback={<SkeletonComponent />}>
+         <SuspenseWithBoundary
+            fallback={<SparkSkeletonComponent sx={styles.aspectRoot} />}
+         >
             {sparkId ? (
                <Component onClose={handleClose} sparkId={sparkId} />
             ) : (
-               <SkeletonComponent />
+               <SparkSkeletonComponent sx={styles.aspectRoot} />
             )}
          </SuspenseWithBoundary>
       </Dialog>
