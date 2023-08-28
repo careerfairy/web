@@ -48,7 +48,14 @@ const styles = sxStyles({
       display: "flex",
       mt: "auto",
       p: 2.5,
-      px: 1.5,
+      px: {
+         xs: 1.5,
+         sparksFullscreen: 2.5,
+      },
+      pb: {
+         xs: 3.25,
+         sparksFullscreen: 4,
+      },
    },
    cardDetails: {
       cursor: "pointer",
