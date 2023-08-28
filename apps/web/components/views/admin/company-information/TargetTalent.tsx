@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { Stack, TextField } from "@mui/material"
+import { Autocomplete, Chip, Stack, TextField } from "@mui/material"
 import { Box } from "@mui/system"
 
 import Styles from "./BaseStyles"
@@ -20,6 +20,8 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "types/commonTypes"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
+import BrandedChip from "./BrandedChip"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 
 const styles = sxStyles({
    selectBox: {
@@ -41,6 +43,11 @@ const styles = sxStyles({
       "#branded-multi-checkbox": {
          width: "100%",
       },
+   },
+   saveBtn: {
+      display: "flex",
+      width: "100%",
+      justifyContent: "end",
    },
 })
 
@@ -115,14 +122,7 @@ const TargetTalent = () => {
    return (
       <SectionComponent title={title} description={description}>
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-            {({
-               values,
-               errors,
-               touched,
-               handleBlur,
-               isSubmitting,
-               setFieldValue,
-            }) => (
+            {({ values, dirty, handleBlur, isSubmitting, setFieldValue }) => (
                <Form>
                   <Stack
                      direction={"column"}
@@ -132,63 +132,102 @@ const TargetTalent = () => {
                         gap: "12px",
                      }}
                   >
-                     <BrandedMultiCheckBox
-                        label="Targeted countries"
-                        options={CompanyCountryValues}
-                        value={values.targetedCountries ?? []}
-                        onChange={(values) => {
-                           setFieldValue("targetedCountries", values)
-                        }}
-                        sx={styles.selectBox}
-                     />
-                     <VirtualizedAutocomplete
-                        options={groupedUniversities}
-                        onBlur={handleBlur}
-                        multiple
-                        openOnFocus
-                        disableCloseOnSelect
-                        freeSolo={false}
-                        value={values.targetedUniversities || []}
-                        disabled={isSubmitting}
-                        onChange={(event, value) =>
-                           setFieldValue("targetedUniversities", value)
-                        }
-                        groupBy={(option) => option.countryName}
-                        isOptionEqualToValue={(option, value) =>
-                           option.id === value.id
-                        }
-                        getOptionLabel={(option) => option.name}
-                        renderOption={(props, option) => [props, option.name]}
-                        fullWidth
-                        renderInput={(params) => (
-                           <TextField
-                              {...params}
-                              name={"targetedUniversities"}
-                              label={"Choose a University"}
-                              error={Boolean(
-                                 touched.targetedUniversities &&
-                                    errors.targetedUniversities
-                              )}
-                              helperText={
-                                 touched.targetedUniversities
-                                    ? errors.targetedUniversities
-                                    : null
-                              }
-                           />
-                        )}
-                        sx={styles.selectBox}
-                     />
-                     <BrandedMultiCheckBox
-                        label="Targeted fields of study"
-                        options={RelevantCompanyIndustryValues}
-                        value={values.targetedFieldsOfStudy ?? []}
-                        onChange={(values) => {
-                           setFieldValue("targetedFieldsOfStudy", values)
-                        }}
-                        sx={styles.selectBox}
-                     />
-                     <Box sx={{ justifyContent: "flex-start" }}>
-                        <SaveChangesButton type="submit" />
+                     {/* Target Contries select box */}
+                     <Box sx={styles.selectBox}>
+                        <Autocomplete
+                           id={"targetedCountries"}
+                           options={CompanyCountryValues}
+                           defaultValue={values.targetedCountries}
+                           getOptionLabel={(option) => option.name || ""}
+                           value={values.targetedCountries ?? []}
+                           multiple
+                           onChange={(_, selected) => {
+                              setFieldValue("targetedCountries", selected)
+                           }}
+                           renderTags={(values, getTagProps) => {
+                              return values.map((value, index) => (
+                                 <BrandedChip
+                                    label={value.name}
+                                    meta={getTagProps({ index })}
+                                 />
+                              ))
+                           }}
+                           renderInput={(params) => (
+                              <BrandedTextField
+                                 {...params}
+                                 label={`Targeted countries`}
+                                 onBlur={handleBlur}
+                                 disabled={isSubmitting}
+                              />
+                           )}
+                        />
+                     </Box>
+
+                     {/* Universities select box */}
+                     <Box sx={styles.selectBox}>
+                        <Autocomplete
+                           id={"targetedUniversities"}
+                           options={groupedUniversities}
+                           defaultValue={values.targetedUniversities}
+                           getOptionLabel={(option) => option.name || ""}
+                           value={values.targetedUniversities || []}
+                           multiple
+                           onChange={(_, selected) => {
+                              setFieldValue("targetedUniversities", selected)
+                           }}
+                           groupBy={(option) => option.countryName}
+                           renderTags={(values, getTagProps) => {
+                              return values.map((value, index) => (
+                                 <BrandedChip
+                                    label={value.name}
+                                    meta={getTagProps({ index })}
+                                 />
+                              ))
+                           }}
+                           renderInput={(params) => (
+                              <BrandedTextField
+                                 {...params}
+                                 label={`Targeted universities`}
+                                 onBlur={handleBlur}
+                                 disabled={isSubmitting}
+                              />
+                           )}
+                        />
+                     </Box>
+
+                     {/* Target fields of study select box */}
+                     <Box sx={styles.selectBox}>
+                        <Autocomplete
+                           id={"targetedFieldsOfStudy"}
+                           options={RelevantCompanyIndustryValues}
+                           defaultValue={values.targetedFieldsOfStudy}
+                           getOptionLabel={(option) => option.name || ""}
+                           value={values.targetedFieldsOfStudy ?? []}
+                           multiple
+                           onChange={(_, selected) => {
+                              setFieldValue("targetedFieldsOfStudy", selected)
+                           }}
+                           renderTags={(values, getTagProps) => {
+                              return values.map((value, index) => (
+                                 <BrandedChip
+                                    label={value.name}
+                                    meta={getTagProps({ index })}
+                                 />
+                              ))
+                           }}
+                           renderInput={(params) => (
+                              <BrandedTextField
+                                 {...params}
+                                 label={`Targeted fields of study`}
+                                 onBlur={handleBlur}
+                                 disabled={isSubmitting}
+                              />
+                           )}
+                        />
+                     </Box>
+
+                     <Box sx={styles.saveBtn}>
+                        <SaveChangesButton active={dirty} type="submit" />
                      </Box>
                   </Stack>
                </Form>

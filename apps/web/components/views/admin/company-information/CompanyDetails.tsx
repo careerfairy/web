@@ -18,6 +18,7 @@ import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import BrandedChip from "./BrandedChip"
 
 const styles = sxStyles({
    selectBox: {
@@ -38,23 +39,6 @@ const styles = sxStyles({
       },
       "#branded-multi-checkbox": {
          width: "-webkit-fill-available",
-      },
-   },
-   chip: {
-      display: "flex",
-      padding: "4px 4px 4px 12px",
-      alignItems: "flex-start",
-      gap: "10px",
-      borderRadius: "60px",
-      background: "#6749EA",
-      color: "#FFF",
-      fontFamily: "Poppins",
-      fontSize: "14px",
-      fontStyle: "normal",
-      fontWeight: 600,
-      lineHeight: "20px",
-      ".MuiChip-deleteIcon": {
-         color: "#FFF",
       },
    },
 })
@@ -182,10 +166,9 @@ const CompanyDetails = () => {
                               }}
                               renderTags={(values, getTagProps) => {
                                  return values.map((value, index) => (
-                                    <Chip
-                                       sx={styles.chip}
+                                    <BrandedChip
                                        label={value.name}
-                                       {...getTagProps({ index })}
+                                       meta={getTagProps({ index })}
                                     />
                                  ))
                               }}
