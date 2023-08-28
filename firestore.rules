@@ -241,7 +241,7 @@ service cloud.firestore {
         }
 
         match /sparks/{sparkId} {
-            allow read: if isAnyGroupAdmin();
+            allow read: if true;
             allow write: if false;
         }
 

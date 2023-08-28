@@ -66,7 +66,10 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
             />
             <Box mr={1.25} />
             <Box flexGrow={1} />
-            <NewTag sparkCreatedDate={spark.createdAt.toDate()} />
+            <NewTag
+               sparkCreatedDate={spark.createdAt.toDate()}
+               visible={showAdminOptions}
+            />
             {showAdminOptions ? (
                <Fragment>
                   <Box width={20} />
@@ -106,11 +109,14 @@ const SparkCreatorDetails: FC<SparkCreatorDetailsProps> = ({
 
 type NewTagProps = {
    sparkCreatedDate: Date
+   visible?: boolean
 }
 
 const oneDayAgo = DateTime.now().minus({ days: 1 }).toJSDate()
 
-const NewTag: FC<NewTagProps> = ({ sparkCreatedDate }) => {
+const NewTag: FC<NewTagProps> = ({ sparkCreatedDate, visible = false }) => {
+   // Display only where is necessary
+   if (!visible) return null
    // only show new tag if spark was created within the last 1 day
    if (sparkCreatedDate < oneDayAgo) {
       return null
