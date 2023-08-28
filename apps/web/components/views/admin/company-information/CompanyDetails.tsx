@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react"
-import { Autocomplete, Stack } from "@mui/material"
+import { Autocomplete, Chip, Stack } from "@mui/material"
 import { Box } from "@mui/system"
 
 import { Form, Formik } from "formik"
@@ -17,6 +17,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 
 const styles = sxStyles({
    selectBox: {
@@ -39,6 +40,23 @@ const styles = sxStyles({
          width: "-webkit-fill-available",
       },
    },
+   chip: {
+      display: "flex",
+      padding: "4px 4px 4px 12px",
+      alignItems: "flex-start",
+      gap: "10px",
+      borderRadius: "60px",
+      background: "#6749EA",
+      color: "#FFF",
+      fontFamily: "Poppins",
+      fontSize: "14px",
+      fontStyle: "normal",
+      fontWeight: 600,
+      lineHeight: "20px",
+      ".MuiChip-deleteIcon": {
+         color: "#FFF",
+      },
+   },
 })
 
 const CompanyDetails = () => {
@@ -49,7 +67,7 @@ const CompanyDetails = () => {
       () => ({
          companyName: company.universityName,
          companyCountry: company.companyCountry,
-         companyIndustries: company.companyIndustries,
+         companyIndustries: company.companyIndustries ?? [],
          companySize: company.companySize,
          description: company.description,
          careerPageUrl: company.careerPageUrl,
@@ -152,30 +170,54 @@ const CompanyDetails = () => {
                         </Box>
 
                         <Box sx={styles.selectBox}>
-                           <BrandedMultiCheckBox
-                              label="Company Industries"
+                           <Autocomplete
+                              id={"companyIndustries"}
                               options={CompanyIndustryValues}
+                              defaultValue={values.companyIndustries}
+                              getOptionLabel={(option) => option.name || ""}
                               value={values.companyIndustries ?? []}
-                              onChange={(values) => {
-                                 setFieldValue("companyIndustries", values)
+                              multiple
+                              onChange={(_, selected) => {
+                                 setFieldValue("companyIndustries", selected)
                               }}
-                              sx={styles.selectBox}
+                              renderTags={(values, getTagProps) => {
+                                 return values.map((value, index) => (
+                                    <Chip
+                                       sx={styles.chip}
+                                       label={value.name}
+                                       {...getTagProps({ index })}
+                                    />
+                                 ))
+                              }}
+                              renderInput={(params) => (
+                                 <BrandedTextField
+                                    {...params}
+                                    label={`Company Industries`}
+                                    onBlur={handleBlur}
+                                    disabled={isSubmitting}
+                                 />
+                              )}
                            />
                         </Box>
 
                         <Box sx={styles.selectBox}>
-                           <GenericDropdown
-                              id="companySize-dropdown"
-                              name="companySize"
-                              onChange={(e) => {
-                                 console.log(e.target.value)
-                                 setFieldValue("companySize", e.target.value)
-                              }}
+                           <Autocomplete
+                              id={"companySize"}
+                              options={CompanySizesCodes}
+                              defaultValue={values.companyIndustries}
+                              getOptionLabel={(option) => option.label || ""}
                               value={values.companySize}
-                              label={`Company size`}
-                              list={CompanySizesCodes}
-                              onBlur={handleBlur}
-                              disabled={isSubmitting}
+                              onChange={(_, selected) => {
+                                 setFieldValue("companySize", selected)
+                              }}
+                              renderInput={(params) => (
+                                 <BrandedTextField
+                                    {...params}
+                                    label={`Company size`}
+                                    onBlur={handleBlur}
+                                    disabled={isSubmitting}
+                                 />
+                              )}
                            />
                         </Box>
                      </>
