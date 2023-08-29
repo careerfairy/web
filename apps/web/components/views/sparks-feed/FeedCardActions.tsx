@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
@@ -11,6 +11,11 @@ import ShareIcon from "components/views/common/icons/ShareIcon"
 import GlobeIcon from "components/views/common/icons/GlobeIcon"
 import FilterIcon from "components/views/common/icons/FilterIcon"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
+import SparksShareDialog from "../sparks/components/SparksShareDialog"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { useAuth } from "HOCs/AuthProvider"
 
 const actionWidth = 52
 
@@ -61,33 +66,67 @@ type Props = {
 }
 
 const FeedCardActions: FC<Props> = ({ spark }) => {
+   const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
+      useDialogStateHandler()
+   const isMobile = useIsMobile()
+   const { userData } = useAuth()
+
+   const shareUrl = useMemo(() => {
+      return `${getHost()}/sparks/${spark.id}?referral=${
+         userData?.referralCode
+      }&invite=${spark.id}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
+   }, [spark.id, userData?.referralCode])
+
+   const shareData = useMemo(() => {
+      return {
+         title: "CareerFairy",
+         text: "Check out this Spark on CareerFairy!",
+         url: shareUrl,
+      }
+   }, [shareUrl])
+
+   const handleShare = useCallback(async () => {
+      if (isMobile && navigator?.share) {
+         await navigator.share(shareData)
+      } else {
+         handleOpenShareDialog()
+      }
+   }, [handleOpenShareDialog, isMobile, shareData])
+
    return (
-      <Stack spacing={3} sx={styles.root}>
-         <Action
-            sparkId={spark.id}
-            icon={<LikesIcon />}
-            onClick={() => {}}
-            label="Like"
+      <>
+         <Stack spacing={3} sx={styles.root}>
+            <Action
+               sparkId={spark.id}
+               icon={<LikesIcon />}
+               onClick={() => {}}
+               label="Like"
+            />
+            <Action
+               sparkId={spark.id}
+               icon={<ShareIcon />}
+               onClick={handleShare}
+               label="Share"
+            />
+            <Action
+               sparkId={spark.id}
+               icon={<GlobeIcon />}
+               onClick={() => {}}
+               label="Career Page"
+            />
+            <Action
+               sparkId={spark.id}
+               icon={<FilterIcon />}
+               onClick={() => {}}
+               label="Filter"
+            />
+         </Stack>
+         <SparksShareDialog
+            isOpen={isShareDialogOpen}
+            handleClose={handleCloseShareDialog}
+            shareUrl={shareUrl}
          />
-         <Action
-            sparkId={spark.id}
-            icon={<ShareIcon />}
-            onClick={() => {}}
-            label="Share"
-         />
-         <Action
-            sparkId={spark.id}
-            icon={<GlobeIcon />}
-            onClick={() => {}}
-            label="Cereer Page"
-         />
-         <Action
-            sparkId={spark.id}
-            icon={<FilterIcon />}
-            onClick={() => {}}
-            label="Filter"
-         />
-      </Stack>
+      </>
    )
 }
 
