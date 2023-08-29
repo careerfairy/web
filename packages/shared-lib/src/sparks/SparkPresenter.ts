@@ -7,17 +7,25 @@ import { fromSerializedDate } from "../BaseModel"
 import { Spark, SparkCategory, SparkVideo } from "./sparks"
 
 interface SparkPresenterInterface
-   extends Omit<Spark, "createdAt" | "updatedAt" | "publishedAt"> {
+   extends Omit<
+      Spark,
+      "createdAt" | "updatedAt" | "publishedAt" | "addedToFeedAt"
+   > {
    createdAt: Date
    updatedAt: Date
    publishedAt: Date
+   addedToFeedAt: Date
 }
 
 export interface SerializedSpark
-   extends Omit<Spark, "createdAt" | "updatedAt" | "publishedAt"> {
+   extends Omit<
+      Spark,
+      "createdAt" | "updatedAt" | "publishedAt" | "addedToFeedAt"
+   > {
    createdAt: number
    updatedAt: number
    publishedAt: number
+   addedToFeedAt: number
 }
 
 /**
@@ -40,6 +48,7 @@ export class SparkPresenter implements SparkPresenterInterface {
    createdAt: Date
    updatedAt: Date
    publishedAt: Date
+   addedToFeedAt: Date
    published: boolean
    category: SparkCategory
    question: string
@@ -78,6 +87,7 @@ export class SparkPresenter implements SparkPresenterInterface {
          createdAt: fromSerializedDate(serializedSpark.createdAt),
          updatedAt: fromSerializedDate(serializedSpark.updatedAt),
          publishedAt: fromSerializedDate(serializedSpark.publishedAt),
+         addedToFeedAt: fromSerializedDate(serializedSpark.addedToFeedAt),
       })
    }
 
@@ -97,6 +107,9 @@ export class SparkPresenter implements SparkPresenterInterface {
             : null,
          publishedAt: firebaseObject.publishedAt
             ? firebaseObject.publishedAt.toDate()
+            : null,
+         addedToFeedAt: firebaseObject.addedToFeedAt
+            ? firebaseObject.addedToFeedAt.toDate()
             : null,
       })
    }
@@ -118,6 +131,9 @@ export class SparkPresenter implements SparkPresenterInterface {
          createdAt: spark.createdAt ? spark.createdAt.getTime() : null,
          updatedAt: spark.updatedAt ? spark.updatedAt.getTime() : null,
          publishedAt: spark.publishedAt ? spark.publishedAt.getTime() : null,
+         addedToFeedAt: spark.addedToFeedAt
+            ? spark.addedToFeedAt.getTime()
+            : null,
       }
    }
 
@@ -138,6 +154,9 @@ export class SparkPresenter implements SparkPresenterInterface {
             : null,
          publishedAt: sparkPresenter.publishedAt
             ? Timestamp.fromDate(sparkPresenter.publishedAt)
+            : null,
+         addedToFeedAt: sparkPresenter.addedToFeedAt
+            ? Timestamp.fromDate(sparkPresenter.addedToFeedAt)
             : null,
       }
    }
