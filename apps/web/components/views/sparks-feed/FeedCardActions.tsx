@@ -66,67 +66,28 @@ type Props = {
 }
 
 const FeedCardActions: FC<Props> = ({ spark }) => {
-   const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
-      useDialogStateHandler()
-   const isMobile = useIsMobile()
-   const { userData } = useAuth()
-
-   const shareUrl = useMemo(() => {
-      return `${getHost()}/sparks/${spark.id}?referral=${
-         userData?.referralCode
-      }&invite=${spark.id}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
-   }, [spark.id, userData?.referralCode])
-
-   const shareData = useMemo(() => {
-      return {
-         title: "CareerFairy",
-         text: "Check out this Spark on CareerFairy!",
-         url: shareUrl,
-      }
-   }, [shareUrl])
-
-   const handleShare = useCallback(async () => {
-      if (isMobile && navigator?.share) {
-         await navigator.share(shareData)
-      } else {
-         handleOpenShareDialog()
-      }
-   }, [handleOpenShareDialog, isMobile, shareData])
-
    return (
-      <>
-         <Stack spacing={3} sx={styles.root}>
-            <Action
-               sparkId={spark.id}
-               icon={<LikesIcon />}
-               onClick={() => {}}
-               label="Like"
-            />
-            <Action
-               sparkId={spark.id}
-               icon={<ShareIcon />}
-               onClick={handleShare}
-               label="Share"
-            />
-            <Action
-               sparkId={spark.id}
-               icon={<GlobeIcon />}
-               onClick={() => {}}
-               label="Career Page"
-            />
-            <Action
-               sparkId={spark.id}
-               icon={<FilterIcon />}
-               onClick={() => {}}
-               label="Filter"
-            />
-         </Stack>
-         <SparksShareDialog
-            isOpen={isShareDialogOpen}
-            handleClose={handleCloseShareDialog}
-            shareUrl={shareUrl}
+      <Stack spacing={3} sx={styles.root}>
+         <Action
+            sparkId={spark.id}
+            icon={<LikesIcon />}
+            onClick={() => {}}
+            label="Like"
          />
-      </>
+         <ShareAction sparkId={spark.id} />
+         <Action
+            sparkId={spark.id}
+            icon={<GlobeIcon />}
+            onClick={() => {}}
+            label="Career Page"
+         />
+         <Action
+            sparkId={spark.id}
+            icon={<FilterIcon />}
+            onClick={() => {}}
+            label="Filter"
+         />
+      </Stack>
    )
 }
 
@@ -166,6 +127,54 @@ const Action: FC<ActionProps> = ({ icon, onClick, label, sparkId }) => {
          </IconButton>
          {isFullScreen ? null : actionLabel}
       </Box>
+   )
+}
+
+type ShareActionProps = {
+   sparkId: string
+}
+const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
+   const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
+      useDialogStateHandler()
+   const isMobile = useIsMobile()
+   const { userData } = useAuth()
+
+   const shareUrl = useMemo(() => {
+      return `${getHost()}/sparks/${sparkId}?referral=${
+         userData?.referralCode
+      }&invite=${sparkId}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
+   }, [sparkId, userData?.referralCode])
+
+   const shareData = useMemo(() => {
+      return {
+         title: "CareerFairy",
+         text: "Check out this Spark on CareerFairy!",
+         url: shareUrl,
+      }
+   }, [shareUrl])
+
+   const handleShare = useCallback(async () => {
+      if (isMobile && navigator?.share) {
+         await navigator.share(shareData)
+      } else {
+         handleOpenShareDialog()
+      }
+   }, [handleOpenShareDialog, isMobile, shareData])
+
+   return (
+      <>
+         <Action
+            sparkId={sparkId}
+            icon={<ShareIcon />}
+            onClick={handleShare}
+            label="Share"
+         />
+         <SparksShareDialog
+            isOpen={isShareDialogOpen}
+            handleClose={handleCloseShareDialog}
+            shareUrl={shareUrl}
+         />
+      </>
    )
 }
 
