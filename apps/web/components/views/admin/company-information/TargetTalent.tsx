@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { Autocomplete, Chip, Stack, TextField } from "@mui/material"
 import { Box } from "@mui/system"
+import { v4 as uuid } from "uuid"
 
 import Styles from "./BaseStyles"
 import { Form, Formik } from "formik"
@@ -14,14 +15,21 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo, universityRepo } from "data/RepositoryInstances"
 import { GroupedUniversity } from "components/views/group/create/CreateBaseGroup"
 import VirtualizedAutocomplete from "components/views/common/VirtualizedAutocomplete"
-import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import {
+   University,
+   UniversityCountry,
+   universityCountryMap,
+} from "@careerfairy/shared-lib/universities"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, GroupOption } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "types/commonTypes"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
 import BrandedChip from "./BrandedChip"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { Country } from "schema-dts"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { useUniversityCountries } from "components/custom-hook/useCollection"
 
 const styles = sxStyles({
    selectBox: {
@@ -51,12 +59,26 @@ const styles = sxStyles({
    },
 })
 
+// Using a map to reduce the O complexity
+const mapUniversitiesByCountryId = (
+   universitiesByCountryList: UniversityCountry[]
+) => {
+   const map = []
+   universitiesByCountryList.forEach((item) => {
+      map[item.id] = item
+   })
+   return map
+}
+
 const TargetTalent = () => {
    const { group: company } = useGroup()
-   const [groupedUniversities, setGroupedUniversities] = useState<
-      GroupedUniversity[]
-   >([])
+   const [selectedCountries, setSelectedCountries] = useState<GroupOption[]>([])
    const { successNotification, errorNotification } = useSnackbarNotifications()
+
+   const { data: universitiesByCountry } = useUniversityCountries()
+   const countriesMap = useMemo(() => {
+      return mapUniversitiesByCountryId(universitiesByCountry)
+   }, [universitiesByCountry])
 
    const initialValues = useMemo(
       () => ({
@@ -70,30 +92,6 @@ const TargetTalent = () => {
          company.targetedFieldsOfStudy,
       ]
    )
-
-   useEffect(() => {
-      ;(async function () {
-         const allUniversitiesByCountries =
-            await universityRepo.getAllUniversitiesByCountries()
-         setGroupedUniversities(
-            allUniversitiesByCountries
-               .reduce<GroupedUniversity[]>((acc, universitiesByCountry) => {
-                  const countryCode = universitiesByCountry.id
-                  const countryName =
-                     universityCountryMap[countryCode] || "other"
-                  const universities = universitiesByCountry.universities
-                  return [
-                     ...acc,
-                     ...universities.map((university) => ({
-                        ...university,
-                        countryName,
-                     })),
-                  ]
-               }, [])
-               .sort(dynamicSort("countryName"))
-         )
-      })()
-   }, [])
 
    const handleSubmit = (values) => {
       try {
@@ -114,6 +112,21 @@ const TargetTalent = () => {
       }
    }
 
+   const filterUniversitiesBySelectedContries = useMemo<University[]>(() => {
+      const selectedCountriesIds = selectedCountries?.map(
+         (country) => country.id
+      )
+      let selectedUniversities = []
+      selectedCountriesIds.forEach((countryId) => {
+         const filtered = countriesMap[countryId] ?? {}
+         selectedUniversities = [
+            ...filtered?.universities,
+            ...selectedUniversities,
+         ]
+      })
+      return selectedUniversities
+   }, [selectedCountries, countriesMap])
+
    const [title, description] = [
       "Target talent",
       `Tell us which talent you’re targeting so that we can present them
@@ -132,99 +145,95 @@ const TargetTalent = () => {
                         gap: "12px",
                      }}
                   >
-                     {/* Target Contries select box */}
-                     <Box sx={styles.selectBox}>
-                        <Autocomplete
-                           id={"targetedCountries"}
-                           options={CompanyCountryValues}
-                           defaultValue={values.targetedCountries}
-                           getOptionLabel={(option) => option.name || ""}
-                           value={values.targetedCountries ?? []}
-                           multiple
-                           onChange={(_, selected) => {
-                              setFieldValue("targetedCountries", selected)
-                           }}
-                           renderTags={(values, getTagProps) => {
-                              return values.map((value, index) => (
-                                 <BrandedChip
-                                    label={value.name}
-                                    meta={getTagProps({ index })}
-                                 />
-                              ))
-                           }}
-                           renderInput={(params) => (
-                              <BrandedTextField
-                                 {...params}
-                                 label={`Targeted countries`}
-                                 onBlur={handleBlur}
-                                 disabled={isSubmitting}
+                     {/* Target Countries select box */}
+                     <Autocomplete
+                        id={"targetedCountries"}
+                        options={CompanyCountryValues}
+                        defaultValue={values.targetedCountries}
+                        getOptionLabel={(option) => option.name || ""}
+                        value={values.targetedCountries ?? []}
+                        multiple
+                        onChange={(_, selected) => {
+                           setSelectedCountries(selected)
+                           setFieldValue("targetedCountries", selected)
+                        }}
+                        renderTags={(values, getTagProps) => {
+                           return values.map((value, index) => (
+                              <BrandedChip
+                                 label={value.name}
+                                 meta={getTagProps({ index })}
                               />
-                           )}
-                        />
-                     </Box>
+                           ))
+                        }}
+                        renderInput={(params) => (
+                           <BrandedTextField
+                              {...params}
+                              label={`Targeted countries`}
+                              onBlur={handleBlur}
+                              disabled={isSubmitting}
+                           />
+                        )}
+                     />
 
                      {/* Universities select box */}
-                     <Box sx={styles.selectBox}>
-                        <Autocomplete
-                           id={"targetedUniversities"}
-                           options={groupedUniversities}
-                           defaultValue={values.targetedUniversities}
-                           getOptionLabel={(option) => option.name || ""}
-                           value={values.targetedUniversities || []}
-                           multiple
-                           onChange={(_, selected) => {
-                              setFieldValue("targetedUniversities", selected)
-                           }}
-                           groupBy={(option) => option.countryName}
-                           renderTags={(values, getTagProps) => {
-                              return values.map((value, index) => (
-                                 <BrandedChip
-                                    label={value.name}
-                                    meta={getTagProps({ index })}
-                                 />
-                              ))
-                           }}
-                           renderInput={(params) => (
-                              <BrandedTextField
-                                 {...params}
-                                 label={`Targeted universities`}
-                                 onBlur={handleBlur}
-                                 disabled={isSubmitting}
+                     <Autocomplete
+                        id={"targetedUniversities"}
+                        options={filterUniversitiesBySelectedContries}
+                        defaultValue={values.targetedUniversities}
+                        getOptionLabel={(option) => option.name || ""}
+                        value={values.targetedUniversities || []}
+                        multiple
+                        onChange={(_, selected) => {
+                           setFieldValue("targetedUniversities", selected)
+                        }}
+                        groupBy={(option) => option.countryName}
+                        renderTags={(values, getTagProps) => {
+                           return values.map((value, index) => (
+                              <BrandedChip
+                                 key={value.id}
+                                 label={value.name}
+                                 meta={getTagProps({ index })}
                               />
-                           )}
-                        />
-                     </Box>
+                           ))
+                        }}
+                        renderInput={(params) => (
+                           <BrandedTextField
+                              {...params}
+                              label={`Targeted universities`}
+                              onBlur={handleBlur}
+                              disabled={isSubmitting}
+                           />
+                        )}
+                     />
 
                      {/* Target fields of study select box */}
-                     <Box sx={styles.selectBox}>
-                        <Autocomplete
-                           id={"targetedFieldsOfStudy"}
-                           options={RelevantCompanyIndustryValues}
-                           defaultValue={values.targetedFieldsOfStudy}
-                           getOptionLabel={(option) => option.name || ""}
-                           value={values.targetedFieldsOfStudy ?? []}
-                           multiple
-                           onChange={(_, selected) => {
-                              setFieldValue("targetedFieldsOfStudy", selected)
-                           }}
-                           renderTags={(values, getTagProps) => {
-                              return values.map((value, index) => (
-                                 <BrandedChip
-                                    label={value.name}
-                                    meta={getTagProps({ index })}
-                                 />
-                              ))
-                           }}
-                           renderInput={(params) => (
-                              <BrandedTextField
-                                 {...params}
-                                 label={`Targeted fields of study`}
-                                 onBlur={handleBlur}
-                                 disabled={isSubmitting}
+                     <Autocomplete
+                        id={"targetedFieldsOfStudy"}
+                        options={RelevantCompanyIndustryValues}
+                        defaultValue={values.targetedFieldsOfStudy}
+                        getOptionLabel={(option) => option.name || ""}
+                        value={values.targetedFieldsOfStudy ?? []}
+                        multiple
+                        onChange={(_, selected) => {
+                           setFieldValue("targetedFieldsOfStudy", selected)
+                        }}
+                        renderTags={(values, getTagProps) => {
+                           return values.map((value, index) => (
+                              <BrandedChip
+                                 label={value.name}
+                                 meta={getTagProps({ index })}
                               />
-                           )}
-                        />
-                     </Box>
+                           ))
+                        }}
+                        renderInput={(params) => (
+                           <BrandedTextField
+                              {...params}
+                              label={`Targeted fields of study`}
+                              onBlur={handleBlur}
+                              disabled={isSubmitting}
+                           />
+                        )}
+                     />
 
                      <Box sx={styles.saveBtn}>
                         <SaveChangesButton active={dirty} type="submit" />
