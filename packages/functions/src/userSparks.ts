@@ -71,6 +71,12 @@ export const markSparkAsSeenByUser = functions
                await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
 
                await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
+
+               await sparkRepo.replenishUserFeed(userEmail)
+
+               functions.logger.info(
+                  `Marked spark ${sparkId} as seen by user ${userEmail}`
+               )
             } catch (error) {
                logAndThrow("Error in marking spark as seen by user", {
                   data,

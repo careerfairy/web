@@ -101,6 +101,7 @@ export class SparksService {
 
       // Determine the base query depending on the provided options.
       let baseQuery: Query
+      let sortField: "addedToFeedAt" | "publishedAt" = "publishedAt"
 
       if ("groupId" in options) {
          // Query sparks based on the specified group.
@@ -108,25 +109,32 @@ export class SparksService {
             collection(db, "sparks"),
             where("group.id", "==", options.groupId!)
          )
+
          // Check if options specify a userId and ensure it's not null.
-      } else if ("userId" in options && options.userId !== null) {
+      } else if (options.userId) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
          )
+
+         // Set the sort field to be the addedToFeedAt field.
+         sortField = "addedToFeedAt"
       } else {
          // If neither userId nor groupId are specified, query the public sparks feed.
          baseQuery = query(collection(db, "sparks"))
       }
 
       // Order the results by their publication date in descending order.
-      baseQuery = query(baseQuery, orderBy("publishedAt", "desc"))
+      baseQuery = query(
+         baseQuery,
+         orderBy(sortField, sortField === "publishedAt" ? "desc" : "asc")
+      )
 
       // If a lastSpark is provided, apply pagination logic to start after that spark.
       // Additionally, apply the limit to get only the specified number of sparks.
       baseQuery = query(
          baseQuery,
-         ...(lastSpark ? [startAfter(lastSpark.publishedAt)] : []),
+         ...(lastSpark ? [startAfter(lastSpark[sortField])] : []),
          limit(numberOfSparks)
       )
 
@@ -172,6 +180,14 @@ export class SparksService {
       const r = await getCountFromServer(q)
 
       return r.data().count > 0
+   }
+
+   async markSparkAsSeen(userId: string, sparkId: string) {
+      if (!userId) return // Should not be called if not logged in
+      return httpsCallable<{ sparkId: string }, void>(
+         this.functions,
+         "markSparkAsSeenByUser"
+      )({ sparkId })
    }
 }
 

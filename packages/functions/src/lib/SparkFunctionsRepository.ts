@@ -23,8 +23,17 @@ import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
-import { FieldPath, Firestore, Storage, Timestamp } from "../api/firestoreAdmin"
+import {
+   FieldPath,
+   FieldValue,
+   Firestore,
+   Storage,
+   Timestamp,
+} from "../api/firestoreAdmin"
 import { createGenericConverter } from "../util/firestore-admin"
+import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
+import { addAddedToFeedAt } from "../util/sparks"
+import { shuffle } from "@careerfairy/shared-lib/utils"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -117,18 +126,7 @@ export interface ISparkFunctionsRepository {
     * @param userId The id of the user
     * @param feed The user's feed if provided, we won't fetch it again
     */
-   replenishUserFeed(
-      userId: string,
-      feed?: UserSparksFeedMetrics
-   ): Promise<void>
-
-   /**
-    * Get all the sparks that a user has seen over the years
-    * - It queries the /userData/{userId}/seenSparks collection
-    * - each document has all the seen sparks by the user for a particular year
-    * @param userId
-    */
-   getUserSeenSparks(userId: string): Promise<SeenSparks[]>
+   replenishUserFeed(userId: string): Promise<void>
 
    /**
     * Marks a spark as seen for a user.
@@ -174,6 +172,16 @@ export interface ISparkFunctionsRepository {
     */
    updateSparkInAllUserFeeds(spark: Spark): Promise<void>
 
+   /**
+    * Increment/Decrement the sparks feed count for a user
+    * @param userId The ID of the user.
+    * @returns void
+    */
+   incrementFeedCount(
+      userId: string,
+      type: "increment" | "decrement"
+   ): Promise<void>
+
    getSparksByGroupId(groupId: string): Promise<Spark[]>
 }
 
@@ -184,12 +192,13 @@ export class SparkFunctionsRepository
    constructor(
       readonly firestore: Firestore,
       readonly storage: Storage,
-      readonly logger: FunctionsLogger
+      readonly logger: FunctionsLogger,
+      readonly feedReplisher: SparksFeedReplenisher
    ) {
       super()
    }
 
-   private readonly TARGET_SPARK_COUNT = 100 // The number of sparks a user's feed should have
+   private readonly TARGET_SPARK_COUNT = 20 // The number of sparks a user's feed should have
 
    async get(id: string): Promise<Spark | null> {
       const doc = await this.firestore
@@ -243,6 +252,7 @@ export class SparkFunctionsRepository
          createdAt: Timestamp.now(),
          publishedAt: data.published ? Timestamp.now() : null,
          updatedAt: null,
+         addedToFeedAt: null,
          published: data.published,
          likes: 0,
          impressions: 0,
@@ -366,20 +376,16 @@ export class SparkFunctionsRepository
       const sparks = sparksSnap.docs.map((doc) => doc.data())
 
       // Randomize sparkIds array
-      // TODO: Should be replaced with recommendation engine dependency injection in the future
-      // This is a simple shuffle using the Fisher-Yates algorithm
-      for (let i = sparks.length - 1; i > 0; i--) {
-         const j = Math.floor(Math.random() * (i + 1))
-         ;[sparks[i], sparks[j]] = [sparks[j], sparks[i]]
-      }
+      shuffle(sparks)
 
       // Store in UserFeed
-      const userFeed: UserSparksFeedMetrics = {
+      const userFeed: Omit<UserSparksFeedMetrics, "numberOfSparks"> = {
          id: userId,
          userId,
-         lastUpdated: Timestamp.now(),
-         numberOfSparks: sparks.length,
+         lastReplenished: Timestamp.now(),
+         replenishStatus: "finished",
       }
+
       const feedRef = this.firestore.collection("sparksFeedMetrics").doc(userId)
 
       await batch.set(feedRef, userFeed, { merge: true })
@@ -391,6 +397,8 @@ export class SparkFunctionsRepository
             .doc(userId)
             .collection("sparksFeed")
             .doc(spark.id)
+
+         addAddedToFeedAt(spark)
 
          batch.set(sparkRef, spark, { merge: true })
       })
@@ -458,7 +466,7 @@ export class SparkFunctionsRepository
 
    async getUserFeedMetrics(userId: string): Promise<UserSparksFeedMetrics> {
       const userFeedSnap = await this.firestore
-         .collection("sparksFeed")
+         .collection("sparksFeedMetrics")
          .withConverter(createGenericConverter<UserSparksFeedMetrics>())
          .doc(userId)
          .get()
@@ -466,62 +474,11 @@ export class SparkFunctionsRepository
       return userFeedSnap.data()
    }
 
-   async getUserSeenSparks(userId: string): Promise<SeenSparks[]> {
-      const seenSparksSnap = await this.firestore
-         .collection(`userData/${userId}/seenSparks`)
-         .withConverter(createGenericConverter<SeenSparks>())
-         .get()
+   async replenishUserFeed(userId: string): Promise<void> {
+      const userSparkFeedMetrics = await this.getUserFeedMetrics(userId)
 
-      return seenSparksSnap.docs.map((doc) => doc.data())
-   }
-
-   async replenishUserFeed(
-      userId: string,
-      feed?: UserSparksFeedMetrics
-   ): Promise<void> {
-      const userSparkFeedMetrics = feed
-         ? feed
-         : await this.getUserFeedMetrics(userId)
-      const currentSparkCount = userSparkFeedMetrics.numberOfSparks
-
-      if (currentSparkCount < this.TARGET_SPARK_COUNT) {
-         const neededSparks = this.TARGET_SPARK_COUNT - currentSparkCount
-
-         const allSeenSparksArr = await this.getUserSeenSparks(userId)
-         const seenSparkIds = allSeenSparksArr.flatMap((sparks) =>
-            Object.keys(sparks.sparks)
-         )
-
-         const sparksSnap = await this.firestore
-            .collection("sparks")
-            .withConverter(createGenericConverter<Spark>())
-            .orderBy("publishedAt", "desc")
-            .limit(seenSparkIds.length + neededSparks)
-            .get()
-
-         const newSparks: Spark[] = []
-
-         // Only add the spark if the user hasn't seen it
-         sparksSnap.docs.forEach((doc) => {
-            if (!seenSparkIds.includes(doc.id)) {
-               newSparks.push(doc.data())
-            }
-         })
-
-         // store the new sparks in the user's feed
-         const batch = this.firestore.batch()
-         newSparks.forEach((spark) => {
-            const sparkRef = this.firestore
-               .collection("userData")
-               .doc(userId)
-               .collection("sparksFeed")
-               .doc(spark.id)
-
-            batch.set(sparkRef, spark, { merge: true })
-         })
-
-         return void batch.commit()
-      }
+      // TODO: Should be replaced with recommendation engine dependency injection in the future
+      return this.feedReplisher.replenishUserFeed(userId, userSparkFeedMetrics)
    }
 
    async markSparkAsSeenByUser(userId: string, sparkId: string): Promise<void> {
@@ -545,11 +502,9 @@ export class SparkFunctionsRepository
       }
 
       // If the spark is not already marked as seen for this user
-      if (!currentSeenSparks.sparks[sparkId]) {
-         currentSeenSparks.sparks[sparkId] = Timestamp.now()
+      currentSeenSparks.sparks[sparkId] = Timestamp.now()
 
-         await seenSparkDocRef.set(currentSeenSparks, { merge: true })
-      }
+      await seenSparkDocRef.set(currentSeenSparks, { merge: true })
    }
 
    async hasUserSeenSpark(userId: string, sparkId: string): Promise<boolean> {
@@ -597,14 +552,16 @@ export class SparkFunctionsRepository
          .withConverter(createGenericConverter<UserSparksFeedMetrics>())
          .get()
 
-      allUsersWithAFeedSnap.docs.forEach((sparkDoc) => {
-         const userId = sparkDoc.data().userId
+      allUsersWithAFeedSnap.docs.forEach((metricsDoc) => {
+         const userId = metricsDoc.data().userId
 
          const userSparkFeedRef = this.firestore
             .collection("userData")
             .doc(userId)
             .collection("sparksFeed")
             .doc(spark.id)
+
+         addAddedToFeedAt(spark)
 
          bulkWriter.set(userSparkFeedRef, spark, { merge: true })
       })
@@ -626,6 +583,17 @@ export class SparkFunctionsRepository
       })
 
       await bulkWriter.close()
+   }
+
+   async incrementFeedCount(
+      userId: string,
+      type: "increment" | "decrement"
+   ): Promise<void> {
+      const ref = this.firestore.collection("sparksFeedMetrics").doc(userId)
+
+      await ref.update({
+         numberOfSparks: FieldValue.increment(type === "increment" ? 1 : -1),
+      })
    }
 
    async getSparksByGroupId(groupId: string): Promise<Spark[]> {

@@ -20,6 +20,12 @@ export interface Spark extends Identifiable {
    publishedAt: Timestamp
 
    /**
+    * The time when the spark was added to the feed
+    * - Only used for private sparks
+    */
+   addedToFeedAt: Timestamp
+
+   /**
     * We can filter sparks by its published state:
     * - false: spark is created but not published
     * - true: spark is ready
@@ -85,7 +91,7 @@ export interface UserSparksFeedMetrics extends Identifiable {
    /**
     * When last the feed was updated
     */
-   lastUpdated: Timestamp
+   lastReplenished: Timestamp
    /**
     * The number of sparks in the feed
     * - This is used to determine if we need to replenish the feed
@@ -93,6 +99,15 @@ export interface UserSparksFeedMetrics extends Identifiable {
     * - This is to prevent us from replenishing the feed too often
     */
    numberOfSparks: number
+   /**
+    * The status of the feed replenishment
+    * - started: the feed replenishment has started
+    * - finished: the feed replenishment has finished
+    * - failed: the feed replenishment has failed
+    * - This is used to prevent us from replenishing the feed too often
+    * - If the feed replenishment has started, we will not start another replenishment
+    */
+   replenishStatus: "started" | "finished" | "failed"
 }
 
 /**
@@ -123,6 +138,40 @@ export const createSeenSparksDocument = (
    sparks: {},
    id: year.toString(),
 })
+
+/**
+ * A map of spark ids to timestamps for easy lookups
+ */
+export type SeenSparksMap = {
+   [sparkId: string]: Timestamp // The timestamp when the spark was last seen
+}
+
+/**
+ * Takes an array of seen sparks documents for the year for a specific user
+ * It merges multiple years of seen sparks into a single map where each entry
+ * corresponds to the latest time a particular spark was seen.
+ *
+ * @param seenSparksByYear - An array of seen sparks documents for a specific user
+ * @returns A map of spark ids to timestamps for easy lookups
+ */
+export const createSeenSparksMap = (
+   seenSparksByYear: SeenSparks[]
+): SeenSparksMap => {
+   const seenSparksMap: SeenSparksMap = {}
+
+   seenSparksByYear.forEach((seenSparks) => {
+      Object.entries(seenSparks.sparks).forEach(([sparkId, timestamp]) => {
+         if (
+            !seenSparksMap[sparkId] ||
+            timestamp.toMillis() > seenSparksMap[sparkId].toMillis()
+         ) {
+            seenSparksMap[sparkId] = timestamp
+         }
+      })
+   })
+
+   return seenSparksMap
+}
 
 /**
  * Collection path: /deletedSparks

@@ -204,10 +204,12 @@ exports.onCreateLivestreamRatingAnswer =
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
+exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
+exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 
 // Group Spark Functions
 exports.createSpark_v2 = groupSparks.createSpark

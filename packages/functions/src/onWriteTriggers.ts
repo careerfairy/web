@@ -195,7 +195,7 @@ export const onWriteSpark = functions
       }
 
       if (changeTypes.isUpdate) {
-         // TODO: Update spark in user feeds
+         // Update spark in user feeds
          sideEffectPromises.push(
             sparkRepo.updateSparkInAllUserFeeds(change.after.data() as Spark)
          )

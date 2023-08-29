@@ -111,7 +111,8 @@ const sparksFeedSlice = createSlice({
 
                state.fetchNextSparksStatus = "idle"
 
-               state.sparks = mergeSparks(sparks, action.payload)
+               // We don't mind duplicates since the feed is endless
+               state.sparks = [...sparks, ...action.payload]
 
                if (action.payload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
