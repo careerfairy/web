@@ -11,7 +11,7 @@ import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
 import {
    generateVideoThumbnails,
-   getVideoFileDuration,
+   getVideoDurationFromVideoFile,
 } from "components/util/video"
 import FileUploader, {
    FileUploaderProps,
@@ -125,7 +125,7 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
 
          let duration
          try {
-            duration = await getVideoFileDuration(newFile)
+            duration = await getVideoDurationFromVideoFile(newFile)
          } catch (error) {
             handleError("Error getting video duration")
             return
