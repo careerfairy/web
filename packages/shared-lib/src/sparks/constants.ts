@@ -17,7 +17,7 @@ export const SPARK_CONSTANTS = {
    /**
     * The allowed file formats for a spark
     */
-   ALLOWED_FILE_FORMATS: ["mp4", "mov", "MP4", "MOV"],
+   ALLOWED_FILE_FORMATS: ["mp4", "mov"],
 
    /**
     * The maximum length of a spark question
