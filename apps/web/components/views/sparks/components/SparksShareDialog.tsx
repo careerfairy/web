@@ -7,10 +7,9 @@ import {
    Grow,
    IconButton,
    Typography,
-   useMediaQuery,
 } from "@mui/material"
 
-import React, { FC, useCallback, useMemo, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
 import ReferralWidget from "components/views/common/ReferralWidget"
@@ -24,6 +23,7 @@ import {
    X as CloseIcon,
 } from "react-feather"
 import { useTheme } from "@mui/styles"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 
 const styles = sxStyles({
    titleContainer: {
@@ -88,8 +88,7 @@ const datalayerEntityName = "sparks"
 const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
-   const { breakpoints } = useTheme()
-   const isSmallDisplay = useMediaQuery(breakpoints.down("md"))
+   const isFullScreen = useSparksFeedIsFullScreen()
 
    const handleCloseDialog = useCallback(() => {
       handleClose()
@@ -125,7 +124,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
          onClose={handleCloseDialog}
          PaperProps={{
             style: {
-               left: isSmallDisplay ? "0%" : "10%",
+               left: isFullScreen ? "0%" : "10%",
             },
          }}
       >
