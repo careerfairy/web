@@ -12,26 +12,9 @@ import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import QuestionName from "./QuestionName"
 import { sxStyles } from "types/commonTypes"
-import { v4 as uuidv4 } from "uuid"
 import { createAGroupQuestionOption } from "./createAGroupQuestionOption"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-
-const getInitialGroupQuestion = (
-   groupQuestion?: GroupQuestion
-): GroupQuestion => {
-   if (groupQuestion) {
-      return {
-         ...groupQuestion,
-      }
-   }
-   return {
-      id: uuidv4(),
-      name: "",
-      options: {},
-      hidden: false,
-      questionType: "custom",
-   }
-}
+import { createAGroupQuestion } from "./createAGroupQuestion"
 
 const styles = sxStyles({
    form: {
@@ -132,7 +115,9 @@ const RegistrationQuestion: React.FC<Props> = ({
    const { group } = useGroup()
    const [isNew, setIsNew] = useState(true)
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const localGroupQuestion = getInitialGroupQuestion(initialValues)
+   const localGroupQuestion = initialValues
+      ? initialValues
+      : createAGroupQuestion()
 
    useEffect(() => {
       if (
@@ -144,7 +129,9 @@ const RegistrationQuestion: React.FC<Props> = ({
       }
    }, [initialValues])
 
-   const deleteQuestion = async ({ groupQuestionId }: QuestionDeleteParams) => {
+   const handleRemoveQuestion = async ({
+      groupQuestionId,
+   }: QuestionDeleteParams) => {
       if (!isNew) {
          await groupRepo.deleteGroupQuestion(
             group.id,
@@ -152,13 +139,6 @@ const RegistrationQuestion: React.FC<Props> = ({
          )
       }
       return onRemove(groupQuestionId)
-   }
-
-   const handleAddOption = (question, setFieldValue) => {
-      const newOption = createAGroupQuestionOption()
-      const newOptions = { ...question.options }
-      newOptions[newOption.id] = newOption
-      setFieldValue("options", newOptions)
    }
 
    const handleSubmit = (question): void => {
@@ -175,6 +155,13 @@ const RegistrationQuestion: React.FC<Props> = ({
       } catch (e) {
          errorNotification(e, "An error has occured")
       }
+   }
+
+   const handleAddOption = (question, setFieldValue) => {
+      const newOption = createAGroupQuestionOption()
+      const newOptions = { ...question.options }
+      newOptions[newOption.id] = newOption
+      setFieldValue("options", newOptions)
    }
 
    return (
@@ -232,7 +219,9 @@ const RegistrationQuestion: React.FC<Props> = ({
                            <Button
                               sx={styles.removeOptionButton}
                               onClick={() =>
-                                 deleteQuestion({ groupQuestionId: values.id })
+                                 handleRemoveQuestion({
+                                    groupQuestionId: values.id,
+                                 })
                               }
                            >
                               Remove question
