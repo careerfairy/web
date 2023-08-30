@@ -110,7 +110,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
 
    const copySparkLinkToClipboard = useCallback(() => {
       setIsCopied(true)
-      const sourceLink = shareUrl + "&UTM_source=CareerFairy"
+      const sourceLink = shareUrl + "&utm_source=CareerFairy"
       copyStringToClipboard(sourceLink)
    }, [shareUrl])
 

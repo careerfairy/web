@@ -142,7 +142,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
          userData?.referralCode
-      }&invite=${sparkId}&UTM_medium=Sparks_referrals&UTM_campaign=Sparks`
+      }&invite=${sparkId}&utm_medium=Sparks_referrals&utm_campaign=Sparks`
    }, [sparkId, userData?.referralCode])
 
    const shareData = useMemo(() => {
