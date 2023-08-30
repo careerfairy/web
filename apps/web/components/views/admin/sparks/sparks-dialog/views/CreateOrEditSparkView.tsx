@@ -31,6 +31,7 @@ import VideoUpload from "./components/VideoUpload"
 import useSparkFormSubmit, { SparkFormValues } from "./hooks/useSparkFormSubmit"
 import CreateOrEditSparkViewSchema from "./schemas/CreateOrEditSparkViewSchema"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useCanPublishMoreSparks from "../../../../sparks/forms/hooks/useCanPublishMoreSparks"
 
 const styles = sxStyles({
    flex: {
@@ -51,7 +52,8 @@ const styles = sxStyles({
 const getInitialSparkValues = (
    spark: Spark,
    selectedCreator: PublicCreator,
-   cachedFormValues: SparkFormValues
+   cachedFormValues: SparkFormValues,
+   canPublishMoreSparks: boolean
 ): SparkFormValues => {
    if (cachedFormValues) {
       return {
@@ -70,7 +72,9 @@ const getInitialSparkValues = (
             ? spark.published
                ? "true"
                : "false"
-            : "true",
+            : canPublishMoreSparks
+            ? "true"
+            : "false",
       id: spark?.id ?? "",
       // If the user has selected a creator, that creator has priority over the current Spark's creator
       creator: selectedCreator ?? spark?.creator ?? null,
@@ -79,6 +83,7 @@ const getInitialSparkValues = (
 
 const CreateOrEditSparkView = () => {
    const { group } = useGroup()
+   const canPublishMoreSparks = useCanPublishMoreSparks(group)
 
    const selectedCreator = useSelector(sparksFormSelectedCreator)
    const selectedSparkId = useSelector(sparksSelectedSparkId)
@@ -125,7 +130,8 @@ const CreateOrEditSparkView = () => {
                      initialValues={getInitialSparkValues(
                         spark,
                         selectedCreator,
-                        cachedFormValues
+                        cachedFormValues,
+                        canPublishMoreSparks
                      )}
                      validationSchema={CreateOrEditSparkViewSchema}
                      enableReinitialize
@@ -146,6 +152,7 @@ const CreateOrEditSparkView = () => {
 const FormComponent: FC = () => {
    const isMobile = useIsMobile()
    const { group } = useGroup()
+   const canPublishMoreSparks = useCanPublishMoreSparks(group)
 
    const dispatch = useDispatch()
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
@@ -262,7 +269,10 @@ const FormComponent: FC = () => {
                         />
                      </Grid>
                      <Grid item xs={12}>
-                        <SparkVisibilitySelect name="published" />
+                        <SparkVisibilitySelect
+                           name="published"
+                           canPublishMoreSparks={canPublishMoreSparks}
+                        />
                      </Grid>
                   </Grid>
                </Grid>

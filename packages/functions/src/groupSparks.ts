@@ -6,6 +6,7 @@ import {
    DeleteSparkData,
    UpdateSparkData,
    sparksCategoriesArray,
+   Spark,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { boolean, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
@@ -16,6 +17,7 @@ import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const sparkDataValidator = {
    question: string()
@@ -64,7 +66,12 @@ export const createSpark = functions.region(config.region).https.onCall(
                })
             }
 
-            return sparkRepo.create(data, group, creator)
+            await sparkRepo.create(data, group, creator)
+
+            functions.logger.log(
+               `Create Spark '${data.question}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in creating spark", {
                data,
@@ -99,7 +106,12 @@ export const updateSpark = functions.region(config.region).https.onCall(
                })
             }
 
-            return sparkRepo.update(data, creator)
+            await sparkRepo.update(data, creator)
+
+            functions.logger.log(
+               `Update Spark '${data.id}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in updating spark", {
                data,
@@ -120,7 +132,13 @@ export const deleteSpark = functions.region(config.region).https.onCall(
       userShouldBeGroupAdmin(),
       async (data: DeleteSparkData, context) => {
          try {
-            return sparkRepo.delete(data.id)
+            const group = context.middlewares.group as Group
+            await sparkRepo.delete(data.id)
+
+            functions.logger.log(
+               `Delete Spark '${data.id}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in deleting spark", {
                data,
@@ -131,3 +149,93 @@ export const deleteSpark = functions.region(config.region).https.onCall(
       }
    )
 )
+
+const validateGroupSparks = async (group: Group) => {
+   try {
+      const { groupId, publicSparks } = group
+
+      // get all the creators from a group
+      const creators: Creator[] = await groupRepo.getCreators(groupId)
+
+      // if the groups has 3 or more creators, validation continues
+      if (
+         creators?.length >= SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+      ) {
+         // get all the sparks from a Group
+         const sparks = await sparkRepo.getSparksByGroupId(groupId)
+         let sparksPerCreatorCounter = 0
+
+         const isValid = creators?.some(({ id: creatorId }) => {
+            // filter all the public sparks per Creator
+            const numberOfPublicSparks = sparks?.filter(
+               (spark: Spark) =>
+                  spark.creator.id === creatorId && spark.published === true
+            ).length
+
+            functions.logger.log(
+               `Creator ${creatorId}, has ${numberOfPublicSparks} public Sparks`
+            )
+
+            if (
+               numberOfPublicSparks >=
+               SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+            ) {
+               sparksPerCreatorCounter++
+            }
+
+            return (
+               sparksPerCreatorCounter ===
+               SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+            )
+         })
+
+         if (isValid) {
+            if (publicSparks) {
+               return functions.logger.log(
+                  `After validation, the group ${groupId} continues to have public sparks`
+               )
+            }
+
+            functions.logger.log(
+               `After validation, the group ${groupId} is able to have public sparks`
+            )
+            return groupRepo.updatePublicSparks(groupId, true)
+         }
+
+         if (
+            sparksPerCreatorCounter <
+            SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+         ) {
+            // To be here, it means that the group has {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} or more creators
+            // but does not have at least {MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} sparks for {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} different creators
+            // which means this group should not have their sparks public
+
+            // only update if needed
+            if (publicSparks) {
+               functions.logger.log(
+                  `After validation, the group ${groupId} does no longer have public sparks`
+               )
+               return groupRepo.updatePublicSparks(groupId, false)
+            }
+
+            return functions.logger.log(
+               `After validation, the group ${groupId} has more than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators but less than ${SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS} Sparks per Creator`
+            )
+         }
+      }
+
+      // To be here, it means that the group has less than {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} creators
+      // which means this group should not have their sparks public
+
+      // only update if needed
+      if (publicSparks) {
+         return groupRepo.updatePublicSparks(groupId, false)
+      }
+
+      functions.logger.log(
+         `After validation, the group ${groupId} has less than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators`
+      )
+   } catch (error) {
+      return functions.logger.error("Error during Spark validation", { error })
+   }
+}

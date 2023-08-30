@@ -6,6 +6,7 @@ import {
    getFirestore,
    Timestamp,
    Firestore,
+   FieldPath,
 } from "firebase-admin/firestore"
 
 /**
@@ -23,4 +24,4 @@ export const firestore = getFirestore()
 export const auth = getAuth()
 export const storage = getStorage()
 
-export { FieldValue, Timestamp, Storage, Firestore }
+export { FieldValue, Timestamp, Storage, Firestore, FieldPath }

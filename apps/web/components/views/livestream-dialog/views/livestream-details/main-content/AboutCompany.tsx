@@ -24,6 +24,7 @@ import { ChevronRight as MoreIcon } from "react-feather"
 import Section from "./Section"
 import { InViewRef } from "../MainContentNavigation"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
 
 const styles = sxStyles({
    root: {
@@ -106,6 +107,11 @@ const styles = sxStyles({
          transition: (theme) => theme.transitions.create("margin-right"),
       },
    },
+   badge: {
+      height: 32,
+      width: 32,
+      ml: 1,
+   },
 })
 
 interface Props {
@@ -165,10 +171,18 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   direction="row"
                   spacing={2}
                   justifyContent="space-between"
+                  alignItems="center"
                >
-                  <Typography component="h5" sx={styles.companyName}>
-                     {presenter.company}
-                  </Typography>
+                  <Stack flexDirection={"row"} alignItems={"center"}>
+                     <Typography component="h5" sx={styles.companyName}>
+                        {presenter.company}
+                     </Typography>
+
+                     {company.publicSparks ? (
+                        <PublicSparksBadge sx={styles.badge} />
+                     ) : null}
+                  </Stack>
+
                   <FollowCompanyButton company={company} />
                </Stack>
                <Stack

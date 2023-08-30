@@ -21,6 +21,10 @@ type Props = {
    fieldsOfStudy?: FieldOfStudy[]
    recordedOnly?: boolean
    listenToPastEvents?: boolean
+   /**
+    * The maximum number of LivestreamEvents to return. Will return `limit + 1` in case we want to know if there are more events.
+    */
+   limit?: number
 }
 
 /**
@@ -49,6 +53,7 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
       fieldsOfStudy,
       recordedOnly,
       listenToPastEvents,
+      limit,
    } = props
 
    const eventsQuery = useMemo<firebase.firestore.Query>(() => {
@@ -104,17 +109,22 @@ const useListenToStreams = (props?: Props): LivestreamEvent[] => {
          query = query.where("denyRecordingAccess", "==", false)
       }
 
+      if (limit) {
+         query = query.limit(limit + 1) // +1 to check if there are more events
+      }
+
       return query
    }, [
-      fieldsOfStudy,
-      filterByGroupId,
-      from,
-      getHiddenEvents,
-      interestsIds,
-      languagesIds,
-      registeredUserEmail,
       listenToPastEvents,
+      filterByGroupId,
+      languagesIds,
+      interestsIds,
+      getHiddenEvents,
+      from,
       recordedOnly,
+      limit,
+      registeredUserEmail,
+      fieldsOfStudy,
    ])
 
    let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {

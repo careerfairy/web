@@ -47,6 +47,7 @@ import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
+import userSparks = require("./userSparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -193,6 +194,7 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
 exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
+exports.onWriteSpark = onWriteTriggers.onWriteSpark
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
@@ -202,12 +204,18 @@ exports.onCreateLivestreamRatingAnswer =
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
 exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
+exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
+exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 
-// Sparks
-exports.createSpark = groupSparks.createSpark
-exports.updateSpark = groupSparks.updateSpark
-exports.deleteSpark = groupSparks.deleteSpark
+// Group Spark Functions
+exports.createSpark_v2 = groupSparks.createSpark
+exports.updateSpark_v2 = groupSparks.updateSpark
+exports.deleteSpark_v2 = groupSparks.deleteSpark
+
+// User Spark Functions
+exports.getSparksFeed = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser

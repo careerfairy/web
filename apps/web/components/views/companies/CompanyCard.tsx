@@ -28,6 +28,7 @@ import FollowButton from "../common/company/FollowButton"
 import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
+import PublicSparksBadge from "../common/icons/PublicSparksBadge"
 
 const LOGO_HEIGHT = 60
 const LOGO_WIDTH = 64
@@ -102,6 +103,11 @@ const styles = sxStyles({
       zIndex: 1,
       textDecoration: "none !important",
    },
+   badge: {
+      height: 32,
+      width: 32,
+      ml: 1,
+   },
 })
 
 type Props = {
@@ -148,15 +154,21 @@ const CompanyCard: FC<Props> = ({ company }) => {
                )}
             </Box>
             <Stack flex={1} justifyContent="space-between" spacing={2}>
-               <Typography
-                  sx={styles.companyName}
-                  variant="h6"
-                  fontWeight={600}
-                  whiteSpace="pre-line"
-                  component="h2"
-               >
-                  {company.universityName}
-               </Typography>
+               <Stack flexDirection={"row"} alignItems={"center"}>
+                  <Typography
+                     sx={styles.companyName}
+                     variant="h6"
+                     fontWeight={600}
+                     whiteSpace="pre-line"
+                     component="h2"
+                  >
+                     {company.universityName}
+                  </Typography>
+
+                  {company.publicSparks ? (
+                     <PublicSparksBadge sx={styles.badge} />
+                  ) : null}
+               </Stack>
                <Stack spacing={1}>
                   <CompanyCountryTag
                      fontSize="1.07rem"

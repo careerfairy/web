@@ -32,6 +32,8 @@ export interface Group extends Identifiable {
     * This flag is used to determine if the group has access to sparks
     * */
    sparksAdminPageFlag?: boolean
+   maxPublicSparks?: number
+   publicSparks?: boolean
    /*
     * Metadata for the group
     * */
@@ -235,6 +237,7 @@ export type PublicGroup = Pick<
    | "extraInfo"
    | "universityName"
    | "universityCode"
+   | "publicSparks"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
@@ -245,6 +248,7 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       extraInfo: group.extraInfo ?? null,
       universityName: group.universityName ?? null,
       universityCode: group.universityCode ?? null,
+      publicSparks: group.publicSparks ?? null,
    }
 }
 
