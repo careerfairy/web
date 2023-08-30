@@ -104,7 +104,7 @@ const QuestionarieCreation: FC<Props> = ({ initialData }) => {
          <Button
             sx={{
                ...styles.addNewQuestionButton,
-               color: inputMode ? "#D9D9D9" : "#6749EA",
+               color: !inputMode ? "#D9D9D9" : "#6749EA",
             }}
             onClick={() => addQuestionnarieQuestion()}
          >
