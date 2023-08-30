@@ -87,7 +87,8 @@ export class SparksService {
     * @param lastSpark - The last retrieved spark to determine the starting point for the next batch.
     *                    If null, the first batch will be retrieved.
     * @param options - The options for the fetch. This can either specify a `userId` or a `groupId`,
-    *                  but not both. It also optionally specifies the number of sparks to fetch.
+    *                  but not both. It also optionally specifies the number of sparks to fetch
+    *                  and the categories for which to filter the sparks
     *
     * @returns A promise that resolves to an array of SparkPresenter objects.
     */
@@ -122,6 +123,14 @@ export class SparksService {
       } else {
          // If neither userId nor groupId are specified, query the public sparks feed.
          baseQuery = query(collection(db, "sparks"))
+      }
+
+      // Filter the sparks by category if provided
+      if (options.sparkCategories?.length) {
+         baseQuery = query(
+            baseQuery,
+            where("category", "in", options.sparkCategories)
+         )
       }
 
       // Order the results by their publication date in descending order.
