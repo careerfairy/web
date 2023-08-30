@@ -211,6 +211,7 @@ const RegistrationQuestion: React.FC<Props> = ({
                                  newValue
                               )
                            }
+                           lastItem={values.options.length === cardinal - 1}
                         />
                      )
                   )}
