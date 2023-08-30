@@ -71,10 +71,10 @@ const useSocials = ({
          : ""
       const encodedUrlBase = encodeURIComponent(urlBase + "?")
 
-      const linkedinLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrlBase}UTM_source=LinkedIn${encodedUrlParameters}`
-      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedUrlBase}UTM_source=Facebook${encodedUrlParameters}`
-      const twitterLink = `https://twitter.com/intent/tweet?url=${encodedUrlBase}UTM_source=X${encodedUrlParameters}&via=CareerFairy&related=CareerFairy&text=${encodedMessage}`
-      const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrlBase}UTM_source=WhatsApp${encodedUrlParameters}`
+      const linkedinLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrlBase}utm_source=LinkedIn${encodedUrlParameters}`
+      const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedUrlBase}utm_source=Facebook${encodedUrlParameters}`
+      const twitterLink = `https://twitter.com/intent/tweet?url=${encodedUrlBase}utm_source=X${encodedUrlParameters}&via=CareerFairy&related=CareerFairy&text=${encodedMessage}`
+      const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrlBase}utm_source=WhatsApp${encodedUrlParameters}`
 
       const eventName = `${dataLayerEntityName}_share`
       const socials = [
@@ -124,7 +124,7 @@ A redirect uri can be added to track where users are coming from internally or f
          {
             icon: EmailIcon,
             name: "Email",
-            href: `mailto:?subject=${title}&body=${encodedUrlBase}UTM_source=Email${encodedUrlParameters}`,
+            href: `mailto:?subject=${title}&body=${encodedUrlBase}utm_source=Email${encodedUrlParameters}`,
             type: SocialPlatformObject.Email,
          },
          {
