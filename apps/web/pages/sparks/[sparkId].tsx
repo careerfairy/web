@@ -2,13 +2,15 @@ import {
    SerializedSpark,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Box, Button, Card, Stack, Typography } from "@mui/material"
+import { Button } from "@mui/material"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import { useEffect, useMemo } from "react"
+import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
+import useSparksFeedIsFullScreen from "pages/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
@@ -17,20 +19,14 @@ import {
    setGroupId,
    setSparks,
    setUserEmail,
-   swipeNextSpark,
-   swipePreviousSpark,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
-   currentSparkIndexSelector,
    fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
-   isFetchingInitialSparksSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
-   numberOfSparksToFetchSelector,
-   totalNumberOfSparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
@@ -38,19 +34,17 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedSpark, groupId, userEmail }) => {
+   const isFullScreen = useSparksFeedIsFullScreen()
+
    const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
    const { replace, query } = useRouter()
 
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
-   const isFetchingInitialSparks = useSelector(isFetchingInitialSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
-   const totalNumberOfSparks = useSelector(totalNumberOfSparksSelector)
    const activeSpark = useSelector(activeSparkSelector)
-   const curentIndex = useSelector(currentSparkIndexSelector)
-   const numberOfSparksToFetch = useSelector(numberOfSparksToFetchSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
 
    useEffect(() => {
@@ -131,39 +125,18 @@ const SparksPage: NextPage<
    }, [sparkForSeo?.id])
 
    return (
-      <GenericDashboardLayout topBarFixed topBarTransparent>
-         <Box>
-            <Typography>
-               Spark: {curentIndex + 1} / {totalNumberOfSparks}
-            </Typography>
-            {activeSpark ? (
-               <Card>
-                  <Box>{activeSpark?.question}</Box>
-                  <Box>{activeSpark?.id}</Box>
-               </Card>
-            ) : null}
-            {isFetchingNextSparks ? (
-               <Typography>
-                  Fetching another {numberOfSparksToFetch} sparks...
-               </Typography>
-            ) : null}
-            {isFetchingInitialSparks ? (
-               <Typography>Fetching initial feed...</Typography>
-            ) : null}
-            {hasNoMoreSparks ? (
-               <Typography>There are no more sparks to fetch.</Typography>
-            ) : null}
-            <Stack direction="row">
-               <Button onClick={() => dispatch(swipePreviousSpark())}>
-                  Prev Slide
-               </Button>
-               <Button onClick={() => dispatch(swipeNextSpark())}>
-                  Next Slide
-               </Button>
-            </Stack>
-            <SparkSeo spark={sparkForSeo} />
-         </Box>
-      </GenericDashboardLayout>
+      <Fragment>
+         <GenericDashboardLayout
+            hideDrawer={isFullScreen}
+            topBarFixed
+            topBarTransparent
+            hideFooter
+            headerWidth="auto"
+         >
+            <SparksFeedCarousel />
+         </GenericDashboardLayout>
+         <SparkSeo spark={sparkForSeo} />
+      </Fragment>
    )
 }
 
@@ -189,6 +162,12 @@ export const getServerSideProps: GetServerSideProps<
    const sparkId = context.params.sparkId
 
    const sparkFromService = await sparkService.getSparkById(sparkId)
+
+   if (!sparkFromService) {
+      return {
+         notFound: true,
+      }
+   }
 
    return {
       props: {

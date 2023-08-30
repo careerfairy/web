@@ -72,6 +72,18 @@ type Props = {
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
    topBarTransparent?: boolean
+   /**
+    * If true, the footer will be hidden
+    */
+   hideFooter?: boolean
+   /**
+    * If true, the left drawer will be hidden
+    */
+   hideDrawer?: boolean
+   /**
+    * The width of the header. Default is 100%
+    */
+   headerWidth?: string
 }
 
 const GenericDashboardLayout = ({
@@ -82,6 +94,9 @@ const GenericDashboardLayout = ({
    topBarFixed,
    headerScrollThreshold = 10,
    topBarTransparent,
+   hideFooter,
+   hideDrawer,
+   headerWidth = "100%",
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -167,13 +182,17 @@ const GenericDashboardLayout = ({
                bgColor={bgColor || "#F7F8FC"}
                headerContent={<TopBar title={pageDisplayName} />}
                drawerContent={<NavBar />}
+               hideDrawer={hideDrawer}
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                topBarTransparent={topBarTransparent}
+               headerWidth={headerWidth}
             >
                {children}
-               <Footer background={bgColor || "#F7F8FC"} />
+               {hideFooter ? null : (
+                  <Footer background={bgColor || "#F7F8FC"} />
+               )}
                <CreditsDialog
                   onClose={handleCloseCreditsDialog}
                   open={creditsDialogOpen}
