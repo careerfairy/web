@@ -18,6 +18,9 @@ const styles = sxStyles({
          textTransform: "none",
       },
       ":hover": {
+         svg: {
+            stroke: "#6749EA",
+         },
          ".MuiTypography-button": {
             color: "#6749EA",
          },
@@ -92,7 +95,7 @@ const SaveChangesButton = ({
             {children}
          </Typography>
          {Boolean(icon) && (
-            <Box sx={{ width: "16px", height: "16px", alignSelf: "baseline" }}>
+            <Box sx={{ width: "16px", height: "24px", alignSelf: "center" }}>
                {icon}
             </Box>
          )}
