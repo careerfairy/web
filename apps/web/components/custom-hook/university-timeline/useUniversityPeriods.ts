@@ -1,5 +1,14 @@
-import { collection, query, where } from "firebase/firestore"
-import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import {
+   collection,
+   collectionGroup,
+   query,
+   where,
+   orderBy,
+} from "firebase/firestore"
+import {
+   FirestoreInstance,
+   Timestamp,
+} from "../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import {
    UniversityPeriod,
@@ -12,6 +21,42 @@ import {
 export const useUniversityPeriods = (uniId: string) => {
    const periodQuery = query(
       collection(FirestoreInstance, "timelineUniversities", uniId, "periods")
+   )
+   return useFirestoreCollection<UniversityPeriod>(periodQuery, {
+      idField: "id",
+      suspense: false,
+   })
+}
+
+/**
+ * Custom hook to get all periods for a set of timeline universities from the database
+ **/
+export const useUniversityPeriodsByIds = (universitiesIds: string[]) => {
+   const periodQuery = query(
+      collectionGroup(FirestoreInstance, "periods"),
+      where("timelineUniversityId", "in", universitiesIds.slice(0, 30))
+   )
+   return useFirestoreCollection<UniversityPeriod>(periodQuery, {
+      idField: "id",
+      suspense: false,
+   })
+}
+
+/**
+ * Custom hook to get all periods whose end is after a certain date for a set of timeline universities from the database
+ **/
+export const useUniversityPeriodsByIdsAndStart = (
+   universityIds: string[],
+   start: Date
+) => {
+   const periodQuery = query(
+      collectionGroup(FirestoreInstance, "periods"),
+      where(
+         "timelineUniversityId",
+         "in",
+         universityIds?.length ? universityIds : ["filler"]
+      ),
+      where("end", ">=", start)
    )
    return useFirestoreCollection<UniversityPeriod>(periodQuery, {
       idField: "id",

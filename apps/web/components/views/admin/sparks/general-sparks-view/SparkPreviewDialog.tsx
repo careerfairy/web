@@ -1,10 +1,10 @@
 import CloseIcon from "@mui/icons-material/Close"
-import { Box, Grow, IconButton, Zoom } from "@mui/material"
+import { Box, IconButton, Zoom } from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
-import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
 import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC, useCallback } from "react"
@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { setSparkToPreview } from "store/reducers/adminSparksReducer"
 import { sparkToPreviewSelector } from "store/selectors/adminSparksSelectors"
 import { sxStyles } from "types/commonTypes"
+import SparkSkeletonComponent from "./SparkSkeletonComponent"
 
 const styles = sxStyles({
    aspectRoot: {
@@ -52,11 +53,13 @@ const SparkPreviewDialog: FC = () => {
          open={open}
          TransitionComponent={Zoom}
       >
-         <SuspenseWithBoundary fallback={<SkeletonComponent />}>
+         <SuspenseWithBoundary
+            fallback={<SparkSkeletonComponent sx={styles.aspectRoot} />}
+         >
             {sparkId ? (
                <Component onClose={handleClose} sparkId={sparkId} />
             ) : (
-               <SkeletonComponent />
+               <SparkSkeletonComponent sx={styles.aspectRoot} />
             )}
          </SuspenseWithBoundary>
       </Dialog>
@@ -85,7 +88,7 @@ const Component: FC<Props> = ({ sparkId, onClose }) => {
          </IconButton>
          <Box>
             <SparkAspectRatioBox sx={styles.aspectRoot}>
-               <SparkCarouselCard preview={false} spark={spark} />
+               <SparkCarouselCardForAdmin preview={false} spark={spark} />
             </SparkAspectRatioBox>
          </Box>
       </>

@@ -229,6 +229,22 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with the creator.
     */
    getCreatorById(groupId: string, creatorId: string): Promise<Creator>
+
+   /**
+    * Gets all group creators
+    * @param groupId the group to get creators from
+    * @returns A Promise that resolves with an array of creators.
+    */
+   getCreators(groupId: string): Promise<Creator[]>
+
+   /**
+    * Updates the publicSparks flag in a group.
+    *
+    * @param  groupId - The ID of the group.
+    * @param  isPublic - The value for the publicSparks flag.
+    * @returns A Promise that resolves when the publicSparks flag is updated.
+    */
+   updatePublicSparks(groupId: string, isPublic: boolean): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1018,6 +1034,27 @@ export class FirebaseGroupRepository
          return this.addIdToDoc<Creator>(snapshot)
       }
       return null
+   }
+
+   async getCreators(groupId: string): Promise<Creator[]> {
+      const snaps = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .get()
+
+      return mapFirestoreDocuments<Creator>(snaps)
+   }
+
+   async updatePublicSparks(groupId: string, isPublic: boolean): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "publicSparks"> = {
+         publicSparks: isPublic,
+      }
+      return groupRef.update(toUpdate)
    }
 }
 

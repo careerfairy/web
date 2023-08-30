@@ -85,6 +85,10 @@ service cloud.firestore {
 
         match /userData/{userId} {
 
+            match /sparksFeed/{sparkId} {
+                allow read: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
             match /companiesUserFollows/{groupId} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
@@ -241,7 +245,7 @@ service cloud.firestore {
         }
 
         match /sparks/{sparkId} {
-            allow read: if isAnyGroupAdmin();
+            allow read: if true;
             allow write: if false;
         }
 
@@ -564,6 +568,14 @@ service cloud.firestore {
                 allow write: if isCFAdmin();
             }
         }
+        match /timelineCountries/{timelineCountry}{
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
+        match /{somePath=**}/periods/{period} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
         match /{somePath=**}/userLivestreamData/{userEmail} {
             allow read: if true;
             allow write: if isSignedInAndIsSameUser(userEmail);
@@ -581,6 +593,14 @@ service cloud.firestore {
         // Group Admin -> Company Followers Count query
         match /{somePath=**}/companiesUserFollows/{groupId} {
             allow read: if isAdminOfGroup(groupId);
+        }
+
+        // User -> Seen Sparks Count query
+        match /{somePath=**}/seenSparks/{year} {
+            // Should be isSignedInAndIsSameUser(userId) but we can't 
+            // access the userId as we don't have proper auth in the server 
+            // fix would be to use admin sdk on the server side
+            allow read: if true;
         }
     }
 }

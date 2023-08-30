@@ -2,7 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Box } from "@mui/material"
-import { darken, useTheme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import { FC, useCallback, useEffect, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
@@ -14,15 +14,21 @@ import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
 import HighlightVideoDialog from "../HighlightVideoDialog"
 import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
-import { CarouselContent } from "./CarouselContentService"
+import {
+   CTASlide,
+   CTASlideTopics,
+   CarouselContent,
+} from "./CarouselContentService"
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import LivestreamContent from "./LivestreamContent"
+import WatchSparksCTAContent from "./WatchSparksCTAContent"
 
 const styles = sxStyles({
    wrapper: {
       width: "100%",
       height: { xs: "55vh", md: "40vh" },
       minHeight: "470px",
+      position: "relative",
    },
    paginationWrapper: (theme) => ({
       mx: "auto",
@@ -136,7 +142,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                if (contentItem.contentType === "CTASlide") {
                   return (
                      <Box sx={styles.wrapper} key={index}>
-                        <BuyCreditsCTAContent cta={contentItem} />
+                        {getCTASlide(contentItem)}
                      </Box>
                   )
                }
@@ -183,6 +189,20 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
          ) : null}
       </>
    )
+}
+
+const getCTASlide = (contentItem: CTASlide) => {
+   switch (contentItem.topic) {
+      case CTASlideTopics.CareerCoins: {
+         return <BuyCreditsCTAContent cta={contentItem} />
+      }
+      case CTASlideTopics.Sparks: {
+         return <WatchSparksCTAContent cta={contentItem} />
+      }
+      default: {
+         return null
+      }
+   }
 }
 
 export default ContentCarousel

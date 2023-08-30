@@ -8,7 +8,11 @@ import Footer from "../../components/views/footer/Footer"
 import CreditsDialogLayout from "../CreditsDialogLayout"
 import DropdownNavigator from "./DropdownNavigator"
 import { INavLink } from "../types"
-import { Home as HomeIcon, Radio as LiveStreamsIcon } from "react-feather"
+import {
+   Home as HomeIcon,
+   Radio as LiveStreamsIcon,
+   PlayCircle as SparksIcon,
+} from "react-feather"
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
 import { useAuth } from "../../HOCs/AuthProvider"
@@ -61,12 +65,25 @@ const PastLivestreamsPath: INavLink = {
 
 type Props = {
    children: JSX.Element
-   pageDisplayName: string
+   pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
    topBarFixed?: boolean
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
+   topBarTransparent?: boolean
+   /**
+    * If true, the footer will be hidden
+    */
+   hideFooter?: boolean
+   /**
+    * If true, the left drawer will be hidden
+    */
+   hideDrawer?: boolean
+   /**
+    * The width of the header. Default is 100%
+    */
+   headerWidth?: string
 }
 
 const GenericDashboardLayout = ({
@@ -76,6 +93,10 @@ const GenericDashboardLayout = ({
    isPortalPage,
    topBarFixed,
    headerScrollThreshold = 10,
+   topBarTransparent,
+   hideFooter,
+   hideDrawer,
+   headerWidth = "100%",
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -119,6 +140,13 @@ const GenericDashboardLayout = ({
             ],
          },
          {
+            id: "sparks",
+            href: `/sparks`,
+            pathname: `/sparks`,
+            Icon: SparksIcon,
+            title: "Sparks",
+         },
+         {
             id: "company",
             href: `/companies`,
             pathname: `/companies`,
@@ -154,12 +182,17 @@ const GenericDashboardLayout = ({
                bgColor={bgColor || "#F7F8FC"}
                headerContent={<TopBar title={pageDisplayName} />}
                drawerContent={<NavBar />}
+               hideDrawer={hideDrawer}
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
+               topBarTransparent={topBarTransparent}
+               headerWidth={headerWidth}
             >
                {children}
-               <Footer background={bgColor || "#F7F8FC"} />
+               {hideFooter ? null : (
+                  <Footer background={bgColor || "#F7F8FC"} />
+               )}
                <CreditsDialog
                   onClose={handleCloseCreditsDialog}
                   open={creditsDialogOpen}
