@@ -48,7 +48,11 @@ const PrivacyPolicy = () => {
    ]
    return (
       <SectionComponent title={title} description={description}>
-         <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+         <Formik
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            enableReinitialize
+         >
             {({ values, dirty, setFieldValue }) => (
                <Form>
                   <Stack>
