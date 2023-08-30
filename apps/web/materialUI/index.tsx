@@ -87,6 +87,7 @@ declare module "@mui/material/styles" {
 
    interface BreakpointOverrides {
       mobile: true // adds the `mobile` breakpoint
+      sparksFullscreen: true // adds the breakpoint for the sparks feed
    }
 }
 
@@ -190,12 +191,13 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          values: {
             xl: 1920,
             lg: 1280,
+            sparksFullscreen: 989,
             md: 900,
             mobile: 768,
             sm: 600,
             xs: 0,
          },
-         keys: ["xs", "sm", "mobile", "md", "lg", "xl"],
+         keys: ["xs", "sm", "mobile", "md", "sparksFullscreen", "lg", "xl"],
       },
       typography: {
          fontFamily: "Poppins,sans-serif",

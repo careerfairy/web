@@ -26,7 +26,7 @@ const initialState: SparksState = {
    hasMoreSparks: true,
    groupId: null,
    userEmail: null,
-   numberOfSparksToFetch: 3,
+   numberOfSparksToFetch: 10,
    initialFetchStatus: "loading",
    fetchNextSparksStatus: "idle",
    initialSparksFetched: false,
@@ -76,16 +76,10 @@ const sparksFeedSlice = createSlice({
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
       },
-      swipeNextSpark: (state) => {
-         // Check if it's not the last spark
-         if (state.currentPlayingIndex < state.sparks.length - 1) {
-            state.currentPlayingIndex += 1
-         }
-      },
-      swipePreviousSpark: (state) => {
-         // Check if it's not the first spark
-         if (state.currentPlayingIndex > 0) {
-            state.currentPlayingIndex -= 1
+      swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
+         const newIndex = action.payload
+         if (newIndex >= 0 && newIndex < state.sparks.length) {
+            state.currentPlayingIndex = newIndex
          }
       },
       resetSparksFeed: (state) => {
@@ -179,10 +173,9 @@ const getSparkOptions = (state: RootState) => {
 export const {
    setSparks,
    setGroupId,
-   swipeNextSpark,
-   swipePreviousSpark,
    setUserEmail,
    resetSparksFeed,
+   swipeNextSparkByIndex,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
