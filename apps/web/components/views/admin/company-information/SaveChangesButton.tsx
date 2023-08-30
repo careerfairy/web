@@ -4,6 +4,12 @@ import { sxStyles } from "types/commonTypes"
 import { Icon } from "react-feather"
 
 const styles = sxStyles({
+   buttom: {
+      ":hover": {
+         color: "none",
+         background: "none",
+      },
+   },
    active: {
       display: "flex",
       height: "34px",
@@ -14,16 +20,14 @@ const styles = sxStyles({
       gap: "8px",
       borderRadius: "53px",
       background: "#6749EA",
-      ".MuiTypography-button": {
-         textTransform: "none",
-      },
       ":hover": {
+         background: "#6749EA",
          svg: {
             stroke: "#6749EA",
          },
-         ".MuiTypography-button": {
-            color: "#6749EA",
-         },
+      },
+      ".MuiTypography-button": {
+         textTransform: "none",
       },
    },
    inactive: {
@@ -35,12 +39,12 @@ const styles = sxStyles({
       gap: "10px",
       borderRadius: "32px",
       background: "#EDEDED",
+      ":hover": {
+         cursor: "not-allowed",
+         background: "#EDEDED",
+      },
       ".MuiTypography-button": {
          textTransform: "none",
-      },
-      ":hover": {
-         background: "#EDEDED",
-         cursor: "not-allowed",
       },
    },
    textActive: {
@@ -83,23 +87,25 @@ const SaveChangesButton = ({
    onClick,
 }: Props) => {
    return (
-      <Button
-         sx={active ? styles.active : styles.inactive}
-         type={type ? type : "button"}
-         onClick={onClick}
-      >
-         <Typography
-            variant="button"
-            sx={active ? styles.textActive : styles.textInactive}
+      <Box sx={styles.buttom}>
+         <Button
+            sx={active ? styles.active : styles.inactive}
+            type={type ? type : "button"}
+            onClick={onClick}
          >
-            {children}
-         </Typography>
-         {Boolean(icon) && (
-            <Box sx={{ width: "16px", height: "24px", alignSelf: "center" }}>
-               {icon}
-            </Box>
-         )}
-      </Button>
+            <Typography
+               variant="button"
+               sx={active ? styles.textActive : styles.textInactive}
+            >
+               {children}
+            </Typography>
+            {Boolean(icon) && (
+               <Box sx={{ width: "16px", height: "24px", alignSelf: "center" }}>
+                  {icon}
+               </Box>
+            )}
+         </Button>
+      </Box>
    )
 }
 export default SaveChangesButton
