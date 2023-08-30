@@ -10,7 +10,7 @@ import { useEffect } from "react"
  * const emblaApi = useEmblaCarousel(options);
  * useVerticalMouseScrollNavigation(emblaApi);
  *
- * @returns {null} Returns null as it doesn't provide any value to consume.
+ * @returns {void} Returns void as it doesn't provide any value to consume.
  */
 const useVerticalMouseScrollNavigation = (emblaApi: EmblaCarouselType) => {
    useEffect(() => {
@@ -40,7 +40,7 @@ const useVerticalMouseScrollNavigation = (emblaApi: EmblaCarouselType) => {
       }
    }, [emblaApi])
 
-   return null
+   return
 }
 
 /**

@@ -13,7 +13,7 @@ type NavigationMode = "upDown" | "leftRight"
  * const emblaApi = useEmblaCarousel(options);
  * useKeyboardNavigation(emblaApi, 'upDown');
  *
- * @returns {null} Returns null as it doesn't provide any value to consume.
+ * @returns {void} Returns void as it doesn't provide any value to consume.
  */
 const useKeyboardNavigation = (
    emblaApi: EmblaCarouselType,
@@ -57,7 +57,7 @@ const useKeyboardNavigation = (
       }
    }, [emblaApi, mode])
 
-   return null
+   return
 }
 
 export default useKeyboardNavigation
