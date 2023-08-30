@@ -4,7 +4,9 @@ import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
 
 /**
- * Collection path: /sparks
+ * Collection path:
+ * - /sparks (public)
+ * - /userData/{userId}/sparksFeed (private)
  */
 export interface Spark extends Identifiable {
    // embedded group public information
@@ -16,6 +18,12 @@ export interface Spark extends Identifiable {
    createdAt: Timestamp
    updatedAt: Timestamp
    publishedAt: Timestamp
+
+   /**
+    * The time when the spark was added to the feed
+    * - Only used for private sparks
+    */
+   addedToFeedAt: Timestamp
 
    /**
     * We can filter sparks by its published state:
@@ -76,6 +84,96 @@ export interface Spark extends Identifiable {
 }
 
 /**
+ * Collection path: /sparksFeedMetrics/{userId}
+ */
+export interface UserSparksFeedMetrics extends Identifiable {
+   userId: string
+   /**
+    * When last the feed was updated
+    */
+   lastReplenished: Timestamp
+   /**
+    * The number of sparks in the feed
+    * - This is used to determine if we need to replenish the feed
+    * - If the number of sparks in the feed is less than the threshold, we will replenish the feed
+    * - This is to prevent us from replenishing the feed too often
+    */
+   numberOfSparks: number
+   /**
+    * The status of the feed replenishment
+    * - started: the feed replenishment has started
+    * - finished: the feed replenishment has finished
+    * - failed: the feed replenishment has failed
+    * - This is used to prevent us from replenishing the feed too often
+    * - If the feed replenishment has started, we will not start another replenishment
+    */
+   replenishStatus: "started" | "finished" | "failed"
+}
+
+/**
+ * Collection path: /userData/{userId}/seenSparks/2022
+ * - The seen sparks are partitioned by year, so we will never hit the 1MB limit
+ * - From my estimates we can have about 20'000 seen sparks on a single document before we hit the 1MB limit
+ *
+ * - e.g: /userData/{userId}/seenSparks/2022
+ * - e.g: /userData/{userId}/seenSparks/2023
+ *
+ *
+ * This will allow us to scale indefinitely, with very little storage cost
+ */
+export interface SeenSparks extends Identifiable {
+   documentType: "seenSparks"
+   userId: string
+   sparks: {
+      [sparkId: string]: Timestamp
+   }
+}
+
+export const createSeenSparksDocument = (
+   userId: string,
+   year: string | number
+): SeenSparks => ({
+   documentType: "seenSparks",
+   userId,
+   sparks: {},
+   id: year.toString(),
+})
+
+/**
+ * A map of spark ids to timestamps for easy lookups
+ */
+export type SeenSparksMap = {
+   [sparkId: string]: Timestamp // The timestamp when the spark was last seen
+}
+
+/**
+ * Takes an array of seen sparks documents for the year for a specific user
+ * It merges multiple years of seen sparks into a single map where each entry
+ * corresponds to the latest time a particular spark was seen.
+ *
+ * @param seenSparksByYear - An array of seen sparks documents for a specific user
+ * @returns A map of spark ids to timestamps for easy lookups
+ */
+export const createSeenSparksMap = (
+   seenSparksByYear: SeenSparks[]
+): SeenSparksMap => {
+   const seenSparksMap: SeenSparksMap = {}
+
+   seenSparksByYear.forEach((seenSparks) => {
+      Object.entries(seenSparks.sparks).forEach(([sparkId, timestamp]) => {
+         if (
+            !seenSparksMap[sparkId] ||
+            timestamp.toMillis() > seenSparksMap[sparkId].toMillis()
+         ) {
+            seenSparksMap[sparkId] = timestamp
+         }
+      })
+   })
+
+   return seenSparksMap
+}
+
+/**
  * Collection path: /deletedSparks
  */
 export interface DeletedSpark extends Spark {
@@ -93,7 +191,8 @@ export type SparkVideo = {
 
    /**
     * Video format
-    *
+    * - mp4
+    * - mov
     * Used to construct the video url
     * /sparks/[videoUid].[videoFormat]
     */
@@ -140,6 +239,28 @@ export type DeleteSparkData = {
    id: Spark["id"]
    groupId: Spark["group"]["id"]
 }
+
+export type GetFeedData = {
+   /**
+    * The number of sparks to fetch (default: 10)
+    */
+   numberOfSparks?: number
+} & (
+   | {
+        /**
+         * If provided, we will only return sparks from this user
+         * If not provided, we will return sparks from all users
+         * (e.g: the public feed)
+         */
+        userId: string | null
+     }
+   | {
+        /**
+         * If provided, we will only return sparks from this group
+         */
+        groupId: string
+     }
+)
 
 export const SparksCategories = {
    CompanyCulture: {

@@ -4,7 +4,7 @@ import {
    defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
 import config from "./config"
-import { livestreamsRepo, userRepo } from "./api/repositories"
+import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
 import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
 import {
    EventRatingAnswer,
@@ -140,6 +140,30 @@ export const onCreateReward = functions
 
       // Run side effects for every new doc
       sideEffectPromises.push(rewardApply(rewardDoc, email))
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateUserSparkFeed = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("userData/{userEmail}/sparksFeed/{sparkId}")
+   .onCreate(async (change, context) => {
+      functions.logger.info(context.params)
+
+      const userEmail = context.params.userEmail
+      const sparkId = context.params.sparkId
+
+      functions.logger.info(
+         `SparkId: ${sparkId} was added to ${userEmail} feed`
+      )
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      sideEffectPromises.push(
+         sparkRepo.incrementFeedCount(userEmail, "increment")
+      )
 
       return handleSideEffects(sideEffectPromises)
    })
