@@ -1,5 +1,4 @@
 import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
    Creator,
@@ -19,6 +18,7 @@ import {
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import { shuffle } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
@@ -31,9 +31,8 @@ import {
    Timestamp,
 } from "../api/firestoreAdmin"
 import { createGenericConverter } from "../util/firestore-admin"
-import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 import { addAddedToFeedAt } from "../util/sparks"
-import { shuffle } from "@careerfairy/shared-lib/utils"
+import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
 export interface ISparkFunctionsRepository {
    /**
