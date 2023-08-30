@@ -27,6 +27,9 @@ export const activeSparkSelector = (state: RootState) => {
 export const currentSparkIndexSelector = (state: RootState) =>
    state.sparksFeed.currentPlayingIndex
 
+export const selectedSparkCategoriesSelector = (state: RootState) =>
+   state.sparksFeed.sparkCategories
+
 export const fetchNextErrorSelector = (state: RootState) =>
    state.sparksFeed.fetchNextError
 

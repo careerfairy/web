@@ -22,6 +22,12 @@ import { Button } from "@mui/material"
 import { useFormik } from "formik"
 import SparkIcon from "components/views/common/icons/SparkIcon"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useDispatch } from "react-redux"
+import {
+   fetchNextSparks,
+   resetSparksFeed,
+   setSparkCategories,
+} from "store/reducers/sparksFeedReducer"
 
 const styles = sxStyles({
    drawer: {
@@ -109,14 +115,12 @@ type Props = {
    isOpen: boolean
    handleClose: () => void
    selectedCategories: SparkCategory[]
-   setSelectedCategories: React.Dispatch<React.SetStateAction<SparkCategory[]>>
 }
 
 const SparksFilterDialog = ({
    isOpen,
    handleClose,
    selectedCategories,
-   setSelectedCategories,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -133,7 +137,6 @@ const SparksFilterDialog = ({
                <FilterContent
                   handleClose={handleClose}
                   selectedCategories={selectedCategories}
-                  setSelectedCategories={setSelectedCategories}
                   isMobile={isMobile}
                />
             </Drawer>
@@ -152,7 +155,6 @@ const SparksFilterDialog = ({
                <FilterContent
                   handleClose={handleClose}
                   selectedCategories={selectedCategories}
-                  setSelectedCategories={setSelectedCategories}
                   isMobile={isMobile}
                />
             </Dialog>
@@ -163,21 +165,22 @@ const SparksFilterDialog = ({
 
 type ContentProps = {
    handleClose: () => void
-   selectedCategories: SparkCategory[]
-   setSelectedCategories: React.Dispatch<React.SetStateAction<SparkCategory[]>>
    isMobile: boolean
+   selectedCategories: SparkCategory[]
 }
 
 const FilterContent = ({
    handleClose,
-   selectedCategories,
-   setSelectedCategories,
    isMobile,
+   selectedCategories,
 }: ContentProps) => {
+   const dispatch = useDispatch()
    const formik = useFormik({
       initialValues: selectedCategories,
       onSubmit: (values) => {
-         setSelectedCategories(values)
+         dispatch(setSparkCategories(values ? values : []))
+         dispatch(resetSparksFeed())
+         dispatch(fetchNextSparks())
       },
    })
 

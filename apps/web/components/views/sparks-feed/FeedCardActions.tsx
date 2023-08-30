@@ -17,6 +17,8 @@ import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
+import { useSelector } from "react-redux"
+import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
 
 const actionWidth = 52
 
@@ -217,9 +219,8 @@ type FilterActionProps = {
 const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
    const [isFilterDialogOpen, handleOpenFilterDialog, handleCloseFilterDialog] =
       useDialogStateHandler()
-   const [selectedCategories, setSelectedCategories] = useState<
-      SparkCategory[]
-   >([])
+   const selectedSparkCategories = useSelector(selectedSparkCategoriesSelector)
+
    return (
       <>
          <Action
@@ -227,13 +228,12 @@ const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
             icon={<FilterIcon />}
             onClick={handleOpenFilterDialog}
             label="Filter"
-            chipValue={selectedCategories.length}
+            chipValue={selectedSparkCategories.length}
          />
          <SparksFilterDialog
             isOpen={isFilterDialogOpen}
             handleClose={handleCloseFilterDialog}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
+            selectedCategories={selectedSparkCategories}
          />
       </>
    )
