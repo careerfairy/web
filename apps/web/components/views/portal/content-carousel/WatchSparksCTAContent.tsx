@@ -1,7 +1,6 @@
 import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import CareerCoinIcon from "components/views/common/CareerCoinIcon"
 import Image from "next/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
@@ -22,16 +21,16 @@ const styles = sxStyles({
    illustrationWrapper: {
       position: "absolute",
       right: 0,
-      top: 0,
+      bottom: 0,
       width: {
-         xs: "40%",
-         md: "50%",
+         xs: "50%",
+         md: "40%",
       },
       height: "100%",
       "& img": {
          objectPosition: {
             xs: "top 28px left 18px",
-            md: "top 50% left 90px",
+            md: "top 0px left 0px",
          },
       },
    },
@@ -41,7 +40,7 @@ type Props = {
    cta: CTASlide
 }
 
-const BuyCreditsCTAContent: FC<Props> = () => {
+const WatchSparksCTAContent: FC<Props> = () => {
    const isMobile = useIsMobile()
    const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
 
@@ -54,7 +53,7 @@ const BuyCreditsCTAContent: FC<Props> = () => {
          CarouselContentService.incrementCTABannerViewCount(
             inView,
             userData,
-            CTASlideTopics.CareerCoins
+            CTASlideTopics.Sparks
          ),
    })
 
@@ -64,26 +63,23 @@ const BuyCreditsCTAContent: FC<Props> = () => {
             ref={ref}
             headerTitle={
                <ContentHeaderTitle maxWidth={"60% !important"} color="black">
-                  Introducing{" "}
+                  {"Discover "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
-                     color="primary.main"
+                     color="secondary.main"
                   >
-                     CareerCoins{" "}
-                     <Box component="span" minWidth={25.38} mb={-0.5}>
-                        <CareerCoinIcon width={25.38} height={33.7} />
-                     </Box>
-                     !
+                     Sparks
                   </ContentHeaderTitle>
+                  !
                </ContentHeaderTitle>
             }
             title={
                <ContentTitle
-                  maxWidth={isMobile ? "60% !important" : "80% !important"}
+                  maxWidth={isMobile ? "50%!important" : "70%!important"}
                   color="black"
                >
-                  Now you can easily re-watch past live streams that are
-                  available using your CareerCoins!
+                  Short videos answering your questions and showing great
+                  opportunities for you.
                </ContentTitle>
             }
             backgroundImageUrl={
@@ -93,8 +89,12 @@ const BuyCreditsCTAContent: FC<Props> = () => {
             }
             backgroundImageAlt="backgroundImageAlt"
             actionItem={
-               <ContentButton href={"/past-livestreams"} color={"primary"}>
-                  Discover Recordings
+               <ContentButton
+                  variant="contained"
+                  href={"/sparks"}
+                  color={"secondary"}
+               >
+                  {isMobile ? "Discover Sparks " : "Watch Sparks"}
                </ContentButton>
             }
             withBackgroundOverlay={false}
@@ -117,12 +117,12 @@ const BuyCreditsCTAContent: FC<Props> = () => {
 }
 
 const desktopCreditsCTABackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fdesktop-background.png?alt=media&token=20e4a946-a4df-409d-a259-fc07cccd39a7"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-desktop.png?alt=media&token=28d768f0-4c24-44fb-82ba-db42ff19017e"
 const mobileCreditsCTABackground =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fmobile-background.png?alt=media&token=5bd44d36-30b3-4777-af25-4b4fe25f09c3"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-background-mobile.png?alt=media&token=6ef9779e-7539-4d6f-98a5-fdc864ca81db"
 const desktopCreditsCTAIllustration =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fdesktop-interface.png?alt=media&token=f56a4eae-8650-421d-9061-6724450c2d11"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-mockup-desktop.png?alt=media&token=4298c1bb-e4ee-4f0c-9dfb-6faacec3310a"
 const mobileCreditsCTAIllustration =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fmobile-interface.png?alt=media&token=6ee60799-9c0e-4ad3-ad13-0b07395e38b3"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-mockup-mobile.png?alt=media&token=dd30fa3b-5d8a-4350-b158-919ef911fd3a"
 
-export default BuyCreditsCTAContent
+export default WatchSparksCTAContent
