@@ -245,7 +245,8 @@ export class SparkFunctionsRepository
       group: Group,
       creator: Creator
    ): Promise<void> {
-      const doc: Create<Spark> = {
+      const ref = this.firestore.collection("sparks").doc()
+      const doc: Spark = {
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
@@ -263,9 +264,10 @@ export class SparkFunctionsRepository
          numberOfCareerPageClicks: 0,
          group: pickPublicDataFromGroup(group),
          creator: pickPublicDataFromCreator(creator),
+         id: ref.id,
       }
 
-      return void this.firestore.collection("sparks").add(doc)
+      return void ref.set(doc)
    }
 
    async update(data: UpdateSparkData, creator: Creator): Promise<void> {
@@ -277,6 +279,7 @@ export class SparkFunctionsRepository
          | "published"
          | "updatedAt"
          | "publishedAt"
+         | "id"
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
@@ -286,6 +289,7 @@ export class SparkFunctionsRepository
          ...(data.published && {
             publishedAt: Timestamp.now(),
          }),
+         id: data.id,
       }
 
       return void this.firestore.collection("sparks").doc(data.id).update(doc)
@@ -575,7 +579,7 @@ export class SparkFunctionsRepository
       const allUserMatchingSparksSnap = await this.firestore
          .collectionGroup("sparksFeed")
          .withConverter(createGenericConverter<Spark>())
-         .where(FieldPath.documentId(), "==", spark.id)
+         .where("id", "==", spark.id)
          .get()
 
       allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {

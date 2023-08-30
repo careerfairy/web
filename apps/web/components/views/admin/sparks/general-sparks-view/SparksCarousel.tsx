@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
-import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { sxStyles } from "types/commonTypes"
