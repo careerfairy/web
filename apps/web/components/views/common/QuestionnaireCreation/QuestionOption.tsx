@@ -5,7 +5,7 @@ import BrandedTextField from "../inputs/BrandedTextField"
 type Props = {
    cardinal?: number
    editing?: boolean
-   lastItem: boolean
+   lastItem?: boolean
    value: string
    setValue: (value: string) => void
 }
@@ -28,7 +28,7 @@ const QuestionOption: React.FC<Props> = ({
    ) : (
       <Stack
          sx={{
-            borderBottom: `${lastItem ? "1" : "2"}px solid #EEE`,
+            borderBottom: lastItem ? "none" : "1px solid #EEE",
             width: "100%",
             margin: "0px",
          }}
