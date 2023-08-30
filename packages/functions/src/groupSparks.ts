@@ -18,6 +18,12 @@ import {
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { addDaysDate } from "./util"
+import { firestore } from "./api/firestoreAdmin"
+import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
+import { WriteBatch } from "firebase-admin/firestore"
+import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import { UserSparksNotifications } from "@careerfairy/shared-lib/users"
 
 const sparkDataValidator = {
    question: string()
@@ -238,4 +244,134 @@ const validateGroupSparks = async (group: Group) => {
    } catch (error) {
       return functions.logger.error("Error during Spark validation", { error })
    }
+}
+
+/**
+ * Every day at 9 AM, check all user's sparksFeed and confirms if any of them needs to have an event sparks notification.
+ */
+export const createSparksFeedEventNotifications = functions
+   .region(config.region)
+   .pubsub.schedule("0 9 * * *")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
+      try {
+         return handleCreateSparksNotifications()
+      } catch (error) {
+         logAndThrow(
+            "Error during the creation of Users Sparks Feed event notifications",
+            error
+         )
+      }
+   })
+
+/**
+ * To create Sparks event notifications to a single User
+ */
+export const createUserSparksFeedEventNotifications = functions
+   .region(config.region)
+   .https.onCall(async (userId) => {
+      try {
+         return handleCreateSparksNotifications(userId)
+      } catch (error) {
+         logAndThrow(
+            "Error during the creation of a single User Sparks Feed event notifications",
+            error
+         )
+      }
+   })
+
+const handleCreateSparksNotifications = async (userId?: string) => {
+   const startDate = new Date()
+   const endDate = addDaysDate(
+      new Date(),
+      SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
+   )
+   let batch = firestore.batch()
+
+   // to get all the upcoming events that will start on the next X days
+   const upcomingEvents = await getStreamsByDateWithRegisteredStudents(
+      startDate,
+      endDate
+   )
+
+   functions.logger.log(
+      `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEvents.length} events will take place`
+   )
+
+   if (userId) {
+      // In this case we want only to create notification for a single user
+      batch = createSparkNotificationForSingleUser({
+         userId,
+         upcomingEvents,
+         batch,
+      })
+      return batch.commit()
+   }
+
+   const userSparksFeedMetrics = await sparkRepo.getAllUserSparksFeedMetrics()
+
+   userSparksFeedMetrics.forEach(({ userId }) => {
+      batch = createSparkNotificationForSingleUser({
+         userId,
+         upcomingEvents,
+         batch,
+      })
+   })
+
+   return batch.commit()
+}
+
+type createSparkNotificationForSingleUser = {
+   userId: string
+   upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
+   batch: WriteBatch
+}
+const createSparkNotificationForSingleUser = ({
+   userId,
+   upcomingEvents,
+   batch,
+}: createSparkNotificationForSingleUser): WriteBatch => {
+   const notifications: UserSparksNotifications[] = []
+
+   // filter all the upcoming events where the user already registered
+   const filteredUpcomingEvents = upcomingEvents.filter(
+      (event) => !event.registeredUsers?.includes(userId)
+   )
+
+   filteredUpcomingEvents.forEach((event) => {
+      const { companyId, id: eventId } = event
+
+      // to check if a notification was already created for this group
+      // could happen in case of multiple events from a single group
+      // we want to get the first event only
+      const groupAlreadyHasNotification = notifications.some(
+         (notification) => notification.groupId === companyId
+      )
+
+      if (!groupAlreadyHasNotification) {
+         notifications.push({
+            eventId: eventId,
+            groupId: companyId,
+            startDate: event.startDate || event.start.toDate(),
+         })
+      }
+   })
+
+   functions.logger.log(
+      `User ${userId} will have spark notifications for the groups: ${notifications
+         .map((notification) => notification.groupId)
+         .join(", ")}`
+   )
+
+   notifications.forEach((notification) => {
+      const userSparksNotificationsRef = firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .doc(notification.groupId)
+
+      batch.set(userSparksNotificationsRef, notification, { merge: true })
+   })
+
+   return batch
 }
