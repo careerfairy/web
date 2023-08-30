@@ -65,12 +65,13 @@ const PastLivestreamsPath: INavLink = {
 
 type Props = {
    children: JSX.Element
-   pageDisplayName: string
+   pageDisplayName?: string
    bgColor?: string
    isPortalPage?: boolean
    topBarFixed?: boolean
    // The number of pixels the user has to scroll before the header is hidden
    headerScrollThreshold?: number
+   topBarTransparent?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -80,6 +81,7 @@ const GenericDashboardLayout = ({
    isPortalPage,
    topBarFixed,
    headerScrollThreshold = 10,
+   topBarTransparent,
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -168,6 +170,7 @@ const GenericDashboardLayout = ({
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
+               topBarTransparent={topBarTransparent}
             >
                {children}
                <Footer background={bgColor || "#F7F8FC"} />

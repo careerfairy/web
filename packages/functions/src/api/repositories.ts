@@ -35,6 +35,7 @@ import {
    SparkFunctionsRepository,
 } from "../lib/SparkFunctionsRepository"
 
+import { SparksFeedReplenisher } from "../lib/sparksFeedReplenisher"
 import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
 
 import logger = require("firebase-functions/logger")
@@ -74,5 +75,7 @@ export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
 )
 
+const feedReplenisher = new SparksFeedReplenisher(firestore as any)
+
 export const sparkRepo: ISparkFunctionsRepository =
-   new SparkFunctionsRepository(firestore, storage, logger)
+   new SparkFunctionsRepository(firestore, storage, logger, feedReplenisher)
