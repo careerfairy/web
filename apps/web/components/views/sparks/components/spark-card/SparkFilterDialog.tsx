@@ -12,7 +12,7 @@ import {
 } from "@mui/material"
 import React, { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { X as CloseIcon } from "react-feather"
+import CloseIcon from "@mui/icons-material/CloseRounded"
 import {
    SparkCategory,
    getCategoryEmoji,
@@ -22,7 +22,6 @@ import { Button } from "@mui/material"
 import { useFormik } from "formik"
 import SparkIcon from "components/views/common/icons/SparkIcon"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useTheme } from "@mui/styles"
 
 const styles = sxStyles({
    drawer: {
@@ -97,6 +96,13 @@ const styles = sxStyles({
       fontSize: "16px",
       color: "tertiary.dark",
    },
+   closeIcon: {
+      "& svg": {
+         width: { xs: "32px", md: "24px" },
+         height: { xs: "32px", md: "24px" },
+         color: "black.main",
+      },
+   },
 })
 
 type Props = {
@@ -122,6 +128,7 @@ const SparksFilterDialog = ({
                anchor={"bottom"}
                open={isOpen}
                onClose={handleClose}
+               ModalProps={{ sx: { zIndex: 3000 } }}
             >
                <FilterContent
                   handleClose={handleClose}
@@ -229,9 +236,11 @@ const FilterContent = ({
                )}
                Filter content
             </Typography>
-            <IconButton onClick={handleClose}>
-               <CloseIcon color={"black"} size={isMobile ? "32px" : "24px"} />
-            </IconButton>
+            <Box sx={styles.closeIcon}>
+               <IconButton onClick={handleClose}>
+                  <CloseIcon />
+               </IconButton>
+            </Box>
          </DialogTitle>
       ),
       [handleClose, isMobile]
@@ -248,7 +257,7 @@ const FilterContent = ({
                Filter Sparks based on the following categories.
             </Typography>
             <Box sx={styles.chipsContainer}>
-               {sparksCategoriesArray.map((category) => (
+               {sortedSparksCategories.map((category) => (
                   <Chip
                      variant={"filled"}
                      key={category.id}
@@ -282,5 +291,9 @@ const FilterContent = ({
       </>
    )
 }
+
+const sortedSparksCategories = sparksCategoriesArray.sort((cat1, cat2) =>
+   cat1.id < cat2.id ? 1 : -1
+)
 
 export default SparksFilterDialog
