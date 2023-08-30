@@ -403,3 +403,15 @@ export interface UserActivity extends Identifiable {
       | "livestreamParticipation"
       | "livestreamRecordingView"
 }
+
+/**
+ * User Activity document
+ * Used for sparks notifications purposes
+ *
+ * Path /userData/{userId}/sparksNotifications/{groupId}
+ */
+export type UserSparksNotifications = {
+   eventId: string
+   startDate: Date
+   groupId: string
+}

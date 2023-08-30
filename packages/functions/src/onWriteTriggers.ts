@@ -33,6 +33,11 @@ export const syncLivestreams = functions
          livestreamsRepo.syncLiveStreamStatsWithLivestream(change)
       )
 
+      // TODO
+      // if the change was that this livestream has started
+      // remove the notification about this livestream from the userSparks notification
+      // and sync it again to update with a new one from this group if does exist
+
       return handleSideEffects(sideEffectPromises)
    })
 

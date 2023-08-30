@@ -34,6 +34,12 @@ import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
+type UserFeedMetrics = {
+   userId: string
+   lastUpdated: Timestamp
+   numberOfSparks: number
+}
+
 export interface ISparkFunctionsRepository {
    /**
     *  Get a spark
@@ -182,6 +188,12 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
+
+   /**
+    * Get all user sparks feed metrics
+    *
+    */
+   getAllUserSparksFeedMetrics(): Promise<UserFeedMetrics[]>
 }
 
 export class SparkFunctionsRepository
@@ -605,6 +617,15 @@ export class SparkFunctionsRepository
          .withConverter(createGenericConverter<Spark>())
          .where("group.id", "==", groupId)
          .orderBy("createdAt", "desc")
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async getAllUserSparksFeedMetrics(): Promise<UserFeedMetrics[]> {
+      const snapshot = await this.firestore
+         .collection("sparksFeedMetrics")
+         .withConverter(createGenericConverter<UserFeedMetrics>())
          .get()
 
       return snapshot.docs.map((doc) => doc.data())

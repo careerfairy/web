@@ -86,7 +86,7 @@ export const livestreamSetIsRecording = async (
  * Get all the streams filtered by starting date and with all the registered students for each stream.
  *
  */
-export const getStreamsByDateWithRegisteredStudents = (
+export const getStreamsByDateWithRegisteredStudents = async (
    filterStartDate: Date,
    filterEndDate: Date
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {

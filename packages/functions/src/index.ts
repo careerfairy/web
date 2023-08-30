@@ -216,6 +216,10 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.createSpark_v2 = groupSparks.createSpark
 exports.updateSpark_v2 = groupSparks.updateSpark
 exports.deleteSpark_v2 = groupSparks.deleteSpark
+exports.createSparksFeedEventNotifications =
+   groupSparks.createSparksFeedEventNotifications
+exports.createUserSparksFeedEventNotifications =
+   groupSparks.createUserSparksFeedEventNotifications
 
 // User Spark Functions
 exports.getSparksFeed = userSparks.getSparksFeed
