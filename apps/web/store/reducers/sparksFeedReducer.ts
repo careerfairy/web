@@ -1,4 +1,5 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
@@ -18,6 +19,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
+   sparkCategories: SparkCategory[]
 }
 
 const initialState: SparksState = {
@@ -32,6 +34,7 @@ const initialState: SparksState = {
    initialSparksFetched: false,
    fetchNextError: null,
    initialFetchError: null,
+   sparkCategories: [],
 }
 
 // Async thunk to fetch the next sparks
@@ -75,6 +78,9 @@ const sparksFeedSlice = createSlice({
       },
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
+      },
+      setSparkCategories: (state, action: PayloadAction<SparkCategory[]>) => {
+         state.sparkCategories = action.payload
       },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
@@ -163,9 +169,11 @@ const mergeSparks = (
  * @returns spark options
  */
 const getSparkOptions = (state: RootState) => {
-   const { numberOfSparksToFetch, groupId, userEmail } = state.sparksFeed
+   const { numberOfSparksToFetch, groupId, userEmail, sparkCategories } =
+      state.sparksFeed
    return {
       numberOfSparks: numberOfSparksToFetch,
+      sparkCategories: sparkCategories,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }
@@ -174,6 +182,7 @@ export const {
    setSparks,
    setGroupId,
    setUserEmail,
+   setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
 } = sparksFeedSlice.actions
