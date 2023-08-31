@@ -10,6 +10,7 @@ export class RegistrationSourcesResponseItem {
    public registered: {
       date?: Date
       utm?: UTMParams
+      sparkId?: string
    }
 
    static serialize(document: UserLivestreamData) {
@@ -45,7 +46,7 @@ export interface GetRegistrationSourcesFnArgs {
    /**
     * If provided, the livestreamIds array will be ignored
     */
-   fetchType?: typeof FETCH_TYPES[number]
+   fetchType?: (typeof FETCH_TYPES)[number]
 
    livestreamIds?: string[]
 }
