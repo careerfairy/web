@@ -51,8 +51,6 @@ export const fetchNextSparks = createAsyncThunk(
       const lastSpark = sparks[sparks.length - 1]
       const sparkOptions = getSparkOptions(state)
 
-      console.log("fetch reducer call", sparkOptions.sparkCategoryIds)
-
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
 )
@@ -177,8 +175,6 @@ const mergeSparks = (
 const getSparkOptions = (state: RootState) => {
    const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
       state.sparksFeed
-
-   console.log("getOptions cat", sparkCategoryIds)
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds: sparkCategoryIds,
