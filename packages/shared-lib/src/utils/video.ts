@@ -1,5 +1,3 @@
-const imageKitId = "wgwxwfyv4"
-
 type TransformationParams = {
    src: string
    width: number
@@ -26,7 +24,7 @@ export const imageKitLoader = (params: TransformationParams) => {
 
    // Replace the Firebase base URL with ImageKit base URL
    const firebaseBaseUrl = "https://firebasestorage.googleapis.com"
-   const imageKitBaseUrl = `https://ik.imagekit.io/${imageKitId}`
+   const imageKitBaseUrl = `https://ik.imagekit.io/${process.env.NEXT_PUBLIC_IMAGEKIT_ID}`
    src = src.replace(firebaseBaseUrl, imageKitBaseUrl)
 
    const transformations = [`w-${width}`, `h-${height}`]

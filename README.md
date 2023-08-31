@@ -174,3 +174,31 @@ In order to run the script on production you need to add a flag `useProd=true` t
 ```sh
 npm run script -w @careerfairy/firebase-scripts -- useProd=true scriptPath=<path-to-script>
 ```
+
+# ImageKit Setup
+
+We use ImageKit for real-time video optimization and transformation. Each developer is required to set up their own ImageKit account for local development. Separate ImageKit IDs are also used for the testing and production environments.
+
+### Create Your Own ImageKit Account
+
+1. Navigate to [ImageKit.io Registration](https://imagekit.io/registration/) and sign up for a new account.
+2. During setup, select Frankfurt (Europe) as the region.
+3. Once registered, go to the [Dashboard](https://imagekit.io/dashboard/external-storage) and click **+Add New** as shown in the image below:
+   ![Dashboard Screenshot](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FScreenshot%20from%202023-08-31%2011-39-47.png?alt=media&token=a45777ec-ad2f-4cc4-83ba-f1404f71f038)
+4. Complete the following fields:
+   1. **Origin name\***: Enter `Firebase Storage`.
+   2. **Origin type\***: Select `Web Folder - HTTP(S) server and Magento, Shopify, Wordpress, etc.`.
+   3. **Base URL\***: Enter `https://firebasestorage.googleapis.com`.
+5. Skip the Advanced section and click "Save".
+
+### Configure Environment Variables
+
+1. Upon completing the account setup, you'll be provided with an `imagekitId`. You can find this ID on the [Developer API Keys Dashboard](https://imagekit.io/dashboard/developer/api-keys) of your ImageKit account. Copy this ID for the next step.
+2. If you don't already have a `.env.local` file in your [project](./apps/web/.env.local), make a copy of the `.env.local.example` file located [here](./apps/web/.env.local.example) and rename it to `.env.local`.
+3. Open your `.env.local` file and paste your `imagekitId` in the designated area, like so:
+
+       ```env
+       NEXT_PUBLIC_IMAGEKIT_ID=YOUR_IMAGEKIT_ID
+       ```
+
+   For testing and production environments, the `NEXT_PUBLIC_IMAGEKIT_ID` will be configured in the CI/CD pipeline and the [.env.test](./apps/web/.env.test) file, respectively.
