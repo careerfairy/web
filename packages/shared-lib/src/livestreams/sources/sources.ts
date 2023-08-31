@@ -2,10 +2,23 @@ import { UTMParams } from "../../commonTypes"
 
 export type RegistrationSource = {
    displayName: string
+   id: RegistrationSourceId
    helpDescription: string
    color: string
    match: (utms: UTMParams) => boolean
 }
+
+export const RegistrationSourceIds = {
+   PlatformNormal: "platform-normal",
+   PlatformPromo: "platform-promo",
+   Social: "social",
+   Sparks: "sparks",
+   University: "university",
+   Other: "other",
+} as const
+
+export type RegistrationSourceId =
+   (typeof RegistrationSourceIds)[keyof typeof RegistrationSourceIds]
 
 /**
  * Types of Sources that will appear in the dashboard UI (chart and tables)
@@ -18,6 +31,7 @@ export type RegistrationSource = {
 export const VALID_SOURCES: RegistrationSource[] = [
    {
       displayName: "Platform Registrations",
+      id: RegistrationSourceIds.PlatformNormal,
       helpDescription:
          "User registered through our platform not tied to any campaign.",
       color: "#2B28BC",
@@ -26,6 +40,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
    },
    {
       displayName: "Platform User Promo",
+      id: RegistrationSourceIds.PlatformPromo,
       helpDescription:
          "User registered through a campaign inside our Platform.",
       color: "#1ED0D0",
@@ -38,6 +53,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
    },
    {
       displayName: "Social",
+      id: RegistrationSourceIds.Social,
       helpDescription:
          "User registered through a social media ad (Facebook, Instagram, etc).",
       color: "#00FF47",
@@ -46,7 +62,15 @@ export const VALID_SOURCES: RegistrationSource[] = [
       ),
    },
    {
+      displayName: "Sparks",
+      id: RegistrationSourceIds.Sparks,
+      helpDescription: "User registered through Sparks.",
+      color: "#FFC200",
+      match: (utms) => false,
+   },
+   {
       displayName: "University Network Promo",
+      id: RegistrationSourceIds.University,
       helpDescription: "User registered through a university campaign.",
       color: "#FF4D4D",
       match: (utms) => {
@@ -65,6 +89,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
 
    {
       displayName: "Other",
+      id: RegistrationSourceIds.Other,
       helpDescription: "User registered through an unknown campaign.",
       color: "#7D7AFF",
       // utms present but no source match
