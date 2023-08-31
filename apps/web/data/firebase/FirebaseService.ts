@@ -59,9 +59,7 @@ import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { getRandomInt } from "../../components/helperFunctions/HelperFunctions"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2200,6 +2198,7 @@ class FirebaseService {
       userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
       options: {
          isRecommended?: boolean
+         fromSpark?: boolean
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
@@ -2238,6 +2237,9 @@ class FirebaseService {
             date: this.getServerTimestamp(),
             ...(options.isRecommended && {
                isRecommended: true,
+            }),
+            ...(options.fromSpark && {
+               fromSpark: options.fromSpark,
             }),
          },
          // to allow queries for users that didn't participate

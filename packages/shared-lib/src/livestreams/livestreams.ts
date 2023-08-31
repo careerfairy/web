@@ -247,6 +247,7 @@ export interface UserLivestreamData extends Identifiable {
       utm?: UTMParams
       referrer?: string
       isRecommended?: boolean
+      fromSpark?: boolean
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
