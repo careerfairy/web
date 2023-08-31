@@ -190,6 +190,11 @@ We use ImageKit for real-time video optimization and transformation. Each develo
    2. **Origin type\***: Select `Web Folder - HTTP(S) server and Magento, Shopify, Wordpress, etc.`.
    3. **Base URL\***: Enter `https://firebasestorage.googleapis.com`.
 5. Skip the Advanced section and click "Save".
+6. Next we need to enable automatic video optimizations in the [Video Settings](https://imagekit.io/dashboard/settings/videos). Click on the **Video Optimization** section.
+7. Enable the **Use best format for video delivery** option.
+8. Enable the **Optimize video quality before delivery** option, choose `40%` for the quality
+9. You can leave the other options as default and click "Save" at the top right corner.
+10.   Now your ImageKit account is ready to use 🚀
 
 ### Configure Environment Variables
 
