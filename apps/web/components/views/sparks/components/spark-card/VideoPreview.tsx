@@ -1,38 +1,30 @@
+import PlayIcon from "@mui/icons-material/PlayArrowRounded"
+import { CircularProgress, IconButton } from "@mui/material"
+import Box from "@mui/material/Box"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
-import Box from "@mui/material/Box"
+import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useState } from "react"
+import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { sxStyles } from "types/commonTypes"
-import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 
 const styles = sxStyles({
    root: {
       position: "absolute",
       inset: 0,
-      background: "black",
    },
    playerWrapper: {
       position: "relative",
       width: "100%",
       height: "100%",
       "& .player": {
-         background: "black",
          position: "absolute",
          top: 0,
          left: 0,
-      },
-   },
-   withAspectRatio: {
-      // Portrait aspect ratio, e.g., 9:16
-   },
-   containThumbnail: {
-      "& .player": {
-         "& .react-player__preview": {
-            backgroundSize: "contain !important",
-            backgroundRepeat: "no-repeat !important",
-            backgroundPosition: "center !important",
+         "& video": {
+            background: "black",
          },
       },
    },
@@ -48,53 +40,84 @@ const styles = sxStyles({
       zIndex: (theme) => theme.zIndex.drawer + 1,
       height: 4.5,
    },
+   clickToPlayOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      background: "rgba(0, 0, 0, 0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "white",
+      "& svg": {
+         width: 80,
+         height: 80,
+      },
+   },
+   thumbnailOverlay: {
+      position: "relative",
+      width: "100%",
+      height: "100%",
+   },
 })
 
 type Props = {
    videoUrl: string
    thumbnailUrl: string
    playing?: boolean
-   containThumbnail?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
    videoUrl,
    thumbnailUrl,
-   playing,
-   containThumbnail,
+   playing: shouldPLay,
 }) => {
    const [progress, setProgress] = useState(0)
+   const [browserAutoplayError, setBrowserAutoplayError] = useState(false)
+   const [playing, setPlaying] = useState(shouldPLay)
+   const [waitingToPlay, setWaitingToPlay] = useState(true)
 
    useEffect(() => {
+      if (shouldPLay) {
+         setPlaying(true)
+      }
       return () => {
          setProgress(0)
+         setPlaying(false)
+         setWaitingToPlay(false)
       }
-   }, [])
+   }, [shouldPLay])
 
    const handleProgress = useCallback((progress: OnProgressProps) => {
       setProgress(progress.played * 100)
    }, [])
 
-   const handleError: BaseReactPlayerProps["onError"] = (
-      error,
-      data,
-      hlsINstance,
-      hlsGlobal
-   ) => {
-      console.log("🚀 ~ file: VideoPreview.tsx:84 ~ hlsGlobal:", hlsGlobal)
-      console.log("🚀 ~ file: VideoPreview.tsx:84 ~ hlsINstance:", hlsINstance)
-      console.log("🚀 ~ file: VideoPreview.tsx:84 ~ data:", data)
-      console.log("🚀 ~ file: VideoPreview.tsx:96 ~ error:", error)
+   const handleError: BaseReactPlayerProps["onError"] = (error) => {
+      setBrowserAutoplayError(true)
+      setPlaying(false)
    }
+
+   const onPlay = useCallback(() => {
+      setWaitingToPlay(false)
+   }, [])
+
+   const handleClickPlayOverlay = useCallback(() => {
+      setPlaying(true)
+      setBrowserAutoplayError(false)
+   }, [])
 
    return (
       <Box sx={styles.root}>
-         <Box
-            sx={[
-               styles.playerWrapper,
-               containThumbnail && styles.containThumbnail,
-            ]}
-         >
+         {browserAutoplayError ? (
+            <ClickToPlayOverlay onClick={handleClickPlayOverlay} />
+         ) : null}
+         {/* Sometimes it takes up to a second for the <video/> element to start
+          playing a video, once the onPlay is triggered, we know the video has been loaded */}
+         {waitingToPlay ? <ThumbnailOverlay src={thumbnailUrl} /> : null}
+         <Box sx={[styles.playerWrapper]}>
             <ReactPlayer
                playing={playing}
                playsinline={playing}
@@ -103,11 +126,20 @@ const VideoPreview: FC<Props> = ({
                height="100%"
                className="player"
                onProgress={handleProgress}
+               onPlay={onPlay}
                onError={handleError}
                progressInterval={500}
                url={videoUrl}
-               light={!playing && thumbnailUrl}
+               light={!playing && <ThumbnailOverlay src={thumbnailUrl} />}
                playIcon={<Fragment />}
+               fallback={
+                  <CircularProgress
+                     size={300}
+                     sx={{
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                     }}
+                  />
+               }
             />
             <LinearProgress
                sx={styles.progress}
@@ -119,8 +151,34 @@ const VideoPreview: FC<Props> = ({
    )
 }
 
-type FallBackComponentProps = {
-   thumbnailUrl: string
+type ClickToPlayOverlayProps = {
+   onClick: () => void
+}
+const ClickToPlayOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
+   return (
+      <Box sx={styles.clickToPlayOverlay} onClick={onClick}>
+         <IconButton size="large" color="info">
+            <PlayIcon />
+         </IconButton>
+      </Box>
+   )
+}
+
+type ThumbnailOverlayProps = {
+   src: string
+}
+const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
+   return (
+      <Box sx={styles.thumbnailOverlay}>
+         <Image
+            src={src}
+            layout="fill"
+            objectFit="cover"
+            alt="thumbnail"
+            priority={true}
+         />
+      </Box>
+   )
 }
 
 export default VideoPreview
