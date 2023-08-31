@@ -38,5 +38,8 @@ export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
 export const sparkEventNotificationsSelector = (state: RootState) =>
    state.sparksFeed.eventNotifications
 
+export const currentSparkEventNotificationSelector = (state: RootState) =>
+   state.sparksFeed.currentEventNotification
+
 export const showEventDetailsDialogSelector = (state: RootState) =>
    state.sparksFeed.showEventDetailsDialog

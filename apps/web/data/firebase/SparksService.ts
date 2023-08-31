@@ -27,6 +27,8 @@ import {
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { fromSerializedDate } from "@careerfairy/shared-lib/BaseModel"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -212,6 +214,20 @@ export class SparksService {
          this.functions,
          "removeAndSyncUserSparkNotification"
       )(data)
+   }
+
+   async fetchUserSparksNotifications(
+      userId: string
+   ): Promise<UserSparksNotification[]> {
+      const { data } = await httpsCallable<string, UserSparksNotification[]>(
+         this.functions,
+         "getUserSparkNotifications"
+      )(userId)
+
+      return data.map(({ startDate, ...data }) => ({
+         ...data,
+         startDate: fromSerializedDate(startDate),
+      }))
    }
 }
 

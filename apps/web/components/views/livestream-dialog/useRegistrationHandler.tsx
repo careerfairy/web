@@ -15,13 +15,14 @@ import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import {
    currentSparkIndexSelector,
    showEventDetailsDialogSelector,
    sparksSelector,
 } from "../../../store/selectors/sparksFeedSelectors"
 import { sparkService } from "../../../data/firebase/SparksService"
+import { fetchUserSparksNotifications } from "../../../store/reducers/sparksFeedReducer"
 
 /**
  * Logic for handling the register button click
@@ -35,6 +36,7 @@ export default function useRegistrationHandler() {
       goToView,
    } = useLiveStreamDialog()
    const { push, asPath } = useRouter()
+   const dispatch = useDispatch()
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
@@ -208,6 +210,9 @@ export default function useRegistrationHandler() {
                      userId: userData.userEmail,
                      groupId: livestream.author.groupId,
                   })
+                  .then(() => {
+                     dispatch(fetchUserSparksNotifications())
+                  })
                   .catch((e) =>
                      errorLogAndNotify(e, {
                         message: "Failed to remove spark notification",
@@ -247,6 +252,7 @@ export default function useRegistrationHandler() {
       [
          currentSparkIndex,
          dialogFromSpark,
+         dispatch,
          isRecommended,
          registerToLivestream,
          sendRegistrationConfirmationEmail,

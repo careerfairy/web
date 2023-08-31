@@ -5,20 +5,31 @@ import Box from "@mui/material/Box"
 import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
-import { FC, useCallback, useEffect } from "react"
+import { FC, useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { swipeNextSparkByIndex } from "store/reducers/sparksFeedReducer"
+import {
+   removeCurrentEventNotifications,
+   setCurrentEventNotification,
+   showEventDetailsDialog,
+   swipeNextSparkByIndex,
+} from "store/reducers/sparksFeedReducer"
 
 import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
 import {
+   currentSparkEventNotificationSelector,
    currentSparkIndexSelector,
    isFetchingSparksSelector,
+   showEventDetailsDialogSelector,
+   sparkEventNotificationsSelector,
    sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
+import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
+import { useAuth } from "../../HOCs/AuthProvider"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -88,45 +99,59 @@ const styles = sxStyles({
    },
 })
 
-const options: EmblaOptionsType = {
-   axis: "y",
-   loop: false,
-   align: "center",
-   /**
-    * Custom function to watch for changes to the slides.
-    * Reloads the Embla Carousel whenever the slides (sparks) are updated,
-    * to prevent flickering.
-    */
-   watchSlides: (emblaApi) => {
-      const reloadEmbla = (): void => {
-         const oldEngine = emblaApi.internalEngine()
-         emblaApi.reInit()
-         const newEngine = emblaApi.internalEngine()
-         const copyEngineModules: (keyof EngineType)[] = [
-            "location",
-            "target",
-            "scrollBody",
-         ]
-         copyEngineModules.forEach((engineModule) => {
-            Object.assign(newEngine[engineModule], oldEngine[engineModule])
-         })
-         newEngine.translate.to(oldEngine.location.get())
-         const { index } = newEngine.scrollTarget.byDistance(0, false)
-         newEngine.index.set(index)
-         newEngine.animation.start()
-      }
-
-      reloadEmbla()
-   },
-}
-
 const SparksFeedCarousel: FC = () => {
+   const { userData } = useAuth()
    const isFullScreen = useSparksFeedIsFullScreen()
-   const currentPlayingIndex = useSelector(currentSparkIndexSelector)
-
    const dispatch = useDispatch()
+
+   const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
+   const eventDetailsDialogVisibility = useSelector(
+      showEventDetailsDialogSelector
+   )
+
+   const eventNotification = useSelector(currentSparkEventNotificationSelector)
+   const eventNotifications = useSelector(sparkEventNotificationsSelector)
+
+   const options = useMemo<EmblaOptionsType>(
+      () => ({
+         active: !eventDetailsDialogVisibility,
+         axis: "y",
+         loop: false,
+         align: "center",
+         /**
+          * Custom function to watch for changes to the slides.
+          * Reloads the Embla Carousel whenever the slides (sparks) are updated,
+          * to prevent flickering.
+          */
+         watchSlides: (emblaApi) => {
+            const reloadEmbla = (): void => {
+               const oldEngine = emblaApi.internalEngine()
+               emblaApi.reInit()
+               const newEngine = emblaApi.internalEngine()
+               const copyEngineModules: (keyof EngineType)[] = [
+                  "location",
+                  "target",
+                  "scrollBody",
+               ]
+               copyEngineModules.forEach((engineModule) => {
+                  Object.assign(
+                     newEngine[engineModule],
+                     oldEngine[engineModule]
+                  )
+               })
+               newEngine.translate.to(oldEngine.location.get())
+               const { index } = newEngine.scrollTarget.byDistance(0, false)
+               newEngine.index.set(index)
+               newEngine.animation.start()
+            }
+
+            reloadEmbla()
+         },
+      }),
+      [eventDetailsDialogVisibility]
+   )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
 
@@ -166,12 +191,36 @@ const SparksFeedCarousel: FC = () => {
       }
    }, [emblaApi, dispatch])
 
-   const handlClickSlide = useCallback(
+   useEffect(() => {
+      const currentSpark = sparks[currentPlayingIndex]
+      const currentNotification = eventNotifications?.find(
+         (notification) => notification.groupId === currentSpark.group.id
+      )
+
+      // to only show the notification after 10 secs
+      dispatch(removeCurrentEventNotifications())
+
+      if (currentNotification) {
+         setTimeout(() => {
+            dispatch(setCurrentEventNotification(currentNotification))
+         }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
+      }
+
+      if (eventNotification && !currentNotification) {
+         dispatch(removeCurrentEventNotifications())
+      }
+   }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
+
+   const handleClickSlide = useCallback(
       (index: number) => {
          dispatch(swipeNextSparkByIndex(index))
       },
       [dispatch]
    )
+
+   const handleCloseDialog = useCallback(() => {
+      dispatch(showEventDetailsDialog(false))
+   }, [dispatch])
 
    return (
       <Box
@@ -186,7 +235,7 @@ const SparksFeedCarousel: FC = () => {
                   onClick={
                      index === currentPlayingIndex
                         ? undefined // Prevents propagating the click event to children
-                        : () => handlClickSlide(index)
+                        : () => handleClickSlide(index)
                   }
                   fullScreen={isFullScreen}
                   key={spark.id + index}
@@ -207,6 +256,16 @@ const SparksFeedCarousel: FC = () => {
             <Box sx={styles.closeBtn}>
                <CloseSparksFeedButton />
             </Box>
+         ) : null}
+         {eventDetailsDialogVisibility ? (
+            <LivestreamDialog
+               livestreamId={eventNotification?.eventId}
+               handleClose={handleCloseDialog}
+               open={eventDetailsDialogVisibility}
+               page={"details"}
+               serverUserEmail={userData?.userEmail}
+               mode={"stand-alone"}
+            />
          ) : null}
       </Box>
    )

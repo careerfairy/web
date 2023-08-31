@@ -79,12 +79,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   serverSideLivestream: LivestreamEvent
+   serverSideLivestream?: LivestreamEvent
    livestreamId: string
    handleClose: () => void
    open: boolean
    page: "details" | "register" | "job-details"
-   updatedStats: UserStats
+   updatedStats?: UserStats
    serverUserEmail: string
    /**
     * The mode of operation for the dialog. Can be either "page" or "stand-alone".

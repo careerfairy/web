@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react"
+import React, { FC, useCallback, useEffect } from "react"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -8,9 +8,11 @@ import Image from "next/image"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import Stack from "@mui/material/Stack"
 import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
-import Link from "../../../common/Link"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import { responsiveConfetti } from "../../../../util/confetti"
+import { useSelector } from "react-redux"
+import { showEventDetailsDialogSelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    fullHeight: {
@@ -68,7 +70,11 @@ const styles = sxStyles({
 type Props = {}
 
 const RegisterSuccessView: FC<Props> = () => {
+   const route = useRouter()
    const { closeDialog, livestream, activeView } = useLiveStreamDialog()
+   const eventDetailsDialogVisibility = useSelector(
+      showEventDetailsDialogSelector
+   )
 
    const isMobile = useIsMobile()
 
@@ -77,6 +83,14 @@ const RegisterSuccessView: FC<Props> = () => {
 
       responsiveConfetti(isMobile)
    }, [isMobile, activeView])
+
+   const handleBackClick = useCallback(() => {
+      if (eventDetailsDialogVisibility) {
+         closeDialog()
+      } else {
+         void route.push("/next-livestreams")
+      }
+   }, [closeDialog, eventDetailsDialogVisibility, route])
 
    return (
       <BaseDialogView
@@ -137,14 +151,15 @@ const RegisterSuccessView: FC<Props> = () => {
                         </AddToCalendar>
 
                         <Button
-                           component={Link}
-                           href={"/next-livestreams"}
                            fullWidth
                            variant={"text"}
                            color={"grey"}
+                           onClick={handleBackClick}
                            sx={[styles.btn, styles.discoverBtn]}
                         >
-                           Discover more live streams
+                           {eventDetailsDialogVisibility
+                              ? "Back to Sparks"
+                              : "Discover more live streams"}
                         </Button>
                      </Stack>
                   </Box>

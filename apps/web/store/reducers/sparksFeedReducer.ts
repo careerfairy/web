@@ -20,6 +20,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
+   currentEventNotification: UserSparksNotification | null
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
 }
@@ -37,6 +38,7 @@ const initialState: SparksState = {
    fetchNextError: null,
    initialFetchError: null,
    sparkCategoryIds: [],
+   currentEventNotification: null,
    showEventDetailsDialog: false,
 }
 
@@ -94,6 +96,22 @@ const sparksFeedSlice = createSlice({
             state.currentPlayingIndex = newIndex
          }
       },
+      setCurrentEventNotification: (
+         state,
+         action: PayloadAction<UserSparksNotification>
+      ) => {
+         state.currentEventNotification = action.payload
+      },
+      removeCurrentEventNotifications: (state) => {
+         state.currentEventNotification = null
+      },
+      showEventDetailsDialog: (state, action: PayloadAction<boolean>) => {
+         // when closing event dialog we want to remove the notification
+         if (action.payload === false) {
+            state.currentEventNotification = null
+         }
+         state.showEventDetailsDialog = action.payload
+      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -103,6 +121,7 @@ const sparksFeedSlice = createSlice({
          state.fetchNextSparksStatus = "idle"
          state.fetchNextError = null
          state.initialFetchError = null
+         state.currentEventNotification = null
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
       },
@@ -193,6 +212,9 @@ export const {
    setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
+   setCurrentEventNotification,
+   removeCurrentEventNotifications,
+   showEventDetailsDialog,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

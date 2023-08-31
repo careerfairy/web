@@ -1,0 +1,138 @@
+import React, { FC, useCallback } from "react"
+import { Avatar, Box, Button, Typography } from "@mui/material"
+import { sxStyles } from "../../../../../types/commonTypes"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import { companyLogoPlaceholder } from "../../../../../constants/images"
+import DateUtil from "../../../../../util/DateUtil"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { useDispatch, useSelector } from "react-redux"
+import { currentSparkEventNotificationSelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import { PublicGroup } from "@careerfairy/shared-lib/groups"
+import {
+   removeCurrentEventNotifications,
+   showEventDetailsDialog,
+} from "../../../../../store/reducers/sparksFeedReducer"
+
+const styles = sxStyles({
+   root: {
+      position: "absolute",
+      display: "flex",
+      flexDirection: "column",
+      top: 26,
+      left: 26,
+      right: 26,
+      borderRadius: 3.25,
+      backgroundColor: "white",
+      padding: 3,
+   },
+   notification: {
+      display: "flex",
+      flexDirection: "row",
+      mb: 3,
+   },
+   avatar: {
+      width: { xs: 50, md: 60 },
+      height: { xs: 50, md: 60 },
+      backgroundColor: "white",
+      boxShadow: "0px 12px 40px rgba(0, 0, 0, 0.08)",
+      borderRadius: 2,
+      "& img": {
+         objectFit: "contain",
+         height: "90%",
+         width: "90%",
+      },
+   },
+   message: {
+      display: "flex",
+      alignItems: "center",
+      ml: 2,
+   },
+   actions: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+   },
+   btn: {
+      fontSize: { xs: 12, md: 14 },
+      width: "48%",
+      textTransform: "none",
+      py: { xs: 1, md: 0.5 },
+   },
+   cancelBtn: {
+      color: "#A5A5A5 !important",
+   },
+})
+
+type Props = {
+   group: PublicGroup
+}
+const SparksEventNotification: FC<Props> = ({ group }) => {
+   const dispatch = useDispatch()
+   const isMobile = useIsMobile()
+   const eventNotification = useSelector(currentSparkEventNotificationSelector)
+
+   const { universityName, logoUrl } = group
+
+   const missingDays = Math.floor(
+      DateUtil.getDifferenceInDays(eventNotification?.startDate, new Date())
+   )
+
+   const discoverHandleClick = useCallback(() => {
+      dispatch(showEventDetailsDialog(true))
+   }, [dispatch])
+
+   const cancelHandleClick = useCallback(() => {
+      dispatch(removeCurrentEventNotifications())
+   }, [dispatch])
+
+   return (
+      <Box sx={styles.root}>
+         <Box sx={styles.notification}>
+            <Avatar
+               variant="square"
+               sx={styles.avatar}
+               alt={`test logo`}
+               src={getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder}
+            />
+            <Box sx={styles.message}>
+               <Typography
+                  color={"text.primary"}
+                  variant={isMobile ? "body1" : "body2"}
+               >
+                  <Typography
+                     fontSize={"inherit"}
+                     color={"primary"}
+                     display={"inline"}
+                  >
+                     {universityName}
+                  </Typography>
+                  has a live stream happening in {missingDays} days! Check now!
+               </Typography>
+            </Box>
+         </Box>
+         <Box sx={styles.actions}>
+            <Button
+               sx={[styles.btn, styles.cancelBtn]}
+               onClick={cancelHandleClick}
+               variant="outlined"
+               size="small"
+               color="grey"
+            >
+               Maybe later
+            </Button>
+            <Button
+               sx={styles.btn}
+               onClick={discoverHandleClick}
+               variant="contained"
+               size="small"
+               color="primary"
+            >
+               Discover now
+            </Button>
+         </Box>
+      </Box>
+   )
+}
+
+export default SparksEventNotification
