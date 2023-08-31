@@ -61,6 +61,9 @@ const styles = sxStyles({
       position: "relative",
       width: "100%",
       height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
    },
 })
 
@@ -80,22 +83,26 @@ const VideoPreview: FC<Props> = ({
    const [playing, setPlaying] = useState(shouldPLay)
    const [waitingToPlay, setWaitingToPlay] = useState(true)
 
+   const handleReset = useCallback(() => {
+      setProgress(0)
+      setPlaying(false)
+      setWaitingToPlay(true)
+   }, [])
+
    useEffect(() => {
       if (shouldPLay) {
          setPlaying(true)
       }
       return () => {
-         setProgress(0)
-         setPlaying(false)
-         setWaitingToPlay(false)
+         handleReset()
       }
-   }, [shouldPLay])
+   }, [handleReset, shouldPLay])
 
    const handleProgress = useCallback((progress: OnProgressProps) => {
       setProgress(progress.played * 100)
    }, [])
 
-   const handleError: BaseReactPlayerProps["onError"] = (error) => {
+   const handleError: BaseReactPlayerProps["onError"] = () => {
       setBrowserAutoplayError(true)
       setPlaying(false)
    }
@@ -116,7 +123,9 @@ const VideoPreview: FC<Props> = ({
          ) : null}
          {/* Sometimes it takes up to a second for the <video/> element to start
           playing a video, once the onPlay is triggered, we know the video has been loaded */}
-         {waitingToPlay ? <ThumbnailOverlay src={thumbnailUrl} /> : null}
+         {waitingToPlay ? (
+            <ThumbnailOverlay loading src={thumbnailUrl} />
+         ) : null}
          <Box sx={[styles.playerWrapper]}>
             <ReactPlayer
                playing={playing}
@@ -166,8 +175,9 @@ const ClickToPlayOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
 
 type ThumbnailOverlayProps = {
    src: string
+   loading?: boolean
 }
-const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
+const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, loading }) => {
    return (
       <Box sx={styles.thumbnailOverlay}>
          <Image
@@ -177,6 +187,7 @@ const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
             alt="thumbnail"
             priority={true}
          />
+         {loading ? <CircularProgress size={50} /> : null}
       </Box>
    )
 }

@@ -12,15 +12,8 @@ type TransformationParams = {
 }
 
 export const imageKitLoader = (params: TransformationParams) => {
-   let {
-      src,
-      width,
-      height,
-      quality,
-      aspectRatio,
-      maxSizeCrop,
-      format = "webm",
-   } = params
+   let { src, width, height, quality, aspectRatio, maxSizeCrop, format } =
+      params
 
    // Replace the Firebase base URL with ImageKit base URL
    const firebaseBaseUrl = "https://firebasestorage.googleapis.com"

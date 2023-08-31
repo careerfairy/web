@@ -168,7 +168,6 @@ const SparksFeedCarousel: FC = () => {
 
    const handlClickSlide = useCallback(
       (index: number) => {
-         console.log("🚀 ~ file: SparksFeedCarousel.tsx:171 ~ index:", index)
          dispatch(swipeNextSparkByIndex(index))
       },
       [dispatch]
@@ -190,7 +189,7 @@ const SparksFeedCarousel: FC = () => {
                         : () => handlClickSlide(index)
                   }
                   fullScreen={isFullScreen}
-                  key={spark.id}
+                  key={spark.id + index}
                >
                   <FeedCardSlide
                      playing={index === currentPlayingIndex}
