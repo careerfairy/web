@@ -414,4 +414,4 @@ export type UserSparksNotification = {
    eventId: string
    startDate: Date
    groupId: string
-}
+} & Identifiable

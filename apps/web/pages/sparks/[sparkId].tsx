@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
    fetchNextSparks,
+   fetchUserSparksNotifications,
    resetSparksFeed,
    setGroupId,
    setSparks,
@@ -56,6 +57,7 @@ const SparksPage: NextPage<
 
    useEffect(() => {
       dispatch(fetchInitialSparksFeed())
+      dispatch(fetchUserSparksNotifications())
 
       return () => {
          dispatch(resetSparksFeed())

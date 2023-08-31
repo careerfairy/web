@@ -86,6 +86,26 @@ export const removeAndSyncUserSparkNotification = functions
       )
    )
 
+/**
+ * To get all User spark notifications
+ */
+export const getUserSparkNotifications = functions
+   .region(config.region)
+   .https.onCall(async (userId, context): Promise<UserSparksNotification[]> => {
+      try {
+         functions.logger.log(
+            `fetch all the spark notifications from the user ${userId}`
+         )
+         return sparkRepo.getUserSparkNotifications(userId)
+      } catch (error) {
+         logAndThrow(
+            "Error during fetch all User Spark Notifications",
+            error,
+            context
+         )
+      }
+   })
+
 export const removeAndSyncSparksNotifications = async (groupId: string) => {
    await sparkRepo.removeSparkNotification(groupId)
    return handleCreateSparksNotifications()
@@ -164,6 +184,7 @@ const createSparkNotificationForSingleUser = ({
 
       if (!groupAlreadyHasNotification) {
          notifications.push({
+            id: groupId,
             eventId: eventId,
             groupId: groupId,
             startDate: event.start.toDate(),

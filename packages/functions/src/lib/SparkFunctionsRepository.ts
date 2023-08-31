@@ -33,6 +33,13 @@ import {
 import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+
+type UserFeedMetrics = {
+   userId: string
+   lastUpdated: Timestamp
+   numberOfSparks: number
+}
 
 export interface ISparkFunctionsRepository {
    /**
@@ -200,6 +207,13 @@ export interface ISparkFunctionsRepository {
     *
     */
    removeUserSparkNotification(userId: string, groupId: string): Promise<void>
+
+
+   /**
+    * Get all User Spark Notification
+    *
+    */
+   getUserSparkNotifications(userId: string): Promise<UserSparksNotification[]>
 }
 
 export class SparkFunctionsRepository
@@ -663,6 +677,19 @@ export class SparkFunctionsRepository
          .doc(groupId)
 
       return void sparkRef.delete()
+   }
+
+   async getUserSparkNotifications(
+      userId: string
+   ): Promise<UserSparksNotification[]> {
+      const snapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .withConverter(createGenericConverter<UserSparksNotification>())
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
    }
 }
 
