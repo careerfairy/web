@@ -178,8 +178,8 @@ const FilterContent = ({
    const formik = useFormik({
       initialValues: selectedCategories,
       onSubmit: (values) => {
-         dispatch(setSparkCategories(values ? values : []))
          dispatch(resetSparksFeed())
+         dispatch(setSparkCategories(values ? values.map((cat) => cat.id) : []))
          dispatch(fetchNextSparks())
       },
    })

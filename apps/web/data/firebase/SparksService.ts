@@ -111,8 +111,8 @@ export class SparksService {
             where("group.id", "==", options.groupId!)
          )
 
-         // Check if options specify a userId and ensure it's not null.
-      } else if (options.userId) {
+         // Check if options specify a userId and that no categories are selected
+      } else if (options.userId && !options.sparkCategories?.length) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
@@ -121,7 +121,7 @@ export class SparksService {
          // Set the sort field to be the addedToFeedAt field.
          sortField = "addedToFeedAt"
       } else {
-         // If neither userId nor groupId are specified, query the public sparks feed.
+         // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
       }
 
@@ -129,7 +129,7 @@ export class SparksService {
       if (options.sparkCategories?.length) {
          baseQuery = query(
             baseQuery,
-            where("category", "in", options.sparkCategories)
+            where("category.id", "in", options.sparkCategories)
          )
       }
 

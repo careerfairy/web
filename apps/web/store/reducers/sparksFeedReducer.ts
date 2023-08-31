@@ -19,7 +19,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
-   sparkCategories: SparkCategory[]
+   sparkCategoryIds: string[]
 }
 
 const initialState: SparksState = {
@@ -34,7 +34,7 @@ const initialState: SparksState = {
    initialSparksFetched: false,
    fetchNextError: null,
    initialFetchError: null,
-   sparkCategories: [],
+   sparkCategoryIds: [],
 }
 
 // Async thunk to fetch the next sparks
@@ -79,8 +79,8 @@ const sparksFeedSlice = createSlice({
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
       },
-      setSparkCategories: (state, action: PayloadAction<SparkCategory[]>) => {
-         state.sparkCategories = action.payload
+      setSparkCategories: (state, action: PayloadAction<string[]>) => {
+         state.sparkCategoryIds = action.payload
       },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
@@ -92,11 +92,12 @@ const sparksFeedSlice = createSlice({
          state.sparks = []
          state.currentPlayingIndex = 0
          state.hasMoreSparks = true
-         state.initialFetchStatus = "loading"
+         state.initialFetchStatus = "idle"
          state.initialSparksFetched = false
          state.fetchNextSparksStatus = "idle"
          state.fetchNextError = null
          state.initialFetchError = null
+         state.sparkCategoryIds = []
       },
    },
    extraReducers: (builder) => {
@@ -169,11 +170,11 @@ const mergeSparks = (
  * @returns spark options
  */
 const getSparkOptions = (state: RootState) => {
-   const { numberOfSparksToFetch, groupId, userEmail, sparkCategories } =
+   const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
       state.sparksFeed
    return {
       numberOfSparks: numberOfSparksToFetch,
-      sparkCategories: sparkCategories,
+      sparkCategoryIds: sparkCategoryIds,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }
