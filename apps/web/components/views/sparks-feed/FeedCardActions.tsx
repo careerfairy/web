@@ -1,10 +1,10 @@
-import { FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 import { sxStyles } from "types/commonTypes"
 
-import { Box, IconButton, Stack, Typography } from "@mui/material"
+import { Box, Chip, IconButton, Stack, Typography } from "@mui/material"
 
 import LikesIcon from "components/views/common/icons/LikesIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
@@ -16,6 +16,9 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
+import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
+import { useSelector } from "react-redux"
+import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
 
 const actionWidth = 52
 
@@ -29,6 +32,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       width: actionWidth,
+      position: "relative",
    },
    fullScreenActionRoot: {
       color: "white",
@@ -41,6 +45,22 @@ const styles = sxStyles({
          color: "inherit",
       },
       mb: 1.25,
+   },
+   buttonChip: {
+      position: "absolute",
+      right: { xs: -5, md: -8 },
+      top: { xs: -8, md: -2 },
+      fontSize: { xs: "10px", md: "14px" },
+   },
+   buttonChip1: {
+      "& .MuiChip-label": { px: "10px" },
+   },
+   labelContainer: {
+      height: "20px",
+      width: "20px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
    },
    fullScreenActionBtn: {
       background: "none",
@@ -81,12 +101,7 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
             onClick={() => {}}
             label="Career Page"
          />
-         <Action
-            sparkId={spark.id}
-            icon={<FilterIcon />}
-            onClick={() => {}}
-            label="Filter"
-         />
+         <FilterAction sparkId={spark.id} />
       </Stack>
    )
 }
@@ -96,8 +111,15 @@ type ActionProps = {
    onClick: () => void
    label: string
    sparkId: string
+   chipValue?: number
 }
-const Action: FC<ActionProps> = ({ icon, onClick, label, sparkId }) => {
+const Action: FC<ActionProps> = ({
+   icon,
+   onClick,
+   label,
+   sparkId,
+   chipValue,
+}) => {
    const isFullScreen = useSparksFeedIsFullScreen()
 
    const actionLabel = (
@@ -106,6 +128,11 @@ const Action: FC<ActionProps> = ({ icon, onClick, label, sparkId }) => {
       >
          {label}
       </Typography>
+   )
+
+   const showChip = useMemo(
+      () => (chipValue ? chipValue > 0 : false),
+      [chipValue]
    )
 
    return (
@@ -125,6 +152,14 @@ const Action: FC<ActionProps> = ({ icon, onClick, label, sparkId }) => {
 
             {isFullScreen ? actionLabel : null}
          </IconButton>
+         {showChip ? (
+            <Chip
+               sx={[styles.buttonChip, chipValue == 1 && styles.buttonChip1]}
+               color={"primary"}
+               label={chipValue}
+               size={"small"}
+            ></Chip>
+         ) : null}
          {isFullScreen ? null : actionLabel}
       </Box>
    )
@@ -173,6 +208,32 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
             isOpen={isShareDialogOpen}
             handleClose={handleCloseShareDialog}
             shareUrl={shareUrl}
+         />
+      </>
+   )
+}
+
+type FilterActionProps = {
+   sparkId: string
+}
+const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
+   const [isFilterDialogOpen, handleOpenFilterDialog, handleCloseFilterDialog] =
+      useDialogStateHandler()
+   const selectedSparkCategories = useSelector(selectedSparkCategoriesSelector)
+
+   return (
+      <>
+         <Action
+            sparkId={sparkId}
+            icon={<FilterIcon />}
+            onClick={handleOpenFilterDialog}
+            label="Filter"
+            chipValue={selectedSparkCategories.length}
+         />
+         <SparksFilterDialog
+            isOpen={isFilterDialogOpen}
+            handleClose={handleCloseFilterDialog}
+            selectedCategoryIds={selectedSparkCategories}
          />
       </>
    )

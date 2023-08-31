@@ -1,4 +1,5 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
@@ -18,6 +19,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
+   sparkCategoryIds: SparkCategory["id"][]
 }
 
 const initialState: SparksState = {
@@ -32,6 +34,7 @@ const initialState: SparksState = {
    initialSparksFetched: false,
    fetchNextError: null,
    initialFetchError: null,
+   sparkCategoryIds: [],
 }
 
 // Async thunk to fetch the next sparks
@@ -76,6 +79,12 @@ const sparksFeedSlice = createSlice({
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
       },
+      setSparkCategories: (
+         state,
+         action: PayloadAction<SparkCategory["id"][]>
+      ) => {
+         state.sparkCategoryIds = action.payload
+      },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
          if (newIndex >= 0 && newIndex < state.sparks.length) {
@@ -86,11 +95,12 @@ const sparksFeedSlice = createSlice({
          state.sparks = []
          state.currentPlayingIndex = 0
          state.hasMoreSparks = true
-         state.initialFetchStatus = "loading"
+         state.initialFetchStatus = "idle"
          state.initialSparksFetched = false
          state.fetchNextSparksStatus = "idle"
          state.fetchNextError = null
          state.initialFetchError = null
+         state.sparkCategoryIds = []
       },
    },
    extraReducers: (builder) => {
@@ -163,9 +173,11 @@ const mergeSparks = (
  * @returns spark options
  */
 const getSparkOptions = (state: RootState) => {
-   const { numberOfSparksToFetch, groupId, userEmail } = state.sparksFeed
+   const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
+      state.sparksFeed
    return {
       numberOfSparks: numberOfSparksToFetch,
+      sparkCategoryIds: sparkCategoryIds,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }
@@ -174,6 +186,7 @@ export const {
    setSparks,
    setGroupId,
    setUserEmail,
+   setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
 } = sparksFeedSlice.actions
