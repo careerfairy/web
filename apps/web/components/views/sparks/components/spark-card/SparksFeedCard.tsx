@@ -85,7 +85,6 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
-               containThumbnail={isFullScreen}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>

@@ -19,7 +19,7 @@ export const imageKitLoader = (params: TransformationParams) => {
       quality,
       aspectRatio,
       maxSizeCrop,
-      format = "mp4",
+      format = "webm",
    } = params
 
    // Replace the Firebase base URL with ImageKit base URL
