@@ -52,6 +52,13 @@ export const VALID_SOURCES: RegistrationSource[] = [
       },
    },
    {
+      displayName: "Sparks",
+      id: RegistrationSourceIds.Sparks,
+      helpDescription: "User registered through Sparks.",
+      color: "#FFC200",
+      match: (utms) => false,
+   },
+   {
       displayName: "Social",
       id: RegistrationSourceIds.Social,
       helpDescription:
@@ -60,13 +67,6 @@ export const VALID_SOURCES: RegistrationSource[] = [
       match: matchAnyUtmParam(
          /instagram|facebook|meta|twitter|linkedin|tiktok/i
       ),
-   },
-   {
-      displayName: "Sparks",
-      id: RegistrationSourceIds.Sparks,
-      helpDescription: "User registered through Sparks.",
-      color: "#FFC200",
-      match: (utms) => false,
    },
    {
       displayName: "University Network Promo",
