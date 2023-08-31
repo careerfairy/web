@@ -15,6 +15,8 @@ import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
+import { useSelector } from "react-redux"
+import { showEventDetailsDialogSelector } from "../../../store/selectors/sparksFeedSelectors"
 
 /**
  * Logic for handling the register button click
@@ -36,6 +38,7 @@ export default function useRegistrationHandler() {
       deregisterFromLivestream,
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
+   const dialogFromSpark = useSelector(showEventDetailsDialogSelector)
 
    /**
     * Initiate the registration process
@@ -182,6 +185,7 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
+               fromSpark: dialogFromSpark,
             }
          )
             .then(() => {
@@ -213,7 +217,12 @@ export default function useRegistrationHandler() {
                })
             })
       },
-      [isRecommended, registerToLivestream, sendRegistrationConfirmationEmail]
+      [
+         dialogFromSpark,
+         isRecommended,
+         registerToLivestream,
+         sendRegistrationConfirmationEmail,
+      ]
    )
 
    return {
