@@ -142,7 +142,7 @@ const GenericDashboardLayout = ({
          {
             id: "sparks",
             href: `/sparks`,
-            pathname: `/sparks`,
+            pathname: `/sparks/[sparkId]`,
             Icon: SparksIcon,
             title: "Sparks",
          },
