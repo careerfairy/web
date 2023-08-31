@@ -114,13 +114,13 @@ const styles = sxStyles({
 type Props = {
    isOpen: boolean
    handleClose: () => void
-   selectedCategories: SparkCategory[]
+   selectedCategoryIds: SparkCategory["id"][]
 }
 
 const SparksFilterDialog = ({
    isOpen,
    handleClose,
-   selectedCategories,
+   selectedCategoryIds,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -136,7 +136,7 @@ const SparksFilterDialog = ({
             >
                <FilterContent
                   handleClose={handleClose}
-                  selectedCategories={selectedCategories}
+                  selectedCategoryIds={selectedCategoryIds}
                   isMobile={isMobile}
                />
             </Drawer>
@@ -154,7 +154,7 @@ const SparksFilterDialog = ({
             >
                <FilterContent
                   handleClose={handleClose}
-                  selectedCategories={selectedCategories}
+                  selectedCategoryIds={selectedCategoryIds}
                   isMobile={isMobile}
                />
             </Dialog>
@@ -166,41 +166,41 @@ const SparksFilterDialog = ({
 type ContentProps = {
    handleClose: () => void
    isMobile: boolean
-   selectedCategories: SparkCategory[]
+   selectedCategoryIds: SparkCategory["id"][]
 }
 
 const FilterContent = ({
    handleClose,
    isMobile,
-   selectedCategories,
+   selectedCategoryIds,
 }: ContentProps) => {
    const dispatch = useDispatch()
    const formik = useFormik({
-      initialValues: selectedCategories,
+      initialValues: selectedCategoryIds,
       onSubmit: (values) => {
          dispatch(resetSparksFeed())
-         dispatch(setSparkCategories(values ? values.map((cat) => cat.id) : []))
+         dispatch(setSparkCategories(values ? values : []))
          dispatch(fetchNextSparks())
       },
    })
 
    const handleChipClick = useCallback(
-      (chipTopic: SparkCategory) => {
-         if (formik.values.map((topic) => topic.id).includes(chipTopic.id)) {
+      (chipCategoryId: SparkCategory["id"]) => {
+         if (formik.values.includes(chipCategoryId)) {
             formik.setValues(
-               formik.values.filter((topic) => topic.id != chipTopic.id)
+               formik.values.filter((topic) => topic != chipCategoryId)
             )
          } else {
-            return formik.setValues([...formik.values, chipTopic])
+            return formik.setValues([...formik.values, chipCategoryId])
          }
       },
       [formik]
    )
 
    const handleCancelButton = useCallback(() => {
-      formik.setValues(selectedCategories)
+      formik.setValues(selectedCategoryIds)
       handleClose()
-   }, [formik, handleClose, selectedCategories])
+   }, [formik, handleClose, selectedCategoryIds])
 
    const handleSaveButton = useCallback(() => {
       formik.handleSubmit()
@@ -208,14 +208,14 @@ const FilterContent = ({
    }, [formik, handleClose])
 
    const getChipColor = useCallback(
-      (category: SparkCategory) =>
-         formik.values.includes(category) ? "primary" : "default",
+      (categoryId: SparkCategory["id"]) =>
+         formik.values.includes(categoryId) ? "primary" : "default",
       [formik.values]
    )
 
    const getSxChipBorder = useCallback(
-      (category: SparkCategory) =>
-         formik.values.includes(category)
+      (categoryId: SparkCategory["id"]) =>
+         formik.values.includes(categoryId)
             ? { border: "none" }
             : { border: "1px solid lightgrey" },
       [formik.values]
@@ -264,10 +264,10 @@ const FilterContent = ({
                   <Chip
                      variant={"filled"}
                      key={category.id}
-                     sx={[styles.chip, getSxChipBorder(category)]}
+                     sx={[styles.chip, getSxChipBorder(category.id)]}
                      label={getCategoryEmoji(category.id) + " " + category.name}
-                     onClick={() => handleChipClick(category)}
-                     color={getChipColor(category)}
+                     onClick={() => handleChipClick(category.id)}
+                     color={getChipColor(category.id)}
                   />
                ))}
             </Box>

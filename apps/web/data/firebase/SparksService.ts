@@ -112,7 +112,7 @@ export class SparksService {
          )
 
          // Check if options specify a userId and that no categories are selected
-      } else if (options.userId && !options.sparkCategories?.length) {
+      } else if (options.userId && !options.sparkCategoryIds?.length) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
@@ -125,11 +125,13 @@ export class SparksService {
          baseQuery = query(collection(db, "sparks"))
       }
 
+      console.log("categories in fetch", options.sparkCategoryIds)
       // Filter the sparks by category if provided
-      if (options.sparkCategories?.length) {
+      if (options.sparkCategoryIds?.length) {
+         console.log("filtering for", options.sparkCategoryIds)
          baseQuery = query(
             baseQuery,
-            where("category.id", "in", options.sparkCategories)
+            where("category.id", "in", options.sparkCategoryIds)
          )
       }
 
