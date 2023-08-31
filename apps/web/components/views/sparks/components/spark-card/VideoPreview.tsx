@@ -141,14 +141,6 @@ const VideoPreview: FC<Props> = ({
                url={videoUrl}
                light={!playing && <ThumbnailOverlay src={thumbnailUrl} />}
                playIcon={<Fragment />}
-               fallback={
-                  <CircularProgress
-                     size={300}
-                     sx={{
-                        zIndex: (theme) => theme.zIndex.drawer + 1,
-                     }}
-                  />
-               }
             />
             <LinearProgress
                sx={styles.progress}
