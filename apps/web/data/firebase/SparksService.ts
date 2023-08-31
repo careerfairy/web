@@ -125,10 +125,8 @@ export class SparksService {
          baseQuery = query(collection(db, "sparks"))
       }
 
-      console.log("categories in fetch", options.sparkCategoryIds)
       // Filter the sparks by category if provided
       if (options.sparkCategoryIds?.length) {
-         console.log("filtering for", options.sparkCategoryIds)
          baseQuery = query(
             baseQuery,
             where("category.id", "in", options.sparkCategoryIds)
