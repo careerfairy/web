@@ -19,7 +19,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
-   sparkCategoryIds: string[]
+   sparkCategoryIds: SparkCategory["id"][]
 }
 
 const initialState: SparksState = {
@@ -51,6 +51,8 @@ export const fetchNextSparks = createAsyncThunk(
       const lastSpark = sparks[sparks.length - 1]
       const sparkOptions = getSparkOptions(state)
 
+      console.log("fetch reducer call", sparkOptions.sparkCategoryIds)
+
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
 )
@@ -79,7 +81,10 @@ const sparksFeedSlice = createSlice({
       setUserEmail: (state, action: PayloadAction<string>) => {
          state.userEmail = action.payload
       },
-      setSparkCategories: (state, action: PayloadAction<string[]>) => {
+      setSparkCategories: (
+         state,
+         action: PayloadAction<SparkCategory["id"][]>
+      ) => {
          state.sparkCategoryIds = action.payload
       },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
@@ -172,6 +177,8 @@ const mergeSparks = (
 const getSparkOptions = (state: RootState) => {
    const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
       state.sparksFeed
+
+   console.log("getOptions cat", sparkCategoryIds)
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds: sparkCategoryIds,

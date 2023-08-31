@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Spark, SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 import { sxStyles } from "types/commonTypes"
 
@@ -233,7 +233,7 @@ const FilterAction: FC<FilterActionProps> = ({ sparkId }) => {
          <SparksFilterDialog
             isOpen={isFilterDialogOpen}
             handleClose={handleCloseFilterDialog}
-            selectedCategories={selectedSparkCategories}
+            selectedCategoryIds={selectedSparkCategories}
          />
       </>
    )

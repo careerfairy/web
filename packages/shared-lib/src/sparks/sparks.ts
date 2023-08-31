@@ -248,7 +248,7 @@ export type GetFeedData = {
    /**
     * The categories for which to filter the sparks
     */
-   sparkCategories?: SparkCategory[]
+   sparkCategoryIds?: SparkCategory["id"][]
 } & (
    | {
         /**
