@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { Autocomplete, Chip, Stack, TextField } from "@mui/material"
 import { Box } from "@mui/system"
 import { v4 as uuid } from "uuid"
@@ -70,7 +70,7 @@ const mapUniversitiesByCountryId = (
    return map
 }
 
-const TargetTalent = () => {
+const TargetTalent: FC = () => {
    const { group: company } = useGroup()
    const [selectedCountries, setSelectedCountries] = useState<GroupOption[]>([])
    const { successNotification, errorNotification } = useSnackbarNotifications()
@@ -140,9 +140,10 @@ const TargetTalent = () => {
                   <Stack
                      direction={"column"}
                      sx={{
-                        display: "flex",
-                        width: "100%",
                         gap: "12px",
+                        width: "100%",
+                        maxWidth: "100%",
+                        minWidth: "100%",
                      }}
                   >
                      {/* Target Countries select box */}

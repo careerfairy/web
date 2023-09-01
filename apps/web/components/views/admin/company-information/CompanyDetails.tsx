@@ -22,7 +22,7 @@ import BrandedChip from "./BrandedChip"
 
 const styles = sxStyles({
    selectBox: {
-      width: "-webkit-fill-available",
+      width: "100%",
       color: "#B0B0B0",
       ".MuiOutlinedInput-root": {
          display: "flex",
@@ -35,10 +35,10 @@ const styles = sxStyles({
          border: "1px solid var(--tertiary-e, #EDE7FD)",
          background: "#F7F8FC",
          color: "#B0B0B0",
-         width: "-webkit-fill-available",
+         width: "100%",
       },
       "#branded-multi-checkbox": {
-         width: "-webkit-fill-available",
+         width: "100%",
       },
    },
 })
