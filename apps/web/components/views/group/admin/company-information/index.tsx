@@ -53,7 +53,7 @@ const PageContent = () => {
                <CompanyDetails />
             </Grid>
 
-            <Grid item>
+            <Grid item sx={{ width: "100%" }}>
                <TargetTalent />
             </Grid>
 
