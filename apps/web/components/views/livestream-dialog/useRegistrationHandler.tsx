@@ -17,6 +17,7 @@ import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications
 import { useLiveStreamDialog } from "./LivestreamDialog"
 import { useSelector } from "react-redux"
 import { showEventDetailsDialogSelector } from "../../../store/selectors/sparksFeedSelectors"
+import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
  * Logic for handling the register button click
@@ -189,6 +190,20 @@ export default function useRegistrationHandler() {
             }
          )
             .then(() => {
+               // after registration, remove from this user's sparks notification the existing notification related to this event
+               sparkService
+                  .removeAndSyncUserSparkNotification({
+                     userId: userData.userEmail,
+                     groupId: livestream.author.groupId,
+                  })
+                  .catch((e) =>
+                     errorLogAndNotify(e, {
+                        message: "Failed to remove spark notification",
+                        user: authenticatedUser,
+                        livestream,
+                     })
+                  )
+
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
                   userData,
