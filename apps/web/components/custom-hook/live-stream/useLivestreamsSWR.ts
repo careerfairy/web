@@ -3,7 +3,10 @@ import {
    removeDuplicateDocuments,
 } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   getEarliestEventBufferTime,
+} from "@careerfairy/shared-lib/livestreams"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import {
@@ -62,7 +65,11 @@ const fetcher = async (options: UseLivestreamsSWROptions) => {
       if (type === "pastEvents") {
          q = query(q, where("start", "<", now), orderBy("start", "desc"))
       } else {
-         q = query(q, where("start", ">", now), orderBy("start", "asc"))
+         q = query(
+            q,
+            where("start", ">", getEarliestEventBufferTime()),
+            orderBy("start", "asc")
+         )
       }
 
       if (withRecordings) {
@@ -158,8 +165,6 @@ const useLivestreamsSWR = (
       type: "upcomingEvents",
    }
 ) => {
-   useTraceUpdate(options)
-
    const key = useMemo(
       () => (options.disabled ? null : JSON.stringify(options)),
       [options]
