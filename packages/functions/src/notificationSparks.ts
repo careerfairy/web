@@ -24,10 +24,9 @@ const removeNotificationFromUserValidator = {
  */
 export const createSparksFeedEventNotifications = functions
    .region(config.region)
-   .https.onCall(async () => {
-      // .pubsub.schedule("0 9 * * *")
-      // .timeZone("Europe/Zurich")
-      // .onRun(async () => {
+   .pubsub.schedule("0 9 * * *")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
       try {
          return handleCreateSparksNotifications()
       } catch (error) {
