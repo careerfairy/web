@@ -34,3 +34,9 @@ export const fetchNextErrorSelector = (state: RootState) =>
    state.sparksFeed.fetchNextError
 
 export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
+
+export const sparkEventNotificationsSelector = (state: RootState) =>
+   state.sparksFeed.eventNotifications
+
+export const showEventDetailsDialogSelector = (state: RootState) =>
+   state.sparksFeed.showEventDetailsDialog

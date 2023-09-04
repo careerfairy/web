@@ -410,7 +410,7 @@ export interface UserActivity extends Identifiable {
  *
  * Path /userData/{userId}/sparksNotifications/{groupId}
  */
-export type UserSparksNotifications = {
+export type UserSparksNotification = {
    eventId: string
    startDate: Date
    groupId: string
