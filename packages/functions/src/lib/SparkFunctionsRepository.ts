@@ -194,6 +194,21 @@ export interface ISparkFunctionsRepository {
     *
     */
    getAllUserSparksFeedMetrics(): Promise<UserFeedMetrics[]>
+
+   /**
+    * Remove all spark notifications related to a specific group
+    *
+    */
+   removeSparkNotification(groupId: string): Promise<void>
+
+   /**
+    * Remove specific spark notifications from a single user
+    *
+    */
+   removeAndSyncUserSparkNotification(
+      userId: string,
+      groupId: string
+   ): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -629,6 +644,34 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async removeSparkNotification(groupId: string): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const snapShot = await this.firestore
+         .collectionGroup("sparksNotifications")
+         .where("groupId", "==", groupId)
+         .get()
+
+      snapShot.docs.map((doc) => {
+         batch.delete(doc.ref)
+      })
+
+      return void batch.commit()
+   }
+
+   async removeAndSyncUserSparkNotification(
+      userId: string,
+      groupId: string
+   ): Promise<void> {
+      const sparkRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .doc(groupId)
+
+      return void sparkRef.delete()
    }
 }
 
