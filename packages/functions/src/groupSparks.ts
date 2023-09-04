@@ -23,7 +23,7 @@ import { firestore } from "./api/firestoreAdmin"
 import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
 import { WriteBatch } from "firebase-admin/firestore"
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
-import { UserSparksNotifications } from "@careerfairy/shared-lib/users"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 const sparkDataValidator = {
    question: string()
@@ -331,7 +331,7 @@ const createSparkNotificationForSingleUser = ({
    upcomingEvents,
    batch,
 }: createSparkNotificationForSingleUser): WriteBatch => {
-   const notifications: UserSparksNotifications[] = []
+   const notifications: UserSparksNotification[] = []
 
    // filter all the upcoming events where the user already registered
    const filteredUpcomingEvents = upcomingEvents.filter(
