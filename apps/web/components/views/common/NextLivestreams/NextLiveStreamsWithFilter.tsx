@@ -1,21 +1,23 @@
-import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
-import React, { useCallback, useMemo, useState } from "react"
-import { StreamsSection } from "./StreamsSection"
-import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
-import Link from "../../../../components/views/common/Link"
-import useIsMobile from "../../../../components/custom-hook/useIsMobile"
-import { sxStyles } from "../../../../types/commonTypes"
+import useLivestreamsSWR, {
+   UseLivestreamsSWROptions,
+} from "components/custom-hook/live-stream/useLivestreamsSWR"
+import { useRouter } from "next/router"
+import { useCallback, useMemo, useState } from "react"
 import { Search as FindIcon } from "react-feather"
+import useIsMobile from "../../../../components/custom-hook/useIsMobile"
+import Link from "../../../../components/views/common/Link"
+import { wishListBorderRadius } from "../../../../constants/pages"
+import { sxStyles } from "../../../../types/commonTypes"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
-import Filter, { FilterEnum } from "../filter/Filter"
-import { wishListBorderRadius } from "../../../../constants/pages"
-import NoResultsMessage from "./NoResultsMessage"
-import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { buildDialogLink } from "../../livestream-dialog"
 import CustomInfiniteScroll from "../CustomInfiniteScroll"
+import Filter, { FilterEnum } from "../filter/Filter"
+import NoResultsMessage from "./NoResultsMessage"
+import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -61,6 +63,9 @@ const getQueryVariables = (query) => {
 type Props = {
    initialTabValue?: "upcomingEvents" | "pastEvents"
 }
+
+const empty = []
+
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
@@ -69,7 +74,9 @@ const NextLiveStreamsWithFilter = ({
 
    const [limit, setLimit] = useState(10)
 
-   const { data: allFieldsOfStudy } = useFieldsOfStudy()
+   const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
+      useFieldsOfStudy()
+
    const {
       languages,
       companyCountries,
@@ -102,17 +109,36 @@ const NextLiveStreamsWithFilter = ({
       [allFieldsOfStudy, fieldsOfStudy]
    )
 
-   const livestreams = useListenToStreams({
-      languagesIds: languages,
-      companyCountriesIds: companyCountries,
-      companyIndustriesIds: companyIndustries,
-      fieldsOfStudy: mapFieldsOfStudy,
-      recordedOnly: recordedOnly,
-      listenToPastEvents: hasPastEvents,
-      filterByGroupId: companyId,
-      getHiddenEvents: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-      limit,
-   })
+   const swrQuery = useMemo<UseLivestreamsSWROptions>(
+      () => ({
+         languageCodes: languages,
+         companyCountries: companyCountries,
+         companyIndustries: companyIndustries,
+         targetFieldsOfStudy: mapFieldsOfStudy,
+         withRecordings: recordedOnly,
+         targetGroupIds: companyId ? [companyId] : empty,
+         withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
+         limit,
+         type: initialTabValue,
+         disabled: isLoadingFieldsOfStudy,
+      }),
+      [
+         languages,
+         companyCountries,
+         companyIndustries,
+         mapFieldsOfStudy,
+         recordedOnly,
+         companyId,
+         limit,
+         initialTabValue,
+         isLoadingFieldsOfStudy,
+      ]
+   )
+
+   const { data, isLoading } = useLivestreamsSWR(swrQuery)
+
+   const hasMore = data?.hasMore
+   const livestreams = data?.livestreams
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -180,9 +206,9 @@ const NextLiveStreamsWithFilter = ({
 
    return (
       <CustomInfiniteScroll
-         hasMore={livestreams?.length > limit}
+         hasMore={hasMore}
          next={handleFetchMoreLivestreams}
-         loading={!livestreams?.length}
+         loading={isLoading}
          offset={100}
       >
          <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
