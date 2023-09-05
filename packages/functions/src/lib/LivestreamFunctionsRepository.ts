@@ -5,7 +5,9 @@ import {
 import {
    EventRating,
    EventRatingAnswer,
+   getEarliestEventBufferTime,
    LivestreamEvent,
+   LivestreamQueryOptions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
@@ -31,6 +33,7 @@ import type { FunctionsLogger } from "../util"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
 import { DateTime } from "luxon"
+import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -94,6 +97,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       ratingName: string,
       newRating: EventRatingAnswer
    ): Promise<void>
+
+   fetchLivestreams(options: LivestreamQueryOptions): Promise<LivestreamEvent[]>
 }
 
 export class LivestreamFunctionsRepository
@@ -331,5 +336,64 @@ export class LivestreamFunctionsRepository
             livestreamStatsDocOperationsToMake,
          })
       }
+   }
+
+   async fetchLivestreams(
+      options: LivestreamQueryOptions
+   ): Promise<LivestreamEvent[]> {
+      let q = this.firestore
+         .collection("livestreams")
+         .withConverter(
+            createCompatGenericConverter<LivestreamEvent>()
+         ) as unknown as FirebaseFirestore.Query<LivestreamEvent>
+
+      const now = new Date()
+
+      const {
+         type,
+         languageCodes,
+         targetGroupId,
+         withHidden,
+         withRecordings,
+         withTest,
+      } = options
+
+      if (targetGroupId) {
+         q = q.where("groupIds", "array-contains", targetGroupId)
+      } else {
+         if (type === "pastEvents") {
+            q = q
+               .where("start", "<", now)
+               .where(
+                  "start",
+                  ">",
+                  DateTime.local().minus({ months: 8 }).toJSDate()
+               )
+               .orderBy("start", "desc")
+         } else {
+            q = q
+               .where("start", ">", getEarliestEventBufferTime())
+               .orderBy("start", "asc")
+         }
+
+         if (withRecordings) {
+            q = q.where("denyRecordingAccess", "==", false)
+         }
+
+         if (!withTest) {
+            q = q.where("test", "==", false)
+         }
+
+         if (!withHidden) {
+            q = q.where("hidden", "==", false)
+         }
+
+         if (languageCodes?.length > 0) {
+            q = q.where("language.code", "in", languageCodes)
+         }
+      }
+
+      const snaps = await q.get()
+      return snaps.docs.map((d) => d.data())
    }
 }

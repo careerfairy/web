@@ -1197,6 +1197,25 @@ export class LivestreamsDataParser {
       return this
    }
 
+   /**
+    * Remove sensitive data from the livestreams
+    * - registeredUsers
+    * - participants
+    * - participatingStudents
+    * - talentPool
+    */
+   removeSensitiveData() {
+      this.livestreams = this.livestreams?.map((e) => ({
+         ...e,
+         registeredUsers: [],
+         participants: [],
+         participatingStudents: [],
+         talentPool: [],
+      }))
+
+      return this
+   }
+
    get() {
       return this.livestreams
    }
