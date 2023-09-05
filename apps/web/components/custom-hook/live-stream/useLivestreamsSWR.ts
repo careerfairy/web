@@ -1,29 +1,25 @@
-import {
-   createGenericConverter,
-   removeDuplicateDocuments,
-} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
    LivestreamEvent,
    getEarliestEventBufferTime,
 } from "@careerfairy/shared-lib/livestreams"
-import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import {
-   QueryConstraint,
-   QuerySnapshot,
+   QueryFilterConstraint,
    collection,
    getDocs,
    limit as limitQuery,
+   or,
    orderBy,
    query,
    where,
 } from "firebase/firestore"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
-import useTraceUpdate from "../utils/useTraceUpdate"
 
 const now = new Date()
 
@@ -87,7 +83,7 @@ const fetcher = async (options: UseLivestreamsSWROptions) => {
 
    q = query(q, limitQuery(limit + 1)) // +1 to check if there are more events
 
-   const complexQueries: QueryConstraint[] = []
+   const complexQueries: QueryFilterConstraint[] = []
 
    if (companyIndustries?.length > 0) {
       complexQueries.push(
@@ -111,52 +107,20 @@ const fetcher = async (options: UseLivestreamsSWROptions) => {
       complexQueries.push(where("language.code", "in", languageCodes))
    }
 
-   let queries: Promise<QuerySnapshot<LivestreamEvent>>[] = []
-
    if (complexQueries.length > 0) {
-      // For each complex query, we need to create a new query
-      queries = complexQueries.map((complexQuery) => {
-         return getDocs(query(q, complexQuery))
-      })
-   } else {
-      queries = [getDocs(q)]
+      // If any complex queries were added, combine them using logical OR
+      // This allows for fetching documents that meet any of the complex conditions
+      // As per Firestore limitations, note that only a maximum of 30 disjunctions aka companyCountries/targetFieldsOfStudy/languageCodes/companyIndustries can be applied
+      q = query(q, or(...complexQueries))
    }
 
-   const results = await Promise.all(queries)
+   const snaps = await getDocs(q)
 
-   const livestreams = results.flatMap((result) =>
-      result.docs.map((doc) => doc.data())
-   )
-
-   // Remove duplicates from the multiple queries
-   const deDupedLivestreams = removeDuplicateDocuments(livestreams)
-
-   let res = new LivestreamsDataParser(deDupedLivestreams)
-
-   /**
-    * Filter by complex queries on client side
-    */
-
-   if (companyCountries?.length) {
-      res = res.filterByCompanyCountry(companyCountries)
-   }
-
-   if (companyIndustries?.length) {
-      res = res.filterByCompanyIndustry(companyIndustries)
-   }
-
-   if (targetFieldsOfStudy?.length) {
-      res = res.filterByTargetFieldsOfStudy(targetFieldsOfStudy)
-   }
-
-   if (languageCodes?.length) {
-      res = res.filterByLanguages(languageCodes)
-   }
+   const livestreams = snaps.docs.map((doc) => doc.data())
 
    return {
-      // if any of the queries has more than the limit, then there are more to fetch
-      hasMore: results.some((result) => result.size > limit),
-      livestreams: res.complementaryFields().get(),
+      hasMore: snaps.size > limit,
+      livestreams,
    }
 }
 
@@ -170,11 +134,19 @@ const useLivestreamsSWR = (
       [options]
    )
 
-   return useSWR(key, () => fetcher(options), {
-      ...reducedRemoteCallsOptions,
-      keepPreviousData: true,
-      suspense: false,
-   })
+   const swrFetcher = useCallback(() => fetcher(options), [options])
+
+   return useSWR(key, swrFetcher, swrOptions)
+}
+
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   keepPreviousData: true,
+   suspense: false,
+   onError: (error, key) =>
+      errorLogAndNotify(error, {
+         message: `Error fetching livestreams with options: ${key}`,
+      }),
 }
 
 export default useLivestreamsSWR

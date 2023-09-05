@@ -138,6 +138,7 @@ const NextLiveStreamsWithFilter = ({
    const { data, isLoading } = useLivestreamsSWR(swrQuery)
 
    const hasMore = data?.hasMore
+
    const livestreams = data?.livestreams
 
    const noResultsMessage = useMemo<JSX.Element>(
