@@ -367,7 +367,7 @@ export class LivestreamFunctionsRepository
                .where(
                   "start",
                   ">",
-                  DateTime.local().minus({ year: 2 }).toJSDate()
+                  DateTime.local().minus({ year: 1 }).toJSDate()
                )
                .orderBy("start", "desc")
          } else {
