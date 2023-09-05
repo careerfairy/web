@@ -216,6 +216,13 @@ export class SparksService {
       )(data)
    }
 
+   async createUserSparksFeedEventNotifications(userId: string) {
+      return httpsCallable<string, void>(
+         this.functions,
+         "createUserSparksFeedEventNotifications"
+      )(userId)
+   }
+
    async fetchUserSparksNotifications(
       userId: string
    ): Promise<UserSparksNotification[]> {

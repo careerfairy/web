@@ -111,6 +111,10 @@ export const removeAndSyncSparksNotifications = async (groupId: string) => {
    return handleCreateSparksNotifications()
 }
 
+export const syncUserSparksNotifications = async (userId: string) => {
+   return handleCreateSparksNotifications(userId)
+}
+
 const handleCreateSparksNotifications = async (userId?: string) => {
    const startDate = new Date()
    const endDate = addDaysDate(
