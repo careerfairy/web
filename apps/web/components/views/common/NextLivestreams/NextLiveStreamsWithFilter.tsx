@@ -1,21 +1,23 @@
-import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
-import React, { useCallback, useMemo, useState } from "react"
-import { StreamsSection } from "./StreamsSection"
-import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
-import Link from "../../../../components/views/common/Link"
-import useIsMobile from "../../../../components/custom-hook/useIsMobile"
-import { sxStyles } from "../../../../types/commonTypes"
+import useLivestreamsSWR, {
+   UseLivestreamsSWROptions,
+} from "components/custom-hook/live-stream/useLivestreamsSWR"
+import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
 import { Search as FindIcon } from "react-feather"
+import useIsMobile from "../../../../components/custom-hook/useIsMobile"
+import Link from "../../../../components/views/common/Link"
+import { wishListBorderRadius } from "../../../../constants/pages"
+import { sxStyles } from "../../../../types/commonTypes"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
-import Filter, { FilterEnum } from "../filter/Filter"
-import { wishListBorderRadius } from "../../../../constants/pages"
-import NoResultsMessage from "./NoResultsMessage"
-import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { buildDialogLink } from "../../livestream-dialog"
-import CustomInfiniteScroll from "../CustomInfiniteScroll"
+import Filter, { FilterEnum } from "../filter/Filter"
+import NoResultsMessage from "./NoResultsMessage"
+import { StreamsSection } from "./StreamsSection"
+import { ParsedUrlQuery } from "querystring"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -39,37 +41,41 @@ const styles = sxStyles({
    },
 })
 
-const getQueryVariables = (query) => {
-   const languages = query.languages as string
-   const companyCountries = query.companyCountries as string
-   const companyIndustries = query.companyIndustries as string
-   const fieldsOfStudy = query.fieldsOfStudy as string
+const queryParamToArr = (
+   queryParam: string | string[] | undefined
+): string[] => {
+   if (!queryParam) return []
+   if (Array.isArray(queryParam)) return queryParam.sort()
+   return queryParam.split(",").sort() // to make sure the order is always the same for caching the key
+}
+
+const getQueryVariables = (query: ParsedUrlQuery) => {
    const recordedOnly = query.recordedOnly as string
    const companyId = query.companyId as string
 
    return {
-      languages: languages && languages.split(","),
-      companyCountries: companyCountries && companyCountries.split(","),
-      companyIndustries:
-         companyIndustries?.length && companyIndustries.split(","),
-      fieldsOfStudy: fieldsOfStudy?.length && fieldsOfStudy.split(","),
+      languages: queryParamToArr(query.languages),
+      companyCountries: queryParamToArr(query.companyCountries),
+      companyIndustries: queryParamToArr(query.companyIndustries),
+      fieldsOfStudy: queryParamToArr(query.fieldsOfStudy),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
-      companyId,
+      companyId: companyId || null,
    }
 }
 
 type Props = {
    initialTabValue?: "upcomingEvents" | "pastEvents"
 }
+
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
 
-   const [limit, setLimit] = useState(10)
+   const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
+      useFieldsOfStudy()
 
-   const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const {
       languages,
       companyCountries,
@@ -102,17 +108,31 @@ const NextLiveStreamsWithFilter = ({
       [allFieldsOfStudy, fieldsOfStudy]
    )
 
-   const livestreams = useListenToStreams({
-      languagesIds: languages,
-      companyCountriesIds: companyCountries,
-      companyIndustriesIds: companyIndustries,
-      fieldsOfStudy: mapFieldsOfStudy,
-      recordedOnly: recordedOnly,
-      listenToPastEvents: hasPastEvents,
-      filterByGroupId: companyId,
-      getHiddenEvents: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-      limit,
-   })
+   const swrQuery = useMemo<UseLivestreamsSWROptions>(
+      () => ({
+         languageCodes: languages,
+         companyCountries: companyCountries,
+         companyIndustries: companyIndustries,
+         targetFieldsOfStudy: mapFieldsOfStudy,
+         withRecordings: recordedOnly,
+         targetGroupId: companyId,
+         withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
+         type: initialTabValue,
+         disabled: isLoadingFieldsOfStudy,
+      }),
+      [
+         languages,
+         companyCountries,
+         companyIndustries,
+         mapFieldsOfStudy,
+         recordedOnly,
+         companyId,
+         initialTabValue,
+         isLoadingFieldsOfStudy,
+      ]
+   )
+
+   const { data: livestreams } = useLivestreamsSWR(swrQuery)
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -174,17 +194,8 @@ const NextLiveStreamsWithFilter = ({
       [push, router]
    )
 
-   const handleFetchMoreLivestreams = useCallback(async () => {
-      setLimit((prev) => prev + 10)
-   }, [])
-
    return (
-      <CustomInfiniteScroll
-         hasMore={livestreams?.length > limit}
-         next={handleFetchMoreLivestreams}
-         loading={!livestreams?.length}
-         offset={100}
-      >
+      <>
          <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
@@ -214,7 +225,7 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
-      </CustomInfiniteScroll>
+      </>
    )
 }
 
