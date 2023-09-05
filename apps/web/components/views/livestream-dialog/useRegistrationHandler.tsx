@@ -106,6 +106,11 @@ export default function useRegistrationHandler() {
          userData.authId
       )
       dataLayerLivestreamEvent("event_registration_removed", livestream)
+
+      // after de-register from a livestream we want to update the user sparks notifications for this user
+      await sparkService.createUserSparksFeedEventNotifications(
+         userData.userEmail
+      )
    }, [deregisterFromLivestream, livestream, userData])
 
    /**

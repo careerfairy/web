@@ -8,6 +8,7 @@ import { EngineType } from "embla-carousel/components/Engine"
 import { FC, useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
+   fetchUserSparksNotifications,
    removeCurrentEventNotifications,
    setCurrentEventNotification,
    showEventDetailsDialog,
@@ -197,19 +198,17 @@ const SparksFeedCarousel: FC = () => {
          (notification) => notification.groupId === currentSpark.group.id
       )
 
-      // to only show the notification after 10 secs
-      dispatch(removeCurrentEventNotifications())
-
       if (currentNotification) {
          setTimeout(() => {
             dispatch(setCurrentEventNotification(currentNotification))
          }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
       }
-
-      if (eventNotification && !currentNotification) {
-         dispatch(removeCurrentEventNotifications())
-      }
    }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
+
+   useEffect(() => {
+      dispatch(removeCurrentEventNotifications())
+      dispatch(fetchUserSparksNotifications())
+   }, [currentPlayingIndex, dispatch])
 
    const handleClickSlide = useCallback(
       (index: number) => {
