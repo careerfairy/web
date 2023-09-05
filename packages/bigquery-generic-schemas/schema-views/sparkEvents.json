@@ -1,0 +1,89 @@
+[
+   {
+      "name": "sparkId",
+      "type": "STRING",
+      "description": "Unique identifier for the Spark"
+   },
+   {
+      "name": "originalSparkId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Original Spark ID from the feed (first one)"
+   },
+   {
+      "name": "userId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "User AuthUID, null if not logged in"
+   },
+   {
+      "name": "visitorId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Visitor ID for non-logged-in user sessions"
+   },
+   {
+      "name": "timestamp",
+      "type": "TIMESTAMP",
+      "description": "Timestamp of the event"
+   },
+   {
+      "name": "referrer",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Document referrer information"
+   },
+   {
+      "name": "referralCode",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Referral code of a user from the URL"
+   },
+   {
+      "name": "utm_source",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "UTM Source"
+   },
+   {
+      "name": "utm_medium",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "UTM Medium"
+   },
+   {
+      "name": "utm_campaign",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "UTM Campaign"
+   },
+   {
+      "name": "utm_term",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "UTM Term"
+   },
+   {
+      "name": "utm_content",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "UTM Content"
+   },
+   {
+      "name": "actionType",
+      "type": "STRING",
+      "description": "Type of action (Share, Like, Impression, Click on career page CTA, Spark completely watched, Played spark)"
+   },
+   {
+      "name": "countryCode",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "ISO Alpha-2 Country code of the user at the time of the event"
+   },
+   {
+      "name": "universityCountry",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "ISO Alpha-2 Country code of the user's university at the time of the event"
+   }
+]
