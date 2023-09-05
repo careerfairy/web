@@ -10,10 +10,12 @@ import useSparks from "components/custom-hook/spark/useSparks"
 const HEADING_TEXT = "Sparks"
 
 type Props = {
-   handleSparksClicked: (spark: Spark) => Promise<boolean>
+   groupId?: String
+   handleSparksClicked: (spark: Spark) => Promise<void>
 }
 
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
+   groupId,
    handleSparksClicked,
 }) => {
    const [isClient, setIsClient] = useState(false)
@@ -44,8 +46,8 @@ const FallbackComponent: FC = () => {
    )
 }
 
-const Component: FC<Props> = ({ handleSparksClicked }) => {
-   const { data: sparksContent } = useSparks(8)
+const Component: FC<Props> = ({ groupId, handleSparksClicked }) => {
+   const { data: sparksContent } = useSparks(8, groupId)
    return (
       <Box sx={{ pl: 2 }}>
          <Stack spacing={1.25}>
