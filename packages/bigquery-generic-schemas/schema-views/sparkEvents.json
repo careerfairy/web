@@ -34,6 +34,11 @@
       "description": "Document referrer information"
    },
    {
+      "name": "sesssionId",
+      "type": "STRING",
+      "description": "A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated."
+   },
+   {
       "name": "referralCode",
       "type": "STRING",
       "mode": "NULLABLE",
