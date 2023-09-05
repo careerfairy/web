@@ -3,7 +3,7 @@ import useLivestreamsSWR, {
    UseLivestreamsSWROptions,
 } from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { useRouter } from "next/router"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { Search as FindIcon } from "react-feather"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import Link from "../../../../components/views/common/Link"
@@ -14,10 +14,10 @@ import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
-import CustomInfiniteScroll from "../CustomInfiniteScroll"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
+import { ParsedUrlQuery } from "querystring"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -41,22 +41,25 @@ const styles = sxStyles({
    },
 })
 
-const getQueryVariables = (query) => {
-   const languages = query.languages as string
-   const companyCountries = query.companyCountries as string
-   const companyIndustries = query.companyIndustries as string
-   const fieldsOfStudy = query.fieldsOfStudy as string
+const queryParamToArr = (
+   queryParam: string | string[] | undefined
+): string[] => {
+   if (!queryParam) return []
+   if (Array.isArray(queryParam)) return queryParam.sort()
+   return queryParam.split(",").sort() // to make sure the order is always the same for caching the key
+}
+
+const getQueryVariables = (query: ParsedUrlQuery) => {
    const recordedOnly = query.recordedOnly as string
    const companyId = query.companyId as string
 
    return {
-      languages: languages && languages.split(","),
-      companyCountries: companyCountries && companyCountries.split(","),
-      companyIndustries:
-         companyIndustries?.length && companyIndustries.split(","),
-      fieldsOfStudy: fieldsOfStudy?.length && fieldsOfStudy.split(","),
+      languages: queryParamToArr(query.languages),
+      companyCountries: queryParamToArr(query.companyCountries),
+      companyIndustries: queryParamToArr(query.companyIndustries),
+      fieldsOfStudy: queryParamToArr(query.fieldsOfStudy),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
-      companyId,
+      companyId: companyId || null,
    }
 }
 
@@ -64,15 +67,11 @@ type Props = {
    initialTabValue?: "upcomingEvents" | "pastEvents"
 }
 
-const empty = []
-
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
-
-   const [limit, setLimit] = useState(10)
 
    const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
       useFieldsOfStudy()
@@ -116,9 +115,8 @@ const NextLiveStreamsWithFilter = ({
          companyIndustries: companyIndustries,
          targetFieldsOfStudy: mapFieldsOfStudy,
          withRecordings: recordedOnly,
-         targetGroupIds: companyId ? [companyId] : empty,
+         targetGroupId: companyId,
          withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-         limit,
          type: initialTabValue,
          disabled: isLoadingFieldsOfStudy,
       }),
@@ -129,17 +127,12 @@ const NextLiveStreamsWithFilter = ({
          mapFieldsOfStudy,
          recordedOnly,
          companyId,
-         limit,
          initialTabValue,
          isLoadingFieldsOfStudy,
       ]
    )
 
-   const { data, isLoading } = useLivestreamsSWR(swrQuery)
-
-   const hasMore = data?.hasMore
-
-   const livestreams = data?.livestreams
+   const { data: livestreams } = useLivestreamsSWR(swrQuery)
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -201,17 +194,8 @@ const NextLiveStreamsWithFilter = ({
       [push, router]
    )
 
-   const handleFetchMoreLivestreams = useCallback(async () => {
-      setLimit((prev) => prev + 10)
-   }, [])
-
    return (
-      <CustomInfiniteScroll
-         hasMore={hasMore}
-         next={handleFetchMoreLivestreams}
-         loading={isLoading}
-         offset={100}
-      >
+      <>
          <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
@@ -241,7 +225,7 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
-      </CustomInfiniteScroll>
+      </>
    )
 }
 
