@@ -599,7 +599,9 @@ export function getEarliestEventBufferTime() {
       Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
    )
 }
-
+/**
+ * The option we are able to query with Firestore
+ */
 export type LivestreamQueryOptions = {
    languageCodes?: string[]
    withRecordings?: boolean
@@ -608,8 +610,9 @@ export type LivestreamQueryOptions = {
    targetGroupId?: string
    type: "pastEvents" | "upcomingEvents"
 }
+
 /**
- * The fields
+ * The options we are not able to query with Firestore
  */
 export type FilterLivestreamsOptions = {
    companyIndustries?: string[]
