@@ -1,17 +1,17 @@
-import React, { FC, useCallback } from "react"
-import { Avatar, Box, Button, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../types/commonTypes"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { companyLogoPlaceholder } from "../../../../../constants/images"
+import React, { FC, useCallback, useMemo } from "react"
 import DateUtil from "../../../../../util/DateUtil"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useDispatch, useSelector } from "react-redux"
 import { currentSparkEventNotificationSelector } from "../../../../../store/selectors/sparksFeedSelectors"
-import { PublicGroup } from "@careerfairy/shared-lib/groups"
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 import {
    removeCurrentEventNotifications,
    showEventDetailsDialog,
 } from "../../../../../store/reducers/sparksFeedReducer"
+import { Avatar, Box, Button, Typography } from "@mui/material"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import { companyLogoPlaceholder } from "../../../../../constants/images"
+import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -65,17 +65,26 @@ const styles = sxStyles({
 })
 
 type Props = {
-   group: PublicGroup
+   spark: SparkPresenter
 }
-const SparksEventNotification: FC<Props> = ({ group }) => {
+const SparksEventNotification: FC<Props> = ({ spark }) => {
    const dispatch = useDispatch()
    const isMobile = useIsMobile()
+
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
+   const { universityName, logoUrl } = spark.group
 
-   const { universityName, logoUrl } = group
-
-   const missingDays = Math.floor(
-      DateUtil.getDifferenceInDays(eventNotification?.startDate, new Date())
+   const missingDays = useMemo(
+      () =>
+         eventNotification
+            ? Math.floor(
+                 DateUtil.getDifferenceInDays(
+                    eventNotification.startDate,
+                    new Date()
+                 )
+              )
+            : 0,
+      [eventNotification]
    )
 
    const discoverHandleClick = useCallback(() => {
@@ -105,7 +114,7 @@ const SparksEventNotification: FC<Props> = ({ group }) => {
                      color={"primary"}
                      display={"inline"}
                   >
-                     {universityName}
+                     {universityName}{" "}
                   </Typography>
                   has a live stream happening in {missingDays} days! Check now!
                </Typography>

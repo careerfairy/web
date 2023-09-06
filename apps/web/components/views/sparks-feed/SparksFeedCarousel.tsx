@@ -8,9 +8,7 @@ import { EngineType } from "embla-carousel/components/Engine"
 import { FC, useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   fetchUserSparksNotifications,
    removeCurrentEventNotifications,
-   setCurrentEventNotification,
    showEventDetailsDialog,
    swipeNextSparkByIndex,
 } from "store/reducers/sparksFeedReducer"
@@ -21,16 +19,14 @@ import {
    currentSparkIndexSelector,
    isFetchingSparksSelector,
    showEventDetailsDialogSelector,
-   sparkEventNotificationsSelector,
    sparksSelector,
+   userEmailSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -101,19 +97,17 @@ const styles = sxStyles({
 })
 
 const SparksFeedCarousel: FC = () => {
-   const { userData } = useAuth()
    const isFullScreen = useSparksFeedIsFullScreen()
    const dispatch = useDispatch()
 
+   const userEmail = useSelector(userEmailSelector)
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const eventDetailsDialogVisibility = useSelector(
       showEventDetailsDialogSelector
    )
-
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
-   const eventNotifications = useSelector(sparkEventNotificationsSelector)
 
    const options = useMemo<EmblaOptionsType>(
       () => ({
@@ -181,6 +175,7 @@ const SparksFeedCarousel: FC = () => {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeNextSparkByIndex(index))
+            dispatch(removeCurrentEventNotifications())
          }
 
          emblaApi.on("select", onSelect)
@@ -191,24 +186,6 @@ const SparksFeedCarousel: FC = () => {
          }
       }
    }, [emblaApi, dispatch])
-
-   useEffect(() => {
-      const currentSpark = sparks[currentPlayingIndex]
-      const currentNotification = eventNotifications?.find(
-         (notification) => notification.groupId === currentSpark.group.id
-      )
-
-      if (currentNotification) {
-         setTimeout(() => {
-            dispatch(setCurrentEventNotification(currentNotification))
-         }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
-      }
-   }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
-
-   useEffect(() => {
-      dispatch(removeCurrentEventNotifications())
-      dispatch(fetchUserSparksNotifications())
-   }, [currentPlayingIndex, dispatch])
 
    const handleClickSlide = useCallback(
       (index: number) => {
@@ -262,7 +239,7 @@ const SparksFeedCarousel: FC = () => {
                handleClose={handleCloseDialog}
                open={eventDetailsDialogVisibility}
                page={"details"}
-               serverUserEmail={userData?.userEmail}
+               serverUserEmail={userEmail}
                mode={"stand-alone"}
             />
          ) : null}
