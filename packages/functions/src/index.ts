@@ -73,7 +73,7 @@ exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 // Group Admin
 exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail_eu =
+exports.sendNewlyPublishedEventEmail_v2 =
    groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
 exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
