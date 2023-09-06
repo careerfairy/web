@@ -8,6 +8,10 @@ import EmailIcon from "@mui/icons-material/Email"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
 import WhatsAppIcon from "@mui/icons-material/WhatsApp"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+import WhatsAppRoundedIcon from "components/views/common/icons/WhatsAppRoundedIcon"
+import LinkedInRoundedIcon from "components/views/common/icons/LinkedInRoundedIcon"
+import FacebookRoundedIcon from "components/views/common/icons/FacebookRoundedIcon"
+import XRoundedIcon from "components/views/common/icons/XRoundedIcon"
 
 export const SocialPlatformObject = {
    Facebook: "facebook",
@@ -21,9 +25,11 @@ export const SocialPlatformObject = {
 export type SocialPlatformType =
    (typeof SocialPlatformObject)[keyof typeof SocialPlatformObject]
 
+export type SocialIcon = typeof LinkedInIcon
+
 export interface SocialIconProps {
-   icon: typeof LinkedInIcon
-   imageLink?: string
+   icon: SocialIcon
+   roundedIcon?: typeof WhatsAppRoundedIcon
    name: string
    onClick?: () => any
    href?: string
@@ -77,11 +83,10 @@ const useSocials = ({
       const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrlBase}utm_source=WhatsApp${encodedUrlParameters}`
 
       const eventName = `${dataLayerEntityName}_share`
-      const socials = [
+      const socials: SocialIconProps[] = [
          {
             icon: LinkedInIcon,
-            imageLink:
-               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Flinkedin.png?alt=media&token=6c3fea64-5ff3-45ef-b6c2-a3b5e3ba4c60",
+            roundedIcon: LinkedInRoundedIcon,
             name: "LinkedIn",
             onClick: () => {
                window.open(linkedinLink, "_blank").focus()
@@ -93,8 +98,7 @@ const useSocials = ({
          },
          {
             icon: FacebookIcon,
-            imageLink:
-               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Ffacebook.png?alt=media&token=e8be60d2-f445-4d21-ad19-2ba24af9c36e",
+            roundedIcon: FacebookRoundedIcon,
             name: "Facebook",
             onClick: () => {
                /*
@@ -110,8 +114,7 @@ A redirect uri can be added to track where users are coming from internally or f
          },
          {
             icon: TwitterIcon,
-            imageLink:
-               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Fx.png?alt=media&token=d0605e29-6627-4510-8b80-31e84c3e6894",
+            roundedIcon: XRoundedIcon,
             name: "χ",
             onClick: () => {
                window.open(twitterLink, "_blank").focus()
@@ -141,8 +144,7 @@ A redirect uri can be added to track where users are coming from internally or f
          },
          {
             icon: WhatsAppIcon,
-            imageLink:
-               "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/share-logos%2Fwhatsapp.png?alt=media&token=54cac0cc-4640-463b-a6c7-35315663e6b6",
+            roundedIcon: WhatsAppRoundedIcon,
             name: "WhatsApp",
             onClick: () => {
                window.open(whatsappLink, "_blank").focus()
