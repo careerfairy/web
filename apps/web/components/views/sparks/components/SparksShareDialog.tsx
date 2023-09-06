@@ -24,6 +24,7 @@ import {
 } from "react-feather"
 import { useTheme } from "@mui/styles"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { DRAWER_WIDTH } from "constants/layout"
 
 const styles = sxStyles({
    titleContainer: {
@@ -130,7 +131,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
          onClose={handleCloseDialog}
          PaperProps={{
             style: {
-               left: isFullScreen ? "0%" : "10%",
+               left: isFullScreen ? "0%" : DRAWER_WIDTH - 120,
             },
             sx: styles.dialogPaper,
          }}
