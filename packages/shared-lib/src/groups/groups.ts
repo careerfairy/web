@@ -255,3 +255,25 @@ export const buildTestimonialsArray = (values, groupId) => {
       }
    })
 }
+
+/**
+ * A group admin info object that is used to send emails to group admins
+ */
+export type GroupAdminNewEventEmailInfo = {
+   /**
+    * The ID of the admin's group
+    */
+   groupId: string
+   /**
+    * The email of the admin
+    */
+   email: string
+   /**
+    * Link to the event in their dashboard
+    */
+   eventDashboardLink: string
+   /**
+    * Link to the public live stream event page in the platform
+    */
+   nextLivestreamsLink: string
+}
