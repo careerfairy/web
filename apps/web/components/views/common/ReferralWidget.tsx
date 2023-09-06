@@ -67,7 +67,7 @@ export const ReferralWidget = ({
    noBackgroundColor,
    iconStyle,
    socials,
-   roundedIcons: withText,
+   roundedIcons,
    ...rest
 }: WidgetButtonProps) => {
    return (
@@ -78,11 +78,11 @@ export const ReferralWidget = ({
             styles.socialIcons,
             noBackgroundColor && { backgroundColor: "transparent !important" },
          ]}
-         spacing={withText ? 3.5 : 0}
+         spacing={roundedIcons ? 3.5 : 0}
          {...rest}
       >
          {socials.map((icon) =>
-            withText ? (
+            roundedIcons ? (
                <SocialButtonWithText key={icon.name} {...icon} />
             ) : (
                <IconButtonComponent
