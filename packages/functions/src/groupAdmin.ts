@@ -117,9 +117,15 @@ export const sendDraftApprovalRequestEmail = functions
 
 export const sendNewlyPublishedEventEmail = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onCall(async (data, context) => {
       try {
-         const { adminsInfo, senderName, stream, submitTime } = data
+         const { senderName, stream, submitTime } = data
+
+         const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
+            stream.id,
+            context.rawRequest.headers.origin
+         )
+
          functions.logger.log(
             "admins Info in newly published event",
             adminsInfo
@@ -127,7 +133,9 @@ export const sendNewlyPublishedEventEmail = functions
 
          const emails = adminsInfo.map(
             ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-               TemplateId: process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT,
+               TemplateId: Number(
+                  process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT
+               ),
                From: "CareerFairy <noreply@careerfairy.io>",
                To: email,
                TemplateModel: {
