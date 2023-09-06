@@ -117,9 +117,15 @@ export const sendDraftApprovalRequestEmail = functions
 
 export const sendNewlyPublishedEventEmail = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onCall(async (data, context) => {
       try {
-         const { adminsInfo, senderName, stream, submitTime } = data
+         const { senderName, stream, submitTime } = data
+
+         const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
+            stream.id,
+            context.rawRequest.headers.origin
+         )
+
          functions.logger.log(
             "admins Info in newly published event",
             adminsInfo

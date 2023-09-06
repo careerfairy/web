@@ -22,12 +22,8 @@ export const useLivestreamDialog = (group: Group) => {
    const dispatch = useDispatch()
    const { replace } = useRouter()
 
-   const {
-      sendNewlyPublishedEventEmail,
-      deleteLivestream,
-      getAllGroupAdminInfo,
-      addLivestream,
-   } = useFirebaseService()
+   const { sendNewlyPublishedEventEmail, deleteLivestream, addLivestream } =
+      useFirebaseService()
 
    const handleOpenNewStreamModal = useCallback(() => {
       setOpenNewStreamModal(true)
@@ -80,15 +76,10 @@ export const useLivestreamDialog = (group: Group) => {
             newStream.id = publishedStreamId
 
             const submitTime = prettyLocalizedDate(new Date())
-            const adminsInfo = await getAllGroupAdminInfo(
-               newStream.groupIds || [],
-               streamObj.id
-            )
 
             const senderName = `${userData.firstName} ${userData.lastName}`
 
             await sendNewlyPublishedEventEmail({
-               adminsInfo: adminsInfo || [],
                senderName,
                stream: newStream,
                submitTime,
@@ -105,7 +96,6 @@ export const useLivestreamDialog = (group: Group) => {
       [
          getAuthor,
          addLivestream,
-         getAllGroupAdminInfo,
          userData?.firstName,
          userData?.lastName,
          sendNewlyPublishedEventEmail,
