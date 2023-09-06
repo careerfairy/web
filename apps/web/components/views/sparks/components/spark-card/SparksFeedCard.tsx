@@ -1,4 +1,7 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
+import Box from "@mui/material/Box"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
@@ -87,7 +90,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
              {
                  eventNotification ? (
-                    <SparksEventNotification group={spark.group} />
+                    <SparksEventNotification spark={spark} />
                 ) : null
              }
              <VideoPreview

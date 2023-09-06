@@ -15,22 +15,27 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
    fetchNextSparks,
-   fetchUserSparksNotifications,
+   removeCurrentEventNotifications,
    resetSparksFeed,
+   setCurrentEventNotification,
    setGroupId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
+   currentSparkIndexSelector,
    fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
+   sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -47,6 +52,9 @@ const SparksPage: NextPage<
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
+   const { data: eventNotifications } = useUserSparksNotifications(userEmail)
+   const currentPlayingIndex = useSelector(currentSparkIndexSelector)
+   const sparks = useSelector(sparksSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -57,7 +65,6 @@ const SparksPage: NextPage<
 
    useEffect(() => {
       dispatch(fetchInitialSparksFeed())
-      dispatch(fetchUserSparksNotifications())
 
       return () => {
          dispatch(resetSparksFeed())
@@ -82,6 +89,26 @@ const SparksPage: NextPage<
       isFetchingNextSparks,
       isOnLastSpark,
    ])
+
+   useEffect(() => {
+      dispatch(removeCurrentEventNotifications())
+      let timeout: NodeJS.Timeout
+
+      const currentSpark = sparks[currentPlayingIndex]
+      const currentNotification = eventNotifications?.find(
+         (notification) => notification.groupId === currentSpark.group.id
+      )
+
+      if (currentNotification) {
+         timeout = setTimeout(() => {
+            dispatch(setCurrentEventNotification(currentNotification))
+         }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
+      }
+
+      return () => {
+         clearTimeout(timeout)
+      }
+   }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
 
    useEffect(() => {
       if (fetchNextError) {

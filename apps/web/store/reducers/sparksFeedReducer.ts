@@ -70,6 +70,16 @@ export const fetchInitialSparksFeed = createAsyncThunk(
       return sparkService.fetchFeed(sparkOptions)
    }
 )
+// Async thunk to fetch the next spark IDs
+export const fetchUserSparksNotifications = createAsyncThunk(
+   "sparks/fetchUserSparksNotifications",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+      return sparkService.fetchUserSparksNotifications(
+         state.sparksFeed.userEmail
+      )
+   }
+)
 
 const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
@@ -172,6 +182,12 @@ const sparksFeedSlice = createSlice({
             state.initialFetchStatus = "failed"
             state.initialFetchError = action.error.message
          })
+         .addCase(
+            fetchUserSparksNotifications.fulfilled,
+            (state, action: PayloadAction<UserSparksNotification[]>) => {
+               state.eventNotifications = action.payload
+            }
+         )
    },
 })
 
