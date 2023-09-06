@@ -52,5 +52,5 @@ export const SPARK_CONSTANTS = {
    /**
     * Only show event spark notifications after X seconds of spark becoming visible
     */
-   SECONDS_TO_SHOW_EVENT_NOTIFICATION: 3000,
+   SECONDS_TO_SHOW_EVENT_NOTIFICATION: 10000,
 }
