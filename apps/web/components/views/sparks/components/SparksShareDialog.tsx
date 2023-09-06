@@ -16,7 +16,7 @@ import ReferralWidget from "components/views/common/ReferralWidget"
 import useSocials, {
    SocialPlatformObject,
 } from "components/custom-hook/useSocials"
-import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined"
+import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import {
    Copy as CopyIcon,
    CheckCircle as CheckIcon,
@@ -33,19 +33,19 @@ const styles = sxStyles({
    title: {
       display: "flex",
       alignItems: "center",
-      fontSize: "16px",
+      fontSize: "1.14286rem",
    },
    shareIcon: {
       display: "flex",
       alignItems: "center",
-      transform: "scaleX(-1)",
       mr: "9px",
-      "& .MuiSvgIcon-root": {
-         fontSize: "30px",
-      },
+      fontSize: "30px",
+      color: "white",
    },
    dialogContent: {
       borderTop: "none",
+      display: "grid",
+      placeItems: "center",
    },
    dialogActions: {
       p: 0,
@@ -57,6 +57,7 @@ const styles = sxStyles({
       width: "100%",
       py: "32px",
       "&.MuiBox-root": {
+         transition: (theme) => theme.transitions.create("background-color"),
          "&:hover": {
             backgroundColor: "grey.main",
             cursor: "pointer",
@@ -65,7 +66,9 @@ const styles = sxStyles({
    },
    copyText: {
       ml: "10px",
-      fontSize: "18px",
+      color: "#505050",
+      fontSize: "1.28571rem",
+      letterSpacing: "-0.01414rem",
    },
    copiedText: {
       color: "success.main",
@@ -75,6 +78,9 @@ const styles = sxStyles({
          xs: "0%",
          md: "10%",
       },
+   },
+   dialogPaper: {
+      maxWidth: 508,
    },
 })
 
@@ -116,7 +122,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
 
    return (
       <Dialog
-         maxWidth="sm"
+         maxWidth={false}
          scroll="paper"
          fullWidth
          TransitionComponent={Grow}
@@ -126,14 +132,13 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
             style: {
                left: isFullScreen ? "0%" : "10%",
             },
+            sx: styles.dialogPaper,
          }}
       >
          <DialogTitle>
             <Box sx={styles.titleContainer}>
                <Typography sx={styles.title}>
-                  <Box sx={styles.shareIcon}>
-                     <ReplyOutlinedIcon />
-                  </Box>
+                  <ShareArrowIcon sx={styles.shareIcon} />
                   Share
                </Typography>
                <IconButton onClick={handleCloseDialog}>
@@ -142,7 +147,7 @@ const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
             </Box>
          </DialogTitle>
          <DialogContent dividers sx={styles.dialogContent}>
-            <ReferralWidget socials={socials} noBackgroundColor isImageIcon />
+            <ReferralWidget socials={socials} noBackgroundColor roundedIcons />
          </DialogContent>
          <DialogActions sx={styles.dialogActions}>
             <Box sx={styles.copyContainer} onClick={copySparkLinkToClipboard}>
