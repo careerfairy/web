@@ -133,7 +133,9 @@ export const sendNewlyPublishedEventEmail = functions
 
          const emails = adminsInfo.map(
             ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
-               TemplateId: process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT,
+               TemplateId: Number(
+                  process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT
+               ),
                From: "CareerFairy <noreply@careerfairy.io>",
                To: email,
                TemplateModel: {
