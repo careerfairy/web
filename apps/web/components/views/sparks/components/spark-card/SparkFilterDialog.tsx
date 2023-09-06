@@ -28,13 +28,13 @@ import {
    resetSparksFeed,
    setSparkCategories,
 } from "store/reducers/sparksFeedReducer"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { DRAWER_WIDTH } from "constants/layout"
 
 const styles = sxStyles({
-   drawer: {
-      "& .MuiPaper-root": {
-         borderTopLeftRadius: "16px",
-         borderTopRightRadius: "16px",
-      },
+   drawerPaper: {
+      borderTopLeftRadius: "16px",
+      borderTopRightRadius: "16px",
    },
    titleContainer: {
       display: "flex",
@@ -124,11 +124,15 @@ const SparksFilterDialog = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
+   const isFullScreen = useSparksFeedIsFullScreen()
+
    return (
       <>
          {isMobile ? (
             <Drawer
-               sx={styles.drawer}
+               PaperProps={{
+                  sx: styles.drawerPaper,
+               }}
                anchor={"bottom"}
                open={isOpen}
                onClose={handleClose}
@@ -149,7 +153,7 @@ const SparksFilterDialog = ({
                open={isOpen}
                onClose={handleClose}
                PaperProps={{
-                  style: { left: "10%" },
+                  style: { left: isFullScreen ? "0%" : DRAWER_WIDTH - 120 },
                }}
             >
                <FilterContent
