@@ -10,6 +10,7 @@ const AdminSparksPage = () => {
       query: { groupId },
    } = useRouter()
 
+   console.log(" test test test")
    return (
       <GroupDashboardLayout
          pageDisplayName={"Sparks"}
