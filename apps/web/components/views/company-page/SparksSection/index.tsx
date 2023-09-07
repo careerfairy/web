@@ -4,7 +4,7 @@ import { SectionAnchor, useCompanyPage, TabValue } from ".."
 import { useMountedState } from "react-use"
 import { useRouter } from "next/router"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 
 type Props = {
    groupId: String
@@ -33,6 +33,11 @@ const SparksSection: FC<Props> = ({ groupId }) => {
             tabValue={TabValue.livesStreams}
          />
          <SparksCarouselWithSuspenseComponent
+            header={
+               <Typography variant="h4" fontWeight={"600"} color="black">
+                  Sparks
+               </Typography>
+            }
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
          />
