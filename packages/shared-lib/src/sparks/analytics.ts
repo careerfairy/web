@@ -1,0 +1,57 @@
+/**
+ * Type representing the data that the client sends to the callable function.
+ * It includes all the fields except `userId`, `timestamp`, and `countryCode`.
+ */
+export type SparkEventClient = {
+   /** Unique identifier for the Spark */
+   sparkId: string
+   /** Original Spark ID from the feed (first one) */
+   originalSparkId: string | null
+   /** Visitor ID to help identify unique users in case they are not logged in */
+   visitorId: string
+   /** Document referrer information */
+   referrer: string | null
+   /** A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated. */
+   sessionId: string
+   /** Referral code of a user from the URL */
+   referralCode: string | null
+   /** UTM Source */
+   utm_source: string | null
+   /** UTM Medium */
+   utm_medium: string | null
+   /** UTM Campaign */
+   utm_campaign: string | null
+   /** UTM Term */
+   utm_term: string | null
+   /** UTM Content */
+   utm_content: string | null
+   /** Type of action (Share, Like, Impression, Click on career page CTA, Spark completely watched, Played spark) */
+   actionType: SparkEventActionType
+   /** ISO Alpha-2 Country code of the user's university at the time of the event */
+   universityCountry: string | null
+}
+
+/**
+ * Type representing the complete data being inserted into BigQuery.
+ * It includes all fields from `SparkEventClient` plus `userId`, `timestamp`, and `countryCode` which are added by the cloud function.
+ */
+export type SparkEvent = SparkEventClient & {
+   /** User AuthUID, null if not logged in */
+   userId: string | null
+   /** Timestamp of the event */
+   timestamp: Date
+   /** ISO Alpha-2 Country code of the user at the time of the event */
+   countryCode: string | null
+}
+
+export const SparkEventActions = {
+   Share: "Share",
+   Like: "Like",
+   Impression: "Impression",
+   ClickOnCareerPageCTA: "Click on career page CTA",
+   SparkCompletelyWatched: "Spark completely watched",
+   PlayedSpark: "Played spark",
+} as const
+
+export type SparkEventActionType =
+   (typeof SparkEventActions)[keyof typeof SparkEventActions]

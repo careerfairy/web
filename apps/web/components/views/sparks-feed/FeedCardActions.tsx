@@ -19,6 +19,8 @@ import { useAuth } from "HOCs/AuthProvider"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
 import { useSelector } from "react-redux"
 import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
+import useSparkEventTracker from "components/custom-hook/spark/useSparkEventTracker"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 
 const actionWidth = 52
 
@@ -174,6 +176,8 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const isMobile = useIsMobile()
    const { userData } = useAuth()
 
+   const { trackEvent } = useSparkEventTracker()
+
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
          userData?.referralCode
@@ -190,11 +194,12 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
 
    const handleShare = useCallback(async () => {
       if (isMobile && navigator?.share) {
+         trackEvent(SparkEventActions.Share, sparkId)
          await navigator.share(shareData)
       } else {
          handleOpenShareDialog()
       }
-   }, [handleOpenShareDialog, isMobile, shareData])
+   }, [handleOpenShareDialog, isMobile, shareData, sparkId, trackEvent])
 
    return (
       <>

@@ -2,6 +2,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
+import { v4 as uuidv4 } from "uuid"
 import { type RootState } from "store"
 
 type Status = "idle" | "loading" | "failed"
@@ -20,6 +21,15 @@ interface SparksState {
    fetchNextError: string | null
    initialFetchError: string | null
    sparkCategoryIds: SparkCategory["id"][]
+   /**
+    * The original spark ID that the user clicked on to get to the Sparks feed
+    */
+   originalSparkId: string | null
+   /**
+    * A sessionId is a unique identifier generated each time a user views a specific spark.
+    * When the user scrolls to a new spark, a new sessionId is generated.
+    */
+   sessionId: string | null
 }
 
 const initialState: SparksState = {
@@ -35,6 +45,8 @@ const initialState: SparksState = {
    fetchNextError: null,
    initialFetchError: null,
    sparkCategoryIds: [],
+   originalSparkId: null,
+   sessionId: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -70,8 +82,21 @@ const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
    reducers: {
+      setOriginalSparkId: (
+         state,
+         action: PayloadAction<SparksState["originalSparkId"]>
+      ) => {
+         state.originalSparkId = action.payload
+      },
       setSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
          state.sparks = action.payload
+         state.currentPlayingIndex = 0
+
+         // also generate a sessionId for the first spark
+         if (action.payload.length > 0) {
+            const sparkId = action.payload[state.currentPlayingIndex].id
+            state.sessionId = generatSessionId(sparkId)
+         }
       },
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
@@ -89,6 +114,10 @@ const sparksFeedSlice = createSlice({
          const newIndex = action.payload
          if (newIndex >= 0 && newIndex < state.sparks.length) {
             state.currentPlayingIndex = newIndex
+
+            const sparkId = state.sparks[newIndex].id
+
+            state.sessionId = generatSessionId(sparkId)
          }
       },
       resetSparksFeed: (state) => {
@@ -101,6 +130,7 @@ const sparksFeedSlice = createSlice({
          state.fetchNextError = null
          state.initialFetchError = null
          state.sparkCategoryIds = []
+         state.originalSparkId = null
       },
    },
    extraReducers: (builder) => {
@@ -182,6 +212,11 @@ const getSparkOptions = (state: RootState) => {
    }
 }
 
+const generatSessionId = (sparkId: string) => {
+   const timestamp = new Date().toISOString()
+   return `spark-${sparkId}-${timestamp}-${uuidv4()}`
+}
+
 export const {
    setSparks,
    setGroupId,
@@ -189,6 +224,7 @@ export const {
    setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
+   setOriginalSparkId,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

@@ -34,3 +34,9 @@ export const fetchNextErrorSelector = (state: RootState) =>
    state.sparksFeed.fetchNextError
 
 export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
+
+export const originalSparkIdSelector = (state: RootState) =>
+   state.sparksFeed.originalSparkId
+
+export const sessionIdSelector = (state: RootState) =>
+   state.sparksFeed.sessionId

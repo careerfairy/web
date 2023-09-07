@@ -17,6 +17,7 @@ import {
    fetchNextSparks,
    resetSparksFeed,
    setGroupId,
+   setOriginalSparkId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
@@ -123,6 +124,14 @@ const SparksPage: NextPage<
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [sparkForSeo?.id])
+
+   /**
+    * This effect is used to set the original spark id in the store.
+    */
+   useEffect(() => {
+      if (!serializedSpark?.id) return
+      dispatch(setOriginalSparkId(serializedSpark.id))
+   }, [dispatch, serializedSpark?.id])
 
    return (
       <Fragment>

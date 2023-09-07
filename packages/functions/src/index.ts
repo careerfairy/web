@@ -220,3 +220,6 @@ exports.deleteSpark_v2 = groupSparks.deleteSpark
 // User Spark Functions
 exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
+
+// Spark Analytics Functions
+exports.trackSparkEvent = userSparks.trackSparkEvent
