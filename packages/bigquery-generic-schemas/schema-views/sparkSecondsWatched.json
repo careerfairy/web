@@ -42,7 +42,7 @@
       "description": "ISO Alpha-2 Country code of the user at the time of the event"
    },
    {
-      "name": "sesssionId",
+      "name": "sessionId",
       "type": "STRING",
       "mode": "REQUIRED",
       "description": "A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated."
