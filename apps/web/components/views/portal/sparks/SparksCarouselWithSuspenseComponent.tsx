@@ -1,6 +1,5 @@
 import { Box, IconButton, Stack } from "@mui/material"
-import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react"
-import Heading from "../common/Heading"
+import { FC, ReactNode, useEffect, useRef, useState } from "react"
 import SparksCarousel, {
    ChildRefType,
 } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
@@ -10,8 +9,6 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import { ArrowLeft, ArrowRight } from "@mui/icons-material"
 import { sxStyles } from "types/commonTypes"
-
-const HEADING_TEXT = "Sparks"
 
 const styles = sxStyles({
    arrowIcon: {

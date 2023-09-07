@@ -77,6 +77,10 @@ const TestimonialSection = () => {
    return isMounted() ? (
       <>
          <Box position={"relative"}>
+            <SectionAnchor
+               ref={testimonialSectionRef}
+               tabValue={TabValue.testimonials}
+            />
             <Box sx={styles.titleSection}>
                <Typography variant="h4" fontWeight={"600"} color="black">
                   Testimonial
