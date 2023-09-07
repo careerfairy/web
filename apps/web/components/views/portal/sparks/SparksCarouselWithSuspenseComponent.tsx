@@ -51,7 +51,7 @@ const FallbackComponent: FC = () => {
 
 const Component: FC<Props> = ({ groupId, handleSparksClicked }) => {
    const { data: sparksContent } = useSparks(8, groupId)
-   return (
+   return Boolean(sparksContent.length) ? (
       <Box sx={{ pl: 2 }}>
          <Stack spacing={1.25}>
             <Heading sx={{ textTransform: "uppercase" }}>
@@ -64,7 +64,7 @@ const Component: FC<Props> = ({ groupId, handleSparksClicked }) => {
             />
          </Stack>
       </Box>
-   )
+   ) : null
 }
 
 export default SparksCarouselWithSuspenseComponent
