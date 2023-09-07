@@ -36,7 +36,7 @@ Note: You can only add new fields to a schema or relax required fields. You cann
    **_Note: If the dataset already exists, you can skip this step._**
 3. **Create a new table:** We then create a new table called `LivestreamMinutesWatched` in the `LivestreamsAnalytics` dataset.
    ```shell
-   bq mk --table careerfairy-e1fd9:LivestreamsAnalytics.LivestreamsAnalytics ./packages/bigquery-generic-schemas/schema-views/livestreamMinutesWatched.json
+   bq mk --table careerfairy-e1fd9:LivestreamsAnalytics.LivestreamMinutesWatched ./packages/bigquery-generic-schemas/schema-views/livestreamMinutesWatched.json
    ```
    We can then verify that the table was created by going to BigQuery and checking the `LivestreamsAnalytics` dataset:
    ![BigQuery Table](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fbq-example.png?alt=media&token=ed016561-54d1-417a-a229-101eb83285b3)
