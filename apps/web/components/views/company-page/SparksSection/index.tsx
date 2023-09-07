@@ -1,9 +1,10 @@
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
 import { FC } from "react"
-import { useCompanyPage } from ".."
+import { SectionAnchor, useCompanyPage, TabValue } from ".."
 import { useMountedState } from "react-use"
 import { useRouter } from "next/router"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { Box } from "@mui/material"
 
 type Props = {
    groupId: String
@@ -25,12 +26,18 @@ const SparksSection: FC<Props> = ({ groupId }) => {
       return
    }
 
-   return (
-      <SparksCarouselWithSuspenseComponent
-         groupId={groupId}
-         handleSparksClicked={handleSparksClicked}
-      />
-   )
+   return isMounted() ? (
+      <Box>
+         <SectionAnchor
+            ref={eventSectionRef}
+            tabValue={TabValue.livesStreams}
+         />
+         <SparksCarouselWithSuspenseComponent
+            groupId={groupId}
+            handleSparksClicked={handleSparksClicked}
+         />
+      </Box>
+   ) : null
 }
 
 export default SparksSection
