@@ -1,5 +1,5 @@
 import { Box, IconButton, Stack } from "@mui/material"
-import { FC, useCallback, useEffect, useRef, useState } from "react"
+import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import Heading from "../common/Heading"
 import SparksCarousel, {
    ChildRefType,
@@ -23,11 +23,13 @@ const styles = sxStyles({
 })
 
 type Props = {
+   header: ReactNode
    groupId?: String
    handleSparksClicked: (spark: Spark) => Promise<void>
 }
 
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
+   header,
    groupId,
    handleSparksClicked,
 }) => {
@@ -38,8 +40,9 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    }, [])
 
    return isClient ? (
-      <SuspenseWithBoundary fallback={<FallbackComponent />}>
+      <SuspenseWithBoundary fallback={<FallbackComponent header={header} />}>
          <Component
+            header={header}
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
          />
@@ -49,42 +52,20 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    )
 }
 
-const FallbackComponent: FC = () => {
+const FallbackComponent: FC<Pick<Props, "header">> = ({ header }) => {
    return (
       <Box sx={{ pl: 2 }}>
          <Stack direction={"column"} sx={{ gap: "10px" }}>
-            <Heading sx={{ textTransform: "uppercase" }}>
-               {HEADING_TEXT}
-            </Heading>
+            {header}
             <SparksCarouselSkeleton numSlides={8} />
          </Stack>
       </Box>
    )
 }
 
-const Component: FC<Props> = ({ groupId, handleSparksClicked }) => {
+const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
-   const [step, setStep] = useState(0)
-
-   useEffect(() => {
-      setStep(0)
-   }, [sparksContent])
-
-   const handleSteps = useCallback(
-      (increment = false) => {
-         if (increment) {
-            setStep((prevStep) => (prevStep + 1) % sparksContent.length)
-         } else {
-            if (step) {
-               setStep((prevStep) => prevStep - 1)
-            } else {
-               setStep(sparksContent.length - 1)
-            }
-         }
-      },
-      [sparksContent?.length, step]
-   )
 
    return Boolean(sparksContent.length) ? (
       <Box sx={{ pl: 2 }}>
@@ -96,29 +77,29 @@ const Component: FC<Props> = ({ groupId, handleSparksClicked }) => {
                   justifyContent: "space-between",
                }}
             >
-               <Heading sx={{ textTransform: "uppercase", color: "#000" }}>
-                  {HEADING_TEXT}
-               </Heading>
-               <Box>
-                  <IconButton
-                     color="inherit"
-                     sx={styles.arrowIcon}
-                     onClick={() => {
-                        childRef?.current?.goPrev()
-                     }}
-                  >
-                     <ArrowLeft fontSize={"large"} />
-                  </IconButton>
-                  <IconButton
-                     color="inherit"
-                     sx={styles.arrowIcon}
-                     onClick={() => {
-                        childRef?.current?.goNext()
-                     }}
-                  >
-                     <ArrowRight fontSize={"large"} />
-                  </IconButton>
-               </Box>
+               {header}
+               {groupId ? (
+                  <Box>
+                     <IconButton
+                        color="inherit"
+                        sx={styles.arrowIcon}
+                        onClick={() => {
+                           childRef?.current?.goPrev()
+                        }}
+                     >
+                        <ArrowLeft fontSize={"large"} />
+                     </IconButton>
+                     <IconButton
+                        color="inherit"
+                        sx={styles.arrowIcon}
+                        onClick={() => {
+                           childRef?.current?.goNext()
+                        }}
+                     >
+                        <ArrowRight fontSize={"large"} />
+                     </IconButton>
+                  </Box>
+               ) : null}
             </Box>
             <SparksCarousel
                ref={childRef}

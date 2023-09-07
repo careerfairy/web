@@ -36,6 +36,7 @@ import {
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import Heading from "components/views/portal/common/Heading"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -116,6 +117,7 @@ const PortalPage = ({
                               loading={false}
                            />
                            <SparksCarouselWithSuspenseComponent
+                              header={<Heading>SPARKS</Heading>}
                               handleSparksClicked={handleSparksClicked}
                            />
                         </WidgetsWrapper>
