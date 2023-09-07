@@ -33,6 +33,8 @@ import {
 import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
+import BigQueryHandler from "./BigQueryHandler"
+import { SparkEvent } from "@careerfairy/shared-lib/sparks/analytics"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -182,6 +184,13 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
+
+   /**
+    * Save spark events to BigQuery
+    * @param event The spark event to save
+    * @returns void
+    */
+   trackSparkEvents(event: SparkEvent[]): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -192,7 +201,8 @@ export class SparkFunctionsRepository
       readonly firestore: Firestore,
       readonly storage: Storage,
       readonly logger: FunctionsLogger,
-      readonly feedReplisher: SparksFeedReplenisher
+      readonly feedReplisher: SparksFeedReplenisher,
+      readonly sparkEventHandler: BigQueryHandler<SparkEvent>
    ) {
       super()
    }
@@ -608,6 +618,10 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async trackSparkEvents(events: SparkEvent[]): Promise<void> {
+      return this.sparkEventHandler.insertData(events)
    }
 }
 

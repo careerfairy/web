@@ -47,6 +47,7 @@ const useSparkEventTracker = () => {
             referrer,
             universityCountry: userData?.universityCountryCode || null,
             sessionId,
+            stringTimestamp: new Date().toISOString(),
          }
 
          sparkService.trackSparkEvent(options).catch(console.error)

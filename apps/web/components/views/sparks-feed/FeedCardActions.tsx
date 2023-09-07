@@ -192,14 +192,17 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
       }
    }, [shareUrl])
 
+   const handleTrackShare = useCallback(() => {
+      trackEvent(SparkEventActions.Share, sparkId)
+   }, [sparkId, trackEvent])
+
    const handleShare = useCallback(async () => {
       if (isMobile && navigator?.share) {
-         trackEvent(SparkEventActions.Share, sparkId)
-         await navigator.share(shareData)
+         await navigator.share(shareData).then(() => handleTrackShare())
       } else {
          handleOpenShareDialog()
       }
-   }, [handleOpenShareDialog, isMobile, shareData, sparkId, trackEvent])
+   }, [handleOpenShareDialog, handleTrackShare, isMobile, shareData])
 
    return (
       <>
@@ -213,6 +216,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
             isOpen={isShareDialogOpen}
             handleClose={handleCloseShareDialog}
             shareUrl={shareUrl}
+            onShareOptionClick={handleTrackShare}
          />
       </>
    )
