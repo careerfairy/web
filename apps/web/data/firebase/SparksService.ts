@@ -10,7 +10,10 @@ import {
    Spark,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { SparkEventClient } from "@careerfairy/shared-lib/sparks/analytics"
+import {
+   SparkClientEventsPayload,
+   SparkEventClient,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import {
    Query,
    collection,
@@ -85,11 +88,13 @@ export class SparksService {
     * Calls the trackSparkEvent cloud function with the provided data.
     * @param data - The data to send to the cloud function.
     */
-   async trackSparkEvent(data: SparkEventClient) {
-      return httpsCallable<SparkEventClient, void>(
+   async trackSparkEvents(data: SparkEventClient[]) {
+      return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
          "trackSparkEvent"
-      )(data)
+      )({
+         sparkEvents: data,
+      })
    }
 
    /**
