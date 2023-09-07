@@ -29,19 +29,29 @@ export type SparkEventClient = {
    actionType: SparkEventActionType
    /** ISO Alpha-2 Country code of the user's university at the time of the event */
    universityCountry: string | null
+   /**
+    * ISO 8601 formatted string representing the timestamp of the event.
+    * This timestamp is generated on the client side when the event occurs.
+    */
+   stringTimestamp: string
 }
 
 /**
  * Type representing the complete data being inserted into BigQuery.
  * It includes all fields from `SparkEventClient` plus `userId`, `timestamp`, and `countryCode` which are added by the cloud function.
+ * The `stringTimestamp` field from `SparkEventClient` is omitted because it's replaced by the `timestamp` field, which is a Date object.
  */
-export type SparkEvent = SparkEventClient & {
+export type SparkEvent = Omit<SparkEventClient, "stringTimestamp"> & {
    /** User AuthUID, null if not logged in */
    userId: string | null
    /** Timestamp of the event */
    timestamp: Date
    /** ISO Alpha-2 Country code of the user at the time of the event */
    countryCode: string | null
+}
+
+export type SparkClientEventsPayload = {
+   sparkEvents: SparkEventClient[]
 }
 
 export const SparkEventActions = {

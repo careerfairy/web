@@ -89,7 +89,7 @@ type Props = {
    isOpen: boolean
    handleClose: () => void
    shareUrl: string
-   onShareClick?: () => void
+   onShareOptionClick: () => void
 }
 
 const datalayerEntityName = "sparks"
@@ -97,7 +97,7 @@ const SparksShareDialog: FC<Props> = ({
    isOpen,
    handleClose,
    shareUrl,
-   onShareClick,
+   onShareOptionClick,
 }) => {
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
@@ -122,10 +122,11 @@ const SparksShareDialog: FC<Props> = ({
    })
 
    const copySparkLinkToClipboard = useCallback(() => {
+      onShareOptionClick()
       setIsCopied(true)
       const sourceLink = shareUrl + "&utm_source=CareerFairy"
       copyStringToClipboard(sourceLink)
-   }, [shareUrl])
+   }, [onShareOptionClick, shareUrl])
 
    return (
       <Dialog
@@ -154,7 +155,12 @@ const SparksShareDialog: FC<Props> = ({
             </Box>
          </DialogTitle>
          <DialogContent dividers sx={styles.dialogContent}>
-            <ReferralWidget socials={socials} noBackgroundColor roundedIcons />
+            <ReferralWidget
+               onSocialClick={onShareOptionClick}
+               socials={socials}
+               noBackgroundColor
+               roundedIcons
+            />
          </DialogContent>
          <DialogActions sx={styles.dialogActions}>
             <Box sx={styles.copyContainer} onClick={copySparkLinkToClipboard}>
