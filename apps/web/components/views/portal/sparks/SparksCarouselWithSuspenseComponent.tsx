@@ -26,7 +26,10 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
 
    return isClient ? (
       <SuspenseWithBoundary fallback={<FallbackComponent />}>
-         <Component handleSparksClicked={handleSparksClicked} />
+         <Component
+            groupId={groupId}
+            handleSparksClicked={handleSparksClicked}
+         />
       </SuspenseWithBoundary>
    ) : (
       <SparksCarouselSkeleton numSlides={8} />

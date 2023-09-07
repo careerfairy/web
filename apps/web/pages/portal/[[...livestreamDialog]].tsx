@@ -64,9 +64,10 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
-   const handleSparksClicked = (spark: Spark) => {
+   const handleSparksClicked = async (spark: Spark) => {
       if (!spark) return
-      return router.push(`/sparks/${spark.id}`)
+      router.push(`/sparks/${spark.id}`)
+      return
    }
 
    return (
