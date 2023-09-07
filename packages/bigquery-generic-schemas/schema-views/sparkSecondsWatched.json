@@ -1,0 +1,56 @@
+[
+   {
+      "name": "sparkId",
+      "type": "STRING",
+      "mode": "REQUIRED",
+      "description": "Unique identifier for the Spark"
+   },
+   {
+      "name": "userId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "User AuthUID, null if not logged in"
+   },
+   {
+      "name": "visitorId",
+      "type": "STRING",
+      "mode": "REQUIRED",
+      "description": "Visitor ID to help identify unique users incase they are not logged in"
+   },
+   {
+      "name": "timestamp",
+      "type": "TIMESTAMP",
+      "mode": "REQUIRED",
+      "description": "Timestamp of the event (e.g., when the half-second or second passed)"
+   },
+   {
+      "name": "sparkPosition",
+      "type": "FLOAT64",
+      "mode": "REQUIRED",
+      "description": "Position (in seconds, allowing for fractions up to 2 decimal places) in the spark at the event time"
+   },
+   {
+      "name": "sparkLength",
+      "type": "FLOAT64",
+      "mode": "REQUIRED",
+      "description": "Total length of the spark in seconds, allowing for fractions up to 2 decimal places"
+   },
+   {
+      "name": "countryCode",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "ISO Alpha-2 Country code of the user at the time of the event"
+   },
+   {
+      "name": "sesssionId",
+      "type": "STRING",
+      "mode": "REQUIRED",
+      "description": "A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated."
+   },
+   {
+      "name": "universityCountry",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "ISO Alpha-2 Country code of the user's university at the time of the event"
+   }
+]

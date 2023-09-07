@@ -2,6 +2,7 @@
    {
       "name": "sparkId",
       "type": "STRING",
+      "mode": "REQUIRED",
       "description": "Unique identifier for the Spark"
    },
    {
@@ -19,12 +20,13 @@
    {
       "name": "visitorId",
       "type": "STRING",
-      "mode": "NULLABLE",
-      "description": "Visitor ID for non-logged-in user sessions"
+      "mode": "REQUIRED",
+      "description": "Visitor ID to help identify unique users incase they are not logged in"
    },
    {
       "name": "timestamp",
       "type": "TIMESTAMP",
+      "mode": "REQUIRED",
       "description": "Timestamp of the event"
    },
    {
@@ -36,6 +38,7 @@
    {
       "name": "sesssionId",
       "type": "STRING",
+      "mode": "REQUIRED",
       "description": "A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated."
    },
    {
@@ -77,6 +80,7 @@
    {
       "name": "actionType",
       "type": "STRING",
+      "mode": "REQUIRED",
       "description": "Type of action (Share, Like, Impression, Click on career page CTA, Spark completely watched, Played spark)"
    },
    {
