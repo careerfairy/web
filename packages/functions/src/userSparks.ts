@@ -112,6 +112,7 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
                .oneOf(Object.values(SparkEventActions))
                .required(),
             universityCountry: string().nullable(),
+            stringTimestamp: string().required(),
          })
       ),
    })
@@ -139,7 +140,7 @@ export const trackSparkEvent = functions.region(config.region).https.onCall(
             // Convert the SparkEventClient[] to SparkEvent[]
             const sparkEvents: SparkEvent[] = data.sparkEvents.map(
                ({ stringTimestamp, ...sparkClientEvent }) => {
-                  const timestamp = getValidTimestamp(stringTimestamp)
+                  const timestamp = getValidEventTimestamp(stringTimestamp)
                   return {
                      ...sparkClientEvent,
                      userId,
@@ -161,7 +162,12 @@ export const trackSparkEvent = functions.region(config.region).https.onCall(
    )
 )
 
-const getValidTimestamp = (stringTimestamp: string): Date => {
+/**
+ * Converts a string timestamp to a Date object. If the string is not a valid timestamp, it falls back to the current time.
+ * @param {string} stringTimestamp - The string representation of the timestamp.
+ * @returns {Date} The converted Date object.
+ */
+const getValidEventTimestamp = (stringTimestamp: string): Date => {
    let timestamp = new Date(stringTimestamp)
    if (isNaN(timestamp.getTime())) {
       timestamp = new Date() // Fallback to current time

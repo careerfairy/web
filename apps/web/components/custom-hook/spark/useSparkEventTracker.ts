@@ -5,7 +5,7 @@ import {
 import { useAuth } from "HOCs/AuthProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { useRouter } from "next/router"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { useSelector } from "react-redux"
 import {
    originalSparkIdSelector,
@@ -13,12 +13,17 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import useFingerPrint from "../useFingerPrint"
 
+const BATCH_SIZE = 10 // Maximum number of events that can be batched
+const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
+
 const useSparkEventTracker = () => {
    const router = useRouter()
    const { data: visitorId } = useFingerPrint()
    const originalSparkId = useSelector(originalSparkIdSelector)
    const sessionId = useSelector(sessionIdSelector)
    const { userData } = useAuth()
+
+   const eventsBatch = useRef<SparkEventClient[]>([])
 
    const trackEvent = useCallback(
       (event: SparkEventActionType, sparkId: string) => {
@@ -50,8 +55,12 @@ const useSparkEventTracker = () => {
             stringTimestamp: new Date().toISOString(),
          }
 
-         sparkService.trackSparkEvent(options).catch(console.error)
-         alert(`Tracked ${event} for spark ${sparkId}`)
+         eventsBatch.current.push(options) // Add event to batch
+
+         // If batch size limit is reached, send events
+         if (eventsBatch.current.length >= BATCH_SIZE) {
+            sendBatchedEvents()
+         }
       },
       [
          router.query,
@@ -61,6 +70,53 @@ const useSparkEventTracker = () => {
          sessionId,
       ]
    )
+
+   const sendBatchedEvents = () => {
+      // Send batched events to server
+      console.log(
+         "🚀 ~ file: useSparkEventTracker.ts:77 ~ sendBatchedEvents ~ eventsBatch.current:",
+         eventsBatch.current
+      )
+      sparkService.trackSparkEvents(eventsBatch.current).catch(console.error)
+      eventsBatch.current = [] // Clear the batch
+   }
+
+   useEffect(() => {
+      // Send batched events at regular intervals
+      const intervalId = setInterval(() => {
+         if (eventsBatch.current.length > 0) {
+            sendBatchedEvents()
+         }
+      }, BATCH_INTERVAL)
+
+      // Clean up interval on unmount
+      return () => clearInterval(intervalId)
+   }, [])
+
+   useEffect(() => {
+      // Define the function
+      const handleBeforeUnload = () => {
+         if (eventsBatch.current.length > 0) {
+            localStorage.setItem(
+               "unsentEvents",
+               JSON.stringify(eventsBatch.current)
+            )
+         }
+      }
+
+      window.addEventListener("beforeunload", handleBeforeUnload)
+
+      // On load, check if there are any unsent events in localStorage
+      const unsentEvents = JSON.parse(localStorage.getItem("unsentEvents"))
+      if (unsentEvents) {
+         eventsBatch.current = unsentEvents
+         sendBatchedEvents() // Send unsent events
+         localStorage.removeItem("unsentEvents") // Clear unsent events from localStorage
+      }
+
+      return () =>
+         window.removeEventListener("beforeunload", handleBeforeUnload)
+   }, [])
 
    return useMemo(() => ({ trackEvent }), [trackEvent])
 }

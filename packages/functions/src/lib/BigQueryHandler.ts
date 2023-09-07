@@ -28,6 +28,14 @@ class BigQueryHandler<TRow> {
     * @returns {Promise<void>}
     */
    public async insertData(rows: TRow[]): Promise<void> {
+      console.log(
+         "🚀 ~ file: BigQueryHandler.ts:33 ~ BigQueryHandler<TRow> ~ insertData ~ this.datasetId:",
+         this.datasetId
+      )
+      console.log(
+         "🚀 ~ file: BigQueryHandler.ts:35 ~ BigQueryHandler<TRow> ~ insertData ~ this.tableId:",
+         this.tableId
+      )
       await this.bigQueryClient
          .dataset(this.datasetId)
          .table(this.tableId)
@@ -63,6 +71,10 @@ export const sparkEventsHandler = new BigQueryHandler<SparkEvent>(
    bigQueryClient,
    "SparkAnalytics",
    "SparkEvents"
+)
+console.log(
+   "🚀 ~ file: BigQueryHandler.ts:75 ~ sparkEventsHandler:",
+   sparkEventsHandler
 )
 
 export default BigQueryHandler
