@@ -89,10 +89,16 @@ type Props = {
    isOpen: boolean
    handleClose: () => void
    shareUrl: string
+   onShareClick?: () => void
 }
 
 const datalayerEntityName = "sparks"
-const SparksShareDialog: FC<Props> = ({ isOpen, handleClose, shareUrl }) => {
+const SparksShareDialog: FC<Props> = ({
+   isOpen,
+   handleClose,
+   shareUrl,
+   onShareClick,
+}) => {
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
    const isFullScreen = useSparksFeedIsFullScreen()
