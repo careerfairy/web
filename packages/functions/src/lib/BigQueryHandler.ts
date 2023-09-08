@@ -37,7 +37,8 @@ class BigQueryHandler<TRow> {
          )
          await this.bigQueryClient
             .dataset(this.datasetId)
-            .table(this.tableId + `_${env}`)
+            .table(this.tableId)
+            // .table(this.tableId + `_${env}`)
             .insert(rows)
       } catch (error) {
          if (error.code === 404) {
