@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
    fetchNextSparks,
-   removeCurrentEventNotifications,
    resetSparksFeed,
    setCurrentEventNotification,
    setGroupId,
@@ -91,7 +90,6 @@ const SparksPage: NextPage<
    ])
 
    useEffect(() => {
-      dispatch(removeCurrentEventNotifications())
       let timeout: NodeJS.Timeout
 
       const currentSpark = sparks[currentPlayingIndex]
