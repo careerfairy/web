@@ -66,7 +66,17 @@ Follow these steps to add a new schema:
 
    -  This will ensure that the table is partitioned by day. You can read more about partitioned tables [here](https://cloud.google.com/bigquery/docs/partitioned-tables). When inserting data into a partitioned table, the partitioning will be handled automatically by BigQuery! So you just do normal inserts and BigQuery will take care of the rest :rocket:
 
-5. **Verify the Table Creation:**
+5. **Querying a Partitioned Table:**
+
+   -  You can query a partitioned table just like a normal table. Here's an example of a partitioned query:
+
+   ```sql
+   SELECT * FROM `careerfairy-e1fd9.SparkAnalytics.SparkEvents` WHERE TIMESTAMP_TRUNC(timestamp, DAY) = TIMESTAMP("2023-09-08") LIMIT 1000
+   ```
+
+   -  Normal queries also work out of the box with partitioned tables.
+
+6. **Verify the Table Creation:**
    -  Go to BigQuery and check the `LivestreamsAnalytics` dataset to verify that the table was created.
    -  Here is an example of what you should see:
       ![BigQuery Table](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fbq-example.png?alt=media&token=ed016561-54d1-417a-a229-101eb83285b3)
