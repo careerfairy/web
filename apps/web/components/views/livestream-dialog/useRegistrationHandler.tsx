@@ -220,7 +220,8 @@ export default function useRegistrationHandler() {
                         livestream,
                      })
                   )
-
+            })
+            .then(() => {
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
                   userData,
