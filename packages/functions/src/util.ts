@@ -417,10 +417,6 @@ export const getBigQueryTablePrefix = () => {
    }
 
    const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
-   console.log(
-      "🚀 ~ file: util.ts:420 ~ getBigQueryTablePrefix ~ prefix:",
-      prefix
-   )
 
    return `_${prefix}`
 }
