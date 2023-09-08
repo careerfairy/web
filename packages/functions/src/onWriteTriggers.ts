@@ -11,6 +11,7 @@ import { rewardSideEffectsUserStats } from "./lib/reward"
 import { handleUserStatsBadges } from "./lib/badge"
 import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -18,6 +19,10 @@ export const syncLivestreams = functions
    .firestore.document("livestreams/{livestreamId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
+      const newEvent = change.after?.data() as LivestreamEvent
+      const oldEvent = change.before?.data() as LivestreamEvent
+
+      functions.logger.log(`new ${newEvent}, old ${oldEvent}`)
 
       logStart({
          changeTypes,
