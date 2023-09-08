@@ -2198,7 +2198,7 @@ class FirebaseService {
       userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
       options: {
          isRecommended?: boolean
-         fromSpark?: boolean
+         sparkId?: string
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
@@ -2238,8 +2238,8 @@ class FirebaseService {
             ...(options.isRecommended && {
                isRecommended: true,
             }),
-            ...(options.fromSpark && {
-               fromSpark: options.fromSpark,
+            ...(options.sparkId?.length > 0 && {
+               sparkId: options.sparkId,
             }),
          },
          // to allow queries for users that didn't participate
