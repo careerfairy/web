@@ -16,7 +16,11 @@ import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
 import { useSelector } from "react-redux"
-import { showEventDetailsDialogSelector } from "../../../store/selectors/sparksFeedSelectors"
+import {
+   currentSparkIndexSelector,
+   showEventDetailsDialogSelector,
+   sparksSelector,
+} from "../../../store/selectors/sparksFeedSelectors"
 import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
@@ -40,6 +44,8 @@ export default function useRegistrationHandler() {
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
    const dialogFromSpark = useSelector(showEventDetailsDialogSelector)
+   const sparks = useSelector(sparksSelector)
+   const currentSparkIndex = useSelector(currentSparkIndexSelector)
 
    /**
     * Initiate the registration process
@@ -179,6 +185,12 @@ export default function useRegistrationHandler() {
          groupsWithPolicies: GroupWithPolicy[],
          userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
       ) => {
+         let sparkId: string
+
+         if (dialogFromSpark) {
+            sparkId = sparks?.[currentSparkIndex]?.id
+         }
+
          registerToLivestream(
             livestream.id,
             userData,
@@ -186,7 +198,7 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
-               fromSpark: dialogFromSpark,
+               sparkId: sparkId,
             }
          )
             .then(() => {
@@ -233,10 +245,12 @@ export default function useRegistrationHandler() {
             })
       },
       [
+         currentSparkIndex,
          dialogFromSpark,
          isRecommended,
          registerToLivestream,
          sendRegistrationConfirmationEmail,
+         sparks,
       ]
    )
 

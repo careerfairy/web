@@ -35,17 +35,19 @@ export const syncLivestreams = functions
          livestreamsRepo.syncLiveStreamStatsWithLivestream(change)
       )
 
-      const previousValue = change.before.data() as LivestreamEvent
-      const newValue = change.after.data() as LivestreamEvent
+      if (changeTypes.isUpdate) {
+         const newValue = change.after?.data() as LivestreamEvent
+         const previousValue = change.before?.data() as LivestreamEvent
 
-      if (previousValue.hasStarted === false && newValue.hasStarted === true) {
-         // In case the livestream as started we want to update the sparks notifications
-         functions.logger.log(
-            `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
-         )
-         sideEffectPromises.push(
-            removeAndSyncSparksNotifications(newValue.author.groupId)
-         )
+         if (newValue.hasStarted && !previousValue.hasStarted) {
+            // In case the livestream as started we want to update the sparks notifications
+            functions.logger.log(
+               `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
+            )
+            sideEffectPromises.push(
+               removeAndSyncSparksNotifications(newValue.author.groupId)
+            )
+         }
       }
 
       return handleSideEffects(sideEffectPromises)
