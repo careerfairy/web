@@ -10,14 +10,13 @@ import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { Fragment, useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
    fetchNextSparks,
    resetSparksFeed,
    setGroupId,
-   setOriginalSparkId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
@@ -31,6 +30,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import SparksFeedEventTrackerProvider from "context/spark/SparksFeedEventTrackerProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -125,16 +125,10 @@ const SparksPage: NextPage<
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [sparkForSeo?.id])
 
-   /**
-    * This effect is used to set the original spark id in the store.
-    */
-   useEffect(() => {
-      if (!serializedSpark?.id) return
-      dispatch(setOriginalSparkId(serializedSpark.id))
-   }, [dispatch, serializedSpark?.id])
-
    return (
-      <Fragment>
+      <SparksFeedEventTrackerProvider
+         originalSparkId={serializedSpark?.id || null}
+      >
          <GenericDashboardLayout
             hideDrawer={isFullScreen}
             topBarFixed
@@ -145,7 +139,7 @@ const SparksPage: NextPage<
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />
-      </Fragment>
+      </SparksFeedEventTrackerProvider>
    )
 }
 

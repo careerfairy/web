@@ -5,28 +5,59 @@ import {
 import { useAuth } from "HOCs/AuthProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { useRouter } from "next/router"
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import {
+   FC,
+   createContext,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+} from "react"
 import { useSelector } from "react-redux"
 import {
-   originalSparkIdSelector,
+   currentSparkIdSelector,
    sessionIdSelector,
 } from "store/selectors/sparksFeedSelectors"
-import useFingerPrint from "../useFingerPrint"
+import useFingerPrint from "../../components/custom-hook/useFingerPrint"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
 
-const useSparkEventTracker = () => {
+type SparkEventTrackerProviderProps = {
+   trackEvent: (event: SparkEventActionType) => void
+}
+
+const SparkEventTrackerContext = createContext<SparkEventTrackerProviderProps>({
+   trackEvent: () => {},
+})
+
+type Props = {
+   /**
+    * The original spark ID that the user clicked on to get to the Sparks feed
+    */
+   originalSparkId: string
+}
+
+export const SparksFeedEventTrackerProvider: FC<Props> = ({
+   children,
+   originalSparkId,
+}) => {
    const router = useRouter()
-   const { data: visitorId } = useFingerPrint()
-   const originalSparkId = useSelector(originalSparkIdSelector)
-   const sessionId = useSelector(sessionIdSelector)
+
    const { userData } = useAuth()
+
+   const { data: visitorId } = useFingerPrint()
+
+   const sessionId = useSelector(sessionIdSelector)
+   const currentSparkId = useSelector(currentSparkIdSelector)
 
    const eventsBatch = useRef<SparkEventClient[]>([])
 
    const trackEvent = useCallback(
-      (event: SparkEventActionType, sparkId: string) => {
+      (event: SparkEventActionType) => {
+         if (!currentSparkId) return
+
          const referrer = document?.referrer || null
 
          const {
@@ -48,14 +79,14 @@ const useSparkEventTracker = () => {
             utm_term: utm_term ? utm_term.toString() : null,
             utm_content: utm_content ? utm_content.toString() : null,
             referralCode: referral ? referral.toString() : null,
-            sparkId,
+            sparkId: currentSparkId,
             referrer,
             universityCountry: userData?.universityCountryCode || null,
             sessionId,
             stringTimestamp: new Date().toISOString(),
          }
 
-         eventsBatch.current.push(options) // Add event to batch
+         eventsBatch.current.push(options) //
 
          // If batch size limit is reached, send events
          if (eventsBatch.current.length >= BATCH_SIZE) {
@@ -63,6 +94,7 @@ const useSparkEventTracker = () => {
          }
       },
       [
+         currentSparkId,
          router.query,
          visitorId,
          originalSparkId,
@@ -73,10 +105,6 @@ const useSparkEventTracker = () => {
 
    const sendBatchedEvents = () => {
       // Send batched events to server
-      console.log(
-         "🚀 ~ file: useSparkEventTracker.ts:77 ~ sendBatchedEvents ~ eventsBatch.current:",
-         eventsBatch.current
-      )
       sparkService.trackSparkEvents(eventsBatch.current).catch(console.error)
       eventsBatch.current = [] // Clear the batch
    }
@@ -98,7 +126,7 @@ const useSparkEventTracker = () => {
       const handleBeforeUnload = () => {
          if (eventsBatch.current.length > 0) {
             localStorage.setItem(
-               "unsentEvents",
+               "unsentSparkEvents",
                JSON.stringify(eventsBatch.current)
             )
          }
@@ -107,18 +135,36 @@ const useSparkEventTracker = () => {
       window.addEventListener("beforeunload", handleBeforeUnload)
 
       // On load, check if there are any unsent events in localStorage
-      const unsentEvents = JSON.parse(localStorage.getItem("unsentEvents"))
-      if (unsentEvents) {
-         eventsBatch.current = unsentEvents
+      const unsentSparkEvents = JSON.parse(
+         localStorage.getItem("unsentSparkEvents")
+      )
+      if (unsentSparkEvents) {
+         eventsBatch.current = unsentSparkEvents
          sendBatchedEvents() // Send unsent events
-         localStorage.removeItem("unsentEvents") // Clear unsent events from localStorage
+         localStorage.removeItem("unsentSparkEvents") // Clear unsent events from localStorage
       }
 
       return () =>
          window.removeEventListener("beforeunload", handleBeforeUnload)
    }, [])
 
-   return useMemo(() => ({ trackEvent }), [trackEvent])
+   const value = useMemo(() => ({ trackEvent }), [trackEvent])
+
+   return (
+      <SparkEventTrackerContext.Provider value={value}>
+         {children}
+      </SparkEventTrackerContext.Provider>
+   )
 }
 
-export default useSparkEventTracker
+export const useSparksFeedEventTracker = () => {
+   const context = useContext(SparkEventTrackerContext)
+   if (context === undefined) {
+      throw new Error(
+         "useSparksFeedEventTracker must be used within a SparkEventTrackerProvider"
+      )
+   }
+   return context
+}
+
+export default SparksFeedEventTrackerProvider

@@ -22,10 +22,6 @@ interface SparksState {
    initialFetchError: string | null
    sparkCategoryIds: SparkCategory["id"][]
    /**
-    * The original spark ID that the user clicked on to get to the Sparks feed
-    */
-   originalSparkId: string | null
-   /**
     * A sessionId is a unique identifier generated each time a user views a specific spark.
     * When the user scrolls to a new spark, a new sessionId is generated.
     */
@@ -45,7 +41,6 @@ const initialState: SparksState = {
    fetchNextError: null,
    initialFetchError: null,
    sparkCategoryIds: [],
-   originalSparkId: null,
    sessionId: null,
 }
 
@@ -82,12 +77,6 @@ const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
    reducers: {
-      setOriginalSparkId: (
-         state,
-         action: PayloadAction<SparksState["originalSparkId"]>
-      ) => {
-         state.originalSparkId = action.payload
-      },
       setSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
          state.sparks = action.payload
          state.currentPlayingIndex = 0
@@ -130,7 +119,7 @@ const sparksFeedSlice = createSlice({
          state.fetchNextError = null
          state.initialFetchError = null
          state.sparkCategoryIds = []
-         state.originalSparkId = null
+         state.sessionId = null
       },
    },
    extraReducers: (builder) => {
@@ -224,7 +213,6 @@ export const {
    setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
-   setOriginalSparkId,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
