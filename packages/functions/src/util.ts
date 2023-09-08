@@ -411,6 +411,20 @@ export const isProductionEnvironment = () => {
    return process.env.NODE_ENV === "production"
 }
 
+export const getBigQueryTablePrefix = () => {
+   if (isProductionEnvironment()) {
+      return ""
+   }
+
+   const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
+   console.log(
+      "🚀 ~ file: util.ts:420 ~ getBigQueryTablePrefix ~ prefix:",
+      prefix
+   )
+
+   return `_${prefix}`
+}
+
 export const logAxiosError = (error: any) => {
    functions.logger.error("Axios: JSON", error?.toJSON?.())
    if (error.response) {

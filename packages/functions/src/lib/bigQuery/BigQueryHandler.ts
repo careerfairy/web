@@ -1,10 +1,8 @@
 import { SparkEvent } from "@careerfairy/shared-lib/sparks/analytics"
-import sparkEvents from "./schema-views/sparkEvents.json"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
 import bigQueryClient from "../../api/bigQueryClient"
-import { isProductionEnvironment } from "../../util"
-
-const env = process.env.NODE_ENV
+import { getBigQueryTablePrefix, isProductionEnvironment } from "../../util"
+import sparkEvents from "./schema-views/sparkEvents.json"
 
 /**
  * Class to handle BigQuery operations.
@@ -30,10 +28,28 @@ class BigQueryHandler<TRow> {
    ) {
       this.bigQueryClient = bigQueryClient
       this.datasetId = datasetId
-      this.tableId = isProductionEnvironment()
-         ? tableId
-         : `${tableId}_${process.env.BIGQUERY_TABLE_PREFIX}`
+
+      this.tableId = `${tableId}${getBigQueryTablePrefix()}`
+
       this.tableOptions = tableOptions
+   }
+
+   /**
+    * Create a new table.
+    * @returns {Promise<void>}
+    */
+   public async createTable(): Promise<void> {
+      await this.bigQueryClient
+         .dataset(this.datasetId)
+         .createTable(this.tableId, this.tableOptions)
+   }
+
+   private async handleInsert(rows: TRow[]): Promise<void> {
+      await this.bigQueryClient
+         .dataset(this.datasetId)
+         .table(this.tableId)
+         .insert(rows)
+      console.log(`Inserted ${rows.length} rows`)
    }
 
    /**
@@ -41,30 +57,20 @@ class BigQueryHandler<TRow> {
     * @param {TRow[]} rows - The rows to insert.
     * @returns {Promise<void>}
     */
-   public async insertData(rows: TRow[], retryCount = 0): Promise<void> {
+   public async insertData(rows: TRow[]): Promise<void> {
       try {
-         await this.bigQueryClient
-            .dataset(this.datasetId)
-            .table(this.tableId)
-            .insert(rows)
-         console.log(`Inserted ${rows.length} rows`)
+         await this.handleInsert(rows)
       } catch (error) {
-         if (error.code === 404 && env !== "production") {
+         // Create the table on the fly if it doesn't exist except in production, we don't want to create tables on the fly in production
+         if (error.code === 404 && !isProductionEnvironment()) {
+            console.log("Table does not exist. Attempting to create table...")
+            await this.createTable()
             console.log(
-               "🚀 ~ file: BigQueryHandler.ts:51 ~ BigQueryHandler<TRow> ~ insertData ~ error:",
-               error
+               "Table created successfully. Note: Data insertion will not be retried in this call. Please make another call to insert data."
             )
-            if (retryCount >= 1) {
-               throw new Error("Table creation failed after 3 attempts")
-            }
-            await this.bigQueryClient
-               .dataset(this.datasetId)
-               .createTable(this.tableId, this.tableOptions)
-
-            await this.insertData(rows)
+         } else {
+            throw error
          }
-
-         throw error
       }
    }
 }
