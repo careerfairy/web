@@ -393,10 +393,6 @@ export const partition = <T>(
  * Detect if we're running the emulators
  */
 export const isLocalEnvironment = () => {
-   console.log(
-      "🚀 ~ file: util.ts:402 ~ isLocalEnvironment ~ process.env.NODE_ENV:",
-      process.env.NODE_ENV
-   )
    return (
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
       process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
@@ -409,6 +405,10 @@ export const isLocalEnvironment = () => {
 
 export const isTestEnvironment = () => {
    return process.env.NODE_ENV === "test"
+}
+
+export const isProductionEnvironment = () => {
+   return process.env.NODE_ENV === "production"
 }
 
 export const logAxiosError = (error: any) => {

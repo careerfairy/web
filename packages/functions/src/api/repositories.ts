@@ -36,7 +36,7 @@ import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
 
 import logger = require("firebase-functions/logger")
 import bigQueryClient from "./bigQueryClient"
-import { sparkEventsHandler } from "../lib/BigQueryHandler"
+import { sparkEventsHandler } from "../lib/bigQuery/BigQueryHandler"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
