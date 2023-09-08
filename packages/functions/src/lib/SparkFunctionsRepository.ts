@@ -33,7 +33,7 @@ import {
 import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
-import BigQueryHandler from "./BigQueryHandler"
+import BigQueryHandler from "./bigQuery/BigQueryHandler"
 import { SparkEvent } from "@careerfairy/shared-lib/sparks/analytics"
 
 export interface ISparkFunctionsRepository {

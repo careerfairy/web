@@ -1,7 +1,8 @@
 import { SparkEvent } from "@careerfairy/shared-lib/sparks/analytics"
-import sparkEvents from "@careerfairy/bigquery-generic-schemas/schema-views/sparkEvents.json"
+import sparkEvents from "./schema-views/sparkEvents.json"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
-import bigQueryClient from "../api/bigQueryClient"
+import bigQueryClient from "../../api/bigQueryClient"
+import { isProductionEnvironment } from "../../util"
 
 const env = process.env.NODE_ENV
 
@@ -29,7 +30,9 @@ class BigQueryHandler<TRow> {
    ) {
       this.bigQueryClient = bigQueryClient
       this.datasetId = datasetId
-      this.tableId = env === "production" ? tableId : `${tableId}_dev`
+      this.tableId = isProductionEnvironment()
+         ? tableId
+         : `${tableId}_${process.env.BIGQUERY_TABLE_PREFIX}`
       this.tableOptions = tableOptions
    }
 
@@ -51,7 +54,7 @@ class BigQueryHandler<TRow> {
                "🚀 ~ file: BigQueryHandler.ts:51 ~ BigQueryHandler<TRow> ~ insertData ~ error:",
                error
             )
-            if (retryCount >= 3) {
+            if (retryCount >= 1) {
                throw new Error("Table creation failed after 3 attempts")
             }
             await this.bigQueryClient
