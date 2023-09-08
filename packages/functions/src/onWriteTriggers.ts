@@ -19,10 +19,6 @@ export const syncLivestreams = functions
    .firestore.document("livestreams/{livestreamId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
-      const newEvent = change.after?.data() as LivestreamEvent
-      const oldEvent = change.before?.data() as LivestreamEvent
-
-      functions.logger.log(`new ${newEvent}, old ${oldEvent}`)
 
       logStart({
          changeTypes,
@@ -37,6 +33,15 @@ export const syncLivestreams = functions
       sideEffectPromises.push(
          livestreamsRepo.syncLiveStreamStatsWithLivestream(change)
       )
+
+      if (changeTypes.isUpdate) {
+         const newEvent = change.after?.data() as LivestreamEvent
+         const oldEvent = change.before?.data() as LivestreamEvent
+
+         if (newEvent.hasStarted && !oldEvent.hasStarted) {
+            functions.logger.log(`new ${newEvent}, old ${oldEvent}`)
+         }
+      }
 
       return handleSideEffects(sideEffectPromises)
    })
