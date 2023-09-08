@@ -120,7 +120,6 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
 export const trackSparkEvent = functions.region(config.region).https.onCall(
    middlewares(
       dataValidation(sparkEventClientSchema),
-      userAuthExists(),
       async (data: SparkClientEventsPayload, context) => {
          try {
             /**

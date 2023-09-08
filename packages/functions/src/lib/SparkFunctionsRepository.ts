@@ -204,10 +204,6 @@ export class SparkFunctionsRepository
       readonly feedReplisher: SparksFeedReplenisher,
       readonly sparkEventHandler: BigQueryHandler<SparkEvent>
    ) {
-      console.log(
-         "🚀 ~ file: SparkFunctionsRepository.ts:207 ~ sparkEventHandler:",
-         sparkEventHandler
-      )
       super()
    }
 
@@ -625,10 +621,6 @@ export class SparkFunctionsRepository
    }
 
    async trackSparkEvents(events: SparkEvent[]): Promise<void> {
-      console.log(
-         "🚀 ~ file: SparkFunctionsRepository.ts:625 ~ trackSparkEvents ~ this.sparkEventHandler:",
-         this.sparkEventHandler
-      )
       return this.sparkEventHandler.insertData(events)
    }
 }

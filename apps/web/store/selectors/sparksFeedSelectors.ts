@@ -35,8 +35,11 @@ export const fetchNextErrorSelector = (state: RootState) =>
 
 export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
 
-export const originalSparkIdSelector = (state: RootState) =>
-   state.sparksFeed.originalSparkId
-
 export const sessionIdSelector = (state: RootState) =>
    state.sparksFeed.sessionId
+
+export const currentSparkIdSelector = (state: RootState) => {
+   const sparks = state.sparksFeed.sparks
+   const index = state.sparksFeed.currentPlayingIndex
+   return sparks[index]?.id || null
+}

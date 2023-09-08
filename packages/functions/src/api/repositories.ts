@@ -75,10 +75,6 @@ export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
 
 const feedReplenisher = new SparksFeedReplenisher(firestore as any)
 
-console.log(
-   "🚀 ~ file: repositories.ts:85 ~ sparkEventsHandler:",
-   sparkEventsHandler
-)
 export const sparkRepo: ISparkFunctionsRepository =
    new SparkFunctionsRepository(
       firestore,
