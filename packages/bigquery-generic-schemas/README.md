@@ -26,22 +26,50 @@ Note: You can only add new fields to a schema or relax required fields. You cann
    bq update --schema ./packages/bigquery-generic-schemas/schema-views/sparkEvents.json careerfairy-e1fd9:SparkAnalytics.SparkEvents
    ```
 
-## Adding a new schema
+## Adding a New Schema
 
-1. **Create a new JSON schema file:** Let's say we want to add a new schema for a new event called `newEvent`. We then create a new file called `livestreamMinutesWatched.json` in the `schema-views` folder, use the other schema files as a reference and add the new fields.
-2. **Make Dataset:** Since this belong to livestreams, we need to create a new dataset called `LivestreamsAnalytics` in BigQuery.
+Follow these steps to add a new schema:
+
+1. **Create a New JSON Schema File:**
+
+   -  If you want to add a new schema for a new event, for example `newEvent`, create a new file named `livestreamMinutesWatched.json` in the `schema-views` folder.
+   -  Use the other schema files as a reference and add the new fields.
+
+2. **Create a Dataset:**
+
+   -  If this belongs to livestreams, create a new dataset named `LivestreamsAnalytics` in BigQuery.
+   -  Use the following command:
+
    ```shell
    bq mk --location=EU --dataset careerfairy-e1fd9:LivestreamsAnalytics
    ```
-   **_Note: If the dataset already exists, you can skip this step._**
-3. **Create a new table:** We then create a new table called `LivestreamMinutesWatched` in the `LivestreamsAnalytics` dataset.
+
+   -  **Note:** If the dataset already exists, you can skip this step.
+
+3. **Create a New Table:**
+
+   -  Create a new table named `LivestreamMinutesWatched` in the `LivestreamsAnalytics` dataset.
+   -  Use the following command:
+
    ```shell
    bq mk --table careerfairy-e1fd9:LivestreamsAnalytics.LivestreamMinutesWatched ./packages/bigquery-generic-schemas/schema-views/livestreamMinutesWatched.json
    ```
-   We can then verify that the table was created by going to BigQuery and checking the `LivestreamsAnalytics` dataset:
-   ![BigQuery Table](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fbq-example.png?alt=media&token=ed016561-54d1-417a-a229-101eb83285b3)
 
-Certainly! Below is an addition to your existing README file to include a part 4 for exporting tables from BigQuery.
+4. **Create a Partitioned Table (Optional):**
+
+   -  If you want to create a time-based partitioned table by day, add the `--time_partitioning_type=DAY` and `--time_partitioning_field` flags followed by the name of the column.
+   -  For example, if the partitioning column in your schema is called `timestamp`, use the following command:
+
+   ```shell
+   bq mk --time_partitioning_type=DAY --time_partitioning_field=timestamp --table careerfairy-e1fd9:LivestreamsAnalytics.LivestreamMinutesWatched ./packages/bigquery-generic-schemas/schema-views/livestreamMinutesWatched.json
+   ```
+
+   -  This will ensure that the table is partitioned by day. You can read more about partitioned tables [here](https://cloud.google.com/bigquery/docs/partitioned-tables). When inserting data into a partitioned table, the partitioning will be handled automatically by BigQuery! So you just do normal inserts and BigQuery will take care of the rest :rocket:
+
+5. **Verify the Table Creation:**
+   -  Go to BigQuery and check the `LivestreamsAnalytics` dataset to verify that the table was created.
+   -  Here is an example of what you should see:
+      ![BigQuery Table](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fbq-example.png?alt=media&token=ed016561-54d1-417a-a229-101eb83285b3)
 
 ---
 
