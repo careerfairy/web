@@ -3,7 +3,7 @@ import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparksContainer from "../components/SparksContainer"
 import CreatorSparksCollection from "./CreatorSparksCollection"
-import HeaderActions from "./HeaderActions"
+import HeaderActions from "./header/HeaderActions"
 
 const styles = sxStyles({
    creatorSparksCollectionContainer: {
