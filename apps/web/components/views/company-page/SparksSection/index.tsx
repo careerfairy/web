@@ -13,8 +13,6 @@ type Props = {
 const SparksSection: FC<Props> = ({ groupId }) => {
    const {
       group,
-      upcomingLivestreams,
-      pastLivestreams,
       sectionRefs: { eventSectionRef },
    } = useCompanyPage()
    const isMounted = useMountedState()
@@ -22,7 +20,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
 
    const handleSparksClicked = async (spark: Spark) => {
       if (!spark) return
-      router.push(`/sparks/${spark.id}`)
+      router.push(`/sparks/${spark.id}?groupId=${group.id}`)
       return
    }
 

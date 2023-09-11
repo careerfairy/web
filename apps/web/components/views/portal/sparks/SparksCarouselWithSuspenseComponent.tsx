@@ -7,7 +7,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
-import { ArrowLeft, ArrowRight } from "@mui/icons-material"
+import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,7 +22,7 @@ const styles = sxStyles({
 type Props = {
    header: ReactNode
    groupId?: String
-   handleSparksClicked: (spark: Spark) => Promise<void>
+   handleSparksClicked: (spark: Spark) => void
 }
 
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
@@ -63,7 +63,7 @@ const FallbackComponent: FC<Pick<Props, "header">> = ({ header }) => {
 const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
-
+   const withControls = Boolean(groupId)
    return Boolean(sparksContent.length) ? (
       <Box sx={{ pl: 2 }}>
          <Stack spacing={1.25}>
@@ -75,7 +75,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
                }}
             >
                {header}
-               {groupId ? (
+               {withControls ? (
                   <Box>
                      <IconButton
                         color="inherit"
