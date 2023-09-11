@@ -10,7 +10,7 @@ const AdminProfile = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"My Profile"}
+         titleComponent={"My Profile"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | My Profile" />

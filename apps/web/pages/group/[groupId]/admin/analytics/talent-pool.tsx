@@ -10,7 +10,7 @@ const TalentPoolPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Talent Pool"}
+         titleComponent={"Talent Pool"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Talent Pool of" />

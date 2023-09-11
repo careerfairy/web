@@ -10,7 +10,7 @@ const GeneralPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"General"}
+         titleComponent={"General"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | General Page of" />
