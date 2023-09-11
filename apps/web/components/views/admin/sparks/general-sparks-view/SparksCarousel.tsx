@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from "react"
+import React, { ReactNode } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
 import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
@@ -58,10 +58,10 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
 
       React.useImperativeHandle(ref, () => ({
          goNext() {
-            emblaApi.scrollNext(true)
+            emblaApi.scrollNext()
          },
          goPrev() {
-            emblaApi.scrollPrev(true)
+            emblaApi.scrollPrev()
          },
       }))
 
@@ -98,5 +98,7 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
       )
    }
 )
+
+SparksCarousel.displayName = "SparksCarousel"
 
 export default SparksCarousel
