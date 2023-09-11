@@ -1,4 +1,8 @@
-import { RegistrationSource, VALID_SOURCES } from "./sources"
+import {
+   RegistrationSource,
+   RegistrationSourceIds,
+   VALID_SOURCES,
+} from "./sources"
 import { RegistrationSourcesResponseItem } from "../../functions/groupAnalyticsTypes"
 import { LivestreamEvent } from "../livestreams"
 
@@ -45,10 +49,20 @@ export const sourcesByDate = (
       if (registration.registered?.date) {
          // it's a valid registration
 
-         for (let source of VALID_SOURCES) {
-            if (source.match(registration.registered.utm)) {
-               addToResults(source, registration)
-               break // one registration only matches a single source
+         // If the registration was made through a spark
+         if (registration.registered.sparkId) {
+            addToResults(
+               VALID_SOURCES.find(
+                  (source) => source.id == RegistrationSourceIds.Sparks
+               ),
+               registration
+            )
+         } else {
+            for (let source of VALID_SOURCES) {
+               if (source.match(registration.registered.utm)) {
+                  addToResults(source, registration)
+                  break // one registration only matches a single source
+               }
             }
          }
       }

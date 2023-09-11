@@ -134,7 +134,7 @@ const LoadStaleWhileRevalidateStats = ({ groupId, livestream }) => {
       const stats = sourcesByLivestream(data.data)
 
       return VALID_SOURCES.map((s) => {
-         const match = stats.find((m) => m.source.displayName === s.displayName)
+         const match = stats.find((m) => m.source.id === s.id)
 
          return {
             name: s.displayName,
