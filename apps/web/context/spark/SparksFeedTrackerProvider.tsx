@@ -1,7 +1,6 @@
 import {
    SparkEventActionType,
    SparkEventClient,
-   SparkSecondsWatched,
    SparkSecondsWatchedClient,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { useAuth } from "HOCs/AuthProvider"
@@ -23,6 +22,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
 import { OnProgressProps } from "react-player/base"
+import useBatchedEvents from "components/custom-hook/utils/useBatchedEvents"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
@@ -120,7 +120,6 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
             userId: userData?.id || null,
             visitorId,
          }
-         // Add your implementation here
          sparkService.trackSparkSecondsWatched(data)
       },
       [
@@ -129,7 +128,7 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
          userData?.id,
          userData?.universityCountryCode,
          visitorId,
-      ] // Add dependencies if needed
+      ]
    )
 
    const sendBatchedEvents = () => {
@@ -137,6 +136,20 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
       sparkService.trackSparkEvents(eventsBatch.current).catch(console.error)
       eventsBatch.current = [] // Clear the batch
    }
+
+   const addEventToBatch = useBatchedEvents(
+      sparkService.trackSparkEvents,
+      BATCH_SIZE,
+      BATCH_INTERVAL,
+      "unsentSparkEvents"
+   )
+
+   const addSecondsWatchedToBatch = useBatchedEvents(
+      sparkService.trackSparkSecondsWatched,
+      BATCH_SIZE,
+      BATCH_INTERVAL,
+      "unsentSparkSecondsWatched"
+   )
 
    useEffect(() => {
       // Send batched events at regular intervals
@@ -193,7 +206,7 @@ export const useSparksFeedTracker = () => {
    const context = useContext(SparkEventTrackerContext)
    if (context === undefined) {
       throw new Error(
-         "useSparksFeedEventTracker must be used within a SparkEventTrackerProvider"
+         "useSparksFeedTracker must be used within a SparksFeedTrackerProvider"
       )
    }
    return context
