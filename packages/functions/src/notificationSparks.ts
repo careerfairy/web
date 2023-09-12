@@ -10,9 +10,9 @@ import { dataValidation } from "./middlewares/validations"
 import { addDaysDate } from "./util"
 import { firestore } from "./api/firestoreAdmin"
 import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
-import { WriteBatch } from "firebase-admin/firestore"
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { BulkWriter } from "firebase-admin/firestore"
 
 const removeNotificationFromUserValidator = {
    userId: string().required(),
@@ -71,10 +71,7 @@ export const removeAndSyncUserSparkNotification = functions
                   `remove spark notification related to the group ${groupId} for the user ${userId}`
                )
                // remove single notification for this particular user
-               await sparkRepo.removeAndSyncUserSparkNotification(
-                  userId,
-                  groupId
-               )
+               await sparkRepo.removeUserSparkNotification(userId, groupId)
 
                // update spark notifications for this user
                return handleCreateSparksNotifications(userId)
@@ -100,7 +97,7 @@ const handleCreateSparksNotifications = async (userId?: string) => {
       new Date(),
       SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
    )
-   let batch = firestore.batch()
+   const bulkWriter = firestore.bulkWriter()
 
    // to get all the upcoming events that will start on the next X days
    const upcomingEvents = await getStreamsByDateWithRegisteredStudents(
@@ -114,37 +111,37 @@ const handleCreateSparksNotifications = async (userId?: string) => {
 
    if (userId) {
       // In this case we want only to create notification for a single user
-      batch = createSparkNotificationForSingleUser({
+      createSparkNotificationForSingleUser({
          userId,
          upcomingEvents,
-         batch,
+         bulkWriter,
       })
-      return batch.commit()
+      return bulkWriter.close()
    }
 
    const userSparksFeedMetrics = await sparkRepo.getAllUserSparksFeedMetrics()
 
    userSparksFeedMetrics.forEach(({ userId }) => {
-      batch = createSparkNotificationForSingleUser({
+      createSparkNotificationForSingleUser({
          userId,
          upcomingEvents,
-         batch,
+         bulkWriter,
       })
    })
 
-   return batch.commit()
+   return bulkWriter.close()
 }
 
 type createSparkNotificationForSingleUser = {
    userId: string
    upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
-   batch: WriteBatch
+   bulkWriter: BulkWriter
 }
 const createSparkNotificationForSingleUser = ({
    userId,
    upcomingEvents,
-   batch,
-}: createSparkNotificationForSingleUser): WriteBatch => {
+   bulkWriter,
+}: createSparkNotificationForSingleUser) => {
    const notifications: UserSparksNotification[] = []
 
    // filter all the upcoming events where the user already registered
@@ -169,7 +166,7 @@ const createSparkNotificationForSingleUser = ({
          notifications.push({
             eventId: eventId,
             groupId: groupId,
-            startDate: event.startDate || event.start.toDate(),
+            startDate: event.start.toDate(),
          })
       }
    })
@@ -187,8 +184,8 @@ const createSparkNotificationForSingleUser = ({
          .collection("sparksNotifications")
          .doc(notification.groupId)
 
-      batch.set(userSparksNotificationsRef, notification, { merge: true })
+      void bulkWriter.set(userSparksNotificationsRef, notification, {
+         merge: true,
+      })
    })
-
-   return batch
 }

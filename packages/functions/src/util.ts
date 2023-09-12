@@ -264,8 +264,10 @@ export const addMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() + minutes * 60000)
 }
 export const addDaysDate = (date: Date, days: number): Date => {
-   date.setDate(date.getDate() + days)
-   return date
+   const newData = new Date(date.getTime())
+   newData.setDate(newData.getDate() + days)
+
+   return newData
 }
 
 export const removeMinutesDate = (date: Date, minutes: number): Date => {

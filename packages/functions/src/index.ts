@@ -223,8 +223,6 @@ exports.createSparksFeedEventNotifications =
    notificationSparks.createSparksFeedEventNotifications
 exports.createUserSparksFeedEventNotifications =
    notificationSparks.createUserSparksFeedEventNotifications
-exports.removeAndSyncSparksNotifications =
-   notificationSparks.removeAndSyncSparksNotifications
 exports.removeAndSyncUserSparkNotification =
    notificationSparks.removeAndSyncUserSparkNotification
 
