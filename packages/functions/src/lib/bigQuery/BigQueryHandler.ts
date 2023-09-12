@@ -1,6 +1,6 @@
 import {
    SparkEvent,
-   SparkSecondsWatched,
+   SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
 import bigQueryClient from "../../api/bigQueryClient"
@@ -92,7 +92,7 @@ export const sparkEventsHandler = new BigQueryHandler<SparkEvent>(
 )
 
 export const sparkSecondsWatchedHanlder =
-   new BigQueryHandler<SparkSecondsWatched>(
+   new BigQueryHandler<SparkSecondWatched>(
       bigQueryClient,
       "SparkAnalytics",
       "SparkSecondsWatched",
