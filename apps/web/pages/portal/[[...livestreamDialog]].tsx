@@ -67,8 +67,7 @@ const PortalPage = ({
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
-      router.push(`/sparks/${spark.id}`)
-      return
+      return router.push(`/sparks/${spark.id}`)
    }
 
    return (

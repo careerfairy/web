@@ -11,6 +11,11 @@ import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
+   stack: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+   },
    arrowIcon: {
       padding: 0,
       minHeight: { xs: "25px", md: "30px" },
@@ -67,13 +72,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
    return Boolean(sparksContent.length) ? (
       <Box sx={{ pl: 2 }}>
          <Stack spacing={1.25}>
-            <Box
-               sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-               }}
-            >
+            <Box sx={styles.stack}>
                {header}
                {withControls ? (
                   <Box>

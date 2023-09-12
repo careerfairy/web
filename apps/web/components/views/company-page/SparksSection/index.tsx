@@ -19,8 +19,9 @@ const SparksSection: FC<Props> = ({ groupId }) => {
    const router = useRouter()
 
    const handleSparksClicked = async (spark: Spark) => {
-      if (!spark) return
-      router.push(`/sparks/${spark.id}?groupId=${group.id}`)
+      if (spark) {
+         router.push(`/sparks/${spark.id}?groupId=${group.id}`)
+      }
       return
    }
 
