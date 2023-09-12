@@ -95,10 +95,6 @@ export type SparkSecondsWatched = Omit<
    countryCode: string | null
 }
 
-export type SparkSecondsWatchedClientPayload = {
-   sparkSecondsWatched: SparkSecondsWatchedClient[]
-}
-
 export const SparkEventActions = {
    Share: "Share",
    Like: "Like",

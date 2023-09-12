@@ -225,7 +225,7 @@ export interface ISparkFunctionsRepository {
     * @param event The spark seconds watched to save
     * @returns void
     */
-   trackSparkSecondsWatched(event: SparkSecondsWatched[]): Promise<void>
+   trackSparkSecondsWatched(event: SparkSecondsWatched): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -710,10 +710,8 @@ export class SparkFunctionsRepository
       return this.sparkEventHandler.insertData(events)
    }
 
-   async trackSparkSecondsWatched(
-      events: SparkSecondsWatched[]
-   ): Promise<void> {
-      return this.sparkSecondsWatchedHandler.insertData(events)
+   async trackSparkSecondsWatched(event: SparkSecondsWatched): Promise<void> {
+      return this.sparkSecondsWatchedHandler.insertData([event])
    }
 }
 
