@@ -70,7 +70,9 @@ class BigQueryHandler<TRow> {
             console.log("Table does not exist. Attempting to create table...")
             await this.createTable()
             console.log(
-               "Table created successfully. Note: Data insertion will not be retried in this call. Please make another call to insert data."
+               "Table created successfully. Note: Data insertion will not be retried in this call." +
+                  "Please make another call to insert data." +
+                  "It may take up to 30 seconds for the table to be ready for data insertion even though the table has been created."
             )
          } else {
             throw error
