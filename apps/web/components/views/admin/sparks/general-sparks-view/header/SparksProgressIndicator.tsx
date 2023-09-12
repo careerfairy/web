@@ -12,7 +12,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       bgcolor: "#F8F5FF",
-      p: 2,
+      p: 3,
       borderRadius: 4,
       border: "1px solid #E0D9FF",
    },
@@ -22,7 +22,7 @@ const styles = sxStyles({
    progress: {
       width: "100%",
       alignItems: "center",
-      justifyContent: "space-evenly",
+      justifyContent: { xs: "space-evenly", md: "flex-end" },
       mt: { xs: 4, md: "unset" },
    },
    singleProgress: {
@@ -143,7 +143,7 @@ const SparksProgressIndicator = () => {
                Upload a new Spark
             </CreateSparkButton>
          </Stack>
-         <Stack spacing={4} direction={"row"} sx={styles.progress}>
+         <Stack spacing={8} direction={"row"} sx={styles.progress}>
             {creatorsToValidate.map((creatorWithSparks, index) => (
                <ProgressIndicator
                   key={index}
