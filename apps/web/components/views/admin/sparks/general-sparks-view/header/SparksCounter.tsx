@@ -20,7 +20,7 @@ const styles = sxStyles({
    },
    progressBar: {
       width: "100%",
-      height: 10,
+      height: 5,
       borderRadius: 5,
       bgcolor: "grey.300",
       [`& .${linearProgressClasses.bar}`]: {
@@ -56,7 +56,7 @@ const SparksCounter: FC<Props> = ({
          }
          sx={styles.tooltip}
       >
-         <Box>
+         <Box alignSelf={"center"}>
             <Typography variant={"body1"} sx={styles.progressCount}>
                {publicSparks.length}/{SPARK_CONSTANTS.MAX_PUBLIC_SPARKS} Spark
                slots
