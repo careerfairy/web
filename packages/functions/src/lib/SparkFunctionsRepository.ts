@@ -34,12 +34,6 @@ import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
-type UserFeedMetrics = {
-   userId: string
-   lastUpdated: Timestamp
-   numberOfSparks: number
-}
-
 export interface ISparkFunctionsRepository {
    /**
     *  Get a spark
@@ -193,7 +187,7 @@ export interface ISparkFunctionsRepository {
     * Get all user sparks feed metrics
     *
     */
-   getAllUserSparksFeedMetrics(): Promise<UserFeedMetrics[]>
+   getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]>
 
    /**
     * Remove all spark notifications related to a specific group
@@ -205,10 +199,7 @@ export interface ISparkFunctionsRepository {
     * Remove specific spark notifications from a single user
     *
     */
-   removeAndSyncUserSparkNotification(
-      userId: string,
-      groupId: string
-   ): Promise<void>
+   removeUserSparkNotification(userId: string, groupId: string): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -637,17 +628,17 @@ export class SparkFunctionsRepository
       return snapshot.docs.map((doc) => doc.data())
    }
 
-   async getAllUserSparksFeedMetrics(): Promise<UserFeedMetrics[]> {
+   async getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]> {
       const snapshot = await this.firestore
          .collection("sparksFeedMetrics")
-         .withConverter(createGenericConverter<UserFeedMetrics>())
+         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
    }
 
    async removeSparkNotification(groupId: string): Promise<void> {
-      const batch = this.firestore.batch()
+      const bulkWriter = this.firestore.bulkWriter()
 
       const snapShot = await this.firestore
          .collectionGroup("sparksNotifications")
@@ -655,13 +646,13 @@ export class SparkFunctionsRepository
          .get()
 
       snapShot.docs.map((doc) => {
-         batch.delete(doc.ref)
+         bulkWriter.delete(doc.ref)
       })
 
-      return void batch.commit()
+      return void bulkWriter.close()
    }
 
-   async removeAndSyncUserSparkNotification(
+   async removeUserSparkNotification(
       userId: string,
       groupId: string
    ): Promise<void> {

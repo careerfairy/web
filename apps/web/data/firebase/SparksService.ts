@@ -200,6 +200,11 @@ export class SparksService {
       )({ sparkId })
    }
 
+   /**
+    * To remove and sync a specific spark notification related to a group from the user SparksNotification subCollection
+    *
+    * @param data - has the groupId and userId
+    */
    async removeAndSyncUserSparkNotification(
       data: RemoveNotificationFromUserData
    ) {
