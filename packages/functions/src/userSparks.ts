@@ -12,8 +12,9 @@ import {
    SparkEvent,
    SparkEventActions,
    SparkClientEventsPayload,
-   SparkSecondsWatchedClientPayload,
+   SparkSecondsWatchedClient,
    SparkSecondsWatched,
+   SparkEventClient,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { getCountryCode } from "./util"
 
@@ -126,11 +127,12 @@ export const trackSparkEvent = functions.region(config.region).https.onCall(
       dataValidation(sparkEventClientSchema),
       async (data: SparkClientEventsPayload, context) => {
          try {
-            const sparkEvents: SparkEvent[] =
-               mapClientPayloadToServerPayload<SparkEvent>(
-                  data.sparkEvents,
+            const sparkEvents = data.sparkEvents.map((sparkEvent) =>
+               mapClientPayloadToServerPayload<SparkEventClient, SparkEvent>(
+                  sparkEvent,
                   context
                )
+            )
 
             return sparkRepo.trackSparkEvents(sparkEvents)
          } catch (error) {
@@ -144,20 +146,16 @@ export const trackSparkEvent = functions.region(config.region).https.onCall(
    )
 )
 
-const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload> =
+const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClient> =
    object().shape({
-      sparkSecondsWatched: array().of(
-         object().shape({
-            sparkId: string().required(),
-            userId: string().nullable(),
-            visitorId: string().required(),
-            sparkPosition: number().required(),
-            sparkLength: number().required(),
-            sessionId: string().required(),
-            universityCountry: string().nullable(),
-            stringTimestamp: string().required(),
-         })
-      ),
+      sparkId: string().required(),
+      userId: string().nullable(),
+      visitorId: string().required(),
+      sparkPosition: number().required(),
+      sparkLength: number().required(),
+      sessionId: string().required(),
+      universityCountry: string().nullable(),
+      stringTimestamp: string().required(),
    })
 
 export const trackSparkSecondsWatched = functions
@@ -165,13 +163,12 @@ export const trackSparkSecondsWatched = functions
    .https.onCall(
       middlewares(
          dataValidation(sparkSecondsWatchedClientSchema),
-         async (data: SparkSecondsWatchedClientPayload, context) => {
+         async (data: SparkSecondsWatchedClient, context) => {
             try {
-               const sparkSecondsWatched =
-                  mapClientPayloadToServerPayload<SparkSecondsWatched>(
-                     data.sparkSecondsWatched,
-                     context
-                  )
+               const sparkSecondsWatched = mapClientPayloadToServerPayload<
+                  SparkSecondsWatchedClient,
+                  SparkSecondsWatched
+               >(data, context)
 
                return sparkRepo.trackSparkSecondsWatched(sparkSecondsWatched)
             } catch (error) {
@@ -200,35 +197,30 @@ const getValidEventTimestamp = (stringTimestamp: string): Date => {
 
 /**
  * Maps client payload to server payload by adding the userId, timestamp, and countryCode fields from the server's callable context.
- * @param {Array} clientPayload - The client payload.
- * @param {CallableContext} context - The callable context.
+ * @param clientPayload - The client payload.
+ * @param context - The callable context.
  * @returns  The server payload.
  */
 const mapClientPayloadToServerPayload = <
+   TClientPayload extends {
+      stringTimestamp: string
+   },
    TServerPayload extends Omit<TClientPayload, "stringTimestamp"> & {
       timestamp: Date
       userId: string
       countryCode: string
-   },
-   TClientPayload extends {
-      stringTimestamp: string
-   } = {
-      stringTimestamp: string
    }
 >(
-   clientPayload: TClientPayload[],
+   { stringTimestamp, ...rest }: TClientPayload,
    context: functions.https.CallableContext
-): TServerPayload[] => {
+): TServerPayload => {
    const countryCode = getCountryCode(context)
    const userId = context.auth?.uid ?? null
 
-   return clientPayload.map(({ stringTimestamp, ...rest }) => {
-      const timestamp = getValidEventTimestamp(stringTimestamp)
-      return {
-         ...rest,
-         userId,
-         timestamp,
-         countryCode,
-      } as TServerPayload
-   })
+   return {
+      ...rest,
+      userId,
+      countryCode,
+      timestamp: getValidEventTimestamp(stringTimestamp),
+   } as TServerPayload
 }
