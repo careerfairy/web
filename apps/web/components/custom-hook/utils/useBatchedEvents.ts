@@ -7,13 +7,13 @@ type InUseStorageKeys = "unsentSparkEvents" | "unsentSparkSecondsWatched"
  * Also, it stores unsent events in local storage and sends them when the page is reloaded.
  *
  * @param sendBatchedEvents - A function that sends the batched events.
- * @param batchSize - The size of the batch.
- * @param batchInterval - The interval at which to send the events.
+ * @param batchSize - The maximum number of events to send in a batch, once this number is reached, the events are sent.
+ * @param batchInterval - The interval at which to send the events if there are any.
  * @param localStorageKey - The key to use for storing unsent events in local storage.
  * @returns A function to add an event to the batch.
  */
 const useBatchedEvents = <TEvent>(
-   sendBatchedEvents: (events: TEvent[]) => Promise<void>,
+   sendBatchedEvents: (events: TEvent[]) => Promise<unknown>,
    batchSize: number,
    batchInterval: number,
    localStorageKey: InUseStorageKeys

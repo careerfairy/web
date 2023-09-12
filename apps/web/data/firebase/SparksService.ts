@@ -14,7 +14,7 @@ import {
 import {
    SparkClientEventsPayload,
    SparkEventClient,
-   SparkSecondsWatchedClient,
+   SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import {
@@ -92,7 +92,7 @@ export class SparksService {
     * @param data - The data to send to the cloud function.
     */
    async trackSparkEvents(data: SparkEventClient[]) {
-      return void httpsCallable<SparkClientEventsPayload, void>(
+      return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
          "trackSparkEvent"
       )({
@@ -105,11 +105,13 @@ export class SparksService {
     * @param data - The data containing the sparkId and the number of seconds watched.
     */
 
-   async trackSparkSecondsWatched(data: SparkSecondsWatchedClient[]) {
-      return void httpsCallable<SparkSecondsWatchedClient, void>(
+   async trackSparkSecondsWatched(data: SparkSecondWatchedClient[]) {
+      return httpsCallable<SparkSecondsWatchedClientPayload, void>(
          this.functions,
          "trackSparkSecondsWatched"
-      )(data)
+      )({
+         sparkSecondsWatched: data,
+      })
    }
 
    /**

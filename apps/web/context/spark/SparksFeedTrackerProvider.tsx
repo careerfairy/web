@@ -1,20 +1,12 @@
 import {
    SparkEventActionType,
    SparkEventClient,
-   SparkSecondsWatchedClient,
+   SparkSecondWatchedClient,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { useAuth } from "HOCs/AuthProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { useRouter } from "next/router"
-import {
-   FC,
-   createContext,
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useRef,
-} from "react"
+import { FC, createContext, useCallback, useContext, useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
    currentSparkIdSelector,
@@ -57,7 +49,19 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
    const sessionId = useSelector(sessionIdSelector)
    const currentSparkId = useSelector(currentSparkIdSelector)
 
-   const eventsBatch = useRef<SparkEventClient[]>([])
+   const addEventToBatch = useBatchedEvents<SparkEventClient>(
+      (data) => sparkService.trackSparkEvents(data),
+      BATCH_SIZE,
+      BATCH_INTERVAL,
+      "unsentSparkEvents"
+   )
+
+   const addSecondsWatchedToBatch = useBatchedEvents<SparkSecondWatchedClient>(
+      (data) => sparkService.trackSparkSecondsWatched(data),
+      BATCH_SIZE,
+      BATCH_INTERVAL,
+      "unsentSparkSecondsWatched"
+   )
 
    const trackEvent = useCallback(
       (event: SparkEventActionType) => {
@@ -91,12 +95,7 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
             stringTimestamp: new Date().toISOString(),
          }
 
-         eventsBatch.current.push(options) //
-
-         // If batch size limit is reached, send events
-         if (eventsBatch.current.length >= BATCH_SIZE) {
-            sendBatchedEvents()
-         }
+         addEventToBatch(options)
       },
       [
          currentSparkId,
@@ -105,12 +104,15 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
          originalSparkId,
          userData?.universityCountryCode,
          sessionId,
+         addEventToBatch,
       ]
    )
 
    const trackSecondsWatched = useCallback(
       (event: OnProgressProps) => {
-         const data: SparkSecondsWatchedClient = {
+         if (!currentSparkId) return
+
+         const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
             sessionId,
             sparkLength: event.loadedSeconds,
@@ -120,9 +122,10 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
             userId: userData?.id || null,
             visitorId,
          }
-         sparkService.trackSparkSecondsWatched(data)
+         addSecondsWatchedToBatch(secondWatched)
       },
       [
+         addSecondsWatchedToBatch,
          currentSparkId,
          sessionId,
          userData?.id,
@@ -130,65 +133,6 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
          visitorId,
       ]
    )
-
-   const sendBatchedEvents = () => {
-      // Send batched events to server
-      sparkService.trackSparkEvents(eventsBatch.current).catch(console.error)
-      eventsBatch.current = [] // Clear the batch
-   }
-
-   const addEventToBatch = useBatchedEvents(
-      sparkService.trackSparkEvents,
-      BATCH_SIZE,
-      BATCH_INTERVAL,
-      "unsentSparkEvents"
-   )
-
-   const addSecondsWatchedToBatch = useBatchedEvents(
-      sparkService.trackSparkSecondsWatched,
-      BATCH_SIZE,
-      BATCH_INTERVAL,
-      "unsentSparkSecondsWatched"
-   )
-
-   useEffect(() => {
-      // Send batched events at regular intervals
-      const intervalId = setInterval(() => {
-         if (eventsBatch.current.length > 0) {
-            sendBatchedEvents()
-         }
-      }, BATCH_INTERVAL)
-
-      // Clean up interval on unmount
-      return () => clearInterval(intervalId)
-   }, [])
-
-   useEffect(() => {
-      // Define the function
-      const handleBeforeUnload = () => {
-         if (eventsBatch.current.length > 0) {
-            localStorage.setItem(
-               "unsentSparkEvents",
-               JSON.stringify(eventsBatch.current)
-            )
-         }
-      }
-
-      window.addEventListener("beforeunload", handleBeforeUnload)
-
-      // On load, check if there are any unsent events in localStorage
-      const unsentSparkEvents = JSON.parse(
-         localStorage.getItem("unsentSparkEvents")
-      )
-      if (unsentSparkEvents) {
-         eventsBatch.current = unsentSparkEvents
-         sendBatchedEvents() // Send unsent events
-         localStorage.removeItem("unsentSparkEvents") // Clear unsent events from localStorage
-      }
-
-      return () =>
-         window.removeEventListener("beforeunload", handleBeforeUnload)
-   }, [])
 
    const value = useMemo(
       () => ({ trackEvent, trackSecondsWatched }),
