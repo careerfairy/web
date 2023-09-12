@@ -43,3 +43,12 @@ export const eventDetailsDialogVisibilitySelector = (state: RootState) =>
 
 export const userEmailSelector = (state: RootState) =>
    state.sparksFeed.userEmail
+
+export const sessionIdSelector = (state: RootState) =>
+   state.sparksFeed.sessionId
+
+export const currentSparkIdSelector = (state: RootState) => {
+   const sparks = state.sparksFeed.sparks
+   const index = state.sparksFeed.currentPlayingIndex
+   return sparks[index]?.id || null
+}

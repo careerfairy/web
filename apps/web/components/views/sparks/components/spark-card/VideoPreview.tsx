@@ -72,6 +72,7 @@ type Props = {
    thumbnailUrl: string
    playing?: boolean
    pausing?: boolean
+   onProgress?: (progress: OnProgressProps) => void
 }
 
 const VideoPreview: FC<Props> = ({
@@ -79,6 +80,7 @@ const VideoPreview: FC<Props> = ({
    thumbnailUrl,
    playing: shouldPLay,
    pausing: shouldPause,
+   onProgress,
 }) => {
    const [progress, setProgress] = useState(0)
    const [browserAutoplayError, setBrowserAutoplayError] = useState(false)
@@ -100,9 +102,13 @@ const VideoPreview: FC<Props> = ({
       }
    }, [handleReset, shouldPLay])
 
-   const handleProgress = useCallback((progress: OnProgressProps) => {
-      setProgress(progress.played * 100)
-   }, [])
+   const handleProgress = useCallback(
+      (progress: OnProgressProps) => {
+         setProgress(progress.played * 100)
+         onProgress?.(progress)
+      },
+      [onProgress]
+   )
 
    const handleError: BaseReactPlayerProps["onError"] = () => {
       setBrowserAutoplayError(true)
@@ -139,7 +145,7 @@ const VideoPreview: FC<Props> = ({
                onProgress={handleProgress}
                onPlay={onPlay}
                onError={handleError}
-               progressInterval={500}
+               progressInterval={1000}
                url={videoUrl}
                light={!playing && <ThumbnailOverlay src={thumbnailUrl} />}
                playIcon={<Fragment />}

@@ -2,6 +2,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
+import { v4 as uuidv4 } from "uuid"
 import { type RootState } from "store"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
@@ -23,6 +24,11 @@ interface SparksState {
    currentEventNotification: UserSparksNotification | null
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
+   /**
+    * A sessionId is a unique identifier generated each time a user views a specific spark.
+    * When the user scrolls to a new spark, a new sessionId is generated.
+    */
+   sessionId: string | null
 }
 
 const initialState: SparksState = {
@@ -40,6 +46,7 @@ const initialState: SparksState = {
    sparkCategoryIds: [],
    currentEventNotification: null,
    showEventDetailsDialog: false,
+   sessionId: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -77,6 +84,13 @@ const sparksFeedSlice = createSlice({
    reducers: {
       setSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
          state.sparks = action.payload
+         state.currentPlayingIndex = 0
+
+         // also generate a sessionId for the first spark
+         if (action.payload.length > 0) {
+            const sparkId = action.payload[state.currentPlayingIndex].id
+            state.sessionId = generatSessionId(sparkId)
+         }
       },
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
@@ -94,6 +108,10 @@ const sparksFeedSlice = createSlice({
          const newIndex = action.payload
          if (newIndex >= 0 && newIndex < state.sparks.length) {
             state.currentPlayingIndex = newIndex
+
+            const sparkId = state.sparks[newIndex].id
+
+            state.sessionId = generatSessionId(sparkId)
          }
       },
       setCurrentEventNotification: (
@@ -124,6 +142,7 @@ const sparksFeedSlice = createSlice({
          state.currentEventNotification = null
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
+         state.sessionId = null
       },
    },
    extraReducers: (builder) => {
@@ -203,6 +222,11 @@ const getSparkOptions = (state: RootState) => {
       sparkCategoryIds: sparkCategoryIds,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
+}
+
+const generatSessionId = (sparkId: string) => {
+   const timestamp = new Date().toISOString()
+   return `spark-${sparkId}-${timestamp}-${uuidv4()}`
 }
 
 export const {

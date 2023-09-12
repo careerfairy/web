@@ -10,7 +10,7 @@ import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { Fragment, useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
@@ -36,6 +36,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import SparksFeedEventTrackerProvider from "context/spark/SparksFeedEventTrackerProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -155,7 +156,9 @@ const SparksPage: NextPage<
    }, [sparkForSeo?.id])
 
    return (
-      <Fragment>
+      <SparksFeedEventTrackerProvider
+         originalSparkId={serializedSpark?.id || null}
+      >
          <GenericDashboardLayout
             hideDrawer={isFullScreen}
             topBarFixed
@@ -166,7 +169,7 @@ const SparksPage: NextPage<
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />
-      </Fragment>
+      </SparksFeedEventTrackerProvider>
    )
 }
 
