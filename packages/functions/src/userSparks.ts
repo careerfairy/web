@@ -12,9 +12,10 @@ import {
    SparkEvent,
    SparkEventActions,
    SparkClientEventsPayload,
-   SparkSecondsWatchedClient,
-   SparkSecondsWatched,
+   SparkSecondWatchedClient,
+   SparkSecondWatched,
    SparkEventClient,
+   SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { getCountryCode } from "./util"
 
@@ -146,16 +147,20 @@ export const trackSparkEvent = functions.region(config.region).https.onCall(
    )
 )
 
-const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClient> =
+const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload> =
    object().shape({
-      sparkId: string().required(),
-      userId: string().nullable(),
-      visitorId: string().required(),
-      sparkPosition: number().required(),
-      sparkLength: number().required(),
-      sessionId: string().required(),
-      universityCountry: string().nullable(),
-      stringTimestamp: string().required(),
+      sparkSecondsWatched: array().of(
+         object().shape({
+            sparkId: string().required(),
+            userId: string().nullable(),
+            visitorId: string().required(),
+            sparkPosition: number().required(),
+            sparkLength: number().required(),
+            sessionId: string().required(),
+            universityCountry: string().nullable(),
+            stringTimestamp: string().required(),
+         })
+      ),
    })
 
 export const trackSparkSecondsWatched = functions
@@ -163,12 +168,15 @@ export const trackSparkSecondsWatched = functions
    .https.onCall(
       middlewares(
          dataValidation(sparkSecondsWatchedClientSchema),
-         async (data: SparkSecondsWatchedClient, context) => {
+         async (data: SparkSecondsWatchedClientPayload, context) => {
             try {
-               const sparkSecondsWatched = mapClientPayloadToServerPayload<
-                  SparkSecondsWatchedClient,
-                  SparkSecondsWatched
-               >(data, context)
+               const sparkSecondsWatched = data.sparkSecondsWatched.map(
+                  (sparkEvent) =>
+                     mapClientPayloadToServerPayload<
+                        SparkSecondWatchedClient,
+                        SparkSecondWatched
+                     >(sparkEvent, context)
+               )
 
                return sparkRepo.trackSparkSecondsWatched(sparkSecondsWatched)
             } catch (error) {

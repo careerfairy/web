@@ -58,7 +58,7 @@ export type SparkClientEventsPayload = {
  * Type representing the data that the client sends to the callable function for SparkSecondsWatched.
  * It includes all the fields except `userId`, `timestamp`, and `countryCode`.
  */
-export type SparkSecondsWatchedClient = {
+export type SparkSecondWatchedClient = {
    /** Unique identifier for the Spark */
    sparkId: string
    /** User AuthUID, null if not logged in */
@@ -85,14 +85,18 @@ export type SparkSecondsWatchedClient = {
  * It includes all fields from `SparkSecondsWatchedClient` plus `userId`, `timestamp`, and `countryCode` which are added by the cloud function.
  * The `stringTimestamp` field from `SparkSecondsWatchedClient` is omitted because it's replaced by the `timestamp` field, which is a Date object.
  */
-export type SparkSecondsWatched = Omit<
-   SparkSecondsWatchedClient,
+export type SparkSecondWatched = Omit<
+   SparkSecondWatchedClient,
    "stringTimestamp"
 > & {
    /** Timestamp of the event */
    timestamp: Date
    /** ISO Alpha-2 Country code of the user at the time of the event */
    countryCode: string | null
+}
+
+export type SparkSecondsWatchedClientPayload = {
+   sparkSecondsWatched: SparkSecondWatchedClient[]
 }
 
 export const SparkEventActions = {

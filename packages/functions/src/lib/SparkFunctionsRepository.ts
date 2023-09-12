@@ -37,7 +37,7 @@ import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import BigQueryHandler from "./bigQuery/BigQueryHandler"
 import {
    SparkEvent,
-   SparkSecondsWatched,
+   SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
 
 export interface ISparkFunctionsRepository {
@@ -225,7 +225,7 @@ export interface ISparkFunctionsRepository {
     * @param event The spark seconds watched to save
     * @returns void
     */
-   trackSparkSecondsWatched(event: SparkSecondsWatched): Promise<void>
+   trackSparkSecondsWatched(event: SparkSecondWatched[]): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -238,7 +238,7 @@ export class SparkFunctionsRepository
       readonly logger: FunctionsLogger,
       readonly feedReplisher: SparksFeedReplenisher,
       readonly sparkEventHandler: BigQueryHandler<SparkEvent>,
-      readonly sparkSecondsWatchedHandler: BigQueryHandler<SparkSecondsWatched>
+      readonly sparkSecondsWatchedHandler: BigQueryHandler<SparkSecondWatched>
    ) {
       super()
    }
@@ -710,8 +710,8 @@ export class SparkFunctionsRepository
       return this.sparkEventHandler.insertData(events)
    }
 
-   async trackSparkSecondsWatched(event: SparkSecondsWatched): Promise<void> {
-      return this.sparkSecondsWatchedHandler.insertData([event])
+   async trackSparkSecondsWatched(event: SparkSecondWatched[]): Promise<void> {
+      return this.sparkSecondsWatchedHandler.insertData(event)
    }
 }
 
