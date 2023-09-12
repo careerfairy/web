@@ -92,7 +92,7 @@ export class SparksService {
     * @param data - The data to send to the cloud function.
     */
    async trackSparkEvents(data: SparkEventClient[]) {
-      return httpsCallable<SparkClientEventsPayload, void>(
+      return void httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
          "trackSparkEvent"
       )({
@@ -105,8 +105,8 @@ export class SparksService {
     * @param data - The data containing the sparkId and the number of seconds watched.
     */
 
-   async trackSparkSecondsWatched(data: SparkSecondsWatchedClient) {
-      return httpsCallable<SparkSecondsWatchedClient, void>(
+   async trackSparkSecondsWatched(data: SparkSecondsWatchedClient[]) {
+      return void httpsCallable<SparkSecondsWatchedClient, void>(
          this.functions,
          "trackSparkSecondsWatched"
       )(data)

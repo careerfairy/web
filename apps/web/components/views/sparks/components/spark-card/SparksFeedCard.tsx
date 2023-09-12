@@ -13,6 +13,7 @@ import VideoPreview from "./VideoPreview"
 import SparksEventNotification from "./SparksEventNotification"
 import { useSelector } from "react-redux"
 import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeedSelectors"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 
 const styles = sxStyles({
    root: {
@@ -84,6 +85,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       eventDetailsDialogVisibilitySelector
    )
 
+   const { trackSecondsWatched } = useSparksFeedTracker()
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
@@ -93,6 +95,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
                pausing={eventDetailsDialogVisibility}
+               onProgress={trackSecondsWatched}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>
