@@ -17,7 +17,7 @@ import GetInspiredButton from "../../components/GetInspiredButton"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
-import SparksProgressIndicator from "./SparksProgressIndicator"
+import SparksCounter from "./SparksCounter"
 
 const styles = sxStyles({
    mobileRoot: {
@@ -79,7 +79,7 @@ const HeaderActions = () => {
          <Stack spacing={5.5}>
             <Box>
                <Stack sx={styles.mobileRoot} spacing={1}>
-                  <CreateSparkButton>Create a new Spark</CreateSparkButton>
+                  <CreateSparkButton>Upload a new Spark</CreateSparkButton>
                   <DividerWithText maxWidth={"50%"}>Or</DividerWithText>
                   <Stack
                      sx={styles.getInspiredBtnWrapper}
@@ -101,9 +101,10 @@ const HeaderActions = () => {
                      sx={styles.mobileProgressIndicator}
                      bgcolor={isCriticalState ? "#FFE8E8" : "#F0EDFD"}
                   >
-                     <SparksProgressIndicator
+                     <SparksCounter
                         isCriticalState={isCriticalState}
                         publicSparks={publicSparks}
+                        maxPublicSparks={maxPublicSparks}
                      />
                   </Stack>
                ) : null}
@@ -119,9 +120,10 @@ const HeaderActions = () => {
    return (
       <Stack spacing={2} direction="row" justifyContent="space-between">
          {group.publicSparks ? (
-            <SparksProgressIndicator
+            <SparksCounter
                isCriticalState={isCriticalState}
                publicSparks={publicSparks}
+               maxPublicSparks={maxPublicSparks}
             />
          ) : (
             <Box component="span">
