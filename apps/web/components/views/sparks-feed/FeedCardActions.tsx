@@ -20,7 +20,7 @@ import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialo
 import { useSelector } from "react-redux"
 import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
-import { useSparksFeedEventTracker } from "context/spark/SparksFeedEventTrackerProvider"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 
 const actionWidth = 52
 
@@ -176,7 +176,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const isMobile = useIsMobile()
    const { userData } = useAuth()
 
-   const { trackEvent } = useSparksFeedEventTracker()
+   const { trackEvent } = useSparksFeedTracker()
 
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
