@@ -21,6 +21,8 @@ import { useSelector } from "react-redux"
 import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import Link from "../common/Link"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 
 const actionWidth = 52
 
@@ -90,19 +92,16 @@ type Props = {
 const FeedCardActions: FC<Props> = ({ spark }) => {
    return (
       <Stack spacing={3} sx={styles.root}>
-         <Action
-            sparkId={spark.id}
-            icon={<LikesIcon />}
-            onClick={() => {}}
-            label="Like"
-         />
+         <LikeAction sparkId={spark.id} />
          <ShareAction sparkId={spark.id} />
-         <Action
-            sparkId={spark.id}
-            icon={<GlobeIcon />}
-            onClick={() => {}}
-            label="Career Page"
-         />
+         {spark.group.publicProfile ? (
+            <CareerPageAction
+               sparkId={spark.id}
+               href={`company/${companyNameSlugify(
+                  spark.group.universityName
+               )}`}
+            />
+         ) : null}
          <FilterAction sparkId={spark.id} />
       </Stack>
    )
@@ -110,7 +109,8 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
 
 type ActionProps = {
    icon: React.ReactNode
-   onClick: () => void
+   onClick?: () => void
+   href?: string
    label: string
    sparkId: string
    chipValue?: number
@@ -121,9 +121,9 @@ const Action: FC<ActionProps> = ({
    label,
    sparkId,
    chipValue,
+   href,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
-
    const actionLabel = (
       <Typography
          sx={[styles.actionLabel, isFullScreen && styles.fullScreenActionLabel]}
@@ -149,6 +149,8 @@ const Action: FC<ActionProps> = ({
             color="inherit"
             onClick={onClick}
             size={isFullScreen ? "small" : "medium"}
+            component={href ? Link : "button"}
+            href={href}
          >
             {icon}
 
@@ -160,16 +162,58 @@ const Action: FC<ActionProps> = ({
                color={"primary"}
                label={chipValue}
                size={"small"}
-            ></Chip>
+            />
          ) : null}
          {isFullScreen ? null : actionLabel}
       </Box>
    )
 }
 
+const LikeAction: FC<{
+   sparkId: string
+}> = ({ sparkId }) => {
+   const { trackEvent } = useSparksFeedTracker()
+
+   const handlLike = useCallback(() => {
+      trackEvent(SparkEventActions.Like)
+      // TODO: implement like
+   }, [trackEvent])
+
+   return (
+      <Action
+         sparkId={sparkId}
+         icon={<LikesIcon />}
+         onClick={handlLike}
+         label="Like"
+      />
+   )
+}
+
+const CareerPageAction: FC<{
+   sparkId: string
+   href: string
+}> = ({ sparkId, href }) => {
+   const { trackEvent } = useSparksFeedTracker()
+
+   const handleCareerPageClick = useCallback(() => {
+      trackEvent(SparkEventActions.ClickOnCareerPageCTA)
+   }, [trackEvent])
+
+   return (
+      <Action
+         href={href}
+         sparkId={sparkId}
+         icon={<GlobeIcon />}
+         onClick={handleCareerPageClick}
+         label="Career Page"
+      />
+   )
+}
+
 type ShareActionProps = {
    sparkId: string
 }
+
 const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
       useDialogStateHandler()
