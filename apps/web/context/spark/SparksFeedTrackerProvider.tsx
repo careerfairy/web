@@ -29,12 +29,12 @@ const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
 
 type SparkEventTrackerProviderProps = {
    trackEvent: (event: SparkEventActionType) => void
-   trackSparkSecondsWatched: (event: OnProgressProps) => void
+   trackSecondsWatched: (event: OnProgressProps) => void
 }
 
 const SparkEventTrackerContext = createContext<SparkEventTrackerProviderProps>({
    trackEvent: () => {},
-   trackSparkSecondsWatched: () => {},
+   trackSecondsWatched: () => {},
 })
 
 type Props = {
@@ -44,7 +44,7 @@ type Props = {
    originalSparkId: string
 }
 
-export const SparksFeedEventTrackerProvider: FC<Props> = ({
+export const SparksFeedTrackerProvider: FC<Props> = ({
    children,
    originalSparkId,
 }) => {
@@ -108,7 +108,7 @@ export const SparksFeedEventTrackerProvider: FC<Props> = ({
       ]
    )
 
-   const trackSparkSecondsWatched = useCallback(
+   const trackSecondsWatched = useCallback(
       (event: OnProgressProps) => {
          const data: SparkSecondsWatchedClient = {
             sparkId: currentSparkId,
@@ -177,7 +177,10 @@ export const SparksFeedEventTrackerProvider: FC<Props> = ({
          window.removeEventListener("beforeunload", handleBeforeUnload)
    }, [])
 
-   const value = useMemo(() => ({ trackEvent }), [trackEvent])
+   const value = useMemo(
+      () => ({ trackEvent, trackSecondsWatched }),
+      [trackEvent, trackSecondsWatched]
+   )
 
    return (
       <SparkEventTrackerContext.Provider value={value}>
@@ -186,7 +189,7 @@ export const SparksFeedEventTrackerProvider: FC<Props> = ({
    )
 }
 
-export const useSparksFeedEventTracker = () => {
+export const useSparksFeedTracker = () => {
    const context = useContext(SparkEventTrackerContext)
    if (context === undefined) {
       throw new Error(
@@ -196,4 +199,4 @@ export const useSparksFeedEventTracker = () => {
    return context
 }
 
-export default SparksFeedEventTrackerProvider
+export default SparksFeedTrackerProvider

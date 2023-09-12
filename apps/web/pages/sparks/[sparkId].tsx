@@ -36,7 +36,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import SparksFeedEventTrackerProvider from "context/spark/SparksFeedEventTrackerProvider"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -156,9 +156,7 @@ const SparksPage: NextPage<
    }, [sparkForSeo?.id])
 
    return (
-      <SparksFeedEventTrackerProvider
-         originalSparkId={serializedSpark?.id || null}
-      >
+      <SparksFeedTrackerProvider originalSparkId={serializedSpark?.id || null}>
          <GenericDashboardLayout
             hideDrawer={isFullScreen}
             topBarFixed
@@ -169,7 +167,7 @@ const SparksPage: NextPage<
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />
-      </SparksFeedEventTrackerProvider>
+      </SparksFeedTrackerProvider>
    )
 }
 
