@@ -337,16 +337,17 @@ export class UniversityTimelineService {
     */
    private validateSpreadsheetData(jsonData: any[]) {
       for (let i = 0; i < jsonData.length; i++) {
+         const rowLine = i + 1
          const row = jsonData[i]
          const name = row["University_name"]
          if (!name?.trim()) {
-            throwBatchError(i, "has a non-empty university name")
+            throwBatchError(rowLine, "has a non-empty university name")
          }
 
          const type = row["Period_type"]
          if (!Object.values(UniversityPeriodObject).includes(type)) {
             throwBatchError(
-               i,
+               rowLine,
                `has a type of exactly one of:  ${Object.values(
                   UniversityPeriodObject
                ).join(", ")}`
@@ -360,10 +361,10 @@ export class UniversityTimelineService {
          const endTime = end.getTime()
 
          if (isNaN(startTime) || isNaN(endTime)) {
-            throwBatchError(i, "has valid start and end dates")
+            throwBatchError(rowLine, "has valid start and end dates")
          }
          if (startTime > endTime) {
-            throwBatchError(i, "starts before it ends")
+            throwBatchError(rowLine, "starts before it ends")
          }
       }
    }
