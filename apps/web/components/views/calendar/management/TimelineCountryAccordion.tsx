@@ -10,7 +10,12 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useMemo, useState } from "react"
+import React, {
+   ChangeEventHandler,
+   useCallback,
+   useMemo,
+   useState,
+} from "react"
 import { sxStyles } from "types/commonTypes"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import { Search as FindIcon } from "react-feather"
@@ -25,7 +30,6 @@ import UniversityIcon from "@mui/icons-material/AccountBalanceOutlined"
 import EditUniversityDialog from "./EditUniversityDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { StyledTextField } from "components/views/group/admin/common/inputs"
-import { useSnackbar } from "notistack"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
@@ -126,7 +130,7 @@ const TimelineCountryAccordion = ({ countryCode, academicYear }: Props) => {
       [searchInputValue, universities]
    )
 
-   const handleBatchUpload = useCallback(
+   const handleBatchUpload: ChangeEventHandler<HTMLInputElement> = useCallback(
       (event) => {
          timelineService.handleAddBatchPeriods(
             event,
