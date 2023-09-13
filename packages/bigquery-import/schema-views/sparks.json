@@ -1,0 +1,164 @@
+{
+   "fields": [
+      {
+         "name": "group",
+         "type": "map",
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "description",
+               "type": "string"
+            },
+            {
+               "name": "logoUrl",
+               "type": "string"
+            },
+            {
+               "name": "extraInfo",
+               "type": "string"
+            },
+            {
+               "name": "universityName",
+               "type": "string"
+            },
+            {
+               "name": "universityCode",
+               "type": "string"
+            },
+            {
+               "name": "publicSparks",
+               "type": "boolean"
+            }
+         ]
+      },
+      {
+         "name": "creator",
+         "type": "map",
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "groupId",
+               "type": "string"
+            },
+            {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "position",
+               "type": "string"
+            },
+            {
+               "name": "avatarUrl",
+               "type": "string"
+            },
+            {
+               "name": "roles",
+               "type": "stringified_map"
+            },
+            {
+               "name": "story",
+               "type": "string"
+            }
+         ]
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "updatedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "publishedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "addedToFeedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "published",
+         "type": "boolean"
+      },
+      {
+         "name": "category",
+         "type": "map",
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ]
+      },
+      {
+         "name": "question",
+         "type": "string"
+      },
+      {
+         "name": "video",
+         "type": "map",
+         "fields": [
+            {
+               "name": "uid",
+               "type": "string"
+            },
+            {
+               "name": "fileExtension",
+               "type": "string"
+            },
+            {
+               "name": "url",
+               "type": "string"
+            },
+            {
+               "name": "thumbnailUrl",
+               "type": "string"
+            }
+         ]
+      },
+      {
+         "name": "impressions",
+         "type": "number"
+      },
+      {
+         "name": "uniquePlays",
+         "type": "number"
+      },
+      {
+         "name": "plays",
+         "type": "number"
+      },
+      {
+         "name": "totalWatchedMinutes",
+         "type": "number"
+      },
+      {
+         "name": "likes",
+         "type": "number"
+      },
+      {
+         "name": "shareCTA",
+         "type": "number"
+      },
+      {
+         "name": "numberOfCareerPageClicks",
+         "type": "number"
+      }
+   ]
+}
