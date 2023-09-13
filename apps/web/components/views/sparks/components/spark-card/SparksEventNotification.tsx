@@ -80,8 +80,8 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
          eventNotification
             ? Math.floor(
                  DateUtil.getDifferenceInDays(
-                    eventNotification.startDate,
-                    new Date()
+                    new Date(),
+                    eventNotification.startDate
                  )
               )
             : 0,

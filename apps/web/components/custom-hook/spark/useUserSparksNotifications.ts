@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { fromSerializedDate } from "@careerfairy/shared-lib/BaseModel"
+import { toDate } from "@careerfairy/shared-lib/firebaseTypes"
 
 const useUserSparksNotifications = (userId: string) => {
    const sparkNotificationsQuery = useMemo(() => {
@@ -27,9 +27,9 @@ const useUserSparksNotifications = (userId: string) => {
       }
    )
 
-   const sparksNotifications = data?.map((notifications) => ({
-      ...notifications,
-      startDate: fromSerializedDate(notifications.startDate),
+   const sparksNotifications = data?.map((notification) => ({
+      ...notification,
+      startDate: toDate(notification.startDate),
    }))
 
    return { data: sparksNotifications }
