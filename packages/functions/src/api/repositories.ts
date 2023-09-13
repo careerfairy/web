@@ -39,7 +39,7 @@ import bigQueryClient from "./bigQueryClient"
 import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
-} from "../lib/bigQuery/BigQueryHandler"
+} from "../lib/bigQuery/IBigQueryService"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)

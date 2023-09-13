@@ -154,7 +154,7 @@ const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload
             sparkId: string().required(),
             userId: string().nullable(),
             visitorId: string().required(),
-            sparkPosition: number().required(),
+            videoEventPositionInSeconds: number().required(),
             sparkLength: number().required(),
             sessionId: string().required(),
             universityCountry: string().nullable(),
