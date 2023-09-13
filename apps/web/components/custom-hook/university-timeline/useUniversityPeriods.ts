@@ -15,6 +15,11 @@ import {
    UniversityPeriodType,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 
+import useSWR from "swr"
+import { UniversityTimelineInstance } from "data/firebase/UniversityTimelineService"
+import { useCallback } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
+
 /**
  * Custom hook to get all periods for a timeline university from the database
  **/
@@ -49,19 +54,30 @@ export const useUniversityPeriodsByIdsAndStart = (
    universityIds: string[],
    start: Date
 ) => {
-   const periodQuery = query(
-      collectionGroup(FirestoreInstance, "periods"),
-      where(
-         "timelineUniversityId",
-         "in",
-         universityIds?.length ? universityIds : ["filler"]
-      ),
-      where("end", ">=", start)
+   const fetcher = useCallback(
+      () =>
+         UniversityTimelineInstance.getUniversityPeriodsByIdsAndStart(
+            universityIds,
+            start
+         ),
+      [universityIds, start]
    )
-   return useFirestoreCollection<UniversityPeriod>(periodQuery, {
-      idField: "id",
-      suspense: false,
-   })
+
+   return useSWR(
+      universityIds && start ? [universityIds, start] : null,
+      fetcher,
+      {
+         onError: (err) => {
+            errorLogAndNotify(err, {
+               message: "Error fetching university periods by ids and start",
+               details: {
+                  universityIds,
+                  start,
+               },
+            })
+         },
+      }
+   )
 }
 
 /**
