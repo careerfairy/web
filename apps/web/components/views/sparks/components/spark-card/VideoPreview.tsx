@@ -4,9 +4,7 @@ import Box from "@mui/material/Box"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
-import useReactPlayerSecondWatcher, {
-   OnSecondPass,
-} from "components/custom-hook/utils/useReactPlayerSecondWatcher"
+import useReactPlayerSecondWatcher from "components/custom-hook/utils/useReactPlayerSecondWatcher"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -74,7 +72,7 @@ type Props = {
    videoUrl: string
    thumbnailUrl: string
    playing?: boolean
-   onSecondPassed?: OnSecondPass
+   onSecondPassed?: (secondsPassed: number) => void
    pausing?: boolean
 }
 
