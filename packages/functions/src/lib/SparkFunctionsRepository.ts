@@ -645,7 +645,7 @@ export class SparkFunctionsRepository
          .where("groupId", "==", groupId)
          .get()
 
-      snapShot.docs.map((doc) => {
+      snapShot.docs.forEach((doc) => {
          bulkWriter.delete(doc.ref)
       })
 
