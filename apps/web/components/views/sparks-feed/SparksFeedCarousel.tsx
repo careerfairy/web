@@ -148,6 +148,11 @@ const SparksFeedCarousel: FC = () => {
       [eventDetailsDialogVisibility]
    )
 
+   const currentSpark = useMemo(
+      () => sparks?.[currentPlayingIndex],
+      [currentPlayingIndex, sparks]
+   )
+
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
 
    /**
@@ -241,6 +246,7 @@ const SparksFeedCarousel: FC = () => {
                page={"details"}
                serverUserEmail={userEmail}
                mode={"stand-alone"}
+               currentSparkId={currentSpark?.id}
             />
          ) : null}
       </Box>
