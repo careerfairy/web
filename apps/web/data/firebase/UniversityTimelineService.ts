@@ -4,6 +4,7 @@ import {
    collectionGroup,
    deleteDoc,
    doc,
+   DocumentReference,
    Firestore,
    getDocs,
    query,
@@ -203,27 +204,27 @@ export class UniversityTimelineService {
       const reader = new FileReader()
 
       reader.onload = async (e) => {
+         const newlyCreatedUniversityRefs: DocumentReference[] = []
+         const data = new Uint8Array(e.target?.result as ArrayBuffer)
+         const workbook = read(data, { type: "array" })
+         const firstSheetName = workbook.SheetNames[0]
+         const worksheet = workbook.Sheets[firstSheetName]
+
+         const jsonData = utils.sheet_to_json(worksheet, {
+            raw: false,
+            defval: null,
+         })
+
+         // get initial universities
+         const timelineUniversitiesRef = collection(
+            this.firestore,
+            "timelineUniversities"
+         )
+         const timelineUniversitiesQuery = query(
+            timelineUniversitiesRef,
+            where("countryCode", "==", countryCode)
+         )
          try {
-            const data = new Uint8Array(e.target?.result as ArrayBuffer)
-            const workbook = read(data, { type: "array" })
-            const firstSheetName = workbook.SheetNames[0]
-            const worksheet = workbook.Sheets[firstSheetName]
-
-            const jsonData = utils.sheet_to_json(worksheet, {
-               raw: false,
-               defval: null,
-            })
-
-            // get initial universities
-            const timelineUniversitiesRef = collection(
-               this.firestore,
-               "timelineUniversities"
-            )
-            const timelineUniversitiesQuery = query(
-               timelineUniversitiesRef,
-               where("countryCode", "==", countryCode)
-            )
-
             const initialUniversitiesSnapshot = await getDocs(
                timelineUniversitiesQuery
             )
@@ -247,15 +248,22 @@ export class UniversityTimelineService {
                validUniversityNames
             ).filter((uniName) => !initialUniversityNames.includes(uniName))
 
-            newUniversityNames.forEach((universityName) =>
-               universitiesBatch.set(doc(timelineUniversitiesRef), {
+            newUniversityNames.forEach((universityName) => {
+               const universityDocRef = doc(timelineUniversitiesRef)
+               newlyCreatedUniversityRefs.push(universityDocRef)
+
+               return universitiesBatch.set(universityDocRef, {
                   name: universityName,
                   countryCode: countryCode,
                })
-            )
+            })
 
             await universitiesBatch.commit()
+         } catch (e) {
+            errorNotification(e, e)
+         }
 
+         try {
             const periodsBatch = writeBatch(this.firestore)
 
             // get updated universites
@@ -322,7 +330,15 @@ export class UniversityTimelineService {
             await periodsBatch.commit()
             successNotification("Batch upload successful")
          } catch (e) {
+            // if there is an error, delete all the universities that were just added
             errorNotification(e, e)
+            const universitiesBatch = writeBatch(this.firestore)
+
+            newlyCreatedUniversityRefs.forEach((uniRef) =>
+               universitiesBatch.delete(uniRef)
+            )
+
+            universitiesBatch.commit()
          }
       }
 
