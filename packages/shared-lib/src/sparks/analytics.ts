@@ -98,12 +98,17 @@ export type SparkSecondsWatchedClientPayload = {
 }
 
 export const SparkEventActions = {
-   Share: "Share",
+   Share_WhatsApp: "Share_WhatsApp",
+   Share_LinkedIn: "Share_LinkedIn",
+   Share_Facebook: "Share_Facebook",
+   Share_X: "Share_X",
+   Share_Clipboard: "Share_Clipboard",
+   Share_Mobile: "Share_Mobile",
    Like: "Like",
    Impression: "Impression",
-   ClickOnCareerPageCTA: "Click on career page CTA",
-   SparkCompletelyWatched: "Spark completely watched",
-   PlayedSpark: "Played spark",
+   Click_CareerPageCTA: "Click_CareerPageCTA",
+   Watched_CompleteSpark: "Watched_CompleteSpark",
+   Played_Spark: "Played_Spark",
 } as const
 
 export type SparkEventActionType =
