@@ -3,12 +3,9 @@ import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
 import { Stack } from "@mui/material"
-import Box from "@mui/material/Box"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
@@ -84,16 +81,14 @@ type Props = {
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
-    
+
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
-             {
-                 eventNotification ? (
-                    <SparksEventNotification spark={spark} />
-                ) : null
-             }
-             <VideoPreview
+            {eventNotification ? (
+               <SparksEventNotification spark={spark} />
+            ) : null}
+            <VideoPreview
                thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
