@@ -15,6 +15,7 @@ import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {
+      zIndex: 10,
       position: "absolute",
       display: "flex",
       flexDirection: "column",

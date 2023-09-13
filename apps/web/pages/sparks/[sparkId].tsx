@@ -94,7 +94,7 @@ const SparksPage: NextPage<
 
       const currentSpark = sparks[currentPlayingIndex]
       const currentNotification = eventNotifications?.find(
-         (notification) => notification.groupId === currentSpark.group.id
+         (notification) => notification.groupId === currentSpark?.group.id
       )
 
       if (currentNotification) {

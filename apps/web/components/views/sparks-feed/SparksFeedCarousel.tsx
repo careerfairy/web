@@ -26,7 +26,7 @@ import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardN
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
-import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
+import LivestreamDialog from "../livestream-dialog/LivestreamDialog"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
