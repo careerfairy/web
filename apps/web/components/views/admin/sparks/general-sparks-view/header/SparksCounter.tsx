@@ -9,7 +9,6 @@ import {
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const styles = sxStyles({
    tooltip: {
@@ -58,8 +57,7 @@ const SparksCounter: FC<Props> = ({
       >
          <Box alignSelf={"center"}>
             <Typography variant={"body1"} sx={styles.progressCount}>
-               {publicSparks.length}/{SPARK_CONSTANTS.MAX_PUBLIC_SPARKS} Spark
-               slots
+               {publicSparks.length}/{maxPublicSparks} Spark slots
             </Typography>
 
             <LinearProgress
