@@ -4,6 +4,9 @@ import Box from "@mui/material/Box"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
+import useReactPlayerSecondWatcher, {
+   OnSecondPass,
+} from "components/custom-hook/utils/useReactPlayerSecondWatcher"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -71,21 +74,25 @@ type Props = {
    videoUrl: string
    thumbnailUrl: string
    playing?: boolean
+   onSecondPassed?: OnSecondPass
    pausing?: boolean
-   onProgress?: (progress: OnProgressProps) => void
 }
 
 const VideoPreview: FC<Props> = ({
    videoUrl,
    thumbnailUrl,
    playing: shouldPLay,
+   onSecondPassed,
    pausing: shouldPause,
-   onProgress,
 }) => {
    const [progress, setProgress] = useState(0)
    const [browserAutoplayError, setBrowserAutoplayError] = useState(false)
    const [playing, setPlaying] = useState(shouldPLay)
    const [waitingToPlay, setWaitingToPlay] = useState(true)
+
+   const { onProgress } = useReactPlayerSecondWatcher((secondsPassed) => {
+      onSecondPassed?.(secondsPassed)
+   })
 
    const handleReset = useCallback(() => {
       setProgress(0)
@@ -105,7 +112,7 @@ const VideoPreview: FC<Props> = ({
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
          setProgress(progress.played * 100)
-         onProgress?.(progress)
+         onProgress(progress)
       },
       [onProgress]
    )
@@ -145,7 +152,7 @@ const VideoPreview: FC<Props> = ({
                onProgress={handleProgress}
                onPlay={onPlay}
                onError={handleError}
-               progressInterval={1000}
+               progressInterval={250}
                url={videoUrl}
                light={!playing && <ThumbnailOverlay src={thumbnailUrl} />}
                playIcon={<Fragment />}

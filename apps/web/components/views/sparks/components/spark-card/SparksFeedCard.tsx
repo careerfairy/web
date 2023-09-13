@@ -107,8 +107,8 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
+               onSecondPassed={trackSecondsWatched}
                pausing={eventDetailsDialogVisibility}
-               onProgress={trackSecondsWatched}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>
