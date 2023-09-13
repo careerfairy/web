@@ -71,12 +71,14 @@ type Props = {
    videoUrl: string
    thumbnailUrl: string
    playing?: boolean
+   pausing?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
    videoUrl,
    thumbnailUrl,
    playing: shouldPLay,
+   pausing: shouldPause,
 }) => {
    const [progress, setProgress] = useState(0)
    const [browserAutoplayError, setBrowserAutoplayError] = useState(false)
@@ -128,7 +130,7 @@ const VideoPreview: FC<Props> = ({
          ) : null}
          <Box sx={[styles.playerWrapper]}>
             <ReactPlayer
-               playing={playing}
+               playing={Boolean(playing && !shouldPause)}
                playsinline={playing}
                loop={playing}
                width="100%"
