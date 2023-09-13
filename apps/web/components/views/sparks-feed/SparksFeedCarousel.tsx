@@ -189,7 +189,7 @@ const SparksFeedCarousel: FC = () => {
                         : () => handlClickSlide(index)
                   }
                   fullScreen={isFullScreen}
-                  key={spark.id}
+                  key={spark.id + index}
                >
                   <FeedCardSlide
                      playing={index === currentPlayingIndex}

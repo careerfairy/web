@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore"
 import { fromSerializedDate } from "../BaseModel"
 import { Spark, SparkCategory, SparkVideo } from "./sparks"
+import { imageKitLoader } from "../utils/video"
 
 interface SparkPresenterInterface
    extends Omit<
@@ -74,6 +75,22 @@ export class SparkPresenter implements SparkPresenterInterface {
     */
    getCreatorDisplayName(): string {
       return `${this.creator.firstName} ${this.creator.lastName}`
+   }
+
+   /**
+    * Gets the video URL with the appropriate transformations. 16:9 aspect ratio, 640x360, 50% quality.
+    */
+   getTransformedVideoUrl(): string {
+      return imageKitLoader({
+         src: this.video.url,
+         aspectRatio: {
+            width: 16,
+            height: 9,
+         },
+         width: 640,
+         height: 360,
+         quality: 40,
+      })
    }
 
    /**
