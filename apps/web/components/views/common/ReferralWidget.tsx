@@ -16,7 +16,7 @@ interface WidgetButtonProps extends StackProps {
    iconStyle?: SystemStyleObject<DefaultTheme>
    socials: SocialIconProps[]
    roundedIcons?: boolean
-   onSocialClick?: () => void
+   onSocialClick?: (type: SocialIconProps["type"]) => void
 }
 
 const styles = sxStyles({
@@ -86,13 +86,13 @@ export const ReferralWidget = ({
          {socials.map((icon) =>
             roundedIcons ? (
                <SocialButtonWithText
-                  onSocialClick={onSocialClick}
+                  onSocialClick={() => onSocialClick(icon.type)}
                   key={icon.name}
                   {...icon}
                />
             ) : (
                <IconButtonComponent
-                  onSocialClick={onSocialClick}
+                  onSocialClick={() => onSocialClick(icon.type)}
                   key={icon.name}
                   iconsColor={iconsColor}
                   iconStyle={iconStyle}

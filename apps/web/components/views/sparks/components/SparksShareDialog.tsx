@@ -15,6 +15,7 @@ import { copyStringToClipboard } from "components/helperFunctions/HelperFunction
 import ReferralWidget from "components/views/common/ReferralWidget"
 import useSocials, {
    SocialPlatformObject,
+   SocialPlatformType,
 } from "components/custom-hook/useSocials"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import {
@@ -89,7 +90,7 @@ type Props = {
    isOpen: boolean
    handleClose: () => void
    shareUrl: string
-   onShareOptionClick: () => void
+   onShareOptionClick: (type: SocialPlatformType) => void
 }
 
 const datalayerEntityName = "sparks"
@@ -122,7 +123,7 @@ const SparksShareDialog: FC<Props> = ({
    })
 
    const copySparkLinkToClipboard = useCallback(() => {
-      onShareOptionClick()
+      onShareOptionClick(SocialPlatformObject.Copy)
       setIsCopied(true)
       const sourceLink = shareUrl + "&utm_source=CareerFairy"
       copyStringToClipboard(sourceLink)
