@@ -1,11 +1,11 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
 import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import { FC, useCallback } from "react"
+import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
@@ -14,6 +14,8 @@ import SparksEventNotification from "./SparksEventNotification"
 import { useSelector } from "react-redux"
 import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 
 const styles = sxStyles({
    root: {
@@ -85,7 +87,18 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       eventDetailsDialogVisibilitySelector
    )
 
-   const { trackSecondsWatched } = useSparksFeedTracker()
+   const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
+
+   const companyPageLink = spark.group.publicProfile
+      ? `/company/${companyNameSlugify(spark.group.universityName)}`
+      : undefined
+
+   const onSparkDetailsClick = useCallback(() => {
+      if (companyPageLink) {
+         trackEvent(SparkEventActions.ClickOnCompanyPageCTA)
+      }
+   }, [companyPageLink, trackEvent])
+
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
@@ -106,8 +119,10 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                            spark.group.logoUrl,
                            "md"
                         )}
+                        onClick={onSparkDetailsClick}
                         displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                         companyName={spark.group.universityName}
+                        linkToCompanyPage={companyPageLink}
                      />
                      <Box mt={2.5} />
                      <SparkCategoryChip categoryId={spark.category.id} />

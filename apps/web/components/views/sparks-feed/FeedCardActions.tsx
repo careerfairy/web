@@ -94,14 +94,13 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
       <Stack spacing={3} sx={styles.root}>
          <LikeAction sparkId={spark.id} />
          <ShareAction sparkId={spark.id} />
-         {spark.group.publicProfile ? (
+         {/* TODO: Wait for alvaro's PR: https://github.com/careerfairy/web/pull/733/files#diff-9d6816a691e80fd0d0d9fa9a7c0d3e833a01200c0807fb9b5b86ceb7f822a352 with this new field */}
+         {/* {spark.group.careerPageUrl ? (
             <CareerPageAction
                sparkId={spark.id}
-               href={`company/${companyNameSlugify(
-                  spark.group.universityName
-               )}`}
+               href={spark.group.careerPageUrl}
             />
-         ) : null}
+         ) : null} */}
          <FilterAction sparkId={spark.id} />
       </Stack>
    )
@@ -176,7 +175,7 @@ const LikeAction: FC<{
 
    const handlLike = useCallback(() => {
       trackEvent(SparkEventActions.Like)
-      // TODO: implement like
+      // TODO: implement like functionality
    }, [trackEvent])
 
    return (

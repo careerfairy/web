@@ -5,6 +5,7 @@ import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import RoundedLogo from "components/views/common/RoundedLogo"
+import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    root: {
@@ -37,15 +38,24 @@ type Props = {
    displayName: string
    companyName: string
    companyLogoUrl: string
+   linkToCompanyPage?: string
+   onClick?: () => void
 }
 
 const SparkDetails: FC<Props> = ({
    companyName,
    displayName,
    companyLogoUrl,
+   linkToCompanyPage,
+   onClick,
 }) => {
    return (
-      <Box sx={styles.root}>
+      <Box
+         component={linkToCompanyPage ? Link : undefined}
+         href={linkToCompanyPage}
+         sx={styles.root}
+         onClick={onClick}
+      >
          <RoundedLogo
             src={companyLogoUrl}
             alt={companyName}
