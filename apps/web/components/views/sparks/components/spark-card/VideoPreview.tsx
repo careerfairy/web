@@ -22,7 +22,15 @@ const styles = sxStyles({
    },
    withAspectRatio: {
       // Portrait aspect ratio, e.g., 9:16
-      paddingTop: "177.77%", // (16 / 9) * 100%
+   },
+   containThumbnail: {
+      "& .player": {
+         "& .react-player__preview": {
+            backgroundSize: "contain !important",
+            backgroundRepeat: "no-repeat !important",
+            backgroundPosition: "center !important",
+         },
+      },
    },
 })
 
@@ -30,12 +38,23 @@ type Props = {
    videoUrl: string
    thumbnailUrl: string
    playing?: boolean
+   containThumbnail?: boolean
 }
 
-const VideoPreview: FC<Props> = ({ videoUrl, thumbnailUrl, playing }) => {
+const VideoPreview: FC<Props> = ({
+   videoUrl,
+   thumbnailUrl,
+   playing,
+   containThumbnail,
+}) => {
    return (
       <Box sx={styles.root}>
-         <Box sx={[styles.playerWrapper, playing && styles.withAspectRatio]}>
+         <Box
+            sx={[
+               styles.playerWrapper,
+               containThumbnail && styles.containThumbnail,
+            ]}
+         >
             <ReactPlayer
                playing={playing}
                playsinline={playing}

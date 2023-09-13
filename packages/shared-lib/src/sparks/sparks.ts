@@ -245,6 +245,10 @@ export type GetFeedData = {
     * The number of sparks to fetch (default: 10)
     */
    numberOfSparks?: number
+   /**
+    * The categories for which to filter the sparks
+    */
+   sparkCategoryIds?: SparkCategory["id"][]
 } & (
    | {
         /**
