@@ -8,7 +8,7 @@ import {
    removeCurrentEventNotifications,
    showEventDetailsDialog,
 } from "../../../../../store/reducers/sparksFeedReducer"
-import { Avatar, Box, Button, Typography } from "@mui/material"
+import { Avatar, Box, Button, Slide, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { companyLogoPlaceholder } from "../../../../../constants/images"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -97,51 +97,54 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    }, [dispatch])
 
    return (
-      <Box sx={styles.root}>
-         <Box sx={styles.notification}>
-            <Avatar
-               variant="square"
-               sx={styles.avatar}
-               alt={`test logo`}
-               src={getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder}
-            />
-            <Box sx={styles.message}>
-               <Typography
-                  color={"text.primary"}
-                  variant={isMobile ? "body1" : "body2"}
-               >
+      <Slide direction={"down"} in={Boolean(eventNotification)}>
+         <Box sx={styles.root}>
+            <Box sx={styles.notification}>
+               <Avatar
+                  variant="square"
+                  sx={styles.avatar}
+                  alt={`test logo`}
+                  src={getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder}
+               />
+               <Box sx={styles.message}>
                   <Typography
-                     fontSize={"inherit"}
-                     color={"primary"}
-                     display={"inline"}
+                     color={"text.primary"}
+                     variant={isMobile ? "body1" : "body2"}
                   >
-                     {universityName}{" "}
+                     <Typography
+                        fontSize={"inherit"}
+                        color={"primary"}
+                        display={"inline"}
+                     >
+                        {universityName}{" "}
+                     </Typography>
+                     has a live stream happening in {missingDays} days! Check
+                     now!
                   </Typography>
-                  has a live stream happening in {missingDays} days! Check now!
-               </Typography>
+               </Box>
+            </Box>
+            <Box sx={styles.actions}>
+               <Button
+                  sx={[styles.btn, styles.cancelBtn]}
+                  onClick={cancelHandleClick}
+                  variant="outlined"
+                  size="small"
+                  color="grey"
+               >
+                  Maybe later
+               </Button>
+               <Button
+                  sx={styles.btn}
+                  onClick={discoverHandleClick}
+                  variant="contained"
+                  size="small"
+                  color="primary"
+               >
+                  Discover now
+               </Button>
             </Box>
          </Box>
-         <Box sx={styles.actions}>
-            <Button
-               sx={[styles.btn, styles.cancelBtn]}
-               onClick={cancelHandleClick}
-               variant="outlined"
-               size="small"
-               color="grey"
-            >
-               Maybe later
-            </Button>
-            <Button
-               sx={styles.btn}
-               onClick={discoverHandleClick}
-               variant="contained"
-               size="small"
-               color="primary"
-            >
-               Discover now
-            </Button>
-         </Box>
-      </Box>
+      </Slide>
    )
 }
 
