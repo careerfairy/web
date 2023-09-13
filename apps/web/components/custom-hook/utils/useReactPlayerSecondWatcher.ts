@@ -7,8 +7,6 @@ type UseReactPlaySecondWatcher = {
    secondsWatched: number
 }
 
-export type OnSecondPass = (secondsWatched: number) => void
-
 /**
  * Custom hook that tracks the number of seconds watched in a ReactPlayer component.
  *
@@ -25,7 +23,7 @@ export type OnSecondPass = (secondsWatched: number) => void
  * <ReactPlayer url={videoUrl} onProgress={onProgress} />
  */
 const useReactPlayerSecondWatcher = (
-   onSecondPass: OnSecondPass
+   onSecondPass: (secondsWatched: number) => void
 ): UseReactPlaySecondWatcher => {
    const [secondsWatched, setSecondsWatched] = useState(0)
    const prevSecondsWatched = usePrevious(secondsWatched)
