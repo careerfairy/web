@@ -21,7 +21,7 @@ const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
 
 type SparkEventTrackerProviderProps = {
    trackEvent: (event: SparkEventActionType) => void
-   trackSecondsWatched: (event: OnProgressProps) => void
+   trackSecondsWatched: (secondsWatched: number) => void
 }
 
 const SparkEventTrackerContext = createContext<SparkEventTrackerProviderProps>({
