@@ -16,8 +16,8 @@ import CreateSparkButton from "../../components/CreateSparkButton"
 import GetInspiredButton from "../../components/GetInspiredButton"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import SparksCounter from "./SparksCounter"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const styles = sxStyles({
    mobileRoot: {
@@ -59,15 +59,14 @@ const styles = sxStyles({
 const HeaderActions = () => {
    const isMobile = useIsMobile()
    const { group } = useGroup()
-   const { data: sparks } = useGroupSparks(group.groupId)
+   const { data: publicSparks } = useGroupSparks(group.groupId, {
+      isPublished: true,
+      limit: GroupPresenter.createFromDocument(group).getMaxPublicSparks(),
+   })
 
-   const publicSparks = useMemo(
-      () => sparks.filter((spark) => spark.published),
-      [sparks]
-   )
    const maxPublicSparks = useMemo(
-      () => group?.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS,
-      [group?.maxPublicSparks]
+      () => GroupPresenter.createFromDocument(group).getMaxPublicSparks(),
+      [group]
    )
    const isCriticalState = useMemo(
       () => publicSparks.length >= maxPublicSparks - 2,
