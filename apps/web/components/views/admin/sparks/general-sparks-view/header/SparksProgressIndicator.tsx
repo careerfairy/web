@@ -6,6 +6,7 @@ import CreateSparkButton from "../../components/CreateSparkButton"
 import React, { FC, useMemo } from "react"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const styles = sxStyles({
    root: {
@@ -62,12 +63,15 @@ type CreatorWithSparksNumber = {
 
 const SparksProgressIndicator = () => {
    const { group } = useGroup()
-   const { data: sparks } = useGroupSparks(group.groupId)
+   const { data: publicSparks } = useGroupSparks(group.groupId, {
+      isPublished: true,
+      limit: GroupPresenter.createFromDocument(group).getMaxPublicSparks(),
+   })
 
    const creatorsToValidate = useMemo(() => {
       // to get the number of public sparks per creator
-      const creatorsWithSparks = sparks.reduce((acc, spark) => {
-         if (spark.published) {
+      const creatorsWithSparks = publicSparks.reduce<CreatorWithSparksNumber[]>(
+         (acc, spark) => {
             const existingCreatorIndex = acc.findIndex(
                ({ creatorId }) => creatorId === spark.creator.id
             )
@@ -83,10 +87,11 @@ const SparksProgressIndicator = () => {
                   numberOfSparks: 1,
                })
             }
-         }
 
-         return acc
-      }, [] as CreatorWithSparksNumber[])
+            return acc
+         },
+         []
+      )
 
       const sortedCreatorsWithSparks = creatorsWithSparks.sort(
          (a, b) => b.numberOfSparks - a.numberOfSparks
@@ -123,7 +128,7 @@ const SparksProgressIndicator = () => {
                progress,
             }
          })
-   }, [sparks])
+   }, [publicSparks])
 
    return (
       <Box sx={styles.root}>
