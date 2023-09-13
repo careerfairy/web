@@ -29,6 +29,7 @@ const csp = {
       "*.amazonaws.com",
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
+      "https://ik.imagekit.io",
    ],
    "script-src": [
       "'self'",
