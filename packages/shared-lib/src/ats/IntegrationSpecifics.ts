@@ -37,6 +37,7 @@ class WorkableIntegration extends DefaultIntegration {
  * account slug => integration specifics
  */
 const map: Record<string, IntegrationSpecifics> = {
+   smartrecruiters: new WorkableIntegration(),
    greenhouse: new GreenhouseIntegration(),
    workable: new WorkableIntegration(),
    default: new DefaultIntegration(),
