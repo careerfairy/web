@@ -35,12 +35,6 @@ import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
-type UserFeedMetrics = {
-   userId: string
-   lastUpdated: Timestamp
-   numberOfSparks: number
-}
-
 export interface ISparkFunctionsRepository {
    /**
     *  Get a spark
@@ -207,7 +201,6 @@ export interface ISparkFunctionsRepository {
     *
     */
    removeUserSparkNotification(userId: string, groupId: string): Promise<void>
-
 
    /**
     * Get all User Spark Notification
