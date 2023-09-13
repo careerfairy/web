@@ -215,17 +215,17 @@ export interface ISparkFunctionsRepository {
 
    /**
     * Save spark events to BigQuery
-    * @param event The spark event to save
+    * @param events The spark events to save
     * @returns void
     */
-   trackSparkEvents(event: SparkEvent[]): Promise<void>
+   trackSparkEvents(events: SparkEvent[]): Promise<void>
 
    /**
     * Save spark seconds watched to BigQuery
-    * @param event The spark seconds watched to save
+    * @param events The spark seconds watched to save
     * @returns void
     */
-   trackSparkSecondsWatched(event: SparkSecondWatched[]): Promise<void>
+   trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -710,8 +710,8 @@ export class SparkFunctionsRepository
       return this.sparkEventHandler.insertData(events)
    }
 
-   async trackSparkSecondsWatched(event: SparkSecondWatched[]): Promise<void> {
-      return this.sparkSecondsWatchedHandler.insertData(event)
+   async trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void> {
+      return this.sparkSecondsWatchedHandler.insertData(events)
    }
 }
 
