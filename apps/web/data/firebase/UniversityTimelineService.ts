@@ -244,6 +244,7 @@ export class UniversityTimelineService {
                }
                return name
             })
+
             const newUniversityNames = removeDuplicates(
                validUniversityNames
             ).filter((uniName) => !initialUniversityNames.includes(uniName))
@@ -252,7 +253,7 @@ export class UniversityTimelineService {
                const universityDocRef = doc(timelineUniversitiesRef)
                newlyCreatedUniversityRefs.push(universityDocRef)
 
-               return universitiesBatch.set(universityDocRef, {
+               universitiesBatch.set(universityDocRef, {
                   name: universityName,
                   countryCode: countryCode,
                })
