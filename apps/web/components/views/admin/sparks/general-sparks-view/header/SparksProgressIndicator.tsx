@@ -6,7 +6,6 @@ import CreateSparkButton from "../../components/CreateSparkButton"
 import React, { FC, useMemo } from "react"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const styles = sxStyles({
    root: {
@@ -62,10 +61,10 @@ type CreatorWithSparksNumber = {
 }
 
 const SparksProgressIndicator = () => {
-   const { group } = useGroup()
-   const { data: publicSparks } = useGroupSparks(group.groupId, {
+   const { groupPresenter } = useGroup()
+   const { data: publicSparks } = useGroupSparks(groupPresenter.id, {
       isPublished: true,
-      limit: GroupPresenter.createFromDocument(group).getMaxPublicSparks(),
+      limit: groupPresenter.getMaxPublicSparks(),
    })
 
    const creatorsToValidate = useMemo(() => {
