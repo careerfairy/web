@@ -12,7 +12,10 @@ import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
 import SparksEventNotification from "./SparksEventNotification"
 import { useSelector } from "react-redux"
-import { currentSparkEventNotificationSelector } from "store/selectors/sparksFeedSelectors"
+import {
+   currentSparkEventNotificationSelector,
+   showEventDetailsDialogSelector,
+} from "store/selectors/sparksFeedSelectors"
 
 const styles = sxStyles({
    root: {
@@ -81,6 +84,9 @@ type Props = {
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
+   const eventDetailsDialogVisibility = useSelector(
+      showEventDetailsDialogSelector
+   )
 
    return (
       <>
@@ -92,6 +98,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
+               pausing={eventDetailsDialogVisibility}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>
