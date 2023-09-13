@@ -11,11 +11,11 @@ import sparkSecondsWatched from "./schema-views/sparkSecondsWatched.json"
 /**
  * Class to handle BigQuery operations.
  */
-class BigQueryHandler<TRow> {
-   private bigQueryClient: BigQuery
-   private datasetId: string
-   private tableId: string
-   private tableOptions: TableMetadata
+class BigQueryServiceCore<TRow> {
+   protected bigQueryClient: BigQuery
+   protected datasetId: string
+   protected tableId: string
+   protected tableOptions: TableMetadata
 
    /**
     * Create a new BigQueryHandler.
@@ -62,28 +62,32 @@ class BigQueryHandler<TRow> {
     * @returns {Promise<void>}
     */
    public async insertData(rows: TRow[]): Promise<void> {
-      try {
-         await this.handleInsert(rows)
-      } catch (error) {
-         // Create the table on the fly if it doesn't exist except in production, we don't want to create tables on the fly in production
-         if (error.code === 404 && !isProductionEnvironment()) {
-            console.log("Table does not exist. Attempting to create table...")
-            await this.createTable()
-            console.log(
-               "Table created successfully. Note: Data insertion will not be retried in this call." +
-                  "Please make another call to insert data." +
-                  "It may take up to 30 seconds for the table to be ready for data insertion even though the table has been created."
-            )
-         } else {
-            throw error
-         }
+      await this.handleInsert(rows).catch(this.createTableOnError)
+   }
+
+   /**
+    * Handle error when inserting data into the table.
+    * If the table does not exist and the environment is not production, create a new one.
+    * @param {any} error - The error object.
+    */
+   protected async createTableOnError(error: any) {
+      if (error.code === 404 && !isProductionEnvironment()) {
+         console.log("Table does not exist. Attempting to create table...")
+         await this.createTable()
+         console.log(
+            "Table created successfully. Note: Data insertion will not be retried in this call." +
+               "Please make another call to insert data." +
+               "It may take up to 30 seconds for the table to be ready for data insertion even though the table has been created."
+         )
+      } else {
+         throw error
       }
    }
 }
 
 // Singleton instances of BigQueryHandler
 
-export const sparkEventsHandler = new BigQueryHandler<SparkEvent>(
+export const sparkEventsHandler = new BigQueryServiceCore<SparkEvent>(
    bigQueryClient,
    "SparkAnalytics",
    "SparkEvents",
@@ -94,7 +98,7 @@ export const sparkEventsHandler = new BigQueryHandler<SparkEvent>(
 )
 
 export const sparkSecondsWatchedHanlder =
-   new BigQueryHandler<SparkSecondWatched>(
+   new BigQueryServiceCore<SparkSecondWatched>(
       bigQueryClient,
       "SparkAnalytics",
       "SparkSecondsWatched",
@@ -104,4 +108,4 @@ export const sparkSecondsWatchedHanlder =
       }
    )
 
-export default BigQueryHandler
+export default BigQueryServiceCore

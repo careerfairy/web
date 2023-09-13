@@ -66,9 +66,7 @@ export type SparkSecondWatchedClient = {
    /** Visitor ID to help identify unique users in case they are not logged in */
    visitorId: string
    /** Position (in seconds, allowing for fractions up to 2 decimal places) in the spark at the event time */
-   sparkPosition: number
-   /** Total length of the spark in seconds, allowing for fractions up to 2 decimal places */
-   sparkLength: number
+   videoEventPositionInSeconds: number
    /** A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated. */
    sessionId: string
    /** ISO Alpha-2 Country code of the user's university at the time of the event */
