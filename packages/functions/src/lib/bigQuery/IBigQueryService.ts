@@ -7,6 +7,7 @@ import bigQueryClient from "../../api/bigQueryClient"
 import { getBigQueryTablePrefix, isProductionEnvironment } from "../../util"
 import sparkEvents from "./schema-views/sparkEvents.json"
 import sparkSecondsWatched from "./schema-views/sparkSecondsWatched.json"
+import { logger } from "firebase-functions"
 
 /**
  * Class to handle BigQuery operations.
@@ -32,9 +33,7 @@ class BigQueryServiceCore<TRow> {
    ) {
       this.bigQueryClient = bigQueryClient
       this.datasetId = datasetId
-
       this.tableId = `${tableId}${getBigQueryTablePrefix()}`
-
       this.tableOptions = tableOptions
    }
 
@@ -53,7 +52,7 @@ class BigQueryServiceCore<TRow> {
          .dataset(this.datasetId)
          .table(this.tableId)
          .insert(rows)
-      console.log(`Inserted ${rows.length} rows`)
+      logger.log(`Inserted ${rows.length} rows`)
    }
 
    /**
