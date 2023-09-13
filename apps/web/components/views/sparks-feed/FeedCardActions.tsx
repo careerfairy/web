@@ -198,7 +198,7 @@ const CareerPageAction: FC<{
    const { trackEvent } = useSparksFeedTracker()
 
    const handleCareerPageClick = useCallback(() => {
-      trackEvent(SparkEventActions.ClickOnCareerPageCTA)
+      trackEvent(SparkEventActions.Click_CareerPageCTA)
    }, [trackEvent])
 
    return (
@@ -255,6 +255,9 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
                break
             case SocialPlatformObject.X:
                trackEvent(SparkEventActions.Share_X)
+               break
+            default:
+               trackEvent(SparkEventActions.Share_Other)
                break
          }
       },
