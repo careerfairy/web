@@ -22,7 +22,10 @@ import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelec
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import Link from "../common/Link"
-import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import {
+   SocialPlatformObject,
+   SocialPlatformType,
+} from "components/custom-hook/useSocials"
 
 const actionWidth = 52
 
@@ -235,17 +238,38 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
       }
    }, [shareUrl])
 
-   const handleTrackShare = useCallback(() => {
-      trackEvent(SparkEventActions.Share)
-   }, [trackEvent])
+   const handleTrackShare = useCallback(
+      (type: SocialPlatformType) => {
+         switch (type) {
+            case SocialPlatformObject.Copy:
+               trackEvent(SparkEventActions.Share_Clipboard)
+               break
+            case SocialPlatformObject.Facebook:
+               trackEvent(SparkEventActions.Share_Facebook)
+               break
+            case SocialPlatformObject.Linkedin:
+               trackEvent(SparkEventActions.Share_LinkedIn)
+               break
+            case SocialPlatformObject.Whatsapp:
+               trackEvent(SparkEventActions.Share_WhatsApp)
+               break
+            case SocialPlatformObject.X:
+               trackEvent(SparkEventActions.Share_X)
+               break
+         }
+      },
+      [trackEvent]
+   )
 
    const handleShare = useCallback(async () => {
       if (isMobile && navigator?.share) {
-         await navigator.share(shareData).then(() => handleTrackShare())
+         await navigator
+            .share(shareData)
+            .then(() => trackEvent(SparkEventActions.Share_Mobile))
       } else {
          handleOpenShareDialog()
       }
-   }, [handleOpenShareDialog, handleTrackShare, isMobile, shareData])
+   }, [handleOpenShareDialog, isMobile, shareData, trackEvent])
 
    return (
       <>
