@@ -24,6 +24,7 @@ import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { utils, writeFile, read } from "xlsx"
 import { chunkArray, removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import BigBatch from "util/BigBatch"
 
 export class UniversityTimelineService {
    constructor(private readonly firestore: Firestore) {}
@@ -204,7 +205,7 @@ export class UniversityTimelineService {
       const reader = new FileReader()
 
       reader.onload = async (e) => {
-         const newlyCreatedUniversityRefs: DocumentReference[] = []
+         const newlyCreatedDocRefs: DocumentReference[] = []
          const data = new Uint8Array(e.target?.result as ArrayBuffer)
          const workbook = read(data, { type: "array" })
          const firstSheetName = workbook.SheetNames[0]
@@ -225,6 +226,9 @@ export class UniversityTimelineService {
             where("countryCode", "==", countryCode)
          )
          try {
+            // Validate the spreadsheet data before proceeding
+            this.validateSpreadsheetData(jsonData)
+
             const initialUniversitiesSnapshot = await getDocs(
                timelineUniversitiesQuery
             )
@@ -234,15 +238,11 @@ export class UniversityTimelineService {
             )
 
             // Batch all the writes together for efficiency and atomicity
-            const universitiesBatch = writeBatch(this.firestore)
+            const batch = new BigBatch(this.firestore)
 
             // add universities in database when needed
             const validUniversityNames = jsonData.map((row, index) => {
-               const name = row["University_name"]
-               if (!name?.trim()) {
-                  throwBatchError(index, "has a non-empty university name")
-               }
-               return name
+               return row["University_name"]
             })
 
             const newUniversityNames = removeDuplicates(
@@ -251,21 +251,13 @@ export class UniversityTimelineService {
 
             newUniversityNames.forEach((universityName) => {
                const universityDocRef = doc(timelineUniversitiesRef)
-               newlyCreatedUniversityRefs.push(universityDocRef)
+               newlyCreatedDocRefs.push(universityDocRef)
 
-               universitiesBatch.set(universityDocRef, {
+               batch.set(universityDocRef, {
                   name: universityName,
                   countryCode: countryCode,
                })
             })
-
-            await universitiesBatch.commit()
-         } catch (e) {
-            errorNotification(e, e)
-         }
-
-         try {
-            const periodsBatch = writeBatch(this.firestore)
 
             // get updated universites
             const updatedUniversitiesSnapshot = await getDocs(
@@ -280,41 +272,23 @@ export class UniversityTimelineService {
             )
 
             // Get the period data from the file
-            const validPeriodValues = Object.values(UniversityPeriodObject)
-            const periods: Create<UniversityPeriod>[] = jsonData.map(
-               (row, index) => {
-                  const type = row["Period_type"]
-                  if (!validPeriodValues.includes(type)) {
-                     throwBatchError(
-                        index,
-                        `has a type of exactly one of:  ${validPeriodValues.join(
-                           ", "
-                        )}`
-                     )
-                  }
+            const periods: Create<UniversityPeriod>[] = jsonData.map((row) => {
+               const type = row["Period_type"]
 
-                  const start = new Date(row["Period_start"])
-                  const end = new Date(row["Period_end"])
-                  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-                     throwBatchError(index, "has valid start and end dates")
-                  }
-                  if (start >= end) {
-                     throwBatchError(index, "starts before it ends")
-                  }
+               const start = new Date(row["Period_start"])
+               const end = new Date(row["Period_end"])
 
-                  const period = {
-                     timelineUniversityId: updatedUniversities.find(
-                        (university) =>
-                           university.name == row["University_name"]
-                     ).id,
-                     type: type,
-                     start: Timestamp.fromDate(start),
-                     end: Timestamp.fromDate(end),
-                  }
-
-                  return period
+               const period = {
+                  timelineUniversityId: updatedUniversities.find(
+                     (university) => university.name == row["University_name"]
+                  ).id,
+                  type: type,
+                  start: Timestamp.fromDate(start),
+                  end: Timestamp.fromDate(end),
                }
-            )
+
+               return period
+            })
 
             // Add the new periods
             periods.forEach((period) => {
@@ -325,25 +299,74 @@ export class UniversityTimelineService {
                      "periods"
                   )
                )
-               periodsBatch.set(newPeriodRef, period)
+
+               newlyCreatedDocRefs.push(newPeriodRef)
+               batch.set(newPeriodRef, period)
             })
 
-            await periodsBatch.commit()
+            await batch.commit()
             successNotification("Batch upload successful")
          } catch (e) {
+            errorNotification(e, e.message)
             // if there is an error, delete all the universities that were just added
-            errorNotification(e, e)
-            const universitiesBatch = writeBatch(this.firestore)
 
-            newlyCreatedUniversityRefs.forEach((uniRef) =>
-               universitiesBatch.delete(uniRef)
-            )
+            const batch = new BigBatch(this.firestore)
 
-            universitiesBatch.commit()
+            newlyCreatedDocRefs.forEach((docRef) => {
+               batch.delete(docRef)
+            })
+
+            await batch.commit()
+         } finally {
+            event.target.value = null // Reset the input value
          }
       }
 
       reader.readAsArrayBuffer(file)
+   }
+
+   /**
+    * Validates the data from the spreadsheet.
+    *
+    * This method checks each row of the spreadsheet data for validity. It checks if the university name is non-empty,
+    * if the period type is one of the allowed types, and if the start and end dates are valid and in the correct order.
+    * If any row fails these checks, it throws an error using the `throwBatchError` function.
+    *
+    * @param jsonData - The spreadsheet data in JSON format, where each item is a row and the keys are the column names.
+    * @throws Will throw an error if a row fails any of the validation checks.
+    */
+   private validateSpreadsheetData(jsonData: any[]) {
+      for (let i = 0; i < jsonData.length; i++) {
+         const rowLine = i + 1
+         const row = jsonData[i]
+         const name = row["University_name"]
+         if (!name?.trim()) {
+            throwBatchError(rowLine, "has a non-empty university name")
+         }
+
+         const type = row["Period_type"]
+         if (!Object.values(UniversityPeriodObject).includes(type)) {
+            throwBatchError(
+               rowLine,
+               `has a type of exactly one of:  ${Object.values(
+                  UniversityPeriodObject
+               ).join(", ")}`
+            )
+         }
+
+         const start = new Date(row["Period_start"])
+         const end = new Date(row["Period_end"])
+
+         const startTime = start.getTime()
+         const endTime = end.getTime()
+
+         if (isNaN(startTime) || isNaN(endTime)) {
+            throwBatchError(rowLine, "has valid start and end dates")
+         }
+         if (startTime > endTime) {
+            throwBatchError(rowLine, "starts before it ends")
+         }
+      }
    }
 
    /**
