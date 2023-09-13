@@ -10,7 +10,7 @@ import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { useEffect, useMemo } from "react"
+import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    fetchInitialSparksFeed,
@@ -18,6 +18,7 @@ import {
    resetSparksFeed,
    setCurrentEventNotification,
    setGroupId,
+   setOriginalSparkId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
@@ -36,7 +37,6 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -64,7 +64,9 @@ const SparksPage: NextPage<
       dispatch(setGroupId(groupId))
       dispatch(setUserEmail(userEmail))
 
-      dispatch(setSparks([SparkPresenter.deserialize(serializedSpark)]))
+      const originalSpark = SparkPresenter.deserialize(serializedSpark)
+      dispatch(setSparks([originalSpark]))
+      dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
@@ -156,7 +158,7 @@ const SparksPage: NextPage<
    }, [sparkForSeo?.id])
 
    return (
-      <SparksFeedTrackerProvider originalSparkId={serializedSpark?.id || null}>
+      <Fragment>
          <GenericDashboardLayout
             hideDrawer={isFullScreen}
             topBarFixed
@@ -167,7 +169,7 @@ const SparksPage: NextPage<
             <SparksFeedCarousel />
          </GenericDashboardLayout>
          <SparkSeo spark={sparkForSeo} />
-      </SparksFeedTrackerProvider>
+      </Fragment>
    )
 }
 

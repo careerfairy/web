@@ -52,3 +52,6 @@ export const currentSparkIdSelector = (state: RootState) => {
    const index = state.sparksFeed.currentPlayingIndex
    return sparks[index]?.id || null
 }
+
+export const originalSparkIdSelector = (state: RootState) =>
+   state.sparksFeed.originalSparkId

@@ -10,10 +10,10 @@ import { FC, createContext, useCallback, useContext, useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
    currentSparkIdSelector,
+   originalSparkIdSelector,
    sessionIdSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
-import { OnProgressProps } from "react-player/base"
 import useBatchedEvents from "components/custom-hook/utils/useBatchedEvents"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
@@ -29,17 +29,23 @@ const SparkEventTrackerContext = createContext<SparkEventTrackerProviderProps>({
    trackSecondsWatched: () => {},
 })
 
-type Props = {
-   /**
-    * The original spark ID that the user clicked on to get to the Sparks feed
-    */
-   originalSparkId: string
-}
-
-export const SparksFeedTrackerProvider: FC<Props> = ({
-   children,
-   originalSparkId,
-}) => {
+/**
+ * SparksFeedTrackerProvider is a React context provider that handles the tracking of Spark events.
+ * It lives at the root of the application and is responsible for sending batch events.
+ * This provider ensures that events are tracked and sent no matter where you are in the application,
+ * even if you leave the feed. Because it is at the root of the application, the events are always sent.
+ *
+ * @example
+ * ```jsx
+ * <SparksFeedTrackerProvider>
+ *   <App />
+ * </SparksFeedTrackerProvider>
+ * ```
+ *
+ * @component
+ * @category Providers
+ */
+export const SparksFeedTrackerProvider: FC = ({ children }) => {
    const router = useRouter()
 
    const { userData } = useAuth()
@@ -48,6 +54,7 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
 
    const sessionId = useSelector(sessionIdSelector)
    const currentSparkId = useSelector(currentSparkIdSelector)
+   const originalSparkId = useSelector(originalSparkIdSelector)
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
       (data) => sparkService.trackSparkEvents(data),
@@ -109,14 +116,13 @@ export const SparksFeedTrackerProvider: FC<Props> = ({
    )
 
    const trackSecondsWatched = useCallback(
-      (event: OnProgressProps) => {
+      (secondsWatched: number) => {
          if (!currentSparkId) return
 
          const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
             sessionId,
-            sparkLength: event.loadedSeconds,
-            sparkPosition: event.playedSeconds,
+            videoEventPositionInSeconds: secondsWatched,
             universityCountry: userData?.universityCountryCode || null,
             stringTimestamp: new Date().toISOString(),
             userId: userData?.id || null,

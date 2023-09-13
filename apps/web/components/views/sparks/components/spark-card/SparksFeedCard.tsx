@@ -95,7 +95,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
 
    const onSparkDetailsClick = useCallback(() => {
       if (companyPageLink) {
-         trackEvent(SparkEventActions.ClickOnCompanyPageCTA)
+         trackEvent(SparkEventActions.Click_CompanyPageCTA)
       }
    }, [companyPageLink, trackEvent])
 
