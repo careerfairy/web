@@ -20,7 +20,7 @@ const useGroupSparks = (groupId: string, options?: Options) => {
          orderBy("createdAt", "desc"),
          ...(options?.limit ? [limit(options.limit)] : [])
       )
-   }, [groupId, options?.isPublished, options.limit])
+   }, [groupId, options?.isPublished, options?.limit])
 
    return useFirestoreCollection<Spark>(groupSparksQuery, {
       idField: "id",
