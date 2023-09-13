@@ -108,7 +108,7 @@ export const SparkEventActions = {
    /**
     * Fallback for when the share action type is not one of the above.
     */
-   Share: "Share",
+   Share_Other: "Share_Other",
    Like: "Like",
    Impression: "Impression",
    Click_CareerPageCTA: "Click_CareerPageCTA",
