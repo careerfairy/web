@@ -1,6 +1,7 @@
 import {
    addDoc,
    collection,
+   collectionGroup,
    deleteDoc,
    doc,
    Firestore,
@@ -20,7 +21,8 @@ import {
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { utils, writeFile, read } from "xlsx"
-import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { chunkArray, removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 
 export class UniversityTimelineService {
    constructor(private readonly firestore: Firestore) {}
@@ -325,6 +327,45 @@ export class UniversityTimelineService {
       }
 
       reader.readAsArrayBuffer(file)
+   }
+
+   /**
+    * Fetches all periods whose end is after a certain date for a set of timeline universities from the database.
+    *
+    * @param universityIds - The IDs of the universities to fetch periods for.
+    * @param start - The start date. Only periods ending after this date will be fetched.
+    * @returns A promise that resolves to an array of university periods.
+    */
+   async getUniversityPeriodsByIdsAndStart(
+      universityIds: string[],
+      start: Date
+   ) {
+      if (!universityIds?.length) return []
+
+      const chunkSize = 30 // Firestore only allows 30 "in" queries per query
+
+      const periodQueryChunksQueryies = chunkArray(
+         universityIds,
+         chunkSize
+      ).map((periodQueryChunk) =>
+         getDocs(
+            query(
+               collectionGroup(this.firestore, "periods"),
+               where("timelineUniversityId", "in", periodQueryChunk),
+               where("end", ">=", start)
+            ).withConverter(createGenericConverter<UniversityPeriod>())
+         )
+      )
+
+      const periodQueryChunks = await Promise.all(periodQueryChunksQueryies)
+
+      const periods: UniversityPeriod[] = []
+
+      periodQueryChunks.forEach((periodQueryChunk) => {
+         periods.push(...periodQueryChunk.docs.map((doc) => doc.data()))
+      })
+
+      return periods
    }
 }
 
