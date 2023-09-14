@@ -101,7 +101,7 @@ export const markSparkAsSeenByUser = functions
 
 const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
    object().shape({
-      sparkEvents: array().of(
+      events: array().of(
          object().shape({
             sparkId: string().required(),
             originalSparkId: string().nullable(),
@@ -128,7 +128,7 @@ export const trackSparkEvents = functions.region(config.region).https.onCall(
       dataValidation(sparkEventClientSchema),
       async (data: SparkClientEventsPayload, context) => {
          try {
-            const sparkEvents = data.sparkEvents.map((sparkEvent) =>
+            const sparkEvents = data.events.map((sparkEvent) =>
                mapClientPayloadToServerPayload<SparkEventClient, SparkEvent>(
                   sparkEvent,
                   context
@@ -149,10 +149,9 @@ export const trackSparkEvents = functions.region(config.region).https.onCall(
 
 const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload> =
    object().shape({
-      sparkSecondsWatched: array().of(
+      events: array().of(
          object().shape({
             sparkId: string().required(),
-            userId: string().nullable(),
             visitorId: string().required(),
             videoEventPositionInSeconds: number().required(),
             sessionId: string().required(),
@@ -169,12 +168,11 @@ export const trackSparkSecondsWatched = functions
          dataValidation(sparkSecondsWatchedClientSchema),
          async (data: SparkSecondsWatchedClientPayload, context) => {
             try {
-               const sparkSecondsWatched = data.sparkSecondsWatched.map(
-                  (sparkEvent) =>
-                     mapClientPayloadToServerPayload<
-                        SparkSecondWatchedClient,
-                        SparkSecondWatched
-                     >(sparkEvent, context)
+               const sparkSecondsWatched = data.events.map((sparkEvent) =>
+                  mapClientPayloadToServerPayload<
+                     SparkSecondWatchedClient,
+                     SparkSecondWatched
+                  >(sparkEvent, context)
                )
 
                return sparkRepo.trackSparkSecondsWatched(sparkSecondsWatched)
