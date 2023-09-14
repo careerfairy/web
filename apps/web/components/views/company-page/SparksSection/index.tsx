@@ -1,5 +1,5 @@
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { SectionAnchor, useCompanyPage, TabValue } from ".."
 import { useMountedState } from "react-use"
 import { useRouter } from "next/router"
@@ -18,12 +18,15 @@ const SparksSection: FC<Props> = ({ groupId }) => {
    const isMounted = useMountedState()
    const router = useRouter()
 
-   const handleSparksClicked = async (spark: Spark) => {
-      if (spark) {
-         router.push(`/sparks/${spark.id}?groupId=${group.id}`)
-      }
-      return
-   }
+   const handleSparksClicked = useCallback(
+      (spark: Spark) => {
+         if (spark) {
+            router.push(`/sparks/${spark.id}?groupId=${group.id}`)
+         }
+         return
+      },
+      [group, router]
+   )
 
    return isMounted() ? (
       <Box>
