@@ -96,7 +96,7 @@ const SparksPage: NextPage<
    useEffect(() => {
       let timeout: NodeJS.Timeout
 
-      if (eventNotifications.length) {
+      if (eventNotifications?.length) {
          timeout = setTimeout(() => {
             dispatch(
                setCurrentEventNotification(
