@@ -128,7 +128,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             videoEventPositionInSeconds: secondsWatched,
             universityCountry: userData?.universityCountryCode || null,
             stringTimestamp: new Date().toISOString(),
-            userId: userData?.id || null,
             visitorId,
          }
          addSecondsWatchedToBatch(secondWatched)
