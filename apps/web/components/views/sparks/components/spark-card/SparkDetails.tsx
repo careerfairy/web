@@ -11,6 +11,8 @@ const styles = sxStyles({
    root: {
       display: "flex",
       flexDirection: "row",
+      textDecoration: "none",
+      color: "inherit",
    },
    displayName: {
       fontSize: "1.14286rem",

@@ -1,11 +1,6 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { usePrevious } from "react-use"
 import { type OnProgressProps } from "react-player/base"
-
-type UseReactPlaySecondWatcher = {
-   onProgress: (progress: OnProgressProps) => void
-   secondsWatched: number
-}
 
 /**
  * Custom hook that tracks the number of seconds watched in a ReactPlayer component.
@@ -13,19 +8,21 @@ type UseReactPlaySecondWatcher = {
  * @param {function} onSecondPass - Callback function that is called every time a full second has passed.
  * @returns {object} An object containing:
  * - `onProgress`: A function to be passed to the `onProgress` prop of the ReactPlayer component.
- * - `secondsWatched`: The total number of seconds that have been watched.
  *
  * @example
- * const { onProgress, secondsWatched } = useReactPlayerSecondWatcher((secondsWatched) => {
+ * const onProgress = useReactPlayerTracker((secondsWatched) => {
  *   console.log('A full second has passed:', secondsWatched);
  * });
  *
  * <ReactPlayer url={videoUrl} onProgress={onProgress} />
  */
-const useReactPlayerSecondWatcher = (
-   onSecondPass: (secondsWatched: number) => void
-): UseReactPlaySecondWatcher => {
+const useReactPlayerTracker = (
+   shouldPLay: boolean,
+   onSecondPass?: (secondsWatched: number) => void,
+   onVideoEnd?: () => void
+) => {
    const [secondsWatched, setSecondsWatched] = useState(0)
+
    const prevSecondsWatched = usePrevious(secondsWatched)
 
    const onProgress = useCallback((progress: OnProgressProps) => {
@@ -38,9 +35,20 @@ const useReactPlayerSecondWatcher = (
       if (Math.floor(secondsWatched) !== Math.floor(prevSecondsWatched)) {
          onSecondPass(secondsWatched)
       }
-   }, [secondsWatched, prevSecondsWatched, onSecondPass])
 
-   return { onProgress, secondsWatched }
+      // Check if the video has looped
+      if (secondsWatched > 0 && secondsWatched < prevSecondsWatched) {
+         onVideoEnd?.()
+      }
+   }, [secondsWatched, prevSecondsWatched, onSecondPass, onVideoEnd])
+
+   useEffect(() => {
+      if (!shouldPLay) {
+         setSecondsWatched(0)
+      }
+   }, [shouldPLay])
+
+   return onProgress
 }
 
-export default useReactPlayerSecondWatcher
+export default useReactPlayerTracker

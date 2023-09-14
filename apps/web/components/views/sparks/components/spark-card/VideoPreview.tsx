@@ -4,7 +4,7 @@ import Box from "@mui/material/Box"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
-import useReactPlayerSecondWatcher from "components/custom-hook/utils/useReactPlayerSecondWatcher"
+import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
@@ -73,6 +73,8 @@ type Props = {
    thumbnailUrl: string
    playing?: boolean
    onSecondPassed?: (secondsPassed: number) => void
+   onVideoEnded?: () => void
+   onVideoPlay?: () => void
    pausing?: boolean
 }
 
@@ -81,6 +83,8 @@ const VideoPreview: FC<Props> = ({
    thumbnailUrl,
    playing: shouldPLay,
    onSecondPassed,
+   onVideoEnded,
+   onVideoPlay,
    pausing: shouldPause,
 }) => {
    const [progress, setProgress] = useState(0)
@@ -88,24 +92,29 @@ const VideoPreview: FC<Props> = ({
    const [playing, setPlaying] = useState(shouldPLay)
    const [waitingToPlay, setWaitingToPlay] = useState(true)
 
-   const { onProgress } = useReactPlayerSecondWatcher((secondsPassed) => {
-      onSecondPassed?.(secondsPassed)
-   })
+   const onProgress = useReactPlayerTracker(
+      shouldPLay,
+      onSecondPassed,
+      onVideoEnded
+   )
 
    const handleReset = useCallback(() => {
       setProgress(0)
-      setPlaying(false)
+      setPlaying(shouldPLay)
       setWaitingToPlay(true)
-   }, [])
+      setBrowserAutoplayError(false)
+   }, [shouldPLay])
 
    useEffect(() => {
-      if (shouldPLay) {
+      if (shouldPLay && !playing) {
+         onVideoPlay?.()
          setPlaying(true)
       }
       return () => {
          handleReset()
       }
-   }, [handleReset, shouldPLay])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [handleReset, onVideoPlay, shouldPLay])
 
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
@@ -115,7 +124,7 @@ const VideoPreview: FC<Props> = ({
       [onProgress]
    )
 
-   const handleError: BaseReactPlayerProps["onError"] = () => {
+   const handleError: BaseReactPlayerProps["onError"] = (error) => {
       setBrowserAutoplayError(true)
       setPlaying(false)
    }
@@ -136,9 +145,7 @@ const VideoPreview: FC<Props> = ({
          ) : null}
          {/* Sometimes it takes up to a second for the <video/> element to start
           playing a video, once the onPlay is triggered, we know the video has been loaded */}
-         {waitingToPlay ? (
-            <ThumbnailOverlay loading src={thumbnailUrl} />
-         ) : null}
+         {waitingToPlay ? <ThumbnailOverlay src={thumbnailUrl} /> : null}
          <Box sx={[styles.playerWrapper]}>
             <ReactPlayer
                playing={Boolean(playing && !shouldPause)}
@@ -149,6 +156,7 @@ const VideoPreview: FC<Props> = ({
                className="player"
                onProgress={handleProgress}
                onPlay={onPlay}
+               onEnded={() => console.log("video ended")}
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
