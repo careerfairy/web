@@ -123,7 +123,7 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
       ),
    })
 
-export const trackSparkEvent = functions.region(config.region).https.onCall(
+export const trackSparkEvents = functions.region(config.region).https.onCall(
    middlewares(
       dataValidation(sparkEventClientSchema),
       async (data: SparkClientEventsPayload, context) => {

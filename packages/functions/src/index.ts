@@ -233,5 +233,5 @@ exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
-exports.trackSparkEvent = userSparks.trackSparkEvent
+exports.trackSparkEvents = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched = userSparks.trackSparkSecondsWatched
