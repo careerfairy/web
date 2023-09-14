@@ -16,6 +16,8 @@ import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeed
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
+import useLivestream from "../../../../custom-hook/live-stream/useLivestream"
 
 const styles = sxStyles({
    root: {
@@ -63,6 +65,15 @@ const styles = sxStyles({
          sparksFullscreen: 4,
       },
    },
+   eventCardContent: {
+      "&::after": {
+         background:
+            "linear-gradient(180deg, rgba(0, 0, 0, 0) 42.19%, rgba(0, 0, 0, 0.2) 88.02%), radial-gradient(167.78% 167.78% at 95.7% 3.63%, rgba(0, 210, 170, 0.9) 8.85%, rgba(103, 73, 234, 0.9) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, linear-gradient(0deg, #2ABAA5, #2ABAA5), linear-gradient(0deg, rgba(247, 248, 252, 0.2), rgba(247, 248, 252, 0.2))",
+      },
+   },
+   eventCardContentInner: {
+      mt: "unset",
+   },
    cardDetails: {
       cursor: "pointer",
    },
@@ -107,6 +118,11 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       trackEvent(SparkEventActions.Watched_CompleteSpark)
    }, [trackEvent])
 
+   // TODO: logic to get the event needs to be adjusted
+   //  is require to set the currentEventNotification on the redux
+   //  then we can read it here, get the eventId and use this hook to get the event
+   const { data: event } = useLivestream("bU2V8XumSfnrigqkJeFT")
+
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
@@ -120,26 +136,46 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                onVideoPlay={onVideoPlay}
                onVideoEnded={onVideoEnded}
             />
-            <Box sx={styles.cardContent}>
-               <Box sx={styles.contentInner}>
-                  <Stack sx={styles.cardDetails} flexGrow={1}>
-                     <Box mt="auto" />
-                     <SparkDetails
-                        companyLogoUrl={getResizedUrl(
-                           spark.group.logoUrl,
-                           "md"
-                        )}
-                        onClick={onSparkDetailsClick}
-                        displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
-                        companyName={spark.group.universityName}
-                        linkToCompanyPage={companyPageLink}
-                     />
-                     <Box mt={2.5} />
-                     <SparkCategoryChip categoryId={spark.category.id} />
-                     <Box mt={1.5} />
-                     <SparkQuestion question={spark.question} />
-                  </Stack>
-                  {isFullScreen ? <FeedCardActions spark={spark} /> : null}
+            <Box
+                sx={[
+                    styles.cardContent,
+                    ...(event ? [styles.eventCardContent] : []),
+                ]}
+            >
+               <Box
+                   sx={[
+                       styles.contentInner,
+                       ...(event ? [styles.eventCardContentInner] : []),
+                   ]}
+               >
+                   {
+                       event ? (
+                           <SparkEventFullCardNotification event={event} />
+                       ) : (
+                           <Stack sx={styles.cardDetails} flexGrow={1}>
+                               <Box mt="auto" />
+                               <SparkDetails
+                                   companyLogoUrl={getResizedUrl(
+                                       spark.group.logoUrl,
+                                       "md"
+                                   )}
+                                   onClick={onSparkDetailsClick}
+                                   displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
+                                   companyName={spark.group.universityName}
+                                   linkToCompanyPage={companyPageLink}
+                               />
+                               <Box mt={2.5} />
+                               <SparkCategoryChip categoryId={spark.category.id} />
+                               <Box mt={1.5} />
+                               <SparkQuestion question={spark.question} />
+                           </Stack>
+                       )
+                   }
+                   {isFullScreen || event ? null : (
+                       <Box sx={styles.outerActionsWrapper}>
+                           <FeedCardActions spark={spark} />
+                       </Box>
+                   )}
                </Box>
             </Box>
          </Box>
