@@ -35,6 +35,7 @@ import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -51,7 +52,10 @@ const SparksPage: NextPage<
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
-   const { data: eventNotifications } = useUserSparksNotifications(userEmail)
+   const { data: eventNotifications } = useUserSparksNotifications(
+      userEmail,
+      groupId
+   )
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const sparks = useSelector(sparksSelector)
 
@@ -92,14 +96,13 @@ const SparksPage: NextPage<
    useEffect(() => {
       let timeout: NodeJS.Timeout
 
-      const currentSpark = sparks[currentPlayingIndex]
-      const currentNotification = eventNotifications?.find(
-         (notification) => notification.groupId === currentSpark?.group.id
-      )
-
-      if (currentNotification) {
+      if (eventNotifications.length) {
          timeout = setTimeout(() => {
-            dispatch(setCurrentEventNotification(currentNotification))
+            dispatch(
+               setCurrentEventNotification(
+                  eventNotifications[0] as UserSparksNotification
+               )
+            )
          }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
       }
 
