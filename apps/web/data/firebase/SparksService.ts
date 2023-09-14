@@ -88,13 +88,13 @@ export class SparksService {
       return serializedSparks.map(SparkPresenter.deserialize)
    }
    /**
-    * Calls the trackSparkEvent cloud function with the provided data.
+    * Calls the trackSparkEvents cloud function with the provided data.
     * @param data - The data to send to the cloud function.
     */
    async trackSparkEvents(data: SparkEventClient[]) {
       return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
-         "trackSparkEvent"
+         "trackSparkEvents"
       )({
          sparkEvents: data,
       })
