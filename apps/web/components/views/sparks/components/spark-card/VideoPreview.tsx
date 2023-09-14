@@ -92,11 +92,11 @@ const VideoPreview: FC<Props> = ({
    const [playing, setPlaying] = useState(shouldPLay)
    const [waitingToPlay, setWaitingToPlay] = useState(true)
 
-   const onProgress = useReactPlayerTracker(
-      shouldPLay,
-      onSecondPassed,
-      onVideoEnded
-   )
+   const onProgress = useReactPlayerTracker({
+      shouldPlay: shouldPLay,
+      onSecondPass: onSecondPassed,
+      onVideoEnd: onVideoEnded,
+   })
 
    const handleReset = useCallback(() => {
       setProgress(0)

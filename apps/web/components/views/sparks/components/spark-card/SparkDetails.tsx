@@ -66,12 +66,12 @@ const SparkDetails: FC<Props> = ({
          />
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>
-            <BrandedTooltip title={displayName.length > 20 ? displayName : ""}>
+            <BrandedTooltip title={displayName.length > 40 ? displayName : ""}>
                <Typography sx={styles.displayName} component={"h5"}>
                   {displayName}
                </Typography>
             </BrandedTooltip>
-            <BrandedTooltip title={companyName.length > 20 ? companyName : ""}>
+            <BrandedTooltip title={companyName.length > 40 ? companyName : ""}>
                <Typography sx={styles.companyName}>
                   From {companyName}
                </Typography>

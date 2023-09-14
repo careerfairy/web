@@ -2,29 +2,43 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import { usePrevious } from "react-use"
 import { type OnProgressProps } from "react-player/base"
 
+export type UseReactPlayerTrackerProps = {
+   /**
+    * Determines if the video should play.
+    */
+   shouldPlay: boolean
+   /**
+    * Callback function that is called every time a full second has passed.
+    * @param secondsWatched - The number of seconds watched.
+    */
+   onSecondPass?: (secondsWatched: number) => void
+   /**
+    * Callback function that is called when the video ends.
+    */
+   onVideoEnd?: () => void
+}
+
 /**
  * Custom hook for tracking the number of seconds watched in a ReactPlayer component.
  *
- * @param {boolean} shouldPlay - Determines if the video should play.
- * @param {function} onSecondPass - Callback function that is called every time a full second has passed.
- * @param {function} onVideoEnd - Callback function that is called when the video ends.
- * @returns {function} A function to be passed to the `onProgress` prop of the ReactPlayer component.
- *
  * @example
- * const onProgress = useReactPlayerTracker(true, (secondsWatched) => {
- *   console.log('A full second has passed:', secondsWatched);
- * },
- * () => {
- *   console.log('The video has ended');
+ * const onProgress = useReactPlayerTracker({
+ *   shouldPlay: true,
+ *   onSecondPass: (secondsWatched) => {
+ *     console.log('A full second has passed:', secondsWatched);
+ *   },
+ *   onVideoEnd: () => {
+ *     console.log('The video has ended');
+ *   }
  * });
  *
  * <ReactPlayer url={videoUrl} onProgress={onProgress} />
  */
-const useReactPlayerTracker = (
-   shouldPLay: boolean,
-   onSecondPass?: (secondsWatched: number) => void,
-   onVideoEnd?: () => void
-) => {
+const useReactPlayerTracker = ({
+   shouldPlay,
+   onSecondPass,
+   onVideoEnd,
+}: UseReactPlayerTrackerProps) => {
    const [secondsWatched, setSecondsWatched] = useState(0)
 
    const prevSecondsWatched = usePrevious(secondsWatched)
@@ -36,6 +50,7 @@ const useReactPlayerTracker = (
    useEffect(() => {
       if (prevSecondsWatched === undefined) return
 
+      // Check if a full second has passed
       if (Math.floor(secondsWatched) !== Math.floor(prevSecondsWatched)) {
          onSecondPass(secondsWatched)
       }
@@ -47,10 +62,10 @@ const useReactPlayerTracker = (
    }, [secondsWatched, prevSecondsWatched, onSecondPass, onVideoEnd])
 
    useEffect(() => {
-      if (!shouldPLay) {
+      if (!shouldPlay) {
          setSecondsWatched(0)
       }
-   }, [shouldPLay])
+   }, [shouldPlay])
 
    return onProgress
 }
