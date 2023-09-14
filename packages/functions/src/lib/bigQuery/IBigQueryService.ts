@@ -69,7 +69,7 @@ class BigQueryServiceCore<TRow> {
     * If the table does not exist and the environment is not production, create a new one.
     * @param {any} error - The error object.
     */
-   protected async createTableOnError(error: any) {
+   protected createTableOnError = async (error: any) => {
       if (error.code === 404 && !isProductionEnvironment()) {
          console.log("Table does not exist. Attempting to create table...")
          await this.createTable()
