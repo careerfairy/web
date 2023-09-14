@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { Form, Formik } from "formik"
 import { Image, Upload } from "react-feather"
 import { Avatar, Button, Grid, Typography } from "@mui/material"
@@ -11,7 +11,6 @@ import { ImageCropperDialog } from "components/views/common/ImageCropperDialog"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
 
@@ -21,13 +20,16 @@ type Banner = Pick<Group, "bannerImageUrl">
 const CompanyIdentity: FC = () => {
    const { group: company } = useGroup()
    const [imageCropperDialog, setImageCropperDialog] = useState(false)
+   const [profilePicHover, setProfilePicHover] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   const initialValues = {
+   const [initialValues, setInitialValues] = useState({
       logoUrl: company.logoUrl,
       logoFileObj: {} as File,
       bannerImageUrl: company.bannerImageUrl,
-   }
+   })
+
+   useEffect(() => {}, [imageCropperDialog])
 
    const saveLogoUrl = (newLogoUrl: string) => {
       if (newLogoUrl) {
@@ -50,6 +52,7 @@ const CompanyIdentity: FC = () => {
       if (resultUrl) {
          saveLogoUrl(resultUrl)
       }
+      setInitialValues((prev) => ({ ...prev, logoUrl: resultUrl }))
       setImageCropperDialog((prev) => !prev)
    }
 
@@ -59,7 +62,11 @@ const CompanyIdentity: FC = () => {
    ]
    return (
       <SectionComponent title={title} description={description}>
-         <Formik initialValues={initialValues} onSubmit={() => {}}>
+         <Formik
+            initialValues={initialValues}
+            onSubmit={() => {}}
+            enableReinitialize
+         >
             {({ values, setFieldValue }) => (
                <Form>
                   <Grid container spacing={3}>
