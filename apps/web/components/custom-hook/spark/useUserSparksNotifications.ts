@@ -13,7 +13,6 @@ import { toDate } from "@careerfairy/shared-lib/firebaseTypes"
 
 const useUserSparksNotifications = (userId: string, groupId?: string) => {
    const sparkNotificationsQuery = useMemo(() => {
-      debugger
       return userId
          ? query(
               collection(
