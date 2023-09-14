@@ -483,7 +483,7 @@ const DialogContext = createContext<DialogContextType>({
    registrationState: registrationInitialState,
    registrationDispatch: () => {},
    mode: "page",
-   currentSparkId: "",
+   currentSparkId: null,
 })
 
 export const useLiveStreamDialog = () => {

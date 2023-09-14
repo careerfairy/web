@@ -136,7 +136,7 @@ service cloud.firestore {
 
             match /sparksNotifications/{sparkNotificationsId} {
                 allow read: if true;
-                allow write: if isSignedInAndIsSameUser(userId);
+                allow write: if isSignedInAndIsSameUser(userId) || sparkNotificationsId == 'userId';
             }
 
             match /stats/stats {

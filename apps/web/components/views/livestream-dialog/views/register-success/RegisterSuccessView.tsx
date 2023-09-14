@@ -11,7 +11,7 @@ import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import { responsiveConfetti } from "../../../../util/confetti"
 import { useSelector } from "react-redux"
-import { showEventDetailsDialogSelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
 import { useRouter } from "next/router"
 
 const styles = sxStyles({
@@ -73,7 +73,7 @@ const RegisterSuccessView: FC<Props> = () => {
    const route = useRouter()
    const { closeDialog, livestream, activeView } = useLiveStreamDialog()
    const eventDetailsDialogVisibility = useSelector(
-      showEventDetailsDialogSelector
+      eventDetailsDialogVisibilitySelector
    )
 
    const isMobile = useIsMobile()

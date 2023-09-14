@@ -189,7 +189,7 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
-               sparkId: currentSparkId,
+               ...(currentSparkId && { sparkId: currentSparkId }),
             }
          )
             .then(() => {

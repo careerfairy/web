@@ -18,7 +18,7 @@ import {
    currentSparkEventNotificationSelector,
    currentSparkIndexSelector,
    isFetchingSparksSelector,
-   showEventDetailsDialogSelector,
+   eventDetailsDialogVisibilitySelector,
    sparksSelector,
    userEmailSelector,
 } from "store/selectors/sparksFeedSelectors"
@@ -105,7 +105,7 @@ const SparksFeedCarousel: FC = () => {
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const eventDetailsDialogVisibility = useSelector(
-      showEventDetailsDialogSelector
+      eventDetailsDialogVisibilitySelector
    )
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
 

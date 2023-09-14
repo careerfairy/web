@@ -12,7 +12,7 @@ import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
 import SparksEventNotification from "./SparksEventNotification"
 import { useSelector } from "react-redux"
-import { showEventDetailsDialogSelector } from "store/selectors/sparksFeedSelectors"
+import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeedSelectors"
 
 const styles = sxStyles({
    root: {
@@ -81,7 +81,7 @@ type Props = {
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const eventDetailsDialogVisibility = useSelector(
-      showEventDetailsDialogSelector
+      eventDetailsDialogVisibilitySelector
    )
 
    return (
