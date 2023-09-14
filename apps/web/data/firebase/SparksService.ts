@@ -96,7 +96,7 @@ export class SparksService {
          this.functions,
          "trackSparkEvents"
       )({
-         sparkEvents: data,
+         events: data,
       })
    }
 
@@ -110,7 +110,7 @@ export class SparksService {
          this.functions,
          "trackSparkSecondsWatched"
       )({
-         sparkSecondsWatched: data,
+         events: data,
       })
    }
 
