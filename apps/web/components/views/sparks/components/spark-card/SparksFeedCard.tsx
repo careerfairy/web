@@ -99,6 +99,14 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       }
    }, [companyPageLink, trackEvent])
 
+   const onVideoPlay = useCallback(() => {
+      trackEvent(SparkEventActions.Played_Spark)
+   }, [trackEvent])
+
+   const onVideoEnded = useCallback(() => {
+      trackEvent(SparkEventActions.Watched_CompleteSpark)
+   }, [trackEvent])
+
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
@@ -109,6 +117,8 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                playing={playing}
                onSecondPassed={trackSecondsWatched}
                pausing={eventDetailsDialogVisibility}
+               onVideoPlay={onVideoPlay}
+               onVideoEnded={onVideoEnded}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>

@@ -4,6 +4,7 @@ import {
    SparkSecondWatchedClient,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { useAuth } from "HOCs/AuthProvider"
+import useBatchedEvents from "components/custom-hook/utils/useBatchedEvents"
 import { sparkService } from "data/firebase/SparksService"
 import { useRouter } from "next/router"
 import { FC, createContext, useCallback, useContext, useMemo } from "react"
@@ -11,10 +12,9 @@ import { useSelector } from "react-redux"
 import {
    currentSparkIdSelector,
    originalSparkIdSelector,
-   sessionIdSelector,
 } from "store/selectors/sparksFeedSelectors"
+import { v4 as uuidv4 } from "uuid"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
-import useBatchedEvents from "components/custom-hook/utils/useBatchedEvents"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
@@ -52,7 +52,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
    const { data: visitorId } = useFingerPrint()
 
-   const sessionId = useSelector(sessionIdSelector)
    const currentSparkId = useSelector(currentSparkIdSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
 
@@ -69,10 +68,14 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
       BATCH_INTERVAL,
       "unsentSparkSecondsWatched"
    )
+   const sessionId = useMemo(() => {
+      if (!currentSparkId) return null
+      return generatSessionId(currentSparkId)
+   }, [currentSparkId])
 
    const trackEvent = useCallback(
       (event: SparkEventActionType) => {
-         if (!currentSparkId) return
+         if (!currentSparkId || !visitorId) return
 
          const referrer = document?.referrer || null
 
@@ -117,7 +120,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
    const trackSecondsWatched = useCallback(
       (secondsWatched: number) => {
-         if (!currentSparkId) return
+         if (!currentSparkId || !visitorId) return
 
          const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
@@ -160,6 +163,11 @@ export const useSparksFeedTracker = () => {
       )
    }
    return context
+}
+
+const generatSessionId = (sparkId: string) => {
+   const timestamp = new Date().toISOString()
+   return `spark-${sparkId}-${timestamp}-${uuidv4()}`
 }
 
 export default SparksFeedTrackerProvider
