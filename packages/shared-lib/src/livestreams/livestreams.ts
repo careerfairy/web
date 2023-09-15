@@ -13,7 +13,7 @@ import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
-   1000 * 60 * 60 * 12
+   1000 * 60 * 60 * 4
 
 export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
