@@ -213,6 +213,13 @@ export class SparksService {
          "removeAndSyncUserSparkNotification"
       )(data)
    }
+
+   async createUserSparksFeedEventNotifications(userId: string) {
+      return httpsCallable<string, void>(
+         this.functions,
+         "createUserSparksFeedEventNotifications"
+      )(userId)
+   }
 }
 
 export const sparkService = new SparksService(FunctionsInstance as any)

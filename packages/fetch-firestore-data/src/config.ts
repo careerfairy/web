@@ -90,5 +90,6 @@ export default {
       "wishes",
       "wishList",
       "voters",
+      "sparksNotifications",
    ],
 }

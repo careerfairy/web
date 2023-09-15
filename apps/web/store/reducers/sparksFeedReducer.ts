@@ -20,8 +20,8 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
+   currentEventNotification: UserSparksNotification | null
    sparkCategoryIds: SparkCategory["id"][]
-   eventNotifications: UserSparksNotification[] | null
    showEventDetailsDialog: boolean
 }
 
@@ -38,7 +38,7 @@ const initialState: SparksState = {
    fetchNextError: null,
    initialFetchError: null,
    sparkCategoryIds: [],
-   eventNotifications: null,
+   currentEventNotification: null,
    showEventDetailsDialog: false,
 }
 
@@ -96,19 +96,19 @@ const sparksFeedSlice = createSlice({
             state.currentPlayingIndex = newIndex
          }
       },
-      setEventNotifications: (
+      setCurrentEventNotification: (
          state,
-         action: PayloadAction<UserSparksNotification[]>
+         action: PayloadAction<UserSparksNotification>
       ) => {
-         state.eventNotifications = action.payload
+         state.currentEventNotification = action.payload
       },
-      removeEventNotifications: (state) => {
-         state.eventNotifications = null
+      removeCurrentEventNotifications: (state) => {
+         state.currentEventNotification = null
       },
       showEventDetailsDialog: (state, action: PayloadAction<boolean>) => {
          // when closing event dialog we want to remove the notification
          if (action.payload === false) {
-            state.eventNotifications = null
+            state.currentEventNotification = null
          }
          state.showEventDetailsDialog = action.payload
       },
@@ -121,8 +121,8 @@ const sparksFeedSlice = createSlice({
          state.fetchNextSparksStatus = "idle"
          state.fetchNextError = null
          state.initialFetchError = null
+         state.currentEventNotification = null
          state.sparkCategoryIds = []
-         state.eventNotifications = null
          state.showEventDetailsDialog = false
       },
    },
@@ -212,8 +212,8 @@ export const {
    setSparkCategories,
    resetSparksFeed,
    swipeNextSparkByIndex,
-   setEventNotifications,
-   removeEventNotifications,
+   setCurrentEventNotification,
+   removeCurrentEventNotifications,
    showEventDetailsDialog,
 } = sparksFeedSlice.actions
 
