@@ -7,6 +7,7 @@ import {
    AddSparkSparkData,
    DeleteSparkData,
    GetFeedData,
+   RemoveNotificationFromUserData,
    Spark,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
@@ -197,6 +198,20 @@ export class SparksService {
          this.functions,
          "markSparkAsSeenByUser"
       )({ sparkId })
+   }
+
+   /**
+    * To remove and sync a specific spark notification related to a group from the user SparksNotification subCollection
+    *
+    * @param data - has the groupId and userId
+    */
+   async removeAndSyncUserSparkNotification(
+      data: RemoveNotificationFromUserData
+   ) {
+      return httpsCallable<RemoveNotificationFromUserData, void>(
+         this.functions,
+         "removeAndSyncUserSparkNotification"
+      )(data)
    }
 }
 
