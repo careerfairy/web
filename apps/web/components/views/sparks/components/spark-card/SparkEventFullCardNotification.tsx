@@ -6,13 +6,25 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 const styles = sxStyles({
    content: {
+      display: "flex",
+      flexDirection: "column",
       textAlign: "center",
       p: 4,
       pt: 6,
    },
    eventCard: {
-      mt: 8,
-      mb: 16,
+      mt: 6,
+   },
+   action: {
+      display: "flex",
+      alignItems: "end",
+      justifyContent: "center",
+      height: "100%",
+   },
+   btn: {
+      border: "2px solid white",
+      fontWeight: "bold",
+      textTransform: "capitalize",
    },
 })
 
@@ -20,8 +32,6 @@ type Props = {
    event: LivestreamEvent
 }
 const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
-   const groupName = "Jane Street"
-
    const handleRegister = useCallback(() => {
       // TODO: reuse redux action to open the dialog with the correct event
    }, [])
@@ -33,7 +43,7 @@ const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
                That’s all from
             </Typography>
             <Typography variant={"h3"} fontWeight={"bold"}>
-               {groupName}
+               {event.company}
             </Typography>
             <Typography variant={"h5"} mt={3}>
                But you still have time to register to their upcoming live
@@ -45,11 +55,12 @@ const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
             <EventPreviewCard event={event} disableClick={true} />
          </Box>
 
-         <Box>
+         <Box sx={styles.action}>
             <Button
                color="primary"
                variant="contained"
                onClick={handleRegister}
+               sx={styles.btn}
             >
                Register to live stream
             </Button>

@@ -72,6 +72,7 @@ const styles = sxStyles({
       },
    },
    eventCardContentInner: {
+      height: "100%",
       mt: "unset",
    },
    cardDetails: {
