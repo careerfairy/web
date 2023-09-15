@@ -45,7 +45,6 @@ const styles = sxStyles({
    },
    subtitle: {
       fontSize: "18px !important",
-      fontWeight: "bold",
       mt: { md: 2 },
 
       "@media (max-height: 800px)": {
