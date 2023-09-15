@@ -15,12 +15,6 @@ import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
-import { useSelector } from "react-redux"
-import {
-   currentSparkIndexSelector,
-   showEventDetailsDialogSelector,
-   sparksSelector,
-} from "../../../store/selectors/sparksFeedSelectors"
 import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
@@ -33,6 +27,7 @@ export default function useRegistrationHandler() {
       livestreamPresenter,
       serverUserEmail,
       goToView,
+      currentSparkId,
    } = useLiveStreamDialog()
    const { push, asPath } = useRouter()
    const { forceShowReminder } = useUserReminders()
@@ -43,9 +38,6 @@ export default function useRegistrationHandler() {
       deregisterFromLivestream,
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
-   const dialogFromSpark = useSelector(showEventDetailsDialogSelector)
-   const sparks = useSelector(sparksSelector)
-   const currentSparkIndex = useSelector(currentSparkIndexSelector)
 
    /**
     * Initiate the registration process
@@ -104,6 +96,11 @@ export default function useRegistrationHandler() {
          userData.authId
       )
       dataLayerLivestreamEvent("event_registration_removed", livestream)
+
+      // after de-register from a livestream we want to update the user sparks notifications for this user
+      await sparkService.createUserSparksFeedEventNotifications(
+         userData.userEmail
+      )
    }, [deregisterFromLivestream, livestream, userData])
 
    /**
@@ -185,12 +182,6 @@ export default function useRegistrationHandler() {
          groupsWithPolicies: GroupWithPolicy[],
          userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
       ) => {
-         let sparkId: string
-
-         if (dialogFromSpark) {
-            sparkId = sparks?.[currentSparkIndex]?.id
-         }
-
          registerToLivestream(
             livestream.id,
             userData,
@@ -198,7 +189,7 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
-               sparkId: sparkId,
+               ...(currentSparkId && { sparkId: currentSparkId }),
             }
          )
             .then(() => {
@@ -215,7 +206,8 @@ export default function useRegistrationHandler() {
                         livestream,
                      })
                   )
-
+            })
+            .then(() => {
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
                   userData,
@@ -245,12 +237,10 @@ export default function useRegistrationHandler() {
             })
       },
       [
-         currentSparkIndex,
-         dialogFromSpark,
+         currentSparkId,
          isRecommended,
          registerToLivestream,
          sendRegistrationConfirmationEmail,
-         sparks,
       ]
    )
 

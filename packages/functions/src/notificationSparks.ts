@@ -91,6 +91,10 @@ export const removeAndSyncSparksNotifications = async (groupId: string) => {
    return handleCreateSparksNotifications()
 }
 
+export const syncUserSparksNotifications = async (userId: string) => {
+   return handleCreateSparksNotifications(userId)
+}
+
 const handleCreateSparksNotifications = async (userId?: string) => {
    const startDate = new Date()
    const endDate = addDaysDate(
@@ -164,6 +168,7 @@ const createSparkNotificationForSingleUser = ({
 
       if (!groupAlreadyHasNotification) {
          notifications.push({
+            id: groupId,
             eventId: eventId,
             groupId: groupId,
             startDate: event.start.toDate(),

@@ -1,15 +1,18 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Stack } from "@mui/material"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
+import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
+import SparksEventNotification from "./SparksEventNotification"
+import { useSelector } from "react-redux"
+import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeedSelectors"
 
 const styles = sxStyles({
    root: {
@@ -77,14 +80,19 @@ type Props = {
 
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
+   const eventDetailsDialogVisibility = useSelector(
+      eventDetailsDialogVisibilitySelector
+   )
 
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
+            <SparksEventNotification spark={spark} />
             <VideoPreview
                thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
                videoUrl={spark.getTransformedVideoUrl()}
                playing={playing}
+               pausing={eventDetailsDialogVisibility}
             />
             <Box sx={styles.cardContent}>
                <Box sx={styles.contentInner}>

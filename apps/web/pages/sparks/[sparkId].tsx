@@ -16,20 +16,26 @@ import {
    fetchInitialSparksFeed,
    fetchNextSparks,
    resetSparksFeed,
+   setCurrentEventNotification,
    setGroupId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
+   currentSparkIndexSelector,
    fetchNextErrorSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
    isOnLastSparkSelector,
+   sparksSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import useUserSparksNotifications from "../../components/custom-hook/spark/useUserSparksNotifications"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -46,6 +52,12 @@ const SparksPage: NextPage<
    const initalSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
+   const { data: eventNotifications } = useUserSparksNotifications(
+      userEmail,
+      groupId
+   )
+   const currentPlayingIndex = useSelector(currentSparkIndexSelector)
+   const sparks = useSelector(sparksSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -80,6 +92,24 @@ const SparksPage: NextPage<
       isFetchingNextSparks,
       isOnLastSpark,
    ])
+
+   useEffect(() => {
+      let timeout: NodeJS.Timeout
+
+      if (eventNotifications?.length) {
+         timeout = setTimeout(() => {
+            dispatch(
+               setCurrentEventNotification(
+                  eventNotifications[0] as UserSparksNotification
+               )
+            )
+         }, SPARK_CONSTANTS.SECONDS_TO_SHOW_EVENT_NOTIFICATION)
+      }
+
+      return () => {
+         clearTimeout(timeout)
+      }
+   }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
 
    useEffect(() => {
       if (fetchNextError) {
