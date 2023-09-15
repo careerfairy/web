@@ -15,6 +15,13 @@ import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
+import { useSelector } from "react-redux"
+import {
+   currentSparkIndexSelector,
+   showEventDetailsDialogSelector,
+   sparksSelector,
+} from "../../../store/selectors/sparksFeedSelectors"
+import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
  * Logic for handling the register button click
@@ -36,6 +43,9 @@ export default function useRegistrationHandler() {
       deregisterFromLivestream,
       sendRegistrationConfirmationEmail,
    } = useFirebaseService()
+   const dialogFromSpark = useSelector(showEventDetailsDialogSelector)
+   const sparks = useSelector(sparksSelector)
+   const currentSparkIndex = useSelector(currentSparkIndexSelector)
 
    /**
     * Initiate the registration process
@@ -175,6 +185,12 @@ export default function useRegistrationHandler() {
          groupsWithPolicies: GroupWithPolicy[],
          userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
       ) => {
+         let sparkId: string
+
+         if (dialogFromSpark) {
+            sparkId = sparks?.[currentSparkIndex]?.id
+         }
+
          registerToLivestream(
             livestream.id,
             userData,
@@ -182,9 +198,24 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
+               sparkId: sparkId,
             }
          )
             .then(() => {
+               // after registration, remove from this user's sparks notification the existing notification related to this event
+               sparkService
+                  .removeAndSyncUserSparkNotification({
+                     userId: userData.userEmail,
+                     groupId: livestream.author.groupId,
+                  })
+                  .catch((e) =>
+                     errorLogAndNotify(e, {
+                        message: "Failed to remove spark notification",
+                        user: authenticatedUser,
+                        livestream,
+                     })
+                  )
+
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
                   userData,
@@ -213,7 +244,14 @@ export default function useRegistrationHandler() {
                })
             })
       },
-      [isRecommended, registerToLivestream, sendRegistrationConfirmationEmail]
+      [
+         currentSparkIndex,
+         dialogFromSpark,
+         isRecommended,
+         registerToLivestream,
+         sendRegistrationConfirmationEmail,
+         sparks,
+      ]
    )
 
    return {

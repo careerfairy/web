@@ -48,6 +48,7 @@ import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
+import notificationSparks = require("./notificationSparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -216,6 +217,14 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.createSpark_v2 = groupSparks.createSpark
 exports.updateSpark_v2 = groupSparks.updateSpark
 exports.deleteSpark_v2 = groupSparks.deleteSpark
+
+// User Spark Notification Functions
+exports.createSparksFeedEventNotifications =
+   notificationSparks.createSparksFeedEventNotifications
+exports.createUserSparksFeedEventNotifications =
+   notificationSparks.createUserSparksFeedEventNotifications
+exports.removeAndSyncUserSparkNotification =
+   notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
 exports.getSparksFeed = userSparks.getSparksFeed

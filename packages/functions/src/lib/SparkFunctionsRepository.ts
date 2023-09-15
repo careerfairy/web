@@ -182,6 +182,24 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
+
+   /**
+    * Get all user sparks feed metrics
+    *
+    */
+   getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]>
+
+   /**
+    * Remove all spark notifications related to a specific group
+    *
+    */
+   removeSparkNotification(groupId: string): Promise<void>
+
+   /**
+    * Remove specific spark notifications from a single user
+    *
+    */
+   removeUserSparkNotification(userId: string, groupId: string): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -608,6 +626,43 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]> {
+      const snapshot = await this.firestore
+         .collection("sparksFeedMetrics")
+         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async removeSparkNotification(groupId: string): Promise<void> {
+      const bulkWriter = this.firestore.bulkWriter()
+
+      const snapShot = await this.firestore
+         .collectionGroup("sparksNotifications")
+         .where("groupId", "==", groupId)
+         .get()
+
+      snapShot.docs.forEach((doc) => {
+         bulkWriter.delete(doc.ref)
+      })
+
+      return void bulkWriter.close()
+   }
+
+   async removeUserSparkNotification(
+      userId: string,
+      groupId: string
+   ): Promise<void> {
+      const sparkRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .doc(groupId)
+
+      return void sparkRef.delete()
    }
 }
 
