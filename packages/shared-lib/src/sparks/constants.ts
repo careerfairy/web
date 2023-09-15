@@ -53,4 +53,9 @@ export const SPARK_CONSTANTS = {
     * Only show event spark notifications after X seconds of spark becoming visible
     */
    SECONDS_TO_SHOW_EVENT_NOTIFICATION: 10000,
+
+   /**
+    * The year we started tracking likes
+    */
+   LIKES_TRACKING_START_YEAR: 2023,
 }

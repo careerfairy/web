@@ -7,6 +7,7 @@ import {
    AddSparkSparkData,
    DeleteSparkData,
    GetFeedData,
+   LikedSparks,
    RemoveNotificationFromUserData,
    Spark,
    UpdateSparkData,
@@ -30,9 +31,16 @@ import {
    where,
    getCountFromServer,
    collectionGroup,
+   Timestamp,
+   deleteField,
+   setDoc,
+   PartialWithFieldValue,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import { DateTime } from "luxon"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -251,6 +259,89 @@ export class SparksService {
          this.functions,
          "createUserSparksFeedEventNotifications"
       )(userId)
+   }
+
+   /**
+    * Toggle the like status of a spark for a user
+    *
+    * @param userId - The id of the user
+    * @param sparkId - The id of the spark
+    * @param liked - The like status to set for the spark
+    **/
+   async toggleSparkLike(userId: string, sparkId: string, liked: boolean) {
+      const currentYear = DateTime.now().year
+      const docRef = doc(
+         FirestoreInstance,
+         "userData",
+         userId,
+         "likedSparks",
+         currentYear.toString()
+      ).withConverter(createGenericConverter<LikedSparks>())
+
+      if (liked) {
+         // If liked is true, add the sparkId to the sparks map for the current year
+         await setDoc<LikedSparks>(
+            docRef,
+            this.createLikedSparksObject(userId, sparkId, currentYear, liked),
+            { merge: true }
+         )
+      } else {
+         // If liked is false, remove the sparkId from the sparks map for all years
+         for (
+            let year = SPARK_CONSTANTS.LIKES_TRACKING_START_YEAR;
+            year <= currentYear;
+            year++
+         ) {
+            const yearDocRef = doc(
+               FirestoreInstance,
+               "userData",
+               userId,
+               "likedSparks",
+               year.toString()
+            ).withConverter(createGenericConverter<LikedSparks>())
+
+            await setDoc<LikedSparks>(
+               yearDocRef,
+               this.createLikedSparksObject(userId, sparkId, year, liked),
+               { merge: true }
+            )
+         }
+      }
+   }
+
+   /**
+    * Check if a user has liked a specific Spark
+    * @param userId - The id of the user
+    * @param sparkId - The id of the spark to check
+    *
+    * @returns true if the user has liked the Spark, false otherwise
+    **/
+   async hasUserLikedSpark(userId: string, sparkId: string): Promise<boolean> {
+      const likedSparksDocRef = query(
+         collection(FirestoreInstance, "userData", userId, "likedSparks"),
+         where(`sparks.${sparkId}`, "!=", null),
+         limit(1)
+      )
+
+      const countRef = await getCountFromServer(likedSparksDocRef)
+
+      return countRef.data().count > 0
+   }
+
+   private createLikedSparksObject(
+      userId: string,
+      sparkId: string,
+      year: number,
+      liked: boolean
+   ): PartialWithFieldValue<LikedSparks> {
+      return {
+         documentType: "likedSparks",
+         userId,
+         id: year.toString(),
+         sparks: {
+            [sparkId]: liked ? Timestamp.now() : deleteField(),
+         },
+      }
    }
 }
 

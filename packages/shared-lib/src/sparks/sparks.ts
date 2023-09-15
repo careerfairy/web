@@ -111,7 +111,7 @@ export interface UserSparksFeedMetrics extends Identifiable {
 }
 
 /**
- * Collection path: /userData/{userId}/seenSparks/2022
+ * Collection path: /userData/{userId}/seenSparks/{year}
  * - The seen sparks are partitioned by year, so we will never hit the 1MB limit
  * - From my estimates we can have about 20'000 seen sparks on a single document before we hit the 1MB limit
  *
@@ -123,6 +123,20 @@ export interface UserSparksFeedMetrics extends Identifiable {
  */
 export interface SeenSparks extends Identifiable {
    documentType: "seenSparks"
+   userId: string
+   sparks: {
+      [sparkId: string]: Timestamp
+   }
+}
+
+/**
+ * Collection path: /userData/{userId}/likedSparks/{year}
+ *
+ * - e.g: /userData/{userId}/likedSparks/2022
+ * - e.g: /userData/{userId}/likedSparks/2023
+ */
+export interface LikedSparks extends Identifiable {
+   documentType: "likedSparks"
    userId: string
    sparks: {
       [sparkId: string]: Timestamp

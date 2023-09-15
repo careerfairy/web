@@ -89,6 +89,10 @@ service cloud.firestore {
                 allow read: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
 
+            match /likedSparks/{year} {
+               allow read, write: if isSignedInAndIsSameUser(userId);
+            }
+
             match /companiesUserFollows/{groupId} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
