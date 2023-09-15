@@ -68,7 +68,7 @@ const styles = sxStyles({
    eventCardContent: {
       "&::after": {
          background:
-            "linear-gradient(180deg, rgba(0, 0, 0, 0) 42.19%, rgba(0, 0, 0, 0.2) 88.02%), radial-gradient(167.78% 167.78% at 95.7% 3.63%, rgba(0, 210, 170, 0.9) 8.85%, rgba(103, 73, 234, 0.9) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, linear-gradient(0deg, #2ABAA5, #2ABAA5), linear-gradient(0deg, rgba(247, 248, 252, 0.2), rgba(247, 248, 252, 0.2))",
+            "linear-gradient(175deg,rgb(255 255 255 / 0%) 55%, rgb(255 255 255 / 13%) 45%), radial-gradient(167.78% 167.78% at 95.7% 3.63%, rgb(15 224 184 / 90%) 8.85%, rgb(103 73 234 / 70%) 100%), linear-gradient(237deg, rgb(42, 186, 165), rgb(42, 186, 165)), linear-gradient(203deg, rgb(247 248 252), rgb(247 248 252))",
       },
    },
    eventCardContentInner: {
@@ -122,7 +122,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    // TODO: logic to get the event needs to be adjusted
    //  is require to set the currentEventNotification on the redux
    //  then we can read it here, get the eventId and use this hook to get the event
-   const { data: event } = useLivestream("bU2V8XumSfnrigqkJeFT")
+   const { data: event } = useLivestream("XWxe4sNU7kGlM2xkt6Mh")
 
    return (
       <>
