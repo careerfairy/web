@@ -209,6 +209,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          isEmbedded = false,
          bottomElement,
          hideChipLabels,
+         disableClick,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -384,6 +385,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   target={isInIframe() ? "_blank" : undefined}
                   onClick={handleDetailsClick}
                   data-testid={`livestream-card-${event?.id}`}
+                  disabled={disableClick}
                >
                   <Box
                      ref={ref}
@@ -693,6 +695,7 @@ interface EventPreviewCardProps {
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean
+   disableClick?: boolean
 }
 
 EventPreviewCard.displayName = "EventPreviewCard"
