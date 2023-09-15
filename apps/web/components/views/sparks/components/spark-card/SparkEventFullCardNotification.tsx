@@ -42,7 +42,7 @@ const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
          </Box>
 
          <Box sx={styles.eventCard}>
-            <EventPreviewCard event={event} loading={!Boolean(event)} />
+            <EventPreviewCard event={event} disableClick={true} />
          </Box>
 
          <Box>
