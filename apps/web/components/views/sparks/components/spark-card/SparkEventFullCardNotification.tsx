@@ -8,7 +8,6 @@ const styles = sxStyles({
    content: {
       display: "flex",
       flexDirection: "column",
-      py: 2,
       px: { md: 4 },
 
       "@media (max-height: 900px)": {
