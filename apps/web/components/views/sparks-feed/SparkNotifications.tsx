@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import {
    activeSparkSelector,
+   cardNotificationSelector,
    currentSparkEventNotificationSelector,
    currentSparkIndexSelector,
    eventDetailsDialogVisibilitySelector,
@@ -10,6 +11,7 @@ import {
 import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
 import { FC, useCallback, useEffect } from "react"
 import {
+   setCardNotification,
    setCurrentEventNotification,
    showEventDetailsDialog,
 } from "../../../store/reducers/sparksFeedReducer"
@@ -30,6 +32,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       eventDetailsDialogVisibilitySelector
    )
    const currentSpark = useSelector(activeSparkSelector)
+   const cardNotification = useSelector(cardNotificationSelector)
    const groupId = useSelector(groupIdSelector)
 
    const { data: eventNotifications } = useUserSparksNotifications(
@@ -37,6 +40,10 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       currentSpark?.group.id
    )
 
+   /**
+    * To verify, with each swipe of the carousel, whether there is a notification to the current spark
+    * If such a notification exists, update the Redux state with a {SECONDS_TO_SHOW_EVENT_NOTIFICATION}-second timeout for the notification
+    */
    useEffect(() => {
       let timeout: NodeJS.Timeout
 
@@ -55,13 +62,24 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       }
    }, [currentPlayingIndex, dispatch, eventNotifications, groupId, sparks])
 
+   /**
+    * Enable the card notification when a user navigates from the Company Page
+    */
+   useEffect(() => {
+      if (groupId && eventNotifications?.length) {
+         dispatch(
+            setCardNotification(eventNotifications[0] as UserSparksNotification)
+         )
+      }
+   }, [groupId, eventNotifications, dispatch])
+
    const handleCloseDialog = useCallback(() => {
       dispatch(showEventDetailsDialog(false))
    }, [dispatch])
 
    return eventDetailsDialogVisibility ? (
       <LivestreamDialog
-         livestreamId={eventNotification?.eventId}
+         livestreamId={eventNotification?.eventId || cardNotification?.eventId}
          handleClose={handleCloseDialog}
          open={eventDetailsDialogVisibility}
          page={"details"}

@@ -24,6 +24,7 @@ interface SparksState {
    currentEventNotification: UserSparksNotification | null
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
+   cardNotification: UserSparksNotification | null
 }
 
 const initialState: SparksState = {
@@ -42,6 +43,7 @@ const initialState: SparksState = {
    sparkCategoryIds: [],
    currentEventNotification: null,
    showEventDetailsDialog: false,
+   cardNotification: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -111,6 +113,12 @@ const sparksFeedSlice = createSlice({
       removeCurrentEventNotifications: (state) => {
          state.currentEventNotification = null
       },
+      setCardNotification: (
+         state,
+         action: PayloadAction<UserSparksNotification>
+      ) => {
+         state.cardNotification = action.payload
+      },
       showEventDetailsDialog: (state, action: PayloadAction<boolean>) => {
          // when closing event dialog we want to remove the notification
          if (action.payload === false) {
@@ -118,6 +126,21 @@ const sparksFeedSlice = createSlice({
          }
          state.showEventDetailsDialog = action.payload
       },
+      addCarNotificationToSparksList: (state) => {
+         // duplicate the last spark and add the isCardNotification field to it
+         state.sparks = [
+            ...state.sparks,
+            {
+               ...state.sparks[state.sparks.length - 1],
+               isCardNotification: true,
+               id: state.groupId,
+            },
+         ]
+      },
+      removeGroupId: (state) => {
+         state.groupId = null
+      },
+
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -223,6 +246,9 @@ export const {
    setCurrentEventNotification,
    removeCurrentEventNotifications,
    showEventDetailsDialog,
+   addCarNotificationToSparksList,
+   removeGroupId,
+   setCardNotification,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

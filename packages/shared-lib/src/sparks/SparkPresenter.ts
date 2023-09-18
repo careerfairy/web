@@ -63,6 +63,7 @@ export class SparkPresenter implements SparkPresenterInterface {
    numberOfCareerPageClicks: number
 
    // Additional properties can be added here as the Spark structure evolves
+   isCardNotification: boolean
 
    // The SparkPresenter constructor
    constructor(data: Partial<SparkPresenter>) {
