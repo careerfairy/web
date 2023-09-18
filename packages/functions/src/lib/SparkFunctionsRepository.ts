@@ -24,7 +24,6 @@ import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
 import {
-   FieldPath,
    FieldValue,
    Firestore,
    Storage,
