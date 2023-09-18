@@ -21,6 +21,7 @@ import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { livestreamRepo, userRepo } from "data/RepositoryInstances"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { sparkService } from "../../data/firebase/SparksService"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -364,6 +365,12 @@ export function RegistrationContextProvider({
                   "event_registration_complete",
                   livestream
                )
+
+               // after registration, remove from this user's sparks notification the existing notification related to this event
+               await sparkService.removeAndSyncUserSparkNotification({
+                  userId: userData.userEmail,
+                  groupId: livestream.author.groupId,
+               })
 
                // Increase livestream popularity
                recommendationServiceInstance.registerEvent(livestream, userData)

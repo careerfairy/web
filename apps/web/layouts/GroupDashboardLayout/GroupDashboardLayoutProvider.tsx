@@ -1,4 +1,4 @@
-import React, {
+import {
    createContext,
    ReactNode,
    useCallback,
@@ -68,7 +68,7 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
 
 type Props = {
    children: ReactNode
-   pageDisplayName: string
+   titleComponent: ReactNode
    topBarCta?: ReactNode
 }
 
@@ -81,7 +81,7 @@ type Props = {
  */
 const GroupDashboardLayoutProvider = ({
    children,
-   pageDisplayName,
+   titleComponent,
    topBarCta,
 }: Props) => {
    const [state, dispatch] = useReducer(reducer, initialState)
@@ -116,7 +116,7 @@ const GroupDashboardLayoutProvider = ({
       <GroupDashboardContext.Provider value={value}>
          <AdminGenericLayout
             bgColor="#F7F8FC"
-            headerContent={<TopBar cta={topBarCta} title={pageDisplayName} />}
+            headerContent={<TopBar cta={topBarCta} title={titleComponent} />}
             drawerContent={<NavBar />}
             drawerOpen={state.layout.leftDrawerOpen}
             setDrawer={setLeftDrawer}

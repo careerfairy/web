@@ -27,6 +27,7 @@ import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
+import SparksSection from "./SparksSection"
 
 type Props = {
    group: Group
@@ -44,7 +45,7 @@ export const TabValue = {
    video: "video-section",
 } as const
 
-export type TabValueType = typeof TabValue[keyof typeof TabValue]
+export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
 export const getTabLabel = (tabId: TabValueType) => {
    switch (tabId) {
@@ -194,6 +195,7 @@ const CompanyPageOverview = ({
                      <Grid item xs={12} md={6}>
                         <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
+                           <SparksSection groupId={group.id} />
                            {showFollowCompanyCta ? <FollowCompany /> : null}
                            {showSignUpCta ? <SignUp /> : null}
                            <TestimonialSection />

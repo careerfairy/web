@@ -33,6 +33,12 @@ import {
 import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import BigQueryServiceCore from "./bigQuery/IBigQueryService"
+import {
+   SparkEvent,
+   SparkSecondWatched,
+} from "@careerfairy/shared-lib/sparks/analytics"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -182,6 +188,44 @@ export interface ISparkFunctionsRepository {
    ): Promise<void>
 
    getSparksByGroupId(groupId: string): Promise<Spark[]>
+
+   /**
+    * Get all user sparks feed metrics
+    *
+    */
+   getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]>
+
+   /**
+    * Remove all spark notifications related to a specific group
+    *
+    */
+   removeSparkNotification(groupId: string): Promise<void>
+
+   /**
+    * Remove specific spark notifications from a single user
+    *
+    */
+   removeUserSparkNotification(userId: string, groupId: string): Promise<void>
+
+   /**
+    * Get all User Spark Notification
+    *
+    */
+   getUserSparkNotifications(userId: string): Promise<UserSparksNotification[]>
+
+   /**
+    * Save spark events to BigQuery
+    * @param events The spark events to save
+    * @returns void
+    */
+   trackSparkEvents(events: SparkEvent[]): Promise<void>
+
+   /**
+    * Save spark seconds watched to BigQuery
+    * @param events The spark seconds watched to save
+    * @returns void
+    */
+   trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -192,7 +236,9 @@ export class SparkFunctionsRepository
       readonly firestore: Firestore,
       readonly storage: Storage,
       readonly logger: FunctionsLogger,
-      readonly feedReplisher: SparksFeedReplenisher
+      readonly feedReplisher: SparksFeedReplenisher,
+      readonly sparkEventHandler: BigQueryServiceCore<SparkEvent>,
+      readonly sparkSecondsWatchedHandler: BigQueryServiceCore<SparkSecondWatched>
    ) {
       super()
    }
@@ -608,6 +654,64 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async getAllUserSparksFeedMetrics(): Promise<UserSparksFeedMetrics[]> {
+      const snapshot = await this.firestore
+         .collection("sparksFeedMetrics")
+         .withConverter(createGenericConverter<UserSparksFeedMetrics>())
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async removeSparkNotification(groupId: string): Promise<void> {
+      const bulkWriter = this.firestore.bulkWriter()
+
+      const snapShot = await this.firestore
+         .collectionGroup("sparksNotifications")
+         .where("groupId", "==", groupId)
+         .get()
+
+      snapShot.docs.forEach((doc) => {
+         bulkWriter.delete(doc.ref)
+      })
+
+      return void bulkWriter.close()
+   }
+
+   async removeUserSparkNotification(
+      userId: string,
+      groupId: string
+   ): Promise<void> {
+      const sparkRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .doc(groupId)
+
+      return void sparkRef.delete()
+   }
+
+   async getUserSparkNotifications(
+      userId: string
+   ): Promise<UserSparksNotification[]> {
+      const snapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sparksNotifications")
+         .withConverter(createGenericConverter<UserSparksNotification>())
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async trackSparkEvents(events: SparkEvent[]): Promise<void> {
+      return this.sparkEventHandler.insertData(events)
+   }
+
+   async trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void> {
+      return this.sparkSecondsWatchedHandler.insertData(events)
    }
 }
 

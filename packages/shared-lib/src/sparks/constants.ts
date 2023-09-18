@@ -43,4 +43,14 @@ export const SPARK_CONSTANTS = {
     * The minimum sparks per creator for a group to publish sparks
     */
    MAX_PUBLIC_SPARKS: 15,
+
+   /**
+    * Only show spark notifications if the upcoming event is within the next X days
+    */
+   LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS: 15,
+
+   /**
+    * Only show event spark notifications after X seconds of spark becoming visible
+    */
+   SECONDS_TO_SHOW_EVENT_NOTIFICATION: 10000,
 }

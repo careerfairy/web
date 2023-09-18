@@ -11,6 +11,8 @@
       "lib": ["ES2021"],
       "allowJs": true,
       "experimentalDecorators": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
       "paths": {
          "@careerfairy/shared-lib/*": ["../shared-lib/src/*"]
       }

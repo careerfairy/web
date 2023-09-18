@@ -11,6 +11,8 @@ import { rewardSideEffectsUserStats } from "./lib/reward"
 import { handleUserStatsBadges } from "./lib/badge"
 import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { removeAndSyncSparksNotifications } from "./notificationSparks"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -32,6 +34,21 @@ export const syncLivestreams = functions
       sideEffectPromises.push(
          livestreamsRepo.syncLiveStreamStatsWithLivestream(change)
       )
+
+      if (changeTypes.isUpdate) {
+         const newValue = change.after?.data() as LivestreamEvent
+         const previousValue = change.before?.data() as LivestreamEvent
+
+         if (newValue.hasStarted && !previousValue.hasStarted) {
+            // In case the livestream as started we want to update the sparks notifications
+            functions.logger.log(
+               `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
+            )
+            sideEffectPromises.push(
+               removeAndSyncSparksNotifications(newValue.author.groupId)
+            )
+         }
+      }
 
       return handleSideEffects(sideEffectPromises)
    })

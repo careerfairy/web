@@ -8,6 +8,7 @@ import {
 } from "./groups"
 import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
+import { SPARK_CONSTANTS } from "../sparks/constants"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
@@ -40,7 +41,8 @@ export class GroupPresenter {
       public readonly testimonials: Testimonial[],
       public readonly publicProfile: boolean,
       public readonly universityName?: string,
-      public readonly universityCode?: string
+      public readonly universityCode?: string,
+      public readonly maxPublicSparks?: number
    ) {}
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
@@ -66,7 +68,8 @@ export class GroupPresenter {
          group.testimonials || [],
          group.publicProfile || false,
          group.universityName,
-         group.universityCode
+         group.universityCode,
+         group.maxPublicSparks
       )
    }
 
@@ -222,5 +225,13 @@ export class GroupPresenter {
          isComplete: percentage === 100, // Whether all the steps are completed
          isReady, // Whether the company page is ready to be viewed by students
       }
+   }
+
+   /**
+    * To get the maximum number of public sparks for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMaxPublicSparks() {
+      return this.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS
    }
 }

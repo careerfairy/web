@@ -13,7 +13,7 @@ import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
-   1000 * 60 * 60 * 12
+   1000 * 60 * 60 * 4
 
 export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
@@ -247,6 +247,7 @@ export interface UserLivestreamData extends Identifiable {
       utm?: UTMParams
       referrer?: string
       isRecommended?: boolean
+      sparkId?: string
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
@@ -598,4 +599,24 @@ export function getEarliestEventBufferTime() {
    return new Date(
       Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
    )
+}
+/**
+ * The option we are able to query with Firestore
+ */
+export type LivestreamQueryOptions = {
+   languageCodes?: string[]
+   withRecordings?: boolean
+   withTest?: boolean
+   withHidden?: boolean
+   targetGroupId?: string
+   type: "pastEvents" | "upcomingEvents"
+}
+
+/**
+ * The options we are not able to query with Firestore
+ */
+export type FilterLivestreamsOptions = {
+   companyIndustries?: string[]
+   companyCountries?: string[]
+   targetFieldsOfStudy?: FieldOfStudy[]
 }

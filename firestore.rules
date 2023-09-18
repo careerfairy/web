@@ -134,6 +134,11 @@ service cloud.firestore {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
 
+            match /sparksNotifications/{sparkNotificationsId} {
+                allow read: if true;
+                allow write: if isSignedInAndIsSameUser(userId) || sparkNotificationsId == 'userId';
+            }
+
             match /stats/stats {
                 allow read: if true; // not ideal, but we need to allow SSR to read this in the mean time
                 allow write: if isSignedInAndIsSameUser(userId);

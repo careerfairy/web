@@ -11,7 +11,7 @@ const MainPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Main Page"}
+         titleComponent={"Main Page"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Main Page of" />

@@ -8,8 +8,8 @@ import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
-import SparksFeedCarousel from "pages/sparks-feed/SparksFeedCarousel"
-import useSparksFeedIsFullScreen from "pages/sparks-feed/hooks/useSparksFeedIsFullScreen"
+import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -17,6 +17,7 @@ import {
    fetchNextSparks,
    resetSparksFeed,
    setGroupId,
+   setOriginalSparkId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
@@ -43,7 +44,7 @@ const SparksPage: NextPage<
    const isOnLastSpark = useSelector(isOnLastSparkSelector)
    const isFetchingNextSparks = useSelector(isFetchingNextSparksSelector)
    const hasNoMoreSparks = useSelector(hasNoMoreSparksSelector)
-   const initalSparksFetched = useSelector(initialSparksFetchedSelector)
+   const initialSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
 
@@ -51,7 +52,9 @@ const SparksPage: NextPage<
       dispatch(setGroupId(groupId))
       dispatch(setUserEmail(userEmail))
 
-      dispatch(setSparks([SparkPresenter.deserialize(serializedSpark)]))
+      const originalSpark = SparkPresenter.deserialize(serializedSpark)
+      dispatch(setSparks([originalSpark]))
+      dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
@@ -64,7 +67,7 @@ const SparksPage: NextPage<
 
    useEffect(() => {
       if (
-         initalSparksFetched &&
+         initialSparksFetched &&
          isOnLastSpark &&
          !isFetchingNextSparks &&
          !hasNoMoreSparks &&
@@ -76,7 +79,7 @@ const SparksPage: NextPage<
       dispatch,
       fetchNextError,
       hasNoMoreSparks,
-      initalSparksFetched,
+      initialSparksFetched,
       isFetchingNextSparks,
       isOnLastSpark,
    ])

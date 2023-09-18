@@ -38,6 +38,7 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
+import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -103,7 +104,9 @@ function MyApp(props) {
                                     <UserReminderProvider>
                                        <ErrorProvider>
                                           <UserRewardsNotifications>
-                                             <Component {...pageProps} />
+                                             <SparksFeedTrackerProvider>
+                                                <Component {...pageProps} />
+                                             </SparksFeedTrackerProvider>
                                           </UserRewardsNotifications>
                                           <Notifier />
                                        </ErrorProvider>
