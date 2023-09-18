@@ -231,3 +231,7 @@ exports.syncUserSparksNotifications =
 // User Spark Functions
 exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
+
+// Spark Analytics Functions
+exports.trackSparkEvents = userSparks.trackSparkEvents
+exports.trackSparkSecondsWatched = userSparks.trackSparkSecondsWatched

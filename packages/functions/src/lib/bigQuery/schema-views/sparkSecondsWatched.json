@@ -21,19 +21,13 @@
       "name": "timestamp",
       "type": "TIMESTAMP",
       "mode": "REQUIRED",
-      "description": "Timestamp of the event (e.g., when the half-second or second passed)"
+      "description": "Timestamp of the event (e.g., when the second passed)"
    },
    {
-      "name": "sparkPosition",
+      "name": "videoEventPositionInSeconds",
       "type": "FLOAT64",
       "mode": "REQUIRED",
-      "description": "Position (in seconds, allowing for fractions up to 2 decimal places) in the spark at the event time"
-   },
-   {
-      "name": "sparkLength",
-      "type": "FLOAT64",
-      "mode": "REQUIRED",
-      "description": "Total length of the spark in seconds, allowing for fractions up to 2 decimal places"
+      "description": "Position (in seconds, allowing for fractions up to 2 decimal places) in the video at the event time"
    },
    {
       "name": "countryCode",

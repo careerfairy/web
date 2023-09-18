@@ -34,6 +34,11 @@ import { createGenericConverter } from "../util/firestore-admin"
 import { addAddedToFeedAt } from "../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import BigQueryServiceCore from "./bigQuery/IBigQueryService"
+import {
+   SparkEvent,
+   SparkSecondWatched,
+} from "@careerfairy/shared-lib/sparks/analytics"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -207,6 +212,20 @@ export interface ISparkFunctionsRepository {
     *
     */
    getUserSparkNotifications(userId: string): Promise<UserSparksNotification[]>
+
+   /**
+    * Save spark events to BigQuery
+    * @param events The spark events to save
+    * @returns void
+    */
+   trackSparkEvents(events: SparkEvent[]): Promise<void>
+
+   /**
+    * Save spark seconds watched to BigQuery
+    * @param events The spark seconds watched to save
+    * @returns void
+    */
+   trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -217,7 +236,9 @@ export class SparkFunctionsRepository
       readonly firestore: Firestore,
       readonly storage: Storage,
       readonly logger: FunctionsLogger,
-      readonly feedReplisher: SparksFeedReplenisher
+      readonly feedReplisher: SparksFeedReplenisher,
+      readonly sparkEventHandler: BigQueryServiceCore<SparkEvent>,
+      readonly sparkSecondsWatchedHandler: BigQueryServiceCore<SparkSecondWatched>
    ) {
       super()
    }
@@ -683,6 +704,14 @@ export class SparkFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async trackSparkEvents(events: SparkEvent[]): Promise<void> {
+      return this.sparkEventHandler.insertData(events)
+   }
+
+   async trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void> {
+      return this.sparkSecondsWatchedHandler.insertData(events)
    }
 }
 

@@ -14,11 +14,7 @@ import {
    ILivestreamFunctionsRepository,
    LivestreamFunctionsRepository,
 } from "../lib/LivestreamFunctionsRepository"
-import {
-   bigQueryClient,
-   BigQueryRepository,
-   IBigQueryRepository,
-} from "./bigQuery"
+import { BigQueryRepository, IBigQueryRepository } from "./bigQuery"
 
 import { getATSRepository } from "../lib/merge/util"
 import {
@@ -39,6 +35,11 @@ import { SparksFeedReplenisher } from "../lib/sparksFeedReplenisher"
 import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
 
 import logger = require("firebase-functions/logger")
+import bigQueryClient from "./bigQueryClient"
+import {
+   sparkEventsHandler,
+   sparkSecondsWatchedHanlder,
+} from "../lib/bigQuery/IBigQueryService"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -78,4 +79,11 @@ export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
 const feedReplenisher = new SparksFeedReplenisher(firestore as any)
 
 export const sparkRepo: ISparkFunctionsRepository =
-   new SparkFunctionsRepository(firestore, storage, logger, feedReplenisher)
+   new SparkFunctionsRepository(
+      firestore,
+      storage,
+      logger,
+      feedReplenisher,
+      sparkEventsHandler,
+      sparkSecondsWatchedHanlder
+   )
