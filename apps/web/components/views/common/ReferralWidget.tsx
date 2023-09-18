@@ -117,12 +117,7 @@ const SocialButtonWithText = ({
    <Box sx={styles.socialContainer}>
       <IconButton
          sx={styles.roundedIcon}
-         onClick={() => {
-            onClick()
-            if (onSocialClick) {
-               onSocialClick()
-            }
-         }}
+         onClick={() => handleButtonClick(onClick, onSocialClick)}
       >
          <RoundedIcon />
       </IconButton>
@@ -158,17 +153,19 @@ const IconButtonComponent: FC<IconButtonProps> = ({
             },
          ]}
          size={"large"}
-         onClick={() => {
-            onClick()
-            if (onSocialClick) {
-               onSocialClick()
-            }
-         }}
+         onClick={() => handleButtonClick(onClick, onSocialClick)}
          href={href}
       >
          <Icon color={"inherit"} sx={[styles.icon, iconStyle]} />
       </IconButton>
    </Tooltip>
 )
+
+const handleButtonClick = (onClick: Function, onSocialClick?: Function) => {
+   onClick()
+   if (onSocialClick) {
+      onSocialClick()
+   }
+}
 
 export default ReferralWidget
