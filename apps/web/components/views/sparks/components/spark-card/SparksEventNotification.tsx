@@ -106,9 +106,12 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    const showNotification: boolean = useMemo(
       () =>
          Boolean(
-            eventNotification && activeSpark.id === spark.id && !groupPageId
+            eventNotification &&
+               activeSpark &&
+               activeSpark.id === spark?.id &&
+               !groupPageId
          ),
-      [activeSpark.id, eventNotification, groupPageId, spark.id]
+      [activeSpark, eventNotification, groupPageId, spark?.id]
    )
 
    return (
