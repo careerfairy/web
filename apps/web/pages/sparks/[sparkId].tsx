@@ -13,8 +13,10 @@ import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSpa
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
+   addCarNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
+   removeGroupId,
    resetSparksFeed,
    setGroupId,
    setOriginalSparkId,
@@ -24,6 +26,7 @@ import {
 import {
    activeSparkSelector,
    fetchNextErrorSelector,
+   groupIdSelector,
    hasNoMoreSparksSelector,
    initialSparksFetchedSelector,
    isFetchingNextSparksSelector,
@@ -47,6 +50,7 @@ const SparksPage: NextPage<
    const initialSparksFetched = useSelector(initialSparksFetchedSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
+   const fromGroupPage = useSelector(groupIdSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -80,6 +84,35 @@ const SparksPage: NextPage<
       fetchNextError,
       hasNoMoreSparks,
       initialSparksFetched,
+      isFetchingNextSparks,
+      isOnLastSpark,
+   ])
+
+   /**
+    * To manage the creation of card notifications, and after they are displayed, ensure that the Sparks feed continues with its content
+    */
+   useEffect(() => {
+      if (
+         !isFetchingNextSparks &&
+         hasNoMoreSparks &&
+         isOnLastSpark &&
+         fromGroupPage
+      ) {
+         // if reach the end of the sparks list and the current spark is the card notification we should
+         // remove the groupId field and fetch the initial sparks feed without the groupId on the query
+         if (activeSpark?.isCardNotification) {
+            dispatch(removeGroupId())
+            dispatch(fetchInitialSparksFeed())
+         } else {
+            // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
+            dispatch(addCarNotificationToSparksList())
+         }
+      }
+   }, [
+      activeSpark?.isCardNotification,
+      dispatch,
+      fromGroupPage,
+      hasNoMoreSparks,
       isFetchingNextSparks,
       isOnLastSpark,
    ])

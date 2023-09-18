@@ -4,7 +4,7 @@ import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC, useCallback } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
@@ -12,12 +12,14 @@ import SparkQuestion from "./SparkQuestion"
 import VideoPreview from "./VideoPreview"
 import SparksEventNotification from "./SparksEventNotification"
 import { useSelector } from "react-redux"
-import { eventDetailsDialogVisibilitySelector } from "store/selectors/sparksFeedSelectors"
+import {
+   cardNotificationSelector,
+   eventDetailsDialogVisibilitySelector,
+} from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
-import useLivestream from "../../../../custom-hook/live-stream/useLivestream"
 
 const styles = sxStyles({
    root: {
@@ -98,6 +100,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+   const cardNotification = useSelector(cardNotificationSelector)
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
 
@@ -119,68 +122,76 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       trackEvent(SparkEventActions.Watched_CompleteSpark)
    }, [trackEvent])
 
-   // TODO: logic to get the event needs to be adjusted
-   //  is require to set the currentEventNotification on the redux
-   //  then we can read it here, get the eventId and use this hook to get the event
-   const { data: event } = useLivestream("XWxe4sNU7kGlM2xkt6Mh")
+   const showCardNotification = useMemo(
+      () => Boolean(spark.isCardNotification && cardNotification),
+      [cardNotification, spark.isCardNotification]
+   )
+
+   if (spark.isCardNotification && !cardNotification) {
+      return null
+   }
 
    return (
       <>
          <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
             <SparksEventNotification spark={spark} />
-            <VideoPreview
-               thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
-               videoUrl={spark.getTransformedVideoUrl()}
-               playing={playing}
-               onSecondPassed={trackSecondsWatched}
-               pausing={eventDetailsDialogVisibility}
-               onVideoPlay={onVideoPlay}
-               onVideoEnded={onVideoEnded}
-            />
+
+            {showCardNotification ? null : (
+               <VideoPreview
+                  thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
+                  videoUrl={spark.getTransformedVideoUrl()}
+                  playing={playing}
+                  onSecondPassed={trackSecondsWatched}
+                  pausing={eventDetailsDialogVisibility}
+                  onVideoPlay={onVideoPlay}
+                  onVideoEnded={onVideoEnded}
+               />
+            )}
+
             <Box
-                sx={[
-                    styles.cardContent,
-                    ...(event ? [styles.eventCardContent] : []),
-                ]}
+               sx={[
+                  styles.cardContent,
+                  ...(showCardNotification ? [styles.eventCardContent] : []),
+               ]}
             >
                <Box
-                   sx={[
-                       styles.contentInner,
-                       ...(event ? [styles.eventCardContentInner] : []),
-                   ]}
+                  sx={[
+                     styles.contentInner,
+                     ...(showCardNotification
+                        ? [styles.eventCardContentInner]
+                        : []),
+                  ]}
                >
-                   {
-                       event ? (
-                           <SparkEventFullCardNotification event={event} />
-                       ) : (
-                           <Stack sx={styles.cardDetails} flexGrow={1}>
-                               <Box mt="auto" />
-                               <SparkDetails
-                                   companyLogoUrl={getResizedUrl(
-                                       spark.group.logoUrl,
-                                       "md"
-                                   )}
-                                   onClick={onSparkDetailsClick}
-                                   displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
-                                   companyName={spark.group.universityName}
-                                   linkToCompanyPage={companyPageLink}
-                               />
-                               <Box mt={2.5} />
-                               <SparkCategoryChip categoryId={spark.category.id} />
-                               <Box mt={1.5} />
-                               <SparkQuestion question={spark.question} />
-                           </Stack>
-                       )
-                   }
-                   {isFullScreen || event ? null : (
-                       <Box sx={styles.outerActionsWrapper}>
-                           <FeedCardActions spark={spark} />
-                       </Box>
-                   )}
+                  {showCardNotification ? (
+                     <SparkEventFullCardNotification />
+                  ) : (
+                     <Stack sx={styles.cardDetails} flexGrow={1}>
+                        <Box mt="auto" />
+                        <SparkDetails
+                           companyLogoUrl={getResizedUrl(
+                              spark.group.logoUrl,
+                              "md"
+                           )}
+                           onClick={onSparkDetailsClick}
+                           displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
+                           companyName={spark.group.universityName}
+                           linkToCompanyPage={companyPageLink}
+                        />
+                        <Box mt={2.5} />
+                        <SparkCategoryChip categoryId={spark.category.id} />
+                        <Box mt={1.5} />
+                        <SparkQuestion question={spark.question} />
+                     </Stack>
+                  )}
+                  {isFullScreen || showCardNotification ? null : (
+                     <Box sx={styles.outerActionsWrapper}>
+                        <FeedCardActions spark={spark} />
+                     </Box>
+                  )}
                </Box>
             </Box>
          </Box>
-         {isFullScreen ? null : (
+         {isFullScreen || showCardNotification ? null : (
             <Box sx={styles.outerActionsWrapper}>
                <FeedCardActions spark={spark} />
             </Box>

@@ -109,6 +109,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
             eventNotification &&
                activeSpark &&
                activeSpark.id === spark?.id &&
+               !activeSpark.isCardNotification &&
                !groupPageId
          ),
       [activeSpark, eventNotification, groupPageId, spark?.id]
