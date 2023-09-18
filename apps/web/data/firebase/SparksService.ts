@@ -41,6 +41,7 @@ import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -336,6 +337,30 @@ export class SparksService {
       const countRef = await getCountFromServer(likedSparksDocRef)
 
       return countRef.data().count > 0
+   }
+
+   incrementSparkCount(
+      sparkId: string,
+      field: keyof Pick<
+         Spark,
+         | "likes"
+         | "impressions"
+         | "numberOfCareerPageClicks"
+         | "shareCTA"
+         | "uniquePlays"
+         | "plays"
+         | "numberOfCompanyPageClicks"
+         | "numberTimesCompletelyWatched"
+         | "totalWatchedMinutes"
+      >,
+      increment: number = 1
+   ) {
+      const sparkCounter = new Counter(
+         FirestoreInstance.doc(`sparks/${sparkId}`),
+         field
+      )
+
+      sparkCounter.incrementBy(increment)
    }
 
    private createLikedSparksObject(

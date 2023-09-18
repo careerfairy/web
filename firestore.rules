@@ -256,6 +256,12 @@ service cloud.firestore {
         match /sparks/{sparkId} {
             allow read: if true;
             allow write: if false;
+
+            // Allow to increment only the 'impressions' or 'recommendedImpressions' field and only by 1.
+            match /_counter_shards_/{shardId} {
+                allow get;
+                allow write: if request.resource.data.keys().hasOnly(["likes", "impressions", "numberOfCareerPageClicks", "shareCTA", "uniquePlays", "plays", "numberOfCompanyPageClicks", "numberTimesCompletelyWatched", "totalWatchedMinutes" ]) 
+            }
         }
 
         match /videos/{video} {

@@ -19,6 +19,8 @@ import {
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { useInView } from "react-intersection-observer"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
 
 const styles = sxStyles({
@@ -96,6 +98,8 @@ type Props = {
 }
 
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
+   const { data: visitorId } = useFingerPrint()
+
    const isFullScreen = useSparksFeedIsFullScreen()
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
@@ -122,6 +126,17 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       trackEvent(SparkEventActions.Watched_CompleteSpark)
    }, [trackEvent])
 
+   const { ref } = useInView({
+      threshold: 0.9, // At least 90% of the element must be visible
+      delay: 1000, // Element must be at least visible for 1 second before triggering
+      skip: !visitorId,
+      onChange: (inView) => {
+         if (inView) {
+            trackEvent(SparkEventActions.Impression)
+         }
+      },
+   })
+
    const showCardNotification = useMemo(
       () => Boolean(spark.isCardNotification && cardNotification),
       [cardNotification, spark.isCardNotification]
@@ -133,7 +148,10 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
 
    return (
       <>
-         <Box sx={[styles.root, isFullScreen && styles.fullScreenRoot]}>
+         <Box
+            ref={ref}
+            sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
+         >
             <SparksEventNotification spark={spark} />
 
             {showCardNotification ? null : (

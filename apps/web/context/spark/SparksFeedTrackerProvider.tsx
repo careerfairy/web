@@ -1,5 +1,6 @@
 import {
    SparkEventActionType,
+   SparkEventActions,
    SparkEventClient,
    SparkSecondWatchedClient,
 } from "@careerfairy/shared-lib/sparks/analytics"
@@ -105,6 +106,64 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             stringTimestamp: new Date().toISOString(),
          }
 
+         switch (options.actionType) {
+            case SparkEventActions.Click_CareerPageCTA:
+               sparkService.incrementSparkCount(
+                  currentSparkId,
+                  "numberOfCareerPageClicks"
+               )
+               break
+            case SparkEventActions.Like:
+               sparkService.incrementSparkCount(currentSparkId, "likes")
+               break
+            case SparkEventActions.Unlike:
+               sparkService.incrementSparkCount(currentSparkId, "likes", -1)
+               break
+            case SparkEventActions.Impression:
+               console.log("incrementing impressions")
+               sparkService.incrementSparkCount(currentSparkId, "impressions")
+               break
+            case SparkEventActions.Played_Spark:
+               sparkService.incrementSparkCount(currentSparkId, "plays")
+               break
+            case SparkEventActions.Click_CompanyPageCTA:
+               sparkService.incrementSparkCount(
+                  currentSparkId,
+                  "numberOfCompanyPageClicks"
+               )
+               break
+            case SparkEventActions.Watched_CompleteSpark:
+               sparkService.incrementSparkCount(
+                  currentSparkId,
+                  "numberTimesCompletelyWatched"
+               )
+               break
+            case SparkEventActions.Share_Clipboard:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_Email:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_Facebook:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_LinkedIn:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_Mobile:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_X:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_WhatsApp:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+            case SparkEventActions.Share_Other:
+               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
+               break
+         }
+
          addEventToBatch(options)
       },
       [
@@ -121,6 +180,11 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
    const trackSecondsWatched = useCallback(
       (secondsWatched: number) => {
          if (!currentSparkId || !visitorId) return
+         sparkService.incrementSparkCount(
+            currentSparkId,
+            "totalWatchedMinutes",
+            1 / 60
+         )
 
          const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
@@ -136,7 +200,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
          addSecondsWatchedToBatch,
          currentSparkId,
          sessionId,
-         userData?.id,
          userData?.universityCountryCode,
          visitorId,
       ]

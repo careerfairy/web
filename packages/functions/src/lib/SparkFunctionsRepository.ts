@@ -307,6 +307,8 @@ export class SparkFunctionsRepository
          uniquePlays: 0,
          shareCTA: 0,
          numberOfCareerPageClicks: 0,
+         numberOfCompanyPageClicks: 0,
+         numberTimesCompletelyWatched: 0,
          group: pickPublicDataFromGroup(group),
          creator: pickPublicDataFromCreator(creator),
          id: ref.id,
