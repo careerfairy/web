@@ -238,6 +238,7 @@ export type PublicGroup = Pick<
    | "universityName"
    | "universityCode"
    | "publicSparks"
+   | "publicProfile"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
@@ -249,6 +250,7 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       universityName: group.universityName ?? null,
       universityCode: group.universityCode ?? null,
       publicSparks: group.publicSparks ?? null,
+      publicProfile: group.publicProfile ?? false,
    }
 }
 
@@ -263,4 +265,26 @@ export const buildTestimonialsArray = (values, groupId) => {
          testimonial: values.testimonials[key].testimonial,
       }
    })
+}
+
+/**
+ * A group admin info object that is used to send emails to group admins
+ */
+export type GroupAdminNewEventEmailInfo = {
+   /**
+    * The ID of the admin's group
+    */
+   groupId: string
+   /**
+    * The email of the admin
+    */
+   email: string
+   /**
+    * Link to the event in their dashboard
+    */
+   eventDashboardLink: string
+   /**
+    * Link to the public live stream event page in the platform
+    */
+   nextLivestreamsLink: string
 }

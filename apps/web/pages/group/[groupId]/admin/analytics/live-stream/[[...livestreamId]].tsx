@@ -10,7 +10,7 @@ const LivestreamPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Live Stream Analytics"}
+         titleComponent={"Live Stream Analytics"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Live Stream Analytics of" />

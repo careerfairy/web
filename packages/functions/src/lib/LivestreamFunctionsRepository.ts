@@ -5,7 +5,9 @@ import {
 import {
    EventRating,
    EventRatingAnswer,
+   getEarliestEventBufferTime,
    LivestreamEvent,
+   LivestreamQueryOptions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
@@ -31,6 +33,11 @@ import type { FunctionsLogger } from "../util"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
 import { DateTime } from "luxon"
+import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   GroupAdmin,
+   GroupAdminNewEventEmailInfo,
+} from "@careerfairy/shared-lib/groups"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -94,6 +101,23 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       ratingName: string,
       newRating: EventRatingAnswer
    ): Promise<void>
+
+   fetchLivestreams(options: LivestreamQueryOptions): Promise<LivestreamEvent[]>
+
+   /**
+    * Retrieves all the admin information for a given livestream.
+    * Iterates over the array of group IDs associated with the livestream, fetches the group data and admin data from Firestore,
+    * and constructs an array of GroupAdminInfo objects.
+    *
+    * @param streamId - The ID of the livestream.
+    * @param origin - The base URL used to construct the event dashboard and next livestream links.
+    * @returns  A promise that resolves to an array of GroupAdminInfo objects.
+    * Each object contains the groupId, admin's email, event dashboard link, and next livestream link.
+    */
+   getAllGroupAdminInfoByStream(
+      streamId: string,
+      origin: string
+   ): Promise<GroupAdminNewEventEmailInfo[]>
 }
 
 export class LivestreamFunctionsRepository
@@ -331,5 +355,108 @@ export class LivestreamFunctionsRepository
             livestreamStatsDocOperationsToMake,
          })
       }
+   }
+
+   async fetchLivestreams(
+      options: LivestreamQueryOptions
+   ): Promise<LivestreamEvent[]> {
+      let q = this.firestore
+         .collection("livestreams")
+         .withConverter(
+            createCompatGenericConverter<LivestreamEvent>()
+         ) as unknown as FirebaseFirestore.Query<LivestreamEvent>
+
+      const now = new Date()
+
+      const {
+         type,
+         languageCodes,
+         targetGroupId,
+         withHidden,
+         withRecordings,
+         withTest,
+      } = options
+
+      if (targetGroupId) {
+         q = q.where("groupIds", "array-contains", targetGroupId)
+      } else {
+         if (type === "pastEvents") {
+            q = q
+               .where("start", "<", now)
+               .where(
+                  "start",
+                  ">",
+                  DateTime.local().minus({ months: 8 }).toJSDate()
+               )
+               .orderBy("start", "desc")
+         } else {
+            q = q
+               .where("start", ">", getEarliestEventBufferTime())
+               .orderBy("start", "asc")
+         }
+
+         if (withRecordings) {
+            q = q.where("denyRecordingAccess", "==", false)
+         }
+
+         if (!withTest) {
+            q = q.where("test", "==", false)
+         }
+
+         if (!withHidden) {
+            q = q.where("hidden", "==", false)
+         }
+
+         if (languageCodes?.length > 0) {
+            q = q.where("language.code", "in", languageCodes)
+         }
+      }
+
+      const snaps = await q.get()
+      return snaps.docs.map((d) => d.data())
+   }
+
+   async getAllGroupAdminInfoByStream(
+      streamId: string,
+      origin = "https://www.careerfairy.io"
+   ): Promise<GroupAdminNewEventEmailInfo[]> {
+      const admins: GroupAdminNewEventEmailInfo[] = []
+
+      const stream = await this.getById(streamId)
+
+      if (!stream) {
+         return admins
+      }
+
+      const groupIds = stream.groupIds
+
+      for (const groupId of groupIds) {
+         const groupRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+
+         const groupSnap = await groupRef.get()
+
+         if (!groupSnap.exists) {
+            continue
+         }
+
+         const adminsSnap = await groupRef
+            .collection("groupAdmins")
+            .withConverter(createCompatGenericConverter<GroupAdmin>())
+            .get()
+
+         adminsSnap.docs.forEach((adminSnap) => {
+            const adminData = adminSnap.data()
+            admins.push({
+               groupId,
+               email: adminData.email,
+               eventDashboardLink: `${origin}/group/${groupId}/admin/events?eventId=${streamId}`,
+               nextLivestreamsLink: `${origin}/next-livestreams/group/${groupId}/livestream/${streamId}`,
+            })
+         })
+      }
+
+      return admins
    }
 }

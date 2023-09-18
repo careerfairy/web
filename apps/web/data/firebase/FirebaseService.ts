@@ -59,9 +59,7 @@ import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { getRandomInt } from "../../components/helperFunctions/HelperFunctions"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -162,7 +160,7 @@ class FirebaseService {
 
    sendNewlyPublishedEventEmail = async (emailData) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail_eu"
+         "sendNewlyPublishedEventEmail_v2"
       )
       return sendNewlyPublishedEventEmail(emailData)
    }
@@ -2200,6 +2198,7 @@ class FirebaseService {
       userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
       options: {
          isRecommended?: boolean
+         sparkId?: string
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
@@ -2238,6 +2237,9 @@ class FirebaseService {
             date: this.getServerTimestamp(),
             ...(options.isRecommended && {
                isRecommended: true,
+            }),
+            ...(options.sparkId?.length > 0 && {
+               sparkId: options.sparkId,
             }),
          },
          // to allow queries for users that didn't participate
@@ -2726,38 +2728,6 @@ class FirebaseService {
             new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS) &&
          eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
       )
-   }
-
-   // Approval Queries
-
-   getAllGroupAdminInfo = async (
-      arrayOfGroupIds = ["groupId"],
-      streamId = ""
-   ) => {
-      let adminsInfo = []
-      const baseUrl = this.getBaseUrl()
-      for (const groupId of arrayOfGroupIds) {
-         const groupRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-         const groupSnap = await groupRef.get()
-
-         if (!groupSnap.exists) continue
-
-         const adminsSnap = await groupRef.collection("groupAdmins").get()
-
-         const newAdminsInfo = adminsSnap.docs.map((adminDoc) => {
-            const adminData = adminDoc.data() as GroupAdmin
-            return {
-               groupId,
-               email: adminData.email,
-               eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
-               nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
-            }
-         })
-         adminsInfo = [...adminsInfo, ...newAdminsInfo]
-      }
-      return adminsInfo
    }
 
    // Notification Queries

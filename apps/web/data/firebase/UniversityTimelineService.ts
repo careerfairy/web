@@ -1,8 +1,10 @@
 import {
    addDoc,
    collection,
+   collectionGroup,
    deleteDoc,
    doc,
+   DocumentReference,
    Firestore,
    getDocs,
    query,
@@ -20,7 +22,8 @@ import {
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { utils, writeFile, read } from "xlsx"
-import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { chunkArray, removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 
 export class UniversityTimelineService {
    constructor(private readonly firestore: Firestore) {}
@@ -201,27 +204,27 @@ export class UniversityTimelineService {
       const reader = new FileReader()
 
       reader.onload = async (e) => {
+         const newlyCreatedUniversityRefs: DocumentReference[] = []
+         const data = new Uint8Array(e.target?.result as ArrayBuffer)
+         const workbook = read(data, { type: "array" })
+         const firstSheetName = workbook.SheetNames[0]
+         const worksheet = workbook.Sheets[firstSheetName]
+
+         const jsonData = utils.sheet_to_json(worksheet, {
+            raw: false,
+            defval: null,
+         })
+
+         // get initial universities
+         const timelineUniversitiesRef = collection(
+            this.firestore,
+            "timelineUniversities"
+         )
+         const timelineUniversitiesQuery = query(
+            timelineUniversitiesRef,
+            where("countryCode", "==", countryCode)
+         )
          try {
-            const data = new Uint8Array(e.target?.result as ArrayBuffer)
-            const workbook = read(data, { type: "array" })
-            const firstSheetName = workbook.SheetNames[0]
-            const worksheet = workbook.Sheets[firstSheetName]
-
-            const jsonData = utils.sheet_to_json(worksheet, {
-               raw: false,
-               defval: null,
-            })
-
-            // get initial universities
-            const timelineUniversitiesRef = collection(
-               this.firestore,
-               "timelineUniversities"
-            )
-            const timelineUniversitiesQuery = query(
-               timelineUniversitiesRef,
-               where("countryCode", "==", countryCode)
-            )
-
             const initialUniversitiesSnapshot = await getDocs(
                timelineUniversitiesQuery
             )
@@ -241,19 +244,27 @@ export class UniversityTimelineService {
                }
                return name
             })
+
             const newUniversityNames = removeDuplicates(
                validUniversityNames
             ).filter((uniName) => !initialUniversityNames.includes(uniName))
 
-            newUniversityNames.forEach((universityName) =>
-               universitiesBatch.set(doc(timelineUniversitiesRef), {
+            newUniversityNames.forEach((universityName) => {
+               const universityDocRef = doc(timelineUniversitiesRef)
+               newlyCreatedUniversityRefs.push(universityDocRef)
+
+               universitiesBatch.set(universityDocRef, {
                   name: universityName,
                   countryCode: countryCode,
                })
-            )
+            })
 
             await universitiesBatch.commit()
+         } catch (e) {
+            errorNotification(e, e)
+         }
 
+         try {
             const periodsBatch = writeBatch(this.firestore)
 
             // get updated universites
@@ -320,11 +331,58 @@ export class UniversityTimelineService {
             await periodsBatch.commit()
             successNotification("Batch upload successful")
          } catch (e) {
+            // if there is an error, delete all the universities that were just added
             errorNotification(e, e)
+            const universitiesBatch = writeBatch(this.firestore)
+
+            newlyCreatedUniversityRefs.forEach((uniRef) =>
+               universitiesBatch.delete(uniRef)
+            )
+
+            universitiesBatch.commit()
          }
       }
 
       reader.readAsArrayBuffer(file)
+   }
+
+   /**
+    * Fetches all periods whose end is after a certain date for a set of timeline universities from the database.
+    *
+    * @param universityIds - The IDs of the universities to fetch periods for.
+    * @param start - The start date. Only periods ending after this date will be fetched.
+    * @returns A promise that resolves to an array of university periods.
+    */
+   async getUniversityPeriodsByIdsAndStart(
+      universityIds: string[],
+      start: Date
+   ) {
+      if (!universityIds?.length) return []
+
+      const chunkSize = 30 // Firestore only allows 30 "in" queries per query
+
+      const periodQueryChunksQueryies = chunkArray(
+         universityIds,
+         chunkSize
+      ).map((periodQueryChunk) =>
+         getDocs(
+            query(
+               collectionGroup(this.firestore, "periods"),
+               where("timelineUniversityId", "in", periodQueryChunk),
+               where("end", ">=", start)
+            ).withConverter(createGenericConverter<UniversityPeriod>())
+         )
+      )
+
+      const periodQueryChunks = await Promise.all(periodQueryChunksQueryies)
+
+      const periods: UniversityPeriod[] = []
+
+      periodQueryChunks.forEach((periodQueryChunk) => {
+         periods.push(...periodQueryChunk.docs.map((doc) => doc.data()))
+      })
+
+      return periods
    }
 }
 

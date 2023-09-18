@@ -10,7 +10,7 @@ const FeedbackPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Feedback"}
+         titleComponent={"Feedback"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Feedback of" />

@@ -263,6 +263,12 @@ const createNonAttendeesEmailData = (
 export const addMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() + minutes * 60000)
 }
+export const addDaysDate = (date: Date, days: number): Date => {
+   const newData = new Date(date.getTime())
+   newData.setDate(newData.getDate() + days)
+
+   return newData
+}
 
 export const removeMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() - minutes * 60000)
@@ -405,6 +411,20 @@ export const isLocalEnvironment = () => {
 
 export const isTestEnvironment = () => {
    return process.env.NODE_ENV === "test"
+}
+
+export const isProductionEnvironment = () => {
+   return process.env.NODE_ENV === "production"
+}
+
+export const getBigQueryTablePrefix = () => {
+   if (isProductionEnvironment()) {
+      return ""
+   }
+
+   const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
+
+   return `_${prefix}`
 }
 
 export const logAxiosError = (error: any) => {
@@ -626,3 +646,17 @@ export const getChangeTypes = (
 }
 
 export type FunctionsLogger = typeof functions.logger
+
+/**
+ * Retrieves the country code from the context headers. The "x-appengine-country" header is added by Google App Engine when the function is deployed.
+ * It uses the request's IP address to determine the country. This header is not present during local development because the function is not running on Google's servers.
+ * Google App Engine can also provide the city and region if needed.
+ * @param  context - The context of the function call.
+ * @returns  The country code if it exists, null otherwise.
+ */
+export const getCountryCode = (
+   context: functions.https.CallableContext
+): string | null => {
+   const appEngineCountry = context?.rawRequest?.headers["x-appengine-country"]
+   return appEngineCountry ? appEngineCountry.toString() : null
+}

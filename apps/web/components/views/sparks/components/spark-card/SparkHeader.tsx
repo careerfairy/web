@@ -1,12 +1,14 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import RoundedLogo from "components/views/common/RoundedLogo"
-import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "components/helperFunctions/HelperFunctions"
 import { DateTime } from "luxon"
 import { FC, Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
+import SparkDetails from "./SparkDetails"
 import SparkOptionsButton from "./SparkOptionsButton"
 
 const styles = sxStyles({
@@ -53,14 +55,8 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
    return (
       <Fragment>
          <Box sx={styles.root}>
-            <RoundedLogo
-               src={spark.group.logoUrl}
-               alt={spark.group.universityName}
-               size={36}
-               borderRadius={1.5}
-            />
-            <Box mr={0.75} />
-            <SparkCreatorDetails
+            <SparkDetails
+               companyLogoUrl={getResizedUrl(spark.group.logoUrl, "md")}
                displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                companyName={spark.group.universityName}
             />
@@ -81,29 +77,6 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
             ) : null}
          </Box>
       </Fragment>
-   )
-}
-
-type SparkCreatorDetailsProps = {
-   displayName: string
-   companyName: string
-}
-
-const SparkCreatorDetails: FC<SparkCreatorDetailsProps> = ({
-   companyName,
-   displayName,
-}) => {
-   return (
-      <Box>
-         <BrandedTooltip title={displayName.length > 20 ? displayName : ""}>
-            <Typography sx={styles.displayName} component={"h5"}>
-               {displayName}
-            </Typography>
-         </BrandedTooltip>
-         <BrandedTooltip title={companyName.length > 20 ? companyName : ""}>
-            <Typography sx={styles.companyName}>From {companyName}</Typography>
-         </BrandedTooltip>
-      </Box>
    )
 }
 

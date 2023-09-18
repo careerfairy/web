@@ -2,7 +2,6 @@ import Box from "@mui/material/Box"
 import React, { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import VideoPreview from "./VideoPreview"
-import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -52,7 +51,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
 }) => {
    return (
       <Box sx={styles.root}>
-         {componentHeader && <Box>{componentHeader}</Box>}
+         {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>
          <VideoPreview
             thumbnailUrl={video.thumbnailUrl}

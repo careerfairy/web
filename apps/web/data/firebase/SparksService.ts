@@ -7,9 +7,16 @@ import {
    AddSparkSparkData,
    DeleteSparkData,
    GetFeedData,
+   RemoveNotificationFromUserData,
    Spark,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   SparkClientEventsPayload,
+   SparkEventClient,
+   SparkSecondWatchedClient,
+   SparkSecondsWatchedClientPayload,
+} from "@careerfairy/shared-lib/sparks/analytics"
 import {
    Query,
    collection,
@@ -80,6 +87,32 @@ export class SparksService {
 
       return serializedSparks.map(SparkPresenter.deserialize)
    }
+   /**
+    * Calls the trackSparkEvents cloud function with the provided data.
+    * @param data - The data to send to the cloud function.
+    */
+   async trackSparkEvents(data: SparkEventClient[]) {
+      return httpsCallable<SparkClientEventsPayload, void>(
+         this.functions,
+         "trackSparkEvents"
+      )({
+         events: data,
+      })
+   }
+
+   /**
+    * Calls the trackSparkSecondsWatched cloud function every second a user watches a spark.
+    * @param data - The data containing the sparkId and the number of seconds watched.
+    */
+
+   async trackSparkSecondsWatched(data: SparkSecondWatchedClient[]) {
+      return httpsCallable<SparkSecondsWatchedClientPayload, void>(
+         this.functions,
+         "trackSparkSecondsWatched"
+      )({
+         events: data,
+      })
+   }
 
    /**
     * Fetches the next batch of sparks based on provided options.
@@ -87,7 +120,8 @@ export class SparksService {
     * @param lastSpark - The last retrieved spark to determine the starting point for the next batch.
     *                    If null, the first batch will be retrieved.
     * @param options - The options for the fetch. This can either specify a `userId` or a `groupId`,
-    *                  but not both. It also optionally specifies the number of sparks to fetch.
+    *                  but not both. It also optionally specifies the number of sparks to fetch
+    *                  and the categories for which to filter the sparks
     *
     * @returns A promise that resolves to an array of SparkPresenter objects.
     */
@@ -110,8 +144,8 @@ export class SparksService {
             where("group.id", "==", options.groupId!)
          )
 
-         // Check if options specify a userId and ensure it's not null.
-      } else if (options.userId) {
+         // Check if options specify a userId and that no categories are selected
+      } else if (options.userId && !options.sparkCategoryIds?.length) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
@@ -120,8 +154,16 @@ export class SparksService {
          // Set the sort field to be the addedToFeedAt field.
          sortField = "addedToFeedAt"
       } else {
-         // If neither userId nor groupId are specified, query the public sparks feed.
+         // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
+      }
+
+      // Filter the sparks by category if provided
+      if (options.sparkCategoryIds?.length) {
+         baseQuery = query(
+            baseQuery,
+            where("category.id", "in", options.sparkCategoryIds)
+         )
       }
 
       // Order the results by their publication date in descending order.
@@ -188,6 +230,27 @@ export class SparksService {
          this.functions,
          "markSparkAsSeenByUser"
       )({ sparkId })
+   }
+
+   /**
+    * To remove and sync a specific spark notification related to a group from the user SparksNotification subCollection
+    *
+    * @param data - has the groupId and userId
+    */
+   async removeAndSyncUserSparkNotification(
+      data: RemoveNotificationFromUserData
+   ) {
+      return httpsCallable<RemoveNotificationFromUserData, void>(
+         this.functions,
+         "removeAndSyncUserSparkNotification"
+      )(data)
+   }
+
+   async createUserSparksFeedEventNotifications(userId: string) {
+      return httpsCallable<string, void>(
+         this.functions,
+         "createUserSparksFeedEventNotifications"
+      )(userId)
    }
 }
 

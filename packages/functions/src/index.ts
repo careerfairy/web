@@ -48,6 +48,7 @@ import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
+import notificationSparks = require("./notificationSparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -73,7 +74,7 @@ exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 // Group Admin
 exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail_eu =
+exports.sendNewlyPublishedEventEmail_v2 =
    groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
 exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
@@ -109,6 +110,7 @@ exports.notifySlackWhenALivestreamStarts =
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
+exports.fetchLivestreams = livestreams.fetchLivestreams
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
@@ -216,6 +218,20 @@ exports.createSpark_v2 = groupSparks.createSpark
 exports.updateSpark_v2 = groupSparks.updateSpark
 exports.deleteSpark_v2 = groupSparks.deleteSpark
 
+// User Spark Notification Functions
+exports.createSparksFeedEventNotifications =
+   notificationSparks.createSparksFeedEventNotifications
+exports.createUserSparksFeedEventNotifications =
+   notificationSparks.createUserSparksFeedEventNotifications
+exports.removeAndSyncUserSparkNotification =
+   notificationSparks.removeAndSyncUserSparkNotification
+exports.syncUserSparksNotifications =
+   notificationSparks.syncUserSparksNotifications
+
 // User Spark Functions
 exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
+
+// Spark Analytics Functions
+exports.trackSparkEvents = userSparks.trackSparkEvents
+exports.trackSparkSecondsWatched = userSparks.trackSparkSecondsWatched

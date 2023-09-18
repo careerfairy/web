@@ -29,6 +29,7 @@ const csp = {
       "*.amazonaws.com",
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
+      "https://ik.imagekit.io",
    ],
    "script-src": [
       "'self'",
@@ -95,6 +96,7 @@ const csp = {
       "vitals.vercel-insights.com",
       "ws:",
       "wss:",
+      "https://noembed.com", // for react-player thumbnail
    ],
    "img-src": [
       "'self'",

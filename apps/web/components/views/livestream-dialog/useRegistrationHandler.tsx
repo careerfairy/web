@@ -15,6 +15,7 @@ import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
+import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
  * Logic for handling the register button click
@@ -26,6 +27,7 @@ export default function useRegistrationHandler() {
       livestreamPresenter,
       serverUserEmail,
       goToView,
+      currentSparkId,
    } = useLiveStreamDialog()
    const { push, asPath } = useRouter()
    const { forceShowReminder } = useUserReminders()
@@ -94,6 +96,11 @@ export default function useRegistrationHandler() {
          userData.authId
       )
       dataLayerLivestreamEvent("event_registration_removed", livestream)
+
+      // after de-register from a livestream we want to update the user sparks notifications for this user
+      await sparkService.createUserSparksFeedEventNotifications(
+         userData.userEmail
+      )
    }, [deregisterFromLivestream, livestream, userData])
 
    /**
@@ -182,8 +189,24 @@ export default function useRegistrationHandler() {
             userAnsweredLivestreamGroupQuestions,
             {
                isRecommended,
+               ...(currentSparkId && { sparkId: currentSparkId }),
             }
          )
+            .then(() => {
+               // after registration, remove from this user's sparks notification the existing notification related to this event
+               sparkService
+                  .removeAndSyncUserSparkNotification({
+                     userId: userData.userEmail,
+                     groupId: livestream.author.groupId,
+                  })
+                  .catch((e) =>
+                     errorLogAndNotify(e, {
+                        message: "Failed to remove spark notification",
+                        user: authenticatedUser,
+                        livestream,
+                     })
+                  )
+            })
             .then(() => {
                sendRegistrationConfirmationEmail(
                   authenticatedUser,
@@ -213,7 +236,12 @@ export default function useRegistrationHandler() {
                })
             })
       },
-      [isRecommended, registerToLivestream, sendRegistrationConfirmationEmail]
+      [
+         currentSparkId,
+         isRecommended,
+         registerToLivestream,
+         sendRegistrationConfirmationEmail,
+      ]
    )
 
    return {

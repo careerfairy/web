@@ -79,12 +79,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   serverSideLivestream: LivestreamEvent
+   serverSideLivestream?: LivestreamEvent
    livestreamId: string
    handleClose: () => void
    open: boolean
    page: "details" | "register" | "job-details"
-   updatedStats: UserStats
+   updatedStats?: UserStats
    serverUserEmail: string
    /**
     * The mode of operation for the dialog. Can be either "page" or "stand-alone".
@@ -95,6 +95,7 @@ type Props = {
     */
    mode?: DialogContextType["mode"]
    onRegisterSuccess?: () => void
+   currentSparkId?: string
 }
 
 export type ViewKey =
@@ -210,6 +211,7 @@ const Content: FC<ContentProps> = ({
    page = "details",
    livestreamId,
    mode = "page",
+   currentSparkId,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -353,6 +355,7 @@ const Content: FC<ContentProps> = ({
          goToJobDetails,
          mode,
          onRegisterSuccess,
+         currentSparkId,
       }),
       [
          goToView,
@@ -369,6 +372,7 @@ const Content: FC<ContentProps> = ({
          goToJobDetails,
          mode,
          onRegisterSuccess,
+         currentSparkId,
       ]
    )
 
@@ -450,6 +454,7 @@ type DialogContextType = {
     * This replaces the default behavior of going to the next view in the dialog.
     */
    onRegisterSuccess?: () => void
+   currentSparkId?: string
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -478,6 +483,7 @@ const DialogContext = createContext<DialogContextType>({
    registrationState: registrationInitialState,
    registrationDispatch: () => {},
    mode: "page",
+   currentSparkId: null,
 })
 
 export const useLiveStreamDialog = () => {

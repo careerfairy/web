@@ -36,6 +36,7 @@ import {
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import Heading from "components/views/portal/common/Heading"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -99,9 +100,7 @@ const PortalPage = ({
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
                            ) : null}
-                           <SparksCarouselWithSuspenseComponent
-                              handleSparksClicked={handleSparksClicked}
-                           />
+
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
                               limit={20}
@@ -115,6 +114,10 @@ const PortalPage = ({
                               seeMoreLink={"/next-livestreams?type=pastEvents"}
                               // No need to show loading as these events have already been queried server side
                               loading={false}
+                           />
+                           <SparksCarouselWithSuspenseComponent
+                              header={<Heading>SPARKS</Heading>}
+                              handleSparksClicked={handleSparksClicked}
                            />
                         </WidgetsWrapper>
                      </Container>
