@@ -18,6 +18,7 @@ import {
    resetSparksFeed,
    setCurrentEventNotification,
    setGroupId,
+   setOriginalSparkId,
    setSparks,
    setUserEmail,
 } from "store/reducers/sparksFeedReducer"
@@ -63,7 +64,9 @@ const SparksPage: NextPage<
       dispatch(setGroupId(groupId))
       dispatch(setUserEmail(userEmail))
 
-      dispatch(setSparks([SparkPresenter.deserialize(serializedSpark)]))
+      const originalSpark = SparkPresenter.deserialize(serializedSpark)
+      dispatch(setSparks([originalSpark]))
+      dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {

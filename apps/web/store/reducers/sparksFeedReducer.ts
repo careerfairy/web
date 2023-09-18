@@ -9,6 +9,7 @@ type Status = "idle" | "loading" | "failed"
 
 // Initial state
 interface SparksState {
+   originalSparkId: string | null
    sparks: SparkPresenter[]
    currentPlayingIndex: number
    hasMoreSparks: boolean
@@ -26,6 +27,7 @@ interface SparksState {
 }
 
 const initialState: SparksState = {
+   originalSparkId: null,
    sparks: [],
    currentPlayingIndex: 0,
    hasMoreSparks: true,
@@ -75,8 +77,12 @@ const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
    reducers: {
+      setOriginalSparkId: (state, action: PayloadAction<string | null>) => {
+         state.originalSparkId = action.payload
+      },
       setSparks: (state, action: PayloadAction<SparkPresenter[]>) => {
          state.sparks = action.payload
+         state.currentPlayingIndex = 0
       },
       setGroupId: (state, action: PayloadAction<SparksState["groupId"]>) => {
          state.groupId = action.payload
@@ -124,6 +130,7 @@ const sparksFeedSlice = createSlice({
          state.currentEventNotification = null
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
+         state.originalSparkId = null
       },
    },
    extraReducers: (builder) => {
@@ -206,6 +213,7 @@ const getSparkOptions = (state: RootState) => {
 }
 
 export const {
+   setOriginalSparkId,
    setSparks,
    setGroupId,
    setUserEmail,

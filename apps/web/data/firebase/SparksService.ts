@@ -12,6 +12,12 @@ import {
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
+   SparkClientEventsPayload,
+   SparkEventClient,
+   SparkSecondWatchedClient,
+   SparkSecondsWatchedClientPayload,
+} from "@careerfairy/shared-lib/sparks/analytics"
+import {
    Query,
    collection,
    doc,
@@ -80,6 +86,32 @@ export class SparksService {
       )(data)
 
       return serializedSparks.map(SparkPresenter.deserialize)
+   }
+   /**
+    * Calls the trackSparkEvents cloud function with the provided data.
+    * @param data - The data to send to the cloud function.
+    */
+   async trackSparkEvents(data: SparkEventClient[]) {
+      return httpsCallable<SparkClientEventsPayload, void>(
+         this.functions,
+         "trackSparkEvents"
+      )({
+         events: data,
+      })
+   }
+
+   /**
+    * Calls the trackSparkSecondsWatched cloud function every second a user watches a spark.
+    * @param data - The data containing the sparkId and the number of seconds watched.
+    */
+
+   async trackSparkSecondsWatched(data: SparkSecondWatchedClient[]) {
+      return httpsCallable<SparkSecondsWatchedClientPayload, void>(
+         this.functions,
+         "trackSparkSecondsWatched"
+      )({
+         events: data,
+      })
    }
 
    /**
