@@ -1,7 +1,11 @@
 import React, { FC, useCallback, useMemo } from "react"
 import DateUtil from "../../../../../util/DateUtil"
 import { useDispatch, useSelector } from "react-redux"
-import { currentSparkEventNotificationSelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import {
+   activeSparkSelector,
+   currentSparkEventNotificationSelector,
+   groupIdSelector,
+} from "../../../../../store/selectors/sparksFeedSelectors"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import {
@@ -73,6 +77,9 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    const isMobile = useIsMobile()
 
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
+   const activeSpark = useSelector(activeSparkSelector)
+   const groupPageId = useSelector(groupIdSelector)
+
    const { universityName, logoUrl } = spark.group
 
    const missingDays = useMemo(
@@ -96,8 +103,19 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
       dispatch(removeCurrentEventNotifications())
    }, [dispatch])
 
+   const showNotification: boolean = useMemo(
+      () =>
+         Boolean(
+            eventNotification &&
+               activeSpark &&
+               activeSpark.id === spark?.id &&
+               !groupPageId
+         ),
+      [activeSpark, eventNotification, groupPageId, spark?.id]
+   )
+
    return (
-      <Slide direction={"down"} in={Boolean(eventNotification)}>
+      <Slide direction={"down"} in={showNotification}>
          <Box sx={styles.root}>
             <Box sx={styles.notification}>
                <Avatar

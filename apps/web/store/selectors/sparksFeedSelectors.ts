@@ -52,3 +52,5 @@ export const currentSparkIdSelector = (state: RootState) => {
 
 export const originalSparkIdSelector = (state: RootState) =>
    state.sparksFeed.originalSparkId
+
+export const groupIdSelector = (state: RootState) => state.sparksFeed.groupId
