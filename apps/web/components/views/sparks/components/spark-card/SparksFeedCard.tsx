@@ -21,6 +21,8 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { useInView } from "react-intersection-observer"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import { sparkService } from "data/firebase/SparksService"
+import { useAuth } from "HOCs/AuthProvider"
 import SparkEventFullCardNotification from "./SparkEventFullCardNotification"
 
 const styles = sxStyles({
@@ -99,6 +101,7 @@ type Props = {
 
 const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const { data: visitorId } = useFingerPrint()
+   const { authenticatedUser } = useAuth()
 
    const isFullScreen = useSparksFeedIsFullScreen()
    const eventDetailsDialogVisibility = useSelector(
@@ -132,6 +135,9 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       skip: !visitorId,
       onChange: (inView) => {
          if (inView) {
+            sparkService
+               .markSparkAsSeen(authenticatedUser?.email, spark.id)
+               .catch(console.error)
             trackEvent(SparkEventActions.Impression)
          }
       },
