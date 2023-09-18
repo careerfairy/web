@@ -4,7 +4,7 @@ import {
    validateUserIsGroupAdmin as validateUserIsGroupAdminFn,
 } from "../lib/validations"
 import { OnCallMiddleware } from "./middlewares"
-import { ObjectShape } from "yup/lib/object"
+import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { object } from "yup"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { Group } from "@careerfairy/shared-lib/groups"
@@ -52,15 +52,20 @@ export const userAuthExists = (): OnCallMiddleware => {
 }
 
 /**
- * Validate a schema against the data property
- * @param objectSchemaShape
+ * Validate data against a schema in a type-safe manner
+ * @param objectSchema - The schema to validate against
+ * @throws If the data is not valid
  */
-export const dataValidation = (
-   objectSchemaShape: ObjectShape
+export const dataValidation = <T extends ObjectShape>(
+   objectSchema: ObjectShape | ObjectSchema<T>
 ): OnCallMiddleware => {
    return async (data, context, next) => {
       // throws if not valid
-      await validateData(data, object(objectSchemaShape))
+      if (objectSchema instanceof ObjectSchema) {
+         await validateData(data, objectSchema)
+      } else {
+         await validateData(data, object(objectSchema))
+      }
 
       return next()
    }
