@@ -5,11 +5,14 @@ import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import RoundedLogo from "components/views/common/RoundedLogo"
+import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    root: {
       display: "flex",
       flexDirection: "row",
+      textDecoration: "none",
+      color: "inherit",
    },
    displayName: {
       fontSize: "1.14286rem",
@@ -37,15 +40,24 @@ type Props = {
    displayName: string
    companyName: string
    companyLogoUrl: string
+   linkToCompanyPage?: string
+   onClick?: () => void
 }
 
 const SparkDetails: FC<Props> = ({
    companyName,
    displayName,
    companyLogoUrl,
+   linkToCompanyPage,
+   onClick,
 }) => {
    return (
-      <Box sx={styles.root}>
+      <Box
+         component={linkToCompanyPage ? Link : undefined}
+         href={linkToCompanyPage}
+         sx={styles.root}
+         onClick={onClick}
+      >
          <RoundedLogo
             src={companyLogoUrl}
             alt={companyName}
@@ -54,12 +66,12 @@ const SparkDetails: FC<Props> = ({
          />
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>
-            <BrandedTooltip title={displayName.length > 20 ? displayName : ""}>
+            <BrandedTooltip title={displayName.length > 40 ? displayName : ""}>
                <Typography sx={styles.displayName} component={"h5"}>
                   {displayName}
                </Typography>
             </BrandedTooltip>
-            <BrandedTooltip title={companyName.length > 20 ? companyName : ""}>
+            <BrandedTooltip title={companyName.length > 40 ? companyName : ""}>
                <Typography sx={styles.companyName}>
                   From {companyName}
                </Typography>

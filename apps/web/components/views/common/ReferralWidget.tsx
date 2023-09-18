@@ -16,6 +16,7 @@ interface WidgetButtonProps extends StackProps {
    iconStyle?: SystemStyleObject<DefaultTheme>
    socials: SocialIconProps[]
    roundedIcons?: boolean
+   onSocialClick?: (type: SocialIconProps["type"]) => void
 }
 
 const styles = sxStyles({
@@ -68,6 +69,7 @@ export const ReferralWidget = ({
    iconStyle,
    socials,
    roundedIcons,
+   onSocialClick,
    ...rest
 }: WidgetButtonProps) => {
    return (
@@ -83,9 +85,14 @@ export const ReferralWidget = ({
       >
          {socials.map((icon) =>
             roundedIcons ? (
-               <SocialButtonWithText key={icon.name} {...icon} />
+               <SocialButtonWithText
+                  onSocialClick={() => onSocialClick(icon.type)}
+                  key={icon.name}
+                  {...icon}
+               />
             ) : (
                <IconButtonComponent
+                  onSocialClick={() => onSocialClick(icon.type)}
                   key={icon.name}
                   iconsColor={iconsColor}
                   iconStyle={iconStyle}
@@ -97,20 +104,28 @@ export const ReferralWidget = ({
    )
 }
 
+type SocialButtonProps = SocialIconProps & {
+   onSocialClick?: () => void
+}
+
 const SocialButtonWithText = ({
    name,
    onClick,
    roundedIcon: RoundedIcon,
-}: SocialIconProps) => (
+   onSocialClick,
+}: SocialButtonProps) => (
    <Box sx={styles.socialContainer}>
-      <IconButton sx={styles.roundedIcon} onClick={onClick}>
+      <IconButton
+         sx={styles.roundedIcon}
+         onClick={() => handleButtonClick(onClick, onSocialClick)}
+      >
          <RoundedIcon />
       </IconButton>
       <Typography sx={styles.iconText}>{name}</Typography>
    </Box>
 )
 
-type IconButtonProps = SocialIconProps & {
+type IconButtonProps = SocialButtonProps & {
    iconStyle?: WidgetButtonProps["iconStyle"]
    iconsColor: WidgetButtonProps["iconsColor"]
 }
@@ -122,6 +137,7 @@ const IconButtonComponent: FC<IconButtonProps> = ({
    onClick,
    iconStyle,
    iconsColor,
+   onSocialClick,
 }) => (
    <Tooltip arrow title={name}>
       <IconButton
@@ -137,12 +153,19 @@ const IconButtonComponent: FC<IconButtonProps> = ({
             },
          ]}
          size={"large"}
-         onClick={onClick}
+         onClick={() => handleButtonClick(onClick, onSocialClick)}
          href={href}
       >
          <Icon color={"inherit"} sx={[styles.icon, iconStyle]} />
       </IconButton>
    </Tooltip>
 )
+
+const handleButtonClick = (onClick: Function, onSocialClick?: Function) => {
+   onClick()
+   if (onSocialClick) {
+      onSocialClick()
+   }
+}
 
 export default ReferralWidget

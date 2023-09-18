@@ -19,6 +19,13 @@ import { useAuth } from "HOCs/AuthProvider"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
 import { useSelector } from "react-redux"
 import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import Link from "../common/Link"
+import {
+   SocialPlatformObject,
+   SocialPlatformType,
+} from "components/custom-hook/useSocials"
 
 const actionWidth = 52
 
@@ -88,19 +95,15 @@ type Props = {
 const FeedCardActions: FC<Props> = ({ spark }) => {
    return (
       <Stack spacing={3} sx={styles.root}>
-         <Action
-            sparkId={spark.id}
-            icon={<LikesIcon />}
-            onClick={() => {}}
-            label="Like"
-         />
+         <LikeAction sparkId={spark.id} />
          <ShareAction sparkId={spark.id} />
-         <Action
-            sparkId={spark.id}
-            icon={<GlobeIcon />}
-            onClick={() => {}}
-            label="Career Page"
-         />
+         {/* TODO: Wait for alvaro's PR: https://github.com/careerfairy/web/pull/733/files#diff-9d6816a691e80fd0d0d9fa9a7c0d3e833a01200c0807fb9b5b86ceb7f822a352 with this new field */}
+         {/* {spark.group.careerPageUrl ? (
+            <CareerPageAction
+               sparkId={spark.id}
+               href={spark.group.careerPageUrl}
+            />
+         ) : null} */}
          <FilterAction sparkId={spark.id} />
       </Stack>
    )
@@ -108,7 +111,8 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
 
 type ActionProps = {
    icon: React.ReactNode
-   onClick: () => void
+   onClick?: () => void
+   href?: string
    label: string
    sparkId: string
    chipValue?: number
@@ -119,9 +123,9 @@ const Action: FC<ActionProps> = ({
    label,
    sparkId,
    chipValue,
+   href,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
-
    const actionLabel = (
       <Typography
          sx={[styles.actionLabel, isFullScreen && styles.fullScreenActionLabel]}
@@ -147,6 +151,8 @@ const Action: FC<ActionProps> = ({
             color="inherit"
             onClick={onClick}
             size={isFullScreen ? "small" : "medium"}
+            component={href ? Link : "button"}
+            href={href}
          >
             {icon}
 
@@ -158,21 +164,65 @@ const Action: FC<ActionProps> = ({
                color={"primary"}
                label={chipValue}
                size={"small"}
-            ></Chip>
+            />
          ) : null}
          {isFullScreen ? null : actionLabel}
       </Box>
    )
 }
 
+const LikeAction: FC<{
+   sparkId: string
+}> = ({ sparkId }) => {
+   const { trackEvent } = useSparksFeedTracker()
+
+   const handlLike = useCallback(() => {
+      trackEvent(SparkEventActions.Like)
+      // TODO: implement like functionality
+   }, [trackEvent])
+
+   return (
+      <Action
+         sparkId={sparkId}
+         icon={<LikesIcon />}
+         onClick={handlLike}
+         label="Like"
+      />
+   )
+}
+
+const CareerPageAction: FC<{
+   sparkId: string
+   href: string
+}> = ({ sparkId, href }) => {
+   const { trackEvent } = useSparksFeedTracker()
+
+   const handleCareerPageClick = useCallback(() => {
+      trackEvent(SparkEventActions.Click_CareerPageCTA)
+   }, [trackEvent])
+
+   return (
+      <Action
+         href={href}
+         sparkId={sparkId}
+         icon={<GlobeIcon />}
+         onClick={handleCareerPageClick}
+         label="Career Page"
+      />
+   )
+}
+
 type ShareActionProps = {
    sparkId: string
 }
+
 const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const [isShareDialogOpen, handleOpenShareDialog, handleCloseShareDialog] =
       useDialogStateHandler()
    const isMobile = useIsMobile()
    const { userData } = useAuth()
+
+   const { trackEvent } = useSparksFeedTracker()
 
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
@@ -188,13 +238,41 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
       }
    }, [shareUrl])
 
+   const handleTrackShare = useCallback(
+      (type: SocialPlatformType) => {
+         switch (type) {
+            case SocialPlatformObject.Copy:
+               trackEvent(SparkEventActions.Share_Clipboard)
+               break
+            case SocialPlatformObject.Facebook:
+               trackEvent(SparkEventActions.Share_Facebook)
+               break
+            case SocialPlatformObject.Linkedin:
+               trackEvent(SparkEventActions.Share_LinkedIn)
+               break
+            case SocialPlatformObject.Whatsapp:
+               trackEvent(SparkEventActions.Share_WhatsApp)
+               break
+            case SocialPlatformObject.X:
+               trackEvent(SparkEventActions.Share_X)
+               break
+            default:
+               trackEvent(SparkEventActions.Share_Other)
+               break
+         }
+      },
+      [trackEvent]
+   )
+
    const handleShare = useCallback(async () => {
       if (isMobile && navigator?.share) {
-         await navigator.share(shareData)
+         await navigator
+            .share(shareData)
+            .then(() => trackEvent(SparkEventActions.Share_Mobile))
       } else {
          handleOpenShareDialog()
       }
-   }, [handleOpenShareDialog, isMobile, shareData])
+   }, [handleOpenShareDialog, isMobile, shareData, trackEvent])
 
    return (
       <>
@@ -208,6 +286,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
             isOpen={isShareDialogOpen}
             handleClose={handleCloseShareDialog}
             shareUrl={shareUrl}
+            onShareOptionClick={handleTrackShare}
          />
       </>
    )
