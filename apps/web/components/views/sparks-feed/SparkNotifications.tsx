@@ -34,13 +34,13 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
 
    const { data: eventNotifications } = useUserSparksNotifications(
       userEmail,
-      groupId
+      currentSpark?.group.id
    )
 
    useEffect(() => {
       let timeout: NodeJS.Timeout
 
-      if (eventNotifications?.length) {
+      if (eventNotifications?.length && !groupId) {
          timeout = setTimeout(() => {
             dispatch(
                setCurrentEventNotification(
@@ -53,7 +53,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       return () => {
          clearTimeout(timeout)
       }
-   }, [currentPlayingIndex, dispatch, eventNotifications, sparks])
+   }, [currentPlayingIndex, dispatch, eventNotifications, groupId, sparks])
 
    const handleCloseDialog = useCallback(() => {
       dispatch(showEventDetailsDialog(false))
