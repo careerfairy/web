@@ -1,9 +1,9 @@
 import { Box, SxProps, Theme } from "@mui/material"
-import React, { useCallback } from "react"
+import React, { FC, useCallback } from "react"
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone"
 
 type Props = {
-   children: JSX.Element
+   children?: JSX.Element
    label?: string
    sx?: SxProps<Theme>
    onChange?: <T extends File>(
@@ -13,7 +13,12 @@ type Props = {
    ) => void
 }
 
-export const FileDropZone = ({ children, label, sx = {}, onChange }: Props) => {
+export const FileDropZone: FC<Props> = ({
+   children,
+   label,
+   sx = {},
+   onChange,
+}) => {
    const onDrop = (acceptedFiles) =>
       acceptedFiles.map((file) =>
          Object.assign(file, {

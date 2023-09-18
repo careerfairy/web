@@ -113,6 +113,7 @@ export const ImageCropperDialog = ({
 
    const uploadLogo = async (fileObjectString: string) => {
       try {
+         debugger
          // Converting cropped 64 based encoded string to a File
          const newFileObject = dataURLtoFile(fileObjectString)
          // Getting the storage instance

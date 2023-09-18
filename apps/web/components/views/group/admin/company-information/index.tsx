@@ -4,7 +4,7 @@ import { Box } from "@mui/system"
 
 import { sxStyles } from "types/commonTypes"
 import { CompanyInformationProvider } from "./CompanyInformationProvider"
-import CompanyIdentity from "../../../admin/company-information/CompanyIdentity"
+import CompanyIdentity from "../../../admin/company-information/CompanyIdentity/CompanyIdentity"
 import CompanyDetails from "../../../admin/company-information/CompanyDetails"
 import TargetTalent from "../../../admin/company-information/TargetTalent"
 import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
