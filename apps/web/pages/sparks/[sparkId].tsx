@@ -99,18 +99,22 @@ const SparksPage: NextPage<
             !isFetchingNextSparks &&
                hasNoMoreSparks &&
                isOnLastSpark &&
-               fromGroupPage &&
-               cardNotification
+               fromGroupPage
          )
       ) {
-         // if reach the end of the sparks list and the current spark is the card notification we should
-         // remove the groupId field and fetch the initial sparks feed without the groupId on the query
-         if (activeSpark?.isCardNotification) {
-            dispatch(removeGroupId())
-            dispatch(fetchInitialSparksFeed())
+         if (cardNotification) {
+            // if reach the end of the sparks list and the current spark is the card notification we should
+            // remove the groupId field and fetch the initial sparks feed without the groupId on the query
+            if (activeSpark?.isCardNotification) {
+               dispatch(removeGroupId())
+               dispatch(fetchInitialSparksFeed())
+            } else {
+               // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
+               dispatch(addCarNotificationToSparksList())
+            }
          } else {
-            // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-            dispatch(addCarNotificationToSparksList())
+            // If there are no card notifications to display, proceed with sparks content
+            dispatch(fetchInitialSparksFeed())
          }
       }
    }, [
