@@ -58,6 +58,8 @@ const useUserSparkLike = (
          // Track the like event if its a like
          if (newLikeStatus) {
             trackEvent(SparkEventActions.Like)
+         } else {
+            trackEvent(SparkEventActions.Unlike)
          }
 
          // If the operation is successful, update the local data again

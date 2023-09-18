@@ -71,10 +71,20 @@ export interface Spark extends Identifiable {
    shareCTA: number
 
    /**
-    * How many times the career page icon is clicked
+    * How many times the external career page icon is clicked
     * on the Spark card
     */
    numberOfCareerPageClicks: number
+
+   /**
+    * How many times the company page icon is clicked on the platform
+    */
+   numberOfCompanyPageClicks: number
+
+   /**
+    * How many times the spark is completely watched
+    */
+   numberTimesCompletelyWatched: number
 
    // possible future fields
 

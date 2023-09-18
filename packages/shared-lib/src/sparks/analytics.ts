@@ -105,6 +105,7 @@ export const SparkEventActions = {
     */
    Share_Other: "Share_Other",
    Like: "Like",
+   Unlike: "Unlike",
    Impression: "Impression",
    Click_CareerPageCTA: "Click_CareerPageCTA",
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
