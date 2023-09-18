@@ -292,19 +292,29 @@ export class SparksService {
             year <= currentYear;
             year++
          ) {
-            const yearDocRef = doc(
-               FirestoreInstance,
-               "userData",
-               userId,
-               "likedSparks",
-               year.toString()
+            const yearQuery = query(
+               collection(FirestoreInstance, "userData", userId, "likedSparks"),
+               where("id", "==", year.toString()),
+               where(`sparks.${sparkId}`, "!=", null)
             ).withConverter(createGenericConverter<LikedSparks>())
 
-            await setDoc<LikedSparks>(
-               yearDocRef,
-               this.createLikedSparksObject(userId, sparkId, year, liked),
-               { merge: true }
-            )
+            const countRef = await getCountFromServer(yearQuery)
+
+            if (countRef.data().count > 0) {
+               const yearRef = doc(
+                  FirestoreInstance,
+                  "userData",
+                  userId,
+                  "likedSparks",
+                  currentYear.toString()
+               ).withConverter(createGenericConverter<LikedSparks>())
+
+               await setDoc<LikedSparks>(
+                  yearRef,
+                  this.createLikedSparksObject(userId, sparkId, year, liked),
+                  { merge: true }
+               )
+            }
          }
       }
    }
