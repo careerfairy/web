@@ -25,6 +25,7 @@ import {
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
+   cardNotificationSelector,
    fetchNextErrorSelector,
    groupIdSelector,
    hasNoMoreSparksSelector,
@@ -51,6 +52,7 @@ const SparksPage: NextPage<
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
    const fromGroupPage = useSelector(groupIdSelector)
+   const cardNotification = useSelector(cardNotificationSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -93,10 +95,13 @@ const SparksPage: NextPage<
     */
    useEffect(() => {
       if (
-         !isFetchingNextSparks &&
-         hasNoMoreSparks &&
-         isOnLastSpark &&
-         fromGroupPage
+         Boolean(
+            !isFetchingNextSparks &&
+               hasNoMoreSparks &&
+               isOnLastSpark &&
+               fromGroupPage &&
+               cardNotification
+         )
       ) {
          // if reach the end of the sparks list and the current spark is the card notification we should
          // remove the groupId field and fetch the initial sparks feed without the groupId on the query
@@ -110,6 +115,7 @@ const SparksPage: NextPage<
       }
    }, [
       activeSpark?.isCardNotification,
+      cardNotification,
       dispatch,
       fromGroupPage,
       hasNoMoreSparks,
