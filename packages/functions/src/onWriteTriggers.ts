@@ -214,6 +214,9 @@ export const onWriteSpark = functions
       if (changeTypes.isDelete) {
          // Remove spark from all user feeds
          sideEffectPromises.push(sparkRepo.removeSparkFromAllUserFeeds(sparkId))
+         sideEffectPromises.push(
+            sparkRepo.deleteDistributedCounterShards(change.before.ref)
+         )
       }
 
       if (changeTypes.isCreate) {
