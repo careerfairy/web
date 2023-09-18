@@ -5,28 +5,26 @@ import Box from "@mui/material/Box"
 import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
-import { FC, useCallback, useEffect, useMemo } from "react"
+import React, { FC, useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    removeCurrentEventNotifications,
-   showEventDetailsDialog,
    swipeNextSparkByIndex,
 } from "store/reducers/sparksFeedReducer"
 
 import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
 import {
-   currentSparkEventNotificationSelector,
    currentSparkIndexSelector,
    isFetchingSparksSelector,
    eventDetailsDialogVisibilitySelector,
    sparksSelector,
-   userEmailSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
 import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
-import LivestreamDialog from "../livestream-dialog/LivestreamDialog"
+import SparkNotifications from "./SparkNotifications"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -99,15 +97,14 @@ const styles = sxStyles({
 const SparksFeedCarousel: FC = () => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const dispatch = useDispatch()
+   const { userData } = useAuth()
 
-   const userEmail = useSelector(userEmailSelector)
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
-   const eventNotification = useSelector(currentSparkEventNotificationSelector)
 
    const options = useMemo<EmblaOptionsType>(
       () => ({
@@ -146,11 +143,6 @@ const SparksFeedCarousel: FC = () => {
          },
       }),
       [eventDetailsDialogVisibility]
-   )
-
-   const currentSpark = useMemo(
-      () => sparks?.[currentPlayingIndex],
-      [currentPlayingIndex, sparks]
    )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
@@ -199,10 +191,6 @@ const SparksFeedCarousel: FC = () => {
       [dispatch]
    )
 
-   const handleCloseDialog = useCallback(() => {
-      dispatch(showEventDetailsDialog(false))
-   }, [dispatch])
-
    return (
       <Box
          sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
@@ -238,16 +226,9 @@ const SparksFeedCarousel: FC = () => {
                <CloseSparksFeedButton />
             </Box>
          ) : null}
-         {eventDetailsDialogVisibility ? (
-            <LivestreamDialog
-               livestreamId={eventNotification?.eventId}
-               handleClose={handleCloseDialog}
-               open={eventDetailsDialogVisibility}
-               page={"details"}
-               serverUserEmail={userEmail}
-               mode={"stand-alone"}
-               currentSparkId={currentSpark?.id}
-            />
+
+         {userData?.userEmail ? (
+            <SparkNotifications userEmail={userData.userEmail} />
          ) : null}
       </Box>
    )
