@@ -61,6 +61,8 @@ export class SparkPresenter implements SparkPresenterInterface {
    likes: number
    shareCTA: number
    numberOfCareerPageClicks: number
+   numberOfCompanyPageClicks: number
+   numberTimesCompletelyWatched: number
 
    // Additional properties can be added here as the Spark structure evolves
    isCardNotification: boolean

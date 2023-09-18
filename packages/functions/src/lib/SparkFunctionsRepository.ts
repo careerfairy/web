@@ -19,7 +19,7 @@ import {
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { shuffle } from "@careerfairy/shared-lib/utils"
-import { DocumentSnapshot } from "firebase-admin/firestore"
+import { DocumentReference, DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
@@ -162,6 +162,16 @@ export interface ISparkFunctionsRepository {
     * @returns void
     */
    removeSparkFromAllUserFeeds(sparkId: string): Promise<void>
+
+   /**
+    * Deletes the distributed counter shards associated with a spark.
+    * This is necessary when a spark is deleted to prevent the extension
+    * from creating an invalid spark document in the collection.
+    *
+    * @async
+    * @param sparkRef - The Firestore DocumentReference of the spark.
+    */
+   deleteDistributedCounterShards(sparkRef: DocumentReference): Promise<void>
 
    /**
     * Adds a spark to all user feeds
@@ -714,6 +724,22 @@ export class SparkFunctionsRepository
 
    async trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void> {
       return this.sparkSecondsWatchedHandler.insertData(events)
+   }
+
+   async deleteDistributedCounterShards(
+      sparkRef: DocumentReference
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const shardRef = sparkRef.collection("_counter_shards_")
+
+      // Get all shards in the collection
+      const snapshot = await shardRef.get()
+
+      // Add each shard document in the collection to the batch for deletion
+      snapshot.docs.forEach((doc) => batch.delete(doc.ref))
+
+      return void batch.commit()
    }
 }
 
