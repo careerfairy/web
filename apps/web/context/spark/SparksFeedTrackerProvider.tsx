@@ -120,7 +120,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
                sparkService.incrementSparkCount(currentSparkId, "likes", -1)
                break
             case SparkEventActions.Impression:
-               console.log("incrementing impressions")
                sparkService.incrementSparkCount(currentSparkId, "impressions")
                break
             case SparkEventActions.Played_Spark:
