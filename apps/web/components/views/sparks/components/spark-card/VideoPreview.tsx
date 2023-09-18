@@ -156,7 +156,6 @@ const VideoPreview: FC<Props> = ({
                className="player"
                onProgress={handleProgress}
                onPlay={onPlay}
-               onEnded={() => console.log("video ended")}
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
