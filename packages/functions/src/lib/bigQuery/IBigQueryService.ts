@@ -71,9 +71,9 @@ class BigQueryServiceCore<TRow> {
     */
    protected createTableOnError = async (error: any) => {
       if (error.code === 404 && !isProductionEnvironment()) {
-         console.log("Table does not exist. Attempting to create table...")
+         logger.warn("Table does not exist. Attempting to create table...")
          await this.createTable()
-         console.log(
+         logger.info(
             "Table created successfully. Note: Data insertion will not be retried in this call." +
                "Please make another call to insert data." +
                "It may take up to 30 seconds for the table to be ready for data insertion even though the table has been created."
