@@ -1,8 +1,11 @@
-import React, { FC, useCallback, useRef } from "react"
+import React, { useCallback, useRef } from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
 import EventPreviewCard from "../../../common/stream-cards/EventPreviewCard"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useDispatch, useSelector } from "react-redux"
+import { cardNotificationSelector } from "../../../../../store/selectors/sparksFeedSelectors"
+import useLivestream from "../../../../custom-hook/live-stream/useLivestream"
+import { showEventDetailsDialog } from "../../../../../store/reducers/sparksFeedReducer"
 
 const styles = sxStyles({
    content: {
@@ -53,17 +56,17 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   event: LivestreamEvent
-}
-const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
-   const handleRegister = useCallback(() => {
-      // TODO: reuse redux action to open the dialog with the correct event
-   }, [])
-
+const SparkEventFullCardNotification = () => {
+   const dispatch = useDispatch()
    const ref = useRef(null)
+   const cardNotification = useSelector(cardNotificationSelector)
+   const { data: event } = useLivestream(cardNotification.eventId)
 
-   return (
+   const handleRegister = useCallback(() => {
+      dispatch(showEventDetailsDialog(true))
+   }, [dispatch])
+
+   return event ? (
       <Box sx={styles.content}>
          <Box sx={styles.header}>
             <Typography variant={"h4"} sx={styles.title}>
@@ -93,7 +96,7 @@ const SparkEventFullCardNotification: FC<Props> = ({ event }) => {
             </Button>
          </Box>
       </Box>
-   )
+   ) : null
 }
 
 export default SparkEventFullCardNotification

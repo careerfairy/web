@@ -18,7 +18,7 @@ const useUserSparksNotifications = (userId: string, groupId?: string) => {
               collection(
                  FirestoreInstance,
                  "userData",
-                 userId || "userId", // to not break when there is no user
+                 userId,
                  "sparksNotifications"
               ),
               ...(groupId ? [where("groupId", "==", groupId)] : [])
