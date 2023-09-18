@@ -1,9 +1,9 @@
 import FileUploader from "components/views/common/FileUploader"
 import { FC, useMemo } from "react"
 import Hover from "../../components/Hover"
-import { Box, Button, Typography } from "@mui/material"
-import { Upload, Image } from "react-feather"
+import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import CompanyBannerDefaultLabel from "./CompanyBannerDefaultLabel"
 
 type Props = {
    bannerImageUrl: string
@@ -63,6 +63,7 @@ const styles = sxStyles({
       border: "1px solid #6749EA",
       color: "#6749EA",
       fill: "#6749EA",
+      textTransform: "none",
    },
 })
 
@@ -83,13 +84,7 @@ const CompanyBanner: FC<Props> = ({ bannerImageUrl, handleChange }) => {
                bannerImageUrl,
             }}
          >
-            <Typography>Recommended size: 2880x576px</Typography>
-            <Button sx={styles.uploadPictureButton}>
-               <Typography variant="body1" sx={{ textTransform: "none" }}>
-                  Upload picture
-               </Typography>
-               <Upload />
-            </Button>
+            <CompanyBannerDefaultLabel sx={styles.uploadPictureButton} />
          </Box>
       )
    }, [hasBannerImage, bannerImageUrl])
@@ -104,13 +99,16 @@ const CompanyBanner: FC<Props> = ({ bannerImageUrl, handleChange }) => {
                   <Box
                      sx={{
                         ...styles.companyBannerUploadArea,
-                        bannerImageUrl,
+                        background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), url(${bannerImageUrl}), lightgray 50% / cover no-repeat`,
                      }}
                   >
-                     <Image />
-                     <Typography variant="body1" sx={{ textTransform: "none" }}>
-                        Change company picture
-                     </Typography>
+                     <CompanyBannerDefaultLabel
+                        sx={{
+                           ...styles.uploadPictureButton,
+                           color: "#9999B1",
+                           borderColor: "#9999B1",
+                        }}
+                     />
                   </Box>
                }
             />
