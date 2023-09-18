@@ -594,7 +594,7 @@ export class SparkFunctionsRepository
    async removeSparkFromAllUserFeeds(sparkId: string): Promise<void> {
       const sparksFromFeedToBeDeletedSnap = await this.firestore
          .collectionGroup("sparksFeed")
-         .where(FieldPath.documentId(), "==", sparkId)
+         .where("id", "==", sparkId)
          .get()
       const bulkWriter = this.firestore.bulkWriter()
 
