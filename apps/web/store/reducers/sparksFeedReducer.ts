@@ -139,6 +139,7 @@ const sparksFeedSlice = createSlice({
       },
       removeGroupId: (state) => {
          state.groupId = null
+         state.hasMoreSparks = true
       },
 
       resetSparksFeed: (state) => {
