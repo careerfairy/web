@@ -42,23 +42,31 @@ const SparkStats: FC<Props> = ({ spark }) => {
       <Stack spacing={1.5}>
          <StatChip
             icon={<ImpressionsIcon />}
-            value={spark.impressions}
-            tooltip={`This Spark has been seen ${spark.impressions} times.`}
+            value={0}
+            // value={spark.impressions}
+            tooltip={`This Spark has been seen ${0} times.`}
+            // tooltip={`This Spark has been seen ${spark.impressions} times.`}
          />
          <StatChip
             icon={<TotalPlaysIcon />}
-            value={spark.numberOfCareerPageClicks}
-            tooltip={`Your Career Page has been viewed ${spark.numberOfCareerPageClicks} times from this Spark.`}
+            value={0}
+            // value={spark.numberOfCareerPageClicks}
+            tooltip={`Your Career Page has been viewed ${0} times from this Spark.`}
+            // tooltip={`Your Career Page has been viewed ${spark.numberOfCareerPageClicks} times from this Spark.`}
          />
          <StatChip
             icon={<LikesIcon />}
-            value={spark.likes}
-            tooltip={`This Spark has been liked ${spark.likes} times.`}
+            value={0}
+            // value={spark.likes}
+            tooltip={`This Spark has been liked ${0} times.`}
+            // tooltip={`This Spark has been liked ${spark.likes} times.`}
          />
          <StatChip
             icon={<ShareIcon />}
-            value={spark.shareCTA}
-            tooltip={`This Spark has been shared ${spark.shareCTA} times.`}
+            // value={spark.shareCTA}
+            value={0}
+            tooltip={`This Spark has been shared ${0} times.`}
+            // tooltip={`This Spark has been shared ${spark.shareCTA} times.`}
          />
       </Stack>
    )
