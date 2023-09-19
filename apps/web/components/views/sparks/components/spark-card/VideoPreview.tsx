@@ -143,7 +143,7 @@ const VideoPreview: FC<Props> = ({
       setBrowserAutoplayError(false)
    }, [])
 
-   const handleClickPause = useCallback(() => {
+   const handleTogglePause = useCallback(() => {
       setPlaying((prevPlaying) => !prevPlaying)
    }, [])
 
@@ -169,7 +169,7 @@ const VideoPreview: FC<Props> = ({
                   shouldPLay ? null : <ThumbnailOverlay src={thumbnailUrl} />
                }
                playIcon={<Fragment />}
-               onClick={handleClickPause}
+               onClick={handleTogglePause}
             />
             <LinearProgress
                sx={styles.progress}
