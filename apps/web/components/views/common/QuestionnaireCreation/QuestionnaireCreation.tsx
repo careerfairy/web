@@ -1,5 +1,5 @@
 import { PlusCircle } from "react-feather"
-import { FC, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { Button, Stack, Typography } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
@@ -64,18 +64,20 @@ const QuestionarieCreation: FC<Props> = ({ initialData }) => {
    )
    const [questions, setQuestions] = useState(initialData.questions ?? [])
 
-   useEffect(() => {
-      setQuestions(initialData.questions)
-   }, [initialData])
-
-   const addQuestionnarieQuestion = () => {
+   const addQuestionnarieQuestion = useCallback(() => {
       const newQuestionsList = [...questions]
       newQuestionsList.push(createAGroupQuestion())
       setQuestions(newQuestionsList)
       const newInputMode = [...inputMode]
       newInputMode.push(true)
       setInputMode([...newInputMode])
-   }
+   }, [questions, inputMode])
+
+   useEffect(() => {
+      if (questions.length === 0) {
+         addQuestionnarieQuestion()
+      }
+   }, [questions, addQuestionnarieQuestion])
 
    const handleQuestionRemove = (questionId) => {
       const newQuestionsList = [
@@ -104,7 +106,9 @@ const QuestionarieCreation: FC<Props> = ({ initialData }) => {
          <Button
             sx={{
                ...styles.addNewQuestionButton,
-               color: !inputMode ? "#D9D9D9" : "#6749EA",
+               color: !inputMode.some((inputMode) => inputMode)
+                  ? "#D9D9D9"
+                  : "#6749EA",
             }}
             onClick={() => addQuestionnarieQuestion()}
          >

@@ -167,6 +167,7 @@ const CompanyDetails = () => {
                               renderTags={(values, getTagProps) => {
                                  return values.map((value, index) => (
                                     <BrandedChip
+                                       key={index}
                                        label={value.name}
                                        meta={getTagProps({ index })}
                                     />

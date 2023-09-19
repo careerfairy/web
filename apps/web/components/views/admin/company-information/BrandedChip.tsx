@@ -15,7 +15,7 @@ const styles = sxStyles({
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: 600,
-      lineHeight: "20px",
+      lineHeight: "24px",
       ".MuiChip-deleteIcon": {
          color: "#FFF",
       },

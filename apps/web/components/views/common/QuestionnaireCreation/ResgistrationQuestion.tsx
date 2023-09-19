@@ -59,7 +59,7 @@ const styles = sxStyles({
    },
    actionButtons: {
       display: "flex",
-      width: "-webkit-fill-available",
+      width: "100%",
       alignItems: "flex-end",
       justifyContent: "flex-end",
       mt: "16px",
@@ -164,13 +164,28 @@ const RegistrationQuestion: React.FC<Props> = ({
       setFieldValue("options", newOptions)
    }
 
+   const validateData = (formData) => {
+      const errors = {}
+
+      const options = Object.values(formData.options as GroupQuestionOption[])
+
+      options.forEach((option) => {
+         if (!Boolean(option?.name.length)) {
+            errors[option?.id] = "Option text is required"
+         }
+      })
+
+      return errors
+   }
+
    return (
       <Formik
          initialValues={localGroupQuestion}
          onSubmit={handleSubmit}
+         validate={validateData}
          enableReinitialize
       >
-         {({ dirty, values, setFieldValue }) => (
+         {({ values, setFieldValue, isValid, dirty }) => (
             <Form style={styles.form}>
                <Stack sx={styles.stack}>
                   <Box id="registration-question-name-field">
@@ -205,7 +220,7 @@ const RegistrationQuestion: React.FC<Props> = ({
                         />
                      )
                   )}
-                  {inputMode && (
+                  {inputMode ? (
                      <Stack id="registration-question-action-buttons">
                         <Button
                            sx={styles.addOptionButton}
@@ -230,15 +245,21 @@ const RegistrationQuestion: React.FC<Props> = ({
                               Remove question
                            </Button>
                            <SaveChangesButton
-                              icon={<Save color={dirty ? "#FFF" : "#BBBBBB"} />}
-                              active={dirty}
-                              onClick={() => dirty && handleSubmit(values)}
+                              icon={
+                                 <Save
+                                    color={
+                                       dirty && isValid ? "#FFF" : "#BBBBBB"
+                                    }
+                                 />
+                              }
+                              active={dirty ? isValid : false}
+                              onClick={() => isValid && handleSubmit(values)}
                            >
                               Save
                            </SaveChangesButton>
                         </Box>
                      </Stack>
-                  )}
+                  ) : null}
                </Stack>
             </Form>
          )}

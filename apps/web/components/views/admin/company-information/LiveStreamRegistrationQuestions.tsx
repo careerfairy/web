@@ -1,15 +1,11 @@
 import React, { useMemo } from "react"
-import { Box } from "@mui/system"
-
-import Styles from "./BaseStyles"
 import QuestionnaireCreation from "components/views/common/QuestionnaireCreation/QuestionnaireCreation"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import LeftColumn from "./LeftColumn"
 import SectionComponent from "./SectionComponent"
 
 const LiveStreamRegistrationQuestions = () => {
    const { groupQuestions } = useGroup()
-
+   console.log(groupQuestions)
    const initialValues = useMemo(
       () => ({
          questions: groupQuestions,
