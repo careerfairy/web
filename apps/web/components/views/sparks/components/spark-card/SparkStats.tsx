@@ -2,7 +2,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Stack } from "@mui/material"
 import Chip, { chipClasses } from "@mui/material/Chip"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
-import LikesIcon from "components/views/common/icons/LikesIcon"
+import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
 import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
@@ -51,7 +51,7 @@ const SparkStats: FC<Props> = ({ spark }) => {
             tooltip={`Your Career Page has been viewed ${spark.numberOfCareerPageClicks} times from this Spark.`}
          />
          <StatChip
-            icon={<LikesIcon />}
+            icon={<LikeIcon />}
             value={spark.likes}
             tooltip={`This Spark has been liked ${spark.likes} times.`}
          />
