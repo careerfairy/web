@@ -27,6 +27,16 @@ const styles = sxStyles({
          "& video": {
             background: "black",
          },
+         "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
+            background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
+         },
       },
    },
    progress: {
@@ -87,10 +97,10 @@ const VideoPreview: FC<Props> = ({
    onVideoPlay,
    pausing: shouldPause,
 }) => {
+   const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const [browserAutoplayError, setBrowserAutoplayError] = useState(false)
    const [playing, setPlaying] = useState(shouldPLay)
-   const [waitingToPlay, setWaitingToPlay] = useState(true)
 
    const onProgress = useReactPlayerTracker({
       shouldPlay: shouldPLay,
@@ -98,23 +108,9 @@ const VideoPreview: FC<Props> = ({
       onVideoEnd: onVideoEnded,
    })
 
-   const handleReset = useCallback(() => {
-      setProgress(0)
-      setPlaying(shouldPLay)
-      setWaitingToPlay(true)
-      setBrowserAutoplayError(false)
-   }, [shouldPLay])
-
    useEffect(() => {
-      if (shouldPLay && !playing) {
-         onVideoPlay?.()
-         setPlaying(true)
-      }
-      return () => {
-         handleReset()
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [handleReset, onVideoPlay, shouldPLay])
+      setPlaying(shouldPLay)
+   }, [shouldPLay])
 
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
@@ -129,13 +125,26 @@ const VideoPreview: FC<Props> = ({
       setPlaying(false)
    }
 
+   useEffect(() => {
+      if (!shouldPLay) {
+         setVideoPlayedForSession(false)
+      }
+   }, [shouldPLay])
+
    const onPlay = useCallback(() => {
-      setWaitingToPlay(false)
-   }, [])
+      setVideoPlayedForSession(true)
+      if (!videoPlayedForSession) {
+         onVideoPlay?.()
+      }
+   }, [onVideoPlay, videoPlayedForSession])
 
    const handleClickPlayOverlay = useCallback(() => {
       setPlaying(true)
       setBrowserAutoplayError(false)
+   }, [])
+
+   const handleClickPause = useCallback(() => {
+      setPlaying((prevPlaying) => !prevPlaying)
    }, [])
 
    return (
@@ -143,9 +152,6 @@ const VideoPreview: FC<Props> = ({
          {browserAutoplayError ? (
             <ClickToPlayOverlay onClick={handleClickPlayOverlay} />
          ) : null}
-         {/* Sometimes it takes up to a second for the <video/> element to start
-          playing a video, once the onPlay is triggered, we know the video has been loaded */}
-         {waitingToPlay ? <ThumbnailOverlay src={thumbnailUrl} /> : null}
          <Box sx={[styles.playerWrapper]}>
             <ReactPlayer
                playing={Boolean(playing && !shouldPause)}
@@ -159,8 +165,11 @@ const VideoPreview: FC<Props> = ({
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
-               light={!playing && <ThumbnailOverlay src={thumbnailUrl} />}
+               light={
+                  shouldPLay ? null : <ThumbnailOverlay src={thumbnailUrl} />
+               }
                playIcon={<Fragment />}
+               onClick={handleClickPause}
             />
             <LinearProgress
                sx={styles.progress}
