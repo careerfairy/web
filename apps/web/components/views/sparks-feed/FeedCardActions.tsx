@@ -1,12 +1,22 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, MouseEvent, useCallback, useMemo } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 import { sxStyles } from "types/commonTypes"
 
-import { Box, Chip, IconButton, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   BoxProps,
+   Chip,
+   IconButton,
+   IconButtonProps,
+   Popover,
+   Stack,
+   Typography,
+   alpha,
+} from "@mui/material"
 
-import LikesIcon from "components/views/common/icons/LikesIcon"
+import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
 import GlobeIcon from "components/views/common/icons/GlobeIcon"
 import FilterIcon from "components/views/common/icons/FilterIcon"
@@ -18,7 +28,10 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
 import { useSelector } from "react-redux"
-import { selectedSparkCategoriesSelector } from "store/selectors/sparksFeedSelectors"
+import {
+   currentSparkIdSelector,
+   selectedSparkCategoriesSelector,
+} from "store/selectors/sparksFeedSelectors"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import Link from "../common/Link"
@@ -26,6 +39,10 @@ import {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
+import useMenuState from "components/custom-hook/useMenuState"
+import LoginButton from "../common/LoginButton"
+import LikeActiveIcon from "../common/icons/LikeActiveIcon"
 
 const actionWidth = 52
 
@@ -40,6 +57,21 @@ const styles = sxStyles({
       alignItems: "center",
       width: actionWidth,
       position: "relative",
+      transition: (theme) => theme.transitions.create(["color", "background"]),
+      "& .MuiIconButton-root": {
+         transition: (theme) => theme.transitions.create("background"),
+      },
+   },
+   actionLiked: {
+      color: "primary.600",
+      "& .MuiIconButton-root": {
+         background: (theme) => `${alpha(theme.palette.primary[600], 0.21)}`,
+      },
+   },
+   actionLikedFullScreen: {
+      "& .MuiIconButton-root": {
+         background: "none",
+      },
    },
    fullScreenActionRoot: {
       color: "white",
@@ -76,7 +108,7 @@ const styles = sxStyles({
       mb: 0,
    },
    actionLabel: {
-      color: "#5C5C5C",
+      color: "inherit",
       fontSize: "1.142rem",
       lineHeight: "117.5%",
       letterSpacing: "-0.437px",
@@ -85,6 +117,9 @@ const styles = sxStyles({
    fullScreenActionLabel: {
       color: "white",
       mt: 0.5,
+   },
+   loginBtn: {
+      color: (theme) => `${theme.palette.primary.main} !important`,
    },
 })
 
@@ -111,11 +146,13 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
 
 type ActionProps = {
    icon: React.ReactNode
-   onClick?: () => void
+   onClick?: IconButtonProps["onClick"]
    href?: string
    label: string
    sparkId: string
    chipValue?: number
+   sx?: BoxProps["sx"]
+   disabled?: boolean
 }
 const Action: FC<ActionProps> = ({
    icon,
@@ -124,6 +161,8 @@ const Action: FC<ActionProps> = ({
    sparkId,
    chipValue,
    href,
+   sx,
+   disabled,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const actionLabel = (
@@ -142,14 +181,19 @@ const Action: FC<ActionProps> = ({
    return (
       <Box
          htmlFor={`action-button-${label}-${sparkId}`}
-         component="label"
-         sx={[styles.actionRoot, isFullScreen && styles.fullScreenActionRoot]}
+         component={isFullScreen ? undefined : "label"}
+         sx={[
+            styles.actionRoot,
+            isFullScreen && styles.fullScreenActionRoot,
+            ...(sx ? (Array.isArray(sx) ? sx : [sx]) : []),
+         ]}
       >
          <IconButton
             id={`action-button-${label}-${sparkId}`}
             sx={[styles.actionBtn, isFullScreen && styles.fullScreenActionBtn]}
             color="inherit"
             onClick={onClick}
+            disabled={disabled}
             size={isFullScreen ? "small" : "medium"}
             component={href ? Link : "button"}
             href={href}
@@ -174,20 +218,65 @@ const Action: FC<ActionProps> = ({
 const LikeAction: FC<{
    sparkId: string
 }> = ({ sparkId }) => {
-   const { trackEvent } = useSparksFeedTracker()
+   const currentSparkId = useSelector(currentSparkIdSelector)
+   const isFullScreen = useSparksFeedIsFullScreen()
 
-   const handlLike = useCallback(() => {
-      trackEvent(SparkEventActions.Like)
-      // TODO: implement like functionality
-   }, [trackEvent])
+   const isCurrentSpark = sparkId && currentSparkId === sparkId
+
+   const { anchorEl, handleClick, handleClose, open } = useMenuState()
+   const { authenticatedUser, isLoggedIn } = useAuth()
+
+   const { toggleLike, isLoading, liked } = useUserSparkLike(
+      authenticatedUser.email,
+      sparkId,
+      !isLoggedIn || !isCurrentSpark
+   )
+
+   const handleClicked = useCallback(
+      (event: MouseEvent<HTMLElement>) => {
+         if (!isLoggedIn) {
+            handleClick(event)
+         } else {
+            toggleLike()
+         }
+      },
+      [handleClick, isLoggedIn, toggleLike]
+   )
 
    return (
-      <Action
-         sparkId={sparkId}
-         icon={<LikesIcon />}
-         onClick={handlLike}
-         label="Like"
-      />
+      <>
+         <Action
+            sparkId={sparkId}
+            icon={liked && isFullScreen ? <LikeActiveIcon /> : <LikeIcon />}
+            onClick={handleClicked}
+            label={liked ? "Liked" : "Like"}
+            disabled={isLoading}
+            sx={[
+               liked && styles.actionLiked,
+               isFullScreen && styles.actionLikedFullScreen,
+            ]}
+         />
+         <Popover
+            id="like-login-popover"
+            open={open ? !isLoggedIn : false}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+         >
+            <Stack spacing={1} sx={{ p: 2 }}>
+               <Typography variant="h5">Like this Spark?</Typography>
+               <Typography variant="body1">
+                  Sign in to make your opinion count.
+               </Typography>
+               <Box pb={0.5} />
+               <LoginButton
+                  sx={styles.loginBtn}
+                  variant="outlined"
+                  fullWidth={false}
+                  size="small"
+               />
+            </Stack>
+         </Popover>
+      </>
    )
 }
 
