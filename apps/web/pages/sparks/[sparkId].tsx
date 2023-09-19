@@ -113,7 +113,8 @@ const SparksPage: NextPage<
                dispatch(addCarNotificationToSparksList())
             }
          } else {
-            // If there are no card notifications to display, proceed with sparks content
+            // If there are no card notifications to display, remove the groupId and proceed with sparks content
+            dispatch(removeGroupId())
             dispatch(fetchInitialSparksFeed())
          }
       }
