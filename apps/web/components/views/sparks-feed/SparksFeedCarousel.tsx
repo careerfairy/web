@@ -18,6 +18,7 @@ import {
    isFetchingSparksSelector,
    eventDetailsDialogVisibilitySelector,
    sparksSelector,
+   emptyFilterSelector,
    cameFromCompanyPageLinkSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
@@ -26,6 +27,7 @@ import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 import SparkNotifications from "./SparkNotifications"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import EmptyFilterView from "./EmptyFilterView"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import { IconButton } from "@mui/material"
 import Link from "../common/Link"
@@ -115,11 +117,14 @@ const SparksFeedCarousel: FC = () => {
    const { userData } = useAuth()
 
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
+   const emptyFilter = useSelector(emptyFilterSelector)
    const sparks = useSelector(sparksSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+
+   const noSparks = sparks.length === 0
 
    const options = useMemo<EmblaOptionsType>(
       () => ({
@@ -133,6 +138,7 @@ const SparksFeedCarousel: FC = () => {
           * to prevent flickering.
           */
          watchSlides: (emblaApi) => {
+            if (noSparks) return
             const reloadEmbla = (): void => {
                const oldEngine = emblaApi.internalEngine()
                emblaApi.reInit()
@@ -157,7 +163,7 @@ const SparksFeedCarousel: FC = () => {
             reloadEmbla()
          },
       }),
-      [eventDetailsDialogVisibility]
+      [eventDetailsDialogVisibility, noSparks]
    )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
@@ -214,6 +220,7 @@ const SparksFeedCarousel: FC = () => {
          <Box
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
+            {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
             {sparks.map((spark, index) => (
                <Slide
                   onClick={
@@ -241,7 +248,7 @@ const SparksFeedCarousel: FC = () => {
          </Box>
          {isFullScreen ? (
             <Box sx={styles.closeBtn}>
-               <CloseSparksFeedButton />
+               <CloseSparksFeedButton dark={emptyFilter} />
             </Box>
          ) : null}
 
@@ -261,6 +268,14 @@ const Slide: FC<SlideProps> = ({ children, fullScreen, ...props }) => {
       <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]} {...props}>
          {children}
       </Box>
+   )
+}
+
+const EmptyFeedSlide: FC<SlideProps> = ({ fullScreen }) => {
+   return (
+      <Slide fullScreen={fullScreen}>
+         <EmptyFilterView />
+      </Slide>
    )
 }
 

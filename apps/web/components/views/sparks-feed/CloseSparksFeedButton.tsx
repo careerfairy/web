@@ -12,14 +12,21 @@ const styles = sxStyles({
          height: 27.83,
       },
    },
+   dark: {
+      color: "#3D3D47 !important",
+   },
 })
 
-const CloseSparksFeedButton: FC = () => {
+type Props = {
+   dark?: boolean
+}
+
+const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
    const { back } = useRouter()
 
    return (
       <IconButton
-         sx={styles.root}
+         sx={[styles.root, dark && styles.dark]}
          aria-label="close-sparks-feed"
          onClick={back}
       >
