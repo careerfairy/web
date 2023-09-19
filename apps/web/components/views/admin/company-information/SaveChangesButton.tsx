@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react"
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Button, SxProps, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { Icon } from "react-feather"
 
@@ -12,7 +12,6 @@ const styles = sxStyles({
    },
    active: {
       display: "flex",
-      height: "34px",
       padding: "8px 16px",
       justifyContent: "center",
       alignItems: "center",
@@ -22,9 +21,7 @@ const styles = sxStyles({
       background: "#6749EA",
       ":hover": {
          background: "#6749EA",
-         svg: {
-            stroke: "#6749EA",
-         },
+         transform: "none",
       },
       ".MuiTypography-button": {
          textTransform: "none",
@@ -77,6 +74,7 @@ type Props = {
    type?: "submit" | "button" | "reset" | undefined
    active?: boolean
    onClick?: React.MouseEventHandler<HTMLButtonElement>
+   sx?: SxProps
 }
 
 const SaveChangesButton = ({
@@ -85,11 +83,12 @@ const SaveChangesButton = ({
    type = "button",
    active = false,
    onClick,
+   sx,
 }: Props) => {
    return (
       <Box sx={styles.buttom}>
          <Button
-            sx={active ? styles.active : styles.inactive}
+            sx={{ ...sx, ...(active ? styles.active : styles.inactive) }}
             type={type ? type : "button"}
             onClick={onClick}
          >
