@@ -58,5 +58,12 @@ export const originalSparkIdSelector = (state: RootState) =>
 
 export const groupIdSelector = (state: RootState) => state.sparksFeed.groupId
 
+export const emptyFilterSelector = (state: RootState) =>
+   Boolean(
+      state.sparksFeed.sparkCategoryIds.length &&
+         state.sparksFeed.fetchNextSparksStatus === "idle" &&
+         state.sparksFeed.sparks.length === 0
+   )
+
 export const cameFromCompanyPageLinkSelector = (state: RootState) =>
    state.sparksFeed.cameFromCompanyPageLink
