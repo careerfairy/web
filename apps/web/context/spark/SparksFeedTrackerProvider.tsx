@@ -138,26 +138,12 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
                )
                break
             case SparkEventActions.Share_Clipboard:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_Email:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_Facebook:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_LinkedIn:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_Mobile:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_X:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_WhatsApp:
-               sparkService.incrementSparkCount(currentSparkId, "shareCTA")
-               break
             case SparkEventActions.Share_Other:
                sparkService.incrementSparkCount(currentSparkId, "shareCTA")
                break

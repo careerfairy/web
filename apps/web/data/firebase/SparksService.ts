@@ -287,36 +287,29 @@ export class SparksService {
             { merge: true }
          )
       } else {
-         // If liked is false, remove the sparkId from the sparks map for all years
-         for (
-            let year = SPARK_CONSTANTS.LIKES_TRACKING_START_YEAR;
-            year <= currentYear;
-            year++
-         ) {
-            const yearQuery = query(
-               collection(FirestoreInstance, "userData", userId, "likedSparks"),
-               where("id", "==", year.toString()),
-               where(`sparks.${sparkId}`, "!=", null)
-            ).withConverter(createGenericConverter<LikedSparks>())
+         // If liked is false, remove the sparkId from the sparks map for all years where the user has liked the spark
 
-            const countRef = await getCountFromServer(yearQuery)
+         const allLikedSparksQuery = query(
+            collection(FirestoreInstance, "userData", userId, "likedSparks"),
+            where(`sparks.${sparkId}`, "!=", null)
+         ).withConverter(createGenericConverter<LikedSparks>())
 
-            if (countRef.data().count > 0) {
-               const yearRef = doc(
-                  FirestoreInstance,
-                  "userData",
-                  userId,
-                  "likedSparks",
-                  currentYear.toString()
-               ).withConverter(createGenericConverter<LikedSparks>())
+         const allLikedSparks = await getDocs<LikedSparks>(allLikedSparksQuery)
 
-               await setDoc<LikedSparks>(
-                  yearRef,
-                  this.createLikedSparksObject(userId, sparkId, year, liked),
-                  { merge: true }
-               )
-            }
-         }
+         const promises = allLikedSparks.docs.map((doc) => {
+            const year = parseInt(doc.id)
+            const yearRef = doc.ref.withConverter(
+               createGenericConverter<LikedSparks>()
+            )
+
+            return setDoc<LikedSparks>(
+               yearRef,
+               this.createLikedSparksObject(userId, sparkId, year, liked),
+               { merge: true }
+            )
+         })
+
+         return void Promise.all(promises)
       }
    }
 
