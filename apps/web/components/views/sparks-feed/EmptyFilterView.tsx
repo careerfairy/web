@@ -96,6 +96,7 @@ const EmptyFilterView: FC = () => {
                >
                   Clear filters
                </Button>
+               <Box />
                <Button
                   sx={styles.backBtn}
                   component={Link}

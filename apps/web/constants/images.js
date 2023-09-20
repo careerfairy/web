@@ -115,4 +115,4 @@ export const confetti =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ui-icons%2Fconfetti.png?alt=media&token=b54e11a3-1fc2-4a7f-9347-942ee2999c8a&_gl=1*whzt9k*_ga*MTEyMTMwODEzMS4xNjY0ODA4OTg0*_ga_CW55HF8NVT*MTY4NTY5NDQzMS40LjEuMTY4NTY5NDU0Ny4wLjAuMA.."
 
 export const sadEmoji =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsad-empty.png?alt=media&token=438f9223-dcc3-4f9c-bda3-218e9671f685"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsad-empty.png?alt=media&token=83f6170f-0a05-4c89-a051-4943f5549da7"
