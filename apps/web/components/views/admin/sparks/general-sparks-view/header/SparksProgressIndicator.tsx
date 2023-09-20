@@ -21,15 +21,22 @@ const styles = sxStyles({
    },
    progress: {
       width: "100%",
-      alignItems: "center",
+      alignSelf: "center",
       justifyContent: { xs: "space-evenly", md: "flex-end" },
       mt: { xs: 4, md: "unset" },
    },
    singleProgress: {
       alignItems: "center",
+      maxWidth: "120px",
    },
-   creator: {
+   message: {
       color: (theme) => theme.palette.grey.A700,
+      textAlign: "center",
+   },
+   onlyMessage: {
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
    },
    circle: {
       borderRadius: "60%",
@@ -147,9 +154,20 @@ const SparksProgressIndicator = () => {
                Upload a new Spark
             </CreateSparkButton>
          </Stack>
-         <Stack spacing={8} direction={"row"} sx={styles.progress}>
+         <Stack
+            spacing={{ xs: 3, md: 8 }}
+            direction={"row"}
+            sx={styles.progress}
+         >
+            <ProgressIndicator
+               id={groupPresenter.id}
+               message={"Publish company page"}
+               progress={groupPresenter.publicProfile ? 100 : 0}
+               isValid={groupPresenter.publicProfile}
+            />
+
             {creatorsToValidate.map((creatorWithSparks, index) => (
-               <ProgressIndicator
+               <CreatorProgressIndicator
                   key={index}
                   creatorWithSparks={creatorWithSparks}
                   index={index + 1}
@@ -160,17 +178,16 @@ const SparksProgressIndicator = () => {
    )
 }
 
-export default SparksProgressIndicator
-
-type ProgressIndicator = {
+type CreatorProgressIndicatorProps = {
    creatorWithSparks: CreatorWithSparksNumber
    index: number
 }
-const ProgressIndicator: FC<ProgressIndicator> = ({
+
+const CreatorProgressIndicator: FC<CreatorProgressIndicatorProps> = ({
    creatorWithSparks,
    index,
 }) => {
-   const numberOfSparks = useMemo(
+   const currentValue = useMemo(
       () =>
          creatorWithSparks.numberOfSparks >
          SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
@@ -187,15 +204,44 @@ const ProgressIndicator: FC<ProgressIndicator> = ({
    )
 
    return (
-      <Stack
-         spacing={1}
-         sx={styles.singleProgress}
-         key={creatorWithSparks.creatorId}
-      >
+      <ProgressIndicator
+         id={creatorWithSparks.creatorId}
+         message={`Creator ${index + 1}`}
+         progress={creatorWithSparks.progress}
+         isValid={isValid}
+         currentValue={currentValue}
+         maxValue={SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS}
+      />
+   )
+}
+
+type ProgressIndicatorProps = {
+   id: string
+   message: string
+   progress: number
+   isValid: boolean
+   currentValue?: number
+   maxValue?: number
+}
+const ProgressIndicator: FC<ProgressIndicatorProps> = ({
+   id,
+   message,
+   progress,
+   isValid,
+   currentValue,
+   maxValue,
+}) => {
+   const showOnlyMessage = useMemo(
+      () => Boolean(!currentValue || !maxValue),
+      [currentValue, maxValue]
+   )
+
+   return (
+      <Stack spacing={1} sx={styles.singleProgress} key={id}>
          <Box sx={styles.circularProgress}>
             <CircularProgress
                variant="determinate"
-               value={creatorWithSparks.progress}
+               value={progress}
                size={60}
                thickness={4}
                sx={styles.circle}
@@ -203,17 +249,24 @@ const ProgressIndicator: FC<ProgressIndicator> = ({
             />
             <Box sx={styles.percentageValue}>
                <Typography variant="body1" color="text.primary">
-                  {creatorWithSparks.progress}%
+                  {progress}%
                </Typography>
             </Box>
          </Box>
-         <Typography variant={"h4"} fontWeight={"bold"}>
-            {numberOfSparks}/
-            {SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS}
-         </Typography>
-         <Typography variant={"h6"} sx={styles.creator}>
-            Creator {index}
+         {showOnlyMessage ? null : (
+            <Typography variant={"h4"} fontWeight={"bold"}>
+               {currentValue}/{maxValue}
+            </Typography>
+         )}
+
+         <Typography
+            variant={"body1"}
+            sx={[styles.message, showOnlyMessage && styles.onlyMessage]}
+         >
+            {message}
          </Typography>
       </Stack>
    )
 }
+
+export default SparksProgressIndicator
