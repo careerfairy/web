@@ -59,6 +59,12 @@ const styles = sxStyles({
    },
 })
 
+const [title, description] = [
+   "Target talent",
+   `Tell us which talent you’re targeting so that we can present them
+   your content.`,
+]
+
 // Using a map to reduce the O complexity
 const mapUniversitiesByCountryId = (
    universitiesByCountryList: UniversityCountry[]
@@ -127,11 +133,6 @@ const TargetTalent: FC = () => {
       return selectedUniversities
    }, [selectedCountries, countriesMap])
 
-   const [title, description] = [
-      "Target talent",
-      `Tell us which talent you’re targeting so that we can present them
-      your content.`,
-   ]
    return (
       <SectionComponent title={title} description={description}>
          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
@@ -161,6 +162,7 @@ const TargetTalent: FC = () => {
                         renderTags={(values, getTagProps) => {
                            return values.map((value, index) => (
                               <BrandedChip
+                                 key={value.id}
                                  label={value.name}
                                  meta={getTagProps({ index })}
                               />
@@ -221,6 +223,7 @@ const TargetTalent: FC = () => {
                         renderTags={(values, getTagProps) => {
                            return values.map((value, index) => (
                               <BrandedChip
+                                 key={value.id}
                                  label={value.name}
                                  meta={getTagProps({ index })}
                               />

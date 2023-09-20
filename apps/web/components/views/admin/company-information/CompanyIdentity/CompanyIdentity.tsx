@@ -80,8 +80,12 @@ const styles = sxStyles({
    },
 })
 
+const [title, description] = [
+   "Company identity",
+   "Choose your brand visuals so that talent can easily recognise you.",
+]
+
 type Logo = Pick<BaseGroupInfo, "logoUrl" | "logoFileObj">
-type Banner = Pick<Group, "bannerImageUrl">
 
 const CompanyIdentity: FC = () => {
    const { group: company } = useGroup()
@@ -105,7 +109,7 @@ const CompanyIdentity: FC = () => {
       }
    }
 
-   const blobUrlToDataUrl = async (blob) => {
+   const blobUrlToDataUrl = async (blob: Blob) => {
       try {
          // Step 2: Read the blob as a Data URL
          return new Promise((resolve, reject) => {
@@ -119,11 +123,6 @@ const CompanyIdentity: FC = () => {
             reader.readAsDataURL(blob)
          })
       } catch (error) {
-         debugger
-         console.error(
-            "There was an error converting the blob URL to a data URL",
-            error
-         )
          throw error // Re-throw so the caller can handle or see the error
       }
    }
@@ -151,7 +150,6 @@ const CompanyIdentity: FC = () => {
       try {
          if (bannerImageUrl) {
             const url = await uploadImage(bannerImageUrl)
-            debugger
             if (!url) throw new Error("Upload error")
             await groupRepo.updateGroupBannerPhoto(company.id, url)
             successNotification("Updated successfull")
@@ -161,7 +159,7 @@ const CompanyIdentity: FC = () => {
       }
    }
 
-   const handleCloseCropImageDialog = async (resultUrl) => {
+   const handleCloseCropImageDialog = async (resultUrl: string) => {
       if (resultUrl) {
          saveLogoUrl(resultUrl)
       }
@@ -169,10 +167,6 @@ const CompanyIdentity: FC = () => {
       setImageCropperDialog((prev) => !prev)
    }
 
-   const [title, description] = [
-      "Company identity",
-      "Choose your brand visuals so that talent can easily recognise you.",
-   ]
    return (
       <SectionComponent title={title} description={description}>
          <Formik

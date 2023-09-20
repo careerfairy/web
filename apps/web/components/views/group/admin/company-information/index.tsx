@@ -1,9 +1,7 @@
 import { FC, memo } from "react"
 import { Container, Grid } from "@mui/material"
-import { Box } from "@mui/system"
 
 import { sxStyles } from "types/commonTypes"
-import { CompanyInformationProvider } from "./CompanyInformationProvider"
 import CompanyIdentity from "../../../admin/company-information/CompanyIdentity/CompanyIdentity"
 import CompanyDetails from "../../../admin/company-information/CompanyDetails"
 import TargetTalent from "../../../admin/company-information/TargetTalent"
@@ -34,11 +32,7 @@ const styles = sxStyles({
 })
 
 const CompanyInformationPageContent: FC = () => {
-   return (
-      <CompanyInformationProvider>
-         <MemoizedPageContent />
-      </CompanyInformationProvider>
-   )
+   return <MemoizedPageContent />
 }
 
 const PageContent = () => {

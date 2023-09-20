@@ -12,9 +12,9 @@ import { groupRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import QuestionName from "./QuestionName"
 import { sxStyles } from "types/commonTypes"
-import { createAGroupQuestionOption } from "./createAGroupQuestionOption"
+import { createAGroupQuestionOption } from "./QuestionaireCreationUtils"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { createAGroupQuestion } from "./createAGroupQuestion"
+import { createAGroupQuestion } from "./QuestionaireCreationUtils"
 
 const styles = sxStyles({
    form: {
@@ -141,14 +141,14 @@ const RegistrationQuestion: React.FC<Props> = ({
       return onRemove(groupQuestionId)
    }
 
-   const handleSubmit = (question): void => {
+   const handleSubmit = async (question): Promise<void> => {
       try {
          if (isNew) {
-            groupRepo.addNewGroupQuestion(group.id, { ...question })
+            await groupRepo.addNewGroupQuestion(group.id, { ...question })
             successNotification("New Question added")
          } else {
+            await groupRepo.updateGroupQuestion(group.id, { ...question })
             successNotification("Question updated")
-            groupRepo.updateGroupQuestion(group.id, { ...question })
          }
 
          setInputMode(false)

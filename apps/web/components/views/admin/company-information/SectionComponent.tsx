@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material"
-import { FC, ReactNode } from "react"
+import { FC } from "react"
 import LeftColumn from "./LeftColumn"
 
 type Props = {

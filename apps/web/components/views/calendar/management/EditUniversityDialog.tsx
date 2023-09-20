@@ -243,7 +243,7 @@ const EditUniversityDialog = ({
                   onChange={(event) => {
                      setUniversityName(event.target.value)
                   }}
-               ></BrandedTextField>
+               />
                <Paper sx={styles.datesContainer} variant={"outlined"}>
                   <AcademicYearSelector />
                   <Grid container spacing={2}>
