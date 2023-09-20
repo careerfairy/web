@@ -51,6 +51,9 @@ const styles = sxStyles({
    backBtn: {
       color: "#8E8E8E",
    },
+   clearBtn: {
+      bgcolor: "primary.600",
+   },
 })
 
 const EmptyFilterView: FC = () => {
@@ -89,6 +92,7 @@ const EmptyFilterView: FC = () => {
                   onClick={handleClearFilters}
                   variant="contained"
                   color="primary"
+                  sx={styles.clearBtn}
                >
                   Clear filters
                </Button>

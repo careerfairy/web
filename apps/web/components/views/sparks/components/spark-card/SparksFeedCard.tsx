@@ -70,9 +70,6 @@ const styles = sxStyles({
       height: "100%",
       mt: "unset",
    },
-   cardDetails: {
-      cursor: "pointer",
-   },
    outerActionsWrapper: {
       position: "absolute",
       bottom: "0",
@@ -178,7 +175,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                   {showCardNotification ? (
                      <SparkEventFullCardNotification />
                   ) : (
-                     <Stack sx={styles.cardDetails} flexGrow={1}>
+                     <Stack flexGrow={1}>
                         <Box mt="auto" />
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
