@@ -9,7 +9,7 @@ import {
    useMemo,
    useRef,
 } from "react"
-import { Box, Container, Grid, Grow, Stack } from "@mui/material"
+import { Box, Container, Grid, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
 import MediaSection from "./MediaSection"
 import TestimonialSection from "./TestimonialSection"
@@ -189,25 +189,23 @@ const CompanyPageOverview = ({
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />
             </Box>
-            <Grow in>
-               <Container disableGutters maxWidth="lg">
-                  <Grid container spacing={4}>
-                     <Grid item xs={12} md={6}>
-                        <Stack px={3} spacing={{ xs: 4, md: 8 }}>
-                           <AboutSection />
-                           <SparksSection groupId={group.id} />
-                           {showFollowCompanyCta ? <FollowCompany /> : null}
-                           {showSignUpCta ? <SignUp /> : null}
-                           <TestimonialSection />
-                           <EventSection />
-                        </Stack>
-                     </Grid>
-                     <Grid item xs={12} md={6}>
-                        <MediaSection />
-                     </Grid>
+            <Container disableGutters maxWidth="lg">
+               <Grid container spacing={4}>
+                  <Grid item xs={12} md={6}>
+                     <Stack px={3} spacing={{ xs: 4, md: 8 }}>
+                        <AboutSection />
+                        <SparksSection key={group.id} groupId={group.id} />
+                        {showFollowCompanyCta ? <FollowCompany /> : null}
+                        {showSignUpCta ? <SignUp /> : null}
+                        <TestimonialSection />
+                        <EventSection />
+                     </Stack>
                   </Grid>
-               </Container>
-            </Grow>
+                  <Grid item xs={12} md={6}>
+                     <MediaSection />
+                  </Grid>
+               </Grid>
+            </Container>
             <NewsletterSection />
          </Box>
       </CompanyPageContext.Provider>
