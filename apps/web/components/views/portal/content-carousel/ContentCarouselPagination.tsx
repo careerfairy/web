@@ -1,4 +1,4 @@
-import { Pagination } from "@mui/material"
+import Pagination, { paginationClasses } from "@mui/material/Pagination"
 import React, { useCallback, useEffect } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import useTimeOut from "../../../custom-hook/useTimeOut"
@@ -7,6 +7,11 @@ import PaginationItem from "@mui/material/PaginationItem"
 import { alpha } from "@mui/material/styles"
 
 const styles = sxStyles({
+   root: {
+      [`& .${paginationClasses.ul}`]: {
+         flexWrap: "nowrap",
+      },
+   },
    stepper: (theme) => ({
       borderRadius: "50%",
       mr: 2,
@@ -62,6 +67,7 @@ const ContentCarouselPagination = ({
    return (
       <Pagination
          defaultPage={activeStep}
+         sx={styles.root}
          page={activeStep + 1}
          hideNextButton={true}
          hidePrevButton={true}
