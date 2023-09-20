@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react"
-import { Autocomplete, Chip, Stack } from "@mui/material"
+import { Autocomplete, Stack } from "@mui/material"
 import { Box } from "@mui/system"
 
 import { Form, Formik } from "formik"
@@ -11,13 +11,10 @@ import {
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "constants/forms"
-import GenericDropdown from "components/views/common/GenericDropdown"
-import BrandedMultiCheckBox from "components/views/common/inputs/BrandedMultiCheckBox"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { groupRepo } from "data/RepositoryInstances"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
-import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 import BrandedChip from "./BrandedChip"
 
 const styles = sxStyles({
@@ -42,6 +39,13 @@ const styles = sxStyles({
       },
    },
 })
+
+const [title, description] = [
+   "Details",
+   `Share information about your company to the next generation of
+   talent. This information will be visible on your company profile,
+   as well as your live streams, and can be edited at any time.`,
+]
 
 const CompanyDetails = () => {
    const { group: company } = useGroup()
@@ -82,12 +86,6 @@ const CompanyDetails = () => {
       [errorNotification, successNotification, company.id]
    )
 
-   const [title, description] = [
-      "Details",
-      `Share information about your company to the next generation of
-      talent. This information will be visible on your company profile,
-      as well as your live streams, and can be edited at any time.`,
-   ]
    return (
       <SectionComponent title={title} description={description}>
          <Formik

@@ -13,7 +13,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import React, { useRef, useState } from "react"
 import "cropperjs/dist/cropper.css"
 import Cropper, { ReactCropperElement } from "react-cropper"
-import { Image, X } from "react-feather"
+import { Image, X as XIcon } from "react-feather"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { sxStyles } from "types/commonTypes"
@@ -25,6 +25,19 @@ const styles = sxStyles({
       height: "100px",
       borderRadius: "50%",
       border: "2px solid blue",
+   },
+   dialogTitle: {
+      ml: "10px",
+      fontSize: "16px",
+      fontWeight: 400,
+      letterSpacing: "-0.176px",
+      width: "stretch",
+   },
+   slider: {
+      mb: 1,
+      mr: "auto",
+      ml: "auto",
+      color: "#686868",
    },
    cropper: {
       ".cropper-center": {
@@ -113,7 +126,6 @@ export const ImageCropperDialog = ({
 
    const uploadLogo = async (fileObjectString: string) => {
       try {
-         debugger
          // Converting cropped 64 based encoded string to a File
          const newFileObject = dataURLtoFile(fileObjectString)
          // Getting the storage instance
@@ -166,20 +178,12 @@ export const ImageCropperDialog = ({
          <DialogTitle sx={styles.dialogHeader}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
                <Image />
-               <Typography
-                  sx={{
-                     ml: "10px",
-                     fontSize: "16px",
-                     fontWeight: 400,
-                     letterSpacing: "-0.176px",
-                     width: "stretch",
-                  }}
-               >
+               <Typography sx={styles.dialogTitle}>
                   {Boolean(title) ? title : "Edit picture"}
                </Typography>
             </Box>
             <Button onClick={() => handleClose()}>
-               <X color="#000000" />
+               <XIcon />
             </Button>
          </DialogTitle>
          <DialogContent>
@@ -202,7 +206,7 @@ export const ImageCropperDialog = ({
             <Stack
                spacing={2}
                direction="row"
-               sx={{ mb: 1, mr: "auto", ml: "auto", color: "#686868" }}
+               sx={styles.slider}
                alignItems="center"
                width={"stretch"}
             >

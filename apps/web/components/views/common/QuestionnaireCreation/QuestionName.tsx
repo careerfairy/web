@@ -20,7 +20,7 @@ const QuestionName: React.FC<Props> = ({
          value={value}
          onChange={(e) => setValue(e.target.value)}
          sx={{ width: "-webkit-fill-available" }}
-      ></BrandedTextField>
+      />
    ) : (
       <Typography
          sx={{ color: "#212020", fontWeight: 600, fontSize: "18px", m: 1 }}

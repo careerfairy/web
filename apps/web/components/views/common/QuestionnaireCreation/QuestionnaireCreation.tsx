@@ -5,7 +5,7 @@ import { Button, Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 import RegistrationQuestion from "./ResgistrationQuestion"
-import { createAGroupQuestion } from "./createAGroupQuestion"
+import { createAGroupQuestion } from "./QuestionaireCreationUtils"
 
 const styles = sxStyles({
    stack: {

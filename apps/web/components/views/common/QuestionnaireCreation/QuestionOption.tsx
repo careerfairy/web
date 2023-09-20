@@ -1,6 +1,27 @@
 import { ReactElement } from "react"
 import { Stack, Typography } from "@mui/material"
 import BrandedTextField from "../inputs/BrandedTextField"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   optionsLabel: {
+      color: "rgba(95, 95, 95, 0.50)",
+      fontSize: "16px",
+      fontWeight: 400,
+      mt: "16px",
+      ml: "16px",
+      mr: "16px",
+      mb: "8px",
+   },
+   optionValue: {
+      color: "#5F5F5F",
+      fontSize: "16px",
+      fontWeight: 400,
+      ml: "16px",
+      mr: "16px",
+      mb: "16px",
+   },
+})
 
 type Props = {
    cardinal?: number
@@ -12,8 +33,8 @@ type Props = {
 
 const QuestionOption: React.FC<Props> = ({
    cardinal = 1,
-   editing = false,
-   lastItem = false,
+   editing,
+   lastItem,
    value,
    setValue,
 }): ReactElement => {
@@ -24,7 +45,7 @@ const QuestionOption: React.FC<Props> = ({
          value={value}
          onChange={(event) => setValue(event.target.value)}
          sx={{ m: 1, width: "100%" }}
-      ></BrandedTextField>
+      />
    ) : (
       <Stack
          sx={{
@@ -33,31 +54,8 @@ const QuestionOption: React.FC<Props> = ({
             margin: "0px",
          }}
       >
-         <Typography
-            sx={{
-               color: "rgba(95, 95, 95, 0.50)",
-               fontSize: "16px",
-               fontWeight: 400,
-               mt: "16px",
-               ml: "16px",
-               mr: "16px",
-               mb: "8px",
-            }}
-         >
-            Option {cardinal}
-         </Typography>
-         <Typography
-            sx={{
-               color: "#5F5F5F",
-               fontSize: "16px",
-               fontWeight: 400,
-               ml: "16px",
-               mr: "16px",
-               mb: "16px",
-            }}
-         >
-            {value}
-         </Typography>
+         <Typography sx={styles.optionsLabel}>Option {cardinal}</Typography>
+         <Typography sx={styles.optionValue}>{value}</Typography>
       </Stack>
    )
 }

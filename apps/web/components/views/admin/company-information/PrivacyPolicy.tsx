@@ -1,17 +1,20 @@
 import React, { useMemo } from "react"
 import { Stack } from "@mui/material"
-import { Box } from "@mui/system"
-
-import Styles from "./BaseStyles"
 import { Form, Formik } from "formik"
 import SaveChangesButton from "./SaveChangesButton"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "data/RepositoryInstances"
-import LeftColumn from "./LeftColumn"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SectionComponent from "./SectionComponent"
+
+const [title, description] = [
+   "Privacy policy",
+   `Adding a privacy policy allows you to see live stream
+   participants and registration details. It will be agreed during
+   the registration process.`,
+]
 
 const PrivacyPolicy = () => {
    const { group } = useGroup()
@@ -40,12 +43,6 @@ const PrivacyPolicy = () => {
       }
    }
 
-   const [title, description] = [
-      "Privacy policy",
-      `Adding a privacy policy allows you to see live stream
-      participants and registration details. It will be agreed during
-      the registration process.`,
-   ]
    return (
       <SectionComponent title={title} description={description}>
          <Formik
@@ -64,7 +61,7 @@ const PrivacyPolicy = () => {
                            setFieldValue("privacyPolicyUrl", e.target.value)
                         }
                         sx={{ mb: "12px" }}
-                     ></BrandedTextField>
+                     />
                      <SaveChangesButton type="submit" active={dirty}>
                         Save Policy
                      </SaveChangesButton>
