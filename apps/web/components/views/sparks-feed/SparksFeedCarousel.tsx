@@ -138,7 +138,6 @@ const SparksFeedCarousel: FC = () => {
           * to prevent flickering.
           */
          watchSlides: (emblaApi) => {
-            if (noSparks) return
             const reloadEmbla = (): void => {
                const oldEngine = emblaApi.internalEngine()
                emblaApi.reInit()
@@ -154,6 +153,7 @@ const SparksFeedCarousel: FC = () => {
                      oldEngine[engineModule]
                   )
                })
+               if (noSparks) return
                newEngine.translate.to(oldEngine.location.get())
                const { index } = newEngine.scrollTarget.byDistance(0, false)
                newEngine.index.set(index)
