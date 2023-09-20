@@ -207,19 +207,17 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                         <SparkQuestion question={spark.question} />
                      </Stack>
                   )}
-                  {isFullScreen || showCardNotification ? null : (
-                     <Box sx={styles.outerActionsWrapper}>
-                        <FeedCardActions spark={spark} />
-                     </Box>
-                  )}
+                  {!showCardNotification && isFullScreen ? (
+                     <FeedCardActions spark={spark} />
+                  ) : null}
                </Box>
             </Box>
          </Box>
-         {isFullScreen || showCardNotification ? null : (
+         {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
                <FeedCardActions spark={spark} />
             </Box>
-         )}
+         ) : null}
       </>
    )
 }
