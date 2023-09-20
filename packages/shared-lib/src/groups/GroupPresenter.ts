@@ -227,6 +227,18 @@ export class GroupPresenter {
       }
    }
 
+   getCompanyPageInitialProgress(): number {
+      const initialActions = this.getCompanyPageSteps().filter(
+         (action) => action.isInitial
+      )
+
+      const completedActions = initialActions.filter((action) =>
+         action.checkIsComplete()
+      )
+
+      return Math.round((completedActions.length / initialActions.length) * 100)
+   }
+
    /**
     * To get the maximum number of public sparks for this specific group
     * This amount may be different depending on the group agreements

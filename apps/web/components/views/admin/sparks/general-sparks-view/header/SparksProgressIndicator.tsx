@@ -3,9 +3,10 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { Upload } from "react-feather"
 import CreateSparkButton from "../../components/CreateSparkButton"
-import React, { FC, useMemo } from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    root: {
@@ -59,6 +60,9 @@ const styles = sxStyles({
    createBtn: {
       width: { xs: "100%", md: "fit-content" },
    },
+   clickable: {
+      cursor: "pointer",
+   },
 })
 
 type CreatorWithSparksNumber = {
@@ -68,6 +72,7 @@ type CreatorWithSparksNumber = {
 }
 
 const SparksProgressIndicator = () => {
+   const { push } = useRouter()
    const { groupPresenter } = useGroup()
    const { data: publicSparks } = useGroupSparks(groupPresenter.id, {
       isPublished: true,
@@ -136,6 +141,14 @@ const SparksProgressIndicator = () => {
          })
    }, [publicSparks])
 
+   const companyPageProgress = useMemo(() => {
+      return groupPresenter.getCompanyPageInitialProgress()
+   }, [groupPresenter])
+
+   const handleCompanyPageProgressClick = useCallback(() => {
+      void push(`/group/${groupPresenter.id}/admin/page`)
+   }, [groupPresenter.id, push])
+
    return (
       <Box sx={styles.root}>
          <Stack spacing={2} sx={styles.info}>
@@ -162,8 +175,9 @@ const SparksProgressIndicator = () => {
             <ProgressIndicator
                id={groupPresenter.id}
                message={"Publish company page"}
-               progress={groupPresenter.publicProfile ? 100 : 0}
+               progress={companyPageProgress}
                isValid={groupPresenter.publicProfile}
+               onClick={handleCompanyPageProgressClick}
             />
 
             {creatorsToValidate.map((creatorWithSparks, index) => (
@@ -222,6 +236,7 @@ type ProgressIndicatorProps = {
    isValid: boolean
    currentValue?: number
    maxValue?: number
+   onClick?: () => void
 }
 const ProgressIndicator: FC<ProgressIndicatorProps> = ({
    id,
@@ -230,6 +245,7 @@ const ProgressIndicator: FC<ProgressIndicatorProps> = ({
    isValid,
    currentValue,
    maxValue,
+   onClick,
 }) => {
    const showOnlyMessage = useMemo(
       () => Boolean(!currentValue || !maxValue),
@@ -237,7 +253,12 @@ const ProgressIndicator: FC<ProgressIndicatorProps> = ({
    )
 
    return (
-      <Stack spacing={1} sx={styles.singleProgress} key={id}>
+      <Stack
+         key={id}
+         spacing={1}
+         sx={[styles.singleProgress, Boolean(onClick) && styles.clickable]}
+         onClick={Boolean(onClick) ? onClick : null}
+      >
          <Box sx={styles.circularProgress}>
             <CircularProgress
                variant="determinate"
