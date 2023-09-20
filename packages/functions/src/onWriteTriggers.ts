@@ -13,6 +13,8 @@ import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { removeAndSyncSparksNotifications } from "./notificationSparks"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { validateGroupSparks } from "./groupSparks"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -176,6 +178,16 @@ export const onWriteGroup = functions
 
       // Run side effects for all creator changes
       sideEffectPromises.push(sparkRepo.syncGroupDataToSpark(change, groupId))
+
+      if (changeTypes.isUpdate) {
+         // In case the publicProfile flag changes we must validate the group sparks
+         const newValue = change.after?.data() as Group
+         const previousValue = change.before?.data() as Group
+
+         if (newValue.publicProfile !== previousValue.publicProfile) {
+            sideEffectPromises.push(validateGroupSparks(newValue))
+         }
+      }
 
       return handleSideEffects(sideEffectPromises)
    })

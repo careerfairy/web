@@ -150,9 +150,23 @@ export const deleteSpark = functions.region(config.region).https.onCall(
    )
 )
 
-const validateGroupSparks = async (group: Group) => {
+export const validateGroupSparks = async (group: Group) => {
    try {
-      const { groupId, publicSparks } = group
+      const { groupId, publicSparks, publicProfile } = group
+
+      // If the group is not yet a public group there's no need to do all the other validations
+      if (!publicProfile) {
+         functions.logger.log(
+            `Group ${groupId} is not yet public so theres no possibility to have public sparks`
+         )
+
+         // only update if needed
+         if (publicSparks) {
+            return groupRepo.updatePublicSparks(groupId, false)
+         }
+
+         return
+      }
 
       // get all the creators from a group
       const creators: Creator[] = await groupRepo.getCreators(groupId)
