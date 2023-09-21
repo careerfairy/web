@@ -1,21 +1,21 @@
 import React, { FC, useCallback, useMemo } from "react"
-import DateUtil from "../../../../../util/DateUtil"
+import DateUtil from "../../../../../../util/DateUtil"
 import { useDispatch, useSelector } from "react-redux"
 import {
    activeSparkSelector,
    currentSparkEventNotificationSelector,
    groupIdSelector,
-} from "../../../../../store/selectors/sparksFeedSelectors"
+} from "../../../../../../store/selectors/sparksFeedSelectors"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import {
    removeCurrentEventNotifications,
    showEventDetailsDialog,
-} from "../../../../../store/reducers/sparksFeedReducer"
+} from "../../../../../../store/reducers/sparksFeedReducer"
 import { Avatar, Box, Button, Slide, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { companyLogoPlaceholder } from "../../../../../constants/images"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import { companyLogoPlaceholder } from "../../../../../../constants/images"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {

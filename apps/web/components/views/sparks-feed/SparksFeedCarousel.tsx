@@ -9,7 +9,7 @@ import React, { FC, useCallback, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    removeCurrentEventNotifications,
-   swipeNextSparkByIndex,
+   swipeToSparkByIndex,
 } from "store/reducers/sparksFeedReducer"
 
 import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
@@ -192,7 +192,7 @@ const SparksFeedCarousel: FC = () => {
       if (emblaApi) {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
-            dispatch(swipeNextSparkByIndex(index))
+            dispatch(swipeToSparkByIndex(index))
             dispatch(removeCurrentEventNotifications())
          }
 
@@ -207,7 +207,7 @@ const SparksFeedCarousel: FC = () => {
 
    const handleClickSlide = useCallback(
       (index: number) => {
-         dispatch(swipeNextSparkByIndex(index))
+         dispatch(swipeToSparkByIndex(index))
       },
       [dispatch]
    )
