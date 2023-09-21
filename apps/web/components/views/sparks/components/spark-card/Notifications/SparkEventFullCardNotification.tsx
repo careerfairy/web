@@ -1,11 +1,10 @@
-import React, { useCallback } from "react"
+import React, { FC, useCallback } from "react"
 import { Box, Button, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../types/commonTypes"
-import EventPreviewCard from "../../../common/stream-cards/EventPreviewCard"
-import { useDispatch, useSelector } from "react-redux"
-import { cardNotificationSelector } from "../../../../../store/selectors/sparksFeedSelectors"
-import useLivestream from "../../../../custom-hook/live-stream/useLivestream"
-import { showEventDetailsDialog } from "../../../../../store/reducers/sparksFeedReducer"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import EventPreviewCard from "../../../../common/stream-cards/EventPreviewCard"
+import { useDispatch } from "react-redux"
+import useLivestream from "../../../../../custom-hook/live-stream/useLivestream"
+import { showEventDetailsDialog } from "../../../../../../store/reducers/sparksFeedReducer"
 
 const styles = sxStyles({
    content: {
@@ -56,10 +55,13 @@ const styles = sxStyles({
    },
 })
 
-const SparkEventFullCardNotification = () => {
+type Props = {
+   eventId: string
+}
+
+const SparkEventFullCardNotification: FC<Props> = ({ eventId }) => {
    const dispatch = useDispatch()
-   const cardNotification = useSelector(cardNotificationSelector)
-   const { data: event } = useLivestream(cardNotification.eventId)
+   const { data: event } = useLivestream(eventId)
 
    const handleRegister = useCallback(() => {
       dispatch(showEventDetailsDialog(true))

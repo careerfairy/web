@@ -25,7 +25,6 @@ import {
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
-   cardNotificationSelector,
    fetchNextErrorSelector,
    groupIdSelector,
    hasNoMoreSparksSelector,
@@ -52,7 +51,6 @@ const SparksPage: NextPage<
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
    const fromGroupPage = useSelector(groupIdSelector)
-   const cardNotification = useSelector(cardNotificationSelector)
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -102,25 +100,16 @@ const SparksPage: NextPage<
                fromGroupPage
          )
       ) {
-         if (cardNotification) {
-            // if reach the end of the sparks list and the current spark is the card notification we should
-            // remove the groupId field and fetch the initial sparks feed without the groupId on the query
-            if (activeSpark?.isCardNotification) {
-               dispatch(removeGroupId())
-               dispatch(fetchInitialSparksFeed())
-            } else {
-               // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-               dispatch(addCarNotificationToSparksList())
-            }
-         } else {
-            // If there are no card notifications to display, remove the groupId and proceed with sparks content
+         if (activeSpark?.isCardNotification) {
             dispatch(removeGroupId())
             dispatch(fetchInitialSparksFeed())
+         } else {
+            // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
+            dispatch(addCarNotificationToSparksList())
          }
       }
    }, [
       activeSpark?.isCardNotification,
-      cardNotification,
       dispatch,
       fromGroupPage,
       hasNoMoreSparks,
