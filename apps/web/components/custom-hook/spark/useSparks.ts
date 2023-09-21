@@ -13,6 +13,7 @@ const useSparks = (totalItems?: number, groupdId?: String) => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where("group.publicSparks", "==", true),
+         where("published", "==", true),
          ...(groupdId ? [where("group.id", "==", groupdId)] : []),
          ...(totalItems ? [limit(totalItems)] : [])
       )
