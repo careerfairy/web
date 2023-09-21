@@ -180,7 +180,7 @@ export interface ISparkFunctionsRepository {
    addSparkToAllUserFeeds(spark: Spark): Promise<void>
 
    /**
-    * Updates a spark in all user feeds
+    * Updates a spark in all user feeds. If the spark is no longer public, it will be deleted from all user feeds.
     * @param spark The spark to update.
     * @returns void
     */
@@ -429,6 +429,7 @@ export class SparkFunctionsRepository
       const sparksSnap = await this.firestore
          .collection("sparks")
          .withConverter(createGenericConverter<Spark>())
+         .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
          .limit(this.TARGET_SPARK_COUNT)
          .get()
@@ -476,6 +477,7 @@ export class SparkFunctionsRepository
          .collection("userData")
          .doc(userId)
          .collection("sparksFeed")
+         .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -495,6 +497,7 @@ export class SparkFunctionsRepository
    async getPublicSparksFeed(limit = 10): Promise<SerializedSpark[]> {
       const publicFeedRef = this.firestore
          .collection("sparks")
+         .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -513,6 +516,7 @@ export class SparkFunctionsRepository
       const groupFeedRef = this.firestore
          .collection("sparks")
          .where("group.id", "==", groupId)
+         .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
          .limit(limit)
          .withConverter(createGenericConverter<Spark>())
@@ -605,6 +609,10 @@ export class SparkFunctionsRepository
    }
 
    async addSparkToAllUserFeeds(spark: Spark): Promise<void> {
+      if (!spark.group.publicSparks) {
+         // If the spark is not public, don't add it to the feed
+         return
+      }
       const bulkWriter = this.firestore.bulkWriter()
 
       const allUsersWithAFeedSnap = await this.firestore
@@ -630,6 +638,8 @@ export class SparkFunctionsRepository
    }
 
    async updateSparkInAllUserFeeds(spark: Spark): Promise<void> {
+      const sparkNoLongerPublic = !spark.group.publicSparks
+
       const bulkWriter = this.firestore.bulkWriter()
 
       const allUserMatchingSparksSnap = await this.firestore
@@ -638,9 +648,17 @@ export class SparkFunctionsRepository
          .where("id", "==", spark.id)
          .get()
 
-      allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
-         bulkWriter.update(sparkDoc.ref, spark)
-      })
+      if (sparkNoLongerPublic) {
+         // If the spark is no longer public, delete it from all user feeds
+         allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
+            bulkWriter.delete(sparkDoc.ref)
+         })
+      } else {
+         // If the spark is still public, update it in all user feeds
+         allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
+            bulkWriter.update(sparkDoc.ref, spark)
+         })
+      }
 
       await bulkWriter.close()
    }

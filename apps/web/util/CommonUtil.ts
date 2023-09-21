@@ -239,6 +239,17 @@ export const shouldUseEmulators = () => {
    return false
 }
 
+/**
+ * Checks if the current environment is either 'preview' or 'development'.
+ *
+ * @returns {boolean} - Returns true if the environment is 'preview' or 'development', false otherwise.
+ */
+export const isInPreviewOrDevelopmentEnvironment = () => {
+   const env = process.env.VERCEL_ENV
+   const nodeEnv = process.env.NODE_ENV
+   return env === "preview" || nodeEnv === "development"
+}
+
 export const getDictValues = <K extends keyof any, T>(
    valueKeys: K[],
    dict: Record<K, T>
