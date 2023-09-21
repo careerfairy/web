@@ -17,7 +17,7 @@ const styles = sxStyles({
       alignSelf: "center",
       alignItems: "center",
 
-      px: { xs: 2, md: 4 },
+      px: { xs: 2, md: 2, lg: 4 },
    },
    header: {
       textAlign: "center",
@@ -63,6 +63,11 @@ const styles = sxStyles({
       border: "3px solid white !important",
       width: 110,
       height: 110,
+
+      "@media (max-height: 700px)": {
+         width: { md: 80 },
+         height: { md: 80 },
+      },
    },
    nextImageWrapper: {
       position: "relative",
