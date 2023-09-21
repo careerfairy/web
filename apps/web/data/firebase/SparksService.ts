@@ -150,14 +150,16 @@ export class SparksService {
          // Query sparks based on the specified group.
          baseQuery = query(
             collection(db, "sparks"),
-            where("group.id", "==", options.groupId!)
+            where("group.id", "==", options.groupId!),
+            where("group.publicSparks", "==", true)
          )
 
          // Check if options specify a userId and that no categories are selected
       } else if (options.userId && !options.sparkCategoryIds?.length) {
          // Query the specified user's sparks feed.
          baseQuery = query(
-            collection(db, "userData", options.userId, "sparksFeed")
+            collection(db, "userData", options.userId, "sparksFeed"),
+            where("group.publicSparks", "==", true)
          )
 
          // Set the sort field to be the addedToFeedAt field.
@@ -208,7 +210,8 @@ export class SparksService {
          docRef.withConverter(sparkPresenterConverter)
       )
       if (docSnap.exists()) {
-         return docSnap.data()
+         const data = docSnap.data()
+         return data.group.publicSparks ? data : null
       } else {
          return null
       }
