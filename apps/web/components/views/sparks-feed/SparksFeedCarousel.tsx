@@ -211,9 +211,6 @@ const SparksFeedCarousel: FC = () => {
          sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
          ref={emblaRef}
       >
-         <Box sx={styles.companyPageBtn}>
-            <BackToCompanyPageButton />
-         </Box>
          <Box
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
@@ -238,6 +235,9 @@ const SparksFeedCarousel: FC = () => {
                   <CircularProgress />
                </Slide>
             </Collapse>
+         </Box>
+         <Box sx={styles.companyPageBtn}>
+            <BackToCompanyPageButton />
          </Box>
          {isFullScreen ? (
             <Box sx={styles.closeBtn}>
