@@ -174,6 +174,7 @@ export class SparksFeedReplenisher {
          while (neededSparks > 0) {
             let query = this.firestore
                .collection("sparks")
+               .where("group.publicSparks", "==", true)
                .withConverter(createGenericConverter<Spark>())
                .orderBy("publishedAt", "desc")
                .limit(this.TARGET_SPARK_COUNT) // Fetch 20 sparks at a time
