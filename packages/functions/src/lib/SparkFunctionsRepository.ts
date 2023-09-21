@@ -173,7 +173,7 @@ export interface ISparkFunctionsRepository {
    deleteDistributedCounterShards(sparkRef: DocumentReference): Promise<void>
 
    /**
-    * Adds a spark to all user feeds
+    * Adds a spark to all user feeds if the spark is public
     * @param spark The spark to add.
     * @returns void
     */
@@ -609,7 +609,7 @@ export class SparkFunctionsRepository
    }
 
    async addSparkToAllUserFeeds(spark: Spark): Promise<void> {
-      if (!spark.group.publicSparks) {
+      if (!spark.group.publicSparks || !spark.published) {
          // If the spark is not public, don't add it to the feed
          return
       }
@@ -638,7 +638,7 @@ export class SparkFunctionsRepository
    }
 
    async updateSparkInAllUserFeeds(spark: Spark): Promise<void> {
-      const sparkNoLongerPublic = !spark.group.publicSparks
+      const sparkNoLongerPublic = !spark.group.publicSparks || !spark.published
 
       const bulkWriter = this.firestore.bulkWriter()
 
