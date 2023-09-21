@@ -150,16 +150,14 @@ export class SparksService {
          // Query sparks based on the specified group.
          baseQuery = query(
             collection(db, "sparks"),
-            where("group.id", "==", options.groupId!),
-            where("group.publicSparks", "==", true)
+            where("group.id", "==", options.groupId!)
          )
 
          // Check if options specify a userId and that no categories are selected
       } else if (options.userId && !options.sparkCategoryIds?.length) {
          // Query the specified user's sparks feed.
          baseQuery = query(
-            collection(db, "userData", options.userId, "sparksFeed"),
-            where("group.publicSparks", "==", true)
+            collection(db, "userData", options.userId, "sparksFeed")
          )
 
          // Set the sort field to be the addedToFeedAt field.
@@ -188,6 +186,8 @@ export class SparksService {
       baseQuery = query(
          baseQuery,
          ...(lastSpark ? [startAfter(lastSpark[sortField])] : []),
+         where("group.publicSparks", "==", true),
+         where("published", "==", true),
          limit(numberOfSparks)
       )
 
@@ -211,7 +211,7 @@ export class SparksService {
       )
       if (docSnap.exists()) {
          const data = docSnap.data()
-         return data.group.publicSparks ? data : null
+         return data.group.publicSparks && data.published ? data : null
       } else {
          return null
       }
