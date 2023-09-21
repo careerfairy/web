@@ -14,7 +14,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { removeAndSyncSparksNotifications } from "./notificationSparks"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { validateGroupSparks } from "./groupSparks"
+import { validateGroupSparks } from "./util/sparks"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
