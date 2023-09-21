@@ -267,9 +267,12 @@ export class SparksService {
     *
     * @param userId - The id of the user
     * @param sparkId - The id of the spark
-    * @param liked - The like status to set for the spark
     **/
-   async toggleSparkLike(userId: string, sparkId: string, liked: boolean) {
+   async toggleSparkLike(userId: string, sparkId: string) {
+      const hasLikedSpark = await this.hasUserLikedSpark(userId, sparkId)
+
+      const toggledLike = !hasLikedSpark
+
       const currentYear = DateTime.now().year
       const docRef = doc(
          FirestoreInstance,
@@ -279,11 +282,16 @@ export class SparksService {
          currentYear.toString()
       ).withConverter(createGenericConverter<LikedSparks>())
 
-      if (liked) {
+      if (toggledLike) {
          // If liked is true, add the sparkId to the sparks map for the current year
          await setDoc<LikedSparks>(
             docRef,
-            this.createLikedSparksObject(userId, sparkId, currentYear, liked),
+            this.createLikedSparksObject(
+               userId,
+               sparkId,
+               currentYear,
+               toggledLike
+            ),
             { merge: true }
          )
       } else {
@@ -304,13 +312,15 @@ export class SparksService {
 
             return setDoc<LikedSparks>(
                yearRef,
-               this.createLikedSparksObject(userId, sparkId, year, liked),
+               this.createLikedSparksObject(userId, sparkId, year, toggledLike),
                { merge: true }
             )
          })
 
-         return void Promise.all(promises)
+         await Promise.all(promises)
       }
+
+      return toggledLike
    }
 
    /**
