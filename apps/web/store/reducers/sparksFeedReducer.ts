@@ -104,7 +104,7 @@ const sparksFeedSlice = createSlice({
             state.fetchNextSparksStatus = "loading"
          }
       },
-      swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
+      swipeToSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
          if (newIndex >= 0 && newIndex < state.sparks.length) {
             state.currentPlayingIndex = newIndex
@@ -253,7 +253,7 @@ export const {
    setUserEmail,
    setSparkCategories,
    resetSparksFeed,
-   swipeNextSparkByIndex,
+   swipeToSparkByIndex,
    setCurrentEventNotification,
    removeCurrentEventNotifications,
    showEventDetailsDialog,
