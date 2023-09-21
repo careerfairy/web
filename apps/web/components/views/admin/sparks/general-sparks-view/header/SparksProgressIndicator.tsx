@@ -184,7 +184,7 @@ const SparksProgressIndicator = () => {
                <CreatorProgressIndicator
                   key={index}
                   creatorWithSparks={creatorWithSparks}
-                  index={index + 1}
+                  index={index}
                />
             ))}
          </Stack>
@@ -248,7 +248,7 @@ const ProgressIndicator: FC<ProgressIndicatorProps> = ({
    onClick,
 }) => {
    const showOnlyMessage = useMemo(
-      () => Boolean(!currentValue || !maxValue),
+      () => Boolean(!currentValue && !maxValue),
       [currentValue, maxValue]
    )
 
