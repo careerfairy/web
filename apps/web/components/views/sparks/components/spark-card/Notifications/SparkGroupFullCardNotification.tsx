@@ -25,6 +25,17 @@ const styles = sxStyles({
    },
    title: {
       fontWeight: "bold",
+
+      "@media (max-height: 800px)": {
+         fontSize: "22px !important",
+      },
+   },
+   subtitle: {
+      mt: 3,
+
+      "@media (max-height: 800px)": {
+         fontSize: "14px !important",
+      },
    },
    actions: {
       display: "flex",
@@ -102,7 +113,7 @@ const SparkGroupFullCardNotification: FC<Props> = ({ group }) => {
                {group.universityName}
             </Typography>
 
-            <Typography variant={"h6"} mt={3}>
+            <Typography variant={"h6"} sx={styles.subtitle}>
                But there are more Sparks to watch on our platform! Keep
                scrolling or click on the button to watch all Sparks
             </Typography>
