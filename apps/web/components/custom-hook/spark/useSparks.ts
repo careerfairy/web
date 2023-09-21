@@ -12,10 +12,11 @@ const useSparks = (totalItems?: number, groupdId?: String) => {
    const sparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
+         where("group.publicSparks", "==", true),
          ...(groupdId ? [where("group.id", "==", groupdId)] : []),
          ...(totalItems ? [limit(totalItems)] : [])
       )
-   }, [totalItems])
+   }, [groupdId, totalItems])
 
    return useFirestoreCollection<Spark>(sparksQuery)
 }

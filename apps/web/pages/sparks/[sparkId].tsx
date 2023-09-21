@@ -34,6 +34,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import { isInPreviewOrDevelopmentEnvironment } from "util/CommonUtil"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -189,6 +190,16 @@ export const getServerSideProps: GetServerSideProps<
       sparkId: string
    }
 > = async (context) => {
+   // TODO: remove this when we are ready to launch
+   if (isInPreviewOrDevelopmentEnvironment()) {
+      return {
+         redirect: {
+            destination: "/portal",
+            permanent: false,
+         },
+      }
+   }
+
    const groupId = context.query.groupId
       ? context.query.groupId.toString()
       : null
