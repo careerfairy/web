@@ -194,7 +194,9 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                         <AboutSection />
-                        <SparksSection key={group.id} groupId={group.id} />
+                        {group.publicSparks ? (
+                           <SparksSection key={group.id} groupId={group.id} />
+                        ) : null}
                         {showFollowCompanyCta ? <FollowCompany /> : null}
                         {showSignUpCta ? <SignUp /> : null}
                         <TestimonialSection />
