@@ -202,7 +202,7 @@ export const getServerSideProps: GetServerSideProps<
    }
 > = async (context) => {
    // TODO: remove this when we are ready to launch
-   if (isInPreviewOrDevelopmentEnvironment()) {
+   if (!isInPreviewOrDevelopmentEnvironment()) {
       return {
          redirect: {
             destination: "/portal",
