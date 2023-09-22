@@ -22,6 +22,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()
@@ -117,10 +118,14 @@ const tableStyles = sxStyles({
 })
 
 const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
+   const { group } = useGroup()
+
    const stats = useMemo(() => {
       const livestreamSources = sourcesByLivestream(utmData, livestreamId)
 
-      return VALID_SOURCES.map((source) => {
+      return VALID_SOURCES.filter(
+         (source) => !(source.id === "sparks" && !group.sparksAdminPageFlag)
+      ).map((source) => {
          // We need to compare the livestream sources with the {VALID_SOURCES}, ensuring that we display all sources regardless of whether they have a value
          const sourceIndex = livestreamSources.findIndex(
             (livestreamSource) =>
@@ -139,7 +144,7 @@ const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
             } as UTMsPercentage
          }
       })
-   }, [livestreamId, utmData])
+   }, [group.sparksAdminPageFlag, livestreamId, utmData])
 
    return (
       <Table padding="none">
