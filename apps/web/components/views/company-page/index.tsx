@@ -24,7 +24,7 @@ import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import {
    errorLogAndNotify,
-   isInPreviewOrDevelopmentEnvironment,
+   shouldEnableSParksB2C,
 } from "../../../util/CommonUtil"
 import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -197,7 +197,7 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                         <AboutSection />
-                        {group.publicSparks && isInPreviewOrDevelopmentEnvironment() ? (
+                        {group.publicSparks && shouldEnableSParksB2C() ? (
                            <SparksSection key={group.id} groupId={group.id} />
                         ) : null}
                         {showFollowCompanyCta ? <FollowCompany /> : null}
