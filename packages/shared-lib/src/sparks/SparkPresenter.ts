@@ -54,15 +54,6 @@ export class SparkPresenter implements SparkPresenterInterface {
    category: SparkCategory
    question: string
    video: SparkVideo
-   impressions: number
-   uniquePlays: number
-   plays: number
-   totalWatchedMinutes: number
-   likes: number
-   shareCTA: number
-   numberOfCareerPageClicks: number
-   numberOfCompanyPageClicks: number
-   numberTimesCompletelyWatched: number
 
    // Additional properties can be added here as the Spark structure evolves
    isCardNotification: boolean

@@ -31,6 +31,10 @@
             {
                "name": "publicSparks",
                "type": "boolean"
+            },
+            {
+               "name": "publicProfile",
+               "type": "boolean"
             }
          ]
       },
@@ -131,34 +135,6 @@
                "type": "string"
             }
          ]
-      },
-      {
-         "name": "impressions",
-         "type": "number"
-      },
-      {
-         "name": "uniquePlays",
-         "type": "number"
-      },
-      {
-         "name": "plays",
-         "type": "number"
-      },
-      {
-         "name": "totalWatchedMinutes",
-         "type": "number"
-      },
-      {
-         "name": "likes",
-         "type": "number"
-      },
-      {
-         "name": "shareCTA",
-         "type": "number"
-      },
-      {
-         "name": "numberOfCareerPageClicks",
-         "type": "number"
       }
    ]
 }

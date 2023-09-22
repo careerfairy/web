@@ -13,13 +13,14 @@ import {
    DeletedSpark,
    SeenSparks,
    Spark,
+   SparkStats,
    UpdateSparkData,
    UserSparksFeedMetrics,
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { shuffle } from "@careerfairy/shared-lib/utils"
-import { DocumentReference, DocumentSnapshot } from "firebase-admin/firestore"
+import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
@@ -163,16 +164,6 @@ export interface ISparkFunctionsRepository {
    removeSparkFromAllUserFeeds(sparkId: string): Promise<void>
 
    /**
-    * Deletes the distributed counter shards associated with a spark.
-    * This is necessary when a spark is deleted to prevent the extension
-    * from creating an invalid spark document in the collection.
-    *
-    * @async
-    * @param sparkRef - The Firestore DocumentReference of the spark.
-    */
-   deleteDistributedCounterShards(sparkRef: DocumentReference): Promise<void>
-
-   /**
     * Adds a spark to all user feeds if the spark is public
     * @param spark The spark to add.
     * @returns void
@@ -235,6 +226,24 @@ export interface ISparkFunctionsRepository {
     * @returns void
     */
    trackSparkSecondsWatched(events: SparkSecondWatched[]): Promise<void>
+
+   /**
+    * Embed spark on the newly created spark stats document
+    * @param sparkId The spark id to fetch and embed
+    * @param snapshot The spark stats document snapshot
+    * @returns void
+    */
+   addSparkToSparkStatsDocument(
+      sparkId: string,
+      snapshot: DocumentSnapshot
+   ): Promise<void>
+
+   /**
+    * Syncs a spark to the spark stats document
+    * @param spark The spark to sync
+    * @returns void
+    */
+   syncSparkToSparkStatsDocument(spark: Spark): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -265,8 +274,10 @@ export class SparkFunctionsRepository
    }
 
    async delete(id: string): Promise<void> {
+      // Get the references
       const sparkRef = this.firestore.collection("sparks").doc(id)
       const sparkDeletedRef = this.firestore.collection("deletedSparks").doc(id)
+      const sparkStatsRef = this.firestore.collection("sparkStats").doc(id)
 
       // Get the document
       const sparkSnap = await sparkRef.get()
@@ -278,15 +289,28 @@ export class SparkFunctionsRepository
 
       const batch = this.firestore.batch()
 
-      // Delete the document
+      // Delete the spark document
       batch.delete(sparkRef)
 
-      // Create a new document in the deleted collection
+      // Create a spark new document in the deleted collection
       const deletedSpark: DeletedSpark = {
          ...sparkData,
          deletedAt: Timestamp.now(),
       }
+
+      // Add deletedAt to the spark stats document
+
+      const updatedSParkStats: Pick<SparkStats, "deletedAt" | "deleted"> = {
+         deleted: true,
+         deletedAt: Timestamp.now(),
+      }
+
       batch.set(sparkDeletedRef, deletedSpark)
+
+      // Create a spark stats new document in the deleted collection
+      batch.set(sparkStatsRef, updatedSParkStats, {
+         merge: true,
+      })
 
       // Delete the files in storage
       this.deleteSparkFiles(sparkData).catch(this.logger.error)
@@ -309,15 +333,6 @@ export class SparkFunctionsRepository
          updatedAt: null,
          addedToFeedAt: null,
          published: data.published,
-         likes: 0,
-         impressions: 0,
-         plays: 0,
-         totalWatchedMinutes: 0,
-         uniquePlays: 0,
-         shareCTA: 0,
-         numberOfCareerPageClicks: 0,
-         numberOfCompanyPageClicks: 0,
-         numberTimesCompletelyWatched: 0,
          group: pickPublicDataFromGroup(group),
          creator: pickPublicDataFromCreator(creator),
          id: ref.id,
@@ -743,20 +758,54 @@ export class SparkFunctionsRepository
       return this.sparkSecondsWatchedHandler.insertData(events)
    }
 
-   async deleteDistributedCounterShards(
-      sparkRef: DocumentReference
+   async addSparkToSparkStatsDocument(
+      sparkId: string,
+      snapshot: DocumentSnapshot
    ): Promise<void> {
-      const batch = this.firestore.batch()
+      const spark = await this.get(sparkId)
 
-      const shardRef = sparkRef.collection("_counter_shards_")
+      const sparkStatsRef = snapshot.ref
 
-      // Get all shards in the collection
-      const snapshot = await shardRef.get()
+      const sparkStats: Pick<SparkStats, "spark"> = {
+         spark,
+      }
 
-      // Add each shard document in the collection to the batch for deletion
-      snapshot.docs.forEach((doc) => batch.delete(doc.ref))
+      return void sparkStatsRef.update(sparkStats)
+   }
 
-      return void batch.commit()
+   async syncSparkToSparkStatsDocument(spark: Spark): Promise<void> {
+      const sparkStatsRef = this.firestore
+         .collection("sparkStats")
+         .doc(spark.id)
+
+      const sparkStatsSnap = await sparkStatsRef.get()
+
+      if (sparkStatsSnap.exists) {
+         const sparkStats: Pick<SparkStats, "spark"> = {
+            spark,
+         }
+
+         return void sparkStatsRef.update(sparkStats)
+      } else {
+         // Create a new document in the sparkStats collection
+         const sparkStats: SparkStats = {
+            spark,
+            id: spark.id,
+            impressions: 0,
+            likes: 0,
+            numberOfCareerPageClicks: 0,
+            numberOfCompanyPageClicks: 0,
+            plays: 0,
+            shareCTA: 0,
+            numberTimesCompletelyWatched: 0,
+            totalWatchedMinutes: 0,
+            uniquePlays: 0,
+            deleted: false,
+            deletedAt: null,
+         }
+
+         return void sparkStatsRef.set(sparkStats)
+      }
    }
 }
 

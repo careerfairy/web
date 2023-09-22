@@ -1,12 +1,14 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Stack } from "@mui/material"
 import Chip, { chipClasses } from "@mui/material/Chip"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
 import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
-import { FC, ReactElement } from "react"
+import { FC, Fragment, ReactElement } from "react"
 import { sxStyles } from "types/commonTypes"
 import { numberToString } from "util/CommonUtil"
 
@@ -39,34 +41,49 @@ type Props = {
 
 const SparkStats: FC<Props> = ({ spark }) => {
    return (
+      <SuspenseWithBoundary fallback={<Fragment />}>
+         <Component spark={spark} />
+      </SuspenseWithBoundary>
+   )
+}
+
+const Component: FC<Props> = ({ spark }) => {
+   const { data: sparkStats } = useSparkStats(spark.id)
+
+   const impressions = sparkStats?.impressions || 0
+   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || 0
+   const likes = sparkStats?.likes || 0
+   const shareCTA = sparkStats?.shareCTA || 0
+
+   return (
       <Stack spacing={1.5}>
          <StatChip
             icon={<ImpressionsIcon />}
             value={0}
-            // value={spark.impressions}
+            // value={impressions}
             tooltip={`This Spark has been seen ${0} times.`}
-            // tooltip={`This Spark has been seen ${spark.impressions} times.`}
+            // tooltip={`This Spark has been seen ${impressions} times.`}
          />
          <StatChip
             icon={<TotalPlaysIcon />}
             value={0}
-            // value={spark.numberOfCareerPageClicks}
+            // value={numberOfCareerPageClicks}
             tooltip={`Your Career Page has been viewed ${0} times from this Spark.`}
-            // tooltip={`Your Career Page has been viewed ${spark.numberOfCareerPageClicks} times from this Spark.`}
+            // tooltip={`Your Career Page has been viewed ${numberOfCareerPageClicks} times from this Spark.`}
          />
          <StatChip
             icon={<LikeIcon />}
-            // value={spark.likes}
+            // value={likes}
             value={0}
             tooltip={`This Spark has been liked ${0} times.`}
-            // tooltip={`This Spark has been liked ${spark.likes} times.`}
+            // tooltip={`This Spark has been liked ${likes} times.`}
          />
          <StatChip
             icon={<ShareIcon />}
-            // value={spark.shareCTA}
+            // value={shareCTA}
             value={0}
             tooltip={`This Spark has been shared ${0} times.`}
-            // tooltip={`This Spark has been shared ${spark.shareCTA} times.`}
+            // tooltip={`This Spark has been shared ${shareCTA} times.`}
          />
       </Stack>
    )
