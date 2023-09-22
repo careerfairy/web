@@ -31,6 +31,10 @@
             {
                "name": "publicSparks",
                "type": "boolean"
+            },
+            {
+               "name": "publicProfile",
+               "type": "boolean"
             }
          ]
       },
