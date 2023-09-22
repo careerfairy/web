@@ -240,11 +240,13 @@ export const shouldUseEmulators = () => {
 }
 
 /**
- * Checks if the current environment is either 'preview' or 'development'.
- *
- * @returns {boolean} - Returns true if the environment is 'preview' or 'development', false otherwise.
+ * Function to check if the B2C side of Sparks should be enabled on the platform.
+ * The function checks the environment variable 'NEXT_PUBLIC_ENABLE_SPARKS_B2C'.
+ * If the environment variable is set to 'true', the B2C side of Sparks is enabled.
+ * Otherwise, it is hidden.
+ * @returns {boolean} - Returns true if the B2C side of Sparks should be enabled, false otherwise.
  */
-export const isInPreviewOrDevelopmentEnvironment = () => {
+export const shouldEnableSParksB2C = () => {
    const env = process.env.NEXT_PUBLIC_ENABLE_SPARKS_B2C
    console.log(
       "🚀 ~ file: CommonUtil.ts:249 ~ isInPreviewOrDevelopmentEnvironment ~ env:",

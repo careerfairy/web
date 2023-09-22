@@ -37,7 +37,7 @@ import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/We
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
 import Heading from "components/views/portal/common/Heading"
-import { isInPreviewOrDevelopmentEnvironment } from "util/CommonUtil"
+import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -102,7 +102,7 @@ const PortalPage = ({
                               <RecommendedEvents limit={10} />
                            ) : null}
                            {/* TODO: remove this when we are ready to launch */}
-                           {isInPreviewOrDevelopmentEnvironment() ? (
+                           {shouldEnableSParksB2C() ? (
                               <SparksCarouselWithSuspenseComponent
                                  header={<Heading>SPARKS</Heading>}
                                  handleSparksClicked={handleSparksClicked}

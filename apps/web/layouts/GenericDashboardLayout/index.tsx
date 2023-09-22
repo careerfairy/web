@@ -18,7 +18,7 @@ import DomainIcon from "@mui/icons-material/Domain"
 import { useAuth } from "../../HOCs/AuthProvider"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
-import { isInPreviewOrDevelopmentEnvironment } from "util/CommonUtil"
+import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 type IGenericDashboardContext = {
    isPortalPage: boolean
@@ -141,7 +141,7 @@ const GenericDashboardLayout = ({
             ],
          },
          // TODO: Uncomment when sparks are ready for launch
-         ...(isInPreviewOrDevelopmentEnvironment()
+         ...(shouldEnableSParksB2C()
             ? [
                  {
                     id: "sparks",
