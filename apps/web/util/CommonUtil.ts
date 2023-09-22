@@ -245,12 +245,12 @@ export const shouldUseEmulators = () => {
  * @returns {boolean} - Returns true if the environment is 'preview' or 'development', false otherwise.
  */
 export const isInPreviewOrDevelopmentEnvironment = () => {
-   const env = process.env.NEXT_PUBLIC_DEPLOYMENT_ENV
+   const env = process.env.ENABLE_SPARKS_B2C
    console.log(
       "🚀 ~ file: CommonUtil.ts:249 ~ isInPreviewOrDevelopmentEnvironment ~ env:",
       env
    )
-   return env === "preview" || env === "development"
+   return env === "true"
 }
 
 export const getDictValues = <K extends keyof any, T>(
