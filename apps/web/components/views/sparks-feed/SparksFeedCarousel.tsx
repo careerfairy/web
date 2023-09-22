@@ -18,6 +18,7 @@ import {
    isFetchingSparksSelector,
    eventDetailsDialogVisibilitySelector,
    sparksSelector,
+   cameFromCompanyPageLinkSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
@@ -25,6 +26,9 @@ import FeedCardSlide from "./FeedCardSlide"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 import SparkNotifications from "./SparkNotifications"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
+import { IconButton } from "@mui/material"
+import Link from "../common/Link"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -91,6 +95,17 @@ const styles = sxStyles({
       right: 0,
       zIndex: (theme) => theme.zIndex.drawer + 1,
       p: 1.5,
+   },
+   companyPageBtn: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      p: 5,
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      "& .MuiIconButton-root": {
+         background: "#DEDEDE",
+         color: "#5C5C5C",
+      },
    },
 })
 
@@ -221,6 +236,9 @@ const SparksFeedCarousel: FC = () => {
                </Slide>
             </Collapse>
          </Box>
+         <Box sx={styles.companyPageBtn}>
+            <BackToCompanyPageButton />
+         </Box>
          {isFullScreen ? (
             <Box sx={styles.closeBtn}>
                <CloseSparksFeedButton />
@@ -243,6 +261,20 @@ const Slide: FC<SlideProps> = ({ children, fullScreen, ...props }) => {
       <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]} {...props}>
          {children}
       </Box>
+   )
+}
+
+const BackToCompanyPageButton: FC = () => {
+   const cameFromCompanyPageLink = useSelector(cameFromCompanyPageLinkSelector)
+
+   const isFullScreen = useSparksFeedIsFullScreen()
+
+   if (!cameFromCompanyPageLink || isFullScreen) return null
+
+   return (
+      <IconButton component={Link} href={cameFromCompanyPageLink}>
+         <ArrowBackRoundedIcon color="inherit" />
+      </IconButton>
    )
 }
 

@@ -57,3 +57,6 @@ export const originalSparkIdSelector = (state: RootState) =>
    state.sparksFeed.originalSparkId
 
 export const groupIdSelector = (state: RootState) => state.sparksFeed.groupId
+
+export const cameFromCompanyPageLinkSelector = (state: RootState) =>
+   state.sparksFeed.cameFromCompanyPageLink

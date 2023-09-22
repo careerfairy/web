@@ -1,9 +1,10 @@
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
-import { useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
+import useSWRMutation from "swr/mutation"
 
 const fetcher = async ([userId, sparkId]: [string, string]) =>
    sparkService.hasUserLikedSpark(userId, sparkId)
@@ -34,56 +35,43 @@ const useUserSparkLike = (
    const enabled = userId && sparkId && !disabled
    const { trackEvent } = useSparksFeedTracker()
 
+   const key = enabled ? [userId, sparkId] : null
+
    const {
       data: userLikesSpark,
       error,
       isLoading: isFetchingLikedStatus,
-      mutate,
-   } = useSWR(enabled ? [userId, sparkId] : null, fetcher, {
+   } = useSWR(key, fetcher, {
       onError: errorLogAndNotify,
    })
 
-   const toggleLike = useCallback(async () => {
-      if (!enabled || isFetchingLikedStatus) return
+   const { trigger: toggleLike, isMutating } = useSWRMutation(
+      key,
+      async (key: [string, string]) => {
+         const [userId, sparkId] = key
+         return sparkService.toggleSparkLike(userId, sparkId)
+      },
+      {
+         onSuccess: (newLikeStatus) => {
+            if (newLikeStatus) {
+               trackEvent(SparkEventActions.Like)
+            } else {
+               trackEvent(SparkEventActions.Unlike)
+            }
+         },
 
-      const newLikeStatus = !userLikesSpark
-
-      // Optimistically update the local data
-      mutate(newLikeStatus, false)
-
-      try {
-         // Perform the asynchronous toggle operation
-         await sparkService.toggleSparkLike(userId, sparkId, newLikeStatus)
-
-         // Track the like event if its a like
-         if (newLikeStatus) {
-            trackEvent(SparkEventActions.Like)
-         }
-
-         // If the operation is successful, update the local data again
-         mutate(newLikeStatus)
-      } catch (error) {
-         // If the operation fails, rollback the local data
-         mutate(userLikesSpark)
+         onError: errorLogAndNotify,
       }
-   }, [
-      enabled,
-      isFetchingLikedStatus,
-      userLikesSpark,
-      mutate,
-      userId,
-      sparkId,
-      trackEvent,
-   ])
+   )
 
    return useMemo(
       () => ({
          liked: userLikesSpark,
-         isLoading: isFetchingLikedStatus,
+         isLoading: isFetchingLikedStatus || isMutating,
          isError: Boolean(error),
          toggleLike,
       }),
-      [userLikesSpark, isFetchingLikedStatus, error, toggleLike]
+      [userLikesSpark, isFetchingLikedStatus, isMutating, error, toggleLike]
    )
 }
 
