@@ -35,7 +35,7 @@ const styles = sxStyles({
    btn: {
       border: "1.5px solid white",
       fontWeight: "bold",
-      textTransform: "capitalize",
+      textTransform: "none",
    },
    title: {
       fontSize: "32px !important",

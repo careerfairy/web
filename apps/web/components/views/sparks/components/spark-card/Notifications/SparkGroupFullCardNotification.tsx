@@ -46,10 +46,10 @@ const styles = sxStyles({
    btn: {
       border: "1.5px solid white",
       fontWeight: "bold",
-      textTransform: "capitalize",
+      textTransform: "none",
    },
    backBtn: {
-      textTransform: "capitalize",
+      textTransform: "none",
       mt: 2,
    },
    avatar: {
