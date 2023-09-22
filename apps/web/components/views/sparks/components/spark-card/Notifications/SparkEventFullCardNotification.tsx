@@ -11,9 +11,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       px: { md: 4 },
+      py: { lg: 4 },
 
       "@media (max-height: 900px)": {
          px: { xs: 1, md: 1 },
+         py: 0,
       },
    },
    header: {
