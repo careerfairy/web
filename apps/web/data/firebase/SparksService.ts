@@ -10,6 +10,7 @@ import {
    LikedSparks,
    RemoveNotificationFromUserData,
    Spark,
+   SparkStats,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
@@ -40,7 +41,6 @@ import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 
 export class SparksService {
@@ -348,7 +348,7 @@ export class SparksService {
    incrementSparkCount(
       sparkId: string,
       field: keyof Pick<
-         Spark,
+         SparkStats,
          | "likes"
          | "impressions"
          | "numberOfCareerPageClicks"
@@ -362,7 +362,7 @@ export class SparksService {
       increment: number = 1
    ) {
       const sparkCounter = new Counter(
-         FirestoreInstance.doc(`sparks/${sparkId}`),
+         FirestoreInstance.doc(`sparkStats/${sparkId}`),
          field
       )
 
