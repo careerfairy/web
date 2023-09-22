@@ -25,6 +25,7 @@ interface SparksState {
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
    cardNotification: UserSparksNotification | null
+   cameFromCompanyPageLink: string | null
 }
 
 const initialState: SparksState = {
@@ -44,6 +45,7 @@ const initialState: SparksState = {
    currentEventNotification: null,
    showEventDetailsDialog: false,
    cardNotification: null,
+   cameFromCompanyPageLink: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -142,6 +144,9 @@ const sparksFeedSlice = createSlice({
          state.hasMoreSparks = true
       },
 
+      setCameFromCompanyPageLink: (state, action: PayloadAction<string>) => {
+         state.cameFromCompanyPageLink = action.payload
+      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -155,6 +160,7 @@ const sparksFeedSlice = createSlice({
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
          state.originalSparkId = null
+         state.cameFromCompanyPageLink = null
       },
    },
    extraReducers: (builder) => {
@@ -250,6 +256,7 @@ export const {
    addCarNotificationToSparksList,
    removeGroupId,
    setCardNotification,
+   setCameFromCompanyPageLink,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

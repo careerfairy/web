@@ -41,6 +41,7 @@ import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -266,9 +267,12 @@ export class SparksService {
     *
     * @param userId - The id of the user
     * @param sparkId - The id of the spark
-    * @param liked - The like status to set for the spark
     **/
-   async toggleSparkLike(userId: string, sparkId: string, liked: boolean) {
+   async toggleSparkLike(userId: string, sparkId: string) {
+      const hasLikedSpark = await this.hasUserLikedSpark(userId, sparkId)
+
+      const toggledLike = !hasLikedSpark
+
       const currentYear = DateTime.now().year
       const docRef = doc(
          FirestoreInstance,
@@ -278,45 +282,45 @@ export class SparksService {
          currentYear.toString()
       ).withConverter(createGenericConverter<LikedSparks>())
 
-      if (liked) {
+      if (toggledLike) {
          // If liked is true, add the sparkId to the sparks map for the current year
          await setDoc<LikedSparks>(
             docRef,
-            this.createLikedSparksObject(userId, sparkId, currentYear, liked),
+            this.createLikedSparksObject(
+               userId,
+               sparkId,
+               currentYear,
+               toggledLike
+            ),
             { merge: true }
          )
       } else {
-         // If liked is false, remove the sparkId from the sparks map for all years
-         for (
-            let year = SPARK_CONSTANTS.LIKES_TRACKING_START_YEAR;
-            year <= currentYear;
-            year++
-         ) {
-            const yearQuery = query(
-               collection(FirestoreInstance, "userData", userId, "likedSparks"),
-               where("id", "==", year.toString()),
-               where(`sparks.${sparkId}`, "!=", null)
-            ).withConverter(createGenericConverter<LikedSparks>())
+         // If liked is false, remove the sparkId from the sparks map for all years where the user has liked the spark
 
-            const countRef = await getCountFromServer(yearQuery)
+         const allLikedSparksQuery = query(
+            collection(FirestoreInstance, "userData", userId, "likedSparks"),
+            where(`sparks.${sparkId}`, "!=", null)
+         ).withConverter(createGenericConverter<LikedSparks>())
 
-            if (countRef.data().count > 0) {
-               const yearRef = doc(
-                  FirestoreInstance,
-                  "userData",
-                  userId,
-                  "likedSparks",
-                  currentYear.toString()
-               ).withConverter(createGenericConverter<LikedSparks>())
+         const allLikedSparks = await getDocs<LikedSparks>(allLikedSparksQuery)
 
-               await setDoc<LikedSparks>(
-                  yearRef,
-                  this.createLikedSparksObject(userId, sparkId, year, liked),
-                  { merge: true }
-               )
-            }
-         }
+         const promises = allLikedSparks.docs.map((doc) => {
+            const year = parseInt(doc.id)
+            const yearRef = doc.ref.withConverter(
+               createGenericConverter<LikedSparks>()
+            )
+
+            return setDoc<LikedSparks>(
+               yearRef,
+               this.createLikedSparksObject(userId, sparkId, year, toggledLike),
+               { merge: true }
+            )
+         })
+
+         await Promise.all(promises)
       }
+
+      return toggledLike
    }
 
    /**
@@ -336,6 +340,30 @@ export class SparksService {
       const countRef = await getCountFromServer(likedSparksDocRef)
 
       return countRef.data().count > 0
+   }
+
+   incrementSparkCount(
+      sparkId: string,
+      field: keyof Pick<
+         Spark,
+         | "likes"
+         | "impressions"
+         | "numberOfCareerPageClicks"
+         | "shareCTA"
+         | "uniquePlays"
+         | "plays"
+         | "numberOfCompanyPageClicks"
+         | "numberTimesCompletelyWatched"
+         | "totalWatchedMinutes"
+      >,
+      increment: number = 1
+   ) {
+      const sparkCounter = new Counter(
+         FirestoreInstance.doc(`sparks/${sparkId}`),
+         field
+      )
+
+      sparkCounter.incrementBy(increment)
    }
 
    private createLikedSparksObject(

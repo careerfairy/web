@@ -208,26 +208,30 @@ export const onWriteSpark = functions
          message: "syncSparkOnWrite",
       })
 
+      const afterData = {
+         ...change.after.data(),
+         id: sparkId,
+      } as Spark
+
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
       if (changeTypes.isDelete) {
          // Remove spark from all user feeds
          sideEffectPromises.push(sparkRepo.removeSparkFromAllUserFeeds(sparkId))
+         sideEffectPromises.push(
+            sparkRepo.deleteDistributedCounterShards(change.before.ref)
+         )
       }
 
       if (changeTypes.isCreate) {
          // Add spark to user feeds
-         sideEffectPromises.push(
-            sparkRepo.addSparkToAllUserFeeds(change.after.data() as Spark)
-         )
+         sideEffectPromises.push(sparkRepo.addSparkToAllUserFeeds(afterData))
       }
 
       if (changeTypes.isUpdate) {
          // Update spark in user feeds
-         sideEffectPromises.push(
-            sparkRepo.updateSparkInAllUserFeeds(change.after.data() as Spark)
-         )
+         sideEffectPromises.push(sparkRepo.updateSparkInAllUserFeeds(afterData))
       }
 
       return handleSideEffects(sideEffectPromises)
