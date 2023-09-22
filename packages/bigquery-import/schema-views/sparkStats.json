@@ -6,7 +6,7 @@
       },
       {
          "name": "spark",
-         "type": "record",
+         "type": "map",
          "fields": [
             {
                "name": "id",
@@ -14,7 +14,7 @@
             },
             {
                "name": "group",
-               "type": "record",
+               "type": "map",
                "fields": [
                   {
                      "name": "id",
@@ -120,7 +120,7 @@
       },
       {
          "name": "totalWatchedMinutes",
-         "type": "float"
+         "type": "number"
       },
       {
          "name": "likes",
