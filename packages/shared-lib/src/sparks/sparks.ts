@@ -296,25 +296,25 @@ export type GetFeedData = {
 )
 
 export const SparksCategories = {
-   CompanyCulture: {
-      id: "company-culture",
-      name: "Company culture",
-   },
    Application: {
       id: "application",
       name: "Application process",
-   },
-   DayInTheLife: {
-      id: "day-in-the-life",
-      name: "Day in the life",
    },
    Jobs: {
       id: "jobs",
       name: "Jobs",
    },
+   DayInTheLife: {
+      id: "day-in-the-life",
+      name: "Day in the life",
+   },
    Role: {
       id: "role",
       name: "Role",
+   },
+   CompanyCulture: {
+      id: "company-culture",
+      name: "Company culture",
    },
    Events: {
       id: "events",
