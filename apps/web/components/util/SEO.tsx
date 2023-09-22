@@ -14,6 +14,16 @@ const SEO = ({
    const SEO: NextSeoProps = {
       ...(keywords && { keywords: keywords.toString() }),
       noindex,
+      facebook: {
+         appId: facebookAppId,
+      },
+      canonical: (getBaseUrl() + router.asPath).split("?")[0],
+      ...props,
+      twitter: {
+         cardType: props.twitter?.cardType,
+         handle: "@FairyCareer",
+         site: "@FairyCareer",
+      },
       openGraph: {
          ...(image && {
             images: [
@@ -25,17 +35,7 @@ const SEO = ({
          }),
          url: getBaseUrl() + router.asPath,
          type: "",
-         ...props,
-      },
-      facebook: {
-         appId: facebookAppId,
-      },
-      canonical: (getBaseUrl() + router.asPath).split("?")[0],
-      ...props,
-      twitter: {
-         cardType: props.twitter?.cardType,
-         handle: "@FairyCareer",
-         site: "@FairyCareer",
+         ...props.openGraph,
       },
    }
 

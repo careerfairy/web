@@ -1,4 +1,5 @@
 import React, { useMemo } from "react"
+import { useRouter } from "next/router"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
@@ -33,6 +34,10 @@ import {
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import Heading from "components/views/portal/common/Heading"
+import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -42,6 +47,7 @@ const PortalPage = ({
    livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
+   const router = useRouter()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -59,6 +65,11 @@ const PortalPage = ({
          serializedCarouselContent
       )
    }, [serializedCarouselContent])
+
+   const handleSparksClicked = (spark: Spark) => {
+      if (!spark) return
+      return router.push(`/sparks/${spark.id}`)
+   }
 
    return (
       <>
@@ -89,6 +100,13 @@ const PortalPage = ({
                         <WidgetsWrapper>
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
+                           ) : null}
+                           {/* TODO: remove this when we are ready to launch */}
+                           {shouldEnableSParksB2C() ? (
+                              <SparksCarouselWithSuspenseComponent
+                                 header={<Heading>SPARKS</Heading>}
+                                 handleSparksClicked={handleSparksClicked}
+                              />
                            ) : null}
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}

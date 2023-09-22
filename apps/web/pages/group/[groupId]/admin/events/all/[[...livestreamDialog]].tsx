@@ -1,4 +1,3 @@
-import React from "react"
 import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { SuspenseWithBoundary } from "../../../../../../components/ErrorBoundary"
@@ -14,7 +13,7 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const AllEventsPage: NextPage<Props> = ({ groupId, livestreamDialogData }) => (
    <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
       <GroupDashboardLayout
-         pageDisplayName={"All Live Streams"}
+         titleComponent={"All Live Streams"}
          groupId={groupId}
       >
          <DashboardHead title="CareerFairy | All Livestreams" />

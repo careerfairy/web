@@ -59,9 +59,7 @@ import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { getRandomInt } from "../../components/helperFunctions/HelperFunctions"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2200,6 +2198,7 @@ class FirebaseService {
       userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
       options: {
          isRecommended?: boolean
+         sparkId?: string
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
@@ -2238,6 +2237,9 @@ class FirebaseService {
             date: this.getServerTimestamp(),
             ...(options.isRecommended && {
                isRecommended: true,
+            }),
+            ...(options.sparkId?.length > 0 && {
+               sparkId: options.sparkId,
             }),
          },
          // to allow queries for users that didn't participate
@@ -3238,6 +3240,26 @@ class FirebaseService {
 
       const toUpdate: Pick<UserData, "creditsBannerCTADates"> = {
          creditsBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
+            today
+         ) as any,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
+   /**
+    * Increments the counter for the number of times a user has seen the Sparks Call-to-Action (CTA) banner,
+    * and updates the last time the user has seen the banner with the current server timestamp.
+    *
+    * @param {string} userEmail - The email of the user whose record is to be updated.
+    * @returns {Promise<void>} - A promise that resolves when the user data is successfully updated.
+    */
+   addDateUserHasSeenSparksCTABanner(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+      const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
+
+      const toUpdate: Pick<UserData, "sparksBannerCTADates"> = {
+         sparksBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
             today
          ) as any,
       }

@@ -3,7 +3,9 @@ import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparksContainer from "../components/SparksContainer"
 import CreatorSparksCollection from "./CreatorSparksCollection"
-import HeaderActions from "./HeaderActions"
+import HeaderActions from "./header/HeaderActions"
+import SparksProgressIndicator from "./header/SparksProgressIndicator"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    creatorSparksCollectionContainer: {
@@ -12,8 +14,14 @@ const styles = sxStyles({
 })
 
 const GeneralSparksView: FC = () => {
+   const { group } = useGroup()
    return (
       <Stack pb={4} alignItems="center" spacing={4.125}>
+         {group.publicSparks ? null : (
+            <SparksContainer>
+               <SparksProgressIndicator />
+            </SparksContainer>
+         )}
          <SparksContainer>
             <HeaderActions />
          </SparksContainer>

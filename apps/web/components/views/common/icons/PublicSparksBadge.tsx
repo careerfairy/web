@@ -1,9 +1,9 @@
 import * as React from "react"
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
-import ReactComponent from "public/sparks/likes-icon.svg"
+import ReactComponent from "public/sparks/public-sparks-badge.svg"
 
-const LikesIcon = (props: SvgIconProps) => {
+const PublicSparksBadge = (props: SvgIconProps) => {
    return <SvgIcon component={ReactComponent} inheritViewBox {...props} />
 }
 
-export default LikesIcon
+export default PublicSparksBadge

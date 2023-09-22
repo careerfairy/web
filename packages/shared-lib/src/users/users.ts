@@ -91,6 +91,11 @@ export interface UserData extends Identifiable {
    creditsBannerCTADates?: string[]
 
    /**
+    * Dates of days when the user has seen the sparks CTA banner
+    */
+   sparksBannerCTADates?: string[]
+
+   /**
     * User has already seen the first onboarding video
     */
    welcomeDialogComplete?: boolean
@@ -398,3 +403,15 @@ export interface UserActivity extends Identifiable {
       | "livestreamParticipation"
       | "livestreamRecordingView"
 }
+
+/**
+ * User Activity document
+ * Used for sparks notifications purposes
+ *
+ * Path /userData/{userId}/sparksNotifications/{groupId}
+ */
+export type UserSparksNotification = {
+   eventId: string
+   startDate: Date
+   groupId: string
+} & Identifiable

@@ -11,7 +11,6 @@ import {
 } from "@mui/material/styles"
 import { grey, red } from "@mui/material/colors"
 
-import React from "react"
 import { Components, PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
@@ -87,6 +86,7 @@ declare module "@mui/material/styles" {
 
    interface BreakpointOverrides {
       mobile: true // adds the `mobile` breakpoint
+      sparksFullscreen: true // adds the breakpoint for the sparks feed
    }
 }
 
@@ -190,12 +190,13 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          values: {
             xl: 1920,
             lg: 1280,
+            sparksFullscreen: 989,
             md: 900,
             mobile: 768,
             sm: 600,
             xs: 0,
          },
-         keys: ["xs", "sm", "mobile", "md", "lg", "xl"],
+         keys: ["xs", "sm", "mobile", "md", "sparksFullscreen", "lg", "xl"],
       },
       typography: {
          fontFamily: "Poppins,sans-serif",
@@ -502,9 +503,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
                size: "medium",
             },
             style: {
-               fontSize: "1rem",
+               fontSize: "16px",
                fontWeight: 400,
-               padding: "12px 30px",
+               padding: "8px 24px",
             },
          },
          {

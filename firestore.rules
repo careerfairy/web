@@ -85,6 +85,14 @@ service cloud.firestore {
 
         match /userData/{userId} {
 
+            match /sparksFeed/{sparkId} {
+                allow read: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
+            match /likedSparks/{year} {
+               allow read, write: if isSignedInAndIsSameUser(userId);
+            }
+
             match /companiesUserFollows/{groupId} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
@@ -128,6 +136,11 @@ service cloud.firestore {
 
             match /savedRecruiters/{recruiterId} {
                 allow read, write: if isSignedInAndIsSameUser(userId);
+            }
+
+            match /sparksNotifications/{sparkNotificationsId} {
+                allow read: if true;
+                allow write: if isSignedInAndIsSameUser(userId) || sparkNotificationsId == 'userId';
             }
 
             match /stats/stats {
@@ -241,8 +254,19 @@ service cloud.firestore {
         }
 
         match /sparks/{sparkId} {
-            allow read: if isAnyGroupAdmin();
+            allow read: if true;
             allow write: if false;
+        }
+
+        match /sparkStats/{sparkId} {
+            allow read: if true;
+            allow write: if false;
+
+            // Allow to increment only the selected fields.
+            match /_counter_shards_/{shardId} {
+                allow get;
+                allow write: if request.resource.data.keys().hasOnly(["likes", "impressions", "numberOfCareerPageClicks", "shareCTA", "uniquePlays", "plays", "numberOfCompanyPageClicks", "numberTimesCompletelyWatched", "totalWatchedMinutes" ]) 
+            }
         }
 
         match /videos/{video} {
@@ -589,6 +613,14 @@ service cloud.firestore {
         // Group Admin -> Company Followers Count query
         match /{somePath=**}/companiesUserFollows/{groupId} {
             allow read: if isAdminOfGroup(groupId);
+        }
+
+        // User -> Seen Sparks Count query
+        match /{somePath=**}/seenSparks/{year} {
+            // Should be isSignedInAndIsSameUser(userId) but we can't 
+            // access the userId as we don't have proper auth in the server 
+            // fix would be to use admin sdk on the server side
+            allow read: if true;
         }
     }
 }

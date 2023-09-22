@@ -4,7 +4,7 @@ on:
    push:
       branches:
          - main
-         # - develop
+         - develop
          # we almost never use the staging env, no need to waste
          # minutes by deploying there every time if we don't use it
 
