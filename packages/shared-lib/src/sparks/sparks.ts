@@ -296,25 +296,29 @@ export type GetFeedData = {
 )
 
 export const SparksCategories = {
-   CompanyCulture: {
-      id: "company-culture",
-      name: "Company culture",
-   },
    Application: {
       id: "application",
       name: "Application process",
-   },
-   DayInTheLife: {
-      id: "day-in-the-life",
-      name: "Day in the life",
    },
    Jobs: {
       id: "jobs",
       name: "Jobs",
    },
+   DayInTheLife: {
+      id: "day-in-the-life",
+      name: "Day in the life",
+   },
    Role: {
       id: "role",
       name: "Role",
+   },
+   CompanyCulture: {
+      id: "company-culture",
+      name: "Company culture",
+   },
+   Events: {
+      id: "events",
+      name: "Events",
    },
 } as const
 
@@ -332,6 +336,8 @@ export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
          return "💼"
       case SparksCategories.Role.id:
          return "🧑‍💼"
+      case SparksCategories.Events.id:
+         return "🗓️"
       default:
          return ""
    }
@@ -349,6 +355,8 @@ export const getCategoryById = (categoryId: SparkCategory["id"]) => {
          return SparksCategories.Jobs
       case SparksCategories.Role.id:
          return SparksCategories.Role
+      case SparksCategories.Events.id:
+         return SparksCategories.Events
       default:
          throw new Error(`Invalid category id: ${categoryId}`)
    }
