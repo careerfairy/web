@@ -100,7 +100,10 @@ const PortalPage = ({
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
                            ) : null}
-
+                           <SparksCarouselWithSuspenseComponent
+                              header={<Heading>SPARKS</Heading>}
+                              handleSparksClicked={handleSparksClicked}
+                           />
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
                               limit={20}
@@ -114,10 +117,6 @@ const PortalPage = ({
                               seeMoreLink={"/next-livestreams?type=pastEvents"}
                               // No need to show loading as these events have already been queried server side
                               loading={false}
-                           />
-                           <SparksCarouselWithSuspenseComponent
-                              header={<Heading>SPARKS</Heading>}
-                              handleSparksClicked={handleSparksClicked}
                            />
                         </WidgetsWrapper>
                      </Container>

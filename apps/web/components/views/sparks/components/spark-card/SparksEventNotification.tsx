@@ -129,6 +129,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
                   <Typography
                      color={"text.primary"}
                      variant={isMobile ? "body1" : "body2"}
+                     component={"span"}
                   >
                      <Typography
                         fontSize={"inherit"}

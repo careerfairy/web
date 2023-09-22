@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import { FC, ReactNode } from "react"
+import { FC, ReactNode, memo } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
 
@@ -35,35 +35,24 @@ type Props = {
  *
  * @returns {JSX.Element} A styled Box element containing the children, constrained by the aspect ratio.
  */
-const AspectRatio: FC<Props> = ({ aspectRatio, children }) => {
+const AspectRatio: FC<Props> = memo(({ aspectRatio, children }) => {
    const [ref, { width, height }] = useMeasure()
 
-   // If no aspectRatio is provided, render children as-is
-   if (!aspectRatio) {
-      return (
-         <Box width="100%" height="100%" ref={ref}>
-            {children}
-         </Box>
-      )
-   }
-
-   // Parse aspectRatio to derive widthRatio and heightRatio
-   const [widthRatio, heightRatio] = aspectRatio.split(":").map(Number)
-
-   if (!widthRatio || !heightRatio) {
-      throw new Error(
-         `Invalid aspectRatio format: ${aspectRatio}. Should be 'width:height'.`
-      )
-   }
-
-   // Initialize child dimensions based on aspectRatio and available width and height
    let adjustedWidth = width
-   let adjustedHeight = (heightRatio / widthRatio) * adjustedWidth
+   let adjustedHeight = height
 
-   // If calculated height exceeds available height, readjust dimensions
-   if (adjustedHeight > height) {
-      adjustedHeight = height
-      adjustedWidth = (widthRatio / heightRatio) * adjustedHeight
+   if (aspectRatio) {
+      // Parse aspectRatio to derive widthRatio and heightRatio
+      const [widthRatio, heightRatio] = aspectRatio.split(":").map(Number)
+
+      // Initialize child dimensions based on aspectRatio and available width and height
+      adjustedHeight = (heightRatio / widthRatio) * adjustedWidth
+
+      // If calculated height exceeds available height, readjust dimensions
+      if (adjustedHeight > height) {
+         adjustedHeight = height
+         adjustedWidth = (widthRatio / heightRatio) * adjustedHeight
+      }
    }
 
    return (
@@ -81,6 +70,8 @@ const AspectRatio: FC<Props> = ({ aspectRatio, children }) => {
          </Box>
       </Box>
    )
-}
+})
+
+AspectRatio.displayName = "AspectRatio"
 
 export default AspectRatio
