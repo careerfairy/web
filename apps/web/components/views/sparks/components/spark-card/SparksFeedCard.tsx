@@ -44,9 +44,19 @@ const styles = sxStyles({
    cardContent: {
       zIndex: 1,
       display: "flex",
+      flex: 1,
       flexDirection: "column",
       position: "relative",
-      mt: "auto",
+
+      "&::after": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         zIndex: -1,
+      },
    },
    contentInner: {
       display: "flex",
@@ -67,7 +77,7 @@ const styles = sxStyles({
             "linear-gradient(175deg,rgb(255 255 255 / 0%) 55%, rgb(255 255 255 / 13%) 45%), radial-gradient(167.78% 167.78% at 95.7% 3.63%, rgb(15 224 184 / 90%) 8.85%, rgb(103 73 234 / 70%) 100%), linear-gradient(237deg, rgb(42, 186, 165), rgb(42, 186, 165)), linear-gradient(203deg, rgb(247 248 252), rgb(247 248 252))",
       },
    },
-   deafultCardContent: {
+   defaultCardContent: {
       "&::after": {
          background:
             "linear-gradient(6deg,rgb(255 255 255 / 0%) 88%, rgb(255 255 255 / 13%) 8%),linear-gradient(185deg,rgb(255 255 255 / 0%) 88%, rgb(255 255 255 / 13%) 8%), linear-gradient(0deg, rgba(247, 248, 252, 0.20) 0%, rgba(247, 248, 252, 0.20) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.00) 42.19%, rgba(0, 0, 0, 0.06) 88.02%), linear-gradient(180deg, rgba(103, 73, 234, 0.30) 0%, rgba(80, 56, 185, 0.30) 100%), radial-gradient(180.08% 206.61% at 95.7% 3.63%, rgba(103, 73, 234, 0.90) 0%, rgba(0, 210, 170, 0.90) 100%), #2ABAA6",
@@ -167,7 +177,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                   ...(showCardNotification
                      ? cardNotification
                         ? [styles.eventCardContent]
-                        : [styles.deafultCardContent]
+                        : [styles.defaultCardContent]
                      : []),
                ]}
             >
