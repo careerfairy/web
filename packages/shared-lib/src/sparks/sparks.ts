@@ -316,6 +316,10 @@ export const SparksCategories = {
       id: "role",
       name: "Role",
    },
+   Events: {
+      id: "events",
+      name: "Events",
+   },
 } as const
 
 export const sparksCategoriesArray = Object.values(SparksCategories)
@@ -332,6 +336,8 @@ export const getCategoryEmoji = (categoryId: SparkCategory["id"]) => {
          return "💼"
       case SparksCategories.Role.id:
          return "🧑‍💼"
+      case SparksCategories.Events.id:
+         return "🗓️"
       default:
          return ""
    }
@@ -349,6 +355,8 @@ export const getCategoryById = (categoryId: SparkCategory["id"]) => {
          return SparksCategories.Jobs
       case SparksCategories.Role.id:
          return SparksCategories.Role
+      case SparksCategories.Events.id:
+         return SparksCategories.Events
       default:
          throw new Error(`Invalid category id: ${categoryId}`)
    }
