@@ -245,10 +245,12 @@ export const shouldUseEmulators = () => {
  * @returns {boolean} - Returns true if the environment is 'preview' or 'development', false otherwise.
  */
 export const isInPreviewOrDevelopmentEnvironment = () => {
-   const env = process.env.VERCEL_ENV
-   const nodeEnv = process.env.NODE_ENV
-   console.log("VERCEL_ENV:", process.env.VERCEL_ENV)
-   return env === "preview" || nodeEnv === "development"
+   const env = process.env.NEXT_PUBLIC_DEPLOYMENT_ENV
+   console.log(
+      "🚀 ~ file: CommonUtil.ts:249 ~ isInPreviewOrDevelopmentEnvironment ~ env:",
+      env
+   )
+   return env === "preview" || env === "development"
 }
 
 export const getDictValues = <K extends keyof any, T>(
