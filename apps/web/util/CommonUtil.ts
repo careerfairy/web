@@ -247,6 +247,7 @@ export const shouldUseEmulators = () => {
 export const isInPreviewOrDevelopmentEnvironment = () => {
    const env = process.env.VERCEL_ENV
    const nodeEnv = process.env.NODE_ENV
+   console.log("VERCEL_ENV:", process.env.VERCEL_ENV)
    return env === "preview" || nodeEnv === "development"
 }
 
