@@ -53,7 +53,10 @@ const styles = sxStyles({
       display: "flex",
       flexWrap: "wrap",
       flexDirection: "row",
-      maxWidth: 370,
+      maxWidth: {
+         xs: "calc(100vw - 62px)",
+         md: 430,
+      },
       gap: 1,
       p: 1.5,
    },

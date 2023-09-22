@@ -186,6 +186,8 @@ export class SparksService {
       baseQuery = query(
          baseQuery,
          ...(lastSpark ? [startAfter(lastSpark[sortField])] : []),
+         where("group.publicSparks", "==", true),
+         where("published", "==", true),
          limit(numberOfSparks)
       )
 
@@ -208,7 +210,8 @@ export class SparksService {
          docRef.withConverter(sparkPresenterConverter)
       )
       if (docSnap.exists()) {
-         return docSnap.data()
+         const data = docSnap.data()
+         return data.group.publicSparks && data.published ? data : null
       } else {
          return null
       }

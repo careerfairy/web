@@ -15,6 +15,7 @@ import {
 import { StyledCheckbox } from "../../common/inputs"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 type ISourceFilter = RegistrationSource & {
    active: boolean
@@ -40,11 +41,14 @@ const styles = sxStyles({
 })
 
 const AggregatedSourcesChart = () => {
+   const { group } = useGroup()
    const { utmData } = useUtmData()
    const isMobile = useIsMobile()
 
    const [sourceFilters, setSourceFilters] = useState<ISourceFilter[]>(
-      VALID_SOURCES.map((source) => ({
+      VALID_SOURCES.filter(
+         (source) => !(source.id === "sparks" && !group.sparksAdminPageFlag)
+      ).map((source) => ({
          ...source,
          active: true,
       }))
