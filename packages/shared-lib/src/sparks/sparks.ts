@@ -45,6 +45,19 @@ export interface Spark extends Identifiable {
 
    video: SparkVideo
 
+   // possible future fields
+
+   // video metadata
+   // videoDurationMs?: number
+   // videoSizeBytes?: number
+}
+
+/**
+ * The document that contains all spark stats
+ * Collection path: /sparkStats/{sparkId}
+ */
+export interface SparkStats extends Identifiable {
+   spark: Spark
    /**
     * KPIs
     */
@@ -86,11 +99,9 @@ export interface Spark extends Identifiable {
     */
    numberTimesCompletelyWatched: number
 
-   // possible future fields
+   deleted: boolean
 
-   // video metadata
-   // videoDurationMs?: number
-   // videoSizeBytes?: number
+   deletedAt: Timestamp
 }
 
 /**
