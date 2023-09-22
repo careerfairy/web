@@ -164,7 +164,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
    const trackSecondsWatched = useCallback(
       (secondsWatched: number) => {
-         if (!currentSparkId || !visitorId) return
+         if (!currentSparkId || !visitorId || secondsWatched < 1) return
          sparkService.incrementSparkCount(
             currentSparkId,
             "totalWatchedMinutes",

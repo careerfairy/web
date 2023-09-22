@@ -1,7 +1,8 @@
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { IconButton } from "@mui/material"
+import { isServer } from "components/helperFunctions/HelperFunctions"
 import { useRouter } from "next/router"
-import { FC } from "react"
+import { FC, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -12,16 +13,32 @@ const styles = sxStyles({
          height: 27.83,
       },
    },
+   dark: {
+      color: "#3D3D47 !important",
+   },
 })
 
-const CloseSparksFeedButton: FC = () => {
-   const { back } = useRouter()
+type Props = {
+   dark?: boolean
+}
+
+const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
+   const { back, push } = useRouter()
+
+   const handleClick = useCallback(() => {
+      if (isServer()) return
+      if (window.history.length > 2) {
+         back()
+      } else {
+         push("/portal")
+      }
+   }, [back, push])
 
    return (
       <IconButton
-         sx={styles.root}
+         sx={[styles.root, dark && styles.dark]}
          aria-label="close-sparks-feed"
-         onClick={back}
+         onClick={handleClick}
       >
          <CloseRoundedIcon color="inherit" />
       </IconButton>

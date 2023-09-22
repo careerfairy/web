@@ -11,7 +11,6 @@ import {
 } from "@mui/material/styles"
 import { grey, red } from "@mui/material/colors"
 
-import React from "react"
 import { Components, PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
@@ -504,9 +503,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
                size: "medium",
             },
             style: {
-               fontSize: "1rem",
+               fontSize: "16px",
                fontWeight: 400,
-               padding: "12px 30px",
+               padding: "8px 24px",
             },
          },
          {

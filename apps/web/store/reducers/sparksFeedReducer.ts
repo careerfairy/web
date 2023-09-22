@@ -99,6 +99,10 @@ const sparksFeedSlice = createSlice({
          action: PayloadAction<SparkCategory["id"][]>
       ) => {
          state.sparkCategoryIds = action.payload
+
+         if (action.payload.length) {
+            state.fetchNextSparksStatus = "loading"
+         }
       },
       swipeNextSparkByIndex: (state, action: PayloadAction<number>) => {
          const newIndex = action.payload
