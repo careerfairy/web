@@ -8,7 +8,7 @@ import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import { sparkService } from "data/firebase/SparksService"
-import { isInPreviewOrDevelopmentEnvironment } from "util/CommonUtil"
+import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -185,7 +185,7 @@ export class CarouselContentService {
       }
 
       // TODO: Remove this if statement once Sparks are ready for launch
-      if (isInPreviewOrDevelopmentEnvironment()) {
+      if (shouldEnableSParksB2C()) {
          // check whether to add Sparks CTA
          const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
             this.options.userData,
