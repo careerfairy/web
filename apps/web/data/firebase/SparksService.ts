@@ -362,7 +362,7 @@ export class SparksService {
       increment: number = 1
    ) {
       const sparkCounter = new Counter(
-         FirestoreInstance.doc(`sparks/${sparkId}`),
+         FirestoreInstance.doc(`sparkStats/${sparkId}`),
          field
       )
 

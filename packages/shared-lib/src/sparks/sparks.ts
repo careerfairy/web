@@ -46,7 +46,7 @@ export interface Spark extends Identifiable {
    video: SparkVideo
 
    /**
-    * KPIs
+    * To be removed
     */
    // count how many times we list the spark in the feed
    // using fingerprinting
@@ -91,6 +91,54 @@ export interface Spark extends Identifiable {
    // video metadata
    // videoDurationMs?: number
    // videoSizeBytes?: number
+}
+
+/**
+ * The document that contains all spark stats
+ * Collection path: /sparkStats/{sparkId}
+ */
+export interface SparkStats extends Identifiable {
+   spark: Spark
+   /**
+    * KPIs
+    */
+   // count how many times we list the spark in the feed
+   // using fingerprinting
+   impressions: number
+
+   // counting the unique number of times the spark starts playing
+   // If logged in, we use the user id
+   // otherwise we use fingerprinting
+   uniquePlays: number
+
+   // counting the number of times the spark is clicked / opened
+   // increments every time the spark starts playing
+   plays: number
+
+   // Sum of watched minutes
+   totalWatchedMinutes: number // floating point
+
+   // signed in user user likes
+   likes: number
+
+   // how many times the share action is clicked
+   shareCTA: number
+
+   /**
+    * How many times the external career page icon is clicked
+    * on the Spark card
+    */
+   numberOfCareerPageClicks: number
+
+   /**
+    * How many times the company page icon is clicked on the platform
+    */
+   numberOfCompanyPageClicks: number
+
+   /**
+    * How many times the spark is completely watched
+    */
+   numberTimesCompletelyWatched: number
 }
 
 /**

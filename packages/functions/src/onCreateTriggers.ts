@@ -13,6 +13,7 @@ import {
 import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 import { RewardDoc } from "@careerfairy/shared-lib/rewards"
 import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 export const onCreateLivestreamPopularityEvents = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -163,6 +164,27 @@ export const onCreateUserSparkFeed = functions
 
       sideEffectPromises.push(
          sparkRepo.incrementFeedCount(userEmail, "increment")
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateSparkStats = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("sparkStats/{sparkId}")
+   .onCreate(async (snapShot, context) => {
+      functions.logger.info(context.params)
+
+      const sparkId = context.params.sparkId
+
+      functions.logger.info(`Spark Stats for SparkId: ${sparkId} was created.`)
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      sideEffectPromises.push(
+         sparkRepo.addSparkToSparkStatsDocument(sparkId, snapShot)
       )
 
       return handleSideEffects(sideEffectPromises)
