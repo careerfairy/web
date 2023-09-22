@@ -2,15 +2,13 @@ import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
-import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import Image from "next/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
-import DateUtil from "util/DateUtil"
-import {
+import CarouselContentService, {
    CTASlide,
-   MAX_CREDITS_CTA_DISPLAY_COUNT,
+   CTASlideTopics,
 } from "./CarouselContentService"
 import Content, { ContentHeaderTitle, ContentTitle } from "./Content"
 import ContentButton from "./ContentButton"
@@ -52,24 +50,12 @@ const BuyCreditsCTAContent: FC<Props> = () => {
    const { ref } = useInView({
       skip: isAuthLoading || !userData?.userEmail, // Only start counting when user is logged in
       triggerOnce: true,
-      onChange: (inView) => {
-         if (inView) {
-            const userDates = userData?.creditsBannerCTADates ?? []
-            const today = DateUtil.formatDateToString(new Date())
-
-            const shouldIncrementBannerDisplayCount =
-               // Only increment if user hasn't seen the banner today
-               !userDates.includes(today) &&
-               // Only increment if user hasn't seen the banner 5 times
-               userDates.length < MAX_CREDITS_CTA_DISPLAY_COUNT
-
-            if (shouldIncrementBannerDisplayCount) {
-               firebaseServiceInstance
-                  .addDateUserHasSeenCreditsCTABanner(userData.userEmail)
-                  .catch(console.error)
-            }
-         }
-      },
+      onChange: (inView) =>
+         CarouselContentService.incrementCTABannerViewCount(
+            inView,
+            userData,
+            CTASlideTopics.CareerCoins
+         ),
    })
 
    return (

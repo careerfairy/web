@@ -109,7 +109,11 @@ type Props = {
    setDrawer?: (open: boolean) => void
    toggleDrawer?: () => void
    bgColor?: string
+   topBarTransparent?: boolean
+   hideDrawer?: boolean
+   headerWidth?: string
 }
+
 const AdminGenericLayout: React.FC<Props> = ({
    children,
    drawerContent,
@@ -120,6 +124,9 @@ const AdminGenericLayout: React.FC<Props> = ({
    setDrawer,
    toggleDrawer,
    bgColor,
+   topBarTransparent = false,
+   hideDrawer,
+   headerWidth,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -141,9 +148,14 @@ const AdminGenericLayout: React.FC<Props> = ({
          ]}
       >
          {/* drawer */}
-         <DrawerComponent drawerOpen={drawerOpen} drawerToggle={toggleDrawer}>
-            {drawerContent}
-         </DrawerComponent>
+         {hideDrawer ? null : (
+            <DrawerComponent
+               drawerOpen={drawerOpen}
+               drawerToggle={toggleDrawer}
+            >
+               {drawerContent}
+            </DrawerComponent>
+         )}
 
          <Box
             sx={[
@@ -153,7 +165,12 @@ const AdminGenericLayout: React.FC<Props> = ({
             ]}
          >
             {/* header */}
-            <HeaderComponent>{headerContent}</HeaderComponent>
+            <HeaderComponent
+               width={headerWidth}
+               topBarTransparent={topBarTransparent}
+            >
+               {headerContent}
+            </HeaderComponent>
 
             {/* mobile dropdown navigation content*/}
             {dropdownNav}
@@ -215,10 +232,14 @@ const DrawerComponent = ({
 type HeaderProps = {
    children: React.ReactNode
    headerBgColor?: string
+   topBarTransparent?: boolean
+   width?: string
 }
 const HeaderComponent = ({
    children,
    headerBgColor = "#F7F8FC",
+   topBarTransparent = false,
+   width,
 }: HeaderProps) => {
    const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
    const styles = useStyles()
@@ -241,6 +262,12 @@ const HeaderComponent = ({
             isScrolling && {
                backgroundColor: alpha(headerBgColor, 0.9),
             },
+            topBarTransparent && {
+               backgroundColor: "transparent",
+               borderBottom: "none",
+               backdropFilter: "none",
+            },
+            width && { width },
          ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>

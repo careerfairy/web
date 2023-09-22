@@ -48,6 +48,7 @@ const Component: FC<Props> = ({ creator }) => {
             onSparkClick={handleSparkClick}
             options={options}
             sparks={sparks}
+            isAdmin
          />
       </Stack>
    )

@@ -4,12 +4,6 @@ import {
    GetUserFilters,
 } from "@careerfairy/shared-lib/bigQuery/types"
 
-export const bigQueryClient = new BigQuery({
-   projectId: "careerfairy-e1fd9",
-   keyFile: require("../keys/big_query_service_account.json"),
-   location: "EU",
-})
-
 export interface IBigQueryRepository {
    getUsers(
       page: number,

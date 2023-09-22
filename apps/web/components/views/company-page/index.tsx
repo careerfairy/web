@@ -9,7 +9,7 @@ import {
    useMemo,
    useRef,
 } from "react"
-import { Box, Container, Grid, Grow, Stack } from "@mui/material"
+import { Box, Container, Grid, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
 import MediaSection from "./MediaSection"
 import TestimonialSection from "./TestimonialSection"
@@ -22,11 +22,15 @@ import useListenToStreams from "../../custom-hook/useListenToStreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../data/RepositoryInstances"
-import { errorLogAndNotify } from "../../../util/CommonUtil"
+import {
+   errorLogAndNotify,
+   shouldEnableSParksB2C,
+} from "../../../util/CommonUtil"
 import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
+import SparksSection from "./SparksSection"
 
 type Props = {
    group: Group
@@ -44,7 +48,7 @@ export const TabValue = {
    video: "video-section",
 } as const
 
-export type TabValueType = typeof TabValue[keyof typeof TabValue]
+export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
 export const getTabLabel = (tabId: TabValueType) => {
    switch (tabId) {
@@ -188,24 +192,25 @@ const CompanyPageOverview = ({
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />
             </Box>
-            <Grow in>
-               <Container disableGutters maxWidth="lg">
-                  <Grid container spacing={4}>
-                     <Grid item xs={12} md={6}>
-                        <Stack px={3} spacing={{ xs: 4, md: 8 }}>
-                           <AboutSection />
-                           {showFollowCompanyCta ? <FollowCompany /> : null}
-                           {showSignUpCta ? <SignUp /> : null}
-                           <TestimonialSection />
-                           <EventSection />
-                        </Stack>
-                     </Grid>
-                     <Grid item xs={12} md={6}>
-                        <MediaSection />
-                     </Grid>
+            <Container disableGutters maxWidth="lg">
+               <Grid container spacing={4}>
+                  <Grid item xs={12} md={6}>
+                     <Stack px={3} spacing={{ xs: 4, md: 8 }}>
+                        <AboutSection />
+                        {group.publicSparks && shouldEnableSParksB2C() ? (
+                           <SparksSection key={group.id} groupId={group.id} />
+                        ) : null}
+                        {showFollowCompanyCta ? <FollowCompany /> : null}
+                        {showSignUpCta ? <SignUp /> : null}
+                        <TestimonialSection />
+                        <EventSection />
+                     </Stack>
                   </Grid>
-               </Container>
-            </Grow>
+                  <Grid item xs={12} md={6}>
+                     <MediaSection />
+                  </Grid>
+               </Grid>
+            </Container>
             <NewsletterSection />
          </Box>
       </CompanyPageContext.Provider>

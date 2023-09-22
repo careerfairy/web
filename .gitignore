@@ -21,3 +21,4 @@ playwright-report/
 
 .DS_Store
 !/packages/fetch-firestore-data/.env
+packages/functions/.env.local

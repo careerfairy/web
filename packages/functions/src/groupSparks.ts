@@ -16,6 +16,7 @@ import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
+import { validateGroupSparks } from "./util/sparks"
 
 const sparkDataValidator = {
    question: string()
@@ -64,7 +65,12 @@ export const createSpark = functions.region(config.region).https.onCall(
                })
             }
 
-            return sparkRepo.create(data, group, creator)
+            await sparkRepo.create(data, group, creator)
+
+            functions.logger.log(
+               `Create Spark '${data.question}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in creating spark", {
                data,
@@ -99,7 +105,12 @@ export const updateSpark = functions.region(config.region).https.onCall(
                })
             }
 
-            return sparkRepo.update(data, creator)
+            await sparkRepo.update(data, creator)
+
+            functions.logger.log(
+               `Update Spark '${data.id}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in updating spark", {
                data,
@@ -120,7 +131,13 @@ export const deleteSpark = functions.region(config.region).https.onCall(
       userShouldBeGroupAdmin(),
       async (data: DeleteSparkData, context) => {
          try {
-            return sparkRepo.delete(data.id)
+            const group = context.middlewares.group as Group
+            await sparkRepo.delete(data.id)
+
+            functions.logger.log(
+               `Delete Spark '${data.id}' completed, start validation`
+            )
+            return validateGroupSparks(group)
          } catch (error) {
             logAndThrow("Error in deleting spark", {
                data,

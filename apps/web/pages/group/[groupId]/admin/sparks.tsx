@@ -12,7 +12,7 @@ const AdminSparksPage = () => {
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Sparks"}
+         titleComponent={"Sparks"}
          groupId={groupId as string}
          topBarCta={<CreateSparkButton />}
       >
