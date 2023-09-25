@@ -52,7 +52,7 @@ const useReactPlayerTracker = ({
 
       // Check if a full second has passed
       if (Math.floor(secondsWatched) !== Math.floor(prevSecondsWatched)) {
-         onSecondPass(secondsWatched)
+         onSecondPass?.(secondsWatched)
       }
 
       // Check if the video has looped
