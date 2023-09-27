@@ -82,7 +82,7 @@ const ImageCropperDialog = ({
    const [scale, setScale] = useState(0)
    const cropperRef = useRef<ReactCropperElement>(null)
 
-   const handleSubmit = async () => {
+   const handleSubmit = useCallback(async () => {
       try {
          const cropper = cropperRef.current?.cropper
          if (!cropper) return
@@ -97,7 +97,7 @@ const ImageCropperDialog = ({
       } catch (e) {
          errorNotification(e, e)
       }
-   }
+   }, [errorNotification, handleClose, onSubmit])
 
    const { trigger: mutateImage, isMutating } = useSWRMutation(
       `update-group-${title}-logo`,
