@@ -5,7 +5,7 @@ type Params = {
    labelRef: any
    inputRef: any
    multiple?: boolean | false
-   handleChanges: (arg0: Array<File>) => boolean
+   handleChanges: (arg0: Array<File>) => boolean | Promise<boolean>
    onDrop?: (arg0: Array<File>) => void
 }
 
@@ -48,7 +48,7 @@ const useDragging = ({
       ev.stopPropagation()
    }, [])
    const handleDrop = useCallback(
-      (ev) => {
+      async (ev) => {
          ev.preventDefault()
          ev.stopPropagation()
          setDragging(false)
@@ -57,7 +57,7 @@ const useDragging = ({
          const eventFiles = ev.dataTransfer.files
          if (eventFiles && eventFiles.length > 0) {
             const files = multiple ? eventFiles : eventFiles[0]
-            const success = handleChanges(files)
+            const success = await handleChanges(files)
             if (onDrop && success) onDrop(files)
          }
       },

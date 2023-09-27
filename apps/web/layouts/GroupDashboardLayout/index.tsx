@@ -17,11 +17,11 @@ import {
    GROUP_DASHBOARD_ROLE,
    GroupOption,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 import GroupsUtil from "../../data/util/GroupsUtil"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { groupRepo } from "../../data/RepositoryInstances"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
