@@ -29,6 +29,7 @@ export interface Group extends Identifiable {
    inActive?: boolean
    bannerImageUrl?: string
    atsAdminPageFlag?: boolean
+   careerPageUrl?: string
    /*
     * This flag is used to determine if the group has access to sparks
     * */
