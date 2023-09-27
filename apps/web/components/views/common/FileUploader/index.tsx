@@ -40,34 +40,18 @@ export type FileUploaderProps = {
    required?: boolean | false
    onSizeError?: (message: string) => void
    onTypeError?: (message: string) => void
+   onCustomError?: (message: string) => void
    onDrop?: (file: File | Array<File>) => void
    onSelect?: (file: File | Array<File>) => void
    handleChange?: (fileOrFiles: Array<File> | File) => void
    onDraggingStateChange?: (dragging: boolean) => void
+   customValidations?: ValidationObject[]
 }
 
-/**
- * File uploading main function
- * @param props - {name,
-    types,
-    handleChange,
-    classes,
-    children,
-    maxSize,
-    minSize,
-    fileOrFiles,
-    onSizeError,
-    onTypeError,
-    onSelect,
-    onDrop,
-    onTypeError,
-    disabled,
-    multiple,
-    required,
-    onDraggingStateChange
-  }
- * @returns JSX Element
- */
+export type ValidationObject = {
+   validation: (file: File) => Promise<boolean>
+}
+
 const FileUploader: React.FC<FileUploaderProps> = (
    props: FileUploaderProps
 ): JSX.Element => {
@@ -82,6 +66,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
       fileOrFiles,
       onSizeError,
       onTypeError,
+      onCustomError,
       onSelect,
       onDrop,
       disabled,
@@ -93,7 +78,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
    const labelRef = useRef<HTMLLabelElement>(null)
    const inputRef = useRef<HTMLInputElement>(null)
 
-   const validateFile = (file: File) => {
+   const validateFile = async (file: File) => {
       const extension: string = file.name.split(".").pop() as string
 
       if (types && !checkType(file, types)) {
@@ -121,18 +106,39 @@ const FileUploader: React.FC<FileUploaderProps> = (
             )
          return false
       }
+
+      if (props.customValidations) {
+         for (const validationObject of props.customValidations) {
+            const isValid = await validationObject
+               .validation(file)
+               .catch((error) => {
+                  if (onCustomError) onCustomError(error)
+                  return false
+               })
+
+            if (!isValid) {
+               // handle error
+               return false
+            }
+         }
+      }
+
       return true
    }
 
-   const handleChanges = (files: File | Array<File>): boolean => {
+   const handleChanges = async (
+      files: File | Array<File>
+   ): Promise<boolean> => {
       let checkError = false
       if (files) {
          if (files instanceof File) {
-            checkError = !validateFile(files)
+            const isValid = await validateFile(files)
+            checkError = !isValid
          } else {
             for (let i = 0; i < files.length; i++) {
                const file = files[i]
-               checkError = !validateFile(file) || checkError
+               const isValid = await validateFile(file)
+               checkError = !isValid || checkError
             }
          }
          if (checkError) return false
@@ -155,10 +161,10 @@ const FileUploader: React.FC<FileUploaderProps> = (
       }
    }
 
-   const handleInputChange = (ev: any) => {
+   const handleInputChange = async (ev: any) => {
       const allFiles = ev.target.files
       const files = multiple ? allFiles : allFiles[0]
-      const success = handleChanges(files)
+      const success = await handleChanges(files)
       if (onSelect && success) onSelect(files)
    }
    const dragging = useDragging({
@@ -191,6 +197,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
          onClick={blockEvent}
       >
          <input
+            title={name}
             onClick={handleClick}
             onChange={handleInputChange}
             accept={acceptedExt(types)}

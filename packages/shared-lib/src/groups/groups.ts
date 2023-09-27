@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, ImageType } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
@@ -11,6 +11,9 @@ export interface Group extends Identifiable {
    groupId: string
    description: string
    logoUrl: string
+
+   logo?: ImageType
+   banner?: ImageType
 
    // optional
    extraInfo?: string

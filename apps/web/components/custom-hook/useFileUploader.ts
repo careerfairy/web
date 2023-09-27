@@ -7,6 +7,7 @@ type UseFileUploaderParams = {
    maxFileSize: number
    multiple?: boolean
    onValidated: (file: File | File[]) => void
+   customValidations?: FileUploaderProps["customValidations"]
 }
 
 type UseFileUploader = {
@@ -19,6 +20,7 @@ const useFileUploader = ({
    maxFileSize,
    multiple = false,
    onValidated: onSelect,
+   customValidations,
 }: UseFileUploaderParams): UseFileUploader => {
    const [dragActive, setDragActive] = useState(false)
    const { errorNotification } = useSnackbarNotifications()
@@ -35,11 +37,13 @@ const useFileUploader = ({
          fileUploaderProps: {
             onTypeError: handleError,
             onSizeError: handleError,
+            onCustomError: handleError,
             types: acceptedFileTypes,
             multiple: multiple,
             maxSize: maxFileSize,
             onDraggingStateChange: setDragActive,
             handleChange: onSelect,
+            customValidations,
          },
          dragActive,
       }),
@@ -49,6 +53,7 @@ const useFileUploader = ({
          multiple,
          maxFileSize,
          onSelect,
+         customValidations,
          dragActive,
       ]
    )

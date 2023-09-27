@@ -36,3 +36,35 @@ export type OptionGroup = {
    name: string
    groupId?: string
 }
+
+export type ImageType = {
+   /**
+    * The image's storage URL
+    */
+   url: string
+
+   /**
+    * The image's file extension
+    */
+   extension: string
+
+   /**
+    * The image's width in pixels
+    */
+   width: number
+
+   /**
+    * The image's height in pixels
+    */
+   height: number
+
+   /**
+    * The image file name
+    */
+   fileName: string
+
+   /**
+    * The image's path in the storage bucket
+    */
+   path: string
+}
