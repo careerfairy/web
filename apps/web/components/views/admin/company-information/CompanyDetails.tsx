@@ -14,8 +14,9 @@ import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
-import BrandedChip from "./BrandedChip"
 import SectionComponent from "./SectionComponent"
+import BrandedChip from "components/views/common/inputs/BrandedChip"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 
 const styles = sxStyles({
    selectBox: {
@@ -130,55 +131,50 @@ const CompanyDetails = () => {
                      />
                      <>
                         <Box>
-                           <Autocomplete
+                           <BrandedTextField
                               id={"companyCountry"}
+                              label={"Company country"}
                               options={CompanyCountryValues}
                               defaultValue={values.companyCountry}
                               getOptionLabel={(option) => option.name || ""}
                               value={values.companyCountry}
                               disableClearable
-                              onChange={(_, newValue) =>
-                                 setFieldValue("companyCountry", newValue)
+                              select
+                              onChange={(e) =>
+                                 setFieldValue("companyCountry", e.target.value)
                               }
-                              renderInput={(params) => (
-                                 <BrandedTextField
-                                    {...params}
-                                    label={`Company location`}
-                                    onBlur={handleBlur}
-                                    disabled={isSubmitting}
-                                 />
-                              )}
                            />
                         </Box>
 
                         <Box sx={styles.selectBox}>
-                           <Autocomplete
+                           <BrandedAutocomplete
                               id={"companyIndustries"}
                               options={CompanyIndustryValues}
                               defaultValue={values.companyIndustries}
                               getOptionLabel={(option) => option.name || ""}
                               value={values.companyIndustries ?? []}
                               multiple
+                              inputLabel={"Company industries"}
                               onChange={(_, selected) => {
                                  setFieldValue("companyIndustries", selected)
                               }}
-                              renderTags={(values, getTagProps) => {
-                                 return values.map((value, index) => (
-                                    <BrandedChip
-                                       key={index}
-                                       label={value.name}
-                                       {...getTagProps({ index })}
-                                    />
-                                 ))
-                              }}
-                              renderInput={(params) => (
-                                 <BrandedTextField
-                                    {...params}
-                                    label={`Company Industries`}
-                                    onBlur={handleBlur}
-                                    disabled={isSubmitting}
-                                 />
-                              )}
+                              // renderTags={(values, getTagProps) => {
+                              //    return values.map((value, index) => (
+                              //       <BrandedChip
+                              //          key={index}
+                              //          label={value.name}
+                              //          {...getTagProps({ index })}
+                              //       />
+                              //    ))
+                              // }}
+                              // renderInput={(params) => (
+                              //    <BrandedTextField
+                              //       {...params}
+                              //       label={`Company Industries`}
+                              //       onBlur={handleBlur}
+                              //       disabled={isSubmitting}
+                              //    />
+                              // )}
                            />
                         </Box>
 
