@@ -4,21 +4,16 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    chip: {
-      display: "flex",
-      padding: "4px 4px 4px 12px",
-      alignItems: "flex-start",
-      gap: "10px",
-      borderRadius: "60px",
-      background: "#6749EA",
-      color: "#FFF",
-      fontFamily: "Poppins",
-      fontSize: "14px",
-      fontStyle: "normal",
+      bgcolor: "secondary.main",
+      color: "white",
+      fontSize: "1rem",
       fontWeight: 600,
-      lineHeight: "24px",
+      // margin: "10px 10px 0 0 !important",
+      // margin: "10px !important",
       ".MuiChip-deleteIcon": {
-         color: "#FFF",
+         color: "white",
       },
+      "& .MuiAutocomplete-tag": {},
    },
 })
 
