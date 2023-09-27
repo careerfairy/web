@@ -2,7 +2,6 @@ import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresente
 import { Box, BoxProps, Button, Stack, Typography } from "@mui/material"
 import useUploadGroupBanner from "components/custom-hook/group/useUploadGroupBanner"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { CONSTANTS } from "components/util/image"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
 import { FC } from "react"
@@ -91,7 +90,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
       fileUploaderProps: bannerUploaderProps,
       dragActive: bannerDragActive,
    } = useFileUploader({
-      acceptedFileTypes: CONSTANTS.ACCEPTED_FILE_TYPES,
+      acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
       maxFileSize: 10, // MB
       multiple: false,
       onValidated: (file) => {

@@ -2,14 +2,14 @@ import { FC, memo } from "react"
 import { Box, Container, Grid } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
-// import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
 import CompanyIdentity from "../../../admin/company-information/CompanyIdentity"
+// import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
 // import CompanyDetails from "../../../admin/company-information/CompanyDetails"
 // import TargetTalent from "../../../admin/company-information/TargetTalent"
 // import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
 
 const styles = sxStyles({
-   root: {
+   container: {
       display: "flex",
       bgcolor: "background.paper",
       borderRadius: {
@@ -18,7 +18,14 @@ const styles = sxStyles({
       },
       p: 4,
    },
-   container: {},
+   root: {
+      py: {
+         md: 3,
+      },
+      px: {
+         md: 6.25,
+      },
+   },
 })
 
 const CompanyInformationPageContent: FC = () => {
@@ -27,16 +34,9 @@ const CompanyInformationPageContent: FC = () => {
 
 const PageContent = () => {
    return (
-      <Box
-         py={{
-            md: 3,
-         }}
-         px={{
-            md: 6.25,
-         }}
-      >
-         <Container sx={styles.root} maxWidth="xl">
-            <Grid container style={styles.container}>
+      <Box sx={styles.root}>
+         <Container sx={styles.container} maxWidth="xl">
+            <Grid container>
                <Grid item>
                   <CompanyIdentity />
                </Grid>

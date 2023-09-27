@@ -2,7 +2,6 @@ import { Avatar, Box, Stack, Typography } from "@mui/material"
 import useUploadGroupLogo from "components/custom-hook/group/useUploadGroupLogo"
 import useFileUploader from "components/custom-hook/useFileUploader"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { CONSTANTS } from "components/util/image"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
 import ImageCropperDialog from "components/views/common/ImageCropperDialog"
@@ -13,6 +12,7 @@ import { sxStyles } from "types/commonTypes"
 import Styles from "./BaseStyles"
 import CompanyBanner from "./CompanyBanner"
 import SectionComponent from "./SectionComponent"
+import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const styles = sxStyles({
    companyLogo: {
@@ -131,7 +131,7 @@ const CompanyIdentity: FC = () => {
 
    const { fileUploaderProps: logoUploaderProps, dragActive: logoDragActive } =
       useFileUploader({
-         acceptedFileTypes: CONSTANTS.ACCEPTED_FILE_TYPES,
+         acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
          maxFileSize: 10, // MB
          multiple: false,
          onValidated: (file) => {
