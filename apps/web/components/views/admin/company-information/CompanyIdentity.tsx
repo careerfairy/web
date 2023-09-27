@@ -189,7 +189,7 @@ const CompanyIdentity: FC = () => {
 
                <FileUploader {...logoUploaderProps}>
                   <CompanyLogo
-                     url={group.logo.url}
+                     url={groupPresenter.getCompanyLogoUrl()}
                      dragActive={logoDragActive}
                   />
                </FileUploader>

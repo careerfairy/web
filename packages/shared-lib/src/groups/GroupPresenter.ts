@@ -253,10 +253,10 @@ export class GroupPresenter {
    }
 
    getCompanyLogoUrl() {
-      return this.logo?.url || this.logoUrl
+      return this.logo ? this.logo.url : this.logoUrl
    }
 
    getCompanyBannerUrl() {
-      return this.banner?.url || this.bannerImageUrl
+      return this.banner ? this.banner.url : this.bannerImageUrl
    }
 }
