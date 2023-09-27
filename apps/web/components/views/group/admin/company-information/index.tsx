@@ -2,9 +2,9 @@ import { FC, memo } from "react"
 import { Box, Container, Stack } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
-import CompanyIdentity from "../../../admin/company-information/CompanyIdentity"
+import CompanyIdentity from "components/views/admin/company-information/CompanyIdentity"
+import CompanyDetails from "components/views/admin/company-information/CompanyDetails"
 // import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
-// import CompanyDetails from "../../../admin/company-information/CompanyDetails"
 // import TargetTalent from "../../../admin/company-information/TargetTalent"
 // import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
 
@@ -39,7 +39,7 @@ const PageContent = () => {
             <Stack spacing={12}>
                <CompanyIdentity />
 
-               {/* <CompanyDetails /> */}
+               <CompanyDetails />
 
                {/* <TargetTalent /> */}
 
