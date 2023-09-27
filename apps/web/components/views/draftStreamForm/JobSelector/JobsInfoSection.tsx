@@ -23,11 +23,6 @@ import GBLocale from "date-fns/locale/en-GB"
 import { datePickerDefaultStyles } from "../../calendar/utils"
 
 const styles = sxStyles({
-   formGrid: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-   },
    header: {
       display: "flex",
       width: "100%",
@@ -36,6 +31,7 @@ const styles = sxStyles({
    },
    datePicker: {
       zIndex: 99,
+      mt: "unset",
    },
 })
 
@@ -46,8 +42,7 @@ type JobsFormSectionProps = {
    titleError: () => void
    salaryError: () => void
    descriptionError: () => void
-   deadlineError: () => void
-   urlError: () => void
+   postingUrlError: () => void
    jobTypeError: () => void
    job: PublicCustomJob
    values: FormikValues
@@ -63,8 +58,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
    titleError,
    salaryError,
    descriptionError,
-   deadlineError,
-   urlError,
+   postingUrlError,
    jobTypeError,
    job,
    values,
@@ -96,7 +90,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                </Fab>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} id={objectKey} item>
+            <Grid xs={12} id={objectKey} item>
                <FormControl fullWidth>
                   <TextField
                      name={`customJobs.${objectKey}.title`}
@@ -120,7 +114,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                </FormControl>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} md={6} id={objectKey} item>
+            <Grid xs={12} md={6} id={objectKey} item>
                <FormControl fullWidth>
                   <TextField
                      name={`customJobs.${objectKey}.salary`}
@@ -144,7 +138,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                </FormControl>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} md={6} id={objectKey} item>
+            <Grid xs={12} md={6} id={objectKey} item>
                <FormControl fullWidth>
                   <Autocomplete
                      id={`customJobs.${objectKey}.jobType`}
@@ -153,11 +147,14 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                         option.value === value.value
                      }
                      getOptionLabel={(option) => option.label || ""}
-                     value={job.jobType}
-                     onChange={(value, newValue) =>
+                     value={getValue(job.jobType)}
+                     onChange={(
+                        value,
+                        newValue: { value: string; label: string }
+                     ) =>
                         setFieldValue(
                            `customJobs.${objectKey}.jobType`,
-                           newValue
+                           newValue?.value
                         )
                      }
                      renderInput={(params) => (
@@ -165,6 +162,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                            {...params}
                            label="Job Type (Required)"
                            variant="outlined"
+                           error={Boolean(jobTypeError)}
                            fullWidth
                         />
                      )}
@@ -175,7 +173,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                </FormControl>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} id={objectKey} item>
+            <Grid xs={12} id={objectKey} item>
                <FormControl fullWidth>
                   <TextField
                      className="multiLineInput"
@@ -198,7 +196,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                            value
                         )
                      }
-                     sx={{ minHeight: "85px", textAlign: "start" }}
+                     sx={{ minHeight: "95px", textAlign: "start" }}
                   />
                   <Collapse
                      in={Boolean(descriptionError)}
@@ -209,7 +207,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                </FormControl>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} md={6} id={objectKey} item>
+            <Grid xs={12} md={6} id={objectKey} item>
                <FormControl fullWidth>
                   <Box
                      sx={[
@@ -239,21 +237,14 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                               variant="outlined"
                               label="Application Deadline"
                               placeholder="Insert date"
-                              error={Boolean(deadlineError)}
                            />
                         }
                      />
                   </Box>
-                  <Collapse
-                     in={Boolean(deadlineError)}
-                     style={{ color: "red" }}
-                  >
-                     {deadlineError}
-                  </Collapse>
                </FormControl>
             </Grid>
 
-            <Grid sx={styles.formGrid} xs={12} md={6} id={objectKey} item>
+            <Grid xs={12} md={6} id={objectKey} item>
                <FormControl fullWidth>
                   <TextField
                      name={`customJobs.${objectKey}.postingUrl`}
@@ -266,7 +257,7 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                      label="Job posting URL (required)"
                      inputProps={{ maxLength: 70 }}
                      value={job.postingUrl}
-                     error={Boolean(titleError)}
+                     error={Boolean(postingUrlError)}
                      onChange={({ currentTarget: { value } }) =>
                         setFieldValue(
                            `customJobs.${objectKey}.postingUrl`,
@@ -274,8 +265,11 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
                         )
                      }
                   />
-                  <Collapse in={Boolean(urlError)} style={{ color: "red" }}>
-                     {urlError}
+                  <Collapse
+                     in={Boolean(postingUrlError)}
+                     style={{ color: "red" }}
+                  >
+                     {postingUrlError}
                   </Collapse>
                </FormControl>
             </Grid>
@@ -285,3 +279,5 @@ const JobsInfoSection: FC<JobsFormSectionProps> = ({
 }
 
 export default JobsInfoSection
+
+const getValue = (value: string) => ({ value: value, label: value })
