@@ -206,6 +206,11 @@ service cloud.firestore {
                 allow write: if isCareerCenterAdmin() || isCFAdmin();
             }
 
+            match /customJobs/{jobId} {
+                allow read: if true;
+                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            }
+
             match /ats/{integrationId} {
                 allow read, write: if isSignedIn() && (isCareerCenterAdmin() || isCFAdmin());
             }
