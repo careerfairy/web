@@ -19,16 +19,11 @@ const styles = sxStyles({
       borderRadius: 1,
       border: "1px solid #EDE7FD",
       background: "#F7F8FC",
-      my: 1.25,
       backgroundSize: "cover",
       backgroundPosition: "center !important",
-      margin: "0px",
-      /* Typograph */
       color: "#9999B1",
       fontSize: "0.85714rem",
       fontWeight: 300,
-      lineHeight: "16px",
-      textTransform: "none",
    },
    uploadPictureButton: {
       textTransform: "none",

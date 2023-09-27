@@ -167,16 +167,16 @@ const CompanyIdentity: FC = () => {
                md: 1.5,
             }}
          >
-            <Stack spacing={1.25}>
+            <Stack spacing={{ xs: 2, md: 1.25 }}>
                <span>
                   <Typography
                      component="h4"
                      gutterBottom
-                     sx={[Styles.section.h4]}
+                     sx={Styles.section.h4}
                   >
                      Upload your company profile picture
                   </Typography>
-                  <Typography variant="h5" color="text.secondary">
+                  <Typography component="h5" sx={Styles.section.h5}>
                      The optimal size for this picture is 1080x1080 pixels
                   </Typography>
                </span>
@@ -200,7 +200,7 @@ const CompanyIdentity: FC = () => {
                </FileUploader>
             </Stack>
 
-            <Stack spacing={1.25}>
+            <Stack spacing={{ xs: 2, md: 1.25 }}>
                <span>
                   <Typography
                      component="h4"
@@ -210,7 +210,7 @@ const CompanyIdentity: FC = () => {
                      Company banner
                   </Typography>
 
-                  <Typography variant="h5" color="text.secondary">
+                  <Typography component="h5" sx={Styles.section.h5}>
                      This image is going to be used as the banner on your
                      company page. It can always be changed.
                   </Typography>
