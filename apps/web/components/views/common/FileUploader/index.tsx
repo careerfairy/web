@@ -108,18 +108,19 @@ const FileUploader: React.FC<FileUploaderProps> = (
       }
 
       if (props.customValidations) {
-         for (const validationObject of props.customValidations) {
-            const isValid = await validationObject
-               .validation(file)
-               .catch((error) => {
+         const validationResults = await Promise.all(
+            props.customValidations.map((validationObject) =>
+               validationObject.validation(file).catch((error) => {
                   if (onCustomError) onCustomError(error)
                   return false
                })
+            )
+         )
 
-            if (!isValid) {
-               // handle error
-               return false
-            }
+         const hasInvalidFile = validationResults.some((result) => !result)
+
+         if (hasInvalidFile) {
+            return false
          }
       }
 
@@ -129,6 +130,11 @@ const FileUploader: React.FC<FileUploaderProps> = (
    const handleChanges = async (
       files: File | Array<File>
    ): Promise<boolean> => {
+      // Clear the input
+      if (inputRef.current) {
+         inputRef.current.value = ""
+      }
+
       let checkError = false
       if (files) {
          if (files instanceof File) {
