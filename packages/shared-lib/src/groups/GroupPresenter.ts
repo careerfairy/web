@@ -9,19 +9,30 @@ import {
 import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 import { SPARK_CONSTANTS } from "../sparks/constants"
+import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
 
 export const BANNER_IMAGE_SPECS = {
-   minWidth: 864,
+   minWidth: 800,
    minHeight: 172,
    maxWidth: 4300,
    maxHeight: 900,
    // In megabytes
    maxSize: 5, // 5MB
-   allowedFormats: ["jpg", "jpeg", "png", "webp"],
+   allowedFormats: IMAGE_CONSTANTS.allowedFormats,
+}
+
+export const LOGO_IMAGE_SPECS = {
+   minWidth: 100,
+   minHeight: 100,
+   maxWidth: 2160,
+   maxHeight: 2160,
+   // In megabytes
+   maxSize: 10, // 10MB
+   allowedFormats: IMAGE_CONSTANTS.allowedFormats,
 }
 
 export class GroupPresenter {
