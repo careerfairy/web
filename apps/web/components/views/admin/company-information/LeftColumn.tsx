@@ -1,31 +1,30 @@
 import { Stack, Typography } from "@mui/material"
-import React from "react"
+import React, { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 
-type ConditionalWrapperProps = {
+const styles = sxStyles({
+   root: {
+      color: "#2C2C2C",
+      fontSize: "24px",
+      fontWeight: 600,
+      mb: "12px",
+   },
+   description: {
+      fontSize: "16px",
+      color: "#5F5F5F",
+   },
+})
+
+type Props = {
    title: string
    description: string
 }
-const LeftColumn: React.FC<ConditionalWrapperProps> = ({
-   title,
-   description,
-}) => {
+
+const LeftColumn: FC<Props> = ({ title, description }) => {
    return (
       <Stack>
-         <Typography
-            sx={{
-               color: "#2C2C2C",
-               fontSize: "24px",
-               fontWeight: 600,
-               mb: "12px",
-            }}
-         >
-            {title}
-         </Typography>
-         <Typography
-            sx={{ fontSize: "16px", fontWeight: 400, color: "#5F5F5F" }}
-         >
-            {description}
-         </Typography>
+         <Typography sx={styles.root}>{title}</Typography>
+         <Typography sx={styles.description}>{description}</Typography>
       </Stack>
    )
 }
