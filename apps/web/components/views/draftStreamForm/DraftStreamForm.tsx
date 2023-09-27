@@ -21,7 +21,6 @@ import makeStyles from "@mui/styles/makeStyles"
 import { useRouter } from "next/router"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
-   getGroupSubCollectionJobs,
    getStreamSubCollectionSpeakers,
    handleFlattenOptions,
    languageCodes,
@@ -155,7 +154,7 @@ export type ICustomJobObj = {
    description: string
    deadline: Date
    postingUrl: string
-   jobType: ""
+   jobType: string
 }
 
 const customJob = {
@@ -217,7 +216,7 @@ export interface DraftFormValues {
    summary: string
    reasonsToJoinLivestream: string
    speakers: Record<string, Partial<Speaker>>
-   customJobs?: Record<string, Partial<PublicCustomJob>>
+   customJobs?: PublicCustomJob[]
    status: {}
    language: {
       code: string
@@ -324,7 +323,7 @@ const DraftStreamForm = ({
       summary: "",
       reasonsToJoinLivestream: "",
       speakers: { [uuidv4()]: speakerObj },
-      customJobs: {},
+      customJobs: [],
       status: {},
       language: languageCodes[0],
       targetFieldsOfStudy: [],
@@ -423,10 +422,6 @@ const DraftStreamForm = ({
                targetId,
                targetCollection
             )
-            const jobsQuery = await firebase.getGroupCustomJobs(
-               group.groupId,
-               targetCollection
-            )
             const promotionQuery = await firebase.getStreamPromotions(
                targetId,
                targetCollection
@@ -460,7 +455,7 @@ const DraftStreamForm = ({
                      livestream,
                      speakerQuery
                   ),
-                  customJobs: getGroupSubCollectionJobs(jobsQuery) || {},
+                  customJobs: livestream?.customJobs || [],
                   status: livestream.status || {},
                   // @ts-ignore
                   language: livestream.language || languageCodes[0],

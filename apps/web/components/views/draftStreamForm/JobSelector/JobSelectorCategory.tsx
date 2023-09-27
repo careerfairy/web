@@ -116,42 +116,35 @@ const JobSelectorCategory = ({
                      setValues={setValues}
                      objectKey={key}
                      titleError={handleErrorSection(
-                        "customJob",
+                        "customJobs",
                         key,
                         "title",
                         errors,
                         touched
                      )}
                      salaryError={handleErrorSection(
-                        "customJob",
+                        "customJobs",
                         key,
                         "salary",
                         errors,
                         touched
                      )}
                      descriptionError={handleErrorSection(
-                        "customJob",
+                        "customJobs",
                         key,
                         "description",
                         errors,
                         touched
                      )}
-                     deadlineError={handleErrorSection(
-                        "customJob",
+                     postingUrlError={handleErrorSection(
+                        "customJobs",
                         key,
-                        "deadline",
-                        errors,
-                        touched
-                     )}
-                     urlError={handleErrorSection(
-                        "customJob",
-                        key,
-                        "url",
+                        "postingUrl",
                         errors,
                         touched
                      )}
                      jobTypeError={handleErrorSection(
-                        "customJob",
+                        "customJobs",
                         key,
                         "jobType",
                         errors,
