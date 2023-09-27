@@ -12,7 +12,7 @@ import { sxStyles } from "types/commonTypes"
 import Styles from "./BaseStyles"
 import CompanyBanner from "./CompanyBanner"
 import SectionComponent from "./SectionComponent"
-import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { LOGO_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const styles = sxStyles({
    companyLogo: {
@@ -114,10 +114,10 @@ const [title, description] = [
 ]
 
 const companyLogoValidator = getImageDimensionsValidator({
-   maxHeight: 2160,
-   maxWidth: 2160,
-   minHeight: 100,
-   minWidth: 100,
+   maxHeight: LOGO_IMAGE_SPECS.maxHeight,
+   maxWidth: LOGO_IMAGE_SPECS.maxWidth,
+   minHeight: LOGO_IMAGE_SPECS.minHeight,
+   minWidth: LOGO_IMAGE_SPECS.minWidth,
 })
 
 const CompanyIdentity: FC = () => {
@@ -131,8 +131,8 @@ const CompanyIdentity: FC = () => {
 
    const { fileUploaderProps: logoUploaderProps, dragActive: logoDragActive } =
       useFileUploader({
-         acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
-         maxFileSize: 10, // MB
+         acceptedFileTypes: LOGO_IMAGE_SPECS.allowedFormats,
+         maxFileSize: LOGO_IMAGE_SPECS.maxSize,
          multiple: false,
          onValidated: (file) => {
             const newFile = Array.isArray(file) ? file[0] : file

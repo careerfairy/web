@@ -1,4 +1,4 @@
-import CompanyInformationPageContent from "components/views/group/admin/company-information"
+import MainPageContent from "components/views/group/admin/main"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
@@ -15,7 +15,7 @@ const MainPage = () => {
       >
          <DashboardHead title="CareerFairy | Main Page of" />
 
-         <CompanyInformationPageContent />
+         <MainPageContent />
       </GroupDashboardLayout>
    )
 }
