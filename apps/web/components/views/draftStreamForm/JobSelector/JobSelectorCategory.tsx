@@ -1,13 +1,32 @@
-import { Alert, Box, Grid, Typography } from "@mui/material"
-import React, { Dispatch, useEffect, useMemo } from "react"
-import MultiListSelect from "../../common/MultiListSelect"
-import FormGroup from "../FormGroup"
+import React, { Dispatch, useCallback, useMemo } from "react"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
-import useGroupATSJobsAllIntegrations from "../../../custom-hook/useGroupATSJobsAllIntegrations"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
-import { useStreamCreationProvider } from "../StreamForm/StreamCreationProvider"
 import Section from "components/views/common/Section"
+import ATSFormSection from "./ATSFormSection"
+import JobsInfoSection from "./JobsInfoSection"
+import { FormikErrors, FormikTouched, FormikValues } from "formik"
+import { ICustomJobObj } from "../DraftStreamForm"
+import {
+   handleAddSection,
+   handleErrorSection,
+} from "../../../helperFunctions/streamFormFunctions"
+import FormGroup from "../FormGroup"
+import { Box, Button, Grid, Typography } from "@mui/material"
+import { PlusCircle } from "react-feather"
+import { sxStyles } from "../../../../types/commonTypes"
+
+const styles = sxStyles({
+   addJob: {
+      borderRadius: "10px",
+      height: (theme) => theme.spacing(10),
+      border: "dashed",
+      borderColor: (theme) => theme.palette.grey.A400,
+
+      "&:hover": {
+         border: "dashed",
+      },
+   },
+})
 
 type Props = {
    groupId: string
@@ -15,6 +34,14 @@ type Props = {
    selectedItems: LivestreamJobAssociation[]
    sectionRef: any
    classes: any
+   customJobObj: ICustomJobObj
+   values: FormikValues
+   setValues: (values: any) => void
+   errors: FormikErrors<FormikValues>
+   touched: FormikTouched<FormikValues>
+   setFieldValue: (field: string, value: any) => void
+   isSubmitting: boolean
+   handleBlur: (e) => void
 }
 
 /**
@@ -28,6 +55,14 @@ type Props = {
  * @param selectedItems
  * @param sectionRef
  * @param classes
+ * @param customJobObj
+ * @param values
+ * @param setValues
+ * @param errors
+ * @param touched
+ * @param setFieldValue
+ * @param isSubmitting
+ * @param handleBlur
  * @constructor
  */
 const JobSelectorCategory = ({
@@ -36,18 +71,135 @@ const JobSelectorCategory = ({
    selectedItems,
    sectionRef,
    classes,
+   customJobObj,
+   values,
+   setValues,
+   errors,
+   touched,
+   setFieldValue,
+   isSubmitting,
+   handleBlur,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
+   // TODO tO be uncomment
    // First sync should be complete to fetch the jobs
-   const filteredAccounts = useMemo(() => {
-      return accounts.filter((account) => account.firstSyncCompletedAt)
-   }, [accounts])
+   // const filteredAccounts = useMemo(() => {
+   //    return accounts.filter((account) => account.firstSyncCompletedAt)
+   // }, [accounts])
 
-   // Only display the selector if the Group has ATS accounts linked with first sync complete
-   if (filteredAccounts.length === 0) {
-      return null
-   }
+   // // Only display the selector if the Group has ATS accounts linked with first sync complete
+   // if (filteredAccounts.length === 0) {
+   //    return null
+   // }
+
+   const filteredAccounts = []
+
+   const renderJobSection = useCallback(() => {
+      return (
+         <>
+            <Box>
+               <Typography fontWeight="bold" variant="h4">
+                  Jobs
+               </Typography>
+               <Typography variant="subtitle1" mt={1} color="textSecondary">
+                  Create and insert all job openings that you want to share with
+                  the talent community!
+               </Typography>
+            </Box>
+
+            <FormGroup container boxShadow={0} spacing={4}>
+               {Object.keys(values.customJobs).map((key, index) => (
+                  <JobsInfoSection
+                     key={key}
+                     index={index}
+                     setValues={setValues}
+                     objectKey={key}
+                     titleError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "title",
+                        errors,
+                        touched
+                     )}
+                     salaryError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "salary",
+                        errors,
+                        touched
+                     )}
+                     descriptionError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "description",
+                        errors,
+                        touched
+                     )}
+                     deadlineError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "deadline",
+                        errors,
+                        touched
+                     )}
+                     urlError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "url",
+                        errors,
+                        touched
+                     )}
+                     jobTypeError={handleErrorSection(
+                        "customJob",
+                        key,
+                        "jobType",
+                        errors,
+                        touched
+                     )}
+                     job={values.customJobs[key]}
+                     values={values}
+                     setFieldValue={setFieldValue}
+                     isSubmitting={isSubmitting}
+                     handleBlur={handleBlur}
+                  />
+               ))}
+
+               <Grid xs={12} item>
+                  <Button
+                     startIcon={<PlusCircle height={18} />}
+                     disabled={isSubmitting}
+                     onClick={() =>
+                        handleAddSection(
+                           "customJobs",
+                           values,
+                           setValues,
+                           customJobObj
+                        )
+                     }
+                     type="button"
+                     color="secondary"
+                     variant="outlined"
+                     sx={styles.addJob}
+                     size="large"
+                     fullWidth
+                  >
+                     Add a Job opening
+                  </Button>
+               </Grid>
+            </FormGroup>
+         </>
+      )
+   }, [
+      customJobObj,
+      errors,
+      handleBlur,
+      isSubmitting,
+      setFieldValue,
+      setValues,
+      touched,
+      values,
+   ])
 
    return (
       <Section
@@ -55,122 +207,17 @@ const JobSelectorCategory = ({
          sectionId={"JobSection"}
          className={classes.section}
       >
-         <FormSection
-            groupId={groupId}
-            accounts={filteredAccounts}
-            selectedItems={selectedItems}
-            onSelectItems={onSelectItems}
-         />
-      </Section>
-   )
-}
-
-type FormSectionProps = {
-   groupId: string
-   accounts: GroupATSAccount[]
-   onSelectItems: Dispatch<any>
-   selectedItems: LivestreamJobAssociation[]
-}
-
-const FormSection = ({
-   groupId,
-   accounts,
-   selectedItems,
-   onSelectItems,
-}: FormSectionProps) => {
-   const { setShowJobSection, showJobSection } = useStreamCreationProvider()
-
-   useEffect(() => {
-      if (!showJobSection) {
-         setShowJobSection(true)
-      }
-   }, [setShowJobSection, showJobSection])
-
-   /**
-    * An account is fully ready if it has first sync completed and
-    * application test completed, if the application test is missing we display an error message instead
-    */
-   const accountsNotReady: GroupATSAccount[] = useMemo(() => {
-      return accounts.filter((a) => !a.applicationTestCompletedAt)
-   }, [accounts])
-
-   return (
-      <>
-         <Typography fontWeight="bold" variant="h4">
-            Job
-         </Typography>
-         <Typography variant="subtitle1" mt={1} color="textSecondary">
-            Select a job that related to this event
-         </Typography>
-
-         {accountsNotReady.length > 0 && (
-            <Box my={2}>
-               <Alert color="error">
-                  You need to complete the Application Test for{" "}
-                  {accountsNotReady.map((a) => a.name).join(", ")} before you
-                  can associate Jobs to your Live Stream.
-               </Alert>
-            </Box>
-         )}
-
-         {accountsNotReady.length === 0 && (
-            <JobSelector
+         {filteredAccounts.length ? (
+            <ATSFormSection
                groupId={groupId}
-               accounts={accounts}
+               accounts={filteredAccounts}
                selectedItems={selectedItems}
                onSelectItems={onSelectItems}
             />
+         ) : (
+            renderJobSection()
          )}
-      </>
-   )
-}
-
-type JobSelectorProps = {
-   groupId: FormSectionProps["groupId"]
-   accounts: FormSectionProps["accounts"]
-   onSelectItems: FormSectionProps["onSelectItems"]
-   selectedItems: FormSectionProps["selectedItems"]
-}
-
-const JobSelector = ({
-   groupId,
-   accounts,
-   selectedItems,
-   onSelectItems,
-}: JobSelectorProps) => {
-   const jobs = useGroupATSJobsAllIntegrations(accounts)
-   const allValues: LivestreamJobAssociation[] = useMemo(() => {
-      return jobs.map((job) => ({
-         groupId: groupId,
-         integrationId: job.integrationId,
-         jobId: job.id,
-         name: job.name,
-      }))
-   }, [jobs, groupId])
-
-   return (
-      <FormGroup container boxShadow={0}>
-         <Grid xs={12} item>
-            <MultiListSelect
-               inputName="jobIds"
-               selectedItems={selectedItems}
-               onSelectItems={onSelectItems}
-               allValues={allValues}
-               isCheckbox
-               // limit={1} // TODO: Bring back limit after ASUS event 23/05/2023
-               getValueFn={(value) => value.jobId}
-               getKeyFn={(value) => value.jobId}
-               inputProps={{
-                  label: "Select Job",
-                  placeholder: "Select one job",
-               }}
-               chipProps={{
-                  variant: "contained",
-                  color: "secondary",
-               }}
-            />
-         </Grid>
-      </FormGroup>
+      </Section>
    )
 }
 

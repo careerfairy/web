@@ -28,7 +28,6 @@ import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
-   GroupAdmin,
    GroupQuestion,
    GroupWithPolicy,
    UserGroupData,
@@ -766,6 +765,15 @@ class FirebaseService {
          .collection(collection)
          .doc(streamId)
          .collection("speakers")
+      return ref.get()
+   }
+
+   getGroupCustomJobs = (groupId: string, streamId: string) => {
+      let ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .where("livestreams", "array-contains", streamId)
       return ref.get()
    }
 
