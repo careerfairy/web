@@ -1,5 +1,5 @@
 import { FC, memo } from "react"
-import { Box, Container, Grid } from "@mui/material"
+import { Box, Container, Stack } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
 import CompanyIdentity from "../../../admin/company-information/CompanyIdentity"
@@ -36,21 +36,17 @@ const PageContent = () => {
    return (
       <Box sx={styles.root}>
          <Container sx={styles.container} maxWidth="xl">
-            <Grid container>
-               <Grid item>
-                  <CompanyIdentity />
-               </Grid>
+            <Stack spacing={12}>
+               <CompanyIdentity />
 
-               <Grid item>{/* <CompanyDetails /> */}</Grid>
+               {/* <CompanyDetails /> */}
 
-               <Grid item sx={{ width: "100%" }}>
-                  {/* <TargetTalent /> */}
-               </Grid>
+               {/* <TargetTalent /> */}
 
-               <Grid item>{/* <LiveStreamRegistrationQuestions /> */}</Grid>
+               {/* <LiveStreamRegistrationQuestions /> */}
 
-               <Grid item>{/* <PrivacyPolicy /> */}</Grid>
-            </Grid>
+               {/* <PrivacyPolicy /> */}
+            </Stack>
          </Container>
       </Box>
    )

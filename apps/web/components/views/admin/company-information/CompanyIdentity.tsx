@@ -161,7 +161,12 @@ const CompanyIdentity: FC = () => {
 
    return (
       <SectionComponent title={title} description={description}>
-         <Stack spacing={1.5}>
+         <Stack
+            spacing={{
+               xs: 3,
+               md: 1.5,
+            }}
+         >
             <Stack spacing={1.25}>
                <span>
                   <Typography
