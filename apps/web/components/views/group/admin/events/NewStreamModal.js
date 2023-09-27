@@ -198,7 +198,8 @@ const NewStreamModal = ({
             values,
             updateMode,
             draftStreamId,
-            firebase
+            firebase,
+            group.id
          )
          if (status === SAVE_WITH_NO_VALIDATION) {
             const newStatus = {}
