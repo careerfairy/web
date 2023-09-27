@@ -1,5 +1,11 @@
 import { sxStyles } from "types/commonTypes"
 
+const COLORS = {
+   DARK_GRAY: "#2C2C2C",
+   LIGHT_GRAY: "#5F5F5F",
+   CAPTION_GRAY: "#9999B1",
+}
+
 export default sxStyles({
    section: {
       display: "flex",
@@ -7,7 +13,6 @@ export default sxStyles({
       gap: "16px",
       alignSelf: "stretch",
       paddingY: 2,
-      fontFamily: "Poppins",
       flexDirection: "row",
       width: "-webkit-fill-available",
       ":child": {
@@ -15,28 +20,27 @@ export default sxStyles({
          flex: 1,
       },
       h3: {
-         color: "#2C2C2C",
+         color: COLORS.DARK_GRAY,
          fontSize: "24px",
          fontweight: "600",
       },
       h4: {
-         color: "#2C2C2C",
-         fontFamily: "Poppins",
-         fontSize: "18px",
+         color: COLORS.DARK_GRAY,
+         fontSize: "1.28571rem",
          fontWeight: 500,
       },
       p: {
-         color: "#5F5F5F",
+         color: COLORS.LIGHT_GRAY,
          fontSize: "16px",
          fontWeight: "400",
       },
       h5: {
-         color: "#5F5F5F",
-         fontSize: "16px",
+         color: COLORS.LIGHT_GRAY,
+         fontSize: "1.14286rem",
          fontWeight: 400,
       },
       caption: {
-         color: "#9999B1",
+         color: COLORS.CAPTION_GRAY,
          textAlign: "center",
          fontSize: "12px",
          fontWeight: 400,
