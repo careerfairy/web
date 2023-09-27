@@ -1,5 +1,7 @@
 import { UniversityPeriod } from "@careerfairy/shared-lib/universities/universityTimeline"
 import { DateTime } from "luxon"
+import { sxStyles } from "../../../types/commonTypes"
+import { lighten } from "@mui/material/styles"
 
 export type AcademicYears = {
    previousYear: {
@@ -82,3 +84,49 @@ export const isPeriodInInterval = (
 ): boolean => {
    return period.end.toDate() >= start && period.start.toDate() <= end
 }
+
+export const datePickerDefaultStyles = sxStyles({
+   datePicker: {
+      mt: "10px",
+      "& .react-datepicker": {
+         fontFamily: (theme) => theme.typography.fontFamily + "!important",
+      },
+      "& .react-datepicker-wrapper": {
+         width: "100%",
+      },
+      "& .react-datepicker__header": {
+         backgroundColor: "white",
+         borderBlockColor: "transparent",
+         pb: 0,
+      },
+      "& .react-datepicker__navigation-icon::before": {
+         borderColor: "secondary.main",
+      },
+      "& .react-datepicker__day-names": {
+         mt: "10px",
+         fontWeight: 600,
+      },
+      "& .react-datepicker__day--selected": {
+         backgroundColor: "secondary.main",
+         borderRadius: "20px",
+      },
+      "& .react-datepicker__day--in-range": {
+         backgroundColor: (theme) =>
+            theme.palette.secondary.main + "!important",
+         color: "white!important",
+         borderRadius: "20px",
+      },
+      "& .react-datepicker__day--in-selecting-range": {
+         backgroundColor: (theme) =>
+            lighten(theme.palette.secondary.main, 0.4) + "!important",
+         borderRadius: "20px",
+      },
+      "& .react-datepicker__day:hover": {
+         backgroundColor: (theme) => lighten(theme.palette.secondary.main, 0.4),
+         borderRadius: "20px",
+      },
+      "& .react-datepicker__day--keyboard-selected": {
+         backgroundColor: "transparent",
+      },
+   },
+})

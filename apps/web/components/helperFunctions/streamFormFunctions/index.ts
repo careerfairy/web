@@ -10,6 +10,7 @@ import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
 import { FormikErrors, FormikTouched } from "formik"
 import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 
 export const speakerObj = {
    avatar: "",
@@ -46,6 +47,24 @@ export const getStreamSubCollectionSpeakers = (
       const newId = uuidv4()
       return { [newId]: { ...speakerObj, id: newId } }
    }
+}
+
+export const getGroupSubCollectionJobs = (
+   jobsQuery
+): Record<string, PublicCustomJob> => {
+   if (jobsQuery.empty) {
+      return null
+   }
+
+   let jobsObj: Record<string, PublicCustomJob> = {}
+
+   jobsQuery.forEach((query) => {
+      let job = query.data()
+      job.id = query.id
+      jobsObj[job.id] = job
+   })
+
+   return jobsObj
 }
 
 export const handleAddSection = (objName, values, setValues, newSection) => {
@@ -105,6 +124,7 @@ export const buildLivestreamObject = (
       questionsDisabled: values.questionsDisabled,
       triGrams: livestreamTriGrams(values.title, values.company),
       denyRecordingAccess: false,
+      customJobs: buildCustomJobsArray(values),
    }
 }
 
@@ -119,6 +139,21 @@ const buildSpeakersArray = (values) => {
          position: values.speakers[key].position,
          email: values.speakers[key].email || "",
          rank: index,
+      }
+   })
+}
+
+const buildCustomJobsArray = (values) => {
+   return Object.keys(values.customJobs).map((key) => {
+      return {
+         id: key,
+         groupId: values.companyId,
+         title: values.customJobs[key].title,
+         description: values.customJobs[key].description,
+         jobType: values.customJobs[key].jobType?.value,
+         postingUrl: values.customJobs[key].postingUrl,
+         deadline: values.customJobs[key].deadline,
+         salary: values.customJobs[key].salary,
       }
    })
 }
