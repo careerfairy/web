@@ -1,42 +1,57 @@
 import { Autocomplete, AutocompleteProps } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import BrandedChip from "./BrandedChip"
-import BrandedTextField from "./BrandedTextField"
+import BrandedTextField, { BrandedTextFieldProps } from "./BrandedTextField"
 
-interface OptionType {
-   name: string
-   id: string
-}
+import { ListItemText, MenuItem } from "@mui/material"
+import BrandedCheckbox from "./BrandedCheckbox"
+import BrandedRadio from "./BrandedRadio"
 
-type BrandedAutocompleteProps<T extends OptionType = OptionType> = Omit<
+type BrandedAutocompleteProps<T extends any = any> = Omit<
    AutocompleteProps<T, boolean, boolean, boolean>,
    "renderInput" | "renderTags"
 > & {
-   inputLabel: string
+   textFieldProps?: BrandedTextFieldProps
+   limit?: number
 }
 
 const BrandedAutocomplete = styled(
-   ({ inputLabel, getOptionLabel, ...props }: BrandedAutocompleteProps) => (
+   ({
+      limit,
+      textFieldProps,
+      getOptionLabel,
+      ...props
+   }: BrandedAutocompleteProps) => (
       <Autocomplete
+         getOptionDisabled={(optionEl) => {
+            if (!props.multiple || !limit) return false
+            return (
+               props.value.length >= limit &&
+               !props.value.find((option) => option === optionEl)
+            )
+         }}
          {...props}
-         renderInput={(params) => (
-            <BrandedTextField {...params} label={inputLabel} />
+         renderOption={(optionProps, option, { selected }) => (
+            <MenuItem
+               {...optionProps}
+               sx={{
+                  '&[aria-selected="true"]': {
+                     backgroundColor: "white !important",
+                  },
+               }}
+            >
+               <ListItemText primary={getOptionLabel(option)} />
+               {props.multiple ? (
+                  <BrandedCheckbox checked={selected} />
+               ) : (
+                  <BrandedRadio checked={selected} />
+               )}
+            </MenuItem>
          )}
-         renderTags={(values, getTagProps) =>
-            values.map((option, index) => (
-               <BrandedChip
-                  key={index}
-                  label={
-                     Array.isArray(option)
-                        ? option.map(getOptionLabel).join(", ")
-                        : typeof option === "string"
-                        ? option
-                        : option.name
-                  }
-                  {...getTagProps({ index })}
-               />
-            ))
-         }
+         color="primary"
+         getOptionLabel={getOptionLabel}
+         renderInput={(params) => (
+            <BrandedTextField {...params} {...textFieldProps} />
+         )}
       />
    )
 )({})
