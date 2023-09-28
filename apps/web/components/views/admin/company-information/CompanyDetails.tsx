@@ -217,8 +217,8 @@ const CompanyDetails = () => {
 
 type FormValues = {
    universityName: string
-   companyCountry: GroupOption
-   companyIndustries: GroupOption[]
+   companyCountry: GroupOption | null
+   companyIndustries: GroupOption[] | null
    companySize: string
    careerPageUrl: string
    extraInfo: string
