@@ -1,6 +1,4 @@
 import { sxStyles } from "types/commonTypes"
-import { styled } from "@mui/material/styles"
-import Typography, { type TypographyProps } from "@mui/material/Typography"
 
 const COLORS = {
    DARK_GRAY: "#2C2C2C",

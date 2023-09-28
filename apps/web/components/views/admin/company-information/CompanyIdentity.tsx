@@ -9,10 +9,10 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC, useCallback, useState } from "react"
 import { Image as ImageIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import Styles from "./BaseStyles"
 import CompanyBanner from "./CompanyBanner"
 import SectionComponent from "./SectionComponent"
 import { LOGO_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { SectionHeader, SectionSubHeader } from "./components"
 
 const styles = sxStyles({
    companyLogo: {
@@ -169,12 +169,16 @@ const CompanyIdentity: FC = () => {
          >
             <Stack spacing={{ xs: 2, md: 1.25 }}>
                <span>
-                  <SectionHeader>
+                  <Typography
+                     component="h4"
+                     gutterBottom
+                     sx={Styles.section.h4}
+                  >
                      Upload your company profile picture
-                  </SectionHeader>
-                  <SectionSubHeader>
+                  </Typography>
+                  <Typography component="h5" sx={Styles.section.h5}>
                      The optimal size for this picture is 1080x1080 pixels
-                  </SectionSubHeader>
+                  </Typography>
                </span>
                {/* Uploading && Cropping Company logo image */}
                {groupLogoObjectUrl ? (
@@ -198,11 +202,18 @@ const CompanyIdentity: FC = () => {
 
             <Stack spacing={{ xs: 2, md: 1.25 }}>
                <span>
-                  <SectionHeader>Company banner</SectionHeader>
-                  <SectionSubHeader>
+                  <Typography
+                     component="h4"
+                     gutterBottom
+                     sx={[Styles.section.h4]}
+                  >
+                     Company banner
+                  </Typography>
+
+                  <Typography component="h5" sx={Styles.section.h5}>
                      This image is going to be used as the banner on your
                      company page. It can always be changed.
-                  </SectionSubHeader>
+                  </Typography>
                </span>
 
                {/* Uploading banner image */}
