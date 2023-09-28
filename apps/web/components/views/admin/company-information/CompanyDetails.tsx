@@ -4,14 +4,17 @@ import { LoadingButton } from "@mui/lab"
 import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import {
+   BrandedTextFieldField,
+   BrandedTextFieldProps,
+} from "components/views/common/inputs/BrandedTextField"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "constants/forms"
 import { groupRepo } from "data/RepositoryInstances"
-import { Form, Formik } from "formik"
+import { Form, Formik, FormikErrors, FormikTouched } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -129,15 +132,12 @@ const CompanyDetails = () => {
                            }
                            value={values.companyCountry}
                            disableClearable
-                           textFieldProps={{
-                              label: "Company location",
-                              helperText:
-                                 touched.companyCountry &&
-                                 errors.companyCountry,
-                              error:
-                                 touched.companyCountry &&
-                                 Boolean(errors.companyCountry),
-                           }}
+                           textFieldProps={getTextFieldProps(
+                              "Company Location",
+                              "companyCountry",
+                              touched,
+                              errors
+                           )}
                            onChange={(_, selected) =>
                               setFieldValue("companyCountry", selected)
                            }
@@ -156,15 +156,12 @@ const CompanyDetails = () => {
                            limit={GROUP_CONSTANTS.MAX_INDUSTRY_COUNT}
                            disableCloseOnSelect
                            sx={styles.chipInput}
-                           textFieldProps={{
-                              label: "Company industries",
-                              helperText:
-                                 touched.companyIndustries &&
-                                 errors.companyIndustries,
-                              error:
-                                 touched.companyIndustries &&
-                                 Boolean(errors.companyIndustries),
-                           }}
+                           textFieldProps={getTextFieldProps(
+                              "Company industries",
+                              "companyIndustries",
+                              touched,
+                              errors
+                           )}
                            onChange={(_, selected) => {
                               setFieldValue("companyIndustries", selected)
                            }}
@@ -184,14 +181,12 @@ const CompanyDetails = () => {
                            onChange={(_, selected) => {
                               setFieldValue("companySize", selected)
                            }}
-                           textFieldProps={{
-                              label: "Company size",
-                              helperText:
-                                 touched.companySize && errors.companySize,
-                              error:
-                                 touched.companySize &&
-                                 Boolean(errors.companySize),
-                           }}
+                           textFieldProps={getTextFieldProps(
+                              "Company size",
+                              "companySize",
+                              touched,
+                              errors
+                           )}
                         />
                         <Box display="flex" justifyContent="flex-end">
                            <LoadingButton
@@ -253,6 +248,17 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
       .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH)
       .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH),
    careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
+})
+
+const getTextFieldProps = (
+   label: string,
+   name: keyof FormValues,
+   touched: FormikTouched<FormValues>,
+   errors: FormikErrors<FormValues>
+): BrandedTextFieldProps => ({
+   label,
+   error: touched[name] && Boolean(errors[name]),
+   helperText: touched[name] && errors[name],
 })
 
 export default CompanyDetails
