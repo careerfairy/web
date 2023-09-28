@@ -1,10 +1,10 @@
-import { Autocomplete, Stack } from "@mui/material"
-import { Box } from "@mui/system"
-import React, { useCallback, useMemo } from "react"
-
+import { GroupOption } from "@careerfairy/shared-lib/groups"
+import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import { LoadingButton } from "@mui/lab"
+import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
@@ -13,31 +13,28 @@ import {
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import * as Yup from "yup"
 import SectionComponent from "./SectionComponent"
-import BrandedChip from "components/views/common/inputs/BrandedChip"
-import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 
 const styles = sxStyles({
-   selectBox: {
-      width: "100%",
-      color: "#B0B0B0",
-      ".MuiOutlinedInput-root": {
-         display: "flex",
-         padding: "12px 15px",
-         flexDirection: "column",
-         alignItems: "flex-start",
-         gap: "10px",
-         alignSelf: "stretch",
-         borderRadius: "8px",
-         border: "1px solid var(--tertiary-e, #EDE7FD)",
-         background: "#F7F8FC",
-         color: "#B0B0B0",
-         width: "100%",
+   chipInput: {
+      "& .MuiFilledInput-root": {
+         pb: 1,
+         pt: 3,
       },
-      "#branded-multi-checkbox": {
-         width: "100%",
+      "& .MuiChip-root": {
+         backgroundColor: "secondary.main",
+         color: "white",
+         m: 0.625,
+         "& svg": {
+            color: "inherit",
+         },
       },
+   },
+   saveBtn: {
+      textTransform: "none",
    },
 })
 
@@ -49,161 +46,152 @@ const [title, description] = [
 ]
 
 const CompanyDetails = () => {
-   const { group: company } = useGroup()
+   const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   const initialValues = useMemo(
+   const initialValues = useMemo<FormValues>(
       () => ({
-         companyName: company.universityName,
-         companyCountry: company.companyCountry,
-         companyIndustries: company.companyIndustries ?? [],
-         companySize: company.companySize,
-         description: company.description,
-         careerPageUrl: company.careerPageUrl,
-         extraInfo: company.extraInfo,
+         universityName: group.universityName ?? "",
+         careerPageUrl: group.careerPageUrl ?? "",
+         extraInfo: group.extraInfo ?? "",
+         companyCountry: group.companyCountry ?? null,
+         companyIndustries: group.companyIndustries ?? [],
+         companySize: group.companySize ?? null,
       }),
       [
-         company.universityName,
-         company.companyCountry,
-         company.companyIndustries,
-         company.companySize,
-         company.description,
-         company.careerPageUrl,
-         company.extraInfo,
+         group.universityName,
+         group.companyCountry,
+         group.companyIndustries,
+         group.companySize,
+         group.careerPageUrl,
+         group.extraInfo,
       ]
    )
 
    const handleSubmit = useCallback(
-      async (values) => {
+      async (values: FormValues) => {
          try {
-            const payload = { ...values, universityName: values.companyName }
-            await groupRepo.updateGroupMetadata(company.id, payload)
+            await groupRepo.updateGroupMetadata(group.id, values)
 
             successNotification("Your data was updated successfully")
          } catch (e) {
             errorNotification(e, "Failed to updated your data")
          }
       },
-      [errorNotification, successNotification, company.id]
+      [errorNotification, successNotification, group.id]
    )
 
    return (
       <SectionComponent title={title} description={description}>
-         <Formik
+         <Formik<FormValues>
             initialValues={initialValues}
             enableReinitialize
+            validationSchema={validationSchema}
             onSubmit={handleSubmit}
          >
-            {({ values, dirty, handleBlur, isSubmitting, setFieldValue }) => (
+            {({
+               values,
+               dirty,
+               isSubmitting,
+               setFieldValue,
+               errors,
+               handleBlur,
+               touched,
+            }) => (
                <Form>
-                  <Stack
-                     direction={"column"}
-                     sx={{ gap: "12px", width: "100%" }}
-                  >
-                     <BrandedTextField
+                  <Stack spacing={1.5}>
+                     <BrandedTextFieldField
                         name="companyName"
                         label="Company name"
                         placeholder="Ex: CareerFairy"
-                        value={values.companyName}
-                        onChange={(e) =>
-                           setFieldValue("companyName", e.target.value)
-                        }
                      />
-                     <BrandedTextField
+                     <BrandedTextFieldField
                         name="careerPageUrl"
                         label="Career page URL"
                         placeholder="Ex: company.io/careers"
-                        value={values.careerPageUrl}
-                        onChange={(e) =>
-                           setFieldValue("careerPageUrl", e.target.value)
-                        }
                      />
-                     <BrandedTextField
+                     <BrandedTextFieldField
                         name="extraInfo"
-                        multiline={true}
+                        multiline
                         rows={4}
                         label="Describe your company"
                         placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
-                        value={values.extraInfo}
-                        onChange={(e) =>
-                           setFieldValue("extraInfo", e.target.value)
+                     />
+                     <BrandedAutocomplete
+                        id={"companyCountry"}
+                        options={CompanyCountryValues}
+                        defaultValue={values.companyCountry}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, value) =>
+                           option.id === value.id
+                        }
+                        value={values.companyCountry}
+                        disableClearable
+                        textFieldProps={{
+                           label: "Company location",
+                        }}
+                        onChange={(_, selected) =>
+                           setFieldValue("companyCountry", selected)
                         }
                      />
-                     <>
-                        <Box>
-                           <BrandedTextField
-                              id={"companyCountry"}
-                              label={"Company country"}
-                              options={CompanyCountryValues}
-                              defaultValue={values.companyCountry}
-                              getOptionLabel={(option) => option.name || ""}
-                              value={values.companyCountry}
-                              disableClearable
-                              select
-                              onChange={(e) =>
-                                 setFieldValue("companyCountry", e.target.value)
-                              }
-                           />
-                        </Box>
 
-                        <Box sx={styles.selectBox}>
-                           <BrandedAutocomplete
-                              id={"companyIndustries"}
-                              options={CompanyIndustryValues}
-                              defaultValue={values.companyIndustries}
-                              getOptionLabel={(option) => option.name || ""}
-                              value={values.companyIndustries ?? []}
-                              multiple
-                              inputLabel={"Company industries"}
-                              onChange={(_, selected) => {
-                                 setFieldValue("companyIndustries", selected)
-                              }}
-                              // renderTags={(values, getTagProps) => {
-                              //    return values.map((value, index) => (
-                              //       <BrandedChip
-                              //          key={index}
-                              //          label={value.name}
-                              //          {...getTagProps({ index })}
-                              //       />
-                              //    ))
-                              // }}
-                              // renderInput={(params) => (
-                              //    <BrandedTextField
-                              //       {...params}
-                              //       label={`Company Industries`}
-                              //       onBlur={handleBlur}
-                              //       disabled={isSubmitting}
-                              //    />
-                              // )}
-                           />
-                        </Box>
-
-                        <Box sx={styles.selectBox}>
-                           <Autocomplete
-                              id={"companySize"}
-                              options={CompanySizesCodes}
-                              defaultValue={values.companyIndustries}
-                              getOptionLabel={(option) => option.label || ""}
-                              value={values.companySize}
-                              onChange={(_, selected) => {
-                                 setFieldValue("companySize", selected)
-                              }}
-                              renderInput={(params) => (
-                                 <BrandedTextField
-                                    {...params}
-                                    label={`Company size`}
-                                    onBlur={handleBlur}
-                                    disabled={isSubmitting}
-                                 />
-                              )}
-                           />
-                        </Box>
-                     </>
-                     <LoadingButton
-                        loading={isSubmitting}
-                        disabled={!dirty || isSubmitting}
-                        type="submit"
+                     <BrandedAutocomplete
+                        id={"companyIndustries"}
+                        options={CompanyIndustryValues}
+                        defaultValue={values.companyIndustries}
+                        isOptionEqualToValue={(option, value) =>
+                           option.id === value.id
+                        }
+                        getOptionLabel={(option) => option.name || ""}
+                        value={values.companyIndustries ?? []}
+                        multiple
+                        limit={GROUP_CONSTANTS.MAX_INDUSTRY_COUNT}
+                        disableCloseOnSelect
+                        sx={styles.chipInput}
+                        textFieldProps={{
+                           label: "Company industries",
+                        }}
+                        onChange={(_, selected) => {
+                           setFieldValue("companyIndustries", selected)
+                        }}
                      />
+
+                     <BrandedAutocomplete
+                        id={"companySize"}
+                        options={CompanySizesCodes}
+                        defaultValue={values.companyIndustries}
+                        getOptionLabel={(option) => option.label || ""}
+                        value={values.companySize}
+                        isOptionEqualToValue={(option, value) =>
+                           option.id === value.id
+                        }
+                        onBlur={handleBlur}
+                        disableClearable
+                        onChange={(_, selected) => {
+                           setFieldValue("companySize", selected)
+                        }}
+                        textFieldProps={{
+                           label: "Company size",
+                           helperText:
+                              touched.companySize && errors.companySize,
+                           error:
+                              touched.companySize &&
+                              Boolean(errors.companySize),
+                        }}
+                     />
+                     <Box display="flex" justifyContent="flex-end">
+                        <LoadingButton
+                           loading={isSubmitting}
+                           disabled={!dirty || isSubmitting}
+                           type="submit"
+                           size="small"
+                           sx={styles.saveBtn}
+                           variant="contained"
+                           color="secondary"
+                        >
+                           Save changes
+                        </LoadingButton>
+                     </Box>
                   </Stack>
                </Form>
             )}
@@ -211,5 +199,45 @@ const CompanyDetails = () => {
       </SectionComponent>
    )
 }
+
+type FormValues = {
+   universityName: string
+   companyCountry: GroupOption
+   companyIndustries: GroupOption[]
+   companySize: string
+   careerPageUrl: string
+   extraInfo: string
+}
+
+const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
+   universityName: Yup.string().required("Company name is required"),
+   companyCountry: Yup.object()
+      .shape({
+         id: Yup.string().required(),
+         name: Yup.string().required(),
+      })
+      .required("Company country is required"),
+   companyIndustries: Yup.array()
+      .of(
+         Yup.object().shape({
+            id: Yup.string().required(),
+            name: Yup.string().required(),
+         })
+      )
+      .nullable()
+      .max(GROUP_CONSTANTS.MAX_INDUSTRY_COUNT, "Maximum of 5 industries")
+      .required("At least one industry is required"),
+   companySize: Yup.object()
+      .shape({
+         id: Yup.string().required(),
+         label: Yup.string().required(),
+      })
+      .nullable()
+      .required("Company size is required"),
+   extraInfo: Yup.string()
+      .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH)
+      .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH),
+   careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
+})
 
 export default CompanyDetails

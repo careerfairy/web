@@ -812,7 +812,7 @@ export class FirebaseGroupRepository
          .collection("careerCenterData")
          .doc(groupId)
 
-      return groupRef.set(metadata, { merge: true })
+      return groupRef.update(metadata)
    }
 
    updateGroupTestimonials(

@@ -1,0 +1,8 @@
+// Constants for Group Entity
+export const GROUP_CONSTANTS = {
+   MAX_EXTRA_INFO_LENGTH: 700,
+   MIN_EXTRA_INFO_LENGTH: 5,
+   MAX_NAME_LENGTH: 60,
+   MIN_NAME_LENGTH: 5,
+   MAX_INDUSTRY_COUNT: 5,
+}
