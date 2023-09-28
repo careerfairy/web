@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { sleep } from "../../utils"
 import { groupAdminFixture as test } from "../../fixtures"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
