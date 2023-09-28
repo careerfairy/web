@@ -6,13 +6,14 @@ import { ListItemText, MenuItem } from "@mui/material"
 import BrandedCheckbox from "./BrandedCheckbox"
 import BrandedRadio from "./BrandedRadio"
 
-type BrandedAutocompleteProps<T extends any = any> = Omit<
-   AutocompleteProps<T, boolean, boolean, boolean>,
-   "renderInput" | "renderTags"
-> & {
-   textFieldProps?: BrandedTextFieldProps
-   limit?: number
-}
+type BrandedAutocompleteProps<T extends { id: string; name: string } = any> =
+   Omit<
+      AutocompleteProps<T, boolean, boolean, boolean>,
+      "renderInput" | "renderTags"
+   > & {
+      textFieldProps?: BrandedTextFieldProps
+      limit?: number
+   }
 
 const BrandedAutocomplete = styled(
    ({

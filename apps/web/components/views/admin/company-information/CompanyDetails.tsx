@@ -97,104 +97,119 @@ const CompanyDetails = () => {
                errors,
                handleBlur,
                touched,
-            }) => (
-               <Form>
-                  <Stack spacing={1.5}>
-                     <BrandedTextFieldField
-                        name="companyName"
-                        label="Company name"
-                        placeholder="Ex: CareerFairy"
-                     />
-                     <BrandedTextFieldField
-                        name="careerPageUrl"
-                        label="Career page URL"
-                        placeholder="Ex: company.io/careers"
-                     />
-                     <BrandedTextFieldField
-                        name="extraInfo"
-                        multiline
-                        rows={4}
-                        label="Describe your company"
-                        placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
-                     />
-                     <BrandedAutocomplete
-                        id={"companyCountry"}
-                        options={CompanyCountryValues}
-                        defaultValue={values.companyCountry}
-                        getOptionLabel={(option) => option.name || ""}
-                        isOptionEqualToValue={(option, value) =>
-                           option.id === value.id
-                        }
-                        value={values.companyCountry}
-                        disableClearable
-                        textFieldProps={{
-                           label: "Company location",
-                        }}
-                        onChange={(_, selected) =>
-                           setFieldValue("companyCountry", selected)
-                        }
-                     />
+               isValid,
+            }) => {
+               return (
+                  <Form>
+                     <Stack spacing={1.5}>
+                        <BrandedTextFieldField
+                           name="universityName"
+                           label="Company name"
+                           placeholder="Ex: CareerFairy"
+                        />
+                        <BrandedTextFieldField
+                           name="careerPageUrl"
+                           label="Career page URL"
+                           placeholder="Ex: company.io/careers"
+                        />
+                        <BrandedTextFieldField
+                           name="extraInfo"
+                           multiline
+                           rows={4}
+                           label="Describe your company"
+                           placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
+                        />
+                        <BrandedAutocomplete
+                           id={"companyCountry"}
+                           options={CompanyCountryValues}
+                           defaultValue={values.companyCountry}
+                           getOptionLabel={(option) => option.name || ""}
+                           isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                           }
+                           value={values.companyCountry}
+                           disableClearable
+                           textFieldProps={{
+                              label: "Company location",
+                              helperText:
+                                 touched.companyCountry &&
+                                 errors.companyCountry,
+                              error:
+                                 touched.companyCountry &&
+                                 Boolean(errors.companyCountry),
+                           }}
+                           onChange={(_, selected) =>
+                              setFieldValue("companyCountry", selected)
+                           }
+                        />
 
-                     <BrandedAutocomplete
-                        id={"companyIndustries"}
-                        options={CompanyIndustryValues}
-                        defaultValue={values.companyIndustries}
-                        isOptionEqualToValue={(option, value) =>
-                           option.id === value.id
-                        }
-                        getOptionLabel={(option) => option.name || ""}
-                        value={values.companyIndustries ?? []}
-                        multiple
-                        limit={GROUP_CONSTANTS.MAX_INDUSTRY_COUNT}
-                        disableCloseOnSelect
-                        sx={styles.chipInput}
-                        textFieldProps={{
-                           label: "Company industries",
-                        }}
-                        onChange={(_, selected) => {
-                           setFieldValue("companyIndustries", selected)
-                        }}
-                     />
+                        <BrandedAutocomplete
+                           id={"companyIndustries"}
+                           options={CompanyIndustryValues}
+                           defaultValue={values.companyIndustries}
+                           isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                           }
+                           getOptionLabel={(option) => option.name || ""}
+                           value={values.companyIndustries ?? []}
+                           multiple
+                           limit={GROUP_CONSTANTS.MAX_INDUSTRY_COUNT}
+                           disableCloseOnSelect
+                           sx={styles.chipInput}
+                           textFieldProps={{
+                              label: "Company industries",
+                              helperText:
+                                 touched.companyIndustries &&
+                                 errors.companyIndustries,
+                              error:
+                                 touched.companyIndustries &&
+                                 Boolean(errors.companyIndustries),
+                           }}
+                           onChange={(_, selected) => {
+                              setFieldValue("companyIndustries", selected)
+                           }}
+                        />
 
-                     <BrandedAutocomplete
-                        id={"companySize"}
-                        options={CompanySizesCodes}
-                        defaultValue={values.companyIndustries}
-                        getOptionLabel={(option) => option.label || ""}
-                        value={values.companySize}
-                        isOptionEqualToValue={(option, value) =>
-                           option.id === value.id
-                        }
-                        onBlur={handleBlur}
-                        disableClearable
-                        onChange={(_, selected) => {
-                           setFieldValue("companySize", selected)
-                        }}
-                        textFieldProps={{
-                           label: "Company size",
-                           helperText:
-                              touched.companySize && errors.companySize,
-                           error:
-                              touched.companySize &&
-                              Boolean(errors.companySize),
-                        }}
-                     />
-                     <Box display="flex" justifyContent="flex-end">
-                        <LoadingButton
-                           loading={isSubmitting}
-                           disabled={!dirty || isSubmitting}
-                           type="submit"
-                           size="small"
-                           sx={styles.saveBtn}
-                           variant="contained"
-                           color="secondary"
-                        >
-                           Save changes
-                        </LoadingButton>
-                     </Box>
-                  </Stack>
-               </Form>
-            )}
+                        <BrandedAutocomplete
+                           id={"companySize"}
+                           options={CompanySizesCodes}
+                           defaultValue={values.companyIndustries}
+                           getOptionLabel={(option) => option.label || ""}
+                           value={values.companySize}
+                           isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                           }
+                           onBlur={handleBlur}
+                           disableClearable
+                           onChange={(_, selected) => {
+                              setFieldValue("companySize", selected)
+                           }}
+                           textFieldProps={{
+                              label: "Company size",
+                              helperText:
+                                 touched.companySize && errors.companySize,
+                              error:
+                                 touched.companySize &&
+                                 Boolean(errors.companySize),
+                           }}
+                        />
+                        <Box display="flex" justifyContent="flex-end">
+                           <LoadingButton
+                              loading={isSubmitting}
+                              disabled={!dirty || isSubmitting || !isValid}
+                              type="submit"
+                              size="small"
+                              sx={styles.saveBtn}
+                              variant="contained"
+                              color="secondary"
+                           >
+                              Save changes
+                           </LoadingButton>
+                        </Box>
+                     </Stack>
+                  </Form>
+               )
+            }}
          </Formik>
       </SectionComponent>
    )
