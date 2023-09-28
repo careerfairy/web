@@ -59,6 +59,7 @@ import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/s
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -684,6 +685,39 @@ class FirebaseService {
       }
    }
 
+   /**
+    * To create a custom job on as sub collection of the group document
+    */
+   addGroupCustomJobOpening = async (
+      jobs: PublicCustomJob[],
+      livestreamId: string,
+      groupId: string
+   ): Promise<void> => {
+      try {
+         const batch = this.firestore.batch()
+
+         jobs.forEach((job) => {
+            const ref = this.firestore
+               .collection("careerCenterData")
+               .doc(groupId)
+               .collection("customJobs")
+               .doc(job.id)
+
+            const customJob = {
+               ...job,
+               createdAt: this.getServerTimestamp(),
+               livestreams: [livestreamId],
+               updatedAt: this.getServerTimestamp(),
+            }
+            batch.set(ref, customJob, { merge: true })
+         })
+
+         await batch.commit()
+      } catch (error) {
+         return error
+      }
+   }
+
    getGroupsInfo = async (arrayOfGroupIds) => {
       const groupsDictionary: Record<string, Group> = {}
       let i,
@@ -768,6 +802,9 @@ class FirebaseService {
       return ref.get()
    }
 
+   /**
+    * To get all the Group custom jobs that are related to a specific livestream event
+    */
    getGroupCustomJobs = (groupId: string, streamId: string) => {
       let ref = this.firestore
          .collection("careerCenterData")
