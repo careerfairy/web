@@ -27,7 +27,12 @@ const BrandedAutocomplete = styled(
             if (!props.multiple || !limit) return false
             return (
                props.value.length >= limit &&
-               !props.value.find((option) => option === optionEl)
+               !props.value.find((item) => {
+                  if (props.isOptionEqualToValue) {
+                     return props.isOptionEqualToValue(item, optionEl)
+                  }
+                  return item === optionEl
+               })
             )
          }}
          {...props}
