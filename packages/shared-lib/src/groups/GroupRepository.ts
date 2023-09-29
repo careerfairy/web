@@ -144,7 +144,13 @@ export interface IGroupRepository {
       groupId: string,
       metadata: Pick<
          Group,
-         "extraInfo" | "companySize" | "companyIndustries" | "companyCountry"
+         | "extraInfo"
+         | "companySize"
+         | "companyIndustries"
+         | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
       >
    ): Promise<void>
 
@@ -805,7 +811,13 @@ export class FirebaseGroupRepository
       groupId: string,
       metadata: Pick<
          Group,
-         "extraInfo" | "companySize" | "companyIndustries" | "companyCountry"
+         | "extraInfo"
+         | "companySize"
+         | "companyIndustries"
+         | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
       >
    ): Promise<void> {
       const groupRef = this.firestore

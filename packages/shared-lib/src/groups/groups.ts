@@ -42,6 +42,9 @@ export interface Group extends Identifiable {
    companyCountry?: GroupOption
    companyIndustries?: GroupOption[]
    companySize?: string
+   targetedCountries?: GroupOption[]
+   targetedUniversities?: GroupOption[]
+   targetedFieldsOfStudy?: GroupOption[]
 
    /*
     * Photos that are displayed on the group company page
