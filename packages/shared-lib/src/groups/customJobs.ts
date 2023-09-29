@@ -1,6 +1,5 @@
-import { Timestamp } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
-
+import firebase from "firebase/compat"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
  * CustomJob is attached to a single group but can be related to multiple live streams
@@ -14,9 +13,9 @@ export interface CustomJob extends Identifiable {
    description: string
    jobType: JobType
    postingUrl: string
-   deadline: Timestamp
-   createdAt: Timestamp
-   updatedAt: Timestamp
+   deadline: firebase.firestore.Timestamp
+   createdAt: firebase.firestore.Timestamp
+   updatedAt: firebase.firestore.Timestamp
 
    // optional fields
    salary?: string
