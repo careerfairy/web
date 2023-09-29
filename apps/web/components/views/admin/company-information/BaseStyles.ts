@@ -7,6 +7,23 @@ const COLORS = {
 }
 
 export default sxStyles({
+   chipInput: {
+      "& .MuiFilledInput-root": {
+         pb: 1,
+         pt: 3,
+      },
+      "& .MuiChip-root": {
+         backgroundColor: "secondary.main",
+         color: "white",
+         m: 0.625,
+         "& svg": {
+            color: "inherit",
+         },
+      },
+   },
+   saveBtn: {
+      textTransform: "none",
+   },
    section: {
       display: "flex",
       alignItems: "flex-start",
