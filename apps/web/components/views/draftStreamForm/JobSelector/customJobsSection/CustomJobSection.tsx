@@ -5,7 +5,7 @@ import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import FormGroup from "../../FormGroup"
 import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
-import CustomJobCreationFrom from "./CustomJobCreationFrom"
+import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
 
 type Props = {
@@ -48,6 +48,32 @@ const CustomJobSection = ({
       [setFieldValue, values.customJobs]
    )
 
+   const handleRemoveJob = useCallback(
+      (jobId: string) => {
+         const filteredJobs = values.customJobs.filter(
+            (job: PublicCustomJob) => job.id !== jobId
+         )
+
+         setFieldValue("customJobs", filteredJobs)
+      },
+      [setFieldValue, values.customJobs]
+   )
+
+   const handleEditJob = useCallback(
+      (updatedJob: PublicCustomJob) => {
+         const updatedJobIndex = values.customJobs.findIndex(
+            (job: PublicCustomJob) => job.id === updatedJob.id
+         )
+
+         setFieldValue("customJobs", [
+            ...values.customJobs.slice(0, updatedJobIndex),
+            updatedJob,
+            ...values.customJobs.slice(updatedJobIndex + 1),
+         ])
+      },
+      [setFieldValue, values.customJobs]
+   )
+
    return (
       <>
          <Typography fontWeight="bold" variant="h4">
@@ -74,7 +100,7 @@ const CustomJobSection = ({
 
                {
                   <Collapse in={showForm} timeout={500}>
-                     <CustomJobCreationFrom
+                     <CustomJobCreateOrEditFrom
                         groupId={groupId}
                         handleCreateNewJob={handleCreateNewJob}
                         handleCancelCreateNewJob={handleCancelCreateNewJob}
@@ -86,8 +112,8 @@ const CustomJobSection = ({
                   <CustomJobPreview
                      key={job.id}
                      job={job}
-                     handleRemove={() => {}}
-                     handleEdit={() => {}}
+                     handleRemoveJob={handleRemoveJob}
+                     handleEditJob={handleEditJob}
                   />
                ))}
             </Grid>
