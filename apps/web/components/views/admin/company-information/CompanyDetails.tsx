@@ -76,7 +76,9 @@ const CompanyDetails = () => {
          try {
             await groupRepo.updateGroupMetadata(group.id, values)
 
-            successNotification("Your data was updated successfully")
+            successNotification(
+               "Your company details were successfully updated"
+            )
          } catch (e) {
             errorNotification(e, "Failed to updated your data")
          }
@@ -106,12 +108,12 @@ const CompanyDetails = () => {
                      <BrandedTextFieldField
                         name="universityName"
                         label="Company name"
-                        placeholder="Ex: CareerFairy"
+                        placeholder="E.g., CareerFairy"
                      />
                      <BrandedTextFieldField
                         name="careerPageUrl"
                         label="Career page URL"
-                        placeholder="Ex: company.io/careers"
+                        placeholder="E.g., company.io/careers"
                      />
                      <BrandedTextFieldField
                         name="extraInfo"
@@ -131,7 +133,7 @@ const CompanyDetails = () => {
                         value={values.companyCountry}
                         disableClearable
                         textFieldProps={getTextFieldProps(
-                           "Company Location",
+                           "Company location",
                            "companyCountry",
                            touched,
                            errors
