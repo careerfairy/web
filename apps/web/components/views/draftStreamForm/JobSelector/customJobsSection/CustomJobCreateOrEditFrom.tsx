@@ -12,6 +12,7 @@ import { Formik } from "formik"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import {
+   JobType,
    jobTypeOptions,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/groups/customJobs"
@@ -22,6 +23,7 @@ import GBLocale from "date-fns/locale/en-GB"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { v4 as uuidv4 } from "uuid"
 import { useMemo } from "react"
+import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
 
 const schema = yup.object().shape({
    title: yup.string().required("Required"),
@@ -38,9 +40,14 @@ const schema = yup.object().shape({
    jobType: yup.string().required("Required"),
 })
 
+/**
+ * Ensure that the 'jobType' field is initialized as an empty string at the start of any form.
+ * Additionally, use the 'Date' data type instead of 'Timestamp' within the form.
+ */
 type CustomJobObj = {
    jobType: string
-} & Omit<PublicCustomJob, "jobType">
+   deadline: Date
+} & Omit<PublicCustomJob, "jobType" | "deadline">
 
 const styles = sxStyles({
    header: {
@@ -72,18 +79,28 @@ const styles = sxStyles({
 })
 
 type Props = {
-   groupId: string
-   handleCreateNewJob: (customJob: CustomJobObj) => void
+   groupId?: string
+   handleCreateNewJob: (customJob: PublicCustomJob) => void
    handleCancelCreateNewJob: () => void
+   job?: PublicCustomJob
 }
 
-const CustomJobCreationFrom = ({
+const CustomJobCreateOrEditFrom = ({
    groupId,
    handleCreateNewJob,
    handleCancelCreateNewJob,
+   job,
 }: Props) => {
-   const initialValues: CustomJobObj = useMemo(
-      () => ({
+   const initialValues: CustomJobObj = useMemo(() => {
+      // If the 'job' field is received, it indicates the intention to edit an existing job.
+      if (job) {
+         return {
+            ...job,
+            deadline: job.deadline.toDate(),
+         }
+      }
+
+      return {
          id: uuidv4(),
          groupId: groupId,
          title: "",
@@ -92,9 +109,8 @@ const CustomJobCreationFrom = ({
          deadline: null,
          postingUrl: "",
          jobType: "",
-      }),
-      [groupId]
-   )
+      }
+   }, [groupId, job])
 
    return (
       <Box sx={styles.wrapper}>
@@ -102,7 +118,13 @@ const CustomJobCreationFrom = ({
             initialValues={initialValues}
             validationSchema={schema}
             onSubmit={(values, { setSubmitting, resetForm }) => {
-               handleCreateNewJob(values)
+               const formatValues: PublicCustomJob = {
+                  ...values,
+                  jobType: values.jobType as JobType,
+                  deadline: Timestamp.fromDate(values.deadline),
+               }
+
+               handleCreateNewJob(formatValues)
 
                setSubmitting(false)
                resetForm()
@@ -273,7 +295,7 @@ const CustomJobCreationFrom = ({
                                     />
                                  }
                                  onChange={(value) =>
-                                    setFieldValue("deadline", new Date(value))
+                                    setFieldValue("deadline", value)
                                  }
                               />
                            </Box>
@@ -351,4 +373,4 @@ const CustomJobCreationFrom = ({
 
 const getValue = (value: string) => ({ value: value, label: value })
 
-export default CustomJobCreationFrom
+export default CustomJobCreateOrEditFrom
