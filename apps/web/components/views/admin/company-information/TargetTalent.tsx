@@ -1,20 +1,24 @@
 import { Stack } from "@mui/material"
 import { FC, useCallback, useMemo } from "react"
 
-import { GroupOption } from "@careerfairy/shared-lib/groups"
+import {
+   GroupOption,
+   GroupTargetUniversity,
+} from "@careerfairy/shared-lib/groups"
 import {
    University,
    UniversityCountry,
+   universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
 import { LoadingButton } from "@mui/lab"
 import { Box } from "@mui/material"
-import { useUniversityCountries } from "components/custom-hook/useCollection"
+import {
+   useFieldsOfStudy,
+   useUniversityCountries,
+} from "components/custom-hook/useCollection"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
-import {
-   CompanyCountryValues,
-   RelevantCompanyIndustryValues,
-} from "constants/forms"
+import { CompanyCountryValues } from "constants/forms"
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -39,6 +43,7 @@ const TargetTalent: FC = () => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const { data: universitiesByCountry } = useUniversityCountries()
+   const { data: fieldsOfStudy } = useFieldsOfStudy()
 
    const initialValues = useMemo<FormValues>(
       () => ({
@@ -56,7 +61,9 @@ const TargetTalent: FC = () => {
    const handleSubmit = async (values: FormValues) => {
       try {
          await groupRepo.updateGroupMetadata(group.id, values)
-         successNotification("saved")
+         successNotification(
+            "Your company target talent were successfully updated"
+         )
       } catch (e) {
          errorNotification(e, "An error has occurred during the save")
       }
@@ -107,7 +114,14 @@ const TargetTalent: FC = () => {
                         limit={maxCountries}
                         onChange={(_, selected) => {
                            setFieldValue("targetedCountries", selected)
-                           // setFieldValue("targetedUniversities", )
+                           const selectedCountriesIds =
+                              selected?.map((country) => country.id) || []
+                           setFieldValue(
+                              "targetedUniversities",
+                              values.targetedUniversities.filter((uni) =>
+                                 selectedCountriesIds.includes(uni.country)
+                              )
+                           )
                         }}
                         textFieldProps={getTextFieldProps(
                            "Targeted countries",
@@ -125,6 +139,7 @@ const TargetTalent: FC = () => {
                         options={filterUniversitiesBySelectedContries(
                            values.targetedCountries
                         )}
+                        groupBy={groupByUniversities}
                         defaultValue={values.targetedUniversities}
                         getOptionLabel={getOptionLabel}
                         value={values.targetedUniversities}
@@ -147,7 +162,7 @@ const TargetTalent: FC = () => {
                         id={"targetedFieldsOfStudy"}
                         sx={BaseStyles.chipInput}
                         isOptionEqualToValue={isOptionEqualToValue}
-                        options={RelevantCompanyIndustryValues}
+                        options={fieldsOfStudy}
                         defaultValue={values.targetedFieldsOfStudy}
                         getOptionLabel={getOptionLabel}
                         value={values.targetedFieldsOfStudy}
@@ -224,9 +239,12 @@ const isOptionEqualToValue = (option: GroupOption, value: GroupOption) =>
 
 const getOptionLabel = (option) => option.name || ""
 
+const groupByUniversities = (uni: GroupTargetUniversity) =>
+   universityCountryMap?.[uni.country] || uni.country
+
 type FormValues = {
    targetedCountries: GroupOption[]
-   targetedUniversities: GroupOption[]
+   targetedUniversities: GroupTargetUniversity[]
    targetedFieldsOfStudy: GroupOption[]
 }
 
@@ -246,6 +264,7 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
          Yup.object().shape({
             id: Yup.string().required(),
             name: Yup.string().required(),
+            country: Yup.string().required(),
          })
       )
       .nullable()
