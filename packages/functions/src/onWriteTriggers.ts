@@ -48,7 +48,7 @@ export const syncLivestreams = functions
             )
             sideEffectPromises.push(
                removeAndSyncSparksNotifications(
-                  newValue.author.groupId || newValue.groupIds?.[0]
+                  newValue.author?.groupId || newValue.groupIds?.[0]
                )
             )
          }
