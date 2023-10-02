@@ -5,7 +5,7 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik, FormikHelpers } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, ReactElement, useEffect, useState } from "react"
+import { FC, ReactElement, useEffect, useRef, useState } from "react"
 import { Trash2 as DeleteIcon, Edit2, PlusCircle, Save } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
@@ -58,6 +58,7 @@ type Props = {
    setInputMode: (value: boolean) => void
    onRemove: (questionId: string) => void
    onCreated: (tempId: string, newQuestion: GroupQuestion) => void
+   onUpdated: (newQuestion: GroupQuestion) => void
 }
 
 const RegistrationQuestion: FC<Props> = ({
@@ -66,22 +67,23 @@ const RegistrationQuestion: FC<Props> = ({
    setInputMode,
    onRemove,
    onCreated,
+   onUpdated,
 }): ReactElement => {
+   const isMounted = useRef(true)
+
+   useEffect(() => {
+      return () => {
+         isMounted.current = false
+      }
+   }, [])
+
    const { group } = useGroup()
-   const [isNew, setIsNew] = useState(true)
+
+   const isNew = initialValues.id.startsWith("temp-")
+
    const [isDeleting, setIsDeleting] = useState(false)
 
    const { successNotification, errorNotification } = useSnackbarNotifications()
-
-   useEffect(() => {
-      if (
-         initialValues &&
-         Boolean(initialValues.name) &&
-         initialValues.name !== ""
-      ) {
-         setIsNew(false)
-      }
-   }, [initialValues])
 
    const handleRemoveQuestion = async (groupQuestionId: string) => {
       if (!isNew) {
@@ -89,9 +91,9 @@ const RegistrationQuestion: FC<Props> = ({
             setIsDeleting(true)
             await groupRepo.deleteGroupQuestion(group.id, groupQuestionId)
             successNotification("Question removed")
+            setIsDeleting(false)
          } catch (e) {
             errorNotification(e, "An error has occured")
-         } finally {
             setIsDeleting(false)
          }
       }
@@ -108,19 +110,21 @@ const RegistrationQuestion: FC<Props> = ({
                group.id,
                values
             )
-            resetForm({ values: newQuestion }) // Reset the form values
-            onCreated(initialValues.id, newQuestion)
+            resetForm({ values: newQuestion })
+            onCreated(values.id, newQuestion)
             successNotification("New Question added")
          } else {
             await groupRepo.updateGroupQuestion(group.id, values)
-            resetForm({ values }) // Reset the form values
+
+            setInputMode(false)
+            resetForm({ values, isSubmitting: false })
+            onUpdated(values)
             successNotification("Question updated")
          }
-
-         setIsNew(false)
-         setInputMode(false)
       } catch (e) {
-         errorNotification(e, "An error has occured")
+         if (isMounted.current) {
+            errorNotification(e, "An error has occured")
+         }
       }
    }
 
@@ -220,7 +224,7 @@ const RegistrationQuestion: FC<Props> = ({
                               <LoadingButton
                                  endIcon={<Save />}
                                  loading={isSubmitting}
-                                 disabled={!dirty || isSubmitting}
+                                 disabled={!dirty}
                                  onClick={() => handleSubmit()}
                                  size="small"
                                  variant="contained"
