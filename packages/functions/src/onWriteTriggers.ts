@@ -47,7 +47,9 @@ export const syncLivestreams = functions
                `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
             )
             sideEffectPromises.push(
-               removeAndSyncSparksNotifications(newValue.author.groupId)
+               removeAndSyncSparksNotifications(
+                  newValue.author.groupId || newValue.groupIds?.[0]
+               )
             )
          }
       }
