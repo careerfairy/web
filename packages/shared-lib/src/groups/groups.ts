@@ -43,7 +43,7 @@ export interface Group extends Identifiable {
    companyIndustries?: GroupOption[]
    companySize?: string
    targetedCountries?: GroupOption[]
-   targetedUniversities?: GroupOption[]
+   targetedUniversities?: GroupTargetUniversity[]
    targetedFieldsOfStudy?: GroupOption[]
 
    /*
@@ -69,6 +69,10 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+}
+
+export type GroupTargetUniversity = GroupOption & {
+   country: string
 }
 
 export interface Testimonial extends Identifiable {
