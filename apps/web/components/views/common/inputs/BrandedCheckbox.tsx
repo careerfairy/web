@@ -4,23 +4,6 @@ import { RadioProps } from "@mui/material/Radio"
 import { styled } from "@mui/material/styles"
 import { sxStyles } from "types/commonTypes"
 
-export type BrandedCheckboxProps = Omit<RadioProps, "variant">
-
-const BrandedCheckbox = styled((props: BrandedCheckboxProps) => (
-   <Checkbox
-      color={"default"}
-      icon={<Box sx={styles.checkboxIconWrapper} />}
-      checkedIcon={
-         <Box sx={styles.checkboxIconWrapper}>
-            <CheckRoundedIcon sx={styles.dotIcon} fontSize={"small"} />
-         </Box>
-      }
-      {...props}
-   />
-))(({ theme }) => ({
-   color: theme.palette.mode === "dark" ? undefined : "black !important",
-}))
-
 const styles = sxStyles({
    checkboxIconWrapper: {
       width: 24,
@@ -38,5 +21,22 @@ const styles = sxStyles({
       color: "black",
    },
 })
+
+export type BrandedCheckboxProps = Omit<RadioProps, "variant">
+
+const BrandedCheckbox = styled((props: BrandedCheckboxProps) => (
+   <Checkbox
+      color={"default"}
+      icon={<Box sx={styles.checkboxIconWrapper} />}
+      checkedIcon={
+         <Box sx={styles.checkboxIconWrapper}>
+            <CheckRoundedIcon sx={styles.dotIcon} fontSize={"small"} />
+         </Box>
+      }
+      {...props}
+   />
+))(({ theme }) => ({
+   color: theme.palette.mode === "dark" ? undefined : "black !important",
+}))
 
 export default BrandedCheckbox
