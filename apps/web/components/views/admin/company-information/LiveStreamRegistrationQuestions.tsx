@@ -1,7 +1,7 @@
 import QuestionnaireCreation from "components/views/admin/company-information/QuestionnaireCreation/QuestionnaireCreation"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import React from "react"
 import SectionComponent from "./SectionComponent"
+import { useMemo } from "react"
 
 const [title, description] = [
    "Live stream registration questions",
@@ -11,11 +11,19 @@ const [title, description] = [
 ]
 
 const LiveStreamRegistrationQuestions = () => {
-   const { groupQuestions } = useGroup()
+   const { groupQuestions, questionsLoaded } = useGroup()
+
+   const initialQuestions = useMemo(
+      () => groupQuestions,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [questionsLoaded]
+   )
 
    return (
       <SectionComponent title={title} description={description}>
-         <QuestionnaireCreation groupQuestions={groupQuestions} />
+         {questionsLoaded ? (
+            <QuestionnaireCreation groupQuestions={initialQuestions} />
+         ) : null}
       </SectionComponent>
    )
 }

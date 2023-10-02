@@ -50,25 +50,6 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
       [questionsForm]
    )
 
-   useEffect(() => {
-      setQuestionsForm((prevQuestionsForm) => {
-         return groupQuestions.map((groupQuestion) => {
-            const existingQuestion = prevQuestionsForm.find(
-               (questionForm) => questionForm.id === groupQuestion.id
-            )
-            return existingQuestion
-               ? {
-                    ...existingQuestion,
-                    ...groupQuestion,
-                 }
-               : {
-                    ...groupQuestion,
-                    isEditMode: true,
-                 }
-         })
-      })
-   }, [groupQuestions])
-
    const addQuestionnarieQuestion = useCallback(() => {
       setQuestionsForm((prev) => {
          const newForm = [
@@ -119,10 +100,25 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
                            setQuestionsForm((prev) => {
                               return prev.map((question) => {
                                  if (question.id === tempId) {
-                                    newQuestion.id = question.id
+                                    return {
+                                       ...question,
+                                       ...newQuestion,
+                                       id: newQuestion.id,
+                                       isEditMode: false,
+                                    }
                                  }
                                  return question
                               })
+                           })
+                        }}
+                        onUpdated={(updatedQuestion) => {
+                           setQuestionsForm((prev) => {
+                              const newForm = [...prev]
+                              newForm[index] = {
+                                 ...updatedQuestion,
+                                 isEditMode: false,
+                              }
+                              return newForm
                            })
                         }}
                      />
