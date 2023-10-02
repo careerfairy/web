@@ -97,6 +97,7 @@ const csp = {
       "ws:",
       "wss:",
       "https://noembed.com", // for react-player thumbnail
+      "blob:",
    ],
    "img-src": [
       "'self'",
