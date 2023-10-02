@@ -5,7 +5,14 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik, FormikHelpers } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, ReactElement, useEffect, useRef, useState } from "react"
+import {
+   FC,
+   ReactElement,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import { Trash2 as DeleteIcon, Edit2, PlusCircle, Save } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
@@ -85,58 +92,75 @@ const RegistrationQuestion: FC<Props> = ({
 
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   const handleRemoveQuestion = async (groupQuestionId: string) => {
-      if (!isNew) {
+   const handleRemoveQuestion = useCallback(
+      async (groupQuestionId: string) => {
+         if (!isNew) {
+            try {
+               setIsDeleting(true)
+               await groupRepo.deleteGroupQuestion(group.id, groupQuestionId)
+               successNotification("Question removed")
+               setIsDeleting(false)
+            } catch (e) {
+               errorNotification(e, "An error has occured")
+               setIsDeleting(false)
+            }
+         }
+         onRemove(groupQuestionId)
+      },
+      [errorNotification, group.id, isNew, onRemove, successNotification]
+   )
+
+   const onSubmit = useCallback(
+      async (
+         values: FormValues,
+         { resetForm }: FormikHelpers<FormValues>
+      ): Promise<void> => {
          try {
-            setIsDeleting(true)
-            await groupRepo.deleteGroupQuestion(group.id, groupQuestionId)
-            successNotification("Question removed")
-            setIsDeleting(false)
+            if (isNew) {
+               const newQuestion = await groupRepo.addNewGroupQuestion(
+                  group.id,
+                  values
+               )
+               resetForm({ values: newQuestion })
+               onCreated(values.id, newQuestion)
+               successNotification("New Question added")
+            } else {
+               await groupRepo.updateGroupQuestion(group.id, values)
+
+               setInputMode(false)
+               resetForm({ values, isSubmitting: false })
+               onUpdated(values)
+               successNotification("Question updated")
+            }
          } catch (e) {
-            errorNotification(e, "An error has occured")
-            setIsDeleting(false)
+            if (isMounted.current) {
+               errorNotification(e, "An error has occured")
+            }
          }
-      }
-      onRemove(groupQuestionId)
-   }
+      },
+      [
+         errorNotification,
+         group.id,
+         isNew,
+         onCreated,
+         onUpdated,
+         setInputMode,
+         successNotification,
+      ]
+   )
 
-   const onSubmit = async (
-      values: FormValues,
-      { resetForm }: FormikHelpers<FormValues>
-   ): Promise<void> => {
-      try {
-         if (isNew) {
-            const newQuestion = await groupRepo.addNewGroupQuestion(
-               group.id,
-               values
-            )
-            resetForm({ values: newQuestion })
-            onCreated(values.id, newQuestion)
-            successNotification("New Question added")
-         } else {
-            await groupRepo.updateGroupQuestion(group.id, values)
-
-            setInputMode(false)
-            resetForm({ values, isSubmitting: false })
-            onUpdated(values)
-            successNotification("Question updated")
-         }
-      } catch (e) {
-         if (isMounted.current) {
-            errorNotification(e, "An error has occured")
-         }
-      }
-   }
-
-   const handleAddOption = (
-      question: GroupQuestion,
-      setFieldValue: FormikHelpers<FormValues>["setFieldValue"]
-   ) => {
-      const newOption = createAGroupQuestionOption()
-      const newOptions = { ...question.options }
-      newOptions[newOption.id] = newOption
-      setFieldValue("options", newOptions)
-   }
+   const handleAddOption = useCallback(
+      (
+         question: GroupQuestion,
+         setFieldValue: FormikHelpers<FormValues>["setFieldValue"]
+      ) => {
+         const newOption = createAGroupQuestionOption()
+         const newOptions = { ...question.options }
+         newOptions[newOption.id] = newOption
+         setFieldValue("options", newOptions)
+      },
+      []
+   )
 
    return (
       <Formik<FormValues>

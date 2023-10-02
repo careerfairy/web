@@ -83,6 +83,40 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
       })
    }
 
+   const handleQuestionCreated = useCallback(
+      (tempId: string, newQuestion: GroupQuestion) => {
+         setQuestionsForm((prev) => {
+            return prev.map((question) => {
+               if (question.id === tempId) {
+                  return {
+                     ...question,
+                     ...newQuestion,
+                     id: newQuestion.id,
+                     isEditMode: false,
+                  }
+               }
+               return question
+            })
+         })
+      },
+      []
+   )
+
+   const handleQuestionUpdated = useCallback((newQuestion: GroupQuestion) => {
+      setQuestionsForm((prev) => {
+         return prev.map((question) => {
+            if (question.id === newQuestion.id) {
+               return {
+                  ...question,
+                  ...newQuestion,
+                  isEditMode: false,
+               }
+            }
+            return question
+         })
+      })
+   }, [])
+
    return (
       <Stack spacing={2} sx={styles.stack}>
          <Stack width="100%" spacing={2} component={TransitionGroup}>
@@ -96,31 +130,8 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
                            handleSetEditMode(value, index)
                         }
                         onRemove={handleQuestionRemove}
-                        onCreated={(tempId, newQuestion) => {
-                           setQuestionsForm((prev) => {
-                              return prev.map((question) => {
-                                 if (question.id === tempId) {
-                                    return {
-                                       ...question,
-                                       ...newQuestion,
-                                       id: newQuestion.id,
-                                       isEditMode: false,
-                                    }
-                                 }
-                                 return question
-                              })
-                           })
-                        }}
-                        onUpdated={(updatedQuestion) => {
-                           setQuestionsForm((prev) => {
-                              const newForm = [...prev]
-                              newForm[index] = {
-                                 ...updatedQuestion,
-                                 isEditMode: false,
-                              }
-                              return newForm
-                           })
-                        }}
+                        onCreated={handleQuestionCreated}
+                        onUpdated={handleQuestionUpdated}
                      />
                   </Box>
                </Collapse>
