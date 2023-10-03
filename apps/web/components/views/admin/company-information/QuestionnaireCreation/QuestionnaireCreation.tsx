@@ -12,7 +12,6 @@ import { Collapse } from "@mui/material"
 const styles = sxStyles({
    stack: {
       display: "flex",
-      p: 2,
       flexDirection: "column",
       alignItems: "flex-end",
       alignSelf: "stretch",
