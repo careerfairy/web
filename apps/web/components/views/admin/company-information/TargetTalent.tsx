@@ -61,9 +61,7 @@ const TargetTalent: FC = () => {
    const handleSubmit = async (values: FormValues) => {
       try {
          await groupRepo.updateGroupMetadata(group.id, values)
-         successNotification(
-            "Your company target talent were successfully updated"
-         )
+         successNotification("Your target talent were successfully updated")
       } catch (e) {
          errorNotification(e, "An error has occurred during the save")
       }
