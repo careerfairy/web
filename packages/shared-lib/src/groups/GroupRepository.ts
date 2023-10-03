@@ -152,6 +152,8 @@ export interface IGroupRepository {
          | "targetedCountries"
          | "targetedUniversities"
          | "targetedFieldsOfStudy"
+         | "privacyPolicyActive"
+         | "privacyPolicyUrl"
       >
    ): Promise<void>
 
@@ -829,6 +831,8 @@ export class FirebaseGroupRepository
          | "targetedCountries"
          | "targetedUniversities"
          | "targetedFieldsOfStudy"
+         | "privacyPolicyActive"
+         | "privacyPolicyUrl"
       >
    ): Promise<void> {
       const groupRef = this.firestore
