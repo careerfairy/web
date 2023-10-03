@@ -69,7 +69,7 @@ const MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS = 320
 type Props = {
    job: PublicCustomJob
    handleRemoveJob: (jobId: string) => void
-   handleEditJob: (job: PublicCustomJob) => void
+   handleEditJob: (job: PublicCustomJob) => Promise<void>
 }
 const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
@@ -96,8 +96,8 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    }, [handleClose])
 
    const handleUpdateJob = useCallback(
-      (job: PublicCustomJob) => {
-         handleEditJob(job)
+      async (job: PublicCustomJob) => {
+         await handleEditJob(job)
 
          setEditMode(false)
          handleClose()
