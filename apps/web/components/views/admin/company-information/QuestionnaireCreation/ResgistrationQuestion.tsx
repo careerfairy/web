@@ -10,6 +10,7 @@ import {
    ReactElement,
    useCallback,
    useEffect,
+   useMemo,
    useRef,
    useState,
 } from "react"
@@ -19,6 +20,11 @@ import * as Yup from "yup"
 import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
 import QuestionOption from "./QuestionOption"
 import { createAGroupQuestionOption } from "./QuestionaireCreationUtils"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
+import BaseStyles from "../BaseStyles"
 
 const styles = sxStyles({
    form: {
@@ -76,7 +82,21 @@ const RegistrationQuestion: FC<Props> = ({
    onCreated,
    onUpdated,
 }): ReactElement => {
+   const { group } = useGroup()
+
    const isMounted = useRef(true)
+
+   const [
+      confirmDeleteQuestionDialogOpen,
+      handleOpenConfirmDeleteQuestionDialogOpen,
+      handleCloseConfirmDeleteQuestionDialogOpen,
+   ] = useDialogStateHandler()
+
+   const { successNotification, errorNotification } = useSnackbarNotifications()
+
+   const [isDeleting, setIsDeleting] = useState(false)
+
+   const isNew = initialValues.id.startsWith("temp-")
 
    useEffect(() => {
       return () => {
@@ -84,31 +104,35 @@ const RegistrationQuestion: FC<Props> = ({
       }
    }, [])
 
-   const { group } = useGroup()
-
-   const isNew = initialValues.id.startsWith("temp-")
-
-   const [isDeleting, setIsDeleting] = useState(false)
-
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-
-   const handleRemoveQuestion = useCallback(
-      async (groupQuestionId: string) => {
-         if (!isNew) {
-            try {
-               setIsDeleting(true)
-               await groupRepo.deleteGroupQuestion(group.id, groupQuestionId)
-               successNotification("Question removed")
-               setIsDeleting(false)
-            } catch (e) {
-               errorNotification(e, "An error has occured")
-               setIsDeleting(false)
-            }
+   const handleRemoveQuestion = useCallback(async () => {
+      if (!isNew) {
+         try {
+            setIsDeleting(true)
+            await groupRepo.deleteGroupQuestion(group.id, initialValues.id)
+            successNotification("Question removed")
+            setIsDeleting(false)
+         } catch (e) {
+            errorNotification(e, "An error has occured")
+            setIsDeleting(false)
          }
-         onRemove(groupQuestionId)
-      },
-      [errorNotification, group.id, isNew, onRemove, successNotification]
-   )
+      }
+      onRemove(initialValues.id)
+   }, [
+      errorNotification,
+      group.id,
+      initialValues.id,
+      isNew,
+      onRemove,
+      successNotification,
+   ])
+
+   const handleClickRemoveQuestion = useCallback(() => {
+      if (!isNew) {
+         handleOpenConfirmDeleteQuestionDialogOpen()
+      } else {
+         handleRemoveQuestion()
+      }
+   }, [handleOpenConfirmDeleteQuestionDialogOpen, handleRemoveQuestion, isNew])
 
    const onSubmit = useCallback(
       async (
@@ -162,6 +186,26 @@ const RegistrationQuestion: FC<Props> = ({
       []
    )
 
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Cancel",
+         callback: handleCloseConfirmDeleteQuestionDialogOpen,
+         variant: "text",
+         color: "grey",
+      }),
+      [handleCloseConfirmDeleteQuestionDialogOpen]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Delete",
+         callback: handleRemoveQuestion,
+         variant: "contained",
+         color: "error",
+      }),
+      [handleRemoveQuestion]
+   )
+
    return (
       <Formik<FormValues>
          initialValues={initialValues}
@@ -169,101 +213,122 @@ const RegistrationQuestion: FC<Props> = ({
          validationSchema={validationSchema}
          enableReinitialize
       >
-         {({ values, setFieldValue, dirty, isSubmitting, handleSubmit }) => {
-            return (
-               <Form style={styles.form}>
-                  <Stack sx={styles.stack}>
-                     <Box p={2} pb={0.75}>
-                        {inputMode ? (
-                           <BrandedTextFieldField
-                              label="Question"
-                              placeholder="Insert your question here"
-                              name={"name"}
-                              fullWidth
-                           />
-                        ) : (
-                           <>
-                              <Typography sx={styles.options}>
-                                 {values.name}
-                              </Typography>
-                              <Box sx={styles.editIcon}>
-                                 <IconButton
-                                    size="small"
-                                    onClick={() => setInputMode(true)}
-                                 >
-                                    <Edit2 size="1rem" color="#A0A0A0" />
-                                 </IconButton>
-                              </Box>
-                           </>
-                        )}
-                     </Box>
-                     {Object.values(values.options).map((option, index) => (
-                        <QuestionOption
-                           key={`${values.id}${index}`}
-                           cardinal={index + 1}
-                           name={`options.${option.id}.name`}
-                           editing={inputMode}
-                           value={option.name}
-                           lastItem={
-                              Object.keys(values.options).length === index + 1
-                           }
-                           canDelete={index > 1}
-                           onDelete={() => {
-                              const canDelete = index > 1
-
-                              if (canDelete) {
-                                 const newOptions = { ...values.options }
-                                 delete newOptions[option.id]
-                                 setFieldValue("options", newOptions)
-                              }
-                           }}
-                        />
-                     ))}
-
+         {({
+            values,
+            setFieldValue,
+            dirty,
+            isSubmitting,
+            handleSubmit,
+            isValid,
+         }) => (
+            <Form style={styles.form}>
+               {confirmDeleteQuestionDialogOpen ? (
+                  <ConfirmationDialog
+                     open={confirmDeleteQuestionDialogOpen}
+                     handleClose={handleCloseConfirmDeleteQuestionDialogOpen}
+                     title={"Delete question"}
+                     description={`The question "${initialValues.name}" is being used. If you delete it, it will be removed from all the associated live streams.`}
+                     icon={
+                        <Box sx={BaseStyles.deleteIcon}>
+                           <DeleteIcon />
+                        </Box>
+                     }
+                     primaryAction={primaryAction}
+                     secondaryAction={secondaryAction}
+                  />
+               ) : null}
+               <Stack sx={styles.stack}>
+                  <Box p={2} pb={0.75}>
                      {inputMode ? (
-                        <Stack mt={1} width="100%">
-                           <Button
-                              sx={styles.addOptionButton}
-                              startIcon={<PlusCircle />}
-                              color="secondary"
-                              variant="outlined"
-                              onClick={() =>
-                                 handleAddOption(values, setFieldValue)
-                              }
-                           >
-                              Add an option
-                           </Button>
-                           <Box sx={styles.actionButtons}>
-                              <LoadingButton
-                                 endIcon={<DeleteIcon />}
-                                 color="error"
-                                 variant="outlined"
+                        <BrandedTextFieldField
+                           label="Question"
+                           placeholder="Insert your question here"
+                           name={"name"}
+                           fullWidth
+                        />
+                     ) : (
+                        <>
+                           <Typography sx={styles.options}>
+                              {values.name}
+                           </Typography>
+                           <Box sx={styles.editIcon}>
+                              <IconButton
                                  size="small"
-                                 loading={isDeleting}
-                                 sx={[styles.btn, styles.deleteBtn]}
-                                 onClick={() => handleRemoveQuestion(values.id)}
+                                 onClick={() => setInputMode(true)}
                               >
-                                 Remove question
-                              </LoadingButton>
-                              <LoadingButton
-                                 endIcon={<Save />}
-                                 loading={isSubmitting}
-                                 disabled={!dirty}
-                                 onClick={() => handleSubmit()}
-                                 size="small"
-                                 variant="contained"
-                                 color="secondary"
-                                 sx={styles.btn}
-                              >
-                                 Save
-                              </LoadingButton>
+                                 <Edit2 size="1rem" color="#A0A0A0" />
+                              </IconButton>
                            </Box>
-                        </Stack>
-                     ) : null}
-                  </Stack>
-               </Form>
-            )
-         }}
+                        </>
+                     )}
+                  </Box>
+                  {Object.values(values.options).map((option, index) => (
+                     <QuestionOption
+                        key={`${values.id}${index}`}
+                        cardinal={index + 1}
+                        name={`options.${option.id}.name`}
+                        editing={inputMode}
+                        value={option.name}
+                        isInUse={initialValues.options[option.id] !== undefined}
+                        lastItem={
+                           Object.keys(values.options).length === index + 1
+                        }
+                        canDelete={index > 1}
+                        onDelete={() => {
+                           const canDelete = index > 1
+
+                           if (canDelete) {
+                              const newOptions = { ...values.options }
+                              delete newOptions[option.id]
+                              setFieldValue("options", newOptions)
+                           }
+                        }}
+                     />
+                  ))}
+
+                  {inputMode ? (
+                     <Stack mt={1} width="100%">
+                        <Button
+                           sx={styles.addOptionButton}
+                           startIcon={<PlusCircle />}
+                           color="secondary"
+                           variant="outlined"
+                           onClick={() =>
+                              handleAddOption(values, setFieldValue)
+                           }
+                        >
+                           Add an option
+                        </Button>
+                        <Box sx={styles.actionButtons}>
+                           <LoadingButton
+                              endIcon={<DeleteIcon />}
+                              color="error"
+                              variant="outlined"
+                              size="small"
+                              loading={isDeleting}
+                              sx={[styles.btn, styles.deleteBtn]}
+                              onClick={handleClickRemoveQuestion}
+                           >
+                              Remove question
+                           </LoadingButton>
+                           <LoadingButton
+                              endIcon={<Save />}
+                              loading={isSubmitting}
+                              disabled={!dirty || !isValid}
+                              onClick={() => handleSubmit()}
+                              size="small"
+                              variant="contained"
+                              color="secondary"
+                              sx={styles.btn}
+                           >
+                              Save
+                           </LoadingButton>
+                        </Box>
+                     </Stack>
+                  ) : null}
+               </Stack>
+            </Form>
+         )}
       </Formik>
    )
 }
@@ -290,6 +355,30 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
             shape[key] = groupQuestionOptionSchema
             return shape
          }, {})
+      ).test(
+         "no-duplicates",
+         "Duplicate options are not allowed",
+         (options) => {
+            const optionNames = Object.values(options).map(
+               (option) => option.name
+            )
+            const duplicates = optionNames.filter(
+               (name, index) => optionNames.indexOf(name) !== index
+            )
+            if (duplicates.length > 0) {
+               const optionId = Object.keys(options).find(
+                  (key) => options[key].name === duplicates[0]
+               )
+               const path = `options.${optionId}.name`
+
+               throw new Yup.ValidationError(
+                  "Duplicate options are not allowed",
+                  null,
+                  path
+               )
+            }
+            return true
+         }
       )
    ),
 })

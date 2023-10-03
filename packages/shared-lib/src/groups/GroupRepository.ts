@@ -1,7 +1,6 @@
 import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
-   createGenericConverter,
    mapFirestoreDocuments,
    OnSnapshotCallback,
    Unsubscribe,

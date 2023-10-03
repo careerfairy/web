@@ -1,10 +1,20 @@
-import { Box, Stack, Typography } from "@mui/material"
-import { ReactElement } from "react"
+import { Delete } from "@mui/icons-material"
+import {
+   Box,
+   IconButton,
+   InputAdornment,
+   Stack,
+   Typography,
+} from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import ConfirmationDialog, {
+   ConfirmationDialogAction,
+} from "materialUI/GlobalModals/ConfirmationDialog"
+import { useMemo } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
-import { InputAdornment } from "@mui/material"
-import { IconButton } from "@mui/material"
-import { Delete } from "@mui/icons-material"
+import BaseStyles from "../BaseStyles"
 
 const styles = sxStyles({
    root: {
@@ -21,13 +31,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   cardinal?: number
-   editing?: boolean
-   lastItem?: boolean
+   cardinal: number
+   editing: boolean
+   lastItem: boolean
    value: string
    name: string
    onDelete: () => void
-   canDelete?: boolean
+   canDelete: boolean
+   isInUse: boolean
 }
 
 const QuestionOption: React.FC<Props> = ({
@@ -38,43 +49,103 @@ const QuestionOption: React.FC<Props> = ({
    name,
    onDelete,
    canDelete,
-}): ReactElement => {
-   return editing ? (
-      <Box px={2} py={0.75}>
-         <BrandedTextFieldField
-            label={`Question option ${cardinal ?? 1}`}
-            placeholder="Insert your question here"
-            name={name}
-            fullWidth
-            InputProps={{
-               endAdornment: canDelete ? (
-                  <InputAdornment position="end">
-                     <IconButton
-                        aria-label="delete option"
-                        onClick={onDelete}
-                        edge="end"
-                        disabled={!canDelete}
-                     >
-                        <Delete />
-                     </IconButton>
-                  </InputAdornment>
-               ) : null,
-            }}
-         />
-      </Box>
-   ) : (
-      <Stack
-         sx={[
-            styles.root,
-            {
-               borderBottom: lastItem ? "none" : "1px solid #EEE",
-            },
-         ]}
-         spacing={1}
-      >
-         <Typography sx={styles.optionsLabel}>Option {cardinal}</Typography>
-         <Typography sx={styles.optionValue}>{value}</Typography>
-      </Stack>
+   isInUse,
+}) => {
+   const [
+      confirmDeleteOptionDialogOpen,
+      handleOpenConfirmDeleteOptionDialogOpen,
+      handleCloseConfirmDeleteOptionDialogOpen,
+   ] = useDialogStateHandler()
+
+   const handleClickDelete = () => {
+      console.log({
+         isInUse,
+         value,
+      })
+      if (isInUse) {
+         handleOpenConfirmDeleteOptionDialogOpen()
+      } else {
+         onDelete()
+      }
+   }
+
+   const primaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Cancel",
+         callback: handleCloseConfirmDeleteOptionDialogOpen,
+         variant: "text",
+         color: "grey",
+      }),
+      [handleCloseConfirmDeleteOptionDialogOpen]
+   )
+
+   const secondaryAction = useMemo<ConfirmationDialogAction>(
+      () => ({
+         text: "Delete",
+         callback: onDelete,
+         variant: "contained",
+         color: "error",
+      }),
+      [onDelete]
+   )
+
+   return (
+      <>
+         {confirmDeleteOptionDialogOpen ? (
+            <ConfirmationDialog
+               open={confirmDeleteOptionDialogOpen}
+               handleClose={handleCloseConfirmDeleteOptionDialogOpen}
+               title={"Delete option"}
+               description={`The option "${value}" is being used. If you delete it, it will be removed from all the associated questions.`}
+               icon={
+                  <Box sx={BaseStyles.deleteIcon}>
+                     <DeleteIcon />
+                  </Box>
+               }
+               primaryAction={primaryAction}
+               secondaryAction={secondaryAction}
+            />
+         ) : null}
+         {editing ? (
+            <Box px={2} py={0.75}>
+               <BrandedTextFieldField
+                  label={`Question option ${cardinal ?? 1}`}
+                  placeholder="Insert your question here"
+                  name={name}
+                  fullWidth
+                  InputProps={{
+                     endAdornment: canDelete ? (
+                        <InputAdornment position="end">
+                           <IconButton
+                              aria-label="delete option"
+                              onClick={handleClickDelete}
+                              edge="end"
+                              disabled={!canDelete}
+                           >
+                              <Delete />
+                           </IconButton>
+                        </InputAdornment>
+                     ) : null,
+                  }}
+               />
+            </Box>
+         ) : (
+            <Stack
+               sx={[
+                  styles.root,
+                  {
+                     borderBottom: lastItem ? "none" : "1px solid #EEE",
+                  },
+               ]}
+               spacing={1}
+            >
+               <Typography sx={styles.optionsLabel}>
+                  Option {cardinal}
+               </Typography>
+               <Typography sx={styles.optionValue}>{value}</Typography>
+            </Stack>
+         )}
+      </>
    )
 }
 
