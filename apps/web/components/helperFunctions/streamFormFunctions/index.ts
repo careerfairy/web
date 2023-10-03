@@ -49,24 +49,6 @@ export const getStreamSubCollectionSpeakers = (
    }
 }
 
-export const getGroupSubCollectionJobs = (
-   jobsQuery
-): Record<string, PublicCustomJob> => {
-   if (jobsQuery.empty) {
-      return null
-   }
-
-   let jobsObj: Record<string, PublicCustomJob> = {}
-
-   jobsQuery.forEach((query) => {
-      let job = query.data()
-      job.id = query.id
-      jobsObj[job.id] = job
-   })
-
-   return jobsObj
-}
-
 export const handleAddSection = (objName, values, setValues, newSection) => {
    const newValues = { ...values }
    newValues[objName][uuidv4()] = newSection

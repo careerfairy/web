@@ -22,9 +22,9 @@ export interface CustomJob extends Identifiable {
    // applicants ids
    applicants?: string[]
    // livestreams ids where this job opening is shown
-   livestreams?: string[]
+   livestreams: string[]
    //increases every time a talent clicks on the jobPostingUrl
-   clicks?: number
+   clicks: number
 }
 
 export type PublicCustomJob = Pick<

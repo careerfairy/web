@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { groupRepo } from "../../../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -198,8 +199,7 @@ const NewStreamModal = ({
             values,
             updateMode,
             draftStreamId,
-            firebase,
-            group.id
+            firebase
          )
          if (status === SAVE_WITH_NO_VALIDATION) {
             const newStatus = {}
@@ -231,6 +231,13 @@ const NewStreamModal = ({
 
          if (publishDraft) {
             await handlePublishDraft(livestream, promotion)
+
+            // When publishing a draft, our goal is to associate the current livestream with all selected job openings
+            await groupRepo.addLivestreamToMultipleCustomJobGroup(
+               group.id,
+               livestream.customJobs.map((job) => job.id),
+               livestream.id
+            )
             setPublishDraft(false)
             return
          }
@@ -247,11 +254,21 @@ const NewStreamModal = ({
                   email: authenticatedUser.email,
                }
             }
+
             await firebase.updateLivestream(
                livestream,
                targetCollection,
                promotion
             )
+
+            if (isActualLivestream) {
+               // When updating a livestream, our goal is to associate the current livestream with all selected job openings
+               await groupRepo.addLivestreamToMultipleCustomJobGroup(
+                  group.id,
+                  livestream.customJobs.map((job) => job.id),
+                  livestream.id
+               )
+            }
          } else {
             const author = {
                groupId: group.id,
