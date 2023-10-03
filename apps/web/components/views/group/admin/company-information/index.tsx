@@ -4,8 +4,8 @@ import { Box, Container, Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import CompanyIdentity from "components/views/admin/company-information/CompanyIdentity"
 import CompanyDetails from "components/views/admin/company-information/CompanyDetails"
+import TargetTalent from "components/views/admin/company-information/TargetTalent"
 // import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
-// import TargetTalent from "../../../admin/company-information/TargetTalent"
 // import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
 
 const styles = sxStyles({
@@ -41,7 +41,7 @@ const PageContent = () => {
 
                <CompanyDetails />
 
-               {/* <TargetTalent /> */}
+               <TargetTalent />
 
                {/* <LiveStreamRegistrationQuestions /> */}
 

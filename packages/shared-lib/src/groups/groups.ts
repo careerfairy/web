@@ -42,6 +42,9 @@ export interface Group extends Identifiable {
    companyCountry?: GroupOption
    companyIndustries?: GroupOption[]
    companySize?: string
+   targetedCountries?: GroupOption[]
+   targetedUniversities?: GroupTargetUniversity[]
+   targetedFieldsOfStudy?: GroupOption[]
 
    /*
     * Photos that are displayed on the group company page
@@ -66,6 +69,10 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+}
+
+export type GroupTargetUniversity = GroupOption & {
+   country: string
 }
 
 export interface Testimonial extends Identifiable {
