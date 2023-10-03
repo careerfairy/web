@@ -1,13 +1,13 @@
-import { PlusCircle } from "react-feather"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { PlusCircle } from "react-feather"
 
-import { sxStyles } from "types/commonTypes"
 import { GroupQuestion } from "@careerfairy/shared-lib/groups"
-import RegistrationQuestion from "./ResgistrationQuestion"
-import { createAGroupQuestion } from "./QuestionaireCreationUtils"
-import { TransitionGroup } from "react-transition-group"
 import { Collapse } from "@mui/material"
+import { TransitionGroup } from "react-transition-group"
+import { sxStyles } from "types/commonTypes"
+import { createAGroupQuestion } from "./QuestionaireCreationUtils"
+import RegistrationQuestion from "./ResgistrationQuestion"
 
 const styles = sxStyles({
    stack: {
@@ -40,7 +40,7 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
    const [questionsForm, setQuestionsForm] = useState<QuestionsForm>(() =>
       groupQuestions.map((question) => ({
          ...question,
-         isEditMode: true,
+         isEditMode: false,
       }))
    )
 
@@ -61,12 +61,6 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
          return newForm
       })
    }, [])
-
-   useEffect(() => {
-      if (questionsForm.length === 0 && !hasTempQuestion) {
-         addQuestionnarieQuestion()
-      }
-   }, [addQuestionnarieQuestion, hasTempQuestion, questionsForm.length])
 
    const handleQuestionRemove = (questionId: string) => {
       setQuestionsForm((prevQuestions) =>

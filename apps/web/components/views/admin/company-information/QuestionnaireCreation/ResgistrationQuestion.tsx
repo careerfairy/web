@@ -262,29 +262,32 @@ const RegistrationQuestion: FC<Props> = ({
                         </>
                      )}
                   </Box>
-                  {Object.values(values.options).map((option, index) => (
-                     <QuestionOption
-                        key={`${values.id}${index}`}
-                        cardinal={index + 1}
-                        name={`options.${option.id}.name`}
-                        editing={inputMode}
-                        value={option.name}
-                        isInUse={initialValues.options[option.id] !== undefined}
-                        lastItem={
-                           Object.keys(values.options).length === index + 1
-                        }
-                        canDelete={index > 1}
-                        onDelete={() => {
-                           const canDelete = index > 1
-
-                           if (canDelete) {
-                              const newOptions = { ...values.options }
-                              delete newOptions[option.id]
-                              setFieldValue("options", newOptions)
+                  {Object.values(values.options).map((option, index, arr) => {
+                     const canDelete = arr.length > 2
+                     return (
+                        <QuestionOption
+                           key={`${values.id}${index}`}
+                           cardinal={index + 1}
+                           name={`options.${option.id}.name`}
+                           editing={inputMode}
+                           value={option.name}
+                           isInUse={
+                              initialValues.options[option.id] !== undefined
                            }
-                        }}
-                     />
-                  ))}
+                           lastItem={
+                              Object.keys(values.options).length === index + 1
+                           }
+                           canDelete={canDelete}
+                           onDelete={() => {
+                              if (canDelete) {
+                                 const newOptions = { ...values.options }
+                                 delete newOptions[option.id]
+                                 setFieldValue("options", newOptions)
+                              }
+                           }}
+                        />
+                     )
+                  })}
 
                   {inputMode ? (
                      <Stack mt={1} width="100%">
@@ -300,17 +303,19 @@ const RegistrationQuestion: FC<Props> = ({
                            Add an option
                         </Button>
                         <Box sx={styles.actionButtons}>
-                           <LoadingButton
-                              endIcon={<DeleteIcon />}
-                              color="error"
-                              variant="outlined"
-                              size="small"
-                              loading={isDeleting}
-                              sx={[styles.btn, styles.deleteBtn]}
-                              onClick={handleClickRemoveQuestion}
-                           >
-                              Remove question
-                           </LoadingButton>
+                           {values.questionType === "custom" ? (
+                              <LoadingButton
+                                 endIcon={<DeleteIcon />}
+                                 color="error"
+                                 variant="outlined"
+                                 size="small"
+                                 loading={isDeleting}
+                                 sx={[styles.btn, styles.deleteBtn]}
+                                 onClick={handleClickRemoveQuestion}
+                              >
+                                 Remove question
+                              </LoadingButton>
+                           ) : null}
                            <LoadingButton
                               endIcon={<Save />}
                               loading={isSubmitting}
