@@ -99,21 +99,19 @@ const SelectorCustomJobsDropDown = ({
                   {children}
                </Paper>
             ),
-            isOptionEqualToValue: (
-               option: PublicCustomJob,
-               value: PublicCustomJob
-            ) => option.id === value.id,
          }}
       />
    )
 }
 
 const getListLabelFn = (option: PublicCustomJob) => (
-   <Typography>{option.title}</Typography>
+   <Typography key={`${option.id}-label`}>{option.title}</Typography>
 )
+
 const getValueFn = (value: any) => {
    return value
 }
+
 const getLabelFn = (value: PublicCustomJob) => {
    return value.title
 }
