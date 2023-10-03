@@ -74,4 +74,10 @@ export default sxStyles({
          gap: "12px",
       },
    },
+   deleteIcon: {
+      "& svg": {
+         fontSize: 60,
+         color: "error.main",
+      },
+   },
 })
