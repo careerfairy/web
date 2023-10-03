@@ -94,5 +94,29 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "ISO Alpha-2 Country code of the user's university at the time of the event"
+   },
+   {
+      "name": "universityName",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Name of the user's university at the time of the event"
+   },
+   {
+      "name": "universityId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "ID of the user's university at the time of the event"
+   },
+   {
+      "name": "fieldOfStudy",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Field of study of the user at the time of the event"
+   },
+   {
+      "name": "levelOfStudy",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Level of study of the user at the time of the event"
    }
 ]
