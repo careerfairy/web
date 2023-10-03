@@ -58,10 +58,6 @@ const QuestionOption: React.FC<Props> = ({
    ] = useDialogStateHandler()
 
    const handleClickDelete = () => {
-      console.log({
-         isInUse,
-         value,
-      })
       if (isInUse) {
          handleOpenConfirmDeleteOptionDialogOpen()
       } else {
@@ -82,11 +78,14 @@ const QuestionOption: React.FC<Props> = ({
    const secondaryAction = useMemo<ConfirmationDialogAction>(
       () => ({
          text: "Delete",
-         callback: onDelete,
+         callback: () => {
+            onDelete()
+            handleCloseConfirmDeleteOptionDialogOpen()
+         },
          variant: "contained",
          color: "error",
       }),
-      [onDelete]
+      [handleCloseConfirmDeleteOptionDialogOpen, onDelete]
    )
 
    return (
@@ -110,7 +109,7 @@ const QuestionOption: React.FC<Props> = ({
             <Box px={2} py={0.75}>
                <BrandedTextFieldField
                   label={`Question option ${cardinal ?? 1}`}
-                  placeholder="Insert your question here"
+                  placeholder="Write an answer option"
                   name={name}
                   fullWidth
                   InputProps={{
