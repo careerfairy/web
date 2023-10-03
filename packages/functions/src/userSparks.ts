@@ -119,6 +119,10 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
                .required(),
             universityCountry: string().nullable(),
             stringTimestamp: string().required(),
+            universityName: string().nullable(),
+            universityId: string().nullable(),
+            fieldOfStudy: string().nullable(),
+            levelOfStudy: string().nullable(),
          })
       ),
    })
@@ -157,6 +161,10 @@ const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload
             sessionId: string().required(),
             universityCountry: string().nullable(),
             stringTimestamp: string().required(),
+            universityName: string().nullable(),
+            universityId: string().nullable(),
+            fieldOfStudy: string().nullable(),
+            levelOfStudy: string().nullable(),
          })
       ),
    })
