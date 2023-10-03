@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useCallback, useMemo } from "react"
+import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
@@ -311,6 +311,10 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const isMobile = useIsMobile()
    const { userData } = useAuth()
 
+   const [clickedComponents, setClickedComponents] = useState(
+      new Set<SocialPlatformType>()
+   )
+
    const { trackEvent } = useSparksFeedTracker()
 
    const shareUrl = useMemo(() => {
@@ -329,28 +333,32 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
 
    const handleTrackShare = useCallback(
       (type: SocialPlatformType) => {
-         switch (type) {
-            case SocialPlatformObject.Copy:
-               trackEvent(SparkEventActions.Share_Clipboard)
-               break
-            case SocialPlatformObject.Facebook:
-               trackEvent(SparkEventActions.Share_Facebook)
-               break
-            case SocialPlatformObject.Linkedin:
-               trackEvent(SparkEventActions.Share_LinkedIn)
-               break
-            case SocialPlatformObject.Whatsapp:
-               trackEvent(SparkEventActions.Share_WhatsApp)
-               break
-            case SocialPlatformObject.X:
-               trackEvent(SparkEventActions.Share_X)
-               break
-            default:
-               trackEvent(SparkEventActions.Share_Other)
-               break
+         if (!clickedComponents.has(type)) {
+            setClickedComponents((prevState) => new Set([...prevState, type]))
+
+            switch (type) {
+               case SocialPlatformObject.Copy:
+                  trackEvent(SparkEventActions.Share_Clipboard)
+                  break
+               case SocialPlatformObject.Facebook:
+                  trackEvent(SparkEventActions.Share_Facebook)
+                  break
+               case SocialPlatformObject.Linkedin:
+                  trackEvent(SparkEventActions.Share_LinkedIn)
+                  break
+               case SocialPlatformObject.Whatsapp:
+                  trackEvent(SparkEventActions.Share_WhatsApp)
+                  break
+               case SocialPlatformObject.X:
+                  trackEvent(SparkEventActions.Share_X)
+                  break
+               default:
+                  trackEvent(SparkEventActions.Share_Other)
+                  break
+            }
          }
       },
-      [trackEvent]
+      [clickedComponents, trackEvent]
    )
 
    const handleShare = useCallback(async () => {
@@ -363,6 +371,11 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
       }
    }, [handleOpenShareDialog, isMobile, shareData, trackEvent])
 
+   const handleClose = useCallback(() => {
+      handleCloseShareDialog()
+      setClickedComponents(new Set())
+   }, [handleCloseShareDialog])
+
    return (
       <>
          <Action
@@ -373,7 +386,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
          />
          <SparksShareDialog
             isOpen={isShareDialogOpen}
-            handleClose={handleCloseShareDialog}
+            handleClose={handleClose}
             shareUrl={shareUrl}
             onShareOptionClick={handleTrackShare}
          />
