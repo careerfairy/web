@@ -71,8 +71,8 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
    )
    const sessionId = useMemo(() => {
       if (!currentSparkId) return null
-      return generatSessionId(currentSparkId)
-   }, [currentSparkId])
+      return generatSessionId(currentSparkId, visitorId)
+   }, [currentSparkId, visitorId])
 
    const trackEvent = useCallback(
       (event: SparkEventActionType) => {
@@ -102,6 +102,10 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             sparkId: currentSparkId,
             referrer,
             universityCountry: userData?.universityCountryCode || null,
+            fieldOfStudy: userData?.fieldOfStudy?.id || null,
+            levelOfStudy: userData?.levelOfStudy?.id || null,
+            universityId: userData?.university?.code || null,
+            universityName: userData?.university?.name || null,
             sessionId,
             stringTimestamp: new Date().toISOString(),
          }
@@ -153,10 +157,14 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
       },
       [
          currentSparkId,
-         router.query,
          visitorId,
+         router.query,
          originalSparkId,
          userData?.universityCountryCode,
+         userData?.fieldOfStudy?.id,
+         userData?.levelOfStudy?.id,
+         userData?.university?.code,
+         userData?.university?.name,
          sessionId,
          addEventToBatch,
       ]
@@ -178,6 +186,10 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             universityCountry: userData?.universityCountryCode || null,
             stringTimestamp: new Date().toISOString(),
             visitorId,
+            fieldOfStudy: userData?.fieldOfStudy?.id || null,
+            levelOfStudy: userData?.levelOfStudy?.id || null,
+            universityId: userData?.university?.code || null,
+            universityName: userData?.university?.name || null,
          }
          addSecondsWatchedToBatch(secondWatched)
       },
@@ -185,6 +197,10 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
          addSecondsWatchedToBatch,
          currentSparkId,
          sessionId,
+         userData?.fieldOfStudy?.id,
+         userData?.levelOfStudy?.id,
+         userData?.university?.code,
+         userData?.university?.name,
          userData?.universityCountryCode,
          visitorId,
       ]
@@ -212,9 +228,9 @@ export const useSparksFeedTracker = () => {
    return context
 }
 
-const generatSessionId = (sparkId: string) => {
+const generatSessionId = (sparkId: string, visitorId: string) => {
    const timestamp = new Date().toISOString()
-   return `spark-${sparkId}-${timestamp}-${uuidv4()}`
+   return `spark-${sparkId}-${timestamp}-${uuidv4()}-${visitorId || ""}`
 }
 
 export default SparksFeedTrackerProvider
