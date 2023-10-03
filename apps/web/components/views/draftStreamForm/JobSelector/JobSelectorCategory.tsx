@@ -1,32 +1,12 @@
-import React, { Dispatch, useCallback, useMemo } from "react"
+import React, { Dispatch, useEffect, useMemo, useState } from "react"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"
-import JobsInfoSection from "./JobsInfoSection"
-import { FormikErrors, FormikTouched, FormikValues } from "formik"
-import { ICustomJobObj } from "../DraftStreamForm"
-import {
-   handleAddSection,
-   handleErrorSection,
-} from "../../../helperFunctions/streamFormFunctions"
-import FormGroup from "../FormGroup"
-import { Box, Button, Grid, Typography } from "@mui/material"
-import { PlusCircle } from "react-feather"
-import { sxStyles } from "../../../../types/commonTypes"
-
-const styles = sxStyles({
-   addJob: {
-      borderRadius: "10px",
-      height: (theme) => theme.spacing(10),
-      border: "dashed",
-      borderColor: (theme) => theme.palette.grey.A400,
-
-      "&:hover": {
-         border: "dashed",
-      },
-   },
-})
+import { FormikValues } from "formik"
+import CustomJobSection from "./customJobsSection/CustomJobSection"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { groupRepo } from "../../../../data/RepositoryInstances"
 
 type Props = {
    groupId: string
@@ -34,14 +14,9 @@ type Props = {
    selectedItems: LivestreamJobAssociation[]
    sectionRef: any
    classes: any
-   customJobObj: ICustomJobObj
    values: FormikValues
-   setValues: (values: any) => void
-   errors: FormikErrors<FormikValues>
-   touched: FormikTouched<FormikValues>
    setFieldValue: (field: string, value: any) => void
    isSubmitting: boolean
-   handleBlur: (e) => void
 }
 
 /**
@@ -50,20 +25,6 @@ type Props = {
  *
  * It will fetch all jobs from all accounts
  *
- * @param groupId
- * @param onSelectItems
- * @param selectedItems
- * @param sectionRef
- * @param classes
- * @param customJobObj
- * @param values
- * @param setValues
- * @param errors
- * @param touched
- * @param setFieldValue
- * @param isSubmitting
- * @param handleBlur
- * @constructor
  */
 const JobSelectorCategory = ({
    groupId,
@@ -71,128 +32,27 @@ const JobSelectorCategory = ({
    selectedItems,
    sectionRef,
    classes,
-   customJobObj,
    values,
-   setValues,
-   errors,
-   touched,
    setFieldValue,
    isSubmitting,
-   handleBlur,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
+   const [allOptions, setAllOptions] = useState<PublicCustomJob[]>([])
 
-   // TODO tO be uncomment
+   useEffect(() => {
+      ;(async () => {
+         const groupJobs = await groupRepo.getAllCustomJobsFromGroup(groupId)
+
+         if (groupJobs.length) {
+            setAllOptions(groupJobs)
+         }
+      })()
+   }, [groupId, values.customJobs])
+
    // First sync should be complete to fetch the jobs
-   // const filteredAccounts = useMemo(() => {
-   //    return accounts.filter((account) => account.firstSyncCompletedAt)
-   // }, [accounts])
-
-   // // Only display the selector if the Group has ATS accounts linked with first sync complete
-   // if (filteredAccounts.length === 0) {
-   //    return null
-   // }
-
-   const filteredAccounts = []
-
-   const renderJobSection = useCallback(() => {
-      return (
-         <>
-            <Box>
-               <Typography fontWeight="bold" variant="h4">
-                  Jobs
-               </Typography>
-               <Typography variant="subtitle1" mt={1} color="textSecondary">
-                  Create and insert all job openings that you want to share with
-                  the talent community!
-               </Typography>
-            </Box>
-
-            <FormGroup container boxShadow={0} spacing={4}>
-               {Object.keys(values.customJobs).map((key, index) => (
-                  <JobsInfoSection
-                     key={key}
-                     index={index}
-                     setValues={setValues}
-                     objectKey={key}
-                     titleError={handleErrorSection(
-                        "customJobs",
-                        key,
-                        "title",
-                        errors,
-                        touched
-                     )}
-                     salaryError={handleErrorSection(
-                        "customJobs",
-                        key,
-                        "salary",
-                        errors,
-                        touched
-                     )}
-                     descriptionError={handleErrorSection(
-                        "customJobs",
-                        key,
-                        "description",
-                        errors,
-                        touched
-                     )}
-                     postingUrlError={handleErrorSection(
-                        "customJobs",
-                        key,
-                        "postingUrl",
-                        errors,
-                        touched
-                     )}
-                     jobTypeError={handleErrorSection(
-                        "customJobs",
-                        key,
-                        "jobType",
-                        errors,
-                        touched
-                     )}
-                     job={values.customJobs[key]}
-                     values={values}
-                     setFieldValue={setFieldValue}
-                     isSubmitting={isSubmitting}
-                     handleBlur={handleBlur}
-                  />
-               ))}
-
-               <Grid xs={12} item>
-                  <Button
-                     startIcon={<PlusCircle height={18} />}
-                     disabled={isSubmitting}
-                     onClick={() =>
-                        handleAddSection(
-                           "customJobs",
-                           values,
-                           setValues,
-                           customJobObj
-                        )
-                     }
-                     type="button"
-                     color="secondary"
-                     variant="outlined"
-                     sx={styles.addJob}
-                     size="large"
-                     fullWidth
-                  >
-                     Add a Job opening
-                  </Button>
-               </Grid>
-            </FormGroup>
-         </>
-      )
-   }, [
-      customJobObj,
-      errors,
-      handleBlur,
-      isSubmitting,
-      setFieldValue,
-      setValues,
-      touched,
-      values,
-   ])
+   const filteredAccounts = useMemo(() => {
+      return accounts.filter((account) => account.firstSyncCompletedAt)
+   }, [accounts])
 
    return (
       <Section
@@ -208,7 +68,13 @@ const JobSelectorCategory = ({
                onSelectItems={onSelectItems}
             />
          ) : (
-            renderJobSection()
+            <CustomJobSection
+               groupId={groupId}
+               jobs={allOptions}
+               values={values}
+               setFieldValue={setFieldValue}
+               isSubmitting={isSubmitting}
+            />
          )}
       </Section>
    )
