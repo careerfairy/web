@@ -3,43 +3,21 @@ import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import { LoadingButton } from "@mui/lab"
 import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import {
-   BrandedTextFieldField,
-   BrandedTextFieldProps,
-} from "components/views/common/inputs/BrandedTextField"
+import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "constants/forms"
 import { groupRepo } from "data/RepositoryInstances"
-import { Form, Formik, FormikErrors, FormikTouched } from "formik"
+import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
-import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
+import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
-
-const styles = sxStyles({
-   chipInput: {
-      "& .MuiFilledInput-root": {
-         pb: 1,
-         pt: 3,
-      },
-      "& .MuiChip-root": {
-         backgroundColor: "secondary.main",
-         color: "white",
-         m: 0.625,
-         "& svg": {
-            color: "inherit",
-         },
-      },
-   },
-   saveBtn: {
-      textTransform: "none",
-   },
-})
 
 const [title, description] = [
    "Details",
@@ -155,7 +133,7 @@ const CompanyDetails = () => {
                         multiple
                         limit={GROUP_CONSTANTS.MAX_INDUSTRY_COUNT}
                         disableCloseOnSelect
-                        sx={styles.chipInput}
+                        sx={BaseStyles.chipInput}
                         textFieldProps={getTextFieldProps(
                            "Company industries",
                            "companyIndustries",
@@ -194,7 +172,7 @@ const CompanyDetails = () => {
                            disabled={!dirty || isSubmitting}
                            type="submit"
                            size="small"
-                           sx={styles.saveBtn}
+                           sx={BaseStyles.saveBtn}
                            variant="contained"
                            color="secondary"
                         >
@@ -247,17 +225,6 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
       .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH)
       .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH),
    careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
-})
-
-const getTextFieldProps = (
-   label: string,
-   name: keyof FormValues,
-   touched: FormikTouched<FormValues>,
-   errors: FormikErrors<FormValues>
-): BrandedTextFieldProps => ({
-   label,
-   error: touched[name] && Boolean(errors[name]),
-   helperText: touched[name] && errors[name],
 })
 
 export default CompanyDetails

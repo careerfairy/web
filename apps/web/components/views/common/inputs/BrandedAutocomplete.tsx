@@ -39,6 +39,7 @@ const BrandedAutocomplete = styled(
          renderOption={(optionProps, option, { selected }) => (
             <MenuItem
                {...optionProps}
+               key={option.id}
                sx={{
                   '&[aria-selected="true"]': {
                      backgroundColor: "white !important",
