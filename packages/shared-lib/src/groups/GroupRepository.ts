@@ -34,6 +34,7 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
+import { PublicCustomJob } from "./customJobs"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -263,6 +264,26 @@ export interface IGroupRepository {
     * @returns A Promise that resolves when the banner image URL is updated.
     */
    updateGroupBanner(groupId: string, image: ImageType): Promise<void>
+
+   /**
+    * To get all the existing custom jobs of a particular group
+    * @param groupId
+    */
+   getAllCustomJobsFromGroup(groupId: string): Promise<PublicCustomJob[]>
+
+   /**
+    * To create a custom job as sub collection of the group document
+    * @param job
+    * @param groupId
+    */
+   createGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
+
+   /**
+    * To update a existing custom job on the sub collection of the group document
+    * @param job
+    * @param groupId
+    */
+   updateGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1095,6 +1116,55 @@ export class FirebaseGroupRepository
       }
 
       return groupRef.update(toUpdate)
+   }
+
+   async createGroupCustomJob(
+      job: PublicCustomJob,
+      groupId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .doc(job.id)
+
+      const newJob = {
+         ...job,
+         createdAt: this.fieldValue.serverTimestamp(),
+         updatedAt: this.fieldValue.serverTimestamp(),
+      }
+
+      await ref.set(newJob, { merge: true })
+   }
+
+   async updateGroupCustomJob(
+      job: PublicCustomJob,
+      groupId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .doc(job.id)
+
+      const updatedJob = {
+         ...job,
+         updatedAt: this.fieldValue.serverTimestamp(),
+      }
+
+      await ref.update(updatedJob)
+   }
+
+   async getAllCustomJobsFromGroup(
+      groupId: string
+   ): Promise<PublicCustomJob[]> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+
+      const snapshots = await ref.get()
+      return mapFirestoreDocuments<PublicCustomJob>(snapshots)
    }
 }
 

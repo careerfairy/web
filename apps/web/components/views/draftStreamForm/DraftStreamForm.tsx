@@ -148,24 +148,6 @@ const speakerObj = {
    email: "",
 } as ISpeakerObj
 
-export type ICustomJobObj = {
-   title: string
-   salary: string
-   description: string
-   deadline: Date
-   postingUrl: string
-   jobType: string
-}
-
-const customJob = {
-   title: "",
-   salary: "",
-   description: "",
-   deadline: null,
-   postingUrl: "",
-   jobType: "",
-} as ICustomJobObj
-
 type StyleProps = {
    isGroupAdmin: boolean
    isOnDialog: boolean
@@ -893,19 +875,14 @@ const DraftStreamForm = ({
                                  {/* /> */}
 
                                  <JobSelectorCategory
-                                    groupId={values.groupIds[0]} // we only support a single group for now
+                                    groupId={values.groupIds[0]}
                                     onSelectItems={setSelectedJobs}
                                     selectedItems={selectedJobs}
                                     sectionRef={jobInfoRef}
                                     classes={classes}
                                     values={values}
-                                    setValues={setValues}
-                                    customJobObj={customJob}
-                                    errors={errors}
-                                    touched={touched}
                                     setFieldValue={setFieldValue}
                                     isSubmitting={isSubmitting}
-                                    handleBlur={handleBlur}
                                  />
 
                                  <HostAndQuestionsInfo

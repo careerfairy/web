@@ -42,6 +42,7 @@ export default {
       "comments",
       "companyData",
       "currentPositions",
+      "customJobs",
       "draftLivestreams",
       "fieldsOfStudy",
       "filterGroups",

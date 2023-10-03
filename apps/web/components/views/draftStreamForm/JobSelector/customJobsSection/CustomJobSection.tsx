@@ -7,6 +7,8 @@ import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
+import { groupRepo } from "../../../../../data/RepositoryInstances"
+import { useSnackbar } from "notistack"
 
 type Props = {
    groupId: string
@@ -24,6 +26,7 @@ const CustomJobSection = ({
    isSubmitting,
 }: Props) => {
    const [showForm, setShowForm] = useState(false)
+   const { enqueueSnackbar } = useSnackbar()
 
    const handleChange = useCallback(
       (name: string, value: PublicCustomJob[]) => {
@@ -41,11 +44,26 @@ const CustomJobSection = ({
    }, [])
 
    const handleCreateNewJob = useCallback(
-      (customJob: PublicCustomJob) => {
-         setFieldValue("customJobs", [customJob, ...values.customJobs])
-         setShowForm(false)
+      async (customJob: PublicCustomJob) => {
+         try {
+            // Create a new custom job on Group subCollection
+            await groupRepo.createGroupCustomJob(customJob, groupId)
+
+            setFieldValue("customJobs", [customJob, ...values.customJobs])
+            setShowForm(false)
+
+            enqueueSnackbar("New job opening was created", {
+               variant: "success",
+               preventDuplicate: true,
+            })
+         } catch (error) {
+            enqueueSnackbar("Something went wrong, try again", {
+               variant: "error",
+               preventDuplicate: true,
+            })
+         }
       },
-      [setFieldValue, values.customJobs]
+      [enqueueSnackbar, groupId, setFieldValue, values.customJobs]
    )
 
    const handleRemoveJob = useCallback(
@@ -60,18 +78,33 @@ const CustomJobSection = ({
    )
 
    const handleEditJob = useCallback(
-      (updatedJob: PublicCustomJob) => {
-         const updatedJobIndex = values.customJobs.findIndex(
-            (job: PublicCustomJob) => job.id === updatedJob.id
-         )
+      async (updatedJob: PublicCustomJob) => {
+         try {
+            const updatedJobIndex = values.customJobs.findIndex(
+               (job: PublicCustomJob) => job.id === updatedJob.id
+            )
 
-         setFieldValue("customJobs", [
-            ...values.customJobs.slice(0, updatedJobIndex),
-            updatedJob,
-            ...values.customJobs.slice(updatedJobIndex + 1),
-         ])
+            // Update custom job on Group subCollection
+            await groupRepo.updateGroupCustomJob(updatedJob, groupId)
+
+            setFieldValue("customJobs", [
+               ...values.customJobs.slice(0, updatedJobIndex),
+               updatedJob,
+               ...values.customJobs.slice(updatedJobIndex + 1),
+            ])
+
+            enqueueSnackbar("Job opening was updated", {
+               variant: "success",
+               preventDuplicate: true,
+            })
+         } catch (error) {
+            enqueueSnackbar("Something went wrong, try again", {
+               variant: "error",
+               preventDuplicate: true,
+            })
+         }
       },
-      [setFieldValue, values.customJobs]
+      [enqueueSnackbar, groupId, setFieldValue, values.customJobs]
    )
 
    return (

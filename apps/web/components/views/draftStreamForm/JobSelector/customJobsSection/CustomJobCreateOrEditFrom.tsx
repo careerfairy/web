@@ -73,14 +73,13 @@ const styles = sxStyles({
    },
    btn: {
       height: 40,
-      width: 105,
       textTransform: "none",
    },
 })
 
 type Props = {
    groupId?: string
-   handleCreateNewJob: (customJob: PublicCustomJob) => void
+   handleCreateNewJob: (customJob: PublicCustomJob) => Promise<void>
    handleCancelCreateNewJob: () => void
    job?: PublicCustomJob
 }
@@ -96,7 +95,7 @@ const CustomJobCreateOrEditFrom = ({
       if (job) {
          return {
             ...job,
-            deadline: job.deadline.toDate(),
+            deadline: job.deadline?.toDate(),
          }
       }
 
@@ -117,14 +116,16 @@ const CustomJobCreateOrEditFrom = ({
          <Formik
             initialValues={initialValues}
             validationSchema={schema}
-            onSubmit={(values, { setSubmitting, resetForm }) => {
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
                const formatValues: PublicCustomJob = {
                   ...values,
                   jobType: values.jobType as JobType,
-                  deadline: Timestamp.fromDate(values.deadline),
+                  deadline: values.deadline
+                     ? Timestamp.fromDate(values.deadline)
+                     : null,
                }
 
-               handleCreateNewJob(formatValues)
+               await handleCreateNewJob(formatValues)
 
                setSubmitting(false)
                resetForm()
@@ -360,7 +361,13 @@ const CustomJobCreateOrEditFrom = ({
                            }
                            onClick={() => handleSubmit()}
                         >
-                           {isSubmitting ? "Creating" : "Create"}
+                           {isSubmitting
+                              ? Boolean(job)
+                                 ? "Updating"
+                                 : "Creating"
+                              : Boolean(job)
+                              ? "Update"
+                              : "Create"}
                         </Button>
                      </Grid>
                   </Grid>
