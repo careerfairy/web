@@ -15,6 +15,22 @@ type CommonClientFields = {
     * This timestamp is generated on the client side when the event occurs.
     */
    stringTimestamp: string
+   /**
+    * The Name of the university the user is currently attending.
+    */
+   universityName: string | null
+   /**
+    * The ID of the university the user is currently attending.
+    */
+   universityId: string | null
+   /**
+    * The ID of the field of study the user is currently studying.
+    */
+   fieldOfStudy: string | null
+   /**
+    * The ID of the level of study the user is currently studying.
+    */
+   levelOfStudy: string | null
 }
 
 /**
