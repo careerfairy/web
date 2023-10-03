@@ -284,6 +284,18 @@ export interface IGroupRepository {
     * @param groupId
     */
    updateGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
+
+   /**
+    * In order to establish a connection between the livestream and the pre-existing custom job within the group document
+    * @param groupId
+    * @param jobIds
+    * @param livestreamId
+    */
+   addLivestreamToMultipleCustomJobGroup(
+      groupId: string,
+      jobIds: string[],
+      livestreamId: string
+   ): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1132,6 +1144,8 @@ export class FirebaseGroupRepository
          ...job,
          createdAt: this.fieldValue.serverTimestamp(),
          updatedAt: this.fieldValue.serverTimestamp(),
+         livestreams: [],
+         clicks: 0,
       }
 
       await ref.set(newJob, { merge: true })
@@ -1165,6 +1179,28 @@ export class FirebaseGroupRepository
 
       const snapshots = await ref.get()
       return mapFirestoreDocuments<PublicCustomJob>(snapshots)
+   }
+
+   async addLivestreamToMultipleCustomJobGroup(
+      groupId: string,
+      jobIds: string[],
+      livestreamId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      jobIds.forEach((id) => {
+         const ref = this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("customJobs")
+            .doc(id)
+
+         batch.update(ref, {
+            livestreams: this.fieldValue.arrayUnion(livestreamId),
+         })
+      })
+
+      return await batch.commit()
    }
 }
 

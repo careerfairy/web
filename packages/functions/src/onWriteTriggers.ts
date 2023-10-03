@@ -241,3 +241,27 @@ export const onWriteSpark = functions
 
       return handleSideEffects(sideEffectPromises)
    })
+
+export const onWriteCustomJobs = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("careerCenterData/{groupId}/customJobs/{jobId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncCustomJobsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all custom jobs changes
+      sideEffectPromises.push(
+         livestreamsRepo.syncCustomJobDataToLivestream(change)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
