@@ -146,7 +146,7 @@ const CustomJobCreateOrEditFrom = ({
                      <FormControl fullWidth>
                         <TextField
                            name={`title`}
-                           id={`title`}
+                           id={`jobTitle`}
                            placeholder="Eg. Spfware Engineer"
                            variant="outlined"
                            fullWidth
@@ -236,7 +236,7 @@ const CustomJobCreateOrEditFrom = ({
                         <TextField
                            className="multiLineInput"
                            name={`description`}
-                           id={`description`}
+                           id={`jobDescription`}
                            placeholder="Tell your viewers more on what to expect about this job"
                            variant="outlined"
                            fullWidth

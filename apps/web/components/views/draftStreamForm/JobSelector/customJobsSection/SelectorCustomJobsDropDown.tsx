@@ -99,6 +99,10 @@ const SelectorCustomJobsDropDown = ({
                   {children}
                </Paper>
             ),
+            isOptionEqualToValue: (
+               option: PublicCustomJob,
+               value: PublicCustomJob
+            ) => option.id === value.id,
          }}
       />
    )
