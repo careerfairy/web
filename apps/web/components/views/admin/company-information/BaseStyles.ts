@@ -20,6 +20,7 @@ export default sxStyles({
             color: "inherit",
          },
       },
+      display: "grid",
    },
    saveBtn: {
       textTransform: "none",
@@ -72,6 +73,12 @@ export default sxStyles({
          flexDirection: "column",
          width: "-webkit-fill-available",
          gap: "12px",
+      },
+   },
+   deleteIcon: {
+      "& svg": {
+         fontSize: 60,
+         color: "error.main",
       },
    },
 })

@@ -49,7 +49,7 @@ const CompanyDetails = () => {
       ]
    )
 
-   const handleSubmit = useCallback(
+   const onSubmit = useCallback(
       async (values: FormValues) => {
          try {
             await groupRepo.updateGroupMetadata(group.id, values)
@@ -70,7 +70,7 @@ const CompanyDetails = () => {
             initialValues={initialValues}
             enableReinitialize
             validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
          >
             {({
                values,
@@ -80,6 +80,7 @@ const CompanyDetails = () => {
                errors,
                handleBlur,
                touched,
+               handleSubmit,
             }) => (
                <Form>
                   <Stack spacing={1.5}>
@@ -168,9 +169,9 @@ const CompanyDetails = () => {
                      />
                      <Box display="flex" justifyContent="flex-end">
                         <LoadingButton
+                           onClick={() => handleSubmit()}
                            loading={isSubmitting}
-                           disabled={!dirty || isSubmitting}
-                           type="submit"
+                           disabled={!dirty}
                            size="small"
                            sx={BaseStyles.saveBtn}
                            variant="contained"
