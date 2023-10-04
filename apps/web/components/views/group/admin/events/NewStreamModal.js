@@ -29,7 +29,6 @@ import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { groupRepo } from "../../../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -231,13 +230,6 @@ const NewStreamModal = ({
 
          if (publishDraft) {
             await handlePublishDraft(livestream, promotion)
-
-            // When publishing a draft, our goal is to associate the current livestream with all selected job openings
-            await groupRepo.addLivestreamToMultipleCustomJobGroup(
-               group.id,
-               livestream.customJobs.map((job) => job.id),
-               livestream.id
-            )
             setPublishDraft(false)
             return
          }
@@ -260,15 +252,6 @@ const NewStreamModal = ({
                targetCollection,
                promotion
             )
-
-            if (isActualLivestream) {
-               // When updating a livestream, our goal is to associate the current livestream with all selected job openings
-               await groupRepo.addLivestreamToMultipleCustomJobGroup(
-                  group.id,
-                  livestream.customJobs.map((job) => job.id),
-                  livestream.id
-               )
-            }
          } else {
             const author = {
                groupId: group.id,
