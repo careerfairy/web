@@ -1,15 +1,12 @@
-import React, { useCallback, useMemo, useState } from "react"
-import { TablePagination } from "@mui/material"
-import AdminUsersTable from "./AdminUsersTable"
-import useSWR from "swr"
-import useFunctionsSWR, {
-   reducedRemoteCallsOptions,
-} from "../../../custom-hook/utils/useFunctionsSWRFetcher"
 import {
    BigQueryUserQueryOptions,
    BigQueryUserResponse,
 } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { TablePagination } from "@mui/material"
+import React, { useCallback, useState } from "react"
 import { usePreviousDistinct } from "react-use"
+import AdminUsersTable from "./AdminUsersTable"
+import useUserRecords from "./useUserRecords"
 
 const QueryForm = () => {
    const [options, setOptions] = useState<BigQueryUserQueryOptions>({
@@ -26,19 +23,8 @@ const QueryForm = () => {
       sortOrder: "DESC",
       limit: 10,
    })
-   const fetcher = useFunctionsSWR<BigQueryUserResponse[]>()
-   const config = useMemo(
-      () => ({
-         ...reducedRemoteCallsOptions,
-         suspense: false,
-      }),
-      []
-   )
-   const { data: users, isValidating } = useSWR(
-      ["getBigQueryUsers_eu", options],
-      fetcher,
-      config
-   )
+
+   const { users, isValidating } = useUserRecords(options)
 
    // Keep the previous users and display them when loading
    const prevUsers = usePreviousDistinct(users)
@@ -74,7 +60,7 @@ const QueryForm = () => {
    )
    const title = `${
       (isValidating ? prevUsers : users)?.[0]?.totalHits || 0
-   } - Subscribed Users Found`
+   } - subscribed users active in the last 18 months`
 
    return (
       <>

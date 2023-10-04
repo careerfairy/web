@@ -68,7 +68,7 @@ exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
 exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
 
 // Admin Functions
-exports.sendBasicTemplateEmail_v2 = admin.sendBasicTemplateEmail
+exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail
 exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
@@ -174,7 +174,7 @@ exports.fetchLivestreamJobs_eu = atsUser.fetchLivestreamJobs
 exports.updateUserJobApplications_eu = atsUser.updateUserJobApplications
 
 // BigQuery
-exports.getBigQueryUsers_eu = bigQuery.getBigQueryUsers
+exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers
 
 // Group Analytics
 exports.getRegistrationSources_eu = groupAnalytics.getRegistrationSources

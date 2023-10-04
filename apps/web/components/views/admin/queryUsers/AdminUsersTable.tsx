@@ -7,10 +7,7 @@ import MaterialTable, {
 } from "@material-table/core"
 
 import SendEmailTemplateDialog from "./SendEmailTemplateDialog/SendEmailTemplateDialog"
-import {
-   BigQueryUserQueryOptions,
-   BigQueryUserResponse,
-} from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import LinkifyText from "../../../util/LinkifyText"
 import {
    useFieldsOfStudy,
@@ -18,7 +15,7 @@ import {
    useUniversityCountries,
 } from "../../../custom-hook/useCollection"
 import { universityCountriesMap } from "../../../util/constants/universityCountries"
-import { University } from "@careerfairy/shared-lib/dist/universities"
+import { University } from "@careerfairy/shared-lib/universities"
 import UniversityCountriesFilter from "./UniversityCountriesFilter"
 import UniversitiesFilter from "./UniversitiesFilter"
 import GenericFilterSelector from "./GenericFilterSelector"
@@ -26,16 +23,14 @@ import {
    countriesOptionCodes,
    maxCountriesOfInterestToShow,
 } from "../../../../constants/forms"
+import { UserRecord } from "./useUserRecords"
 
 interface UserTableProps {
-   users: BigQueryUserResponse[]
+   users: UserRecord[]
    pageSize: number
    loading: boolean
    title?: string
-   handleSort: (
-      orderBy: keyof BigQueryUserResponse,
-      sortOrder: "DESC" | "ASC"
-   ) => void
+   handleSort: (orderBy: keyof UserRecord, sortOrder: "DESC" | "ASC") => void
    setOptions: React.Dispatch<React.SetStateAction<BigQueryUserQueryOptions>>
    queryOptions: BigQueryUserQueryOptions
 }
@@ -131,7 +126,7 @@ const AdminUsersTable = ({
       }, {})
    }, [allFieldsOfStudy])
 
-   const columns: MaterialTableProps<BigQueryUserResponse>["columns"] = useMemo(
+   const columns: MaterialTableProps<UserRecord>["columns"] = useMemo(
       () => [
          {
             field: "firstName",
@@ -279,7 +274,7 @@ const AdminUsersTable = ({
       ]
    )
 
-   const customTableOptions = useMemo<Options<BigQueryUserResponse>>(
+   const customTableOptions = useMemo<Options<UserRecord>>(
       () => ({
          ...defaultTableOptions,
          pageSize: pageSize || 10,
@@ -300,7 +295,7 @@ const AdminUsersTable = ({
       []
    )
 
-   const actions: MaterialTableProps<BigQueryUserResponse>["actions"] = [
+   const actions: MaterialTableProps<UserRecord>["actions"] = [
       {
          // @ts-ignore
          icon: tableIcons.EmailIcon,
@@ -314,14 +309,12 @@ const AdminUsersTable = ({
          if (columnIndex <= -1) {
             return handleSort("firstName", "DESC")
          }
-         const field = columns[
-            columnIndex
-         ].field.toString() as keyof BigQueryUserResponse
+         const field = columns[columnIndex].field.toString() as keyof UserRecord
          handleSort(field, columnSortOrder.toUpperCase() as "DESC" | "ASC")
       },
       [columns, handleSort]
    )
-   const onFilterChange: MaterialTableProps<BigQueryUserResponse>["onFilterChange"] =
+   const onFilterChange: MaterialTableProps<UserRecord>["onFilterChange"] =
       useCallback(
          (filters) => {
             filters.forEach((filter) => {
