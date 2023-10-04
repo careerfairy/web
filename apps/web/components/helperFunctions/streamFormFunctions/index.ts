@@ -10,7 +10,6 @@ import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
 import { FormikErrors, FormikTouched } from "formik"
 import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 
 export const speakerObj = {
    avatar: "",
@@ -106,7 +105,7 @@ export const buildLivestreamObject = (
       questionsDisabled: values.questionsDisabled,
       triGrams: livestreamTriGrams(values.title, values.company),
       denyRecordingAccess: false,
-      customJobs: buildCustomJobsArray(values),
+      customJobs: values.customJobs,
    }
 }
 
@@ -121,21 +120,6 @@ const buildSpeakersArray = (values) => {
          position: values.speakers[key].position,
          email: values.speakers[key].email || "",
          rank: index,
-      }
-   })
-}
-
-const buildCustomJobsArray = (values) => {
-   return Object.keys(values.customJobs).map((key) => {
-      return {
-         id: key,
-         groupId: values.companyId,
-         title: values.customJobs[key].title,
-         description: values.customJobs[key].description,
-         jobType: values.customJobs[key].jobType?.value,
-         postingUrl: values.customJobs[key].postingUrl,
-         deadline: values.customJobs[key].deadline,
-         salary: values.customJobs[key].salary,
       }
    })
 }

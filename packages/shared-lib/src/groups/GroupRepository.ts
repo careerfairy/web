@@ -34,7 +34,11 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
-import { PublicCustomJob } from "./customJobs"
+import {
+   CustomJob,
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "./customJobs"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -1166,7 +1170,9 @@ export class FirebaseGroupRepository
          .collection("customJobs")
 
       const snapshots = await ref.get()
-      return mapFirestoreDocuments<PublicCustomJob>(snapshots)
+      return mapFirestoreDocuments<CustomJob>(snapshots).map(
+         pickPublicDataFromCustomJob
+      )
    }
 }
 
