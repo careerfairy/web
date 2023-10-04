@@ -20,6 +20,7 @@ export default sxStyles({
             color: "inherit",
          },
       },
+      display: "grid",
    },
    saveBtn: {
       textTransform: "none",

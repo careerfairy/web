@@ -25,6 +25,7 @@ import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
 import BaseStyles from "../BaseStyles"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    form: {
@@ -41,13 +42,14 @@ const styles = sxStyles({
       mx: 2,
    },
    actionButtons: {
-      display: "flex",
-      alignItems: "flex-end",
-      justifyContent: "flex-end",
       p: 2,
    },
    btn: {
       textTransform: "none",
+   },
+   cancelBtn: {
+      color: "text.secondary",
+      mr: 1,
    },
    deleteBtn: {
       mr: "auto",
@@ -85,6 +87,7 @@ const RegistrationQuestion: FC<Props> = ({
    const { group } = useGroup()
 
    const isMounted = useRef(true)
+   const isMobile = useIsMobile()
 
    const [
       confirmDeleteQuestionDialogOpen,
@@ -186,6 +189,14 @@ const RegistrationQuestion: FC<Props> = ({
       []
    )
 
+   const disableInputMode = useCallback(() => {
+      if (isNew) {
+         onRemove(initialValues.id)
+      } else {
+         setInputMode(false)
+      }
+   }, [initialValues.id, isNew, onRemove, setInputMode])
+
    const primaryAction = useMemo<ConfirmationDialogAction>(
       () => ({
          text: "Cancel",
@@ -220,6 +231,7 @@ const RegistrationQuestion: FC<Props> = ({
             isSubmitting,
             handleSubmit,
             isValid,
+            resetForm,
          }) => (
             <Form style={styles.form}>
                {confirmDeleteQuestionDialogOpen ? (
@@ -302,10 +314,16 @@ const RegistrationQuestion: FC<Props> = ({
                         >
                            Add an option
                         </Button>
-                        <Box sx={styles.actionButtons}>
+                        <Stack
+                           direction={{
+                              xs: "column-reverse",
+                              md: "row",
+                           }}
+                           sx={styles.actionButtons}
+                        >
                            {values.questionType === "custom" ? (
                               <LoadingButton
-                                 endIcon={<DeleteIcon />}
+                                 endIcon={isMobile ? null : <DeleteIcon />}
                                  color="error"
                                  variant="outlined"
                                  size="small"
@@ -313,22 +331,35 @@ const RegistrationQuestion: FC<Props> = ({
                                  sx={[styles.btn, styles.deleteBtn]}
                                  onClick={handleClickRemoveQuestion}
                               >
-                                 Remove question
+                                 {isMobile ? "Remove" : "Remove question"}
                               </LoadingButton>
                            ) : null}
-                           <LoadingButton
-                              endIcon={<Save />}
-                              loading={isSubmitting}
-                              disabled={!dirty || !isValid}
-                              onClick={() => handleSubmit()}
-                              size="small"
-                              variant="contained"
-                              color="secondary"
-                              sx={styles.btn}
-                           >
-                              Save
-                           </LoadingButton>
-                        </Box>
+                           <Box ml="auto" display="flex">
+                              <Button
+                                 size="small"
+                                 color="grey"
+                                 sx={[styles.btn, styles.cancelBtn]}
+                                 onClick={() => {
+                                    resetForm()
+                                    disableInputMode()
+                                 }}
+                              >
+                                 Cancel
+                              </Button>
+                              <LoadingButton
+                                 endIcon={<Save />}
+                                 loading={isSubmitting}
+                                 disabled={!dirty || !isValid}
+                                 onClick={() => handleSubmit()}
+                                 size="small"
+                                 variant="contained"
+                                 color="secondary"
+                                 sx={styles.btn}
+                              >
+                                 Save
+                              </LoadingButton>
+                           </Box>
+                        </Stack>
                      </Stack>
                   ) : null}
                </Stack>
