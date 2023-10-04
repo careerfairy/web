@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
+   createCompatGenericConverter,
    mapFirestoreDocuments,
    OnSnapshotCallback,
    Unsubscribe,
@@ -32,7 +33,7 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
-import { ImageType } from "../commonTypes"
+import { Create, ImageType } from "../commonTypes"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -83,8 +84,8 @@ export interface IGroupRepository {
 
    addNewGroupQuestion(
       groupId: string,
-      groupQuestion: Omit<GroupQuestion, "id">
-   ): Promise<void>
+      groupQuestion: Create<GroupQuestion>
+   ): Promise<GroupQuestion>
 
    updateGroupQuestion(
       groupId: string,
@@ -468,13 +469,23 @@ export class FirebaseGroupRepository
 
    async addNewGroupQuestion(
       groupId: string,
-      groupQuestion: Omit<GroupQuestion, "id">
-   ): Promise<void> {
-      const groupQuestionsRef = this.firestore
+      groupQuestion: Create<GroupQuestion>
+   ): Promise<GroupQuestion> {
+      const newQuestionRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("groupQuestions")
-      await groupQuestionsRef.add(groupQuestion)
+         .withConverter(createCompatGenericConverter<GroupQuestion>())
+         .doc()
+
+      const newQuestion: GroupQuestion = {
+         ...groupQuestion,
+         id: newQuestionRef.id,
+      }
+
+      await newQuestionRef.set(newQuestion)
+
+      return newQuestion
    }
 
    async updateGroupQuestion(
