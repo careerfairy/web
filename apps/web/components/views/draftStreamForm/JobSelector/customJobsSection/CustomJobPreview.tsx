@@ -62,9 +62,14 @@ const styles = sxStyles({
    deleteMenuItem: {
       color: "error.main",
    },
+   description: {
+      fontSize: "16px",
+      fontWeight: 400,
+      lineHeight: "27px",
+   },
 })
 
-const MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS = 320
+const MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS = 290
 
 type Props = {
    job: PublicCustomJob
@@ -186,9 +191,10 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
 
             <Grid xs={12} item mt={4}>
                <Collapse in={!isDescriptionCollapsed} collapsedSize={75}>
-                  <Typography variant="body1" fontSize={16}>
-                     <SanitizedHTML htmlString={job.description} />
-                  </Typography>
+                  <SanitizedHTML
+                     sx={styles.description}
+                     htmlString={job.description}
+                  />
                </Collapse>
                {showCollapse ? (
                   <Box display="flex" justifyContent="start">
