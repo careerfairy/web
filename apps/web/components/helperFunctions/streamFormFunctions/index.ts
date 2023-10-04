@@ -8,7 +8,8 @@ import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
-import { FormikErrors } from "formik"
+import { FormikErrors, FormikTouched } from "formik"
+import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
 
 export const speakerObj = {
    avatar: "",
@@ -320,3 +321,14 @@ export const getDownloadUrl = (fileElement) => {
       return ""
    }
 }
+
+export const getTextFieldProps = <TFormValues>(
+   label: string,
+   name: keyof TFormValues,
+   touched: FormikTouched<TFormValues>,
+   errors: FormikErrors<TFormValues>
+): BrandedTextFieldProps => ({
+   label,
+   error: touched[name] && Boolean(errors[name]),
+   helperText: touched[name] && errors[name],
+})

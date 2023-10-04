@@ -517,6 +517,7 @@ const getComponents = (theme: DefaultTheme): Components => ({
                fontWeight: 400,
                fontSize: "1rem",
                letterSpacing: "-0.011rem",
+               lineHeight: "150%",
             },
          },
       ],
