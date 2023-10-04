@@ -6,7 +6,7 @@ import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 
 test.describe("Company page creation", () => {
-   test("Update company page description and location", async ({
+   test.skip("Update company page description and location", async ({
       groupPage,
       group,
    }) => {

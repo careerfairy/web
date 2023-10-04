@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, ImageType } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
@@ -11,6 +11,9 @@ export interface Group extends Identifiable {
    groupId: string
    description: string
    logoUrl: string
+
+   logo?: ImageType
+   banner?: ImageType
 
    // optional
    extraInfo?: string
@@ -26,6 +29,7 @@ export interface Group extends Identifiable {
    inActive?: boolean
    bannerImageUrl?: string
    atsAdminPageFlag?: boolean
+   careerPageUrl?: string
    /*
     * This flag is used to determine if the group has access to sparks
     * */
@@ -38,6 +42,9 @@ export interface Group extends Identifiable {
    companyCountry?: GroupOption
    companyIndustries?: GroupOption[]
    companySize?: string
+   targetedCountries?: GroupOption[]
+   targetedUniversities?: GroupTargetUniversity[]
+   targetedFieldsOfStudy?: GroupOption[]
 
    /*
     * Photos that are displayed on the group company page
@@ -62,6 +69,10 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+}
+
+export type GroupTargetUniversity = GroupOption & {
+   country: string
 }
 
 export interface Testimonial extends Identifiable {

@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
+   createCompatGenericConverter,
    mapFirestoreDocuments,
    OnSnapshotCallback,
    Unsubscribe,
@@ -32,6 +33,7 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
+import { Create, ImageType } from "../commonTypes"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -82,8 +84,8 @@ export interface IGroupRepository {
 
    addNewGroupQuestion(
       groupId: string,
-      groupQuestion: Omit<GroupQuestion, "id">
-   ): Promise<void>
+      groupQuestion: Create<GroupQuestion>
+   ): Promise<GroupQuestion>
 
    updateGroupQuestion(
       groupId: string,
@@ -143,7 +145,15 @@ export interface IGroupRepository {
       groupId: string,
       metadata: Pick<
          Group,
-         "extraInfo" | "companySize" | "companyIndustries" | "companyCountry"
+         | "extraInfo"
+         | "companySize"
+         | "companyIndustries"
+         | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
+         | "privacyPolicyActive"
+         | "privacyPolicyUrl"
       >
    ): Promise<void>
 
@@ -233,6 +243,24 @@ export interface IGroupRepository {
     * @returns A Promise that resolves when the publicSparks flag is updated.
     */
    updatePublicSparks(groupId: string, isPublic: boolean): Promise<void>
+
+   /**
+    * Updates the group's logo image.
+    *
+    * @param  groupId - The ID of the group.
+    * @param  image - The image metadata to store in the database.
+    * @returns A Promise that resolves when the banner image URL is updated.
+    */
+   updateGroupLogo(groupId: string, image: ImageType): Promise<void>
+
+   /**
+    * Updates the group's banner image.
+    *
+    * @param  groupId - The ID of the group.
+    * @param  image - The image metadata to store in the database.
+    * @returns A Promise that resolves when the banner image URL is updated.
+    */
+   updateGroupBanner(groupId: string, image: ImageType): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -443,13 +471,23 @@ export class FirebaseGroupRepository
 
    async addNewGroupQuestion(
       groupId: string,
-      groupQuestion: Omit<GroupQuestion, "id">
-   ): Promise<void> {
-      const groupQuestionsRef = this.firestore
+      groupQuestion: Create<GroupQuestion>
+   ): Promise<GroupQuestion> {
+      const newQuestionRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("groupQuestions")
-      await groupQuestionsRef.add(groupQuestion)
+         .withConverter(createCompatGenericConverter<GroupQuestion>())
+         .doc()
+
+      const newQuestion: GroupQuestion = {
+         ...groupQuestion,
+         id: newQuestionRef.id,
+      }
+
+      await newQuestionRef.set(newQuestion)
+
+      return newQuestion
    }
 
    async updateGroupQuestion(
@@ -786,14 +824,22 @@ export class FirebaseGroupRepository
       groupId: string,
       metadata: Pick<
          Group,
-         "extraInfo" | "companySize" | "companyIndustries" | "companyCountry"
+         | "extraInfo"
+         | "companySize"
+         | "companyIndustries"
+         | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
+         | "privacyPolicyActive"
+         | "privacyPolicyUrl"
       >
    ): Promise<void> {
       const groupRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
 
-      return groupRef.set(metadata, { merge: true })
+      return groupRef.update(metadata)
    }
 
    updateGroupTestimonials(
@@ -1019,6 +1065,32 @@ export class FirebaseGroupRepository
       const toUpdate: Pick<Group, "publicSparks"> = {
          publicSparks: isPublic,
       }
+      return groupRef.update(toUpdate)
+   }
+
+   updateGroupLogo(groupId: string, image: ImageType): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "logo" | "logoUrl"> = {
+         logo: image,
+         logoUrl: image.url,
+      }
+
+      return groupRef.update(toUpdate)
+   }
+
+   updateGroupBanner(groupId: string, image: ImageType): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "banner" | "bannerImageUrl"> = {
+         banner: image,
+         bannerImageUrl: image.url,
+      }
+
       return groupRef.update(toUpdate)
    }
 }

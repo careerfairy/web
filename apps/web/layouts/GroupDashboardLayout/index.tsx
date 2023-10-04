@@ -17,11 +17,11 @@ import {
    GROUP_DASHBOARD_ROLE,
    GroupOption,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 import GroupsUtil from "../../data/util/GroupsUtil"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { groupRepo } from "../../data/RepositoryInstances"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
@@ -42,6 +42,7 @@ type GroupAdminContext = {
    stats: GroupStats
    flattenedGroupOptions: GroupOption[]
    groupQuestions: GroupQuestion[]
+   questionsLoaded: boolean
    groupPresenter?: GroupPresenter
    role: GROUP_DASHBOARD_ROLE
    livestreamDialog: ReturnType<typeof useLivestreamDialog>
@@ -55,6 +56,7 @@ const GroupContext = createContext<GroupAdminContext>({
    stats: null,
    flattenedGroupOptions: [],
    groupQuestions: [],
+   questionsLoaded: false,
    groupPresenter: undefined,
    role: undefined,
    livestreamDialog: undefined,
@@ -73,6 +75,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, titleComponent } = props
    const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
+   const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false)
 
    const { replace, push, pathname } = useRouter()
    const pathShouldShrink = usePathShouldShrink()
@@ -162,10 +165,13 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
             group.id,
             (categories) => {
                setGroupQuestions(mapFirestoreDocuments(categories) || [])
+               setQuestionsLoaded(true)
             }
          )
 
          return () => {
+            setQuestionsLoaded(false)
+            setGroupQuestions([])
             unsubscribe()
          }
       }
@@ -184,6 +190,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          stats,
          flattenedGroupOptions,
          groupQuestions,
+         questionsLoaded,
          groupPresenter,
          role: adminGroups?.[group?.id]?.role,
          livestreamDialog,
@@ -192,15 +199,16 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          setShrunkLeftMenuState,
       }),
       [
-         adminGroups,
-         flattenedGroupOptions,
          group,
-         groupPresenter,
+         stats,
+         flattenedGroupOptions,
          groupQuestions,
+         questionsLoaded,
+         groupPresenter,
+         adminGroups,
          livestreamDialog,
          shrunkLeftMenuState,
          setShrunkLeftMenuState,
-         stats,
       ]
    )
 

@@ -1,16 +1,16 @@
-import React from "react"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import EditOverview from "../../../../components/views/group/admin/edit"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
+
+import CompanyInformationPageContent from "components/views/group/admin/company-information"
 
 const EditGroupProfile = ({ groupId }) => {
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Company Information"}
-         groupId={groupId}
+         titleComponent={"Company Information"}
+         groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Admin Edit Details of" />
-         <EditOverview />
+         <CompanyInformationPageContent />
       </GroupDashboardLayout>
    )
 }
@@ -22,4 +22,5 @@ export async function getServerSideProps(context) {
       },
    }
 }
+
 export default EditGroupProfile
