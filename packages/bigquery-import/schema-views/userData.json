@@ -9,6 +9,10 @@
          "type": "string"
       },
       {
+         "name": "userEmail",
+         "type": "string"
+      },
+      {
          "name": "linkedinUrl",
          "type": "string"
       },
@@ -30,6 +34,10 @@
       },
       {
          "name": "groupIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "countriesOfInterest",
          "type": "stringified_map"
       },
       {
