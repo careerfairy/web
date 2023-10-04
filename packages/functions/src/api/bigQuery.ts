@@ -20,7 +20,7 @@ export class BigQueryRepository implements IBigQueryRepository {
     * @param client
     */
    private readonly dataset = "careerfairy-e1fd9.firestore_export"
-   private readonly userDataTable = `\`${this.dataset}.userData_raw_latest\``
+   private readonly userDataTable = `\`${this.dataset}.userData_schema_userData_latest\``
 
    constructor(private readonly client: BigQuery) {}
 
@@ -60,63 +60,56 @@ export class BigQueryRepository implements IBigQueryRepository {
       const whereQueries = []
       if (filters.universityName) {
          whereQueries.push(
-            `LOWER(JSON_VALUE(DATA, "$.university.name")) like '%${filters.universityName}%'`
+            `LOWER(university_name) like '%${filters.universityName}%'`
          )
       }
       if (universityCountryCodesString.length > 0) {
          whereQueries.push(
-            `JSON_VALUE(DATA, "$.universityCountryCode") IN (${universityCountryCodesString})`
+            `universityCountryCode IN (${universityCountryCodesString})`
          )
       }
       if (universityCodesString.length > 0) {
-         whereQueries.push(
-            `JSON_VALUE(DATA, "$.university.code") IN (${universityCodesString})`
-         )
+         whereQueries.push(`university_code IN (${universityCodesString})`)
       }
       if (fieldOfStudyIdsString.length > 0) {
-         whereQueries.push(
-            `JSON_VALUE(DATA, "$.fieldOfStudy.id") IN (${fieldOfStudyIdsString})`
-         )
+         whereQueries.push(`fieldOfStudy_id IN (${fieldOfStudyIdsString})`)
       }
       if (levelOfStudyIdsString.length > 0) {
-         whereQueries.push(
-            `JSON_VALUE(DATA, "$.levelOfStudy.id") IN (${levelOfStudyIdsString})`
-         )
+         whereQueries.push(`levelOfStudy_id IN (${levelOfStudyIdsString})`)
       }
       if (countriesOfInterestString.length > 0) {
          whereQueries.push(
-            `REGEXP_CONTAINS(JSON_EXTRACT(DATA, "$.countriesOfInterest"),"${countriesOfInterestString}")`
+            `REGEXP_CONTAINS(countriesOfInterest, "${countriesOfInterestString}")`
          )
       }
 
-      const query = `SELECT
-               COUNT(*) OVER () as totalHits,
-               JSON_VALUE(DATA, "$.firstName") AS firstName,
-               JSON_VALUE(DATA, "$.lastName") AS lastName,
-               JSON_VALUE(DATA, "$.universityCountryCode") AS universityCountryCode,
-               JSON_VALUE(DATA, "$.university.code") AS universityCode,
-               JSON_VALUE(DATA, "$.university.name") AS universityName,
-               JSON_VALUE(DATA, "$.userEmail") AS userEmail,
-               JSON_VALUE(DATA, "$.linkedinUrl") AS linkedinUrl,
-               JSON_VALUE(DATA, "$.unsubscribed") AS unsubscribed,
-               JSON_VALUE(DATA, "$.fieldOfStudy.name") AS fieldOfStudyName,
-               JSON_VALUE(DATA, "$.fieldOfStudy.id") AS fieldOfStudyId,
-               JSON_VALUE(DATA, "$.levelOfStudy.name") AS levelOfStudyName,
-               JSON_VALUE(DATA, "$.levelOfStudy.id") AS levelOfStudyId,
-               JSON_QUERY(DATA, "$.countriesOfInterest") AS countriesOfInterest,
-
-               FROM ${this.userDataTable}
-               WHERE
-               (JSON_VALUE(DATA, "$.unsubscribed") IN ("false") OR JSON_VALUE(DATA, "$.unsubscribed") IS NULL) 
-               ${whereQueries.length ? "AND " + whereQueries.join(" AND ") : ""}
-               ORDER BY ${orderBy} ${sortOrder} NULLS LAST
-               ${
-                  limit === false
-                     ? ""
-                     : `LIMIT ${limit}
-               OFFSET ${page * limit}`
-               }
-               `
+      const query = `
+      SELECT
+         COUNT(*) OVER () AS totalHits,
+         firstName,
+         lastName,
+         universityCountryCode,
+         university_code AS universityCode,
+         university_name AS universityName,
+         userEmail,
+         linkedinUrl,
+         unsubscribed,
+         fieldOfStudy_name AS fieldOfStudyName,
+         fieldOfStudy_id AS fieldOfStudyId,
+         levelOfStudy_name AS levelOfStudyName,
+         levelOfStudy_id AS levelOfStudyId,
+         countriesOfInterest,
+         lastActivityAt
+      FROM 
+         ${this.userDataTable}
+      WHERE
+         (unsubscribed = false OR unsubscribed IS NULL) 
+         AND TIMESTAMP(lastActivityAt) >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 18 MONTH))
+         ${whereQueries.length ? "AND " + whereQueries.join(" AND ") : ""}
+      ORDER BY 
+         ${orderBy} ${sortOrder} NULLS LAST
+      ${limit === false ? "" : `LIMIT ${limit} OFFSET ${page * limit}`}
+      `
       const options = {
          query: query,
       }
