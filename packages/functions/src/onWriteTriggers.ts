@@ -54,6 +54,8 @@ export const syncLivestreams = functions
          }
       }
 
+      sideEffectPromises.push(groupRepo.syncLivestreamIdWithCustomJobs(change))
+
       return handleSideEffects(sideEffectPromises)
    })
 
