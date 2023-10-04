@@ -1,7 +1,7 @@
 export interface BigQueryUserResponse {
    firstName: string
    lastName: string
-   userEmail?: string
+   userEmail: string
    id: string
    unsubscribed: boolean
    fieldOfStudyName: string
@@ -14,7 +14,11 @@ export interface BigQueryUserResponse {
    universityName: string
    linkedinUrl: string
    totalHits: number
+   lastActivityAt: {
+      value: string
+   }
 }
+
 export interface BigQueryUserQueryOptions {
    filters?: GetUserFilters
    page: number
