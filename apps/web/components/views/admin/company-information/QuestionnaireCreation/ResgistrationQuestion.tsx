@@ -41,9 +41,6 @@ const styles = sxStyles({
       textTransform: "none",
       mx: 2,
    },
-   actionButtons: {
-      p: 2,
-   },
    btn: {
       textTransform: "none",
    },
@@ -314,13 +311,7 @@ const RegistrationQuestion: FC<Props> = ({
                         >
                            Add an option
                         </Button>
-                        <Stack
-                           direction={{
-                              xs: "column-reverse",
-                              md: "row",
-                           }}
-                           sx={styles.actionButtons}
-                        >
+                        <Stack direction="row" p={2}>
                            {values.questionType === "custom" ? (
                               <LoadingButton
                                  endIcon={isMobile ? null : <DeleteIcon />}
