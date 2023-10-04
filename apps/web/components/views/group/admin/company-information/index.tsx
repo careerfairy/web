@@ -6,8 +6,7 @@ import CompanyIdentity from "components/views/admin/company-information/CompanyI
 import CompanyDetails from "components/views/admin/company-information/CompanyDetails"
 import TargetTalent from "components/views/admin/company-information/TargetTalent"
 import LiveStreamRegistrationQuestions from "components/views/admin/company-information/LiveStreamRegistrationQuestions"
-// import LiveStreamRegistrationQuestions from "../../../admin/company-information/LiveStreamRegistrationQuestions"
-// import PrivacyPolicy from "../../../admin/company-information/PrivacyPolicy"
+import PrivacyPolicy from "components/views/admin/company-information/PrivacyPolicy"
 
 const styles = sxStyles({
    container: {
@@ -46,7 +45,7 @@ const PageContent = () => {
 
                <LiveStreamRegistrationQuestions />
 
-               {/* <PrivacyPolicy /> */}
+               <PrivacyPolicy />
             </Stack>
          </Container>
       </Box>
