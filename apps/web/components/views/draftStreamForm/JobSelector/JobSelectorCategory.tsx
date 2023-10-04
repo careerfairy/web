@@ -43,7 +43,7 @@ const JobSelectorCategory = ({
       ;(async () => {
          const groupJobs = await groupRepo.getAllCustomJobsFromGroup(groupId)
 
-         if (groupJobs.length) {
+         if (groupJobs?.length) {
             setAllOptions(groupJobs)
          }
       })()
