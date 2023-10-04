@@ -1170,8 +1170,10 @@ export class FirebaseGroupRepository
          .collection("customJobs")
 
       const snapshots = await ref.get()
-      return mapFirestoreDocuments<CustomJob>(snapshots).map(
-         pickPublicDataFromCustomJob
+      return (
+         mapFirestoreDocuments<CustomJob>(snapshots)?.map(
+            pickPublicDataFromCustomJob
+         ) || []
       )
    }
 }
