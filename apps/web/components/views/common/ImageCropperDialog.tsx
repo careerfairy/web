@@ -6,6 +6,8 @@ import {
    DialogContent,
    DialogTitle,
    IconButton,
+   Slider,
+   Stack,
    Typography,
 } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -120,6 +122,23 @@ const ImageCropperDialog = ({
       handleClose()
    }
 
+   const handleChange = useCallback(
+      (_: Event, newValue: number) => {
+         const cropper = cropperRef.current.cropper
+
+         if (newValue > scale) {
+            zoomIn(cropper)
+         } else if (newValue < scale) {
+            zoomOut(cropper)
+         } else if (newValue === 1) {
+            zoomOut(cropper)
+         }
+
+         setScale(newValue as number)
+      },
+      [scale]
+   )
+
    return (
       <Dialog open={open} fullScreen={fullScreen} onClose={handleClose}>
          <DialogTitle sx={styles.dialogHeader}>
@@ -138,7 +157,7 @@ const ImageCropperDialog = ({
          <DialogContent dividers>
             <Box sx={styles.cropper}>
                <Cropper
-                  viewMode={0}
+                  viewMode={1}
                   dragMode={"none"}
                   src={imageSrc}
                   aspectRatio={aspectRatio}
@@ -154,6 +173,24 @@ const ImageCropperDialog = ({
                   cropBoxResizable={false}
                />
             </Box>
+            <Stack
+               spacing={2}
+               direction="row"
+               sx={styles.slider}
+               alignItems="center"
+               width={"stretch"}
+            >
+               <ImageIcon width={"24px"} height={"24px"} />
+               <Slider
+                  color="secondary"
+                  max={10}
+                  min={1}
+                  step={1}
+                  aria-label="Scale"
+                  onChange={handleChange}
+               />
+               <ImageIcon width={"36px"} height={"36px"} />
+            </Stack>
          </DialogContent>
          <DialogActions sx={styles.button}>
             <Button
@@ -177,5 +214,9 @@ const ImageCropperDialog = ({
       </Dialog>
    )
 }
+
+const zoomIn = (cropper: Cropper) => cropper.zoom(0.1)
+
+const zoomOut = (cropper: Cropper) => cropper.zoom(-0.1)
 
 export default ImageCropperDialog
