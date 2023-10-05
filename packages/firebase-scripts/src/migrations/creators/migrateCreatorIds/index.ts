@@ -3,6 +3,7 @@ import { groupRepo } from "../../../repositories"
 import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
 import { firestore } from "../../../lib/firebase"
+import { pickPublicDataFromCreator } from "@careerfairy/shared-lib/dist/groups/creators"
 
 const counter = new Counter()
 
@@ -12,7 +13,10 @@ export async function run() {
 
       const [creators, sparks] = await logAction(
          () =>
-            Promise.all([groupRepo.getAllCreators(), groupRepo.getAllSparks()]),
+            Promise.all([
+               groupRepo.getAllCreators(false),
+               groupRepo.getAllSparks(false),
+            ]),
          "Fetching all creators and sparks"
       )
 
@@ -26,7 +30,11 @@ export async function run() {
 
       for (const creator of creators) {
          // Generate a new Firestore ID
-         const newId = firestore.collection("_").doc().id
+         const newId = firestore
+            .collection("careerCenterData")
+            .doc(creator.groupId)
+            .collection("creators")
+            .doc().id
 
          // Update the creator's ID
          creator.id = newId
@@ -37,7 +45,10 @@ export async function run() {
             .doc(creator.groupId)
             .collection("creators")
             .doc(newId)
+
          batch.set(newCreatorRef, creator)
+         counter.writeIncrement()
+         counter.addToCustomCount("creatorIdsUpdated", 1)
 
          // Delete the old creator document
          const oldCreatorRef = firestore
@@ -45,7 +56,10 @@ export async function run() {
             .doc(creator.groupId)
             .collection("creators")
             .doc(creator.email)
+
          batch.delete(oldCreatorRef)
+         counter.writeIncrement()
+         counter.addToCustomCount("creatorIdsDeleted", 1)
 
          // Update the embedded creator data in all sparks that reference this creator
          const sparksSnapshot = await firestore
@@ -53,20 +67,25 @@ export async function run() {
             .where("creator.id", "==", creator.email)
             .get()
 
+         counter.addToReadCount(sparksSnapshot.size)
+
          for (const sparkDoc of sparksSnapshot.docs) {
             const sparkData = sparkDoc.data()
 
             // Update the embedded creator data
-            sparkData.creator = creator
+            sparkData.creator = pickPublicDataFromCreator(creator)
 
             // Update the spark document
             const sparkRef = firestore.collection("sparks").doc(sparkDoc.id)
-            batch.set(sparkRef, sparkData)
+            batch.update(sparkRef, sparkData)
+            counter.writeIncrement()
+            counter.addToCustomCount("sparkCreatorIdsUpdated", 1)
          }
       }
 
       // Commit the batch
       await batch.commit()
+      Counter.log("Batch committed")
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
