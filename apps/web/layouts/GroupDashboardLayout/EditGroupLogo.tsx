@@ -10,6 +10,7 @@ import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions"
 import Link from "../../components/views/common/Link"
 import { sxStyles } from "../../types/commonTypes"
 import { useGroup } from "./index"
+import { useState } from "react"
 
 const styles = sxStyles({
    logoWrapper: {
@@ -58,6 +59,13 @@ const styles = sxStyles({
 
 const EditGroupLogo = () => {
    const { group, shrunkLeftMenuState } = useGroup()
+
+   const [imageFailedToLoad, setImageFailedToLoad] = useState<boolean>(false)
+
+   const handleImageError = () => {
+      setImageFailedToLoad(true)
+   }
+
    return (
       <Box
          sx={[
@@ -74,7 +82,12 @@ const EditGroupLogo = () => {
          >
             <Box sx={styles.nextImageWrapper}>
                <Image
-                  src={getResizedUrl(group?.logoUrl, "lg")}
+                  src={
+                     imageFailedToLoad
+                        ? group?.logoUrl
+                        : getResizedUrl(group?.logoUrl, "lg")
+                  }
+                  onError={handleImageError}
                   layout="fill"
                   objectFit="contain"
                   quality={100}
