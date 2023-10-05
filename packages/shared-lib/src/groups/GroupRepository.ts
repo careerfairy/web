@@ -1027,9 +1027,10 @@ export class FirebaseGroupRepository
          .collection("careerCenterData")
          .doc(groupId)
          .collection("creators")
-         .doc(email)
+         .where("email", "==", email)
+         .limit(1)
 
-      return creatorRef.get().then((snap) => !snap.exists)
+      return creatorRef.get().then((snap) => snap.empty)
    }
 
    async getCreatorById(groupId: string, creatorId: string): Promise<Creator> {
