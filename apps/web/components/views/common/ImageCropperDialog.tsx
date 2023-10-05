@@ -6,8 +6,6 @@ import {
    DialogContent,
    DialogTitle,
    IconButton,
-   Slider,
-   Stack,
    Typography,
 } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -19,6 +17,7 @@ import { Image as ImageIcon, X as XIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import useSWRMutation from "swr/mutation"
 import { LoadingButton } from "@mui/lab"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    dialogTitle: {
@@ -37,6 +36,10 @@ const styles = sxStyles({
       },
       ".cropper-view-box": {
          borderRadius: "50% 50%",
+      },
+      "& img": {
+         display: "block",
+         maxWidth: "100%",
       },
    },
    dialogHeader: {
@@ -78,6 +81,7 @@ const ImageCropperDialog = ({
    aspectRatio = 1,
 }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
+   const fullScreen = useIsMobile()
 
    const [scale, setScale] = useState(0)
    const cropperRef = useRef<ReactCropperElement>(null)
@@ -116,25 +120,8 @@ const ImageCropperDialog = ({
       handleClose()
    }
 
-   const handleChange = useCallback(
-      (_: Event, newValue: number) => {
-         const cropper = cropperRef.current.cropper
-
-         if (newValue > scale) {
-            zoomIn(cropper)
-         } else if (newValue < scale) {
-            zoomOut(cropper)
-         } else if (newValue === 1) {
-            zoomOut(cropper)
-         }
-
-         setScale(newValue as number)
-      },
-      [scale]
-   )
-
    return (
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} fullScreen={fullScreen} onClose={handleClose}>
          <DialogTitle sx={styles.dialogHeader}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
                <ImageIcon />
@@ -151,7 +138,7 @@ const ImageCropperDialog = ({
          <DialogContent dividers>
             <Box sx={styles.cropper}>
                <Cropper
-                  viewMode={1}
+                  viewMode={0}
                   dragMode={"none"}
                   src={imageSrc}
                   aspectRatio={aspectRatio}
@@ -162,27 +149,11 @@ const ImageCropperDialog = ({
                   zoomable
                   responsive
                   movable={false}
+                  minContainerWidth={300}
+                  minContainerHeight={300}
                   cropBoxResizable={false}
                />
             </Box>
-            <Stack
-               spacing={2}
-               direction="row"
-               sx={styles.slider}
-               alignItems="center"
-               width={"stretch"}
-            >
-               <ImageIcon width={"24px"} height={"24px"} />
-               <Slider
-                  color="secondary"
-                  max={10}
-                  min={1}
-                  step={1}
-                  aria-label="Scale"
-                  onChange={handleChange}
-               />
-               <ImageIcon width={"36px"} height={"36px"} />
-            </Stack>
          </DialogContent>
          <DialogActions sx={styles.button}>
             <Button
@@ -206,9 +177,5 @@ const ImageCropperDialog = ({
       </Dialog>
    )
 }
-
-const zoomIn = (cropper: Cropper) => cropper.zoom(0.1)
-
-const zoomOut = (cropper: Cropper) => cropper.zoom(-0.1)
 
 export default ImageCropperDialog
