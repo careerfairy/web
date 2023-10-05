@@ -11,6 +11,7 @@ import CalendarFilter from "./CalendarFilter"
 import { renderToString } from "react-dom/server"
 import { Filter as FilterIcon } from "react-feather"
 import { CalendarChartDataType } from "./AcademicCalendar"
+import { DateTime } from "luxon"
 
 const Chart = dynamic(() => import("react-apexcharts"), {
    ssr: false,
@@ -40,6 +41,10 @@ const styles = sxStyles({
 type Props = {
    seriesData: CalendarChartDataType
 }
+
+const now = DateTime.local()
+const sixDaysAgo = now.minus({ days: 6 })
+const sixDaysLater = now.plus({ days: 6 })
 
 const iconString = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
    renderToString(<FilterIcon color={"#6F8193"} />)
@@ -134,13 +139,9 @@ const CalendarChart = ({ seriesData }: Props) => {
             },
             xaxis: {
                type: "datetime",
+               min: sixDaysAgo.toMillis(),
+               max: sixDaysLater.toMillis(),
                labels: { datetimeFormatter: { month: "01 MMM " } },
-            },
-            yaxis: {
-               labels: {
-                  align: "left",
-                  offsetX: -20,
-               },
             },
             stroke: {
                width: 1,
