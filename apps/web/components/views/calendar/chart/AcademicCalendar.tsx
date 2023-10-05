@@ -23,13 +23,13 @@ const styles = sxStyles({
       height: "100%",
       width: "100%",
       maxHeight: "487px",
-      maxWidth: "822px",
+      maxWidth: "1080px",
    },
 })
 
 export type CalendarChartDataType = {
    name: string
-   data: { x: any; y: any[] }[]
+   data: { x: any; y: any[]; isOneDay: boolean }[]
 }[]
 
 type CalendarContextType = {
@@ -123,28 +123,36 @@ const AcademicCalendar = () => {
    )
 
    const periodToDataPoint = useCallback(
-      (period, universities) => ({
-         x: getUniversityName(period.timelineUniversityId, universities),
-         y: [period.start.toMillis(), period.end.toMillis()],
-      }),
+      (period, universities) => {
+         let endDate = period.end.toMillis()
+         if (period.start.toMillis() === endDate) {
+            // Add 23 hours to the end date of one-day events
+            endDate += 23 * 60 * 60 * 1000
+         }
+         return {
+            x: getUniversityName(period.timelineUniversityId, universities),
+            y: [period.start.toMillis(), endDate],
+            isOneDay: period.start.toMillis() === period.end.toMillis(),
+         }
+      },
       [getUniversityName]
    )
 
    const seriesData: CalendarChartDataType = useMemo(() => {
-      const seriesData = []
+      const seriesData: CalendarChartDataType = []
       if (!selectedPeriods || selectedPeriods.length <= 0) {
          // need at least one element for the graph to display at all
          // and we need the toolbar to stay
          seriesData.push({
             name: "empty",
-            data: [{ x: ["No available data"], y: [0, 0] }],
+            data: [{ x: ["No available data"], y: [0, 0], isOneDay: false }],
          })
          return seriesData
       }
       Object.values(UniversityPeriodObject).forEach(function (type) {
-         let dataArray = []
+         let dataArray: CalendarChartDataType[number]["data"] = []
          dataArray = selectedPeriods
-            .filter((period) => period.type == type)
+            .filter((period) => period.type === type)
             .map((period) => periodToDataPoint(period, selectedUniversities))
          seriesData.push({
             name: type.charAt(0).toUpperCase() + type.slice(1),
