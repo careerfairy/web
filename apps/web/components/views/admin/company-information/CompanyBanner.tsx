@@ -1,5 +1,5 @@
 import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { Box, BoxProps, Button, Stack, Typography } from "@mui/material"
+import { Avatar, Box, BoxProps, Button, Stack, Typography } from "@mui/material"
 import useUploadGroupBanner from "components/custom-hook/group/useUploadGroupBanner"
 import useFileUploader from "components/custom-hook/useFileUploader"
 import FileUploader from "components/views/common/FileUploader"
@@ -14,16 +14,14 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       width: "100%",
-      height: 124,
-      flexShrink: 0,
+      height: "100%",
       borderRadius: 1,
       border: "1px solid #EDE7FD",
       background: "#F7F8FC",
-      backgroundSize: "cover",
-      backgroundPosition: "center !important",
       color: "#9999B1",
       fontSize: "0.85714rem",
       fontWeight: 300,
+      position: "relative",
    },
    uploadPictureButton: {
       textTransform: "none",
@@ -51,7 +49,7 @@ const styles = sxStyles({
          transition: (theme) => theme.transitions.create("opacity"),
       },
       width: "100%",
-      height: "124px",
+      height: 144,
       position: "relative",
       cursor: "pointer",
    },
@@ -62,6 +60,19 @@ const styles = sxStyles({
       "& .banner-upload-cta": {
          opacity: 1,
       },
+   },
+   bannerImage: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 1,
+      position: "absolute",
+   },
+   greyOverlay: {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      opacity: 0.95,
+      background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), lightgray 50% / cover no-repeat`,
    },
 })
 
@@ -117,7 +128,7 @@ type DefaultLabelProps = {
 const DefaultLabel: FC<DefaultLabelProps> = ({ sx }) => {
    return (
       <>
-         <Typography>Recommended size: 2880x576px</Typography>
+         <Typography zIndex={1}>Recommended size: 2880x576px</Typography>
          <Button
             size="small"
             color="secondary"
@@ -138,31 +149,25 @@ type BannerPreviewProps = {
 const BannerPreview: FC<BannerPreviewProps> = ({ url }) => {
    return (
       <Box className="banner-preview">
-         <Box
-            sx={[
-               styles.companyBannerUploadArea,
-               url && {
-                  background: `url(${url}), lightgray 50% / cover no-repeat`,
-               },
-            ]}
-         >
+         <Box sx={styles.companyBannerUploadArea}>
+            <BannerImage url={url} />
             {url ? null : <DefaultLabel sx={styles.uploadPictureButton} />}
          </Box>
       </Box>
    )
 }
 
+const BannerImage: FC<BannerPreviewProps> = ({ url }) => {
+   if (!url) return null
+
+   return <Avatar src={url} alt="banner preview" sx={styles.bannerImage} />
+}
+
 const BannerUploadCTA: FC<BannerPreviewProps> = ({ url }) => {
    return (
-      <Stack
-         className="banner-upload-cta"
-         sx={[
-            styles.companyBannerUploadArea,
-            {
-               background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), url(${url}), lightgray 50% / cover no-repeat`,
-            },
-         ]}
-      >
+      <Stack className="banner-upload-cta" sx={styles.companyBannerUploadArea}>
+         <BannerImage url={url} />
+         <Box sx={styles.greyOverlay} />
          <DefaultLabel sx={styles.uploadPictureButton} />
       </Stack>
    )

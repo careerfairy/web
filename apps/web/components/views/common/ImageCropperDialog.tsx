@@ -19,6 +19,7 @@ import { Image as ImageIcon, X as XIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import useSWRMutation from "swr/mutation"
 import { LoadingButton } from "@mui/lab"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    dialogTitle: {
@@ -37,6 +38,10 @@ const styles = sxStyles({
       },
       ".cropper-view-box": {
          borderRadius: "50% 50%",
+      },
+      "& img": {
+         display: "block",
+         maxWidth: "100%",
       },
    },
    dialogHeader: {
@@ -78,6 +83,7 @@ const ImageCropperDialog = ({
    aspectRatio = 1,
 }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
+   const fullScreen = useIsMobile()
 
    const [scale, setScale] = useState(0)
    const cropperRef = useRef<ReactCropperElement>(null)
@@ -134,7 +140,7 @@ const ImageCropperDialog = ({
    )
 
    return (
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} fullScreen={fullScreen} onClose={handleClose}>
          <DialogTitle sx={styles.dialogHeader}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
                <ImageIcon />
@@ -162,6 +168,8 @@ const ImageCropperDialog = ({
                   zoomable
                   responsive
                   movable={false}
+                  minContainerWidth={300}
+                  minContainerHeight={300}
                   cropBoxResizable={false}
                />
             </Box>
