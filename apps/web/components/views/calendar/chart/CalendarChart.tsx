@@ -43,7 +43,7 @@ type Props = {
 }
 
 const now = DateTime.local()
-const sixDaysAgo = now.minus({ days: 6 })
+const sixMonthsAgo = now.minus({ months: 6 })
 const sixMonthsLater = now.plus({ months: 6 })
 
 const iconString = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
