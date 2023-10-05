@@ -44,7 +44,7 @@ type Props = {
 
 const now = DateTime.local()
 const sixDaysAgo = now.minus({ days: 6 })
-const sixDaysLater = now.plus({ days: 6 })
+const sixMonthsLater = now.plus({ months: 6 })
 
 const iconString = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
    renderToString(<FilterIcon color={"#6F8193"} />)
