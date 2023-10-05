@@ -28,12 +28,17 @@ const styles = sxStyles({
       height: 140,
       position: "relative",
       cursor: "pointer",
+      border: `1px solid #EDE7FD`,
+      borderRadius: "50%",
    },
    companyLogoAvatar: {
       position: "absolute",
       width: "100%",
       height: "100%",
       top: 0,
+      "& img": {
+         objectFit: "contain",
+      },
    },
    imageLabel: {
       color: "#9999B1",
@@ -105,6 +110,9 @@ const styles = sxStyles({
          fontWeight: 400,
          lineHeight: "141%",
       },
+   },
+   logoUploader: {
+      width: "fit-content",
    },
 })
 
@@ -192,7 +200,7 @@ const CompanyIdentity: FC = () => {
                   />
                ) : null}
 
-               <FileUploader {...logoUploaderProps}>
+               <FileUploader sx={styles.logoUploader} {...logoUploaderProps}>
                   <CompanyLogo
                      url={groupPresenter.getCompanyLogoUrl()}
                      dragActive={logoDragActive}

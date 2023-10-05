@@ -154,6 +154,8 @@ export interface IGroupRepository {
          | "targetedFieldsOfStudy"
          | "privacyPolicyActive"
          | "privacyPolicyUrl"
+         | "universityName"
+         | "careerPageUrl"
       >
    ): Promise<void>
 
