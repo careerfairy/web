@@ -14,13 +14,13 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       width: "100%",
-      height: 124,
-      flexShrink: 0,
+      height: "100%",
       borderRadius: 1,
       border: "1px solid #EDE7FD",
       background: "#F7F8FC",
-      backgroundSize: "cover",
+      backgroundSize: "auto 150% !important",
       backgroundPosition: "center !important",
+      backgroundRepeat: "no-repeat !important",
       color: "#9999B1",
       fontSize: "0.85714rem",
       fontWeight: 300,
@@ -51,7 +51,7 @@ const styles = sxStyles({
          transition: (theme) => theme.transitions.create("opacity"),
       },
       width: "100%",
-      height: "124px",
+      height: 124,
       position: "relative",
       cursor: "pointer",
    },
@@ -142,7 +142,7 @@ const BannerPreview: FC<BannerPreviewProps> = ({ url }) => {
             sx={[
                styles.companyBannerUploadArea,
                url && {
-                  background: `url(${url}), lightgray 50% / cover no-repeat`,
+                  background: `url(${url})`,
                },
             ]}
          >
