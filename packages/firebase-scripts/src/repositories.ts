@@ -1,12 +1,5 @@
-import {
-   FirebaseUniversityRepository,
-   IUniversityRepository,
-} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
+import { auth, firestore } from "./lib/firebase"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
-import {
-   GroupScriptsRepository,
-   IGroupScriptsRepository,
-} from "./api/GroupScriptsRepository"
 import {
    ILivestreamScriptsRepository,
    LivestreamScriptsRepository,
@@ -15,7 +8,14 @@ import {
    IUserScriptsRepository,
    UserScriptsRepository,
 } from "./api/UserScriptsRepository"
-import { auth, firestore } from "./lib/firebase"
+import {
+   GroupScriptsRepository,
+   IGroupScriptsRepository,
+} from "./api/GroupScriptsRepository"
+import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
 
 const firestoreInstance = firestore as any
 const authInstance = auth
