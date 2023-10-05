@@ -139,8 +139,8 @@ const CalendarChart = ({ seriesData }: Props) => {
             },
             xaxis: {
                type: "datetime",
-               min: sixDaysAgo.toMillis(),
-               max: sixDaysLater.toMillis(),
+               min: sixMonthsAgo.toMillis(),
+               max: sixMonthsLater.toMillis(),
                labels: { datetimeFormatter: { month: "01 MMM " } },
             },
             stroke: {
