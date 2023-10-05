@@ -37,7 +37,9 @@ const CompanyDetails = () => {
          extraInfo: group.extraInfo ?? "",
          companyCountry: group.companyCountry ?? null,
          companyIndustries: group.companyIndustries ?? [],
-         companySize: group.companySize ?? null,
+         companySize:
+            CompanySizesCodes.find((size) => size.id === group.companySize) ??
+            null,
       }),
       [
          group.universityName,
@@ -52,7 +54,14 @@ const CompanyDetails = () => {
    const onSubmit = useCallback(
       async (values: FormValues) => {
          try {
-            await groupRepo.updateGroupMetadata(group.id, values)
+            await groupRepo.updateGroupMetadata(group.id, {
+               universityName: values.universityName,
+               careerPageUrl: values.careerPageUrl,
+               extraInfo: values.extraInfo,
+               companyCountry: values.companyCountry,
+               companyIndustries: values.companyIndustries,
+               companySize: values.companySize.id,
+            })
 
             successNotification(
                "Your company details were successfully updated"
@@ -192,7 +201,7 @@ type FormValues = {
    universityName: string
    companyCountry: GroupOption | null
    companyIndustries: GroupOption[] | null
-   companySize: string
+   companySize: (typeof CompanySizesCodes)[number] | null
    careerPageUrl: string
    extraInfo: string
 }
