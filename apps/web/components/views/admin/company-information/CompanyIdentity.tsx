@@ -34,6 +34,9 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       top: 0,
+      "& img": {
+         objectFit: "contain",
+      },
    },
    imageLabel: {
       color: "#9999B1",
