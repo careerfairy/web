@@ -18,6 +18,7 @@ import { StyledCheckbox } from "../group/admin/common/inputs"
 import { alpha } from "@mui/material/styles"
 import ChipDeleteIcon from "@mui/icons-material/HighlightOffRounded"
 import { makeStyles } from "@mui/styles"
+import BrandedTooltip from "./tooltips/BrandedTooltip"
 
 const useStyles = makeStyles({
    option: {
@@ -32,6 +33,8 @@ const useStyles = makeStyles({
       },
    },
 })
+
+const maxChipCount = 3
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -284,7 +287,7 @@ const MultiListSelect = ({
          />
          {isChipUnderTextfield ? (
             <Box mt={2}>
-               {selectedItemsLocal.map((option, index) => (
+               {selectedItemsLocal.slice(0, maxChipCount).map((option) => (
                   <CustomChip
                      key={getKeyFn(option)}
                      sx={{ m: 0.5 }}
@@ -301,6 +304,20 @@ const MultiListSelect = ({
                      disabled={getOptionDisabled(option)}
                   />
                ))}
+               {selectedItemsLocal.length > maxChipCount && (
+                  <BrandedTooltip
+                     title={selectedItemsLocal
+                        .slice(maxChipCount)
+                        .map((option) => getLabelFn(option))
+                        .join(", ")}
+                  >
+                     <CustomChip
+                        label={`+${selectedItemsLocal.length - maxChipCount}`}
+                        sx={{ m: 0.5 }}
+                        {...chipProps}
+                     />
+                  </BrandedTooltip>
+               )}
             </Box>
          ) : null}
       </>
