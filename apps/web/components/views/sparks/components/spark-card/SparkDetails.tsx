@@ -21,7 +21,7 @@ const styles = sxStyles({
       letterSpacing: "-0.03121rem",
       ...getMaxLineStyles(1),
    },
-   displayNameWithCompanyName: {
+   displayNameWithRole: {
       fontWeight: 600,
       lineHeight: "168.75%",
    },
@@ -101,7 +101,7 @@ const SparkDetails: FC<Props> = ({
                <Typography
                   sx={[
                      styles.displayName,
-                     showCreatorPosition && styles.displayNameWithCompanyName,
+                     showCreatorPosition && styles.displayNameWithRole,
                   ]}
                   component={"h5"}
                >
