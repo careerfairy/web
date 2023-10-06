@@ -40,6 +40,10 @@ export class RankedLivestreamEvent {
       return this.model.companySizes || []
    }
 
+   getLanguage(): string {
+      return this.model.language.code || ""
+   }
+
    addPoints(points: number) {
       this.points += points
    }

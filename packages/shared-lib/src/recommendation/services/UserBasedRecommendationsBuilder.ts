@@ -66,4 +66,18 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
       return this
    }
+
+   public userSpokenLanguages() {
+      if (this.user.spokenLanguages?.length > 0) {
+         // Fetch the top recommended events based on the user's spoken languages
+         this.addResults(
+            this.rankedLivestreamRepo.getEventsBasedOnSpokenLanguages(
+               this.user.spokenLanguages,
+               this.limit
+            )
+         )
+      }
+
+      return this
+   }
 }
