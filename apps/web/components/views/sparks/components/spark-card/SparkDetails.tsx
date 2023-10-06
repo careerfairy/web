@@ -63,7 +63,7 @@ const SparkDetails: FC<Props> = ({
 }) => {
    const showCreatorPosition = Boolean(creatorPosition)
 
-   const title = showCreatorPosition
+   const detailsTooltipTitle = showCreatorPosition
       ? `${creatorPosition} at ${companyName}`
       : `From ${companyName}`
 
@@ -109,7 +109,11 @@ const SparkDetails: FC<Props> = ({
                </Typography>
             </BrandedTooltip>
             <BrandedTooltip
-               title={title.length > detailsTooltipThreshold ? title : ""}
+               title={
+                  detailsTooltipTitle.length > detailsTooltipThreshold
+                     ? detailsTooltipTitle
+                     : ""
+               }
             >
                <Typography
                   sx={[
