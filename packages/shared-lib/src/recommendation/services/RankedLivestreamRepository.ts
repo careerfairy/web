@@ -11,6 +11,7 @@ type RankEventsArgs = {
    targetUserIds: unknown[]
    targetLivestreamIdsGetter: (stream: RankedLivestreamEvent) => unknown[]
    pointsPerMatch: number
+   pointsPerMissingMatch?: number
 }
 
 /**
@@ -26,6 +27,7 @@ export class RankedLivestreamRepository {
    private readonly pointsPerCompanyIndustryMatch = 2
    private readonly pointsPerCompanySizeMatch = 1
    private readonly pointsPerUniversityCountryMatch = 5
+   private readonly pointsPerSpokenLanguageMatch = 3
 
    private readonly livestreams: RankedLivestreamEvent[]
 
@@ -148,6 +150,20 @@ export class RankedLivestreamRepository {
       })
    }
 
+   public getEventsBasedOnSpokenLanguages(
+      spokenLanguages: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      return this.rankEvents({
+         pointsPerMatch: this.pointsPerSpokenLanguageMatch,
+         pointsPerMissingMatch: -this.pointsPerSpokenLanguageMatch, // decrease points if the user does not speak the language
+         // use all livestreams since we want to decrease the points if the user does not speak the language
+         rankedLivestreams: this.livestreams,
+         targetUserIds: spokenLanguages,
+         targetLivestreamIdsGetter: (stream) => [stream.getLanguage()],
+      })
+   }
+
    private getEventsFilteredByArrayField(
       field: keyof LivestreamEvent,
       values: unknown[],
@@ -169,13 +185,24 @@ export class RankedLivestreamRepository {
       rankedLivestreams,
       targetLivestreamIdsGetter,
       targetUserIds,
+      pointsPerMissingMatch = 0,
    }: RankEventsArgs): RankedLivestreamEvent[] {
       rankedLivestreams.forEach((rankedLivestream) => {
          // This is the number of matches between the user's interests or
          // field Of Study, etc and the event's interests or field Of Studies, etc
-         const numMatches = targetLivestreamIdsGetter(rankedLivestream).filter(
-            (livestreamDataId) => targetUserIds.includes(livestreamDataId)
+
+         const targetIds = targetLivestreamIdsGetter(rankedLivestream)
+
+         const numMatches = targetIds.filter((livestreamDataId) =>
+            targetUserIds.includes(livestreamDataId)
          ).length
+
+         const numMissingMatches = targetUserIds.length - numMatches
+
+         if (numMissingMatches > 0) {
+            const missMacthPoints = numMissingMatches * pointsPerMissingMatch
+            rankedLivestream.addPoints(missMacthPoints)
+         }
 
          // Add points to the event based on the number of matches
          rankedLivestream.addPoints(numMatches * pointsPerMatch)
