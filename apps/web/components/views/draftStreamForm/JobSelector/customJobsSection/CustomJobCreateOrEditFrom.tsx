@@ -147,7 +147,7 @@ const CustomJobCreateOrEditFrom = ({
                         <TextField
                            name={`title`}
                            id={`jobTitle`}
-                           placeholder="Eg. Spfware Engineer"
+                           placeholder="E.g., Software Engineer"
                            variant="outlined"
                            fullWidth
                            disabled={isSubmitting}
@@ -174,7 +174,7 @@ const CustomJobCreateOrEditFrom = ({
                         <TextField
                            name={`salary`}
                            id={`salary`}
-                           placeholder="E.g. 85’000-95’000 CHF"
+                           placeholder="E.g., 85’000-95’000 CHF"
                            variant="outlined"
                            fullWidth
                            disabled={isSubmitting}
@@ -214,6 +214,9 @@ const CustomJobCreateOrEditFrom = ({
                               <TextField
                                  {...params}
                                  label="Job Type (Required)"
+                                 placeholder={
+                                    "Tell your viewers more on what to expect about this job"
+                                 }
                                  variant="outlined"
                                  error={Boolean(
                                     errors.jobType && touched.jobType
