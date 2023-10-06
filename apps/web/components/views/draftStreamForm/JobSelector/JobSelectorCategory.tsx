@@ -1,12 +1,11 @@
-import React, { Dispatch, useEffect, useMemo, useState } from "react"
+import React, { Dispatch, useMemo } from "react"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"
 import { FormikValues } from "formik"
 import CustomJobSection from "./customJobsSection/CustomJobSection"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
-import { groupRepo } from "../../../../data/RepositoryInstances"
+import useGroupCustomJobs from "../../../custom-hook/useGroupCustomJobs"
 
 type Props = {
    groupId: string
@@ -37,17 +36,7 @@ const JobSelectorCategory = ({
    isSubmitting,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
-   const [allOptions, setAllOptions] = useState<PublicCustomJob[]>([])
-
-   useEffect(() => {
-      ;(async () => {
-         const groupJobs = await groupRepo.getAllCustomJobsFromGroup(groupId)
-
-         if (groupJobs?.length) {
-            setAllOptions(groupJobs)
-         }
-      })()
-   }, [groupId, values.customJobs])
+   const { data: allCustomJobs } = useGroupCustomJobs(groupId)
 
    // First sync should be complete to fetch the jobs
    const filteredAccounts = useMemo(() => {
@@ -70,7 +59,7 @@ const JobSelectorCategory = ({
          ) : (
             <CustomJobSection
                groupId={groupId}
-               jobs={allOptions}
+               jobs={allCustomJobs}
                values={values}
                setFieldValue={setFieldValue}
                isSubmitting={isSubmitting}
