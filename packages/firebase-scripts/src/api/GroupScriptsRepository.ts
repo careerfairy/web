@@ -16,6 +16,8 @@ import {
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { DataWithRef } from "../util/types"
 import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
+import { Creator } from "@careerfairy/shared-lib/dist/groups/creators"
+import { Spark } from "@careerfairy/shared-lib/dist/sparks/sparks"
 import admin = require("firebase-admin")
 
 export interface IGroupScriptsRepository extends IGroupRepository {
@@ -64,6 +66,14 @@ export interface IGroupScriptsRepository extends IGroupRepository {
       companySize: string,
       withRef?: T
    ): Promise<DataWithRef<T, Group>[]>
+
+   getAllCreators<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, Creator>[]>
+
+   getAllSparks<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, Spark>[]>
 }
 
 export class GroupScriptsRepository
@@ -215,5 +225,24 @@ export class GroupScriptsRepository
          .where("companySize", "==", companySize)
          .get()
       return mapFirestoreDocuments<Group, T>(groups, withRef)
+   }
+
+   async getAllCreators<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, Creator>[]> {
+      const users = await this.firestore
+         .collectionGroup("creators")
+         .where("documentType", "==", "groupCreator")
+         .get()
+
+      return mapFirestoreDocuments<Creator, T>(users, withRef)
+   }
+
+   async getAllSparks<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, Spark>[]> {
+      const sparks = await this.firestore.collection("sparks").get()
+
+      return mapFirestoreDocuments<Spark, T>(sparks, withRef)
    }
 }
