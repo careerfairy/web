@@ -124,29 +124,39 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                   {job.title}
                </Typography>
 
-               <IconButton onClick={handleClick} size="small">
-                  <MoreVertIcon color={"secondary"} />
-               </IconButton>
-               <BrandedMenu
-                  onClose={handleClose}
-                  anchorEl={anchorEl}
-                  open={open}
-               >
-                  <MenuItem onClick={handleClickEdit}>
-                     <EditIcon sx={{ height: 16 }} color="inherit" />
-                     Edit details
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem
-                     sx={styles.deleteMenuItem}
-                     onClick={() => handleRemoveJob(job.id)}
+               <Box>
+                  <IconButton onClick={handleClick} size="small">
+                     <MoreVertIcon color={"secondary"} />
+                  </IconButton>
+                  <BrandedMenu
+                     onClose={handleClose}
+                     anchorEl={anchorEl}
+                     open={open}
+                     anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right",
+                     }}
+                     transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                     }}
                   >
-                     <Box sx={styles.deleteIcon}>
-                        <DeleteIcon />
-                     </Box>
-                     Remove job opening
-                  </MenuItem>
-               </BrandedMenu>
+                     <MenuItem onClick={handleClickEdit}>
+                        <EditIcon sx={{ height: 16 }} color="inherit" />
+                        Edit details
+                     </MenuItem>
+                     <Divider />
+                     <MenuItem
+                        sx={styles.deleteMenuItem}
+                        onClick={() => handleRemoveJob(job.id)}
+                     >
+                        <Box sx={styles.deleteIcon}>
+                           <DeleteIcon />
+                        </Box>
+                        Remove job opening
+                     </MenuItem>
+                  </BrandedMenu>
+               </Box>
             </Grid>
 
             <Grid xs={12} item sx={styles.infoSection} mt={2}>
@@ -179,7 +189,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
 
                <Typography variant="body1" fontSize={"inherit"} mt={1}>
                   <Link
-                     href={job.postingUrl}
+                     href={getPostingUrl(job.postingUrl)}
                      color={"inherit"}
                      underline={"none"}
                      target={"_blank"}
@@ -229,4 +239,11 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    )
 }
 
+const getPostingUrl = (postingUrl: string): string => {
+   if (postingUrl.indexOf("http") === 0) {
+      return postingUrl
+   } else {
+      return `https://${postingUrl}`
+   }
+}
 export default CustomJobPreview
