@@ -55,6 +55,8 @@ export default class RecommendationServiceCore {
                userInterestIds: user?.interestsIds || [],
                userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
                userCountriesOfInterest: user?.countriesOfInterest || [],
+               userUniversityCountryCode: user?.universityCountryCode || "N/A",
+               userSpokenLanguages: user?.spokenLanguages || [],
             },
             eventMetaData: deDupedEvents.map((e) => ({
                id: e.id,
@@ -64,6 +66,7 @@ export default class RecommendationServiceCore {
                companyCountries: e.getCompanyCountries(),
                companyIndustries: e.getCompanyIndustries(),
                companySizes: e.getCompanySizes(),
+               language: e.getLanguage(),
             })),
          })
       }
@@ -138,6 +141,7 @@ export default class RecommendationServiceCore {
          .userFieldsOfStudy()
          .userCountriesOfInterest()
          .userUniversityCountry()
+         .userSpokenLanguages()
          .get()
    }
 }
