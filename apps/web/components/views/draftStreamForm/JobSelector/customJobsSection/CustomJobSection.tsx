@@ -8,7 +8,7 @@ import CustomJobPreview from "./CustomJobPreview"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
 import { groupRepo } from "../../../../../data/RepositoryInstances"
-import { useSnackbar } from "notistack"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 type Props = {
    groupId: string
@@ -26,7 +26,7 @@ const CustomJobSection = ({
    isSubmitting,
 }: Props) => {
    const [showForm, setShowForm] = useState(false)
-   const { enqueueSnackbar } = useSnackbar()
+   const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const handleChange = useCallback(
       (name: string, value: PublicCustomJob[]) => {
@@ -52,18 +52,18 @@ const CustomJobSection = ({
             setFieldValue("customJobs", [customJob, ...values.customJobs])
             setShowForm(false)
 
-            enqueueSnackbar("New job opening was created", {
-               variant: "success",
-               preventDuplicate: true,
-            })
+            successNotification("New job opening was created")
          } catch (error) {
-            enqueueSnackbar("Something went wrong, try again", {
-               variant: "error",
-               preventDuplicate: true,
-            })
+            errorNotification("Something went wrong, try again")
          }
       },
-      [enqueueSnackbar, groupId, setFieldValue, values.customJobs]
+      [
+         errorNotification,
+         groupId,
+         setFieldValue,
+         successNotification,
+         values.customJobs,
+      ]
    )
 
    const handleRemoveJob = useCallback(
@@ -93,18 +93,18 @@ const CustomJobSection = ({
                ...values.customJobs.slice(updatedJobIndex + 1),
             ])
 
-            enqueueSnackbar("Job opening was updated", {
-               variant: "success",
-               preventDuplicate: true,
-            })
+            successNotification("Job opening was updated")
          } catch (error) {
-            enqueueSnackbar("Something went wrong, try again", {
-               variant: "error",
-               preventDuplicate: true,
-            })
+            errorNotification("Something went wrong, try again")
          }
       },
-      [enqueueSnackbar, groupId, setFieldValue, values.customJobs]
+      [
+         errorNotification,
+         groupId,
+         setFieldValue,
+         successNotification,
+         values.customJobs,
+      ]
    )
 
    return (
