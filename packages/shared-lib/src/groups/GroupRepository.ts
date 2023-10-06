@@ -1138,6 +1138,7 @@ export class FirebaseGroupRepository
          updatedAt: this.fieldValue.serverTimestamp(),
          livestreams: [],
          clicks: 0,
+         id: ref.id,
       }
 
       await ref.set(newJob, { merge: true })

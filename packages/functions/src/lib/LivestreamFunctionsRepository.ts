@@ -513,7 +513,6 @@ export class LivestreamFunctionsRepository
 
                if (customJobToUpdateIndex >= 0) {
                   batch.update(doc.ref, {
-                     ...livestream,
                      customJobs: [
                         ...livestream.customJobs.slice(
                            0,
