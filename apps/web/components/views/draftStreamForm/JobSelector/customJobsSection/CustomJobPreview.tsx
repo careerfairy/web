@@ -179,7 +179,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
             </Grid>
 
             <Grid xs={12} item mt={4}>
-               <CollapsableText text={job.description} />
+               <CollapsableText text={job.description} collapsedSize={80} />
             </Grid>
          </Grid>
       </Box>

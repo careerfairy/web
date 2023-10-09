@@ -242,7 +242,10 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                   <Typography variant={"subtitle1"} sx={styles.subTitle}>
                      Job description
                   </Typography>
-                  <CollapsableText text={job.description} />
+                  <CollapsableText
+                     text={job.description}
+                     collapsedSize={isMobile ? 190 : 80}
+                  />
                </Box>
 
                {Boolean(jobSalary) ? (
