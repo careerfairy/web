@@ -237,6 +237,7 @@ const FormComponent: FC = () => {
             <CreatorCard
                onClick={() => handleBack(true)}
                creator={values.creator}
+               groupId={group.id}
             />
          ) : (
             <SparksDialog.Button
