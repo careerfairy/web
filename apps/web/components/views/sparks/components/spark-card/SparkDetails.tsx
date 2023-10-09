@@ -21,18 +21,26 @@ const styles = sxStyles({
       letterSpacing: "-0.03121rem",
       ...getMaxLineStyles(1),
    },
+   displayNameWithRole: {
+      fontWeight: 600,
+      lineHeight: "168.75%",
+   },
    companyName: {
       fontSize: "0.85714rem",
-      fontStyle: "normal",
       fontWeight: 300,
       lineHeight: "117.5%",
-      letterSpacing: "-0.03121rem",
       ...getMaxLineStyles(1),
    },
    creatorDetails: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
+   },
+   companyNameAndRole: {
+      fontSize: "1rem",
+      fontWeight: 400,
+      lineHeight: "171.429%",
+      ...getMaxLineStyles(2),
    },
 })
 
@@ -41,6 +49,7 @@ type Props = {
    companyName: string
    companyLogoUrl: string
    linkToCompanyPage?: string
+   creatorPosition?: string
    onClick?: () => void
 }
 
@@ -49,8 +58,28 @@ const SparkDetails: FC<Props> = ({
    displayName,
    companyLogoUrl,
    linkToCompanyPage,
+   creatorPosition,
    onClick,
 }) => {
+   const showCreatorPosition = Boolean(creatorPosition)
+
+   const detailsTooltipTitle = showCreatorPosition
+      ? `${creatorPosition} at ${companyName}`
+      : `From ${companyName}`
+
+   const detailsTooltipThreshold = showCreatorPosition ? 70 : 40
+
+   const details = showCreatorPosition ? (
+      <>
+         {creatorPosition} at{" "}
+         <Box component="b" fontWeight={600}>
+            {companyName}
+         </Box>
+      </>
+   ) : (
+      <>From {companyName}</>
+   )
+
    return (
       <Box
          component={linkToCompanyPage ? Link : undefined}
@@ -58,22 +87,41 @@ const SparkDetails: FC<Props> = ({
          sx={styles.root}
          onClick={onClick}
       >
-         <RoundedLogo
-            src={companyLogoUrl}
-            alt={companyName}
-            size={36}
-            borderRadius={1.5}
-         />
+         <span>
+            <RoundedLogo
+               src={companyLogoUrl}
+               alt={companyName}
+               size={52}
+               borderRadius={1.5}
+            />
+         </span>
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>
             <BrandedTooltip title={displayName.length > 40 ? displayName : ""}>
-               <Typography sx={styles.displayName} component={"h5"}>
+               <Typography
+                  sx={[
+                     styles.displayName,
+                     showCreatorPosition && styles.displayNameWithRole,
+                  ]}
+                  component={"h5"}
+               >
                   {displayName}
                </Typography>
             </BrandedTooltip>
-            <BrandedTooltip title={companyName.length > 40 ? companyName : ""}>
-               <Typography sx={styles.companyName}>
-                  From {companyName}
+            <BrandedTooltip
+               title={
+                  detailsTooltipTitle.length > detailsTooltipThreshold
+                     ? detailsTooltipTitle
+                     : ""
+               }
+            >
+               <Typography
+                  sx={[
+                     styles.companyName,
+                     showCreatorPosition && styles.companyNameAndRole,
+                  ]}
+               >
+                  {details}
                </Typography>
             </BrandedTooltip>
          </Box>
