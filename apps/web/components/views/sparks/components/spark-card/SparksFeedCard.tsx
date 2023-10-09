@@ -212,9 +212,10 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                            onClick={onSparkDetailsClick}
                            displayName={`${spark.creator.firstName} ${spark.creator.lastName}`}
                            companyName={spark.group.universityName}
+                           creatorPosition={spark.creator.position}
                            linkToCompanyPage={companyPageLink}
                         />
-                        <Box mt={2.5} />
+                        <Box mt={2} />
                         <SparkCategoryChip categoryId={spark.category.id} />
                         <Box mt={1.5} />
                         <SparkQuestion question={spark.question} />
