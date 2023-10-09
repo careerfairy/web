@@ -271,7 +271,7 @@ export interface UserLivestreamData extends Identifiable {
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
    }
-   customJobApplication?: {
+   customJobApplications?: {
       [jobId: string]: LivestreamCustomJobApplicationsDetails
    }
 }
