@@ -2,6 +2,8 @@ import functions = require("firebase-functions")
 import firestore = require("@google-cloud/firestore")
 import config from "./config"
 
+import { collectionsForBackup } from "@careerfairy/shared-lib/constants/collections"
+
 // Run this function every hour
 export const exportFirestoreBackup = functions
    .region(config.region)
@@ -20,7 +22,7 @@ export const exportFirestoreBackup = functions
          const responses = await client.exportDocuments({
             name: databaseName,
             outputUriPrefix: bucket,
-            collectionIds: [],
+            collectionIds: collectionsForBackup,
          })
          const response = responses[0]
          console.log(`Operation Name: ${response["name"]}`)
