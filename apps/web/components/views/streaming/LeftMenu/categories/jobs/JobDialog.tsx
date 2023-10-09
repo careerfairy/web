@@ -1,234 +1,277 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useCallback, useMemo, useState } from "react"
-import GenericDialog from "../../../../common/GenericDialog"
+import React, { useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
-import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded"
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined"
 import JobEntryApply from "./JobEntryApply"
 import Typography from "@mui/material/Typography"
-import UserResume from "../../../../profile/userData/user-resume/UserResume"
-import { Button, Collapse, Stack } from "@mui/material"
+import {
+   Avatar,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   Stack,
+} from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import SanitizedHTML from "../../../../../util/SanitizedHTML"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import CloseIcon from "@mui/icons-material/Close"
+import IconButton from "@mui/material/IconButton"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import DateUtil from "../../../../../../util/DateUtil"
+import CvUploadSection from "./CvUploadSection"
+import CollapsableText from "../../../../common/inputs/CollapsableText"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import CustomJobEntryApply from "./CustomJobEntryApply"
 
 const styles = sxStyles({
-   infoItem: {
+   header: {
       display: "flex",
-      alignSelf: "end",
+      ml: 2,
    },
-   itemLabel: {
+   headerLeftSide: {
+      display: "flex",
+      width: "100%",
+      alignItems: "center",
+      mt: { xs: 4, md: 2 },
+   },
+   headerContent: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: "8px",
+      ml: 4,
+   },
+   jobName: {
       fontWeight: "bold",
-      ml: 2,
    },
-   uploadCvWrapper: {
+   jobType: {
+      color: "#8B8B8B",
+      fontSize: "16px",
+   },
+   subTitle: {
+      fontSize: "20px",
+      fontWeight: "bold",
+   },
+   jobValues: {
+      fontSize: "16px",
+   },
+   userMessage: {
+      fontSize: "16px",
+      fontWeight: "bold",
+   },
+   content: {
+      mt: { xs: 4, md: 2 },
+      mx: 2,
+      height: { xs: "none", md: "420px" },
+      overflow: "scroll",
+      pb: 2,
+   },
+   actions: {
+      borderTop: "1px solid #F1F1F1",
+      py: 2,
+      pr: 4,
+   },
+   companyAvatar: {
+      width: 63,
+      height: 63,
+      background: (theme) => theme.palette.common.white,
+      boxShadow: (theme) => theme.shadows[2],
+
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "90%",
+         maxHeight: "90%",
+      },
+   },
+   bottomSection: {
+      height: "100%",
       display: "flex",
-      flexDirection: { xs: "column", md: "row" },
-      alignItems: { xs: "start", md: "center" },
-   },
-   studentsInfoWrapper: {
-      display: "flex",
-      alignSelf: "center",
-      ml: 2,
-   },
-   studentsMessage: {
-      variant: "body2",
-      ml: 1,
-      alignSelf: "center",
-   },
-   uploadCvButton: {
-      display: "flex",
-      ml: { md: 6 },
-      mt: { xs: 2, md: 0 },
-   },
-   uploadCvLabel: {
-      display: "flex",
-      alignItems: "end",
+      alignItems: "flex-end",
    },
 })
 
-const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
+type Props = {
+   job: Job | PublicCustomJob
+   handleClose: () => any
+   livestream: LivestreamEvent
+   open: boolean
+}
+
+const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
    let { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
+   const isAtsJob = useIsAtsJob(job)
+   const isMobile = useIsMobile()
    const [alreadyApplied, setAlreadyApplied] = useState(false)
 
-   const hiringManagers = job.getHiringManager()
+   let hiringManager: string,
+      jobName: string,
+      jobType: string,
+      jobSalary: string,
+      jobDeadline: string
+
+   if (isAtsJob) {
+      hiringManager = job.getHiringManager()
+      jobName = job.name
+   } else {
+      jobName = job.title
+      jobType = job.jobType
+      jobSalary = job.salary
+      jobDeadline = job.deadline
+         ? DateUtil.formatDateToString(job.deadline.toDate())
+         : ""
+   }
 
    const renderApplyButton = useMemo((): JSX.Element => {
       if (isStreamer) {
          return null
       }
 
+      if (isAtsJob) {
+         return (
+            <Box mr={4}>
+               <SuspenseWithBoundary>
+                  <JobEntryApply
+                     job={job}
+                     livestreamId={livestream.id}
+                     isApplied={alreadyApplied}
+                     handleAlreadyApply={setAlreadyApplied}
+                  />
+               </SuspenseWithBoundary>
+            </Box>
+         )
+      }
+
       return (
-         <Box mr={4}>
+         <Box>
             <SuspenseWithBoundary>
-               <JobEntryApply
-                  job={job}
-                  livestreamId={livestreamId}
-                  isApplied={alreadyApplied}
-                  handleAlreadyApply={setAlreadyApplied}
-               />
+               <CustomJobEntryApply job={job} />
             </SuspenseWithBoundary>
          </Box>
       )
-   }, [alreadyApplied, isStreamer, job, livestreamId])
+   }, [alreadyApplied, isAtsJob, isStreamer, job, livestream.id])
 
    return (
-      <GenericDialog
-         onClose={onCloseDialog}
-         title={`Apply to Job`}
-         titleOnCenter={true}
-         additionalLeftButton={renderApplyButton}
+      <Dialog
+         open={open}
+         onClose={handleClose}
+         maxWidth={"md"}
+         fullWidth
+         fullScreen={isMobile}
       >
-         <Stack spacing={3} padding={2}>
-            <Box display="flex">
-               <WorkOutlineOutlinedIcon color="secondary" fontSize="large" />
-               <Box sx={styles.infoItem}>
-                  <Typography variant="h6" sx={styles.itemLabel}>
-                     Title
+         <DialogTitle sx={styles.header}>
+            <Box sx={styles.headerLeftSide}>
+               <Avatar
+                  sx={styles.companyAvatar}
+                  alt={`company ${livestream.company} avatar`}
+                  src={getResizedUrl(livestream?.companyLogoUrl, "xs")}
+               />
+
+               <Box sx={styles.headerContent}>
+                  <Typography variant={"h4"} sx={styles.jobName}>
+                     {jobName}
                   </Typography>
-                  <Typography variant="h6" ml={4}>
-                     {job.name}
-                  </Typography>
+                  {Boolean(jobType) ? (
+                     <Typography variant={"subtitle1"} sx={styles.jobType}>
+                        {jobType}
+                     </Typography>
+                  ) : null}
                </Box>
             </Box>
+            <Box>
+               <IconButton
+                  color="inherit"
+                  onClick={handleClose}
+                  aria-label="close"
+               >
+                  <CloseIcon />
+               </IconButton>
+            </Box>
+         </DialogTitle>
 
-            {hiringManagers && (
-               <Box display="flex">
-                  <PersonOutlineOutlinedIcon
-                     color="secondary"
-                     fontSize="large"
-                  />
-                  <Box sx={styles.infoItem}>
-                     <Typography variant="h6" sx={styles.itemLabel}>
+         <DialogContent sx={styles.content}>
+            <Stack spacing={2} sx={{ height: "100%" }}>
+               {Boolean(hiringManager) ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Hiring Manager
                      </Typography>
-                     <Typography variant="h6" ml={4}>
-                        {hiringManagers}
+                     <Typography variant={"body1"} sx={styles.jobValues}>
+                        {hiringManager}
                      </Typography>
                   </Box>
-               </Box>
-            )}
+               ) : null}
 
-            <Box>
-               <Box display="flex">
-                  <ChatBubbleOutlineRoundedIcon
-                     color="secondary"
-                     fontSize="large"
-                  />
-                  <Box sx={styles.infoItem}>
-                     <Typography variant="h6" sx={styles.itemLabel}>
-                        Job Description
-                     </Typography>
-                  </Box>
-               </Box>
-               <JobDescriptionCollapsable description={job.description} />
-            </Box>
-
-            <Box sx={styles.uploadCvWrapper}>
-               <Box sx={styles.uploadCvLabel}>
-                  <DescriptionOutlinedIcon color="secondary" fontSize="large" />
-                  <Box display="flex">
-                     <Typography variant="h6" sx={styles.itemLabel}>
-                        Upload CV
-                     </Typography>
-                  </Box>
-               </Box>
-
-               {userData && (
-                  <Box sx={styles.uploadCvButton}>
-                     <Box>
-                        <UserResume
-                           userData={userData}
-                           showOnlyButton={true}
-                           disabled={isStreamer || alreadyApplied}
-                        />
-                     </Box>
-                     {isStreamer && (
-                        <Box sx={styles.studentsInfoWrapper}>
-                           <InfoOutlinedIcon />
-                           <Typography sx={styles.studentsMessage}>
-                              Only for students
-                           </Typography>
-                        </Box>
-                     )}
-                  </Box>
-               )}
-            </Box>
-
-            {!userData && (
                <Box>
-                  <Box mt={4} display="flex">
-                     <Typography fontWeight="bold" variant="body1" mr={1}>
-                        You need to sign in to be able to apply to jobs.
-                     </Typography>
-                     <Link
-                        href={`/login?absolutePath=/streaming/${livestreamId}/viewer`}
-                     >
-                        <Typography variant="body1" mr={1}>
-                           Sign In
-                        </Typography>
-                     </Link>
-                  </Box>
+                  <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                     Job description
+                  </Typography>
+                  <CollapsableText text={job.description} />
                </Box>
-            )}
-         </Stack>
-      </GenericDialog>
+
+               {Boolean(jobSalary) ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Salary
+                     </Typography>
+                     <Typography variant={"body1"} sx={styles.jobValues}>
+                        {jobSalary}
+                     </Typography>
+                  </Box>
+               ) : null}
+
+               {Boolean(jobDeadline) ? (
+                  <Box>
+                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
+                        Application deadline
+                     </Typography>
+                     <Typography variant={"body1"} sx={styles.jobValues}>
+                        {jobDeadline}
+                     </Typography>
+                  </Box>
+               ) : null}
+
+               {isAtsJob ? (
+                  <Box sx={styles.bottomSection}>
+                     <Box mt={2}>
+                        {Boolean(userData) ? (
+                           <CvUploadSection alreadyApplied={alreadyApplied} />
+                        ) : (
+                           <Box display="flex">
+                              <Typography
+                                 variant="body1"
+                                 sx={styles.userMessage}
+                                 mr={1}
+                              >
+                                 You need to sign in to be able to apply to
+                                 jobs.
+                              </Typography>
+                              <Link
+                                 href={`/login?absolutePath=/streaming/${livestream.id}/viewer`}
+                              >
+                                 <Typography
+                                    variant="body1"
+                                    sx={styles.userMessage}
+                                 >
+                                    Sign In
+                                 </Typography>
+                              </Link>
+                           </Box>
+                        )}
+                     </Box>
+                  </Box>
+               ) : null}
+            </Stack>
+         </DialogContent>
+
+         <DialogActions sx={styles.actions}>{renderApplyButton}</DialogActions>
+      </Dialog>
    )
 }
 
-const JobDescriptionCollapsable = ({ description }) => {
-   const [isCollapsed, setCollapsed] = useState(true)
-
-   const toggle = useCallback(() => {
-      setCollapsed((prev) => !prev)
-   }, [])
-
-   return (
-      <>
-         <Collapse in={!isCollapsed} collapsedSize={150}>
-            <Typography variant="h6" mt={1}>
-               <SanitizedHTML htmlString={description} />
-            </Typography>
-         </Collapse>
-         <Box display="flex" justifyContent="center">
-            {isCollapsed && (
-               <Button
-                  size="small"
-                  color="secondary"
-                  startIcon={<ExpandMoreIcon />}
-                  onClick={toggle}
-               >
-                  Read more..
-               </Button>
-            )}
-
-            {!isCollapsed && (
-               <Button
-                  size="small"
-                  color="secondary"
-                  startIcon={<ExpandLessIcon />}
-                  onClick={toggle}
-               >
-                  Read less..
-               </Button>
-            )}
-         </Box>
-      </>
-   )
-}
-
-type Props = {
-   job: Job
-   onCloseDialog: () => any
-   livestreamId: string
-}
 export default JobDialog

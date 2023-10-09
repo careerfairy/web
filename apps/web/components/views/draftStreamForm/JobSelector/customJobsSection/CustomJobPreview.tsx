@@ -1,7 +1,5 @@
 import {
    Box,
-   Button,
-   Collapse,
    Divider,
    Grid,
    IconButton,
@@ -12,10 +10,7 @@ import {
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import React, { useCallback, useMemo, useState } from "react"
-import SanitizedHTML from "../../../../util/SanitizedHTML"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import React, { useCallback, useState } from "react"
 import Link from "../../../common/Link"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import useMenuState from "../../../../custom-hook/useMenuState"
@@ -23,6 +18,7 @@ import BrandedMenu from "../../../common/inputs/BrandedMenu"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import EditIcon from "@mui/icons-material/Edit"
 import { Trash2 as DeleteIcon } from "react-feather"
+import CollapsableText from "../../../common/inputs/CollapsableText"
 
 const styles = sxStyles({
    wrapper: {
@@ -42,12 +38,6 @@ const styles = sxStyles({
       color: "#7C7C7C",
       fontSize: 16,
    },
-   collapseBtn: {
-      p: 0,
-      mt: 2,
-      textTransform: "none",
-      fontSize: "16px",
-   },
    deleteIcon: {
       display: "flex",
       alignSelf: "center",
@@ -63,19 +53,12 @@ const styles = sxStyles({
       color: "error.main",
       py: "12px",
    },
-   description: {
-      fontSize: "16px",
-      fontWeight: 400,
-      lineHeight: "27px",
-   },
    menu: {
       "& .MuiPaper-root": {
          borderRadius: "6px",
       },
    },
 })
-
-const MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS = 290
 
 type Props = {
    job: PublicCustomJob
@@ -84,18 +67,7 @@ type Props = {
 }
 const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
-
-   const [isDescriptionCollapsed, setIsDescriptionCollapsed] = useState(true)
    const [editMode, setEditMode] = useState(false)
-
-   const showCollapse = useMemo(
-      () => job.description.length >= MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS,
-      [job.description]
-   )
-
-   const toggle = useCallback(() => {
-      setIsDescriptionCollapsed((prev) => !prev)
-   }, [])
 
    const handleClickEdit = useCallback(() => {
       setEditMode(true)
@@ -207,39 +179,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
             </Grid>
 
             <Grid xs={12} item mt={4}>
-               <Collapse in={!isDescriptionCollapsed} collapsedSize={75}>
-                  <SanitizedHTML
-                     sx={styles.description}
-                     htmlString={job.description}
-                  />
-               </Collapse>
-               {showCollapse ? (
-                  <Box display="flex" justifyContent="start">
-                     {isDescriptionCollapsed ? (
-                        <Button
-                           variant="text"
-                           color="secondary"
-                           sx={styles.collapseBtn}
-                           endIcon={<ExpandMoreIcon />}
-                           onClick={toggle}
-                        >
-                           View more
-                        </Button>
-                     ) : null}
-
-                     {!isDescriptionCollapsed && (
-                        <Button
-                           variant="text"
-                           color="secondary"
-                           sx={styles.collapseBtn}
-                           startIcon={<ExpandLessIcon />}
-                           onClick={toggle}
-                        >
-                           View less
-                        </Button>
-                     )}
-                  </Box>
-               ) : null}
+               <CollapsableText text={job.description} />
             </Grid>
          </Grid>
       </Box>

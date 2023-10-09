@@ -10,6 +10,8 @@ import React, { memo, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -26,22 +28,34 @@ const styles = sxStyles({
    },
 })
 
+type Props = {
+   job: Job | PublicCustomJob
+   handleSelectJob: (job: Job | PublicCustomJob) => void
+}
 const JobItem = ({ job, handleSelectJob }: Props) => {
-   const hiringManager = job.getHiringManager()
-   const { id, name } = job
+   const isAtsJob = useIsAtsJob(job)
+
+   let hiringManager: string, jobName: string
+
+   if (isAtsJob) {
+      hiringManager = job.getHiringManager()
+      jobName = job.name
+   } else {
+      jobName = job.title
+   }
 
    const handleClick = useCallback(() => {
       handleSelectJob(job)
       dataLayerEvent("livestream_job_open", {
-         jobId: job?.id,
-         jobName: job?.name,
+         jobId: job.id,
+         jobName: jobName,
       })
-   }, [handleSelectJob, job])
+   }, [handleSelectJob, job, jobName])
 
    return (
       <ListItem
          disablePadding
-         key={id}
+         key={job.id}
          onClick={handleClick}
          sx={styles.itemWrapper}
       >
@@ -51,20 +65,18 @@ const JobItem = ({ job, handleSelectJob }: Props) => {
             </ListItemIcon>
             <ListItemText>
                <Typography variant="subtitle1" fontWeight="bold">
-                  {name}
+                  {jobName}
                </Typography>
 
-               <Typography variant="body2" mt={1} fontStyle="italic">
-                  {hiringManager && `Posted by ${hiringManager}`}
-               </Typography>
+               {Boolean(hiringManager) ? (
+                  <Typography variant="body2" mt={1} fontStyle="italic">
+                     {`Posted by ${hiringManager}`}
+                  </Typography>
+               ) : null}
             </ListItemText>
          </ListItemButton>
       </ListItem>
    )
 }
 
-type Props = {
-   job: Job
-   handleSelectJob: (job: Job) => void
-}
 export default memo(JobItem)

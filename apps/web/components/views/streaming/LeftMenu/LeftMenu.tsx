@@ -144,7 +144,7 @@ const LeftMenu = ({
          />,
       ]
 
-      if (livestream?.jobs?.length > 0) {
+      if (livestream?.hasJobs) {
          newViews.push(
             <JobsCategory
                key={"jobs-category-tab"}
