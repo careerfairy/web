@@ -286,15 +286,22 @@ export interface IGroupRepository {
    /**
     * To get a custom job by id on the sub collection of the group document
     * @param jobId
+    * @param groupId
     */
    getCustomJobById(jobId: string, groupId: string): Promise<PublicCustomJob>
 
    /**
-    * Increments the 'clicks' field on a specific customJob
+    * To update an existing job with a new applicant
+    * And increments the 'clicks' field on a specific customJob and adds the
+    * @param userId
     * @param groupId
     * @param jobId
     */
-   applyUserToCustomJob(groupId: string, jobId: string): Promise<void>
+   applyUserToCustomJob(
+      userId: string,
+      groupId: string,
+      jobId: string
+   ): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1189,7 +1196,11 @@ export class FirebaseGroupRepository
       return null
    }
 
-   async applyUserToCustomJob(groupId: string, jobId: string): Promise<void> {
+   async applyUserToCustomJob(
+      userId: string,
+      groupId: string,
+      jobId: string
+   ): Promise<void> {
       const ref = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -1197,6 +1208,7 @@ export class FirebaseGroupRepository
          .doc(jobId)
 
       return ref.update({
+         applicants: this.fieldValue.arrayUnion(userId),
          clicks: this.fieldValue.increment(1),
       })
    }

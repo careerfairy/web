@@ -486,6 +486,10 @@ export class LivestreamFunctionsRepository
       const updatedCustomJob: PublicCustomJob =
          pickPublicDataFromCustomJob(newCustomJob)
 
+      functions.logger.log(
+         `Sync livestreams with updated job ${updatedCustomJob.id}.`
+      )
+
       // To fetch all livestreams and drafts
       const [livestreamsSnaps, draftSnaps] = await Promise.all([
          this.firestore

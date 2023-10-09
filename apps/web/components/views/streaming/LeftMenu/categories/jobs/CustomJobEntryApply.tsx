@@ -4,6 +4,7 @@ import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    btn: {
@@ -24,6 +25,7 @@ const CustomJobEntryApply = ({ job, livestreamId, handleClose }: Props) => {
       job,
       livestreamId
    )
+   const isMobile = useIsMobile()
 
    const handleClick = useCallback(async () => {
       await handleApply()
@@ -34,8 +36,10 @@ const CustomJobEntryApply = ({ job, livestreamId, handleClose }: Props) => {
    return (
       <>
          {alreadyApplied ? (
-            <Typography fontWeight="bold" color="primary" variant="h6">
-               Congrats! You have already applied to this job!
+            <Typography fontWeight="bold" color="primary" variant={"h6"}>
+               {isMobile
+                  ? "You have already applied to this job!"
+                  : "Congrats! You have already applied to this job!"}
             </Typography>
          ) : (
             <Button
