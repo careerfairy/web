@@ -39,7 +39,7 @@ const CollapsableText = ({
    const [isTextCollapsed, setIsTextCollapsed] = useState(true)
 
    const showCollapse = useMemo(
-      () => text.length >= maxLength || MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS,
+      () => text.length >= (maxLength || MAX_LENGTH_TO_SHOW_COLLAPSE_BUTTONS),
       [maxLength, text.length]
    )
 

@@ -16,6 +16,7 @@ import {
 import { Job } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
+import { PublicCustomJob } from "../groups/customJobs"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -266,6 +267,14 @@ export interface UserJobApplicationDocument extends Identifiable {
    rejectedAt?: Timestamp
    currentStage?: string
    rejectReason?: string
+}
+
+/**
+ * userData/{id}/customJobApplications/{doc}
+ */
+export interface UserCustomJobApplicationDocument extends Identifiable {
+   date: Timestamp
+   job: PublicCustomJob
 }
 
 /**

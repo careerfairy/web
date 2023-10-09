@@ -18,6 +18,8 @@ import useLivestreamJobs from "../../../custom-hook/useLivestreamJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Skeleton from "@mui/material/Skeleton"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -81,10 +83,21 @@ const LoadingJobsSpinner = () => {
 const JobList = ({ livestream }: Props) => {
    let { jobs } = useLivestreamJobs(livestream.id, livestream.jobs)
    const [selectedJob, setSelectedJob] = useState(null)
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
 
    const onCloseDialog = useCallback(() => {
       setSelectedJob(null)
-   }, [])
+      handleCloseDialog()
+   }, [handleCloseDialog])
+
+   const handleJobClick = useCallback(
+      (job: Job | PublicCustomJob) => {
+         setSelectedJob(job)
+         handleOpenDialog()
+      },
+      [handleOpenDialog]
+   )
 
    if (jobs.length === 0) {
       // no active jobs in ATS
@@ -102,18 +115,19 @@ const JobList = ({ livestream }: Props) => {
                <JobItem
                   key={job.id}
                   job={job}
-                  handleSelectJob={setSelectedJob}
+                  handleSelectJob={handleJobClick}
                />
             ))}
          </List>
 
-         {selectedJob && (
+         {selectedJob ? (
             <JobDialog
                job={selectedJob}
-               onCloseDialog={onCloseDialog}
-               livestreamId={livestream.id}
+               handleClose={onCloseDialog}
+               livestream={livestream}
+               open={isDialogOpen}
             />
-         )}
+         ) : null}
       </Box>
    )
 }
@@ -160,7 +174,7 @@ const JobItem = ({ job, handleSelectJob }: JobItemProps) => {
             >
                <WorkOutlineOutlinedIcon color="secondary" sx={{ mr: 1 }} />
                {name}
-               {isMobile && (
+               {isMobile ? (
                   <Button
                      variant={"contained"}
                      onClick={handleClick}
@@ -169,7 +183,7 @@ const JobItem = ({ job, handleSelectJob }: JobItemProps) => {
                   >
                      Apply Now
                   </Button>
-               )}
+               ) : null}
             </Typography>
          </ListItemText>
       </ListItem>
