@@ -67,6 +67,7 @@ const styles = sxStyles({
    content: {
       mt: { xs: 4, md: 2 },
       mx: 2,
+      mb: 2,
       height: { xs: "none", md: "420px" },
       overflow: "scroll",
       pb: 2,
@@ -103,7 +104,7 @@ type Props = {
 }
 
 const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
-   let { userData } = useAuth()
+   const { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
@@ -127,11 +128,25 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          : ""
    }
 
-   const renderApplyButton = useMemo((): JSX.Element => {
-      if (isStreamer) {
-         return null
-      }
+   const renderNeedsLogin = useMemo(
+      () => (
+         <Box display="flex">
+            <Typography variant="body1" sx={styles.userMessage} mr={1}>
+               You need to sign in to be able to apply to jobs.
+            </Typography>
+            <Link
+               href={`/login?absolutePath=/streaming/${livestream.id}/viewer`}
+            >
+               <Typography variant="body1" sx={styles.userMessage}>
+                  Sign In
+               </Typography>
+            </Link>
+         </Box>
+      ),
+      [livestream.id]
+   )
 
+   const renderApplyButton = useMemo((): JSX.Element => {
       if (isAtsJob) {
          return (
             <Box mr={4}>
@@ -147,14 +162,30 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          )
       }
 
+      if (!Boolean(userData)) {
+         return renderNeedsLogin
+      }
+
       return (
          <Box>
             <SuspenseWithBoundary>
-               <CustomJobEntryApply job={job} />
+               <CustomJobEntryApply
+                  job={job}
+                  livestreamId={livestream.id}
+                  handleClose={handleClose}
+               />
             </SuspenseWithBoundary>
          </Box>
       )
-   }, [alreadyApplied, isAtsJob, isStreamer, job, livestream.id])
+   }, [
+      alreadyApplied,
+      handleClose,
+      isAtsJob,
+      job,
+      livestream.id,
+      renderNeedsLogin,
+      userData,
+   ])
 
    return (
       <Dialog
@@ -242,26 +273,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                         {Boolean(userData) ? (
                            <CvUploadSection alreadyApplied={alreadyApplied} />
                         ) : (
-                           <Box display="flex">
-                              <Typography
-                                 variant="body1"
-                                 sx={styles.userMessage}
-                                 mr={1}
-                              >
-                                 You need to sign in to be able to apply to
-                                 jobs.
-                              </Typography>
-                              <Link
-                                 href={`/login?absolutePath=/streaming/${livestream.id}/viewer`}
-                              >
-                                 <Typography
-                                    variant="body1"
-                                    sx={styles.userMessage}
-                                 >
-                                    Sign In
-                                 </Typography>
-                              </Link>
-                           </Box>
+                           renderNeedsLogin
                         )}
                      </Box>
                   </Box>
@@ -269,7 +281,11 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
             </Stack>
          </DialogContent>
 
-         <DialogActions sx={styles.actions}>{renderApplyButton}</DialogActions>
+         {isStreamer ? null : (
+            <DialogActions sx={styles.actions}>
+               {renderApplyButton}
+            </DialogActions>
+         )}
       </Dialog>
    )
 }

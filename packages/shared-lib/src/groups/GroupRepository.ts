@@ -34,7 +34,11 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
-import { PublicCustomJob } from "./customJobs"
+import {
+   CustomJob,
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "./customJobs"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -278,6 +282,19 @@ export interface IGroupRepository {
     * @param groupId
     */
    updateGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
+
+   /**
+    * To get a custom job by id on the sub collection of the group document
+    * @param jobId
+    */
+   getCustomJobById(jobId: string, groupId: string): Promise<PublicCustomJob>
+
+   /**
+    * Increments the 'clicks' field on a specific customJob
+    * @param groupId
+    * @param jobId
+    */
+   applyUserToCustomJob(groupId: string, jobId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1150,6 +1167,38 @@ export class FirebaseGroupRepository
       }
 
       await ref.update(updatedJob)
+   }
+
+   async getCustomJobById(
+      jobId: string,
+      groupId: string
+   ): Promise<PublicCustomJob> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .doc(jobId)
+
+      const snapshot = await ref.get()
+
+      if (snapshot.exists) {
+         return pickPublicDataFromCustomJob(
+            this.addIdToDoc<CustomJob>(snapshot)
+         )
+      }
+      return null
+   }
+
+   async applyUserToCustomJob(groupId: string, jobId: string): Promise<void> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .doc(jobId)
+
+      return ref.update({
+         clicks: this.fieldValue.increment(1),
+      })
    }
 }
 
