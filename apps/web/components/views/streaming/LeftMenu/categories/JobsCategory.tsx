@@ -17,7 +17,7 @@ type Props = {
 }
 
 const JobsCategory = ({ selectedState, livestream, showMenu }: Props) => {
-   if (selectedState !== "jobs" || !showMenu || !livestream.jobs) {
+   if (selectedState !== "jobs" || !showMenu || !livestream.hasJobs) {
       return null
    }
 

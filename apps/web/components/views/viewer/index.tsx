@@ -107,7 +107,7 @@ const ViewerOverview = ({
                   isMobile={mobile}
                   handleStateChange={handleStateChange}
                   streamer={false}
-                  includeJobs={currentLivestream.jobs?.length > 0}
+                  includeJobs={currentLivestream.hasJobs}
                   questionsAreDisabled={currentLivestream.questionsDisabled}
                />
             )}
