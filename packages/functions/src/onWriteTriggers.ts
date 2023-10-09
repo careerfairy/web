@@ -1,5 +1,10 @@
 import functions = require("firebase-functions")
-import { groupRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
    handleSideEffects,
@@ -262,7 +267,8 @@ export const onWriteCustomJobs = functions
 
       // Run side effects for all custom jobs changes
       sideEffectPromises.push(
-         livestreamsRepo.syncCustomJobDataToLivestream(change)
+         livestreamsRepo.syncCustomJobDataToLivestream(change),
+         userRepo.syncCustomJobDataToUser(change)
       )
 
       return handleSideEffects(sideEffectPromises)

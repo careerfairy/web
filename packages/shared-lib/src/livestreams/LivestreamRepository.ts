@@ -30,7 +30,6 @@ import {
 } from "./stats"
 import { OrderByDirection } from "firebase/firestore"
 import { Create } from "../commonTypes"
-import { PublicCustomJob } from "../groups/customJobs"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -247,18 +246,6 @@ export interface ILivestreamRepository {
       limit?: number,
       order?: OrderByDirection
    ): firebase.firestore.Query
-
-   /**
-    * Adds the custom job public info on the userLivestreamData sub collection from the Livestream document
-    * @param userEmail
-    * @param job
-    * @param livestreamId
-    */
-   applyUserToCustomJob(
-      userEmail: string,
-      job: PublicCustomJob,
-      livestreamId: string
-   ): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1104,28 +1091,6 @@ export class FirebaseLivestreamRepository
          .map((result: PromiseFulfilledResult<RecordingToken>) => result.value)
 
       return recordingToken
-   }
-
-   async applyUserToCustomJob(
-      userEmail: string,
-      job: PublicCustomJob,
-      livestreamId: string
-   ): Promise<void> {
-      const ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("userLivestreamData")
-         .doc(userEmail)
-
-      const jobToApply = {
-         date: this.fieldValue.serverTimestamp(),
-         job: job,
-      }
-
-      const toUpdate: Partial<UserLivestreamData> = {
-         [`customJobApplications.${job.id}`]: jobToApply,
-      }
-      return ref.update(toUpdate)
    }
 }
 

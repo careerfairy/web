@@ -4,7 +4,7 @@ import { onCallWrapper } from "./util"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { string } from "yup"
-import { groupRepo, livestreamsRepo, userRepo } from "./api/repositories"
+import { groupRepo, userRepo } from "./api/repositories"
 
 export const userApplyToCustomJob = functions
    .region(config.region)
@@ -42,12 +42,11 @@ export const userApplyToCustomJob = functions
 
             return Promise.allSettled([
                userRepo.applyUserToCustomJob(userId, jobToApply),
-               livestreamsRepo.applyUserToCustomJob(
+               groupRepo.applyUserToCustomJob(
                   userId,
-                  jobToApply,
-                  livestreamId
+                  jobToApply.groupId,
+                  jobId
                ),
-               groupRepo.applyUserToCustomJob(jobToApply.groupId, jobId),
             ])
          })
       )
