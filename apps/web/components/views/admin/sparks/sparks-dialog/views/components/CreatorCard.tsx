@@ -1,7 +1,10 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
-import { FC } from "react"
+import { FC, useMemo } from "react"
+import { ReactFireOptions } from "reactfire"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -81,10 +84,33 @@ const styles = sxStyles({
 type Props = {
    creator: PublicCreator
    onClick: () => void
+   groupId: string
 }
 
-const CreatorCard: FC<Props> = ({ creator, onClick }) => {
-   const displayName = `${creator.firstName} ${creator.lastName}`
+const CreatorCard: FC<Props> = (props) => {
+   return (
+      <SuspenseWithBoundary fallback={<div>Loading...</div>}>
+         <Component {...props} />
+      </SuspenseWithBoundary>
+   )
+}
+
+const Component: FC<Props> = ({ creator, onClick, groupId }) => {
+   const options = useMemo<ReactFireOptions>(
+      () => ({
+         suspense: true,
+         initialData: creator,
+      }),
+      [creator]
+   )
+
+   const { data: fullCreatorData } = useGroupCreator(
+      groupId,
+      creator.id,
+      options
+   )
+
+   const displayName = `${fullCreatorData.firstName} ${fullCreatorData.lastName}`
 
    return (
       <Stack
@@ -96,18 +122,21 @@ const CreatorCard: FC<Props> = ({ creator, onClick }) => {
          spacing={3}
       >
          <Box sx={styles.creatorDetailsWrapper}>
-            <CreatorAvatar creator={creator} sx={styles.creatorCardAvatar} />
+            <CreatorAvatar
+               creator={fullCreatorData}
+               sx={styles.creatorCardAvatar}
+            />
             <Box sx={styles.creatorCardContent}>
                <Typography sx={styles.displayName} component="h2">
                   {displayName}
                </Typography>
                <Box mt={0.75} />
                <Typography sx={styles.position} component="p">
-                  {creator.position}
+                  {fullCreatorData.position}
                </Typography>
                <Box mt={1} />
                <Typography sx={styles.email} component="p">
-                  {creator.id}
+                  {fullCreatorData?.email || "..."}
                </Typography>
             </Box>
          </Box>
