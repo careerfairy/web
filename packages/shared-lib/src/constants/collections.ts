@@ -1,4 +1,7 @@
-const allProjectCollectionIds = [
+/**
+ * This array represents all Firestore collection/sub-collection IDs.
+ */
+export const ALL_PROJECT_COLLECTION_IDS = [
    "activities",
    "admins",
    "analytics",
@@ -86,45 +89,4 @@ const allProjectCollectionIds = [
    "wishList",
 ] as const
 
-type ProjectCollectionId = (typeof allProjectCollectionIds)[number]
-
-const excludeFromEmulatorCollectionIds: ProjectCollectionId[] = [
-   "activities",
-   "callToActions",
-   "chatEntries",
-   "companiesUserFollows",
-   "companyPageViews",
-   "creators",
-   "deletedSparks",
-   "deletedUsers",
-   "detailPageViews",
-   "flags",
-   "icons",
-   "impressions",
-   "invites",
-   "likedSparks",
-   "periods",
-   "popularityEvents",
-   "recordingStatsUser",
-   "savedRecruiters",
-   "seenSparks",
-   "sparksFeed",
-   "sparksFeedMetrics",
-   "sparkStats",
-   "talentProfiles",
-   "timelineCountries",
-   "timelineUniversities",
-   "users",
-   "usersInPolicy",
-   "usersWhoClickedLink",
-]
-
-const exludeFromBackupCollectionIds: ProjectCollectionId[] = ["impressions"]
-
-export const collectionsForEmulatorImport = allProjectCollectionIds.filter(
-   (id) => !excludeFromEmulatorCollectionIds.includes(id)
-)
-
-export const collectionsForBackup = allProjectCollectionIds.filter(
-   (id) => !exludeFromBackupCollectionIds.includes(id)
-)
+export type ProjectCollectionId = (typeof ALL_PROJECT_COLLECTION_IDS)[number]
