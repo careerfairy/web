@@ -271,9 +271,6 @@ export interface UserLivestreamData extends Identifiable {
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
    }
-   customJobApplications?: {
-      [jobId: string]: LivestreamCustomJobApplicationsDetails
-   }
 }
 
 export interface RecordingToken extends Identifiable {
@@ -303,11 +300,6 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
    applicationId?: string
    job: Partial<Job>
-}
-
-export interface LivestreamCustomJobApplicationsDetails extends JobIdentifier {
-   date: firebase.firestore.Timestamp
-   job: PublicCustomJob
 }
 
 // Collection Path: livestreams/{livestreamId}/recordingStats/stats

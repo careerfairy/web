@@ -39,6 +39,7 @@ import {
    pickPublicDataFromCustomJob,
    PublicCustomJob,
 } from "./customJobs"
+import { Timestamp } from "../firebaseTypes"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -1146,11 +1147,13 @@ export class FirebaseGroupRepository
          .collection("customJobs")
          .doc()
 
-      const newJob = {
+      const newJob: CustomJob = {
+         documentType: "groupCustomJob",
          ...job,
-         createdAt: this.fieldValue.serverTimestamp(),
-         updatedAt: this.fieldValue.serverTimestamp(),
+         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
+         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
          livestreams: [],
+         applicants: [],
          clicks: 0,
          id: ref.id,
       }
@@ -1168,9 +1171,9 @@ export class FirebaseGroupRepository
          .collection("customJobs")
          .doc(job.id)
 
-      const updatedJob = {
+      const updatedJob: Partial<CustomJob> = {
          ...job,
-         updatedAt: this.fieldValue.serverTimestamp(),
+         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
       }
 
       await ref.update(updatedJob)

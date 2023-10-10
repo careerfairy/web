@@ -23,6 +23,7 @@ import { Application } from "../ats/Application"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
 import { PublicCustomJob } from "../groups/customJobs"
+import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -777,9 +778,10 @@ export class FirebaseUserRepository
          .collection("customJobApplications")
          .doc(job.id)
 
-      const jobToApply = {
-         date: this.fieldValue.serverTimestamp(),
+      const jobToApply: UserCustomJobApplicationDocument = {
+         date: this.fieldValue.serverTimestamp() as Timestamp,
          job: job,
+         id: job.id,
       }
 
       return ref.set(jobToApply, { merge: true })

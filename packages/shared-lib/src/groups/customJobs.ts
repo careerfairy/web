@@ -56,7 +56,7 @@ export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
    return {
-      id: job.id ?? null,
+      id: job.id,
       groupId: job.groupId ?? null,
       title: job.title ?? null,
       description: job.description ?? null,

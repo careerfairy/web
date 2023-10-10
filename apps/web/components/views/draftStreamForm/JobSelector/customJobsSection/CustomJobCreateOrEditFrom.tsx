@@ -205,7 +205,9 @@ const CustomJobCreateOrEditFrom = ({
                               option.value === value.value
                            }
                            getOptionLabel={(option) => option.label || ""}
-                           value={getValue(values.jobType)}
+                           value={
+                              values.jobType ? getValue(values.jobType) : null
+                           }
                            onChange={(
                               _,
                               newValue: { value: string; label: string }
