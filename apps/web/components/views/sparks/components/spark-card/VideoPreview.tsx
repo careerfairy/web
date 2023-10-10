@@ -165,9 +165,6 @@ const VideoPreview: FC<Props> = ({
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
-               light={
-                  shouldPLay ? null : <ThumbnailOverlay src={thumbnailUrl} />
-               }
                playIcon={<Fragment />}
                onClick={handleTogglePause}
             />
