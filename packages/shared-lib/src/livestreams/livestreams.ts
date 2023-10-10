@@ -220,6 +220,13 @@ export interface LivestreamJobAssociation {
    name: string
 }
 
+export type LivestreamCustomJobAssociationPresenter = Omit<
+   PublicCustomJob,
+   "deadline"
+> & {
+   deadline?: string
+}
+
 export type LivestreamUserAction = keyof Pick<
    UserLivestreamData,
    "talentPool" | "registered" | "participated" | "jobApplications"
