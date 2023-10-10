@@ -768,18 +768,6 @@ class FirebaseService {
       return ref.get()
    }
 
-   /**
-    * To get all the Group custom jobs that are related to a specific livestream event
-    */
-   getGroupCustomJobs = (groupId: string, streamId: string) => {
-      let ref = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("customJobs")
-         .where("livestreams", "array-contains", streamId)
-      return ref.get()
-   }
-
    getStreamPromotions = (streamId, collection) => {
       const ref = this.firestore
          .collection(collection)
