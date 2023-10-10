@@ -153,21 +153,26 @@ const VideoPreview: FC<Props> = ({
             <ClickToPlayOverlay onClick={handleClickPlayOverlay} />
          ) : null}
          <Box sx={[styles.playerWrapper]}>
-            <ReactPlayer
-               playing={Boolean(playing && !shouldPause)}
-               playsinline={playing}
-               loop={playing}
-               width="100%"
-               height="100%"
-               className="player"
-               onProgress={handleProgress}
-               onPlay={onPlay}
-               onError={handleError}
-               progressInterval={250}
-               url={videoUrl}
-               playIcon={<Fragment />}
-               onClick={handleTogglePause}
-            />
+            {shouldPLay ? (
+               <ReactPlayer
+                  playing={Boolean(playing && !shouldPause)}
+                  playsinline
+                  playsInline
+                  loop={playing}
+                  width="100%"
+                  height="100%"
+                  className="player"
+                  onProgress={handleProgress}
+                  onPlay={onPlay}
+                  onError={handleError}
+                  progressInterval={250}
+                  url={videoUrl}
+                  playIcon={<Fragment />}
+                  onClick={handleTogglePause}
+               />
+            ) : (
+               <ThumbnailOverlay src={thumbnailUrl} />
+            )}
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
