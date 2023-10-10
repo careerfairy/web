@@ -5,7 +5,7 @@ import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"
 import { FormikValues } from "formik"
 import CustomJobSection from "./customJobsSection/CustomJobSection"
-import useGroupCustomJobs from "../../../custom-hook/useGroupCustomJobs"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 
 type Props = {
    groupId: string
@@ -36,7 +36,6 @@ const JobSelectorCategory = ({
    isSubmitting,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
-   const { data: allCustomJobs } = useGroupCustomJobs(groupId)
 
    // First sync should be complete to fetch the jobs
    const filteredAccounts = useMemo(() => {
@@ -57,13 +56,14 @@ const JobSelectorCategory = ({
                onSelectItems={onSelectItems}
             />
          ) : (
-            <CustomJobSection
-               groupId={groupId}
-               jobs={allCustomJobs}
-               values={values}
-               setFieldValue={setFieldValue}
-               isSubmitting={isSubmitting}
-            />
+            <SuspenseWithBoundary>
+               <CustomJobSection
+                  groupId={groupId}
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  isSubmitting={isSubmitting}
+               />
+            </SuspenseWithBoundary>
          )}
       </Section>
    )
