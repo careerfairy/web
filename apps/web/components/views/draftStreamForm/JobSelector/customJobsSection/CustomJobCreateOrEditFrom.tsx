@@ -123,6 +123,10 @@ const CustomJobCreateOrEditFrom = ({
                   deadline: values.deadline
                      ? Timestamp.fromDate(values.deadline)
                      : null,
+                  postingUrl:
+                     values.postingUrl.indexOf("http") === 0
+                        ? values.postingUrl
+                        : `https://${values.postingUrl}`,
                }
 
                await handleCreateNewJob(formatValues)

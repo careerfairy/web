@@ -157,10 +157,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                      <>
                         <Divider orientation="vertical" />
                         <Typography variant="body1" fontSize={"inherit"}>
-                           {" "}
-                           {DateUtil.formatDateToString(
-                              job.deadline.toDate()
-                           )}{" "}
+                           {DateUtil.formatDateToString(job.deadline.toDate())}
                         </Typography>
                      </>
                   ) : null}
@@ -168,7 +165,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
 
                <Typography variant="body1" fontSize={"inherit"} mt={1}>
                   <Link
-                     href={getPostingUrl(job.postingUrl)}
+                     href={job.postingUrl}
                      color={"inherit"}
                      underline={"none"}
                      target={"_blank"}
@@ -186,11 +183,4 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    )
 }
 
-const getPostingUrl = (postingUrl: string): string => {
-   if (postingUrl.indexOf("http") === 0) {
-      return postingUrl
-   } else {
-      return `https://${postingUrl}`
-   }
-}
 export default CustomJobPreview
