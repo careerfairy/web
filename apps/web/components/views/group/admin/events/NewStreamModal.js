@@ -217,7 +217,7 @@ const NewStreamModal = ({
          }
 
          livestream.hasJobs =
-            selectedJobs?.length > 0 || livestream?.customJobs.length > 0
+            selectedJobs?.length > 0 || livestream?.customJobs?.length > 0
 
          if (metaData) {
             livestream.companySizes = metaData.companySizes
