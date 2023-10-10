@@ -19,6 +19,8 @@ import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -75,17 +77,25 @@ const Jobs: FC<Props> = (props) => {
 }
 
 export const JobsComponent: FC<Props> = ({ presenter }) => {
+   let jobsToPresent: (LivestreamJobAssociation | PublicCustomJob)[]
+
+   if (presenter.jobs && presenter.jobs.length > 0) {
+      jobsToPresent = presenter.jobs
+   } else {
+      jobsToPresent = presenter.customJobs
+   }
+
    return (
       <Stack spacing={2}>
-         {presenter.jobs.map((job) => (
-            <JobItem presenter={presenter} key={job.jobId} job={job} />
+         {jobsToPresent.map((job, index) => (
+            <JobItem presenter={presenter} key={index} job={job} />
          ))}
       </Stack>
    )
 }
 
 type JobItemProps = {
-   job: LivestreamJobAssociation
+   job: LivestreamJobAssociation | PublicCustomJob
    presenter: LivestreamPresenter
 }
 
@@ -95,12 +105,23 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const { successNotification } = useSnackbarNotifications()
    const { authenticatedUser, userStats } = useAuth()
    const { mode, goToJobDetails } = useLiveStreamDialog()
+   const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
 
    const { userHasBoughtRecording } = useRecordingAccess(
       authenticatedUser.email,
       presenter,
       userStats
    )
+
+   let jobId: string, jobName: string
+
+   if (isAtsLivestreamAssociation) {
+      jobId = job.jobId
+      jobName = job.name
+   } else {
+      jobId = job.id
+      jobName = job.title
+   }
 
    const isPast = presenter.isPast()
    const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
@@ -133,11 +154,11 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             router,
             link: {
                type: "jobDetails",
-               jobId: job.jobId,
+               jobId: jobId,
                livestreamId: presenter.id,
             },
          }),
-      [router, presenter.id, job.jobId]
+      [router, jobId, presenter.id]
    )
 
    const copy = useMemo<{
@@ -187,14 +208,17 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       }
 
       if (!isPageMode) {
-         goToJobDetails(job.jobId)
+         goToJobDetails(jobId)
       }
    }, [
       buttonDisabled,
       isMobile,
+      isPageMode,
       successNotification,
       copy.description,
       copy.toastTitle,
+      goToJobDetails,
+      jobId,
    ])
 
    return (
@@ -212,7 +236,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
                <JobIcon />
             </Box>
             <Stack sx={styles.jobDetails} spacing={1.5}>
-               <Typography sx={styles.jobName}>{job.name}</Typography>
+               <Typography sx={styles.jobName}>{jobName}</Typography>
             </Stack>
          </Stack>
          <Box sx={styles.jobActionWrapper}>

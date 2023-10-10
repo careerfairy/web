@@ -20,6 +20,7 @@ import {
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
+import { PublicCustomJob } from "../groups/customJobs"
 
 export const MAX_DAYS_TO_SHOW_RECORDING = 5
 
@@ -78,6 +79,7 @@ export class LivestreamPresenter extends BaseModel {
        * During livestream creating, jobs can be associated with the livestream
        */
       public readonly jobs: LivestreamJobAssociation[],
+      public readonly customJobs: PublicCustomJob[],
 
       /**
        * An empty array means the livestream should target all the fields of study
@@ -241,7 +243,10 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    hasJobs(): boolean {
-      return this.jobs && this.jobs.length > 0
+      return (
+         (this.jobs && this.jobs.length > 0) ||
+         (this.customJobs && this.customJobs.length > 0)
+      )
    }
 
    getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
@@ -298,6 +303,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
 
          livestream.jobs ?? [],
+         livestream.customJobs ?? [],
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
@@ -361,6 +367,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address,
          livestream.denyRecordingAccess,
          livestream.jobs,
+         livestream.customJobs,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
