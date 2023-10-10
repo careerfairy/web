@@ -5,6 +5,7 @@ import useSnackbarNotifications from "./useSnackbarNotifications"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { customJobServiceInstance } from "../../data/firebase/CustomJobService"
+import { groupRepo } from "../../data/RepositoryInstances"
 
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
@@ -52,9 +53,15 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       userData.id,
    ])
 
+   const handleClickApplyBtn = useCallback(async () => {
+      setIsApplying(true)
+      await groupRepo.incrementCustomJobClicks(job.groupId, job.id)
+      setIsApplying(false)
+   }, [job.groupId, job.id])
+
    return useMemo(
-      () => ({ alreadyApplied, handleApply, isApplying }),
-      [alreadyApplied, handleApply, isApplying]
+      () => ({ alreadyApplied, handleApply, isApplying, handleClickApplyBtn }),
+      [alreadyApplied, handleApply, handleClickApplyBtn, isApplying]
    )
 }
 
