@@ -259,8 +259,17 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const hasJobsToApply = useMemo<boolean>(() => {
          if (loading) return false
 
-         return event?.hasJobs
-      }, [event?.hasJobs, loading])
+         return Boolean(
+            event?.hasJobs ||
+               event?.jobs?.length > 0 ||
+               event?.customJobs?.length > 0
+         )
+      }, [
+         event?.customJobs?.length,
+         event?.hasJobs,
+         event?.jobs?.length,
+         loading,
+      ])
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
          if (isPast && isLoggedIn && presenterEvent) {
