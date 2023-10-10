@@ -12,14 +12,16 @@ import Link from "../../../../common/Link"
 import { useRouter } from "next/router"
 import { LinkProps } from "next/dist/client/link"
 import { buildDialogLink } from "../../../util"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamCustomJobAssociationPresenter,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
 
 const styles = sxStyles({
@@ -77,7 +79,10 @@ const Jobs: FC<Props> = (props) => {
 }
 
 export const JobsComponent: FC<Props> = ({ presenter }) => {
-   let jobsToPresent: (LivestreamJobAssociation | PublicCustomJob)[]
+   let jobsToPresent: (
+      | LivestreamJobAssociation
+      | LivestreamCustomJobAssociationPresenter
+   )[]
 
    if (presenter.jobs && presenter.jobs.length > 0) {
       jobsToPresent = presenter.jobs
@@ -95,7 +100,7 @@ export const JobsComponent: FC<Props> = ({ presenter }) => {
 }
 
 type JobItemProps = {
-   job: LivestreamJobAssociation | PublicCustomJob
+   job: LivestreamJobAssociation | LivestreamCustomJobAssociationPresenter
    presenter: LivestreamPresenter
 }
 
