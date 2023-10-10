@@ -191,7 +191,7 @@ exports.periodicallyRemoveCachedDocument =
 exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
-exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports.syncLivestreams_v2 = onWriteTriggers.syncLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
