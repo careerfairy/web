@@ -1,8 +1,10 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamCustomJobAssociationPresenter,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 
 const useIsAtsLivestreamJobAssociation = (
-   job: LivestreamJobAssociation | PublicCustomJob
+   job: LivestreamJobAssociation | LivestreamCustomJobAssociationPresenter
 ): job is LivestreamJobAssociation => {
    return "integrationId" in job
 }
