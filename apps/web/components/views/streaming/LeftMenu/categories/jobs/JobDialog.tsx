@@ -1,7 +1,6 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
@@ -27,6 +26,8 @@ import CvUploadSection from "./CvUploadSection"
 import CollapsableText from "../../../../common/inputs/CollapsableText"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import CustomJobEntryApply from "./CustomJobEntryApply"
+import CustomJobApplyConfirmationDialog from "./CustomJobApplyConfirmationDialog"
+import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
 
 const styles = sxStyles({
    header: {
@@ -109,6 +110,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const [alreadyApplied, setAlreadyApplied] = useState(false)
+   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
 
    let hiringManager: string,
       jobName: string,
@@ -127,6 +129,10 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          ? DateUtil.formatDateToString(job.deadline.toDate())
          : ""
    }
+
+   const handleShowConfirmation = useCallback(() => {
+      setShowConfirmationDialog(true)
+   }, [])
 
    const renderNeedsLogin = useMemo(
       () => (
@@ -172,20 +178,31 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                <CustomJobEntryApply
                   job={job}
                   livestreamId={livestream.id}
-                  handleClose={handleClose}
+                  handleApplyClick={handleShowConfirmation}
                />
             </SuspenseWithBoundary>
          </Box>
       )
    }, [
       alreadyApplied,
-      handleClose,
+      handleShowConfirmation,
       isAtsJob,
       job,
       livestream.id,
       renderNeedsLogin,
       userData,
    ])
+
+   if (showConfirmationDialog && !isAtsJob) {
+      return (
+         <CustomJobApplyConfirmationDialog
+            open={open}
+            handleClose={handleClose}
+            job={job}
+            livestreamId={livestream.id}
+         />
+      )
+   }
 
    return (
       <Dialog

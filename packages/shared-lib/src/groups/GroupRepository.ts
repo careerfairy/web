@@ -293,7 +293,6 @@ export interface IGroupRepository {
 
    /**
     * To update an existing job with a new applicant
-    * And increments the 'clicks' field on a specific customJob and adds the
     * @param userId
     * @param groupId
     * @param jobId
@@ -303,6 +302,13 @@ export interface IGroupRepository {
       groupId: string,
       jobId: string
    ): Promise<void>
+
+   /**
+    * To increment the 'clicks' field on a specific customJob
+    * @param groupId
+    * @param jobId
+    */
+   incrementCustomJobClicks(groupId: string, jobId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1212,6 +1218,20 @@ export class FirebaseGroupRepository
 
       return ref.update({
          applicants: this.fieldValue.arrayUnion(userId),
+      })
+   }
+
+   async incrementCustomJobClicks(
+      groupId: string,
+      jobId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .doc(jobId)
+
+      return ref.update({
          clicks: this.fieldValue.increment(1),
       })
    }

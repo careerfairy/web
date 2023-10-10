@@ -1,10 +1,9 @@
-import { Button, CircularProgress, Typography } from "@mui/material"
+import { Button, CircularProgress } from "@mui/material"
 import { ExternalLink } from "react-feather"
 import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    btn: {
@@ -17,47 +16,43 @@ const styles = sxStyles({
 type Props = {
    job: PublicCustomJob
    livestreamId: string
-   handleClose: () => void
+   handleApplyClick: () => void
 }
 
-const CustomJobEntryApply = ({ job, livestreamId, handleClose }: Props) => {
-   const { alreadyApplied, handleApply, isApplying } = useCustomJobApply(
+const CustomJobEntryApply = ({
+   job,
+   livestreamId,
+   handleApplyClick,
+}: Props) => {
+   const { handleClickApplyBtn, isApplying } = useCustomJobApply(
       job,
       livestreamId
    )
-   const isMobile = useIsMobile()
 
    const handleClick = useCallback(async () => {
-      await handleApply()
+      await handleClickApplyBtn()
       document.getElementById("toOpenANewTab").click()
-      handleClose()
-   }, [handleApply, handleClose])
+      handleApplyClick()
+   }, [handleClickApplyBtn, handleApplyClick])
 
    return (
       <>
-         {alreadyApplied ? (
-            <Typography fontWeight="bold" color="primary" variant={"h6"}>
-               {isMobile
-                  ? "You have already applied to this job!"
-                  : "Congrats! You have already applied to this job!"}
-            </Typography>
-         ) : (
-            <Button
-               sx={styles.btn}
-               variant="contained"
-               color="primary"
-               startIcon={
-                  isApplying ? (
-                     <CircularProgress size={20} color="inherit" />
-                  ) : (
-                     <ExternalLink size={18} />
-                  )
-               }
-               onClick={handleClick}
-            >
-               {isApplying ? "Applying" : "Apply now"}
-            </Button>
-         )}
+         <Button
+            sx={styles.btn}
+            variant="contained"
+            color="primary"
+            startIcon={
+               isApplying ? (
+                  <CircularProgress size={20} color="inherit" />
+               ) : (
+                  <ExternalLink size={18} />
+               )
+            }
+            onClick={handleClick}
+         >
+            {isApplying ? "Applying" : "Apply now"}
+         </Button>
+
          <a
             id={"toOpenANewTab"}
             href={job.postingUrl}
