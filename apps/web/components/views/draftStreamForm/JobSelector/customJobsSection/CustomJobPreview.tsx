@@ -61,11 +61,17 @@ const styles = sxStyles({
    },
    deleteMenuItem: {
       color: "error.main",
+      py: "12px",
    },
    description: {
       fontSize: "16px",
       fontWeight: 400,
       lineHeight: "27px",
+   },
+   menu: {
+      "& .MuiPaper-root": {
+         borderRadius: "6px",
+      },
    },
 })
 
@@ -140,6 +146,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                         vertical: "top",
                         horizontal: "right",
                      }}
+                     sx={styles.menu}
                   >
                      <MenuItem onClick={handleClickEdit}>
                         <EditIcon sx={{ height: 16 }} color="inherit" />

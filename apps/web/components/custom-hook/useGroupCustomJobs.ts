@@ -22,13 +22,12 @@ const useGroupCustomJobs = (groupId: string) => {
 
    const { data } = useFirestoreCollection<CustomJob>(collectionRef, {
       idField: "id", // this field will be added to the firestore object
-      suspense: false,
    })
 
    return useMemo(() => {
       // map to business model
       const jobs =
-         data?.map((document) => pickPublicDataFromCustomJob(document)) || []
+         data.map((document) => pickPublicDataFromCustomJob(document)) || []
 
       return {
          data: jobs,

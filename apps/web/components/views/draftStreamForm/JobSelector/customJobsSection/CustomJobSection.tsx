@@ -9,10 +9,10 @@ import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
 import { groupRepo } from "../../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import useGroupCustomJobs from "../../../../custom-hook/useGroupCustomJobs"
 
 type Props = {
    groupId: string
-   jobs: PublicCustomJob[]
    values: FormikValues
    setFieldValue: (fieldName: string, value: any) => void
    isSubmitting: boolean
@@ -20,13 +20,13 @@ type Props = {
 
 const CustomJobSection = ({
    groupId,
-   jobs,
    values,
    setFieldValue,
    isSubmitting,
 }: Props) => {
-   const [showForm, setShowForm] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const { data: allCustomJobs } = useGroupCustomJobs(groupId)
+   const [showForm, setShowForm] = useState(false)
 
    const handleChange = useCallback(
       (name: string, value: PublicCustomJob[]) => {
@@ -124,7 +124,7 @@ const CustomJobSection = ({
                   label="Job related to this event"
                   placeholder="Select a job"
                   values={values.customJobs}
-                  jobs={jobs}
+                  jobs={allCustomJobs}
                   disabled={isSubmitting}
                   handleChange={handleChange}
                   handleOpenCreateJobForm={handleOpenCreateJobForm}
