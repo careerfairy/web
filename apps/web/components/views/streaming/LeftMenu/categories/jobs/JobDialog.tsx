@@ -70,7 +70,7 @@ const styles = sxStyles({
       mx: 2,
       mb: 2,
       height: { xs: "none", md: "420px" },
-      overflow: "scroll",
+      overflow: "auto",
       pb: 2,
       background: "white",
    },
