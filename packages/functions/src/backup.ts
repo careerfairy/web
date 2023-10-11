@@ -2,6 +2,13 @@ import functions = require("firebase-functions")
 import firestore = require("@google-cloud/firestore")
 import config from "./config"
 
+import {
+   type ProjectCollectionId,
+   ALL_PROJECT_COLLECTION_IDS,
+} from "@careerfairy/shared-lib/constants/collections"
+
+const collectionsToExclude: ProjectCollectionId[] = ["impressions"]
+
 // Run this function every hour
 export const exportFirestoreBackup = functions
    .region(config.region)
@@ -20,7 +27,9 @@ export const exportFirestoreBackup = functions
          const responses = await client.exportDocuments({
             name: databaseName,
             outputUriPrefix: bucket,
-            collectionIds: [],
+            collectionIds: ALL_PROJECT_COLLECTION_IDS.filter(
+               (collectionId) => !collectionsToExclude.includes(collectionId)
+            ),
          })
          const response = responses[0]
          console.log(`Operation Name: ${response["name"]}`)

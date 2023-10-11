@@ -1,4 +1,5 @@
 import * as path from "path"
+import { type ProjectCollectionId } from "@careerfairy/shared-lib/dist/constants/collections"
 
 export default {
    /**
@@ -40,8 +41,6 @@ export default {
       "breakoutRoomsSettings",
       "careerCenterData",
       "comments",
-      "companyData",
-      "currentPositions",
       "draftLivestreams",
       "fieldsOfStudy",
       "filterGroups",
@@ -68,13 +67,15 @@ export default {
       "rating",
       "ratings",
       "recommendedEvents",
+      "recordingStats",
       "recordingToken",
       "registeredGroups",
       "rewards",
       "roles",
+      "sparks",
+      "sparksNotifications",
       "speakers",
       "stats",
-      "support",
       "tokens",
       "universitiesByCountry",
       "userAdminGroups",
@@ -83,13 +84,11 @@ export default {
       "userInterface",
       "userLivestreamData",
       "userReminders",
-      "recordingStats",
       "usersWhoClicked",
       "usersWhoDismissed",
       "videos",
+      "voters",
       "wishes",
       "wishList",
-      "voters",
-      "sparksNotifications",
-   ],
+   ] as ProjectCollectionId[],
 }
