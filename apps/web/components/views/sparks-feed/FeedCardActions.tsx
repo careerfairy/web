@@ -132,13 +132,12 @@ const FeedCardActions: FC<Props> = ({ spark }) => {
       <Stack spacing={3} sx={styles.root}>
          <LikeAction sparkId={spark.id} />
          <ShareAction sparkId={spark.id} />
-         {/* TODO: Wait for alvaro's PR: https://github.com/careerfairy/web/pull/733/files#diff-9d6816a691e80fd0d0d9fa9a7c0d3e833a01200c0807fb9b5b86ceb7f822a352 with this new field */}
-         {/* {spark.group.careerPageUrl ? (
+         {spark.group.careerPageUrl ? (
             <CareerPageAction
                sparkId={spark.id}
                href={spark.group.careerPageUrl}
             />
-         ) : null} */}
+         ) : null}
          <FilterAction sparkId={spark.id} />
       </Stack>
    )
@@ -148,6 +147,7 @@ type ActionProps = {
    icon: React.ReactNode
    onClick?: IconButtonProps["onClick"]
    href?: string
+   hrefTarget?: string
    label: string
    sparkId: string
    chipValue?: number
@@ -161,6 +161,7 @@ const Action: FC<ActionProps> = ({
    sparkId,
    chipValue,
    href,
+   hrefTarget,
    sx,
    disabled,
 }) => {
@@ -197,6 +198,7 @@ const Action: FC<ActionProps> = ({
             size={isFullScreen ? "small" : "medium"}
             component={href ? Link : "button"}
             href={href}
+            target={hrefTarget}
          >
             {icon}
 
@@ -293,6 +295,7 @@ const CareerPageAction: FC<{
    return (
       <Action
          href={href}
+         hrefTarget="_blank"
          sparkId={sparkId}
          icon={<GlobeIcon />}
          onClick={handleCareerPageClick}
