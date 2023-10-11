@@ -1,6 +1,7 @@
 import config from "./config"
 import { execute } from "./lib/executor"
 import { debug, h1Text, log } from "./lib/util"
+import { type ProjectCollectionId } from "@careerfairy/shared-lib/dist/constants/collections"
 
 /**
  * Export Firestore collections into a Bucket `fetched`
@@ -53,8 +54,12 @@ async function exportCollections() {
 /**
  * Remove collections with user data
  */
-function filterCollectionsWithUserData(collectionIds: string[]) {
-   const toRemove = ["userData", "userLivestreamData", "participatingStats"]
+function filterCollectionsWithUserData(collectionIds: ProjectCollectionId[]) {
+   const toRemove: ProjectCollectionId[] = [
+      "userData",
+      "userLivestreamData",
+      "participatingStats",
+   ]
 
    return collectionIds.filter((elem) => {
       return toRemove.includes(elem) === false
