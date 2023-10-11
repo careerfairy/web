@@ -15,6 +15,7 @@ import { useSelector } from "react-redux"
 import {
    cardNotificationSelector,
    eventDetailsDialogVisibilitySelector,
+   videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
@@ -112,6 +113,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       eventDetailsDialogVisibilitySelector
    )
 
+   const videosMuted = useSelector(videosMuttedSelector)
    const cardNotification = useSelector(cardNotificationSelector)
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
@@ -173,6 +175,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
             >
                {showCardNotification ? null : (
                   <VideoPreview
+                     muted={videosMuted}
                      thumbnailUrl={getResizedUrl(
                         spark.video.thumbnailUrl,
                         "lg"
