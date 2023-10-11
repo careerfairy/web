@@ -25,7 +25,7 @@ const CustomJobSection = ({
    isSubmitting,
 }: Props) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const { data: allCustomJobs } = useGroupCustomJobs(groupId)
+   const allCustomJobs = useGroupCustomJobs(groupId)
    const [showForm, setShowForm] = useState(false)
 
    const handleChange = useCallback(

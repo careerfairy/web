@@ -1,5 +1,6 @@
 import { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
+import HttpsCallableResult = firebase.functions.HttpsCallableResult
 
 export class CustomJobService {
    constructor(
@@ -11,7 +12,7 @@ export class CustomJobService {
       jobId: string,
       userId: string,
       groupId: string
-   ): Promise<any> {
+   ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable("userApplyToCustomJob")({
          livestreamId,
          userId,

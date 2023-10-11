@@ -24,15 +24,10 @@ const useGroupCustomJobs = (groupId: string) => {
       idField: "id", // this field will be added to the firestore object
    })
 
-   return useMemo(() => {
-      // map to business model
-      const jobs =
-         data.map((document) => pickPublicDataFromCustomJob(document)) || []
-
-      return {
-         data: jobs,
-      }
-   }, [data])
+   return useMemo(
+      () => data.map((document) => pickPublicDataFromCustomJob(document)),
+      [data]
+   )
 }
 
 export default useGroupCustomJobs
