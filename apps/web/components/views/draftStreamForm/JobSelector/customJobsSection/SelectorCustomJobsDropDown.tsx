@@ -99,10 +99,7 @@ const SelectorCustomJobsDropDown = ({
                   {children}
                </Paper>
             ),
-            isOptionEqualToValue: (
-               option: PublicCustomJob,
-               value: PublicCustomJob
-            ) => option.id === value.id,
+            isOptionEqualToValue,
          }}
       />
    )
@@ -119,5 +116,10 @@ const getValueFn = (value: any) => {
 const getLabelFn = (value: PublicCustomJob) => {
    return value.title
 }
+
+const isOptionEqualToValue = (
+   option: PublicCustomJob,
+   value: PublicCustomJob
+): Boolean => option.id === value.id
 
 export default SelectorCustomJobsDropDown
