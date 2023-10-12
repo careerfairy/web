@@ -77,13 +77,10 @@ export class SparkPresenter implements SparkPresenterInterface {
    getTransformedVideoUrl(): string {
       return imageKitLoader({
          src: this.video.url,
-         aspectRatio: {
-            width: 16,
-            height: 9,
-         },
-         width: 640,
-         height: 360,
+         height: 640 * 2,
+         width: 360 * 2,
          quality: 40,
+         maxSizeCrop: true,
       })
    }
 

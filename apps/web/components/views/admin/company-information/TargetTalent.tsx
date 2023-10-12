@@ -27,11 +27,13 @@ import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
 import * as Yup from "yup"
 import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 
-const [title, description] = [
+const [title, description, targetUniversityLabel] = [
    "Target talent",
    `Tell us which talent you’re targeting so that we can present them
    your content.`,
+   "Targeted universities",
 ]
 
 const maxCountries = GROUP_CONSTANTS.MAX_TARGET_COUNTRY_COUNT
@@ -130,30 +132,40 @@ const TargetTalent: FC = () => {
                      />
 
                      {/* Universities select box */}
-                     <BrandedAutocomplete
-                        id={"targetedUniversities"}
-                        sx={BaseStyles.chipInput}
-                        isOptionEqualToValue={isOptionEqualToValue}
-                        options={filterUniversitiesBySelectedContries(
-                           values.targetedCountries
-                        )}
-                        groupBy={groupByUniversities}
-                        defaultValue={values.targetedUniversities}
-                        getOptionLabel={getOptionLabel}
-                        value={values.targetedUniversities}
-                        disableCloseOnSelect
-                        multiple
-                        limit={maxUniversities}
-                        onChange={(_, selected) => {
-                           setFieldValue("targetedUniversities", selected)
-                        }}
-                        textFieldProps={getTextFieldProps(
-                           "Targeted universities",
-                           "targetedUniversities",
-                           touched,
-                           errors
-                        )}
-                     />
+                     {values.targetedCountries.length === 0 ? (
+                        <BrandedTextField
+                           label={targetUniversityLabel}
+                           disabled
+                           value="Please first select your target countries"
+                        />
+                     ) : (
+                        <BrandedAutocomplete
+                           id={"targetedUniversities"}
+                           sx={BaseStyles.chipInput}
+                           isOptionEqualToValue={isOptionEqualToValue}
+                           options={filterUniversitiesBySelectedContries(
+                              values.targetedCountries
+                           )}
+                           groupBy={groupByUniversities}
+                           defaultValue={values.targetedUniversities}
+                           getOptionLabel={getOptionLabel}
+                           value={values.targetedUniversities}
+                           disableCloseOnSelect
+                           multiple
+                           placeholder="haiii"
+                           disabled={values.targetedCountries.length === 0}
+                           limit={maxUniversities}
+                           onChange={(_, selected) => {
+                              setFieldValue("targetedUniversities", selected)
+                           }}
+                           textFieldProps={getTextFieldProps(
+                              targetUniversityLabel,
+                              "targetedUniversities",
+                              touched,
+                              errors
+                           )}
+                        />
+                     )}
 
                      {/* Target fields of study select box */}
                      <BrandedAutocomplete
