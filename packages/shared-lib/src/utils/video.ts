@@ -20,15 +20,19 @@ export const imageKitLoader = (params: TransformationParams) => {
    const imageKitBaseUrl = `https://ik.imagekit.io/${process.env.NEXT_PUBLIC_IMAGEKIT_ID}`
    src = src.replace(firebaseBaseUrl, imageKitBaseUrl)
 
-   const transformations = [`w-${width}`, `h-${height}`]
+   const transformations = []
+
+   if (aspectRatio) {
+      transformations.push(`ar-${aspectRatio.width}-${aspectRatio.height}`)
+      // If aspectRatio is provided, only add width to transformations
+      transformations.push(`w-${height}`)
+   } else {
+      // If aspectRatio is not provided, add both width and height to transformations
+      transformations.push(`w-${width}`, `h-${height}`)
+   }
 
    if (quality) {
       transformations.push(`q-${quality}`)
-   }
-
-   // If aspectRatio is provided, add it to transformations
-   if (aspectRatio) {
-      transformations.push(`ar-${aspectRatio.width}-${aspectRatio.height}`)
    }
 
    // If maxSizeCrop is true, add 'c-at_max' to transformations
@@ -45,5 +49,10 @@ export const imageKitLoader = (params: TransformationParams) => {
    // Ensure no trailing slash in the base URL
    if (src[src.length - 1] === "/") src = src.substring(0, src.length - 1)
 
-   return `${src}?tr=${paramsString}`
+   // Insert the transformations into the URL path
+   const urlParts = src.split("/")
+
+   urlParts.splice(4, 0, `tr:${paramsString}`)
+
+   return urlParts.join("/")
 }

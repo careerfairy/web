@@ -95,6 +95,7 @@ type Props = {
    onVideoPlay?: () => void
    pausing?: boolean
    muted?: boolean
+   light?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
@@ -104,7 +105,9 @@ const VideoPreview: FC<Props> = ({
    onVideoEnded,
    onVideoPlay,
    pausing: shouldPause,
+   thumbnailUrl,
    muted,
+   light,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
@@ -164,8 +167,9 @@ const VideoPreview: FC<Props> = ({
          {muted ? (
             <ClickToUnmuteOverlay onClick={handleClickPlayOverlay} />
          ) : null}
-         <Box sx={[styles.playerWrapper]}>
+         <Box sx={styles.playerWrapper}>
             <ReactPlayer
+               key={videoUrl}
                ref={playerRef}
                playing={Boolean(playing && !shouldPause)}
                playsinline
@@ -179,6 +183,7 @@ const VideoPreview: FC<Props> = ({
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
+               light={light ? thumbnailUrl : false}
                playIcon={<Fragment />}
                muted={muted}
                onClick={handleTogglePause}
