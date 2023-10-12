@@ -3,6 +3,12 @@ import { v4 as uuid } from "uuid"
 import useSnackbarNotifications from "./useSnackbarNotifications"
 import useFirebaseUpload from "./useFirebaseUpload"
 
+export type FileMetadata = {
+   url: string
+   uid: string
+   fileExtension: string
+}
+
 /**
  * Type definition for the return value of useUploadFile.
  */
@@ -12,11 +18,7 @@ type UseUploadFile = {
     * @param file - The file to upload.
     * @returns An object containing the url and the unique id (uid) of the uploaded file.
     */
-   handleUploadFile: (file: File) => Promise<{
-      url: string
-      uid: string
-      fileExtension: string
-   }>
+   handleUploadFile: (file: File) => Promise<FileMetadata>
 
    /**
     * A boolean indicating if the file has been uploaded successfully.
