@@ -23,7 +23,7 @@ export class LivestreamService {
          }[]
       >(
          this.functions,
-         "fetchLivestreams"
+         "fetchLivestreams_v2"
       )(data)
 
       return mapFromServerSide(serializedLivestreams)
