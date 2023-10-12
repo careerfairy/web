@@ -62,6 +62,7 @@ const styles = sxStyles({
    },
    contentInner: {
       display: "flex",
+      justifyContent: "space-between",
       zIndex: 1,
       p: 2.5,
       px: {
@@ -209,7 +210,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                         )}
                      </>
                   ) : (
-                     <Stack>
+                     <Stack justifyContent="flex-end">
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
                               spark.group.logoUrl,
