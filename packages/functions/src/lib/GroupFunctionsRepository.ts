@@ -497,7 +497,7 @@ export class GroupFunctionsRepository
       const previousLivestream = livestream.before?.data() as LivestreamEvent
 
       const groupId =
-         newLivestream?.groupIds[0] || previousLivestream?.groupIds[0]
+         newLivestream?.groupIds?.[0] || previousLivestream?.groupIds?.[0]
       const livestreamId = newLivestream?.id || previousLivestream?.id
 
       const newJobs = newLivestream?.customJobs || []
@@ -514,6 +514,11 @@ export class GroupFunctionsRepository
          ({ id: newJobId }) =>
             !oldJobs.some(({ id: oldJobId }) => oldJobId === newJobId)
       )
+
+      if (Boolean(!groupId) || Boolean(!livestreamId)) {
+         // If there are no valid group id or livestream id at this moment, no additional work is required
+         return
+      }
 
       if (
          jobsToAddLivestreamId.length === 0 &&
