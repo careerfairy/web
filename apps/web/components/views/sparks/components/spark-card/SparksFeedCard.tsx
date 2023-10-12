@@ -15,6 +15,7 @@ import { useSelector } from "react-redux"
 import {
    cardNotificationSelector,
    eventDetailsDialogVisibilitySelector,
+   videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
@@ -47,6 +48,7 @@ const styles = sxStyles({
       flex: 1,
       flexDirection: "column",
       position: "relative",
+      justifyContent: "flex-end",
 
       "&::after": {
          content: '""',
@@ -60,7 +62,8 @@ const styles = sxStyles({
    },
    contentInner: {
       display: "flex",
-      mt: "auto",
+      justifyContent: "space-between",
+      zIndex: 1,
       p: 2.5,
       px: {
          xs: 1.5,
@@ -110,6 +113,8 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+
+   const videosMuted = useSelector(videosMuttedSelector)
    const cardNotification = useSelector(cardNotificationSelector)
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
@@ -159,18 +164,6 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
          >
             <SparksEventNotification spark={spark} />
 
-            {showCardNotification ? null : (
-               <VideoPreview
-                  thumbnailUrl={getResizedUrl(spark.video.thumbnailUrl, "lg")}
-                  videoUrl={spark.getTransformedVideoUrl()}
-                  playing={playing}
-                  onSecondPassed={trackSecondsWatched}
-                  pausing={eventDetailsDialogVisibility}
-                  onVideoPlay={onVideoPlay}
-                  onVideoEnded={onVideoEnded}
-               />
-            )}
-
             <Box
                sx={[
                   styles.cardContent,
@@ -181,6 +174,21 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      : []),
                ]}
             >
+               {showCardNotification ? null : (
+                  <VideoPreview
+                     muted={videosMuted}
+                     thumbnailUrl={getResizedUrl(
+                        spark.video.thumbnailUrl,
+                        "lg"
+                     )}
+                     videoUrl={spark.getTransformedVideoUrl()}
+                     playing={playing}
+                     onSecondPassed={trackSecondsWatched}
+                     pausing={eventDetailsDialogVisibility}
+                     onVideoPlay={onVideoPlay}
+                     onVideoEnded={onVideoEnded}
+                  />
+               )}
                <Box
                   sx={[
                      styles.contentInner,
@@ -202,8 +210,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                         )}
                      </>
                   ) : (
-                     <Stack flexGrow={1}>
-                        <Box mt="auto" />
+                     <Stack justifyContent="flex-end">
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
                               spark.group.logoUrl,

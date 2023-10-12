@@ -24,6 +24,7 @@ import { FC, Fragment, ReactNode, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"
 import UploadOverlay from "./UploadOverlay"
+import { type FileMetadata } from "components/custom-hook/useUploadFile"
 
 const styles = sxStyles({
    root: {
@@ -131,7 +132,10 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             return
          }
 
-         if (duration < minSeconds || duration > maxSeconds) {
+         if (
+            duration < minSeconds ||
+            duration > maxSeconds + 5 // Add some leniency (60 + 5 seconds) to the max duration, but still show the 60 seconds req on the UI
+         ) {
             const roundedDuration = Math.round(duration * 10) / 10 // round to 1 decimal
             const message = `Your video is ${roundedDuration} seconds long, a Spark should be between ${minSeconds} and ${maxSeconds} seconds`
 
@@ -147,11 +151,11 @@ const VideoUpload: FC<Props> = ({ name, editing }) => {
             )
          }
 
-         let videoData,
-            thumbnailsInBase64,
-            thumbnail64,
-            thumbnailFile,
-            thumbnailData
+         let videoData: FileMetadata,
+            thumbnailsInBase64: string[],
+            thumbnail64: string,
+            thumbnailFile: File,
+            thumbnailData: FileMetadata
 
          try {
             // upload file

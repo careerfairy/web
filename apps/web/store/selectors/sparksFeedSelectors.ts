@@ -67,3 +67,6 @@ export const emptyFilterSelector = (state: RootState) =>
 
 export const cameFromCompanyPageLinkSelector = (state: RootState) =>
    state.sparksFeed.cameFromCompanyPageLink
+
+export const videosMuttedSelector = (state: RootState) =>
+   state.sparksFeed.videosMuted
