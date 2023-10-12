@@ -88,7 +88,7 @@ const styles = sxStyles({
 
 type Props = {
    videoUrl: string
-   thumbnailUrl: string
+   thumbnailUrl?: string
    playing?: boolean
    onSecondPassed?: (secondsPassed: number) => void
    onVideoEnded?: () => void
@@ -99,7 +99,6 @@ type Props = {
 
 const VideoPreview: FC<Props> = ({
    videoUrl,
-   thumbnailUrl,
    playing: shouldPLay,
    onSecondPassed,
    onVideoEnded,
