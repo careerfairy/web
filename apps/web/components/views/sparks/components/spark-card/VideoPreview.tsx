@@ -1,17 +1,15 @@
-import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import { Button } from "@mui/material"
-import { CircularProgress, IconButton } from "@mui/material"
-import Box from "@mui/material/Box"
+import { Fade, Grow, Button, Box } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
-import { FC, Fragment, useCallback, useEffect, useState } from "react"
+import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
-import { unMuteVideos } from "store/reducers/sparksFeedReducer"
+import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
@@ -68,10 +66,15 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       color: "white",
-      "& svg": {
-         // width: 80,
-         // height: 80,
-      },
+   },
+   overlayButtonWrapper: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      p: 2,
+   },
+   hideOverlay: {
+      background: "transparent",
    },
    thumbnailOverlay: {
       position: "relative",
@@ -104,6 +107,7 @@ const VideoPreview: FC<Props> = ({
    pausing: shouldPause,
    muted,
 }) => {
+   const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
    const [playing, setPlaying] = useState(shouldPLay)
@@ -128,7 +132,7 @@ const VideoPreview: FC<Props> = ({
    )
 
    const handleError: BaseReactPlayerProps["onError"] = (error) => {
-      // alert(error)
+      dispatch(setVideosMuted(true))
       errorLogAndNotify(error, {
          message: "Error playing video",
       })
@@ -148,7 +152,8 @@ const VideoPreview: FC<Props> = ({
    }, [onVideoPlay, videoPlayedForSession])
 
    const handleClickPlayOverlay = useCallback(() => {
-      dispatch(unMuteVideos())
+      dispatch(setVideosMuted(false))
+      playerRef.current?.getInternalPlayer()?.play()
    }, [dispatch])
 
    const handleTogglePause = useCallback(() => {
@@ -161,29 +166,24 @@ const VideoPreview: FC<Props> = ({
             <ClickToUnmuteOverlay onClick={handleClickPlayOverlay} />
          ) : null}
          <Box sx={[styles.playerWrapper]}>
-            {shouldPLay ? (
-               <ReactPlayer
-                  playing={Boolean(playing && !shouldPause)}
-                  playsinline
-                  playsInline
-                  loop={playing}
-                  width="100%"
-                  height="100%"
-                  className="player"
-                  onProgress={handleProgress}
-                  onPlay={onPlay}
-                  onError={handleError}
-                  progressInterval={250}
-                  url={videoUrl}
-                  playIcon={<Fragment />}
-                  muted
-                  autoPlay
-                  autoplay
-                  onClick={handleTogglePause}
-               />
-            ) : (
-               <ThumbnailOverlay src={thumbnailUrl} />
-            )}
+            <ReactPlayer
+               ref={playerRef}
+               playing={Boolean(playing && !shouldPause)}
+               playsinline
+               playsInline
+               loop={playing}
+               width="100%"
+               height="100%"
+               className="player"
+               onProgress={handleProgress}
+               onPlay={onPlay}
+               onError={handleError}
+               progressInterval={250}
+               url={videoUrl}
+               playIcon={<Fragment />}
+               muted={muted}
+               onClick={handleTogglePause}
+            />
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
@@ -198,27 +198,38 @@ type ClickToPlayOverlayProps = {
    onClick: () => void
 }
 const ClickToUnmuteOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
+   const [hideOverlay, setHideOverlay] = useState(false)
+
+   useEffect(() => {
+      const timer = setTimeout(() => {
+         setHideOverlay(false)
+      }, 5000)
+      return () => {
+         clearTimeout(timer)
+      }
+   }, [])
+
    return (
-      <Box sx={styles.clickToPlayOverlay} onClick={onClick}>
+      <Fade in>
          <Box
-            sx={{
-               position: "absolute",
-               top: 0,
-               left: 0,
-               p: 2,
-            }}
+            sx={[styles.clickToPlayOverlay, hideOverlay && styles.hideOverlay]}
+            onClick={onClick}
          >
-            <span>
-               <Button
-                  variant="contained"
-                  color="info"
-                  startIcon={<UnmuteIcon />}
-               >
-                  Tap to unmute
-               </Button>
-            </span>
+            <Box sx={styles.overlayButtonWrapper}>
+               <Grow in={!hideOverlay}>
+                  <span>
+                     <Button
+                        variant="contained"
+                        color="info"
+                        startIcon={<UnmuteIcon />}
+                     >
+                        Tap to unmute
+                     </Button>
+                  </span>
+               </Grow>
+            </Box>
          </Box>
-      </Box>
+      </Fade>
    )
 }
 
