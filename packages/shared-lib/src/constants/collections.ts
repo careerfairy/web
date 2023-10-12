@@ -16,6 +16,7 @@ export const ALL_PROJECT_COLLECTION_IDS = [
    "companiesUserFollows",
    "companyPageViews",
    "creators",
+   "customJobs",
    "deletedSparks",
    "deletedUsers",
    "detailPageViews",
