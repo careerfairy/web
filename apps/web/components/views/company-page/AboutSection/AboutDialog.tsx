@@ -14,6 +14,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import * as yup from "yup"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 
 type Props = {
    handleClose: () => void
@@ -149,7 +150,14 @@ const schema = yup.object().shape({
    extraInfo: yup
       .string()
       .required("Please describe your company")
-      .min(10, `Must be at least 10 characters`),
+      .min(
+         GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
+         `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`
+      )
+      .max(
+         GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
+         `Must be less than ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`
+      ),
    companySize: yup.string().required("Please add the company size"),
    companyIndustries: yup
       .array()

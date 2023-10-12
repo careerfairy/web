@@ -245,6 +245,7 @@ export type PublicGroup = Pick<
    | "universityCode"
    | "publicSparks"
    | "publicProfile"
+   | "careerPageUrl"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
@@ -257,6 +258,7 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       universityCode: group.universityCode ?? null,
       publicSparks: group.publicSparks ?? null,
       publicProfile: group.publicProfile ?? false,
+      careerPageUrl: group.careerPageUrl ?? null,
    }
 }
 
