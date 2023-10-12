@@ -13,6 +13,7 @@ import {
    shouldUseEmulators,
 } from "../../util/CommonUtil"
 import {
+   AuthorInfo,
    EventRating,
    EventRatingAnswer,
    LivestreamChatEntry,
@@ -604,7 +605,12 @@ class FirebaseService {
 
    // CREATE_LIVESTREAMS
 
-   addLivestream = async (livestream, collection, author = {}, promotion) => {
+   addLivestream = async (
+      livestream: LivestreamEvent,
+      collection: "livestreams" | "draftLivestreams",
+      author: AuthorInfo,
+      promotion
+   ) => {
       try {
          const ratings: EventRating[] = [
             {
@@ -617,7 +623,7 @@ class FirebaseService {
                isForEnd: false,
             },
             {
-               question: `Help ${livestream.company} to improve: How can they make the experience more useful to you and other students?`,
+               question: `Help ${livestream.company} improve: How can we make the experience more useful to you?`,
                appearAfter: 40,
                id: "companyFeedback",
                hasText: true,
@@ -630,7 +636,7 @@ class FirebaseService {
          let batch = this.firestore.batch()
          let livestreamsRef = this.firestore.collection(collection).doc()
          livestream.author = author
-         livestream.created = this.getServerTimestamp()
+         livestream.created = this.getServerTimestamp() as any
          livestream.currentSpeakerId = livestreamsRef.id
          livestream.id = livestreamsRef.id
          batch.set(livestreamsRef, livestream, { merge: true })
@@ -655,13 +661,7 @@ class FirebaseService {
                .collection("rating")
                .doc(rating.id)
 
-            const toSet: EventRating = {
-               question: rating.question,
-               appearAfter: rating.appearAfter,
-               hasText: Boolean(rating.hasText),
-               id: rating.id,
-            }
-            batch.set(ratingRef, toSet)
+            batch.set(ratingRef, rating)
          }
 
          const promotionsRef = this.firestore
