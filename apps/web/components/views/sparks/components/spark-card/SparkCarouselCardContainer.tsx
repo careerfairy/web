@@ -57,7 +57,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
             playing={video.preview}
-            light
+            light={!video.preview}
          />
       </Box>
    )
