@@ -221,22 +221,22 @@ const SparksFeedCarousel: FC = () => {
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
             {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
-            {sparks.map((spark, index) => (
-               <Slide
-                  onClick={
-                     index === currentPlayingIndex
-                        ? undefined // Prevents propagating the click event to children
-                        : () => handleClickSlide(index)
-                  }
-                  fullScreen={isFullScreen}
-                  key={spark.id + index}
-               >
-                  <FeedCardSlide
-                     playing={index === currentPlayingIndex}
-                     spark={spark}
-                  />
-               </Slide>
-            ))}
+            {sparks.map((spark, index) => {
+               const playing = index === currentPlayingIndex
+               return (
+                  <Slide
+                     onClick={
+                        playing
+                           ? undefined // Prevents propagating the click event to children
+                           : () => handleClickSlide(index)
+                     }
+                     fullScreen={isFullScreen}
+                     key={spark.id + index}
+                  >
+                     <FeedCardSlide playing={playing} spark={spark} />
+                  </Slide>
+               )
+            })}
             <Collapse in={isFetchingSparks} unmountOnExit>
                <Slide fullScreen={isFullScreen}>
                   <CircularProgress />

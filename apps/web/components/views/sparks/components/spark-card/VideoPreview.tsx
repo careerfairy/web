@@ -11,8 +11,8 @@ import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import { errorLogAndNotify } from "util/CommonUtil"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
+import { usePrevious } from "react-use"
 
 const styles = sxStyles({
    root: {
@@ -135,9 +135,7 @@ const VideoPreview: FC<Props> = ({
 
    const handleError: BaseReactPlayerProps["onError"] = (error) => {
       dispatch(setVideosMuted(true))
-      errorLogAndNotify(error, {
-         message: "Error playing video",
-      })
+      console.error(error)
    }
 
    useEffect(() => {
@@ -145,6 +143,24 @@ const VideoPreview: FC<Props> = ({
          setVideoPlayedForSession(false)
       }
    }, [shouldPLay])
+
+   const prevShouldPlay = usePrevious(shouldPLay)
+
+   const reset = () => {
+      setVideoPlayedForSession(false)
+      setProgress(0)
+      setPlaying(false)
+      // reset player to
+      setTimeout(() => {
+         playerRef.current?.seekTo(0)
+      }, 100)
+   }
+
+   useEffect(() => {
+      if (prevShouldPlay && !shouldPLay) {
+         reset()
+      }
+   }, [prevShouldPlay, shouldPLay])
 
    const onPlay = useCallback(() => {
       setVideoPlayedForSession(true)
