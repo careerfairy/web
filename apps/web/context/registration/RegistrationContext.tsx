@@ -369,7 +369,8 @@ export function RegistrationContextProvider({
                // after registration, remove from this user's sparks notification the existing notification related to this event
                await sparkService.removeAndSyncUserSparkNotification({
                   userId: userData.userEmail,
-                  groupId: livestream.author.groupId,
+                  groupId:
+                     livestream.groupIds?.[0] || livestream.author?.groupId,
                })
 
                // Increase livestream popularity
