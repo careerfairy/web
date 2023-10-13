@@ -54,7 +54,7 @@ export class UserFunctionsRepository
          `Sync CustomJobApplicants with updated job ${updatedCustomJob.id}.`
       )
 
-      const applicants = newCustomJob.applicants
+      const applicants = newCustomJob.applicants || []
 
       applicants.forEach((applicant) => {
          const ref = this.firestore
