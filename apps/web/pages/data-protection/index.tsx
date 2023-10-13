@@ -1549,7 +1549,7 @@ const TextContent = () => {
                version published on this website is the current version. &nbsp;
             </p>
 
-            <p>Last updated: 04.04.2023 &nbsp;</p>
+            <p>Last updated: 13.10.2023 &nbsp;</p>
          </div>
       </Box>
    )

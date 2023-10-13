@@ -1673,7 +1673,7 @@ const TextContent = () => {
                jeweils aktuelle Fassung. &nbsp;
             </p>
 
-            <p>Letzte Aktualisierung: 06.09.2023 &nbsp;</p>
+            <p>Letzte Aktualisierung: 13.10.2023 &nbsp;</p>
          </div>
       </Box>
    )
