@@ -197,7 +197,8 @@ export default function useRegistrationHandler() {
                sparkService
                   .removeAndSyncUserSparkNotification({
                      userId: userData.userEmail,
-                     groupId: livestream.author.groupId,
+                     groupId:
+                        livestream.groupIds?.[0] || livestream.author?.groupId,
                   })
                   .catch((e) =>
                      errorLogAndNotify(e, {
