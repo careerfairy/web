@@ -22,7 +22,7 @@ npm install
 npm run prepare
 ```
 
-Make a copy of `env.local.example` and rename it to `env.local`. Ask your colleagues for the values of the environment values.
+Make a copies in place for the `env.local.example` file for the [web app](./apps/web/.env.local.example) and the [functions package](./packages/functions/.env.local.example) and rename them to `env.local`. Ask your colleagues for the values of the environment values.
 For ImageKit check [this section](#configure-environment-variables).
 
 ## NPM Commands
