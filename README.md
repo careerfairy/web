@@ -4,8 +4,10 @@ Monorepo with all the apps, managed by npm workspaces and turborepo.
 
 ### Requirements
 
--  `node` v14 (webapp), v16 (functions)
+-  `node` (v16)
 -  `npm` (>v7)
+
+Check our [Development Environment Setup Guide](https://www.notion.so/Development-Environment-Setup-Guide-a5f414de756245aabde5a7d4e9a48350) article for instructions on how to setup your machine.
 
 ## Setup root folder
 
@@ -19,6 +21,9 @@ npm install
 # runs only once after cloning, will setup husky hooks
 npm run prepare
 ```
+
+Make a copies in place for the `env.local.example` file for the [web app](./apps/web/.env.local.example) and the [functions package](./packages/functions/.env.local.example) and rename them to `env.local`. Ask your colleagues for the values of the environment values.
+For ImageKit check [this section](#configure-environment-variables).
 
 ## NPM Commands
 
@@ -70,14 +75,16 @@ npm run test:e2e-webapp
 # using the functions, firestore and auth emulators
 ```
 
-The upon test completion or failure a report html folder is generated which can be accessed
-in `./apps/web/playwright-report`. If the test had failed, the report will include screenshots and video recordings of
+Upon test completion or failure a report html folder is generated which can be accessed
+in `./apps/web/playwright-report`.
+
+If the test had failed, the report will include screenshots and video recordings of
 what produced the failure as seen below:
 ![failed report example](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Freport-example.png?alt=media&token=bb91ecc7-d4f1-457e-a1fc-c5b811dad706)
 
 There are two ways in which you can open up the report:
 
--  running the root script `npm run webapp:report`
+-  Running the root script `npm run webapp:report`
 -  Running the index.html file within `./apps/web/playwright-report`
 
 ## Storybook
@@ -90,7 +97,7 @@ npm run storybook
 
 ## CI
 
-The CI Pipeline now runs on every push/pull_request test results are always uploaded through a GitHub action and are
+The CI Pipeline now runs on every push/pull request and test results are always uploaded through a GitHub action and are
 stored in a zip file attached to the pipeline as seen below:
 ![uploaded report folder example](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Freport-upload-example.png?alt=media&token=51f95e0d-26aa-4e49-b724-515c6991a74a)
 
@@ -129,8 +136,7 @@ http://localhost:4000/
 
 Update the `firestore.rules` file with your new rules, test them using the local emulators.
 
-Create a Pull Request with the new changes, and only after approval, you should deploy them using `npm run deploy:rules`
-.
+Create a Pull Request with the new changes, and only after approval, should you deploy them using `npm run deploy:rules`.
 
 ### Run E2E tests on a linux docker container
 
@@ -202,8 +208,6 @@ We use ImageKit for real-time video optimization and transformation. Each develo
 2. If you don't already have a `.env.local` file in your [project](./apps/web/.env.local), make a copy of the `.env.local.example` file located [here](./apps/web/.env.local.example) and rename it to `.env.local`.
 3. Open your `.env.local` file and paste your `imagekitId` in the designated area, like so:
 
-       ```env
-       NEXT_PUBLIC_IMAGEKIT_ID=YOUR_IMAGEKIT_ID
-       ```
+         NEXT_PUBLIC_IMAGEKIT_ID=YOUR_IMAGEKIT_ID
 
    For testing and production environments, the `NEXT_PUBLIC_IMAGEKIT_ID` will be configured in the CI/CD pipeline and the [.env.test](./apps/web/.env.test) file, respectively.
