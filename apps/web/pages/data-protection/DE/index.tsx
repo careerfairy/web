@@ -1,7 +1,8 @@
 import { withFirebase } from "../../../context/firebase/FirebaseServiceContext"
 
 import Head from "next/head"
-import { Box, Button, Container, Link } from "@mui/material"
+import Link from "next/link"
+import { Box, Button, Container } from "@mui/material"
 import GeneralLayout from "../../../layouts/GeneralLayout"
 import { useEffect } from "react"
 import { getWindow } from "../../../util/PathUtils"
