@@ -77,9 +77,9 @@ export class SparkPresenter implements SparkPresenterInterface {
    getTransformedVideoUrl(): string {
       return imageKitLoader({
          src: this.video.url,
-         height: 640 * 2,
-         width: 360 * 2,
-         quality: 40,
+         height: 640 * 3,
+         width: 360 * 3,
+         quality: 60,
          maxSizeCrop: true,
       })
    }
