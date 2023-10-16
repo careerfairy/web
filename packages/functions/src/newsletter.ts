@@ -7,6 +7,8 @@ import config from "./config"
 import { NewsletterEmailBuilder } from "./lib/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { SparkReleaseEmailBuilder } from "./lib/SparkReleaseEmailBuilder"
+import { SparkReleaseEmailService } from "./lib/SparkNewsletterService"
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -85,6 +87,38 @@ export const manualNewsletter = functions
       }
    })
 
+export const manualSparkReleaseEmail = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onRequest(async (req, res) => {
+      if (req.method !== "GET") {
+         res.status(400).send("Only GET requests are allowed")
+         return
+      }
+
+      const receivedEmails = ((req.query.emails as string) ?? "")
+         .split(",")
+         .map((email) => email?.trim())
+         .filter(Boolean)
+
+      functions.logger.info("Received emails", receivedEmails)
+
+      if (receivedEmails.length === 0) {
+         res.status(400).send("No emails provided")
+         return
+      }
+
+      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+         await sendSparkReleaseEmail()
+         res.status(200).send("Spark Release email sent to everyone")
+      } else {
+         await sendSparkReleaseEmail(receivedEmails)
+         res.status(200).send(
+            "Spark Release email sent to " + receivedEmails.join(", ")
+         )
+      }
+   })
+
 async function sendNewsletter(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
       functions.logger.info(
@@ -106,6 +140,36 @@ async function sendNewsletter(overrideUsers?: string[]) {
    await newsletterService.fetchRequiredData()
    await newsletterService.generateRecommendations()
    await newsletterService.populateUsers()
+
+   await newsletterService.send(overrideUsers)
+
+   if (!overrideUsers) {
+      // set this flag when sending the newsletter to everyone
+      newsletterAlreadySent = true
+   }
+
+   functions.logger.info("Newsletter sent")
+}
+
+async function sendSparkReleaseEmail(overrideUsers?: string[]) {
+   if (newsletterAlreadySent) {
+      functions.logger.info(
+         "Spark release email was already sent in this execution environment, skipping"
+      )
+      return
+   }
+
+   const emailBuilder = new SparkReleaseEmailBuilder(
+      PostmarkEmailSender.create()
+   )
+
+   const newsletterService = new SparkReleaseEmailService(
+      userRepo,
+      emailBuilder,
+      functions.logger
+   )
+
+   await newsletterService.fetchRequiredData()
 
    await newsletterService.send(overrideUsers)
 

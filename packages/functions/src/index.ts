@@ -96,6 +96,7 @@ exports.sendReminderForNonAttendeesByStreamId =
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
+exports.manualSparkReleaseEmail = newsletter.manualSparkReleaseEmail
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
