@@ -243,9 +243,9 @@ const SparksFeedCarousel: FC = () => {
                </Slide>
             </Collapse>
          </Box>
-         <Box sx={styles.companyPageBtn}>
-            <BackToCompanyPageButton />
-         </Box>
+
+         <BackToCompanyPageButton />
+
          {isFullScreen ? (
             <Box sx={styles.closeBtn}>
                <CloseSparksFeedButton dark={emptyFilter} />
@@ -287,9 +287,11 @@ const BackToCompanyPageButton: FC = () => {
    if (!cameFromCompanyPageLink || isFullScreen) return null
 
    return (
-      <IconButton component={Link} href={cameFromCompanyPageLink}>
-         <ArrowBackRoundedIcon color="inherit" />
-      </IconButton>
+      <Box sx={styles.companyPageBtn}>
+         <IconButton component={Link} href={cameFromCompanyPageLink}>
+            <ArrowBackRoundedIcon color="inherit" />
+         </IconButton>
+      </Box>
    )
 }
 
