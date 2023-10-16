@@ -8,11 +8,15 @@ import Image from "next/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
-import { useDispatch } from "react-redux"
-import { setVideosMuted } from "store/reducers/sparksFeedReducer"
+import { useDispatch, useSelector } from "react-redux"
+import {
+   setVideoHasBeenUnmuted,
+   setVideosMuted,
+} from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { usePrevious } from "react-use"
+import { videoHasBeenUnmutedSelector } from "store/selectors/sparksFeedSelectors"
 
 const styles = sxStyles({
    root: {
@@ -257,7 +261,10 @@ type ThumbnailOverlayProps = {
    src: string
    loading?: boolean
 }
-const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, loading }) => {
+export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
+   src,
+   loading,
+}) => {
    return (
       <Box sx={styles.thumbnailOverlay}>
          <Image

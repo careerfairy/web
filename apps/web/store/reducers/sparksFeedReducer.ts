@@ -27,6 +27,7 @@ interface SparksState {
    cardNotification: UserSparksNotification | null
    cameFromCompanyPageLink: string | null
    videosMuted: boolean
+   videoHasBeenUnmuted: boolean
 }
 
 const initialState: SparksState = {
@@ -48,6 +49,7 @@ const initialState: SparksState = {
    cardNotification: null,
    cameFromCompanyPageLink: null,
    videosMuted: false,
+   videoHasBeenUnmuted: false,
 }
 
 // Async thunk to fetch the next sparks
@@ -171,6 +173,9 @@ const sparksFeedSlice = createSlice({
          state.originalSparkId = null
          state.cameFromCompanyPageLink = null
       },
+      setVideoHasBeenUnmuted: (state, action: PayloadAction<boolean>) => {
+         state.videoHasBeenUnmuted = action.payload
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -267,6 +272,7 @@ export const {
    setCardNotification,
    setCameFromCompanyPageLink,
    setVideosMuted,
+   setVideoHasBeenUnmuted,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

@@ -9,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
 import SparkQuestion from "./SparkQuestion"
-import VideoPreview from "./VideoPreview"
+import VideoPreview, { ThumbnailOverlay } from "./VideoPreview"
 import SparksEventNotification from "./Notifications/SparksEventNotification"
 import { useSelector } from "react-redux"
 import {
@@ -118,6 +118,13 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    const cardNotification = useSelector(cardNotificationSelector)
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
+   const onVideoPlay = useCallback(() => {
+      trackEvent(SparkEventActions.Played_Spark)
+   }, [trackEvent])
+
+   const onVideoEnded = useCallback(() => {
+      trackEvent(SparkEventActions.Watched_CompleteSpark)
+   }, [trackEvent])
 
    const companyPageLink = spark.group.publicProfile
       ? `/company/${companyNameSlugify(spark.group.universityName)}`
@@ -128,14 +135,6 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
          trackEvent(SparkEventActions.Click_CompanyPageCTA)
       }
    }, [companyPageLink, trackEvent])
-
-   const onVideoPlay = useCallback(() => {
-      trackEvent(SparkEventActions.Played_Spark)
-   }, [trackEvent])
-
-   const onVideoEnded = useCallback(() => {
-      trackEvent(SparkEventActions.Watched_CompleteSpark)
-   }, [trackEvent])
 
    const { ref } = useInView({
       threshold: 0.9, // At least 90% of the element must be visible
@@ -175,18 +174,8 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                ]}
             >
                {showCardNotification ? null : (
-                  <VideoPreview
-                     muted={videosMuted}
-                     thumbnailUrl={getResizedUrl(
-                        spark.video.thumbnailUrl,
-                        "lg"
-                     )}
-                     videoUrl={spark.getTransformedVideoUrl()}
-                     playing={playing}
-                     onSecondPassed={trackSecondsWatched}
-                     pausing={eventDetailsDialogVisibility}
-                     onVideoPlay={onVideoPlay}
-                     onVideoEnded={onVideoEnded}
+                  <ThumbnailOverlay
+                     src={getResizedUrl(spark.video.thumbnailUrl, "md")}
                   />
                )}
                <Box

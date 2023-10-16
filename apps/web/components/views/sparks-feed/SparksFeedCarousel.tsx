@@ -20,6 +20,8 @@ import {
    sparksSelector,
    emptyFilterSelector,
    cameFromCompanyPageLinkSelector,
+   videosMuttedSelector,
+   activeSparkSelector,
 } from "store/selectors/sparksFeedSelectors"
 import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import CloseSparksFeedButton from "./CloseSparksFeedButton"
@@ -31,6 +33,10 @@ import EmptyFilterView from "./EmptyFilterView"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import { IconButton } from "@mui/material"
 import Link from "../common/Link"
+import VideoPreview from "../sparks/components/spark-card/VideoPreview"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -115,14 +121,26 @@ const SparksFeedCarousel: FC = () => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const dispatch = useDispatch()
    const { userData } = useAuth()
+   const videosMuted = useSelector(videosMuttedSelector)
 
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const emptyFilter = useSelector(emptyFilterSelector)
    const sparks = useSelector(sparksSelector)
+   const activeSpark = useSelector(activeSparkSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+
+   const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
+
+   const onVideoPlay = useCallback(() => {
+      trackEvent(SparkEventActions.Played_Spark)
+   }, [trackEvent])
+
+   const onVideoEnded = useCallback(() => {
+      trackEvent(SparkEventActions.Watched_CompleteSpark)
+   }, [trackEvent])
 
    const noSparks = sparks.length === 0
 
@@ -213,53 +231,84 @@ const SparksFeedCarousel: FC = () => {
    )
 
    return (
-      <Box
-         sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
-         ref={emblaRef}
-      >
+      <>
          <Box
-            sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
+            sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
+            ref={emblaRef}
          >
-            {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
-            {sparks.map((spark, index) => {
-               const playing = index === currentPlayingIndex
-               const shouldRender = Math.abs(currentPlayingIndex - index) <= 1 // Only render the previous, current, and next sparks
+            <Box
+               sx={[
+                  styles.container,
+                  isFullScreen && styles.fullScreenContainer,
+               ]}
+            >
+               {emptyFilter ? (
+                  <EmptyFeedSlide fullScreen={isFullScreen} />
+               ) : null}
+               {sparks.map((spark, index) => {
+                  const playing = index === currentPlayingIndex
+                  const shouldRender =
+                     Math.abs(currentPlayingIndex - index) <= 1 // Only render the previous, current, and next sparks
 
-               return (
-                  <Slide
-                     onClick={
-                        playing
-                           ? undefined // Prevents propagating the click event to children
-                           : () => handleClickSlide(index)
-                     }
-                     fullScreen={isFullScreen}
-                     key={spark.id + index}
-                  >
-                     {shouldRender ? (
-                        <FeedCardSlide playing={playing} spark={spark} />
-                     ) : null}
+                  return (
+                     <Slide
+                        onClick={
+                           playing
+                              ? undefined // Prevents propagating the click event to children
+                              : () => handleClickSlide(index)
+                        }
+                        fullScreen={isFullScreen}
+                        key={spark.id + index}
+                     >
+                        {shouldRender ? (
+                           <FeedCardSlide>
+                              <SparksFeedCard playing={playing} spark={spark} />
+                           </FeedCardSlide>
+                        ) : null}
+                     </Slide>
+                  )
+               })}
+
+               <Collapse in={isFetchingSparks} unmountOnExit>
+                  <Slide fullScreen={isFullScreen}>
+                     <CircularProgress />
                   </Slide>
-               )
-            })}
-            <Collapse in={isFetchingSparks} unmountOnExit>
-               <Slide fullScreen={isFullScreen}>
-                  <CircularProgress />
-               </Slide>
-            </Collapse>
-         </Box>
-         <Box sx={styles.companyPageBtn}>
-            <BackToCompanyPageButton />
-         </Box>
-         {isFullScreen ? (
-            <Box sx={styles.closeBtn}>
-               <CloseSparksFeedButton dark={emptyFilter} />
+               </Collapse>
             </Box>
-         ) : null}
+            <Box sx={styles.companyPageBtn}>
+               <BackToCompanyPageButton />
+            </Box>
+            {isFullScreen ? (
+               <Box sx={styles.closeBtn}>
+                  <CloseSparksFeedButton dark={emptyFilter} />
+               </Box>
+            ) : null}
 
-         {userData?.userEmail ? (
-            <SparkNotifications userEmail={userData.userEmail} />
+            {userData?.userEmail ? (
+               <SparkNotifications userEmail={userData.userEmail} />
+            ) : null}
+         </Box>
+         {activeSpark ? (
+            <FeedCardSlide>
+               <VideoPreview
+                  muted={videosMuted}
+                  thumbnailUrl={getResizedUrl(
+                     activeSpark.video.thumbnailUrl,
+                     "lg"
+                  )}
+                  videoUrl={activeSpark.getTransformedVideoUrl()}
+                  playing={
+                     currentPlayingIndex ===
+                     sparks.findIndex((s) => s.id === activeSpark.id)
+                  }
+                  pausing={eventDetailsDialogVisibility}
+                  onSecondPassed={trackSecondsWatched}
+                  onVideoPlay={onVideoPlay}
+                  onVideoEnded={onVideoEnded}
+               />
+            </FeedCardSlide>
          ) : null}
-      </Box>
+      </>
    )
 }
 
