@@ -187,7 +187,7 @@ const sparksFeedSlice = createSlice({
                // We don't mind duplicates since the feed is endless
                state.sparks = [...sparks, ...action.payload]
 
-               if (action.payload.length < numberOfSparksToFetch) {
+               if (action.payload.length === 0) {
                   state.hasMoreSparks = false
                }
             }
