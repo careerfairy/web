@@ -212,6 +212,15 @@ const SparksFeedCarousel: FC = () => {
       [dispatch]
    )
 
+   const start = Math.max(currentPlayingIndex - 1, 0)
+   const end = Math.min(currentPlayingIndex + 2, sparks.length)
+
+   // Create the slice
+   const sparksSlice = useMemo(
+      () => sparks.slice(start, end),
+      [sparks, start, end]
+   )
+
    return (
       <Box
          sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
@@ -221,8 +230,10 @@ const SparksFeedCarousel: FC = () => {
             sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
          >
             {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
-            {sparks.map((spark, index) => {
-               const playing = index === currentPlayingIndex
+            {sparksSlice.map((spark, index) => {
+               const absoluteIndex = start + index // Adjust the index for the slice
+               const playing = absoluteIndex === currentPlayingIndex
+
                return (
                   <Slide
                      onClick={
