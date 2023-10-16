@@ -242,6 +242,7 @@ const ClickToUnmuteOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
                         variant="contained"
                         color="info"
                         startIcon={<UnmuteIcon />}
+                        onClick={onClick}
                      >
                         Tap to unmute
                      </Button>
