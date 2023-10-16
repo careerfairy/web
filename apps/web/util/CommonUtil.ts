@@ -247,7 +247,8 @@ export const shouldUseEmulators = () => {
  * @returns {boolean} - Returns true if the B2C side of Sparks should be enabled, false otherwise.
  */
 export const shouldEnableSParksB2C = () => {
-   return process.env.NEXT_PUBLIC_ENABLE_SPARKS_B2C === "true"
+   return true
+   // return process.env.NEXT_PUBLIC_ENABLE_SPARKS_B2C === "true"
 }
 
 export const getDictValues = <K extends keyof any, T>(
