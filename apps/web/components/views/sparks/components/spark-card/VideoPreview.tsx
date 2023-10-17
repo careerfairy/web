@@ -96,8 +96,12 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    previewVideo: {
-      "& video": {
-         objectFit: "cover",
+      "& .player": {
+         "& video": {
+            objectFit: {
+               sm: "cover !important",
+            },
+         },
       },
    },
 })
@@ -112,6 +116,7 @@ type Props = {
    pausing?: boolean
    muted?: boolean
    light?: boolean
+   containPreviewOnTablet?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
@@ -124,6 +129,7 @@ const VideoPreview: FC<Props> = ({
    thumbnailUrl,
    muted,
    light,
+   containPreviewOnTablet,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
@@ -167,7 +173,6 @@ const VideoPreview: FC<Props> = ({
       setVideoPlayedForSession(false)
       setProgress(0)
       setPlaying(false)
-      // reset player to
       playerRef.current?.seekTo(0)
    }
 
@@ -203,7 +208,10 @@ const VideoPreview: FC<Props> = ({
          ) : null}
          <Box
             onClick={handleTogglePause}
-            sx={[styles.playerWrapper, light && styles.previewVideo]}
+            sx={[
+               styles.playerWrapper,
+               light && !containPreviewOnTablet && styles.previewVideo,
+            ]}
          >
             <ReactPlayer
                ref={playerRef}
@@ -219,8 +227,6 @@ const VideoPreview: FC<Props> = ({
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
-               // light={thumbnailUrl}
-               // light={light ? thumbnailUrl : false}
                playIcon={<Fragment />}
                muted={muted}
             />
