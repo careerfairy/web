@@ -27,6 +27,7 @@ interface SparksState {
    cardNotification: UserSparksNotification | null
    cameFromCompanyPageLink: string | null
    videosMuted: boolean
+   playing: boolean
 }
 
 const initialState: SparksState = {
@@ -48,6 +49,7 @@ const initialState: SparksState = {
    cardNotification: null,
    cameFromCompanyPageLink: null,
    videosMuted: false,
+   playing: true,
 }
 
 // Async thunk to fetch the next sparks
@@ -83,8 +85,17 @@ const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
    reducers: {
+      togglePlaying: (state) => {
+         state.playing = !state.playing
+      },
+      setVideoPlaying: (state, action: PayloadAction<boolean>) => {
+         state.playing = action.payload
+      },
       setVideosMuted: (state, action: PayloadAction<boolean>) => {
          state.videosMuted = action.payload
+         if (action.payload) {
+            state.playing = false
+         }
       },
       setOriginalSparkId: (state, action: PayloadAction<string | null>) => {
          state.originalSparkId = action.payload
@@ -267,6 +278,8 @@ export const {
    setCardNotification,
    setCameFromCompanyPageLink,
    setVideosMuted,
+   setVideoPlaying,
+   togglePlaying,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

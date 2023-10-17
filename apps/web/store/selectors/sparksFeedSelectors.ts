@@ -70,3 +70,5 @@ export const cameFromCompanyPageLinkSelector = (state: RootState) =>
 
 export const videosMuttedSelector = (state: RootState) =>
    state.sparksFeed.videosMuted
+
+export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing

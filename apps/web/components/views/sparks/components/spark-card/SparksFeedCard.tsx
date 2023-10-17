@@ -4,7 +4,7 @@ import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC, useCallback, useMemo } from "react"
+import { FC, SyntheticEvent, useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
@@ -102,18 +102,39 @@ const styles = sxStyles({
 
 type Props = {
    spark: SparkPresenter
+   /**
+    * Whether the video is playing or not,
+    * if it goes from true to false,
+    * the video will be reset to the beginning
+    */
    playing: boolean
+   /**
+    * Whether the video is paused or not
+    */
+   paused?: boolean
+   beThumbnail?: boolean
+   hideCard?: boolean
+   hideActions?: boolean
+   handleClickCard?: (e: SyntheticEvent) => void
 }
 
-const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
+const SparksFeedCard: FC<Props> = ({
+   spark,
+   playing,
+   paused,
+   beThumbnail,
+   hideCard,
+   hideActions,
+   handleClickCard,
+}) => {
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
 
    const isFullScreen = useSparksFeedIsFullScreen()
+
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
-
    const videosMuted = useSelector(videosMuttedSelector)
    const cardNotification = useSelector(cardNotificationSelector)
 
@@ -159,6 +180,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
    return (
       <>
          <Box
+            onClick={handleClickCard}
             ref={ref}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
@@ -174,7 +196,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      : []),
                ]}
             >
-               {showCardNotification ? null : (
+               {showCardNotification || hideCard ? null : (
                   <VideoPreview
                      muted={videosMuted}
                      thumbnailUrl={getResizedUrl(
@@ -184,9 +206,10 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      videoUrl={spark.getTransformedVideoUrl()}
                      playing={playing}
                      onSecondPassed={trackSecondsWatched}
-                     pausing={eventDetailsDialogVisibility}
+                     pausing={eventDetailsDialogVisibility || paused}
                      onVideoPlay={onVideoPlay}
                      onVideoEnded={onVideoEnded}
+                     light={beThumbnail}
                   />
                )}
                <Box
@@ -197,7 +220,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                         : []),
                   ]}
                >
-                  {showCardNotification ? (
+                  {hideCard ? null : showCardNotification ? (
                      <>
                         {cardNotification ? (
                            <SparkEventFullCardNotification
@@ -229,14 +252,17 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      </Stack>
                   )}
                   {!showCardNotification && isFullScreen ? (
-                     <FeedCardActions spark={spark} />
+                     <>
+                        <Box ml="auto" />
+                        <FeedCardActions hide={hideActions} spark={spark} />
+                     </>
                   ) : null}
                </Box>
             </Box>
          </Box>
          {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
-               <FeedCardActions spark={spark} />
+               <FeedCardActions hide={hideActions} spark={spark} />
             </Box>
          ) : null}
       </>
