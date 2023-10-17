@@ -87,14 +87,12 @@ const JobSection = ({
          onSelectItems={onSelectItems}
       />
    ) : (
-      <SuspenseWithBoundary>
-         <CustomJobSection
-            groupId={groupId}
-            values={values}
-            setFieldValue={setFieldValue}
-            isSubmitting={isSubmitting}
-         />
-      </SuspenseWithBoundary>
+      <CustomJobSection
+         groupId={groupId}
+         values={values}
+         setFieldValue={setFieldValue}
+         isSubmitting={isSubmitting}
+      />
    )
 }
 
