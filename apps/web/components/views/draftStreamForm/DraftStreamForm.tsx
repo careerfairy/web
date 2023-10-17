@@ -61,6 +61,7 @@ import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useGroupATSAccounts from "../../custom-hook/useGroupATSAccounts"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -282,6 +283,7 @@ const DraftStreamForm = ({
       useStreamCreationProvider()
 
    const { data: existingInterests } = useInterests()
+   const { data: accounts } = useGroupATSAccounts(group?.id)
 
    const [draftId, setDraftId] = useState("")
 
@@ -883,6 +885,7 @@ const DraftStreamForm = ({
                                     values={values}
                                     setFieldValue={setFieldValue}
                                     isSubmitting={isSubmitting}
+                                    atsAccounts={accounts}
                                  />
 
                                  <HostAndQuestionsInfo

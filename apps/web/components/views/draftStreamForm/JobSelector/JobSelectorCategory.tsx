@@ -1,11 +1,10 @@
 import React, { Dispatch, useMemo } from "react"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
-import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"
 import { FormikValues } from "formik"
 import CustomJobSection from "./customJobsSection/CustomJobSection"
-import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 
 type Props = {
    groupId: string
@@ -16,6 +15,7 @@ type Props = {
    values: FormikValues
    setFieldValue: (field: string, value: any) => void
    isSubmitting: boolean
+   atsAccounts: GroupATSAccount[]
 }
 
 /**
@@ -34,13 +34,12 @@ const JobSelectorCategory = ({
    values,
    setFieldValue,
    isSubmitting,
+   atsAccounts,
 }: Props) => {
-   const { data: accounts } = useGroupATSAccounts(groupId)
-
    // First sync should be complete to fetch the jobs
    const filteredAccounts = useMemo(() => {
-      return accounts.filter((account) => account.firstSyncCompletedAt)
-   }, [accounts])
+      return atsAccounts.filter((account) => account.firstSyncCompletedAt)
+   }, [atsAccounts])
 
    return (
       <Section
@@ -56,14 +55,12 @@ const JobSelectorCategory = ({
                onSelectItems={onSelectItems}
             />
          ) : (
-            <SuspenseWithBoundary>
-               <CustomJobSection
-                  groupId={groupId}
-                  values={values}
-                  setFieldValue={setFieldValue}
-                  isSubmitting={isSubmitting}
-               />
-            </SuspenseWithBoundary>
+            <CustomJobSection
+               groupId={groupId}
+               values={values}
+               setFieldValue={setFieldValue}
+               isSubmitting={isSubmitting}
+            />
          )}
       </Section>
    )

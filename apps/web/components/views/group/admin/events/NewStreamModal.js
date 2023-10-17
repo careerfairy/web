@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -398,20 +399,22 @@ const NewStreamModal = ({
                <DialogContent
                   className={`${classes.content} ${classes.contentRoot}`}
                >
-                  <DraftStreamForm
-                     formRef={formRef}
-                     group={group}
-                     saveChangesButtonRef={saveChangesButtonRef}
-                     onSubmit={onSubmit}
-                     submitted={submitted}
-                     isActualLivestream={isActualLivestream}
-                     currentStream={currentStream}
-                     setSubmitted={setSubmitted}
-                     canPublish={canPublish}
-                     isOnDialog={true}
-                     submitButtonRef={submitButtonRef}
-                     isDraft={isDraft}
-                  />
+                  <SuspenseWithBoundary fallback={<CircularProgress />}>
+                     <DraftStreamForm
+                        formRef={formRef}
+                        group={group}
+                        saveChangesButtonRef={saveChangesButtonRef}
+                        onSubmit={onSubmit}
+                        submitted={submitted}
+                        isActualLivestream={isActualLivestream}
+                        currentStream={currentStream}
+                        setSubmitted={setSubmitted}
+                        canPublish={canPublish}
+                        isOnDialog={true}
+                        submitButtonRef={submitButtonRef}
+                        isDraft={isDraft}
+                     />
+                  </SuspenseWithBoundary>
                </DialogContent>
             </div>
          </DialogContent>
