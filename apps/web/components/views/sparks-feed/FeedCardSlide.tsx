@@ -20,9 +20,8 @@ type Props = {
    playing?: boolean
    paused?: boolean
    hide?: boolean
-   beThumbnail?: boolean
-   hideCard?: boolean
-   hideActions?: boolean
+   isOverlayedOntop?: boolean
+   hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
 }
 
@@ -31,9 +30,8 @@ const FeedCardSlide: FC<Props> = ({
    playing,
    paused,
    hide,
-   beThumbnail,
-   hideCard,
-   hideActions,
+   isOverlayedOntop,
+   hideVideo,
    handleClickCard,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
@@ -46,9 +44,8 @@ const FeedCardSlide: FC<Props> = ({
                   playing={playing}
                   spark={spark}
                   paused={paused}
-                  beThumbnail={beThumbnail}
-                  hideCard={hideCard}
-                  hideActions={hideActions}
+                  isOverlayedOntop={isOverlayedOntop}
+                  hideVideo={hideVideo}
                   handleClickCard={handleClickCard}
                />
             </AspectRatio>
