@@ -48,7 +48,10 @@ const styles = sxStyles({
          },
       },
       "& .react-player__preview": {
-         backgroundSize: "cover !important",
+         backgroundSize: {
+            xs: "cover !important",
+            sm: "contain !important",
+         },
          backgroundRepeat: "no-repeat !important",
          backgroundColor: "black !important",
       },
@@ -96,6 +99,11 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    previewVideo: {
+      "& .react-player__preview": {
+         backgroundSize: {
+            sm: "cover !important",
+         },
+      },
       "& .player": {
          "& video": {
             objectFit: {
@@ -226,6 +234,7 @@ const VideoPreview: FC<Props> = ({
                onPlay={onPlay}
                onError={handleError}
                progressInterval={250}
+               light={light ? thumbnailUrl : false}
                url={videoUrl}
                playIcon={<Fragment />}
                muted={muted}

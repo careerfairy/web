@@ -282,6 +282,7 @@ const SparksFeedCarousel: FC = () => {
                   {
                      height: isFullScreen ? undefined : "auto",
                      opacity: isFullScreen && !isOnEdge ? 1 : scrolling ? 0 : 1,
+                     transition: (theme) => theme.transitions.create("opacity"),
                   },
                   styles.staticViewportVideo,
                ]}
