@@ -6,6 +6,7 @@ import ATSFormSection from "./ATSFormSection"
 import { FormikValues } from "formik"
 import CustomJobSection from "./customJobsSection/CustomJobSection"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import { CircularProgress } from "@mui/material"
 
 type Props = {
    groupId: string
@@ -35,6 +36,42 @@ const JobSelectorCategory = ({
    setFieldValue,
    isSubmitting,
 }: Props) => {
+   return (
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"JobSection"}
+         className={classes.section}
+      >
+         <SuspenseWithBoundary fallback={<CircularProgress />}>
+            <JobSection
+               groupId={groupId}
+               selectedItems={selectedItems}
+               onSelectItems={onSelectItems}
+               values={values}
+               setFieldValue={setFieldValue}
+               isSubmitting={isSubmitting}
+            />
+         </SuspenseWithBoundary>
+      </Section>
+   )
+}
+
+type JobSectionProps = {
+   groupId: string
+   onSelectItems: Dispatch<any>
+   selectedItems: LivestreamJobAssociation[]
+   values: FormikValues
+   setFieldValue: (field: string, value: any) => void
+   isSubmitting: boolean
+}
+const JobSection = ({
+   groupId,
+   selectedItems,
+   onSelectItems,
+   values,
+   setFieldValue,
+   isSubmitting,
+}: JobSectionProps) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
    // First sync should be complete to fetch the jobs
@@ -42,30 +79,22 @@ const JobSelectorCategory = ({
       return accounts.filter((account) => account.firstSyncCompletedAt)
    }, [accounts])
 
-   return (
-      <Section
-         sectionRef={sectionRef}
-         sectionId={"JobSection"}
-         className={classes.section}
-      >
-         {filteredAccounts.length ? (
-            <ATSFormSection
-               groupId={groupId}
-               accounts={filteredAccounts}
-               selectedItems={selectedItems}
-               onSelectItems={onSelectItems}
-            />
-         ) : (
-            <SuspenseWithBoundary>
-               <CustomJobSection
-                  groupId={groupId}
-                  values={values}
-                  setFieldValue={setFieldValue}
-                  isSubmitting={isSubmitting}
-               />
-            </SuspenseWithBoundary>
-         )}
-      </Section>
+   return filteredAccounts.length ? (
+      <ATSFormSection
+         groupId={groupId}
+         accounts={filteredAccounts}
+         selectedItems={selectedItems}
+         onSelectItems={onSelectItems}
+      />
+   ) : (
+      <SuspenseWithBoundary>
+         <CustomJobSection
+            groupId={groupId}
+            values={values}
+            setFieldValue={setFieldValue}
+            isSubmitting={isSubmitting}
+         />
+      </SuspenseWithBoundary>
    )
 }
 
