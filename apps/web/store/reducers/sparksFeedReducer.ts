@@ -93,9 +93,6 @@ const sparksFeedSlice = createSlice({
       },
       setVideosMuted: (state, action: PayloadAction<boolean>) => {
          state.videosMuted = action.payload
-         if (action.payload) {
-            state.playing = false
-         }
       },
       setOriginalSparkId: (state, action: PayloadAction<string | null>) => {
          state.originalSparkId = action.payload

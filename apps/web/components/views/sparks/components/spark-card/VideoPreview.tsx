@@ -8,10 +8,7 @@ import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
-import {
-   setVideoPlaying,
-   setVideosMuted,
-} from "store/reducers/sparksFeedReducer"
+import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { usePrevious } from "react-use"
@@ -98,6 +95,18 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    },
+   topAndBottomGradient: {
+      "&::after": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
+         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
+      },
+   },
    previewVideo: {
       "& .react-player__preview": {
          backgroundSize: {
@@ -125,11 +134,12 @@ type Props = {
    muted?: boolean
    light?: boolean
    containPreviewOnTablet?: boolean
+   identifier?: string
 }
 
 const VideoPreview: FC<Props> = ({
    videoUrl,
-   playing: shouldPLay,
+   playing,
    onSecondPassed,
    onVideoEnded,
    onVideoPlay,
@@ -138,22 +148,29 @@ const VideoPreview: FC<Props> = ({
    muted,
    light,
    containPreviewOnTablet,
+   identifier,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
    const [progress, setProgress] = useState(0)
-   const [playing, setPlaying] = useState(shouldPLay)
    const dispatch = useDispatch()
 
    const onProgress = useReactPlayerTracker({
-      shouldPlay: shouldPLay,
+      identifier,
+      shouldPlay: playing,
       onSecondPass: onSecondPassed,
       onVideoEnd: onVideoEnded,
    })
 
-   useEffect(() => {
-      setPlaying(shouldPLay)
-   }, [shouldPLay])
+   const handleError: BaseReactPlayerProps["onError"] = useCallback(
+      (error) => {
+         dispatch(setVideosMuted(true))
+         playerRef.current?.getInternalPlayer()?.play()
+
+         console.error(error)
+      },
+      [dispatch]
+   )
 
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
@@ -163,32 +180,19 @@ const VideoPreview: FC<Props> = ({
       [onProgress]
    )
 
-   const handleError: BaseReactPlayerProps["onError"] = (error) => {
-      dispatch(setVideosMuted(true))
-      dispatch(setVideoPlaying(false))
-      console.error(error)
-   }
-
-   useEffect(() => {
-      if (!shouldPLay) {
-         setVideoPlayedForSession(false)
-      }
-   }, [shouldPLay])
-
-   const prevShouldPlay = usePrevious(shouldPLay)
+   const prevIdentifier = usePrevious(identifier)
 
    const reset = () => {
       setVideoPlayedForSession(false)
       setProgress(0)
-      setPlaying(false)
       playerRef.current?.seekTo(0)
    }
 
    useEffect(() => {
-      if (prevShouldPlay && !shouldPLay) {
+      if (prevIdentifier !== identifier) {
          reset()
       }
-   }, [prevShouldPlay, shouldPLay])
+   }, [identifier, prevIdentifier])
 
    const onPlay = useCallback(() => {
       setVideoPlayedForSession(true)
@@ -197,25 +201,12 @@ const VideoPreview: FC<Props> = ({
       }
    }, [onVideoPlay, videoPlayedForSession])
 
-   const handleClickPlayOverlay = useCallback(() => {
-      dispatch(setVideosMuted(false))
-      dispatch(setVideoPlaying(true))
-      playerRef.current?.getInternalPlayer()?.play()
-   }, [dispatch])
-
-   const handleTogglePause = useCallback(() => {
-      setPlaying((prevPlaying) => !prevPlaying)
-   }, [])
-
    const playingVideo = Boolean(playing && !shouldPause)
 
    return (
       <Box sx={styles.root}>
-         {muted ? (
-            <ClickToUnmuteOverlay onClick={handleClickPlayOverlay} />
-         ) : null}
+         {muted ? <ClickToUnmuteOverlay /> : null}
          <Box
-            onClick={handleTogglePause}
             sx={[
                styles.playerWrapper,
                light && !containPreviewOnTablet && styles.previewVideo,
@@ -249,10 +240,7 @@ const VideoPreview: FC<Props> = ({
    )
 }
 
-type ClickToPlayOverlayProps = {
-   onClick: () => void
-}
-const ClickToUnmuteOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
+const ClickToUnmuteOverlay: FC = () => {
    const [hideOverlay, setHideOverlay] = useState(false)
 
    useEffect(() => {
@@ -268,7 +256,6 @@ const ClickToUnmuteOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
       <Fade in>
          <Box
             sx={[styles.clickToPlayOverlay, hideOverlay && styles.hideOverlay]}
-            onClick={onClick}
          >
             <Box sx={styles.overlayButtonWrapper}>
                <Grow in={!hideOverlay}>
@@ -293,7 +280,7 @@ type ThumbnailOverlayProps = {
 }
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
    return (
-      <Box sx={styles.thumbnailOverlay}>
+      <Box sx={[styles.thumbnailOverlay, styles.topAndBottomGradient]}>
          <Image
             src={src}
             layout="fill"

@@ -214,7 +214,10 @@ export const getServerSideProps: GetServerSideProps<
 
    if (!sparkFromService) {
       return {
-         notFound: true,
+         redirect: {
+            destination: `/sparks`,
+            permanent: false,
+         },
       }
    }
 
