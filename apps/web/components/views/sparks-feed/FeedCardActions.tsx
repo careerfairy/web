@@ -47,8 +47,12 @@ import LikeActiveIcon from "../common/icons/LikeActiveIcon"
 const actionWidth = 52
 
 const styles = sxStyles({
+   hidden: {
+      visibility: "hidden",
+   },
    root: {
       alignItems: "center",
+      width: 52,
    },
    actionRoot: {
       color: "#5C5C5C",
@@ -125,11 +129,12 @@ const styles = sxStyles({
 
 type Props = {
    spark: Spark | SparkPresenter
+   hide?: boolean
 }
 
-const FeedCardActions: FC<Props> = ({ spark }) => {
+const FeedCardActions: FC<Props> = ({ spark, hide }) => {
    return (
-      <Stack spacing={3} sx={styles.root}>
+      <Stack spacing={3} sx={[styles.root, hide && styles.hidden]}>
          <LikeAction sparkId={spark.id} />
          <ShareAction sparkId={spark.id} />
          {spark.group.careerPageUrl ? (
@@ -193,7 +198,10 @@ const Action: FC<ActionProps> = ({
             id={`action-button-${label}-${sparkId}`}
             sx={[styles.actionBtn, isFullScreen && styles.fullScreenActionBtn]}
             color="inherit"
-            onClick={onClick}
+            onClick={(e) => {
+               e.stopPropagation()
+               onClick(e)
+            }}
             disabled={disabled}
             size={isFullScreen ? "small" : "medium"}
             component={href ? Link : "button"}

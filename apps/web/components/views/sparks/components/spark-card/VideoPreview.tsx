@@ -1,5 +1,4 @@
 import { Fade, Grow, Button, Box } from "@mui/material"
-import { CircularProgress } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
@@ -9,7 +8,10 @@ import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
-import { setVideosMuted } from "store/reducers/sparksFeedReducer"
+import {
+   setVideoPlaying,
+   setVideosMuted,
+} from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { usePrevious } from "react-use"
@@ -29,6 +31,10 @@ const styles = sxStyles({
          left: 0,
          "& video": {
             background: "black",
+            objectFit: {
+               xs: "cover !important",
+               sm: "contain !important",
+            },
          },
          "&::after": {
             content: '""',
@@ -40,6 +46,11 @@ const styles = sxStyles({
             // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
             background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
          },
+      },
+      "& .react-player__preview": {
+         backgroundSize: "cover !important",
+         backgroundRepeat: "no-repeat !important",
+         backgroundColor: "black !important",
       },
    },
    progress: {
@@ -77,12 +88,17 @@ const styles = sxStyles({
       background: "transparent",
    },
    thumbnailOverlay: {
-      position: "relative",
+      position: "absolute",
       width: "100%",
       height: "100%",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+   },
+   previewVideo: {
+      "& video": {
+         objectFit: "cover",
+      },
    },
 })
 
@@ -135,6 +151,7 @@ const VideoPreview: FC<Props> = ({
 
    const handleError: BaseReactPlayerProps["onError"] = (error) => {
       dispatch(setVideosMuted(true))
+      dispatch(setVideoPlaying(false))
       console.error(error)
    }
 
@@ -151,9 +168,7 @@ const VideoPreview: FC<Props> = ({
       setProgress(0)
       setPlaying(false)
       // reset player to
-      setTimeout(() => {
-         playerRef.current?.seekTo(0)
-      }, 100)
+      playerRef.current?.seekTo(0)
    }
 
    useEffect(() => {
@@ -171,6 +186,7 @@ const VideoPreview: FC<Props> = ({
 
    const handleClickPlayOverlay = useCallback(() => {
       dispatch(setVideosMuted(false))
+      dispatch(setVideoPlaying(true))
       playerRef.current?.getInternalPlayer()?.play()
    }, [dispatch])
 
@@ -178,16 +194,20 @@ const VideoPreview: FC<Props> = ({
       setPlaying((prevPlaying) => !prevPlaying)
    }, [])
 
+   const playingVideo = Boolean(playing && !shouldPause)
+
    return (
       <Box sx={styles.root}>
          {muted ? (
             <ClickToUnmuteOverlay onClick={handleClickPlayOverlay} />
          ) : null}
-         <Box sx={styles.playerWrapper}>
+         <Box
+            onClick={handleTogglePause}
+            sx={[styles.playerWrapper, light && styles.previewVideo]}
+         >
             <ReactPlayer
-               key={videoUrl}
                ref={playerRef}
-               playing={Boolean(playing && !shouldPause)}
+               playing={playingVideo}
                playsinline
                playsInline
                loop={playing}
@@ -199,10 +219,10 @@ const VideoPreview: FC<Props> = ({
                onError={handleError}
                progressInterval={250}
                url={videoUrl}
-               light={light ? thumbnailUrl : false}
+               // light={thumbnailUrl}
+               // light={light ? thumbnailUrl : false}
                playIcon={<Fragment />}
                muted={muted}
-               onClick={handleTogglePause}
             />
             <LinearProgress
                sx={styles.progress}
@@ -255,9 +275,8 @@ const ClickToUnmuteOverlay: FC<ClickToPlayOverlayProps> = ({ onClick }) => {
 
 type ThumbnailOverlayProps = {
    src: string
-   loading?: boolean
 }
-const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, loading }) => {
+export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
    return (
       <Box sx={styles.thumbnailOverlay}>
          <Image
@@ -267,7 +286,6 @@ const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src, loading }) => {
             alt="thumbnail"
             priority={true}
          />
-         {loading ? <CircularProgress size={50} /> : null}
       </Box>
    )
 }
