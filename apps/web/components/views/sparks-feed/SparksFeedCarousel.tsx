@@ -7,7 +7,9 @@ import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
 import {
    FC,
+   Ref,
    SyntheticEvent,
+   forwardRef,
    useCallback,
    useEffect,
    useMemo,
@@ -32,6 +34,7 @@ import {
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
    isFetchingSparksSelector,
+   isOnEdgeSelector,
    isPlayingSelector,
    sparksSelector,
    videosMuttedSelector,
@@ -51,7 +54,10 @@ const slideSize = "100%"
 
 const styles = sxStyles({
    root: {
+      flexGrow: 1,
       display: "flex",
+      flexDirection: "column",
+      position: "relative",
    },
    viewport: {
       padding: "1.6rem",
@@ -63,6 +69,11 @@ const styles = sxStyles({
 
       justifyContent: "center",
       alignItems: "center",
+   },
+   staticViewportVideo: {
+      position: "absolute",
+      inset: 0,
+      backgroundColor: "transparent",
    },
    fullScreenViewport: {
       height: "100dvh",
@@ -97,12 +108,6 @@ const styles = sxStyles({
       flex: "1 0 auto",
       height: "100%",
       paddingTop: 0,
-   },
-   slideImg: {
-      display: "block",
-      height: "100%",
-      width: "100%",
-      objectFit: "cover",
    },
    closeBtn: {
       position: "fixed",
@@ -140,6 +145,7 @@ const SparksFeedCarousel: FC = () => {
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+   const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
 
    const noSparks = sparks.length === 0
@@ -263,103 +269,81 @@ const SparksFeedCarousel: FC = () => {
    return (
       <Box
          onClick={handleClickPlayOverlay}
-         sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            backgroundColor: "#F7F8FC",
-         }}
+         sx={[
+            styles.root,
+            {
+               backgroundColor: isFullScreen ? "black !important" : undefined,
+            },
+         ]}
       >
          {activeSpark ? (
-            <Box
+            <ViewportBox
                sx={[
-                  styles.viewport,
-                  isFullScreen && styles.fullScreenViewport,
                   {
-                     position: "absolute",
-                     inset: 0,
                      height: isFullScreen ? undefined : "auto",
-                     backgroundColor: "transparent",
-                     opacity: isFullScreen ? 1 : scrolling ? 0 : 1,
+                     opacity: isFullScreen && !isOnEdge ? 1 : scrolling ? 0 : 1,
                   },
+                  styles.staticViewportVideo,
                ]}
             >
-               <Box
-                  sx={[
-                     styles.container,
-                     isFullScreen && styles.fullScreenContainer,
-                  ]}
-               >
-                  <Slide fullScreen={isFullScreen}>
-                     <FeedCardSlide
-                        paused={!isPlaying}
-                        playing
-                        spark={activeSpark}
-                        hideActions
-                     />
-                  </Slide>
-               </Box>
-            </Box>
+               <Slide fullScreen={isFullScreen}>
+                  <FeedCardSlide
+                     paused={!isPlaying}
+                     playing
+                     spark={activeSpark}
+                     hideActions
+                  />
+               </Slide>
+            </ViewportBox>
          ) : null}
-         <Box
-            sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
+         <ViewportBox
+            outterContent={
+               <>
+                  <BackToCompanyPageButton />
+
+                  {isFullScreen ? (
+                     <Box sx={styles.closeBtn}>
+                        <CloseSparksFeedButton dark={emptyFilter} />
+                     </Box>
+                  ) : null}
+
+                  {userData?.userEmail ? (
+                     <SparkNotifications userEmail={userData.userEmail} />
+                  ) : null}
+               </>
+            }
             ref={emblaRef}
          >
-            <Box
-               sx={[
-                  styles.container,
-                  isFullScreen && styles.fullScreenContainer,
-               ]}
-            >
-               {emptyFilter ? (
-                  <EmptyFeedSlide fullScreen={isFullScreen} />
-               ) : null}
-               {sparks.map((spark, index) => {
-                  // const playing = index === currentPlayingIndex
-                  // Only render the previous, current, and next sparks
-                  const shouldRender =
-                     Math.abs(currentPlayingIndex - index) <= 1
+            {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
+            {sparks.map((spark, index) => {
+               // Only render the previous, current, and next sparks for performance
+               const shouldRender = Math.abs(currentPlayingIndex - index) <= 1
+               const isCurrent = index === currentPlayingIndex
 
-                  const isCurrent = index === currentPlayingIndex
-
-                  return (
-                     <Slide fullScreen={isFullScreen} key={spark.id + index}>
-                        <FeedCardSlide
-                           hide={!shouldRender}
-                           beThumbnail
-                           hideCard={!scrolling && isCurrent}
-                           spark={spark}
-                           handleClickCard={(e: SyntheticEvent) => {
-                              if (isCurrent) {
-                                 dispatch(togglePlaying())
-                              } else {
-                                 handleClickSlide(index)
-                              }
-                           }}
-                        />
-                     </Slide>
-                  )
-               })}
-               <Collapse in={isFetchingSparks} unmountOnExit>
-                  <Slide fullScreen={isFullScreen}>
-                     <CircularProgress />
+               return (
+                  <Slide fullScreen={isFullScreen} key={spark.id + index}>
+                     <FeedCardSlide
+                        hide={!shouldRender}
+                        beThumbnail
+                        hideCard={!scrolling && isCurrent}
+                        spark={spark}
+                        handleClickCard={(e: SyntheticEvent) => {
+                           if (isCurrent) {
+                              dispatch(togglePlaying())
+                           } else {
+                              handleClickSlide(index)
+                           }
+                        }}
+                     />
                   </Slide>
-               </Collapse>
-            </Box>
-
-            <BackToCompanyPageButton />
-
-            {isFullScreen ? (
-               <Box sx={styles.closeBtn}>
-                  <CloseSparksFeedButton dark={emptyFilter} />
-               </Box>
-            ) : null}
-
-            {userData?.userEmail ? (
-               <SparkNotifications userEmail={userData.userEmail} />
-            ) : null}
-         </Box>
+               )
+            })}
+            <Collapse in={isFetchingSparks} unmountOnExit>
+               <Slide fullScreen={isFullScreen}>
+                  <CircularProgress />
+               </Slide>
+            </Collapse>
+         </ViewportBox>
       </Box>
    )
 }
@@ -406,5 +390,41 @@ const BackToCompanyPageButton: FC = () => {
       </Box>
    )
 }
+
+type ViewportBoxProps = BoxProps & {
+   outterContent?: React.ReactNode
+}
+
+const ViewportBox = forwardRef(
+   (
+      { outterContent, children, sx, ...props }: ViewportBoxProps,
+      ref: Ref<any>
+   ) => {
+      const isFullScreen = useSparksFeedIsFullScreen()
+      return (
+         <Box
+            ref={ref}
+            sx={[
+               styles.viewport,
+               isFullScreen && styles.fullScreenViewport,
+               ...(Array.isArray(sx) ? sx : [sx]),
+            ]}
+            {...props}
+         >
+            <Box
+               sx={[
+                  styles.container,
+                  isFullScreen && styles.fullScreenContainer,
+               ]}
+            >
+               {children}
+            </Box>
+            {outterContent}
+         </Box>
+      )
+   }
+)
+
+ViewportBox.displayName = "ViewportBox"
 
 export default SparksFeedCarousel

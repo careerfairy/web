@@ -184,7 +184,7 @@ const SparksFeedCard: FC<Props> = ({
             ref={ref}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            <SparksEventNotification spark={spark} />
+            {hideCard ? null : <SparksEventNotification spark={spark} />}
 
             <Box
                sx={[
@@ -210,6 +210,7 @@ const SparksFeedCard: FC<Props> = ({
                      onVideoPlay={onVideoPlay}
                      onVideoEnded={onVideoEnded}
                      light={beThumbnail}
+                     containPreviewOnTablet
                   />
                )}
                <Box
@@ -220,7 +221,7 @@ const SparksFeedCard: FC<Props> = ({
                         : []),
                   ]}
                >
-                  {hideCard ? null : showCardNotification ? (
+                  {showCardNotification ? (
                      <>
                         {cardNotification ? (
                            <SparkEventFullCardNotification
@@ -232,7 +233,7 @@ const SparksFeedCard: FC<Props> = ({
                            />
                         )}
                      </>
-                  ) : (
+                  ) : hideCard ? null : (
                      <Stack justifyContent="flex-end">
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
