@@ -23,6 +23,7 @@ type Props = {
    isOverlayedOntop?: boolean
    hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
+   identifier?: string
 }
 
 const FeedCardSlide: FC<Props> = ({
@@ -33,6 +34,7 @@ const FeedCardSlide: FC<Props> = ({
    isOverlayedOntop,
    hideVideo,
    handleClickCard,
+   identifier,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
 
@@ -47,6 +49,7 @@ const FeedCardSlide: FC<Props> = ({
                   isOverlayedOntop={isOverlayedOntop}
                   hideVideo={hideVideo}
                   handleClickCard={handleClickCard}
+                  identifier={identifier}
                />
             </AspectRatio>
          )}

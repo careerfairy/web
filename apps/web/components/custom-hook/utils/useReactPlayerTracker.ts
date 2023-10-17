@@ -16,6 +16,10 @@ export type UseReactPlayerTrackerProps = {
     * Callback function that is called when the video ends.
     */
    onVideoEnd?: () => void
+   /**
+    * Identifier for the video.
+    */
+   identifier: string
 }
 
 /**
@@ -38,6 +42,7 @@ const useReactPlayerTracker = ({
    shouldPlay,
    onSecondPass,
    onVideoEnd,
+   identifier,
 }: UseReactPlayerTrackerProps) => {
    const [secondsWatched, setSecondsWatched] = useState(0)
 
@@ -46,6 +51,14 @@ const useReactPlayerTracker = ({
    const onProgress = useCallback((progress: OnProgressProps) => {
       setSecondsWatched(progress.playedSeconds)
    }, [])
+
+   const prevIdentifier = usePrevious(identifier)
+
+   useEffect(() => {
+      if (identifier !== prevIdentifier) {
+         setSecondsWatched(0)
+      }
+   }, [identifier, prevIdentifier])
 
    useEffect(() => {
       if (prevSecondsWatched === undefined) return

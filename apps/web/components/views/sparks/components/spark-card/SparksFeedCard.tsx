@@ -4,7 +4,14 @@ import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC, SyntheticEvent, useCallback, useMemo } from "react"
+import {
+   FC,
+   SyntheticEvent,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+} from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
@@ -22,7 +29,6 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import SparkEventFullCardNotification from "./Notifications/SparkEventFullCardNotification"
 import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNotification"
-import { useInView } from "react-intersection-observer"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { sparkService } from "data/firebase/SparksService"
 import { useAuth } from "HOCs/AuthProvider"
@@ -115,6 +121,7 @@ type Props = {
    isOverlayedOntop?: boolean
    hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
+   identifier?: string
 }
 
 const SparksFeedCard: FC<Props> = ({
@@ -124,6 +131,7 @@ const SparksFeedCard: FC<Props> = ({
    isOverlayedOntop,
    hideVideo,
    handleClickCard,
+   identifier,
 }) => {
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
@@ -156,30 +164,38 @@ const SparksFeedCard: FC<Props> = ({
       trackEvent(SparkEventActions.Watched_CompleteSpark)
    }, [trackEvent])
 
-   const { ref } = useInView({
-      threshold: 0.9, // At least 90% of the element must be visible
-      delay: 1000, // Element must be at least visible for 1 second before triggering
-      skip: !visitorId,
-      onChange: (inView) => {
-         if (inView) {
+   const trackEventRef = useRef(trackEvent)
+
+   useEffect(() => {
+      if (!visitorId || !isOverlayedOntop) return
+
+      if (identifier) {
+         // Identifier has changed, perform necessary actions
+         const timeoutId = setTimeout(() => {
+            // At least 1 second has passed, trigger the impression and mark the spark as seen
             sparkService
                .markSparkAsSeen(authenticatedUser?.email, spark.id)
                .catch(console.error)
-            trackEvent(SparkEventActions.Impression)
-         }
-      },
-   })
+            trackEventRef.current(SparkEventActions.Impression)
+         }, 1000) // Delay of 1 second
+
+         // Cleanup function to clear the timeout if the component unmounts before the timeout finishes
+         return () => clearTimeout(timeoutId)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [identifier, visitorId, isOverlayedOntop])
 
    const showCardNotification = useMemo(
       () => Boolean(spark.isCardNotification),
       [spark.isCardNotification]
    )
 
+   if (!visitorId) return null
+
    return (
       <>
          <Box
             onClick={handleClickCard}
-            ref={ref}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
             {isOverlayedOntop ? (
@@ -211,6 +227,7 @@ const SparksFeedCard: FC<Props> = ({
                      onVideoEnded={onVideoEnded}
                      light={isOverlayedOntop}
                      containPreviewOnTablet
+                     identifier={identifier}
                   />
                )}
                <Box

@@ -8,7 +8,6 @@ import { EngineType } from "embla-carousel/components/Engine"
 import {
    FC,
    Ref,
-   SyntheticEvent,
    forwardRef,
    useCallback,
    useEffect,
@@ -282,7 +281,6 @@ const SparksFeedCarousel: FC = () => {
                   {
                      height: isFullScreen ? undefined : "auto",
                      opacity: isFullScreen && !isOnEdge ? 1 : scrolling ? 0 : 1,
-                     transition: (theme) => theme.transitions.create("opacity"),
                   },
                   styles.staticViewportVideo,
                ]}
@@ -290,8 +288,9 @@ const SparksFeedCarousel: FC = () => {
                <Slide fullScreen={isFullScreen}>
                   <FeedCardSlide
                      paused={!isPlaying}
-                     playing
+                     playing={isPlaying}
                      spark={activeSpark}
+                     identifier={activeSpark.id + currentPlayingIndex}
                   />
                </Slide>
             </ViewportBox>
@@ -319,12 +318,14 @@ const SparksFeedCarousel: FC = () => {
                // Only render the previous, current, and next sparks for performance
                const shouldRender = Math.abs(currentPlayingIndex - index) <= 1
                const isCurrent = index === currentPlayingIndex
+               const identifier = spark.id + index
 
                return (
-                  <Slide fullScreen={isFullScreen} key={spark.id + index}>
+                  <Slide fullScreen={isFullScreen} key={identifier}>
                      <FeedCardSlide
                         hide={!shouldRender}
                         isOverlayedOntop
+                        identifier={identifier}
                         hideVideo={!scrolling && isCurrent}
                         spark={spark}
                         handleClickCard={() => {
