@@ -112,9 +112,8 @@ type Props = {
     * Whether the video is paused or not
     */
    paused?: boolean
-   beThumbnail?: boolean
-   hideCard?: boolean
-   hideActions?: boolean
+   isOverlayedOntop?: boolean
+   hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
 }
 
@@ -122,9 +121,8 @@ const SparksFeedCard: FC<Props> = ({
    spark,
    playing,
    paused,
-   beThumbnail,
-   hideCard,
-   hideActions,
+   isOverlayedOntop,
+   hideVideo,
    handleClickCard,
 }) => {
    const { data: visitorId } = useFingerPrint()
@@ -184,7 +182,9 @@ const SparksFeedCard: FC<Props> = ({
             ref={ref}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            {hideCard ? null : <SparksEventNotification spark={spark} />}
+            {isOverlayedOntop ? (
+               <SparksEventNotification spark={spark} />
+            ) : null}
 
             <Box
                sx={[
@@ -196,7 +196,7 @@ const SparksFeedCard: FC<Props> = ({
                      : []),
                ]}
             >
-               {showCardNotification || hideCard ? null : (
+               {showCardNotification || hideVideo ? null : (
                   <VideoPreview
                      muted={videosMuted}
                      thumbnailUrl={getResizedUrl(
@@ -209,7 +209,7 @@ const SparksFeedCard: FC<Props> = ({
                      pausing={eventDetailsDialogVisibility || paused}
                      onVideoPlay={onVideoPlay}
                      onVideoEnded={onVideoEnded}
-                     light={beThumbnail}
+                     light={isOverlayedOntop}
                      containPreviewOnTablet
                   />
                )}
@@ -233,7 +233,7 @@ const SparksFeedCard: FC<Props> = ({
                            />
                         )}
                      </>
-                  ) : hideCard ? null : (
+                  ) : isOverlayedOntop ? (
                      <Stack justifyContent="flex-end">
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
@@ -251,11 +251,14 @@ const SparksFeedCard: FC<Props> = ({
                         <Box mt={1.5} />
                         <SparkQuestion question={spark.question} />
                      </Stack>
-                  )}
+                  ) : null}
                   {!showCardNotification && isFullScreen ? (
                      <>
                         <Box ml="auto" />
-                        <FeedCardActions hide={hideActions} spark={spark} />
+                        <FeedCardActions
+                           hide={!isOverlayedOntop}
+                           spark={spark}
+                        />
                      </>
                   ) : null}
                </Box>
@@ -263,7 +266,7 @@ const SparksFeedCard: FC<Props> = ({
          </Box>
          {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
-               <FeedCardActions hide={hideActions} spark={spark} />
+               <FeedCardActions hide={!isOverlayedOntop} spark={spark} />
             </Box>
          ) : null}
       </>

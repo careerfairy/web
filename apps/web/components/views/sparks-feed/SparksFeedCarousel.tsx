@@ -291,7 +291,6 @@ const SparksFeedCarousel: FC = () => {
                      paused={!isPlaying}
                      playing
                      spark={activeSpark}
-                     hideActions
                   />
                </Slide>
             </ViewportBox>
@@ -324,10 +323,10 @@ const SparksFeedCarousel: FC = () => {
                   <Slide fullScreen={isFullScreen} key={spark.id + index}>
                      <FeedCardSlide
                         hide={!shouldRender}
-                        beThumbnail
-                        hideCard={!scrolling && isCurrent}
+                        isOverlayedOntop
+                        hideVideo={!scrolling && isCurrent}
                         spark={spark}
-                        handleClickCard={(e: SyntheticEvent) => {
+                        handleClickCard={() => {
                            if (isCurrent) {
                               dispatch(togglePlaying())
                            } else {

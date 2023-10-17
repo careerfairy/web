@@ -181,6 +181,9 @@ const sparksFeedSlice = createSlice({
          state.showEventDetailsDialog = false
          state.originalSparkId = null
          state.cameFromCompanyPageLink = null
+         state.cardNotification = null
+         state.videosMuted = false
+         state.playing = true
       },
    },
    extraReducers: (builder) => {
