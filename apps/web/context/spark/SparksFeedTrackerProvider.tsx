@@ -191,6 +191,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             universityId: userData?.university?.code || null,
             universityName: userData?.university?.name || null,
          }
+
          addSecondsWatchedToBatch(secondWatched)
       },
       [

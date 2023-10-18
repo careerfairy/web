@@ -1,10 +1,11 @@
-import { withFirebase } from "../context/firebase/FirebaseServiceContext"
+import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
 
 import Head from "next/head"
+import Link from "next/link"
 import { Box, Button, Container } from "@mui/material"
-import GeneralLayout from "../layouts/GeneralLayout"
+import GeneralLayout from "../../layouts/GeneralLayout"
 import { useEffect } from "react"
-import { getWindow } from "../util/PathUtils"
+import { getWindow } from "../../util/PathUtils"
 
 const DataProtection = () => {
    useEffect(() => {
@@ -48,6 +49,11 @@ const TextContent = () => {
             },
          }}
       >
+         <p>
+            <span>
+               EN | <Link href={"/data-protection/DE"}>DE</Link>
+            </span>
+         </p>
          <ol start={1}>
             <li>
                <b>
@@ -1544,7 +1550,7 @@ const TextContent = () => {
                version published on this website is the current version. &nbsp;
             </p>
 
-            <p>Last updated: 04.04.2023 &nbsp;</p>
+            <p>Last updated: 13.10.2023 &nbsp;</p>
          </div>
       </Box>
    )
