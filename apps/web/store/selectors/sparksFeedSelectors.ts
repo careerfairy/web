@@ -5,6 +5,12 @@ export const isOnLastSparkSelector = (state: RootState) => {
    return state.sparksFeed.currentPlayingIndex === sparks.length - 1
 }
 
+export const isOnEdgeSelector = (state: RootState) => {
+   const sparks = state.sparksFeed.sparks
+   const index = state.sparksFeed.currentPlayingIndex
+   return index === sparks.length - 1 || index === 0
+}
+
 export const isFetchingNextSparksSelector = (state: RootState) =>
    state.sparksFeed.fetchNextSparksStatus === "loading"
 
@@ -70,3 +76,5 @@ export const cameFromCompanyPageLinkSelector = (state: RootState) =>
 
 export const videosMuttedSelector = (state: RootState) =>
    state.sparksFeed.videosMuted
+
+export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing
