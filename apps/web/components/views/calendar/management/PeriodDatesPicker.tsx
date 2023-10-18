@@ -4,7 +4,7 @@ import {
    UniversityPeriodType,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
 import React, { useCallback, useMemo, useRef, useState } from "react"
-import { lighten, useTheme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { Calendar as CalendarIcon, PlusCircle as PlusIcon } from "react-feather"
 import DatePicker from "react-datepicker"
@@ -19,51 +19,9 @@ import ConfirmationDialog, {
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
 import GBLocale from "date-fns/locale/en-GB"
+import { datePickerDefaultStyles } from "../utils"
 
 const styles = sxStyles({
-   datePicker: {
-      mt: "10px",
-      "& .react-datepicker": {
-         fontFamily: (theme) => theme.typography.fontFamily + "!important",
-      },
-      "& .react-datepicker-wrapper": {
-         width: "100%",
-      },
-      "& .react-datepicker__header": {
-         backgroundColor: "white",
-         borderBlockColor: "transparent",
-         pb: 0,
-      },
-      "& .react-datepicker__navigation-icon::before": {
-         borderColor: "secondary.main",
-      },
-      "& .react-datepicker__day-names": {
-         mt: "10px",
-         fontWeight: 600,
-      },
-      "& .react-datepicker__day--selected": {
-         backgroundColor: "secondary.main",
-         borderRadius: "20px",
-      },
-      "& .react-datepicker__day--in-range": {
-         backgroundColor: (theme) =>
-            theme.palette.secondary.main + "!important",
-         color: "white!important",
-         borderRadius: "20px",
-      },
-      "& .react-datepicker__day--in-selecting-range": {
-         backgroundColor: (theme) =>
-            lighten(theme.palette.secondary.main, 0.4) + "!important",
-         borderRadius: "20px",
-      },
-      "& .react-datepicker__day:hover": {
-         backgroundColor: (theme) => lighten(theme.palette.secondary.main, 0.4),
-         borderRadius: "20px",
-      },
-      "& .react-datepicker__day--keyboard-selected": {
-         backgroundColor: "transparent",
-      },
-   },
    buttonsContainer: {
       pt: "10px",
    },
@@ -207,7 +165,7 @@ const PeriodDatesPicker = ({
    }, [period, setDeletedPeriodIds, setModifiedPeriods])
 
    return (
-      <Box sx={styles.datePicker}>
+      <Box sx={datePickerDefaultStyles.datePicker}>
          <DatePicker
             ref={datePickerRef}
             selected={startDate}

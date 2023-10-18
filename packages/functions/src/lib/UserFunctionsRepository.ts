@@ -5,9 +5,19 @@ import {
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
+import { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
+import {
+   CustomJob,
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/groups/customJobs"
+import * as functions from "firebase-functions"
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
+   syncCustomJobDataToUser(customJob: Change<DocumentSnapshot>): Promise<void>
 }
 
 export class UserFunctionsRepository
@@ -24,5 +34,38 @@ export class UserFunctionsRepository
          .get()
 
       return mapFirestoreDocuments(data)
+   }
+
+   async syncCustomJobDataToUser(
+      customJobChange: Change<DocumentSnapshot>
+   ): Promise<void> {
+      if (!customJobChange.after.exists) {
+         // Custom job was deleted, so we don't need to do nothing
+         return
+      }
+
+      const batch = this.firestore.batch()
+      const newCustomJob = customJobChange.after.data() as CustomJob
+
+      const updatedCustomJob: PublicCustomJob =
+         pickPublicDataFromCustomJob(newCustomJob)
+
+      functions.logger.log(
+         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id}.`
+      )
+
+      const applicants = newCustomJob.applicants || []
+
+      applicants.forEach((applicant) => {
+         const ref = this.firestore
+            .collection("userData")
+            .doc(applicant)
+            .collection("customJobApplications")
+            .doc(newCustomJob.id)
+
+         batch.update(ref, { job: updatedCustomJob })
+      })
+
+      return void batch.commit()
    }
 }

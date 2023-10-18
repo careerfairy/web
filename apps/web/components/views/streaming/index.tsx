@@ -178,7 +178,7 @@ const StreamerOverview = ({
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
-               includeJobs={currentLivestream.jobs?.length > 0}
+               includeJobs={currentLivestream.hasJobs}
                questionsAreDisabled={currentLivestream.questionsDisabled}
             />
             {showTapHint && (

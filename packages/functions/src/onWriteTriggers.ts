@@ -1,5 +1,10 @@
 import functions = require("firebase-functions")
-import { groupRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   sparkRepo,
+   userRepo,
+} from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
    handleSideEffects,
@@ -53,6 +58,8 @@ export const syncLivestreams = functions
             )
          }
       }
+
+      sideEffectPromises.push(groupRepo.syncLivestreamIdWithCustomJobs(change))
 
       return handleSideEffects(sideEffectPromises)
    })
@@ -238,6 +245,31 @@ export const onWriteSpark = functions
          // Update spark in user feeds
          sideEffectPromises.push(sparkRepo.updateSparkInAllUserFeeds(afterData))
       }
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onWriteCustomJobs = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("careerCenterData/{groupId}/customJobs/{jobId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncCustomJobsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all custom jobs changes
+      sideEffectPromises.push(
+         livestreamsRepo.syncCustomJobDataToLivestream(change),
+         userRepo.syncCustomJobDataToUser(change)
+      )
 
       return handleSideEffects(sideEffectPromises)
    })

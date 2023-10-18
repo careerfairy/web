@@ -4,7 +4,14 @@ import { Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
-import { FC, useCallback, useMemo } from "react"
+import {
+   FC,
+   SyntheticEvent,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+} from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
 import SparkDetails from "./SparkDetails"
@@ -22,7 +29,6 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import SparkEventFullCardNotification from "./Notifications/SparkEventFullCardNotification"
 import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNotification"
-import { useInView } from "react-intersection-observer"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { sparkService } from "data/firebase/SparksService"
 import { useAuth } from "HOCs/AuthProvider"
@@ -102,18 +108,39 @@ const styles = sxStyles({
 
 type Props = {
    spark: SparkPresenter
+   /**
+    * Whether the video is playing or not,
+    * if it goes from true to false,
+    * the video will be reset to the beginning
+    */
    playing: boolean
+   /**
+    * Whether the video is paused or not
+    */
+   paused?: boolean
+   isOverlayedOntop?: boolean
+   hideVideo?: boolean
+   handleClickCard?: (e: SyntheticEvent) => void
+   identifier?: string
 }
 
-const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
+const SparksFeedCard: FC<Props> = ({
+   spark,
+   playing,
+   paused,
+   isOverlayedOntop,
+   hideVideo,
+   handleClickCard,
+   identifier,
+}) => {
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
 
    const isFullScreen = useSparksFeedIsFullScreen()
+
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
-
    const videosMuted = useSelector(videosMuttedSelector)
    const cardNotification = useSelector(cardNotificationSelector)
 
@@ -137,32 +164,43 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
       trackEvent(SparkEventActions.Watched_CompleteSpark)
    }, [trackEvent])
 
-   const { ref } = useInView({
-      threshold: 0.9, // At least 90% of the element must be visible
-      delay: 1000, // Element must be at least visible for 1 second before triggering
-      skip: !visitorId,
-      onChange: (inView) => {
-         if (inView) {
+   const trackEventRef = useRef(trackEvent)
+
+   useEffect(() => {
+      if (!visitorId || !isOverlayedOntop) return
+
+      if (identifier) {
+         // Identifier has changed, perform necessary actions
+         const timeoutId = setTimeout(() => {
+            // At least 1 second has passed, trigger the impression and mark the spark as seen
             sparkService
                .markSparkAsSeen(authenticatedUser?.email, spark.id)
                .catch(console.error)
-            trackEvent(SparkEventActions.Impression)
-         }
-      },
-   })
+            trackEventRef.current(SparkEventActions.Impression)
+         }, 1000) // Delay of 1 second
+
+         // Cleanup function to clear the timeout if the component unmounts before the timeout finishes
+         return () => clearTimeout(timeoutId)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [identifier, visitorId, isOverlayedOntop])
 
    const showCardNotification = useMemo(
       () => Boolean(spark.isCardNotification),
       [spark.isCardNotification]
    )
 
+   if (!visitorId) return null
+
    return (
       <>
          <Box
-            ref={ref}
+            onClick={handleClickCard}
             sx={[styles.root, isFullScreen && styles.fullScreenRoot]}
          >
-            <SparksEventNotification spark={spark} />
+            {isOverlayedOntop ? (
+               <SparksEventNotification spark={spark} />
+            ) : null}
 
             <Box
                sx={[
@@ -174,7 +212,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      : []),
                ]}
             >
-               {showCardNotification ? null : (
+               {showCardNotification || hideVideo ? null : (
                   <VideoPreview
                      muted={videosMuted}
                      thumbnailUrl={getResizedUrl(
@@ -184,9 +222,12 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                      videoUrl={spark.getTransformedVideoUrl()}
                      playing={playing}
                      onSecondPassed={trackSecondsWatched}
-                     pausing={eventDetailsDialogVisibility}
+                     pausing={eventDetailsDialogVisibility || paused}
                      onVideoPlay={onVideoPlay}
                      onVideoEnded={onVideoEnded}
+                     light={isOverlayedOntop}
+                     containPreviewOnTablet
+                     identifier={identifier}
                   />
                )}
                <Box
@@ -209,7 +250,7 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                            />
                         )}
                      </>
-                  ) : (
+                  ) : isOverlayedOntop ? (
                      <Stack justifyContent="flex-end">
                         <SparkDetails
                            companyLogoUrl={getResizedUrl(
@@ -227,16 +268,22 @@ const SparksFeedCard: FC<Props> = ({ spark, playing }) => {
                         <Box mt={1.5} />
                         <SparkQuestion question={spark.question} />
                      </Stack>
-                  )}
+                  ) : null}
                   {!showCardNotification && isFullScreen ? (
-                     <FeedCardActions spark={spark} />
+                     <>
+                        <Box ml="auto" />
+                        <FeedCardActions
+                           hide={!isOverlayedOntop}
+                           spark={spark}
+                        />
+                     </>
                   ) : null}
                </Box>
             </Box>
          </Box>
          {!showCardNotification && !isFullScreen ? (
             <Box sx={styles.outerActionsWrapper}>
-               <FeedCardActions spark={spark} />
+               <FeedCardActions hide={!isOverlayedOntop} spark={spark} />
             </Box>
          ) : null}
       </>

@@ -85,6 +85,14 @@ type Props = {
     * The width of the header. Default is 100%
     */
    headerWidth?: string
+   /**
+    * If true, the bottom nav will be hidden
+    */
+   hideBottomNav?: boolean
+   /**
+    * If true, the header will be hidden
+    */
+   hideHeader?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -98,6 +106,8 @@ const GenericDashboardLayout = ({
    hideFooter,
    hideDrawer,
    headerWidth = "100%",
+   hideBottomNav,
+   hideHeader,
 }: Props) => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -186,10 +196,12 @@ const GenericDashboardLayout = ({
          <CreditsDialogLayout>
             <AdminGenericLayout
                bgColor={bgColor || "#F7F8FC"}
-               headerContent={<TopBar title={pageDisplayName} />}
+               headerContent={
+                  hideHeader ? null : <TopBar title={pageDisplayName} />
+               }
                drawerContent={<NavBar />}
                hideDrawer={hideDrawer}
-               bottomNavContent={<GenericNavList />}
+               bottomNavContent={hideBottomNav ? null : <GenericNavList />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                topBarTransparent={topBarTransparent}
