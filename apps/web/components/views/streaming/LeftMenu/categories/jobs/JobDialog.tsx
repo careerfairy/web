@@ -3,7 +3,6 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import React, { useCallback, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import JobEntryApply from "./JobEntryApply"
 import Typography from "@mui/material/Typography"
 import {
@@ -157,14 +156,12 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
       if (isAtsJob) {
          return (
             <Box mr={4}>
-               <SuspenseWithBoundary>
-                  <JobEntryApply
-                     job={job}
-                     livestreamId={livestream.id}
-                     isApplied={alreadyApplied}
-                     handleAlreadyApply={setAlreadyApplied}
-                  />
-               </SuspenseWithBoundary>
+               <JobEntryApply
+                  job={job}
+                  livestreamId={livestream.id}
+                  isApplied={alreadyApplied}
+                  handleAlreadyApply={setAlreadyApplied}
+               />
             </Box>
          )
       }
@@ -175,13 +172,11 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
 
       return (
          <Box>
-            <SuspenseWithBoundary>
-               <CustomJobEntryApply
-                  job={job}
-                  livestreamId={livestream.id}
-                  handleApplyClick={handleShowConfirmation}
-               />
-            </SuspenseWithBoundary>
+            <CustomJobEntryApply
+               job={job}
+               livestreamId={livestream.id}
+               handleApplyClick={handleShowConfirmation}
+            />
          </Box>
       )
    }, [

@@ -1,7 +1,10 @@
 import { Grid, Typography } from "@mui/material"
 import { FormikValues } from "formik"
 import React, { useCallback, useState } from "react"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import {
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/groups/customJobs"
 import FormGroup from "../../FormGroup"
 import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
@@ -47,9 +50,15 @@ const CustomJobSection = ({
       async (customJob: PublicCustomJob) => {
          try {
             // Create a new custom job on Group subCollection
-            await groupRepo.createGroupCustomJob(customJob, groupId)
+            const createdJob = await groupRepo.createGroupCustomJob(
+               customJob,
+               groupId
+            )
 
-            setFieldValue("customJobs", [customJob, ...values.customJobs])
+            setFieldValue("customJobs", [
+               pickPublicDataFromCustomJob(createdJob),
+               ...values.customJobs,
+            ])
             setShowForm(false)
 
             successNotification("New job opening was created")

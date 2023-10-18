@@ -275,7 +275,10 @@ export interface IGroupRepository {
     * @param job
     * @param groupId
     */
-   createGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
+   createGroupCustomJob(
+      job: PublicCustomJob,
+      groupId: string
+   ): Promise<CustomJob>
 
    /**
     * To update a existing custom job on the sub collection of the group document
@@ -1146,7 +1149,7 @@ export class FirebaseGroupRepository
    async createGroupCustomJob(
       job: PublicCustomJob,
       groupId: string
-   ): Promise<void> {
+   ): Promise<CustomJob> {
       const ref = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -1165,6 +1168,8 @@ export class FirebaseGroupRepository
       }
 
       await ref.set(newJob, { merge: true })
+
+      return newJob
    }
 
    async updateGroupCustomJob(
