@@ -1,6 +1,6 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import Box from "@mui/material/Box"
-import { Stack } from "@mui/material"
+import { Fade, Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
@@ -122,6 +122,7 @@ type Props = {
    hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
    identifier?: string
+   scrolling?: boolean
 }
 
 const SparksFeedCard: FC<Props> = ({
@@ -132,6 +133,7 @@ const SparksFeedCard: FC<Props> = ({
    hideVideo,
    handleClickCard,
    identifier,
+   scrolling,
 }) => {
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
@@ -212,23 +214,31 @@ const SparksFeedCard: FC<Props> = ({
                      : []),
                ]}
             >
-               {showCardNotification || hideVideo ? null : (
-                  <VideoPreview
-                     muted={videosMuted}
-                     thumbnailUrl={getResizedUrl(
-                        spark.video.thumbnailUrl,
-                        "md"
-                     )}
-                     videoUrl={spark.getTransformedVideoUrl()}
-                     playing={playing}
-                     onSecondPassed={trackSecondsWatched}
-                     pausing={eventDetailsDialogVisibility || paused}
-                     onVideoPlay={onVideoPlay}
-                     onVideoEnded={onVideoEnded}
-                     light={isOverlayedOntop}
-                     containPreviewOnTablet
-                     identifier={identifier}
-                  />
+               {showCardNotification ? null : (
+                  <Box
+                     sx={{
+                        opacity: hideVideo ? 0 : 1,
+                        transition: (theme) =>
+                           theme.transitions.create("opacity"),
+                     }}
+                  >
+                     <VideoPreview
+                        muted={videosMuted}
+                        thumbnailUrl={getResizedUrl(
+                           spark.video.thumbnailUrl,
+                           "lg"
+                        )}
+                        videoUrl={spark.getTransformedVideoUrl()}
+                        playing={playing}
+                        onSecondPassed={trackSecondsWatched}
+                        pausing={eventDetailsDialogVisibility || paused}
+                        onVideoPlay={onVideoPlay}
+                        onVideoEnded={onVideoEnded}
+                        light={isOverlayedOntop || scrolling}
+                        containPreviewOnTablet
+                        identifier={identifier}
+                     />
+                  </Box>
                )}
                <Box
                   sx={[

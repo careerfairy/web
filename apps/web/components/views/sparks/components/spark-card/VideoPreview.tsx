@@ -4,7 +4,15 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
-import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
+import {
+   FC,
+   Fragment,
+   forwardRef,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
@@ -12,6 +20,7 @@ import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { usePrevious } from "react-use"
+import { useSnackbar } from "notistack"
 
 const styles = sxStyles({
    root: {
@@ -88,6 +97,7 @@ const styles = sxStyles({
       background: "transparent",
    },
    thumbnailOverlay: {
+      zIndex: (theme) => theme.zIndex.drawer + 1,
       position: "absolute",
       width: "100%",
       height: "100%",
@@ -137,110 +147,124 @@ type Props = {
    identifier?: string
 }
 
-const VideoPreview: FC<Props> = ({
-   videoUrl,
-   playing,
-   onSecondPassed,
-   onVideoEnded,
-   onVideoPlay,
-   pausing: shouldPause,
-   thumbnailUrl,
-   muted,
-   light,
-   containPreviewOnTablet,
-   identifier,
-}) => {
-   const playerRef = useRef<ReactPlayer | null>(null)
-   const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
-   const [progress, setProgress] = useState(0)
-   const dispatch = useDispatch()
-
-   const onProgress = useReactPlayerTracker({
-      identifier,
-      shouldPlay: playing,
-      onSecondPass: onSecondPassed,
-      onVideoEnd: onVideoEnded,
-   })
-
-   const handleError: BaseReactPlayerProps["onError"] = useCallback(
-      (error) => {
-         dispatch(setVideosMuted(true))
-         playerRef.current?.getInternalPlayer()?.play()
-
-         console.error(error)
+const VideoPreview = forwardRef<HTMLDivElement, Props>(
+   (
+      {
+         videoUrl,
+         playing,
+         onSecondPassed,
+         onVideoEnded,
+         onVideoPlay,
+         pausing: shouldPause,
+         thumbnailUrl,
+         muted,
+         light,
+         containPreviewOnTablet,
+         identifier,
       },
-      [dispatch]
-   )
+      ref
+   ) => {
+      const { enqueueSnackbar } = useSnackbar()
+      const playerRef = useRef<ReactPlayer | null>(null)
+      const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
+      const [progress, setProgress] = useState(0)
+      const dispatch = useDispatch()
 
-   const handleProgress = useCallback(
-      (progress: OnProgressProps) => {
-         setProgress(progress.played * 100)
-         onProgress(progress)
-      },
-      [onProgress]
-   )
+      const onProgress = useReactPlayerTracker({
+         identifier,
+         shouldPlay: playing,
+         onSecondPass: onSecondPassed,
+         onVideoEnd: onVideoEnded,
+      })
 
-   const prevIdentifier = usePrevious(identifier)
+      const handleError: BaseReactPlayerProps["onError"] = useCallback(
+         (error) => {
+            dispatch(setVideosMuted(true))
+            playerRef.current?.getInternalPlayer()?.play()
 
-   const reset = () => {
-      setVideoPlayedForSession(false)
-      setProgress(0)
-      playerRef.current?.seekTo(0)
-   }
+            console.error(error)
+         },
+         [dispatch]
+      )
 
-   useEffect(() => {
-      if (prevIdentifier !== identifier) {
-         reset()
+      const handleProgress = useCallback(
+         (progress: OnProgressProps) => {
+            setProgress(progress.played * 100)
+            onProgress(progress)
+         },
+         [onProgress]
+      )
+
+      const prevIdentifier = usePrevious(identifier)
+
+      const reset = () => {
+         setVideoPlayedForSession(false)
+         setProgress(0)
+         playerRef.current?.seekTo(0)
       }
-   }, [identifier, prevIdentifier])
 
-   const onPlay = useCallback(() => {
-      setVideoPlayedForSession(true)
-      if (!videoPlayedForSession) {
-         onVideoPlay?.()
-      }
-   }, [onVideoPlay, videoPlayedForSession])
+      useEffect(() => {
+         if (prevIdentifier !== identifier) {
+            reset()
+         }
+      }, [identifier, prevIdentifier])
 
-   const playingVideo = Boolean(playing && !shouldPause)
+      const onPlay = useCallback(() => {
+         setVideoPlayedForSession(true)
+         if (!videoPlayedForSession) {
+            enqueueSnackbar("Video is playing", { variant: "info" })
+            onVideoPlay?.()
+         }
+      }, [enqueueSnackbar, onVideoPlay, videoPlayedForSession])
 
-   return (
-      <Box sx={styles.root}>
-         {muted ? <ClickToUnmuteOverlay /> : null}
-         <Box
-            sx={[
-               styles.playerWrapper,
-               light && !containPreviewOnTablet && styles.previewVideo,
-            ]}
-         >
-            <ReactPlayer
-               ref={playerRef}
-               playing={playingVideo}
-               playsinline
-               playsInline
-               loop={playing}
-               width="100%"
-               height="100%"
-               className="player"
-               onProgress={handleProgress}
-               onPlay={onPlay}
-               onError={handleError}
-               progressInterval={250}
-               light={light ? <ThumbnailOverlay src={thumbnailUrl} /> : false}
-               url={videoUrl}
-               playIcon={<Fragment />}
-               muted={muted}
-            />
-            <LinearProgress
-               sx={styles.progress}
-               variant="determinate"
-               value={progress}
-            />
+      const playingVideo = Boolean(playing && !shouldPause)
+
+      return (
+         <Box sx={styles.root} ref={ref}>
+            {muted ? <ClickToUnmuteOverlay /> : null}
+            {!videoPlayedForSession ? (
+               <ThumbnailOverlay src={thumbnailUrl} />
+            ) : null}
+            <Box
+               sx={[
+                  styles.playerWrapper,
+                  light && !containPreviewOnTablet && styles.previewVideo,
+               ]}
+            >
+               <ReactPlayer
+                  ref={playerRef}
+                  playing={playingVideo}
+                  playsinline
+                  playsInline
+                  loop={playing}
+                  width="100%"
+                  height="100%"
+                  className="player"
+                  onProgress={handleProgress}
+                  onPlay={onPlay}
+                  onError={handleError}
+                  progressInterval={250}
+                  light={
+                     light ? <ThumbnailOverlay src={thumbnailUrl} /> : false
+                  }
+                  url={videoUrl}
+                  playIcon={<Fragment />}
+                  muted={muted}
+               />
+               <LinearProgress
+                  sx={styles.progress}
+                  variant="determinate"
+                  value={progress}
+               />
+            </Box>
          </Box>
-      </Box>
-   )
-}
+      )
+   }
+)
 
-const ClickToUnmuteOverlay: FC = () => {
+VideoPreview.displayName = "VideoPreview"
+
+const ClickToUnmuteOverlay = forwardRef<HTMLElement, {}>((props, ref) => {
    const [hideOverlay, setHideOverlay] = useState(false)
 
    useEffect(() => {
@@ -256,6 +280,7 @@ const ClickToUnmuteOverlay: FC = () => {
       <Fade in>
          <Box
             sx={[styles.clickToPlayOverlay, hideOverlay && styles.hideOverlay]}
+            ref={ref}
          >
             <Box sx={styles.overlayButtonWrapper}>
                <Grow in={!hideOverlay}>
@@ -273,7 +298,9 @@ const ClickToUnmuteOverlay: FC = () => {
          </Box>
       </Fade>
    )
-}
+})
+
+ClickToUnmuteOverlay.displayName = "ClickToUnmuteOverlay"
 
 type ThumbnailOverlayProps = {
    src: string

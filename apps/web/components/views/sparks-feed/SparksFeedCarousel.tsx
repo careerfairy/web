@@ -290,6 +290,7 @@ const SparksFeedCarousel: FC = () => {
                      paused={!isPlaying}
                      playing={isPlaying}
                      spark={activeSpark}
+                     scrolling={scrolling}
                      identifier={activeSpark.id + currentPlayingIndex}
                   />
                </Slide>
