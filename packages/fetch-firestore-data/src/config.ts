@@ -41,6 +41,7 @@ export default {
       "breakoutRoomsSettings",
       "careerCenterData",
       "comments",
+      "customJobs",
       "draftLivestreams",
       "fieldsOfStudy",
       "filterGroups",

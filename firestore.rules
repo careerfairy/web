@@ -123,6 +123,11 @@ service cloud.firestore {
                 allow write: if false;
             }
 
+            match /customJobApplications/{jobId} {
+                allow read: if isSignedInAndIsSameUser(userId);
+                allow write: if false;
+            }
+
             match /activities/{id} {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
@@ -202,6 +207,11 @@ service cloud.firestore {
             }
 
             match /creators/{creatorEmail} {
+                allow read: if true;
+                allow write: if isCareerCenterAdmin() || isCFAdmin();
+            }
+
+            match /customJobs/{jobId} {
                 allow read: if true;
                 allow write: if isCareerCenterAdmin() || isCFAdmin();
             }

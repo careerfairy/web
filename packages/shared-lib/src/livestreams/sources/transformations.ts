@@ -4,7 +4,16 @@ import {
    VALID_SOURCES,
 } from "./sources"
 import { RegistrationSourcesResponseItem } from "../../functions/groupAnalyticsTypes"
-import { LivestreamEvent } from "../livestreams"
+import {
+   LivestreamCustomJobAssociationPresenter,
+   LivestreamEvent,
+} from "../livestreams"
+import {
+   fromDateConverter,
+   fromDateFirestoreFn,
+   toDate,
+} from "../../firebaseTypes"
+import { PublicCustomJob } from "../../groups/customJobs"
 
 export type RegistrationSourceWithDates = {
    source: Omit<RegistrationSource, "match">
@@ -154,5 +163,26 @@ export const fixLivestreamRegistrationDates = (
       }
 
       return entry
+   })
+}
+
+export const formatLivestreamCustomJobAssociationToPublicCustomJob = (
+   jobs: LivestreamCustomJobAssociationPresenter[],
+   fromDate: fromDateFirestoreFn
+): PublicCustomJob[] => {
+   return jobs?.map((job) => ({
+      ...job,
+      deadline: fromDateConverter(new Date(job?.deadline), fromDate),
+   }))
+}
+
+export const formatPublicCustomJobToLivestreamCustomJobAssociation = (
+   jobs: PublicCustomJob[]
+): LivestreamCustomJobAssociationPresenter[] => {
+   return jobs?.map((job) => {
+      return {
+         ...job,
+         deadline: job.deadline ? toDate(job.deadline).toISOString() : null,
+      }
    })
 }

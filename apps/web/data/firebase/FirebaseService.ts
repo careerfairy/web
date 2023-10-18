@@ -29,7 +29,6 @@ import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
-   GroupAdmin,
    GroupQuestion,
    GroupWithPolicy,
    UserGroupData,

@@ -48,6 +48,7 @@ import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
+import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 
 // Auth
@@ -110,7 +111,7 @@ exports.notifySlackWhenALivestreamStarts =
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
-exports.fetchLivestreams = livestreams.fetchLivestreams
+exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
@@ -197,6 +198,7 @@ exports.syncUserStats = onWriteTriggers.syncUserStats
 exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
 exports.onWriteSpark = onWriteTriggers.onWriteSpark
+exports.onWriteCustomJobs = onWriteTriggers.onWriteCustomJobs
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
@@ -236,3 +238,6 @@ exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 // Spark Analytics Functions
 exports.trackSparkEvents = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched = userSparks.trackSparkSecondsWatched
+
+// Custom Jobs
+exports.userApplyToCustomJob = customJobs.userApplyToCustomJob

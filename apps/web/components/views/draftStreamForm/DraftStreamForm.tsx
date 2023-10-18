@@ -44,7 +44,6 @@ import {
    LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/livestreams"
-import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import StreamInfo from "./StreamForm/StreamInfo"
@@ -61,6 +60,7 @@ import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -198,6 +198,7 @@ export interface DraftFormValues {
    summary: string
    reasonsToJoinLivestream: string
    speakers: Record<string, Partial<Speaker>>
+   customJobs?: PublicCustomJob[]
    status: {}
    language: {
       code: string
@@ -250,6 +251,7 @@ const DraftStreamForm = ({
             { label: "Speakers", ref: speakersInfoRef },
             { label: "Target Students", ref: targetStudentsRef },
             // { label: "Promotion", ref: promotionInfoRef },
+            { label: "Jobs", ref: jobInfoRef },
             { label: "Event Categories", ref: eventCategoriesInfoRef },
          ] as IStreamFormNavigatorSteps[],
       []
@@ -276,12 +278,8 @@ const DraftStreamForm = ({
    )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
-   const {
-      showJobSection,
-      formHasChanged,
-      setFormHasChanged,
-      showPromotionInputs,
-   } = useStreamCreationProvider()
+   const { formHasChanged, setFormHasChanged, showPromotionInputs } =
+      useStreamCreationProvider()
 
    const { data: existingInterests } = useInterests()
 
@@ -307,6 +305,7 @@ const DraftStreamForm = ({
       summary: "",
       reasonsToJoinLivestream: "",
       speakers: { [uuidv4()]: speakerObj },
+      customJobs: [],
       status: {},
       language: languageCodes[0],
       targetFieldsOfStudy: [],
@@ -438,6 +437,7 @@ const DraftStreamForm = ({
                      livestream,
                      speakerQuery
                   ),
+                  customJobs: livestream?.customJobs || [],
                   status: livestream.status || {},
                   // @ts-ignore
                   language: livestream.language || languageCodes[0],
@@ -451,6 +451,7 @@ const DraftStreamForm = ({
                      promotion?.promotionUniversitiesCodes || [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
+
                setFormData(newFormData)
                setAllFetched(false)
                if (careerCenterIds) {
@@ -511,25 +512,6 @@ const DraftStreamForm = ({
          )
       }
    }, [existingGroups?.length])
-
-   // to handle the visibility of the Job section
-   useEffect(() => {
-      if (showJobSection) {
-         // We want to add this section on the 5th position
-         setSteps((prevSteps) => [
-            ...prevSteps.slice(0, 4),
-            {
-               label: "Job",
-               ref: jobInfoRef,
-            },
-            ...prevSteps.slice(4),
-         ])
-      } else {
-         setSteps((prevSteps) =>
-            prevSteps.filter(({ label }) => label !== "Job")
-         )
-      }
-   }, [showJobSection])
 
    useEffect(() => {
       const closeAlert = (e) => {
@@ -892,17 +874,16 @@ const DraftStreamForm = ({
                                  {/*    isPastStream={isPastStream} */}
                                  {/* /> */}
 
-                                 <SuspenseWithBoundary hide expected>
-                                    {values.groupIds.length > 0 && (
-                                       <JobSelectorCategory
-                                          groupId={values.groupIds[0]} // we only support a single group for now
-                                          onSelectItems={setSelectedJobs}
-                                          selectedItems={selectedJobs}
-                                          sectionRef={jobInfoRef}
-                                          classes={classes}
-                                       />
-                                    )}
-                                 </SuspenseWithBoundary>
+                                 <JobSelectorCategory
+                                    groupId={values.groupIds[0]}
+                                    onSelectItems={setSelectedJobs}
+                                    selectedItems={selectedJobs}
+                                    sectionRef={jobInfoRef}
+                                    classes={classes}
+                                    values={values}
+                                    setFieldValue={setFieldValue}
+                                    isSubmitting={isSubmitting}
+                                 />
 
                                  <HostAndQuestionsInfo
                                     existingGroups={existingGroups}
