@@ -217,7 +217,7 @@ const SparksFeedCard: FC<Props> = ({
                      muted={videosMuted}
                      thumbnailUrl={getResizedUrl(
                         spark.video.thumbnailUrl,
-                        "lg"
+                        "md"
                      )}
                      videoUrl={spark.getTransformedVideoUrl()}
                      playing={playing}

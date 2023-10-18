@@ -225,7 +225,7 @@ const VideoPreview: FC<Props> = ({
                onPlay={onPlay}
                onError={handleError}
                progressInterval={250}
-               light={light ? thumbnailUrl : false}
+               light={light ? <ThumbnailOverlay src={thumbnailUrl} /> : false}
                url={videoUrl}
                playIcon={<Fragment />}
                muted={muted}
@@ -280,7 +280,7 @@ type ThumbnailOverlayProps = {
 }
 export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
    return (
-      <Box sx={[styles.thumbnailOverlay, styles.topAndBottomGradient]}>
+      <Box sx={styles.thumbnailOverlay}>
          <Image
             src={src}
             layout="fill"
