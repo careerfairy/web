@@ -74,12 +74,6 @@ const useReactPlayerTracker = ({
       }
    }, [secondsWatched, prevSecondsWatched, onSecondPass, onVideoEnd])
 
-   useEffect(() => {
-      if (!shouldPlay) {
-         setSecondsWatched(0)
-      }
-   }, [shouldPlay])
-
    return onProgress
 }
 
