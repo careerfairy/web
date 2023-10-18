@@ -169,6 +169,8 @@ const SparksPage: NextPage<
             topBarTransparent
             hideFooter
             headerWidth="auto"
+            hideBottomNav={isFullScreen}
+            hideHeader={isFullScreen}
          >
             <SparksFeedCarousel />
          </GenericDashboardLayout>
@@ -212,7 +214,10 @@ export const getServerSideProps: GetServerSideProps<
 
    if (!sparkFromService) {
       return {
-         notFound: true,
+         redirect: {
+            destination: `/sparks`,
+            permanent: false,
+         },
       }
    }
 
