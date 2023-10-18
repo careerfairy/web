@@ -1,36 +1,51 @@
 import { sxStyles } from "types/commonTypes"
 
 import { Collapse } from "@mui/material"
-import Box from "@mui/material/Box"
+import Box, { BoxProps } from "@mui/material/Box"
 import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
-import React, { FC, useCallback, useEffect, useMemo } from "react"
+import {
+   FC,
+   Ref,
+   forwardRef,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
    removeCurrentEventNotifications,
+   setVideoPlaying,
+   setVideosMuted,
    swipeToSparkByIndex,
+   togglePlaying,
 } from "store/reducers/sparksFeedReducer"
 
-import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
-import {
-   currentSparkIndexSelector,
-   isFetchingSparksSelector,
-   eventDetailsDialogVisibilitySelector,
-   sparksSelector,
-   emptyFilterSelector,
-   cameFromCompanyPageLinkSelector,
-} from "store/selectors/sparksFeedSelectors"
-import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
-import CloseSparksFeedButton from "./CloseSparksFeedButton"
-import FeedCardSlide from "./FeedCardSlide"
-import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
-import SparkNotifications from "./SparkNotifications"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import EmptyFilterView from "./EmptyFilterView"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import { IconButton } from "@mui/material"
+import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carousel/useVerticalMouseScrollNavigation"
+import {
+   activeSparkSelector,
+   cameFromCompanyPageLinkSelector,
+   currentSparkIndexSelector,
+   emptyFilterSelector,
+   eventDetailsDialogVisibilitySelector,
+   isFetchingSparksSelector,
+   isOnEdgeSelector,
+   isPlayingSelector,
+   sparksSelector,
+   videosMuttedSelector,
+} from "store/selectors/sparksFeedSelectors"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import useKeyboardNavigation from "../../custom-hook/embla-carousel/useKeyboardNavigation"
 import Link from "../common/Link"
+import CloseSparksFeedButton from "./CloseSparksFeedButton"
+import EmptyFilterView from "./EmptyFilterView"
+import FeedCardSlide from "./FeedCardSlide"
+import SparkNotifications from "./SparkNotifications"
+import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -38,7 +53,10 @@ const slideSize = "100%"
 
 const styles = sxStyles({
    root: {
+      flexGrow: 1,
       display: "flex",
+      flexDirection: "column",
+      position: "relative",
    },
    viewport: {
       padding: "1.6rem",
@@ -47,9 +65,14 @@ const styles = sxStyles({
       flexGrow: 1,
       height: "calc(100dvh - 64px - 3.2rem)",
       position: "relative",
-      backgroundColor: "#F7F8FC",
+
       justifyContent: "center",
       alignItems: "center",
+   },
+   staticViewportVideo: {
+      position: "absolute",
+      inset: 0,
+      backgroundColor: "transparent",
    },
    fullScreenViewport: {
       height: "100dvh",
@@ -85,12 +108,6 @@ const styles = sxStyles({
       height: "100%",
       paddingTop: 0,
    },
-   slideImg: {
-      display: "block",
-      height: "100%",
-      width: "100%",
-      objectFit: "cover",
-   },
    closeBtn: {
       position: "fixed",
       top: 0,
@@ -112,6 +129,8 @@ const styles = sxStyles({
 })
 
 const SparksFeedCarousel: FC = () => {
+   const [scrolling, setScrolling] = useState(false)
+
    const isFullScreen = useSparksFeedIsFullScreen()
    const dispatch = useDispatch()
    const { userData } = useAuth()
@@ -119,10 +138,14 @@ const SparksFeedCarousel: FC = () => {
    const currentPlayingIndex = useSelector(currentSparkIndexSelector)
    const emptyFilter = useSelector(emptyFilterSelector)
    const sparks = useSelector(sparksSelector)
+   const activeSpark = useSelector(activeSparkSelector)
    const isFetchingSparks = useSelector(isFetchingSparksSelector)
+   const isPlaying = useSelector(isPlayingSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
+   const isOnEdge = useSelector(isOnEdgeSelector)
+   const videoIsMuted = useSelector(videosMuttedSelector)
 
    const noSparks = sparks.length === 0
 
@@ -132,6 +155,8 @@ const SparksFeedCarousel: FC = () => {
          axis: "y",
          loop: false,
          align: "center",
+         duration: 15,
+         dragFree: false,
          /**
           * Custom function to watch for changes to the slides.
           * Reloads the Embla Carousel whenever the slides (sparks) are updated,
@@ -189,6 +214,22 @@ const SparksFeedCarousel: FC = () => {
     * update the current playing spark in redux
     */
    useEffect(() => {
+      let timeoutId
+      const onScroll = () => {
+         setScrolling(true)
+         clearTimeout(timeoutId)
+         timeoutId = setTimeout(() => {
+            setScrolling(false)
+            if (emblaApi) {
+               const nearestSlide = emblaApi.selectedScrollSnap()
+               emblaApi.scrollTo(nearestSlide)
+            }
+         }, 500)
+      }
+      const onSettle = () => {
+         clearTimeout(timeoutId)
+         setScrolling(false)
+      }
       if (emblaApi) {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
@@ -196,11 +237,16 @@ const SparksFeedCarousel: FC = () => {
             dispatch(removeCurrentEventNotifications())
          }
 
+         emblaApi.on("scroll", onScroll)
+         emblaApi.on("settle", onSettle)
          emblaApi.on("select", onSelect)
 
          // Cleanup: remove the event listener if the component unmounts or sparks changes
          return () => {
+            clearTimeout(timeoutId)
             emblaApi.off("select", onSelect)
+            emblaApi.off("scroll", onScroll)
+            emblaApi.off("settle", onSettle)
          }
       }
    }, [emblaApi, dispatch])
@@ -212,60 +258,111 @@ const SparksFeedCarousel: FC = () => {
       [dispatch]
    )
 
+   const handleClickPlayOverlay = useCallback(() => {
+      if (videoIsMuted) {
+         dispatch(setVideosMuted(false))
+         dispatch(setVideoPlaying(true))
+      }
+   }, [dispatch, videoIsMuted])
+
    return (
       <Box
-         sx={[styles.viewport, isFullScreen && styles.fullScreenViewport]}
-         ref={emblaRef}
+         onClick={handleClickPlayOverlay}
+         sx={[
+            styles.root,
+            {
+               backgroundColor: isFullScreen ? "black !important" : undefined,
+            },
+         ]}
       >
-         <Box
-            sx={[styles.container, isFullScreen && styles.fullScreenContainer]}
+         {activeSpark ? (
+            <ViewportBox
+               sx={[
+                  {
+                     height: isFullScreen ? undefined : "auto",
+                     opacity: isFullScreen && !isOnEdge ? 1 : scrolling ? 0 : 1,
+                  },
+                  styles.staticViewportVideo,
+               ]}
+            >
+               <Slide fullScreen={isFullScreen}>
+                  <FeedCardSlide
+                     paused={!isPlaying}
+                     playing={isPlaying}
+                     spark={activeSpark}
+                     identifier={activeSpark.id + currentPlayingIndex}
+                  />
+               </Slide>
+            </ViewportBox>
+         ) : null}
+         <ViewportBox
+            outterContent={
+               <>
+                  <BackToCompanyPageButton />
+
+                  {isFullScreen ? (
+                     <Box sx={styles.closeBtn}>
+                        <CloseSparksFeedButton dark={emptyFilter} />
+                     </Box>
+                  ) : null}
+
+                  {userData?.userEmail ? (
+                     <SparkNotifications userEmail={userData.userEmail} />
+                  ) : null}
+               </>
+            }
+            ref={emblaRef}
          >
             {emptyFilter ? <EmptyFeedSlide fullScreen={isFullScreen} /> : null}
             {sparks.map((spark, index) => {
-               const playing = index === currentPlayingIndex
+               // Only render the previous, current, and next sparks for performance
+               const shouldRender = Math.abs(currentPlayingIndex - index) <= 1
+               const isCurrent = index === currentPlayingIndex
+               const identifier = spark.id + index
+
                return (
-                  <Slide
-                     onClick={
-                        playing
-                           ? undefined // Prevents propagating the click event to children
-                           : () => handleClickSlide(index)
-                     }
-                     fullScreen={isFullScreen}
-                     key={spark.id + index}
-                  >
-                     <FeedCardSlide playing={playing} spark={spark} />
+                  <Slide fullScreen={isFullScreen} key={identifier}>
+                     <FeedCardSlide
+                        hide={!shouldRender}
+                        isOverlayedOntop
+                        identifier={identifier}
+                        hideVideo={!scrolling && isCurrent}
+                        spark={spark}
+                        handleClickCard={() => {
+                           if (isCurrent) {
+                              dispatch(togglePlaying())
+                           } else {
+                              handleClickSlide(index)
+                           }
+                        }}
+                     />
                   </Slide>
                )
             })}
-            <Collapse in={isFetchingSparks} unmountOnExit>
+            {/* <Collapse in={isFetchingSparks} unmountOnExit>
                <Slide fullScreen={isFullScreen}>
                   <CircularProgress />
                </Slide>
-            </Collapse>
-         </Box>
-         <Box sx={styles.companyPageBtn}>
-            <BackToCompanyPageButton />
-         </Box>
-         {isFullScreen ? (
-            <Box sx={styles.closeBtn}>
-               <CloseSparksFeedButton dark={emptyFilter} />
-            </Box>
-         ) : null}
-
-         {userData?.userEmail ? (
-            <SparkNotifications userEmail={userData.userEmail} />
-         ) : null}
+            </Collapse> */}
+         </ViewportBox>
       </Box>
    )
 }
 
 type SlideProps = {
    fullScreen: boolean
-} & React.HTMLAttributes<HTMLDivElement>
+} & BoxProps
 
-const Slide: FC<SlideProps> = ({ children, fullScreen, ...props }) => {
+const Slide: FC<SlideProps> = ({ children, fullScreen, sx, ...props }) => {
    return (
-      <Box sx={[styles.slide, fullScreen && styles.fullScreenSlide]} {...props}>
+      <Box
+         sx={[
+            styles.slide,
+            fullScreen && styles.fullScreenSlide,
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
+         {...props}
+      >
          {children}
       </Box>
    )
@@ -287,10 +384,48 @@ const BackToCompanyPageButton: FC = () => {
    if (!cameFromCompanyPageLink || isFullScreen) return null
 
    return (
-      <IconButton component={Link} href={cameFromCompanyPageLink}>
-         <ArrowBackRoundedIcon color="inherit" />
-      </IconButton>
+      <Box sx={styles.companyPageBtn}>
+         <IconButton component={Link} href={cameFromCompanyPageLink}>
+            <ArrowBackRoundedIcon color="inherit" />
+         </IconButton>
+      </Box>
    )
 }
+
+type ViewportBoxProps = BoxProps & {
+   outterContent?: React.ReactNode
+}
+
+const ViewportBox = forwardRef(
+   (
+      { outterContent, children, sx, ...props }: ViewportBoxProps,
+      ref: Ref<any>
+   ) => {
+      const isFullScreen = useSparksFeedIsFullScreen()
+      return (
+         <Box
+            ref={ref}
+            sx={[
+               styles.viewport,
+               isFullScreen && styles.fullScreenViewport,
+               ...(Array.isArray(sx) ? sx : [sx]),
+            ]}
+            {...props}
+         >
+            <Box
+               sx={[
+                  styles.container,
+                  isFullScreen && styles.fullScreenContainer,
+               ]}
+            >
+               {children}
+            </Box>
+            {outterContent}
+         </Box>
+      )
+   }
+)
+
+ViewportBox.displayName = "ViewportBox"
 
 export default SparksFeedCarousel
