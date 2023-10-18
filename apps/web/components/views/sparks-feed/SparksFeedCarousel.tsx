@@ -339,11 +339,11 @@ const SparksFeedCarousel: FC = () => {
                   </Slide>
                )
             })}
-            <Collapse in={isFetchingSparks} unmountOnExit>
+            {/* <Collapse in={isFetchingSparks} unmountOnExit>
                <Slide fullScreen={isFullScreen}>
                   <CircularProgress />
                </Slide>
-            </Collapse>
+            </Collapse> */}
          </ViewportBox>
       </Box>
    )
