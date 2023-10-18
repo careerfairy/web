@@ -4,6 +4,7 @@ import JobDialog from "../../streaming/LeftMenu/categories/jobs/JobDialog"
 import {
    Box,
    Button,
+   CircularProgress,
    List,
    ListItem,
    ListItemText,
@@ -121,12 +122,14 @@ const JobList = ({ livestream }: Props) => {
          </List>
 
          {selectedJob ? (
-            <JobDialog
-               job={selectedJob}
-               handleClose={onCloseDialog}
-               livestream={livestream}
-               open={isDialogOpen}
-            />
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <JobDialog
+                  job={selectedJob}
+                  handleClose={onCloseDialog}
+                  livestream={livestream}
+                  open={isDialogOpen}
+               />
+            </SuspenseWithBoundary>
          ) : null}
       </Box>
    )

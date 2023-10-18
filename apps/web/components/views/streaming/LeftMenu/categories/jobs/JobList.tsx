@@ -1,5 +1,5 @@
 import useLivestreamJobs from "../../../../../custom-hook/useLivestreamJobs"
-import { List } from "@mui/material"
+import { CircularProgress, List } from "@mui/material"
 import React, { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import JobDialog from "./JobDialog"
@@ -8,6 +8,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import useDialogStateHandler from "../../../../../custom-hook/useDialogStateHandler"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 
 const styles = sxStyles({
    list: {
@@ -58,12 +59,14 @@ const JobList = ({ livestream }: Props) => {
             ))}
          </List>
          {selectedJob ? (
-            <JobDialog
-               job={selectedJob}
-               handleClose={onCloseDialog}
-               livestream={livestream}
-               open={isDialogOpen}
-            />
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <JobDialog
+                  job={selectedJob}
+                  handleClose={onCloseDialog}
+                  livestream={livestream}
+                  open={isDialogOpen}
+               />
+            </SuspenseWithBoundary>
          ) : null}
       </>
    )
