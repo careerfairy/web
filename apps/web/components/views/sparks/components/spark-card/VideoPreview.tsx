@@ -126,7 +126,6 @@ const VideoPreview: FC<Props> = ({
 
    const onProgress = useReactPlayerTracker({
       identifier,
-      shouldPlay: playing,
       onSecondPass: onSecondPassed,
       onVideoEnd: onVideoEnded,
    })
@@ -164,9 +163,7 @@ const VideoPreview: FC<Props> = ({
    }, [identifier, prevIdentifier])
 
    const onPlay = useCallback(() => {
-      setTimeout(() => {
-         setVideoPlayedForSession(true)
-      }, 200)
+      setVideoPlayedForSession(true)
       if (!videoPlayedForSession) {
          onVideoPlay?.()
       }

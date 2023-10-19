@@ -1,12 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { usePrevious } from "react-use"
 import { type OnProgressProps } from "react-player/base"
 
 export type UseReactPlayerTrackerProps = {
-   /**
-    * Determines if the video should play.
-    */
-   shouldPlay: boolean
    /**
     * Callback function that is called every time a full second has passed.
     * @param secondsWatched - The number of seconds watched.
@@ -39,12 +35,12 @@ export type UseReactPlayerTrackerProps = {
  * <ReactPlayer url={videoUrl} onProgress={onProgress} />
  */
 const useReactPlayerTracker = ({
-   shouldPlay,
    onSecondPass,
    onVideoEnd,
    identifier,
 }: UseReactPlayerTrackerProps) => {
    const [secondsWatched, setSecondsWatched] = useState(0)
+   const [hasEnded, setHasEnded] = useState(false) // Add this line
 
    const prevSecondsWatched = usePrevious(secondsWatched)
 
@@ -57,6 +53,7 @@ const useReactPlayerTracker = ({
    useEffect(() => {
       if (identifier !== prevIdentifier) {
          setSecondsWatched(0)
+         setHasEnded(false) // Reset hasEnded when identifier changes
       }
    }, [identifier, prevIdentifier])
 
@@ -69,10 +66,15 @@ const useReactPlayerTracker = ({
       }
 
       // Check if the video has looped
-      if (secondsWatched > 0 && secondsWatched < prevSecondsWatched) {
+      if (
+         !hasEnded &&
+         secondsWatched > 0 &&
+         secondsWatched < prevSecondsWatched
+      ) {
          onVideoEnd?.()
+         setHasEnded(true) // Set hasEnded to true when the video ends
       }
-   }, [secondsWatched, prevSecondsWatched, onSecondPass, onVideoEnd])
+   }, [secondsWatched, prevSecondsWatched, onSecondPass, onVideoEnd, hasEnded])
 
    return onProgress
 }
