@@ -76,7 +76,6 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    },
-   topAndBottomGradient: {},
    previewVideo: {
       "& .react-player__preview": {
          backgroundSize: {
