@@ -1,8 +1,8 @@
+import React, { FC } from "react"
+import { Box, Button, IconButton, Dialog, DialogContent } from "@mui/material"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
-import { Box, Button, IconButton, Dialog, DialogContent } from "@mui/material"
-import ReactPlayer from "react-player"
-import { FC } from "react"
+import ReactPlayer, { Config } from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { sparksTutorialVideoUrl } from "constants/videos"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
@@ -20,6 +20,7 @@ const sparksTutorialVideoUrlImageKit: string = imageKitLoader({
 const styles = sxStyles({
    btnWatchNow: {
       color: "#8E8E8E",
+      textTransform: "none",
    },
    btnCloseTutorialDialog: {
       position: "absolute",
@@ -58,19 +59,38 @@ const styles = sxStyles({
       pointerEvents: "none", // allows interaction with elements behind the overlay
       zIndex: 1,
    },
+   playerStyles: {
+      position: "relative",
+      display: "flex",
+   },
 })
 
-const TutorialVideo: FC<{ videoUrl: string }> = ({ videoUrl }) => {
+type TutorialVideoProps = {
+   videoUrl: string
+   width?: string
+   height?: string
+}
+
+const playerConfig: Config = {
+   file: { attributes: { controlsList: "nowdownload" } },
+}
+
+const TutorialVideo: FC<TutorialVideoProps> = ({
+   videoUrl,
+   width = "100%",
+   height = "100%",
+}) => {
    return (
       <ReactPlayer
          alt="Sparks video tutorial"
-         width={"100%"}
-         height={"100%"}
-         style={{ display: "flex", position: "relative" }} // fixes the margin bottom and the overlay issue, respectively
+         width={width}
+         height={height}
+         style={styles.playerStyles} // fixes the margin bottom and the overlay issue, respectively
          url={videoUrl}
          controls
          playing
          playsinlines
+         config={playerConfig}
       />
    )
 }
@@ -109,7 +129,8 @@ const TutorialVideoDialog: FC<TutorialVideoDialogProps> = ({
          <DialogContent sx={{ p: 0 }}>
             <GradientOverlay />
             <TutorialVideoCloseIcon handleClose={handleDialogClose} />
-            <TutorialVideo videoUrl={videoUrl} />
+            <TutorialVideo videoUrl={videoUrl} width="156.25vh" />{" "}
+            {/* this number was calculated based on the 16/9 aspect ratio, 9/16 = 56.25 */}
          </DialogContent>
       </Dialog>
    )
