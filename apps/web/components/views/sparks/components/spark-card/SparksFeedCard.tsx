@@ -1,6 +1,6 @@
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import Box from "@mui/material/Box"
-import { Fade, Stack } from "@mui/material"
+import { Button, Fade, Grow, Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FeedCardActions from "components/views/sparks-feed/FeedCardActions"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
@@ -11,6 +11,7 @@ import {
    useEffect,
    useMemo,
    useRef,
+   useState,
 } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "./SparkCategoryChip"
@@ -32,6 +33,7 @@ import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNo
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { sparkService } from "data/firebase/SparksService"
 import { useAuth } from "HOCs/AuthProvider"
+import UnmuteIcon from "@mui/icons-material/VolumeOff"
 
 const styles = sxStyles({
    root: {
@@ -104,6 +106,28 @@ const styles = sxStyles({
       pl: 2.9375,
       pb: 4,
    },
+   clickToPlayOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: (theme) => theme.zIndex.drawer + 12342423,
+      background: "rgba(0, 0, 0, 0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "white",
+   },
+   overlayButtonWrapper: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      p: 2,
+   },
+   hideOverlay: {
+      background: "transparent",
+   },
 })
 
 type Props = {
@@ -122,7 +146,6 @@ type Props = {
    hideVideo?: boolean
    handleClickCard?: (e: SyntheticEvent) => void
    identifier?: string
-   scrolling?: boolean
 }
 
 const SparksFeedCard: FC<Props> = ({
@@ -133,7 +156,6 @@ const SparksFeedCard: FC<Props> = ({
    hideVideo,
    handleClickCard,
    identifier,
-   scrolling,
 }) => {
    const { data: visitorId } = useFingerPrint()
    const { authenticatedUser } = useAuth()
@@ -214,31 +236,26 @@ const SparksFeedCard: FC<Props> = ({
                      : []),
                ]}
             >
-               {showCardNotification ? null : (
-                  <Box
-                     sx={{
-                        opacity: hideVideo ? 0 : 1,
-                        transition: (theme) =>
-                           theme.transitions.create("opacity"),
-                     }}
-                  >
-                     <VideoPreview
-                        muted={videosMuted}
-                        thumbnailUrl={getResizedUrl(
-                           spark.video.thumbnailUrl,
-                           "lg"
-                        )}
-                        videoUrl={spark.getTransformedVideoUrl()}
-                        playing={playing}
-                        onSecondPassed={trackSecondsWatched}
-                        pausing={eventDetailsDialogVisibility || paused}
-                        onVideoPlay={onVideoPlay}
-                        onVideoEnded={onVideoEnded}
-                        light={isOverlayedOntop || scrolling}
-                        containPreviewOnTablet
-                        identifier={identifier}
-                     />
-                  </Box>
+               {videosMuted && isOverlayedOntop ? (
+                  <ClickToUnmuteOverlay />
+               ) : null}
+               {showCardNotification || hideVideo ? null : (
+                  <VideoPreview
+                     muted={videosMuted}
+                     thumbnailUrl={getResizedUrl(
+                        spark.video.thumbnailUrl,
+                        "lg"
+                     )}
+                     videoUrl={spark.getTransformedVideoUrl()}
+                     playing={playing}
+                     onSecondPassed={trackSecondsWatched}
+                     pausing={eventDetailsDialogVisibility || paused}
+                     onVideoPlay={onVideoPlay}
+                     onVideoEnded={onVideoEnded}
+                     light={isOverlayedOntop}
+                     containPreviewOnTablet
+                     identifier={identifier}
+                  />
                )}
                <Box
                   sx={[
@@ -297,6 +314,41 @@ const SparksFeedCard: FC<Props> = ({
             </Box>
          ) : null}
       </>
+   )
+}
+
+export const ClickToUnmuteOverlay = () => {
+   const [hideOverlay, setHideOverlay] = useState(false)
+
+   useEffect(() => {
+      const timer = setTimeout(() => {
+         setHideOverlay(false)
+      }, 5000)
+      return () => {
+         clearTimeout(timer)
+      }
+   }, [])
+
+   return (
+      <Fade in>
+         <Box
+            sx={[styles.clickToPlayOverlay, hideOverlay && styles.hideOverlay]}
+         >
+            <Box sx={styles.overlayButtonWrapper}>
+               <Grow in={!hideOverlay}>
+                  <span>
+                     <Button
+                        variant="contained"
+                        color="info"
+                        startIcon={<UnmuteIcon />}
+                     >
+                        Tap to unmute
+                     </Button>
+                  </span>
+               </Grow>
+            </Box>
+         </Box>
+      </Fade>
    )
 }
 

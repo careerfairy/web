@@ -1,8 +1,8 @@
 import { sxStyles } from "types/commonTypes"
 
-import { Collapse } from "@mui/material"
+// import { Collapse } from "@mui/material"
 import Box, { BoxProps } from "@mui/material/Box"
-import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
+// import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { EngineType } from "embla-carousel/components/Engine"
 import {
@@ -156,7 +156,11 @@ const SparksFeedCarousel: FC = () => {
          loop: false,
          align: "center",
          duration: 15,
+         dragThreshold: 0.5,
+         asdsa: "dsfs",
+         // dragFree: false,
          dragFree: false,
+         inViewThreshold: 0,
          /**
           * Custom function to watch for changes to the slides.
           * Reloads the Embla Carousel whenever the slides (sparks) are updated,
@@ -290,7 +294,6 @@ const SparksFeedCarousel: FC = () => {
                      paused={!isPlaying}
                      playing={isPlaying}
                      spark={activeSpark}
-                     scrolling={scrolling}
                      identifier={activeSpark.id + currentPlayingIndex}
                   />
                </Slide>
@@ -323,20 +326,22 @@ const SparksFeedCarousel: FC = () => {
 
                return (
                   <Slide fullScreen={isFullScreen} key={identifier}>
-                     <FeedCardSlide
-                        hide={!shouldRender}
-                        isOverlayedOntop
-                        identifier={identifier}
-                        hideVideo={!scrolling && isCurrent}
-                        spark={spark}
-                        handleClickCard={() => {
-                           if (isCurrent) {
-                              dispatch(togglePlaying())
-                           } else {
-                              handleClickSlide(index)
-                           }
-                        }}
-                     />
+                     {shouldRender ? (
+                        <FeedCardSlide
+                           hide={!shouldRender}
+                           isOverlayedOntop
+                           identifier={identifier}
+                           hideVideo={!scrolling && isCurrent}
+                           spark={spark}
+                           handleClickCard={() => {
+                              if (isCurrent) {
+                                 dispatch(togglePlaying())
+                              } else {
+                                 handleClickSlide(index)
+                              }
+                           }}
+                        />
+                     ) : null}
                   </Slide>
                )
             })}

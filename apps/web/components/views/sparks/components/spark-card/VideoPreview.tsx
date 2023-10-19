@@ -1,26 +1,18 @@
-import { Fade, Grow, Button, Box } from "@mui/material"
+import { Box } from "@mui/material"
 import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
 import Image from "next/image"
-import {
-   FC,
-   Fragment,
-   forwardRef,
-   useCallback,
-   useEffect,
-   useRef,
-   useState,
-} from "react"
+import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
 import { useDispatch } from "react-redux"
 import { setVideosMuted } from "store/reducers/sparksFeedReducer"
 import { sxStyles } from "types/commonTypes"
-import UnmuteIcon from "@mui/icons-material/VolumeOff"
 import { usePrevious } from "react-use"
-import { useSnackbar } from "notistack"
+import { useTheme } from "@mui/material/styles"
+import useMediaQuery from "@mui/material/useMediaQuery"
 
 const styles = sxStyles({
    root: {
@@ -28,6 +20,17 @@ const styles = sxStyles({
       inset: 0,
    },
    playerWrapper: {
+      "&::after": {
+         zIndex: 0,
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
+         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
+      },
       position: "relative",
       width: "100%",
       height: "100%",
@@ -41,16 +44,6 @@ const styles = sxStyles({
                xs: "cover !important",
                sm: "contain !important",
             },
-         },
-         "&::after": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
          },
       },
       "& .react-player__preview": {
@@ -74,30 +67,8 @@ const styles = sxStyles({
       zIndex: (theme) => theme.zIndex.drawer + 1,
       height: 4.5,
    },
-   clickToPlayOverlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      zIndex: (theme) => theme.zIndex.drawer + 1,
-      background: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "white",
-   },
-   overlayButtonWrapper: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      p: 2,
-   },
-   hideOverlay: {
-      background: "transparent",
-   },
+
    thumbnailOverlay: {
-      zIndex: (theme) => theme.zIndex.drawer + 1,
       position: "absolute",
       width: "100%",
       height: "100%",
@@ -105,18 +76,7 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
    },
-   topAndBottomGradient: {
-      "&::after": {
-         content: '""',
-         position: "absolute",
-         top: 0,
-         right: 0,
-         bottom: 0,
-         left: 0,
-         // Provides a gradient overlay at the top and bottom of the card to make the text more readable.
-         background: `linear-gradient(180deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0) 17.71%), linear-gradient(180deg, rgba(0, 0, 0, 0) 82.29%, rgba(0, 0, 0, 0.60) 100%)`,
-      },
-   },
+   topAndBottomGradient: {},
    previewVideo: {
       "& .react-player__preview": {
          backgroundSize: {
@@ -147,90 +107,89 @@ type Props = {
    identifier?: string
 }
 
-const VideoPreview = forwardRef<HTMLDivElement, Props>(
-   (
-      {
-         videoUrl,
-         playing,
-         onSecondPassed,
-         onVideoEnded,
-         onVideoPlay,
-         pausing: shouldPause,
-         thumbnailUrl,
-         muted,
-         light,
-         containPreviewOnTablet,
-         identifier,
+const VideoPreview: FC<Props> = ({
+   videoUrl,
+   playing,
+   onSecondPassed,
+   onVideoEnded,
+   onVideoPlay,
+   pausing: shouldPause,
+   thumbnailUrl,
+   muted,
+   light,
+   containPreviewOnTablet,
+   identifier,
+}) => {
+   const playerRef = useRef<ReactPlayer | null>(null)
+   const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
+   const [progress, setProgress] = useState(0)
+   const dispatch = useDispatch()
+
+   const onProgress = useReactPlayerTracker({
+      identifier,
+      shouldPlay: playing,
+      onSecondPass: onSecondPassed,
+      onVideoEnd: onVideoEnded,
+   })
+
+   const handleError: BaseReactPlayerProps["onError"] = useCallback(
+      (error) => {
+         dispatch(setVideosMuted(true))
+         playerRef.current?.getInternalPlayer()?.play()
+
+         console.error(error)
       },
-      ref
-   ) => {
-      const { enqueueSnackbar } = useSnackbar()
-      const playerRef = useRef<ReactPlayer | null>(null)
-      const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
-      const [progress, setProgress] = useState(0)
-      const dispatch = useDispatch()
+      [dispatch]
+   )
 
-      const onProgress = useReactPlayerTracker({
-         identifier,
-         shouldPlay: playing,
-         onSecondPass: onSecondPassed,
-         onVideoEnd: onVideoEnded,
-      })
+   const handleProgress = useCallback(
+      (progress: OnProgressProps) => {
+         setProgress(progress.played * 100)
+         onProgress(progress)
+      },
+      [onProgress]
+   )
 
-      const handleError: BaseReactPlayerProps["onError"] = useCallback(
-         (error) => {
-            dispatch(setVideosMuted(true))
-            playerRef.current?.getInternalPlayer()?.play()
+   const prevIdentifier = usePrevious(identifier)
 
-            console.error(error)
-         },
-         [dispatch]
-      )
+   const reset = () => {
+      setVideoPlayedForSession(false)
+      setProgress(0)
+      playerRef.current?.seekTo(0)
+   }
 
-      const handleProgress = useCallback(
-         (progress: OnProgressProps) => {
-            setProgress(progress.played * 100)
-            onProgress(progress)
-         },
-         [onProgress]
-      )
-
-      const prevIdentifier = usePrevious(identifier)
-
-      const reset = () => {
-         setVideoPlayedForSession(false)
-         setProgress(0)
-         playerRef.current?.seekTo(0)
+   useEffect(() => {
+      if (prevIdentifier !== identifier) {
+         reset()
       }
+   }, [identifier, prevIdentifier])
 
-      useEffect(() => {
-         if (prevIdentifier !== identifier) {
-            reset()
-         }
-      }, [identifier, prevIdentifier])
-
-      const onPlay = useCallback(() => {
+   const onPlay = useCallback(() => {
+      setTimeout(() => {
          setVideoPlayedForSession(true)
-         if (!videoPlayedForSession) {
-            enqueueSnackbar("Video is playing", { variant: "info" })
-            onVideoPlay?.()
-         }
-      }, [enqueueSnackbar, onVideoPlay, videoPlayedForSession])
+      }, 200)
+      if (!videoPlayedForSession) {
+         onVideoPlay?.()
+      }
+   }, [onVideoPlay, videoPlayedForSession])
 
-      const playingVideo = Boolean(playing && !shouldPause)
+   const playingVideo = Boolean(playing && !shouldPause)
 
-      return (
-         <Box sx={styles.root} ref={ref}>
-            {muted ? <ClickToUnmuteOverlay /> : null}
-            {!videoPlayedForSession ? (
-               <ThumbnailOverlay src={thumbnailUrl} />
-            ) : null}
-            <Box
-               sx={[
-                  styles.playerWrapper,
-                  light && !containPreviewOnTablet && styles.previewVideo,
-               ]}
-            >
+   return (
+      <Box sx={styles.root}>
+         <Box
+            sx={[
+               styles.playerWrapper,
+               light && !containPreviewOnTablet && styles.previewVideo,
+            ]}
+         >
+            {videoPlayedForSession || !light ? null : (
+               <ThumbnailOverlay
+                  src={thumbnailUrl}
+                  containPreviewOnTablet={containPreviewOnTablet}
+               />
+            )}
+            {light ? null : (
                <ReactPlayer
                   ref={playerRef}
                   playing={playingVideo}
@@ -245,73 +204,55 @@ const VideoPreview = forwardRef<HTMLDivElement, Props>(
                   onError={handleError}
                   progressInterval={250}
                   light={
-                     light ? <ThumbnailOverlay src={thumbnailUrl} /> : false
+                     light ? (
+                        <ThumbnailOverlay
+                           src={thumbnailUrl}
+                           containPreviewOnTablet={containPreviewOnTablet}
+                        />
+                     ) : (
+                        false
+                     )
                   }
                   url={videoUrl}
                   playIcon={<Fragment />}
                   muted={muted}
                />
-               <LinearProgress
-                  sx={styles.progress}
-                  variant="determinate"
-                  value={progress}
-               />
-            </Box>
+            )}
          </Box>
-      )
-   }
-)
-
-VideoPreview.displayName = "VideoPreview"
-
-const ClickToUnmuteOverlay = forwardRef<HTMLElement, {}>((props, ref) => {
-   const [hideOverlay, setHideOverlay] = useState(false)
-
-   useEffect(() => {
-      const timer = setTimeout(() => {
-         setHideOverlay(false)
-      }, 5000)
-      return () => {
-         clearTimeout(timer)
-      }
-   }, [])
-
-   return (
-      <Fade in>
-         <Box
-            sx={[styles.clickToPlayOverlay, hideOverlay && styles.hideOverlay]}
-            ref={ref}
-         >
-            <Box sx={styles.overlayButtonWrapper}>
-               <Grow in={!hideOverlay}>
-                  <span>
-                     <Button
-                        variant="contained"
-                        color="info"
-                        startIcon={<UnmuteIcon />}
-                     >
-                        Tap to unmute
-                     </Button>
-                  </span>
-               </Grow>
-            </Box>
-         </Box>
-      </Fade>
+         <LinearProgress
+            sx={styles.progress}
+            variant="determinate"
+            value={progress}
+         />
+      </Box>
    )
-})
-
-ClickToUnmuteOverlay.displayName = "ClickToUnmuteOverlay"
+}
 
 type ThumbnailOverlayProps = {
    src: string
+   containPreviewOnTablet?: boolean
 }
-export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({ src }) => {
+
+export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
+   src,
+   containPreviewOnTablet,
+}) => {
+   const theme = useTheme()
+   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
+
    return (
-      <Box sx={styles.thumbnailOverlay}>
+      <Box sx={[styles.thumbnailOverlay]}>
          <Image
             src={src}
             layout="fill"
-            objectFit="cover"
+            quality={40}
+            objectFit={
+               containPreviewOnTablet
+                  ? isSmallScreen
+                     ? "cover"
+                     : "contain"
+                  : "cover"
+            }
             alt="thumbnail"
             priority={true}
          />
