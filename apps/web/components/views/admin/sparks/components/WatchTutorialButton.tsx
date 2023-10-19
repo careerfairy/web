@@ -63,6 +63,18 @@ const styles = sxStyles({
       position: "relative",
       display: "flex",
    },
+   dialogPaperProps: {
+      width: "156.25vh", // this value was calculated based on the 16/9 aspect ratio, 9/16 = 56.25
+   },
+   aspectRatioWrapper: {
+      position: "relative",
+      paddingTop: "56.25%",
+   },
+   aspectRatioInner: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+   },
 })
 
 type TutorialVideoProps = {
@@ -83,14 +95,14 @@ const TutorialVideo: FC<TutorialVideoProps> = ({
    return (
       <ReactPlayer
          alt="Sparks video tutorial"
+         config={playerConfig}
+         url={videoUrl}
+         style={styles.playerStyles} // fixes the margin bottom and the overlay issue, respectively
          width={width}
          height={height}
-         style={styles.playerStyles} // fixes the margin bottom and the overlay issue, respectively
-         url={videoUrl}
-         controls
          playing
          playsinlines
-         config={playerConfig}
+         controls
       />
    )
 }
@@ -113,6 +125,14 @@ const GradientOverlay = () => {
    return <Box sx={styles.overlay} />
 }
 
+const AspectRatioWrapper = ({ children }) => {
+   return (
+      <Box sx={styles.aspectRatioWrapper}>
+         <Box sx={styles.aspectRatioInner}>{children}</Box>
+      </Box>
+   )
+}
+
 type TutorialVideoDialogProps = {
    isDialogOpen: boolean
    handleDialogClose: () => void
@@ -125,12 +145,18 @@ const TutorialVideoDialog: FC<TutorialVideoDialogProps> = ({
    videoUrl,
 }) => {
    return (
-      <Dialog open={isDialogOpen} onClose={handleDialogClose} maxWidth="lg">
+      <Dialog
+         open={isDialogOpen}
+         onClose={handleDialogClose}
+         maxWidth="lg"
+         PaperProps={{ sx: styles.dialogPaperProps }}
+      >
          <DialogContent sx={{ p: 0 }}>
-            <GradientOverlay />
-            <TutorialVideoCloseIcon handleClose={handleDialogClose} />
-            <TutorialVideo videoUrl={videoUrl} width="156.25vh" />{" "}
-            {/* this number was calculated based on the 16/9 aspect ratio, 9/16 = 56.25 */}
+            <AspectRatioWrapper>
+               <GradientOverlay />
+               <TutorialVideoCloseIcon handleClose={handleDialogClose} />
+               <TutorialVideo videoUrl={videoUrl} />
+            </AspectRatioWrapper>
          </DialogContent>
       </Dialog>
    )
