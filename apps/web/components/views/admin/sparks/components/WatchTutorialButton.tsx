@@ -84,7 +84,7 @@ type TutorialVideoProps = {
 }
 
 const playerConfig: Config = {
-   file: { attributes: { controlsList: "nowdownload" } },
+   file: { attributes: { controlsList: "nodownload" } },
 }
 
 const TutorialVideo: FC<TutorialVideoProps> = ({
