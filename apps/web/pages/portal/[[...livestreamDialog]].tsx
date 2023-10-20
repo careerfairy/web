@@ -98,15 +98,15 @@ const PortalPage = ({
                      </Box>
                      <Container disableGutters>
                         <WidgetsWrapper>
-                           {hasInterests ? (
-                              <RecommendedEvents limit={10} />
-                           ) : null}
                            {/* TODO: remove this when we are ready to launch */}
                            {shouldEnableSParksB2C() ? (
                               <SparksCarouselWithSuspenseComponent
                                  header={<Heading>SPARKS</Heading>}
                                  handleSparksClicked={handleSparksClicked}
                               />
+                           ) : null}
+                           {hasInterests ? (
+                              <RecommendedEvents limit={10} />
                            ) : null}
                            <ComingUpNextEvents
                               serverSideEvents={comingUpNext}
