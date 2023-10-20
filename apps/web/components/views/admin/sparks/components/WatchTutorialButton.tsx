@@ -65,6 +65,7 @@ const styles = sxStyles({
    },
    dialogPaperProps: {
       width: "156.25vh", // this value was calculated based on the 16/9 aspect ratio, 9/16 = 56.25
+      backgroundColor: "transparent",
    },
    aspectRatioWrapper: {
       position: "relative",
