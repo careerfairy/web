@@ -192,13 +192,13 @@ const WatchTutorialButton: FC = () => {
          >
             Watch Sparks tutorial
          </Button>
-         {isWeb && (
+         {isWeb ? (
             <TutorialVideoDialog
                isDialogOpen={isTutorialDialogOpen}
                handleDialogClose={handleTutorialDialogClose}
                videoUrl={sparksTutorialVideoUrlImageKit}
             />
-         )}
+         ) : null}
          {isMobile && isTutorialMobileOpen ? (
             <Box sx={styles.mobileTutorialVideoWrapper}>
                <GradientOverlay />
@@ -207,7 +207,7 @@ const WatchTutorialButton: FC = () => {
                />
                <TutorialVideo videoUrl={sparksTutorialVideoUrlImageKit} />
             </Box>
-         ) : null }
+         ) : null}
       </>
    )
 }
