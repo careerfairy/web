@@ -40,7 +40,7 @@ const useReactPlayerTracker = ({
    identifier,
 }: UseReactPlayerTrackerProps) => {
    const [secondsWatched, setSecondsWatched] = useState(0)
-   const [hasEnded, setHasEnded] = useState(false) // Add this line
+   const [hasEnded, setHasEnded] = useState(false)
 
    const prevSecondsWatched = usePrevious(secondsWatched)
 
