@@ -102,7 +102,7 @@ const TutorialVideo: FC<TutorialVideoProps> = ({
          width={width}
          height={height}
          playing
-         playsinlines
+         playsinline
          controls
       />
    )
