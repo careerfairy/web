@@ -11,21 +11,34 @@ import Image from "next/image"
 import React, { FC, Fragment } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 
+const COMPANY_LOGO_SIZE = 63
+
 const styles = sxStyles({
    info: {
       marginTop: 4,
       display: "flex",
       flexDirection: "column",
    },
+   logoContainer: {
+      marginTop: "1.5vh !important",
+      marginBottom: "0.5vh !important",
+   },
    logoWrapper: {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 88,
-      height: 48,
-      p: [1, 1.5],
+      width: COMPANY_LOGO_SIZE,
+      height: COMPANY_LOGO_SIZE,
+      p: 0.5,
       backgroundColor: "white",
-      borderRadius: 1.5,
+      borderRadius: 100,
+   },
+   logoCaptionWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      flexDirection: "column",
+      color: "white",
+      height: "100%",
    },
    subtitle: {
       fontWeight: "400",
@@ -72,6 +85,7 @@ const styles = sxStyles({
 type ContentProps = {
    headerTitle: string | React.ReactNode
    logoUrl?: string
+   logoCaption?: string
    title?: string | React.ReactNode
    subtitle?: string | React.ReactNode
    actionItem?: React.ReactNode
@@ -86,6 +100,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
          actionItem,
          headerTitle,
          logoUrl,
+         logoCaption,
          subtitle,
          title,
          backgroundImageUrl,
@@ -120,16 +135,32 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                   <Stack spacing={1.5} mt={4}>
                      <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
                      {logoUrl ? (
-                        <Box sx={styles.logoWrapper} mt={2}>
-                           <Image
-                              objectFit="contain"
-                              quality={90}
-                              src={logoUrl}
-                              alt={"company logo"}
-                              width={200}
-                              height={100}
-                           />
-                        </Box>
+                        <Stack
+                           spacing={1.5}
+                           direction="row"
+                           sx={styles.logoContainer}
+                        >
+                           <Box sx={styles.logoWrapper}>
+                              <Image
+                                 objectFit="contain"
+                                 quality={90}
+                                 src={logoUrl}
+                                 alt={"company logo"}
+                                 width={COMPANY_LOGO_SIZE}
+                                 height={COMPANY_LOGO_SIZE}
+                              />
+                           </Box>
+                           {logoCaption ? (
+                              <Box sx={styles.logoCaptionWrapper}>
+                                 <Typography fontWeight={300} variant={"body1"}>
+                                    Hosted by
+                                 </Typography>
+                                 <Typography fontWeight={600} variant={"body1"}>
+                                    {logoCaption}
+                                 </Typography>
+                              </Box>
+                           ) : null}
+                        </Stack>
                      ) : null}
                      <ContentTitle sx={styles.title} component="h2">
                         {title}
