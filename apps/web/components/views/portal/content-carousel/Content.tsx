@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack"
 import Image from "next/image"
 import React, { FC, Fragment } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
+import CircularLogo from "components/views/common/CircularLogo"
 
 const COMPANY_LOGO_SIZE = 63
 
@@ -22,16 +23,6 @@ const styles = sxStyles({
    logoContainer: {
       marginTop: "1.5vh !important",
       marginBottom: "0.5vh !important",
-   },
-   logoWrapper: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: COMPANY_LOGO_SIZE,
-      height: COMPANY_LOGO_SIZE,
-      p: 0.5,
-      backgroundColor: "white",
-      borderRadius: 100,
    },
    logoCaptionWrapper: {
       display: "flex",
@@ -140,16 +131,11 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(
                            direction="row"
                            sx={styles.logoContainer}
                         >
-                           <Box sx={styles.logoWrapper}>
-                              <Image
-                                 objectFit="contain"
-                                 quality={90}
-                                 src={logoUrl}
-                                 alt={"company logo"}
-                                 width={COMPANY_LOGO_SIZE}
-                                 height={COMPANY_LOGO_SIZE}
-                              />
-                           </Box>
+                           <CircularLogo
+                              src={logoUrl}
+                              alt={"company logo"}
+                              size={COMPANY_LOGO_SIZE}
+                           />
                            {logoCaption ? (
                               <Box sx={styles.logoCaptionWrapper}>
                                  <Typography fontWeight={300} variant={"body1"}>
