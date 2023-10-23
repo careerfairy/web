@@ -150,7 +150,7 @@ const styles = sxStyles({
    },
    companyAvatar: {
       padding: 1,
-      border: "solid 3px white",
+      border: "solid 2px white",
       backgroundColor: "white",
       width: cardAvatarSize,
       height: cardAvatarSize,
@@ -467,13 +467,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                  >
                                     <Box sx={styles.nextImageWrapper}>
                                        <Image
-                                          src={getResizedUrl(
-                                             event?.companyLogoUrl,
-                                             "lg"
-                                          )}
+                                          src={event?.companyLogoUrl}
                                           layout="fill"
                                           objectFit="contain"
-                                          quality={100}
+                                          quality={70}
                                           alt={`logo of company ${event.company}`}
                                        />
                                     </Box>
