@@ -92,7 +92,7 @@ const SparkDetails: FC<Props> = ({
                src={companyLogoUrl}
                alt={companyName}
                size={52}
-               borderRadius={1.5}
+               borderRadius={100}
             />
          </span>
          <Box mr={0.75} />
