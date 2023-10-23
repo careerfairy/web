@@ -25,6 +25,7 @@ import Section from "./Section"
 import { InViewRef } from "../MainContentNavigation"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
+import CircularLogo from "components/views/common/CircularLogo"
 
 const styles = sxStyles({
    root: {
@@ -156,13 +157,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                />
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>
-                  <Image
-                     src={getResizedUrl(presenter.companyLogoUrl, "lg")}
-                     width={100}
-                     height={100}
+                  <CircularLogo
+                     src={presenter.companyLogoUrl}
                      alt={presenter.company}
-                     objectFit="contain"
-                     className="company-logo"
+                     size={120}
                   />
                </Box>
             </CardMedia>

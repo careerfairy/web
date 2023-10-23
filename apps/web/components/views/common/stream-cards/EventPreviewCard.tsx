@@ -46,6 +46,7 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
+import CircularLogo from "../CircularLogo"
 
 const bottomContentHeight = 50
 const cardAvatarSize = 65
@@ -460,21 +461,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     height={cardAvatarSize}
                                  />
                               ) : (
-                                 <Avatar
-                                    title={`${event?.company}`}
-                                    variant="circular"
-                                    sx={styles.companyAvatar}
-                                 >
-                                    <Box sx={styles.nextImageWrapper}>
-                                       <Image
-                                          src={event?.companyLogoUrl}
-                                          layout="fill"
-                                          objectFit="contain"
-                                          quality={70}
-                                          alt={`logo of company ${event.company}`}
-                                       />
-                                    </Box>
-                                 </Avatar>
+                                 <CircularLogo
+                                    src={event?.companyLogoUrl}
+                                    alt={`logo of company ${event?.company}`}
+                                    size={cardAvatarSize}
+                                    objectFit="cover"
+                                 />
                               )}
                            </Box>
                            {isPlaceholderEvent || isPast ? null : (

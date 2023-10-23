@@ -2,11 +2,10 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { FC } from "react"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
-import Image from "next/image"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import Typography from "@mui/material/Typography"
 import { sxStyles } from "../../../../../types/commonTypes"
 import Skeleton from "@mui/material/Skeleton"
+import CircularLogo from "components/views/common/CircularLogo"
 
 const styles = sxStyles({
    logoWrapper: {
@@ -31,15 +30,11 @@ type HostInfoProps = {
 const HostInfo: FC<HostInfoProps> = ({ presenter }) => {
    return (
       <Stack spacing={1.5} direction="row">
-         <Box sx={styles.logoWrapper}>
-            <Image
-               src={getResizedUrl(presenter.companyLogoUrl, "lg")}
-               width={50}
-               height={50}
-               objectFit={"contain"}
-               alt={presenter.company}
-            />
-         </Box>
+         <CircularLogo
+            src={presenter.companyLogoUrl}
+            alt={presenter.company}
+            size={73}
+         />
          <Box sx={styles.companyNameWrapper}>
             <Typography fontWeight={300} variant={"body1"}>
                Hosted by
