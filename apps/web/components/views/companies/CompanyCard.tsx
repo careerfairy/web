@@ -23,7 +23,6 @@ import {
 import { useInView } from "react-intersection-observer"
 import Skeleton from "@mui/material/Skeleton"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
-import { alpha } from "@mui/material/styles"
 import FollowButton from "../common/company/FollowButton"
 import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
@@ -31,7 +30,7 @@ import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
 
 const LOGO_HEIGHT = 60
-const LOGO_WIDTH = 64
+const LOGO_WIDTH = 60
 
 const styles = sxStyles({
    root: {
@@ -79,11 +78,10 @@ const styles = sxStyles({
    companyLogo: {
       width: LOGO_WIDTH,
       height: LOGO_HEIGHT,
-      border: (theme) =>
-         `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+      border: "2px solid white",
       position: "absolute",
       background: (theme) => theme.palette.background.paper,
-      borderRadius: 2,
+      borderRadius: 100,
       p: 1,
       top: -LOGO_HEIGHT / 2,
    },
@@ -136,8 +134,8 @@ const CompanyCard: FC<Props> = ({ company }) => {
             <Box sx={styles.companyLogo}>
                <Image
                   src={getResizedUrl(company.logoUrl, "sm")}
-                  width={64}
-                  height={60}
+                  width={LOGO_WIDTH}
+                  height={LOGO_HEIGHT}
                   alt={company.universityName}
                   objectFit="contain"
                />
@@ -244,7 +242,7 @@ export const CompanyCardSkeleton: FC = () => {
          </CardMedia>
          <CardContent sx={styles.content}>
             <Box sx={styles.companyLogo}>
-               <Skeleton variant="rectangular" width="100%" height="100%" />
+               <Skeleton variant="circular" width="100%" height="100%" />
             </Box>
             <Box sx={styles.followButtonWrapper}>
                <Skeleton variant="rectangular" width={100} height={30} />
