@@ -48,6 +48,7 @@ import {
 } from "../../livestream-dialog"
 
 const bottomContentHeight = 50
+const cardAvatarWidthAndHeight = 65
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -149,12 +150,10 @@ const styles = sxStyles({
    },
    companyAvatar: {
       padding: 1,
-      backgroundColor: "white",
-      boxShadow: 3,
-      border: "none !important",
-      width: 110,
-      height: 60,
-      borderRadius: 3,
+      backgroundColor: "lightblue",
+      border: "solid 3px white",
+      width: cardAvatarWidthAndHeight,
+      height: cardAvatarWidthAndHeight,
    },
    calendarDate: {
       display: "flex",
@@ -162,7 +161,7 @@ const styles = sxStyles({
       textAlign: "center",
       justifyContent: "center",
       backgroundColor: "white",
-      boxShadow: 3,
+      boxShadow: "0px 10px 15px -10px rgba(0,0,0,0.1)",
       border: "none !important",
       width: 58,
       height: 60,
@@ -452,6 +451,35 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            className="hideOnHoverContent"
                            sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
                         >
+                           <Box sx={{ display: "flex" }}>
+                              {loading ? (
+                                 <Skeleton
+                                    animation={animation ?? "wave"}
+                                    variant="circular"
+                                    width={cardAvatarWidthAndHeight}
+                                    height={cardAvatarWidthAndHeight}
+                                 />
+                              ) : (
+                                 <Avatar
+                                    title={`${event?.company}`}
+                                    variant="circular"
+                                    sx={styles.companyAvatar}
+                                 >
+                                    <Box sx={styles.nextImageWrapper}>
+                                       <Image
+                                          src={getResizedUrl(
+                                             event?.companyLogoUrl,
+                                             "lg"
+                                          )}
+                                          layout="fill"
+                                          objectFit="contain"
+                                          quality={100}
+                                          alt={`logo of company ${event.company}`}
+                                       />
+                                    </Box>
+                                 </Avatar>
+                              )}
+                           </Box>
                            {isPlaceholderEvent || isPast ? null : (
                               <Box sx={{ display: "flex" }}>
                                  {loading ? (
@@ -482,37 +510,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                  )}
                               </Box>
                            )}
-
-                           <Box sx={{ display: "flex" }}>
-                              {loading ? (
-                                 <Skeleton
-                                    animation={animation ?? "wave"}
-                                    variant="rectangular"
-                                    sx={{ borderRadius: 3 }}
-                                    width={110}
-                                    height={60}
-                                 />
-                              ) : (
-                                 <Avatar
-                                    title={`${event?.company}`}
-                                    variant="rounded"
-                                    sx={styles.companyAvatar}
-                                 >
-                                    <Box sx={styles.nextImageWrapper}>
-                                       <Image
-                                          src={getResizedUrl(
-                                             event?.companyLogoUrl,
-                                             "lg"
-                                          )}
-                                          layout="fill"
-                                          objectFit="contain"
-                                          quality={100}
-                                          alt={`logo of company ${event.company}`}
-                                       />
-                                    </Box>
-                                 </Avatar>
-                              )}
-                           </Box>
                         </Box>
                         <Box
                            className="contentWrapper"
