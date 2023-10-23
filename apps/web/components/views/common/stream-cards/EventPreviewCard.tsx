@@ -48,7 +48,7 @@ import {
 } from "../../livestream-dialog"
 
 const bottomContentHeight = 50
-const cardAvatarWidthAndHeight = 65
+const cardAvatarSize = 65
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -152,8 +152,8 @@ const styles = sxStyles({
       padding: 1,
       border: "solid 3px white",
       backgroundColor: "white",
-      width: cardAvatarWidthAndHeight,
-      height: cardAvatarWidthAndHeight,
+      width: cardAvatarSize,
+      height: cardAvatarSize,
    },
    calendarDate: {
       display: "flex",
@@ -456,8 +456,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                  <Skeleton
                                     animation={animation ?? "wave"}
                                     variant="circular"
-                                    width={cardAvatarWidthAndHeight}
-                                    height={cardAvatarWidthAndHeight}
+                                    width={cardAvatarSize}
+                                    height={cardAvatarSize}
                                  />
                               ) : (
                                  <Avatar
