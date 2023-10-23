@@ -30,7 +30,7 @@ function replace(node: Element): ReactElement | false {
    // Replace links with Next links
    if (node.name === `a` && isUrlInternal(attribs.href)) {
       let { href, style, ...props } = attribs
-      href = `/employers${href}` // prefix href with /employers
+      href = `${href}`
       if (props.class) {
          props.className = props.class
          delete props.class
@@ -82,12 +82,12 @@ function replace(node: Element): ReactElement | false {
 
 const parseOptions: HTMLReactParserOptions = { replace }
 
-interface HomeProps {
+interface WebflowProps {
    headContent: string
    bodyContent: string
 }
 
-const Home: NextPage<HomeProps> = (props) => {
+export const WebflowPage: NextPage<WebflowProps> = (props) => {
    return (
       <>
          <Head>{parseHtml(props.headContent, parseOptions)}</Head>
@@ -95,8 +95,6 @@ const Home: NextPage<HomeProps> = (props) => {
       </>
    )
 }
-
-export default Home
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
    // Import modules in here that aren't needed in the component
@@ -110,7 +108,12 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       url = `/${url}`
    }
 
-   const fetchUrl = process.env.WEBFLOW_URL + url
+   // Workaround for B2B home page since we cannot use a redirect on webflow for the route '/'
+   if (url === "/employers") {
+      url = ""
+   }
+
+   const fetchUrl = process.env.WEBFLOW_B2B_URL + url
 
    // Fetch HTML
    const res = await axios(fetchUrl).catch((err) => {
@@ -132,6 +135,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
    // Send HTML to component via props
    return {
+      revalidate: 60,
       props: {
          bodyContent,
          headContent,

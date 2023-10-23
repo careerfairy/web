@@ -58,9 +58,9 @@ const csp = {
       "js.hs-scripts.com",
       "js.hsadspixel.net",
       "snap.licdn.com",
-      "https://cdn.dreamdata.cloud", // added source
-      "https://d3e54v103j8qbb.cloudfront.net", // added source
-      "https://assets-global.website-files.com", // added source
+      "https://cdn.dreamdata.cloud",
+      "https://d3e54v103j8qbb.cloudfront.net",
+      "https://assets-global.website-files.com",
    ],
    "style-src": [
       "'self'",
@@ -102,7 +102,7 @@ const csp = {
       "wss:",
       "https://noembed.com", // for react-player thumbnail
       "blob:",
-      "https://cdn.dreamdata.cloud", // added source
+      "https://cdn.dreamdata.cloud",
    ],
    "img-src": [
       "'self'",
@@ -122,14 +122,16 @@ const csp = {
       "https://www.facebook.com",
       "https://www.youtube.com",
       "https://app.usercentrics.eu",
-      "https://player.vimeo.com", // added source
-      "https://www.careerfairy.io", // added source
+      "https://player.vimeo.com",
+      "https://www.careerfairy.io",
+      "https://library.careerfairy.io",
    ],
    "font-src": [
       "'self'",
       "https://fonts.gstatic.com",
       "https://script.hotjar.com",
-      "data:", // added source
+      "data:",
+      "https://uploads-ssl.webflow.com",
    ],
 }
 
