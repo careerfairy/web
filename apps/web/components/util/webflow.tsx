@@ -135,7 +135,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
    // Send HTML to component via props
    return {
-      revalidate: 60,
+      revalidate: 1,
       props: {
          bodyContent,
          headContent,
