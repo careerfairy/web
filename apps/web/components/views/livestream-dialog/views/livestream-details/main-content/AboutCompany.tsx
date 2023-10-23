@@ -288,7 +288,7 @@ export const AboutCompanySkeleton: FC = () => {
             <CardMedia sx={styles.media}>
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>
-                  <Skeleton variant="rectangular" width={106} height={50} />
+                  <Skeleton variant="circular" width={100} height={100} />
                </Box>
             </CardMedia>
             <CardContent sx={styles.content}>
