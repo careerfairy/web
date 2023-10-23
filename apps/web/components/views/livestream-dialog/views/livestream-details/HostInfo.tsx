@@ -58,8 +58,8 @@ export const HostInfoSkeleton = () => {
          <Skeleton
             sx={styles.logoSkeleton}
             variant={"circular"}
-            width={63}
-            height={63}
+            width={50}
+            height={50}
          />
          <Box sx={styles.companyNameWrapper}>
             <Typography fontWeight={300} variant={"body1"}>
