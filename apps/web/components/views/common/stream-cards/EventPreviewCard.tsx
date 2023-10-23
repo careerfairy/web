@@ -151,6 +151,7 @@ const styles = sxStyles({
    companyAvatar: {
       padding: 1,
       border: "solid 3px white",
+      backgroundColor: "white",
       width: cardAvatarWidthAndHeight,
       height: cardAvatarWidthAndHeight,
    },
