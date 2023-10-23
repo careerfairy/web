@@ -12,7 +12,7 @@ const styles = sxStyles({
    logoWrapper: {
       p: 1,
       background: "white",
-      borderRadius: 4,
+      borderRadius: 100,
       display: "flex",
    },
    companyNameWrapper: {
@@ -21,7 +21,7 @@ const styles = sxStyles({
       flexDirection: "column",
    },
    logoSkeleton: {
-      borderRadius: 4,
+      borderRadius: 100,
    },
 })
 
@@ -57,9 +57,9 @@ export const HostInfoSkeleton = () => {
       <Stack spacing={1.5} direction="row">
          <Skeleton
             sx={styles.logoSkeleton}
-            variant={"rectangular"}
-            width={58}
-            height={58}
+            variant={"circular"}
+            width={63}
+            height={63}
          />
          <Box sx={styles.companyNameWrapper}>
             <Typography fontWeight={300} variant={"body1"}>
