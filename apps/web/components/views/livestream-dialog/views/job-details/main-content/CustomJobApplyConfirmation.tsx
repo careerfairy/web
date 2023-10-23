@@ -9,10 +9,10 @@ import { useLiveStreamDialog } from "../../../LivestreamDialog"
 
 const styles = sxStyles({
    confirmationWrapper: {
-      position: "fixed",
+      position: "sticky",
       display: "flex",
+      flexDirection: { xs: "column", md: "row" },
       bottom: "100px",
-      width: "92%",
       padding: "24px",
       justifyContent: "space-between",
       alignItems: "center",
@@ -26,6 +26,7 @@ const styles = sxStyles({
    },
    info: {
       display: "flex",
+      flexDirection: { xs: "column", md: "row" },
       alignItems: "center",
 
       "& svg": {
@@ -37,7 +38,11 @@ const styles = sxStyles({
       height: "40px",
       padding: "12px 30px",
    },
-   message: {},
+   message: {
+      display: "flex",
+      mt: { xs: 1, md: "unset" },
+      mb: { xs: 2, md: "unset" },
+   },
 })
 
 type Props = {
@@ -69,13 +74,14 @@ const CustomJobApplyConfirmation = ({
       <Box sx={styles.confirmationWrapper}>
          <Box sx={styles.info}>
             <HelpCircle size={28} />
-            <Typography variant={"h6"} ml={2}>
-               {" "}
-               Did you apply to{" "}
-            </Typography>
-            <Typography variant={"h6"} fontWeight={"bold"} ml={1}>
-               {job.title}?
-            </Typography>
+            <Box sx={styles.message}>
+               <Typography variant={"h6"} ml={2}>
+                  Did you apply to
+                  <Box component="span" fontWeight="bold" ml={0.5}>
+                     {job.title} ?
+                  </Box>
+               </Typography>
+            </Box>
          </Box>
 
          <Box>
