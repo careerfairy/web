@@ -7,6 +7,7 @@ import { useFirestoreCollection } from "components/custom-hook/utils/useFirestor
 
 const config = {
    suspense: false,
+   initialData: [],
 }
 
 const MyNextEvents = ({ limit }: Props) => {
