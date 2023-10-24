@@ -322,7 +322,6 @@ const CustomJobCreateOrEditFrom = ({
                            disabled={isSubmitting}
                            onBlur={handleBlur}
                            label="Job posting URL (required)"
-                           inputProps={{ maxLength: 70 }}
                            value={values.postingUrl}
                            error={Boolean(
                               errors.postingUrl && touched.postingUrl
