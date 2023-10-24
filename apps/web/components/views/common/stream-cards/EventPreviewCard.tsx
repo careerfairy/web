@@ -430,7 +430,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     }
                                     layout="fill"
                                     priority
-                                    objectFit="cover"
+                                    objectFit="contain"
                                     className="backgroundImage"
                                  />
                               </>
