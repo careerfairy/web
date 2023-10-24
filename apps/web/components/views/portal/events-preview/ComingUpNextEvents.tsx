@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
-import { usePagination } from "use-pagination-firestore"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
+import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+
+const config = {
+   suspense: false,
+}
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()
@@ -19,12 +23,16 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
    const query = useMemo(() => {
-      return livestreamRepo.upcomingEventsQuery()
-   }, [])
+      return livestreamRepo.upcomingEventsQuery(
+         undefined,
+         isLoggedIn ? limit : 80
+      )
+   }, [isLoggedIn, limit])
 
-   const { items: events } = usePagination<LivestreamEvent>(query, {
-      limit: isLoggedIn ? limit : 80,
-   })
+   const { data: events } = useFirestoreCollection<LivestreamEvent>(
+      query,
+      config
+   )
 
    useEffect(() => {
       if (livestreamId) {
@@ -43,7 +51,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
    useEffect(() => {
       const newLocalEvents =
-         localEvents.length && !events.length
+         localEvents.length && !events?.length
             ? [...localEvents]
             : new LivestreamsDataParser(events).filterByNotEndedEvents().get()
 

@@ -44,8 +44,8 @@
    "lint-staged": {
       "**/*": "prettier --write --ignore-unknown"
    },
-   "packageManager": "npm@8.5.5",
+   "packageManager": "npm@9.8.1",
    "engines": {
-      "npm": ">=7"
+      "npm": ">=9"
    }
 }

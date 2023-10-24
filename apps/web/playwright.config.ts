@@ -104,9 +104,9 @@ const config: PlaywrightTestConfig = {
       } --only auth,firestore,functions,storage`,
       cwd: "../../",
       env: {
-         FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",
-         FIREBASE_STORAGE_EMULATOR_HOST: "localhost:9199",
-         FIRESTORE_EMULATOR_HOST: "localhost:8080",
+         FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:9099",
+         FIREBASE_STORAGE_EMULATOR_HOST: "127.0.0.1:9199",
+         FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080",
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
          APP_ENV: "test",
       },

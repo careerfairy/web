@@ -6,7 +6,7 @@
       "lint": "eslint --ext .ts .",
       "build": "npm run clean && npm run copy-files && tsc",
       "dev": "npm run watch | npm run start:emulators",
-      "start:emulators": "cross-env JAVA_TOOL_OPTIONS=-Xmx15g FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199 FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions,storage --export-on-exit --import ../../emulatorData/fetched",
+      "start:emulators": "cross-env JAVA_TOOL_OPTIONS=-Xmx15g FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 firebase emulators:start --only auth,firestore,functions,storage --export-on-exit --import ../../emulatorData/fetched",
       "test": "jest",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
@@ -24,7 +24,7 @@
       "axios": "^0.27.2",
       "dotenv": "^8.2.0",
       "firebase": "^9.18.0",
-      "firebase-admin": "^11.9.0",
+      "firebase-admin": "^11.11.0",
       "firebase-functions": "^4.4.1",
       "form-data": "^4.0.0",
       "graphql": "^16.5.0",
@@ -39,7 +39,7 @@
       "yup": "^0.32.11"
    },
    "engines": {
-      "node": "16"
+      "node": "18"
    },
    "devDependencies": {
       "@types/jest": "^29.0.2",
@@ -57,5 +57,6 @@
       "rimraf": "^3.0.2",
       "ts-jest": "^29.1.0",
       "typescript": "^5.1.6"
-   }
+   },
+   "fireConfig": {}
 }
