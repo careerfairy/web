@@ -66,14 +66,14 @@ const styles = sxStyles({
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      borderRadius: 100,
+      borderRadius: 50,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       width: "fit-content",
       height: "fit-content",
       "& .company-logo": {
-         borderRadius: (theme) => theme.spacing(100),
+         borderRadius: (theme) => theme.spacing(50),
          maxHeight: 90,
          maxWidth: 280,
       },
@@ -114,6 +114,8 @@ const styles = sxStyles({
       ml: 1,
    },
 })
+
+const LOGO_SIZE = 120
 
 interface Props {
    presenter: LivestreamPresenter
@@ -160,7 +162,7 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   <CircularLogo
                      src={presenter.companyLogoUrl}
                      alt={presenter.company}
-                     size={120}
+                     size={LOGO_SIZE}
                   />
                </Box>
             </CardMedia>
@@ -286,7 +288,11 @@ export const AboutCompanySkeleton: FC = () => {
             <CardMedia sx={styles.media}>
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>
-                  <Skeleton variant="circular" width={100} height={100} />
+                  <Skeleton
+                     variant="circular"
+                     width={LOGO_SIZE}
+                     height={LOGO_SIZE}
+                  />
                </Box>
             </CardMedia>
             <CardContent sx={styles.content}>
