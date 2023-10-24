@@ -34,7 +34,6 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -192,14 +191,11 @@ export const getServerSideProps: GetServerSideProps<
       sparkId: string
    }
 > = async (context) => {
-   // TODO: remove this when we are ready to launch
-   if (!shouldEnableSParksB2C()) {
-      return {
-         redirect: {
-            destination: "/portal",
-            permanent: false,
-         },
-      }
+   return {
+      redirect: {
+         destination: "/portal",
+         permanent: false,
+      },
    }
 
    const groupId = context.query.groupId

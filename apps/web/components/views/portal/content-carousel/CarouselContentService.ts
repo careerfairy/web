@@ -8,7 +8,6 @@ import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import { sparkService } from "data/firebase/SparksService"
-import { shouldEnableSParksB2C } from "util/CommonUtil"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -184,23 +183,20 @@ export class CarouselContentService {
          ]
       }
 
-      // TODO: Remove this if statement once Sparks are ready for launch
-      if (shouldEnableSParksB2C()) {
-         // check whether to add Sparks CTA
-         const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
-            this.options.userData,
-            CTASlideTopics.Sparks
-         )
-         const userHasSeenASpark = await this.userHasSeenASpark()
-         if (!userHasSeenASpark && shouldSeeSparksCTABanner) {
-            content = [
-               {
-                  contentType: "CTASlide",
-                  topic: CTASlideTopics.Sparks,
-               },
-               ...content,
-            ]
-         }
+      // check whether to add Sparks CTA
+      const shouldSeeSparksCTABanner = userShouldSeeCTABannerToday(
+         this.options.userData,
+         CTASlideTopics.Sparks
+      )
+      const userHasSeenASpark = await this.userHasSeenASpark()
+      if (!userHasSeenASpark && shouldSeeSparksCTABanner) {
+         content = [
+            {
+               contentType: "CTASlide",
+               topic: CTASlideTopics.Sparks,
+            },
+            ...content,
+         ]
       }
 
       return content
