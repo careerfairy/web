@@ -87,7 +87,7 @@ interface WebflowProps {
    bodyContent: string
 }
 
-export const WebflowPage: NextPage<WebflowProps> = (props) => {
+const WebflowPage: NextPage<WebflowProps> = (props) => {
    return (
       <>
          <Head>{parseHtml(props.headContent, parseOptions)}</Head>
@@ -96,7 +96,9 @@ export const WebflowPage: NextPage<WebflowProps> = (props) => {
    )
 }
 
-export const getStaticProps: GetStaticProps = async (ctx) => {
+export default WebflowPage
+
+const getStaticProps: GetStaticProps = async (ctx) => {
    // Import modules in here that aren't needed in the component
    const cheerio = await import(`cheerio`)
    const axios = (await import(`axios`)).default
@@ -113,7 +115,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       url = ""
    }
 
-   const fetchUrl = process.env.WEBFLOW_B2B_URL + url
+   const fetchUrl = process.env.WEBFLOW_URL + url
 
    // Fetch HTML
    const res = await axios(fetchUrl).catch((err) => {
@@ -142,3 +144,5 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       },
    }
 }
+
+export { getStaticProps }
