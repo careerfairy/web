@@ -430,7 +430,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     }
                                     layout="fill"
                                     priority
-                                    objectFit="contain"
+                                    objectFit="cover"
                                     className="backgroundImage"
                                  />
                               </>
@@ -465,7 +465,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     src={event?.companyLogoUrl}
                                     alt={`logo of company ${event?.company}`}
                                     size={cardAvatarSize}
-                                    objectFit="cover"
+                                    objectFit="contain"
                                  />
                               )}
                            </Box>
