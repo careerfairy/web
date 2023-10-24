@@ -10,6 +10,7 @@ import { useFirestoreCollection } from "components/custom-hook/utils/useFirestor
 
 const config = {
    suspense: false,
+   initialData: [],
 }
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
@@ -64,7 +65,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       if (eventFromQuery) {
          newLocalEvents.unshift(eventFromQuery)
       }
-      setLocalEvents(newLocalEvents)
+      setLocalEvents(newLocalEvents || [])
    }, [eventFromQuery, events])
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
