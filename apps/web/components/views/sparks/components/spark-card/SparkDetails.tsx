@@ -88,7 +88,7 @@ const SparkDetails: FC<Props> = ({
          onClick={onClick}
       >
          <span>
-            <CircularLogo src={companyLogoUrl} alt={companyName} size={52} />
+            <CircularLogo src={companyLogoUrl} alt={companyName} size={60} />
          </span>
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>
