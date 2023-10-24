@@ -110,11 +110,6 @@ const getStaticProps: GetStaticProps = async (ctx) => {
       url = `/${url}`
    }
 
-   // Workaround for B2B home page since we cannot use a redirect on webflow for the route '/'
-   if (url === "/employers") {
-      url = ""
-   }
-
    const fetchUrl = process.env.WEBFLOW_URL + url
 
    // Fetch HTML
