@@ -29,8 +29,7 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
 
-const LOGO_HEIGHT = 60
-const LOGO_WIDTH = 60
+const LOGO_SIZE = 60
 
 const styles = sxStyles({
    root: {
@@ -76,14 +75,14 @@ const styles = sxStyles({
       color: "text.primary",
    },
    companyLogo: {
-      width: LOGO_WIDTH,
-      height: LOGO_HEIGHT,
+      width: LOGO_SIZE,
+      height: LOGO_SIZE,
       border: "2px solid white",
       position: "absolute",
       background: (theme) => theme.palette.background.paper,
-      borderRadius: 100,
+      borderRadius: 50,
       p: 1,
-      top: -LOGO_HEIGHT / 2,
+      top: -LOGO_SIZE / 2,
    },
    followButtonWrapper: {
       position: "absolute",
@@ -134,8 +133,8 @@ const CompanyCard: FC<Props> = ({ company }) => {
             <Box sx={styles.companyLogo}>
                <Image
                   src={getResizedUrl(company.logoUrl, "sm")}
-                  width={LOGO_WIDTH}
-                  height={LOGO_HEIGHT}
+                  width={LOGO_SIZE}
+                  height={LOGO_SIZE}
                   alt={company.universityName}
                   objectFit="contain"
                />

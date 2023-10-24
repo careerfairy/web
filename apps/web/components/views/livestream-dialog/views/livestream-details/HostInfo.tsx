@@ -11,7 +11,7 @@ const styles = sxStyles({
    logoWrapper: {
       p: 1,
       background: "white",
-      borderRadius: 100,
+      borderRadius: 50,
       display: "flex",
    },
    companyNameWrapper: {
@@ -20,7 +20,7 @@ const styles = sxStyles({
       flexDirection: "column",
    },
    logoSkeleton: {
-      borderRadius: 100,
+      borderRadius: 50,
    },
 })
 

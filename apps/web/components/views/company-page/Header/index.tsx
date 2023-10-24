@@ -38,7 +38,7 @@ const styles = sxStyles({
    logo: {
       width: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
       height: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
-      borderRadius: 100,
+      borderRadius: 50,
       border: "2px solid white",
       marginRight: "-5px",
       background: (theme) => theme.palette.common.white,
@@ -61,7 +61,7 @@ const styles = sxStyles({
       width: STICKY_LOGO_SIZE,
       height: STICKY_LOGO_SIZE,
       backgroundColor: "white",
-      borderRadius: 100,
+      borderRadius: 50,
       border: "2px solid white",
       "& img": {
          objectFit: "contain",
