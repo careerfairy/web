@@ -137,7 +137,7 @@ const getStaticProps: GetStaticProps = async (ctx) => {
 
    // Send HTML to component via props
    return {
-      revalidate: 1,
+      revalidate: 60, // Re-build the webflow pages every 60 seconds, any new pages will be added to the build automatically
       props: {
          bodyContent,
          headContent,
