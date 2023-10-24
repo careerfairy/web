@@ -22,10 +22,7 @@ import useListenToStreams from "../../custom-hook/useListenToStreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../data/RepositoryInstances"
-import {
-   errorLogAndNotify,
-   shouldEnableSParksB2C,
-} from "../../../util/CommonUtil"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
 import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import NewsletterSection from "./NewsletterSection"
@@ -197,7 +194,7 @@ const CompanyPageOverview = ({
                   <Grid item xs={12} md={6}>
                      <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                         <AboutSection />
-                        {group.publicSparks && shouldEnableSParksB2C() ? (
+                        {group.publicSparks ? (
                            <SparksSection key={group.id} groupId={group.id} />
                         ) : null}
                         {showFollowCompanyCta ? <FollowCompany /> : null}
