@@ -9,7 +9,7 @@ const getStyles = (size: number) =>
          width: size,
          height: size,
          backgroundColor: "white",
-         border: "solid 2px white",
+         border: "solid 2px #F6F6FA",
          "& > *": {
             display: "flex",
          },
