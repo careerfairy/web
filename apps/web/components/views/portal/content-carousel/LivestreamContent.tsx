@@ -161,7 +161,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
          }
          title={<ContentTitle color="white">{livestream.title}</ContentTitle>}
          subtitle={<ContentSubtitle color="white">{subtitle}</ContentSubtitle>}
-         logoUrl={getResizedUrl(livestream.companyLogoUrl, "lg")}
+         logoUrl={livestream.companyLogoUrl}
          logoCaption={livestream.company}
          actionItem={actionItem}
          backgroundImageAlt={livestream.company}
