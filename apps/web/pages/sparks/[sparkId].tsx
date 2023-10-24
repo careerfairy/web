@@ -191,13 +191,6 @@ export const getServerSideProps: GetServerSideProps<
       sparkId: string
    }
 > = async (context) => {
-   return {
-      redirect: {
-         destination: "/portal",
-         permanent: false,
-      },
-   }
-
    const groupId = context.query.groupId
       ? context.query.groupId.toString()
       : null
