@@ -483,7 +483,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     <Box sx={styles.calendarDate}>
                                        <Typography
                                           variant={"h5"}
-                                          color={"secondary"}
+                                          color={"#2ABAA5"}
                                           fontWeight={600}
                                        >
                                           {getStartDay}
