@@ -6,7 +6,7 @@ import { projectId } from "./lib/firebase"
  */
 export function clearFirestoreData() {
    return axios.delete(
-      `http://localhost:8080/emulator/v1/projects/${projectId}/databases/(default)/documents`
+      `http://127.0.0.1:8080/emulator/v1/projects/${projectId}/databases/(default)/documents`
    )
 }
 
@@ -15,6 +15,6 @@ export function clearFirestoreData() {
  */
 export function clearAuthData() {
    return axios.delete(
-      `http://localhost:9099/emulator/v1/projects/${projectId}/accounts`
+      `http://127.0.0.1:9099/emulator/v1/projects/${projectId}/accounts`
    )
 }

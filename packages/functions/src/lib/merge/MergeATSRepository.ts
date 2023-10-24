@@ -495,11 +495,14 @@ export function createMergeAttachmentObject(
 
 export function getResumeURL(resumeUrl: string): string {
    let res = resumeUrl
-   // Merge doesn't accept localhost, replace with remote storage
+   // Merge doesn't accept localhost/127.0.0.1, replace with remote storage
    // merge will try to fetch the file and store in their systems
    // it might fail if the file not accessible
    // this is only used during local development
-   if (res.indexOf("http://localhost:9199") !== -1) {
+   if (
+      res.indexOf("http://localhost:9199") !== -1 ||
+      res.indexOf("http://127.0.0.1:9199") !== -1
+   ) {
       // use a remote test CV file
       res = TEST_CV
    }

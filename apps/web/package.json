@@ -117,7 +117,6 @@
       "slick-carousel": "^1.8.1",
       "swr": "^2.2.0",
       "use-file-picker": "^1.7.0",
-      "use-pagination-firestore": "0.5.0",
       "uuid": "^9.0.0",
       "validate-color": "^2.1.1",
       "xlsx": "^0.18.5",
@@ -172,7 +171,7 @@
       "webpack": "^5.88.1"
    },
    "engines": {
-      "node": "16.x"
+      "node": "18.x"
    },
    "copyFiles": [
       {

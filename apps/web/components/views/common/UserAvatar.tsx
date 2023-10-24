@@ -5,7 +5,7 @@ import React from "react"
 import ColorizedAvatar from "./ColorizedAvatar"
 import { StylesProps } from "../../../types/commonTypes"
 import Link from "./Link"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 type stringSizes = "small" | "medium" | "large"
 export interface UserAvatarProps {
@@ -69,6 +69,7 @@ const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
          onClick={(e) => e.stopPropagation()}
          // @ts-ignore
          component={isLoggedInUser ? Link : undefined}
+         // @ts-ignore
          href={isLoggedInUser ? "/profile" : undefined}
       />
    )

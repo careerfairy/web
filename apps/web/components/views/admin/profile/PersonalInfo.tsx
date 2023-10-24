@@ -11,8 +11,9 @@ import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
 import { getDownloadUrl } from "../../../helperFunctions/streamFormFunctions"
 import { FieldOfStudySelector } from "../../signup/userInformation/FieldOfStudySelector"
 import React from "react"
-import { FormikErrors, FormikValues } from "formik"
+import { FormikErrors, FormikValues, FormikHelpers } from "formik"
 import { FormikTouched } from "formik/dist/types"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 
 type Props = {
    handleChange: (event) => void
@@ -21,7 +22,7 @@ type Props = {
    errors: FormikErrors<FormikValues>
    touched: FormikTouched<FormikValues>
    isSubmitting: boolean
-   setFieldValue: (field, value) => void
+   setFieldValue?: FormikHelpers<FieldOfStudy>["setFieldValue"]
    imagePathId: string
 }
 

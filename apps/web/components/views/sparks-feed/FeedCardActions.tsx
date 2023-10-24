@@ -150,7 +150,7 @@ const FeedCardActions: FC<Props> = ({ spark, hide }) => {
 
 type ActionProps = {
    icon: React.ReactNode
-   onClick?: IconButtonProps["onClick"]
+   onClick?: IconButtonProps<"a">["onClick"]
    href?: string
    hrefTarget?: string
    label: string
