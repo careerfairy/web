@@ -28,8 +28,9 @@ import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
+import CircularLogo from "../common/CircularLogo"
 
-const LOGO_SIZE = 60
+const LOGO_SIZE = 75
 
 const styles = sxStyles({
    root: {
@@ -74,15 +75,10 @@ const styles = sxStyles({
       height: 45,
       color: "text.primary",
    },
-   companyLogo: {
-      width: LOGO_SIZE,
-      height: LOGO_SIZE,
-      border: "2px solid white",
+   companyLogoWrapper: {
       position: "absolute",
-      background: (theme) => theme.palette.background.paper,
-      borderRadius: 50,
-      p: 1,
       top: -LOGO_SIZE / 2,
+      zIndex: 2,
    },
    followButtonWrapper: {
       position: "absolute",
@@ -130,12 +126,11 @@ const CompanyCard: FC<Props> = ({ company }) => {
             <LinkToCompanyPage companyName={company.universityName} />
          </CardMedia>
          <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogo}>
-               <Image
-                  src={getResizedUrl(company.logoUrl, "sm")}
-                  width={LOGO_SIZE}
-                  height={LOGO_SIZE}
+            <Box sx={styles.companyLogoWrapper}>
+               <CircularLogo
+                  src={company.logoUrl}
                   alt={company.universityName}
+                  size={LOGO_SIZE}
                   objectFit="contain"
                />
             </Box>
@@ -240,8 +235,12 @@ export const CompanyCardSkeleton: FC = () => {
             <Skeleton variant="rectangular" width="100%" height="100%" />
          </CardMedia>
          <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogo}>
-               <Skeleton variant="circular" width="100%" height="100%" />
+            <Box sx={styles.companyLogoWrapper}>
+               <Skeleton
+                  variant="circular"
+                  width={LOGO_SIZE}
+                  height={LOGO_SIZE}
+               />
             </Box>
             <Box sx={styles.followButtonWrapper}>
                <Skeleton variant="rectangular" width={100} height={30} />
