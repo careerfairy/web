@@ -41,7 +41,7 @@ const CircularLogo: FC<Props> = ({
    const styles = getStyles(adjustedSize)
 
    return (
-      <Avatar variant="circular" sx={styles.root}>
+      <Avatar variant="circular" sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}>
          <Box borderRadius={borderRadius}>
             <Image
                src={src}
