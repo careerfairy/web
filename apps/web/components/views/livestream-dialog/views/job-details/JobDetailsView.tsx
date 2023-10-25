@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from "react"
+import React, { FC } from "react"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
@@ -19,6 +19,7 @@ import { Job } from "@careerfairy/shared-lib/ats/Job"
 import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
 import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
+import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
 
 type Props = {
    jobId: string
@@ -80,7 +81,7 @@ const JobDetailsView: FC = (props) => {
 
 const JobDetails: FC<Props> = ({ jobId }) => {
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
-   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
+   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
    let job: Job | PublicCustomJob
 
    job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
@@ -92,13 +93,6 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    }
 
    const isAtsJob = useIsAtsJob(job)
-
-   const handleCloseConfirmationDialog = useCallback(() => {
-      setShowConfirmationDialog(false)
-   }, [])
-   const handleShowConfirmationDialog = useCallback(() => {
-      setShowConfirmationDialog(true)
-   }, [])
 
    if (!job) {
       return (
@@ -141,9 +135,9 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
                   <JobDescription job={job} />
 
-                  {showConfirmationDialog && !isAtsJob ? (
+                  {isOpen && !isAtsJob ? (
                      <CustomJobApplyConfirmation
-                        handleClose={handleCloseConfirmationDialog}
+                        handleClose={handleClose}
                         job={job as PublicCustomJob}
                         livestreamId={livestream.id}
                      />
@@ -162,7 +156,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                   <CustomJobCTAButton
                      livestreamId={livestream.id}
                      job={job as PublicCustomJob}
-                     handleClick={handleShowConfirmationDialog}
+                     handleClick={handleOpen}
                   />
                )}
             </Box>
