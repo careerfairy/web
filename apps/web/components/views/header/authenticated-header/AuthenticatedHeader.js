@@ -52,7 +52,7 @@ const AuthenticatedHeader = (props) => {
                   </IconButton>
                </li>
                <li>
-                  <Link href="/">
+                  <Link href="/" legacyBehavior>
                      <a>
                         <img
                            src={
@@ -82,17 +82,17 @@ const AuthenticatedHeader = (props) => {
                <li
                   className={props.page === "next-livestreams" ? "active" : ""}
                >
-                  <Link href="/next-livestreams">
+                  <Link href="/next-livestreams" legacyBehavior>
                      <a className={classes.nextLink}>Next Live Streams</a>
                   </Link>
                </li>
                <li className={props.page === "wishlist" ? "active" : ""}>
-                  <Link href="/wishlist">
+                  <Link href="/wishlist" legacyBehavior>
                      <a>Wishlist</a>
                   </Link>
                </li>
                <li className={props.page === "groups" ? "active" : ""}>
-                  <Link href="/groups">
+                  <Link href="/groups" legacyBehavior>
                      <a>Follow Groups</a>
                   </Link>
                </li>

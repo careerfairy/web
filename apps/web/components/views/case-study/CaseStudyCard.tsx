@@ -53,36 +53,31 @@ const styles = {
 const CaseStudyCard = ({ caseStudyPreview }: Props) => {
    return (
       <Link href={`/companies/customers/${caseStudyPreview.slug}`}>
-         <a>
-            <Card elevation={0} sx={styles.root}>
-               <CardMedia
-                  sx={styles.media}
-                  title={caseStudyPreview.company.name}
+         <Card elevation={0} sx={styles.root}>
+            <CardMedia sx={styles.media} title={caseStudyPreview.company.name}>
+               <Box sx={styles.mediaWrapper}>
+                  <Image
+                     src={caseStudyPreview.coverImage.url}
+                     layout="fill"
+                     objectFit="cover"
+                     loader={GraphCMSImageLoader}
+                  />
+               </Box>
+            </CardMedia>
+            <CardContent>
+               <Typography
+                  gutterBottom
+                  variant={"subtitle1"}
+                  color={"text.secondary"}
+                  sx={styles.contentText}
                >
-                  <Box sx={styles.mediaWrapper}>
-                     <Image
-                        src={caseStudyPreview.coverImage.url}
-                        layout="fill"
-                        objectFit="cover"
-                        loader={GraphCMSImageLoader}
-                     />
-                  </Box>
-               </CardMedia>
-               <CardContent>
-                  <Typography
-                     gutterBottom
-                     variant={"subtitle1"}
-                     color={"text.secondary"}
-                     sx={styles.contentText}
-                  >
-                     {caseStudyPreview.company.name}
-                  </Typography>
-                  <Typography variant={"h6"} sx={styles.name}>
-                     {caseStudyPreview.title}
-                  </Typography>
-               </CardContent>
-            </Card>
-         </a>
+                  {caseStudyPreview.company.name}
+               </Typography>
+               <Typography variant={"h6"} sx={styles.name}>
+                  {caseStudyPreview.title}
+               </Typography>
+            </CardContent>
+         </Card>
       </Link>
    )
 }

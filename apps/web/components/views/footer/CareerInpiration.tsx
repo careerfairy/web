@@ -73,9 +73,7 @@ const CareerInspiration = () => {
                               {label}
                            </a>
                         ) : (
-                           <Link href={href}>
-                              <a>{label}</a>
-                           </Link>
+                           <Link href={href}>{label}</Link>
                         )}
                      </Box>
                   ))}

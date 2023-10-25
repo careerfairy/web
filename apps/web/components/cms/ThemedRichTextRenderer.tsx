@@ -121,7 +121,7 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
                }
 
                return (
-                  <Link href={href}>
+                  <Link href={href} legacyBehavior>
                      <Box
                         component={"a"}
                         sx={{

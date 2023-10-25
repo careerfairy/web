@@ -39,7 +39,7 @@ const HelperHint = ({ groupAdmin }: Props) => {
                   },
                }}
             >
-               <a>Log in</a>
+               Log in
             </Link>
          </Box>
          <Box sx={styles.resetEmail}>

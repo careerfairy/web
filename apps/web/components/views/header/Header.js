@@ -106,6 +106,7 @@ function Header(props) {
                   <Link
                      className="next-livestream-link"
                      href="/next-livestreams"
+                     legacyBehavior
                   >
                      <a onClick={toggleSideBar} className={classes.nextLink}>
                         Next Live Streams
@@ -120,17 +121,20 @@ function Header(props) {
                   </li>
                )}
                <li>
-                  <Link href="https://companies.careerfairy.io">
+                  <Link href="https://companies.careerfairy.io" legacyBehavior>
                      <a onClick={toggleSideBar}>Companies</a>
                   </Link>
                </li>
                <li>
-                  <Link href="/wishlist">
+                  <Link href="/wishlist" legacyBehavior>
                      <a onClick={toggleSideBar}>Wishlist</a>
                   </Link>
                </li>
                <li>
-                  <Link href={authenticated ? "/profile" : "/login"}>
+                  <Link
+                     href={authenticated ? "/profile" : "/login"}
+                     legacyBehavior
+                  >
                      <a>{authenticated ? "My Profile" : "Log in"}</a>
                   </Link>
                </li>

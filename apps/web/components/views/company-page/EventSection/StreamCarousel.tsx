@@ -135,7 +135,7 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                      </Typography>
                   )}
                   {hasMore ? (
-                     <Link href={link} passHref>
+                     <Link href={link} passHref legacyBehavior>
                         <Box component="a" sx={styles.seeMoreLink}>
                            See all
                         </Box>
@@ -192,16 +192,14 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                </Stack>
             ) : type === "upcoming" && editMode ? (
                <Link href={`/group/${group.id}/admin/events`}>
-                  <a>
-                     <Button color="secondary" sx={styles.addEvent}>
-                        <Box>
-                           <Add sx={{ height: "58px", width: "58px" }} />
-                           <Typography variant="subtitle2" color={"black"}>
-                              Create new live stream
-                           </Typography>
-                        </Box>
-                     </Button>
-                  </a>
+                  <Button color="secondary" sx={styles.addEvent}>
+                     <Box>
+                        <Add sx={{ height: "58px", width: "58px" }} />
+                        <Typography variant="subtitle2" color={"black"}>
+                           Create new live stream
+                        </Typography>
+                     </Box>
+                  </Button>
                </Link>
             ) : (
                <>

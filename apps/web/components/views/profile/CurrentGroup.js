@@ -223,11 +223,9 @@ const CurrentGroup = ({
                   <CardActions className={classes.actions}>
                      {!isAdmin && (
                         <Link href={`/next-livestreams/${localGroup.groupId}`}>
-                           <a>
-                              <Button fullWidth size="large" color="primary">
-                                 View Calendar
-                              </Button>
-                           </a>
+                           <Button fullWidth size="large" color="primary">
+                              View Calendar
+                           </Button>
                         </Link>
                      )}
                      {isAdmin ? (

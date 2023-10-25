@@ -380,9 +380,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          <>
             <Link
                {...linkProps}
-               shallow // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+               // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+               shallow
                passHref
-               scroll={false} // Prevents the page from scrolling to the top when the link is clicked
+               // Prevents the page from scrolling to the top when the link is clicked
+               scroll={false}
+               legacyBehavior
             >
                <CardActionArea
                   component={event ? "a" : "div"}

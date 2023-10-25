@@ -278,10 +278,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                         </Button>
                         <Grid style={{ marginBottom: "1rem" }} container>
                            <Grid item xs>
-                              <Link href="/reset-password">
-                                 <a data-testid="forgot-password-page-link">
-                                    Forgot password?
-                                 </a>
+                              <Link
+                                 href="/reset-password"
+                                 data-testid="forgot-password-page-link"
+                              >
+                                 Forgot password?
                               </Link>
                            </Grid>
                            <Grid item>
@@ -295,8 +296,9 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                                          }
                                        : signupPagePath
                                  }
+                                 data-testid="signup-page-link"
                               >
-                                 <a data-testid="signup-page-link"> Sign up</a>
+                                 Sign up
                               </Link>
                            </Grid>
                         </Grid>
