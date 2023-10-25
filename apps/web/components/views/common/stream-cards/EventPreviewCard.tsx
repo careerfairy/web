@@ -465,7 +465,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     src={event?.companyLogoUrl}
                                     alt={`logo of company ${event?.company}`}
                                     size={cardAvatarSize}
-                                    objectFit="contain"
                                  />
                               )}
                            </Box>
