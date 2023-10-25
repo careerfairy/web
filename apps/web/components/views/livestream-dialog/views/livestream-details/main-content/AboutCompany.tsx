@@ -60,23 +60,15 @@ const styles = sxStyles({
       flex: 1,
    }),
    logoWrapper: {
-      p: 0.5,
-      bgcolor: "background.paper",
       position: "absolute",
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      borderRadius: 50,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       width: "fit-content",
       height: "fit-content",
-      "& .company-logo": {
-         borderRadius: (theme) => theme.spacing(50),
-         maxHeight: 90,
-         maxWidth: 280,
-      },
    },
    followButton: {
       borderRadius: 1,
