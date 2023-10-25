@@ -58,7 +58,7 @@ const EditGroupCard = () => {
             objectFit="contain"
          >
             <HoverOverlay
-               href="{`/group/${group.id}/admin/edit`}"
+               href={`/group/${group.id}/admin/edit`}
                icon={
                   <EditGroupIcon sx={styles.hoverOverlay} fontSize="large" />
                }
