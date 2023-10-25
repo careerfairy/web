@@ -35,6 +35,7 @@ const CircularLogo: FC<Props> = ({
    objectFit = "contain",
    quality = 70,
    children,
+     sx,
 }) => {
    const adjustedSize = size - 8 // 8 is the padding
    const styles = getStyles(adjustedSize)
