@@ -43,7 +43,6 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       position: "absolute",
-      // bottom: "-3px",
       borderRadius: "12px",
       border: "1.5px solid var(--turquoise-turquoise-400, #6ACFC0)",
       background: "var(--white-white-200, #FCFCFE)",
