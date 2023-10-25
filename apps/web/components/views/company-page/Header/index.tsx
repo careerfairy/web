@@ -8,7 +8,6 @@ import {
    Tabs,
    Typography,
 } from "@mui/material"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../types/commonTypes"
 import { companyLogoPlaceholder } from "../../../../constants/images"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
@@ -23,6 +22,7 @@ import useControlledTabNavigationOnScroll from "../../../custom-hook/useControll
 import Link from "../../common/Link"
 import BannerIllustration from "./BannerIllustration"
 import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
+import CircularLogo from "components/views/common/CircularLogo"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -38,15 +38,7 @@ const styles = sxStyles({
    logo: {
       width: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
       height: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
-      borderRadius: 50,
-      border: "2px solid white",
       marginRight: "-5px",
-      background: (theme) => theme.palette.common.white,
-      "& img": {
-         objectFit: "contain",
-         maxWidth: "90%",
-         maxHeight: "90%",
-      },
       marginLeft: { xs: "10px", md: 3 },
    },
    companyTitle: {
@@ -60,13 +52,9 @@ const styles = sxStyles({
    stickyLogo: {
       width: STICKY_LOGO_SIZE,
       height: STICKY_LOGO_SIZE,
-      backgroundColor: "white",
-      borderRadius: 50,
-      border: "2px solid white",
-      "& img": {
-         objectFit: "contain",
-         height: "85%",
-         width: "85%",
+      "& > img": {
+         maxWidth: "100%",
+         maxHeight: "100%",
       },
    },
    navigatorWrapper: {
@@ -267,14 +255,11 @@ const Header = () => {
                         spacing={2}
                         bgcolor={isMobile ? "white" : NAV_BG_COLOR}
                      >
-                        <Avatar
-                           variant="circular"
+                        <CircularLogo
                            sx={styles.logo}
                            alt={`${universityName} logo`}
-                           src={
-                              getResizedUrl(logoUrl, "sm") ||
-                              companyLogoPlaceholder
-                           }
+                           src={logoUrl || companyLogoPlaceholder}
+                           size={DESKTOP_LOGO_SIZE}
                         />
                         {isMobile ? (
                            <span>
@@ -324,14 +309,11 @@ const Header = () => {
                               direction={"down"}
                               in={isSticky}
                            >
-                              <Avatar
-                                 variant="circular"
-                                 sx={styles.stickyLogo}
+                              <CircularLogo
+                                 src={logoUrl || companyLogoPlaceholder}
                                  alt={`${universityName} logo`}
-                                 src={
-                                    getResizedUrl(logoUrl, "sm") ||
-                                    companyLogoPlaceholder
-                                 }
+                                 size={STICKY_LOGO_SIZE}
+                                 sx={styles.stickyLogo}
                               />
                            </Slide>
                            <AppBar
