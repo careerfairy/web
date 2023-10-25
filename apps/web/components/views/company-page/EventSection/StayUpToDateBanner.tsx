@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { useCompanyPage } from "../index"
 import FollowButton from "../../common/company/FollowButton"
 

@@ -16,7 +16,7 @@ import {
    isInIframe,
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { useRouter } from "next/router"
 import { checkIfPast } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"

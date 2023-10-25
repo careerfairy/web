@@ -20,7 +20,7 @@ import Link from "../../common/Link"
 import { sxStyles } from "../../../../types/commonTypes"
 import { JobStatus } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import Box from "@mui/material/Box"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
