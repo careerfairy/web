@@ -23,6 +23,7 @@ type Props = {
    borderRadius?: number
    objectFit?: ImageProps["objectFit"]
    quality?: number
+   children?: React.ReactNode
 }
 
 const CircularLogo: FC<Props> = ({
@@ -32,6 +33,7 @@ const CircularLogo: FC<Props> = ({
    borderRadius = 50,
    objectFit = "contain",
    quality = 70,
+   children,
 }) => {
    const adjustedSize = size - 8 // 8 is the padding
    const styles = getStyles(adjustedSize)
@@ -48,6 +50,7 @@ const CircularLogo: FC<Props> = ({
                quality={quality}
             />
          </Box>
+         {children}
       </Avatar>
    )
 }
