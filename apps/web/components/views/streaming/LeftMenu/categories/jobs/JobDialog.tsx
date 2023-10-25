@@ -71,7 +71,6 @@ const styles = sxStyles({
       height: { xs: "none", md: "420px" },
       overflow: "auto",
       pb: 2,
-      background: "white",
    },
    actions: {
       borderTop: "1px solid #F1F1F1",
