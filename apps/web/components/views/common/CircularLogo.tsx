@@ -24,7 +24,7 @@ type Props = {
    objectFit?: ImageProps["objectFit"]
    quality?: number
    children?: React.ReactNode
-     sx: AvatarProps["sx"]
+   sx?: AvatarProps["sx"]
 }
 
 const CircularLogo: FC<Props> = ({
@@ -35,13 +35,16 @@ const CircularLogo: FC<Props> = ({
    objectFit = "contain",
    quality = 70,
    children,
-     sx,
+   sx,
 }) => {
    const adjustedSize = size - 8 // 8 is the padding
    const styles = getStyles(adjustedSize)
 
    return (
-      <Avatar variant="circular" sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}>
+      <Avatar
+         variant="circular"
+         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+      >
          <Box borderRadius={borderRadius}>
             <Image
                src={src}

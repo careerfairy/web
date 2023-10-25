@@ -1,4 +1,4 @@
-import { Box, Link, SxProps, alpha } from "@mui/material"
+import { Box, type BoxProps, Link, alpha } from "@mui/material"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -24,7 +24,7 @@ const styles = sxStyles({
 type Props = {
    icon: React.ReactNode
    href: string
-   sx?: SxProps
+   sx?: BoxProps["sx"]
 }
 
 const HoverOverlay: FC<Props> = ({ icon, href, sx }) => {
