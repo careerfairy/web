@@ -66,10 +66,28 @@ const CustomJobApplyConfirmation = ({
       goToView("livestream-details")
    }, [goToView, handleApply])
 
-   if (alreadyApplied) {
-      handleClose()
-   }
+   return alreadyApplied ? null : (
+      <Component
+         job={job}
+         handleClose={handleClose}
+         handleClick={handleClick}
+         isApplying={isApplying}
+      />
+   )
+}
 
+type ComponentProps = {
+   job: PublicCustomJob
+   handleClose: () => void
+   handleClick: () => void
+   isApplying: boolean
+}
+const Component = ({
+   job,
+   handleClose,
+   handleClick,
+   isApplying,
+}: ComponentProps) => {
    return (
       <Box sx={styles.confirmationWrapper}>
          <Box sx={styles.info}>
@@ -111,5 +129,4 @@ const CustomJobApplyConfirmation = ({
       </Box>
    )
 }
-
 export default CustomJobApplyConfirmation
