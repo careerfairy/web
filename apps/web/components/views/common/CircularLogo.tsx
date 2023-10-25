@@ -24,6 +24,7 @@ type Props = {
    objectFit?: ImageProps["objectFit"]
    quality?: number
    children?: React.ReactNode
+     sx: AvatarProps["sx"]
 }
 
 const CircularLogo: FC<Props> = ({
