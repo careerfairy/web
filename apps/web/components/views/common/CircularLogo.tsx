@@ -3,15 +3,18 @@ import { Avatar, type AvatarProps, Box } from "@mui/material"
 import Image, { ImageProps } from "next/image"
 import { sxStyles } from "types/commonTypes"
 
-const styles = sxStyles({
-   root: {
-      backgroundColor: "white",
-      border: "solid 2px #F6F6FA",
-      "& > *": {
-         display: "flex",
+const getStyles = (size: number) =>
+   sxStyles({
+      root: {
+         width: size,
+         height: size,
+         backgroundColor: "white",
+         border: "solid 2px #F6F6FA",
+         "& > *": {
+            display: "flex",
+         },
       },
-   },
-})
+   })
 
 type Props = {
    src: string
@@ -38,6 +41,8 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
       },
       ref
    ) => {
+      const styles = getStyles(size)
+
       return (
          <Avatar
             variant="circular"
