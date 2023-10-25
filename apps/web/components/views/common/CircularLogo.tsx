@@ -1,20 +1,17 @@
-import { FC } from "react"
+import React from "react"
 import { Avatar, type AvatarProps, Box } from "@mui/material"
 import Image, { ImageProps } from "next/image"
 import { sxStyles } from "types/commonTypes"
 
-const getStyles = (size: number) =>
-   sxStyles({
-      root: {
-         width: size,
-         height: size,
-         backgroundColor: "white",
-         border: "solid 2px #F6F6FA",
-         "& > *": {
-            display: "flex",
-         },
+const styles = sxStyles({
+   root: {
+      backgroundColor: "white",
+      border: "solid 2px #F6F6FA",
+      "& > *": {
+         display: "flex",
       },
-   })
+   },
+})
 
 type Props = {
    src: string
@@ -27,37 +24,42 @@ type Props = {
    sx?: AvatarProps["sx"]
 }
 
-const CircularLogo: FC<Props> = ({
-   src,
-   alt,
-   size = 50,
-   borderRadius = 50,
-   objectFit = "contain",
-   quality = 70,
-   children,
-   sx,
-}) => {
-   const adjustedSize = size - 8 // 8 is the padding
-   const styles = getStyles(adjustedSize)
+const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
+   (
+      {
+         src,
+         alt,
+         size = 50,
+         borderRadius = 50,
+         objectFit = "contain",
+         quality = 70,
+         children,
+         sx,
+      },
+      ref
+   ) => {
+      return (
+         <Avatar
+            variant="circular"
+            sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+            ref={ref}
+         >
+            <Box borderRadius={borderRadius}>
+               <Image
+                  src={src}
+                  width={size}
+                  height={size}
+                  objectFit={objectFit}
+                  alt={alt}
+                  quality={quality}
+               />
+            </Box>
+            {children}
+         </Avatar>
+      )
+   }
+)
 
-   return (
-      <Avatar
-         variant="circular"
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
-      >
-         <Box borderRadius={borderRadius}>
-            <Image
-               src={src}
-               width={adjustedSize}
-               height={adjustedSize}
-               objectFit={objectFit}
-               alt={alt}
-               quality={quality}
-            />
-         </Box>
-         {children}
-      </Avatar>
-   )
-}
+CircularLogo.displayName = "CircularLogo"
 
 export default CircularLogo
