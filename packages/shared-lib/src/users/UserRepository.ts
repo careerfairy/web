@@ -24,6 +24,7 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
 import { PublicCustomJob } from "../groups/customJobs"
 import { Timestamp } from "../firebaseTypes"
+import { PublicUserNotification, UserNotification } from "./userNotifications"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -181,6 +182,22 @@ export interface IUserRepository {
       userEmail: string,
       jobId: string
    ): Promise<UserCustomJobApplicationDocument>
+
+   /**
+    * Adds a new user notification on the userNotifications sub collection from the User document
+    * @param userEmail
+    * @param notification
+    */
+   createUserNotification(
+      userEmail: string,
+      notification: PublicUserNotification
+   ): Promise<UserNotification>
+
+   /**
+    * Deletes all the user notifications
+    * @param userEmail
+    */
+   deleteAllUserNotifications(userEmail: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -802,6 +819,44 @@ export class FirebaseUserRepository
          return this.addIdToDoc<UserCustomJobApplicationDocument>(snap)
       }
       return null
+   }
+
+   async createUserNotification(
+      userEmail: string,
+      notification: PublicUserNotification
+   ): Promise<UserNotification> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userNotifications")
+         .doc()
+
+      const newNotification: UserNotification = {
+         documentType: "userNotification",
+         ...notification,
+         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
+         id: ref.id,
+      }
+
+      await ref.set(newNotification, { merge: true })
+
+      return newNotification
+   }
+
+   async deleteAllUserNotifications(userEmail: string): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const snaps = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userNotifications")
+         .get()
+
+      snaps.forEach((snap) => {
+         batch.delete(snap.ref)
+      })
+
+      return batch.commit()
    }
 }
 
