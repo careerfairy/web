@@ -21,7 +21,7 @@ import {
 } from "../../common/NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../common/chips/TagChip"
 import LanguageIcon from "@mui/icons-material/Language"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import JobApply from "./JobApply"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"

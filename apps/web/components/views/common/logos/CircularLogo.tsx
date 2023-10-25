@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { Avatar, type AvatarProps, Box } from "@mui/material"
-import Image, { ImageProps } from "next/image"
+import Image, { ImageProps } from "next/legacy/image"
 import { sxStyles } from "types/commonTypes"
 
 const getStyles = (size: number) =>

@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import {
    getMaxLineStyles,
    getResizedUrl,

@@ -1,7 +1,7 @@
 import React from "react"
 import Box from "@mui/material/Box"
 import { Theme } from "@mui/material/styles"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
 import LockClockIcon from "@mui/icons-material/LockClock"
