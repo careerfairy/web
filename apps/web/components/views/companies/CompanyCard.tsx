@@ -131,7 +131,6 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   src={company.logoUrl}
                   alt={company.universityName}
                   size={LOGO_SIZE}
-                  objectFit="contain"
                />
             </Box>
             <Box sx={styles.followButtonWrapper}>

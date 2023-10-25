@@ -55,7 +55,6 @@ const EditGroupCard = () => {
             src={group?.logoUrl}
             alt={`logo of company ${companyName}`}
             size={80}
-            objectFit="contain"
          >
             <HoverOverlay
                href={`/group/${group.id}/admin/edit`}
