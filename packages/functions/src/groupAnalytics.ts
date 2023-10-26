@@ -45,7 +45,7 @@ export const getRegistrationSources = functions
          userShouldBeGroupAdmin(),
          cache((data) => registrationSourcesCacheKey({ ...data })),
          async (data) => {
-            const type: typeof FETCH_TYPES[number] = data.fetchType
+            const type: (typeof FETCH_TYPES)[number] = data.fetchType
 
             let userLivestreamData: UserLivestreamData[] = []
             switch (type) {
