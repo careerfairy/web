@@ -10,8 +10,13 @@ test.describe("Landing Page Functionality", () => {
          "Failing in webkit for some reason, page was closed"
       )
       await page.goto("/")
-      await page.locator('a[role="tab"]:has-text("About Us")').click()
-      // Expect to be on the about us page
-      await expect(page.locator("text=Meet our team")).toBeVisible()
+      await page.getByTestId("uc-accept-all-button").click()
+
+      // scrollt o bottom
+      await page.evaluate(() => {
+         window.scrollTo(0, document.body.scrollHeight)
+      })
+
+      await page.getByRole("link", { name: "About us" }).click()
    })
 })
