@@ -17,7 +17,6 @@ import {
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
 import Image from "next/image"
-import Avatar from "@mui/material/Avatar"
 import { useRouter } from "next/router"
 import { checkIfPast } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
@@ -199,14 +198,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       {
          event,
          loading,
-         light,
          interests,
          animation,
          isRecommended,
          totalElements,
          index,
          location = ImpressionLocation.unknown,
-         isEmbedded = false,
          bottomElement,
          hideChipLabels,
          disableClick,
@@ -671,10 +668,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    }
 )
 
-interface EventPreviewCardProps {
+type EventPreviewCardProps = {
    event?: LivestreamEvent
    loading?: boolean
-   light?: boolean
    interests?: Interest[]
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
@@ -685,7 +681,6 @@ interface EventPreviewCardProps {
    totalElements?: number
    location?: ImpressionLocation
    ref?: React.Ref<HTMLDivElement>
-   isEmbedded?: boolean
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean
