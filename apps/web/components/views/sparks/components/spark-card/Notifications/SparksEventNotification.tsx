@@ -12,8 +12,7 @@ import {
    removeCurrentEventNotifications,
    showEventDetailsDialog,
 } from "../../../../../../store/reducers/sparksFeedReducer"
-import { Avatar, Box, Button, Slide, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import { Box, Button, Slide, Typography } from "@mui/material"
 import { companyLogoPlaceholder } from "../../../../../../constants/images"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import CircularLogo from "components/views/common/CircularLogo"
