@@ -23,8 +23,8 @@ const StayUpToDateBanner = () => {
             <Grid item xs={3}>
                <Image
                   src="/illustrations/undraw_video_streaming.png"
-                  width="100px"
-                  height="90px"
+                  width="100"
+                  height="90"
                   alt="Stay up to date illustration"
                   objectFit={"contain"}
                />
