@@ -3,11 +3,17 @@ import { useEffect } from "react"
 
 type NavigationMode = "upDown" | "leftRight"
 
+type Options = {
+   disabled?: boolean
+   mode?: NavigationMode
+}
+
 /**
  * Custom React hook for adding keyboard navigation to an Embla Carousel.
  *
  * @param {EmblaCarouselType} emblaApi - The Embla API object.
  * @param {NavigationMode} mode - The navigation mode, either "upDown" or "leftRight".
+ * @param {boolean} disabled - Whether the keyboard navigation should be disabled.
  *
  * @example
  * const emblaApi = useEmblaCarousel(options);
@@ -17,8 +23,11 @@ type NavigationMode = "upDown" | "leftRight"
  */
 const useKeyboardNavigation = (
    emblaApi: EmblaCarouselType,
-   mode: NavigationMode
+   options?: Options
 ) => {
+   const mode = options?.mode || "upDown"
+   const disabled = options?.disabled || false
+
    useEffect(() => {
       /**
        * Event handler for keyboard events. Scrolls the Embla carousel
@@ -27,7 +36,7 @@ const useKeyboardNavigation = (
        * @param {KeyboardEvent} event - The keyboard event object.
        */
       const handleKeyDown = (event: KeyboardEvent) => {
-         if (!emblaApi) return
+         if (!emblaApi || disabled) return
 
          switch (mode) {
             case "upDown":
@@ -55,7 +64,7 @@ const useKeyboardNavigation = (
       return () => {
          window.removeEventListener("keydown", handleKeyDown)
       }
-   }, [emblaApi, mode])
+   }, [disabled, emblaApi, mode])
 
    return
 }
