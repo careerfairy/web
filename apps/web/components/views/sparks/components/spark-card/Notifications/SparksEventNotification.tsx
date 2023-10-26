@@ -108,7 +108,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    )
 
    return (
-      <Slide direction={"down"} in={true}>
+      <Slide direction={"down"} in={showNotification}>
          <Box sx={styles.root}>
             <Box sx={styles.notification}>
                <CircularLogo
