@@ -111,9 +111,6 @@ const styles = sxStyles({
       background: "#EBEBEF",
    },
    bellIcon: {
-      width: "100px",
-      height: "100px",
-
       "& svg": {
          color: "#9999B1",
       },
@@ -143,6 +140,7 @@ const NotificationsMenu = ({
          transformOrigin={transformOrigin}
          anchorOrigin={anchorOrigin}
          disableScrollLock={false}
+         marginThreshold={0}
          sx={[styles.menuWrapper, isMobile ? styles.menuWrapperMobile : null]}
       >
          <Box sx={styles.menu}>
@@ -225,7 +223,7 @@ const NotificationsMenu = ({
                ) : (
                   <Stack spacing={2} sx={styles.noNotificationWrapper}>
                      <Box sx={styles.bellIcon}>
-                        <Bell size={"inherit"} />
+                        <Bell size={100} />
                      </Box>
 
                      <Typography variant={"h5"} fontWeight={"bold"}>
