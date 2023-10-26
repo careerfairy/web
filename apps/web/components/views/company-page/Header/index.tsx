@@ -306,6 +306,7 @@ const Header = () => {
                         >
                            <Slide
                               unmountOnExit
+                              exit={false}
                               direction={"down"}
                               in={isSticky}
                            >
