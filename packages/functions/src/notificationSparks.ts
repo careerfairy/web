@@ -48,7 +48,8 @@ export const createUserSparksFeedEventNotifications = functions
       } catch (error) {
          logAndThrow(
             "Error during the creation of a single User Sparks Feed event notifications",
-            error
+            error,
+            userId
          )
       }
    })
@@ -79,7 +80,8 @@ export const removeAndSyncUserSparkNotification = functions
                logAndThrow(
                   "Error during removing a single spark notification from a user",
                   error,
-                  context
+                  context,
+                  data
                )
             }
          }
@@ -154,24 +156,26 @@ const createSparkNotificationForSingleUser = ({
    )
 
    filteredUpcomingEvents.forEach((event) => {
-      const {
-         author: { groupId },
-         id: eventId,
-      } = event
+      // Check if groupIds array exists and is not empty
+      if (event.groupIds && event.groupIds.length > 0) {
+         const eventId = event.id
 
-      // to check if a notification was already created for this group
-      // could happen in case of multiple events from a single group
-      // we want to get the first event only
-      const groupAlreadyHasNotification = notifications.some(
-         (notification) => notification.groupId === groupId
-      )
+         event.groupIds.forEach((groupId) => {
+            // to check if a notification was already created for this group
+            // could happen in case of multiple events from a single group
+            // we want to get the first event only
+            const groupAlreadyHasNotification = notifications.some(
+               (notification) => notification.groupId === groupId
+            )
 
-      if (!groupAlreadyHasNotification) {
-         notifications.push({
-            id: groupId,
-            eventId: eventId,
-            groupId: groupId,
-            startDate: event.start.toDate(),
+            if (!groupAlreadyHasNotification) {
+               notifications.push({
+                  id: groupId,
+                  eventId: eventId,
+                  groupId: groupId,
+                  startDate: event.start.toDate(),
+               })
+            }
          })
       }
    })
