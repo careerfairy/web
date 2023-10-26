@@ -38,6 +38,10 @@ const Component = ({ userEmail }: ComponentProps) => {
       await userRepo.deleteAllUserNotifications(userEmail)
    }, [userEmail])
 
+   const handleNotificationClick = useCallback(() => {
+      handleClose()
+   }, [handleClose])
+
    return (
       <>
          <UserNotificationsButton
@@ -49,6 +53,7 @@ const Component = ({ userEmail }: ComponentProps) => {
             anchorEl={anchorEl}
             notifications={notifications}
             handleClose={handleClose}
+            handleClick={handleNotificationClick}
             handleDeleteNotifications={handleDeleteNotifications}
          />
       </>

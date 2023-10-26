@@ -3,7 +3,7 @@ import { UserNotification } from "@careerfairy/shared-lib/users/userNotification
 import { sxStyles } from "../../../../types/commonTypes"
 import { Trash2 as DeleteIcon } from "react-feather"
 import IconButton from "@mui/material/IconButton"
-import React from "react"
+import React, { useCallback } from "react"
 import Image from "next/image"
 import CircleIcon from "@mui/icons-material/Circle"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
@@ -122,14 +122,23 @@ type Props = {
    handleClose: () => void
    notifications: UserNotification[]
    handleDeleteNotifications: () => void
+   handleClick: (notification: PublicUserNotification) => void
 }
 const NotificationsMenu = ({
    anchorEl,
    handleClose,
+   handleClick,
    notifications,
    handleDeleteNotifications,
 }: Props) => {
    const isMobile = useIsMobile()
+
+   const handleNotificationClick = useCallback(
+      (notification: PublicUserNotification) => {
+         handleClick(notification)
+      },
+      [handleClick]
+   )
 
    return (
       <Menu
@@ -173,10 +182,7 @@ const NotificationsMenu = ({
                            styles.item,
                            Boolean(notification.readAt) && styles.readItem,
                         ]}
-                        onClick={() => {
-                           alert(`Redirect to ${notification.actionUrl}`)
-                           handleClose()
-                        }}
+                        onClick={() => handleNotificationClick(notification)}
                      >
                         <Grid container sx={styles.itemContent}>
                            <Grid xs={1} md={0.5} item>
