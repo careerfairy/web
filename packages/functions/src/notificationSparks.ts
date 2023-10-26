@@ -186,10 +186,6 @@ const createSparkNotificationForSingleUser = ({
          .join(", ")}`
    )
 
-   console.log(
-      "🚀 ~ file: notificationSparks.ts:200 ~ notifications.forEach ~ notifications:",
-      notifications
-   )
    notifications.forEach((notification) => {
       const userSparksNotificationsRef = firestore
          .collection("userData")
