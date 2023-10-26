@@ -151,7 +151,6 @@ const SparksFeedCarousel: FC = () => {
 
    const options = useMemo<EmblaOptionsType>(
       () => ({
-         active: !eventDetailsDialogVisibility,
          axis: "y",
          loop: false,
          align: "center",
@@ -192,7 +191,7 @@ const SparksFeedCarousel: FC = () => {
             reloadEmbla()
          },
       }),
-      [eventDetailsDialogVisibility, noSparks]
+      [noSparks]
    )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
