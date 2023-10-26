@@ -200,8 +200,13 @@ const SparksFeedCarousel: FC = () => {
    /**
     * Custom plugin hooks for Embla Carousel
     */
-   useKeyboardNavigation(emblaApi, "upDown")
-   useVerticalMouseScrollNavigation(emblaApi)
+   useKeyboardNavigation(emblaApi, {
+      disabled: eventDetailsDialogVisibility,
+      mode: "upDown",
+   })
+   useVerticalMouseScrollNavigation(emblaApi, {
+      disabled: eventDetailsDialogVisibility,
+   })
 
    /**
     * When the current playing spark changes,
