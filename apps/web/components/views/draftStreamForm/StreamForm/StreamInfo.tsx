@@ -194,7 +194,7 @@ const StreamInfo = ({
                      variant="outlined"
                      fullWidth
                      id="title"
-                     label="Livestream Title"
+                     label="Live Stream Title"
                      inputProps={{ maxLength: 104 }}
                      onBlur={handleBlur}
                      value={values.title}
@@ -481,7 +481,7 @@ const StreamInfo = ({
                            <Typography>
                               By disabling questions the participants will no
                               longer be able to use the Q&A section during the
-                              livestream and create questions during the
+                              live stream and create questions during the
                               registration process.
                            </Typography>
                         }

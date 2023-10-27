@@ -157,7 +157,7 @@ const Jobs = () => {
 
             <Grid item xs={12}>
                <Typography>
-                  During a Livestream event you can apply to job openings and
+                  During a Live Stream event you can apply to job openings and
                   they will appear here.
                </Typography>
             </Grid>
