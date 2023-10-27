@@ -1,10 +1,14 @@
 import { EmblaCarouselType } from "embla-carousel-react"
 import { useEffect } from "react"
 
+type Options = {
+   disabled?: boolean
+}
 /**
  * Custom React hook for adding vertical mouse scroll navigation to an Embla Carousel.
  *
  * @param {EmblaCarouselType} emblaApi - The Embla API object.
+ * @param {boolean} disabled - Whether the vertical mouse scroll navigation should be disabled.
  *
  * @example
  * const emblaApi = useEmblaCarousel(options);
@@ -12,8 +16,14 @@ import { useEffect } from "react"
  *
  * @returns {void} Returns void as it doesn't provide any value to consume.
  */
-const useVerticalMouseScrollNavigation = (emblaApi: EmblaCarouselType) => {
+const useVerticalMouseScrollNavigation = (
+   emblaApi: EmblaCarouselType,
+   options?: Options
+) => {
+   const disabled = options?.disabled || false
+
    useEffect(() => {
+      if (disabled) return
       /**
        * Event handler for mouse wheel events. Scrolls the Embla carousel
        * to the next or previous slide based on the vertical scroll direction.
@@ -38,7 +48,7 @@ const useVerticalMouseScrollNavigation = (emblaApi: EmblaCarouselType) => {
       return () => {
          window.removeEventListener("wheel", throttledHandleWheel)
       }
-   }, [emblaApi])
+   }, [disabled, emblaApi])
 
    return
 }
