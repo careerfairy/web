@@ -244,8 +244,8 @@ export const onWriteSpark = functions
             (!beforeData.published && afterData.published) ||
             (!beforeData.group.publicSparks && afterData.group.publicSparks)
          ) {
-            // only creates notification if the publicSparks flag on the Group document or the published flag on the Sparks
-            // are changed from disable to active
+            // This notification will be triggered only when either the 'publicSparks' flag on the Group document
+            // or the 'published' flag on the Sparks is changed from disable to active
             sideEffectPromises.push(
                sparkRepo.createSparkUserNotification(afterData)
             )
