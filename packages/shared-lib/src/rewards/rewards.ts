@@ -72,18 +72,18 @@ export const REWARDS: Record<RewardAction, Reward> = {
    LIVESTREAM_USER_ATTENDED: {
       name: "LIVESTREAM_USER_ATTENDED",
       credits: 0,
-      humanStringDescription: "You attended a livestream event",
+      humanStringDescription: "You attended a live stream event",
    },
    LIVESTREAM_USER_ASKED_QUESTION: {
       name: "LIVESTREAM_USER_ASKED_QUESTION",
       credits: 0,
-      humanStringDescription: "You asked a question during a livestream event",
+      humanStringDescription: "You asked a question during a live stream event",
    },
    LIVESTREAM_USER_HAND_RAISED: {
       name: "LIVESTREAM_USER_HAND_RAISED",
       credits: 0,
       humanStringDescription:
-         "You have raised your hand during a livestream event",
+         "You have raised your hand during a live stream event",
    },
    LIVESTREAM_INVITE_COMPLETE_FOLLOWER: {
       name: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",

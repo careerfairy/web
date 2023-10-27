@@ -352,8 +352,8 @@ const SuperAdminControls = () => {
             onConfirm={toggleStreamStarted}
             confirmDescription={
                currentLivestream?.hasStarted
-                  ? "Are you sure that you want to end your livestream now?"
-                  : "Are you sure that you want to start your livestream now?"
+                  ? "Are you sure that you want to end your live stream now?"
+                  : "Are you sure that you want to start your live stream now?"
             }
          />
       </>
