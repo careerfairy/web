@@ -3,36 +3,66 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { MouseEvent, useMemo } from "react"
 import { Bell } from "react-feather"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
+import { useGenericDashboard } from "../../index"
 
-const styles = sxStyles({
-   notificationBtn: {
-      background: "unset",
+const useStyles = () => {
+   const { headerScrollThreshold, isPortalPage } = useGenericDashboard()
 
-      "&:hover": {
-         background: "unset",
-      },
-      "& svg": {
-         color: "#4F4F4F",
-      },
-   },
-   badge: {
-      "& .MuiBadge-dot": {
-         minWidth: 12,
-         height: 12,
-         borderRadius: "50%",
-      },
-   },
-})
+   const isOutsideBanner = useScrollTrigger({
+      disableHysteresis: true,
+      threshold: headerScrollThreshold,
+   })
 
+   const isOnPortalBanner = !isOutsideBanner && isPortalPage
+
+   return useMemo(
+      () =>
+         sxStyles({
+            notificationBtn: {
+               background: "unset",
+
+               "&:hover": {
+                  background: "unset",
+               },
+               "& svg": {
+                  color: isOnPortalBanner ? "white" : "#4F4F4F",
+               },
+            },
+            notificationBtnFilled: {
+               "& svg": {
+                  fill: isOnPortalBanner ? "white" : "#4F4F4F",
+               },
+            },
+            badge: {
+               "& .MuiBadge-dot": {
+                  minWidth: 12,
+                  height: 12,
+                  borderRadius: "50%",
+               },
+            },
+         }),
+      [isOnPortalBanner]
+   )
+}
 type Props = {
    notifications: UserNotification[]
    handleClick: (event: MouseEvent<HTMLElement>) => void
+   anchorEl: HTMLElement
 }
-const UserNotificationsButton = ({ notifications, handleClick }: Props) => {
+const UserNotificationsButton = ({
+   notifications,
+   handleClick,
+   anchorEl,
+}: Props) => {
+   const styles = useStyles()
+
    const unReadNotifications = useMemo(
-      () => notifications.filter((notification) => !Boolean(notification.readAt)),
+      () =>
+         notifications.filter((notification) => !Boolean(notification.readAt)),
       [notifications]
    )
+
    return (
       <Badge
          sx={styles.badge}
@@ -43,7 +73,10 @@ const UserNotificationsButton = ({ notifications, handleClick }: Props) => {
       >
          <Fab
             onClick={handleClick}
-            sx={styles.notificationBtn}
+            sx={[
+               styles.notificationBtn,
+               Boolean(anchorEl) ? styles.notificationBtnFilled : null,
+            ]}
             size="small"
             aria-label="user-notifications"
          >

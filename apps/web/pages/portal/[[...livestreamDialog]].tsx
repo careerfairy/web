@@ -83,6 +83,7 @@ const PortalPage = ({
             pageDisplayName={""}
             topBarFixed={carouselContent?.length > 0}
             headerScrollThreshold={carouselContent?.length ? 250 : 10}
+            isPortalPage={true}
          >
             <>
                <LivestreamDialogLayout

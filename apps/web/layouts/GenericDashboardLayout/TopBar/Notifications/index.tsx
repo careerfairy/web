@@ -51,6 +51,7 @@ const Component = ({ userEmail }: ComponentProps) => {
          <UserNotificationsButton
             notifications={notifications}
             handleClick={handleClick}
+            anchorEl={anchorEl}
          />
 
          <NotificationsMenu
