@@ -1,4 +1,4 @@
-import { collection } from "firebase/firestore"
+import { collection, orderBy, query } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
@@ -10,11 +10,9 @@ import { UserNotification } from "@careerfairy/shared-lib/users/userNotification
  * @param userId
  */
 const useUserNotifications = (userId: string) => {
-   const collectionRef = collection(
-      useFirestore(),
-      "userData",
-      userId,
-      "userNotifications"
+   const collectionRef = query(
+      collection(useFirestore(), "userData", userId, "userNotifications"),
+      orderBy("createdAt", "desc")
    )
 
    const { data } = useFirestoreCollection<UserNotification>(collectionRef)
