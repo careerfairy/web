@@ -834,7 +834,7 @@ export class SparkFunctionsRepository
          return
       }
 
-      const batch = this.firestore.batch()
+      const bulkWriter = this.firestore.bulkWriter()
 
       const followers = await userRepo.getGroupFollowers(group.id)
 
@@ -852,18 +852,19 @@ export class SparkFunctionsRepository
          const newNotification: UserNotification = {
             documentType: "userNotification",
             actionUrl: `/sparks/${spark.id}`,
-            companyName: group.universityName,
+            companyId: group.id,
+            sparkId: spark.id,
+            imageFormat: "circular",
             imageUrl: group.logoUrl,
-            isRead: false,
-            message: `${group.universityName} has recently published a new Spark. Watch it now!`,
+            message: `<strong>${group.universityName}</strong> has recently published a new Spark. Watch it now!`,
             createdAt: Timestamp.now(),
             id: ref.id,
          }
 
-         batch.set(ref, newNotification, { merge: true })
+         bulkWriter.set(ref, newNotification, { merge: true })
       })
 
-      return void batch.commit()
+      return void bulkWriter.close()
    }
 }
 
