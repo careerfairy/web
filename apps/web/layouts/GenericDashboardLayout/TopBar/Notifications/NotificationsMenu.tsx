@@ -139,7 +139,7 @@ const NotificationsMenu = ({
          onClose={handleClose}
          transformOrigin={transformOrigin}
          anchorOrigin={anchorOrigin}
-         disableScrollLock={false}
+         disableScrollLock={!isMobile}
          marginThreshold={0}
          sx={[styles.menuWrapper, isMobile ? styles.menuWrapperMobile : null]}
       >
