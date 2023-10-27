@@ -847,7 +847,7 @@ export class FirebaseUserRepository
          .doc(notificationId)
 
       return ref.update({
-         createAt: this.fieldValue.serverTimestamp() as Timestamp,
+         readAt: this.fieldValue.serverTimestamp() as Timestamp,
       })
    }
 }
