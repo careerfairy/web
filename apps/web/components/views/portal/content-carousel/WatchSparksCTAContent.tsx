@@ -62,7 +62,11 @@ const WatchSparksCTAContent: FC<Props> = () => {
          <Content
             ref={ref}
             headerTitle={
-               <ContentHeaderTitle maxWidth={"60% !important"} color="black">
+               <ContentHeaderTitle
+                  component="span"
+                  maxWidth={"60% !important"}
+                  color="black"
+               >
                   {"Discover "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
