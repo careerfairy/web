@@ -8,7 +8,7 @@ import Stack from "@mui/material/Stack"
 // project imports
 import BottomLinks from "../common/BottomLinks"
 import { useGroup } from "./index"
-import EditGroupLogo from "./EditGroupLogo"
+import EditGroupCard from "./EditGroupCard"
 import GroupNavList from "./GroupNavList"
 import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -34,7 +34,7 @@ const NavBar = () => {
    return (
       <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
          <ShrunkToggleButton />
-         <EditGroupLogo />
+         <EditGroupCard />
          <GroupNavList />
          <Box flexGrow={1} />
          <BottomLinks />

@@ -17,7 +17,6 @@ import {
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
 import Image from "next/image"
-import Avatar from "@mui/material/Avatar"
 import { useRouter } from "next/router"
 import { checkIfPast } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
@@ -46,8 +45,10 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
+import CircularLogo from "../CircularLogo"
 
 const bottomContentHeight = 50
+const cardAvatarSize = 65
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -149,12 +150,10 @@ const styles = sxStyles({
    },
    companyAvatar: {
       padding: 1,
+      border: "solid 2px white",
       backgroundColor: "white",
-      boxShadow: 3,
-      border: "none !important",
-      width: 110,
-      height: 60,
-      borderRadius: 3,
+      width: cardAvatarSize,
+      height: cardAvatarSize,
    },
    calendarDate: {
       display: "flex",
@@ -162,7 +161,7 @@ const styles = sxStyles({
       textAlign: "center",
       justifyContent: "center",
       backgroundColor: "white",
-      boxShadow: 3,
+      boxShadow: "0px 10px 15px -10px rgba(0,0,0,0.1)",
       border: "none !important",
       width: 58,
       height: 60,
@@ -199,14 +198,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       {
          event,
          loading,
-         light,
          interests,
          animation,
          isRecommended,
          totalElements,
          index,
          location = ImpressionLocation.unknown,
-         isEmbedded = false,
          bottomElement,
          hideChipLabels,
          disableClick,
@@ -452,6 +449,22 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            className="hideOnHoverContent"
                            sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
                         >
+                           <Box sx={{ display: "flex" }}>
+                              {loading ? (
+                                 <Skeleton
+                                    animation={animation ?? "wave"}
+                                    variant="circular"
+                                    width={cardAvatarSize}
+                                    height={cardAvatarSize}
+                                 />
+                              ) : (
+                                 <CircularLogo
+                                    src={event?.companyLogoUrl}
+                                    alt={`logo of company ${event?.company}`}
+                                    size={cardAvatarSize}
+                                 />
+                              )}
+                           </Box>
                            {isPlaceholderEvent || isPast ? null : (
                               <Box sx={{ display: "flex" }}>
                                  {loading ? (
@@ -466,7 +479,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     <Box sx={styles.calendarDate}>
                                        <Typography
                                           variant={"h5"}
-                                          color={"secondary"}
+                                          color={"#2ABAA5"}
                                           fontWeight={600}
                                        >
                                           {getStartDay}
@@ -482,37 +495,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                  )}
                               </Box>
                            )}
-
-                           <Box sx={{ display: "flex" }}>
-                              {loading ? (
-                                 <Skeleton
-                                    animation={animation ?? "wave"}
-                                    variant="rectangular"
-                                    sx={{ borderRadius: 3 }}
-                                    width={110}
-                                    height={60}
-                                 />
-                              ) : (
-                                 <Avatar
-                                    title={`${event?.company}`}
-                                    variant="rounded"
-                                    sx={styles.companyAvatar}
-                                 >
-                                    <Box sx={styles.nextImageWrapper}>
-                                       <Image
-                                          src={getResizedUrl(
-                                             event?.companyLogoUrl,
-                                             "lg"
-                                          )}
-                                          layout="fill"
-                                          objectFit="contain"
-                                          quality={100}
-                                          alt={`logo of company ${event.company}`}
-                                       />
-                                    </Box>
-                                 </Avatar>
-                              )}
-                           </Box>
                         </Box>
                         <Box
                            className="contentWrapper"
@@ -686,10 +668,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    }
 )
 
-interface EventPreviewCardProps {
+type EventPreviewCardProps = {
    event?: LivestreamEvent
    loading?: boolean
-   light?: boolean
    interests?: Interest[]
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
@@ -700,7 +681,6 @@ interface EventPreviewCardProps {
    totalElements?: number
    location?: ImpressionLocation
    ref?: React.Ref<HTMLDivElement>
-   isEmbedded?: boolean
    bottomElement?: React.ReactNode
    // If true, the chip labels will be hidden
    hideChipLabels?: boolean

@@ -189,7 +189,6 @@ const EventsPreview = ({
                                    key={event.id}
                                    event={event}
                                    isRecommended={isRecommended}
-                                   isEmbedded={isEmbedded}
                                 />
                              </Box>
                           ))}
