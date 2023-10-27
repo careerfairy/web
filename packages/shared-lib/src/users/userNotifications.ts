@@ -6,32 +6,12 @@ export interface UserNotification extends Identifiable {
 
    createdAt: firebase.firestore.Timestamp
    message: string
-   isRead: boolean
    actionUrl: string
 
-   companyName?: string
+   readAt?: firebase.firestore.Timestamp
+   companyId?: string
+   livestreamId?: string
+   sparkId?: string
    imageUrl?: string
+   imageFormat?: "circular" | "contain"
 }
-
-export type PublicUserNotification = Pick<
-   UserNotification,
-   | "id"
-   | "createdAt"
-   | "message"
-   | "isRead"
-   | "imageUrl"
-   | "actionUrl"
-   | "companyName"
->
-
-export const pickPublicDataFromUserNotification = (
-   notification: UserNotification
-): PublicUserNotification => ({
-   id: notification.id,
-   createdAt: notification.createdAt ?? null,
-   message: notification.message ?? null,
-   isRead: notification.isRead ?? null,
-   imageUrl: notification.imageUrl ?? null,
-   actionUrl: notification.actionUrl ?? null,
-   companyName: notification.companyName ?? null,
-})

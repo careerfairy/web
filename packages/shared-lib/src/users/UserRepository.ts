@@ -24,7 +24,7 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
 import { PublicCustomJob } from "../groups/customJobs"
 import { Timestamp } from "../firebaseTypes"
-import { PublicUserNotification, UserNotification } from "./userNotifications"
+import { UserNotification } from "./userNotifications"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -190,7 +190,7 @@ export interface IUserRepository {
     */
    createUserNotification(
       userEmail: string,
-      notification: PublicUserNotification
+      notification: UserNotification
    ): Promise<UserNotification>
 
    /**
@@ -823,7 +823,7 @@ export class FirebaseUserRepository
 
    async createUserNotification(
       userEmail: string,
-      notification: PublicUserNotification
+      notification: UserNotification
    ): Promise<UserNotification> {
       const ref = this.firestore
          .collection("userData")

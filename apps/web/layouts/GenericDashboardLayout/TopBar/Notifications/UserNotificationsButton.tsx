@@ -1,6 +1,6 @@
 import { Badge, Fab } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
-import { PublicUserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { MouseEvent } from "react"
 import { Bell } from "react-feather"
 
@@ -25,7 +25,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   notifications: PublicUserNotification[]
+   notifications: UserNotification[]
    handleClick: (event: MouseEvent<HTMLElement>) => void
 }
 const UserNotificationsButton = ({ notifications, handleClick }: Props) => {
