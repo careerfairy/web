@@ -9,6 +9,7 @@ import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { Bell } from "react-feather"
 import DateUtil from "../../../../util/DateUtil"
+import CircularLogo from "../../../../components/views/common/CircularLogo"
 
 const styles = sxStyles({
    menuWrapper: {
@@ -205,13 +206,21 @@ const NotificationsMenu = ({
                            {notification.imageUrl ? (
                               <Grid xs={3} item>
                                  <Box sx={styles.imageBox}>
-                                    <Image
-                                       src={notification.imageUrl}
-                                       height={91}
-                                       alt={`Image to notification ${notification.id}`}
-                                       objectFit="contain"
-                                       width={51}
-                                    />
+                                    {notification.imageFormat === "circular" ? (
+                                       <CircularLogo
+                                          src={notification.imageUrl}
+                                          alt={`logo of notification, ${notification.message}`}
+                                          size={70}
+                                       />
+                                    ) : (
+                                       <Image
+                                          src={notification.imageUrl}
+                                          height={45}
+                                          alt={`Image to notification ${notification.id}`}
+                                          objectFit="contain"
+                                          width={78}
+                                       />
+                                    )}
                                  </Box>
                               </Grid>
                            ) : null}
