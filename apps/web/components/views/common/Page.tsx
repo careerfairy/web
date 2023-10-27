@@ -44,6 +44,7 @@ const Page: FC<Props> = ({ sx, backgroundColor, viewRef, ...props }) => {
 
 export const PageContentWrapper: FC<{
    sx?: SxProps<DefaultTheme>
+   children: React.ReactNode
 }> = ({ children, sx }) => {
    return (
       <Box sx={[styles.contentWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
@@ -55,6 +56,7 @@ export const PageContentWrapper: FC<{
 interface PageChildrenProps {
    sx?: SxProps<DefaultTheme>
    padding?: boolean
+   children: React.ReactNode
 }
 export const PageChildrenWrapper: FC<PageChildrenProps> = ({
    children,

@@ -68,6 +68,7 @@ const CompanyMetadata = ({
                in={Boolean(errors.companyCountry && touched.companyCountry)}
                style={{ color: "red" }}
             >
+               {/* @ts-ignore */}
                {errors.companyCountry}
             </Collapse>
          </Box>
@@ -97,6 +98,7 @@ const CompanyMetadata = ({
                )}
                style={{ color: "red" }}
             >
+               {/* @ts-ignore */}
                {errors.companyIndustries}
             </Collapse>
          </Box>
@@ -117,6 +119,7 @@ const CompanyMetadata = ({
                in={Boolean(errors.companySize && touched.companySize)}
                style={{ color: "red" }}
             >
+               {/* @ts-ignore */}
                {errors.companySize}
             </Collapse>
          </Box>

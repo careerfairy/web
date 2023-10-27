@@ -52,6 +52,7 @@ const UniversityCountriesFilter = ({
          getOptionLabel={(option) =>
             universityCountriesLookup[option.id] || option.id
          }
+         // @ts-ignore
          renderOption={(props, option) => [
             props,
             universityCountriesLookup[option.id] || option.id,

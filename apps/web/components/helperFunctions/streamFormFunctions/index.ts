@@ -331,5 +331,6 @@ export const getTextFieldProps = <TFormValues>(
 ): BrandedTextFieldProps => ({
    label,
    error: touched[name] && Boolean(errors[name]),
+   // @ts-ignore
    helperText: touched[name] && errors[name],
 })

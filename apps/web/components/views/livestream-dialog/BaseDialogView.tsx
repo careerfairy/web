@@ -250,6 +250,7 @@ export const FixedBottomContent = forwardRef<
 
 type MainContentProps = {
    sx?: SxProps<DefaultTheme>
+   children: ReactNode
 } & BackAndCloseButtonProps
 
 export const MainContent: FC<MainContentProps> = ({

@@ -238,6 +238,7 @@ const EmailTemplateForm = ({
                                              formik.touched[field.name] &&
                                              Boolean(formik.errors[field.name])
                                           }
+                                          // @ts-ignore
                                           helperText={
                                              formik.touched[field.name] &&
                                              formik.errors[field.name]

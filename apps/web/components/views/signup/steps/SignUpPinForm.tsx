@@ -153,7 +153,10 @@ const SignUpPinForm = () => {
                            errors.pinCode && touched.pinCode && errors.pinCode
                         )}
                      >
-                        <FormHelperText error>{errors.pinCode}</FormHelperText>
+                        <FormHelperText error>
+                           {/* @ts-ignore */}
+                           {errors.pinCode}
+                        </FormHelperText>
                      </Collapse>
                   </Box>
                   <Button

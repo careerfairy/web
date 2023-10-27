@@ -8,6 +8,7 @@ type Props = {
    expected?: boolean // sometimes the error can be expected, and we don't need to log it
    detailedDescription?: boolean
    showToastNotification?: boolean
+   children: ReactNode
 }
 
 type State = {
@@ -22,6 +23,8 @@ type State = {
  */
 export default class ErrorBoundary extends React.Component<Props, State> {
    static contextType = ErrorContext
+
+   context!: React.ContextType<typeof ErrorContext>
 
    static defaultProps = {
       detailedDescription: true,

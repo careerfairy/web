@@ -6,6 +6,7 @@ import { Box } from "@mui/material"
 type Props = {
    title: string
    description: string
+   children: React.ReactNode
 }
 
 const SectionComponent: FC<Props> = ({ title, description, children }) => {

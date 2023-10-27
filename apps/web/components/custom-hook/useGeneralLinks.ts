@@ -51,6 +51,7 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
       href: `/profile`,
       title: "Profile",
       basePath: "/profile",
+      // @ts-ignore
       icon: ProfileIcon,
    },
    {
@@ -135,6 +136,7 @@ const useGeneralLinks = () => {
             {
                href: `/profile`,
                title: "PROFILE",
+               // @ts-ignore
                icon: ProfileIcon,
                basePath: "/profile",
             },

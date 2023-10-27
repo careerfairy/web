@@ -224,6 +224,7 @@ const CreateBaseGroup = ({
                            />
                         </Box>
                         <FormHelperText>
+                           {/* @ts-ignore */}
                            {touched.logoFileObj && errors.logoFileObj
                               ? errors.logoFileObj
                               : null}
@@ -239,6 +240,7 @@ const CreateBaseGroup = ({
                         )}
                         onBlur={handleBlur}
                         disabled={isSubmitting}
+                        // @ts-ignore
                         helperText={
                            touched.universityName ? errors.universityName : null
                         }
@@ -256,6 +258,7 @@ const CreateBaseGroup = ({
                         inputProps={{ maxLength: 60 }}
                         placeholder="Please describe the purpose of your group"
                         onBlur={handleBlur}
+                        // @ts-ignore
                         helperText={
                            touched.description ? errors.description : null
                         }
@@ -333,6 +336,7 @@ const CreateBaseGroup = ({
                                  error={Boolean(
                                     touched.university && errors.university
                                  )}
+                                 // @ts-ignore
                                  helperText={
                                     touched.university
                                        ? errors.university

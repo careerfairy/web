@@ -88,6 +88,7 @@ const PersonalInfo = ({
                            )}
                         >
                            <FormHelperText error>
+                              {/* @ts-ignore */}
                               {errors.firstName}
                            </FormHelperText>
                         </Collapse>
@@ -120,6 +121,7 @@ const PersonalInfo = ({
                            )}
                         >
                            <FormHelperText error>
+                              {/* @ts-ignore */}
                               {errors.lastName}
                            </FormHelperText>
                         </Collapse>
@@ -151,6 +153,7 @@ const PersonalInfo = ({
                            )}
                         >
                            <FormHelperText error>
+                              {/* @ts-ignore */}
                               {errors.position}
                            </FormHelperText>
                         </Collapse>

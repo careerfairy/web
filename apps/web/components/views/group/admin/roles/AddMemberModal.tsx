@@ -111,6 +111,7 @@ const AddMemberModal = ({
                         <Grid item xs={12} sm={8}>
                            <TextField
                               fullWidth
+                              // @ts-ignore
                               helperText={errors.email}
                               label="Email"
                               autoFocus

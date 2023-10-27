@@ -202,6 +202,7 @@ const ActionComponent = ({
                            name="message"
                            value={values.message}
                            error={Boolean(errors.message)}
+                           // @ts-ignore
                            helperText={errors.message}
                            inputProps={{ maxLength: 1000 }}
                            label="Review"

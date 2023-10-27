@@ -224,6 +224,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                                  touched.firstName &&
                                  errors.firstName
                            )}
+                           // @ts-ignore
                            helperText={
                               errors.firstName &&
                               touched.firstName &&
@@ -250,6 +251,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                                  touched.lastName &&
                                  errors.lastName
                            )}
+                           // @ts-ignore
                            helperText={
                               errors.lastName &&
                               touched.lastName &&
@@ -275,6 +277,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            error={Boolean(
                               errors.email && touched.email && errors.email
                            )}
+                           // @ts-ignore
                            helperText={
                               errors.email && touched.email && errors.email
                            }
@@ -294,6 +297,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                                  touched.fieldOfStudyId &&
                                  errors.fieldOfStudyId
                            )}
+                           // @ts-ignore
                            helperText={
                               errors.fieldOfStudyId &&
                               touched.fieldOfStudyId &&
