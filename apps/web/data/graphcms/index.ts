@@ -5,7 +5,7 @@ interface Options {
 }
 import { GraphQLClient } from "graphql-request"
 
-const fetchAPI = async (query: string, options?: Options) => {
+const fetchAPI = async <TData>(query: string, options?: Options) => {
    return new GraphQLClient(process.env.GRAPHCMS_PROJECT_API, {
       headers: {
          ...(process.env.GRAPHCMS_PROD_AUTH_TOKEN && {
@@ -16,7 +16,7 @@ const fetchAPI = async (query: string, options?: Options) => {
             }`,
          }),
       },
-   }).request(query, options?.variables)
+   }).request<TData>(query, options?.variables)
 }
 
 export { fetchAPI }

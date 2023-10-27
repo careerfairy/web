@@ -20,12 +20,21 @@ export interface ICaseStudyRepository {
       moreCompanyCaseStudies: CompanyCaseStudyPreview[]
    }>
 }
+
+type ICaseStudySlug = {
+   slug: Slug
+}
+
+type ICaseStudyResponse = {
+   companyCaseStudies: ICaseStudySlug[]
+}
+
 // language=GraphQL
 class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    constructor() {}
 
-   async getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]> {
-      const data = await fetchAPI(`
+   async getAllCaseStudiesWithSlug(): Promise<ICaseStudySlug[]> {
+      const data = await fetchAPI<ICaseStudyResponse>(`
          {
             companyCaseStudies {
                slug
