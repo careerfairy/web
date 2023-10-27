@@ -3,12 +3,12 @@ import { UserNotification } from "@careerfairy/shared-lib/users/userNotification
 import { sxStyles } from "../../../../types/commonTypes"
 import { Trash2 as DeleteIcon } from "react-feather"
 import IconButton from "@mui/material/IconButton"
-import React, { useCallback } from "react"
 import Image from "next/image"
 import CircleIcon from "@mui/icons-material/Circle"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { Bell } from "react-feather"
+import DateUtil from "../../../../util/DateUtil"
 
 const styles = sxStyles({
    menuWrapper: {
@@ -87,7 +87,7 @@ const styles = sxStyles({
    itemDate: {
       display: "flex",
       alignSelf: "start",
-      ml: 4,
+      ml: { xs: 3.5, md: 2.5 },
    },
    imageBox: {
       display: "flex",
@@ -222,8 +222,9 @@ const NotificationsMenu = ({
                               variant={"body1"}
                               color={"text.secondary"}
                            >
-                              {" "}
-                              12h ago
+                              {DateUtil.calculateAndFormatTimeAgo(
+                                 notification.createdAt.toDate()
+                              )}
                            </Typography>
                         </Box>
                      </MenuItem>
