@@ -67,7 +67,7 @@ const CareerCenterLandingPage = ({}) => {
       {
          name: "Plan a live stream",
          description:
-            "Manage your liv estream requests " +
+            "Manage your live stream requests " +
             "from companies and setup future " +
             "events",
          imageUrl: livestream,
