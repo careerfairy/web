@@ -166,6 +166,7 @@ const LivestreamAutoComplete: FC<Props> = ({
          value={localSelectedStats}
          getOptionLabel={getLabelFn}
          isOptionEqualToValue={isOptionEqualToValue}
+         // @ts-ignore
          renderOption={renderOption}
          renderInput={renderInput}
          renderTags={renderTags}

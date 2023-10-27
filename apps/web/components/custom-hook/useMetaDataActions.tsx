@@ -166,7 +166,11 @@ interface CSVDialogDownloadProps {
 
 export type CSVData = Record<string, string>[]
 
-export const CSVDialogDownload: FC<CSVDialogDownloadProps> = ({
+export const CSVDialogDownload: FC<
+   CSVDialogDownloadProps & {
+      children: React.ReactElement
+   }
+> = ({
    title,
    children,
    data,

@@ -230,7 +230,9 @@ const CountDown = ({ stream }: CountDownProps) => {
    )
 }
 
-const RecordingTitle: FC = ({ children }) => {
+const RecordingTitle: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    return (
       <Typography sx={styles.recordingTitle} variant={"body1"}>
          {children}

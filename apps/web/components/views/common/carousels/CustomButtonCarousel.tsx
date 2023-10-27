@@ -129,6 +129,7 @@ interface Props {
    carouselStyles?: SxProps<Theme>
    shouldCenter?: boolean
    hideMobileButtons?: boolean
+   children: React.ReactNode
 }
 
 export default CustomButtonCarousel

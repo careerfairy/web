@@ -176,6 +176,7 @@ export const LeftContent: FC<LeftContentProps> = ({
 
 type RightContentProps = {
    backgroundColor?: string
+   children: React.ReactNode
 }
 
 export const RightContent: FC<RightContentProps> = ({

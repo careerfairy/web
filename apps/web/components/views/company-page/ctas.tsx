@@ -137,7 +137,9 @@ export const SignUp = () => {
    )
 }
 
-const CTACard: FC = ({ children }) => {
+const CTACard: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    return (
       <Paper variant={"outlined"} sx={styles.root}>
          {children}

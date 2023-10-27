@@ -20,10 +20,11 @@ export type LiveStreamDialogData = {
 
 type Props = {
    livestreamDialogData?: LiveStreamDialogData
+   children: React.ReactNode
 }
 
 const validDialogPages = ["details", "register", "job-details"] as const
-type DialogPage = typeof validDialogPages[number]
+type DialogPage = (typeof validDialogPages)[number]
 
 /**
  * Renders the layout for the dialog that shows livestream information.

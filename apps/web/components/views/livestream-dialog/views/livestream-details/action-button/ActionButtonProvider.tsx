@@ -24,7 +24,11 @@ const ActionButtonContext = createContext<ActionButtonContextType>({
    userEmailFromServer: null,
 })
 
-const ActionButtonProvider: FC<ActionButtonContextType> = (props) => {
+const ActionButtonProvider: FC<
+   ActionButtonContextType & {
+      children: React.ReactNode
+   }
+> = (props) => {
    return (
       <ActionButtonContext.Provider value={props}>
          {props.children}

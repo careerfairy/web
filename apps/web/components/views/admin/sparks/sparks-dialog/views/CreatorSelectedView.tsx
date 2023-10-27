@@ -195,7 +195,9 @@ const CreatorSelectedView = () => {
    )
 }
 
-const Details: FC = ({ children }) => (
+const Details: FC<{
+   children: React.ReactNode
+}> = ({ children }) => (
    <Typography variant="body2" color="text.secondary" sx={styles.details}>
       {children}
    </Typography>

@@ -232,7 +232,10 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                            disabled={isSubmitting}
                         />
                         <Collapse in={Boolean(errors.email && touched.email)}>
-                           <FormHelperText error>{errors.email}</FormHelperText>
+                           <FormHelperText error>
+                              {/* @ts-ignore */}
+                              {errors.email}
+                           </FormHelperText>
                         </Collapse>
                         <TextField
                            className="registrationInput"
@@ -255,6 +258,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                            in={Boolean(errors.password && touched.password)}
                         >
                            <FormHelperText error>
+                              {/* @ts-ignore */}
                               {errors.password}
                            </FormHelperText>
                         </Collapse>
@@ -309,6 +313,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                               align="center"
                               color="error"
                            >
+                              {/* @ts-ignore */}
                               {errors.submitError}
                            </Typography>
                         </Collapse>

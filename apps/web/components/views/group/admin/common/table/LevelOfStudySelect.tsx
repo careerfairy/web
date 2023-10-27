@@ -90,6 +90,7 @@ const LevelOfStudySelect = () => {
          multiple={false}
          options={Object.keys(levelsOfStudyLookup)}
          sx={styles.root}
+         // @ts-ignore
          renderOption={renderOption}
          listBoxCustomProps={listboxCustomProps}
          isOptionEqualToValue={isOptionEqualToValue}

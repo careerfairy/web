@@ -209,6 +209,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                   >
                      <Typography sx={styles.videoErrorText}>
                         {formik.errors.file ? (
+                           // @ts-ignore
                            <div>{formik.errors.file}</div>
                         ) : null}
                      </Typography>

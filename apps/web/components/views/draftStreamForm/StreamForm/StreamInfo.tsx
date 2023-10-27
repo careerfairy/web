@@ -220,6 +220,7 @@ const StreamInfo = ({
                      className={classes.errorMessage}
                      in={Boolean(errors.title && touched.title)}
                   >
+                     {/* @ts-ignore */}
                      {errors.title}
                   </Collapse>
                </FormControl>
@@ -367,6 +368,7 @@ const StreamInfo = ({
                   className={classes.errorMessage}
                   in={Boolean(errors.start && touched.start)}
                >
+                  {/* @ts-ignore */}
                   {errors.start}
                </Collapse>
             </Grid>
@@ -408,6 +410,7 @@ const StreamInfo = ({
                      className={classes.errorMessage}
                      in={Boolean(errors.company && touched.company)}
                   >
+                     {/* @ts-ignore */}
                      {errors.company}
                   </Collapse>
                </FormControl>
@@ -442,6 +445,7 @@ const StreamInfo = ({
                      className={classes.errorMessage}
                      in={Boolean(errors.summary && touched.summary)}
                   >
+                     {/* @ts-ignore */}
                      {errors.summary}
                   </Collapse>
                </FormControl>
@@ -482,6 +486,7 @@ const StreamInfo = ({
                            touched.reasonsToJoinLivestream
                      )}
                   >
+                     {/* @ts-ignore */}
                      {errors.reasonsToJoinLivestream}
                   </Collapse>
                </FormControl>

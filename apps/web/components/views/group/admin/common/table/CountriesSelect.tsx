@@ -65,6 +65,7 @@ export const CountriesSelect = () => {
          options={Object.keys(countriesLookup)}
          limitTags={1}
          sx={styles.root}
+         // @ts-ignore
          renderOption={renderOption}
          disableCloseOnSelect
          getOptionDisabled={() => filters.selectedCountryCodes.length >= limit}
