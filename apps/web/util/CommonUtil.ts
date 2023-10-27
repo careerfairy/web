@@ -239,18 +239,6 @@ export const shouldUseEmulators = () => {
    return false
 }
 
-/**
- * Function to check if the B2C side of Sparks should be enabled on the platform.
- * The function checks the environment variable 'NEXT_PUBLIC_ENABLE_SPARKS_B2C'.
- * If the environment variable is set to 'true', the B2C side of Sparks is enabled.
- * Otherwise, it is hidden.
- * @returns {boolean} - Returns true if the B2C side of Sparks should be enabled, false otherwise.
- */
-export const shouldEnableSParksB2C = () => {
-   return true
-   // return process.env.NEXT_PUBLIC_ENABLE_SPARKS_B2C === "true"
-}
-
 export const getDictValues = <K extends keyof any, T>(
    valueKeys: K[],
    dict: Record<K, T>

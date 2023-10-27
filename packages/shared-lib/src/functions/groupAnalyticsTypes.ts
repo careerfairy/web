@@ -19,6 +19,7 @@ export class RegistrationSourcesResponseItem {
          registered: {
             date: document.registered?.date?.toMillis(),
             utm: document.registered?.utm,
+            sparkId: document.registered?.sparkId,
          },
       }
 
@@ -31,6 +32,7 @@ export class RegistrationSourcesResponseItem {
          registered: {
             date: obj.registered?.date ? new Date(obj.registered?.date) : null,
             utm: obj.registered?.utm,
+            sparkId: obj.registered?.sparkId,
          },
       }
 
