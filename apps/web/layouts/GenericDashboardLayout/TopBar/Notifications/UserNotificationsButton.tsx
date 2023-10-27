@@ -1,4 +1,4 @@
-import { Badge, Fab } from "@mui/material"
+import { Badge, Fab, Tooltip } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { MouseEvent, useMemo } from "react"
@@ -64,25 +64,27 @@ const UserNotificationsButton = ({
    )
 
    return (
-      <Badge
-         sx={styles.badge}
-         color="error"
-         overlap="circular"
-         invisible={unReadNotifications?.length === 0}
-         badgeContent={`${unReadNotifications?.length}`}
-      >
-         <Fab
-            onClick={handleClick}
-            sx={[
-               styles.notificationBtn,
-               Boolean(anchorEl) ? styles.notificationBtnFilled : null,
-            ]}
-            size="small"
-            aria-label="user-notifications"
+      <Tooltip title="Notifications">
+         <Badge
+            sx={styles.badge}
+            color="error"
+            overlap="circular"
+            invisible={unReadNotifications?.length === 0}
+            badgeContent={`${unReadNotifications?.length}`}
          >
-            <Bell fontSize={"large"} />
-         </Fab>
-      </Badge>
+            <Fab
+               onClick={handleClick}
+               sx={[
+                  styles.notificationBtn,
+                  Boolean(anchorEl) ? styles.notificationBtnFilled : null,
+               ]}
+               size="small"
+               aria-label="user-notifications"
+            >
+               <Bell fontSize={"large"} />
+            </Fab>
+         </Badge>
+      </Tooltip>
    )
 }
 
