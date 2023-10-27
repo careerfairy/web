@@ -1,12 +1,14 @@
 import { collection } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
-import { useMemo } from "react"
-import {
-   pickPublicDataFromUserNotification,
-   UserNotification,
-} from "@careerfairy/shared-lib/users/userNotifications"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 
+/**
+ * Fetch User Notifications
+ * from /userData/{userEmail}/UserNotifications
+ *
+ * @param userId
+ */
 const useUserNotifications = (userId: string) => {
    const collectionRef = collection(
       useFirestore(),
@@ -15,15 +17,9 @@ const useUserNotifications = (userId: string) => {
       "userNotifications"
    )
 
-   const { data } = useFirestoreCollection<UserNotification>(collectionRef, {
-      idField: "id", // this field will be added to the firestore object
-   })
+   const { data } = useFirestoreCollection<UserNotification>(collectionRef)
 
-   return useMemo(
-      () =>
-         data.map((document) => pickPublicDataFromUserNotification(document)),
-      [data]
-   )
+   return data
 }
 
 export default useUserNotifications

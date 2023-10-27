@@ -1,5 +1,5 @@
 import { Box, Grid, Menu, MenuItem, Stack, Typography } from "@mui/material"
-import { PublicUserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { sxStyles } from "../../../../types/commonTypes"
 import { Trash2 as DeleteIcon } from "react-feather"
 import IconButton from "@mui/material/IconButton"
@@ -120,7 +120,7 @@ const styles = sxStyles({
 type Props = {
    anchorEl: HTMLElement
    handleClose: () => void
-   notifications: PublicUserNotification[]
+   notifications: UserNotification[]
    handleDeleteNotifications: () => void
 }
 const NotificationsMenu = ({
@@ -171,7 +171,7 @@ const NotificationsMenu = ({
                         key={notification.id}
                         sx={[
                            styles.item,
-                           notification.isRead && styles.readItem,
+                           Boolean(notification.readAt) && styles.readItem,
                         ]}
                         onClick={() => {
                            alert(`Redirect to ${notification.actionUrl}`)
@@ -180,7 +180,7 @@ const NotificationsMenu = ({
                      >
                         <Grid container sx={styles.itemContent}>
                            <Grid xs={1} md={0.5} item>
-                              {notification.isRead ? null : (
+                              {Boolean(notification.readAt) ? null : (
                                  <CircleIcon
                                     color="primary"
                                     sx={styles.circle}
@@ -192,7 +192,13 @@ const NotificationsMenu = ({
                               md={notification.imageUrl ? 8.5 : 11.5}
                               item
                            >
-                              {getMessage(notification)}
+                              <Typography
+                                 variant={"subtitle1"}
+                                 sx={styles.message}
+                                 dangerouslySetInnerHTML={{
+                                    __html: notification.message,
+                                 }}
+                              />
                            </Grid>
                            {notification.imageUrl ? (
                               <Grid xs={3} item>
@@ -246,28 +252,5 @@ const NotificationsMenu = ({
 
 const transformOrigin = { horizontal: "right", vertical: "top" } as const
 const anchorOrigin = { horizontal: "right", vertical: "bottom" } as const
-
-const getMessage = (notification: PublicUserNotification): JSX.Element => {
-   const { message, companyName } = notification
-
-   if (companyName) {
-      const [beforeCompanyName, afterCompanyName] = message.split(companyName)
-
-      return (
-         <Typography variant={"subtitle1"} sx={styles.message}>
-            {beforeCompanyName}
-            <Box component="span" fontWeight="bold">
-               {companyName}
-            </Box>
-            {afterCompanyName}
-         </Typography>
-      )
-   }
-   return (
-      <Typography variant={"subtitle1"} sx={styles.message}>
-         {message}
-      </Typography>
-   )
-}
 
 export default NotificationsMenu
