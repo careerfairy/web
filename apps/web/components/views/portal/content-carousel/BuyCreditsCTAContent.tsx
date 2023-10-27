@@ -63,7 +63,11 @@ const BuyCreditsCTAContent: FC<Props> = () => {
          <Content
             ref={ref}
             headerTitle={
-               <ContentHeaderTitle maxWidth={"60% !important"} color="black">
+               <ContentHeaderTitle
+                  maxWidth={"60% !important"}
+                  component="span"
+                  color="black"
+               >
                   Introducing{" "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}
