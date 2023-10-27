@@ -13,7 +13,7 @@ import CircularLogo from "../../../../components/views/common/CircularLogo"
 
 const styles = sxStyles({
    menuWrapper: {
-      top: 10,
+      top: { md: 10 },
 
       "& .MuiList-root": {
          p: 0,
