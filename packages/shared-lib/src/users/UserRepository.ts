@@ -24,7 +24,6 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
 import { PublicCustomJob } from "../groups/customJobs"
 import { Timestamp } from "../firebaseTypes"
-import { UserNotification } from "./userNotifications"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -184,20 +183,20 @@ export interface IUserRepository {
    ): Promise<UserCustomJobApplicationDocument>
 
    /**
-    * Adds a new user notification on the userNotifications sub collection from the User document
-    * @param userEmail
-    * @param notification
-    */
-   createUserNotification(
-      userEmail: string,
-      notification: UserNotification
-   ): Promise<UserNotification>
-
-   /**
     * Deletes all the user notifications
     * @param userEmail
     */
    deleteAllUserNotifications(userEmail: string): Promise<void>
+
+   /**
+    * Should update the isRead flag to a specific user notification
+    * @param userEmail
+    * @param notificationId
+    */
+   markUserNotificationAsRead(
+      userEmail: string,
+      notificationId: string
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -821,28 +820,6 @@ export class FirebaseUserRepository
       return null
    }
 
-   async createUserNotification(
-      userEmail: string,
-      notification: UserNotification
-   ): Promise<UserNotification> {
-      const ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userNotifications")
-         .doc()
-
-      const newNotification: UserNotification = {
-         documentType: "userNotification",
-         ...notification,
-         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
-         id: ref.id,
-      }
-
-      await ref.set(newNotification, { merge: true })
-
-      return newNotification
-   }
-
    async deleteAllUserNotifications(userEmail: string): Promise<void> {
       const batch = this.firestore.batch()
 
@@ -857,6 +834,21 @@ export class FirebaseUserRepository
       })
 
       return batch.commit()
+   }
+
+   async markUserNotificationAsRead(
+      userEmail: string,
+      notificationId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userNotifications")
+         .doc(notificationId)
+
+      return ref.update({
+         isRead: true,
+      })
    }
 }
 

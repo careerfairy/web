@@ -1,7 +1,7 @@
 import { Badge, Fab } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { MouseEvent } from "react"
+import { MouseEvent, useMemo } from "react"
 import { Bell } from "react-feather"
 
 const styles = sxStyles({
@@ -29,13 +29,17 @@ type Props = {
    handleClick: (event: MouseEvent<HTMLElement>) => void
 }
 const UserNotificationsButton = ({ notifications, handleClick }: Props) => {
+   const unReadNotifications = useMemo(
+      () => notifications.filter((notification) => !Boolean(notification.readAt)),
+      [notifications]
+   )
    return (
       <Badge
          sx={styles.badge}
          color="error"
          overlap="circular"
-         invisible={notifications?.length === 0}
-         badgeContent={`${notifications?.length}`}
+         invisible={unReadNotifications?.length === 0}
+         badgeContent={`${unReadNotifications?.length}`}
       >
          <Fab
             onClick={handleClick}

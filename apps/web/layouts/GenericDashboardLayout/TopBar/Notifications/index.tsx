@@ -38,9 +38,13 @@ const Component = ({ userEmail }: ComponentProps) => {
       await userRepo.deleteAllUserNotifications(userEmail)
    }, [userEmail])
 
-   const handleNotificationClick = useCallback(() => {
-      handleClose()
-   }, [handleClose])
+   const handleNotificationClick = useCallback(
+      async (notificationId: string) => {
+         handleClose()
+         void userRepo.markUserNotificationAsRead(userEmail, notificationId)
+      },
+      [handleClose, userEmail]
+   )
 
    return (
       <>

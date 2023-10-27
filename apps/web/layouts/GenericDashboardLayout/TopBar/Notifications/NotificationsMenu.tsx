@@ -122,7 +122,7 @@ type Props = {
    handleClose: () => void
    notifications: UserNotification[]
    handleDeleteNotifications: () => void
-   handleClick: (notification: PublicUserNotification) => void
+   handleClick: (notificationId: string) => void
 }
 const NotificationsMenu = ({
    anchorEl,
@@ -132,13 +132,6 @@ const NotificationsMenu = ({
    handleDeleteNotifications,
 }: Props) => {
    const isMobile = useIsMobile()
-
-   const handleNotificationClick = useCallback(
-      (notification: PublicUserNotification) => {
-         handleClick(notification)
-      },
-      [handleClick]
-   )
 
    return (
       <Menu
@@ -178,11 +171,14 @@ const NotificationsMenu = ({
                   notifications.map((notification) => (
                      <MenuItem
                         key={notification.id}
+                        id={notification.id}
+                        component="a"
                         sx={[
                            styles.item,
                            Boolean(notification.readAt) && styles.readItem,
                         ]}
-                        onClick={() => handleNotificationClick(notification)}
+                        onClick={() => handleClick(notification.id)}
+                        href={notification.actionUrl}
                      >
                         <Grid container sx={styles.itemContent}>
                            <Grid xs={1} md={0.5} item>
