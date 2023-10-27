@@ -11,7 +11,7 @@ export const ResearchBadge: Badge = new Badge(
    1,
    [
       {
-         description: "Attend 1 Live Stream Event",
+         description: "Attend 1 live stream",
          isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 1,
          progress: (userStats: UserStats) =>
@@ -30,7 +30,7 @@ export const ResearchBadgeLevel2: Badge = new Badge(
    2,
    [
       {
-         description: "Attend 3 Live Stream Events",
+         description: "Attend 3 live stream",
          isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 3,
          progress: (userStats: UserStats) =>
@@ -49,7 +49,7 @@ export const ResearchBadgeLevel3: Badge = new Badge(
    3,
    [
       {
-         description: "Attend 10 Live Stream Events",
+         description: "Attend 10 live stream",
          isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 10,
          progress: (userStats: UserStats) =>
