@@ -41,7 +41,7 @@ const useVerticalMouseScrollNavigation = (
       }
 
       // Attach the event listener with throttling
-      const throttledHandleWheel = throttle(handleWheel, 1800)
+      const throttledHandleWheel = throttle(handleWheel, 1000)
       window.addEventListener("wheel", throttledHandleWheel, { passive: true })
 
       // Cleanup: Remove the event listener when the component unmounts
