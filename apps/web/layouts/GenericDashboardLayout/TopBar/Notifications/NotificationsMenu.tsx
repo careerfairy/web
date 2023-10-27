@@ -222,7 +222,7 @@ const NotificationsMenu = ({
                               variant={"body1"}
                               color={"text.secondary"}
                            >
-                              {DateUtil.calculateAndFormatTimeAgo(
+                              {DateUtil.getTimeAgo(
                                  notification.createdAt.toDate()
                               )}
                            </Typography>

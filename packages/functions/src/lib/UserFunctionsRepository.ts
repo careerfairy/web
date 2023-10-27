@@ -76,10 +76,6 @@ export class UserFunctionsRepository
          .where("id", "==", groupId)
          .get()
 
-      if (!querySnapshot.empty) {
-         return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
-      }
-
-      return []
+      return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
    }
 }

@@ -232,16 +232,14 @@ export const onWriteSpark = functions
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
          sideEffectPromises.push(
-            sparkRepo.syncSparkToSparkStatsDocument(afterData)
+            sparkRepo.syncSparkToSparkStatsDocument(afterData),
+            sparkRepo.createSparkUserNotification(afterData)
          )
       }
 
       if (changeTypes.isCreate) {
          // Add spark to user feeds
-         sideEffectPromises.push(
-            sparkRepo.addSparkToAllUserFeeds(afterData),
-            sparkRepo.createSparkUserNotification(afterData)
-         )
+         sideEffectPromises.push(sparkRepo.addSparkToAllUserFeeds(afterData))
       }
 
       if (changeTypes.isUpdate) {
