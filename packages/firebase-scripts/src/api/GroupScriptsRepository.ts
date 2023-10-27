@@ -74,11 +74,6 @@ export interface IGroupScriptsRepository extends IGroupRepository {
    getAllSparks<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, Spark>[]>
-
-   getGroupsByIds<T extends boolean>(
-      ids: string[],
-      withRef?: T
-   ): Promise<DataWithRef<T, Group>[]>
 }
 
 export class GroupScriptsRepository
@@ -249,17 +244,5 @@ export class GroupScriptsRepository
       const sparks = await this.firestore.collection("sparks").get()
 
       return mapFirestoreDocuments<Spark, T>(sparks, withRef)
-   }
-
-   async getGroupsByIds<T extends boolean>(
-      ids: string[],
-      withRef?: T
-   ): Promise<DataWithRef<T, Group>[]> {
-      const groups = await this.firestore
-         .collection("careerCenterData")
-         .where("id", "in", ids)
-         .get()
-
-      return mapFirestoreDocuments<Group, T>(groups, withRef)
    }
 }
