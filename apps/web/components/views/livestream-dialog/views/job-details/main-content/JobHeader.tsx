@@ -10,6 +10,8 @@ import Skeleton from "@mui/material/Skeleton"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { alpha } from "@mui/material/styles"
 import { MapPin as LocationIcon } from "react-feather"
+import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
    logoWrapper: {
@@ -51,13 +53,23 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job
+   job: Job | PublicCustomJob
    livestreamPresenter: LivestreamPresenter
 }
 
 const JobHeader: FC<Props> = ({ job, livestreamPresenter }) => {
-   const jobLocation = job.getLocation()
-   const jobDepartment = job.getDepartment()
+   const isAtsJob = useIsAtsJob(job)
+
+   let jobName: string, jobLocation: string, jobDepartment: string
+
+   if (isAtsJob) {
+      jobName = job.name
+      jobLocation = job.getLocation()
+      jobDepartment = job.getDepartment()
+   } else {
+      jobName = job.title
+      jobDepartment = job.jobType
+   }
 
    return (
       <Stack spacing={1.5} direction="row">
@@ -72,7 +84,7 @@ const JobHeader: FC<Props> = ({ job, livestreamPresenter }) => {
          </Box>
          <Box sx={styles.companyNameWrapper}>
             <Typography sx={styles.jobTitle} component={"h4"}>
-               {job.name}
+               {jobName}
             </Typography>
             {jobDepartment ? (
                <Typography sx={[styles.jobDepartment, styles.lightText]}>
