@@ -11,12 +11,14 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 const Notifications = () => {
    const { userData } = useAuth()
 
+   if (!userData || !userData.id) {
+      return null
+   }
+
    return (
       <Box>
          <SuspenseWithBoundary fallback={<CircularProgress />} hide>
-            {userData?.userEmail ? (
-               <Component userEmail={userData.userEmail} />
-            ) : null}
+            <Component userEmail={userData.userEmail} />
          </SuspenseWithBoundary>
       </Box>
    )
