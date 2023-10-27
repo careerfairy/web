@@ -587,6 +587,7 @@ export class FirebaseLivestreamRepository
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
+         .where("hasEnded", "==", false)
          .where("registeredUsers", "array-contains", userEmail || "")
          .orderBy("start", "asc")
    }
