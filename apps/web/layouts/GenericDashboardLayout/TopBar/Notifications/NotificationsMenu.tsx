@@ -10,6 +10,8 @@ import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { Bell } from "react-feather"
 import DateUtil from "../../../../util/DateUtil"
 import CircularLogo from "../../../../components/views/common/CircularLogo"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    menuWrapper: {
@@ -86,11 +88,6 @@ const styles = sxStyles({
    menuContent: {
       display: "flex",
       maxHeight: { xs: "100%", md: "520px" },
-   },
-   itemDate: {
-      display: "flex",
-      alignSelf: "start",
-      ml: { xs: 3.5, md: 2.5 },
    },
    imageBox: {
       display: "flex",
@@ -175,7 +172,7 @@ const NotificationsMenu = ({
                      <MenuItem
                         key={notification.id}
                         id={notification.id}
-                        component="a"
+                        component={Link}
                         sx={[
                            styles.item,
                            Boolean(notification.readAt) && styles.readItem,
@@ -192,18 +189,15 @@ const NotificationsMenu = ({
                                  />
                               )}
                            </Grid>
-                           <Grid
-                              xs={notification.imageUrl ? 8 : 11}
-                              md={notification.imageUrl ? 8.5 : 11.5}
-                              item
-                           >
+                           <Grid item {...getGridItemProps(notification)}>
                               <Typography
                                  variant={"subtitle1"}
                                  sx={styles.message}
-                                 dangerouslySetInnerHTML={{
-                                    __html: notification.message,
-                                 }}
-                              />
+                              >
+                                 <SanitizedHTML
+                                    htmlString={notification.message}
+                                 />
+                              </Typography>
                            </Grid>
                            {notification.imageUrl ? (
                               <Grid xs={3} item>
@@ -227,17 +221,19 @@ const NotificationsMenu = ({
                               </Grid>
                            ) : null}
                         </Grid>
-
-                        <Box sx={styles.itemDate}>
-                           <Typography
-                              variant={"body1"}
-                              color={"text.secondary"}
-                           >
-                              {DateUtil.getTimeAgo(
-                                 notification.createdAt.toDate()
-                              )}
-                           </Typography>
-                        </Box>
+                        <Grid container>
+                           <Grid item xs={1} md={0.5} />
+                           <Grid item {...getGridItemProps(notification)}>
+                              <Typography
+                                 variant={"body1"}
+                                 color={"text.secondary"}
+                              >
+                                 {DateUtil.getTimeAgo(
+                                    notification.createdAt.toDate()
+                                 )}
+                              </Typography>
+                           </Grid>
+                        </Grid>
                      </MenuItem>
                   ))
                ) : (
@@ -266,5 +262,13 @@ const NotificationsMenu = ({
 
 const transformOrigin = { horizontal: "right", vertical: "top" } as const
 const anchorOrigin = { horizontal: "right", vertical: "bottom" } as const
+
+const getGridItemProps = (notification: UserNotification) => {
+   const baseProps = notification.imageUrl ? 8 : 11
+   return {
+      xs: baseProps,
+      md: baseProps + 0.5,
+   }
+}
 
 export default NotificationsMenu
