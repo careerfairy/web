@@ -25,7 +25,7 @@ export const MISSING_DATA_KEY = "cf_missing_data" // localstorage key
 export const MISSING_DATA_DISMISS_PERIOD_MS = 3600 * 24 * 7 // 1 week
 
 const MissingDataButton = ({
-   switchInterval = 1000, // 15s delay until a more intrusive button
+   switchInterval = 1000, // 1s delay until a more intrusive button
 }: Props) => {
    const { authenticatedUser: user, userData, isLoggedOut } = useAuth()
    const isMobile = useIsMobile()

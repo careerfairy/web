@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import UserNotificationsButton from "./UserNotificationsButton"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
@@ -16,11 +16,9 @@ const Notifications = () => {
    }
 
    return (
-      <Box>
-         <SuspenseWithBoundary fallback={<CircularProgress />} hide>
-            <Component userEmail={userData.userEmail} />
-         </SuspenseWithBoundary>
-      </Box>
+      <SuspenseWithBoundary fallback={<CircularProgress />} hide>
+         <Component userEmail={userData.userEmail} />
+      </SuspenseWithBoundary>
    )
 }
 
