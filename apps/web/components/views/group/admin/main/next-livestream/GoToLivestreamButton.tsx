@@ -42,8 +42,8 @@ export const GoToLivestreamButton = ({
                   .focus()
             } else {
                errorNotification(
-                  "Livestream doesn't have a secure token",
-                  "Failed to redirect to the livestream",
+                  "Live stream doesn't have a secure token",
+                  "Failed to redirect to the live stream",
                   {
                      livestreamId,
                   }
@@ -51,7 +51,7 @@ export const GoToLivestreamButton = ({
             }
          })
          .catch((e) => {
-            errorNotification(e, "Failed to redirect to the livestream", {
+            errorNotification(e, "Failed to redirect to the live stream", {
                livestreamId,
             })
          })

@@ -440,8 +440,8 @@ const StreamCard = ({ isUpcoming, stream }) => {
                      <CircularProgress />
                   </div>
                   {stream.isRecording
-                     ? "Stopping livestream recording"
-                     : "Starting livestream recording"}
+                     ? "Stopping live stream recording"
+                     : "Starting live stream recording"}
                </Box>
             </DialogContent>
          </Dialog>
