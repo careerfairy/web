@@ -13,6 +13,7 @@ import { MainLogo } from "../../../components/logos"
 import React from "react"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import { useCreditsDialog } from "../../CreditsDialogLayout"
+import Notifications from "./Notifications"
 
 const styles = sxStyles({
    root: {
@@ -78,7 +79,12 @@ const TopBar = ({ title, bgColor }: Props) => {
                   <LoginButton />
                </div>
             ) : (
-               <ProfileMenu handleOpenCreditsDialog={handleOpenCreditsDialog} />
+               <>
+                  <Notifications />
+                  <ProfileMenu
+                     handleOpenCreditsDialog={handleOpenCreditsDialog}
+                  />
+               </>
             )}
          </Stack>
       </Box>
