@@ -1,17 +1,11 @@
-import { Box, Grid, Menu, MenuItem, Stack, Typography } from "@mui/material"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { sxStyles } from "../../../../types/commonTypes"
-import { Trash2 as DeleteIcon } from "react-feather"
-import IconButton from "@mui/material/IconButton"
-import Image from "next/image"
-import CircleIcon from "@mui/icons-material/Circle"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import { Box, Menu, Stack, Typography } from "@mui/material"
+import IconButton from "@mui/material/IconButton"
+import { Bell, Trash2 as DeleteIcon } from "react-feather"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
-import { Bell } from "react-feather"
-import DateUtil from "../../../../util/DateUtil"
-import CircularLogo from "../../../../components/views/common/CircularLogo"
-import SanitizedHTML from "components/util/SanitizedHTML"
-import Link from "components/views/common/Link"
+import { sxStyles } from "../../../../types/commonTypes"
+import NotificationMenuItem from "./NotificationMenuItem"
 
 const styles = sxStyles({
    menuWrapper: {
@@ -74,41 +68,9 @@ const styles = sxStyles({
          color: "#888888",
       },
    },
-   item: {
-      display: "flex",
-      flexDirection: "column",
-      py: 2,
-      borderBottom: "1px solid #E1E1E1",
-   },
-   itemContent: {
-      display: "flex",
-      alignItems: "center",
-      minHeight: "91px",
-   },
    menuContent: {
       display: "flex",
       maxHeight: { xs: "100%", md: "520px" },
-   },
-   imageBox: {
-      display: "flex",
-      justifyContent: "center",
-
-      "& img": {
-         height: 50,
-      },
-   },
-   circle: {
-      height: 10,
-      width: 10,
-   },
-   message: {
-      textWrap: "wrap",
-      fontSize: "16px",
-      whiteSpace: "normal",
-      wordBreak: "break-word",
-   },
-   readItem: {
-      background: "#EBEBEF",
    },
    bellIcon: {
       "& svg": {
@@ -169,72 +131,11 @@ const NotificationsMenu = ({
             <Stack sx={styles.menuContent}>
                {notifications.length ? (
                   notifications.map((notification) => (
-                     <MenuItem
+                     <NotificationMenuItem
                         key={notification.id}
-                        id={notification.id}
-                        component={Link}
-                        sx={[
-                           styles.item,
-                           Boolean(notification.readAt) && styles.readItem,
-                        ]}
-                        onClick={() => handleClick(notification.id)}
-                        href={notification.actionUrl}
-                     >
-                        <Grid container sx={styles.itemContent}>
-                           <Grid xs={1} md={0.5} item>
-                              {Boolean(notification.readAt) ? null : (
-                                 <CircleIcon
-                                    color="primary"
-                                    sx={styles.circle}
-                                 />
-                              )}
-                           </Grid>
-                           <Grid item {...getGridItemProps(notification)}>
-                              <Typography
-                                 variant={"subtitle1"}
-                                 sx={styles.message}
-                              >
-                                 <SanitizedHTML
-                                    htmlString={notification.message}
-                                 />
-                              </Typography>
-                           </Grid>
-                           {notification.imageUrl ? (
-                              <Grid xs={3} item>
-                                 <Box sx={styles.imageBox}>
-                                    {notification.imageFormat === "circular" ? (
-                                       <CircularLogo
-                                          src={notification.imageUrl}
-                                          alt={`logo of notification, ${notification.message}`}
-                                          size={70}
-                                       />
-                                    ) : (
-                                       <Image
-                                          src={notification.imageUrl}
-                                          height={45}
-                                          alt={`Image to notification ${notification.id}`}
-                                          objectFit="contain"
-                                          width={78}
-                                       />
-                                    )}
-                                 </Box>
-                              </Grid>
-                           ) : null}
-                        </Grid>
-                        <Grid container>
-                           <Grid item xs={1} md={0.5} />
-                           <Grid item {...getGridItemProps(notification)}>
-                              <Typography
-                                 variant={"body1"}
-                                 color={"text.secondary"}
-                              >
-                                 {DateUtil.getTimeAgo(
-                                    notification.createdAt.toDate()
-                                 )}
-                              </Typography>
-                           </Grid>
-                        </Grid>
-                     </MenuItem>
+                        notification={notification}
+                        handleClick={handleClick}
+                     />
                   ))
                ) : (
                   <Stack spacing={2} sx={styles.noNotificationWrapper}>
@@ -262,13 +163,5 @@ const NotificationsMenu = ({
 
 const transformOrigin = { horizontal: "right", vertical: "top" } as const
 const anchorOrigin = { horizontal: "right", vertical: "bottom" } as const
-
-const getGridItemProps = (notification: UserNotification) => {
-   const baseProps = notification.imageUrl ? 8 : 11
-   return {
-      xs: baseProps,
-      md: baseProps + 0.5,
-   }
-}
 
 export default NotificationsMenu
