@@ -241,7 +241,9 @@ export const onWriteSpark = functions
          )
 
          if (
-            (!beforeData.published && afterData.published) ||
+            (!beforeData.published &&
+               afterData.published &&
+               afterData.group.publicSparks) ||
             (!beforeData?.group?.publicSparks && afterData.group.publicSparks)
          ) {
             // This notification will be triggered only when either the 'publicSparks' flag on the Group document
