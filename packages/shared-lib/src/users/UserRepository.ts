@@ -181,6 +181,22 @@ export interface IUserRepository {
       userEmail: string,
       jobId: string
    ): Promise<UserCustomJobApplicationDocument>
+
+   /**
+    * Deletes all the user notifications
+    * @param userEmail
+    */
+   deleteAllUserNotifications(userEmail: string): Promise<void>
+
+   /**
+    * Should update the isRead flag to a specific user notification
+    * @param userEmail
+    * @param notificationId
+    */
+   markUserNotificationAsRead(
+      userEmail: string,
+      notificationId: string
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -802,6 +818,37 @@ export class FirebaseUserRepository
          return this.addIdToDoc<UserCustomJobApplicationDocument>(snap)
       }
       return null
+   }
+
+   async deleteAllUserNotifications(userEmail: string): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const snaps = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userNotifications")
+         .get()
+
+      snaps.forEach((snap) => {
+         batch.delete(snap.ref)
+      })
+
+      return batch.commit()
+   }
+
+   async markUserNotificationAsRead(
+      userEmail: string,
+      notificationId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userNotifications")
+         .doc(notificationId)
+
+      return ref.update({
+         readAt: this.fieldValue.serverTimestamp() as Timestamp,
+      })
    }
 }
 
