@@ -11,7 +11,7 @@ export const EngageBadge: Badge = new Badge(
    1,
    [
       {
-         description: "Ask 5 questions to livestream events",
+         description: "Ask 5 questions to live stream events",
          isComplete: (userStats: UserStats) =>
             userStats?.totalQuestionsAsked >= 5,
          progress: (userStats: UserStats) =>
@@ -27,7 +27,7 @@ export const EngageBadgeLevel2: Badge = new Badge(
    2,
    [
       {
-         description: "Ask 10 questions to livestream events",
+         description: "Ask 10 questions to live stream events",
          isComplete: (userStats: UserStats) =>
             userStats?.totalQuestionsAsked >= 10,
          progress: (userStats: UserStats) =>
@@ -37,7 +37,7 @@ export const EngageBadgeLevel2: Badge = new Badge(
             ),
       },
       {
-         description: "Do 1 Hand Raise during livestreams",
+         description: "Do 1 Hand Raise during live streams",
          isComplete: (userStats: UserStats) => userStats?.totalHandRaises >= 1,
          progress: (userStats: UserStats) =>
             calculateProgressForNumericField(userStats?.totalHandRaises, 1),
@@ -52,7 +52,7 @@ export const EngageBadgeLevel3: Badge = new Badge(
    3,
    [
       {
-         description: "Ask 25 questions to livestream events",
+         description: "Ask 25 questions to live stream events",
          isComplete: (userStats: UserStats) =>
             userStats?.totalQuestionsAsked >= 25,
          progress: (userStats: UserStats) =>
@@ -62,7 +62,7 @@ export const EngageBadgeLevel3: Badge = new Badge(
             ),
       },
       {
-         description: "Do 3 Hand Raises during livestreams",
+         description: "Do 3 Hand Raises during live streams",
          isComplete: (userStats: UserStats) => userStats?.totalHandRaises >= 3,
          progress: (userStats: UserStats) =>
             calculateProgressForNumericField(userStats?.totalHandRaises, 3),
