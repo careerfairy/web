@@ -168,7 +168,7 @@ export type CSVData = Record<string, string>[]
 
 export const CSVDialogDownload: FC<
    CSVDialogDownloadProps & {
-      children: React.ReactElement
+      children?: React.ReactElement
    }
 > = ({
    title,

@@ -5,6 +5,7 @@ import { MarketingLandingPage } from "../data/graphcms/MarketingLandingPage"
 
 interface Props {
    page: MarketingLandingPage
+   children: React.ReactNode
 }
 const CmsPageLayout: FC<Props> = ({ children, page }) => (
    <PaperBackground>
