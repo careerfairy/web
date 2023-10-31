@@ -118,5 +118,19 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "Level of study of the user at the time of the event"
+   },
+   {
+      "fields": [
+         {
+            "name": "id",
+            "type": "string"
+         },
+         {
+            "name": "name",
+            "type": "string"
+         }
+      ],
+      "name": "category",
+      "type": "map"
    }
 ]
