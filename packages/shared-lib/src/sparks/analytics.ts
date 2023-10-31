@@ -54,6 +54,8 @@ type CommonServerFields = {
 export type SparkEventClient = {
    /** Original Spark ID from the feed (first one) */
    originalSparkId: string | null
+   /** Category ID of the Spark */
+   categoryId: string | null
    /** Document referrer information */
    referrer: string | null
    /** Referral code of a user from the URL */
