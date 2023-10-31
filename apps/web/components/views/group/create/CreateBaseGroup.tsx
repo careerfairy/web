@@ -27,6 +27,7 @@ import { BaseGroupInfo } from "../../../../pages/group/create"
 import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
 import { scrollTop } from "../../../../util/CommonUtil"
+import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
 
 const placeholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -206,43 +207,13 @@ const CreateBaseGroup = ({
                               errors.logoFileObj
                         )}
                      >
-                        <Box>
-                           <img
-                              className={classes.image}
-                              alt="logo"
-                              src={
-                                 values.logoUrl.length
-                                    ? values.logoUrl
-                                    : placeholder
-                              }
-                           />
-                        </Box>
-                        <FilePickerContainer
-                           extensions={["jpg", "jpeg", "png"]}
-                           maxSize={20}
-                           onBlur={handleBlur}
-                           onChange={(fileObject) => {
-                              setFieldValue(
-                                 "logoUrl",
-                                 URL.createObjectURL(fileObject),
-                                 true
-                              )
+                        <LogoUploaderWithCropping
+                           handleSubmit={async (fileObject) => {
+                              const newLogoUrl = URL.createObjectURL(fileObject)
+                              setFieldValue("logoUrl", newLogoUrl, true)
                               setFieldValue("logoFileObj", fileObject, true)
                            }}
-                           onError={(errMsg) =>
-                              setFieldError("logoFileObj", errMsg)
-                           }
-                        >
-                           <Button
-                              variant="contained"
-                              size="large"
-                              endIcon={<PublishIcon />}
-                           >
-                              {values.logoFileObj || baseGroupInfo.logoFileObj
-                                 ? "Change"
-                                 : "Upload Your Logo"}
-                           </Button>
-                        </FilePickerContainer>
+                        />
                         <FormHelperText>
                            {touched.logoFileObj && errors.logoFileObj
                               ? errors.logoFileObj
