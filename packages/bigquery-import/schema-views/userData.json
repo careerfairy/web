@@ -13,7 +13,15 @@
          "type": "string"
       },
       {
+         "name": "authId",
+         "type": "string"
+      },
+      {
          "name": "linkedinUrl",
+         "type": "string"
+      },
+      {
+         "name": "referralCode",
          "type": "string"
       },
       {
