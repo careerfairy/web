@@ -10,7 +10,7 @@ import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import { createFirestoreInstance } from "redux-firestore"
-import { RouterContext } from "next/dist/shared/lib/router-context"
+import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime"
 import { NextRouter } from "next/router"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 
@@ -26,7 +26,9 @@ const rrfProps = {
    createFirestoreInstance,
 }
 
-const AllTheProviders: FC = ({ children }) => {
+const AllTheProviders: FC<{
+   children: ReactElement
+}> = ({ children }) => {
    return (
       <RouterContext.Provider value={{ ...mockRouter }}>
          <Provider store={store}>
