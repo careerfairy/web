@@ -5,7 +5,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { sxStyles } from "../../../../../types/commonTypes"
 import Skeleton from "@mui/material/Skeleton"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    logoWrapper: {
