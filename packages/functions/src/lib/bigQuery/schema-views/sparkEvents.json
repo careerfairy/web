@@ -12,6 +12,12 @@
       "description": "Original Spark ID from the feed (first one)"
    },
    {
+      "name": "categoryId",
+      "type": "STRING",
+      "mode": "REQUIRED",
+      "description": "Category of the Spark"
+   },
+   {
       "name": "userId",
       "type": "STRING",
       "mode": "NULLABLE",
@@ -118,19 +124,5 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "Level of study of the user at the time of the event"
-   },
-   {
-      "fields": [
-         {
-            "name": "id",
-            "type": "STRING"
-         },
-         {
-            "name": "name",
-            "type": "STRING"
-         }
-      ],
-      "name": "category",
-      "type": "RECORD"
    }
 ]
