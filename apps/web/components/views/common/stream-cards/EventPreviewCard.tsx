@@ -45,7 +45,7 @@ import {
    buildDialogLink,
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
-import CircularLogo from "../CircularLogo"
+import CircularLogo from "../logos/CircularLogo"
 
 const bottomContentHeight = 50
 const cardAvatarSize = 65
