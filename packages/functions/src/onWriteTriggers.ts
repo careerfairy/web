@@ -222,6 +222,11 @@ export const onWriteSpark = functions
          id: sparkId,
       } as Spark
 
+      const beforeData = {
+         ...change.before?.data(),
+         id: sparkId,
+      } as Spark
+
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
@@ -234,6 +239,19 @@ export const onWriteSpark = functions
          sideEffectPromises.push(
             sparkRepo.syncSparkToSparkStatsDocument(afterData)
          )
+
+         if (
+            (!beforeData.published &&
+               afterData.published &&
+               afterData.group.publicSparks) ||
+            (!beforeData?.group?.publicSparks && afterData.group.publicSparks)
+         ) {
+            // This notification will be triggered only when either the 'publicSparks' flag on the Group document
+            // or the 'published' flag on the Sparks is changed from disable to active
+            sideEffectPromises.push(
+               sparkRepo.createSparkUserNotification(afterData)
+            )
+         }
       }
 
       if (changeTypes.isCreate) {

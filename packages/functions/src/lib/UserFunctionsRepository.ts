@@ -1,5 +1,5 @@
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import {
    FirebaseUserRepository,
    IUserRepository,
@@ -18,6 +18,7 @@ import * as functions from "firebase-functions"
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
    syncCustomJobDataToUser(customJob: Change<DocumentSnapshot>): Promise<void>
+   getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 }
 
 export class UserFunctionsRepository
@@ -67,5 +68,14 @@ export class UserFunctionsRepository
       })
 
       return void batch.commit()
+   }
+
+   async getGroupFollowers(groupId: string): Promise<CompanyFollowed[]> {
+      const querySnapshot = await this.firestore
+         .collectionGroup("companiesUserFollows")
+         .where("id", "==", groupId)
+         .get()
+
+      return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
    }
 }
