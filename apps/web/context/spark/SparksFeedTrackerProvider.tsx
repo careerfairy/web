@@ -185,6 +185,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
          const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
+            categoryId: categoryId,
             sessionId,
             videoEventPositionInSeconds: secondsWatched,
             universityCountry: userData?.universityCountryCode || null,
@@ -201,6 +202,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
       [
          addSecondsWatchedToBatch,
          currentSparkId,
+         categoryId,
          sessionId,
          userData?.fieldOfStudy?.id,
          userData?.levelOfStudy?.id,
