@@ -14,7 +14,7 @@
    {
       "name": "categoryId",
       "type": "STRING",
-      "mode": "REQUIRED",
+      "mode": "NULLABLE",
       "description": "Category of the Spark"
    },
    {
