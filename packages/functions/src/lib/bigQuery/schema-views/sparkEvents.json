@@ -123,14 +123,14 @@
       "fields": [
          {
             "name": "id",
-            "type": "string"
+            "type": "STRING"
          },
          {
             "name": "name",
-            "type": "string"
+            "type": "STRING"
          }
       ],
       "name": "category",
-      "type": "map"
+      "type": "RECORD"
    }
 ]
