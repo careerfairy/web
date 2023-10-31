@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack"
 import Image from "next/image"
 import React, { FC, Fragment } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const COMPANY_LOGO_SIZE = 63
 

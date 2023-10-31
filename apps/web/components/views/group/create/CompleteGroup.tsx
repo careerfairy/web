@@ -13,6 +13,7 @@ import DisplayCategoryElement from "./DisplayCategoryElement"
 import { sxStyles } from "../../../../types/commonTypes"
 import { BaseGroupInfo } from "../../../../pages/group/create"
 import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    root: {
@@ -86,11 +87,10 @@ const CompleteGroup = ({
             </Typography>
             <Card>
                <CardMedia sx={styles.media}>
-                  <Box
-                     component="img"
-                     sx={styles.image}
-                     alt={`${baseGroupInfo.universityName} logo`}
+                  <CircularLogo
                      src={baseGroupInfo.logoUrl}
+                     alt={`${baseGroupInfo.universityName} logo`}
+                     size={120}
                   />
                </CardMedia>
                <CardContent>

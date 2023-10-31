@@ -3,7 +3,7 @@ import { UserNotification } from "@careerfairy/shared-lib/users/userNotification
 import { sxStyles } from "../../../../types/commonTypes"
 import { Circle as CircleIcon } from "@mui/icons-material"
 import Image from "next/image"
-import CircularLogo from "../../../../components/views/common/CircularLogo"
+import CircularLogo from "../../../../components/views/common/logos/CircularLogo"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import Link from "components/views/common/Link"
 import DateUtil from "../../../../util/DateUtil"
