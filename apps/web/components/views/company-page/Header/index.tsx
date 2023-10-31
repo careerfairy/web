@@ -22,7 +22,7 @@ import useControlledTabNavigationOnScroll from "../../../custom-hook/useControll
 import Link from "../../common/Link"
 import BannerIllustration from "./BannerIllustration"
 import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60

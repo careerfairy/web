@@ -6,7 +6,7 @@ import EditGroupIcon from "@mui/icons-material/EditOutlined"
 import { getMaxLineStyles } from "../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../types/commonTypes"
 import { useGroup } from "./index"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import HoverOverlay from "components/views/common/HoverOverlay"
 
 const styles = sxStyles({
