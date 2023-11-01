@@ -59,7 +59,7 @@ function Header(props) {
    let TopHeader = null
 
    if (props.page === "landing") {
-      TopHeader = (props) => {
+      TopHeader = function LandingHeaderComponent(props) {
          return (
             <LandingHeader
                {...props}
@@ -69,11 +69,11 @@ function Header(props) {
          )
       }
    } else if (authenticated) {
-      TopHeader = (props) => {
+      TopHeader = function AuthenticatedHeaderComponent(props) {
          return <AuthenticatedHeader {...props} toggleSideBar={toggleSideBar} />
       }
    } else {
-      TopHeader = (props) => {
+      TopHeader = function NonAuthenticatedHeaderComponent(props) {
          return (
             <NonAuthenticatedHeader {...props} toggleSideBar={toggleSideBar} />
          )
@@ -115,9 +115,9 @@ function Header(props) {
                </li>
                {authenticated && (
                   <li>
-                     <a onClick={toggleSideBar} href="/groups">
+                     <Link onClick={toggleSideBar} href="/groups">
                         Follow Groups
-                     </a>
+                     </Link>
                   </li>
                )}
                <li>

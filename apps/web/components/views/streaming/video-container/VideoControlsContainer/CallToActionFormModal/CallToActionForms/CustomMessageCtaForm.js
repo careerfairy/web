@@ -88,4 +88,6 @@ const CustomMessageCtaForm = memo(
    }
 )
 
+CustomMessageCtaForm.displayName = "CustomMessageCtaForm"
+
 export default CustomMessageCtaForm

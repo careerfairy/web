@@ -47,6 +47,8 @@ const RegistrationModal = memo(
    }
 )
 
+RegistrationModal.displayName = "RegistrationModal"
+
 interface Props {
    open?: boolean
    onQuestionsAnswered?: (...any) => void

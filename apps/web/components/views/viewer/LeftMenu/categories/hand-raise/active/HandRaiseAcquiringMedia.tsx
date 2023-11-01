@@ -27,6 +27,9 @@ const HandRaiseAcquiringMedia = memo(({ handRaiseState }: Props) => {
       )
    )
 })
+
+HandRaiseAcquiringMedia.displayName = "HandRaiseAcquiringMedia"
+
 type Props = {
    handRaiseState: HandRaise
 }
