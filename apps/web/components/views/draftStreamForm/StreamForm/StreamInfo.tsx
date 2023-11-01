@@ -21,7 +21,6 @@ import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
-import CloseIcon from "@mui/icons-material/Close"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import DateUtil from "../../../../util/DateUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
@@ -278,8 +277,8 @@ const StreamInfo = ({
                      paddingTop: "2.5%",
                      height: "95%",
                      [theme.breakpoints.down("md")]: {
-                        width: "35vw",
-                        height: "35vw",
+                        width: "40vw",
+                        height: "40vw",
                      },
                      [theme.breakpoints.up("md")]: {
                         width: "95%",
