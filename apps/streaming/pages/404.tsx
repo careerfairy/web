@@ -1,4 +1,4 @@
-import { Status404Page } from "modules"
+import { Status404Page } from "components/templates"
 
 const Status404 = () => <Status404Page />
 

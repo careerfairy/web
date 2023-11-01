@@ -1,4 +1,4 @@
-import { colors, createTheme } from "@mui/material"
+import { colors, createTheme, darken, lighten } from "@mui/material"
 
 const customFontFamily = "'Poppins', sans-serif"
 // const customFontFamily = "'Roboto', 'Helvetica', 'Arial', sans-serif"
@@ -8,11 +8,22 @@ export const theme = createTheme({
    brand: {
       blue: colors.blue[800],
       green: colors.green[400],
+      yellow: "#EECA61",
    },
 
    // Palette
    palette: {
-      secondary: { main: "#3289a8" },
+      secondary: {
+         light: lighten("#6749EA", 0.2),
+         main: "#6749EA",
+         dark: darken("#6749EA", 0.2),
+      },
+      primary: {
+         main: "#2ABAA5",
+         light: "#89c2ba",
+         dark: "#00b08f",
+         contrastText: "#FFFFFF",
+      },
       neutral: { main: "#FF5733" },
    },
 
@@ -57,6 +68,16 @@ export const theme = createTheme({
       MuiButtonBase: {
          defaultProps: {
             disableRipple: true,
+         },
+      },
+      MuiButton: {
+         styleOverrides: {
+            root: {
+               textTransform: "none",
+            },
+         },
+         defaultProps: {
+            disableElevation: true,
          },
       },
    },

@@ -7,11 +7,6 @@ export const Status500Page = () => {
          <Typography variant="h6" mt={1} mb={2}>
             Something went wrong
          </Typography>
-         <img
-            src="/assets/teddy-bear.png"
-            alt="something went wrong"
-            width={250}
-         />
       </Box>
    )
 }

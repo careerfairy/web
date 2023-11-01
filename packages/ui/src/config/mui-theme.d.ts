@@ -8,6 +8,7 @@ declare module "@mui/material/styles" {
       brand: {
          blue: CSSProperties["color"]
          green: CSSProperties["color"]
+         yellow: CSSProperties["color"]
       }
    }
 
@@ -15,6 +16,7 @@ declare module "@mui/material/styles" {
       brand: {
          blue: CSSProperties["color"]
          green: CSSProperties["color"]
+         yellow: CSSProperties["color"]
       }
    }
 
@@ -29,13 +31,13 @@ declare module "@mui/material/styles" {
 
    // Typography
    interface TypographyVariants {
-      title1: React.CSSProperties
-      title2: React.CSSProperties
+      // title1: React.CSSProperties
+      // title2: React.CSSProperties
    }
 
    interface TypographyVariantsOptions {
-      title1?: React.CSSProperties
-      title2?: React.CSSProperties
+      // title1?: React.CSSProperties
+      // title2?: React.CSSProperties
    }
 
    // Breakpoints
@@ -54,10 +56,10 @@ declare module "@mui/material/styles" {
 // Typography
 declare module "@mui/material/Typography" {
    interface TypographyPropsVariantOverrides {
-      title1: true
-      title2: true
-      body1: false
-      body2: false
+      // title1: true
+      // title2: true
+      // body1: false
+      // body2: false
       button: false
    }
 }
