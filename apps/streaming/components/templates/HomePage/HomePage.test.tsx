@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react"
 
-import { HomePage } from "./"
+import { HomePage } from "."
 import { renderWithTheme } from "@careerfairy/ui"
 
 describe("apps", () => {

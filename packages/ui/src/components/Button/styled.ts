@@ -5,12 +5,10 @@ import { ButtonProps } from "."
 
 export const ButtonStyled = styled(Button, {
    shouldForwardProp: shouldForwardProp<ButtonProps>(["isDisabled", "bgColor"]),
-})<ButtonProps>(({ theme, isDisabled, size, bgColor }) => ({
+})<ButtonProps>(({ isDisabled, bgColor }) => ({
    width: isDisabled ? "100%" : undefined,
-   color: size === "small" ? theme.palette.secondary.main : undefined,
    backgroundColor: bgColor,
    "&.Mui-disabled": {
-      color: theme.brand.green,
-      backgroundColor: theme.palette.grey[600],
+      // add styles for disabled state
    },
 }))
