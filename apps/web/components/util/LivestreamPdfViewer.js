@@ -240,11 +240,9 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
                maxSize={20}
                onError={(errMsg) => console.log(errMsg)}
             >
-               <Button
-                  color="primary"
-                  children="Upload Slides [.pdf]"
-                  variant="contained"
-               />
+               <Button color="primary" variant="contained">
+                  Upload Slides [.pdf]
+               </Button>
             </FilePickerContainer>
          </div>
       </div>

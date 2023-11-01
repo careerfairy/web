@@ -21,18 +21,19 @@ const HandRaiseRequested = memo(
                   <CategoryContainerCentered>
                      <CategoryContainerContent>
                         <ThemedPermanentMarker>
-                           Sorry we can't answer your question right now.
+                           Sorry we can&apos;t answer your question right now.
                         </ThemedPermanentMarker>
                         <Button
                            size="large"
                            startIcon={<ClearRoundedIcon />}
                            variant="contained"
-                           children="Cancel"
                            color="grey"
                            onClick={() =>
                               updateHandRaiseRequest(HandRaiseState.unrequested)
                            }
-                        />
+                        >
+                           Cancel
+                        </Button>
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
                </span>
@@ -41,6 +42,9 @@ const HandRaiseRequested = memo(
       )
    }
 )
+
+HandRaiseRequested.displayName = "HandRaiseRequested"
+
 type Props = {
    handRaiseState: HandRaise
    updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>

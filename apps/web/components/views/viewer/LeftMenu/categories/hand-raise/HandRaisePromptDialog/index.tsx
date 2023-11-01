@@ -44,13 +44,14 @@ const Content = ({ handleClose, requestHandRaise }: ContentProps) => {
             </DialogContentText>
          </DialogContent>
          <DialogActions>
-            <Button children="No Thanks" onClick={handleClose} />
+            <Button onClick={handleClose}>No Thanks</Button>
             <Button
                variant="contained"
-               children="Request to Join with video and audio"
                color="primary"
                onClick={requestHandRaise}
-            />
+            >
+               Request to Join with video and audio
+            </Button>
          </DialogActions>
       </React.Fragment>
    )

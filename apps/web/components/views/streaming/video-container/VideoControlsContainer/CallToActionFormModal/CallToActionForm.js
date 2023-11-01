@@ -109,6 +109,7 @@ const CallToActionForm = memo(
       }
 
       const buildFormikForm = (type, validationSchema) => {
+         // eslint-disable-next-line react-hooks/rules-of-hooks
          return useFormik({
             initialValues: getInitialValues(
                isJobPosting,
@@ -285,6 +286,8 @@ const CallToActionForm = memo(
       )
    }
 )
+
+CallToActionForm.displayName = "CallToActionForm"
 
 CallToActionForm.propTypes = {
    handleClose: PropTypes.func,

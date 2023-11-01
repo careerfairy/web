@@ -236,10 +236,11 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                         style={{ margin: "auto 0 2rem 0" }}
                         startIcon={<CloseRoundedIcon />}
                         variant="contained"
-                        children="Deactivate Hand Raise"
                         disabled={isStepOpen(11)}
                         onClick={handlers.setHandRaiseModeInactive}
-                     />
+                     >
+                        Deactivate Hand Raise
+                     </Button>
                   </Box>
                </List>
             </Box>
@@ -268,8 +269,8 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                         style={{ marginBottom: "1rem" }}
                         align="center"
                      >
-                        Your viewers can now request to join the stream. Don't
-                        forget to remind them to join in!
+                        Your viewers can now request to join the stream.
+                        Don&apos;t forget to remind them to join in!
                      </Typography>
                      <Typography
                         style={{
@@ -306,14 +307,15 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                         <Button
                            variant="contained"
                            startIcon={<CloseRoundedIcon />}
-                           children="Deactivate Hand Raise"
                            onClick={() => {
                               handlers.setHandRaiseModeInactive()
                               isOpen(13) &&
                                  activeStep === 13 &&
                                  handleConfirm(13)
                            }}
-                        />
+                        >
+                           Deactivate Hand Raise
+                        </Button>
                      </WhiteTooltip>
                   </Box>
                </CategoryContainerCentered>

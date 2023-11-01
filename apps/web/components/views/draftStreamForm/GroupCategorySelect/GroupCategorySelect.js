@@ -73,6 +73,7 @@ const GroupCategorySelect = ({
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
+                  key={option.id}
                   variant="outlined"
                   label={option.name}
                   {...getTagProps({ index })}

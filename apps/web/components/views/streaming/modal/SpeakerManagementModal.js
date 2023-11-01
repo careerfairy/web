@@ -59,12 +59,13 @@ function SpeakerManagementModal({ open, setOpen, joiningStreamerLink }) {
          </MuiDialogContent>
          <MuiDialogActions>
             <Button
-               children="OK"
                variant="contained"
                color="primary"
                startIcon={<CheckIcon />}
                onClick={() => setOpen(false)}
-            />
+            >
+               OK
+            </Button>
          </MuiDialogActions>
       </GlassDialog>
    )

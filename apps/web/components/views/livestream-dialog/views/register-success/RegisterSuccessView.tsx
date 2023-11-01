@@ -129,7 +129,7 @@ const RegisterSuccessView: FC<Props> = () => {
                         content on our platform. We will send you a reminder as
                         soon as this live stream is about to start, so you can
                         join it. Additionally, you can add the live stream to
-                        your calendar to ensure you don't forget about it.
+                        your calendar to ensure you don&apos;t forget about it.
                      </Typography>
                      <Stack spacing={1} mt={4} sx={styles.buttons}>
                         <AddToCalendar

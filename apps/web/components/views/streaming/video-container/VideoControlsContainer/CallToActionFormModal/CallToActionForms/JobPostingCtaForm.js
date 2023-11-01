@@ -195,4 +195,6 @@ const JobPostingCtaForm = memo(
    }
 )
 
+JobPostingCtaForm.displayName = "JobPostingCtaForm"
+
 export default JobPostingCtaForm

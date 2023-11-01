@@ -84,4 +84,6 @@ const SocialCtaForm = memo(({ formik }) => {
    )
 })
 
+SocialCtaForm.displayName = "SocialCtaForm"
+
 export default SocialCtaForm

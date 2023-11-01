@@ -45,9 +45,9 @@ const DemoEndModal = ({ open, handleClose }) => {
             <DialogTitle>Talent Pool</DialogTitle>
             <DialogContent>
                <DialogContentText>
-                  By joining a company's Talent Pool during the stream, students
-                  can ask their Career Center to submit their profile data to
-                  the company after the event.
+                  By joining a company&apos;s Talent Pool during the stream,
+                  students can ask their Career Center to submit their profile
+                  data to the company after the event.
                </DialogContentText>
                <Box
                   display="flex"
@@ -59,15 +59,14 @@ const DemoEndModal = ({ open, handleClose }) => {
                   <TooltipHighlight open={!hasJoinedTalentPool}>
                      <Button
                         onClick={handleClickJoinTalentPool}
-                        children={
-                           hasJoinedTalentPool
-                              ? "Leave Talent Pool"
-                              : "Join Talent Pool"
-                        }
                         variant="contained"
                         startIcon={<PeopleAltIcon />}
                         color={hasJoinedTalentPool ? "" : "primary"}
-                     />
+                     >
+                        {hasJoinedTalentPool
+                           ? "Leave Talent Pool"
+                           : "Join Talent Pool"}
+                     </Button>
                   </TooltipHighlight>
                   <Collapse in={hasJoinedTalentPool}>
                      <Typography
@@ -75,7 +74,7 @@ const DemoEndModal = ({ open, handleClose }) => {
                         algin="center"
                         color="primary"
                      >
-                        You've now been added to the Talent Pool!
+                        You&apos;ve now been added to the Talent Pool!
                      </Typography>
                   </Collapse>
                </Box>
@@ -85,9 +84,10 @@ const DemoEndModal = ({ open, handleClose }) => {
                   disabled={!hasJoinedTalentPool}
                   variant="contained"
                   onClick={handleNext}
-                  children={"Next"}
                   color={"primary"}
-               />
+               >
+                  Next
+               </Button>
             </DialogActions>
          </GlassDialog>
          <GlassDialog
@@ -115,10 +115,11 @@ const DemoEndModal = ({ open, handleClose }) => {
                         download
                      >
                         <Button
-                           children={"Download Analytics"}
                            startIcon={<CloudDownloadIcon />}
                            color={"primary"}
-                        />
+                        >
+                           Download Analytics
+                        </Button>
                      </a>
                   </TooltipHighlight>
                </Box>
@@ -129,9 +130,10 @@ const DemoEndModal = ({ open, handleClose }) => {
                      disabled={!hasClickedDownload}
                      variant="contained"
                      onClick={handleNext}
-                     children={"Next"}
                      color={"primary"}
-                  />
+                  >
+                     Next
+                  </Button>
                </DialogActions>
             </Collapse>
          </GlassDialog>
@@ -142,8 +144,9 @@ const DemoEndModal = ({ open, handleClose }) => {
             <DialogTitle>Congratulations!!</DialogTitle>
             <DialogContent>
                <DialogContentText>
-                  You've now completed the tutorial :). We believe you're now
-                  ready to venture into the world of streaming! Good luck!
+                  You&apos;ve now completed the tutorial :). We believe
+                  you&apos;re now ready to venture into the world of streaming!
+                  Good luck!
                </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -151,9 +154,11 @@ const DemoEndModal = ({ open, handleClose }) => {
                   disabled={!hasClickedDownload}
                   variant="contained"
                   onClick={handleClose}
-                  children={"Back to Stream"}
                   color={"primary"}
-               />
+                  S
+               >
+                  Back to Stream
+               </Button>
             </DialogActions>
          </GlassDialog>
       </>

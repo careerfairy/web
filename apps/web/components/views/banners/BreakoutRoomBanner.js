@@ -42,4 +42,6 @@ const BreakoutRoomBanner = memo(() => {
    )
 })
 
+BreakoutRoomBanner.displayName = "BreakoutRoomBanner"
+
 export default BreakoutRoomBanner

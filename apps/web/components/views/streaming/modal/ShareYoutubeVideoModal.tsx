@@ -78,7 +78,7 @@ const ShareYoutubeVideoModal = ({ open, onClose }: Props) => {
             />
             <Typography color="text.secondary" variant={"subtitle1"}>
                When sharing a video, the player actions (play, pause, etc) will
-               be replayed on the viewer's screens as well.
+               be replayed on the viewer&apos;s screens as well.
             </Typography>
             <DialogActions sx={{ pr: 0 }}>
                <LoadingButton
