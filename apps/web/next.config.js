@@ -233,6 +233,13 @@ const moduleExports = {
    experimental: {
       externalDir: true,
       esmExternals: false, // fixes issue with [firebase](https://github.com/FirebaseExtended/reactfire/issues/491)
+      outputFileTracingExcludes: {
+         "*": [
+            // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
+            "./node_modules/@swc/core-linux-x64-gnu",
+            "./node_modules/@swc/core-linux-x64-musl",
+         ],
+      },
    },
    images: {
       domains: [
@@ -266,12 +273,6 @@ const moduleExports = {
       // });
 
       return config
-   },
-   outputFileTracingExcludes: {
-      "*": [
-         "./node_modules/@swc/core-linux-x64-gnu",
-         "./node_modules/@swc/core-linux-x64-musl",
-      ],
    },
 }
 
