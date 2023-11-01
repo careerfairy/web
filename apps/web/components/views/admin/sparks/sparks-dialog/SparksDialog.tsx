@@ -10,6 +10,7 @@ import {
    Stack,
    Typography,
    TypographyProps,
+   StackProps,
 } from "@mui/material"
 import SteppedDialog, {
    useStepper,
@@ -430,7 +431,7 @@ const Content: FC<ContentProps> = ({ sx, ...props }) => {
    )
 }
 
-const Actions: FC<BoxProps> = ({ children, sx, ...props }) => {
+const Actions: FC<StackProps> = ({ children, sx, ...props }) => {
    const {
       stepper: { currentStep },
    } = useSparksForm()

@@ -95,11 +95,13 @@ export interface ILivestreamRepository {
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    upcomingEventsQuery(
-      showHidden?: boolean
+      showHidden?: boolean,
+      limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    registeredEventsQuery(
-      userEmail: string
+      userEmail: string,
+      limit?: number
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
    featuredEventQuery(): firebase.firestore.Query<firebase.firestore.DocumentData>
@@ -474,7 +476,7 @@ export class FirebaseLivestreamRepository
       return this.mapLivestreamCollections(snapshots).get()
    }
 
-   upcomingEventsQuery(showHidden: boolean = false) {
+   upcomingEventsQuery(showHidden: boolean = false, limit?: number) {
       let query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
@@ -483,6 +485,10 @@ export class FirebaseLivestreamRepository
 
       if (showHidden === false) {
          query = query.where("hidden", "==", false)
+      }
+
+      if (limit) {
+         query = query.limit(limit)
       }
 
       return query
@@ -582,13 +588,19 @@ export class FirebaseLivestreamRepository
       return query
    }
 
-   registeredEventsQuery(userEmail: string) {
-      return this.firestore
+   registeredEventsQuery(userEmail: string, limit?: number) {
+      let q = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .where("registeredUsers", "array-contains", userEmail || "")
          .orderBy("start", "asc")
+
+      if (limit) {
+         q = q.limit(limit)
+      }
+
+      return q
    }
 
    async getRegisteredEvents(

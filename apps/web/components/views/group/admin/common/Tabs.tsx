@@ -24,7 +24,6 @@ export const TabsComponent: FC<Props> = ({
       <StyledTabs
          value={value}
          onChange={onChange}
-         disabled={disabled}
          color={"secondary"}
          aria-label="basic tabs example"
       >
