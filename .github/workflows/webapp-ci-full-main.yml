@@ -27,7 +27,7 @@ concurrency:
 jobs:
    build_app_for_tests:
       name: "Pre-build cache for tests"
-      runs-on: ubuntu-latest-m
+      runs-on: ubuntu-latest-l
       timeout-minutes: 10
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
