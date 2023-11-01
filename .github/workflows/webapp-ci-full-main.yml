@@ -27,7 +27,7 @@ concurrency:
 jobs:
    build_app_for_tests:
       name: "Pre-build cache for tests"
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-latest-m
       timeout-minutes: 10
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
@@ -88,7 +88,7 @@ jobs:
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-latest-m
       timeout-minutes: 10
       env:
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -125,7 +125,7 @@ jobs:
          matrix:
             shard: [1, 2, 3, 4, 5]
             total: [5]
-      runs-on: ubuntu-22.04
+      runs-on: ubuntu-latest-m
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v3
@@ -171,7 +171,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [e2e_tests, unit_tests]
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-latest-m
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v3
