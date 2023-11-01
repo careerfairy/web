@@ -4,9 +4,13 @@ const { withSentryConfig } = require("@sentry/nextjs")
 //    enabled: process.env.ANALYZE === "true",
 // });
 
+/** @type {boolean} */
 const notProduction = process.env.NODE_ENV !== "production"
+
+/** @type {boolean} */
 const isVercelPreview = process.env.VERCEL_ENV === "preview"
 
+/** @type {Record<string, string[]>} */
 const csp = {
    "default-src": [
       "'self'",
@@ -152,6 +156,7 @@ if (isVercelPreview) {
    csp["frame-src"].push("https://vercel.live")
 }
 
+/** @type {{key: string, value: string}[]} */
 const securityHeaders = [
    {
       // prevent careerfairy from being iframed
@@ -175,6 +180,7 @@ const securityHeaders = [
    },
 ]
 
+/** @type {import('next').NextConfig} */
 const moduleExports = {
    env: {
       REACT_APP_FIREBASE_API_KEY: "AIzaSyAMx1wVVxqo4fooh0OMVSeSTOqNKzMbch0",
@@ -185,12 +191,7 @@ const moduleExports = {
       REACT_APP_FIREBASE_STORAGE_BUCKET: "careerfairy-e1fd9.appspot.com",
       REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
    },
-   eslint: {
-      // Since ESLint was introduced a long time after the beginning of the codebase
-      // there are a lot of pending errors that need to be fixed first
-      // this will ignore eslint during build to allow deploys
-      ignoreDuringBuilds: true,
-   },
+
    headers: async () => {
       return [
          {
@@ -236,8 +237,8 @@ const moduleExports = {
       outputFileTracingExcludes: {
          "*": [
             // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
-            "./node_modules/@swc/core-linux-x64-gnu",
-            "./node_modules/@swc/core-linux-x64-musl",
+            "**/node_modules/@swc/core-linux-x64-gnu",
+            "**/node_modules/@swc/core-linux-x64-musl",
          ],
       },
    },
