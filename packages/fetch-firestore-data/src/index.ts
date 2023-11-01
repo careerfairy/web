@@ -94,7 +94,7 @@ async function deleteAuth() {
 
    debug("Starting deleting auth request", project)
    await axios.delete(
-      `http://localhost:9099/emulator/v1/projects/${project}/accounts`
+      `http://127.0.0.1:9099/emulator/v1/projects/${project}/accounts`
    )
 }
 
@@ -176,7 +176,7 @@ function emulatorExport() {
       config.LOCAL_FOLDER,
       config.BUCKET_FOLDER
    )
-   return axios.post("http://localhost:4400/_admin/export", {
+   return axios.post("http://127.0.0.1:4400/_admin/export", {
       path: fullPath,
    })
 }

@@ -7,6 +7,7 @@ import {
    heroQueryProps,
    highlightListQueryProps,
    HygraphRemoteFieldOfStudyResponse,
+   HygraphResponseMarketingPage,
    imageQueryProps,
    marketingSignupQueryProps,
    seoQueryProps,
@@ -29,12 +30,24 @@ export interface IMarketingPageRepository {
    getFieldsOfStudyWithMarketingPages(): Promise<HygraphRemoteFieldOfStudyResponse>
 }
 
+interface IMarketingPageSlugsResponse {
+   marketingLandingPages: { slug: Slug }[]
+}
+
+interface IPageResponse {
+   page: Page
+}
+
+interface IFieldOfStudiesResponse {
+   fieldOfStudies: HygraphRemoteFieldOfStudyResponse
+}
+
 // language=GraphQL
 class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
    constructor() {}
 
    async getAllMarketingPageSlugs(): Promise<{ slug: Slug }[]> {
-      const data = await fetchAPI(`
+      const data = await fetchAPI<IMarketingPageSlugsResponse>(`
           {
               marketingLandingPages {
                   slug
@@ -45,7 +58,9 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
    }
 
    async getMarketingPage(variables: Variables): Promise<MarketingLandingPage> {
-      const response = await fetchAPI(
+      const response = await fetchAPI<{
+         marketingLandingPage: HygraphResponseMarketingPage
+      }>(
          `
               query MarketingLandingPageQuery($slug: String!, $stage: Stage!) {
                   marketingLandingPage(stage: $stage, where: { slug: $slug }) {
@@ -83,7 +98,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
    }
 
    async getPage(variables: Variables): Promise<Page> {
-      const response = await fetchAPI(
+      const response = await fetchAPI<IPageResponse>(
          `
               query PageQuery($slug: String!, $stage: Stage!) {
                   page(stage: $stage, where: { slug: $slug }) {
@@ -111,7 +126,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
    }
 
    async getFieldsOfStudyWithMarketingPages(): Promise<HygraphRemoteFieldOfStudyResponse> {
-      const data = await fetchAPI(`
+      const data = await fetchAPI<IFieldOfStudiesResponse>(`
           {
               fieldOfStudies ${fieldOfStudyQueryProps}
           }

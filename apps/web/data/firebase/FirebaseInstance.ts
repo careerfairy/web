@@ -38,10 +38,10 @@ export const createFirebaseInstance = (
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
    if (shouldUseEmulators()) {
-      app.auth().useEmulator("http://localhost:9099")
-      app.firestore().useEmulator("localhost", 8080)
-      app.functions(region).useEmulator("localhost", 5001)
-      app.storage().useEmulator("localhost", 9199)
+      app.auth().useEmulator("http://127.0.0.1:9099")
+      app.firestore().useEmulator("127.0.0.1", 8080)
+      app.functions(region).useEmulator("127.0.0.1", 5001)
+      app.storage().useEmulator("127.0.0.1", 9199)
       console.log("You're connected to the emulators!")
    }
 
