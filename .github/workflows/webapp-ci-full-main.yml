@@ -171,7 +171,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [e2e_tests, unit_tests]
-      runs-on: ubuntu-latest-m
+      runs-on: ubuntu-latest-l
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v3
