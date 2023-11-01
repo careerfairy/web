@@ -56,7 +56,7 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
    const currentSparkId = useSelector(currentSparkIdSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
-   const categoryId = useSelector(activeSparkSelector)?.category.id
+   const categoryId = useSelector(activeSparkSelector)?.category?.id || null
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
       (data) => sparkService.trackSparkEvents(data),
