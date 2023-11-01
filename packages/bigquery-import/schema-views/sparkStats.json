@@ -76,7 +76,17 @@
             },
             {
                "name": "category",
-               "type": "string"
+               "type": "map",
+               "fields": [
+                  {
+                     "name": "id",
+                     "type": "string"
+                  },
+                  {
+                     "name": "name",
+                     "type": "string"
+                  }
+               ]
             },
             {
                "name": "question",
