@@ -11,7 +11,6 @@ import { useRouter } from "next/router"
 import { FC, createContext, useCallback, useContext, useMemo } from "react"
 import { useSelector } from "react-redux"
 import {
-   activeSparkSelector,
    currentSparkIdSelector,
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
@@ -56,7 +55,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
    const currentSparkId = useSelector(currentSparkIdSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
-   const categoryId = useSelector(activeSparkSelector)?.category?.id || null
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
       (data) => sparkService.trackSparkEvents(data),
@@ -95,7 +93,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
             visitorId,
             actionType: event,
             originalSparkId,
-            categoryId,
             utm_source: utm_source ? utm_source.toString() : null,
             utm_medium: utm_medium ? utm_medium.toString() : null,
             utm_campaign: utm_campaign ? utm_campaign.toString() : null,
@@ -163,7 +160,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
          visitorId,
          router.query,
          originalSparkId,
-         categoryId,
          userData?.universityCountryCode,
          userData?.fieldOfStudy?.id,
          userData?.levelOfStudy?.id,
@@ -185,7 +181,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
 
          const secondWatched: SparkSecondWatchedClient = {
             sparkId: currentSparkId,
-            categoryId: categoryId,
             sessionId,
             videoEventPositionInSeconds: secondsWatched,
             universityCountry: userData?.universityCountryCode || null,
@@ -202,7 +197,6 @@ export const SparksFeedTrackerProvider: FC = ({ children }) => {
       [
          addSecondsWatchedToBatch,
          currentSparkId,
-         categoryId,
          sessionId,
          userData?.fieldOfStudy?.id,
          userData?.levelOfStudy?.id,

@@ -105,7 +105,6 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
          object().shape({
             sparkId: string().required(),
             originalSparkId: string().nullable(),
-            categoryId: string().nullable(),
             visitorId: string().required(),
             referrer: string().nullable(),
             sessionId: string().required(),
@@ -157,7 +156,6 @@ const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload
       events: array().of(
          object().shape({
             sparkId: string().required(),
-            categoryId: string().nullable(),
             visitorId: string().required(),
             videoEventPositionInSeconds: number().required(),
             sessionId: string().required(),
