@@ -125,7 +125,7 @@ jobs:
          matrix:
             shard: [1, 2, 3, 4, 5]
             total: [5]
-      runs-on: ubuntu-latest-m
+      runs-on: ubuntu-latest-l
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v3
