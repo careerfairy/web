@@ -1,10 +1,10 @@
 import {
    Box,
    Collapse,
+   Container,
    FormControl,
    FormControlLabel,
    Grid,
-   IconButton,
    Switch,
    TextField,
    Tooltip,
@@ -24,6 +24,7 @@ import Section from "components/views/common/Section"
 import CloseIcon from "@mui/icons-material/Close"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import DateUtil from "../../../../util/DateUtil"
+import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
 
 type Props = {
    isGroupsSelected: boolean
@@ -250,8 +251,8 @@ const StreamInfo = ({
                   </Tooltip>
                </Grid>
             )}
-            <Grid xs={12} lg={6} item>
-               <ImageSelect
+            <Grid xs={12} lg={4} item>
+               {/*<ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}
                   isSubmitting={isSubmitting}
@@ -266,9 +267,26 @@ const StreamInfo = ({
                      errors.companyLogoUrl
                   }
                   resolution={"640 x 480"}
-               />
+               />*/}
+               <Container
+                  sx={{
+                     display: "flex",
+                     justifyContent: "center",
+                     paddingTop: "2.5%",
+                     width: "95%",
+                     height: "95%",
+                  }}
+               >
+                  <LogoUploaderWithCropping
+                     logoUrl={values.companyLogoUrl}
+                     handleSubmit={async (fileObject) => {
+                        const newLogoUrl = URL.createObjectURL(fileObject)
+                        setFieldValue("companyLogoUrl", newLogoUrl, true)
+                     }}
+                  />
+               </Container>
             </Grid>
-            <Grid xs={12} lg={6} item>
+            <Grid xs={12} lg={8} item>
                <ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}

@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import { FC, useState } from "react"
 import ImageCropperDialog from "../ImageCropperDialog"
 import FileUploader from "../FileUploader"
 import { sxStyles } from "types/commonTypes"
@@ -18,8 +18,8 @@ const styles = sxStyles({
             opacity: 1,
          },
       },
-      width: 140,
-      height: 140,
+      width: "100%",
+      height: "100%",
       position: "relative",
       cursor: "pointer",
       border: `1px solid #EDE7FD`,
@@ -30,9 +30,6 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       top: 0,
-      "& img": {
-         objectFit: "contain",
-      },
    },
    imageLabel: {
       color: "#9999B1",
@@ -61,7 +58,8 @@ const styles = sxStyles({
       },
    },
    logoUploader: {
-      width: "fit-content",
+      width: "100%",
+      height: "100%",
    },
 })
 
@@ -103,6 +101,7 @@ type UploaderProps = {
 
 const LogoUploaderWithCropping: FC<UploaderProps> = (props) => {
    const { logoUrl, handleSubmit } = props
+
    const [logoObjectUrl, setLogoObjectUrl] = useState<string | null>(null)
    const [logoUrlInternal, setLogoUrlInternal] = useState<string | null>(
       logoUrl
