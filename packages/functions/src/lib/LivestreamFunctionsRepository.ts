@@ -404,6 +404,7 @@ export class LivestreamFunctionsRepository
          } else {
             q = q
                .where("start", ">", getEarliestEventBufferTime())
+               .where("hasEnded", "==", false)
                .orderBy("start", "asc")
          }
 
