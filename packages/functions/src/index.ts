@@ -236,8 +236,8 @@ exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
-exports.trackSparkEvents_v2 = userSparks.trackSparkEvents
-exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
+exports.trackSparkEvents = userSparks.trackSparkEvents
+exports.trackSparkSecondsWatched = userSparks.trackSparkSecondsWatched
 
 // Custom Jobs
 exports.userApplyToCustomJob = customJobs.userApplyToCustomJob

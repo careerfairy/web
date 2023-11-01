@@ -12,12 +12,6 @@
       "description": "Original Spark ID from the feed (first one)"
    },
    {
-      "name": "categoryId",
-      "type": "STRING",
-      "mode": "NULLABLE",
-      "description": "Category of the Spark"
-   },
-   {
       "name": "userId",
       "type": "STRING",
       "mode": "NULLABLE",

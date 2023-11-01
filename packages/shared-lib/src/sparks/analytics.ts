@@ -4,8 +4,6 @@
 type CommonClientFields = {
    /** Unique identifier for the Spark */
    sparkId: string
-   /** Category ID of the Spark */
-   categoryId: string | null
    /** Visitor ID to help identify unique users in case they are not logged in */
    visitorId: string
    /** A sessionId is a unique identifier generated each time a user views a specific spark. When the user scrolls to a new spark, a new sessionId is generated. */
