@@ -1,10 +1,10 @@
 import {
    Box,
    Collapse,
+   Container,
    FormControl,
    FormControlLabel,
    Grid,
-   IconButton,
    Switch,
    TextField,
    Tooltip,
@@ -21,9 +21,10 @@ import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
-import CloseIcon from "@mui/icons-material/Close"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import DateUtil from "../../../../util/DateUtil"
+import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
+import AspectRatio from "components/views/common/AspectRatio"
 
 type Props = {
    isGroupsSelected: boolean
@@ -66,6 +67,8 @@ const StreamInfo = ({
    const [disableStartDatePicker, setDisableStartDatePicker] = useState(false)
    const { setShowPromotionInputs, setIsPromotionInputsDisabled } =
       useStreamCreationProvider()
+
+   const theme = useTheme()
 
    const handleShowPromotions = (disabled = false) => {
       setShowStartToolTip(false)
@@ -250,8 +253,8 @@ const StreamInfo = ({
                   </Tooltip>
                </Grid>
             )}
-            <Grid xs={12} lg={6} item>
-               <ImageSelect
+            <Grid xs={12} md={4} lg={4} item>
+               {/*<ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}
                   isSubmitting={isSubmitting}
@@ -266,9 +269,34 @@ const StreamInfo = ({
                      errors.companyLogoUrl
                   }
                   resolution={"640 x 480"}
-               />
+               />*/}
+               <Container
+                  sx={{
+                     display: "flex",
+                     justifyContent: "center",
+                     paddingTop: "2.5%",
+                     height: "95%",
+                     [theme.breakpoints.down("md")]: {
+                        width: "40vw",
+                        height: "40vw",
+                     },
+                     [theme.breakpoints.up("md")]: {
+                        width: "95%",
+                     },
+                  }}
+               >
+                  <AspectRatio aspectRatio="1:1">
+                     <LogoUploaderWithCropping
+                        logoUrl={values.companyLogoUrl}
+                        handleSubmit={async (fileObject) => {
+                           const newLogoUrl = URL.createObjectURL(fileObject)
+                           setFieldValue("companyLogoUrl", newLogoUrl, true)
+                        }}
+                     />
+                  </AspectRatio>
+               </Container>
             </Grid>
-            <Grid xs={12} lg={6} item>
+            <Grid xs={12} md={8} lg={8} item>
                <ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}

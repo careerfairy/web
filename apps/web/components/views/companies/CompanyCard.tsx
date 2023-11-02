@@ -28,7 +28,7 @@ import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
-import CircularLogo from "../common/CircularLogo"
+import CircularLogo from "../common/logos/CircularLogo"
 
 const LOGO_SIZE = 75
 

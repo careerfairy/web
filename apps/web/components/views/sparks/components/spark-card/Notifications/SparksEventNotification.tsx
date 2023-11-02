@@ -15,7 +15,7 @@ import {
 import { Box, Button, Slide, Typography } from "@mui/material"
 import { companyLogoPlaceholder } from "../../../../../../constants/images"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    root: {

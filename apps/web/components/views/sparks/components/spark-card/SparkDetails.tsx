@@ -4,7 +4,7 @@ import Box from "@mui/material/Box"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "components/views/common/Link"
 
 const styles = sxStyles({
