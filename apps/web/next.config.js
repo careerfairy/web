@@ -125,6 +125,7 @@ const csp = {
       "https://player.vimeo.com",
       "https://www.careerfairy.io",
       "https://library.careerfairy.io",
+      "https://cdn.embedly.com",
    ],
    "font-src": [
       "'self'",
