@@ -1,4 +1,5 @@
 {
+   "extends": "@careerfairy/config-tsconfig/tsconfig.nextjs.json",
    "compilerOptions": {
       "target": "es5",
       "lib": ["dom", "dom.iterable", "esnext"],
@@ -17,7 +18,7 @@
       "paths": {
          ".": ["."],
          "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"],
-         "@careerfairy/ui/*": ["../../packages/ui/src/*"]
+         "@careerfairy/shared-ui/*": ["../../packages/shared-ui/src/*"]
       }
    },
    "include": [
@@ -25,7 +26,7 @@
       "next-env.d.ts",
       "**/*.ts",
       "**/*.tsx",
-      "../../packages/ui/src/config/mui-theme.d.ts"
+      "../../packages/shared-ui/src/config/mui-theme.d.ts"
    ],
    "exclude": ["node_modules"]
 }

@@ -16,8 +16,7 @@
       "jsx": "react-jsx",
       "downlevelIteration": true,
       "paths": {
-         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"],
-         "@careerfairy/seed-data/*": ["../../packages/seed-data/src/*"]
+         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"]
       },
       "outDir": "dist",
       "strict": true,

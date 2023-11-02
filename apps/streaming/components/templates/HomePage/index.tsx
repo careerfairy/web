@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material"
 
 import { Content } from "./styled"
-import { Button } from "@careerfairy/ui"
+import { Button } from "@careerfairy/shared-ui"
 
 export const HomePage = () => {
    return (
