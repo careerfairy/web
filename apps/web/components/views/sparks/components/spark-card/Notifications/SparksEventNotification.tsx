@@ -12,10 +12,10 @@ import {
    removeCurrentEventNotifications,
    showEventDetailsDialog,
 } from "../../../../../../store/reducers/sparksFeedReducer"
-import { Avatar, Box, Button, Slide, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import { Box, Button, Slide, Typography } from "@mui/material"
 import { companyLogoPlaceholder } from "../../../../../../constants/images"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    root: {
@@ -38,14 +38,6 @@ const styles = sxStyles({
    avatar: {
       width: { xs: 50, md: 60 },
       height: { xs: 50, md: 60 },
-      backgroundColor: "white",
-      boxShadow: "0px 12px 40px rgba(0, 0, 0, 0.08)",
-      borderRadius: 2,
-      "& img": {
-         objectFit: "contain",
-         height: "90%",
-         width: "90%",
-      },
    },
    message: {
       display: "flex",
@@ -119,11 +111,10 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
       <Slide direction={"down"} in={showNotification}>
          <Box sx={styles.root}>
             <Box sx={styles.notification}>
-               <Avatar
-                  variant="square"
+               <CircularLogo
+                  src={logoUrl || companyLogoPlaceholder}
+                  alt="company logo live stream notification"
                   sx={styles.avatar}
-                  alt={`test logo`}
-                  src={getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder}
                />
                <Box sx={styles.message}>
                   <Typography

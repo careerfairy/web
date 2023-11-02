@@ -23,15 +23,14 @@ import {
 import { useInView } from "react-intersection-observer"
 import Skeleton from "@mui/material/Skeleton"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
-import { alpha } from "@mui/material/styles"
 import FollowButton from "../common/company/FollowButton"
 import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
+import CircularLogo from "../common/logos/CircularLogo"
 
-const LOGO_HEIGHT = 60
-const LOGO_WIDTH = 64
+const LOGO_SIZE = 75
 
 const styles = sxStyles({
    root: {
@@ -76,16 +75,10 @@ const styles = sxStyles({
       height: 45,
       color: "text.primary",
    },
-   companyLogo: {
-      width: LOGO_WIDTH,
-      height: LOGO_HEIGHT,
-      border: (theme) =>
-         `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+   companyLogoWrapper: {
       position: "absolute",
-      background: (theme) => theme.palette.background.paper,
-      borderRadius: 2,
-      p: 1,
-      top: -LOGO_HEIGHT / 2,
+      top: -LOGO_SIZE / 2,
+      zIndex: 2,
    },
    followButtonWrapper: {
       position: "absolute",
@@ -102,6 +95,7 @@ const styles = sxStyles({
       textTransform: "none",
       zIndex: 1,
       textDecoration: "none !important",
+      fontWeight: "bold",
    },
    badge: {
       height: 32,
@@ -132,13 +126,11 @@ const CompanyCard: FC<Props> = ({ company }) => {
             <LinkToCompanyPage companyName={company.universityName} />
          </CardMedia>
          <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogo}>
-               <Image
-                  src={getResizedUrl(company.logoUrl, "sm")}
-                  width={64}
-                  height={60}
+            <Box sx={styles.companyLogoWrapper}>
+               <CircularLogo
+                  src={company.logoUrl}
                   alt={company.universityName}
-                  objectFit="contain"
+                  size={LOGO_SIZE}
                />
             </Box>
             <Box sx={styles.followButtonWrapper}>
@@ -242,8 +234,12 @@ export const CompanyCardSkeleton: FC = () => {
             <Skeleton variant="rectangular" width="100%" height="100%" />
          </CardMedia>
          <CardContent sx={styles.content}>
-            <Box sx={styles.companyLogo}>
-               <Skeleton variant="rectangular" width="100%" height="100%" />
+            <Box sx={styles.companyLogoWrapper}>
+               <Skeleton
+                  variant="circular"
+                  width={LOGO_SIZE}
+                  height={LOGO_SIZE}
+               />
             </Box>
             <Box sx={styles.followButtonWrapper}>
                <Skeleton variant="rectangular" width={100} height={30} />

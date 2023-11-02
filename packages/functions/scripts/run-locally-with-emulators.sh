@@ -4,8 +4,8 @@ set -e
 # ./run-locally-with-emulators.sh [folderToImport] [--export-on-exit]
 
 # Firebase functions running locally should connect to emulators
-export FIREBASE_AUTH_EMULATOR_HOST="localhost:9099"
-export FIRESTORE_EMULATOR_HOST="localhost:8080"
+export FIREBASE_AUTH_EMULATOR_HOST="127.0.0.1:9099"
+export FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
 
 # NextJS app will read this var to setup emulators
 export NEXT_PUBLIC_FIREBASE_EMULATORS="true"

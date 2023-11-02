@@ -213,7 +213,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             {
                start: admin.firestore.Timestamp.fromDate(new Date(pastDateMs)),
                hasStarted: true,
-            },
+            } as Partial<LivestreamEvent>,
             overrideFields
          )
       )
@@ -228,7 +228,8 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
                start: admin.firestore.Timestamp.fromDate(
                   faker.date.future(faker.datatype.number({ min: 1, max: 60 }))
                ),
-            },
+               hasEnded: false,
+            } as Partial<LivestreamEvent>,
             overrideFields
          )
       )
@@ -258,6 +259,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          },
          registeredUsers,
          groupIds: [groupId],
+         hasEnded: false,
          ...overrideFields,
       })
 

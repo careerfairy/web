@@ -5,6 +5,8 @@ import MultiListSelect from "../../common/MultiListSelect"
 import GroupQuestionSelect from "../GroupQuestionSelect"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import Section from "components/views/common/Section"
+import { FormikHelpers } from "formik"
+import { DraftFormValues } from "../DraftStreamForm"
 
 type Props = {
    existingGroups: Group[]
@@ -13,7 +15,7 @@ type Props = {
    selectedGroups: Group[]
    isSubmitting: boolean
    isNotAdmin: boolean
-   setFieldValue: (field, value) => void
+   setFieldValue?: FormikHelpers<DraftFormValues>["setFieldValue"]
    isGroupAdmin: (groupId) => boolean
    groupId: string
    sectionRef: any

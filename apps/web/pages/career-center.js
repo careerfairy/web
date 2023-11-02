@@ -65,9 +65,9 @@ const CareerCenterLandingPage = ({}) => {
 
    const careerCenterBenefitsData2 = [
       {
-         name: "Plan a livestream",
+         name: "Plan a live stream",
          description:
-            "Manage your livestream requests " +
+            "Manage your live stream requests " +
             "from companies and setup future " +
             "events",
          imageUrl: livestream,
@@ -75,7 +75,7 @@ const CareerCenterLandingPage = ({}) => {
       {
          name: "Promote the event",
          description:
-            "Once a livestream event is scheduled, " +
+            "Once a live stream event is scheduled, " +
             "you notify your students about the event ",
          imageUrl: promote,
       },

@@ -138,8 +138,11 @@ const csp = {
 
 if (notProduction) {
    csp["default-src"].push("localhost:*")
+   csp["default-src"].push("127.0.0.1:*")
    csp["connect-src"].push("localhost:*")
+   csp["connect-src"].push("127.0.0.1:*")
    csp["img-src"].push("localhost:*")
+   csp["img-src"].push("127.0.0.1:*")
 }
 
 if (isVercelPreview) {
@@ -237,6 +240,7 @@ const moduleExports = {
          "media.graphcms.com",
          "media.graphassets.com",
          "localhost",
+         "127.0.0.1",
       ],
    },
    webpackDevMiddleware: (config) => {
