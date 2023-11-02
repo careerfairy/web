@@ -105,7 +105,7 @@ const getStaticProps: GetStaticProps = async (ctx) => {
 
    // Use path to determine Webflow path
    let url = get(ctx, `params.path`, [])
-   url = url.join(`/`)
+   url = Array.isArray(url) ? url.join(`/`) : url
    if (url.charAt(0) !== `/`) {
       url = `/${url}`
    }
