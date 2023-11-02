@@ -1,16 +1,19 @@
 {
-   "name": "streaming",
+   "name": "@careerfairy/streaming",
    "version": "0.1.0",
    "private": true,
    "scripts": {
       "dev": "next dev -p 3001",
       "build": "next build",
       "start": "next start -p 3001",
-      "lint": "next lint"
+      "lint": "next lint",
+      "test": "jest --verbose --passWithNoTests",
+      "test:watch": "jest --watch",
+      "test:coverage": "jest --coverage"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
-      "@careerfairy/ui": "*",
+      "@careerfairy/shared-ui": "*",
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
       "next": "13.5.6"
