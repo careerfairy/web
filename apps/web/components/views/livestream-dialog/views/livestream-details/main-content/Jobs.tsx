@@ -16,7 +16,6 @@ import {
    LivestreamCustomJobAssociationPresenter,
    LivestreamJobAssociation,
 } from "@careerfairy/shared-lib/livestreams"
-import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
