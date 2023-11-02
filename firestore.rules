@@ -157,6 +157,10 @@ service cloud.firestore {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
 
+            match /userNotifications/{notificationId} {
+                allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
             allow read: if true;
             allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin", "userEmail"]);
             allow create: if false; // only admin sdk can create users

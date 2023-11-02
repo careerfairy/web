@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
       display: "flex",
       flexDirection: "row",
       flexWrap: "wrap",
+      // @ts-ignore
       verticalAlign: "middle",
       marginBottom: "5px",
    },

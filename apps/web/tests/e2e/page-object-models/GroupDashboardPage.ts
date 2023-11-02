@@ -52,9 +52,7 @@ export class GroupDashboardPage extends CommonPage {
       this.companyInformationIndustriesInput =
          this.page.getByLabel("Company industries")
 
-      this.companyInformationSizeInput = this.page.getByRole("button", {
-         name: "Company size *",
-      })
+      this.companyInformationSizeInput = this.page.getByLabel("Company size *")
 
       this.companyInformationAboutInput = this.page.getByLabel("About *")
 

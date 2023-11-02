@@ -6,6 +6,7 @@ import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
+import WatchTutorialButton from "../components/WatchTutorialButton"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -78,6 +79,9 @@ const EmptySparksView: FC = () => {
                >
                   Upload a Spark
                </Button>
+            </Stack>
+            <Stack mt={3} justifyContent="center" direction="row">
+               <WatchTutorialButton />
             </Stack>
          </Box>
       </SparksContainer>

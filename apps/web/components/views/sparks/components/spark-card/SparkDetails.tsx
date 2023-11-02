@@ -4,7 +4,7 @@ import Box from "@mui/material/Box"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import RoundedLogo from "components/views/common/RoundedLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "components/views/common/Link"
 
 const styles = sxStyles({
@@ -88,12 +88,7 @@ const SparkDetails: FC<Props> = ({
          onClick={onClick}
       >
          <span>
-            <RoundedLogo
-               src={companyLogoUrl}
-               alt={companyName}
-               size={52}
-               borderRadius={1.5}
-            />
+            <CircularLogo src={companyLogoUrl} alt={companyName} size={60} />
          </span>
          <Box mr={0.75} />
          <Box sx={styles.creatorDetails}>

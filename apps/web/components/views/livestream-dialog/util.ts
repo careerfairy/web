@@ -39,7 +39,7 @@ export const getLivestreamDialogData = async (
       }
    } catch (e) {
       errorLogAndNotify(e, {
-         message: "Error getting livestream dialog data",
+         message: "Error getting live stream dialog data",
          context: "getLivestreamDialogData",
          extra: {
             ctx,

@@ -39,6 +39,9 @@ import {
    SparkEvent,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import * as functions from "firebase-functions"
+import { userRepo } from "../api/repositories"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -56,6 +59,8 @@ export interface ISparkFunctionsRepository {
    /**
     *  Create a spark
     * @param spark  The spark to create
+    * @param group
+    * @param creator
     */
    create(
       spark: AddSparkSparkData,
@@ -129,7 +134,6 @@ export interface ISparkFunctionsRepository {
    /**
     * Method to replenish a user's feed, when the number of sparks in the feed is less than x
     * @param userId The id of the user
-    * @param feed The user's feed if provided, we won't fetch it again
     */
    replenishUserFeed(userId: string): Promise<void>
 
@@ -180,6 +184,7 @@ export interface ISparkFunctionsRepository {
    /**
     * Increment/Decrement the sparks feed count for a user
     * @param userId The ID of the user.
+    * @param type
     * @returns void
     */
    incrementFeedCount(
@@ -244,6 +249,12 @@ export interface ISparkFunctionsRepository {
     * @returns void
     */
    syncSparkToSparkStatsDocument(spark: Spark): Promise<void>
+
+   /**
+    * Create spark notification
+    * @param spark
+    */
+   createSparkUserNotification(spark: Spark): Promise<void>
 }
 
 export class SparkFunctionsRepository
@@ -464,7 +475,7 @@ export class SparkFunctionsRepository
 
       const feedRef = this.firestore.collection("sparksFeedMetrics").doc(userId)
 
-      await batch.set(feedRef, userFeed, { merge: true })
+      batch.set(feedRef, userFeed, { merge: true })
 
       // Store in UserFeed
       sparks.forEach((spark) => {
@@ -806,6 +817,54 @@ export class SparkFunctionsRepository
 
          return void sparkStatsRef.set(sparkStats)
       }
+   }
+
+   async createSparkUserNotification(spark: Spark): Promise<void> {
+      const { group } = spark
+
+      functions.logger.log(
+         `start creating notifications for the Spark ${spark.id}`
+      )
+
+      if (!group.publicSparks || !spark.published) {
+         // if the group or the spark is not yet public, don't create notification
+         functions.logger.log(
+            `Group ${group.universityName} or Spark ${spark.id} are not public, so no notification will be created`
+         )
+         return
+      }
+
+      const bulkWriter = this.firestore.bulkWriter()
+
+      const followers = await userRepo.getGroupFollowers(group.id)
+
+      functions.logger.log(
+         `Will create notification for ${followers.length} users`
+      )
+
+      followers.forEach((follower) => {
+         const ref = this.firestore
+            .collection("userData")
+            .doc(follower.userId)
+            .collection("userNotifications")
+            .doc()
+
+         const newNotification: UserNotification = {
+            documentType: "userNotification",
+            actionUrl: `/sparks/${spark.id}`,
+            companyId: group.id,
+            sparkId: spark.id,
+            imageFormat: "circular",
+            imageUrl: group.logoUrl,
+            message: `<strong>${group.universityName}</strong> has recently published a new Spark. Watch it now!`,
+            createdAt: Timestamp.now(),
+            id: ref.id,
+         }
+
+         bulkWriter.set(ref, newNotification, { merge: true })
+      })
+
+      return void bulkWriter.close()
    }
 }
 

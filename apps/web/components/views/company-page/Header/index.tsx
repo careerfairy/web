@@ -8,7 +8,6 @@ import {
    Tabs,
    Typography,
 } from "@mui/material"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../types/commonTypes"
 import { companyLogoPlaceholder } from "../../../../constants/images"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
@@ -23,10 +22,12 @@ import useControlledTabNavigationOnScroll from "../../../custom-hook/useControll
 import Link from "../../common/Link"
 import BannerIllustration from "./BannerIllustration"
 import PublicSparksBadge from "../../common/icons/PublicSparksBadge"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
 const DESKTOP_LOGO_SIZE = LOGO_SIZE * 1.5
+const NAV_BG_COLOR = "#EFF5F8"
 
 const styles = sxStyles({
    imageWrapper: {
@@ -37,15 +38,7 @@ const styles = sxStyles({
    logo: {
       width: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
       height: { xs: LOGO_SIZE, md: DESKTOP_LOGO_SIZE },
-      borderRadius: 2,
       marginRight: "-5px",
-      background: (theme) => theme.palette.common.white,
-      boxShadow: "0px 12px 40px rgba(0, 0, 0, 0.08)",
-      "& img": {
-         objectFit: "contain",
-         maxWidth: "90%",
-         maxHeight: "90%",
-      },
       marginLeft: { xs: "10px", md: 3 },
    },
    companyTitle: {
@@ -59,13 +52,9 @@ const styles = sxStyles({
    stickyLogo: {
       width: STICKY_LOGO_SIZE,
       height: STICKY_LOGO_SIZE,
-      backgroundColor: "white",
-      boxShadow: "0px 12px 40px rgba(0, 0, 0, 0.08)",
-      borderRadius: 2,
-      "& img": {
-         objectFit: "contain",
-         height: "85%",
-         width: "85%",
+      "& > img": {
+         maxWidth: "100%",
+         maxHeight: "100%",
       },
    },
    navigatorWrapper: {
@@ -97,12 +86,15 @@ const styles = sxStyles({
          md: "100px",
       },
    },
+   companyNameMobileNotSticky: {
+      backgroundColor: "white",
+   },
    navigatorTabs: {
       display: "flex",
       alignItems: "center",
       flex: 1,
       height: { xs: "50px", md: "60px" },
-      backgroundColor: "#EFF5F8",
+      backgroundColor: NAV_BG_COLOR,
    },
    indicator: {
       height: (theme) => theme.spacing(0.4),
@@ -146,7 +138,7 @@ const styles = sxStyles({
       height: "auto",
    },
    avatarAndTabsWrapper: {
-      backgroundColor: "#EFF5F8",
+      backgroundColor: NAV_BG_COLOR,
       display: "flex",
       width: "100%",
       height: "100%",
@@ -247,8 +239,8 @@ const Header = () => {
 
             <Box display={"flex"}>
                <Box
-                  minWidth={isSticky ? { xs: "unset", md: "300px" } : null}
-                  bgcolor={isSticky ? "#EFF5F8" : "transparent"}
+                  minWidth={isSticky ? { md: "300px" } : null}
+                  bgcolor={NAV_BG_COLOR}
                   flex={1}
                />
                <Container
@@ -261,15 +253,13 @@ const Header = () => {
                         alignItems={"flex-end"}
                         direction={"row"}
                         spacing={2}
+                        bgcolor={isMobile ? "white" : NAV_BG_COLOR}
                      >
-                        <Avatar
-                           variant="square"
+                        <CircularLogo
                            sx={styles.logo}
                            alt={`${universityName} logo`}
-                           src={
-                              getResizedUrl(logoUrl, "sm") ||
-                              companyLogoPlaceholder
-                           }
+                           src={logoUrl || companyLogoPlaceholder}
+                           size={DESKTOP_LOGO_SIZE}
                         />
                         {isMobile ? (
                            <span>
@@ -279,7 +269,15 @@ const Header = () => {
                      </Stack>
                   )}
                   <Box sx={styles.navigatorInfoWrapper}>
-                     <Box sx={[styles.companyName, styles.companyNameSticky]}>
+                     <Box
+                        sx={[
+                           styles.companyName,
+                           styles.companyNameSticky,
+                           isMobile &&
+                              !isSticky &&
+                              styles.companyNameMobileNotSticky,
+                        ]}
+                     >
                         <Typography
                            sx={[
                               styles.companyTitle,
@@ -308,17 +306,15 @@ const Header = () => {
                         >
                            <Slide
                               unmountOnExit
+                              exit={false}
                               direction={"down"}
                               in={isSticky}
                            >
-                              <Avatar
-                                 variant="square"
-                                 sx={styles.stickyLogo}
+                              <CircularLogo
+                                 src={logoUrl || companyLogoPlaceholder}
                                  alt={`${universityName} logo`}
-                                 src={
-                                    getResizedUrl(logoUrl, "sm") ||
-                                    companyLogoPlaceholder
-                                 }
+                                 size={STICKY_LOGO_SIZE}
+                                 sx={styles.stickyLogo}
                               />
                            </Slide>
                            <AppBar
@@ -350,7 +346,7 @@ const Header = () => {
                      </Box>
                   </Box>
                </Container>
-               <Box flex={1} bgcolor="#EFF5F8" />
+               <Box flex={1} bgcolor={NAV_BG_COLOR} />
             </Box>
          </Box>
       </>

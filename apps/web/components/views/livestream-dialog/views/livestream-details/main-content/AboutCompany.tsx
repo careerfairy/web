@@ -25,6 +25,7 @@ import Section from "./Section"
 import { InViewRef } from "../MainContentNavigation"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    root: {
@@ -59,23 +60,15 @@ const styles = sxStyles({
       flex: 1,
    }),
    logoWrapper: {
-      p: 0.5,
-      bgcolor: "background.paper",
       position: "absolute",
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      borderRadius: 2,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       width: "fit-content",
       height: "fit-content",
-      "& .company-logo": {
-         borderRadius: (theme) => theme.spacing(1),
-         maxHeight: 90,
-         maxWidth: 280,
-      },
    },
    followButton: {
       borderRadius: 1,
@@ -113,6 +106,8 @@ const styles = sxStyles({
       ml: 1,
    },
 })
+
+const LOGO_SIZE = 120
 
 interface Props {
    presenter: LivestreamPresenter
@@ -156,13 +151,10 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                />
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>
-                  <Image
-                     src={getResizedUrl(presenter.companyLogoUrl, "lg")}
-                     width={100}
-                     height={100}
+                  <CircularLogo
+                     src={presenter.companyLogoUrl}
                      alt={presenter.company}
-                     objectFit="contain"
-                     className="company-logo"
+                     size={LOGO_SIZE}
                   />
                </Box>
             </CardMedia>
@@ -288,7 +280,11 @@ export const AboutCompanySkeleton: FC = () => {
             <CardMedia sx={styles.media}>
                <Box sx={styles.overlay} />
                <Box sx={styles.logoWrapper}>
-                  <Skeleton variant="rectangular" width={106} height={50} />
+                  <Skeleton
+                     variant="circular"
+                     width={LOGO_SIZE}
+                     height={LOGO_SIZE}
+                  />
                </Box>
             </CardMedia>
             <CardContent sx={styles.content}>

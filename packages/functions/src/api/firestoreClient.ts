@@ -26,7 +26,7 @@ export const firestoreClientSDK = getFirestore(app)
 
 // Connect to emulators
 if (isLocalEnvironment()) {
-   connectFirestoreEmulator(firestoreClientSDK, "localhost", 8080)
+   connectFirestoreEmulator(firestoreClientSDK, "127.0.0.1", 8080)
    console.log("Using Firestore Client connected to Emulators")
 } else {
    console.log("Using Firestore Client connected to Production")
