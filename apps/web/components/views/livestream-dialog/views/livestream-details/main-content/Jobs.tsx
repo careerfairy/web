@@ -165,65 +165,11 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       [router, jobId, presenter.id]
    )
 
-   const copy = useMemo<{
-      title: string
-      description: string
-      toastTitle?: string
-   }>(() => {
-      const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
-
-      if (isPast) {
-         if (!hasRegistered && !userHasBoughtRecording) {
-            return {
-               title: "Job details not available",
-               description:
-                  "You cannot see the job details, since you did not attend this live stream",
-               toastTitle: "Not available",
-            }
-         }
-         if (!hasRegistered && userHasBoughtRecording) {
-            return {
-               title: "See more",
-               description:
-                  "Watch the recording to get access to the job details",
-               toastTitle: "Available",
-            }
-         }
-         if (hasRegistered) {
-            return {
-               title: "See more",
-               description:
-                  "You can see the job details because you attended the live stream",
-               toastTitle: "Available",
-            }
-         }
-      }
-
-      return {
-         title: "Details in live stream",
-         description: "The job details are presented during the live stream!",
-         toastTitle: "Available soon",
-      }
-   }, [presenter, authenticatedUser.email, isPast, userHasBoughtRecording])
-
-   const onClick = useCallback(() => {
-      if (buttonDisabled && isMobile) {
-         successNotification(copy.description, copy.toastTitle)
-      }
-
+   const onClick = () => {
       if (!isPageMode) {
          goToJobDetails(jobId)
       }
-   }, [
-      buttonDisabled,
-      isMobile,
-      isPageMode,
-      successNotification,
-      copy.description,
-      copy.toastTitle,
-      goToJobDetails,
-      jobId,
-   ])
+   }
 
    return (
       <Stack

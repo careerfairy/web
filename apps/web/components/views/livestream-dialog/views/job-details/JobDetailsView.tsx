@@ -50,19 +50,6 @@ const JobDetailsView: FC = (props) => {
 
    if (!jobId) return <JobDetailsViewSkeleton />
 
-   if (
-      !livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
-      !userHasBoughtRecording &&
-      livestreamPresenter.isPast()
-   ) {
-      return (
-         <NotFoundView
-            title="Job details not available"
-            description="You cannot see the job details, since you did not attend this live stream."
-         />
-      )
-   }
-
    return (
       <SuspenseWithBoundary fallback={<JobDetailsViewSkeleton />}>
          <JobDetails jobId={jobId} {...props} />
