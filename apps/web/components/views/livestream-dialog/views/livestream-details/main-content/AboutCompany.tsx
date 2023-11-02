@@ -25,7 +25,7 @@ import Section from "./Section"
 import { InViewRef } from "../MainContentNavigation"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
-import CircularLogo from "components/views/common/CircularLogo"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    root: {
