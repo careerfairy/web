@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Form as UiForm, Formik } from "formik"
 import {
+   Box,
    Button,
    Collapse,
    Container,
@@ -25,6 +26,8 @@ import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
 import { scrollTop } from "../../../../util/CommonUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
+import AspectRatio from "components/views/common/AspectRatio"
+import { useTheme } from "@mui/styles"
 
 const useStyles = makeStyles(() => ({
    root: {
@@ -90,6 +93,7 @@ const CreateBaseGroup = ({
    const [groupedUniversities, setGroupedUniversities] = useState<
       GroupedUniversity[]
    >([])
+   const theme = useTheme()
 
    useEffect(() => {
       ;(async function () {
@@ -201,13 +205,28 @@ const CreateBaseGroup = ({
                               errors.logoFileObj
                         )}
                      >
-                        <LogoUploaderWithCropping
-                           handleSubmit={async (fileObject) => {
-                              const newLogoUrl = URL.createObjectURL(fileObject)
-                              setFieldValue("logoUrl", newLogoUrl, true)
-                              setFieldValue("logoFileObj", fileObject, true)
+                        <Box
+                           sx={{
+                              [theme.breakpoints.down("md")]: {
+                                 width: 220,
+                                 height: 220,
+                              },
+                              [theme.breakpoints.up("md")]: {
+                                 width: 275,
+                                 height: 275,
+                              },
+                              marginTop: 2,
                            }}
-                        />
+                        >
+                           <LogoUploaderWithCropping
+                              handleSubmit={async (fileObject) => {
+                                 const newLogoUrl =
+                                    URL.createObjectURL(fileObject)
+                                 setFieldValue("logoUrl", newLogoUrl, true)
+                                 setFieldValue("logoFileObj", fileObject, true)
+                              }}
+                           />
+                        </Box>
                         <FormHelperText>
                            {touched.logoFileObj && errors.logoFileObj
                               ? errors.logoFileObj
