@@ -124,7 +124,7 @@ service cloud.firestore {
             }
 
             match /customJobApplications/{jobId} {
-                allow read: if isSignedInAndIsSameUser(userId);
+                allow read: if true;
                 allow write: if false;
             }
 
