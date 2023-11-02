@@ -50,19 +50,10 @@ const JobDetailsView: FC = (props) => {
 
    if (!jobId) return <JobDetailsViewSkeleton />
 
-   // If the livestream is in the past, we don't want to show or fetch the job details
-   if (!livestreamPresenter.isPast()) {
-      return (
-         <NotFoundView
-            title="Details in live stream"
-            description="The job details will be made available after the livestream."
-         />
-      )
-   }
-
    if (
       !livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
-      !userHasBoughtRecording
+      !userHasBoughtRecording &&
+      livestreamPresenter.isPast()
    ) {
       return (
          <NotFoundView

@@ -245,28 +245,22 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             </Stack>
          </Stack>
          <Box sx={styles.jobActionWrapper}>
-            <StyledToolTip
-               placement="top"
-               title={buttonDisabled ? copy.description : ""}
-            >
-               <span onClick={onClick}>
-                  <Button
-                     component={isPageMode ? Link : undefined}
-                     shallow
-                     disabled={buttonDisabled}
-                     scroll={false}
-                     variant="contained"
-                     disableElevation
-                     color="primary"
-                     size="small"
-                     sx={styles.seeMoreBtn}
-                     // @ts-ignore
-                     href={isPageMode ? jobLink : undefined}
-                  >
-                     {copy.title}
-                  </Button>
-               </span>
-            </StyledToolTip>
+            <span onClick={onClick}>
+               <Button
+                  component={isPageMode ? Link : undefined}
+                  shallow
+                  scroll={false}
+                  variant="contained"
+                  disableElevation
+                  color="primary"
+                  size="small"
+                  sx={styles.seeMoreBtn}
+                  // @ts-ignore
+                  href={isPageMode ? jobLink : undefined}
+               >
+                  {"See more"}
+               </Button>
+            </span>
          </Box>
       </Stack>
    )
