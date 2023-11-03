@@ -25,6 +25,7 @@ import { useStreamCreationProvider } from "./StreamCreationProvider"
 import DateUtil from "../../../../util/DateUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
 import AspectRatio from "components/views/common/AspectRatio"
+import useUploadLivestreamLogo from "components/custom-hook/live-stream/useUploadLivestreamLogo"
 
 type Props = {
    isGroupsSelected: boolean
@@ -41,6 +42,7 @@ type Props = {
    sectionRef: any
    publishDate: Date | null
    isPastStream: boolean
+   isDraft: boolean
 }
 
 const PROMOTION_MIN_DAYS = 30
@@ -60,6 +62,7 @@ const StreamInfo = ({
    sectionRef,
    publishDate,
    isPastStream,
+   isDraft,
 }: Props) => {
    const { palette } = useTheme()
    const [showStartTooltip, setShowStartToolTip] = useState(false)
@@ -68,7 +71,14 @@ const StreamInfo = ({
    const { setShowPromotionInputs, setIsPromotionInputsDisabled } =
       useStreamCreationProvider()
 
+   const { handleUploadImage } = useUploadLivestreamLogo(values.id, isDraft)
+
    const theme = useTheme()
+
+   const handleUploadCompanyLogo = async (fileObject: File) => {
+      const { url } = await handleUploadImage(fileObject)
+      setFieldValue("companyLogoUrl", url, true)
+   }
 
    const handleShowPromotions = (disabled = false) => {
       setShowStartToolTip(false)
@@ -254,22 +264,6 @@ const StreamInfo = ({
                </Grid>
             )}
             <Grid xs={12} md={4} lg={4} item>
-               {/*<ImageSelect
-                  getDownloadUrl={getDownloadUrl}
-                  setFieldValue={setFieldValue}
-                  isSubmitting={isSubmitting}
-                  path="company-logos"
-                  label="Your Company Logo"
-                  formName="companyLogoUrl"
-                  changeImageButtonLabel="Change Logo"
-                  value={values.companyLogoUrl}
-                  error={
-                     errors.companyLogoUrl &&
-                     touched.companyLogoUrl &&
-                     errors.companyLogoUrl
-                  }
-                  resolution={"640 x 480"}
-               />*/}
                <Container
                   sx={{
                      display: "flex",
@@ -288,10 +282,7 @@ const StreamInfo = ({
                   <AspectRatio aspectRatio="1:1">
                      <LogoUploaderWithCropping
                         logoUrl={values.companyLogoUrl}
-                        handleSubmit={async (fileObject) => {
-                           const newLogoUrl = URL.createObjectURL(fileObject)
-                           setFieldValue("companyLogoUrl", newLogoUrl, true)
-                        }}
+                        handleSubmit={handleUploadCompanyLogo}
                      />
                   </AspectRatio>
                </Container>
