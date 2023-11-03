@@ -10,7 +10,7 @@ import { groupRepo } from "../../data/RepositoryInstances"
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
    const [isApplying, setIsApplying] = useState(false)
-   const userCustomJob = useUserCustomJob(userData?.id || job.id, job.id)
+   const userCustomJob = useUserCustomJob(userData?.id, job.id)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const alreadyApplied: boolean = !!userCustomJob
