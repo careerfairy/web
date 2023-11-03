@@ -16,7 +16,6 @@ import {
    LivestreamCustomJobAssociationPresenter,
    LivestreamJobAssociation,
 } from "@careerfairy/shared-lib/livestreams"
-import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
@@ -166,65 +165,11 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       [router, jobId, presenter.id]
    )
 
-   const copy = useMemo<{
-      title: string
-      description: string
-      toastTitle?: string
-   }>(() => {
-      const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
-
-      if (isPast) {
-         if (!hasRegistered && !userHasBoughtRecording) {
-            return {
-               title: "Job details not available",
-               description:
-                  "You cannot see the job details, since you did not attend this live stream",
-               toastTitle: "Not available",
-            }
-         }
-         if (!hasRegistered && userHasBoughtRecording) {
-            return {
-               title: "See more",
-               description:
-                  "Watch the recording to get access to the job details",
-               toastTitle: "Available",
-            }
-         }
-         if (hasRegistered) {
-            return {
-               title: "See more",
-               description:
-                  "You can see the job details because you attended the live stream",
-               toastTitle: "Available",
-            }
-         }
-      }
-
-      return {
-         title: "Details in live stream",
-         description: "The job details are presented during the live stream!",
-         toastTitle: "Available soon",
-      }
-   }, [presenter, authenticatedUser.email, isPast, userHasBoughtRecording])
-
-   const onClick = useCallback(() => {
-      if (buttonDisabled && isMobile) {
-         successNotification(copy.description, copy.toastTitle)
-      }
-
+   const onClick = () => {
       if (!isPageMode) {
          goToJobDetails(jobId)
       }
-   }, [
-      buttonDisabled,
-      isMobile,
-      isPageMode,
-      successNotification,
-      copy.description,
-      copy.toastTitle,
-      goToJobDetails,
-      jobId,
-   ])
+   }
 
    return (
       <Stack
@@ -245,28 +190,22 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             </Stack>
          </Stack>
          <Box sx={styles.jobActionWrapper}>
-            <StyledToolTip
-               placement="top"
-               title={buttonDisabled ? copy.description : ""}
-            >
-               <span onClick={onClick}>
-                  <Button
-                     component={isPageMode ? Link : undefined}
-                     shallow
-                     disabled={buttonDisabled}
-                     scroll={false}
-                     variant="contained"
-                     disableElevation
-                     color="primary"
-                     size="small"
-                     sx={styles.seeMoreBtn}
-                     // @ts-ignore
-                     href={isPageMode ? jobLink : undefined}
-                  >
-                     {copy.title}
-                  </Button>
-               </span>
-            </StyledToolTip>
+            <span onClick={onClick}>
+               <Button
+                  component={isPageMode ? Link : undefined}
+                  shallow
+                  scroll={false}
+                  variant="contained"
+                  disableElevation
+                  color="primary"
+                  size="small"
+                  sx={styles.seeMoreBtn}
+                  // @ts-ignore
+                  href={isPageMode ? jobLink : undefined}
+               >
+                  {"See more"}
+               </Button>
+            </span>
          </Box>
       </Stack>
    )

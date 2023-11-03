@@ -2,6 +2,7 @@ dist/
 node_modules/
 
 emulatorData/
+emulatorDataBackup/
 firebase-export-*/
 
 .firebase/
@@ -22,3 +23,7 @@ playwright-report/
 .DS_Store
 !/packages/fetch-firestore-data/.env
 packages/functions/.env.local
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

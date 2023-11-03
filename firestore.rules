@@ -124,7 +124,7 @@ service cloud.firestore {
             }
 
             match /customJobApplications/{jobId} {
-                allow read: if isSignedInAndIsSameUser(userId);
+                allow read: if true;
                 allow write: if false;
             }
 
@@ -217,7 +217,7 @@ service cloud.firestore {
 
             match /customJobs/{jobId} {
                 allow read: if true;
-                allow write: if isSignedIn();
+                allow write: if true;
             }
 
             match /ats/{integrationId} {
