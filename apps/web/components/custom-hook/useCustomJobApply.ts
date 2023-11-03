@@ -10,7 +10,7 @@ import { groupRepo } from "../../data/RepositoryInstances"
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
    const [isApplying, setIsApplying] = useState(false)
-   const userCustomJob = useUserCustomJob(userData.id, job.id)
+   const userCustomJob = useUserCustomJob(userData?.id, job.id)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const alreadyApplied: boolean = !!userCustomJob
@@ -22,7 +22,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
             await customJobServiceInstance.applyToAJob(
                livestreamId,
                job.id,
-               userData.id,
+               userData?.id,
                job.groupId
             )
             successNotification(
@@ -45,7 +45,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
       job,
       livestreamId,
       successNotification,
-      userData.id,
+      userData?.id,
    ])
 
    const handleClickApplyBtn = useCallback(async () => {
