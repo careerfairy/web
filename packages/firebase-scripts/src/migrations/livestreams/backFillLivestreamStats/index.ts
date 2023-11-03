@@ -167,7 +167,7 @@ const handleSaveLivestreamStatsInFirestore = async () => {
             const mergedStats = merge(currentStats, stats)
 
             // update here since set(arg, {merge: true})  fails and we want to merge the stats not overwrite them
-            batch.update(statsRef, mergedStats)
+            batch.update(statsRef, mergedStats as { [x: string]: any })
          } else {
             const newStats = createLiveStreamStatsDoc(
                livestream,
