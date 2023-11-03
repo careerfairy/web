@@ -830,6 +830,7 @@ const DraftStreamForm = ({
                                     sectionRef={streamInfoRef}
                                     publishDate={currentStream?.created?.toDate?.()}
                                     isPastStream={isPastStream}
+                                    isDraft={isDraft}
                                  />
 
                                  <SpeakersInfo
