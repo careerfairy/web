@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Form as UiForm, Formik } from "formik"
 import {
+   Box,
    Button,
    Collapse,
    Container,
@@ -188,7 +189,6 @@ const CreateBaseGroup = ({
                handleSubmit,
                isSubmitting,
                setFieldValue,
-               setFieldError,
                /* and other goodies */
             }) => (
                <UiForm className={classes.form} onSubmit={handleSubmit}>
@@ -201,13 +201,28 @@ const CreateBaseGroup = ({
                               errors.logoFileObj
                         )}
                      >
-                        <LogoUploaderWithCropping
-                           handleSubmit={async (fileObject) => {
-                              const newLogoUrl = URL.createObjectURL(fileObject)
-                              setFieldValue("logoUrl", newLogoUrl, true)
-                              setFieldValue("logoFileObj", fileObject, true)
+                        <Box
+                           sx={{
+                              marginTop: 2,
+                              width: {
+                                 xs: 220,
+                                 md: 275,
+                              },
+                              height: {
+                                 xs: 220,
+                                 md: 275,
+                              },
                            }}
-                        />
+                        >
+                           <LogoUploaderWithCropping
+                              handleSubmit={async (fileObject) => {
+                                 const newLogoUrl =
+                                    URL.createObjectURL(fileObject)
+                                 setFieldValue("logoUrl", newLogoUrl, true)
+                                 setFieldValue("logoFileObj", fileObject, true)
+                              }}
+                           />
+                        </Box>
                         <FormHelperText>
                            {touched.logoFileObj && errors.logoFileObj
                               ? errors.logoFileObj
