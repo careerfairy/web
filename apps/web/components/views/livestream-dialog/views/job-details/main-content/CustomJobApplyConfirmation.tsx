@@ -2,7 +2,7 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import React, { useCallback } from "react"
 import { HelpCircle } from "react-feather"
-import { Button, CircularProgress, Typography } from "@mui/material"
+import { Button, CircularProgress, Stack, Typography } from "@mui/material"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { useLiveStreamDialog } from "../../../LivestreamDialog"
@@ -102,7 +102,7 @@ const Component = ({
             </Box>
          </Box>
 
-         <Box>
+         <Stack direction="row" flexWrap="nowrap">
             <Button
                sx={[styles.btn, styles.noBtn]}
                variant="text"
@@ -125,7 +125,7 @@ const Component = ({
             >
                Yes
             </Button>
-         </Box>
+         </Stack>
       </Box>
    )
 }
