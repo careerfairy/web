@@ -180,7 +180,7 @@ const handleSaveGroupStatsInFirestore = async () => {
             // Perform a deep merge of the stats
             const mergedStats = merge(currentGroupStats, stats) // The stats that are not set by this script will not be overwritten by this merge :)
 
-            batch.update(groupStatsRef, mergedStats) // Upsert the stats data
+            batch.update(groupStatsRef, mergedStats as { [x: string]: any }) // Upsert the stats data
          } else {
             // Create a new group stats doc
             const currentGroupStats = createGroupStatsDoc(group, groupStatsId)
