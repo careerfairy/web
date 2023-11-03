@@ -223,23 +223,30 @@ export const useSparksForm = () => {
 
    const goToCreatorSelectedView = useCallback(
       (creator: PublicCreator) => {
-         setCreator(creator)
-         stepper.goToStep("creator-selected")
+         setStateAndNavigate(
+            setCreator,
+            stepper.goToStep,
+            creator,
+            "creator-selected"
+         )
       },
       [setCreator, stepper]
    )
 
    const goToCreateOrEditCreatorView = useCallback(
       (creator: PublicCreator) => {
-         stepper.goToStep("create-or-edit-creator")
-         setCreator(creator)
+         setStateAndNavigate(
+            setCreator,
+            stepper.goToStep,
+            creator,
+            "create-or-edit-creator"
+         )
       },
       [setCreator, stepper]
    )
 
    const goToSelectCreatorView = useCallback(() => {
-      stepper.goToStep("select-creator")
-      setCreator(null)
+      setStateAndNavigate(setCreator, stepper.goToStep, null, "select-creator")
    }, [setCreator, stepper])
 
    const goToCreateSparkView = useCallback(() => {
@@ -467,6 +474,29 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
          </LoadingButton>
       </span>
    )
+}
+
+/**
+ * Utility function to set state and navigate to a step.
+ * This function is designed to avoid the 'maximum update depth' error in React.
+ * It does this by using setTimeout to enqueue the state update operation in the JavaScript event loop,
+ * which ensures that the state update and navigation don't occur in the same rendering phase.
+ *
+ * @param {Function} setState - The function to update the state.
+ * @param {Function} goToStep - The function to navigate to a step.
+ * @param {any} stateValue - The new state value.
+ * @param {string} step - The step to navigate to.
+ */
+function setStateAndNavigate(
+   setState: Function,
+   goToStep: Function,
+   stateValue: any,
+   step: SparkDialogStep
+) {
+   setState(stateValue)
+   setTimeout(() => {
+      goToStep(step)
+   }, 0)
 }
 
 SparksDialog.Title = Title
