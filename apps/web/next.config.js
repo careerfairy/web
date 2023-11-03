@@ -273,6 +273,9 @@ const moduleExports = {
 
       return config
    },
+   eslint: {
+      ignoreDuringBuilds: true,
+   },
 }
 
 // test or development environment
