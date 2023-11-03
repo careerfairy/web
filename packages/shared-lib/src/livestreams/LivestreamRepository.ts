@@ -29,7 +29,7 @@ import {
    LivestreamStatsToUpdate,
 } from "./stats"
 import { OrderByDirection } from "firebase/firestore"
-import { Create } from "../commonTypes"
+import { Create, ImageType } from "../commonTypes"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -248,6 +248,20 @@ export interface ILivestreamRepository {
       limit?: number,
       order?: OrderByDirection
    ): firebase.firestore.Query
+
+   /**
+    * Updates the live streams company logo in the database.
+    *
+    * @param  livestreamId - The ID of the livestream.
+    * @param  isDraft - Whether the livestream is a draft to decide which collection (draftLivestreams or livestreams) to update.
+    * @param  image - The image metadata to store in the database.
+    * @returns A Promise that resolves when the banner image URL is updated.
+    */
+   updateLivestreamLogo(
+      livestreamId: string,
+      isDraft: boolean,
+      image: ImageType
+   ): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -259,6 +273,22 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   async updateLivestreamLogo(
+      livestreamId: string,
+      isDraft: boolean,
+      image: ImageType
+   ): Promise<void> {
+      const livestreamRef = this.firestore
+         .collection(isDraft ? "draftLivestreams" : "livestreams")
+         .doc(livestreamId)
+
+      const toUpdate: Pick<LivestreamEvent, "companyLogoUrl"> = {
+         companyLogoUrl: image.url,
+      }
+
+      return livestreamRef.update(toUpdate)
    }
 
    getGroupDraftLivestreamsQuery(
