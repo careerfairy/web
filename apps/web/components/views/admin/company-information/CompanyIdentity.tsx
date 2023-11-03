@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC } from "react"
 import Styles from "./BaseStyles"
@@ -48,10 +48,12 @@ const CompanyIdentity: FC = () => {
                   </Typography>
                </span>
                {/* Uploading && Cropping Company logo image */}
-               <LogoUploaderWithCropping
-                  handleSubmit={handleSubmitLogo}
-                  logoUrl={groupPresenter.getCompanyLogoUrl()}
-               />
+               <Box width={140} height={140}>
+                  <LogoUploaderWithCropping
+                     handleSubmit={handleSubmitLogo}
+                     logoUrl={groupPresenter.getCompanyLogoUrl()}
+                  />
+               </Box>
             </Stack>
 
             <Stack spacing={{ xs: 2, md: 1.25 }}>

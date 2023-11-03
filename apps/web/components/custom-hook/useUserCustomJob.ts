@@ -4,7 +4,7 @@ import { useFirestoreDocument } from "./utils/useFirestoreDocument"
 const useUserCustomJob = (userId: string, jobId: string) => {
    const { data } = useFirestoreDocument<UserCustomJobApplicationDocument>(
       "userData",
-      [userId, "customJobApplications", jobId]
+      [userId ?? "public", "customJobApplications", jobId]
    )
 
    return data

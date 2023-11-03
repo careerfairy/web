@@ -13,7 +13,6 @@ import Stack from "@mui/material/Stack"
 import JobCTAButton from "./main-content/JobCTAButton"
 import NotFoundView from "../common/NotFoundView"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
@@ -27,19 +26,7 @@ type Props = {
 
 const JobDetailsView: FC = (props) => {
    const { query } = useRouter()
-   const {
-      livestreamPresenter,
-      updatedStats,
-      jobId: contextJobId,
-      mode,
-   } = useLiveStreamDialog()
-   const { authenticatedUser } = useAuth()
-
-   const { userHasBoughtRecording } = useRecordingAccess(
-      authenticatedUser.email,
-      livestreamPresenter,
-      updatedStats
-   )
+   const { jobId: contextJobId, mode } = useLiveStreamDialog()
 
    const { livestreamDialog } = query
 
@@ -50,28 +37,6 @@ const JobDetailsView: FC = (props) => {
 
    if (!jobId) return <JobDetailsViewSkeleton />
 
-   // If the livestream is in the past, we don't want to show or fetch the job details
-   if (!livestreamPresenter.isPast()) {
-      return (
-         <NotFoundView
-            title="Details in live stream"
-            description="The job details will be made available after the livestream."
-         />
-      )
-   }
-
-   if (
-      !livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
-      !userHasBoughtRecording
-   ) {
-      return (
-         <NotFoundView
-            title="Job details not available"
-            description="You cannot see the job details, since you did not attend this live stream."
-         />
-      )
-   }
-
    return (
       <SuspenseWithBoundary fallback={<JobDetailsViewSkeleton />}>
          <JobDetails jobId={jobId} {...props} />
@@ -80,6 +45,8 @@ const JobDetailsView: FC = (props) => {
 }
 
 const JobDetails: FC<Props> = ({ jobId }) => {
+   const { userData } = useAuth()
+
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
    let job: Job | PublicCustomJob
@@ -135,7 +102,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
                   <JobDescription job={job} />
 
-                  {isOpen && !isAtsJob ? (
+                  {isOpen && !isAtsJob && userData?.id ? (
                      <CustomJobApplyConfirmation
                         handleClose={handleClose}
                         job={job as PublicCustomJob}
