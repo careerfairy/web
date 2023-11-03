@@ -26,8 +26,6 @@ import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
 import { scrollTop } from "../../../../util/CommonUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
-import AspectRatio from "components/views/common/AspectRatio"
-import { useTheme } from "@mui/styles"
 
 const useStyles = makeStyles(() => ({
    root: {
@@ -93,7 +91,6 @@ const CreateBaseGroup = ({
    const [groupedUniversities, setGroupedUniversities] = useState<
       GroupedUniversity[]
    >([])
-   const theme = useTheme()
 
    useEffect(() => {
       ;(async function () {
@@ -192,7 +189,6 @@ const CreateBaseGroup = ({
                handleSubmit,
                isSubmitting,
                setFieldValue,
-               setFieldError,
                /* and other goodies */
             }) => (
                <UiForm className={classes.form} onSubmit={handleSubmit}>
@@ -207,15 +203,15 @@ const CreateBaseGroup = ({
                      >
                         <Box
                            sx={{
-                              [theme.breakpoints.down("md")]: {
-                                 width: 220,
-                                 height: 220,
-                              },
-                              [theme.breakpoints.up("md")]: {
-                                 width: 275,
-                                 height: 275,
-                              },
                               marginTop: 2,
+                              width: {
+                                 xs: 220,
+                                 md: 275,
+                              },
+                              height: {
+                                 xs: 220,
+                                 md: 275,
+                              },
                            }}
                         >
                            <LogoUploaderWithCropping
