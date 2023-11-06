@@ -1,4 +1,4 @@
-import { createEmotionCache, theme } from "@careerfairy/shared-ui"
+import { createEmotionCache } from "@careerfairy/shared-ui"
 import Document, {
    Html,
    Head,
@@ -8,8 +8,9 @@ import Document, {
    DocumentContext,
 } from "next/document"
 import createEmotionServer from "@emotion/server/create-instance"
-import { MyAppProps, poppins } from "./_app"
+import { MyAppProps } from "./_app"
 import { AppType } from "next/app"
+import { poppins, theme } from "utils"
 
 interface MyDocumentProps extends DocumentProps {
    emotionStyleTags: JSX.Element[]

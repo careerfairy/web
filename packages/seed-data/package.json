@@ -9,9 +9,7 @@
       "clean": "rimraf dist/"
    },
    "devDependencies": {
-      "@types/uuid": "^9.0.0",
-      "rimraf": "^3.0.2",
-      "typescript": "^5.1.6"
+      "@types/uuid": "^9.0.0"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",

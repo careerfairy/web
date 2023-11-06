@@ -6,17 +6,17 @@ declare module "@mui/material/styles" {
    // Theme
    interface Theme {
       brand: {
-         blue: CSSProperties["color"]
-         green: CSSProperties["color"]
-         yellow: CSSProperties["color"]
+         // blue: CSSProperties["color"]
+         // green: CSSProperties["color"]
+         // yellow: CSSProperties["color"]
       }
    }
 
    interface ThemeOptions {
       brand: {
-         blue: CSSProperties["color"]
-         green: CSSProperties["color"]
-         yellow: CSSProperties["color"]
+         // blue: CSSProperties["color"]
+         // green: CSSProperties["color"]
+         // yellow: CSSProperties["color"]
       }
    }
 
@@ -33,11 +33,17 @@ declare module "@mui/material/styles" {
    interface TypographyVariants {
       title1: React.CSSProperties
       title2: React.CSSProperties
+      medium: React.CSSProperties
+      small: React.CSSProperties
+      xsmall: React.CSSProperties
    }
 
    interface TypographyVariantsOptions {
       title1?: React.CSSProperties
       title2?: React.CSSProperties
+      medium?: React.CSSProperties
+      small?: React.CSSProperties
+      xsmall?: React.CSSProperties
    }
 
    // Breakpoints
@@ -58,8 +64,11 @@ declare module "@mui/material/Typography" {
    interface TypographyPropsVariantOverrides {
       title1: true
       title2: true
-      body1: false
-      body2: false
+      // body1: false
+      // body2: false
       button: false
+      medium: true
+      small: true
+      xsmall: true
    }
 }

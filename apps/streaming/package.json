@@ -7,23 +7,17 @@
       "build": "next build",
       "start": "next start -p 3001",
       "lint": "next lint",
-      "test": "jest --verbose --passWithNoTests",
+      "test": "jest --verbose",
       "test:watch": "jest --watch",
-      "test:coverage": "jest --coverage"
+      "test:coverage": "jest --coverage",
+      "storybook": "storybook dev -p 6101",
+      "build-storybook": "storybook build"
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
-      "@careerfairy/shared-ui": "*",
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "next": "13.5.6"
+      "@careerfairy/shared-ui": "*"
    },
    "devDependencies": {
-      "typescript": "^5.1.6",
-      "@types/node": "^20",
-      "@types/react": "^18.2.32",
-      "@types/react-dom": "^18.2.14",
-      "eslint": "^8.43.0",
-      "eslint-config-next": "^13.5.6"
+      "@careerfairy/config-storybook": "*"
    }
 }

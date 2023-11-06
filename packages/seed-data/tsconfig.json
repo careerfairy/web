@@ -9,7 +9,8 @@
       "lib": ["ES2021", "dom"],
       "module": "commonjs",
       "allowJs": false,
-      "declaration": true
+      "declaration": true,
+      "skipLibCheck": true
    },
    "compileOnSave": true,
    "include": ["src"]
