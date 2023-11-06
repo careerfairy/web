@@ -164,6 +164,7 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                   <Stack sx={{ pt: 1 }} spacing={2}>
                      <TextField
                         fullWidth
+                        // @ts-ignore
                         helperText={errors.question}
                         label="Question"
                         disabled={isSubmitting}
@@ -204,7 +205,10 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                               </MenuItem>
                            ))}
                         </Select>
-                        <FormHelperText>{errors.appearAfter}</FormHelperText>
+                        <FormHelperText>
+                           {/* @ts-ignore */}
+                           {errors.appearAfter}
+                        </FormHelperText>
                      </FormControl>
 
                      <FormControl
@@ -224,7 +228,10 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                            }
                            label="Enable Written Reviews"
                         />
-                        <FormHelperText>{errors.hasText}</FormHelperText>
+                        <FormHelperText>
+                           {/* @ts-ignore */}
+                           {errors.hasText}
+                        </FormHelperText>
                      </FormControl>
                      <FormControl
                         error={Boolean(errors.noStars)}
@@ -247,7 +254,10 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                            }
                            label="Enable Rating System"
                         />
-                        <FormHelperText>{errors.noStars}</FormHelperText>
+                        <FormHelperText>
+                           {/* @ts-ignore */}
+                           {errors.noStars}
+                        </FormHelperText>
                      </FormControl>
                      <Collapse in={!values.noStars}>
                         <Stack spacing={2}>

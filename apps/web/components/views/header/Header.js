@@ -59,7 +59,7 @@ function Header(props) {
    let TopHeader = null
 
    if (props.page === "landing") {
-      TopHeader = (props) => {
+      TopHeader = function LandingHeaderComponent(props) {
          return (
             <LandingHeader
                {...props}
@@ -69,11 +69,11 @@ function Header(props) {
          )
       }
    } else if (authenticated) {
-      TopHeader = (props) => {
+      TopHeader = function AuthenticatedHeaderComponent(props) {
          return <AuthenticatedHeader {...props} toggleSideBar={toggleSideBar} />
       }
    } else {
-      TopHeader = (props) => {
+      TopHeader = function NonAuthenticatedHeaderComponent(props) {
          return (
             <NonAuthenticatedHeader {...props} toggleSideBar={toggleSideBar} />
          )
@@ -106,6 +106,7 @@ function Header(props) {
                   <Link
                      className="next-livestream-link"
                      href="/next-livestreams"
+                     legacyBehavior
                   >
                      <a onClick={toggleSideBar} className={classes.nextLink}>
                         Next Live Streams
@@ -114,23 +115,26 @@ function Header(props) {
                </li>
                {authenticated && (
                   <li>
-                     <a onClick={toggleSideBar} href="/groups">
+                     <Link onClick={toggleSideBar} href="/groups">
                         Follow Groups
-                     </a>
+                     </Link>
                   </li>
                )}
                <li>
-                  <Link href="https://companies.careerfairy.io">
+                  <Link href="https://companies.careerfairy.io" legacyBehavior>
                      <a onClick={toggleSideBar}>Companies</a>
                   </Link>
                </li>
                <li>
-                  <Link href="/wishlist">
+                  <Link href="/wishlist" legacyBehavior>
                      <a onClick={toggleSideBar}>Wishlist</a>
                   </Link>
                </li>
                <li>
-                  <Link href={authenticated ? "/profile" : "/login"}>
+                  <Link
+                     href={authenticated ? "/profile" : "/login"}
+                     legacyBehavior
+                  >
                      <a>{authenticated ? "My Profile" : "Log in"}</a>
                   </Link>
                </li>

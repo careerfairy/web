@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import {
    getMaxLineStyles,
    getResizedUrl,
@@ -272,7 +272,9 @@ const UpcomingLivestreamSkeleton = () => {
    )
 }
 
-const LivestreamHeader: FC = ({ children }) => (
+const LivestreamHeader: FC<{
+   children: React.ReactNode
+}> = ({ children }) => (
    <Typography
       color="primary.main"
       fontSize="0.931rem"
@@ -285,6 +287,7 @@ const LivestreamHeader: FC = ({ children }) => (
 
 const LivestreamTitle: FC<{
    italic?: boolean
+   children: React.ReactNode
 }> = ({ children, italic }) => {
    return (
       <Typography
@@ -300,10 +303,10 @@ const LivestreamTitle: FC<{
    )
 }
 
-const LinkToCompanyPage: FC<{ companyName: string }> = ({
-   companyName,
-   children,
-}) => {
+const LinkToCompanyPage: FC<{
+   companyName: string
+   children?: React.ReactNode
+}> = ({ companyName, children }) => {
    return (
       <CardActionArea
          href={`/company/${companyNameSlugify(companyName)}`}

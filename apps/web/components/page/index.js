@@ -13,6 +13,8 @@ const Page = forwardRef(({ children, title = "", ...rest }, ref) => {
    )
 })
 
+Page.displayName = "Page"
+
 Page.propTypes = {
    children: PropTypes.node.isRequired,
    title: PropTypes.string.isRequired,

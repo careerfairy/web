@@ -30,7 +30,9 @@ const initialValues: IAnalyticsPageContext = {
 
 const AnalyticsPageContext = createContext<IAnalyticsPageContext>(initialValues)
 
-export const GeneralPageProvider: FC = ({ children }) => {
+export const GeneralPageProvider: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    const [livestreamStats, setLivestreamStats] = useState<
       LiveStreamStats[] | undefined
    >(undefined)

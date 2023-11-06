@@ -153,6 +153,9 @@ const EngagementChart = memo(({ percentage, noOfEngagement, total }) => {
       </Box>
    )
 })
+
+EngagementChart.displayName = "EngagementChart"
+
 const numberOfTicks = 20
 let count = 0
 export const CallToActionItem = React.memo((props) => {
@@ -366,5 +369,7 @@ export const CallToActionItem = React.memo((props) => {
       </StyledTooltipWithButton>
    )
 })
+
+CallToActionItem.displayName = "CallToActionItem"
 
 export default CallToActionItem

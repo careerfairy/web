@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { useCompanyPage } from "../index"
 import FollowButton from "../../common/company/FollowButton"
 
@@ -23,8 +23,8 @@ const StayUpToDateBanner = () => {
             <Grid item xs={3}>
                <Image
                   src="/illustrations/undraw_video_streaming.png"
-                  width="100px"
-                  height="90px"
+                  width="100"
+                  height="90"
                   alt="Stay up to date illustration"
                   objectFit={"contain"}
                />

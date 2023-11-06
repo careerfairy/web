@@ -32,11 +32,12 @@ const HandRaiseRequested = memo(
                            startIcon={<ClearRoundedIcon />}
                            variant="contained"
                            color="grey"
-                           children="Cancel"
                            onClick={() =>
                               updateHandRaiseRequest(HandRaiseState.unrequested)
                            }
-                        />
+                        >
+                           Cancel
+                        </Button>
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
                </span>
@@ -45,6 +46,8 @@ const HandRaiseRequested = memo(
       )
    }
 )
+
+HandRaiseRequested.displayName = "HandRaiseRequested"
 
 type Props = {
    handRaiseState: HandRaise

@@ -50,7 +50,7 @@ const ScreenShareDeniedModal = () => {
                sharing.
                <br />
                <br />
-               Please check your system's Security & Privacy settings to
+               Please check your system&apos;s Security & Privacy settings to
                authorize your browser to share your screen or{" "}
                <Box
                   sx={styles.link}

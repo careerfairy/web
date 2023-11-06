@@ -183,7 +183,10 @@ export function ResetPasswordBase() {
                               errors.email && touched.email && errors.email
                            )}
                         >
-                           <FormHelperText error>{errors.email}</FormHelperText>
+                           <FormHelperText error>
+                              {/* @ts-ignore */}
+                              {errors.email}
+                           </FormHelperText>
                         </Collapse>
 
                         <Button

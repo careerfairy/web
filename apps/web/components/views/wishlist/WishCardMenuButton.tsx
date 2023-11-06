@@ -175,7 +175,10 @@ const WishCardMenuButton = ({
                   onClick={option.onClick}
                   sx={styles.menuItem}
                >
-                  <ListItemIcon>{option.icon}</ListItemIcon>
+                  <ListItemIcon>
+                     {/* @ts-ignore */}
+                     {option.icon}
+                  </ListItemIcon>
                   <ListItemText primary={option.label} />
                </MenuItem>
             ))}

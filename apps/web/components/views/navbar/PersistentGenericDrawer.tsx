@@ -76,6 +76,7 @@ const styles: StylesProps = {
 interface PersistentDrawerProps {
    isPersistent: boolean
    sx?: SxProps<DefaultTheme>
+   children: React.ReactNode
 }
 
 /**

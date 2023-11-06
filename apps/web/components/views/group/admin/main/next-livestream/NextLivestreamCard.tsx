@@ -291,7 +291,7 @@ const NoLivestreams = () => {
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
             Looks like you don&apos;t have any upcoming live stream.
             <br />
-             Start creating your next live stream now!
+            Start creating your next live stream now!
          </Typography>
 
          <Box mt={2} mb={3} display="flex" justifyContent="center">

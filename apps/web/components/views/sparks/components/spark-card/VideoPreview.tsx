@@ -3,7 +3,7 @@ import LinearProgress, {
    linearProgressClasses,
 } from "@mui/material/LinearProgress"
 import useReactPlayerTracker from "components/custom-hook/utils/useReactPlayerTracker"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { FC, Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"

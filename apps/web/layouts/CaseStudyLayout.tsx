@@ -7,6 +7,7 @@ import GeneralNavDrawer from "../components/views/navbar/GeneralNavDrawer"
 
 type Props = {
    preview: boolean
+   children: React.ReactNode
 }
 const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
    return (

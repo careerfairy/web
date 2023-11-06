@@ -16,7 +16,7 @@ function YoutubePreviewer(props) {
             <Grid container>
                <Grid item xs={3}>
                   <img
-                     style={{ margin: "12px 10px 0 10px" }}
+                     // style={{ margin: "12px 10px 0 10px" }}
                      src={props.video.companyLogoUrl}
                      style={{ maxWidth: "100%", maxHeight: "100px" }}
                   />

@@ -85,6 +85,7 @@ const ButtonElement: FC = () => {
 type LinkTextProps = {
    onClick: (e: React.SyntheticEvent) => void
    isFloating: boolean
+   children: React.ReactNode
 }
 
 export const LinkText: FC<LinkTextProps> = ({
@@ -112,6 +113,7 @@ export const LinkText: FC<LinkTextProps> = ({
 type FloatingButtonProps = {
    isFloating: boolean
    disableMarginTop?: boolean
+   children: React.ReactNode
 }
 
 export const FloatingButtonWrapper: FC<FloatingButtonProps> = ({
