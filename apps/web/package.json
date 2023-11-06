@@ -35,7 +35,7 @@
       "@mui/material": "^5.14.15",
       "@mui/styles": "^5.14.15",
       "@mui/x-date-pickers": "^5.0.1",
-      "@react-pdf/renderer": "^2.1.0",
+      "@react-pdf/renderer": "^3.1.14",
       "@reduxjs/toolkit": "^1.8.3",
       "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
