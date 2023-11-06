@@ -145,12 +145,13 @@ function HandRaiseInactive({
                            variant="contained"
                            color="primary"
                            size="large"
-                           children="Activate Hand Raise"
                            onClick={() => {
                               setHandRaiseModeActive()
                               isOpen(9) && handleConfirm(9)
                            }}
-                        />
+                        >
+                           Activate Hand Raise
+                        </Button>
                      </NewFeatureHint>
                   </WhiteTooltip>
                </div>

@@ -16,7 +16,9 @@ const styles = sxStyles({
       letterSpacing: "0.4em",
    },
 })
-const SignupLayout: FC = ({ children }) => {
+const SignupLayout: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    return (
       <PillsBackground>
          <SEO title="CareerFairy | Sign Up" />

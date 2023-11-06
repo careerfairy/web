@@ -10,7 +10,7 @@ import {
    Typography,
 } from "@mui/material"
 import CardMedia from "@mui/material/CardMedia"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import {
    getMaxLineStyles,
    getResizedUrl,
@@ -75,6 +75,7 @@ const FeedbackCard: FC<Props> = ({ stats, groupId }) => {
          <Link
             href={`/group/${groupId}/admin/analytics/feedback/${stats.livestream.id}`}
             passHref
+            legacyBehavior
          >
             <CardActionArea sx={styles.actionArea} component="a">
                <CardMedia sx={styles.media} title={stats.livestream.company}>

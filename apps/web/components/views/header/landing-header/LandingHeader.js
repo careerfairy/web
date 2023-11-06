@@ -26,7 +26,7 @@ const LandingHeader = (props) => {
                   </IconButton>
                </li>
                <li>
-                  <Link href="/">
+                  <Link href="/" legacyBehavior>
                      <a>
                         <img
                            src="/logo_white.png"
@@ -43,7 +43,7 @@ const LandingHeader = (props) => {
             </ul>
             <ul id="middle-menu" className={"centered-menu white"}>
                <li className={props.page === "landing" ? "active" : ""}>
-                  <Link href="/">
+                  <Link href="/" legacyBehavior>
                      <a>For Students</a>
                   </Link>
                </li>

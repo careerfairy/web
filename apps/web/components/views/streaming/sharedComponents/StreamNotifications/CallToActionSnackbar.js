@@ -376,4 +376,6 @@ const CallToActionSnackbar = forwardRef(
    }
 )
 
+CallToActionSnackbar.displayName = "CallToActionSnackbar"
+
 export default CallToActionSnackbar

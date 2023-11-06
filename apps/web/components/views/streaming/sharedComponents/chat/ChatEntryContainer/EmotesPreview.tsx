@@ -7,7 +7,7 @@ import {
 } from "../EmotesModal/utils"
 import { Paper, Typography, Zoom } from "@mui/material"
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { sxStyles } from "../../../../../../types/commonTypes"
 
 const styles = sxStyles({

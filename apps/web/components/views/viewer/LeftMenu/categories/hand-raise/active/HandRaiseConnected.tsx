@@ -25,11 +25,12 @@ const HandRaiseRequested = memo(
                            size="large"
                            startIcon={<ClearRoundedIcon />}
                            variant="contained"
-                           children="Stop Streaming"
                            onClick={() =>
                               updateHandRaiseRequest(HandRaiseState.unrequested)
                            }
-                        />
+                        >
+                           Stop Streaming
+                        </Button>
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
                </span>
@@ -38,6 +39,9 @@ const HandRaiseRequested = memo(
       )
    }
 )
+
+HandRaiseRequested.displayName = "HandRaiseRequested"
+
 type Props = {
    handRaiseState: HandRaise
    updateHandRaiseRequest: (state: HandRaiseState) => Promise<void>

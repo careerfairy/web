@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react"
+import { ReactNode, useEffect, useRef } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useLiveStreamDialog } from "./LivestreamDialog"
 import useRegistrationHandler from "./useRegistrationHandler"
@@ -30,12 +30,15 @@ const RegistrationPreConditions = ({ children, skeleton }: Options) => {
    // check for fully auth load (auth + user data)
    const isAuthLoading = isLoadingAuth || isLoadingUserData
 
+   const statusRef = useRef(status)
+   statusRef.current = status
+
    useEffect(() => {
       if (isAuthLoading) {
          return
       }
 
-      switch (status) {
+      switch (statusRef.current) {
          case "login_required":
             redirectToLogin()
             break
@@ -46,7 +49,7 @@ const RegistrationPreConditions = ({ children, skeleton }: Options) => {
             }
             break
       }
-   }, [goToView, isAuthLoading, redirectToLogin, status, isPageMode])
+   }, [goToView, isAuthLoading, redirectToLogin, isPageMode])
 
    if (
       isAuthLoading ||

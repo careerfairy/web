@@ -1,5 +1,5 @@
 import { Identifiable } from "./commonTypes"
-import firebase from "firebase/compat"
+import firebase from "firebase/compat/app"
 import Timestamp = firebase.firestore.Timestamp
 
 export enum HandRaiseState {

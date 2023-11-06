@@ -26,6 +26,7 @@ const styles = sxStyles({
 
 type Props = {
    maxWidth?: BoxProps["maxWidth"]
+   children: React.ReactNode
 }
 
 const DividerWithText: FC<Props> = ({ children, maxWidth }) => {

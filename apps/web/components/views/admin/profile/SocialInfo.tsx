@@ -73,7 +73,10 @@ const SocialInfo = ({
                         errors.linkedinUrl
                   )}
                >
-                  <FormHelperText error>{errors.linkedinUrl}</FormHelperText>
+                  <FormHelperText error>
+                     {/* @ts-ignore */}
+                     {errors.linkedinUrl}
+                  </FormHelperText>
                </Collapse>
             </FormControl>
          </Box>

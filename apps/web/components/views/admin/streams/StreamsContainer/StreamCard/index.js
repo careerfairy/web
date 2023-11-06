@@ -46,7 +46,7 @@ import {
    dynamicSort,
    removeDuplicates,
 } from "@careerfairy/shared-lib/dist/utils"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 

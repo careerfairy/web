@@ -6,7 +6,7 @@ import {
    UserPublicData,
    UserStats,
 } from "../users"
-import firebase from "firebase/compat"
+import firebase from "firebase/compat/app"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp

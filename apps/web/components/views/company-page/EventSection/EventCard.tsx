@@ -13,7 +13,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import ChevronRight from "@mui/icons-material/ChevronRight"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { getRelevantHosts } from "../../../../util/streamUtil"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import { buildDialogLink } from "../../livestream-dialog"
 import { useRouter } from "next/router"
@@ -172,9 +172,12 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
                   <Box sx={styles.buttonsWrapper}>
                      <Link
                         href={linkProps}
-                        shallow // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                        // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                        shallow
                         passHref
-                        scroll={false} // Prevents the page from scrolling to the top when the link is clicked
+                        // Prevents the page from scrolling to the top when the link is clicked
+                        scroll={false}
+                        legacyBehavior
                      >
                         <Button
                            endIcon={<ChevronRight sx={{ mb: "2px" }} />}

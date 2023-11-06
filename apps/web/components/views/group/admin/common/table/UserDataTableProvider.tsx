@@ -123,6 +123,7 @@ type Props = {
    converterFn: (doc: unknown) => UserDataEntry
    title: string
    userType: string
+   children: React.ReactNode
 }
 
 const initialFilters: Filters = {

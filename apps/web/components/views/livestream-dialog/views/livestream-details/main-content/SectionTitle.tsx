@@ -11,7 +11,9 @@ const styles = sxStyles({
    },
 })
 
-type Props = {}
+type Props = {
+   children: React.ReactNode
+}
 
 const SectionTitle: FC<Props> = (props) => {
    return (

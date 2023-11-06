@@ -1,13 +1,6 @@
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined"
-import {
-   Box,
-   Chip,
-   CircularProgress,
-   Divider,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { Box, Chip, Divider, Skeleton, Stack, Typography } from "@mui/material"
 import CreatorFetchWrapper from "HOCs/creator/CreatorFetchWrapper"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -20,6 +13,7 @@ import {
    Creator,
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 const styles = sxStyles({
    creatorDetailsWrapper: {
@@ -111,91 +105,145 @@ const CreatorSelectedView = () => {
    }, [goToCreateSparkView])
 
    return (
-      <CreatorFetchWrapper
-         selectedCreatorId={selectedCreatorId}
-         groupId={group.id}
-         shouldFetch={Boolean(selectedCreatorId)}
-      >
-         {(creator) =>
-            creator ? (
-               <SparksDialog.Container>
-                  <SparksDialog.Content>
-                     <SparksDialog.Title>
-                        <Box component="span" color="secondary.main">
-                           Creator
-                        </Box>{" "}
-                        selected!
-                     </SparksDialog.Title>
-                     <SparksDialog.Subtitle>
-                        Please check if that’s the correct creator
-                     </SparksDialog.Subtitle>
-                     <Box sx={styles.creatorDetailsWrapper}>
-                        <Box sx={styles.editButton}>
-                           <Chip
-                              label="Edit"
-                              onDelete={() => handleClickEdit(creator)}
-                              onClick={() => handleClickEdit(creator)}
-                              deleteIcon={<EditIcon />}
-                           />
-                        </Box>
-                        <CreatorAvatar creator={creator} sx={styles.avatar} />
-                        <Box mt={2.85} />
-                        <Typography sx={styles.fullName} component="h4">
-                           {creator.firstName} {creator.lastName}
-                        </Typography>
-                        <Box mt={2} />
-                        <Stack
-                           direction="row"
-                           divider={<Divider orientation="vertical" flexItem />}
-                           spacing={1.5}
-                        >
-                           <Details>{creator.position}</Details>
-                           {creator.linkedInUrl ? (
-                              <Box
-                                 component="a"
-                                 target="_blank"
-                                 href={creator.linkedInUrl}
-                                 sx={styles.linkedIn}
-                              >
-                                 <LinkedInIcon />
-                                 <Typography>Linked</Typography>
-                              </Box>
-                           ) : null}
-                        </Stack>
-                        <Box mt={2} />
-                        <Details>{creator.email}</Details>
-                        <Box mt={2} />
-                        <Typography sx={styles.story}>
-                           {creator.story || "No story"}
-                        </Typography>
-                     </Box>
-                     <SparksDialog.ActionsOffset />
-                  </SparksDialog.Content>
-                  <SparksDialog.Actions>
-                     <SparksDialog.Button
-                        color="grey"
-                        variant="outlined"
-                        onClick={handleBack}
-                     >
-                        Back
-                     </SparksDialog.Button>
-                     <SparksDialog.Button
-                        variant="contained"
-                        onClick={handleNext}
-                     >
-                        Next
-                     </SparksDialog.Button>
-                  </SparksDialog.Actions>
-               </SparksDialog.Container>
-            ) : (
-               <CircularProgress /> // TODO: Add loading skeleton UI
-            )
+      <SuspenseWithBoundary
+         fallback={
+            <CreatorView
+               handleClickEdit={handleClickEdit}
+               handleBack={handleBack}
+               handleNext={handleNext}
+            />
          }
-      </CreatorFetchWrapper>
+      >
+         <CreatorFetchWrapper
+            selectedCreatorId={selectedCreatorId}
+            groupId={group.id}
+            shouldFetch={Boolean(selectedCreatorId)}
+            fallbackComponent={() => (
+               <CreatorView
+                  handleClickEdit={handleClickEdit}
+                  handleBack={handleBack}
+                  handleNext={handleNext}
+               />
+            )}
+         >
+            {(creator) => (
+               <CreatorView
+                  creator={creator}
+                  handleClickEdit={handleClickEdit}
+                  handleBack={handleBack}
+                  handleNext={handleNext}
+               />
+            )}
+         </CreatorFetchWrapper>
+      </SuspenseWithBoundary>
    )
 }
 
-const Details: FC = ({ children }) => (
+const CreatorView: FC<{
+   creator?: Creator
+   handleClickEdit: (creator: Creator) => void
+   handleBack: () => void
+   handleNext: () => void
+}> = ({ creator, handleClickEdit, handleBack, handleNext }) => {
+   return (
+      <SparksDialog.Container>
+         <SparksDialog.Content>
+            <SparksDialog.Title>
+               <Box component="span" color="secondary.main">
+                  Creator
+               </Box>{" "}
+               selected!
+            </SparksDialog.Title>
+            <SparksDialog.Subtitle>
+               Please check if that’s the correct creator
+            </SparksDialog.Subtitle>
+            <Box sx={styles.creatorDetailsWrapper}>
+               <Box sx={styles.editButton}>
+                  <Chip
+                     label="Edit"
+                     onDelete={() => handleClickEdit(creator)}
+                     onClick={() => handleClickEdit(creator)}
+                     deleteIcon={<EditIcon />}
+                  />
+               </Box>
+               {creator ? (
+                  <CreatorAvatar creator={creator} sx={styles.avatar} />
+               ) : (
+                  <Skeleton
+                     variant="circular"
+                     sx={styles.avatar}
+                     animation="wave"
+                  />
+               )}
+               <Box mt={2.85} />
+               <Typography sx={styles.fullName} component="h4">
+                  {creator ? (
+                     `${creator.firstName} ${creator.lastName}`
+                  ) : (
+                     <Skeleton variant="text" animation="wave" width={180} />
+                  )}
+               </Typography>
+               <Box mt={2} />
+               <Stack
+                  direction="row"
+                  divider={<Divider orientation="vertical" flexItem />}
+                  spacing={1.5}
+               >
+                  {creator ? (
+                     <Details>{creator.position}</Details>
+                  ) : (
+                     <Skeleton variant="text" animation="wave" />
+                  )}
+                  {creator?.linkedInUrl ? (
+                     <Box
+                        component="a"
+                        target="_blank"
+                        href={creator.linkedInUrl}
+                        sx={styles.linkedIn}
+                     >
+                        <LinkedInIcon />
+                        <Typography>Linked</Typography>
+                     </Box>
+                  ) : null}
+               </Stack>
+               <Box mt={2} />
+               <Details>
+                  {creator ? (
+                     creator.email
+                  ) : (
+                     <Skeleton variant="text" animation="wave" />
+                  )}
+               </Details>
+               <Box mt={2} />
+               <Typography sx={styles.story}>
+                  {creator ? (
+                     creator.story
+                  ) : (
+                     <Skeleton variant="text" animation="wave" />
+                  )}
+               </Typography>
+            </Box>
+            <SparksDialog.ActionsOffset />
+         </SparksDialog.Content>
+         <SparksDialog.Actions>
+            <SparksDialog.Button
+               color="grey"
+               variant="outlined"
+               onClick={handleBack}
+            >
+               Back
+            </SparksDialog.Button>
+            <SparksDialog.Button variant="contained" onClick={handleNext}>
+               Next
+            </SparksDialog.Button>
+         </SparksDialog.Actions>
+      </SparksDialog.Container>
+   )
+}
+
+const Details: FC<{
+   children: React.ReactNode
+}> = ({ children }) => (
    <Typography variant="body2" color="text.secondary" sx={styles.details}>
       {children}
    </Typography>

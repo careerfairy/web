@@ -59,6 +59,7 @@ const CategoryCard = ({ category, handleToggleActive }) => {
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
+                  key={option}
                   label={optionsMap[option]?.name}
                   {...getTagProps({ index })}
                />

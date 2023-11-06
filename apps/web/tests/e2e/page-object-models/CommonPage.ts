@@ -185,13 +185,19 @@ export const materialSelectOption = async (
 ) => {
    return page.evaluate(
       ({ newSelectedValue, cssSelector }) => {
-         let clickEvent = document.createEvent("MouseEvents")
-         clickEvent.initEvent("mousedown", true, true)
+         let clickEvent = new MouseEvent("mousedown", {
+            bubbles: true,
+            cancelable: true,
+         })
          let selectNode = document.querySelector(cssSelector)
          selectNode.dispatchEvent(clickEvent)
-         ;[...document.querySelectorAll("li")]
-            .filter((el) => el.innerText == newSelectedValue)[0]
-            .click()
+
+         // Wait for a short period of time to allow the dropdown to render
+         setTimeout(() => {
+            ;[...document.querySelectorAll("li")]
+               .filter((el) => el.innerText == newSelectedValue)[0]
+               .click()
+         }, 250)
       },
       {
          newSelectedValue,

@@ -19,7 +19,7 @@ import FileUploader, {
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
 import { imagePlaceholder } from "constants/images"
 import { useField } from "formik"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { FC, Fragment, ReactNode, useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import SparkVideoPreview from "./SparkVideoPreview"

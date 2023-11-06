@@ -7,6 +7,7 @@ import { IColors, StylesProps } from "../../types/commonTypes"
 interface ContentCardProps {
    sx?: SxProps<DefaultTheme>
    bgColor?: IColors
+   children: React.ReactNode
 }
 
 const styles: StylesProps = {

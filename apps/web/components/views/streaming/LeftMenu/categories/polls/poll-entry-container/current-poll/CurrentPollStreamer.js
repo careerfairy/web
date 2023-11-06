@@ -187,7 +187,6 @@ function CurrentPollStreamer({
                >
                   <Button
                      fullWidth
-                     children={"Close Poll"}
                      variant="contained"
                      color="primary"
                      onClick={() => {
@@ -195,7 +194,9 @@ function CurrentPollStreamer({
                         isOpen(7) && handleConfirm(7)
                      }}
                      style={{ borderRadius: "0 0 15px 15px" }}
-                  />
+                  >
+                     Close Poll
+                  </Button>
                </WhiteTooltip>
             </div>
          </div>

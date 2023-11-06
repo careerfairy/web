@@ -65,15 +65,14 @@ const HandRaiseRequested = memo(
                               }
                               variant="contained"
                               color={handRaiseActive ? "primary" : "grey"}
-                              children={
-                                 isCountingDown
-                                    ? `disabled for ${DELAY_IN_SECONDS} seconds`
-                                    : handRaiseActive
-                                    ? "Raise again"
-                                    : "Cancel"
-                              }
                               onClick={onClick}
-                           />
+                           >
+                              {isCountingDown
+                                 ? `disabled for ${DELAY_IN_SECONDS} seconds`
+                                 : handRaiseActive
+                                 ? "Raise again"
+                                 : "Cancel"}
+                           </Button>
                         }
                      </CategoryContainerContent>
                   </CategoryContainerCentered>
@@ -83,6 +82,8 @@ const HandRaiseRequested = memo(
       )
    }
 )
+
+HandRaiseRequested.displayName = "HandRaiseRequested"
 
 type Props = {
    handRaiseState: HandRaise

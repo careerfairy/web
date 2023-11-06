@@ -6,7 +6,7 @@ import {
    EmbedProps,
 } from "@graphcms/rich-text-types"
 import Link from "next/link"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import { GraphCMSImageLoader } from "./util"
@@ -121,7 +121,7 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
                }
 
                return (
-                  <Link href={href}>
+                  <Link href={href} legacyBehavior>
                      <Box
                         component={"a"}
                         sx={{

@@ -147,7 +147,11 @@ const styles = sxStyles({
    },
 })
 
-const Hero: FC<HygraphResponseHero> = ({
+const Hero: FC<
+   HygraphResponseHero & {
+      children?: React.ReactNode
+   }
+> = ({
    image,
    video,
    slug,

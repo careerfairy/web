@@ -63,10 +63,11 @@ const ContactSection = (props) => {
                         <Button
                            size="large"
                            color="grey"
-                           children="Contact CareerFairy"
                            startIcon={<EmailIcon />}
                            variant="outlined"
-                        />
+                        >
+                           Contact CareerFairy
+                        </Button>
                      </a>
                   </Box>
                </Fade>
