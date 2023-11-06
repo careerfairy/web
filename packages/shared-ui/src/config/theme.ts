@@ -25,6 +25,26 @@ export const theme = createTheme({
          contrastText: "#FFFFFF",
       },
       neutral: { main: "#FF5733" },
+      success: {
+         "50": "#E6FBED",
+         "100": "#CCF6DA",
+         "200": "#B3F2C8",
+         "300": "#99EDB5",
+         "400": "#66E491",
+         "500": "#33DB6C",
+         "600": "#00D247",
+         "700": "#00BD40",
+      },
+      warning: {
+         "50": "#FFF5E7",
+         "100": "#FFEBCF",
+         "200": "#FFE1B7",
+         "300": "#FFD79F",
+         "400": "#FEC36E",
+         "500": "#FEAF3E",
+         "600": "#FE9B0E",
+         "700": "#E58C0D",
+      },
    },
 
    // Typography
