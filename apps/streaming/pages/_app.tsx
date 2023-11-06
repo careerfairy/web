@@ -2,17 +2,10 @@ import "styles/globals.css"
 import type { AppProps } from "next/app"
 import Head from "next/head"
 import { CacheProvider, EmotionCache } from "@emotion/react"
-import { Poppins } from "next/font/google"
 
 import { ThemeProvider, CssBaseline } from "@mui/material"
-import { createEmotionCache, theme } from "@careerfairy/shared-ui"
-
-export const poppins = Poppins({
-   subsets: ["latin"],
-   weight: "400", // or any other available weight
-})
-
-theme.typography.fontFamily = poppins.style.fontFamily
+import { createEmotionCache } from "@careerfairy/shared-ui"
+import { theme } from "utils"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
