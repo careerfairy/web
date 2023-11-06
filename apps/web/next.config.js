@@ -1,4 +1,5 @@
 const { withSentryConfig } = require("@sentry/nextjs")
+const path = require("path")
 
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
@@ -234,11 +235,37 @@ const moduleExports = {
    experimental: {
       externalDir: true,
       esmExternals: false, // fixes issue with [firebase](https://github.com/FirebaseExtended/reactfire/issues/491)
+      outputFileTracingRoot: path.join(__dirname, "../../"),
       outputFileTracingIgnores: [
          // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
+         "../../node_modules/@swc/core-linux-x64-gnu",
+         "../../node_modules/@swc/core-linux-x64-musl",
+         "./node_modules/@swc/core-linux-x64-gnu",
+         "./node_modules/@swc/core-linux-x64-musl",
+         "/node_modules/@swc/core-linux-x64-gnu",
+         "/node_modules/@swc/core-linux-x64-musl",
+         "node_modules/@swc/core-linux-x64-gnu",
+         "node_modules/@swc/core-linux-x64-musl",
          "**/node_modules/@swc/core-linux-x64-gnu",
          "**/node_modules/@swc/core-linux-x64-musl",
+         "**/@swc/*",
       ],
+      // fixes issue with nextjs [serverless functions max size](https://github.com/vercel/next.js/issues/42641)
+      outputFileTracingExcludes: {
+         "**/*": [
+            "../../node_modules/@swc/core-linux-x64-gnu",
+            "../../node_modules/@swc/core-linux-x64-musl",
+            "./node_modules/@swc/core-linux-x64-gnu",
+            "./node_modules/@swc/core-linux-x64-musl",
+            "/node_modules/@swc/core-linux-x64-gnu",
+            "/node_modules/@swc/core-linux-x64-musl",
+            "node_modules/@swc/core-linux-x64-gnu",
+            "node_modules/@swc/core-linux-x64-musl",
+            "**/node_modules/@swc/core-linux-x64-gnu",
+            "**/node_modules/@swc/core-linux-x64-musl",
+            "**/@swc/*",
+         ],
+      },
    },
    images: {
       domains: [
