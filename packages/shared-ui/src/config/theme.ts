@@ -1,54 +1,74 @@
 import { createTheme, PaletteOptions, Theme } from "@mui/material/styles"
 
-const primaryMain = "#2ABAA5"
-const secondaryMain = "#6749EA"
-
 const common = {
    black: "#1F1F1F", // our default black
    white: "#FEFEFE", // our default white
 } satisfies PaletteOptions["common"]
 
+const primary = {
+   main: "#2ABAA5",
+   light: "#F1FCF9",
+   dark: "#229584",
+   contrastText: common.white,
+   "50": "#F1FCF9",
+   "100": "#D1F6ED",
+   "200": "#95DDD2",
+   "300": "#7FD6C9",
+   "400": "#6ACFC0",
+   "500": "#55C8B7",
+   "600": "#2ABAA5",
+   "700": "#26A795",
+   "800": "#229584",
+} satisfies PaletteOptions["primary"]
+
+const secondary = {
+   main: "#6749EA",
+   light: "#F0EDFD",
+   dark: "#523ABB",
+   contrastText: common.white,
+   "50": "#F0EDFD",
+   "100": "#E1DBFB",
+   "200": "#D1C8F9",
+   "300": "#D1C8F9",
+   "400": "#9580F0",
+   "500": "#856DEE",
+   "600": "#6749EA",
+   "700": "#5D42D3",
+   "800": "#523ABB",
+} satisfies PaletteOptions["secondary"]
+
+const white = {
+   "50": "#FFFFFF",
+   "100": "#FEFEFE",
+   "200": "#FCFCFE",
+   "300": "#FAFAFE",
+   "400": "#F6F6FA",
+   "500": "#F3F3F5",
+} satisfies Theme["brand"]["white"]
+
+const black = {
+   "200": "#FAFAFA",
+   "300": "#F5F5F5",
+   "400": "#EEEEEE",
+   "500": "#E1E1E1",
+   "600": "#CACACA",
+   "700": "#8E8E8E",
+   "800": "#4B4B4B",
+   "900": "#1F1F1F",
+} satisfies Theme["brand"]["black"]
+
 // Theme
 export const baseTheme = createTheme({
    // example of custom theme property
    brand: {
-      // blue: colors.blue[800],
-      // green: colors.green[400],
-      // yellow: "#EECA61",
+      black,
+      white,
    },
 
    // Palette
    palette: {
-      primary: {
-         main: primaryMain,
-         light: "#F1FCF9",
-         dark: "#229584",
-         contrastText: common.white,
-         "50": "#F1FCF9",
-         "100": "#D1F6ED",
-         "200": "#95DDD2",
-         "300": "#7FD6C9",
-         "400": "#6ACFC0",
-         "500": "#55C8B7",
-         "600": "#2ABAA5",
-         "700": "#26A795",
-         "800": "#229584",
-      },
-      secondary: {
-         main: secondaryMain,
-         light: "#F0EDFD",
-         dark: "#523ABB",
-         contrastText: common.white,
-         "50": "#F0EDFD",
-         "100": "#E1DBFB",
-         "200": "#D1C8F9",
-         "300": "#D1C8F9",
-         "400": "#9580F0",
-         "500": "#856DEE",
-         "600": "#6749EA",
-         "700": "#5D42D3",
-         "800": "#523ABB",
-      },
+      primary: primary,
+      secondary: secondary,
       neutral: {
          main: "#FF5733",
          "50": "#EBEBEF",
@@ -150,6 +170,7 @@ export const baseTheme = createTheme({
                   fontSize: "0.875rem", // 12px
                   padding: "0.75rem 1rem", // 12px 16px
                   lineHeight: "57.5%",
+                  height: 32,
                },
             },
             {
@@ -158,6 +179,7 @@ export const baseTheme = createTheme({
                   fontSize: "1rem", // 14px
                   padding: "0.75rem 1.5rem", // 14px 24px
                   lineHeight: "100%",
+                  height: 40,
                },
             },
             {
@@ -166,6 +188,19 @@ export const baseTheme = createTheme({
                   fontSize: "1.125rem", // 16px
                   padding: "0.75rem 1.75rem", // 12px 28px
                   lineHeight: "135%",
+                  height: 48,
+               },
+            },
+            {
+               props: { variant: "outlined", color: "secondary" },
+               style: {
+                  backgroundColor: white[300],
+               },
+            },
+            {
+               props: { variant: "outlined", color: "primary" },
+               style: {
+                  backgroundColor: white[200],
                },
             },
          ],
@@ -220,25 +255,26 @@ const createResponsiveTypography = (theme: Theme): Theme => {
 
    const responsiveTypography = {
       ...theme.typography, // spread existing typography properties
+
       h1: {
-         fontSize: "1.75rem",
+         fontSize: "1.75rem", // 28px
          lineHeight: "150%",
          [desktop]: {
-            fontSize: "2.375rem",
+            fontSize: "2.375rem", // 38px
          },
       },
       h2: {
-         fontSize: "1.5rem",
+         fontSize: "1.5rem", // 24px
          lineHeight: "150%",
          [desktop]: {
-            fontSize: "2rem",
+            fontSize: "2rem", // 32px
          },
       },
       h3: {
-         fontSize: "1.5rem",
+         fontSize: "1.5rem", // 24px
          lineHeight: "150%",
          [desktop]: {
-            fontSize: "1.5rem",
+            fontSize: "1.5rem", // 24px
          },
       },
       h4,
@@ -246,13 +282,14 @@ const createResponsiveTypography = (theme: Theme): Theme => {
       h6: {},
       medium: textMedium,
       small: {
-         fontSize: "0.875rem",
+         fontSize: "0.875rem", // 14px
          lineHeight: "171.429%",
          [desktop]: {},
       },
       xsmall: {
-         fontSize: "0.75rem",
-         lineHeight: "166.667%",
+         fontSize: "0.75rem", // 12px
+         lineHeight: "100%",
+         // lineHeight: "150%",
          [desktop]: {},
       },
       subtitle1: h4,
@@ -276,6 +313,7 @@ const createResponsiveTypography = (theme: Theme): Theme => {
       fontWeightLight: 300,
       fontSize: 16,
       htmlFontSize: 16,
+      fontFamily: "Poppins, sans-serif",
    } satisfies Theme["typography"]
 
    return createTheme({
