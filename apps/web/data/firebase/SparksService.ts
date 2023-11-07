@@ -265,6 +265,12 @@ export class SparksService {
       )(userId)
    }
 
+   async fetchPublicSparksNotifications() {
+      const q = query(collection(FirestoreInstance, "publicSparksNotification"))
+      const r = await getDocs(q)
+      return r.docs.map((doc) => doc.data())
+   }
+
    /**
     * Toggle the like status of a spark for a user
     *
