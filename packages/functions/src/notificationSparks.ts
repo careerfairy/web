@@ -146,7 +146,7 @@ const handleCreateSparksNotifications = async (userId?: string) => {
    return bulkWriter.close()
 }
 
-const createNotificationsFromEvents = (
+const mapEventsToNotifications = (
    events: LiveStreamEventWithUsersLivestreamData[] | LivestreamEvent[]
 ): UserSparksNotification[] => {
    const notifications: UserSparksNotification[] = []
@@ -190,8 +190,9 @@ const createSparkNotificationForSingleUser = ({
       (event) => !event.registeredUsers?.includes(userId)
    )
 
-   const notifications: UserSparksNotification[] =
-      createNotificationsFromEvents(filteredUpcomingEvents)
+   const notifications: UserSparksNotification[] = mapEventsToNotifications(
+      filteredUpcomingEvents
+   )
 
    functions.logger.log(
       `User ${userId} will have spark notifications for the groups: ${notifications
@@ -217,7 +218,7 @@ const createPublicSparksNotifications = (
    bulkWriter: BulkWriter
 ) => {
    const notifications: UserSparksNotification[] =
-      createNotificationsFromEvents(upcomingEvents)
+      mapEventsToNotifications(upcomingEvents)
 
    functions.logger.log(
       `Creating public spark notifications for the groups: ${notifications
