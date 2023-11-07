@@ -49,6 +49,7 @@ export const ALL_PROJECT_COLLECTION_IDS = [
    "preferences",
    "presentations",
    "promotions",
+   "publicSparksNotification",
    "questions",
    "rating",
    "ratings",
