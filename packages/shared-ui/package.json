@@ -1,0 +1,17 @@
+{
+   "name": "@careerfairy/shared-ui",
+   "private": true,
+   "version": "0.0.0",
+   "main": "./dist/index.js",
+   "scripts": {
+      "build": "npm run clean && npm run copy-files && tsc",
+      "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "test": "jest",
+      "copy-files": "cpx \"src/**/*.{json}\" dist/",
+      "clean": "rimraf dist/"
+   },
+   "dependencies": {
+      "@careerfairy/shared-lib": "*"
+   },
+   "devDependencies": {}
+}
