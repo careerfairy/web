@@ -9,8 +9,14 @@ import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
 import { addDaysDate } from "./util"
 import { firestore } from "./api/firestoreAdmin"
-import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
-import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import {
+   getStreamsByDate,
+   getStreamsByDateWithRegisteredStudents,
+} from "./lib/livestream"
+import {
+   LiveStreamEventWithUsersLivestreamData,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { BulkWriter } from "firebase-admin/firestore"
 
@@ -106,20 +112,18 @@ const handleCreateSparksNotifications = async (userId?: string) => {
    const bulkWriter = firestore.bulkWriter()
 
    // to get all the upcoming events that will start on the next X days
-   const upcomingEvents = await getStreamsByDateWithRegisteredStudents(
-      startDate,
-      endDate
-   )
+   const upcomingEventsWithRegisteredStudents =
+      await getStreamsByDateWithRegisteredStudents(startDate, endDate)
 
    functions.logger.log(
-      `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEvents.length} events will take place`
+      `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEventsWithRegisteredStudents.length} events will take place`
    )
 
    if (userId) {
       // In this case we want only to create notification for a single user
       createSparkNotificationForSingleUser({
          userId,
-         upcomingEvents,
+         upcomingEvents: upcomingEventsWithRegisteredStudents,
          bulkWriter,
       })
       return bulkWriter.close()
@@ -130,40 +134,28 @@ const handleCreateSparksNotifications = async (userId?: string) => {
    userSparksFeedMetrics.forEach(({ userId }) => {
       createSparkNotificationForSingleUser({
          userId,
-         upcomingEvents,
+         upcomingEvents: upcomingEventsWithRegisteredStudents,
          bulkWriter,
       })
    })
 
+   const upcomingEvents = await getStreamsByDate(startDate, endDate)
+
+   createPublicSparksNotifications(upcomingEvents, bulkWriter)
+
    return bulkWriter.close()
 }
 
-type createSparkNotificationForSingleUser = {
-   userId: string
-   upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
-   bulkWriter: BulkWriter
-}
-const createSparkNotificationForSingleUser = ({
-   userId,
-   upcomingEvents,
-   bulkWriter,
-}: createSparkNotificationForSingleUser) => {
+const createNotificationsFromEvents = (
+   events: LiveStreamEventWithUsersLivestreamData[] | LivestreamEvent[]
+): UserSparksNotification[] => {
    const notifications: UserSparksNotification[] = []
 
-   // filter all the upcoming events where the user already registered
-   const filteredUpcomingEvents = upcomingEvents.filter(
-      (event) => !event.registeredUsers?.includes(userId)
-   )
-
-   filteredUpcomingEvents.forEach((event) => {
-      // Check if groupIds array exists and is not empty
+   events.forEach((event) => {
       if (event.groupIds && event.groupIds.length > 0) {
          const eventId = event.id
 
          event.groupIds.forEach((groupId) => {
-            // to check if a notification was already created for this group
-            // could happen in case of multiple events from a single group
-            // we want to get the first event only
             const groupAlreadyHasNotification = notifications.some(
                (notification) => notification.groupId === groupId
             )
@@ -179,6 +171,27 @@ const createSparkNotificationForSingleUser = ({
          })
       }
    })
+
+   return notifications
+}
+
+type createSparkNotificationForSingleUser = {
+   userId: string
+   upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
+   bulkWriter: BulkWriter
+}
+const createSparkNotificationForSingleUser = ({
+   userId,
+   upcomingEvents,
+   bulkWriter,
+}: createSparkNotificationForSingleUser) => {
+   // filter all the upcoming events where the user already registered
+   const filteredUpcomingEvents = upcomingEvents.filter(
+      (event) => !event.registeredUsers?.includes(userId)
+   )
+
+   const notifications: UserSparksNotification[] =
+      createNotificationsFromEvents(filteredUpcomingEvents)
 
    functions.logger.log(
       `User ${userId} will have spark notifications for the groups: ${notifications
@@ -196,5 +209,26 @@ const createSparkNotificationForSingleUser = ({
       void bulkWriter.set(userSparksNotificationsRef, notification, {
          merge: true,
       })
+   })
+}
+
+const createPublicSparksNotifications = (
+   upcomingEvents: LivestreamEvent[],
+   bulkWriter: BulkWriter
+) => {
+   const notifications: UserSparksNotification[] =
+      createNotificationsFromEvents(upcomingEvents)
+
+   functions.logger.log(
+      `Creating public spark notifications for the groups: ${notifications
+         .map((notification) => notification.groupId)
+         .join(", ")}`
+   )
+
+   const collectionRef = firestore.collection("publicSparksNotifications")
+
+   notifications.forEach((notification) => {
+      const docRef = collectionRef.doc()
+      bulkWriter.create(docRef, notification)
    })
 }
