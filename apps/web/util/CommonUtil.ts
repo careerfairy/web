@@ -132,13 +132,14 @@ const removeSpecialChars = (str: string) => {
  * */
 const getInitials = (fullName: string) => {
    return (
+      // if no initials found, return A
       removeSpecialChars(fullName)
          .match(/(^\S\S?|\s\S)?/g)
          .map((v) => v.trim())
          .join("")
          .match(/(^\S|\S$)?/g)
          .join("")
-         .toLocaleUpperCase() || "A" // if no initials found, return A
+         .toLocaleUpperCase() || "A"
    )
 }
 export function stringAvatar(firstName: string, lastName: string) {

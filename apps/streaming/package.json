@@ -1,0 +1,23 @@
+{
+   "name": "@careerfairy/streaming",
+   "version": "0.1.0",
+   "private": true,
+   "scripts": {
+      "dev": "next dev -p 3001",
+      "build": "next build",
+      "start": "next start -p 3001",
+      "lint": "next lint",
+      "test": "jest --verbose",
+      "test:watch": "jest --watch",
+      "test:coverage": "jest --coverage",
+      "storybook": "storybook dev -p 6101",
+      "build-storybook": "storybook build"
+   },
+   "dependencies": {
+      "@careerfairy/shared-lib": "*",
+      "@careerfairy/shared-ui": "*"
+   },
+   "devDependencies": {
+      "@careerfairy/config-storybook": "*"
+   }
+}
