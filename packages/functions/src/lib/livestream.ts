@@ -91,6 +91,7 @@ export const getStreamsByDate = async (
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
       .where("test", "==", false)
+      .where("hidden", "==", false)
       .get()
       .then((querySnapshot) => {
          return querySnapshot.docs?.map(
