@@ -65,7 +65,7 @@ export default {
       "preferences",
       "presentations",
       "promotions",
-      "publicSparksNotification",
+      "publicSparksNotifications",
       "questions",
       "rating",
       "ratings",

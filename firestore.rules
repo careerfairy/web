@@ -637,7 +637,7 @@ service cloud.firestore {
             allow read: if true;
         }
 
-        match /publicSparksNotification/{notificationId} {
+        match /publicSparksNotifications/{notificationId} {
             allow read: if true;
             allow write: if false;
         }

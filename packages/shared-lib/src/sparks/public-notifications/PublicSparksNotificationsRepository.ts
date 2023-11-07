@@ -6,16 +6,13 @@ import { UserSparksNotification } from "../../users"
 import { IPublicSparksNotificationsRepository } from "./IPublicSparksNotificationsRepository"
 import { Create } from "../../commonTypes"
 
-export class PublicNotificationsRespository
+export default class PublicSparksNotificationsRepository
    extends BaseFirebaseRepository
    implements IPublicSparksNotificationsRepository
 {
-   constructor(
-      private readonly COLLECTION_NAME: string = "publicSparksNotification",
-      readonly firestore: firebase.firestore.Firestore,
-      readonly fieldValue: typeof firebase.firestore.FieldValue,
-      readonly timestamp: typeof firebase.firestore.Timestamp
-   ) {
+   private readonly COLLECTION_NAME: string = "publicSparksNotifications"
+
+   constructor(readonly firestore: firebase.firestore.Firestore) {
       super()
    }
 

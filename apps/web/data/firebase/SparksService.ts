@@ -266,7 +266,9 @@ export class SparksService {
    }
 
    async fetchPublicSparksNotifications() {
-      const q = query(collection(FirestoreInstance, "publicSparksNotification"))
+      const q = query(
+         collection(FirestoreInstance, "publicSparksNotifications")
+      )
       const r = await getDocs(q)
       return r.docs.map((doc) => doc.data())
    }
