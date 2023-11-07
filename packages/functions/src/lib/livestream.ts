@@ -112,8 +112,23 @@ export const getStreamsByDateWithRegisteredStudents = async (
    filterStartDate: Date,
    filterEndDate: Date
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
-   const livestreams = await getStreamsByDate(filterStartDate, filterEndDate)
-   return addUsersDataOnStreams(livestreams)
+   return firestore
+      .collection("livestreams")
+      .where("start", ">=", filterStartDate)
+      .where("start", "<=", filterEndDate)
+      .where("test", "==", false)
+      .get()
+      .then((querySnapshot) => {
+         const streams = querySnapshot.docs?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+
+         return addUsersDataOnStreams(streams)
+      })
 }
 
 /**
