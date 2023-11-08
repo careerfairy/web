@@ -1,6 +1,6 @@
-import { ThemeProvider, CssBaseline } from "@mui/material"
+import { ThemeProvider, CssBaseline, createTheme } from "@mui/material"
 import { Preview } from "@storybook/react"
-import { theme } from "@careerfairy/shared-ui"
+import { themeOptions } from "@careerfairy/shared-ui"
 
 export const baseStorybookPreview: Preview = {
    parameters: {
@@ -20,7 +20,7 @@ export const baseStorybookPreviewMui: Preview = {
    ...baseStorybookPreview,
    decorators: [
       (Story) => (
-         <ThemeProvider theme={theme}>
+         <ThemeProvider theme={createTheme(themeOptions)}>
             <CssBaseline />
             <Story />
          </ThemeProvider>

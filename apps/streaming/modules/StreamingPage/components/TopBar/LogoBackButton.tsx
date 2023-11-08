@@ -27,7 +27,7 @@ export const LogoBackButton = () => {
             src="/logo_teal.png"
             width={150}
             height={32}
-            alt={"logo"}
+            alt={"cf-logo"}
          />
       </Stack>
    )
