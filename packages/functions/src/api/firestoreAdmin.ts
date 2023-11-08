@@ -8,6 +8,7 @@ import {
    Firestore,
    FieldPath,
 } from "firebase-admin/firestore"
+import { isLocalEnvironment } from "../util"
 
 /**
  * Firebase Admin SDK
@@ -18,6 +19,12 @@ import {
  * When running locally with the emulators environment variables, it will
  * connect to the emulators.
  */
+if (isLocalEnvironment()) {
+   process.env["NODE_ENV"] = "development"
+   process.env["FIREBASE_STORAGE_EMULATOR_HOST"] = "127.0.0.1:9199"
+   process.env["FIREBASE_AUTH_EMULATOR_HOST"] = "127.0.0.1:9099"
+   process.env["FIRESTORE_EMULATOR_HOST"] = "127.0.0.1:8080"
+}
 initializeApp()
 
 export const firestore = getFirestore()
