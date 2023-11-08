@@ -18,6 +18,7 @@ const SynchronisedVideoViewer = dynamic(() =>
 )
 
 const STREAMS_ROW_HEIGHT = 125
+const BANNER_ROW_HEIGHT = 75
 const WIDE_SCREEN_ROW_HEIGHT = 180
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -81,8 +82,8 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       zIndex: 1,
       display: "flex",
-      top: 0,
       left: 0,
+      top: ({ handRaiseActive }) => (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
       right: 0,
       "& > *": {
          overflow: "hidden",
@@ -98,15 +99,24 @@ const useStyles = makeStyles((theme) => ({
       }),
    },
    largeSquished: {
-      top: STREAMS_ROW_HEIGHT,
+      top: ({ handRaiseActive }) =>
+         STREAMS_ROW_HEIGHT + (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
       [theme.breakpoints.up("lg")]: {
-         top: WIDE_SCREEN_ROW_HEIGHT,
+         top: ({ handRaiseActive }) =>
+            WIDE_SCREEN_ROW_HEIGHT + (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
       },
    },
 }))
 
-const StreamElementWrapper = ({ children, large, index, squished, first }) => {
-   const classes = useStyles()
+const StreamElementWrapper = ({
+   children,
+   large,
+   index,
+   squished,
+   first,
+   handRaiseActive,
+}) => {
+   const classes = useStyles({ handRaiseActive })
    return (
       <Box
          className={clsx({
@@ -137,6 +147,7 @@ const StreamsLayout = ({
    sharingVideo,
    streamerId,
    viewer,
+   handRaiseActive,
 }) => {
    const hasSmallStreams = streamData.length > 1
    const classes = useStyles({ hasSmallStreams })
@@ -195,6 +206,7 @@ const StreamsLayout = ({
                               large={isLarge}
                               key={stream.uid}
                               squished={hasSmallStreams}
+                              handRaiseActive={handRaiseActive}
                            >
                               <StreamContainer
                                  stream={stream}
@@ -213,6 +225,7 @@ const StreamsLayout = ({
                            index={1}
                            large
                            squished={streamData.length}
+                           handRaiseActive={handRaiseActive}
                         >
                            {sharingPdf ? (
                               <LivestreamPdfViewer
