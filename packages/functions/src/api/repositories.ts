@@ -40,6 +40,8 @@ import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
 } from "../lib/bigQuery/IBigQueryService"
+import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
+import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -87,3 +89,6 @@ export const sparkRepo: ISparkFunctionsRepository =
       sparkEventsHandler,
       sparkSecondsWatchedHanlder
    )
+
+export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository =
+   new PublicSparksNotificationsRepository(firestore as any)
