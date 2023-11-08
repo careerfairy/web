@@ -42,6 +42,7 @@ import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
