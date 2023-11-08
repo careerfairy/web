@@ -40,7 +40,6 @@ export default class PublicSparksNotificationsRepository
    }
 
    async update(notification: UserSparksNotification): Promise<void> {
-      await this.delete(notification.id)
-      return this.create(notification)
+      return void this.firestore.collection(this.COLLECTION_NAME).doc(notification.id).update(notification)
    }
 }
