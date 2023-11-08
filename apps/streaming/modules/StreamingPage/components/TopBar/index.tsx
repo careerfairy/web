@@ -1,71 +1,24 @@
-import { ResponsiveButton, sxStyles } from "@careerfairy/shared-ui"
-import {
-   AppBar,
-   Box,
-   Container,
-   Stack,
-   Toolbar,
-   Typography,
-   Button,
-   IconButton,
-} from "@mui/material"
-import Image from "next/image"
-import ArrowBackIcon from "@mui/icons-material/ArrowBackIosRounded"
-import EyeIcon from "@mui/icons-material/RemoveRedEyeOutlined"
-import React from "react"
-import { Link } from "components"
-import { CompanyIcon } from "components/icons"
-import { theme } from "utils"
+import { AppBar, Container, Stack, StackProps, Toolbar } from "@mui/material"
+
+import { CheckJobsButton } from "./CheckJobsButton"
+import { CompanyButton } from "./CompanyButton"
+import { LogoBackButton } from "./LogoBackButton"
+import { Timer } from "./Timer"
+import { ViewCount } from "./ViewCount"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { CTAButton } from "./CTAButton"
 
 const styles = sxStyles({
    root: {
-      borderBottomColor: {
-         xs: "transparent",
-         tablet: "black.400",
-      },
-      borderBottomWidth: 1,
-      borderBottomStyle: "solid",
+      borderBottom: (theme) => ({
+         xs: "none",
+         tablet: `1px solid ${theme.brand.black[400]}`,
+      }),
       pt: 2.75,
       pb: 1.75,
    },
    toolbar: {
       minHeight: "auto !important",
-   },
-   backicon: {
-      fontSize: 18,
-   },
-   timer: {
-      bgcolor: "error.500",
-      color: "white",
-      p: 1,
-      borderRadius: "3px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-   },
-   whiteCircle: {
-      bgcolor: "white",
-      borderRadius: "50%",
-      width: 9,
-      height: 9,
-      mr: "3px",
-   },
-   circularBtn: {
-      borderRadius: "50%",
-      height: {
-         xs: 32,
-         sm: 40,
-      },
-      width: {
-         xs: 32,
-         sm: 40,
-      },
-      "& svg": {
-         fontSize: 20,
-      },
-   },
-   withBorder: {
-      border: (theme) => `1px solid ${theme.brand.black[400]}`,
    },
 })
 
@@ -79,44 +32,49 @@ export const TopBar = () => {
       >
          <Container maxWidth={false}>
             <Toolbar sx={styles.toolbar} disableGutters>
-               <Stack direction="row" spacing={1} alignItems="center">
-                  <Stack
-                     component={Link}
-                     noLinkStyle
-                     href={"https://careerfairy.io"}
-                     direction="row"
-                     alignItems="center"
-                  >
-                     <ArrowBackIcon sx={styles.backicon} />
-                     <Image
-                        style={{
-                           objectFit: "contain",
-                        }}
-                        src="/logo_teal.png"
-                        width={150}
-                        height={32}
-                        alt={"logo"}
-                     />
-                  </Stack>
-                  <Box sx={styles.timer}>
-                     <Box sx={styles.whiteCircle} />
-                     <Typography variant="xsmall">16:03</Typography>
-                  </Box>
-               </Stack>
-               <Stack direction="row" spacing={1} alignItems="center">
-                  <ResponsiveButton
-                     sx={styles.withBorder}
-                     variant="outlined"
-                     startIcon={<EyeIcon />}
-                  >
-                     128
-                  </ResponsiveButton>
-                  <IconButton sx={[styles.circularBtn, styles.withBorder]}>
-                     <CompanyIcon />
-                  </IconButton>
+               <Stack
+                  width="100%"
+                  direction={{
+                     xs: "column",
+                     tablet: "row",
+                  }}
+                  spacing={{
+                     xs: 2.625,
+                     tablet: 0,
+                  }}
+                  alignItems="center"
+                  justifyContent="space-between"
+               >
+                  <StackComponent>
+                     <LogoBackButton />
+                     <Timer />
+                  </StackComponent>
+                  <StackComponent justifyContent="flex-end">
+                     <ViewCount />
+                     <CTAButton />
+                     <CompanyButton />
+                     <CheckJobsButton />
+                  </StackComponent>
                </Stack>
             </Toolbar>
          </Container>
       </AppBar>
+   )
+}
+
+const StackComponent = ({ children, ...props }: StackProps) => {
+   return (
+      <Stack
+         direction="row"
+         spacing={1}
+         alignItems="center"
+         width={{
+            xs: "100%",
+            tablet: "auto",
+         }}
+         {...props}
+      >
+         {children}
+      </Stack>
    )
 }

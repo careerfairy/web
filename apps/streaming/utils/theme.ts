@@ -1,17 +1,16 @@
 import { Poppins } from "next/font/google"
-import { createTheme, Theme } from "@mui/material/styles"
+import { createTheme } from "@mui/material/styles"
 
-import { theme as baseTheme } from "@careerfairy/shared-ui"
+import { themeOptions } from "@careerfairy/shared-ui"
 
 export const poppins = Poppins({
    subsets: ["latin"],
-   weight: ["300", "400", "500", "600", "700"],
+   weight: ["300", "400", "500", "600", "700", "800", "900"],
+   style: ["normal", "italic"],
+   fallback: ["sans-serif"],
+   display: "swap",
 })
 
-export const theme: Theme = createTheme({
-   ...baseTheme,
-   typography: {
-      ...baseTheme.typography,
-      fontFamily: poppins.style.fontFamily,
-   },
-})
+themeOptions.typography.fontFamily = poppins.style.fontFamily
+
+export const theme = createTheme(themeOptions)

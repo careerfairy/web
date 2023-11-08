@@ -1,5 +1,6 @@
-import { Button, ButtonProps, useTheme, useMediaQuery } from "@mui/material"
+import { Button, ButtonProps } from "@mui/material"
 import { forwardRef } from "react"
+import { useIsMobile } from "../../"
 
 export type ResponsiveButtonProps = ButtonProps
 
@@ -7,10 +8,10 @@ export const ResponsiveButton = forwardRef<
    HTMLButtonElement,
    ResponsiveButtonProps
 >((props, ref) => {
-   const theme = useTheme()
-   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
+   const isMobile = useIsMobile()
+
    return (
-      <Button ref={ref} size={isSmallScreen ? "small" : "medium"} {...props}>
+      <Button ref={ref} size={isMobile ? "small" : "medium"} {...props}>
          {props.children}
       </Button>
    )
