@@ -34,10 +34,13 @@ export const createSparksFeedEventNotifications = functions
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       try {
-         return handleCreateSparksNotifications()
+         return Promise.allSettled([
+            handleCreateUsersSparksNotifications(),
+            handleCreatePublicSparksNotifications(),
+         ])
       } catch (error) {
          logAndThrow(
-            "Error during the creation of Users Sparks Feed event notifications",
+            "Error during the creation of Sparks Feed event notifications",
             error
          )
       }
@@ -50,7 +53,7 @@ export const createUserSparksFeedEventNotifications = functions
    .region(config.region)
    .https.onCall(async (userId) => {
       try {
-         return handleCreateSparksNotifications(userId)
+         return handleCreateUsersSparksNotifications(userId)
       } catch (error) {
          logAndThrow(
             "Error during the creation of a single User Sparks Feed event notifications",
@@ -81,7 +84,7 @@ export const removeAndSyncUserSparkNotification = functions
                await sparkRepo.removeUserSparkNotification(userId, groupId)
 
                // update spark notifications for this user
-               return handleCreateSparksNotifications(userId)
+               return handleCreateUsersSparksNotifications(userId)
             } catch (error) {
                logAndThrow(
                   "Error during removing a single spark notification from a user",
@@ -96,14 +99,14 @@ export const removeAndSyncUserSparkNotification = functions
 
 export const removeAndSyncSparksNotifications = async (groupId: string) => {
    await sparkRepo.removeSparkNotification(groupId)
-   return handleCreateSparksNotifications()
+   return handleCreateUsersSparksNotifications()
 }
 
 export const syncUserSparksNotifications = async (userId: string) => {
-   return handleCreateSparksNotifications(userId)
+   return handleCreateUsersSparksNotifications(userId)
 }
 
-const handleCreateSparksNotifications = async (userId?: string) => {
+const handleCreateUsersSparksNotifications = async (userId?: string) => {
    const startDate = new Date()
    const endDate = addDaysDate(
       new Date(),
@@ -138,6 +141,17 @@ const handleCreateSparksNotifications = async (userId?: string) => {
          bulkWriter,
       })
    })
+
+   return bulkWriter.close()
+}
+
+const handleCreatePublicSparksNotifications = async () => {
+   const startDate = new Date()
+   const endDate = addDaysDate(
+      new Date(),
+      SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
+   )
+   const bulkWriter = firestore.bulkWriter()
 
    const upcomingEvents = await getStreamsByDate(startDate, endDate)
 
