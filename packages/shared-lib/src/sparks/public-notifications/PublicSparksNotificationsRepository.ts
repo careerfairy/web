@@ -4,7 +4,6 @@ import BaseFirebaseRepository, {
 } from "../../BaseFirebaseRepository"
 import { UserSparksNotification } from "../../users"
 import { IPublicSparksNotificationsRepository } from "./IPublicSparksNotificationsRepository"
-import { Create } from "../../commonTypes"
 
 export default class PublicSparksNotificationsRepository
    extends BaseFirebaseRepository
@@ -26,13 +25,11 @@ export default class PublicSparksNotificationsRepository
    }
 
    async create(notification: UserSparksNotification): Promise<void> {
-      const doc: Create<UserSparksNotification> = {
-         eventId: notification.eventId,
-         startDate: notification.startDate,
-         groupId: notification.groupId,
-      }
-
-      return void this.firestore.collection(this.COLLECTION_NAME).doc(notification.id).set(notification)
+      // The notification id is the group id. This is to ensure there is only one notification per group.
+      return void this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(notification.id)
+         .set(notification)
    }
 
    async delete(id: string): Promise<void> {
@@ -40,6 +37,9 @@ export default class PublicSparksNotificationsRepository
    }
 
    async update(notification: UserSparksNotification): Promise<void> {
-      return void this.firestore.collection(this.COLLECTION_NAME).doc(notification.id).update(notification)
+      return void this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(notification.id)
+         .update(notification)
    }
 }
