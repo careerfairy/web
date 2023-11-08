@@ -2,14 +2,13 @@ import functions = require("firebase-functions")
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { RemoveNotificationFromUserData } from "@careerfairy/shared-lib/sparks/sparks"
 import { string } from "yup"
-import { sparkRepo } from "./api/repositories"
+import { sparkRepo, publicSparksNotificationsRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
 import { addDaysDate } from "./util"
 import { firestore } from "./api/firestoreAdmin"
-import firebase from "firebase/compat/app"
 import {
    getStreamsByDate,
    getStreamsByDateWithRegisteredStudents,
@@ -20,7 +19,6 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { BulkWriter } from "firebase-admin/firestore"
-import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
 
 const removeNotificationFromUserValidator = {
    userId: string().required(),
@@ -147,7 +145,7 @@ const handleCreateUsersSparksNotifications = async (userId?: string) => {
    return bulkWriter.close()
 }
 
-const handleCreatePublicSparksNotifications = async () => {
+export const handleCreatePublicSparksNotifications = async () => {
    const startDate = new Date()
    const endDate = addDaysDate(
       new Date(),
@@ -270,11 +268,9 @@ export const handleEventStartDateChangeTrigger = (
    logger: any
 ): Promise<void> => {
    const endDate = addDaysDate(
-      newValue.startDate,
+      new Date(),
       SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
    )
-   const publicSparksNotificationsRepo =
-      new PublicSparksNotificationsRepository(firebase.firestore())
 
    const isConsideredUpcomingEvent = newValue.startDate <= endDate
    const wasConsideredUpcomingEvent = previousValue.startDate <= endDate
