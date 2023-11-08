@@ -141,6 +141,7 @@ const handleCreateSparksNotifications = async (userId?: string) => {
 
    const upcomingEvents = await getStreamsByDate(startDate, endDate)
 
+   clearPublicSparksNotifications()
    createPublicSparksNotifications(upcomingEvents, bulkWriter)
 
    return bulkWriter.close()
@@ -210,6 +211,18 @@ const createSparkNotificationForSingleUser = ({
       void bulkWriter.set(userSparksNotificationsRef, notification, {
          merge: true,
       })
+   })
+}
+
+const clearPublicSparksNotifications = async () => {
+   const publicSparksNotificationsRef = firestore.collection(
+      "publicSparksNotifications"
+   )
+   const publicSparksNotificationsSnapshot =
+      await publicSparksNotificationsRef.get()
+
+   publicSparksNotificationsSnapshot.docs.forEach((doc) => {
+      publicSparksNotificationsRef.doc(doc.id).delete()
    })
 }
 
