@@ -256,7 +256,7 @@ const createPublicSparksNotifications = (
    const collectionRef = firestore.collection("publicSparksNotifications")
 
    notifications.forEach((notification) => {
-      const docRef = collectionRef.doc()
-      bulkWriter.create(docRef, notification)
+      const docRef = collectionRef.doc(notification.id)
+      bulkWriter.set(docRef, notification)
    })
 }
