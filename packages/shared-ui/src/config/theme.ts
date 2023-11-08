@@ -175,7 +175,7 @@ const textSmall = {
    [desktop]: {},
 } satisfies React.CSSProperties
 
-const typography = {
+const typography: ThemeOptions["typography"] = {
    h1: {
       fontSize: "1.75rem", // 28px
       lineHeight: "150%",
@@ -233,9 +233,10 @@ const typography = {
    fontWeightLight: 300,
    fontSize: 16,
    htmlFontSize: 16,
-} satisfies ThemeOptions["typography"]
+   fontFamily: "Poppins, sans-serif",
+}
 
-export const themeOptions: ThemeOptions = {
+export const themeOptions = {
    // example of custom theme property
    brand,
 
@@ -347,4 +348,4 @@ export const themeOptions: ThemeOptions = {
          },
       },
    },
-}
+} satisfies ThemeOptions

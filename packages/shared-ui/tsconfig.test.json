@@ -6,12 +6,7 @@
          ".": ["."]
       }
    },
-   "include": [
-      ".",
-      ".eslintrc.js",
-      ".storybook/**/*",
-      "../config-mui/mui-theme.d.ts"
-   ],
+   "include": [".", ".eslintrc.js", ".storybook/**/*"],
    "exclude": [
       "node_modules",
       ".next",
