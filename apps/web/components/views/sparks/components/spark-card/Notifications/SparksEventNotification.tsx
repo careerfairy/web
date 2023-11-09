@@ -91,9 +91,14 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
       dispatch(showEventDetailsDialog(true))
    }, [dispatch])
 
-   const cancelHandleClick = useCallback(() => {
-      dispatch(removeCurrentEventNotifications())
-   }, [dispatch])
+   const cancelHandleClick = useCallback(
+      (ev) => {
+         dispatch(removeCurrentEventNotifications())
+         ev.preventDefault()
+         ev.stopPropagation()
+      },
+      [dispatch]
+   )
 
    const showNotification: boolean = useMemo(
       () =>
