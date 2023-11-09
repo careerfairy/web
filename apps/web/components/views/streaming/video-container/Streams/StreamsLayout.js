@@ -15,7 +15,6 @@ import { Stack } from "@mui/material"
 import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
 import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
-import { focus } from "@testing-library/user-event/dist/focus"
 const SynchronisedVideoViewer = dynamic(() =>
    import("../../../../util/SynchronisedVideoViewer")
 )
