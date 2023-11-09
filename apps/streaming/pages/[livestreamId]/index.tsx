@@ -1,5 +1,5 @@
 import { StreamingPage } from "modules"
 
-const Streaming = () => <StreamingPage />
+const Streaming = () => <StreamingPage isHost={false} />
 
 export default Streaming
