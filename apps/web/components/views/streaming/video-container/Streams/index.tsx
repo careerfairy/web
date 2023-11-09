@@ -174,6 +174,7 @@ const Streams = ({
                sharingVideo={sharingVideo}
                viewer={viewer}
                streamerId={streamerId}
+               handRaiseActive={handRaiseActive}
             />
             {userData?.isAdmin && <SuperAdminControls />}
          </Box>
