@@ -6,7 +6,10 @@ import { LogoBackButton } from "./LogoBackButton"
 import { Timer } from "./Timer"
 import { ViewCount } from "./ViewCount"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { CTAButton } from "./CTAButton"
+import { CallToActionsButton } from "./CallToActionsButton"
+import { useStreamContext } from "../../context/StreamContext"
+import { ToggleStartLiveStreamButton } from "./ToggleStartLiveStreamButton"
+import { ConnectionStatus } from "./ConnectionStatus"
 
 const styles = sxStyles({
    root: {
@@ -23,6 +26,8 @@ const styles = sxStyles({
 })
 
 export const TopBar = () => {
+   const { isHost } = useStreamContext()
+
    return (
       <AppBar
          color="transparent"
@@ -51,9 +56,11 @@ export const TopBar = () => {
                   </StackComponent>
                   <StackComponent justifyContent="flex-end">
                      <ViewCount />
-                     <CTAButton />
+                     {isHost ? null : <CallToActionsButton />}
+                     <ConnectionStatus />
+                     {isHost ? <ToggleStartLiveStreamButton /> : null}
                      <CompanyButton />
-                     <CheckJobsButton />
+                     {isHost ? null : <CheckJobsButton />}
                   </StackComponent>
                </Stack>
             </Toolbar>
