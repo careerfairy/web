@@ -32,6 +32,7 @@ jobs:
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
+         streaming: ${{ steps.changes.outputs.streaming }}
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
          - uses: actions/checkout@v3
@@ -198,6 +199,7 @@ jobs:
    deploy_streaming:
       name: "Deploy Streaming"
       needs: [unit_tests]
+      if: needs.build_app_for_tests.outputs.streaming == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
