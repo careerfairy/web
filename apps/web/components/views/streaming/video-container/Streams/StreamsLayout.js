@@ -13,6 +13,9 @@ import {
 import Typography from "@mui/material/Typography"
 import { Stack } from "@mui/material"
 import dynamic from "next/dynamic"
+import { useSelector } from "react-redux"
+import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
+import { focus } from "@testing-library/user-event/dist/focus"
 const SynchronisedVideoViewer = dynamic(() =>
    import("../../../../util/SynchronisedVideoViewer")
 )
@@ -83,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
       display: "flex",
       left: 0,
-      top: ({ handRaiseActive }) => (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
+      top: ({ showBanner }) => (showBanner ? BANNER_ROW_HEIGHT : 0),
       right: 0,
       "& > *": {
          overflow: "hidden",
@@ -99,11 +102,11 @@ const useStyles = makeStyles((theme) => ({
       }),
    },
    largeSquished: {
-      top: ({ handRaiseActive }) =>
-         STREAMS_ROW_HEIGHT + (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
+      top: ({ showBanner }) =>
+         STREAMS_ROW_HEIGHT + (showBanner ? BANNER_ROW_HEIGHT : 0),
       [theme.breakpoints.up("lg")]: {
-         top: ({ handRaiseActive }) =>
-            WIDE_SCREEN_ROW_HEIGHT + (handRaiseActive ? BANNER_ROW_HEIGHT : 0),
+         top: ({ showBanner }) =>
+            WIDE_SCREEN_ROW_HEIGHT + (showBanner ? BANNER_ROW_HEIGHT : 0),
       },
    },
 }))
@@ -116,7 +119,12 @@ const StreamElementWrapper = ({
    first,
    handRaiseActive,
 }) => {
-   const classes = useStyles({ handRaiseActive })
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
+   const showBanner = useMemo(
+      () => handRaiseActive && !focusModeEnabled,
+      [handRaiseActive, focusModeEnabled]
+   )
+   const classes = useStyles({ showBanner })
    return (
       <Box
          className={clsx({
