@@ -78,6 +78,10 @@ jobs:
                    - 'packages/seed-data/**'
                  shared-lib:
                    - 'packages/shared-lib/**'
+                 streaming: 
+                   - 'apps/streaming/**'
+                   - 'packages/shared-lib/**'
+                   - 'packages/shared-ui/**'
 
    # Run Unit Tests
    unit_tests:
@@ -87,7 +91,8 @@ jobs:
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
+         needs.build_app_for_tests.outputs.workflow == 'true' ||
+         needs.build_app_for_tests.outputs.streaming == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -187,6 +192,27 @@ jobs:
               PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
               PR_LABELS: false
               ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
+         - name: preview-url
+           run: |
+              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
+   deploy_streaming:
+      name: "Deploy Streaming"
+      needs: [unit_tests]
+      runs-on: ubuntu-latest
+      timeout-minutes: 20
+      steps:
+         - uses: actions/checkout@v3
+         - name: Deploy to Vercel
+           uses: BetaHuhn/deploy-to-vercel-action@v1
+           id: vercel-deploy
+           with:
+              VERCEL_SCOPE: careerfairy-ssr
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STREAMING_PROJECT_ID }} # replace with the project ID of the streaming app
+              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
+              PR_LABELS: false
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}

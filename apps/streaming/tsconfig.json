@@ -13,7 +13,7 @@
       "next-env.d.ts",
       "**/*.ts",
       "**/*.tsx",
-      "../../packages/shared-ui/src/config/mui-theme.d.ts"
+      "../../packages/config-mui/mui-theme.d.ts"
    ],
    "exclude": ["node_modules"]
 }
