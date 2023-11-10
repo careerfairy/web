@@ -53,8 +53,7 @@ const createSparkNotificationForSingleUser = ({
 export const handleCreateUsersSparksNotifications = async (
    firestore: Firestore,
    logger: any,
-   userId?: string,
-   groupId?: string
+   userId?: string
 ) => {
    const startDate = new Date()
    const endDate = addDaysDate(
