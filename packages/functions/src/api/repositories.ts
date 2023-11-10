@@ -29,9 +29,9 @@ import {
 import {
    ISparkFunctionsRepository,
    SparkFunctionsRepository,
-} from "../lib/SparkFunctionsRepository"
+} from "../lib/sparks/SparkFunctionsRepository"
 
-import { SparksFeedReplenisher } from "../lib/sparksFeedReplenisher"
+import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
 
 import logger = require("firebase-functions/logger")
