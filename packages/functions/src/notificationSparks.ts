@@ -1,24 +1,16 @@
 import functions = require("firebase-functions")
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { RemoveNotificationFromUserData } from "@careerfairy/shared-lib/sparks/sparks"
 import { string } from "yup"
-import { sparkRepo, publicSparksNotificationsRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
-import { addDaysDate } from "./util"
+import {
+   handleCreateUsersSparksNotifications,
+   removeUserNotificationsAndSyncSparksNotifications,
+} from "./lib/sparks/notifications/userNotifications"
+import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
 import { firestore } from "./api/firestoreAdmin"
-import {
-   getStreamsByDate,
-   getStreamsByDateWithRegisteredStudents,
-} from "./lib/livestream"
-import {
-   LiveStreamEventWithUsersLivestreamData,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { BulkWriter } from "firebase-admin/firestore"
 
 const removeNotificationFromUserValidator = {
    userId: string().required(),
@@ -35,30 +27,13 @@ export const createSparksFeedEventNotifications = functions
    .onRun(async () => {
       try {
          return Promise.allSettled([
-            handleCreateUsersSparksNotifications(),
-            handleCreatePublicSparksNotifications(),
+            handleCreateUsersSparksNotifications(firestore, functions.logger),
+            handleCreatePublicSparksNotifications(firestore, functions.logger),
          ])
       } catch (error) {
          logAndThrow(
             "Error during the creation of Sparks Feed event notifications",
             error
-         )
-      }
-   })
-
-/**
- * To create Sparks event notifications to a single User
- */
-export const createUserSparksFeedEventNotifications = functions
-   .region(config.region)
-   .https.onCall(async (userId) => {
-      try {
-         return handleCreateUsersSparksNotifications(userId)
-      } catch (error) {
-         logAndThrow(
-            "Error during the creation of a single User Sparks Feed event notifications",
-            error,
-            userId
          )
       }
    })
@@ -76,15 +51,12 @@ export const removeAndSyncUserSparkNotification = functions
          async (data: RemoveNotificationFromUserData, context) => {
             try {
                const { userId, groupId } = data
-
-               functions.logger.log(
-                  `remove spark notification related to the group ${groupId} for the user ${userId}`
+               return removeUserNotificationsAndSyncSparksNotifications(
+                  firestore,
+                  functions.logger,
+                  userId,
+                  groupId
                )
-               // remove single notification for this particular user
-               await sparkRepo.removeUserSparkNotification(userId, groupId)
-
-               // update spark notifications for this user
-               return handleCreateUsersSparksNotifications(userId)
             } catch (error) {
                logAndThrow(
                   "Error during removing a single spark notification from a user",
@@ -97,204 +69,23 @@ export const removeAndSyncUserSparkNotification = functions
       )
    )
 
-export const removeAndSyncSparksNotifications = async (groupId: string) => {
-   await sparkRepo.removeSparkNotification(groupId)
-   return handleCreateUsersSparksNotifications()
-}
-
-export const syncUserSparksNotifications = async (userId: string) => {
-   return handleCreateUsersSparksNotifications(userId)
-}
-
-const handleCreateUsersSparksNotifications = async (userId?: string) => {
-   const startDate = new Date()
-   const endDate = addDaysDate(
-      new Date(),
-      SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
-   )
-   const bulkWriter = firestore.bulkWriter()
-
-   // to get all the upcoming events that will start on the next X days
-   const upcomingEventsWithRegisteredStudents =
-      await getStreamsByDateWithRegisteredStudents(startDate, endDate)
-
-   functions.logger.log(
-      `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEventsWithRegisteredStudents.length} events will take place`
-   )
-
-   if (userId) {
-      // In this case we want only to create notification for a single user
-      createSparkNotificationForSingleUser({
-         userId,
-         upcomingEvents: upcomingEventsWithRegisteredStudents,
-         bulkWriter,
-      })
-      return bulkWriter.close()
-   }
-
-   const userSparksFeedMetrics = await sparkRepo.getAllUserSparksFeedMetrics()
-
-   userSparksFeedMetrics.forEach(({ userId }) => {
-      createSparkNotificationForSingleUser({
-         userId,
-         upcomingEvents: upcomingEventsWithRegisteredStudents,
-         bulkWriter,
-      })
-   })
-
-   return bulkWriter.close()
-}
-
-export const handleCreatePublicSparksNotifications = async () => {
-   const startDate = new Date()
-   const endDate = addDaysDate(
-      new Date(),
-      SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
-   )
-   const bulkWriter = firestore.bulkWriter()
-
-   const upcomingEvents = await getStreamsByDate(startDate, endDate)
-
-   clearPublicSparksNotifications()
-   createPublicSparksNotifications(upcomingEvents, bulkWriter)
-
-   return bulkWriter.close()
-}
-
-const mapEventsToNotifications = (
-   events: LiveStreamEventWithUsersLivestreamData[] | LivestreamEvent[]
-): UserSparksNotification[] => {
-   const notifications: UserSparksNotification[] = []
-
-   events.forEach((event) => {
-      if (event.groupIds && event.groupIds.length > 0) {
-         const eventId = event.id
-
-         event.groupIds.forEach((groupId) => {
-            const groupAlreadyHasNotification = notifications.some(
-               (notification) => notification.groupId === groupId
-            )
-
-            if (!groupAlreadyHasNotification) {
-               notifications.push({
-                  id: groupId,
-                  eventId: eventId,
-                  groupId: groupId,
-                  startDate: event.start.toDate(),
-               })
-            }
-         })
+/**
+ * To create Sparks event notifications to a single User
+ */
+export const createUserSparksFeedEventNotifications = functions
+   .region(config.region)
+   .https.onCall(async (userId) => {
+      try {
+         return handleCreateUsersSparksNotifications(
+            firestore,
+            functions.logger,
+            userId
+         )
+      } catch (error) {
+         logAndThrow(
+            "Error during the creation of a single User Sparks Feed event notifications",
+            error,
+            userId
+         )
       }
    })
-
-   return notifications
-}
-
-type createSparkNotificationForSingleUser = {
-   userId: string
-   upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
-   bulkWriter: BulkWriter
-}
-const createSparkNotificationForSingleUser = ({
-   userId,
-   upcomingEvents,
-   bulkWriter,
-}: createSparkNotificationForSingleUser) => {
-   // filter all the upcoming events where the user already registered
-   const filteredUpcomingEvents = upcomingEvents.filter(
-      (event) => !event.registeredUsers?.includes(userId)
-   )
-
-   const notifications: UserSparksNotification[] = mapEventsToNotifications(
-      filteredUpcomingEvents
-   )
-
-   functions.logger.log(
-      `User ${userId} will have spark notifications for the groups: ${notifications
-         .map((notification) => notification.groupId)
-         .join(", ")}`
-   )
-
-   notifications.forEach((notification) => {
-      const userSparksNotificationsRef = firestore
-         .collection("userData")
-         .doc(userId)
-         .collection("sparksNotifications")
-         .doc(notification.groupId)
-
-      void bulkWriter.set(userSparksNotificationsRef, notification, {
-         merge: true,
-      })
-   })
-}
-
-const clearPublicSparksNotifications = async () => {
-   const publicSparksNotificationsRef = firestore.collection(
-      "publicSparksNotifications"
-   )
-   const publicSparksNotificationsSnapshot =
-      await publicSparksNotificationsRef.get()
-
-   publicSparksNotificationsSnapshot.docs.forEach((doc) => {
-      publicSparksNotificationsRef.doc(doc.id).delete()
-   })
-}
-
-const createPublicSparksNotifications = (
-   upcomingEvents: LivestreamEvent[],
-   bulkWriter: BulkWriter
-) => {
-   const notifications: UserSparksNotification[] =
-      mapEventsToNotifications(upcomingEvents)
-
-   functions.logger.log(
-      `Creating public spark notifications for the groups: ${notifications
-         .map((notification) => notification.groupId)
-         .join(", ")}`
-   )
-
-   const collectionRef = firestore.collection("publicSparksNotifications")
-
-   notifications.forEach((notification) => {
-      const docRef = collectionRef.doc(notification.id)
-      bulkWriter.set(docRef, notification)
-   })
-}
-
-export const handleEventStartDateChangeTrigger = (
-   newValue: LivestreamEvent,
-   previousValue: LivestreamEvent,
-   groupId: string,
-   logger: any
-): Promise<void> => {
-   const endDate = addDaysDate(
-      new Date(),
-      SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS
-   )
-
-   const isConsideredUpcomingEvent = newValue.startDate <= endDate
-   const wasConsideredUpcomingEvent = previousValue.startDate <= endDate
-
-   if (isConsideredUpcomingEvent) {
-      logger.log(
-         `Event ${newValue.id} from ${groupId} has changed its starting date and is now considered an upcoming event. As result, public spark notification associated with this event will be updated`
-      )
-
-      const newNotification: UserSparksNotification = {
-         id: groupId,
-         eventId: newValue.id,
-         startDate: newValue.startDate,
-         groupId: groupId,
-      }
-
-      return publicSparksNotificationsRepo.create(newNotification)
-   } else if (wasConsideredUpcomingEvent) {
-      functions.logger.log(
-         `Event ${newValue.id} from ${groupId} has changed its starting date and is no longer considered an upcoming event. As result, public spark notification associated with this event will be deleted`
-      )
-
-      return publicSparksNotificationsRepo.delete(groupId)
-   }
-
-   return Promise.resolve()
-}

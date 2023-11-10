@@ -17,12 +17,11 @@ import { handleUserStatsBadges } from "./lib/badge"
 import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import {
-   handleEventStartDateChangeTrigger,
-   removeAndSyncSparksNotifications,
-} from "./notificationSparks"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { validateGroupSparks } from "./util/sparks"
+import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks/notifications/userNotifications"
+import { firestore } from "./api/firestoreAdmin"
+import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -55,7 +54,13 @@ export const syncLivestreams = functions
             functions.logger.log(
                `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
             )
-            sideEffectPromises.push(removeAndSyncSparksNotifications(groupId))
+            sideEffectPromises.push(
+               removeGroupNotificationsAndSyncSparksNotifications(
+                  firestore,
+                  functions.logger,
+                  groupId
+               )
+            )
          }
 
          if (newValue.startDate !== previousValue.startDate) {
