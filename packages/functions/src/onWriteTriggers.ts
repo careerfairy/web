@@ -47,7 +47,7 @@ export const syncLivestreams = functions
       if (changeTypes.isUpdate) {
          const newValue = change.after?.data() as LivestreamEvent
          const previousValue = change.before?.data() as LivestreamEvent
-         const groupId = newValue.author?.groupId || newValue.groupIds?.[0]
+         const groupId = newValue.groupIds?.[0]
 
          if (newValue.hasStarted && !previousValue.hasStarted) {
             // In case the livestream as started we want to update the sparks notifications
