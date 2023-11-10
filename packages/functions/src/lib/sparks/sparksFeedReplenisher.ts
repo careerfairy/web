@@ -7,9 +7,9 @@ import {
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { shuffle } from "@careerfairy/shared-lib/utils"
 import { DateTime, Duration } from "luxon"
-import { createGenericConverter } from "../util/firestore-admin"
-import { Firestore, Timestamp } from "../api/firestoreAdmin"
-import { addAddedToFeedAt } from "../util/sparks"
+import { createGenericConverter } from "../../util/firestore-admin"
+import { Firestore, Timestamp } from "../../api/firestoreAdmin"
+import { addAddedToFeedAt } from "../../util/sparks"
 
 /**
  * The SparksFeedReplenisher class is responsible for replenishing the user's feed
