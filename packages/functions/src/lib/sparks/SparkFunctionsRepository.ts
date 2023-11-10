@@ -29,19 +29,19 @@ import {
    Firestore,
    Storage,
    Timestamp,
-} from "../api/firestoreAdmin"
-import { createGenericConverter } from "../util/firestore-admin"
-import { addAddedToFeedAt } from "../util/sparks"
+} from "../../api/firestoreAdmin"
+import { createGenericConverter } from "../../util/firestore-admin"
+import { addAddedToFeedAt } from "../../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import BigQueryServiceCore from "./bigQuery/IBigQueryService"
+import BigQueryServiceCore from "../bigQuery/IBigQueryService"
 import {
    SparkEvent,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import * as functions from "firebase-functions"
-import { userRepo } from "../api/repositories"
+import { userRepo } from "../../api/repositories"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -204,7 +204,7 @@ export interface ISparkFunctionsRepository {
     * Remove all spark notifications related to a specific group
     *
     */
-   removeSparkNotification(groupId: string): Promise<void>
+   removeAllSparkNotificationsByGroup(groupId: string): Promise<void>
 
    /**
     * Remove specific spark notifications from a single user
@@ -720,7 +720,7 @@ export class SparkFunctionsRepository
       return snapshot.docs.map((doc) => doc.data())
    }
 
-   async removeSparkNotification(groupId: string): Promise<void> {
+   async removeAllSparkNotificationsByGroup(groupId: string): Promise<void> {
       const bulkWriter = this.firestore.bulkWriter()
 
       const snapShot = await this.firestore
