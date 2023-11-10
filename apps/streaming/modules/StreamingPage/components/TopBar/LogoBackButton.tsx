@@ -1,12 +1,13 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBackIosRounded"
 import Image from "next/image"
 import { Link } from "components"
-import { Stack } from "@mui/material"
+import { IconButton, Stack } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
 
 const styles = sxStyles({
    backicon: {
       fontSize: 18,
+      ml: -1,
    },
 })
 
@@ -19,7 +20,9 @@ export const LogoBackButton = () => {
          direction="row"
          alignItems="center"
       >
-         <ArrowBackIcon sx={styles.backicon} />
+         <IconButton sx={styles.backicon}>
+            <ArrowBackIcon fontSize="inherit" />
+         </IconButton>
          <Image
             style={{
                objectFit: "contain",

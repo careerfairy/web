@@ -344,7 +344,13 @@ export const themeOptions = {
       },
       MuiBadge: {
          styleOverrides: {
-            badge: {},
+            badge: {
+               boxShadow: `0 0 0 1px ${brand.white[50]}`,
+               transform: "scale(1) translate(30%, -30%)",
+            },
+            anchorOriginTopRight: {
+               transform: "scale(1) translate(30%, -30%)",
+            },
          },
       },
    },

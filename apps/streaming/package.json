@@ -16,6 +16,7 @@
    "dependencies": {
       "@careerfairy/shared-lib": "*",
       "@careerfairy/shared-ui": "*",
+      "@careerfairy/config-mui": "*",
       "@reduxjs/toolkit": "^1.9.7",
       "react-feather": "^2.0.10"
    },
