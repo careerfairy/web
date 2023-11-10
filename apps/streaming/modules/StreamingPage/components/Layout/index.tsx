@@ -8,6 +8,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       height: "100vh",
+      background: "#F7F8FC",
    },
 })
 
