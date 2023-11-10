@@ -57,7 +57,7 @@ export const syncLivestreams = functions
             sideEffectPromises.push(
                removeGroupNotificationsAndSyncSparksNotifications(
                   firestore,
-                  functions.logger,
+                  functions.logger.log,
                   groupId
                )
             )
@@ -69,7 +69,7 @@ export const syncLivestreams = functions
                   newValue,
                   previousValue,
                   groupId,
-                  functions.logger
+                  functions.logger.log
                )
             )
          }

@@ -1,11 +1,11 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Firestore } from "firebase-admin/firestore"
-import { mapEventsToNotifications } from "../util"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { addDaysDate } from "src/util"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
-import { getStreamsByDate } from "src/lib/livestream"
-import { publicSparksNotificationsRepo } from "src/api/repositories"
+import { addDaysDate } from "../../../util"
+import { mapEventsToNotifications } from "../util"
+import { getStreamsByDate } from "../../livestream"
+import { publicSparksNotificationsRepo } from "../../../api/repositories"
 
 const createPublicSparksNotifications = (
    upcomingEvents: LivestreamEvent[],
@@ -17,7 +17,7 @@ const createPublicSparksNotifications = (
    const notifications: UserSparksNotification[] =
       mapEventsToNotifications(upcomingEvents)
 
-   logger.log(
+   logger(
       `Creating public spark notifications for the groups: ${notifications
          .map((notification) => notification.groupId)
          .join(", ")}`
@@ -45,7 +45,7 @@ const clearPublicSparksNotifications = async (
       publicSparksNotificationsRef.doc(doc.id).delete()
    })
 
-   logger.log("Cleared publicSparksNotifications collection.")
+   logger("Cleared publicSparksNotifications collection.")
 }
 
 export const handleCreatePublicSparksNotifications = async (
@@ -82,7 +82,7 @@ export const handleEventStartDateChangeTrigger = (
    const wasConsideredUpcomingEvent = previousValue.startDate <= endDate
 
    if (isConsideredUpcomingEvent) {
-      logger.log(
+      logger(
          `Event ${newValue.id} from ${groupId} has changed its starting date and is now considered an upcoming event. As result, public spark notification associated with this event will be updated`
       )
 
@@ -95,7 +95,7 @@ export const handleEventStartDateChangeTrigger = (
 
       return publicSparksNotificationsRepo.create(newNotification)
    } else if (wasConsideredUpcomingEvent) {
-      logger.log(
+      logger(
          `Event ${newValue.id} from ${groupId} has changed its starting date and is no longer considered an upcoming event. As result, public spark notification associated with this event will be deleted`
       )
 
