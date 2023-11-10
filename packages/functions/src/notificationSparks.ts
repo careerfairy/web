@@ -27,8 +27,14 @@ export const createSparksFeedEventNotifications = functions
    .onRun(async () => {
       try {
          return Promise.allSettled([
-            handleCreateUsersSparksNotifications(firestore, functions.logger),
-            handleCreatePublicSparksNotifications(firestore, functions.logger),
+            handleCreateUsersSparksNotifications(
+               firestore,
+               functions.logger.log
+            ),
+            handleCreatePublicSparksNotifications(
+               firestore,
+               functions.logger.log
+            ),
          ])
       } catch (error) {
          logAndThrow(
@@ -53,7 +59,7 @@ export const removeAndSyncUserSparkNotification = functions
                const { userId, groupId } = data
                return removeUserNotificationsAndSyncSparksNotifications(
                   firestore,
-                  functions.logger,
+                  functions.logger.log,
                   userId,
                   groupId
                )
@@ -78,7 +84,7 @@ export const createUserSparksFeedEventNotifications = functions
       try {
          return handleCreateUsersSparksNotifications(
             firestore,
-            functions.logger,
+            functions.logger.log,
             userId
          )
       } catch (error) {
