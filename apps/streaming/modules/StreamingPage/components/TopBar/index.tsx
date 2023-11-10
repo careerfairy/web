@@ -1,4 +1,11 @@
-import { AppBar, Container, Stack, StackProps, Toolbar } from "@mui/material"
+import {
+   AppBar,
+   Box,
+   Container,
+   Stack,
+   StackProps,
+   Toolbar,
+} from "@mui/material"
 
 import { CheckJobsButton } from "./CheckJobsButton"
 import { CompanyButton } from "./CompanyButton"
@@ -50,24 +57,49 @@ export const TopBar = () => {
                   alignItems="center"
                   justifyContent="space-between"
                >
-                  <StackComponent>
+                  <StackComponent
+                     justifyContent={{
+                        xs: "space-between",
+                        tablet: "flex-start",
+                     }}
+                     width={{
+                        xs: "100%",
+                        tablet: "auto",
+                     }}
+                  >
                      <LogoBackButton />
                      <Timer />
                   </StackComponent>
-                  <StackComponent justifyContent="flex-end">
-                     <ViewCount />
-                     {isHost ? null : <CallToActionsButton />}
-                     <ConnectionStatus />
-                     {isHost ? <ToggleStartLiveStreamButton /> : null}
-                     <CompanyButton />
-                     {isHost ? null : <CheckJobsButton />}
-                  </StackComponent>
+                  {isHost ? <HostView /> : <ViewerView />}
                </Stack>
             </Toolbar>
          </Container>
       </AppBar>
    )
 }
+
+const HostView = () => (
+   <StackComponent justifyContent="flex-end">
+      <MarginBox>
+         <ConnectionStatus />
+      </MarginBox>
+      <ToggleStartLiveStreamButton />
+      <CompanyButton />
+      <ViewCount />
+   </StackComponent>
+)
+
+const ViewerView = () => (
+   <StackComponent justifyContent="flex-end">
+      <MarginBox>
+         <ViewCount />
+      </MarginBox>
+      <CallToActionsButton />
+      <ConnectionStatus />
+      <CompanyButton />
+      <CheckJobsButton />
+   </StackComponent>
+)
 
 const StackComponent = ({ children, ...props }: StackProps) => {
    return (
@@ -85,3 +117,18 @@ const StackComponent = ({ children, ...props }: StackProps) => {
       </Stack>
    )
 }
+
+type MarginBoxProps = {
+   children: React.ReactNode
+}
+
+const MarginBox = ({ children }: MarginBoxProps) => (
+   <Box
+      mr={{
+         xs: "auto !important",
+         tablet: 0,
+      }}
+   >
+      {children}
+   </Box>
+)

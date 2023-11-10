@@ -13,14 +13,14 @@ export const CallToActionsButton = () => {
          unmountOnExit
          in={showCallToActionsButton}
       >
-         <CircularButton
-            onClick={() => setShowCallToActionsButton(false)}
-            color="primary"
-         >
-            <Badge color="error" badgeContent={2}>
+         <Badge color="error" badgeContent={2}>
+            <CircularButton
+               onClick={() => setShowCallToActionsButton(false)}
+               color="primary"
+            >
                <Link2 />
-            </Badge>
-         </CircularButton>
+            </CircularButton>
+         </Badge>
       </Collapse>
    )
 }

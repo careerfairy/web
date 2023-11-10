@@ -19,7 +19,8 @@
       "update-dependencies": "npx npm-check-updates -u"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*"
+      "@careerfairy/shared-lib": "*",
+      "@careerfairy/config-mui": "*"
    },
    "devDependencies": {
       "@careerfairy/config-tsconfig": "*"

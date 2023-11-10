@@ -6,10 +6,6 @@ import React from "react"
 const styles = sxStyles({
    root: {
       border: (theme) => `1px solid ${theme.brand.black[400]}`,
-      mr: {
-         xs: "auto !important",
-         tablet: 0,
-      },
    },
 })
 
