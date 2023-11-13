@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useCallback } from "react"
 import { useRouter } from "next/router"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { Button, Typography } from "@mui/material"
@@ -7,7 +7,19 @@ import Link from "../../../../common/Link"
 import { FloatingButtonWrapper } from "./ActionButton"
 
 const SignUpToWatchButton: FC = () => {
-   const { asPath } = useRouter()
+   const { push, asPath, pathname } = useRouter()
+
+   const redirectToSignUp = useCallback(() => {
+      const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
+      const utmParams = isOnSparksFeed
+         ? { utm_source: "careerfairy", utm_medium: "sparks" }
+         : null
+      console.log(isOnSparksFeed, utmParams)
+      return push({
+         pathname: `/signup`,
+         query: { absolutePath: asPath, ...utmParams },
+      })
+   }, [asPath, pathname, push])
 
    const { isFloating } = useActionButtonContext()
 
@@ -19,8 +31,7 @@ const SignUpToWatchButton: FC = () => {
             sx={styles.btn}
             variant={"contained"}
             fullWidth
-            href={`/signup?absolutePath=${asPath}`}
-            component={Link}
+            onClick={redirectToSignUp}
             disableElevation
             data-testid="livestream-signup-watch-button"
             size="large"
