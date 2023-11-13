@@ -104,6 +104,7 @@ class GroupFirebaseSeed implements GroupSeed {
          bannerImageUrl: faker.image.business(),
          test: false,
          universityName,
+         normalizedUniversityName: universityName.toLowerCase(),
          triGrams: groupTriGrams(universityName),
          atsAdminPageFlag: true,
       }
