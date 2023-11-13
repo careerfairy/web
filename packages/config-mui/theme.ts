@@ -136,7 +136,7 @@ const breakpoints = {
       xl: 1536,
       // added
       mobile: 0,
-      tablet: 690,
+      tablet: 710,
       desktop: 1024,
    },
 } satisfies ThemeOptions["breakpoints"]
