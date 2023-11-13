@@ -29,7 +29,7 @@ export default function useRegistrationHandler() {
       goToView,
       currentSparkId,
    } = useLiveStreamDialog()
-   const { push, asPath } = useRouter()
+   const { push, asPath, pathname } = useRouter()
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
@@ -129,11 +129,16 @@ export default function useRegistrationHandler() {
    ])
 
    const redirectToLogin = useCallback(() => {
+      const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
+      const utmParams = isOnSparksFeed
+         ? { utm_source: "careerfairy", utm_medium: "sparks" }
+         : null
+
       return push({
          pathname: `/login`,
-         query: { absolutePath: asPath },
+         query: { absolutePath: asPath, ...utmParams },
       })
-   }, [asPath, push])
+   }, [asPath, pathname, push])
 
    /**
     * Handle the register button click
