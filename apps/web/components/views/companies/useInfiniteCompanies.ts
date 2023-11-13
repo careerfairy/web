@@ -55,7 +55,7 @@ export const getInfiniteQuery = (
       where("test", "==", false),
       ...constraints,
       limit(pageSIze),
-      orderBy("universityName", "asc")
+      orderBy("normalizedUniversityName", "asc")
    ).withConverter(createGenericConverter<Group>())
 }
 
