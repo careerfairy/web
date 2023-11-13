@@ -47,31 +47,44 @@ export const syncLivestreams = functions
       if (changeTypes.isUpdate) {
          const newValue = change.after?.data() as LivestreamEvent
          const previousValue = change.before?.data() as LivestreamEvent
-         const groupId = newValue.groupIds?.[0]
+
+         // We must delete all notifications for this event's groupIds because of the Notification creation process.
+         // Check comment of mapEventsToNotifications.
+         const groupIdsToBeUpdatedFromNotifications = [
+            ...new Set([
+               ...(newValue?.groupIds ?? []),
+               ...(previousValue?.groupIds ?? []),
+            ]),
+         ]
 
          if (newValue.hasStarted && !previousValue.hasStarted) {
             // In case the livestream as started we want to update the sparks notifications
             functions.logger.log(
                `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
             )
-            sideEffectPromises.push(
-               removeGroupNotificationsAndSyncSparksNotifications(
-                  firestore,
-                  functions.logger.log,
-                  groupId
+
+            groupIdsToBeUpdatedFromNotifications.forEach((groupId) => {
+               sideEffectPromises.push(
+                  removeGroupNotificationsAndSyncSparksNotifications(
+                     firestore,
+                     functions.logger.log,
+                     groupId
+                  )
                )
-            )
+            })
          }
 
          if (newValue.startDate !== previousValue.startDate) {
-            sideEffectPromises.push(
-               handleEventStartDateChangeTrigger(
-                  newValue,
-                  previousValue,
-                  groupId,
-                  functions.logger.log
+            groupIdsToBeUpdatedFromNotifications.forEach((groupId) => {
+               sideEffectPromises.push(
+                  handleEventStartDateChangeTrigger(
+                     newValue,
+                     previousValue,
+                     groupId,
+                     functions.logger.log
+                  )
                )
-            )
+            })
          }
       }
 
