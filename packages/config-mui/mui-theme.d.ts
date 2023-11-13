@@ -9,6 +9,8 @@ declare module "@mui/material/styles" {
       brand: {
          black: ColorPartial
          white: ColorPartial
+         tq: ColorPartial
+         purple: ColorPartial
       }
    }
 
@@ -16,6 +18,8 @@ declare module "@mui/material/styles" {
       brand: {
          black: ColorPartial
          white: ColorPartial
+         tq: ColorPartial
+         purple: ColorPartial
       }
    }
 
