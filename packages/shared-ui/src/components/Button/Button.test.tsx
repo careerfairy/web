@@ -1,8 +1,8 @@
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { renderWithTheme } from "@careerfairy/utils-test"
 
 import { Button } from "."
-import { renderWithTheme } from "../../utils/test"
 
 describe("packages", () => {
    describe("ui", () => {
