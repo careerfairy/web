@@ -43,6 +43,10 @@ const styles = sxStyles({
          },
       },
       zIndex: 0,
+      width: {
+         xs: 38,
+         tablet: 44,
+      },
    }),
    speedDialOpen: {
       "& .MuiSpeedDial-fab": {
@@ -57,6 +61,11 @@ const styles = sxStyles({
       height: {
          xs: 38,
          tablet: 44,
+      },
+   },
+   speedDialAction: {
+      "&:hover": {
+         backgroundColor: "transparent",
       },
    },
    noShadow: {
@@ -127,7 +136,8 @@ export const ActionsSpeedDial = () => {
                   icon={allActions[action]}
                   tooltipTitle={action}
                   FabProps={{
-                     sx: styles.noShadow,
+                     sx: [styles.noShadow, styles.speedDialAction],
+                     component: "div",
                   }}
                />
             ))}
