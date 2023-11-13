@@ -4,7 +4,11 @@ import { QaIcon } from "components/icons"
 
 export const QAndAPanel = () => {
    return (
-      <SidePanelView id="qanda-panel" title="Q&A" icon={<QaIcon />}>
+      <SidePanelView
+         id="qanda-panel"
+         title="Questions and Answers"
+         icon={<QaIcon />}
+      >
          content
       </SidePanelView>
    )

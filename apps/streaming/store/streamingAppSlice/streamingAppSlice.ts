@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-export type ActiveView = "chat" | "polls" | "quests" | "jobs" | "cta"
+export type ActiveView =
+   | "chat"
+   | "polls"
+   | "quests"
+   | "jobs"
+   | "cta"
+   | "hand-raise"
 
 export interface StreamingAppState {
    sidePanel: {

@@ -5,7 +5,11 @@ import { Typography } from "@mui/material"
 
 export const JobsPanel = () => {
    return (
-      <SidePanelView id="jobs-panel" title="Jobs" icon={<Briefcase />}>
+      <SidePanelView
+         id="jobs-panel"
+         title="Available jobs"
+         icon={<Briefcase />}
+      >
          <Typography variant="medium">
             ply dummy text of the printing and typesetting industry. Lorem Ipsum
             has been the industry's standard dummy text ever since the 1500s,

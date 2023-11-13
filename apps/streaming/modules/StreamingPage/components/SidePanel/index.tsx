@@ -11,6 +11,7 @@ import { ChatPanel } from "./ChatPanel"
 import { JobsPanel } from "./JobsPanel"
 import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
+import { HandRaisePanel } from "./HandRaisePanel"
 
 const drawerWidth = 328
 
@@ -43,6 +44,7 @@ const viewComponents = {
    polls: <PollsPanel />,
    quests: <QAndAPanel />,
    cta: <CTAPanel />,
+   "hand-raise": <HandRaisePanel />,
    default: null,
 } satisfies Record<ActiveView | "default", React.ReactNode>
 

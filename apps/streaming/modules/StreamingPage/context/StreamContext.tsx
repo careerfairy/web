@@ -1,10 +1,13 @@
+import { useAppDispatch, useAppSelector } from "hooks"
 import React, {
    createContext,
    useContext,
    ReactNode,
    useMemo,
    useCallback,
+   useEffect,
 } from "react"
+import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
 
 type StreamContextProps = {
    livestreamId: string
@@ -28,6 +31,20 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({
    isHost,
    children,
 }) => {
+   const { activeView } = useAppSelector(sidePanelSelector)
+
+   const dispatch = useAppDispatch()
+
+   const handRaiseActive = activeView === "hand-raise"
+
+   useEffect(() => {
+      // if the user is not a host and the hand raise panel is active,
+      // switch to chat
+      if (!isHost && handRaiseActive) {
+         dispatch(setActiveView("chat"))
+      }
+   }, [isHost, handRaiseActive, dispatch])
+
    // for demo purposes
    const [isStreaming, setIsStreaming] = React.useState<boolean>(isHost)
 
