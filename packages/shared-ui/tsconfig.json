@@ -1,32 +1,25 @@
 {
+   "extends": "@careerfairy/config-tsconfig/tsconfig.base.json",
    "compilerOptions": {
-      "baseUrl": ".",
-      "target": "ES6",
-      "lib": ["dom", "es6", "dom.iterable", "esnext"],
-      "allowJs": true,
-      "checkJs": false,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "incremental": true,
-      "esModuleInterop": true,
-      "module": "esnext",
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "jsx": "react-jsx",
-      "downlevelIteration": true,
+      "baseUrl": "src",
       "paths": {
-         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"]
-      },
-      "outDir": "dist",
-      "strict": true,
-      "strictNullChecks": true,
-      "pretty": true,
-      "composite": false,
-      "declaration": true,
-      "declarationMap": true
+         ".": ["."]
+      }
    },
-   "compileOnSave": true,
-   "include": ["src"],
-   "exclude": ["dist"]
+   "include": [
+      ".",
+      ".eslintrc.js",
+      ".storybook/**/*",
+      "../config-mui/mui-theme.d.ts"
+   ],
+   "exclude": [
+      "node_modules",
+      ".next",
+      ".turbo",
+      "coverage",
+      "dist",
+      "compiled",
+      "build-next-static",
+      "build-storybook-static"
+   ]
 }

@@ -3,15 +3,26 @@
    "private": true,
    "version": "0.0.0",
    "main": "./dist/index.js",
+   "module": "./dist/index.mjs",
+   "types": "./dist/index.d.ts",
    "scripts": {
-      "build": "npm run clean && npm run copy-files && tsc",
-      "dev": "npm run clean && npm run copy-files && tsc --watch",
-      "test": "jest",
-      "copy-files": "cpx \"src/**/*.{json}\" dist/",
-      "clean": "rimraf dist/"
+      "build": "tsup",
+      "dev": "tsup --watch",
+      "lint": "eslint --max-warnings 0 .",
+      "lint-fix": "eslint --fix .",
+      "tsc": "tsc -p tsconfig.json",
+      "test": "jest --verbose",
+      "test-watch": "jest --verbose --watch",
+      "test-coverage": "jest --coverage --verbose",
+      "storybook": "storybook dev -p 6202 --quiet",
+      "storybook-build": "storybook build -o build-storybook-static",
+      "update-dependencies": "npx npm-check-updates -u"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*"
+      "@careerfairy/shared-lib": "*",
+      "@careerfairy/config-mui": "*"
    },
-   "devDependencies": {}
+   "devDependencies": {
+      "@careerfairy/config-tsconfig": "*"
+   }
 }
