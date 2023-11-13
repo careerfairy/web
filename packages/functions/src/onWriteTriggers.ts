@@ -22,6 +22,7 @@ import { validateGroupSparks } from "./util/sparks"
 import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks/notifications/userNotifications"
 import { firestore } from "./api/firestoreAdmin"
 import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
+import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -50,12 +51,8 @@ export const syncLivestreams = functions
 
          // We must delete all notifications for this event's groupIds because of the Notification creation process.
          // Check comment of mapEventsToNotifications.
-         const groupIdsToBeUpdatedFromNotifications = [
-            ...new Set([
-               ...(newValue?.groupIds ?? []),
-               ...(previousValue?.groupIds ?? []),
-            ]),
-         ]
+         const groupIdsToBeUpdatedFromNotifications =
+            getGroupIdsToBeUpdatedFromChangedEvent(previousValue, newValue)
 
          if (newValue.hasStarted && !previousValue.hasStarted) {
             // In case the livestream as started we want to update the sparks notifications

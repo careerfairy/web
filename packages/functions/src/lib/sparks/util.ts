@@ -46,3 +46,16 @@ export const mapEventsToNotifications = (
 
    return notifications
 }
+
+export const getGroupIdsToBeUpdatedFromChangedEvent = (
+   previousEventValue: LiveStreamEventWithUsersLivestreamData | LivestreamEvent,
+   newEventValue: LiveStreamEventWithUsersLivestreamData | LivestreamEvent
+): string[] => {
+   const notifications = mapEventsToNotifications([
+      previousEventValue,
+      newEventValue,
+   ])
+   return [
+      ...new Set(notifications?.map((notification) => notification.groupId)),
+   ]
+}
