@@ -56,6 +56,7 @@ export const SidePanelView = ({ title, icon, children, id }: Props) => {
    const handleToggle = () => {
       dispatch(toggleSidePanel())
    }
+
    return (
       <Box id={id} sx={[styles.root, styles.baseBgColor]}>
          <Box sx={[styles.header, styles.baseBgColor]}>

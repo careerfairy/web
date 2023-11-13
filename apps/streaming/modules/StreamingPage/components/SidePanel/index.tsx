@@ -12,6 +12,7 @@ import { JobsPanel } from "./JobsPanel"
 import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
+import { useIsLandscape } from "@careerfairy/shared-ui"
 
 const drawerWidth = 328
 
@@ -54,6 +55,7 @@ type Props = {
 
 export const SidePanel = ({ parentHeight }: Props) => {
    const isMobile = useIsMobile()
+   const isLandScape = useIsLandscape()
 
    const dispatch = useAppDispatch()
    const { isOpen, activeView } = useAppSelector(sidePanelSelector)
@@ -64,7 +66,7 @@ export const SidePanel = ({ parentHeight }: Props) => {
 
    const content = viewComponents[activeView] ?? viewComponents.default
 
-   if (isMobile) {
+   if (isMobile || isLandScape) {
       return (
          <SwipeableDrawer
             onOpen={handleToggle}
