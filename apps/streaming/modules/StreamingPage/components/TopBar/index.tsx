@@ -89,17 +89,21 @@ const HostView = () => (
    </StackComponent>
 )
 
-const ViewerView = () => (
-   <StackComponent justifyContent="flex-end">
-      <MarginBox>
-         <ViewCount />
-      </MarginBox>
-      <CallToActionsButton />
-      <ConnectionStatus />
-      <CompanyButton />
-      <CheckJobsButton />
-   </StackComponent>
-)
+const ViewerView = () => {
+   const { isStreaming } = useStreamContext()
+
+   return (
+      <StackComponent justifyContent="flex-end">
+         <MarginBox>
+            <ViewCount />
+         </MarginBox>
+         <CallToActionsButton />
+         {isStreaming ? <ConnectionStatus /> : null}
+         <CompanyButton />
+         <CheckJobsButton />
+      </StackComponent>
+   )
+}
 
 const StackComponent = ({ children, ...props }: StackProps) => {
    return (
