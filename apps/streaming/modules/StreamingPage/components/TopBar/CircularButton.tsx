@@ -4,6 +4,7 @@ export const CircularButton = styled(IconButton)(({ theme }) => ({
    borderRadius: "50%",
    height: 32,
    width: 32,
+   backgroundColor: theme.palette.background.paper,
    [theme.breakpoints.up("tablet")]: {
       height: 40,
       width: 40,

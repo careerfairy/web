@@ -21,9 +21,8 @@ const styles = sxStyles({
       pb: 5,
    },
    actionsBar: {
-      bgcolor: (theme) => theme.brand.white[200],
-      py: 0.875,
-      px: 2,
+      bgcolor: "background.paper",
+      p: 1,
       borderRadius: 66,
       "& .MuiDivider-root": {
          borderColor: "#F7F7F7",
