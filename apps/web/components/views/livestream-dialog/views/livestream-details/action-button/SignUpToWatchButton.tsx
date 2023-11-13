@@ -7,19 +7,17 @@ import Link from "../../../../common/Link"
 import { FloatingButtonWrapper } from "./ActionButton"
 
 const SignUpToWatchButton: FC = () => {
-   const { push, asPath, pathname } = useRouter()
+   const { asPath, pathname } = useRouter()
 
-   const redirectToSignUp = useCallback(() => {
+   const getSparksUtmParamsIfExist = () => {
       const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
-      const utmParams = isOnSparksFeed
-         ? { utm_source: "careerfairy", utm_medium: "sparks" }
-         : null
-      console.log(isOnSparksFeed, utmParams)
-      return push({
-         pathname: `/signup`,
-         query: { absolutePath: asPath, ...utmParams },
-      })
-   }, [asPath, pathname, push])
+
+      if (isOnSparksFeed) {
+         return `&utm_source=careerfairy&utm_medium=sparks`
+      }
+
+      return ""
+   }
 
    const { isFloating } = useActionButtonContext()
 
@@ -31,7 +29,8 @@ const SignUpToWatchButton: FC = () => {
             sx={styles.btn}
             variant={"contained"}
             fullWidth
-            onClick={redirectToSignUp}
+            href={`/signup?absolutePath=${asPath}${getSparksUtmParamsIfExist()}`}
+            component={Link}
             disableElevation
             data-testid="livestream-signup-watch-button"
             size="large"
