@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-type ActiveView = "chat" | "polls" | "quests" | null
+export type ActiveView = "chat" | "polls" | "quests" | "jobs" | "cta"
 
 export interface StreamingAppState {
    sidePanel: {
@@ -16,7 +16,7 @@ export interface StreamingAppState {
 const initialState: StreamingAppState = {
    sidePanel: {
       isOpen: false,
-      activeView: null, // 'chat', 'polls', 'quests', etc.
+      activeView: "chat", // 'chat', 'polls', 'quests', etc.
    },
    isHost: false,
    topBar: {
@@ -31,8 +31,18 @@ const streamingAppSlice = createSlice({
       toggleSidePanel(state) {
          state.sidePanel.isOpen = !state.sidePanel.isOpen
       },
+      closeSidePanel(state) {
+         state.sidePanel.isOpen = false
+      },
       setActiveView(state, action: PayloadAction<ActiveView>) {
+         // if the view is already active, toggle the drawer
+         if (action.payload === state.sidePanel.activeView) {
+            state.sidePanel.isOpen = !state.sidePanel.isOpen
+            return
+         }
+
          state.sidePanel.activeView = action.payload
+
          // Ensure the drawer opens when a new view is set
          state.sidePanel.isOpen = true
       },
@@ -52,6 +62,7 @@ const streamingAppSlice = createSlice({
 export const {
    actions: {
       toggleSidePanel,
+      closeSidePanel,
       setActiveView,
       setHostStatus,
       incrementViewCount,
