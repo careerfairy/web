@@ -22,7 +22,7 @@ export async function run() {
          const docs = totalDocs.slice(i, i + batchSize)
 
          docs.forEach((doc) => {
-            const universityName = doc.data().universityName
+            const universityName = doc.data().universityName || ""
             const normalizedUniversityName = universityName.toLowerCase()
 
             batch.update(doc.ref, { normalizedUniversityName })
