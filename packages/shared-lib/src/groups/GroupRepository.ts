@@ -161,6 +161,7 @@ export interface IGroupRepository {
          | "privacyPolicyActive"
          | "privacyPolicyUrl"
          | "universityName"
+         | "normalizedUniversityName"
          | "careerPageUrl"
       >
    ): Promise<void>
@@ -884,6 +885,9 @@ export class FirebaseGroupRepository
          | "targetedFieldsOfStudy"
          | "privacyPolicyActive"
          | "privacyPolicyUrl"
+         | "universityName"
+         | "normalizedUniversityName"
+         | "careerPageUrl"
       >
    ): Promise<void> {
       const groupRef = this.firestore

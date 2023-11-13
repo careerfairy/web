@@ -23,6 +23,7 @@ export interface Group extends Identifiable {
    universityCode?: string
    universityId?: string
    universityName?: string
+   normalizedUniversityName?: string
    hidePrivateEventsFromEmbed?: boolean
    privacyPolicyActive?: boolean
    privacyPolicyUrl?: string

@@ -185,6 +185,9 @@ const CreateGroup = () => {
          const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
          const careerCenter: Omit<Group, "id" | "groupId" | "triGrams"> = {
             universityName: baseGroupInfo.universityName?.trim(),
+            normalizedUniversityName: baseGroupInfo.universityName
+               ?.trim()
+               .toLowerCase(),
             logoUrl: downloadURL,
             description: baseGroupInfo.description?.trim(),
             test: false,
