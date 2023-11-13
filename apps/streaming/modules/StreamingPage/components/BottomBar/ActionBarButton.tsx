@@ -4,12 +4,11 @@ import React from "react"
 
 type Props = {
    active?: boolean
-   deviceOff?: boolean
 }
 
 export const ActionBarButtonStyled = styled(IconButton, {
-   shouldForwardProp: shouldForwardProp<Props>(["active", "deviceOff"]),
-})<Props>(({ theme, active, deviceOff }) => ({
+   shouldForwardProp: shouldForwardProp<Props>(["active"]),
+})<Props>(({ theme, active }) => ({
    width: 38,
    height: 38,
    [theme.breakpoints.up("tablet")]: {
@@ -24,7 +23,7 @@ export const ActionBarButtonStyled = styled(IconButton, {
       fontSize: 24,
       width: 24,
       height: 24,
-      color: deviceOff ? theme.palette.error.main : theme.palette.primary.main,
+      color: theme.palette.primary.main,
       [theme.breakpoints.up("tablet")]: {
          fontSize: 28,
          width: 28,

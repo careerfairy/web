@@ -1,18 +1,34 @@
 import React from "react"
 import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
 import { Mic, MicOff } from "react-feather"
+import { sxStyles } from "@careerfairy/shared-ui"
+
+const styles = sxStyles({
+   off: {
+      "& svg": {
+         color: "error.main",
+      },
+   },
+})
 
 export const MicActionButton = React.forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
+   const [deviceOff, setDeviceOff] = React.useState<boolean>(false)
+
+   const handleClick = () => {
+      setDeviceOff(!deviceOff)
+   }
    return (
       <ActionBarButtonStyled
-         color={props.deviceOff ? "error" : undefined}
+         color={deviceOff ? "error" : undefined}
          ref={ref}
+         onClick={handleClick}
+         sx={deviceOff ? styles.off : undefined}
          {...props}
       >
-         {props.deviceOff ? <MicOff /> : <Mic />}
+         {deviceOff ? <MicOff /> : <Mic />}
       </ActionBarButtonStyled>
    )
 })
