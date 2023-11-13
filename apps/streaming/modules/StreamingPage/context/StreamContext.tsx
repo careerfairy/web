@@ -15,8 +15,10 @@ type StreamContextProps = {
    isStreaming: boolean
 }
 
-type StreamProviderProps = StreamContextProps & {
+type StreamProviderProps = {
    children: ReactNode
+   livestreamId: string
+   isHost: boolean
 }
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
@@ -39,7 +41,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({
       setIsStreaming(!isStreaming)
    }, [isHost, isStreaming])
 
-   const value = useMemo(
+   const value = useMemo<StreamContextProps>(
       () => ({
          livestreamId,
          isHost,
