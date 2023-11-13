@@ -55,7 +55,10 @@ const CompanyDetails = () => {
       async (values: FormValues) => {
          try {
             await groupRepo.updateGroupMetadata(group.id, {
-               universityName: values.universityName,
+               universityName: values.universityName.trim(),
+               normalizedUniversityName: values.universityName
+                  .trim()
+                  .toLowerCase(),
                careerPageUrl: values.careerPageUrl,
                extraInfo: values.extraInfo,
                companyCountry: values.companyCountry,
