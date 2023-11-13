@@ -39,6 +39,7 @@ const secondary = {
 
 const brand = {
    black: {
+      "100": "#FAFAFA",
       "200": "#FAFAFA",
       "300": "#F5F5F5",
       "400": "#EEEEEE",
@@ -56,6 +57,8 @@ const brand = {
       "400": "#F6F6FA",
       "500": "#F3F3F5",
    },
+   tq: primary,
+   purple: secondary,
 } satisfies ThemeOptions["brand"]
 
 const palette = {
@@ -350,6 +353,24 @@ export const themeOptions = {
             },
             anchorOriginTopRight: {
                transform: "scale(1) translate(30%, -30%)",
+            },
+         },
+      },
+      MuiTooltip: {
+         defaultProps: {
+            arrow: true,
+         },
+         styleOverrides: {
+            tooltip: {
+               backgroundColor: "white",
+               color: "rgba(0, 0, 0, 0.87)",
+               px: 8,
+               py: 12,
+               borderRadius: 8,
+               boxShadow: "0px 8px 25px rgba(33, 32, 32, 0.1)",
+            },
+            arrow: {
+               color: "white",
             },
          },
       },
