@@ -38,19 +38,20 @@ export const BottomBar = () => {
 }
 
 export const allActions = {
-   "Hand raise": <HandRaiseActionButton />,
-   "Q&A": <QaActionButton />,
-   Polls: <PollActionButton />,
-   Jobs: <JobsActionButton />,
-   Reactions: <ReactionsActionButton />,
-   Chat: <ChatActionButton />,
-   Settings: <SettingsActionButton />,
-   CTA: <CTAActionButton />,
-   Share: <ShareActionButton />,
-   Mic: <MicActionButton />,
-   Video: <VideoActionButton />,
-   Divider: <Divider orientation="vertical" flexItem />,
-   SpeedDial: <ActionsSpeedDial />,
+   "Hand raise": <HandRaiseActionButton key="Hand raise" />,
+   "Q&A": <QaActionButton key="Q&A" />,
+   Polls: <PollActionButton key="Polls" />,
+   Jobs: <JobsActionButton key="Jobs" />,
+   Reactions: <ReactionsActionButton key="Reactions" />,
+   Chat: <ChatActionButton key="Chat" />,
+   Settings: <SettingsActionButton key="Settings" />,
+   CTA: <CTAActionButton key="CTA" />,
+   Share: <ShareActionButton key="Share" />,
+   Mic: <MicActionButton key="Mic" />,
+   Video: <VideoActionButton key="Video" />,
+   Divider: null,
+   // Divider: <Divider orientation="vertical" flexItem key="Divider" />,
+   SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
 export type ActionName = keyof typeof allActions
@@ -78,7 +79,16 @@ const HostView = () => {
 
    return (
       <ActionsBar>
-         {getHostActionNames(isMobile).map((action) => allActions[action])}
+         {getHostActionNames(isMobile).map(
+            (action, index) =>
+               allActions[action] || (
+                  <Divider
+                     key={action + index}
+                     orientation="vertical"
+                     flexItem
+                  />
+               )
+         )}
       </ActionsBar>
    )
 }
@@ -119,7 +129,14 @@ const ViewerView = () => {
    return (
       <ActionsBar>
          {getViewerActionNames(isMobile, isStreaming).map(
-            (action) => allActions[action]
+            (action, index) =>
+               allActions[action] || (
+                  <Divider
+                     key={action + index}
+                     orientation="vertical"
+                     flexItem
+                  />
+               )
          )}
       </ActionsBar>
    )

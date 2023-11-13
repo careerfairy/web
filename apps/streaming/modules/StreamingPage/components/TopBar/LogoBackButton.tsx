@@ -31,6 +31,7 @@ export const LogoBackButton = () => {
             width={150}
             height={32}
             alt={"cf-logo"}
+            priority
          />
       </Stack>
    )
