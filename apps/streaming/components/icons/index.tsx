@@ -1,1 +1,5 @@
 export * from "./CompanyIcon"
+export * from "./QaIcon"
+export * from "./HandRaiseIcon"
+export * from "./PollIcon"
+export * from "./ReactionsIcon"
