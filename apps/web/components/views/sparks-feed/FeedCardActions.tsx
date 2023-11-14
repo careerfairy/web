@@ -15,6 +15,7 @@ import {
    Typography,
    alpha,
 } from "@mui/material"
+import Work from "@mui/icons-material/Work"
 
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
@@ -42,7 +43,6 @@ import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
 import useMenuState from "components/custom-hook/useMenuState"
 import LoginButton from "../common/LoginButton"
 import LikeActiveIcon from "../common/icons/LikeActiveIcon"
-import { Work } from "@mui/icons-material"
 
 const actionWidth = 52
 
