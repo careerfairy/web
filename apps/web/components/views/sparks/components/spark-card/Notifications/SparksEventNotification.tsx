@@ -10,6 +10,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import {
    removeCurrentEventNotifications,
+   setCameFromSignInOrSignUpPage,
    setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../../../../store/reducers/sparksFeedReducer"
@@ -90,6 +91,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
 
    const discoverHandleClick = useCallback(() => {
       dispatch(setEventToRegisterTo(eventNotification?.eventId))
+      dispatch(setCameFromSignInOrSignUpPage(true))
       dispatch(showEventDetailsDialog(true))
    }, [dispatch, eventNotification?.eventId])
 
