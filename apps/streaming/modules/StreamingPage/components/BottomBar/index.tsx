@@ -28,7 +28,6 @@ const styles = sxStyles({
          borderColor: "#F7F7F7",
       },
    },
-   divider: {},
 })
 
 export const BottomBar = () => {
@@ -36,6 +35,8 @@ export const BottomBar = () => {
 
    return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
 }
+
+const DividerComponent = () => <Divider orientation="vertical" flexItem />
 
 export const allActions = {
    "Hand raise": <HandRaiseActionButton key="Hand raise" />,
@@ -50,7 +51,6 @@ export const allActions = {
    Mic: <MicActionButton key="Mic" />,
    Video: <VideoActionButton key="Video" />,
    Divider: null,
-   // Divider: <Divider orientation="vertical" flexItem key="Divider" />,
    SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
@@ -81,13 +81,7 @@ const HostView = () => {
       <ActionsBar>
          {getHostActionNames(isMobile).map(
             (action, index) =>
-               allActions[action] || (
-                  <Divider
-                     key={action + index}
-                     orientation="vertical"
-                     flexItem
-                  />
-               )
+               allActions[action] || <DividerComponent key={index} />
          )}
       </ActionsBar>
    )
@@ -130,13 +124,7 @@ const ViewerView = () => {
       <ActionsBar>
          {getViewerActionNames(isMobile, isStreaming).map(
             (action, index) =>
-               allActions[action] || (
-                  <Divider
-                     key={action + index}
-                     orientation="vertical"
-                     flexItem
-                  />
-               )
+               allActions[action] || <DividerComponent key={index} />
          )}
       </ActionsBar>
    )
