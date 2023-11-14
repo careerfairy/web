@@ -1,11 +1,13 @@
 import { useAppDispatch, useAppSelector } from "hooks"
-import React, {
+import {
    createContext,
    useContext,
    ReactNode,
    useMemo,
    useCallback,
    useEffect,
+   FC,
+   useState,
 } from "react"
 import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
 
@@ -26,7 +28,7 @@ type StreamProviderProps = {
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
 
-export const StreamProvider: React.FC<StreamProviderProps> = ({
+export const StreamProvider: FC<StreamProviderProps> = ({
    livestreamId,
    isHost,
    children,
@@ -46,7 +48,7 @@ export const StreamProvider: React.FC<StreamProviderProps> = ({
    }, [isHost, handRaiseActive, dispatch])
 
    // for demo purposes
-   const [isStreaming, setIsStreaming] = React.useState<boolean>(isHost)
+   const [isStreaming, setIsStreaming] = useState<boolean>(isHost)
 
    // for demo purposes
    const toggleIsStreaming = useCallback(() => {

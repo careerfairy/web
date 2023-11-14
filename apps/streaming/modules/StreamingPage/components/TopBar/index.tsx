@@ -17,6 +17,7 @@ import { CallToActionsButton } from "./CallToActionsButton"
 import { useStreamContext } from "../../context/StreamContext"
 import { ToggleStartLiveStreamButton } from "./ToggleStartLiveStreamButton"
 import { ConnectionStatus } from "./ConnectionStatus"
+import { ReactNode } from "react"
 
 const styles = sxStyles({
    root: {
@@ -123,7 +124,7 @@ const StackComponent = ({ children, ...props }: StackProps) => {
 }
 
 type MarginBoxProps = {
-   children: React.ReactNode
+   children: ReactNode
 }
 
 const MarginBox = ({ children }: MarginBoxProps) => (

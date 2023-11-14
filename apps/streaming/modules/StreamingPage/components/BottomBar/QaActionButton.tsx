@@ -1,31 +1,25 @@
 import { QaIcon } from "components/icons"
-import React from "react"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
-import { useAppDispatch, useAppSelector } from "hooks"
+import { useActiveSidePanelView } from "hooks"
+import { forwardRef } from "react"
+import { ActiveViews } from "store/streamingAppSlice"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
-export const QaActionButton = React.forwardRef<
-   HTMLButtonElement,
-   ActionButtonProps
->((props, ref) => {
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
-   const dispatch = useAppDispatch()
+export const QaActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+   (props, ref) => {
+      const { handleSetActive, isActive } = useActiveSidePanelView(
+         ActiveViews.QUESTS
+      )
 
-   const qAndAActive = activeView === "quests" && isOpen
-
-   const handleClick = () => {
-      dispatch(setActiveView("quests"))
+      return (
+         <ActionBarButtonStyled
+            onClick={handleSetActive}
+            active={isActive}
+            ref={ref}
+            {...props}
+         >
+            <QaIcon />
+         </ActionBarButtonStyled>
+      )
    }
-
-   return (
-      <ActionBarButtonStyled
-         onClick={handleClick}
-         active={qAndAActive}
-         ref={ref}
-         {...props}
-      >
-         <QaIcon />
-      </ActionBarButtonStyled>
-   )
-})
+)
 QaActionButton.displayName = "QaActionButton"

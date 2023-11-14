@@ -1,6 +1,6 @@
 import { Video, VideoOff } from "react-feather"
 import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import React from "react"
+import { forwardRef, useState } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
 
 const styles = sxStyles({
@@ -11,11 +11,11 @@ const styles = sxStyles({
    },
 })
 
-export const VideoActionButton = React.forwardRef<
+export const VideoActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
-   const [deviceOff, setDeviceOff] = React.useState<boolean>(false)
+   const [deviceOff, setDeviceOff] = useState<boolean>(false)
 
    const handleClick = () => {
       setDeviceOff(!deviceOff)

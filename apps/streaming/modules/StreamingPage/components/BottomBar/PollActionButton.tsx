@@ -1,26 +1,21 @@
 import { PollIcon } from "components/icons"
-import React from "react"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
-import { useAppDispatch, useAppSelector } from "hooks"
+import { useActiveSidePanelView } from "hooks"
+import { forwardRef } from "react"
+import { ActiveViews } from "store/streamingAppSlice"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
-export const PollActionButton = React.forwardRef<
+export const PollActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
-   const dispatch = useAppDispatch()
-
-   const pollActive = activeView === "polls" && isOpen
-
-   const handleClick = () => {
-      dispatch(setActiveView("polls"))
-   }
+   const { handleSetActive, isActive } = useActiveSidePanelView(
+      ActiveViews.POLLS
+   )
 
    return (
       <ActionBarButtonStyled
-         active={pollActive}
-         onClick={handleClick}
+         active={isActive}
+         onClick={handleSetActive}
          ref={ref}
          {...props}
       >

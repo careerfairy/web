@@ -1,27 +1,21 @@
-import React from "react"
+import { useActiveSidePanelView } from "hooks"
+import { forwardRef } from "react"
 import { Briefcase } from "react-feather"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import { useAppDispatch, useAppSelector } from "hooks"
-import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
+import { ActiveViews } from "store/streamingAppSlice"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
-export const JobsActionButton = React.forwardRef<
+export const JobsActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
-
-   const dispatch = useAppDispatch()
-
-   const jobsActive = activeView === "jobs" && isOpen
-
-   const handleClick = () => {
-      dispatch(setActiveView("jobs"))
-   }
+   const { handleSetActive, isActive } = useActiveSidePanelView(
+      ActiveViews.JOBS
+   )
 
    return (
       <ActionBarButtonStyled
-         onClick={handleClick}
-         active={jobsActive}
+         onClick={handleSetActive}
+         active={isActive}
          ref={ref}
          {...props}
       >

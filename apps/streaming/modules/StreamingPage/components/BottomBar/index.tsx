@@ -1,7 +1,7 @@
 import { sxStyles, useIsMobile } from "@careerfairy/shared-ui"
 import { Box, Divider, Stack } from "@mui/material"
 import { useStreamContext } from "modules/StreamingPage/context"
-import React from "react"
+import { ReactNode } from "react"
 import { SettingsActionButton } from "./SettingsActionButton"
 import { JobsActionButton } from "./JobsActionButton"
 import { ReactionsActionButton } from "./ReactionsActionButton"
@@ -131,7 +131,7 @@ const ViewerView = () => {
 }
 
 type ActionsBarProps = {
-   children: React.ReactNode
+   children: ReactNode
 }
 const ActionsBar = ({ children }: ActionsBarProps) => {
    return (

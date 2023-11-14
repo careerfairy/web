@@ -3,6 +3,7 @@ import { Box, IconButton, Typography } from "@mui/material"
 import { useAppDispatch } from "hooks"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { toggleSidePanel } from "store/streamingAppSlice"
+import { ReactNode } from "react"
 
 const styles = sxStyles({
    baseBgColor: {
@@ -46,8 +47,8 @@ const styles = sxStyles({
 
 type Props = {
    title: string
-   icon?: React.ReactNode
-   children: React.ReactNode
+   icon?: ReactNode
+   children: ReactNode
    id: string
 }
 

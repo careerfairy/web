@@ -3,13 +3,13 @@ import { CircularButton } from "./CircularButton"
 import { Link2 } from "react-feather"
 import React from "react"
 import { useAppDispatch } from "hooks"
-import { setActiveView } from "store/streamingAppSlice"
+import { setActiveView, ActiveViews } from "store/streamingAppSlice"
 
 export const CallToActionsButton = () => {
    const dispatch = useAppDispatch()
 
    const handleClick = () => {
-      dispatch(setActiveView("cta"))
+      dispatch(setActiveView(ActiveViews.CTA))
    }
 
    return (
