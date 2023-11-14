@@ -255,14 +255,14 @@ export class SparksService {
    ) {
       return httpsCallable<RemoveNotificationFromUserData, void>(
          this.functions,
-         "removeAndSyncUserSparkNotification"
+         "removeAndSyncUserSparkNotification_v2"
       )(data)
    }
 
    async createUserSparksFeedEventNotifications(userId: string) {
       return httpsCallable<string, void>(
          this.functions,
-         "createUserSparksFeedEventNotifications"
+         "createUserSparksFeedEventNotifications_v2"
       )(userId)
    }
 
