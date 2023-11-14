@@ -49,11 +49,7 @@ const viewComponents = {
    default: null,
 } satisfies Record<ActiveView | "default", React.ReactNode>
 
-type Props = {
-   parentHeight: number
-}
-
-export const SidePanel = ({ parentHeight }: Props) => {
+export const SidePanel = () => {
    const isMobile = useIsMobile()
    const isLandScape = useIsLandscape()
 
@@ -83,15 +79,7 @@ export const SidePanel = ({ parentHeight }: Props) => {
    }
 
    return (
-      <Box
-         sx={[
-            styles.root,
-            isOpen ? styles.open : styles.closed,
-            {
-               maxHeight: parentHeight,
-            },
-         ]}
-      >
+      <Box sx={[styles.root, isOpen ? styles.open : styles.closed]}>
          {content}
       </Box>
    )

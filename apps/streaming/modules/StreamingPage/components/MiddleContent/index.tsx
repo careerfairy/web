@@ -1,9 +1,11 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Container, Stack } from "@mui/material"
 import { SidePanel, StreamingGrid } from ".."
-import { useMeasure } from "react-use"
 
 const styles = sxStyles({
+   root: {
+      overflowY: "auto",
+   },
    fullHeight: {
       height: "100%",
    },
@@ -19,18 +21,15 @@ const styles = sxStyles({
 })
 
 export const MiddleContent = () => {
-   const [ref, { height }] = useMeasure<HTMLDivElement>()
-
    return (
-      <Container sx={styles.fullHeight} maxWidth={false}>
+      <Container sx={[styles.root, styles.fullHeight]} maxWidth={false}>
          <Stack
             sx={[styles.stack, styles.fullHeight]}
             direction="row"
             spacing={2.625}
-            ref={ref}
          >
             <StreamingGrid />
-            <SidePanel parentHeight={height} />
+            <SidePanel />
          </Stack>
       </Container>
    )
