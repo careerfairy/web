@@ -1,4 +1,4 @@
-import React from "react"
+import { ReactNode } from "react"
 import { Box } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
 
@@ -13,7 +13,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   children: React.ReactNode
+   children: ReactNode
 }
 
 export const Layout = ({ children }: Props) => {

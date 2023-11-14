@@ -1,31 +1,25 @@
-import React from "react"
+import { useActiveSidePanelView } from "hooks"
+import { forwardRef } from "react"
 import { Link2 } from "react-feather"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import { useAppDispatch, useAppSelector } from "hooks"
-import { setActiveView, sidePanelSelector } from "store/streamingAppSlice"
+import { ActiveViews } from "store/streamingAppSlice"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
-export const CTAActionButton = React.forwardRef<
-   HTMLButtonElement,
-   ActionButtonProps
->((props, ref) => {
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
-   const dispatch = useAppDispatch()
+export const CTAActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+   (props, ref) => {
+      const { handleSetActive, isActive } = useActiveSidePanelView(
+         ActiveViews.CTA
+      )
 
-   const ctaActive = activeView === "cta" && isOpen
-
-   const handleClick = () => {
-      dispatch(setActiveView("cta"))
+      return (
+         <ActionBarButtonStyled
+            onClick={handleSetActive}
+            active={isActive}
+            ref={ref}
+            {...props}
+         >
+            <Link2 />
+         </ActionBarButtonStyled>
+      )
    }
-
-   return (
-      <ActionBarButtonStyled
-         onClick={handleClick}
-         active={ctaActive}
-         ref={ref}
-         {...props}
-      >
-         <Link2 />
-      </ActionBarButtonStyled>
-   )
-})
+)
 CTAActionButton.displayName = "CTAActionButton"

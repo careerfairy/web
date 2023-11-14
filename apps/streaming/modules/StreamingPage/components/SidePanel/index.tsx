@@ -13,6 +13,7 @@ import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
 import { useIsLandscape } from "@careerfairy/shared-ui"
+import { ReactNode } from "react"
 
 const drawerWidth = 328
 
@@ -47,7 +48,7 @@ const viewComponents = {
    cta: <CTAPanel />,
    "hand-raise": <HandRaisePanel />,
    default: null,
-} satisfies Record<ActiveView | "default", React.ReactNode>
+} satisfies Record<ActiveView | "default", ReactNode>
 
 export const SidePanel = () => {
    const isMobile = useIsMobile("desktop")

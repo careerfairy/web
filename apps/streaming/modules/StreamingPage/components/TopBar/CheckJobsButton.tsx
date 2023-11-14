@@ -1,7 +1,7 @@
 import { ResponsiveButton, useIsMobile } from "@careerfairy/shared-ui"
 import { useAppDispatch } from "hooks"
 import { Briefcase } from "react-feather"
-import { setActiveView } from "store/streamingAppSlice"
+import { ActiveViews, setActiveView } from "store/streamingAppSlice"
 
 export const CheckJobsButton = () => {
    const isMobile = useIsMobile("md")
@@ -9,7 +9,7 @@ export const CheckJobsButton = () => {
    const dispatch = useAppDispatch()
 
    const handleClick = () => {
-      dispatch(setActiveView("jobs"))
+      dispatch(setActiveView(ActiveViews.JOBS))
    }
 
    return (

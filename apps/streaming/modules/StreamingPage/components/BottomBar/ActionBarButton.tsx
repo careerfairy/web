@@ -1,6 +1,6 @@
 import { shouldForwardProp } from "@careerfairy/shared-ui"
 import { IconButton, styled } from "@mui/material"
-import React from "react"
+import { ComponentProps } from "react"
 
 type Props = {
    active?: boolean
@@ -32,6 +32,4 @@ export const ActionBarButtonStyled = styled(IconButton, {
    },
 }))
 
-export type ActionButtonProps = React.ComponentProps<
-   typeof ActionBarButtonStyled
->
+export type ActionButtonProps = ComponentProps<typeof ActionBarButtonStyled>

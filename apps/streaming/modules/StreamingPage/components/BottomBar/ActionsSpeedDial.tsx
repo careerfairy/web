@@ -4,7 +4,7 @@ import SpeedDial from "@mui/material/SpeedDial"
 import SpeedDialAction from "@mui/material/SpeedDialAction"
 import SpeedDialIcon from "@mui/material/SpeedDialIcon"
 import { useStreamContext } from "modules/StreamingPage/context"
-import * as React from "react"
+import { useState, useRef, ReactNode } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
 import { ActionName, allActions } from "."
@@ -74,7 +74,7 @@ const styles = sxStyles({
 })
 
 export type Action = {
-   component: React.ReactNode
+   component: ReactNode
    label: string
 }
 const getStreamerActions = (isMobile: boolean): ActionName[] => {
@@ -97,8 +97,8 @@ const getViewerActions = (
 }
 
 export const ActionsSpeedDial = () => {
-   const [open, setOpen] = React.useState(false)
-   const ref = React.useRef(null)
+   const [open, setOpen] = useState(false)
+   const ref = useRef(null)
 
    const { isHost, isStreaming } = useStreamContext()
 

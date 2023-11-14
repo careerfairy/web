@@ -1,4 +1,4 @@
-import React from "react"
+import { forwardRef, useState } from "react"
 import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
 import { Mic, MicOff } from "react-feather"
 import { sxStyles } from "@careerfairy/shared-ui"
@@ -11,26 +11,25 @@ const styles = sxStyles({
    },
 })
 
-export const MicActionButton = React.forwardRef<
-   HTMLButtonElement,
-   ActionButtonProps
->((props, ref) => {
-   const [deviceOff, setDeviceOff] = React.useState<boolean>(false)
+export const MicActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+   (props, ref) => {
+      const [deviceOff, setDeviceOff] = useState<boolean>(false)
 
-   const handleClick = () => {
-      setDeviceOff(!deviceOff)
+      const handleClick = () => {
+         setDeviceOff(!deviceOff)
+      }
+      return (
+         <ActionBarButtonStyled
+            color={deviceOff ? "error" : undefined}
+            ref={ref}
+            onClick={handleClick}
+            sx={deviceOff ? styles.off : undefined}
+            {...props}
+         >
+            {deviceOff ? <MicOff /> : <Mic />}
+         </ActionBarButtonStyled>
+      )
    }
-   return (
-      <ActionBarButtonStyled
-         color={deviceOff ? "error" : undefined}
-         ref={ref}
-         onClick={handleClick}
-         sx={deviceOff ? styles.off : undefined}
-         {...props}
-      >
-         {deviceOff ? <MicOff /> : <Mic />}
-      </ActionBarButtonStyled>
-   )
-})
+)
 
 MicActionButton.displayName = "MicActionButton"
