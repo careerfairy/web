@@ -29,7 +29,6 @@ const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
 
    const handleClick = useCallback(() => {
       if (isServer()) return
-      debugger
       if (isLoggedIn && userPresenter.shouldSeeWelcomeDialog()) {
          push("/portal")
       } else if (window.history.length > 2) {
