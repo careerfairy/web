@@ -50,7 +50,7 @@ const viewComponents = {
 } satisfies Record<ActiveView | "default", React.ReactNode>
 
 export const SidePanel = () => {
-   const isMobile = useIsMobile()
+   const isMobile = useIsMobile("desktop")
    const isLandScape = useIsLandscape()
 
    const dispatch = useAppDispatch()
