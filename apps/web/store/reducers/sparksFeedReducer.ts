@@ -29,7 +29,6 @@ interface SparksState {
    videosMuted: boolean
    playing: boolean
    eventToRegisterTo: string | null
-   cameFromSignInOrSignUpPage: boolean
 }
 
 const initialState: SparksState = {
@@ -53,7 +52,6 @@ const initialState: SparksState = {
    videosMuted: false,
    playing: true,
    eventToRegisterTo: null,
-   cameFromSignInOrSignUpPage: false,
 }
 
 // Async thunk to fetch the next sparks
@@ -170,12 +168,6 @@ const sparksFeedSlice = createSlice({
       setEventToRegisterTo: (state, action: PayloadAction<string>) => {
          state.eventToRegisterTo = action.payload
       },
-      setCameFromSignInOrSignUpPage: (
-         state,
-         action: PayloadAction<boolean>
-      ) => {
-         state.cameFromSignInOrSignUpPage = action.payload
-      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -290,7 +282,6 @@ export const {
    setCardNotification,
    setCameFromCompanyPageLink,
    setEventToRegisterTo,
-   setCameFromSignInOrSignUpPage,
    setVideosMuted,
    setVideoPlaying,
    togglePlaying,
