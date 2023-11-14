@@ -81,3 +81,6 @@ export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing
 
 export const eventToRegisterTo = (state: RootState) =>
    state.sparksFeed.eventToRegisterTo
+
+export const cameFromSignInOrSignUpPage = (state: RootState) =>
+   state.sparksFeed.cameFromSignInOrSignUpPage
