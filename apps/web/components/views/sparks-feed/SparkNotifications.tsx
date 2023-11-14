@@ -48,6 +48,10 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
    useEffect(() => {
       if (isLoggedIn && eventToRegisterToId) {
          dispatch(showEventDetailsDialog(true))
+      } else if (!isLoggedIn && eventToRegisterToId) {
+         // This condition handles the case where the user was redirected to the sign-in or sign-up page
+         // but did not complete the process and returned to the sparks feed
+         dispatch(setEventToRegisterTo(null))
       }
    }, [dispatch, isLoggedIn, eventToRegisterToId])
 
