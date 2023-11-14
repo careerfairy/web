@@ -97,7 +97,6 @@ const SignupForm = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const {
       push,
-      replace,
       query: { absolutePath },
    } = useRouter()
    const firebase = useFirebaseService()
@@ -163,7 +162,7 @@ const SignupForm = () => {
          setIsLoadingRedirectPage(true)
 
          if (absolutePath) {
-            void replace(absolutePath as any)
+            void push(absolutePath as any)
          } else {
             void push(fallbackSignupRedirectPath)
          }
