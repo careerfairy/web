@@ -1,9 +1,16 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
+import { Container, Stack } from "@mui/material"
 import { SidePanel, StreamingGrid } from ".."
 
 const styles = sxStyles({
    root: {
+      overflowY: "auto",
+   },
+   fullHeight: {
+      height: "100%",
+   },
+
+   stack: {
       pt: {
          xs: 3,
          sm: 4.875,
@@ -15,9 +22,15 @@ const styles = sxStyles({
 
 export const MiddleContent = () => {
    return (
-      <Stack sx={styles.root} direction="row" spacing={2.625}>
-         <StreamingGrid />
-         <SidePanel />
-      </Stack>
+      <Container sx={[styles.root, styles.fullHeight]} maxWidth={false}>
+         <Stack
+            sx={[styles.stack, styles.fullHeight]}
+            direction="row"
+            spacing={2.625}
+         >
+            <StreamingGrid />
+            <SidePanel />
+         </Stack>
+      </Container>
    )
 }
