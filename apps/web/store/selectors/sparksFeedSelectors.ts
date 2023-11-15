@@ -78,3 +78,6 @@ export const videosMuttedSelector = (state: RootState) =>
    state.sparksFeed.videosMuted
 
 export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing
+
+export const eventToRegisterTo = (state: RootState) =>
+   state.sparksFeed.eventToRegisterTo

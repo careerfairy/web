@@ -314,9 +314,7 @@ const SparksFeedCarousel: FC = () => {
                      </Box>
                   ) : null}
 
-                  {userData?.userEmail ? (
-                     <SparkNotifications userEmail={userData.userEmail} />
-                  ) : null}
+                  <SparkNotifications userEmail={userData?.userEmail} />
                </>
             }
             ref={emblaRef}

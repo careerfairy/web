@@ -10,6 +10,7 @@ import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import {
    removeCurrentEventNotifications,
+   setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../../../../store/reducers/sparksFeedReducer"
 import { Box, Button, Slide, Typography } from "@mui/material"
@@ -88,12 +89,18 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    )
 
    const discoverHandleClick = useCallback(() => {
+      dispatch(setEventToRegisterTo(eventNotification?.eventId))
       dispatch(showEventDetailsDialog(true))
-   }, [dispatch])
+   }, [dispatch, eventNotification?.eventId])
 
-   const cancelHandleClick = useCallback(() => {
-      dispatch(removeCurrentEventNotifications())
-   }, [dispatch])
+   const cancelHandleClick = useCallback(
+      (ev) => {
+         dispatch(removeCurrentEventNotifications())
+         ev.preventDefault()
+         ev.stopPropagation()
+      },
+      [dispatch]
+   )
 
    const showNotification: boolean = useMemo(
       () =>
