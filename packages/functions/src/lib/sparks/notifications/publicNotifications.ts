@@ -26,7 +26,19 @@ const createPublicSparksNotifications = (
 
    notifications.forEach((notification) => {
       const docRef = collectionRef.doc(notification.id)
-      void bulkWriter.set(docRef, notification)
+      void bulkWriter
+         .set(docRef, notification)
+         .then(() => {
+            logger(
+               `Created public sparks notifications for group ${notification.groupId}.`
+            )
+         })
+         .catch((error) => {
+            logger(
+               `Error while trying to created public sparks notifications for group ${notification.groupId}.
+               \nError: ${error}`
+            )
+         })
    })
 }
 
@@ -41,7 +53,7 @@ const clearPublicSparksNotifications = async (
       await publicSparksNotificationsRef.get()
 
    await Promise.allSettled(
-      publicSparksNotificationsSnapshot.docs.map(async (doc) => {
+      publicSparksNotificationsSnapshot.docs.map((doc) => {
          return publicSparksNotificationsRef.doc(doc.id).delete()
       })
    )

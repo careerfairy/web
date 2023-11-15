@@ -31,12 +31,6 @@ const createSparkNotificationForSingleUser = ({
       filteredUpcomingEvents
    )
 
-   logger(
-      `User ${userId} will have spark notifications for the groups: ${notifications
-         .map((notification) => notification.groupId)
-         .join(", ")}`
-   )
-
    notifications.forEach((notification) => {
       const userSparksNotificationsRef = firestore
          .collection("userData")
@@ -44,9 +38,21 @@ const createSparkNotificationForSingleUser = ({
          .collection("sparksNotifications")
          .doc(notification.groupId)
 
-      void bulkWriter.set(userSparksNotificationsRef, notification, {
-         merge: true,
-      })
+      void bulkWriter
+         .set(userSparksNotificationsRef, notification, {
+            merge: true,
+         })
+         .then(() => {
+            logger(
+               `Created notifications for User ${userId} for the group ${notification.groupId}.`
+            )
+         })
+         .catch((error) => {
+            logger(
+               `Error while trying to create notifications for User ${userId} for the group ${notification.groupId}.
+               \nError: ${error}`
+            )
+         })
    })
 }
 

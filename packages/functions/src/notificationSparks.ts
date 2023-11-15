@@ -30,11 +30,31 @@ export const createSparksFeedEventNotifications = functions
             handleCreateUsersSparksNotifications(
                firestore,
                functions.logger.log
-            ),
+            )
+               .then(() => {
+                  functions.logger.log(
+                     "Finished creating user sparks notifications."
+                  )
+               })
+               .catch((error) => {
+                  functions.logger.error(
+                     `Failed to create user sparks notifications: ${error}`
+                  )
+               }),
             handleCreatePublicSparksNotifications(
                firestore,
                functions.logger.log
-            ),
+            )
+               .then(() => {
+                  functions.logger.log(
+                     "Finished creating public sparks notifications."
+                  )
+               })
+               .catch((error) => {
+                  functions.logger.error(
+                     `Failed to create public sparks notifications: ${error}`
+                  )
+               }),
          ])
       } catch (error) {
          logAndThrow(
