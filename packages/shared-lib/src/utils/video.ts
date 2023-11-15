@@ -17,7 +17,7 @@ export const imageKitLoader = (params: TransformationParams) => {
 
    // Replace the Firebase base URL with ImageKit base URL
    const firebaseBaseUrl = "https://firebasestorage.googleapis.com"
-   const imageKitBaseUrl = `https://ik.imagekit.io/${process.env.NEXT_PUBLIC_IMAGEKIT_ID}`
+   const imageKitBaseUrl = `https://media.careerfairy.io`
    src = src.replace(firebaseBaseUrl, imageKitBaseUrl)
 
    const transformations = []
@@ -54,5 +54,6 @@ export const imageKitLoader = (params: TransformationParams) => {
 
    urlParts.splice(4, 0, `tr:${paramsString}`)
 
+   // https://media.careerfairy.io/tr:transformation1,transformation2,.../rest-of-the-path.mp4
    return urlParts.join("/")
 }
