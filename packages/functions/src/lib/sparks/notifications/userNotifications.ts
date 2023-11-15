@@ -1,4 +1,4 @@
-import { Firestore } from "firebase-admin/firestore"
+import { BulkWriter, Firestore } from "firebase-admin/firestore"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
@@ -11,6 +11,7 @@ type createSparkNotificationForSingleUser = {
    userId: string
    upcomingEvents: LiveStreamEventWithUsersLivestreamData[]
    firestore: Firestore
+   bulkWriter: BulkWriter
    logger: any
 }
 
@@ -18,10 +19,9 @@ const createSparkNotificationForSingleUser = ({
    userId,
    upcomingEvents,
    firestore,
+   bulkWriter,
    logger,
 }: createSparkNotificationForSingleUser) => {
-   const bulkWriter = firestore.bulkWriter()
-
    // filter all the upcoming events where the user already registered
    const filteredUpcomingEvents = upcomingEvents.filter(
       (event) => !event.registeredUsers?.includes(userId)
@@ -77,6 +77,7 @@ export const handleCreateUsersSparksNotifications = async (
          userId,
          upcomingEvents: upcomingEventsWithRegisteredStudents,
          firestore,
+         bulkWriter,
          logger,
       })
       return bulkWriter.close()
@@ -89,6 +90,7 @@ export const handleCreateUsersSparksNotifications = async (
          userId,
          upcomingEvents: upcomingEventsWithRegisteredStudents,
          firestore,
+         bulkWriter,
          logger,
       })
    })

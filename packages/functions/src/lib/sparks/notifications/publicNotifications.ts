@@ -1,4 +1,4 @@
-import { Firestore } from "firebase-admin/firestore"
+import { BulkWriter, Firestore } from "firebase-admin/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
@@ -10,10 +10,9 @@ import { publicSparksNotificationsRepo } from "../../../api/repositories"
 const createPublicSparksNotifications = (
    upcomingEvents: LivestreamEvent[],
    firestore: Firestore,
+   bulkWriter: BulkWriter,
    logger: any
 ) => {
-   const bulkWriter = firestore.bulkWriter()
-
    const notifications: UserSparksNotification[] =
       mapEventsToNotifications(upcomingEvents)
 
@@ -27,7 +26,7 @@ const createPublicSparksNotifications = (
 
    notifications.forEach((notification) => {
       const docRef = collectionRef.doc(notification.id)
-      bulkWriter.set(docRef, notification)
+      void bulkWriter.set(docRef, notification)
    })
 }
 
@@ -61,8 +60,13 @@ export const handleCreatePublicSparksNotifications = async (
 
    const upcomingEvents = await getStreamsByDate(startDate, endDate)
 
-   clearPublicSparksNotifications(firestore, logger)
-   createPublicSparksNotifications(upcomingEvents, firestore, logger)
+   await clearPublicSparksNotifications(firestore, logger)
+   createPublicSparksNotifications(
+      upcomingEvents,
+      firestore,
+      bulkWriter,
+      logger
+   )
 
    return bulkWriter.close()
 }
