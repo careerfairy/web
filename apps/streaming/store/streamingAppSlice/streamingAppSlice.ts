@@ -3,10 +3,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 export const ActiveViews = {
    CHAT: "chat",
    POLLS: "polls",
-   QUESTS: "quests",
+   QUESTIONS: "questions",
    JOBS: "jobs",
    CTA: "cta",
-   HAND_RAISE: "hand-raise",
+   HAND_RAISE: "handRaise",
 } as const
 
 export type ActiveView = (typeof ActiveViews)[keyof typeof ActiveViews]
@@ -25,7 +25,7 @@ export interface StreamingAppState {
 const initialState: StreamingAppState = {
    sidePanel: {
       isOpen: false,
-      activeView: "chat", // 'chat', 'polls', 'quests', etc.
+      activeView: ActiveViews.CHAT, // 'chat', 'polls', 'questions', etc.
    },
    isHost: false,
    topBar: {

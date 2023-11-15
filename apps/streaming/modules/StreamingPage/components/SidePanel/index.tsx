@@ -44,9 +44,9 @@ const viewComponents = {
    chat: <ChatPanel />,
    jobs: <JobsPanel />,
    polls: <PollsPanel />,
-   quests: <QAndAPanel />,
+   questions: <QAndAPanel />,
    cta: <CTAPanel />,
-   "hand-raise": <HandRaisePanel />,
+   handRaise: <HandRaisePanel />,
    default: null,
 } satisfies Record<ActiveView | "default", ReactNode>
 

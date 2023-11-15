@@ -56,24 +56,26 @@ export const allActions = {
 
 export type ActionName = keyof typeof allActions
 
-const getHostActionNames = (isMobile: boolean): ActionName[] =>
-   isMobile
-      ? ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
-      : [
-           "Mic",
-           "Video",
-           "Share",
-           "CTA",
-           "Divider",
-           "Q&A",
-           "Hand raise",
-           "Polls",
-           "Jobs",
-           "Chat",
-           "Divider",
-           "Settings",
-        ]
+const getHostActionNames = (isMobile: boolean): ActionName[] => {
+   if (isMobile) {
+      return ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
+   }
 
+   return [
+      "Mic",
+      "Video",
+      "Share",
+      "CTA",
+      "Divider",
+      "Q&A",
+      "Hand raise",
+      "Polls",
+      "Jobs",
+      "Chat",
+      "Divider",
+      "Settings",
+   ]
+}
 const HostView = () => {
    const isMobile = useIsMobile()
 
@@ -89,31 +91,35 @@ const HostView = () => {
 const getViewerActionNames = (
    isMobile: boolean,
    isStreaming: boolean
-): ActionName[] =>
-   isStreaming
-      ? isMobile
-         ? [
-              "Mic",
-              "Video",
-              "Divider",
-              "Q&A",
-              "Hand raise",
-              "Polls",
-              "SpeedDial",
-           ]
-         : [
-              "Mic",
-              "Video",
-              "Divider",
-              "Q&A",
-              "Hand raise",
-              "Polls",
-              "Chat",
-              "Reactions",
-              "Divider",
-              "Settings",
-           ]
-      : ["Q&A", "Hand raise", "Polls", "Chat", "Reactions"]
+): ActionName[] => {
+   if (isStreaming) {
+      if (isMobile) {
+         return [
+            "Mic",
+            "Video",
+            "Divider",
+            "Q&A",
+            "Hand raise",
+            "Polls",
+            "SpeedDial",
+         ]
+      }
+
+      return [
+         "Mic",
+         "Video",
+         "Divider",
+         "Q&A",
+         "Hand raise",
+         "Polls",
+         "Chat",
+         "Reactions",
+         "Divider",
+         "Settings",
+      ]
+   }
+   return ["Q&A", "Hand raise", "Polls", "Chat", "Reactions"]
+}
 
 const ViewerView = () => {
    const isMobile = useIsMobile()
