@@ -1,8 +1,8 @@
-import React from "react"
+import { forwardRef } from "react"
 import { Settings } from "react-feather"
 import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
 
-export const SettingsActionButton = React.forwardRef<
+export const SettingsActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {

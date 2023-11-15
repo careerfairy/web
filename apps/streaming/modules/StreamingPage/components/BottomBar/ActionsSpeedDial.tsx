@@ -4,7 +4,7 @@ import SpeedDial from "@mui/material/SpeedDial"
 import SpeedDialAction from "@mui/material/SpeedDialAction"
 import SpeedDialIcon from "@mui/material/SpeedDialIcon"
 import { useStreamContext } from "modules/StreamingPage/context"
-import * as React from "react"
+import { useState, useRef, ReactNode } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
 import { ActionName, allActions } from "."
@@ -43,6 +43,10 @@ const styles = sxStyles({
          },
       },
       zIndex: 0,
+      width: {
+         xs: 38,
+         tablet: 44,
+      },
    }),
    speedDialOpen: {
       "& .MuiSpeedDial-fab": {
@@ -59,13 +63,18 @@ const styles = sxStyles({
          tablet: 44,
       },
    },
+   speedDialAction: {
+      "&:hover": {
+         backgroundColor: "transparent",
+      },
+   },
    noShadow: {
       boxShadow: "none !important",
    },
 })
 
 export type Action = {
-   component: React.ReactNode
+   component: ReactNode
    label: string
 }
 const getStreamerActions = (isMobile: boolean): ActionName[] => {
@@ -88,8 +97,8 @@ const getViewerActions = (
 }
 
 export const ActionsSpeedDial = () => {
-   const [open, setOpen] = React.useState(false)
-   const ref = React.useRef(null)
+   const [open, setOpen] = useState(false)
+   const ref = useRef(null)
 
    const { isHost, isStreaming } = useStreamContext()
 
@@ -127,7 +136,8 @@ export const ActionsSpeedDial = () => {
                   icon={allActions[action]}
                   tooltipTitle={action}
                   FabProps={{
-                     sx: styles.noShadow,
+                     sx: [styles.noShadow, styles.speedDialAction],
+                     component: "div",
                   }}
                />
             ))}

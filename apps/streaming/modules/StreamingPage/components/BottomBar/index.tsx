@@ -1,7 +1,7 @@
 import { sxStyles, useIsMobile } from "@careerfairy/shared-ui"
 import { Box, Divider, Stack } from "@mui/material"
 import { useStreamContext } from "modules/StreamingPage/context"
-import React from "react"
+import { ReactNode } from "react"
 import { SettingsActionButton } from "./SettingsActionButton"
 import { JobsActionButton } from "./JobsActionButton"
 import { ReactionsActionButton } from "./ReactionsActionButton"
@@ -28,7 +28,6 @@ const styles = sxStyles({
          borderColor: "#F7F7F7",
       },
    },
-   divider: {},
 })
 
 export const BottomBar = () => {
@@ -37,79 +36,90 @@ export const BottomBar = () => {
    return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
 }
 
+const DividerComponent = () => <Divider orientation="vertical" flexItem />
+
 export const allActions = {
-   "Hand raise": <HandRaiseActionButton />,
-   "Q&A": <QaActionButton />,
-   Polls: <PollActionButton />,
-   Jobs: <JobsActionButton />,
-   Reactions: <ReactionsActionButton />,
-   Chat: <ChatActionButton />,
-   Settings: <SettingsActionButton />,
-   CTA: <CTAActionButton />,
-   Share: <ShareActionButton />,
-   Mic: <MicActionButton />,
-   Video: <VideoActionButton />,
-   Divider: <Divider orientation="vertical" flexItem />,
-   SpeedDial: <ActionsSpeedDial />,
+   "Hand raise": <HandRaiseActionButton key="Hand raise" />,
+   "Q&A": <QaActionButton key="Q&A" />,
+   Polls: <PollActionButton key="Polls" />,
+   Jobs: <JobsActionButton key="Jobs" />,
+   Reactions: <ReactionsActionButton key="Reactions" />,
+   Chat: <ChatActionButton key="Chat" />,
+   Settings: <SettingsActionButton key="Settings" />,
+   CTA: <CTAActionButton key="CTA" />,
+   Share: <ShareActionButton key="Share" />,
+   Mic: <MicActionButton key="Mic" />,
+   Video: <VideoActionButton key="Video" />,
+   Divider: null,
+   SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
 export type ActionName = keyof typeof allActions
 
-const getHostActionNames = (isMobile: boolean): ActionName[] =>
-   isMobile
-      ? ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
-      : [
-           "Mic",
-           "Video",
-           "Share",
-           "CTA",
-           "Divider",
-           "Q&A",
-           "Hand raise",
-           "Polls",
-           "Jobs",
-           "Chat",
-           "Divider",
-           "Settings",
-        ]
+const getHostActionNames = (isMobile: boolean): ActionName[] => {
+   if (isMobile) {
+      return ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
+   }
 
+   return [
+      "Mic",
+      "Video",
+      "Share",
+      "CTA",
+      "Divider",
+      "Q&A",
+      "Hand raise",
+      "Polls",
+      "Jobs",
+      "Chat",
+      "Divider",
+      "Settings",
+   ]
+}
 const HostView = () => {
    const isMobile = useIsMobile()
 
    return (
       <ActionsBar>
-         {getHostActionNames(isMobile).map((action) => allActions[action])}
+         {getHostActionNames(isMobile).map(
+            (action, index) =>
+               allActions[action] || <DividerComponent key={index} />
+         )}
       </ActionsBar>
    )
 }
 const getViewerActionNames = (
    isMobile: boolean,
    isStreaming: boolean
-): ActionName[] =>
-   isStreaming
-      ? isMobile
-         ? [
-              "Mic",
-              "Video",
-              "Divider",
-              "Q&A",
-              "Hand raise",
-              "Polls",
-              "SpeedDial",
-           ]
-         : [
-              "Mic",
-              "Video",
-              "Divider",
-              "Q&A",
-              "Hand raise",
-              "Polls",
-              "Chat",
-              "Reactions",
-              "Divider",
-              "Settings",
-           ]
-      : ["Q&A", "Hand raise", "Polls", "Chat", "Reactions"]
+): ActionName[] => {
+   if (isStreaming) {
+      if (isMobile) {
+         return [
+            "Mic",
+            "Video",
+            "Divider",
+            "Q&A",
+            "Hand raise",
+            "Polls",
+            "SpeedDial",
+         ]
+      }
+
+      return [
+         "Mic",
+         "Video",
+         "Divider",
+         "Q&A",
+         "Hand raise",
+         "Polls",
+         "Chat",
+         "Reactions",
+         "Divider",
+         "Settings",
+      ]
+   }
+   return ["Q&A", "Hand raise", "Polls", "Chat", "Reactions"]
+}
 
 const ViewerView = () => {
    const isMobile = useIsMobile()
@@ -119,14 +129,15 @@ const ViewerView = () => {
    return (
       <ActionsBar>
          {getViewerActionNames(isMobile, isStreaming).map(
-            (action) => allActions[action]
+            (action, index) =>
+               allActions[action] || <DividerComponent key={index} />
          )}
       </ActionsBar>
    )
 }
 
 type ActionsBarProps = {
-   children: React.ReactNode
+   children: ReactNode
 }
 const ActionsBar = ({ children }: ActionsBarProps) => {
    return (

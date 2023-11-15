@@ -1,8 +1,8 @@
 import { ReactionsIcon } from "components/icons"
-import React from "react"
+import { forwardRef } from "react"
 import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
 
-export const ReactionsActionButton = React.forwardRef<
+export const ReactionsActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {

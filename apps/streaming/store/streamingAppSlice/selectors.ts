@@ -11,5 +11,5 @@ export const viewCountSelector = (state: RootState) =>
 export const isSideDrawerOpenSelector = (state: RootState) =>
    state.streamingApp.sidePanel.isOpen
 
-export const sideDrawerSelector = (state: RootState) =>
+export const sidePanelSelector = (state: RootState) =>
    state.streamingApp.sidePanel
