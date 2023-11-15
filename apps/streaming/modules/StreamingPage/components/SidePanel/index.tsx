@@ -1,4 +1,4 @@
-import { sxStyles, useIsMobile } from "@careerfairy/shared-ui"
+import { sxStyles, useIsMobile, useIsLandscape } from "@careerfairy/shared-ui"
 import { Box, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "hooks"
 import {
@@ -12,7 +12,6 @@ import { JobsPanel } from "./JobsPanel"
 import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
-import { useIsLandscape } from "@careerfairy/shared-ui"
 import { ReactNode } from "react"
 
 const drawerWidth = 328
