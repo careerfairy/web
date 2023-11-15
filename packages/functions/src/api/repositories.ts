@@ -29,9 +29,9 @@ import {
 import {
    ISparkFunctionsRepository,
    SparkFunctionsRepository,
-} from "../lib/SparkFunctionsRepository"
+} from "../lib/sparks/SparkFunctionsRepository"
 
-import { SparksFeedReplenisher } from "../lib/sparksFeedReplenisher"
+import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
 
 import logger = require("firebase-functions/logger")
@@ -40,6 +40,8 @@ import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
 } from "../lib/bigQuery/IBigQueryService"
+import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
+import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -87,3 +89,6 @@ export const sparkRepo: ISparkFunctionsRepository =
       sparkEventsHandler,
       sparkSecondsWatchedHanlder
    )
+
+export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository =
+   new PublicSparksNotificationsRepository(firestore as any)

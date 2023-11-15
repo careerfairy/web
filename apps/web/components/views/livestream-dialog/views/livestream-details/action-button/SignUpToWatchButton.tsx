@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useCallback } from "react"
 import { useRouter } from "next/router"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { Button, Typography } from "@mui/material"
@@ -7,7 +7,17 @@ import Link from "../../../../common/Link"
 import { FloatingButtonWrapper } from "./ActionButton"
 
 const SignUpToWatchButton: FC = () => {
-   const { asPath } = useRouter()
+   const { asPath, pathname } = useRouter()
+
+   const getSparksUtmParamsIfExist = () => {
+      const isOnSparksFeed = pathname.includes("/sparks/[sparkId]")
+
+      if (isOnSparksFeed) {
+         return `&utm_source=careerfairy&utm_medium=sparks`
+      }
+
+      return ""
+   }
 
    const { isFloating } = useActionButtonContext()
 
@@ -19,7 +29,7 @@ const SignUpToWatchButton: FC = () => {
             sx={styles.btn}
             variant={"contained"}
             fullWidth
-            href={`/signup?absolutePath=${asPath}`}
+            href={`/signup?absolutePath=${asPath}${getSparksUtmParamsIfExist()}`}
             component={Link}
             disableElevation
             data-testid="livestream-signup-watch-button"
@@ -30,7 +40,10 @@ const SignUpToWatchButton: FC = () => {
          {isFloating ? null : (
             <Typography sx={{ textAlign: "center", marginTop: 2 }}>
                Already have an account?{" "}
-               <Link color="inherit" href={`/login?absolutePath=${asPath}`}>
+               <Link
+                  color="inherit"
+                  href={`/login?absolutePath=${asPath}${getSparksUtmParamsIfExist()}`}
+               >
                   Log In
                </Link>
             </Typography>

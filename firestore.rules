@@ -636,5 +636,10 @@ service cloud.firestore {
             // fix would be to use admin sdk on the server side
             allow read: if true;
         }
+
+        match /publicSparksNotifications/{notificationId} {
+            allow read: if true;
+            allow write: if false;
+        }
     }
 }

@@ -42,6 +42,7 @@ import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -254,15 +255,23 @@ export class SparksService {
    ) {
       return httpsCallable<RemoveNotificationFromUserData, void>(
          this.functions,
-         "removeAndSyncUserSparkNotification"
+         "removeAndSyncUserSparkNotification_v2"
       )(data)
    }
 
    async createUserSparksFeedEventNotifications(userId: string) {
       return httpsCallable<string, void>(
          this.functions,
-         "createUserSparksFeedEventNotifications"
+         "createUserSparksFeedEventNotifications_v2"
       )(userId)
+   }
+
+   async fetchPublicSparksNotifications() {
+      const q = query(
+         collection(FirestoreInstance, "publicSparksNotifications")
+      ).withConverter(createGenericConverter<UserSparksNotification>())
+      const r = await getDocs(q)
+      return r.docs.map((doc) => doc.data())
    }
 
    /**
