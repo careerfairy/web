@@ -40,9 +40,11 @@ const clearPublicSparksNotifications = async (
    const publicSparksNotificationsSnapshot =
       await publicSparksNotificationsRef.get()
 
-   publicSparksNotificationsSnapshot.docs.forEach((doc) => {
-      publicSparksNotificationsRef.doc(doc.id).delete()
-   })
+   await Promise.allSettled(
+      publicSparksNotificationsSnapshot.docs.map(async (doc) => {
+         return publicSparksNotificationsRef.doc(doc.id).delete()
+      })
+   )
 
    logger("Cleared publicSparksNotifications collection.")
 }
