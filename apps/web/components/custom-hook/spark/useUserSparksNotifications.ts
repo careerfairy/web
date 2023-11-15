@@ -5,25 +5,30 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { toDate } from "@careerfairy/shared-lib/firebaseTypes"
 
+const getUserSparkNotifications = (userId: string, groupId?: string) => {
+   return query(
+      collection(FirestoreInstance, "userData", userId, "sparksNotifications"),
+      ...(groupId ? [where("groupId", "==", groupId)] : [])
+   )
+}
+
+const getPublicSparkNotifications = (groupId?: string) => {
+   return query(
+      collection(FirestoreInstance, "publicSparksNotifications"),
+      ...(groupId ? [where("id", "==", groupId)] : [])
+   )
+}
+
 /**
  * Custom hook to fetch user spark notifications
  * @param userId - Identifier of the user
  * @param [groupId] - Identifier of the group (optional)
  */
-
 const useUserSparksNotifications = (userId: string, groupId?: string) => {
    const sparkNotificationsQuery = useMemo(() => {
       return userId
-         ? query(
-              collection(
-                 FirestoreInstance,
-                 "userData",
-                 userId,
-                 "sparksNotifications"
-              ),
-              ...(groupId ? [where("groupId", "==", groupId)] : [])
-           )
-         : null
+         ? getUserSparkNotifications(userId, groupId)
+         : getPublicSparkNotifications(groupId)
    }, [groupId, userId])
 
    const { data } = useFirestoreCollection<UserSparksNotification>(

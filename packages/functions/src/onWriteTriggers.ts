@@ -17,9 +17,12 @@ import { handleUserStatsBadges } from "./lib/badge"
 import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { removeAndSyncSparksNotifications } from "./notificationSparks"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { validateGroupSparks } from "./util/sparks"
+import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks/notifications/userNotifications"
+import { firestore } from "./api/firestoreAdmin"
+import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
+import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -46,16 +49,39 @@ export const syncLivestreams = functions
          const newValue = change.after?.data() as LivestreamEvent
          const previousValue = change.before?.data() as LivestreamEvent
 
+         // We must delete all notifications for this event's groupIds because of the Notification creation process.
+         // Check comment of mapEventsToNotifications.
+         const groupIdsToBeUpdatedFromNotifications =
+            getGroupIdsToBeUpdatedFromChangedEvent(previousValue, newValue)
+
          if (newValue.hasStarted && !previousValue.hasStarted) {
             // In case the livestream as started we want to update the sparks notifications
             functions.logger.log(
                `Event ${newValue.id} has started, as result, spark notification associated with this event will be deleted`
             )
-            sideEffectPromises.push(
-               removeAndSyncSparksNotifications(
-                  newValue.author?.groupId || newValue.groupIds?.[0]
+
+            groupIdsToBeUpdatedFromNotifications.forEach((groupId) => {
+               sideEffectPromises.push(
+                  removeGroupNotificationsAndSyncSparksNotifications(
+                     firestore,
+                     functions.logger.log,
+                     groupId
+                  )
                )
-            )
+            })
+         }
+
+         if (newValue.startDate !== previousValue.startDate) {
+            groupIdsToBeUpdatedFromNotifications.forEach((groupId) => {
+               sideEffectPromises.push(
+                  handleEventStartDateChangeTrigger(
+                     newValue,
+                     previousValue,
+                     groupId,
+                     functions.logger.log
+                  )
+               )
+            })
          }
       }
 

@@ -1,5 +1,6 @@
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { IconButton } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { isServer } from "components/helperFunctions/HelperFunctions"
 import { useRouter } from "next/router"
 import { FC, useCallback } from "react"
@@ -24,15 +25,18 @@ type Props = {
 
 const CloseSparksFeedButton: FC<Props> = ({ dark }) => {
    const { back, push } = useRouter()
+   const { isLoggedIn, userPresenter } = useAuth()
 
    const handleClick = useCallback(() => {
       if (isServer()) return
-      if (window.history.length > 2) {
+      if (isLoggedIn && userPresenter.shouldSeeWelcomeDialog()) {
+         push("/portal")
+      } else if (window.history.length > 2) {
          back()
       } else {
          push("/portal")
       }
-   }, [back, push])
+   }, [back, isLoggedIn, push, userPresenter])
 
    return (
       <IconButton
