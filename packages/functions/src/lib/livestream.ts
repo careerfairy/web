@@ -82,6 +82,28 @@ export const livestreamSetIsRecording = async (
    })
 }
 
+export const getStreamsByDate = async (
+   filterStartDate: Date,
+   filterEndDate: Date
+): Promise<LivestreamEvent[]> => {
+   return firestore
+      .collection("livestreams")
+      .where("start", ">=", filterStartDate)
+      .where("start", "<=", filterEndDate)
+      .where("test", "==", false)
+      .where("hidden", "==", false)
+      .get()
+      .then((querySnapshot) => {
+         return querySnapshot.docs?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+      })
+}
+
 /**
  * Get all the streams filtered by starting date and with all the registered students for each stream.
  *

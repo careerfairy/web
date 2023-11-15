@@ -32,5 +32,6 @@ module.exports = {
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "guard-for-in": "off",
+      "@typescript-eslint/no-floating-promises": "warn",
    },
 }

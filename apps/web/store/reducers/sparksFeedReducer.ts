@@ -28,6 +28,7 @@ interface SparksState {
    cameFromCompanyPageLink: string | null
    videosMuted: boolean
    playing: boolean
+   eventToRegisterTo: string | null
 }
 
 const initialState: SparksState = {
@@ -50,6 +51,7 @@ const initialState: SparksState = {
    cameFromCompanyPageLink: null,
    videosMuted: false,
    playing: true,
+   eventToRegisterTo: null,
 }
 
 // Async thunk to fetch the next sparks
@@ -160,9 +162,11 @@ const sparksFeedSlice = createSlice({
          state.groupId = null
          state.hasMoreSparks = true
       },
-
       setCameFromCompanyPageLink: (state, action: PayloadAction<string>) => {
          state.cameFromCompanyPageLink = action.payload
+      },
+      setEventToRegisterTo: (state, action: PayloadAction<string>) => {
+         state.eventToRegisterTo = action.payload
       },
       resetSparksFeed: (state) => {
          state.sparks = []
@@ -277,6 +281,7 @@ export const {
    removeGroupId,
    setCardNotification,
    setCameFromCompanyPageLink,
+   setEventToRegisterTo,
    setVideosMuted,
    setVideoPlaying,
    togglePlaying,
