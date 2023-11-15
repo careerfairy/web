@@ -7,7 +7,7 @@ import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 export const QaActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
    (props, ref) => {
       const { handleSetActive, isActive } = useActiveSidePanelView(
-         ActiveViews.QUESTS
+         ActiveViews.QUESTIONS
       )
 
       return (
