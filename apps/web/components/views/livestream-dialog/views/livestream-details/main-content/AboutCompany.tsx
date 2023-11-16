@@ -5,7 +5,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { CardContent, CardMedia, Typography } from "@mui/material"
 import Card from "@mui/material/Card"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import Stack from "@mui/material/Stack"
 import FollowButton from "../../../../common/company/FollowButton"

@@ -70,6 +70,7 @@ type Props = {
    sx?: SxProps<Theme>
    customAction?: React.ReactNode
    disableTypography?: boolean
+   children: React.ReactNode
 }
 
 /**

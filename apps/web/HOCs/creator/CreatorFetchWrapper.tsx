@@ -33,16 +33,18 @@ const CreatorFetcher: FC<CreatorFetcherProps> = ({
  * Props for CreatorFetchWrapper component.
  * @typedef {Object} WrapperProps
  * @property {boolean} shouldFetch - Indicates whether the creator data should be fetched.
+ * @property {() => ReactNode} [fallbackComponent] - A function that returns a ReactNode to be rendered when shouldFetch is false.
  */
 type WrapperProps = {
    shouldFetch: boolean
+   fallbackComponent?: () => ReactNode
 }
 
 /**
  * A Higher Order Component (HOC) that wraps around the CreatorFetcher component and conditionally fetches the creator data.
  * This component provides a level of abstraction to handle conditional rendering based on the `shouldFetch` prop.
  * If `shouldFetch` is true, it will render the CreatorFetcher component which in turn fetches data using the reactfire-based hook.
- * Otherwise, it simply renders children with null data, ensuring the hook is not called with undefined arguments or else it will throw an error.
+ * Otherwise, it renders the fallbackComponent if provided, or children with null data.
  * @param {WrapperProps & CreatorFetcherProps} props - The props for the component.
  * @returns {ReactNode} - The child components.
  */
@@ -51,6 +53,7 @@ const CreatorFetchWrapper: FC<WrapperProps & CreatorFetcherProps> = ({
    groupId,
    selectedCreatorId,
    children,
+   fallbackComponent,
 }) => {
    if (shouldFetch) {
       return (
@@ -62,7 +65,7 @@ const CreatorFetchWrapper: FC<WrapperProps & CreatorFetcherProps> = ({
          </CreatorFetcher>
       )
    } else {
-      return <>{children(null)}</>
+      return fallbackComponent ? fallbackComponent() : <>{children(null)}</>
    }
 }
 

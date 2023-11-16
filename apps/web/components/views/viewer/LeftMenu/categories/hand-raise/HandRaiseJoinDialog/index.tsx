@@ -21,17 +21,20 @@ const Content = ({ handleClose, startConnectingHandRaise }: ContentProps) => {
       <React.Fragment>
          <DialogTitle>
             <Typography sx={styles.title} align="center">
-               You've been invited to join with audio and video!
+               You&apos;ve been invited to join with audio and video!
             </Typography>
          </DialogTitle>
          <DialogActions>
-            <Button color="grey" children="Cancel" onClick={handleClose} />
+            <Button color="grey" onClick={handleClose}>
+               Cancel
+            </Button>
             <Button
                variant="contained"
-               children="Join now"
                color="primary"
                onClick={startConnectingHandRaise}
-            />
+            >
+               Join now
+            </Button>
          </DialogActions>
       </React.Fragment>
    )

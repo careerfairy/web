@@ -5,7 +5,7 @@ import { Box, Button, IconButton, Typography } from "@mui/material"
 import ReactPlayer, { Config } from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import EditIcon from "@mui/icons-material/Edit"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { videoImagePlaceholder } from "../../../../constants/images"
 

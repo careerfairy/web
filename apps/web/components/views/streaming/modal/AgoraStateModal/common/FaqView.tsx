@@ -44,15 +44,13 @@ const FaqView = ({ faqIds }: Props) => {
             <Typography variant="h5" fontWeight={500}>
                Frequently Asked Questions
             </Typography>
-            <Link href="/faq">
-               <a target={"_blank"}>
-                  <Box sx={styles.viewAction}>
-                     <Typography variant={"h6"} fontWeight={600}>
-                        VIEW ALL
-                     </Typography>
-                     <ArrowForwardIosIcon />
-                  </Box>
-               </a>
+            <Link href="/faq" target={"_blank"}>
+               <Box sx={styles.viewAction}>
+                  <Typography variant={"h6"} fontWeight={600}>
+                     VIEW ALL
+                  </Typography>
+                  <ArrowForwardIosIcon />
+               </Box>
             </Link>
          </Box>
          <Stack spacing={1.5}>
@@ -73,21 +71,19 @@ interface FaqCardProps {
 
 export const FaqCard = ({ href, title }: FaqCardProps) => {
    return (
-      <Link href={href}>
-         <a target={"_blank"}>
-            <Stack
-               justifyContent={"space-between"}
-               alignItems={"center"}
-               sx={styles.cardRoot}
-               direction={"row"}
-               spacing={2}
-            >
-               <Typography fontWeight={400} variant="h6">
-                  {title}
-               </Typography>
-               <ArrowForwardRoundedIcon />
-            </Stack>
-         </a>
+      <Link href={href} target={"_blank"}>
+         <Stack
+            justifyContent={"space-between"}
+            alignItems={"center"}
+            sx={styles.cardRoot}
+            direction={"row"}
+            spacing={2}
+         >
+            <Typography fontWeight={400} variant="h6">
+               {title}
+            </Typography>
+            <ArrowForwardRoundedIcon />
+         </Stack>
       </Link>
    )
 }

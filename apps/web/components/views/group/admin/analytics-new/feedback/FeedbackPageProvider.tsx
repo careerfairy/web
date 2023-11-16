@@ -34,7 +34,9 @@ const initialValues: IFeedbackPageContext = {
 
 const FeedbackPageContext = createContext<IFeedbackPageContext>(initialValues)
 
-export const FeedbackPageProvider: FC = ({ children }) => {
+export const FeedbackPageProvider: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    const { group } = useGroup()
 
    const {

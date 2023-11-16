@@ -5,7 +5,7 @@ import CardMedia from "@mui/material/CardMedia"
 import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"
 import { EmbedProps } from "@graphcms/rich-text-types"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import Box from "@mui/material/Box"
 import { alpha } from "@mui/material/styles"
 const borderRadius = 5

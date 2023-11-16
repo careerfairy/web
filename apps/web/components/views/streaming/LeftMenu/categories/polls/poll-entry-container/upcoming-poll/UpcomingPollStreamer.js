@@ -241,7 +241,6 @@ function UpcomingPollStreamer({
                   disableElevation
                   variant="contained"
                   color="primary"
-                  children={"Ask the Audience Now"}
                   disabled={somePollIsCurrent || tutorialActive()}
                   sx={{
                      borderRadius: (theme) => theme.spacing(0, 0, 2, 2),
@@ -253,7 +252,9 @@ function UpcomingPollStreamer({
                      }
                      setPollState("current")
                   }}
-               />
+               >
+                  Ask the Audience Now
+               </Button>
             </WhiteTooltip>
             {showNotEditableMessage && (
                <Overlay>

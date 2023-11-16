@@ -13,6 +13,7 @@
       "experimentalDecorators": true,
       "resolveJsonModule": true,
       "esModuleInterop": true,
+      "skipLibCheck": true,
       "paths": {
          "@careerfairy/shared-lib/*": ["../shared-lib/src/*"]
       }

@@ -1,6 +1,6 @@
 import React from "react"
 import { CardMedia } from "@mui/material"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 

@@ -122,11 +122,9 @@ const EventsPreview = ({
                      !isOnMarketingLandingPage &&
                      seeMoreLink ? (
                         <Link href={seeMoreLink}>
-                           <a>
-                              <Typography sx={styles.seeMoreText} color="grey">
-                                 See more
-                              </Typography>
-                           </a>
+                           <Typography sx={styles.seeMoreText} color="grey">
+                              See more
+                           </Typography>
                         </Link>
                      ) : null}
                   </Box>

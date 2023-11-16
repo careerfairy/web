@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 // @ts-nocheck
 import React, { forwardRef } from "react"
 import { getMinutes, prettyDate } from "../../helperFunctions/HelperFunctions"

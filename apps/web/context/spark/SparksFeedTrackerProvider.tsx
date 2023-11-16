@@ -47,7 +47,9 @@ const SparkEventTrackerContext = createContext<SparkEventTrackerProviderProps>({
  * @component
  * @category Providers
  */
-export const SparksFeedTrackerProvider: FC = ({ children }) => {
+export const SparksFeedTrackerProvider: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    const router = useRouter()
 
    const { userData } = useAuth()

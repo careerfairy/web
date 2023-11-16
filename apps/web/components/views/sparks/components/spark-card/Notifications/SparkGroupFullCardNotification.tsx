@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { Avatar, Box, Button, Typography } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"

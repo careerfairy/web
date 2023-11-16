@@ -6,7 +6,7 @@ import {
    Typography,
 } from "@mui/material"
 import Box from "@mui/material/Box"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import Link from "../common/Link"
 import List from "@mui/material/List"
 import CheckIcon from "@mui/icons-material/Check"

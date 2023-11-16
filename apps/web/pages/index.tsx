@@ -37,12 +37,10 @@ function replace(node: Element): ReactElement | false {
       }
       if (!style) {
          return (
-            <Link href={href}>
-               <a {...props}>
-                  {!!node.children &&
-                     !!node.children.length &&
-                     domToReact(node.children, parseOptions)}
-               </a>
+            <Link href={href} {...props}>
+               {!!node.children &&
+                  !!node.children.length &&
+                  domToReact(node.children, parseOptions)}
             </Link>
          )
       }
@@ -53,12 +51,10 @@ function replace(node: Element): ReactElement | false {
          styleObj[property.trim()] = value.trim()
       }
       return (
-         <Link href={href}>
-            <a {...props} href={href} style={styleObj}>
-               {!!node.children &&
-                  !!node.children.length &&
-                  domToReact(node.children, parseOptions)}
-            </a>
+         <Link href={href} {...props} style={styleObj}>
+            {!!node.children &&
+               !!node.children.length &&
+               domToReact(node.children, parseOptions)}
          </Link>
       )
    }

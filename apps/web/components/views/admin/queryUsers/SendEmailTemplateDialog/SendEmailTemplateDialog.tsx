@@ -73,7 +73,7 @@ const EventSelectView = ({
          </Box>
          <DialogActions>
             <Box marginRight="auto">
-               <Button onClick={handleClose} children={"Close"} />
+               <Button onClick={handleClose}>Close</Button>
             </Box>
             {targetStream && (
                <Button variant="contained" color="primary" onClick={handleNext}>
@@ -113,16 +113,13 @@ const TemplateSelectView = ({
          </Box>
          <DialogActions>
             <Box marginRight="auto">
-               <Button onClick={handleClose} children={"Close"} />
+               <Button onClick={handleClose}>Close</Button>
             </Box>
-            <Button onClick={handleBack} children={"back"} />
+            <Button onClick={handleBack}>Back</Button>{" "}
             {targetTemplate && (
-               <Button
-                  onClick={handleNext}
-                  color="primary"
-                  variant="contained"
-                  children={"Next"}
-               />
+               <Button onClick={handleNext} color="primary" variant="contained">
+                  Next
+               </Button>
             )}
          </DialogActions>
       </>

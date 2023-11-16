@@ -1,5 +1,5 @@
-import Image from "next/image"
-import { ImageProps } from "next/image"
+import Image from "next/legacy/image"
+import { ImageProps } from "next/legacy/image"
 
 type Props = {
    width?: number

@@ -3,11 +3,18 @@
    "pipeline": {
       "build": {
          "dependsOn": ["^build"],
-         "outputs": ["dist/**", ".next/**"]
+         "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      },
+      "storybook-build": {
+         "dependsOn": ["build"],
+         "outputs": ["build-storybook-static/**"]
       },
       "test": {
          "dependsOn": ["build"],
          "outputs": ["coverage/**"]
+      },
+      "storybook": {
+         "dependsOn": ["build"]
       },
       "clean": {
          "dependsOn": ["^clean"]

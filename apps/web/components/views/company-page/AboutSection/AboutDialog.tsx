@@ -123,6 +123,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                            in={Boolean(errors.extraInfo)}
                            style={{ color: "red" }}
                         >
+                           {/* @ts-ignore */}
                            {errors.extraInfo}
                         </Collapse>
                      </Box>

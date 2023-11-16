@@ -36,4 +36,6 @@ const UserList = memo(({ audience, isStreamer }: Props) => {
    )
 })
 
+UserList.displayName = "UserList"
+
 export default UserList

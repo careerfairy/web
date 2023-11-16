@@ -86,7 +86,10 @@ const NavElement = ({
             {(svgIcon || Icon) && (
                <ListItemIcon color={"inherit"}>
                   {svgIcon ? (
-                     <Box sx={styles.icon}>{svgIcon}</Box>
+                     <Box sx={styles.icon}>
+                        {/* @ts-ignore */}
+                        {svgIcon}
+                     </Box>
                   ) : (
                      // @ts-ignore
                      Icon && <Box component={Icon} sx={styles.icon} size="20" />

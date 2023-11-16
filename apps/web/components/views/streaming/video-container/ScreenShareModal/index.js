@@ -110,7 +110,8 @@ const ScreenShareModal = ({
                   <DialogContentText color="textPrimary">
                      <ol className={classes.shareAudioList}>
                         <li>
-                           After clicking "Proceed", please click "Chrome Tabs"
+                           After clicking &quot;Proceed&quot;, please click
+                           &quot;Chrome Tabs&quot;
                         </li>
                         <li>Select the tab with the video</li>
                         <li>Make sure the share audio checkbox is checked</li>

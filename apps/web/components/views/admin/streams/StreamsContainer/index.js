@@ -6,6 +6,10 @@ import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
 
 const StreamsContainer = ({ isUpcoming, streams }) => {
+   const drawerOpen = useSelector(
+      (state) => state.generalLayout.layout.drawerOpen
+   )
+
    if (!isLoaded(streams)) {
       return <CircularProgress />
    }
@@ -13,10 +17,6 @@ const StreamsContainer = ({ isUpcoming, streams }) => {
    if (isEmpty(streams)) {
       return <span>No streams found</span>
    }
-
-   const drawerOpen = useSelector(
-      (state) => state.generalLayout.layout.drawerOpen
-   )
 
    return (
       <React.Fragment>

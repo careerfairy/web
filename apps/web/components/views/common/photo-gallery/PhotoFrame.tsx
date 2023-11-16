@@ -1,7 +1,7 @@
 import { FC, forwardRef, HTMLAttributes, memo } from "react"
 import { Box, Typography } from "@mui/material"
 import clsx from "clsx"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import IconButton from "@mui/material/IconButton"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { SortablePhotoProps } from "../../company-page/MediaSection/PhotosGallery"

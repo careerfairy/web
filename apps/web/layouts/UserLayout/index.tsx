@@ -9,7 +9,9 @@ import { CircularProgress } from "@mui/material"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../GenericDashboardLayout"
 
-const UserLayout: FC = ({ children }) => {
+const UserLayout: FC<{
+   children: React.ReactNode
+}> = ({ children }) => {
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { push, asPath } = useRouter()
 

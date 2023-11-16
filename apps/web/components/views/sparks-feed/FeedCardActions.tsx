@@ -15,10 +15,10 @@ import {
    Typography,
    alpha,
 } from "@mui/material"
+import Work from "@mui/icons-material/Work"
 
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
-import GlobeIcon from "components/views/common/icons/GlobeIcon"
 import FilterIcon from "components/views/common/icons/FilterIcon"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 import SparksShareDialog from "../sparks/components/SparksShareDialog"
@@ -125,6 +125,10 @@ const styles = sxStyles({
    loginBtn: {
       color: (theme) => `${theme.palette.primary.main} !important`,
    },
+   icon: {
+      height: "24px",
+      width: "24px",
+   },
 })
 
 type Props = {
@@ -136,13 +140,13 @@ const FeedCardActions: FC<Props> = ({ spark, hide }) => {
    return (
       <Stack spacing={3} sx={[styles.root, hide && styles.hidden]}>
          <LikeAction sparkId={spark.id} />
-         <ShareAction sparkId={spark.id} />
          {spark.group.careerPageUrl ? (
             <CareerPageAction
                sparkId={spark.id}
                href={spark.group.careerPageUrl}
             />
          ) : null}
+         <ShareAction sparkId={spark.id} />
          <FilterAction sparkId={spark.id} />
       </Stack>
    )
@@ -305,9 +309,9 @@ const CareerPageAction: FC<{
          href={href}
          hrefTarget="_blank"
          sparkId={sparkId}
-         icon={<GlobeIcon />}
+         icon={<Work sx={styles.icon} />}
          onClick={handleCareerPageClick}
-         label="Career Page"
+         label="Jobs"
       />
    )
 }

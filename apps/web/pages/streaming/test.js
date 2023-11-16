@@ -117,8 +117,8 @@ function TestStreamingPage(props) {
                   server and get familiar with our interactive features.
                </Typography>
                <Typography style={{ width: "60%", margin: "0 0 5% 0" }}>
-                  Let's make sure that you're ready when it is time for your
-                  stream to start!
+                  Let&apos;s make sure that you&apos;re ready when it is time
+                  for your stream to start!
                </Typography>
                <Button
                   size="large"

@@ -154,4 +154,6 @@ const HandRaiseNotifier = memo(({ handRaiseMenuOpen }) => {
    )
 })
 
+HandRaiseNotifier.displayName = "HandRaiseNotifier"
+
 export default HandRaiseNotifier
