@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { forwardRef, useCallback, useState } from "react"
 import { getMinutes } from "../../../../../helperFunctions/HelperFunctions"
 import { Box, Rating, Typography } from "@mui/material"

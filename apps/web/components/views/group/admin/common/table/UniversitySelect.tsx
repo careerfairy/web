@@ -58,6 +58,7 @@ const UniversitySelect = () => {
          disabled={noCountrySelected}
          options={universities}
          sx={styles.root}
+         // @ts-ignore
          renderOption={renderOption}
          listBoxCustomProps={listboxCustomProps}
          isOptionEqualToValue={isOptionEqualToValue}

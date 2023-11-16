@@ -32,7 +32,7 @@ const BrowserIncompatibleOverlay = () => {
                fontWeight="600"
                variant="h4"
             >
-               Whoops... CareerFairy doesn't support your browser
+               Whoops... CareerFairy doesn&apos;t support your browser
             </Typography>
             <Typography
                align="center"

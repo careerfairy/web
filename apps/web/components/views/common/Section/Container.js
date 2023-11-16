@@ -25,8 +25,9 @@ const SectionContainer = ({
          sx={[styles.root, sx]}
          maxWidth={maxWidth}
          {...props}
-         children={children}
-      />
+      >
+         {children}
+      </Container>
    )
 }
 

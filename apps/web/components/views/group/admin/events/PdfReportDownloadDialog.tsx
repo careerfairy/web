@@ -46,7 +46,7 @@ const PdfReportDownloadDialogContent = ({
                   {({ loading, error }) =>
                      error ? (
                         <Alert severity="error">
-                           <AlertTitle>{error}</AlertTitle>
+                           <AlertTitle>{error.message}</AlertTitle>
                            Something went wrong —{" "}
                            <a
                               color="inherit"

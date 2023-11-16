@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
@@ -62,7 +62,11 @@ const WatchSparksCTAContent: FC<Props> = () => {
          <Content
             ref={ref}
             headerTitle={
-               <ContentHeaderTitle maxWidth={"60% !important"} color="black">
+               <ContentHeaderTitle
+                  component="span"
+                  maxWidth={"60% !important"}
+                  color="black"
+               >
                   {"Discover "}
                   <ContentHeaderTitle
                      sx={styles.centeredHeaderTitle}

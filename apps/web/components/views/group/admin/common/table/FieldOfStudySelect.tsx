@@ -90,6 +90,7 @@ const FieldOfStudySelect = () => {
          multiple={false}
          options={Object.keys(fieldsOfStudyLookup)}
          sx={styles.root}
+         // @ts-ignore
          renderOption={renderOption}
          listBoxCustomProps={listboxCustomProps}
          isOptionEqualToValue={isOptionEqualToValue}

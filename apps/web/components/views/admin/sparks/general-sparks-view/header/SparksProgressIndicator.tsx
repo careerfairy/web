@@ -158,7 +158,7 @@ const SparksProgressIndicator = () => {
             <Typography variant={"body1"} fontSize={16}>
                Almost there! Providing your talent community with valuable
                insights into your company requires some initial content.
-               Remember, hidden Sparks don't count!
+               Remember, hidden Sparks don&apos;t count!
             </Typography>
             <CreateSparkButton
                startIcon={<Upload size={18} />}

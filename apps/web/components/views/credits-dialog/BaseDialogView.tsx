@@ -4,7 +4,7 @@ import { sxStyles } from "../../../types/commonTypes"
 import { Box, IconButton, Typography, TypographyProps } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
-import Image from "next/image"
+import Image from "next/legacy/image"
 
 const responsiveBreakpoint = "md"
 
@@ -176,6 +176,7 @@ export const LeftContent: FC<LeftContentProps> = ({
 
 type RightContentProps = {
    backgroundColor?: string
+   children: React.ReactNode
 }
 
 export const RightContent: FC<RightContentProps> = ({

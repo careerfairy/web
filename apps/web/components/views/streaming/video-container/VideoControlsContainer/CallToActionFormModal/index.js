@@ -150,6 +150,8 @@ const CallToActionFormModal = memo(
    }
 )
 
+CallToActionFormModal.displayName = "CallToActionFormModal"
+
 CallToActionFormModal.propTypes = {
    callToActionToEdit: PropTypes.shape({
       buttonText: PropTypes.string,

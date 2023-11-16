@@ -1,0 +1,26 @@
+import { useIsMobile } from "@careerfairy/shared-ui"
+import { ResponsiveButton } from "@careerfairy/shared-ui"
+import { useState } from "react"
+
+export const ToggleStartLiveStreamButton = () => {
+   const [hasStartedLivestream, setHasStartedLivestream] =
+      useState<boolean>(false)
+
+   const isMobile = useIsMobile(390)
+
+   return (
+      <ResponsiveButton
+         onClick={() => setHasStartedLivestream(!hasStartedLivestream)}
+         color={hasStartedLivestream ? "error" : "primary"}
+         variant="contained"
+      >
+         {hasStartedLivestream
+            ? isMobile
+               ? "Stop"
+               : "End live stream"
+            : isMobile
+            ? "Start"
+            : "Start live stream"}
+      </ResponsiveButton>
+   )
+}

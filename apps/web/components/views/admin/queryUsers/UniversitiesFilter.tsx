@@ -38,6 +38,7 @@ const UniversitiesFilter = ({
          isOptionEqualToValue={(option, value) => option.id === value.id}
          sx={{ minWidth: 200 }}
          getOptionLabel={(option) => option.name}
+         // @ts-ignore
          renderOption={(props, option) => [props, option.name]}
          fullWidth
          size="small"

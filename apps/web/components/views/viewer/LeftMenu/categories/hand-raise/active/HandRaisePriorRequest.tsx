@@ -38,8 +38,8 @@ const HandRaisePriorRequest = memo(
                            </ThemedPermanentMarker>
                            <CategorySubtitle>
                               By raising your hand, you can request to join the
-                              stream with your computer's audio and video and
-                              ask your questions face-to-face.
+                              stream with your computer&apos;s audio and video
+                              and ask your questions face-to-face.
                            </CategorySubtitle>
                            <Button
                               variant="contained"
@@ -47,14 +47,15 @@ const HandRaisePriorRequest = memo(
                               startIcon={
                                  <PanToolOutlinedIcon fontSize="large" />
                               }
-                              children="Raise my hand"
                               onClick={() =>
                                  updateHandRaiseRequest(
                                     HandRaiseState.acquire_media
                                  )
                               }
                               color="primary"
-                           />
+                           >
+                              Raise my hand
+                           </Button>
                         </CategoryContainerContent>
                      </CategoryContainerCentered>
                   </span>
@@ -64,6 +65,8 @@ const HandRaisePriorRequest = memo(
       )
    }
 )
+
+HandRaisePriorRequest.displayName = "HandRaisePriorRequest"
 
 type Props = {
    handRaiseState: HandRaise

@@ -218,6 +218,7 @@ const PersonalInfo = ({ userData }) => {
                                  )}
                               >
                                  <FormHelperText error>
+                                    {/* @ts-ignore */}
                                     {errors.firstName}
                                  </FormHelperText>
                               </Collapse>
@@ -251,6 +252,7 @@ const PersonalInfo = ({ userData }) => {
                                  )}
                               >
                                  <FormHelperText error>
+                                    {/* @ts-ignore */}
                                     {errors.lastName}
                                  </FormHelperText>
                               </Collapse>
@@ -348,6 +350,7 @@ const PersonalInfo = ({ userData }) => {
                                  )}
                               >
                                  <FormHelperText error>
+                                    {/* @ts-ignore */}
                                     {errors.linkedinUrl}
                                  </FormHelperText>
                               </Collapse>

@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { GraphCMSImageLoader } from "./util"
 import { caseStudyCompanyCoverImageDimensions } from "./constants"
 import React from "react"

@@ -100,11 +100,14 @@ const CARD_OPTIONS = ["Latest", "Oldest"]
 const AggregatedFeedbackCard = () => {
    const [hideOptions, setHideOptions] = useState(false)
    const [sortingMethod, setSortingMethod] =
-      useState<typeof CARD_OPTIONS[number]>("Latest")
+      useState<(typeof CARD_OPTIONS)[number]>("Latest")
 
-   const optionsHandler = useCallback((option: typeof CARD_OPTIONS[number]) => {
-      setSortingMethod(option)
-   }, [])
+   const optionsHandler = useCallback(
+      (option: (typeof CARD_OPTIONS)[number]) => {
+         setSortingMethod(option)
+      },
+      []
+   )
 
    return (
       <CardCustom
@@ -128,7 +131,7 @@ const PaginatedFeedback = ({
    sortingMethod,
    setHideOptions,
 }: {
-   sortingMethod: typeof CARD_OPTIONS[number]
+   sortingMethod: (typeof CARD_OPTIONS)[number]
    setHideOptions: React.Dispatch<boolean>
 }) => {
    const { group } = useGroup()
@@ -249,7 +252,7 @@ const NoLivestreams = () => {
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
             You can check live stream feedback here.
             <br />
-             Start creating new live stream to get feedbacks.
+            Start creating new live stream to get feedbacks.
          </Typography>
 
          <Box mt={2} mb={3} display="flex" justifyContent="center">

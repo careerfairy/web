@@ -16,7 +16,7 @@ import { useCompanyPage } from "../index"
 import { useFormik } from "formik"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { v4 as uuid } from "uuid"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { videoImagePlaceholder } from "../../../../constants/images"
 import { sxStyles } from "../../../../types/commonTypes"
 import { groupRepo } from "../../../../data/RepositoryInstances"
@@ -209,6 +209,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                   >
                      <Typography sx={styles.videoErrorText}>
                         {formik.errors.file ? (
+                           // @ts-ignore
                            <div>{formik.errors.file}</div>
                         ) : null}
                      </Typography>

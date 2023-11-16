@@ -2,7 +2,9 @@ import { createContext, FC, useContext, useMemo } from "react"
 import useDialogStateHandler from "../components/custom-hook/useDialogStateHandler"
 import CreditsDialog from "../components/views/credits-dialog/CreditsDialog"
 
-type Props = {}
+type Props = {
+   children: React.ReactNode
+}
 
 type ICreditsDialogContext = {
    creditsDialogOpen: boolean

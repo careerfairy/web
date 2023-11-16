@@ -71,6 +71,7 @@ interface SectionProps {
    disableBottomPadding?: boolean
    disableTopPadding?: boolean
    maxWidth?: ContainerProps["maxWidth"]
+   children: React.ReactNode
 }
 
 export default Section

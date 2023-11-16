@@ -19,14 +19,14 @@ const StudentHeroSection = (props) => {
       <HeroSection
          title={
             <>
-               Looking for your <b>dream job</b> but don't know where to{" "}
+               Looking for your <b>dream job</b> but don&apos;t know where to{" "}
                <b>start?</b>
             </>
          }
          subTitle={
             <Box mt={3}>
                <Typography sx={styles.subTitleHeader} variant="h4">
-                  We've been there.
+                  We&apos;ve been there.
                </Typography>
                <Typography variant="h5">
                   We host sessions with employees and recruiters from hundreds

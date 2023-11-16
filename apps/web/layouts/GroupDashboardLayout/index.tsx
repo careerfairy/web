@@ -251,14 +251,28 @@ type OutletProps = {
    loading?: boolean
    empty?: boolean
 }
+
+/**
+ * Outlet component is used to conditionally render CircularProgress, Typography, or children based on the loading and empty states.
+ * However, due to a specific rendering issue in Safari, CircularProgress was still being rendered even when loading was false.
+ * This led to both CircularProgress and the children being rendered at the same time, causing layout shifts.
+ *
+ * To prevent this layout shift, we use position: "absolute" for CircularProgress. This ensures that even if Safari incorrectly
+ * renders CircularProgress, it doesn't affect the layout of the other elements on the page.
+ *
+ * This is a workaround specifically for Safari and should be revisited if the rendering issue in Safari is resolved in the future.
+ */
 const Outlet = ({ children, empty, loading }: OutletProps) => {
    if (loading) {
-      return <CircularProgress sx={{ margin: "auto" }} />
+      return <CircularProgress sx={{ margin: "auto", position: "absolute" }} />
    }
 
    if (empty) {
       return (
-         <Typography variant={"h6"} sx={{ margin: "auto" }}>
+         <Typography
+            variant={"h6"}
+            sx={{ margin: "auto", position: "absolute" }}
+         >
             Group not found
          </Typography>
       )

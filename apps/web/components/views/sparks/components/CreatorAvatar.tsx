@@ -1,6 +1,6 @@
 import { Avatar, AvatarProps } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
-import Image from "next/image"
+import Image from "next/legacy/image"
 import { FC, useMemo, useState } from "react"
 
 type Props = {
