@@ -4,6 +4,7 @@ import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
+import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    btn: {
@@ -31,7 +32,6 @@ const CustomJobEntryApply = ({
 
    const handleClick = useCallback(async () => {
       await handleClickApplyBtn()
-      document.getElementById("toOpenANewTab").click()
       handleApplyClick()
    }, [handleClickApplyBtn, handleApplyClick])
 
@@ -39,6 +39,10 @@ const CustomJobEntryApply = ({
       <>
          <Button
             sx={styles.btn}
+            component={Link}
+            href={job.postingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             variant="contained"
             color="primary"
             startIcon={
@@ -52,13 +56,6 @@ const CustomJobEntryApply = ({
          >
             {isApplying ? "Applying" : "Apply now"}
          </Button>
-
-         <a
-            id={"toOpenANewTab"}
-            href={job.postingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-         />
       </>
    )
 }
