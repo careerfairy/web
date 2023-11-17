@@ -26,7 +26,13 @@ const SparksSection: FC<Props> = ({ groupId }) => {
       (spark: Spark) => {
          if (spark) {
             dispatch(setCameFromCompanyPageLink(router.asPath))
-            router.push(`/sparks/${spark.id}?groupId=${group.id}`)
+            router.push({
+               pathname: `/sparks/${spark.id}`,
+               query: {
+                  ...router.query, // spread current query params
+                  groupId: group.id,
+               },
+            })
          }
          return
       },

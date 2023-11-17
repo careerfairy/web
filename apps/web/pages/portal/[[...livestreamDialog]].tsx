@@ -67,7 +67,10 @@ const PortalPage = ({
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
-      return router.push(`/sparks/${spark.id}`)
+      return router.push({
+         pathname: `/sparks/${spark.id}`,
+         query: { ...router.query }, // spread current query params
+      })
    }
 
    return (
