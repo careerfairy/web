@@ -4,7 +4,6 @@ import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
-import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    btn: {
@@ -39,7 +38,7 @@ const CustomJobEntryApply = ({
       <>
          <Button
             sx={styles.btn}
-            component={Link}
+            component={"a"}
             href={job.postingUrl}
             target="_blank"
             rel="noopener noreferrer"
