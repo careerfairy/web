@@ -1,0 +1,54 @@
+{
+   "fields": [
+      {
+         "name": "atsAdminPageFlag",
+         "type": "boolean"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "companyCountry",
+         "type": "map"
+      },
+      {
+         "name": "companyIndustries",
+         "type": "stringified_map"
+      },
+      {
+         "name": "companySize",
+         "type": "string"
+      },
+      {
+         "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "publicProfile",
+         "type": "boolean"
+      },
+      {
+         "name": "publicSparks",
+         "type": "boolean"
+      },
+      {
+         "name": "sparksAdminPageFlag",
+         "type": "boolean"
+      },
+      {
+         "name": "test",
+         "type": "boolean"
+      },
+      {
+         "name": "universityName",
+         "type": "string"
+      }
+   ]
+}
