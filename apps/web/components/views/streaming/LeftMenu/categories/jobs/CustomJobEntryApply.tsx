@@ -31,7 +31,6 @@ const CustomJobEntryApply = ({
 
    const handleClick = useCallback(async () => {
       await handleClickApplyBtn()
-      document.getElementById("toOpenANewTab").click()
       handleApplyClick()
    }, [handleClickApplyBtn, handleApplyClick])
 
@@ -39,6 +38,10 @@ const CustomJobEntryApply = ({
       <>
          <Button
             sx={styles.btn}
+            component={"a"}
+            href={job.postingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             variant="contained"
             color="primary"
             startIcon={
@@ -52,13 +55,6 @@ const CustomJobEntryApply = ({
          >
             {isApplying ? "Applying" : "Apply now"}
          </Button>
-
-         <a
-            id={"toOpenANewTab"}
-            href={job.postingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-         />
       </>
    )
 }
