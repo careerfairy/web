@@ -1,0 +1,32 @@
+{
+   "fields": [
+      {
+         "name": "documentId",
+         "type": "string"
+      },
+      {
+         "name": "applicants",
+         "type": "stringified_map"
+      },
+      {
+         "name": "clicks",
+         "type": "number"
+      },
+      {
+         "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "jobType",
+         "type": "string"
+      },
+      {
+         "name": "livestreams",
+         "type": "stringified_map"
+      },
+      {
+         "name": "title",
+         "type": "string"
+      }
+   ]
+}
