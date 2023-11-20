@@ -1,4 +1,5 @@
-import { BigQuery } from "@google-cloud/bigquery"
+import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
+import { getBigQueryTablePrefix } from "../../util"
 
 /**
  * Class to handle BigQuery operations.
@@ -12,14 +13,6 @@ class BigQueryServiceCore {
     */
    constructor(bigQueryClient: BigQuery) {
       this.bigQueryClient = bigQueryClient
-   }
-
-   public async query(sqlQuery: string, params?: object) {
-      const query = {
-         query: sqlQuery,
-         params: params,
-      }
-      return this.bigQueryClient.query(query)
    }
    public async query(sqlQuery: string, params?: object) {
       const query = {
