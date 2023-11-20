@@ -140,15 +140,8 @@ const csp = {
       "data:",
       "https://uploads-ssl.webflow.com",
    ],
-   "media-src": [
-      "'self'",
-      "https://media.careerfairy.io",
-      "blob:",
-      "*.amazonaws.com",
-      "careerfairy-e1fd9.firebaseapp.com",
-      "*.youtube.com",
-      "*.googleapis.com",
-   ],
+  
+   "media-src": ["'self'", "https://media.careerfairy.io"],
 }
 
 if (notProduction) {
