@@ -11,7 +11,7 @@ import {
    CacheKeyOnCallFn,
    cacheOnCallValues,
 } from "./middlewares/cacheMiddleware"
-import { getSparksAnalyticsRepo } from "./api/repositories"
+import { getSparksAnalyticsRepoInstance } from "./api/repositories"
 import {
    LinearBarWithPastData,
    MostSomethingBase,
@@ -74,7 +74,7 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
       cache((data) => registrationSourcesCacheKey({ ...data })),
       async (data) => {
          const groupId = data.groupId
-         const sparksAnalyticsRepo = getSparksAnalyticsRepo(groupId)
+         const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(groupId)
 
          const [
             totalViews,
@@ -122,12 +122,12 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                levelsOfStudy1year,
             ],
          ] = await Promise.all([
-            sparksAnalyticsRepo.getTotalViews(),
-            sparksAnalyticsRepo.getUniqueViewers(),
-            sparksAnalyticsRepo.getLikes(),
-            sparksAnalyticsRepo.getShares(),
-            sparksAnalyticsRepo.getRegistrations(),
-            sparksAnalyticsRepo.getPageClicks(),
+            sparksAnalyticsRepo.getTotalViewsPastYear(),
+            sparksAnalyticsRepo.getUniqueViewersPastYear(),
+            sparksAnalyticsRepo.getLikesPastYear(),
+            sparksAnalyticsRepo.getSharesPastYear(),
+            sparksAnalyticsRepo.getRegistrationsPastYear(),
+            sparksAnalyticsRepo.getPageClicksPastYear(),
             fetchTimePeriodData(sparksAnalyticsRepo.getMostWatchedSparks),
             fetchTimePeriodData(sparksAnalyticsRepo.getMostLikedSparks),
             fetchTimePeriodData(sparksAnalyticsRepo.getMostSharedSparks),
