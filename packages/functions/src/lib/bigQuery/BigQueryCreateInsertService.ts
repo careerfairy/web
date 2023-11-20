@@ -1,12 +1,15 @@
 import BigQueryServiceCore from "./IBigQueryService"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
-import { isProductionEnvironment } from "../../util"
+import { getBigQueryTablePrefix, isProductionEnvironment } from "../../util"
 import { logger } from "firebase-functions"
 
-class BigQueryCRUDService<TRow> extends BigQueryServiceCore {
+class BigQueryCreateInsertService<TRow> extends BigQueryServiceCore {
+   protected datasetId: string
+   protected tableId: string
+   protected tableOptions: TableMetadata
+
    /**
-    * Create a new BigQueryHandler.
-    * @param {BigQuery} bigQueryClient - The BigQuery client.
+    * Create a new BigQueryCRUDService.
     * @param {string} datasetId - The ID of the dataset.
     * @param {string} tableId - The ID of the table.
     * @param {TableMetadata} tableOptions - The options for creating the table.
@@ -17,7 +20,10 @@ class BigQueryCRUDService<TRow> extends BigQueryServiceCore {
       tableId: string,
       tableOptions: TableMetadata
    ) {
-      super(bigQueryClient, datasetId, tableId, tableOptions)
+      super(bigQueryClient)
+      this.datasetId = datasetId
+      this.tableId = `${tableId}${getBigQueryTablePrefix()}`
+      this.tableOptions = tableOptions
    }
 
    /**
@@ -65,14 +71,6 @@ class BigQueryCRUDService<TRow> extends BigQueryServiceCore {
          throw error
       }
    }
-
-   public async read() {
-      throw new Error("Not implemented.")
-   }
-
-   public async delete() {
-      throw new Error("Not implemented.")
-   }
 }
 
-export default BigQueryCRUDService
+export default BigQueryCreateInsertService
