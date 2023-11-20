@@ -94,7 +94,7 @@ export const sparkRepo: ISparkFunctionsRepository =
 export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository =
    new PublicSparksNotificationsRepository(firestore as any)
 
-export const getSparksAnalyticsRepo = (
+export const getSparksAnalyticsRepoInstance = (
    groupId: string
 ): SparksAnalyticsRepository => {
    return new SparksAnalyticsRepository(groupId, bigQueryClient)
