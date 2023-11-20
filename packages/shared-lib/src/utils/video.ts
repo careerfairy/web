@@ -22,9 +22,9 @@ export const imageKitLoader = (params: TransformationParams) => {
 
    const transformations = []
 
+   // If aspectRatio is provided, add aspect ratio and height to transformations
    if (aspectRatio) {
       transformations.push(`ar-${aspectRatio.width}-${aspectRatio.height}`)
-      // If aspectRatio is provided, only add width to transformations
       transformations.push(`w-${height}`)
    } else {
       // If aspectRatio is not provided, add both width and height to transformations
@@ -52,8 +52,11 @@ export const imageKitLoader = (params: TransformationParams) => {
    // Insert the transformations into the URL path
    const urlParts = src.split("/")
 
-   urlParts.splice(4, 0, `tr:${paramsString}`)
+   // Insert the transformations after the base URL
+   urlParts.splice(3, 0, `tr:${paramsString}`)
 
-   // https://media.careerfairy.io/tr:transformation1,transformation2,.../rest-of-the-path.mp4
+   // Join the URL parts back together
+   // The resulting URL will look like this:
+   // https://media.careerfairy.io/tr:transformation1,transformation2,.../v0/b/app-name.appspot.com/o/path-to-video.mp4?alt=media&token=token-value
    return urlParts.join("/")
 }
