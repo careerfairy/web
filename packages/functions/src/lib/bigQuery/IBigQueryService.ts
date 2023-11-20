@@ -1,5 +1,4 @@
-import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
-import { getBigQueryTablePrefix } from "../../util"
+import { BigQuery } from "@google-cloud/bigquery"
 
 /**
  * Class to handle BigQuery operations.
