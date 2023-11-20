@@ -39,7 +39,7 @@ import bigQueryClient from "./bigQueryClient"
 import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
-} from "../lib/bigQuery/IBigQueryService"
+} from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
 
