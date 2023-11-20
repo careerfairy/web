@@ -139,6 +139,7 @@ const csp = {
       "data:",
       "https://uploads-ssl.webflow.com",
    ],
+   "media-src": ["'self'", "https://media.careerfairy.io"],
 }
 
 if (notProduction) {
