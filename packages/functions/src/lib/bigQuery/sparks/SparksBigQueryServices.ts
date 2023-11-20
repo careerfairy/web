@@ -1,15 +1,15 @@
-// Singleton instances of BigQueryHandler
-
 import {
    SparkEvent,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
-import BigQueryCRUDService from "../BigQueryCRUDService"
+import BigQueryCreateInsertService from "../BigQueryCreateInsertService"
 import bigQueryClient from "src/api/bigQueryClient"
 import sparkEvents from "./schema-views/sparkEvents.json"
 import sparkSecondsWatched from "./schema-views/sparkSecondsWatched.json"
 
-export const sparkEventsHandler = new BigQueryCRUDService<SparkEvent>(
+// Singleton instances of BigQueryHandler
+
+export const sparkEventsHandler = new BigQueryCreateInsertService<SparkEvent>(
    bigQueryClient,
    "SparkAnalytics",
    "SparkEvents",
@@ -20,7 +20,7 @@ export const sparkEventsHandler = new BigQueryCRUDService<SparkEvent>(
 )
 
 export const sparkSecondsWatchedHanlder =
-   new BigQueryCRUDService<SparkSecondWatched>(
+   new BigQueryCreateInsertService<SparkSecondWatched>(
       bigQueryClient,
       "SparkAnalytics",
       "SparkSecondsWatched",
