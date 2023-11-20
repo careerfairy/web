@@ -19,7 +19,7 @@ import {
    PieChartWithPastData,
    TimePeriodParams,
    TimeseriesDataPoint,
-} from "./lib/sparks/analytics/GroupSparksAnalyticsTypes"
+} from "./lib/sparks/analytics/SparksAnalytics"
 
 type ReachData = {
    totalViews: TimeseriesDataPoint[]
