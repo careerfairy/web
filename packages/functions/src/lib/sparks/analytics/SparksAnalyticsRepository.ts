@@ -28,12 +28,12 @@ import {
 } from "./queries/Audience"
 
 interface ISparksAnalyticsRepository {
-   getTotalViewsPastYear(): Promise<TimeseriesDataPoint[]>
-   getUniqueViewersPastYear(): Promise<TimeseriesDataPoint[]>
-   getLikesPastYear(): Promise<TimeseriesDataPoint[]>
-   getSharesPastYear(): Promise<TimeseriesDataPoint[]>
-   getRegistrationsPastYear(): Promise<TimeseriesDataPoint[]>
-   getPageClicksPastYear(): Promise<TimeseriesDataPoint[]>
+   getTotalViews(): Promise<TimeseriesDataPoint[]>
+   getUniqueViewers(): Promise<TimeseriesDataPoint[]>
+   getLikes(): Promise<TimeseriesDataPoint[]>
+   getShares(): Promise<TimeseriesDataPoint[]>
+   getRegistrations(): Promise<TimeseriesDataPoint[]>
+   getPageClicks(): Promise<TimeseriesDataPoint[]>
    getMostWatchedSparks(
       timeperiod: TimePeriodParams
    ): Promise<MostSomethingBase>
@@ -65,35 +65,35 @@ class SparksAnalyticsRepository implements ISparksAnalyticsRepository {
       this.bigQueryService = new IBigQueryService(bigQueryClient)
    }
 
-   getTotalViewsPastYear(): Promise<TimeseriesDataPoint[]> {
+   getTotalViews(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(totalViewsPastYear)
    }
 
-   getUniqueViewersPastYear(): Promise<TimeseriesDataPoint[]> {
+   getUniqueViewers(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(
          uniqueViewersPastYear
       )
    }
 
-   getLikesPastYear(): Promise<TimeseriesDataPoint[]> {
+   getLikes(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(
          timeseriesLikesPastYear
       )
    }
 
-   getSharesPastYear(): Promise<TimeseriesDataPoint[]> {
+   getShares(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(
          timeseriesSharesPastYear
       )
    }
 
-   getRegistrationsPastYear(): Promise<TimeseriesDataPoint[]> {
+   getRegistrations(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(
          timeseriesRegistrationsPastYear
       )
    }
 
-   getPageClicksPastYear(): Promise<TimeseriesDataPoint[]> {
+   getPageClicks(): Promise<TimeseriesDataPoint[]> {
       return this.handleQueryPromise<TimeseriesDataPoint[]>(
          timeseriesPageClicksPastYear
       )
@@ -172,11 +172,11 @@ class SparksAnalyticsRepository implements ISparksAnalyticsRepository {
    }
 
    private async handleQueryPromiseWithTimePeriodValidation<T>(
-      getSqlQuery: (string) => string,
+      sqlQuery: string,
       timeperiod: TimePeriodParams
    ): Promise<T> {
-      const sqlQueryWithTimePeriod = getSqlQuery(this.timePeriodMap[timeperiod])
-      return this.handleQueryPromise<T>(sqlQueryWithTimePeriod)
+      const params = { timeperiod: this.timePeriodMap[timeperiod] }
+      return this.handleQueryPromise<T>(sqlQuery, params)
    }
 }
 

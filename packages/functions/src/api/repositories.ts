@@ -42,7 +42,7 @@ import {
 } from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
-import SparksAnalyticsRepository from "../lib/sparks/analytics/SparksAnalyticsRepository"
+import SparksAnalyticsRepository from "src/lib/sparks/analytics/SparksAnalyticsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -94,7 +94,7 @@ export const sparkRepo: ISparkFunctionsRepository =
 export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository =
    new PublicSparksNotificationsRepository(firestore as any)
 
-export const getSparksAnalyticsRepoInstance = (
+export const getSparksAnalyticsRepo = (
    groupId: string
 ): SparksAnalyticsRepository => {
    return new SparksAnalyticsRepository(groupId, bigQueryClient)
