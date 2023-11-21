@@ -2,15 +2,16 @@ import {
    Group,
    GroupOption,
    GroupPhoto,
+   GroupPlan,
    GroupQuestion,
    GroupVideo,
    Testimonial,
 } from "./groups"
 import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
-import { SPARK_CONSTANTS } from "../sparks/constants"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
+import { getPlanConstants } from "./planConstants"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
@@ -55,8 +56,10 @@ export class GroupPresenter {
       public readonly universityName: string,
       public readonly universityCode: string,
       public readonly maxPublicSparks: number,
+      public readonly publicSparks: boolean,
       public readonly logo: ImageType,
-      public readonly banner: ImageType
+      public readonly banner: ImageType,
+      public readonly plan: GroupPlan
    ) {}
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
@@ -83,9 +86,12 @@ export class GroupPresenter {
          group.publicProfile || false,
          group.universityName || null,
          group.universityCode || null,
-         group.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS,
+         group.maxPublicSparks ||
+            getPlanConstants(group.plan?.type).MAX_PUBLIC_SPARKS,
+         group.publicSparks || false,
          group.logo || null,
-         group.banner || null
+         group.banner || null,
+         group.plan || null
       )
    }
 
@@ -260,7 +266,36 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxPublicSparks() {
-      return this.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS
+      return (
+         this.maxPublicSparks ||
+         getPlanConstants(this.plan?.type).MAX_PUBLIC_SPARKS
+      )
+   }
+
+   /**
+    * To get the minimum number of creators required to publish sparks for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMinimumCreatorsToPublishSparks() {
+      return getPlanConstants(this.plan?.type)
+         .MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+   }
+
+   /**
+    * To get the minimum number of sparks required per creator to publish sparks for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMinimumSparksPerCreatorToPublishSparks() {
+      return getPlanConstants(this.plan?.type)
+         .MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+   }
+
+   /**
+    * To get the maximum number of creators for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMaxSparkCreatorCount() {
+      return getPlanConstants(this.plan?.type).MAX_SPARK_CREATOR_COUNT
    }
 
    getCompanyLogoUrl() {

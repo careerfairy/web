@@ -5,7 +5,6 @@ import { Upload } from "react-feather"
 import CreateSparkButton from "../../components/CreateSparkButton"
 import React, { FC, useCallback, useMemo } from "react"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { useRouter } from "next/router"
 
 const styles = sxStyles({
@@ -79,6 +78,10 @@ const SparksProgressIndicator = () => {
       limit: groupPresenter.getMaxPublicSparks(),
    })
 
+   const minSparksPerCreator =
+      groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
+   const minCreators = groupPresenter.getMinimumCreatorsToPublishSparks()
+
    const creatorsToValidate = useMemo(() => {
       // to get the number of public sparks per creator
       const creatorsWithSparks = publicSparks.reduce<CreatorWithSparksNumber[]>(
@@ -109,10 +112,7 @@ const SparksProgressIndicator = () => {
       )
 
       // In case there are less than 3 creators, add an empty object for the missing elements
-      while (
-         sortedCreatorsWithSparks.length <
-         SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
-      ) {
+      while (sortedCreatorsWithSparks.length < minSparksPerCreator) {
          sortedCreatorsWithSparks.push({
             creatorId: "",
             numberOfSparks: 0,
@@ -122,15 +122,14 @@ const SparksProgressIndicator = () => {
       // To get only the minimum creators need to publish sparks from the sorted array
       // Add the progress percentage to each element of the array
       return sortedCreatorsWithSparks
-         .slice(0, SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS)
+         .slice(0, minCreators)
          .map((creatorWithSparks) => {
             const progress =
-               creatorWithSparks.numberOfSparks >
-               SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+               creatorWithSparks.numberOfSparks > minSparksPerCreator
                   ? 100
                   : Math.floor(
                        (creatorWithSparks.numberOfSparks /
-                          SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS) *
+                          minSparksPerCreator) *
                           100
                     )
 
@@ -139,7 +138,7 @@ const SparksProgressIndicator = () => {
                progress,
             }
          })
-   }, [publicSparks])
+   }, [minCreators, minSparksPerCreator, publicSparks])
 
    const companyPageProgress = useMemo(() => {
       return groupPresenter.getCompanyPageInitialProgress()
@@ -185,6 +184,7 @@ const SparksProgressIndicator = () => {
                   key={index}
                   creatorWithSparks={creatorWithSparks}
                   index={index}
+                  minSparksPerCreator={minSparksPerCreator}
                />
             ))}
          </Stack>
@@ -195,26 +195,25 @@ const SparksProgressIndicator = () => {
 type CreatorProgressIndicatorProps = {
    creatorWithSparks: CreatorWithSparksNumber
    index: number
+   minSparksPerCreator: number
 }
 
 const CreatorProgressIndicator: FC<CreatorProgressIndicatorProps> = ({
    creatorWithSparks,
    index,
+   minSparksPerCreator,
 }) => {
    const currentValue = useMemo(
       () =>
-         creatorWithSparks.numberOfSparks >
-         SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
-            ? SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+         creatorWithSparks.numberOfSparks > minSparksPerCreator
+            ? minSparksPerCreator
             : creatorWithSparks.numberOfSparks,
-      [creatorWithSparks.numberOfSparks]
+      [creatorWithSparks.numberOfSparks, minSparksPerCreator]
    )
 
    const isValid = useMemo(
-      () =>
-         creatorWithSparks.numberOfSparks >=
-         SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS,
-      [creatorWithSparks.numberOfSparks]
+      () => creatorWithSparks.numberOfSparks >= minSparksPerCreator,
+      [creatorWithSparks.numberOfSparks, minSparksPerCreator]
    )
 
    return (
@@ -224,7 +223,7 @@ const CreatorProgressIndicator: FC<CreatorProgressIndicatorProps> = ({
          progress={creatorWithSparks.progress}
          isValid={isValid}
          currentValue={currentValue}
-         maxValue={SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS}
+         maxValue={minSparksPerCreator}
       />
    )
 }
