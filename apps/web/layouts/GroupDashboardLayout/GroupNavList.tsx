@@ -8,6 +8,7 @@ import {
    Sliders as ATSIcon,
    Home as HomeIcon,
    PlayCircle as SparksIcon,
+   Briefcase,
 } from "react-feather"
 
 // material-ui
@@ -50,6 +51,9 @@ const GroupNavList = () => {
    const hasAccessToSparks =
       featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
 
+   const hasAtsIntegration =
+      featureFlags.atsAdminPageFlag || group.atsAdminPageFlag
+
    const navLinks = useMemo(() => {
       // Declare hrefs here if you are using them in multiple places
       const companyPageHref = `/${baseHrefPath}/${group.id}/admin/page`
@@ -89,6 +93,17 @@ const GroupNavList = () => {
                  },
               ]
             : []),
+         ...(hasAtsIntegration
+            ? []
+            : [
+                 {
+                    id: "customJobs",
+                    href: `/${baseHrefPath}/${group.id}/admin/jobs`,
+                    pathname: `/${baseHrefPath}/${baseParam}/admin/jobs`,
+                    Icon: Briefcase,
+                    title: "Jobs",
+                 },
+              ]),
          {
             id: "company",
             title: "Company",
@@ -173,7 +188,7 @@ const GroupNavList = () => {
          },
       ]
 
-      if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
+      if (hasAtsIntegration) {
          links.push({
             id: "ats",
             href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
@@ -191,9 +206,8 @@ const GroupNavList = () => {
    }, [
       group.id,
       group.universityCode,
-      group.atsAdminPageFlag,
       hasAccessToSparks,
-      featureFlags.atsAdminPageFlag,
+      hasAtsIntegration,
       showCompanyPageCTA,
       push,
       shrunkLeftMenuIsActive,
