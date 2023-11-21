@@ -3,8 +3,8 @@ import { Timestamp } from "../api/firestoreAdmin"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, sparkRepo } from "../api/repositories"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import functions = require("firebase-functions")
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 /**
  * Adds the current timestamp to the "addedToFeedAt" field of a spark.
@@ -26,7 +26,14 @@ export const addAddedToFeedAt = (spark: Spark) => {
  */
 export const validateGroupSparks = async (group: Group) => {
    try {
-      const { groupId, publicSparks, publicProfile } = group
+      const groupPresenter = GroupPresenter.createFromDocument(group)
+
+      const { id: groupId, publicSparks, publicProfile } = groupPresenter
+
+      const minCreatorsToPublishSparks =
+         groupPresenter.getMinimumCreatorsToPublishSparks()
+      const minSparksPerCreatorToPublishSparks =
+         groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
 
       // If the group is not yet a public group there's no need to do all the other validations
       if (!publicProfile) {
@@ -46,9 +53,7 @@ export const validateGroupSparks = async (group: Group) => {
       const creators: Creator[] = await groupRepo.getCreators(groupId)
 
       // if the groups has 3 or more creators, validation continues
-      if (
-         creators?.length >= SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
-      ) {
+      if (creators?.length >= minCreatorsToPublishSparks) {
          // get all the sparks from a Group
          const sparks = await sparkRepo.getSparksByGroupId(groupId)
          let sparksPerCreatorCounter = 0
@@ -64,17 +69,11 @@ export const validateGroupSparks = async (group: Group) => {
                `Creator ${creatorId}, has ${numberOfPublicSparks} public Sparks`
             )
 
-            if (
-               numberOfPublicSparks >=
-               SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
-            ) {
+            if (numberOfPublicSparks >= minSparksPerCreatorToPublishSparks) {
                sparksPerCreatorCounter++
             }
 
-            return (
-               sparksPerCreatorCounter ===
-               SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
-            )
+            return sparksPerCreatorCounter === minCreatorsToPublishSparks
          })
 
          if (isValid) {
@@ -90,10 +89,7 @@ export const validateGroupSparks = async (group: Group) => {
             return groupRepo.updatePublicSparks(groupId, true)
          }
 
-         if (
-            sparksPerCreatorCounter <
-            SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
-         ) {
+         if (sparksPerCreatorCounter < minCreatorsToPublishSparks) {
             // To be here, it means that the group has {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} or more creators
             // but does not have at least {MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} sparks for {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} different creators
             // which means this group should not have their sparks public
@@ -107,7 +103,7 @@ export const validateGroupSparks = async (group: Group) => {
             }
 
             return functions.logger.log(
-               `After validation, the group ${groupId} has more than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators but less than ${SPARK_CONSTANTS.MINIMUM_CREATORS_TO_PUBLISH_SPARKS} Sparks per Creator`
+               `After validation, the group ${groupId} has more than ${minSparksPerCreatorToPublishSparks} Creators but less than ${minCreatorsToPublishSparks} Sparks per Creator`
             )
          }
       }
@@ -121,7 +117,7 @@ export const validateGroupSparks = async (group: Group) => {
       }
 
       functions.logger.log(
-         `After validation, the group ${groupId} has less than ${SPARK_CONSTANTS.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} Creators`
+         `After validation, the group ${groupId} has less than ${minSparksPerCreatorToPublishSparks} Creators`
       )
    } catch (error) {
       return functions.logger.error("Error during Spark validation", { error })
