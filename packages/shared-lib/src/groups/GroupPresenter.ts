@@ -40,6 +40,7 @@ export const LOGO_IMAGE_SPECS = {
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
    public hasLivestream: boolean
+   private planConstants: PlanConstants
 
    constructor(
       public readonly id: string,
@@ -343,6 +344,17 @@ export class GroupPresenter {
    getCompanyBannerUrl() {
       return this.banner ? this.banner.url : this.bannerImageUrl
    }
+}
+
+const createPlanObject = (plan: GroupPlan | null) => {
+   if (plan) {
+      return {
+         type: plan.type,
+         expiresAt: toDate(plan.expiresAt),
+         startedAt: toDate(plan.startedAt),
+      }
+   }
+   return null
 }
 
 const createPlanObject = (plan: GroupPlan | null) => {
