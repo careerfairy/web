@@ -3,7 +3,7 @@ import {
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import BigQueryCreateInsertService from "../BigQueryCreateInsertService"
-import bigQueryClient from "src/api/bigQueryClient"
+import bigQueryClient from "../../../api/bigQueryClient"
 import sparkEvents from "./schema-views/sparkEvents.json"
 import sparkSecondsWatched from "./schema-views/sparkSecondsWatched.json"
 
