@@ -6,6 +6,7 @@ import {
    IconButton,
    Stack,
    StackProps,
+   Theme,
    Typography,
    TypographyProps,
    useTheme,
@@ -29,6 +30,7 @@ import { sxStyles } from "types/commonTypes"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
+import { SxProps } from "@mui/material/styles"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -49,6 +51,8 @@ const styles = sxStyles({
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: 770,
+      overflowY: "auto",
+      top: { xs: "70px", md: 0 },
    },
    content: {
       p: 0,
@@ -88,28 +92,11 @@ const styles = sxStyles({
       px: { xs: 3, md: 6 },
       position: "relative",
       height: {
-         xs: "100dvh",
+         xs: "90dvh",
          [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
-      },
-      justifyContent: {
-         xs: "flex-start",
-         [mobileBreakpoint]: "center",
-      },
-      display: {
-         [mobileBreakpoint]: "grid",
-      },
-      placeItems: {
-         [mobileBreakpoint]: "center",
       },
    },
    container: {
-      width: {
-         xs: "100%",
-         [mobileBreakpoint]: "100%",
-      },
-      height: "100%",
-      display: "grid",
-      flexDirection: "column",
       px: "unset !important",
    },
    closeBtn: {
@@ -303,7 +290,11 @@ const SteppedDialog = <K extends string>({
          open={open}
          onClose={handleClose}
          TransitionComponent={
-            isMobile ? SlideLeftTransition : SlideUpTransition
+            isMobile
+               ? steps === 1
+                  ? SlideUpTransition
+                  : SlideLeftTransition
+               : SlideUpTransition
          }
          maxWidth="md"
          fullWidth
@@ -365,6 +356,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 type SteppedDialogContainerProps = BoxProps & {
    width?: string | number
    hideCloseButton?: boolean
+   containerSx?: SxProps<Theme>
 }
 
 const Container: FC<SteppedDialogContainerProps> = ({
@@ -372,6 +364,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    sx,
    hideCloseButton,
    children,
+   containerSx,
 }) => {
    const stepper = useStepper()
 
@@ -387,6 +380,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
                        },
                     }
                   : null,
+               ...(Array.isArray(containerSx) ? containerSx : [containerSx]),
             ]}
             maxWidth="md"
          >
