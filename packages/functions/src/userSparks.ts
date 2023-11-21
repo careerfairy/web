@@ -115,6 +115,7 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
             utm_campaign: string().nullable(),
             utm_term: string().nullable(),
             utm_content: string().nullable(),
+            groupId: string().nullable(),
             actionType: mixed()
                .oneOf(Object.values(SparkEventActions))
                .required(),
