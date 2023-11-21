@@ -124,5 +124,11 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "Level of study of the user at the time of the event"
+   },
+   {
+      "name": "groupId",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Group ID for spark ownership"
    }
 ]
