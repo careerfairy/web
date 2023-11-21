@@ -193,6 +193,7 @@ export default function MyDocument(props: DocumentProps) {
                  */}
             <script dangerouslySetInnerHTML={dataLayerObj}></script>
             {/* Inject MUI styles first to match with the prepend: true configuration. */}
+            <meta name="emotion-insertion-point" content="" />
             {props.emotionStyleTags}
          </Head>
          <body>

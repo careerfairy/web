@@ -166,6 +166,23 @@ export class CommonPage {
          .getByRole("option", { name: stringToSelect, exact: true })
          .click()
    }
+
+   /**
+    * Hides the warning element with the class 'firebase-emulator-warning' on the page.
+    * This is useful in test environments where this warning element may obstruct other elements,
+    * preventing interactions with them.
+    */
+   public async hideEmulatorWarning() {
+      await this.page.evaluate(() => {
+         const warning = document.querySelector(
+            ".firebase-emulator-warning"
+         ) as HTMLElement
+
+         if (warning) {
+            warning.style.display = "none"
+         }
+      })
+   }
 }
 
 /**
