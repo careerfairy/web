@@ -108,6 +108,7 @@ const csp = {
       "https://noembed.com", // for react-player thumbnail
       "blob:",
       "https://cdn.dreamdata.cloud",
+      "https://px.ads.linkedin.com",
    ],
    "img-src": [
       "'self'",
@@ -149,6 +150,8 @@ if (notProduction) {
    csp["connect-src"].push("127.0.0.1:*")
    csp["img-src"].push("localhost:*")
    csp["img-src"].push("127.0.0.1:*")
+   csp["media-src"].push("localhost:*")
+   csp["media-src"].push("127.0.0.1:*")
 }
 
 if (isVercelPreview) {
