@@ -2,7 +2,7 @@ import SteppedDialog, {
    useStepper,
 } from "../../../stepped-dialog/SteppedDialog"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { AlertTriangle } from "react-feather"
 import Stack from "@mui/material/Stack"
@@ -51,12 +51,6 @@ const PrivacyPolicyDialog = () => {
    const handleClose = () => {
       setIsOpen(false)
    }
-
-   useEffect(() => {
-      if (!isOpen) {
-         setTimeout(() => setIsOpen(true), 2000)
-      }
-   }, [isOpen])
 
    if (privacyPolicyActive) {
       return null
