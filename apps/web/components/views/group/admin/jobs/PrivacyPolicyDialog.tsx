@@ -14,13 +14,17 @@ import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
 import * as Yup from "yup"
 
 const styles = sxStyles({
-   content: {
+   container: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       height: "100%",
       width: "100%",
       px: 2,
+   },
+   content: {
+      mt: { xs: "20px", md: "100px" },
+      minHeight: "500px",
    },
    info: {
       display: "flex",
@@ -101,16 +105,16 @@ const Content = () => {
       [group.id, errorNotification, successNotification]
    )
    return (
-      <SteppedDialog.Container>
-         <Formik<FormValues>
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-            validationSchema={validationSchema}
-            enableReinitialize
-         >
-            {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+      <Formik<FormValues>
+         initialValues={initialValues}
+         onSubmit={handleSubmit}
+         validationSchema={validationSchema}
+         enableReinitialize
+      >
+         {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+            <SteppedDialog.Container containerSx={styles.content}>
                <>
-                  <SteppedDialog.Content sx={styles.content}>
+                  <SteppedDialog.Content sx={styles.container}>
                      <Stack spacing={3} sx={styles.info}>
                         <AlertTriangle color={"#FE9B0E"} size={68} />
 
@@ -163,9 +167,9 @@ const Content = () => {
                      </SteppedDialog.Button>
                   </SteppedDialog.Actions>
                </>
-            )}
-         </Formik>
-      </SteppedDialog.Container>
+            </SteppedDialog.Container>
+         )}
+      </Formik>
    )
 }
 
