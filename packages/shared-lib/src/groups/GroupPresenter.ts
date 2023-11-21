@@ -40,7 +40,6 @@ export const LOGO_IMAGE_SPECS = {
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
    public hasLivestream: boolean
-   private planConstants: PlanConstants
 
    constructor(
       public readonly id: string,
@@ -61,14 +60,13 @@ export class GroupPresenter {
       public readonly publicSparks: boolean,
       public readonly logo: ImageType,
       public readonly banner: ImageType,
+      public readonly planConstants: PlanConstants,
       public readonly plan: {
          type: GroupPlan["type"]
          expiresAt: Date | null
          startedAt: Date | null
       } | null
-   ) {
-      this.assignPlanConstants()
-   }
+   ) {}
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
       this.atsAccounts = accounts
@@ -98,13 +96,8 @@ export class GroupPresenter {
          group.publicSparks || false,
          group.logo || null,
          group.banner || null,
-         group.plan
-            ? {
-                 type: group.plan.type,
-                 expiresAt: toDate(group.plan.expiresAt),
-                 startedAt: toDate(group.plan.startedAt),
-              }
-            : null
+         getPlanConstants(group.plan?.type),
+         createPlanObject(group.plan)
       )
    }
 
@@ -349,8 +342,15 @@ export class GroupPresenter {
    getCompanyBannerUrl() {
       return this.banner ? this.banner.url : this.bannerImageUrl
    }
+}
 
-   private assignPlanConstants() {
-      this.planConstants = getPlanConstants(this.plan?.type)
+const createPlanObject = (plan: GroupPlan | null) => {
+   if (plan) {
+      return {
+         type: plan.type,
+         expiresAt: toDate(plan.expiresAt),
+         startedAt: toDate(plan.startedAt),
+      }
    }
+   return null
 }
