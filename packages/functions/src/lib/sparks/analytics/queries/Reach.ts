@@ -1,21 +1,21 @@
 export const totalViewsPastYear = `
   SELECT 
-    TIMESTAMP_TRUNC(timestamp, DAY) as date,
-    count(sparkId) as total_views
+    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
-  WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 YEAR)
+  WHERE timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR))
     AND actionType = "Played_Spark"
-  GROUP BY date
-  ORDER BY date
+  GROUP BY x
+  ORDER BY x
 `
 
 export const uniqueViewersPastYear = `
-SELECT 
-  TIMESTAMP_TRUNC(timestamp, DAY) as date,
-	count(distinct(ifNull(userId, visitorId))) as unique_viewers
-FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
-WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 YEAR)
-  AND actionType = "Played_Spark"
-GROUP BY date
-ORDER BY date
+  SELECT 
+    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    COUNT(distinct(ifNull(userId, visitorId))) AS y
+  FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+  WHERE timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR))
+    AND actionType = "Played_Spark"
+  GROUP BY x
+  ORDER BY x
 `
