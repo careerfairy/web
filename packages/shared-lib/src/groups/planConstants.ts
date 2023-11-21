@@ -9,8 +9,8 @@ export interface PlanConstants {
    MAX_PUBLIC_SPARKS: number
    /** The maximum number of creators for a specific group. */
    MAX_SPARK_CREATOR_COUNT: number
-   /** The duration of the plan in days. */
-   PLAN_DURATION_DAYS: number
+   /** The duration of the plan in milliseconds. */
+   PLAN_DURATION_MILLISECONDS: number
 }
 
 const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
@@ -19,14 +19,14 @@ const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
       MAX_PUBLIC_SPARKS: 6,
       MAX_SPARK_CREATOR_COUNT: 1,
-      PLAN_DURATION_DAYS: 75, // 2.5 months
+      PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 75, // 2.5 months
    },
    sparks: {
       MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 3,
       MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
       MAX_PUBLIC_SPARKS: 15,
       MAX_SPARK_CREATOR_COUNT: 100, // No limit
-      PLAN_DURATION_DAYS: 365, // 1 year
+      PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
    },
 }
 

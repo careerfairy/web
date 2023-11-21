@@ -6,6 +6,8 @@ import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
+   GroupPlan,
+   GroupPlanType,
    GroupQuestion,
 } from "@careerfairy/shared-lib/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
@@ -27,9 +29,10 @@ import type { FunctionsLogger } from "../util"
 
 import DocumentSnapshot = firestore.DocumentSnapshot
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { auth } from "../api/firestoreAdmin"
+import { auth, Timestamp } from "../api/firestoreAdmin"
 import { UserRecord } from "firebase-admin/auth"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -113,6 +116,28 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    syncLivestreamIdWithCustomJobs(
       livestream: Change<DocumentSnapshot>
    ): Promise<void>
+
+   /**
+    * Starts a plan for a group.
+    *
+    * This method sets the 'plan' field of the group document to the specified plan type and sets the 'startedAt' field to the current time.
+    * The 'expiresAt' field is set to the current time plus the duration of the plan.
+    *
+    * @param groupId - The ID of the group for which the plan is to be started.
+    * @param planType - The type of the plan to be started.
+    * @returns A promise that resolves when the plan has been successfully started.
+    */
+   startPlan(groupId: string, plan: GroupPlanType): Promise<void>
+
+   /**
+    * Stops a plan for a group.
+    *
+    * This method sets the 'expiresAt' field of the group's plan to the current time, effectively making the plan expired immediately.
+    *
+    * @param groupId - The ID of the group for which the plan is to be stopped.
+    * @returns A promise that resolves when the plan has been successfully stopped.
+    */
+   stopPlan(groupId: string): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -554,6 +579,34 @@ export class GroupFunctionsRepository
       })
 
       return await batch.commit()
+   }
+
+   async startPlan(groupId: string, planType: GroupPlanType): Promise<void> {
+      const groupRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(groupId)
+
+      const now = Timestamp.now()
+
+      const expiresAt = Timestamp.fromMillis(
+         now.toMillis() + getPlanConstants(planType).PLAN_DURATION_MILLISECONDS
+      )
+
+      const plan: GroupPlan = {
+         type: planType,
+         startedAt: now,
+         expiresAt,
+      }
+
+      return groupRef.update({ plan })
+   }
+
+   async stopPlan(groupId: string): Promise<void> {
+      const groupRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(groupId)
+
+      return groupRef.update({ "plan.expiresAt": Timestamp.now() })
    }
 }
 
