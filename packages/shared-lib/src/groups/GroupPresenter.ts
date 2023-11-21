@@ -11,7 +11,8 @@ import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
-import { getPlanConstants } from "./planConstants"
+import { PlanConstants, getPlanConstants } from "./planConstants"
+import { toDate } from "../firebaseTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
@@ -39,6 +40,7 @@ export const LOGO_IMAGE_SPECS = {
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
    public hasLivestream: boolean
+   private planConstants: PlanConstants
 
    constructor(
       public readonly id: string,
@@ -59,8 +61,14 @@ export class GroupPresenter {
       public readonly publicSparks: boolean,
       public readonly logo: ImageType,
       public readonly banner: ImageType,
-      public readonly plan: GroupPlan
-   ) {}
+      public readonly plan: {
+         type: GroupPlan["type"]
+         expiresAt: Date | null
+         startedAt: Date | null
+      } | null
+   ) {
+      this.assignPlanConstants()
+   }
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
       this.atsAccounts = accounts
@@ -86,12 +94,17 @@ export class GroupPresenter {
          group.publicProfile || false,
          group.universityName || null,
          group.universityCode || null,
-         group.maxPublicSparks ||
-            getPlanConstants(group.plan?.type).MAX_PUBLIC_SPARKS,
+         group.maxPublicSparks || null,
          group.publicSparks || false,
          group.logo || null,
          group.banner || null,
-         group.plan || null
+         group.plan
+            ? {
+                 type: group.plan.type,
+                 expiresAt: toDate(group.plan.expiresAt),
+                 startedAt: toDate(group.plan.startedAt),
+              }
+            : null
       )
    }
 
@@ -266,10 +279,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxPublicSparks() {
-      return (
-         this.maxPublicSparks ||
-         getPlanConstants(this.plan?.type).MAX_PUBLIC_SPARKS
-      )
+      return this.maxPublicSparks || this.planConstants.MAX_PUBLIC_SPARKS
    }
 
    /**
@@ -277,8 +287,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMinimumCreatorsToPublishSparks() {
-      return getPlanConstants(this.plan?.type)
-         .MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+      return this.planConstants.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
    }
 
    /**
@@ -286,8 +295,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMinimumSparksPerCreatorToPublishSparks() {
-      return getPlanConstants(this.plan?.type)
-         .MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+      return this.planConstants.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
    }
 
    /**
@@ -295,7 +303,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxSparkCreatorCount() {
-      return getPlanConstants(this.plan?.type).MAX_SPARK_CREATOR_COUNT
+      return this.planConstants.MAX_SPARK_CREATOR_COUNT
    }
 
    getCompanyLogoUrl() {
@@ -304,5 +312,9 @@ export class GroupPresenter {
 
    getCompanyBannerUrl() {
       return this.banner ? this.banner.url : this.bannerImageUrl
+   }
+
+   private assignPlanConstants() {
+      this.planConstants = getPlanConstants(this.plan?.type)
    }
 }
