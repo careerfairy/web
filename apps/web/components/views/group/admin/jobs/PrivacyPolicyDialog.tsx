@@ -103,13 +103,13 @@ const Content = () => {
                privacyPolicyActive: Boolean(values.privacyPolicyUrl),
                privacyPolicyUrl: values.privacyPolicyUrl,
             }
-            await groupRepo.updateGroupMetadata(group.id, privacyPolicy)
+            await groupRepo.updateGroupMetadata(group.groupId, privacyPolicy)
             successNotification("Privacy policy successfull updated")
          } catch (error) {
             errorNotification(error, "An error has occured")
          }
       },
-      [group.id, errorNotification, successNotification]
+      [group.groupId, successNotification, errorNotification]
    )
    return (
       <Formik<FormValues>
@@ -194,7 +194,7 @@ type FormValues = {
 
 const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
    privacyPolicyActive: Yup.boolean(),
-   privacyPolicyUrl: Yup.string().url("Invalid URL").required(),
+   privacyPolicyUrl: Yup.string().url("Invalid URL").required("Required field"),
 })
 
 export default PrivacyPolicyDialog
