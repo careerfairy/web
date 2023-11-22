@@ -20,6 +20,11 @@ import {
 import { jobsPrivacyPolicyDialogOpenSelector } from "../../../../../store/selectors/adminJobsSelectors"
 
 const styles = sxStyles({
+   wrapContainer: {
+      height: {
+         md: "100%",
+      },
+   },
    container: {
       display: "flex",
       flexDirection: "column",
@@ -61,6 +66,7 @@ const PrivacyPolicyDialog = () => {
          dispatch(openPrivacyPolicyDialog())
       }
    }, [])
+
    const handleClose = () => {
       dispatch(closePrivacyPolicyDialog())
    }
@@ -119,7 +125,10 @@ const Content = () => {
          enableReinitialize
       >
          {({ dirty, handleSubmit, isSubmitting, isValid }) => (
-            <SteppedDialog.Container containerSx={styles.content}>
+            <SteppedDialog.Container
+               containerSx={styles.content}
+               sx={styles.wrapContainer}
+            >
                <>
                   <SteppedDialog.Content sx={styles.container}>
                      <Stack spacing={3} sx={styles.info}>
