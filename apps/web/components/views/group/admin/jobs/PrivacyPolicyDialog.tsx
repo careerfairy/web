@@ -2,7 +2,7 @@ import SteppedDialog, {
    useStepper,
 } from "../../../stepped-dialog/SteppedDialog"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { AlertTriangle } from "react-feather"
 import Stack from "@mui/material/Stack"
@@ -12,6 +12,12 @@ import { groupRepo } from "../../../../../data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
 import * as Yup from "yup"
+import { useDispatch, useSelector } from "react-redux"
+import {
+   closePrivacyPolicyDialog,
+   openPrivacyPolicyDialog,
+} from "../../../../../store/reducers/adminJobsReducer"
+import { jobsPrivacyPolicyDialogOpenSelector } from "../../../../../store/selectors/adminJobsSelectors"
 
 const styles = sxStyles({
    container: {
@@ -42,14 +48,21 @@ const styles = sxStyles({
 })
 
 const PrivacyPolicyDialog = () => {
+   const dispatch = useDispatch()
    const { group } = useGroupFromState()
    const privacyPolicyActive = useMemo(
       () => Boolean(group.privacyPolicyActive),
       [group.privacyPolicyActive]
    )
-   const [isOpen, setIsOpen] = useState(!privacyPolicyActive)
+   const isOpen = useSelector(jobsPrivacyPolicyDialogOpenSelector)
+
+   useEffect(() => {
+      if (!privacyPolicyActive) {
+         dispatch(openPrivacyPolicyDialog())
+      }
+   }, [])
    const handleClose = () => {
-      setIsOpen(false)
+      dispatch(closePrivacyPolicyDialog())
    }
 
    if (privacyPolicyActive) {
