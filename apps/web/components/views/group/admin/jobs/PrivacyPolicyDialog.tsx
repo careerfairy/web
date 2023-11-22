@@ -34,7 +34,7 @@ const styles = sxStyles({
       px: 2,
    },
    content: {
-      mt: { xs: "20px", md: "100px" },
+      mt: { xs: 1, md: "100px" },
       minHeight: "500px",
    },
    info: {
