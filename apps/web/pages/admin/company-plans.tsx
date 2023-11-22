@@ -1,11 +1,10 @@
-import React from "react"
+import CompanyPlansOverview from "components/views/admin/company-plans"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
-import QueryUsersOverview from "../../components/views/admin/query-users"
 
 const CompanyPlansPage = () => {
    return (
       <AdminDashboardLayout>
-         <QueryUsersOverview />
+         <CompanyPlansOverview />
       </AdminDashboardLayout>
    )
 }
