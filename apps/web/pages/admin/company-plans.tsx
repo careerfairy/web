@@ -2,7 +2,7 @@ import React from "react"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
 import QueryUsersOverview from "../../components/views/admin/query-users"
 
-const QueryDataPage = () => {
+const CompanyPlansPage = () => {
    return (
       <AdminDashboardLayout>
          <QueryUsersOverview />
@@ -10,4 +10,4 @@ const QueryDataPage = () => {
    )
 }
 
-export default QueryDataPage
+export default CompanyPlansPage
