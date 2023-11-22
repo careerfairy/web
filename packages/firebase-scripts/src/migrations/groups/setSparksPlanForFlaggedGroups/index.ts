@@ -73,12 +73,13 @@ const setSparksPlanForFlaggedGroups = async (
 
       const expiryTimestamp = Timestamp.fromMillis(
          nowTimeStamp.toMillis() +
-            PLAN_CONSTANTS.sparks.PLAN_DURATION_MILLISECONDS
+            PLAN_CONSTANTS[GroupPlanTypes.Tier1].sparks
+               .PLAN_DURATION_MILLISECONDS
       )
 
       const toUpdate: Pick<Group, "plan"> = {
          plan: {
-            type: GroupPlanTypes.Sparks,
+            type: GroupPlanTypes.Tier1,
             startedAt: nowTimeStamp,
             expiresAt: expiryTimestamp,
          },
