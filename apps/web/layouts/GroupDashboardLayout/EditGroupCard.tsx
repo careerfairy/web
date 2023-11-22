@@ -41,7 +41,7 @@ const styles = sxStyles({
 const EditGroupCard = () => {
    const { group, shrunkLeftMenuState } = useGroup()
 
-   // fix for CF-672
+   // fix for CF-673
    const companyName =
       group?.universityName.length > 14
          ? group?.universityName.substring(0, 15)
