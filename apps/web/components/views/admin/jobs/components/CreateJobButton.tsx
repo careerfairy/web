@@ -2,8 +2,12 @@ import { Button, ButtonProps } from "@mui/material"
 import { FC, useCallback } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { useDispatch } from "react-redux"
-import { openJobsDialog } from "../../../../../store/reducers/adminJobsReducer"
+import {
+   openJobFormDialog,
+   openPrivacyPolicyDialog,
+} from "../../../../../store/reducers/adminJobsReducer"
 import { PlusCircle } from "react-feather"
+import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 
 const styles = sxStyles({
    root: {
@@ -13,10 +17,15 @@ const styles = sxStyles({
 
 const CreateJobButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
    const dispatch = useDispatch()
+   const { group } = useGroupFromState()
 
    const handleCreateJob = useCallback(() => {
-      dispatch(openJobsDialog())
-   }, [dispatch])
+      if (group.privacyPolicyActive) {
+         dispatch(openJobFormDialog())
+      } else {
+         dispatch(openPrivacyPolicyDialog())
+      }
+   }, [dispatch, group.privacyPolicyActive])
 
    return (
       <Button
