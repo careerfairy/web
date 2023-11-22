@@ -14,7 +14,7 @@ const Jobs = ({ groupId }) => (
    >
       <DashboardHead title="CareerFairy | Jobs" />
       <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
-         <JobsContent groupId={groupId} />
+         <JobsContent />
          <PrivacyPolicyDialog />
       </SuspenseWithBoundary>
    </GroupDashboardLayout>
