@@ -336,42 +336,6 @@ export class GroupPresenter {
       return this.plan?.startedAt?.getTime() || 0
    }
 
-   /**
-    * To get the duration of the plan for this specific group
-    * The duration is calculated from the plan's start and end dates
-    */
-   getPlanTimeLeft() {
-      return this.getExpiresAt() - this.getStartedAt()
-   }
-
-   /**
-    * To check if the plan for this specific group has expired
-    * The check is done by comparing the current time with the plan's expiry time
-    */
-   hasPlanExpired() {
-      const currentTime = new Date().getTime()
-      return currentTime > this.getExpiresAt()
-   }
-
-   /**
-    * To check if the plan for this specific group has started
-    * The check is done by comparing the current time with the plan's start time
-    *
-    * @returns true if the plan has started, false otherwise
-    */
-   hasPlanStarted() {
-      const currentTime = new Date().getTime()
-      return currentTime > this.getStartedAt()
-   }
-
-   getExpiresAt() {
-      return this.plan?.expiresAt?.getTime() || 0
-   }
-
-   getStartedAt() {
-      return this.plan?.startedAt?.getTime() || 0
-   }
-
    getCompanyLogoUrl() {
       return this.logo ? this.logo.url : this.logoUrl
    }
