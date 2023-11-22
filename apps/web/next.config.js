@@ -147,6 +147,7 @@ const csp = {
       "*.amazonaws.com",
       "careerfairy-e1fd9.firebaseapp.com",
       "*.youtube.com",
+      "*.googleapis.com",
    ],
 }
 
