@@ -1,9 +1,11 @@
 import { useTheme } from "@mui/material/styles"
-import { Box, Typography } from "@mui/material"
+import { useDispatch } from "react-redux"
+import { useCallback } from "react"
+import { openPrivacyPolicyDialog } from "../../../../../store/reducers/adminJobsReducer"
+import { Box, Button, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import { Briefcase } from "react-feather"
+import { Briefcase, PlusCircle } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
-import CreateJobButton from "../components/CreateJobButton"
 
 const styles = sxStyles({
    wrap: {
@@ -30,6 +32,11 @@ const styles = sxStyles({
 
 const EmptyJobsView = () => {
    const theme = useTheme()
+   const dispatch = useDispatch()
+
+   const handleCreteNewJobClick = useCallback(() => {
+      dispatch(openPrivacyPolicyDialog())
+   }, [dispatch])
 
    return (
       <Box sx={styles.wrap}>
@@ -43,7 +50,15 @@ const EmptyJobsView = () => {
                Ready to kickstart your hiring journey? Create your first job
                posting and promote it to your talent community.
             </Typography>
-            <CreateJobButton />
+            <Button
+               variant="contained"
+               color="secondary"
+               startIcon={<PlusCircle />}
+               onClick={handleCreteNewJobClick}
+               sx={styles.btn}
+            >
+               Create new job
+            </Button>
          </Stack>
       </Box>
    )
