@@ -66,6 +66,17 @@ const GroupNavList = () => {
             Icon: HomeIcon,
             title: "Main page",
          },
+         ...(hasAccessToSparks
+            ? [
+                 {
+                    id: "sparks",
+                    href: `/${baseHrefPath}/${group.id}/admin/sparks`,
+                    pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
+                    Icon: SparksIcon,
+                    title: "Sparks",
+                 },
+              ]
+            : []),
          {
             id: "live-streams",
             title: "Live streams",
@@ -82,17 +93,6 @@ const GroupNavList = () => {
                },
             ],
          },
-         ...(hasAccessToSparks
-            ? [
-                 {
-                    id: "sparks",
-                    href: `/${baseHrefPath}/${group.id}/admin/sparks`,
-                    pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
-                    Icon: SparksIcon,
-                    title: "Sparks",
-                 },
-              ]
-            : []),
          ...(hasAtsIntegration
             ? []
             : [
