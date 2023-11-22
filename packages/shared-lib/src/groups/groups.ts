@@ -78,8 +78,14 @@ export interface Group extends Identifiable {
 }
 
 export const GroupPlanTypes = {
+   /**
+    * The group is on the trial plan
+    */
    Trial: "trial",
-   Sparks: "sparks",
+   /**
+    * The group is on the base plan that includes the regular spark features
+    */
+   Tier1: "tier1",
 } as const
 
 export type GroupPlanType = (typeof GroupPlanTypes)[keyof typeof GroupPlanTypes]

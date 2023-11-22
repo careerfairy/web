@@ -272,7 +272,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxPublicSparks() {
-      return this.maxPublicSparks || this.planConstants.MAX_PUBLIC_SPARKS
+      return this.maxPublicSparks || this.planConstants.sparks.MAX_PUBLIC_SPARKS
    }
 
    /**
@@ -280,7 +280,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMinimumCreatorsToPublishSparks() {
-      return this.planConstants.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+      return this.planConstants.sparks.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
    }
 
    /**
@@ -288,7 +288,8 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMinimumSparksPerCreatorToPublishSparks() {
-      return this.planConstants.MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+      return this.planConstants.sparks
+         .MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
    }
 
    /**
@@ -296,7 +297,7 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxSparkCreatorCount() {
-      return this.planConstants.MAX_SPARK_CREATOR_COUNT
+      return this.planConstants.sparks.MAX_SPARK_CREATOR_COUNT
    }
 
    /**

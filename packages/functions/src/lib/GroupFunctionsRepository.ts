@@ -589,7 +589,8 @@ export class GroupFunctionsRepository
       const now = Timestamp.now()
 
       const expiresAt = Timestamp.fromMillis(
-         now.toMillis() + getPlanConstants(planType).PLAN_DURATION_MILLISECONDS
+         now.toMillis() +
+            getPlanConstants(planType).sparks.PLAN_DURATION_MILLISECONDS
       )
 
       const plan: GroupPlan = {
