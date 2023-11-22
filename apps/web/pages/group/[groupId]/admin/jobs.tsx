@@ -9,7 +9,7 @@ const Jobs = ({ groupId }) => (
    <GroupDashboardLayout titleComponent={"Jobs"} groupId={groupId as string}>
       <DashboardHead title="CareerFairy | Jobs" />
       <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
-         <JobsContent />
+         <JobsContent groupId={groupId} />
          <PrivacyPolicyDialog />
       </SuspenseWithBoundary>
    </GroupDashboardLayout>
