@@ -44,9 +44,7 @@ const styles = sxStyles({
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
-      borderRadius: {
-         md: 5,
-      },
+      borderRadius: 5,
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
