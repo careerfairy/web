@@ -24,7 +24,7 @@ export type PlanConstants = {
    jobs: JobsPlanConstants
 }
 
-const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
+export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    trial: {
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
