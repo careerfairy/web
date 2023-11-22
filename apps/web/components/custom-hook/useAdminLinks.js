@@ -8,6 +8,7 @@ import {
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import DomainIcon from "@mui/icons-material/Domain"
 
 const initialHeaderLinks = [
    {
@@ -99,6 +100,12 @@ const useAdminLinks = () => {
                icon: CalendarIcon,
                title: "Academic Calendar",
                basePath: `/admin/academic-calendar-manager`,
+            },
+            {
+               href: `/admin/company-plans`,
+               icon: DomainIcon,
+               title: "Company Plans",
+               basePath: `/admin/company-plans`,
             },
          ])
       } else {
