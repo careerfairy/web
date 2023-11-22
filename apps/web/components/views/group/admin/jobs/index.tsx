@@ -3,11 +3,12 @@ import useGroupCustomJobs from "../../../../custom-hook/useGroupCustomJobs"
 import JobList from "./JobList"
 import { Briefcase, PlusCircle } from "react-feather"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { FC, useCallback } from "react"
+import { useCallback } from "react"
 import Stack from "@mui/material/Stack"
 import { openPrivacyPolicyDialog } from "../../../../../store/reducers/adminJobsReducer"
 import { useDispatch } from "react-redux"
 import { useTheme } from "@mui/material/styles"
+import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 
 const styles = sxStyles({
    wrap: {
@@ -32,11 +33,9 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   groupId: string
-}
-const JobsContent: FC<Props> = ({ groupId }) => {
-   const allJobs = useGroupCustomJobs(groupId)
+const JobsContent = () => {
+   const { group } = useGroupFromState()
+   const allJobs = useGroupCustomJobs(group.groupId)
 
    return allJobs.length > 0 ? <JobList /> : <NoJobs />
 }
