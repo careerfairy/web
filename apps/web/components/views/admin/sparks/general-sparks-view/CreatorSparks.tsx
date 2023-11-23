@@ -28,7 +28,7 @@ const CreatorSparks: FC<Props> = ({ creator }) => {
 const Component: FC<Props> = ({ creator }) => {
    const showHiddenSparks = useSelector(sparksShowHiddenSparks)
 
-   const { data: sparks } = useCreatorSparks(creator.id, showHiddenSparks)
+   const { data: sparks } = useCreatorSparks(creator, showHiddenSparks)
 
    const dispatch = useDispatch()
 

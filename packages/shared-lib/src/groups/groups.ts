@@ -64,12 +64,39 @@ export interface Group extends Identifiable {
     */
    triGrams: Record<string, true>
 
-   /*
+   /**
+    * Group plan properties
+    * */
+   plan?: GroupPlan
+
+   /**
     * Deprecated
     * */
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+}
+
+export const GroupPlanTypes = {
+   /**
+    * The group is on the trial plan
+    */
+   Trial: "trial",
+   /**
+    * The group is on the base plan that includes the regular spark features
+    */
+   Tier1: "tier1",
+} as const
+
+export type GroupPlanType = (typeof GroupPlanTypes)[keyof typeof GroupPlanTypes]
+
+export type GroupPlan = {
+   // The type of the group plan.
+   type: GroupPlanType
+   // The timestamp when the group plan started, or null if the group plan has not started yet.
+   startedAt: firebase.firestore.Timestamp | null
+   // The timestamp when the group plan expires, or null if the group plan does not expire. Can be overwritten by CF admin.
+   expiresAt: firebase.firestore.Timestamp | null
 }
 
 export type GroupTargetUniversity = GroupOption & {
