@@ -5,6 +5,7 @@ import { SkeletonAdminPage } from "../../../../components/util/Skeletons"
 import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
 import PrivacyPolicyDialog from "../../../../components/views/group/admin/jobs/PrivacyPolicyDialog"
 import CreateJobButton from "../../../../components/views/admin/jobs/components/CreateJobButton"
+import JobFormDialog from "../../../../components/views/group/admin/jobs/JobFormDialog"
 
 const Jobs = ({ groupId }) => (
    <GroupDashboardLayout
@@ -16,6 +17,7 @@ const Jobs = ({ groupId }) => (
       <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
          <JobsContent />
          <PrivacyPolicyDialog />
+         <JobFormDialog />
       </SuspenseWithBoundary>
    </GroupDashboardLayout>
 )

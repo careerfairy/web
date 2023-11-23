@@ -133,6 +133,10 @@ const styles = sxStyles({
          color: "#BBBBBB",
       },
    },
+   actionsContainer: {
+      display: "flex",
+      height: "90px",
+   },
 })
 
 /**
@@ -339,13 +343,13 @@ const Title: FC<TypographyProps<"h1">> = ({ sx, ...props }) => {
    )
 }
 
-const Subtitle: FC<TypographyProps<"h2">> = (props) => {
+const Subtitle: FC<TypographyProps<"h2">> = ({ sx, ...props }) => {
    return (
       <Typography
          color={"#1F1F29"}
          component="h2"
          maxWidth={385}
-         sx={styles.subtitle}
+         sx={[styles.subtitle, ...(Array.isArray(sx) ? sx : [sx])]}
          {...props}
       />
    )
@@ -354,6 +358,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 type SteppedDialogContainerProps = BoxProps & {
    width?: string | number
    hideCloseButton?: boolean
+   withActions?: boolean
    containerSx?: SxProps<Theme>
 }
 
@@ -363,6 +368,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    hideCloseButton,
    children,
    containerSx,
+   withActions,
 }) => {
    const stepper = useStepper()
 
@@ -391,6 +397,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
                </Box>
             )}
          </MuiContainer>
+         {withActions ? <Box sx={styles.actionsContainer} /> : null}
       </Box>
    )
 }
