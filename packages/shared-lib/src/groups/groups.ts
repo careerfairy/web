@@ -77,16 +77,6 @@ export interface Group extends Identifiable {
    adminEmail?: string // deprecated
 }
 
-/**
- * This interface is essential for server-side timestamp serialization.
- * It helps in avoiding errors when passing these timestamps to the client.
- */
-export interface SerializedGroup extends Omit<Group, "plan"> {
-   planType: GroupPlanType | null
-   planStartedAtString: string | null
-   planExpiresAtString: string | null
-}
-
 export const GroupPlanTypes = {
    /**
     * The group is on the trial plan
