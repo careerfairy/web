@@ -41,11 +41,7 @@ const styles = sxStyles({
 const EditGroupCard = () => {
    const { group, shrunkLeftMenuState } = useGroup()
 
-   // fix for CF-673
-   const companyName =
-      group?.universityName.length > 14
-         ? group?.universityName.substring(0, 15)
-         : group?.universityName
+   const companyName = group?.universityName
 
    return (
       <Box
@@ -73,7 +69,12 @@ const EditGroupCard = () => {
                {"Dashboard"}
             </Typography>
             <Typography sx={styles.maxOneLine} fontWeight={500} color="black">
-               {companyName}
+               {
+                  // fix for CF-673
+                  companyName.length > 14
+                     ? companyName.substring(0, 15)
+                     : companyName
+               }
             </Typography>
          </Box>
       </Box>
