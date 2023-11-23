@@ -7,6 +7,7 @@ import {
    Grid,
    Grow,
    InputAdornment,
+   InputProps,
    TextField,
 } from "@mui/material"
 import useGroupSearch from "components/custom-hook/group/useGroupSearch"
@@ -83,14 +84,7 @@ const Search = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onBlur={() => setBlured(true)}
-            InputProps={{
-               startAdornment: (
-                  <InputAdornment position="start">
-                     <FindIcon color={"black"} />
-                  </InputAdornment>
-               ),
-               autoComplete: "organization",
-            }}
+            InputProps={inputProps}
          />
          <Grow in={blured ? inputValue.length < 3 : null}>
             <FormHelperText sx={styles.helperText}>
@@ -114,6 +108,15 @@ const Search = () => {
          </Container>
       </>
    )
+}
+
+const inputProps: Partial<InputProps> = {
+   startAdornment: (
+      <InputAdornment position="start">
+         <FindIcon color={"black"} />
+      </InputAdornment>
+   ),
+   autoComplete: "organization",
 }
 
 export default Search
