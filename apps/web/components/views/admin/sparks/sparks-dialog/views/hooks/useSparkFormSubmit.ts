@@ -1,6 +1,8 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
@@ -39,6 +41,8 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const [formSubmitting, setFormSubmitting] = useState(false)
+
+   const { trackEvent } = useSparksFeedTracker()
 
    const dispatch = useDispatch()
 
@@ -83,6 +87,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                   groupId,
                   creatorId: values.creator.id,
                })
+               trackEvent(SparkEventActions.Create)
             }
 
             setSubmitting(false)
