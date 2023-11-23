@@ -42,6 +42,7 @@ const EditGroupCard = () => {
    const { group, shrunkLeftMenuState } = useGroup()
 
    const companyName = group?.universityName
+   const numberOfCharsThatDontBreakUI = 14
 
    return (
       <Box
@@ -71,7 +72,7 @@ const EditGroupCard = () => {
             <Typography sx={styles.maxOneLine} fontWeight={500} color="black">
                {
                   // fix for CF-673
-                  companyName.length > 14
+                  companyName.length > numberOfCharsThatDontBreakUI
                      ? companyName.substring(0, 15)
                      : companyName
                }
