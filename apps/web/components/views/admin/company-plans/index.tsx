@@ -1,17 +1,27 @@
-import { Box, Container } from "@mui/material"
-import React from "react"
+import { Container } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import Search from "./Search"
 import Title from "./Title"
+import { Box } from "@mui/material"
 
 const styles = sxStyles({
-   root: {},
+   root: {
+      overflow: "auto",
+      height: {
+         xs: "calc(100vh - 56px)",
+         sm: "calc(100vh - 64px)",
+      },
+   },
 })
 
 const CompanyPlansOverview = () => {
    return (
-      <Container>
-         <Title />
-      </Container>
+      <Box sx={styles.root}>
+         <Container>
+            <Title />
+            <Search />
+         </Container>
+      </Box>
    )
 }
 
