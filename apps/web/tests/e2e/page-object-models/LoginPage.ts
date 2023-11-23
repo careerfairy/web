@@ -80,6 +80,7 @@ export class LoginPage {
 
       if (options.openPage) {
          await handler.open(options.loginPath)
+         await page.waitForURL(options.loginPath)
       }
 
       await handler.enterEmail(options.email)
