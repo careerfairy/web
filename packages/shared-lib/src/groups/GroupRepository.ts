@@ -319,6 +319,8 @@ export class FirebaseGroupRepository
    extends BaseFirebaseRepository
    implements IGroupRepository
 {
+   protected readonly COLLECTION_NAME: string = "careerCenterData"
+
    constructor(
       protected readonly firestore: firebase.firestore.Firestore,
       protected readonly fieldValue: typeof firebase.firestore.FieldValue
