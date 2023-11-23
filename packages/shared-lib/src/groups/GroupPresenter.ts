@@ -2,15 +2,17 @@ import {
    Group,
    GroupOption,
    GroupPhoto,
+   GroupPlan,
    GroupQuestion,
    GroupVideo,
    Testimonial,
 } from "./groups"
 import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
-import { SPARK_CONSTANTS } from "../sparks/constants"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
+import { PlanConstants, getPlanConstants } from "./planConstants"
+import { toDate } from "../firebaseTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
@@ -55,8 +57,15 @@ export class GroupPresenter {
       public readonly universityName: string,
       public readonly universityCode: string,
       public readonly maxPublicSparks: number,
+      public readonly publicSparks: boolean,
       public readonly logo: ImageType,
-      public readonly banner: ImageType
+      public readonly banner: ImageType,
+      public readonly planConstants: PlanConstants,
+      public readonly plan: {
+         type: GroupPlan["type"]
+         expiresAt: Date | null
+         startedAt: Date | null
+      } | null
    ) {}
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
@@ -83,9 +92,12 @@ export class GroupPresenter {
          group.publicProfile || false,
          group.universityName || null,
          group.universityCode || null,
-         group.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS,
+         group.maxPublicSparks || null,
+         group.publicSparks || false,
          group.logo || null,
-         group.banner || null
+         group.banner || null,
+         getPlanConstants(group.plan?.type),
+         createPlanObject(group.plan)
       )
    }
 
@@ -260,7 +272,68 @@ export class GroupPresenter {
     * This amount may be different depending on the group agreements
     */
    getMaxPublicSparks() {
-      return this.maxPublicSparks || SPARK_CONSTANTS.MAX_PUBLIC_SPARKS
+      return this.maxPublicSparks || this.planConstants.sparks.MAX_PUBLIC_SPARKS
+   }
+
+   /**
+    * To get the minimum number of creators required to publish sparks for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMinimumCreatorsToPublishSparks() {
+      return this.planConstants.sparks.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
+   }
+
+   /**
+    * To get the minimum number of sparks required per creator to publish sparks for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMinimumSparksPerCreatorToPublishSparks() {
+      return this.planConstants.sparks
+         .MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+   }
+
+   /**
+    * To get the maximum number of creators for this specific group
+    * This amount may be different depending on the group agreements
+    */
+   getMaxSparkCreatorCount() {
+      return this.planConstants.sparks.MAX_SPARK_CREATOR_COUNT
+   }
+
+   /**
+    * To get the duration of the plan for this specific group
+    * The duration is calculated from the plan's start and end dates
+    */
+   getPlanTimeLeft() {
+      return this.getExpiresAt() - this.getStartedAt()
+   }
+
+   /**
+    * To check if the plan for this specific group has expired
+    * The check is done by comparing the current time with the plan's expiry time
+    */
+   hasPlanExpired() {
+      const currentTime = new Date().getTime()
+      return currentTime > this.getExpiresAt()
+   }
+
+   /**
+    * To check if the plan for this specific group has started
+    * The check is done by comparing the current time with the plan's start time
+    *
+    * @returns true if the plan has started, false otherwise
+    */
+   hasPlanStarted() {
+      const currentTime = new Date().getTime()
+      return currentTime > this.getStartedAt()
+   }
+
+   getExpiresAt() {
+      return this.plan?.expiresAt?.getTime() || 0
+   }
+
+   getStartedAt() {
+      return this.plan?.startedAt?.getTime() || 0
    }
 
    getCompanyLogoUrl() {
@@ -270,4 +343,15 @@ export class GroupPresenter {
    getCompanyBannerUrl() {
       return this.banner ? this.banner.url : this.bannerImageUrl
    }
+}
+
+const createPlanObject = (plan: GroupPlan | null) => {
+   if (plan) {
+      return {
+         type: plan.type,
+         expiresAt: toDate(plan.expiresAt),
+         startedAt: toDate(plan.startedAt),
+      }
+   }
+   return null
 }
