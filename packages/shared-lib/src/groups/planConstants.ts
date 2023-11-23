@@ -61,3 +61,10 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
 export const getPlanConstants = (planType: GroupPlanType): PlanConstants => {
    return PLAN_CONSTANTS[planType] || PLAN_CONSTANTS.tier1
 }
+
+export type StartPlanData = {
+   /** The type of plan to create */
+   planType: GroupPlanType
+   /** The group ID for which to create the plan */
+   groupId: string
+}
