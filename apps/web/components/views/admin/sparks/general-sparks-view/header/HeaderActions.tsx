@@ -2,7 +2,7 @@ import { Box, Button, Stack, tooltipClasses } from "@mui/material"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import DividerWithText from "../../../../common/misc/DividerWithText"
 import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import {
    EyeOff as HiddenIcon,
    Info as InfoIcon,
@@ -58,19 +58,15 @@ const styles = sxStyles({
 const HeaderActions = () => {
    const isMobile = useIsMobile()
    const { group, groupPresenter } = useGroup()
+
+   const maxPublicSparks = groupPresenter.getMaxPublicSparks()
+
    const { data: publicSparks } = useGroupSparks(group.groupId, {
       isPublished: true,
-      limit: groupPresenter.getMaxPublicSparks(),
+      limit: maxPublicSparks,
    })
 
-   const maxPublicSparks = useMemo(
-      () => groupPresenter.getMaxPublicSparks(),
-      [groupPresenter]
-   )
-   const isCriticalState = useMemo(
-      () => publicSparks.length >= maxPublicSparks - 2,
-      [maxPublicSparks, publicSparks.length]
-   )
+   const isCriticalState = publicSparks.length >= maxPublicSparks - 2
 
    if (isMobile) {
       return (
