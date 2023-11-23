@@ -34,8 +34,7 @@ const styles = sxStyles({
       px: 2,
    },
    content: {
-      mt: { xs: 1, md: "100px" },
-      minHeight: "500px",
+      my: { xs: 1, md: "80px" },
    },
    info: {
       display: "flex",
@@ -45,7 +44,6 @@ const styles = sxStyles({
    title: {
       fontSize: { xs: "20px", md: "24px" },
    },
-   form: {},
    input: {
       width: "100%",
       mt: 4,
@@ -128,6 +126,7 @@ const Content = () => {
             <SteppedDialog.Container
                containerSx={styles.content}
                sx={styles.wrapContainer}
+               withActions
             >
                <>
                   <SteppedDialog.Content sx={styles.container}>
