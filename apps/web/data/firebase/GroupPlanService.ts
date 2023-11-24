@@ -2,11 +2,11 @@ import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
 
-export class CompanyPlanService {
+export class GroupPlanService {
    constructor(private readonly functions: Functions) {}
 
    /**
-    * Starts a plan for a given company
+    * Starts a plan for a given group
     * @param data  The data to start the plan
     * */
    async startPlan(data: StartPlanData) {
@@ -17,8 +17,6 @@ export class CompanyPlanService {
    }
 }
 
-export const companyPlanService = new CompanyPlanService(
-   FunctionsInstance as any
-)
+export const groupPlanService = new GroupPlanService(FunctionsInstance as any)
 
-export default CompanyPlanService
+export default GroupPlanService
