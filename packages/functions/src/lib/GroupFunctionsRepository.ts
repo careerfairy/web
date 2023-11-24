@@ -6,7 +6,6 @@ import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
-   GroupPlan,
    GroupPlanType,
    GroupQuestion,
 } from "@careerfairy/shared-lib/groups"
