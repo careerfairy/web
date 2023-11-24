@@ -8,7 +8,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
-import { companyPlanService } from "data/firebase/CompanyPlanService"
+import { groupPlanService } from "data/firebase/GroupPlanService"
 import React from "react"
 import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { sxStyles } from "types/commonTypes"
@@ -116,7 +116,7 @@ type ActionButtonProps = {
 }
 
 const fetcher: MutationFetcher<void, string, StartPlanData> = (_, { arg }) =>
-   void companyPlanService.startPlan(arg)
+   void groupPlanService.startPlan(arg)
 
 const ActionButton = ({ presenter }: ActionButtonProps) => {
    const isTier1 = presenter.plan?.type === GroupPlanTypes.Tier1
