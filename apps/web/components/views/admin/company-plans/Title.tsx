@@ -21,7 +21,7 @@ const Title = () => {
          <Typography component="span" sx={styles.text}>
             Manage our clients{" "}
             <Typography component="span" color="secondary" sx={styles.text}>
-               Sparks trial
+               subscription plans
             </Typography>
          </Typography>
       </Box>

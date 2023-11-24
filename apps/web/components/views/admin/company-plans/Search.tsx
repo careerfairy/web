@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import {
+   Box,
    CircularProgress,
    Container,
    FormHelperText,
@@ -17,6 +18,7 @@ import { useMemo, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CompanyPlanCard from "./CompanyPlanCard"
+import { useInView } from "react-intersection-observer"
 
 const styles = sxStyles({
    root: {
@@ -47,20 +49,33 @@ const styles = sxStyles({
    },
 })
 
+const INITIAL_MAX_RESULTS = 10
+
 const Search = () => {
    const [inputValue, setInputValue] = useState("")
    const [blured, setBlured] = useState<boolean>()
+   const [maxResults, setMaxResults] = useState(INITIAL_MAX_RESULTS)
+
+   const [bottomRef] = useInView({
+      onChange: (inView) => {
+         if (inView) {
+            setMaxResults((prevMaxResults) => {
+               return prevMaxResults + INITIAL_MAX_RESULTS
+            })
+         }
+      },
+   })
 
    const options = useMemo<UseSearchOptions<Group>>(
       () => ({
-         maxResults: 100,
+         maxResults,
          additionalConstraints: [where("test", "==", false)],
          emptyOrderBy: {
             field: "normalizedUniversityName",
             direction: "asc",
          },
       }),
-      []
+      [maxResults]
    )
 
    const { data: groups, status } = useGroupSearch(inputValue, options)
@@ -88,9 +103,7 @@ const Search = () => {
          />
          <Grow in={blured ? inputValue.length < 3 : null}>
             <FormHelperText sx={styles.helperText}>
-               {inputValue.length < 3
-                  ? "Type a minimum of 3 characters to search"
-                  : ""}
+               {inputValue.length < 3 ? "Type at least 3 characters" : ""}
             </FormHelperText>
          </Grow>
          <Container disableGutters sx={styles.container} maxWidth={false}>
@@ -105,6 +118,7 @@ const Search = () => {
                   ))
                )}
             </Grid>
+            <Box pt={5} ref={bottomRef} />
          </Container>
       </>
    )
