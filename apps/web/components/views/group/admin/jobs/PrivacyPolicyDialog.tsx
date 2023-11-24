@@ -190,7 +190,7 @@ const Content = () => {
 
 const view = [
    {
-      key: "select-creator",
+      key: "privacy-policy",
       Component: () => <Content />,
    },
 ]
