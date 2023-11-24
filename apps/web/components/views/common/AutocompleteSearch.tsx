@@ -5,6 +5,7 @@ import Autocomplete, {
 import { InputAdornment } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import { StyledTextField } from "../group/admin/common/inputs"
+import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
 
 const styles = sxStyles({
    listBox: {
@@ -102,7 +103,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          isOptionEqualToValue={isOptionEqualToValue}
          noOptionsText={
             inputTooSmall
-               ? `Type at least ${minCharacters} characters`
+               ? COPY_CONSTANTS.FORMS.MIN_SEARCH_CHARACTERS
                : noOptionsText
          }
          onChange={onChange}
