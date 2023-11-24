@@ -7,7 +7,7 @@ import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
 } from "../../../stepped-dialog/SteppedDialog"
-import React, { useCallback } from "react"
+import { useCallback } from "react"
 import { closeJobFormDialog } from "../../../../../store/reducers/adminJobsReducer"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
@@ -26,6 +26,8 @@ import { Box } from "@mui/material"
 import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../../../data/RepositoryInstances"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
+import Loader from "components/views/loader/Loader"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -121,78 +123,82 @@ const Content = () => {
    )
 
    return (
-      <JobFetchWrapper
-         jobId={selectedJobId}
-         groupId={group.groupId}
-         shouldFetch={Boolean(selectedJobId)}
-      >
-         {(job) => (
-            <Formik<JobFormValues>
-               initialValues={getInitialValues(job, group.groupId)}
-               onSubmit={handleSubmit}
-               validationSchema={validationSchema(job)}
-               enableReinitialize
-            >
-               {({ dirty, handleSubmit, isSubmitting, isValid }) => (
-                  <SteppedDialog.Container
-                     containerSx={styles.content}
-                     sx={styles.wrapContainer}
-                     withActions
-                  >
-                     <>
-                        <SteppedDialog.Content sx={styles.container}>
-                           <>
-                              {/*<Box sx={styles.header}>*/}
-                              <SteppedDialog.Title sx={styles.title}>
-                                 Create a{" "}
-                                 <Box component="span" color="secondary.main">
-                                    job posting
+      <SuspenseWithBoundary fallback={<Loader />}>
+         <JobFetchWrapper
+            jobId={selectedJobId}
+            groupId={group.groupId}
+            shouldFetch={Boolean(selectedJobId)}
+         >
+            {(job) => (
+               <Formik<JobFormValues>
+                  initialValues={getInitialValues(job, group.groupId)}
+                  onSubmit={handleSubmit}
+                  validationSchema={validationSchema(job)}
+                  enableReinitialize
+               >
+                  {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+                     <SteppedDialog.Container
+                        containerSx={styles.content}
+                        sx={styles.wrapContainer}
+                        withActions
+                     >
+                        <>
+                           <SteppedDialog.Content sx={styles.container}>
+                              <>
+                                 <SteppedDialog.Title sx={styles.title}>
+                                    Create a{" "}
+                                    <Box
+                                       component="span"
+                                       color="secondary.main"
+                                    >
+                                       job posting
+                                    </Box>
+                                 </SteppedDialog.Title>
+
+                                 <SteppedDialog.Subtitle sx={styles.subtitle}>
+                                    Share with your audience the details about
+                                    your job opening!
+                                 </SteppedDialog.Subtitle>
+
+                                 <Box sx={styles.form}>
+                                    <JobForm />
                                  </Box>
-                              </SteppedDialog.Title>
+                              </>
+                           </SteppedDialog.Content>
 
-                              <SteppedDialog.Subtitle sx={styles.subtitle}>
-                                 Share with your audience the details about your
-                                 job opening!
-                              </SteppedDialog.Subtitle>
-                              {/*</Box>*/}
-                              <Box sx={styles.form}>
-                                 <JobForm />
-                              </Box>
-                           </>
-                        </SteppedDialog.Content>
+                           <SteppedDialog.Actions>
+                              <SteppedDialog.Button
+                                 variant="outlined"
+                                 color="grey"
+                                 onClick={handleClose}
+                              >
+                                 Cancel
+                              </SteppedDialog.Button>
 
-                        <SteppedDialog.Actions>
-                           <SteppedDialog.Button
-                              variant="outlined"
-                              color="grey"
-                              onClick={handleClose}
-                           >
-                              Cancel
-                           </SteppedDialog.Button>
-
-                           <SteppedDialog.Button
-                              variant="contained"
-                              color={"secondary"}
-                              disabled={isSubmitting || !isValid || !dirty}
-                              type="submit"
-                              onClick={() => handleSubmit()}
-                              loading={isSubmitting}
-                           >
-                              {selectedJobId ? "Update" : "create"}
-                           </SteppedDialog.Button>
-                        </SteppedDialog.Actions>
-                     </>
-                  </SteppedDialog.Container>
-               )}
-            </Formik>
-         )}
-      </JobFetchWrapper>
+                              <SteppedDialog.Button
+                                 variant="contained"
+                                 color={"secondary"}
+                                 disabled={isSubmitting || !isValid || !dirty}
+                                 type="submit"
+                                 onClick={() => handleSubmit()}
+                                 loading={isSubmitting}
+                              >
+                                 {selectedJobId ? "Update" : "create"}
+                              </SteppedDialog.Button>
+                           </SteppedDialog.Actions>
+                        </>
+                     </SteppedDialog.Container>
+                  )}
+               </Formik>
+            )}
+         </JobFetchWrapper>
+      </SuspenseWithBoundary>
    )
 }
 
 const view = [
    {
-      key: "select-creator",
+      key: "select-job",
       Component: () => <Content />,
    },
 ]
