@@ -8,4 +8,7 @@ export const jobsPrivacyPolicyDialogOpenSelector = (
 ): boolean => state.adminJobs.jobsPrivacyPolicyDialogOpen
 
 export const jobsFormSelectedJobIdSelector = (state: RootState): string =>
-   state.adminJobs.jobsForm.selectedJobId
+   state.adminJobs.selectedJobId
+
+export const deleteJobsDialogOpenSelector = (state: RootState): boolean =>
+   state.adminJobs.deleteJobDialogOpen
