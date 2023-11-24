@@ -593,13 +593,16 @@ export class GroupFunctionsRepository
             getPlanConstants(planType).sparks.PLAN_DURATION_MILLISECONDS
       )
 
-      const plan: GroupPlan = {
-         type: planType,
-         startedAt: now,
-         expiresAt,
+      const toUpdate: Pick<Group, "plan" | "sparksAdminPageFlag"> = {
+         plan: {
+            type: planType,
+            startedAt: now,
+            expiresAt,
+         },
+         sparksAdminPageFlag: true,
       }
 
-      return groupRef.update({ plan })
+      return groupRef.update(toUpdate)
    }
 
    async stopPlan(groupId: string): Promise<void> {
