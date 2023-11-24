@@ -17,8 +17,8 @@ const Jobs = ({ groupId }) => (
       <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
          <JobsContent />
          <PrivacyPolicyDialog />
-         <JobFormDialog />
       </SuspenseWithBoundary>
+      <JobFormDialog />
    </GroupDashboardLayout>
 )
 
