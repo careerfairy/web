@@ -19,9 +19,9 @@ const Title = () => {
    return (
       <Box sx={styles.root}>
          <Typography component="span" sx={styles.text}>
-            Manage our clients{" "}
+            Manage our clients&apos;{" "}
             <Typography component="span" color="secondary" sx={styles.text}>
-               subscription plans
+               subscription plan
             </Typography>
          </Typography>
       </Box>
