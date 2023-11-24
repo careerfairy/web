@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import {
    Box,
@@ -33,6 +34,7 @@ const styles = sxStyles({
    },
    container: {
       maxWidth: 1160,
+      position: "relative",
    },
    input: {
       position: "sticky",
@@ -47,6 +49,10 @@ const styles = sxStyles({
       mx: "auto",
       mt: 5,
    },
+   bottomNode: {
+      position: "absolute",
+      bottom: 200,
+   },
 })
 
 const INITIAL_MAX_RESULTS = 10
@@ -59,9 +65,10 @@ const Search = () => {
    const [bottomRef] = useInView({
       onChange: (inView) => {
          if (inView) {
-            setMaxResults((prevMaxResults) => {
-               return prevMaxResults + INITIAL_MAX_RESULTS
-            })
+            // Load more results
+            setMaxResults(
+               (prevMaxResults) => prevMaxResults + INITIAL_MAX_RESULTS
+            )
          }
       },
    })
@@ -80,12 +87,13 @@ const Search = () => {
 
    const { data: groups, status } = useGroupSearch(inputValue, options)
 
-   const isLoading = status === "loading"
-
    const presenters = useMemo(
       () => groups?.map(GroupPresenter.createFromDocument) ?? [],
       [groups]
    )
+
+   const isLoading = status === "loading"
+   const isInputTooSmall = inputValue.length < 3
 
    return (
       <>
@@ -101,9 +109,11 @@ const Search = () => {
             onBlur={() => setBlured(true)}
             InputProps={inputProps}
          />
-         <Grow in={blured ? inputValue.length < 3 : null}>
+         <Grow in={blured ? isInputTooSmall : null}>
             <FormHelperText sx={styles.helperText}>
-               {inputValue.length < 3 ? "Type at least 3 characters" : ""}
+               {isInputTooSmall
+                  ? COPY_CONSTANTS.FORMS.MIN_SEARCH_CHARACTERS
+                  : ""}
             </FormHelperText>
          </Grow>
          <Container disableGutters sx={styles.container} maxWidth={false}>
@@ -118,7 +128,7 @@ const Search = () => {
                   ))
                )}
             </Grid>
-            <Box pt={5} ref={bottomRef} />
+            <Box sx={styles.bottomNode} ref={isLoading ? null : bottomRef} />
          </Container>
       </>
    )
