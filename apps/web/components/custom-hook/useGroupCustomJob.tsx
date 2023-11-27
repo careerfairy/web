@@ -1,6 +1,5 @@
-import { useFirestore, useFirestoreDocDataOnce } from "reactfire"
-import { doc } from "firebase/firestore"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { useFirestoreDocument } from "./utils/useFirestoreDocument"
 
 /**
  * Fetch Group Custom Jobs
@@ -9,17 +8,13 @@ import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
  * @param jobId
  */
 const useGroupCustomJob = (groupId: string, jobId: string) => {
-   const ref = doc(
-      useFirestore(),
+   const { data } = useFirestoreDocument<CustomJob>(
       "careerCenterData",
-      groupId,
-      "customJobs",
-      jobId
+      [groupId, "customJobs", jobId],
+      {
+         idField: "id",
+      }
    )
-
-   const { data } = useFirestoreDocDataOnce<CustomJob>(ref as any, {
-      idField: "id",
-   })
 
    return data
 }

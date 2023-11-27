@@ -7,6 +7,7 @@ import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import { GetServerSidePropsContext } from "next"
 import { useRouter } from "next/router"
 import { Button } from "@mui/material"
+import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
 
 type Props = {
    groupId: string
@@ -14,7 +15,11 @@ type Props = {
 }
 
 const JobDetails: FC<Props> = ({ groupId, jobId }) => {
-   const router = useRouter()
+   const { push } = useRouter()
+
+   const handleClickBack = () => {
+      void push(`/group/${groupId}/admin/jobs`)
+   }
 
    return (
       <GroupDashboardLayout
@@ -24,10 +29,18 @@ const JobDetails: FC<Props> = ({ groupId, jobId }) => {
       >
          <DashboardHead title="CareerFairy | Jobs" />
          <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
-            <>
-               <Button onClick={() => router.back()}>Back</Button>
-               Job details {jobId} from the Group {groupId}
-            </>
+            <JobFetchWrapper
+               jobId={jobId}
+               groupId={groupId}
+               shouldFetch={Boolean(jobId)}
+            >
+               {(job) => (
+                  <>
+                     <Button onClick={handleClickBack}>Back</Button>
+                     Job details {job.title} from the Group {groupId}
+                  </>
+               )}
+            </JobFetchWrapper>
          </SuspenseWithBoundary>
       </GroupDashboardLayout>
    )
