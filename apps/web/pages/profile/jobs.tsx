@@ -9,7 +9,7 @@ const MyJobsPage = () => {
    return (
       <UserLayout>
          <SEO
-            title="CareerFairy | Jobs"
+            title="CareerFairy | Index"
             canonical={`https://www.careerfairy.io${pathname}`}
          />
          <UserView currentPath="/profile/jobs" />

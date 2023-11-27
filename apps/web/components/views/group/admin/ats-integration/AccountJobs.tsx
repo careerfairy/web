@@ -63,7 +63,9 @@ const AccountJobs = () => {
          <MaterialTable
             columns={columns}
             data={fetcher}
-            title={<TableTitle title="Jobs" subtitle="Most recent open Jobs" />}
+            title={
+               <TableTitle title="Index" subtitle="Most recent open Index" />
+            }
             detailPanel={RowDetailPanel}
             onRowClick={expandDetailPanel}
             options={tableOptions}
