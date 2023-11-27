@@ -48,6 +48,7 @@ import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
+import sparksAnalytics = require("./sparksAnalytics")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 
@@ -236,6 +237,7 @@ exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 // Spark Analytics Functions
 exports.trackSparkEvents_v3 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
+exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob = customJobs.userApplyToCustomJob
