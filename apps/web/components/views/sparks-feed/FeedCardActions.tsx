@@ -311,7 +311,7 @@ const CareerPageAction: FC<{
          sparkId={sparkId}
          icon={<Work sx={styles.icon} />}
          onClick={handleCareerPageClick}
-         label="Jobs"
+         label="Index"
       />
    )
 }
