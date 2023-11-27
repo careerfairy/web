@@ -172,11 +172,11 @@ class SparksAnalyticsRepository implements ISparksAnalyticsRepository {
    }
 
    private async handleQueryPromiseWithTimePeriodValidation<T>(
-      sqlQuery: string,
+      getSqlQuery: (string) => string,
       timeperiod: TimePeriodParams
    ): Promise<T> {
-      const params = { timeperiod: this.timePeriodMap[timeperiod] }
-      return this.handleQueryPromise<T>(sqlQuery, params)
+      const sqlQueryWithTimePeriod = getSqlQuery(this.timePeriodMap[timeperiod])
+      return this.handleQueryPromise<T>(sqlQueryWithTimePeriod)
    }
 }
 
