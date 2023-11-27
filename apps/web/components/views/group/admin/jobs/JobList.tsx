@@ -1,6 +1,6 @@
 import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
 import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
-import React, { FC, MouseEvent, useCallback } from "react"
+import React, { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 import {
    Box,
    Divider,
@@ -10,9 +10,10 @@ import {
    IconButton,
    MenuItem,
    ListItem,
+   Card,
 } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { Trash2 as DeleteIcon, User } from "react-feather"
+import { Search as FindIcon, Trash2 as DeleteIcon, User } from "react-feather"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import EditIcon from "@mui/icons-material/Edit"
 import BrandedMenu from "../../../common/inputs/BrandedMenu"
@@ -23,6 +24,13 @@ import {
    openJobFormDialog,
 } from "../../../../../store/reducers/adminJobsReducer"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import AutocompleteSearch from "../../../common/AutocompleteSearch"
+import { useRouter } from "next/router"
+import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
+import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
+import { getParts } from "../../../../util/search"
+import RenderParts from "../../../common/search/RenderParts"
+import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 
 const styles = sxStyles({
    wrapper: {
@@ -47,8 +55,10 @@ const styles = sxStyles({
       mt: 1,
    },
    subtitle: {
-      fontSize: "16px",
+      fontSize: { xs: "14px", md: "16px" },
       color: "text.secondary",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
    },
    statsWrapper: {
       display: "flex",
@@ -127,17 +137,49 @@ type Props = {
 }
 const JobList: FC<Props> = ({ jobs }) => {
    const isMobile = useIsMobile()
+   const { push } = useRouter()
+   const { group } = useGroupFromState()
+   const [inputValue, setInputValue] = useState("")
 
-   const handleJobOpen = (jobId: string) => {
-      console.log(`open job ${jobId} details component `)
-   }
+   const handleJobClick = useCallback(
+      (jobId: string) => {
+         void push(`/group/${group.groupId}/admin/jobs/${jobId}`)
+      },
+      [group.groupId, push]
+   )
+
+   const handleChange = useCallback(
+      (newValue: PublicCustomJob | null) =>
+         push(`/group/${group.groupId}/admin/jobs/${newValue.id}`),
+      [group.groupId, push]
+   )
+
+   const sortedGroups = useMemo(
+      () => jobs.sort(dynamicSort("deadline", "desc")),
+      [jobs]
+   )
 
    return (
       <Box sx={styles.wrapper}>
          <Stack spacing={2} sx={styles.searchWrapper}>
             {isMobile ? <CreateJobButton sx={styles.createButton} /> : null}
 
-            <Box>Search component</Box>
+            <Card>
+               <AutocompleteSearch
+                  id="jobs-search"
+                  minCharacters={3}
+                  inputValue={inputValue}
+                  handleChange={handleChange}
+                  options={sortedGroups}
+                  renderOption={renderOption}
+                  isOptionEqualToValue={isOptionEqualToValue}
+                  getOptionLabel={getOptionLabel}
+                  setInputValue={setInputValue}
+                  noOptionsText="No jobs found"
+                  placeholderText="Search"
+                  inputStartIcon={<FindIcon />}
+               />
+            </Card>
          </Stack>
 
          <Stack spacing={2}>
@@ -145,7 +187,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                <ListItem
                   key={job.id}
                   sx={styles.listItem}
-                  onClick={() => handleJobOpen(job.id)}
+                  onClick={() => handleJobClick(job.id)}
                >
                   <Grid key={job.id} container>
                      <Box sx={styles.itemWrapper}>
@@ -165,11 +207,16 @@ const JobList: FC<Props> = ({ jobs }) => {
                            </Box>
 
                            <Stack
-                              spacing={2}
+                              spacing={isMobile ? 1 : 2}
                               sx={styles.info}
-                              direction="row"
+                              direction={isMobile ? "column" : "row"}
                               divider={
-                                 <Divider orientation="vertical" flexItem />
+                                 <Divider
+                                    orientation={
+                                       isMobile ? "horizontal" : "vertical"
+                                    }
+                                    flexItem
+                                 />
                               }
                            >
                               <Typography
@@ -177,15 +224,14 @@ const JobList: FC<Props> = ({ jobs }) => {
                                  sx={styles.subtitle}
                                  minWidth={"90px"}
                               >
-                                 {job.jobType}{" "}
+                                 {job.jobType}
                               </Typography>
 
                               <Typography
                                  variant={"subtitle1"}
                                  sx={styles.subtitle}
                               >
-                                 {" "}
-                                 {job.postingUrl}{" "}
+                                 {formatJobPostingUrl(job.postingUrl)}
                               </Typography>
                            </Stack>
                         </Grid>
@@ -233,6 +279,32 @@ const JobList: FC<Props> = ({ jobs }) => {
          </Stack>
       </Box>
    )
+}
+
+const isOptionEqualToValue = (
+   option: PublicCustomJob,
+   value: PublicCustomJob
+) => option.id === value.id
+
+const getOptionLabel = (option: PublicCustomJob) => option.title
+
+const renderOption = (
+   props: React.HTMLAttributes<HTMLLIElement>,
+   option: PublicCustomJob,
+   state: AutocompleteRenderOptionState
+) => {
+   const titleParts = getParts(option.title, state.inputValue)
+
+   return (
+      <Box {...props} component={"li"} key={option.id}>
+         <RenderParts parts={titleParts} />
+      </Box>
+   )
+}
+
+const formatJobPostingUrl = (postingUrl: string): string => {
+   const withoutProtocol = postingUrl.split("://")[1]
+   return withoutProtocol ? withoutProtocol : postingUrl
 }
 
 type EditComponentProps = {
