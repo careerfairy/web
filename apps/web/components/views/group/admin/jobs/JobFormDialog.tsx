@@ -117,9 +117,17 @@ const Content = () => {
             }
          } catch (error) {
             errorNotification(error, "An error has occurred")
+         } finally {
+            handleClose()
          }
       },
-      [selectedJobId, group.groupId, successNotification, errorNotification]
+      [
+         selectedJobId,
+         group.groupId,
+         successNotification,
+         errorNotification,
+         handleClose,
+      ]
    )
 
    return (
