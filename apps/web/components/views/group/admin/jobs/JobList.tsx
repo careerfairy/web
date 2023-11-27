@@ -54,6 +54,11 @@ const styles = sxStyles({
       display: "flex",
       mt: 1,
    },
+   title: {
+      color: "text.primary",
+      fontWeight: "bold",
+      fontSize: "20px",
+   },
    subtitle: {
       fontSize: { xs: "14px", md: "16px" },
       color: "text.secondary",
@@ -193,11 +198,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                      <Box sx={styles.itemWrapper}>
                         <Grid item xs={12} md={8} sx={styles.infoWrapper}>
                            <Box sx={styles.mobileHeader}>
-                              <Typography
-                                 variant={"h5"}
-                                 color={"text.primary"}
-                                 fontWeight="bold"
-                              >
+                              <Typography variant={"h5"} sx={styles.title}>
                                  {" "}
                                  {job.title}{" "}
                               </Typography>
