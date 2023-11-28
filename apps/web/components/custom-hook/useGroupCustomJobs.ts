@@ -1,10 +1,6 @@
 import { collection } from "firebase/firestore"
 import { useFirestore } from "reactfire"
-import { useMemo } from "react"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 
 /**
@@ -24,10 +20,7 @@ const useGroupCustomJobs = (groupId: string) => {
       idField: "id", // this field will be added to the firestore object
    })
 
-   return useMemo(
-      () => data.map((document) => pickPublicDataFromCustomJob(document)),
-      [data]
-   )
+   return data
 }
 
 export default useGroupCustomJobs
