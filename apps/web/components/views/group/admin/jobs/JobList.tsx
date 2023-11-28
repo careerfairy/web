@@ -1,5 +1,8 @@
 import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/groups/customJobs"
 import React, { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 import {
    Box,
@@ -73,8 +76,8 @@ const styles = sxStyles({
       pb: { xs: 1.5, md: 0 },
    },
    stats: {
-      background: "var(--white-white-300, #FAFAFE)",
-      border: "1px solid var(--white-white-400, #F6F6FA)",
+      background: "#FAFAFE",
+      border: "#F6F6FA",
       borderRadius: "10px",
       p: { xs: "12px 12px", md: "12px 20px" },
       alignItems: "center",
@@ -124,6 +127,12 @@ const styles = sxStyles({
       flexDirection: "column",
       py: { xs: 2 },
    },
+   search: {
+      display: "flex",
+      alignItems: "center",
+      height: "40px",
+      borderRadius: "20px",
+   },
    editButtonDesktop: {
       display: "flex",
       justifyContent: "end",
@@ -138,7 +147,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   jobs: PublicCustomJob[]
+   jobs: CustomJob[]
 }
 const JobList: FC<Props> = ({ jobs }) => {
    const isMobile = useIsMobile()
@@ -159,8 +168,14 @@ const JobList: FC<Props> = ({ jobs }) => {
       [group.groupId, push]
    )
 
-   const sortedGroups = useMemo(
-      () => jobs.sort(dynamicSort("deadline", "desc")),
+   const sortedJobs = useMemo(
+      () =>
+         jobs
+            .map((job) => ({
+               ...job,
+               createdAt: job.createdAt?.toDate(),
+            }))
+            .sort(dynamicSort("createdAt", "asc")),
       [jobs]
    )
 
@@ -169,13 +184,13 @@ const JobList: FC<Props> = ({ jobs }) => {
          <Stack spacing={2} sx={styles.searchWrapper}>
             {isMobile ? <CreateJobButton sx={styles.createButton} /> : null}
 
-            <Card>
+            <Card sx={styles.search}>
                <AutocompleteSearch
                   id="jobs-search"
                   minCharacters={3}
                   inputValue={inputValue}
                   handleChange={handleChange}
-                  options={sortedGroups}
+                  options={sortedJobs}
                   renderOption={renderOption}
                   isOptionEqualToValue={isOptionEqualToValue}
                   getOptionLabel={getOptionLabel}
@@ -188,7 +203,7 @@ const JobList: FC<Props> = ({ jobs }) => {
          </Stack>
 
          <Stack spacing={2}>
-            {jobs.map((job) => (
+            {sortedJobs.map((job) => (
                <ListItem
                   key={job.id}
                   sx={styles.listItem}
@@ -251,7 +266,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                                  color={"text.secondary"}
                               >
                                  {" "}
-                                 23 Clicks{" "}
+                                 {job.clicks} Clicks{" "}
                               </Typography>
 
                               <Box sx={styles.applications}>
@@ -262,7 +277,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                                     ml={1}
                                  >
                                     {" "}
-                                    12 Applications{" "}
+                                    {job.applicants.length} Applications{" "}
                                  </Typography>
                               </Box>
                            </Stack>
@@ -341,13 +356,21 @@ const EditButtonComponent: FC<EditComponentProps> = ({ jobId }) => {
       [handleClick]
    )
 
+   const handleCloseMenu = useCallback(
+      (event: MouseEvent<HTMLElement>) => {
+         event.stopPropagation()
+         handleClose()
+      },
+      [handleClose]
+   )
+
    return (
       <Box>
          <IconButton onClick={menuClick} size={"small"}>
             <MoreVertIcon color={"secondary"} />
          </IconButton>
          <BrandedMenu
-            onClose={handleClose}
+            onClose={handleCloseMenu}
             anchorEl={anchorEl}
             open={open}
             anchorOrigin={{
