@@ -1,11 +1,11 @@
-import { FC } from "react"
-import { useRouter } from "next/router"
-import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
+import Sparks from "components/views/admin/sparks"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
+import { useRouter } from "next/router"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 
-const AdminSparksAnalyticsPage: FC = () => {
+const AdminSparksAnalyticsPage = () => {
    const {
       query: { groupId },
    } = useRouter()
@@ -17,7 +17,7 @@ const AdminSparksAnalyticsPage: FC = () => {
          topBarCta={<CreateSparkButton />}
       >
          <DashboardHead title="CareerFairy | My Sparks Analytics" />
-         <GroupSparkAnalytics />
+         <h1>🧐 ✨✨✨ 📈📉📈 🧐</h1>
       </GroupDashboardLayout>
    )
 }
