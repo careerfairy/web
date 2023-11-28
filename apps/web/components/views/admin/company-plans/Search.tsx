@@ -94,6 +94,8 @@ const Search = () => {
 
    const { data: groups, status } = useGroupSearch(inputValue, options)
 
+   // We need to memoize this because the list can get long and
+   // we don't want to recompute it every time the input changes
    const presenters = useMemo(
       () => groups?.map(GroupPresenter.createFromDocument) ?? [],
       [groups]
@@ -144,11 +146,13 @@ const Search = () => {
             </Grid>
             <Box sx={styles.bottomNode} ref={isLoading ? null : bottomRef} />
          </Container>
-         <CompanyPlanConfirmationDialog
-            open={confirmDialogOpen}
-            handleClose={handleCloseConfirmDialog}
-            groupToManage={groupToManage}
-         />
+         {confirmDialogOpen ? (
+            <CompanyPlanConfirmationDialog
+               open={confirmDialogOpen}
+               handleClose={handleCloseConfirmDialog}
+               groupToManage={groupToManage}
+            />
+         ) : null}
       </>
    )
 }
