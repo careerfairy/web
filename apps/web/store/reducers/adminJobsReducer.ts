@@ -1,15 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 interface IJobsState {
-   jobsFormDialogOpen: boolean
-   jobsPrivacyPolicyDialogOpen: boolean
+   jobsDialogOpen: boolean
    deleteJobDialogOpen: boolean
    selectedJobId: string | null
 }
 
 const initialState: IJobsState = {
-   jobsFormDialogOpen: false,
-   jobsPrivacyPolicyDialogOpen: false,
+   jobsDialogOpen: false,
    deleteJobDialogOpen: false,
    selectedJobId: null,
 }
@@ -18,19 +16,12 @@ export const adminJobsSlice = createSlice({
    name: "Admin Jobs",
    initialState,
    reducers: {
-      openJobFormDialog: (state, action: PayloadAction<string> = null) => {
-         state.jobsFormDialogOpen = true
+      openJobsDialog: (state, action: PayloadAction<string> = null) => {
+         state.jobsDialogOpen = true
          state.selectedJobId = action.payload
       },
-      closeJobFormDialog: (state) => {
-         state.jobsFormDialogOpen = false
-         state.selectedJobId = null
-      },
-      openPrivacyPolicyDialog: (state) => {
-         state.jobsPrivacyPolicyDialogOpen = true
-      },
-      closePrivacyPolicyDialog: (state) => {
-         state.jobsPrivacyPolicyDialogOpen = false
+      closeJobsDialog: (state) => {
+         state.jobsDialogOpen = false
       },
       openDeleteJobDialogOpen: (
          state,
@@ -48,10 +39,8 @@ export const adminJobsSlice = createSlice({
 
 // Export actions
 export const {
-   openJobFormDialog,
-   closeJobFormDialog,
-   openPrivacyPolicyDialog,
-   closePrivacyPolicyDialog,
+   openJobsDialog,
+   closeJobsDialog,
    openDeleteJobDialogOpen,
    closeDeleteJobDialogOpen,
 } = adminJobsSlice.actions
