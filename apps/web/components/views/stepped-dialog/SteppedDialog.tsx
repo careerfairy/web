@@ -20,6 +20,7 @@ import {
    ComponentType,
    createContext,
    FC,
+   JSXElementConstructor,
    useCallback,
    useContext,
    useEffect,
@@ -31,6 +32,7 @@ import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import { SxProps } from "@mui/material/styles"
+import { TransitionProps } from "@mui/material/transitions"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -44,13 +46,11 @@ const styles = sxStyles({
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
-      borderRadius: 5,
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: 770,
       overflowY: "auto",
-      top: { xs: "70px", md: 0 },
    },
    content: {
       p: 0,
@@ -166,6 +166,8 @@ interface StepperDialogProps {
    views: ReadonlyArray<View>
    initialStep?: number
    bgcolor?: string
+   transition?: JSXElementConstructor<TransitionProps>
+   sx?: SxProps<Theme>
 }
 
 /**
@@ -233,6 +235,8 @@ const SteppedDialog = <K extends string>({
    views,
    bgcolor,
    initialStep = 0,
+   transition,
+   sx,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -292,10 +296,10 @@ const SteppedDialog = <K extends string>({
          open={open}
          onClose={handleClose}
          TransitionComponent={
-            isMobile
-               ? steps === 1
-                  ? SlideUpTransition
-                  : SlideLeftTransition
+            transition
+               ? transition
+               : isMobile
+               ? SlideLeftTransition
                : SlideUpTransition
          }
          maxWidth="md"
@@ -308,6 +312,7 @@ const SteppedDialog = <K extends string>({
                {
                   bgcolor,
                },
+               ...(Array.isArray(sx) ? sx : [sx]),
             ],
          }}
       >
