@@ -1,6 +1,13 @@
 import React, { ChangeEvent } from "react"
-import { Collapse, FormControl, FormHelperText, TextField } from "@mui/material"
+import {
+   Collapse,
+   FormControl,
+   FormHelperText,
+   TextField,
+   Tooltip,
+} from "@mui/material"
 import { FormikTouched } from "formik"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
 
 type Props = {
    value: string
@@ -14,7 +21,8 @@ type Props = {
    ) => void
    touched?: boolean | FormikTouched<any> | FormikTouched<any>[]
 }
-
+const EMAIL_TOOLTIP_INFO =
+   "The email address won't be exposed to your talent community, but will be used to send technical documentation to prepare for live streams and Sparks."
 const Email = ({
    onBlur,
    disabled,
@@ -39,6 +47,13 @@ const Email = ({
             disabled={disabled}
             error={Boolean(error && touched && error)}
             onChange={onChange}
+            InputProps={{
+               endAdornment: (
+                  <Tooltip color={"secondary"} title={EMAIL_TOOLTIP_INFO}>
+                     <InfoIcon />
+                  </Tooltip>
+               ),
+            }}
          />
          <Collapse in={Boolean(error && touched && error)}>
             <FormHelperText error>{error}</FormHelperText>
