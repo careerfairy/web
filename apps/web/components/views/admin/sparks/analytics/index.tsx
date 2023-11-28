@@ -4,17 +4,20 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
-      mx: "auto",
+      mx: {
+         md: "auto",
+      },
    },
    controlHeader: {
       display: "flex",
+      justifyContent: "space-between",
       flexDirection: {
          xs: "column",
          md: "row",
       },
-      justifyContent: "space-between",
    },
    tabs: {
+      alignSelf: "center",
       ".Mui-selected": {
          fontWeight: 600,
       },
