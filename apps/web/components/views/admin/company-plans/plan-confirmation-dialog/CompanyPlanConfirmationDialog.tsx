@@ -142,6 +142,8 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
          (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksTrial
       )
    }
+
+   return 0 // We should never get here
 }
 
 export const usePlanConfirmationDialog = () => {

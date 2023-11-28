@@ -8,7 +8,7 @@ import {
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import DomainIcon from "@mui/icons-material/Domain"
+import CompanyIcon from "components/views/common/icons/CompanyIcon"
 
 const initialHeaderLinks = [
    {
@@ -103,7 +103,7 @@ const useAdminLinks = () => {
             },
             {
                href: `/admin/company-plans`,
-               icon: DomainIcon,
+               icon: CompanyIcon,
                title: "Company Plans",
                basePath: `/admin/company-plans`,
             },
