@@ -4,11 +4,13 @@ import React, { FC, ReactNode } from "react"
 import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, Tooltip } from "@mui/material"
 import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 import { sxStyles } from "types/commonTypes"
 import AvatarUpload from "./inputs/AvatarUpload"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
+import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 
 const styles = sxStyles({
    avaGrid: {
@@ -109,6 +111,16 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         placeholder="ex: John@careerfairy.io"
                         disabled={Boolean(values.id)} // if we are editing a creator, we don't want to allow changing the email
                         fullWidth
+                        InputProps={{
+                           endAdornment: (
+                              <Tooltip
+                                 color={"secondary"}
+                                 title={EMAIL_TOOLTIP_INFO}
+                              >
+                                 <InfoIcon />
+                              </Tooltip>
+                           ),
+                        }}
                      />
                   </Grid>
                   <Grid item xs={12}>
