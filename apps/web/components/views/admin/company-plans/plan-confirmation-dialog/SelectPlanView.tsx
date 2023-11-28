@@ -1,13 +1,13 @@
 import { Button, Stack, Typography } from "@mui/material"
-import DialogBody from "components/views/common/dialogs/DialogBody"
+import DialogBody from "components/views/admin/company-plans/plan-confirmation-dialog/DialogBody"
 import BasicSparkIcon from "components/views/common/icons/BasicSparkIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
 import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import {
-   Keys,
+   PlanConfirmationDialogKeys,
    usePlanConfirmationDialog,
+   usePlanConfirmationDialogStepper,
 } from "./CompanyPlanConfirmationDialog"
 
 const styles = sxStyles({
@@ -40,7 +40,7 @@ const styles = sxStyles({
 
 const SelectPlanView = () => {
    const { groupToManage, handleClose } = usePlanConfirmationDialog()
-   const { goToStep } = useStepper<Keys>()
+   const { goToStep } = usePlanConfirmationDialogStepper()
    return (
       <>
          <DialogBody.CloseIconButton onClick={handleClose} />
@@ -65,7 +65,9 @@ const SelectPlanView = () => {
                   variant="outlined"
                   color="grey"
                   fullWidth
-                  onClick={() => goToStep("confirm-sparks-trial")}
+                  onClick={() =>
+                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksTrial)
+                  }
                >
                   Trial plan
                </Button>
@@ -75,7 +77,9 @@ const SelectPlanView = () => {
                   sx={styles.btn}
                   variant="outlined"
                   fullWidth
-                  onClick={() => goToStep("confirm-sparks-plan")}
+                  onClick={() =>
+                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksPlan)
+                  }
                >
                   Sparks plan
                </Button>
