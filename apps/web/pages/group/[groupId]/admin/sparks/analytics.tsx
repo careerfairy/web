@@ -1,10 +1,11 @@
-import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
+import { FC } from "react"
 import { useRouter } from "next/router"
+import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
+import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
 
-const AdminSparksAnalyticsPage = () => {
+const AdminSparksAnalyticsPage: FC = () => {
    const {
       query: { groupId },
    } = useRouter()
