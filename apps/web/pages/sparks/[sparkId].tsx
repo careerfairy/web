@@ -34,11 +34,13 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import { useMountedState } from "react-use"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedSpark, groupId, userEmail }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
+   const mounted = useMountedState()
 
    const { closeSnackbar, enqueueSnackbar } = useSnackbar()
    const dispatch = useDispatch()
@@ -162,17 +164,19 @@ const SparksPage: NextPage<
 
    return (
       <Fragment>
-         <GenericDashboardLayout
-            hideDrawer={isFullScreen}
-            topBarFixed
-            topBarTransparent
-            hideFooter
-            headerWidth="auto"
-            hideBottomNav={isFullScreen}
-            hideHeader={isFullScreen}
-         >
-            <SparksFeedCarousel />
-         </GenericDashboardLayout>
+         {mounted() ? (
+            <GenericDashboardLayout
+               hideDrawer={isFullScreen}
+               topBarFixed
+               topBarTransparent
+               hideFooter
+               headerWidth="auto"
+               hideBottomNav={isFullScreen}
+               hideHeader={isFullScreen}
+            >
+               <SparksFeedCarousel />
+            </GenericDashboardLayout>
+         ) : null}
          <SparkSeo spark={sparkForSeo} />
       </Fragment>
    )
