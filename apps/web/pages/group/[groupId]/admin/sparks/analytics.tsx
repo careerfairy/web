@@ -1,8 +1,9 @@
+import Sparks from "components/views/admin/sparks"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import { useRouter } from "next/router"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import SparksAnalytics from "components/views/admin/sparks/analytics"
+import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 
 const AdminSparksAnalyticsPage = () => {
    const {
@@ -16,7 +17,7 @@ const AdminSparksAnalyticsPage = () => {
          topBarCta={<CreateSparkButton />}
       >
          <DashboardHead title="CareerFairy | My Sparks Analytics" />
-         <SparksAnalytics />
+         <h1>🧐 ✨✨✨ 📈📉📈 🧐</h1>
       </GroupDashboardLayout>
    )
 }
