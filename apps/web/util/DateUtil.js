@@ -4,10 +4,15 @@ var calendar = require("dayjs/plugin/calendar")
 var advancedFormat = require("dayjs/plugin/advancedFormat")
 var utc = require("dayjs/plugin/utc")
 var timezone = require("dayjs/plugin/timezone") // dependent on utc plugin
+var relativeTime = require("dayjs/plugin/relativeTime")
+var duration = require("dayjs/plugin/duration")
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
 dayjs.extend(calendar)
+dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
 export default class DateUtil {
    static getJobApplicationDate(JSDate) {
@@ -294,5 +299,16 @@ export default class DateUtil {
    static formatPastDate(JSDate) {
       const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
       return `Live streamed on: ${formattedDate}` // Release date: 15 Dec 2022
+   }
+
+   /**
+    * Transforms a duration in milliseconds into a human readable relative time string
+    * using the dayjs library.
+    *
+    * @param {number} milliseconds - The duration in milliseconds to be transformed.
+    * @return {string} - The resulting human readable relative time string.
+    */
+   static getHumanReadableTimeFromMilliseconds(milliseconds) {
+      return dayjs.duration(milliseconds).humanize() // 2 hours, 2 days, 2 months, 2 years
    }
 }
