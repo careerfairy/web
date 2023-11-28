@@ -42,12 +42,6 @@ const styles = sxStyles({
          height: 32,
       },
    },
-   header: {
-      fontWeight: 700,
-      textAlign: "center",
-      mb: 5,
-      fontSize: "2.2857142857rem",
-   },
    titleWrapper: {
       position: "relative",
       pt: 3.5,
@@ -77,7 +71,6 @@ const styles = sxStyles({
    content: {
       pb: 0,
    },
-   containedBtn: {},
 })
 
 type Props = {
