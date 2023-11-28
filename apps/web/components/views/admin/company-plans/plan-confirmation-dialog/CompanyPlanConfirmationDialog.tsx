@@ -12,8 +12,7 @@ import SelectPlanView from "./SelectPlanView"
 import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
 import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
 import SuccessView from "./SuccessView"
-// import { groupPlanService } from "data/firebase/GroupPlanService" TODO: uncomment this when backend is ready
-import { sleep } from "components/helperFunctions/HelperFunctions"
+import { groupPlanService } from "data/firebase/GroupPlanService"
 
 type Props = {
    open: boolean
@@ -71,9 +70,8 @@ const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
    _,
    { arg }
 ) => {
-   await sleep(2000) // for PR demo purposes
-   // await void groupPlanService.startPlan(arg) TODO: uncomment this when backend is ready
-   return arg.planType
+   await void groupPlanService.startPlan(arg)
+   return arg.planType // We return the new plan type so that we can display it in the success view
 }
 
 const CompanyPlanConfirmationDialog = ({
