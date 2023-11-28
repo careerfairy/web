@@ -3,7 +3,6 @@ import { Box, Button, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
 import ActionButton from "./ActionButton"
@@ -38,22 +37,20 @@ const styles = sxStyles({
    adminPageBtn: {
       color: "text.secondary",
    },
-   actions: {
-      mt: 2.5,
-   },
    noMouseEvents: {
       pointerEvents: "none",
+   },
+   actions: {
+      width: "100%",
    },
 })
 
 type Props = {
    presenter: GroupPresenter
+   setGroupToManage: (group: GroupPresenter) => void
 }
-const extraInfoToolipThreshold = 145
 
-const CompanyPlanCard = React.memo(({ presenter }: Props) => {
-   const extraInfo = presenter.extraInfo || ""
-
+const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
    return (
       <Box sx={styles.root}>
          <CircularLogo
@@ -66,24 +63,12 @@ const CompanyPlanCard = React.memo(({ presenter }: Props) => {
             {presenter.universityName}
          </Typography>
          <StatusChips presenter={presenter} />
-         <Box sx={styles.descWrapper}>
-            <BrandedTooltip
-               title={
-                  extraInfo.length > extraInfoToolipThreshold ? extraInfo : ""
-               }
-               placement={"top"}
-            >
-               <Typography
-                  sx={styles.description}
-                  variant={"body2"}
-                  color={"text.secondary"}
-               >
-                  {extraInfo}
-               </Typography>
-            </BrandedTooltip>
-         </Box>
-         <Stack spacing={0.5} sx={styles.actions}>
-            <ActionButton presenter={presenter} />
+         <Box pt={4} />
+         <Stack sx={styles.actions} spacing={0.5}>
+            <ActionButton
+               onClick={() => setGroupToManage(presenter)}
+               presenter={presenter}
+            />
             <Button
                component={Link}
                noLinkStyle
@@ -93,7 +78,7 @@ const CompanyPlanCard = React.memo(({ presenter }: Props) => {
                href={`/group/${presenter.id}/admin`}
                sx={styles.adminPageBtn}
             >
-               View admin page
+               View dashboard
             </Button>
          </Stack>
       </Box>

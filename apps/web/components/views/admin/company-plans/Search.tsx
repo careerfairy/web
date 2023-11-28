@@ -20,6 +20,7 @@ import { Search as FindIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CompanyPlanCard from "./CompanyPlanCard"
 import { useInView } from "react-intersection-observer"
+import CompanyPlanConfirmationDialog from "./plan-confirmation-dialog/CompanyPlanConfirmationDialog"
 
 const styles = sxStyles({
    root: {
@@ -62,6 +63,12 @@ const Search = () => {
    const [blured, setBlured] = useState<boolean>()
    const [maxResults, setMaxResults] = useState(INITIAL_MAX_RESULTS)
 
+   const [groupToManage, setGroupToManage] = useState<GroupPresenter | null>(
+      null
+   )
+
+   const confirmDialogOpen = Boolean(groupToManage)
+
    const [bottomRef] = useInView({
       onChange: (inView) => {
          if (inView) {
@@ -91,6 +98,10 @@ const Search = () => {
       () => groups?.map(GroupPresenter.createFromDocument) ?? [],
       [groups]
    )
+
+   const handleCloseConfirmDialog = () => {
+      setGroupToManage(null)
+   }
 
    const isLoading = status === "loading"
    const isInputTooSmall = inputValue.length < 3
@@ -123,13 +134,21 @@ const Search = () => {
                ) : (
                   presenters.map((presenter) => (
                      <Grid item xs={12} md={6} lg={4} key={presenter.id}>
-                        <CompanyPlanCard presenter={presenter} />
+                        <CompanyPlanCard
+                           setGroupToManage={setGroupToManage}
+                           presenter={presenter}
+                        />
                      </Grid>
                   ))
                )}
             </Grid>
             <Box sx={styles.bottomNode} ref={isLoading ? null : bottomRef} />
          </Container>
+         <CompanyPlanConfirmationDialog
+            open={confirmDialogOpen}
+            handleClose={handleCloseConfirmDialog}
+            groupToManage={groupToManage}
+         />
       </>
    )
 }
