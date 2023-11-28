@@ -71,9 +71,22 @@ const GroupNavList = () => {
                  {
                     id: "sparks",
                     href: `/${baseHrefPath}/${group.id}/admin/sparks`,
-                    pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
                     Icon: SparksIcon,
                     title: "Sparks",
+                    childLinks: [
+                     {
+                        id: "videos",
+                        href: `/${baseHrefPath}/${group.id}/admin/sparks`,
+                        pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
+                        title: "Videos",
+                     },
+                     {
+                        id: "analytics",
+                        href: `/${baseHrefPath}/${group.id}/admin/sparks/analytics`,
+                        pathname: `/${baseHrefPath}/${baseParam}/admin/sparks/analytics`,
+                        title: "Analytics",
+                     },
+                  ],
                  },
               ]
             : []),
