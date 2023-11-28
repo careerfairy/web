@@ -75,7 +75,6 @@ const styles = sxStyles({
       justifyContent: "end",
       px: { xs: 1.5, md: 0 },
       pb: { xs: 1.5, md: 0 },
-      minWidth: { md: "300px" },
    },
    stats: {
       background: "#FAFAFE",
@@ -83,7 +82,7 @@ const styles = sxStyles({
       borderRadius: "10px",
       p: { xs: "12px 12px", md: "12px 20px" },
       alignItems: "center",
-      width: "100%",
+      width: { xs: "100%", md: "unset" },
       justifyContent: "space-between",
    },
    applications: {
@@ -218,7 +217,13 @@ const JobList: FC<Props> = ({ jobs }) => {
                >
                   <Grid key={job.id} container>
                      <Box sx={styles.itemWrapper}>
-                        <Grid item xs={12} md={8} sx={styles.infoWrapper}>
+                        <Grid
+                           item
+                           xs={12}
+                           md={6.5}
+                           lg={7}
+                           sx={styles.infoWrapper}
+                        >
                            <Box sx={styles.mobileHeader}>
                               <Typography variant={"h5"} sx={styles.title}>
                                  {" "}
@@ -259,7 +264,13 @@ const JobList: FC<Props> = ({ jobs }) => {
                            </Stack>
                         </Grid>
 
-                        <Grid item xs={12} md={3.5} sx={styles.statsWrapper}>
+                        <Grid
+                           item
+                           xs={12}
+                           md={5}
+                           lg={4.5}
+                           sx={styles.statsWrapper}
+                        >
                            <Stack
                               spacing={2}
                               sx={styles.stats}
