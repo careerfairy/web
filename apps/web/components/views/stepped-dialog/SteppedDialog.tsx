@@ -147,7 +147,7 @@ const styles = sxStyles({
  * @property {string} key - A unique identifier for the View
  * @property {ComponentType} Component - A React component that will be rendered for the View
  */
-interface View {
+export interface View {
    key: string
    Component: ComponentType
 }
