@@ -16,7 +16,6 @@ import { Formik } from "formik"
 import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
 import { v4 as uuidv4 } from "uuid"
 import {
-   CustomJob,
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/groups/customJobs"
@@ -141,7 +140,7 @@ const Content = () => {
                <Formik<JobFormValues>
                   initialValues={getInitialValues(job, group.groupId)}
                   onSubmit={handleSubmit}
-                  validationSchema={validationSchema(job)}
+                  validationSchema={validationSchema}
                   enableReinitialize
                >
                   {({ dirty, handleSubmit, isSubmitting, isValid }) => (
@@ -191,7 +190,7 @@ const Content = () => {
                                  onClick={() => handleSubmit()}
                                  loading={isSubmitting}
                               >
-                                 {selectedJobId ? "Update" : "create"}
+                                 {selectedJobId ? "Update" : "Create"}
                               </SteppedDialog.Button>
                            </SteppedDialog.Actions>
                         </>
@@ -218,6 +217,7 @@ const view = [
 export type JobFormValues = {
    jobType: string
    deadline: Date
+   noDateValidation: boolean
 } & Omit<PublicCustomJob, "jobType" | "deadline">
 
 const getInitialValues = (
@@ -226,9 +226,18 @@ const getInitialValues = (
 ): JobFormValues => {
    // If the 'job' field is received, it indicates the intention to edit an existing job.
    if (job) {
+      let pastJob = false
+
+      if (job?.deadline.toDate() < new Date()) {
+         // The deadline for this job has already expired
+         // In this case, we will proceed to update the job fields without validating the deadline
+         pastJob = true
+      }
+
       return {
          ...job,
          deadline: job.deadline?.toDate(),
+         noDateValidation: pastJob,
       }
    }
 
@@ -241,30 +250,23 @@ const getInitialValues = (
       deadline: null,
       postingUrl: "",
       jobType: "",
+      noDateValidation: false,
    }
 }
 
-const validationSchema = (job?: CustomJob) => {
-   let pastJob = false
-
-   if (job?.deadline.toDate() < new Date()) {
-      // The deadline for this job has already expired
-      // In this case, we will proceed to update the job fields without validating the deadline
-      pastJob = true
-   }
-
+const validationSchema = () => {
    return Yup.object().shape({
       title: yup.string().required("Required"),
       description: yup.string().required("Required"),
       salary: yup.string(),
-      ...(pastJob
-         ? {}
-         : {
-              deadline: yup
-                 .date()
-                 .nullable()
-                 .min(new Date(), `The date must be in the future`),
-           }),
+      isPastJob: yup.boolean(),
+      deadline: yup.date().when("noDateValidation", {
+         is: true,
+         then: yup
+            .date()
+            .nullable()
+            .min(new Date(), `The date must be in the future`),
+      }),
       postingUrl: yup
          .string()
          .matches(URL_REGEX, { message: "Must be a valid url" })
