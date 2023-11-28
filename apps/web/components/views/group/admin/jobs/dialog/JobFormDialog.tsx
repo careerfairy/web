@@ -1,32 +1,28 @@
-import { useDispatch, useSelector } from "react-redux"
-import {
-   jobsFormDialogOpenSelector,
-   jobsFormSelectedJobIdSelector,
-} from "../../../../../store/selectors/adminJobsSelectors"
-import useGroupFromState from "../../../../custom-hook/useGroupFromState"
+import { useSelector } from "react-redux"
+import { jobsFormSelectedJobIdSelector } from "../../../../../../store/selectors/adminJobsSelectors"
+import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
-} from "../../../stepped-dialog/SteppedDialog"
+} from "../../../../stepped-dialog/SteppedDialog"
 import { useCallback } from "react"
-import { closeJobFormDialog } from "../../../../../store/reducers/adminJobsReducer"
-import { sxStyles } from "../../../../../types/commonTypes"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import * as Yup from "yup"
 import { Formik } from "formik"
-import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
+import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
 import { v4 as uuidv4 } from "uuid"
 import {
    JobType,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/groups/customJobs"
 import * as yup from "yup"
-import { URL_REGEX } from "../../../../util/constants"
+import { URL_REGEX } from "../../../../../util/constants"
 import { Box } from "@mui/material"
-import JobForm from "./JobForm"
-import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
-import { groupRepo } from "../../../../../data/RepositoryInstances"
-import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import Loader from "components/views/loader/Loader"
+import JobForm from "../JobForm"
+import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
+import { groupRepo } from "../../../../../../data/RepositoryInstances"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import Loader from "../../../../loader/Loader"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -60,33 +56,9 @@ const styles = sxStyles({
       maxWidth: "unset",
       fontSize: { xs: "16px", md: "16px" },
    },
-   header: {},
 })
 
 const JobFormDialog = () => {
-   const dispatch = useDispatch()
-   const isOpen = useSelector(jobsFormDialogOpenSelector)
-
-   const handleClose = () => {
-      dispatch(closeJobFormDialog())
-   }
-
-   if (!isOpen) {
-      return null
-   }
-
-   return (
-      <SteppedDialog
-         key={isOpen ? "open" : "closed"}
-         bgcolor="#FCFCFC"
-         handleClose={handleClose}
-         open={isOpen}
-         views={view}
-      />
-   )
-}
-
-const Content = () => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { group } = useGroupFromState()
    const { handleClose } = useStepper()
@@ -203,13 +175,6 @@ const Content = () => {
    )
 }
 
-const view = [
-   {
-      key: "select-job",
-      Component: () => <Content />,
-   },
-]
-
 /**
  * Ensure that the 'jobType' field is initialized as an empty string at the start of any form.
  * Additionally, use the 'Date' data type instead of 'Timestamp' within the form.
@@ -259,9 +224,9 @@ const validationSchema = () => {
       title: yup.string().required("Required"),
       description: yup.string().required("Required"),
       salary: yup.string(),
-      isPastJob: yup.boolean(),
+      noDateValidation: yup.boolean(),
       deadline: yup.date().when("noDateValidation", {
-         is: true,
+         is: false,
          then: yup
             .date()
             .nullable()

@@ -24,7 +24,7 @@ import useMenuState from "../../../../custom-hook/useMenuState"
 import { useDispatch } from "react-redux"
 import {
    openDeleteJobDialogOpen,
-   openJobFormDialog,
+   openJobsDialog,
 } from "../../../../../store/reducers/adminJobsReducer"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
@@ -50,17 +50,18 @@ const styles = sxStyles({
       border: "1px solid #ECECEC",
    },
    infoWrapper: {
-      p: { xs: 3, md: 0 },
-      pb: { xs: 2, md: 0 },
+      p: { xs: 2, md: 0 },
    },
    info: {
       display: "flex",
+      px: { xs: 1, md: 0 },
       mt: 1,
    },
    title: {
       color: "text.primary",
       fontWeight: "bold",
       fontSize: "20px",
+      px: { xs: 1, md: 0 },
    },
    subtitle: {
       fontSize: { xs: "14px", md: "16px" },
@@ -144,6 +145,11 @@ const styles = sxStyles({
       "&:hover": {
          cursor: "pointer",
       },
+   },
+   editWrapper: {
+      position: "absolute",
+      right: "12px",
+      top: "16px",
    },
 })
 
@@ -343,7 +349,7 @@ const EditButtonComponent: FC<EditComponentProps> = ({ jobId }) => {
    const handleEditJob = useCallback(
       (event: MouseEvent<HTMLElement>) => {
          event.stopPropagation()
-         dispatch(openJobFormDialog(jobId))
+         dispatch(openJobsDialog(jobId))
          handleClose()
       },
       [dispatch, handleClose, jobId]
@@ -366,7 +372,7 @@ const EditButtonComponent: FC<EditComponentProps> = ({ jobId }) => {
    )
 
    return (
-      <Box>
+      <Box sx={styles.editWrapper}>
          <IconButton onClick={menuClick} size={"small"}>
             <MoreVertIcon color={"secondary"} />
          </IconButton>
