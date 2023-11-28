@@ -51,7 +51,6 @@ const styles = sxStyles({
       justifyContent: "end",
       px: { xs: 1.5, md: 0 },
       pb: { xs: 1.5, md: 0 },
-      minWidth: { md: "300px" },
    },
    stats: {
       background: "#FAFAFE",
