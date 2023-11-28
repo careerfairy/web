@@ -4,10 +4,21 @@ import SteppedDialog, {
    useStepper,
 } from "../../../../stepped-dialog/SteppedDialog"
 import { useDispatch, useSelector } from "react-redux"
-import { jobsDialogOpenSelector } from "../../../../../../store/selectors/adminJobsSelectors"
+import {
+   jobsDialogOpenSelector,
+   jobsFormSelectedJobIdSelector,
+} from "../../../../../../store/selectors/adminJobsSelectors"
 import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
+import { SlideUpTransition } from "../../../../common/transitions"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
+const styles = sxStyles({
+   dialog: {
+      top: { xs: "70px", md: 0 },
+      borderRadius: 5,
+   },
+})
 const views = [
    {
       key: "privacy-policy",
@@ -26,6 +37,7 @@ const JobDialog = () => {
    const { group } = useGroupFromState()
    const dispatch = useDispatch()
    const isOpen = useSelector(jobsDialogOpenSelector)
+   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
@@ -33,8 +45,8 @@ const JobDialog = () => {
    }, [dispatch, handleClose])
 
    const currentStep = useMemo(
-      () => (group.privacyPolicyActive ? 1 : 0),
-      [group.privacyPolicyActive]
+      () => (group.privacyPolicyActive || selectedJobId ? 1 : 0),
+      [group.privacyPolicyActive, selectedJobId]
    )
 
    return (
@@ -45,6 +57,8 @@ const JobDialog = () => {
          open={isOpen}
          views={views}
          initialStep={currentStep}
+         transition={SlideUpTransition}
+         sx={styles.dialog}
       />
    )
 }
