@@ -1,9 +1,19 @@
+import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SteppedDialog, {
    View,
+   useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import React, { createContext, useMemo } from "react"
+import React, { createContext, useCallback, useMemo } from "react"
+import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import SelectPlanView from "./SelectPlanView"
+import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
+import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
+import SucessView from "./SucessView"
+// import { groupPlanService } from "data/firebase/GroupPlanService" TODO: uncomment this when backend is ready
+import { sleep } from "components/helperFunctions/HelperFunctions"
 
 type Props = {
    open: boolean
@@ -11,55 +21,98 @@ type Props = {
    groupToManage: GroupPresenter
 }
 
+export const PlanConfirmationDialogKeys = {
+   SelectPlan: "select-plan",
+   ConfirmSparksPlan: "confirm-sparks-plan",
+   ConfirmSparksTrial: "confirm-sparks-trial",
+   Success: "success",
+} as const
+
 const views = [
    {
-      key: "select-plan",
+      key: PlanConfirmationDialogKeys.SelectPlan,
       Component: SelectPlanView,
    },
    {
-      key: "confirm-upgrade-to-sparks",
-      Component: () => <div>Upgrade to Sparks</div>,
+      key: PlanConfirmationDialogKeys.ConfirmSparksPlan,
+      Component: ConfirmSparksPlanView,
    },
    {
-      key: "confirm-sparks-plan",
-      Component: () => <div>Confirm Sparks Plan</div>,
+      key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
+      Component: ConfirmSparksTrialView,
    },
    {
-      key: "confirm-sparks-trial",
-      Component: () => <div>Confirm Sparks Trial</div>,
+      key: PlanConfirmationDialogKeys.Success,
+      Component: SucessView,
    },
-   {
-      key: "success",
-      Component: () => <div>Success</div>,
-   },
-] as const satisfies View[]
+] as const satisfies ReadonlyArray<View>
 
-export type Keys = (typeof views)[number]["key"]
+export type PlanConfirmationDialogKey =
+   (typeof PlanConfirmationDialogKeys)[keyof typeof PlanConfirmationDialogKeys]
 
 type PlanConfirmationDialogContextType = {
    groupToManage: GroupPresenter
    handleClose: () => void
+   startPlan: (planType: GroupPlanType) => Promise<void>
+   isMutating: boolean
+   updatedGroupPlanType: GroupPlanType | undefined
 }
 
 const PlanConfirmationDialogContext =
    createContext<PlanConfirmationDialogContextType>({
       groupToManage: null,
       handleClose: () => {},
+      startPlan: async () => {},
+      isMutating: false,
+      updatedGroupPlanType: undefined,
    })
+
+const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
+   _,
+   { arg }
+) => {
+   await sleep(2000) // for PR demo purposes
+   // await void groupPlanService.startPlan(arg) TODO: uncomment this when backend is ready
+   return arg.planType
+}
 
 const CompanyPlanConfirmationDialog = ({
    handleClose,
    open,
    groupToManage,
 }: Props) => {
-   const initialStep = 0
+   const initialStep = getInitialStep(groupToManage)
+
+   const { errorNotification } = useSnackbarNotifications()
+
+   const {
+      trigger,
+      isMutating,
+      data: updatedGroupPlanType,
+   } = useSWRMutation(`startPlan-${groupToManage.id}`, fetcher, {
+      onError: errorNotification,
+   })
+
+   const startPlan = useCallback(
+      async (planType: GroupPlanType) => {
+         const planData: StartPlanData = {
+            planType: planType,
+            groupId: groupToManage.id,
+         }
+         await trigger(planData)
+      },
+      [groupToManage.id, trigger]
+   )
 
    const providerValue = useMemo<PlanConfirmationDialogContextType>(
       () => ({
          groupToManage,
          handleClose,
+         startPlan,
+         isMutating,
+         updatedGroupPlanType,
       }),
-      [groupToManage, handleClose]
+      [groupToManage, handleClose, isMutating, startPlan, updatedGroupPlanType]
    )
 
    return (
@@ -71,9 +124,24 @@ const CompanyPlanConfirmationDialog = ({
             open={open}
             views={views}
             initialStep={initialStep}
+            disableFullScreen
          />
       </PlanConfirmationDialogContext.Provider>
    )
+}
+
+const getInitialStep = (groupToManage: GroupPresenter) => {
+   if (!groupToManage.hasPlan()) {
+      return views.findIndex(
+         (view) => view.key === PlanConfirmationDialogKeys.SelectPlan
+      )
+   }
+
+   if (groupToManage.plan.type === GroupPlanTypes.Trial) {
+      return views.findIndex(
+         (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksTrial
+      )
+   }
 }
 
 export const usePlanConfirmationDialog = () => {
@@ -87,5 +155,8 @@ export const usePlanConfirmationDialog = () => {
 
    return context
 }
+
+export const usePlanConfirmationDialogStepper =
+   useStepper<PlanConfirmationDialogKey>
 
 export default CompanyPlanConfirmationDialog

@@ -3,7 +3,7 @@ import { Box, Button, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import Link from "components/views/common/Link"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import React from "react"
+import React, { Dispatch, SetStateAction } from "react"
 import { sxStyles } from "types/commonTypes"
 import ActionButton from "./ActionButton"
 import StatusChips from "./StatusChips"
@@ -47,7 +47,7 @@ const styles = sxStyles({
 
 type Props = {
    presenter: GroupPresenter
-   setGroupToManage: (group: GroupPresenter) => void
+   setGroupToManage: Dispatch<SetStateAction<GroupPresenter>>
 }
 
 const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
@@ -62,6 +62,7 @@ const CompanyPlanCard = React.memo(({ presenter, setGroupToManage }: Props) => {
          <Typography variant={"h6"} sx={styles.name}>
             {presenter.universityName}
          </Typography>
+         <Box pt={1.5} />
          <StatusChips presenter={presenter} />
          <Box pt={4} />
          <Stack sx={styles.actions} spacing={0.5}>
