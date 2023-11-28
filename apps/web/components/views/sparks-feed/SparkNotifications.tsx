@@ -21,6 +21,8 @@ import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import LivestreamDialog from "../livestream-dialog/LivestreamDialog"
 import { useAuth } from "HOCs/AuthProvider"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 
 type Props = {
    userEmail: string
@@ -44,6 +46,8 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       userEmail,
       currentSpark?.group.id
    )
+
+   const { trackEvent } = useSparksFeedTracker()
 
    useEffect(() => {
       if (isLoggedIn && eventToRegisterToId) {
@@ -89,6 +93,10 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       dispatch(setEventToRegisterTo(null))
    }, [dispatch])
 
+   const handleSuccessfulEventRegistration = () => {
+      trackEvent(SparkEventActions.Register_Event)
+   }
+
    return eventDetailsDialogVisibility ? (
       <LivestreamDialog
          livestreamId={
@@ -102,6 +110,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          serverUserEmail={userEmail}
          mode={"stand-alone"}
          currentSparkId={currentSpark?.id}
+         onRegisterSuccess={handleSuccessfulEventRegistration}
       />
    ) : null
 }

@@ -131,6 +131,7 @@ export const SparkEventActions = {
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
+   Register_Event: "Register_Event",
 } as const
 
 export type SparkEventActionType =

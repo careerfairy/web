@@ -201,13 +201,3 @@ We use ImageKit for real-time video optimization and transformation. Each develo
 8. Enable the **Optimize video quality before delivery** option, choose `40%` for the quality
 9. You can leave the other options as default and click "Save" at the top right corner.
 10.   Now your ImageKit account is ready to use 🚀
-
-### Configure Environment Variables
-
-1. Upon completing the account setup, you'll be provided with an `imagekitId`. You can find this ID on the [Developer API Keys Dashboard](https://imagekit.io/dashboard/developer/api-keys) of your ImageKit account. Copy this ID for the next step.
-2. If you don't already have a `.env.local` file in your [project](./apps/web/.env.local), make a copy of the `.env.local.example` file located [here](./apps/web/.env.local.example) and rename it to `.env.local`.
-3. Open your `.env.local` file and paste your `imagekitId` in the designated area, like so:
-
-         NEXT_PUBLIC_IMAGEKIT_ID=YOUR_IMAGEKIT_ID
-
-   For testing and production environments, the `NEXT_PUBLIC_IMAGEKIT_ID` will be configured in the CI/CD pipeline and the [.env.test](./apps/web/.env.test) file, respectively.
