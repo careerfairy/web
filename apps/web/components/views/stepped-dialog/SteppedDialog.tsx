@@ -51,7 +51,6 @@ const styles = sxStyles({
       maxHeight: "none",
       maxWidth: 770,
       overflowY: "auto",
-      top: { xs: "70px", md: 0 },
    },
    content: {
       p: 0,
