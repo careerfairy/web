@@ -43,7 +43,7 @@ const JobForm = () => {
                isOptionEqualToValue={(option, value) =>
                   option.value === value.value
                }
-               value={values.jobType ? getValue(values.jobType) : null}
+               value={getValue(values.jobType)}
                disableClearable
                textFieldProps={getTextFieldProps(
                   "Job Type (Required)",
@@ -110,6 +110,7 @@ const JobForm = () => {
    )
 }
 
-const getValue = (value: string) => ({ value: value, label: value })
+const getValue = (value: string) =>
+   value ? { value: value, label: value } : null
 
 export default JobForm
