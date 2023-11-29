@@ -19,6 +19,8 @@ const styles = sxStyles({
    tabs: {
       "*": {
          textTransform: "none !important",
+         fontWeight: 400,
+         fontSize: "1rem",
       },
       alignSelf: "center",
       ".Mui-selected": {
@@ -42,6 +44,9 @@ const styles = sxStyles({
    selectRoot: {
       width: "11.5rem",
       borderRadius: 50,
+      color: "#7A7A8E",
+      paddingTop: 0,
+      paddingBottom: 0,
       "& .MuiSelect-select": {
          paddingTop: {
             xs: 1.745,
@@ -61,9 +66,15 @@ const styles = sxStyles({
          },
       },
    },
+   selectMenu: {
+      ".MuiList-padding": {
+         paddingTop: "0 !important",
+      },
+   },
    selectMenuItem: {
-      paddingTop: 1.25,
-      paddingBottom: 1.25,
+      color: "#3D3D47",
+      paddingTop: 1.5,
+      paddingBottom: 1.5,
       "&.Mui-selected": {
          backgroundColor: "#FAFAFE !important",
       },
@@ -109,6 +120,7 @@ const GroupSparkAnalytics = () => {
                value={selectValue}
                onChange={handleSelectChange}
                sx={styles.selectRoot}
+               MenuProps={{ sx: styles.selectMenu }}
             >
                <StyledMenuItem value="7">Past 7 days</StyledMenuItem>
                <StyledMenuItem value="30">Past 30 days</StyledMenuItem>
