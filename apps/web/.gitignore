@@ -7,5 +7,7 @@ playwright-report/
 # jest
 .jest/
 .vercel
-.env.local
+.env*
+!.env.*.example*
+!.env.example.*
 *.tsbuildinfo

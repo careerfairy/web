@@ -23,7 +23,9 @@ playwright-report/
 
 .DS_Store
 !/packages/fetch-firestore-data/.env
-packages/functions/.env.local
+/packages/functions/.env*
+!/packages/functions/.env.example*
+!/packages/functions/.env.*.example*
 /test-results/
 /playwright-report/
 /blob-report/
