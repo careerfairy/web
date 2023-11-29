@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import {
    LiveStreamDialogData,
@@ -9,6 +9,7 @@ import CompanyPageOverview from "../../../../../components/views/company-page"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import {
+   deserializeGroupClient,
    getLivestreamsAndDialogData,
    getServerSideGroup,
    mapFromServerSide,
@@ -32,7 +33,7 @@ const CompanyPage: NextPage<
          >
             <DashboardHead title={`CareerFairy | ${universityName}`} />
             <CompanyPageOverview
-               group={serverSideGroup}
+               group={deserializeGroupClient(serverSideGroup)}
                upcomingLivestreams={mapFromServerSide(
                   serverSideUpcomingLivestreams
                )}
@@ -45,7 +46,7 @@ const CompanyPage: NextPage<
 }
 
 export const getServerSideProps: GetServerSideProps<{
-   serverSideGroup: Group
+   serverSideGroup: SerializedGroup
    serverSideUpcomingLivestreams: any[]
    serverSidePastLivestreams: any[]
    livestreamDialogData: LiveStreamDialogData
@@ -69,7 +70,7 @@ export const getServerSideProps: GetServerSideProps<{
 
       return {
          props: {
-            serverSideGroup,
+            serverSideGroup: serializeGroup(serverSideGroup),
             serverSideUpcomingLivestreams:
                serverSideUpcomingLivestreams?.map(
                   LivestreamPresenter.serializeDocument
