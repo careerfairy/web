@@ -11,7 +11,7 @@ import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import SelectPlanView from "./SelectPlanView"
 import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
 import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
-import SucessView from "./SucessView"
+import SuccessView from "./SuccessView"
 // import { groupPlanService } from "data/firebase/GroupPlanService" TODO: uncomment this when backend is ready
 import { sleep } from "components/helperFunctions/HelperFunctions"
 
@@ -43,7 +43,7 @@ const views = [
    },
    {
       key: PlanConfirmationDialogKeys.Success,
-      Component: SucessView,
+      Component: SuccessView,
    },
 ] as const satisfies ReadonlyArray<View>
 
