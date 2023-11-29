@@ -101,6 +101,12 @@ test.describe("Access a recording when the user registered to the livestream", (
 
       // sign up page -> log in page
       await page.getByRole("link", { name: "Log in" }).click()
+
+      // ensure we are on the login page, before filling out the form
+      // or else it will start filling out the form on the sign up page
+      // causing the test to fail
+      await page.waitForURL((url) => url.pathname === "/login")
+
       await LoginPage.login(page, {
          openPage: false,
          email: user.userEmail,
