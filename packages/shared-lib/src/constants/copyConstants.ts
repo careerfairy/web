@@ -1,6 +1,6 @@
 export const COPY_CONSTANTS = {
    GENERAL: {
-      ERROR: "Something went wrong, please try again or contact support",
+      ERROR: "Something went wrong, please try again or contact support.",
       PERMISSION_ERROR: "You do not have permission to perform this action.",
    },
    FORMS: {
