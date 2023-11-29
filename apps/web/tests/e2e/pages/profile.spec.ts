@@ -140,6 +140,7 @@ test.describe("Personal Information", () => {
       profilePage,
       browserName,
    }) => {
+      test.setTimeout(15000)
       test.skip(browserName === "chromium", "very flakey on chromium")
 
       // open page
