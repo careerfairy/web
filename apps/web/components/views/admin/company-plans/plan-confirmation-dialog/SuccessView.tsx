@@ -5,7 +5,7 @@ import { GroupPlanType } from "@careerfairy/shared-lib/groups"
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import DateUtil from "util/DateUtil"
 
-const SucessView = () => {
+const SuccessView = () => {
    const { handleClose, isMutating, groupToManage, updatedGroupPlanType } =
       usePlanConfirmationDialog()
 
@@ -25,7 +25,7 @@ const SucessView = () => {
          title="Plan active!"
          content={`${
             groupToManage?.universityName
-         }  plan is now active and will be last until ${getExpirationDate(
+         }  plan is now active and will last until ${getExpirationDate(
             updatedGroupPlanType
          )}`}
       />
@@ -42,10 +42,10 @@ const SucessView = () => {
  * @returns {string} - The expiration date of the plan, formatted as a string.
  */
 const getExpirationDate = (groupPlanType: GroupPlanType) => {
-   const durattion =
+   const duration =
       PLAN_CONSTANTS[groupPlanType]?.sparks.PLAN_DURATION_MILLISECONDS || 0
 
-   return DateUtil.formatDateToString(new Date(Date.now() + durattion))
+   return DateUtil.formatDateToString(new Date(Date.now() + duration))
 }
 
-export default SucessView
+export default SuccessView
