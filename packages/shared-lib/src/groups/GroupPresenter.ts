@@ -333,6 +333,36 @@ export class GroupPresenter {
       return this.plan !== null && this.plan !== undefined
    }
 
+   isTrialPlan() {
+      return this.plan?.type === "trial"
+   }
+
+   /**
+    * To get the number of days left in the trial plan creation period
+    *
+    * @returns number of days left in the trial plan creation period, or null if not on trial plan
+    */
+   getTrialPlanCreationPeriodLeft() {
+      if (this.isTrialPlan()) {
+         const currentTime = new Date().getTime()
+         const trialPlanCreationPeriodEnd =
+            this.getStartedAt() +
+            this.planConstants.sparks.TRIAL_CREATION_PERIOD_MILLISECONDS
+
+         if (currentTime > trialPlanCreationPeriodEnd) {
+            // If the current time is past the end of the trial plan creation period, return 0
+            return 0
+         } else {
+            // Calculate the time left in milliseconds
+            const timeLeftInMilliseconds =
+               trialPlanCreationPeriodEnd - currentTime
+            return timeLeftInMilliseconds
+         }
+      }
+
+      return null // Return null if not on trial plan
+   }
+
    /**
     * To check if the plan for this specific group has started
     * The check is done by comparing the current time with the plan's start time
