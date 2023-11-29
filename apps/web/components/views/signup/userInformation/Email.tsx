@@ -1,8 +1,6 @@
 import React, { ChangeEvent } from "react"
 import { Collapse, FormControl, FormHelperText, TextField } from "@mui/material"
 import { FormikTouched } from "formik"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 
 type Props = {
    value: string
