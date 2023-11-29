@@ -9,7 +9,6 @@ import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTex
 import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 import { sxStyles } from "types/commonTypes"
 import AvatarUpload from "./inputs/AvatarUpload"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 
 const styles = sxStyles({
@@ -114,16 +113,8 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         placeholder="E.g.,: John@careerfairy.io"
                         disabled={Boolean(values.id)} // if we are editing a creator, we don't want to allow changing the email
                         fullWidth
-                        InputProps={{
-                           endAdornment: (
-                              <Tooltip
-                                 color={"secondary"}
-                                 title={EMAIL_TOOLTIP_INFO}
-                              >
-                                 <InfoIcon />
-                              </Tooltip>
-                           ),
-                        }}
+                        requiredText={"(required)"}
+                        tooltipText={EMAIL_TOOLTIP_INFO}
                      />
                   </Grid>
                   <Grid item xs={12}>
