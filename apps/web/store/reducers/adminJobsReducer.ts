@@ -1,48 +1,48 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 interface IJobsState {
-   jobsDialogOpen: boolean
-   deleteJobDialogOpen: boolean
-   selectedJobId: string | null
+   jobsFormDialogOpen: boolean
+   jobsPrivacyPolicyDialogOpen: boolean
+   jobsForm: {
+      selectedJobId: string | null
+   }
 }
 
 const initialState: IJobsState = {
-   jobsDialogOpen: false,
-   deleteJobDialogOpen: false,
-   selectedJobId: null,
+   jobsFormDialogOpen: false,
+   jobsPrivacyPolicyDialogOpen: false,
+   jobsForm: {
+      selectedJobId: null,
+   },
 }
 
 export const adminJobsSlice = createSlice({
    name: "Admin Jobs",
    initialState,
    reducers: {
-      openJobsDialog: (state, action: PayloadAction<string> = null) => {
-         state.jobsDialogOpen = true
-         state.selectedJobId = action.payload
+      openJobFormDialog: (state, action: PayloadAction<string> = null) => {
+         state.jobsFormDialogOpen = true
+         state.jobsForm.selectedJobId = action.payload
       },
-      closeJobsDialog: (state) => {
-         state.jobsDialogOpen = false
+      closeJobFormDialog: (state) => {
+         state.jobsFormDialogOpen = false
+         state.jobsForm.selectedJobId = null
       },
-      openDeleteJobDialogOpen: (
-         state,
-         action: PayloadAction<string> = null
-      ) => {
-         state.deleteJobDialogOpen = true
-         state.selectedJobId = action.payload
+      openPrivacyPolicyDialog: (state) => {
+         state.jobsPrivacyPolicyDialogOpen = true
       },
-      closeDeleteJobDialogOpen: (state) => {
-         state.deleteJobDialogOpen = false
-         state.selectedJobId = null
+      closePrivacyPolicyDialog: (state) => {
+         state.jobsPrivacyPolicyDialogOpen = false
       },
    },
 })
 
 // Export actions
 export const {
-   openJobsDialog,
-   closeJobsDialog,
-   openDeleteJobDialogOpen,
-   closeDeleteJobDialogOpen,
+   openJobFormDialog,
+   closeJobFormDialog,
+   openPrivacyPolicyDialog,
+   closePrivacyPolicyDialog,
 } = adminJobsSlice.actions
 
 // Export reducer
