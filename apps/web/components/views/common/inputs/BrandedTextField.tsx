@@ -13,7 +13,7 @@ import { FC, ReactElement } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 
-export interface CustomBrandedTextFieldProps extends FilledInputProps {
+export interface CustomBrandedTextFieldProps {
    /**
     * Text to be shown when an input is required.
     * This property is used instead of required to prevent the default * from showing
