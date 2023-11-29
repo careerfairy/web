@@ -169,6 +169,7 @@ interface StepperDialogProps {
    transition?: JSXElementConstructor<TransitionProps>
    sx?: SxProps<Theme>
    disableFullScreen?: boolean
+   maxWidth?: number
 }
 
 /**
@@ -239,6 +240,7 @@ const SteppedDialog = <K extends string>({
    transition,
    sx,
    disableFullScreen,
+   maxWidth,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -313,6 +315,7 @@ const SteppedDialog = <K extends string>({
                styles.dialogPaper,
                {
                   bgcolor,
+                  maxWidth,
                },
                ...(Array.isArray(sx) ? sx : [sx]),
             ],
