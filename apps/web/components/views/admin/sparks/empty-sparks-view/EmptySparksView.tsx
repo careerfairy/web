@@ -49,6 +49,13 @@ const styles = sxStyles({
    warningColor: {
       color: "#FE9B0E",
    },
+   infoBox: {
+      p: 1,
+      borderRadius: 4,
+      border: "1px solid #FFD79F",
+      bgcolor: "#FAFAFA",
+      maxWidth: 423,
+   },
 })
 
 const EmptySparksView: FC = () => {
@@ -101,19 +108,21 @@ const EmptySparksView: FC = () => {
 
 const TrialPlanCreationPeriodInfo = () => {
    const { groupPresenter } = useGroup()
+
    const creationTimeLeft = groupPresenter.getTrialPlanCreationPeriodLeft()
+
    const planReadableTimeLeft = DateUtil.getHumanReadableTimeFromMilliseconds(
       groupPresenter.getPlanTimeLeft()
    )
 
-   const readableTimeleft =
+   const creationReadableTimeleft =
       DateUtil.getHumanReadableTimeFromMilliseconds(creationTimeLeft)
 
    const creationPeriodExpired = creationTimeLeft === 0
 
    if (creationPeriodExpired) {
       return (
-         <Box>
+         <Box sx={styles.infoBox}>
             <Typography sx={styles.infoText}>
                Your content creation period has ended; however, you still have
                time. Upload your Sparks and make the most of the remaining{" "}
@@ -130,7 +139,7 @@ const TrialPlanCreationPeriodInfo = () => {
       <Typography sx={styles.infoText}>
          Your content creation period ends in{" "}
          <Box sx={styles.warningColor} component="span">
-            {readableTimeleft}
+            {creationReadableTimeleft}
          </Box>
          .
       </Typography>
