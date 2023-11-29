@@ -1,11 +1,10 @@
 import dayjs from "dayjs"
-
-var calendar = require("dayjs/plugin/calendar")
-var advancedFormat = require("dayjs/plugin/advancedFormat")
-var utc = require("dayjs/plugin/utc")
-var timezone = require("dayjs/plugin/timezone") // dependent on utc plugin
-var relativeTime = require("dayjs/plugin/relativeTime")
-var duration = require("dayjs/plugin/duration")
+import calendar from "dayjs/plugin/calendar"
+import advancedFormat from "dayjs/plugin/advancedFormat"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
+import relativeTime from "dayjs/plugin/relativeTime"
+import duration from "dayjs/plugin/duration"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -44,7 +43,7 @@ export default class DateUtil {
    static eventPreviewHour(JSDate: Date) {
       return dayjs(JSDate).format("HH:mm")
    }
-   static getUpcomingDate(JSDate: Date) {
+   static getUpcomingDate(JSDate: Date | string) {
       return dayjs(JSDate).format("dddd, MMM D, YYYY h:mm A")
    }
    static getStreamTime(JSDate: Date) {
@@ -53,7 +52,7 @@ export default class DateUtil {
    static getStreamDate(JSDate: Date) {
       return dayjs(JSDate).format("dddd, MMMM D")
    }
-   static getRatingDate(JSDate: Date) {
+   static getRatingDate(JSDate: Date | string) {
       return dayjs(JSDate).format("D MMMM YYYY")
    }
 
@@ -196,10 +195,7 @@ export default class DateUtil {
       )
    }
 
-   static getMonth(
-      JsDateMonth: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11,
-      isAbbreviated = false
-   ) {
+   static getMonth(JsDateMonth: number, isAbbreviated = false) {
       switch (JsDateMonth) {
          case 0:
             return isAbbreviated ? "JAN" : "January"
@@ -263,8 +259,13 @@ export default class DateUtil {
    }
 
    static calculateTimeLeft(time: Date) {
-      const difference = time - new Date()
-      let timeLeft = {}
+      const difference = time.getTime() - new Date().getTime()
+      let timeLeft = {
+         Days: 0,
+         Hours: 0,
+         Minutes: 0,
+         Seconds: 0,
+      }
 
       if (difference > 0) {
          timeLeft = {
@@ -278,35 +279,39 @@ export default class DateUtil {
       return timeLeft
    }
 
-   static addDaysToDate(date, numberOfDays) {
+   static addDaysToDate(date: Date, numberOfDays: number) {
       const result = date
       result.setDate(date.getDate() + numberOfDays)
 
       return result
    }
 
-   static formatLiveDate(JSDate) {
+   static formatLiveDate(JSDate: Date) {
       const formattedDate = dayjs(JSDate).format(
          "dddd, DD MMM YYYY [at] h:mm A"
       )
       return `Live on ${formattedDate}` // Live on Monday, 12 Oct 2020 at 12:00 PM
    }
 
-   static formatPastDate(JSDate) {
+   static formatPastDate(JSDate: Date) {
       const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
       return `Live streamed on: ${formattedDate}` // Release date: 15 Dec 2022
    }
 
    /**
-    * Transforms a duration in milliseconds into a human readable relative time string formatted as "X days"
-    * using the dayjs library.
+    * Transforms a duration in milliseconds into a human readable relative time string
+    * using the dayjs library. If the duration is negative, a fallback string is returned.
     *
     * @param {number} milliseconds - The duration in milliseconds to be transformed.
-    * @return {string} - The resulting human readable relative time string.
+    * @param {string} fallback - The fallback string to be returned if the duration is negative.
+    * @return {string} - The resulting human readable relative time string, e.g. "2 hours" or "0 days left".
     *
     */
-   static getHumanReadableTimeFromMilliseconds(milliseconds, fallback) {
-      if (milliseconds < 0) return "0 days left"
+   static getHumanReadableTimeFromMilliseconds(
+      milliseconds: number,
+      fallback = "0 days left"
+   ) {
+      if (milliseconds < 0) return fallback
       return dayjs.duration(milliseconds).humanize() // 2 hours, 2 days, 2 months, 2 years
    }
 }
