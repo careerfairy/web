@@ -123,6 +123,7 @@ const CompanyPlanConfirmationDialog = ({
             views={views}
             initialStep={initialStep}
             disableFullScreen
+            maxWidth={546}
          />
       </PlanConfirmationDialogContext.Provider>
    )
@@ -137,7 +138,7 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
 
    if (groupToManage.plan.type === GroupPlanTypes.Trial) {
       return views.findIndex(
-         (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksTrial
+         (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksPlan
       )
    }
 
