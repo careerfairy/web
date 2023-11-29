@@ -68,9 +68,9 @@ const PrivacyPolicyDialog = () => {
                privacyPolicyUrl: values.privacyPolicyUrl,
             }
             await groupRepo.updateGroupMetadata(group.groupId, privacyPolicy)
-            successNotification("Privacy policy successfull updated")
+            successNotification("Privacy policy successfully updated")
          } catch (error) {
-            errorNotification(error, "An error has occured")
+            errorNotification(error, "An error has occurred")
          } finally {
             moveToNext()
          }

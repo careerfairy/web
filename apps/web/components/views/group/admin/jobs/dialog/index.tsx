@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic"
 import React, { useCallback, useMemo } from "react"
 import SteppedDialog, {
    useStepper,
@@ -12,6 +11,8 @@ import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReduc
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import PrivacyPolicyDialog from "./PrivacyPolicyDialog"
+import JobFormDialog from "./JobFormDialog"
 
 const styles = sxStyles({
    dialog: {
@@ -22,15 +23,20 @@ const styles = sxStyles({
 const views = [
    {
       key: "privacy-policy",
-      Component: dynamic(() => import("./PrivacyPolicyDialog")),
+      Component: () => <PrivacyPolicyDialog />,
    },
    {
       key: "create-form",
-      Component: dynamic(() => import("./JobFormDialog")),
+      Component: () => <JobFormDialog />,
    },
 ]
 
 export type JobDialogStep = (typeof views)[number]["key"]
+
+enum JobDialogStepEnum {
+   PRIVACY_POLICY = 0,
+   FORM = 1,
+}
 
 const JobDialog = () => {
    const { handleClose } = useStepper<JobDialogStep>()
@@ -45,7 +51,10 @@ const JobDialog = () => {
    }, [dispatch, handleClose])
 
    const currentStep = useMemo(
-      () => (group.privacyPolicyActive || selectedJobId ? 1 : 0),
+      () =>
+         group.privacyPolicyActive || selectedJobId
+            ? JobDialogStepEnum.FORM
+            : JobDialogStepEnum.PRIVACY_POLICY,
       [group.privacyPolicyActive, selectedJobId]
    )
 

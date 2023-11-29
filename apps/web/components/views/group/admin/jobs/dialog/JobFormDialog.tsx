@@ -18,7 +18,7 @@ import {
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../../util/constants"
 import { Box } from "@mui/material"
-import JobForm from "../JobForm"
+import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
@@ -230,7 +230,7 @@ const validationSchema = () => {
          then: yup
             .date()
             .nullable()
-            .min(new Date(), `The date must be in the future`),
+            .min(new Date(), "The date must be in the future"),
       }),
       postingUrl: yup
          .string()
