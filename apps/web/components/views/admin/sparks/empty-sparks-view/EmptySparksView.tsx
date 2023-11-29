@@ -55,6 +55,7 @@ const styles = sxStyles({
       border: "1px solid #FFD79F",
       bgcolor: "#FAFAFA",
       maxWidth: 423,
+      mx: "auto",
    },
 })
 
@@ -118,7 +119,7 @@ const TrialPlanCreationPeriodInfo = () => {
    const creationReadableTimeleft =
       DateUtil.getHumanReadableTimeFromMilliseconds(creationTimeLeft)
 
-   const creationPeriodExpired = creationTimeLeft === 0
+   const creationPeriodExpired = true
 
    if (creationPeriodExpired) {
       return (
