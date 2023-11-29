@@ -1,10 +1,8 @@
 import {
    Box,
-   Box,
    FilledInputProps,
    InputLabelProps,
    SelectProps,
-   Typography,
    Typography,
    lighten,
 } from "@mui/material"
@@ -15,12 +13,7 @@ import { FC, ReactElement } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 
-export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
-import { FC, ReactElement } from "react"
-import BrandedTooltip from "../tooltips/BrandedTooltip"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
-
-export interface CustomBrandedTextFieldProps {
+export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant"> & {
    /**
     * Text to be shown when an input is required.
     * This property is used instead of required to prevent the default * from showing
@@ -33,18 +26,6 @@ export interface CustomBrandedTextFieldProps {
    tooltipText?: String
 }
 
-export type BrandedTextFieldProps = Omit<
-   FilledTextFieldProps & CustomBrandedTextFieldProps,
-   "variant"
->
-
-function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
-   return (
-      <BrandedTooltip title={title}>
-         <InfoIcon color="secondary" />
-      </BrandedTooltip>
-   )
-}
 function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
    return (
       <BrandedTooltip title={title}>
@@ -56,25 +37,6 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    <TextField
       variant="filled"
       {...props}
-      label={
-         <Typography>
-            <Box
-               component="span"
-               display="flex"
-               alignItems="center center"
-               columnGap={1}
-               rowGap={0}
-            >
-               <span> {props.label} </span>
-               {props.requiredText ? <span>{props.requiredText}</span> : null}
-               {props.tooltipText ? (
-                  <span className="branded-tooltip">
-                     {getBrandedTooltip(props.tooltipText)}
-                  </span>
-               ) : null}
-            </Box>
-         </Typography>
-      }
       label={
          <Typography>
             <Box
