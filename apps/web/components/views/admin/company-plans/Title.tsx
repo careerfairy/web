@@ -19,7 +19,10 @@ const Title = () => {
    return (
       <Box sx={styles.root}>
          <Typography component="span" sx={styles.text}>
-            Manage our clients&apos; subscription plan
+            Manage our clients&apos;{" "}
+            <Typography component="span" color="secondary" sx={styles.text}>
+               subscription plan
+            </Typography>
          </Typography>
       </Box>
    )
