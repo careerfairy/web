@@ -13,7 +13,7 @@ import { FC, ReactElement } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 
-export interface CustomBrandedTextFieldProps {
+export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant"> & {
    /**
     * Text to be shown when an input is required.
     * This property is used instead of required to prevent the default * from showing
@@ -25,11 +25,6 @@ export interface CustomBrandedTextFieldProps {
     */
    tooltipText?: String
 }
-
-export type BrandedTextFieldProps = Omit<
-   FilledTextFieldProps & CustomBrandedTextFieldProps,
-   "variant"
->
 
 function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
    return (
