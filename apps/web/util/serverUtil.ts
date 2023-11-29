@@ -2,7 +2,11 @@ import { store } from "../pages/_app"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
-import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   Group,
+   SerializedGroup,
+   deserializeGroup,
+} from "@careerfairy/shared-lib/groups"
 import nookies from "nookies"
 import CookiesUtil from "./CookiesUtil"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
@@ -100,6 +104,28 @@ export const mapFromServerSide = (events: { [p: string]: any }[]) => {
    return events.map((e) =>
       LivestreamPresenter.parseDocument(e as any, fromDate)
    )
+}
+
+/**
+ * Deserializes a single group object.
+ * This function is used to convert a serialized group object (usually from a server response) into a Group object.
+ *
+ * @param {SerializedGroup} group - The group to deserialize.
+ * @returns {Group} The deserialized group.
+ */
+export const deserializeGroupClient = (group: SerializedGroup): Group => {
+   return deserializeGroup(group, fromDate)
+}
+
+/**
+ * Deserializes an array of group objects.
+ * This function is used to convert an array of serialized group objects (usually from a server response) into an array of Group objects.
+ *
+ * @param {SerializedGroup[]} groups - The groups to deserialize.
+ * @returns {Group[]} The deserialized groups.
+ */
+export const deserializeGroups = (groups: SerializedGroup[]): Group[] => {
+   return groups.map((group) => deserializeGroupClient(group))
 }
 
 export const getUserTokenFromCookie = (

@@ -7,8 +7,9 @@ import { InferGetServerSidePropsType, NextPage } from "next"
 import { getInfiniteQuery } from "../../components/views/companies/useInfiniteCompanies"
 import { getDocs } from "@firebase/firestore"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, serializeGroup } from "@careerfairy/shared-lib/groups"
 import { COMPANIES_PAGE_SIZE } from "components/util/constants"
+import { deserializeGroups } from "util/serverUtil"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -20,7 +21,9 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
             title={"CareerFairy | Companies"}
          />
          <GenericDashboardLayout pageDisplayName={"Companies"}>
-            <CompaniesPageOverview serverSideCompanies={serverSideCompanies} />
+            <CompaniesPageOverview
+               serverSideCompanies={deserializeGroups(serverSideCompanies)}
+            />
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
@@ -32,7 +35,8 @@ export const getServerSideProps = async () => {
 
    return {
       props: {
-         serverSideCompanies: mapFirestoreDocuments<Group>(snaps),
+         serverSideCompanies:
+            mapFirestoreDocuments<Group>(snaps).map(serializeGroup),
       },
    }
 }
