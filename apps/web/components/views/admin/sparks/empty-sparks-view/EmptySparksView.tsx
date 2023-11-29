@@ -7,6 +7,7 @@ import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -43,6 +44,7 @@ const styles = sxStyles({
 
 const EmptySparksView: FC = () => {
    const dispatch = useDispatch()
+   const { groupPresenter } = useGroup()
 
    const handleOpen = useCallback(() => {
       dispatch(openSparkDialog(null))
