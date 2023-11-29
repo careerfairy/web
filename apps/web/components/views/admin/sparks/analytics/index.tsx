@@ -17,9 +17,26 @@ const styles = sxStyles({
       },
    },
    tabs: {
+      "*": {
+         textTransform: "none !important",
+      },
       alignSelf: "center",
       ".Mui-selected": {
          fontWeight: 600,
+      },
+   },
+   mobileLimiter: {
+      display: {
+         md: "none",
+      },
+      width: {
+         xs: "100%",
+      },
+      marginTop: {
+         xs: "-2px",
+      },
+      borderBottom: {
+         xs: "2px solid #EFEFEF",
       },
    },
    selectRoot: {
@@ -87,6 +104,7 @@ const GroupSparkAnalytics = () => {
                <Tab label="Overview" value="overview" />
                <Tab label="Audience" value="audience" />
             </Tabs>
+            <Box component="span" sx={styles.mobileLimiter} />
             <Select
                value={selectValue}
                onChange={handleSelectChange}
