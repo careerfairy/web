@@ -3,19 +3,21 @@ import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const useCreatorSparks = (
-   creatorId: string,
+   creator: Creator,
    showHiddenSparks: boolean = false
 ) => {
    const creatorSparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
-         where("creator.id", "==", creatorId),
+         where("creator.id", "==", creator.id),
+         where("creator.groupId", "==", creator.groupId),
          ...(showHiddenSparks ? [] : [where("published", "==", true)]),
          orderBy("createdAt", "desc")
       )
-   }, [creatorId, showHiddenSparks])
+   }, [creator.id, creator.groupId, showHiddenSparks])
 
    return useFirestoreCollection<Spark>(creatorSparksQuery, {
       idField: "id",

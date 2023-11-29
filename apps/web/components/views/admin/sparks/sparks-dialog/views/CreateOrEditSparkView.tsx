@@ -82,8 +82,11 @@ const getInitialSparkValues = (
 }
 
 const CreateOrEditSparkView = () => {
-   const { group } = useGroup()
-   const canPublishMoreSparks = useCanPublishMoreSparks(group)
+   const { group, groupPresenter } = useGroup()
+   const canPublishMoreSparks = useCanPublishMoreSparks(
+      group.id,
+      groupPresenter.getMaxPublicSparks()
+   )
 
    const selectedCreator = useSelector(sparksFormSelectedCreator)
    const selectedSparkId = useSelector(sparksSelectedSparkId)
@@ -151,8 +154,11 @@ const CreateOrEditSparkView = () => {
 
 const FormComponent: FC = () => {
    const isMobile = useIsMobile()
-   const { group } = useGroup()
-   const canPublishMoreSparks = useCanPublishMoreSparks(group)
+   const { group, groupPresenter } = useGroup()
+   const canPublishMoreSparks = useCanPublishMoreSparks(
+      group.id,
+      groupPresenter.getMaxPublicSparks()
+   )
 
    const dispatch = useDispatch()
    const cachedFormValues = useSelector(sparksCachedSparkFormValues)
