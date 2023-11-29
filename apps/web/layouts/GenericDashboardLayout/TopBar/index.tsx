@@ -4,7 +4,10 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
-import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import {
+   getMaxLineStyles,
+   isServer,
+} from "../../../components/helperFunctions/HelperFunctions"
 import ProfileMenu from "./ProfileMenu"
 import LoginButton from "../../../components/views/common/LoginButton"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -74,7 +77,9 @@ const TopBar = ({ title, bgColor }: Props) => {
             <MissingDataButton />
 
             {/* profile avatar */}
-            {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+            {authenticatedUser.isLoaded &&
+            authenticatedUser.isEmpty &&
+            !isServer() ? ( // fixes nextjs ssr hydration client error
                <div>
                   <LoginButton />
                </div>
