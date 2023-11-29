@@ -13,7 +13,18 @@ import { FC, ReactElement } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 
-export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
+export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant"> & {
+   /**
+    * Text to be shown when an input is required.
+    * This property is used instead of required to prevent the default * from showing
+    * when the Component has required=true
+    */
+   requiredText?: String
+   /**
+    * Text for the additional tooltip, empty if not provided
+    */
+   tooltipText?: String
+}
 
 function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
    return (
