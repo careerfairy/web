@@ -70,7 +70,7 @@ const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
    _,
    { arg }
 ) => {
-   await void groupPlanService.startPlan(arg)
+   await groupPlanService.startPlan(arg)
    return arg.planType // We return the new plan type so that we can display it in the success view
 }
 
