@@ -1,20 +1,46 @@
 import {
+   Box,
    FilledInputProps,
    InputLabelProps,
    SelectProps,
+   Typography,
    lighten,
 } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
 import { useField } from "formik"
-import { FC } from "react"
+import { FC, ReactElement } from "react"
+import BrandedTooltip from "../tooltips/BrandedTooltip"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
 
 export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
 
+function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
+   return (
+      <BrandedTooltip title={title}>
+         <InfoIcon color="secondary" />
+      </BrandedTooltip>
+   )
+}
 const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    <TextField
       variant="filled"
       {...props}
+      label={
+         <Typography>
+            <Box
+               component="span"
+               display="flex"
+               alignItems="center center"
+               columnGap={1}
+               rowGap={0}
+            >
+               <span> {props.label} </span>
+               {props.requiredText ? <span>{props.requiredText}</span> : null}
+               {props.tooltipText ? getBrandedTooltip(props.tooltipText) : null}
+            </Box>
+         </Typography>
+      }
       InputProps={Object.assign({}, inputProps, props.InputProps)}
       InputLabelProps={Object.assign(
          {},
@@ -27,6 +53,10 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
+   },
+   "& label span": {
+      fontWeight: 500,
+      color: "#6F6F80",
    },
    "& label.Mui-focused": {
       color: "#9999B1",
