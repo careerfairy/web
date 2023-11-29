@@ -7,7 +7,6 @@ import {
    Tooltip,
 } from "@mui/material"
 import { FormikTouched } from "formik"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
 
 type Props = {
    value: string
