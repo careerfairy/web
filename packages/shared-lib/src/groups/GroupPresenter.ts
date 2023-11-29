@@ -339,8 +339,7 @@ export class GroupPresenter {
 
    /**
     * To get the number of days left in the trial plan creation period
-    *
-    * @returns number of days left in the trial plan creation period, or null if not on trial plan
+    * @returns the number of days left in the trial plan creation period, 0 if the trial plan creation period has ended, null if not on trial plan
     */
    getTrialPlanCreationPeriodLeft() {
       if (this.isTrialPlan()) {
