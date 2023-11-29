@@ -217,9 +217,9 @@ exports.onDeleteLivestreamPopularityEvents =
 exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 
 // Group Spark Functions
-exports.createSpark_v2 = groupSparks.createSpark
-exports.updateSpark_v2 = groupSparks.updateSpark
-exports.deleteSpark_v2 = groupSparks.deleteSpark
+exports.createSpark_v3 = groupSparks.createSpark
+exports.updateSpark_v3 = groupSparks.updateSpark
+exports.deleteSpark_v3 = groupSparks.deleteSpark
 
 // User Spark Notification Functions
 exports.createSparksFeedEventNotifications =
@@ -234,7 +234,7 @@ exports.getSparksFeed = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
-exports.trackSparkEvents_v2 = userSparks.trackSparkEvents
+exports.trackSparkEvents_v3 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
 
 // Custom Jobs

@@ -72,6 +72,8 @@ export type SparkEventClient = {
    utm_content: string | null
    /** Type of action (Share, Like, Impression, Click on career page CTA, Spark completely watched, Played spark) */
    actionType: SparkEventActionType
+   /** Group Id for spark ownership */
+   groupId: string | null
 } & CommonClientFields
 
 /**
@@ -129,6 +131,7 @@ export const SparkEventActions = {
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
+   Register_Event: "Register_Event",
 } as const
 
 export type SparkEventActionType =

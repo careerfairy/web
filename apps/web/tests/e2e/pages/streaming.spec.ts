@@ -143,10 +143,12 @@ test.describe("Streaming Journey", () => {
       // streamer posts a chat message
       const message = "First chat entry"
       const name = user.firstName + " " + user.lastName.charAt(0)
+      await streamerPage.hideEmulatorWarning()
       await streamerPage.openChat()
       await streamerPage.sendChatMessage(message)
 
       // viewer receives the message
+      await viewerPage.hideEmulatorWarning()
       await viewerPage.openChat(1)
       await expect(viewerPage.text(`${message}${name}`)).toBeVisible()
 

@@ -59,6 +59,7 @@ export const SparksFeedTrackerProvider: FC<{
    const currentSparkId = useSelector(currentSparkIdSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
    const categoryId = useSelector(activeSparkSelector)?.category?.id || null
+   const groupId = useSelector(activeSparkSelector)?.group.id || null
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
       (data) => sparkService.trackSparkEvents(data),
@@ -103,6 +104,7 @@ export const SparksFeedTrackerProvider: FC<{
             utm_campaign: utm_campaign ? utm_campaign.toString() : null,
             utm_term: utm_term ? utm_term.toString() : null,
             utm_content: utm_content ? utm_content.toString() : null,
+            groupId,
             referralCode: referral ? referral.toString() : null,
             sparkId: currentSparkId,
             referrer,
@@ -172,6 +174,7 @@ export const SparksFeedTrackerProvider: FC<{
          userData?.university?.code,
          userData?.university?.name,
          sessionId,
+         groupId,
          addEventToBatch,
       ]
    )

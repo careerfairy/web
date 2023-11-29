@@ -30,21 +30,6 @@ export const SPARK_CONSTANTS = {
    QUESTION_MIN_LENGTH: 10,
 
    /**
-    * The minimum creators for a group to publish sparks
-    */
-   MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 3,
-
-   /**
-    * The minimum sparks per creator for a group to publish sparks
-    */
-   MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-
-   /**
-    * The minimum sparks per creator for a group to publish sparks
-    */
-   MAX_PUBLIC_SPARKS: 15,
-
-   /**
     * Only show spark notifications if the upcoming event is within the next X days
     */
    LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS: 15,

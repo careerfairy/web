@@ -17,6 +17,8 @@ import { Box, Button, Slide, Typography } from "@mui/material"
 import { companyLogoPlaceholder } from "../../../../../../constants/images"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import useLivestream from "components/custom-hook/live-stream/useLivestream"
+import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    root: {
@@ -68,10 +70,15 @@ type Props = {
 const SparksEventNotification: FC<Props> = ({ spark }) => {
    const dispatch = useDispatch()
    const isMobile = useIsMobile()
+   const { authenticatedUser } = useAuth()
 
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
    const activeSpark = useSelector(activeSparkSelector)
    const groupPageId = useSelector(groupIdSelector)
+   const event = useLivestream(eventNotification?.eventId || "none")
+   const isUserRegisteredToEvent = event?.data?.registeredUsers.includes(
+      authenticatedUser?.email
+   )
 
    const { universityName, logoUrl } = spark.group
 
@@ -109,9 +116,16 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
                activeSpark &&
                activeSpark.id === spark?.id &&
                !activeSpark.isCardNotification &&
-               !groupPageId
+               !groupPageId &&
+               !isUserRegisteredToEvent
          ),
-      [activeSpark, eventNotification, groupPageId, spark?.id]
+      [
+         activeSpark,
+         eventNotification,
+         groupPageId,
+         isUserRegisteredToEvent,
+         spark?.id,
+      ]
    )
 
    return (

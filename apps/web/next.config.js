@@ -108,6 +108,7 @@ const csp = {
       "https://noembed.com", // for react-player thumbnail
       "blob:",
       "https://cdn.dreamdata.cloud",
+      "https://px.ads.linkedin.com",
    ],
    "img-src": [
       "'self'",
@@ -139,6 +140,15 @@ const csp = {
       "data:",
       "https://uploads-ssl.webflow.com",
    ],
+   "media-src": [
+      "'self'",
+      "https://media.careerfairy.io",
+      "blob:",
+      "*.amazonaws.com",
+      "careerfairy-e1fd9.firebaseapp.com",
+      "*.youtube.com",
+      "*.googleapis.com",
+   ],
 }
 
 if (notProduction) {
@@ -148,6 +158,8 @@ if (notProduction) {
    csp["connect-src"].push("127.0.0.1:*")
    csp["img-src"].push("localhost:*")
    csp["img-src"].push("127.0.0.1:*")
+   csp["media-src"].push("localhost:*")
+   csp["media-src"].push("127.0.0.1:*")
 }
 
 if (isVercelPreview) {
