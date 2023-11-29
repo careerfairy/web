@@ -13,6 +13,11 @@ interface SparksPlanConstants {
    MAX_SPARK_CREATOR_COUNT: number
    /** The duration of the plan in milliseconds. */
    PLAN_DURATION_MILLISECONDS: number
+   /**
+    * The duration of the trial creation period in milliseconds.
+    * This is optional as it only applies to the trial plan.
+    */
+   TRIAL_CREATION_PERIOD_MILLISECONDS?: number
 }
 
 interface JobsPlanConstants {
@@ -32,6 +37,7 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
          MAX_PUBLIC_SPARKS: 6,
          MAX_SPARK_CREATOR_COUNT: 1,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 75, // 2.5 months
+         TRIAL_CREATION_PERIOD_MILLISECONDS: 1000 * 60 * 60 * 24 * 14, // 2 weeks
       },
       jobs: {
          // Empty for now
