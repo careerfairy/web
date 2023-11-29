@@ -1,39 +1,15 @@
 import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
-import {
-   CustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
-import React, { FC, MouseEvent, useCallback, useMemo, useState } from "react"
-import {
-   Box,
-   Divider,
-   Grid,
-   Typography,
-   Stack,
-   IconButton,
-   MenuItem,
-   ListItem,
-   Card,
-} from "@mui/material"
+import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import React, { FC, useCallback, useMemo } from "react"
+import { Box, Divider, Grid, Typography, Stack, ListItem } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { Search as FindIcon, Trash2 as DeleteIcon, User } from "react-feather"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
-import EditIcon from "@mui/icons-material/Edit"
-import BrandedMenu from "../../../common/inputs/BrandedMenu"
-import useMenuState from "../../../../custom-hook/useMenuState"
-import { useDispatch } from "react-redux"
-import {
-   openDeleteJobDialogOpen,
-   openJobsDialog,
-} from "../../../../../store/reducers/adminJobsReducer"
+import { User } from "react-feather"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { useRouter } from "next/router"
 import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
-import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import { getParts } from "../../../../util/search"
-import RenderParts from "../../../common/search/RenderParts"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
+import JobMenu from "./JobMenu"
+import JobSearch from "./JobSearch"
 
 const styles = sxStyles({
    wrapper: {
@@ -93,26 +69,6 @@ const styles = sxStyles({
          color: "secondary.main",
       },
    },
-   deleteIcon: {
-      display: "flex",
-      alignSelf: "center",
-      height: "16px",
-      width: "16px",
-      mr: 1,
-
-      "& svg": {
-         height: 16,
-      },
-   },
-   deleteMenuItem: {
-      color: "error.main",
-      py: "12px",
-   },
-   menu: {
-      "& .MuiPaper-root": {
-         borderRadius: "6px",
-      },
-   },
    mobileHeader: {
       display: "flex",
       justifyContent: "space-between",
@@ -126,13 +82,7 @@ const styles = sxStyles({
    searchWrapper: {
       display: "flex",
       flexDirection: "column",
-      py: { xs: 2 },
-   },
-   search: {
-      display: "flex",
-      alignItems: "center",
-      height: "40px",
-      borderRadius: "20px",
+      pb: { xs: 2 },
    },
    editButtonDesktop: {
       display: "flex",
@@ -145,12 +95,8 @@ const styles = sxStyles({
          cursor: "pointer",
       },
    },
-   editWrapper: {
-      position: "absolute",
-      right: "12px",
-      top: "16px",
-   },
 })
+export type SortedJobs = Omit<CustomJob, "createdAt"> & { createdAt: Date }
 
 type Props = {
    jobs: CustomJob[]
@@ -159,7 +105,6 @@ const JobList: FC<Props> = ({ jobs }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
-   const [inputValue, setInputValue] = useState("")
 
    const handleJobClick = useCallback(
       (jobId: string) => {
@@ -168,14 +113,8 @@ const JobList: FC<Props> = ({ jobs }) => {
       [group.groupId, push]
    )
 
-   const handleChange = useCallback(
-      (newValue: PublicCustomJob | null) =>
-         push(`/group/${group.groupId}/admin/jobs/${newValue.id}`),
-      [group.groupId, push]
-   )
-
    const sortedJobs = useMemo(
-      () =>
+      (): SortedJobs[] =>
          jobs
             .map((job) => ({
                ...job,
@@ -189,23 +128,7 @@ const JobList: FC<Props> = ({ jobs }) => {
       <Box sx={styles.wrapper}>
          <Stack spacing={2} sx={styles.searchWrapper}>
             {isMobile ? <CreateJobButton sx={styles.createButton} /> : null}
-
-            <Card sx={styles.search}>
-               <AutocompleteSearch
-                  id="jobs-search"
-                  minCharacters={3}
-                  inputValue={inputValue}
-                  handleChange={handleChange}
-                  options={sortedJobs}
-                  renderOption={renderOption}
-                  isOptionEqualToValue={isOptionEqualToValue}
-                  getOptionLabel={getOptionLabel}
-                  setInputValue={setInputValue}
-                  noOptionsText="No jobs found"
-                  placeholderText="Search"
-                  inputStartIcon={<FindIcon />}
-               />
-            </Card>
+            <JobSearch options={sortedJobs} />
          </Stack>
 
          <Stack spacing={2}>
@@ -229,9 +152,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                                  {" "}
                                  {job.title}{" "}
                               </Typography>
-                              {isMobile ? (
-                                 <EditButtonComponent jobId={job.id} />
-                              ) : null}
+                              {isMobile ? <JobMenu jobId={job.id} /> : null}
                            </Box>
 
                            <Stack
@@ -303,7 +224,7 @@ const JobList: FC<Props> = ({ jobs }) => {
 
                         {isMobile ? null : (
                            <Grid item xs={0.5} sx={styles.editButtonDesktop}>
-                              <EditButtonComponent jobId={job.id} />
+                              <JobMenu jobId={job.id} />
                            </Grid>
                         )}
                      </Box>
@@ -315,106 +236,9 @@ const JobList: FC<Props> = ({ jobs }) => {
    )
 }
 
-const isOptionEqualToValue = (
-   option: PublicCustomJob,
-   value: PublicCustomJob
-) => option.id === value.id
-
-const getOptionLabel = (option: PublicCustomJob) => option.title
-
-const renderOption = (
-   props: React.HTMLAttributes<HTMLLIElement>,
-   option: PublicCustomJob,
-   state: AutocompleteRenderOptionState
-) => {
-   const titleParts = getParts(option.title, state.inputValue)
-
-   return (
-      <Box {...props} component={"li"} key={option.id}>
-         <RenderParts parts={titleParts} />
-      </Box>
-   )
-}
-
 const formatJobPostingUrl = (postingUrl: string): string => {
    const withoutProtocol = postingUrl.split("://")[1]
    return withoutProtocol ? withoutProtocol : postingUrl
-}
-
-type EditComponentProps = {
-   jobId: string
-}
-const EditButtonComponent: FC<EditComponentProps> = ({ jobId }) => {
-   const { anchorEl, handleClick, handleClose, open } = useMenuState()
-   const dispatch = useDispatch()
-
-   const handleRemoveJob = useCallback(
-      (event: MouseEvent<HTMLElement>) => {
-         event.stopPropagation()
-         dispatch(openDeleteJobDialogOpen(jobId))
-         handleClose()
-      },
-      [dispatch, handleClose, jobId]
-   )
-
-   const handleEditJob = useCallback(
-      (event: MouseEvent<HTMLElement>) => {
-         event.stopPropagation()
-         dispatch(openJobsDialog(jobId))
-         handleClose()
-      },
-      [dispatch, handleClose, jobId]
-   )
-
-   const menuClick = useCallback(
-      (event: MouseEvent<HTMLElement>) => {
-         event.stopPropagation()
-         handleClick(event)
-      },
-      [handleClick]
-   )
-
-   const handleCloseMenu = useCallback(
-      (event: MouseEvent<HTMLElement>) => {
-         event.stopPropagation()
-         handleClose()
-      },
-      [handleClose]
-   )
-
-   return (
-      <Box sx={styles.editWrapper}>
-         <IconButton onClick={menuClick} size={"small"}>
-            <MoreVertIcon color={"secondary"} />
-         </IconButton>
-         <BrandedMenu
-            onClose={handleCloseMenu}
-            anchorEl={anchorEl}
-            open={open}
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "right",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "right",
-            }}
-            sx={styles.menu}
-         >
-            <MenuItem onClick={handleEditJob}>
-               <EditIcon sx={{ height: 16 }} color="inherit" />
-               Edit job opening details
-            </MenuItem>
-            <Divider />
-            <MenuItem sx={styles.deleteMenuItem} onClick={handleRemoveJob}>
-               <Box sx={styles.deleteIcon}>
-                  <DeleteIcon />
-               </Box>
-               Remove job opening
-            </MenuItem>
-         </BrandedMenu>
-      </Box>
-   )
 }
 
 export default JobList

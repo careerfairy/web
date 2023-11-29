@@ -3,10 +3,10 @@ import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import useGroupCustomJob from "../../components/custom-hook/useGroupCustomJob"
 
 /**
- * Props for JObFetcher component.
+ * Props for JobFetcher component.
  * @typedef {Object} JobFetcherProps
  * @property {string} groupId - The ID of the group.
- * @property {string} [jobId] - The ID of the selected JOb.
+ * @property {string} [jobId] - The ID of the selected Job.
  * @property {(job: CustomJob | null) => ReactNode} children - A function that returns a ReactNode, given a Job.
  */
 type JobFetcherProps = {

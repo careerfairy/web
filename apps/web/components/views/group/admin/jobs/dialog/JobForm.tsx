@@ -1,15 +1,16 @@
 import { useFormikContext } from "formik"
-import { JobFormValues } from "./dialog/JobFormDialog"
+import { JobFormValues } from "./JobFormDialog"
 import { Box, Grid } from "@mui/material"
 import DatePicker from "react-datepicker"
 import BrandedTextField, {
    BrandedTextFieldField,
-} from "../../../common/inputs/BrandedTextField"
+} from "../../../../common/inputs/BrandedTextField"
 import { jobTypeOptions } from "@careerfairy/shared-lib/groups/customJobs"
-import { getTextFieldProps } from "../../../../helperFunctions/streamFormFunctions"
-import BrandedAutocomplete from "../../../common/inputs/BrandedAutocomplete"
-import { datePickerDefaultStyles } from "../../../calendar/utils"
+import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
+import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
+import { datePickerDefaultStyles } from "../../../../calendar/utils"
 import GBLocale from "date-fns/locale/en-GB"
+import DateUtil from "../../../../../../util/DateUtil"
 
 const JobForm = () => {
    const { values, setFieldValue, errors, touched } =
@@ -80,7 +81,7 @@ const JobForm = () => {
             >
                <DatePicker
                   selected={values.deadline}
-                  minDate={new Date()}
+                  minDate={DateUtil.getTomorrowDate()}
                   dateFormat={"dd/MM/yyyy"}
                   locale={GBLocale}
                   formatWeekDay={(nameOfDay) => nameOfDay.substr(0, 1)}
@@ -92,6 +93,9 @@ const JobForm = () => {
                         label="Application Deadline"
                         placeholder="Insert date"
                         fullWidth
+                        error={Boolean(errors.deadline)}
+                        // @ts-ignore
+                        helperText={errors.deadline ? errors.deadline : null}
                      />
                   }
                   onChange={(value) => setFieldValue("deadline", value)}
