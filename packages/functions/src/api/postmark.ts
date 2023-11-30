@@ -3,11 +3,11 @@ import * as postmark from "postmark"
 import { ServerClient } from "postmark"
 import { Callback, MessageSendingResponse } from "postmark/dist/client/models"
 import { isLocalEnvironment, isTestEnvironment } from "../util"
-let serverToken = "3f6d5713-5461-4453-adfd-71f5fdad4e63"
+let serverToken = process.env.NEXT_PRIVATE_PROD_POSTMARK_SERVER_TOKEN
 
 // on local emulators use the sandbox environment
 if (isLocalEnvironment()) {
-   serverToken = "40c62a86-6189-432d-b3f8-f25b345184aa"
+   serverToken = process.env.NEXT_PRIVATE_DEV_POSTMARK_SERVER_TOKEN
    console.log(
       "Using postmark sandbox environment, you need to check the sent emails on their dashboard"
    )
