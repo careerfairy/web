@@ -112,12 +112,12 @@ const TrialPlanCreationPeriodInfo = () => {
 
    const creationTimeLeft = groupPresenter.getTrialPlanCreationPeriodLeft()
 
-   const planReadableTimeLeft = DateUtil.getHumanReadableTimeFromMilliseconds(
+   const planReadableTimeLeft = DateUtil.getDaysLeftFromMilliseconds(
       groupPresenter.getPlanTimeLeft()
    )
 
    const creationReadableTimeleft =
-      DateUtil.getHumanReadableTimeFromMilliseconds(creationTimeLeft)
+      DateUtil.getDaysLeftFromMilliseconds(creationTimeLeft)
 
    const creationPeriodExpired = creationTimeLeft === 0 // 0 means expired, see method
 
