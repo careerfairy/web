@@ -119,7 +119,7 @@ const TrialPlanCreationPeriodInfo = () => {
    const creationReadableTimeleft =
       DateUtil.getHumanReadableTimeFromMilliseconds(creationTimeLeft)
 
-   const creationPeriodExpired = true
+   const creationPeriodExpired = creationTimeLeft === 0 // 0 means expired, see method
 
    if (creationPeriodExpired) {
       return (
