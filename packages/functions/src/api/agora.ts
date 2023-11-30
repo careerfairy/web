@@ -14,7 +14,7 @@ if (isLocalEnvironment()) {
    appID = process.env.NEXT_PRIVATE_DEV_AGORA_APP_ID
    appCertificate = process.env.NEXT_PRIVATE_DEV_AGORA_APP_CERTIFICATE
 
-   // Restfull api credentials for customer id: e76e7e728a5241b5803036a87c735736
+   // Restfull api credentials for customer id: mappend in .env.local
    customerKey = process.env.NEXT_PRIVATE_DEV_AGORA_CUSTOMER_KEY
    customerSecret = process.env.NEXT_PRIVATE_DEV_AGORA_CUSTOMER_SECRET
    console.log("Using AgoraSDK testing environment")
