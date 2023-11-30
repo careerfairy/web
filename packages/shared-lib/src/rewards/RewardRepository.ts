@@ -144,7 +144,7 @@ export class FirebaseRewardRepository
             )
          }
 
-         await userRef.update({
+         transaction.update(userRef, {
             credits: this.fieldValue.increment(credits),
          })
       })
