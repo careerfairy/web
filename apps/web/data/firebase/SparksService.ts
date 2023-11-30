@@ -36,13 +36,14 @@ import {
    deleteField,
    setDoc,
    PartialWithFieldValue,
+   updateDoc,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { UserData, UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -376,6 +377,20 @@ export class SparksService {
       )
 
       sparkCounter.incrementBy(increment)
+   }
+
+   /**
+    * Mark the Sparks B2B onboarding as completed for a user
+    * @param userId The user who completed the onboarding
+    */
+   async markSparksB2BOnboardingAsCompleted(userId: string) {
+      const userRef = doc(FirestoreInstance, "users", userId).withConverter(
+         createGenericConverter<UserData>()
+      )
+
+      return updateDoc(userRef, {
+         hasCompletedSparksB2BOnboarding: true,
+      })
    }
 
    private createLikedSparksObject(

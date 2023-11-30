@@ -100,6 +100,11 @@ export interface UserData extends Identifiable {
     * User has already seen the first onboarding video
     */
    welcomeDialogComplete?: boolean
+
+   /**
+    * Indicates if the user has completed the Sparks onboarding process
+    */
+   hasCompletedSparksB2BOnboarding?: boolean
 }
 
 /*
