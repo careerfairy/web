@@ -302,13 +302,15 @@ export default class DateUtil {
    }
 
    /**
-    * Transforms a duration in milliseconds into a human readable relative time string
+    * Transforms a duration in milliseconds into a human readable relative time string formatted as "X days"
     * using the dayjs library.
     *
     * @param {number} milliseconds - The duration in milliseconds to be transformed.
-    * @return {string} - The resulting human readable relative time string.
+    * @return {string} - The resulting string formatted as "X days".
     */
-   static getHumanReadableTimeFromMilliseconds(milliseconds) {
-      return dayjs.duration(milliseconds).humanize() // 2 hours, 2 days, 2 months, 2 years
+   static getDaysLeftFromMilliseconds(milliseconds, fallback = "0 days left") {
+      if (milliseconds < 0) return fallback
+      const days = dayjs.duration(milliseconds).asDays()
+      return `${Math.floor(days)} days`
    }
 }
