@@ -4,7 +4,7 @@ import {
    PieChartDataPoint,
    TimePeriodParams,
    TimeseriesDataPoint,
-} from "./SparksAnalytics"
+} from "./SparksAnalyticsTypes"
 import IBigQueryService from "../../bigQuery/IBigQueryService"
 import { BigQuery } from "@google-cloud/bigquery"
 import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"
@@ -27,30 +27,112 @@ import {
    topLevelsOfStudy,
 } from "./queries/Audience"
 
-interface ISparksAnalyticsRepository {
+/**
+ * Interface for the SparksAnalyticsRepository
+ * @interface
+ */
+interface IGroupSparksAnalyticsRepository {
+   /**
+    * Get group's total sparks views for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the total views for the past year
+    */
    getTotalViewsPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get group sparks' unique viewers for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the unique viewers for the past year
+    */
    getUniqueViewersPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get group's sparks likes for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the likes for the past year
+    */
    getLikesPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get group's sparks shares for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the shares for the past year
+    */
    getSharesPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get event registrations from sparks for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the registrations for the past year
+    */
    getRegistrationsPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get group's sparks page clicks for the past year
+    * @returns {Promise<TimeseriesDataPoint[]>} Promise object represents the page clicks for the past year
+    */
    getPageClicksPastYear(): Promise<TimeseriesDataPoint[]>
+
+   /**
+    * Get group's most watched sparks for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<MostSomethingBase>} Promise object represents the most watched sparks for the given time period
+    */
    getMostWatchedSparks(
       timeperiod: TimePeriodParams
    ): Promise<MostSomethingBase>
+
+   /**
+    * Get group's most liked sparks for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<MostSomethingBase>} Promise object represents the most liked sparks for the given time period
+    */
    getMostLikedSparks(timeperiod: TimePeriodParams): Promise<MostSomethingBase>
+
+   /**
+    * Get group's most shared sparks for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<MostSomethingBase>} Promise object represents the most shared sparks for the given time period
+    */
    getMostSharedSparks(timeperiod: TimePeriodParams): Promise<MostSomethingBase>
+
+   /**
+    * Get group's most recent sparks
+    * @returns {Promise<MostSomethingBase>} Promise object represents the most recent sparks
+    */
    getMostRecentSparks(): Promise<MostSomethingBase>
+
+   /**
+    * Get group's sparks audience top countries for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<LinearBarDataPoint[]>} Promise object represents the top countries for the given time period
+    */
    getTopCountries(timeperiod: TimePeriodParams): Promise<LinearBarDataPoint[]>
+
+   /**
+    * Get group's sparks audience top universities for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<LinearBarDataPoint[]>} Promise object represents the top universities for the given time period
+    */
    getTopUniversities(
       timeperiod: TimePeriodParams
    ): Promise<LinearBarDataPoint[]>
+
+   /**
+    * Get group's sparks audience top fields of study for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<PieChartDataPoint[]>} Promise object represents the top fields of study for the given time period
+    */
    getTopFieldsOfStudy(
       timeperiod: TimePeriodParams
    ): Promise<PieChartDataPoint[]>
+
+   /**
+    * Get group's sparks audience levels of study for a given time period
+    * @param {TimePeriodParams} timeperiod - The time period to consider
+    * @returns {Promise<PieChartDataPoint[]>} Promise object represents the levels of study for the given time period
+    */
    getLevelsOfStudy(timeperiod: TimePeriodParams): Promise<PieChartDataPoint[]>
 }
 
-class SparksAnalyticsRepository implements ISparksAnalyticsRepository {
+class GroupSparksAnalyticsRepository
+   implements IGroupSparksAnalyticsRepository
+{
    private readonly groupId: string
    private bigQueryService: IBigQueryService
    private readonly timePeriodMap: Record<TimePeriodParams, string> = {
@@ -180,4 +262,4 @@ class SparksAnalyticsRepository implements ISparksAnalyticsRepository {
    }
 }
 
-export default SparksAnalyticsRepository
+export default GroupSparksAnalyticsRepository
