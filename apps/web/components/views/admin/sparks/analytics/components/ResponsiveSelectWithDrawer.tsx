@@ -9,7 +9,6 @@ import {
    BoxProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = {
    selectRoot: {
@@ -107,6 +106,11 @@ export const ResponsiveSelectWithDrawer: React.FC<{
    }
 
    const handleClick = isMobile ? () => setIsDrawerOpen(true) : undefined
+
+   const combineStyles = (myStyles, propsStyles) => [
+      myStyles,
+      ...(Array.isArray(propsStyles) ? propsStyles : [propsStyles]),
+   ]
 
    const drawerOptions = useMemo(
       () =>
