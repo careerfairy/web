@@ -25,7 +25,16 @@ export interface IRewardRepository {
       filters?: RewardFilterFields
    ): Promise<RewardDoc | null>
 
-   applyCreditsToUser(userEmail: string, credits: number): Promise<void>
+   /**
+    * Delete a reward
+    */
+   delete(userDataId: string, rewardId: string): Promise<void>
+
+   applyCreditsToUser(
+      userEmail: string,
+      credits: number,
+      rewardId?: string
+   ): Promise<void>
 }
 
 export class FirebaseRewardRepository
@@ -91,6 +100,15 @@ export class FirebaseRewardRepository
       return querySnapshot.docs[0].data()
    }
 
+   async delete(userDataId: string, rewardId: string): Promise<void> {
+      await this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("rewards")
+         .doc(rewardId)
+         .delete()
+   }
+
    /**
     * Applies or deducts credits to/from a user's account.
     *
@@ -104,7 +122,11 @@ export class FirebaseRewardRepository
     * // Deducting 5 credits from a user's account
     * await applyCreditsToUser('user@example.com', -5);
     */
-   async applyCreditsToUser(userEmail: string, credits: number): Promise<void> {
+   async applyCreditsToUser(
+      userEmail: string,
+      credits: number,
+      rewardId: string
+   ): Promise<void> {
       if (!credits) return // skip 0/null/undefined credits
 
       const userRef = this.firestore.collection("userData").doc(userEmail)
@@ -114,11 +136,17 @@ export class FirebaseRewardRepository
          const user = userDoc.data() as UserData
 
          // Verify that the user possesses enough credits for the deduction operation
-         if (credits > 0 || user.credits >= credits) {
-            await userRef.update({
-               credits: this.fieldValue.increment(credits),
-            })
+         // If not, delete the created reward and throw an error
+         if (credits < 0 && user.credits < credits) {
+            await this.delete(userEmail, rewardId)
+            throw new Error(
+               `User ${userEmail} does not have enough credits to deduct the ${rewardId} reward`
+            )
          }
+
+         await userRef.update({
+            credits: this.fieldValue.increment(credits),
+         })
       })
    }
 }
