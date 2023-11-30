@@ -56,7 +56,13 @@ const ButtonElement: FC = () => {
          return <SignUpToWatchButton />
       }
 
-      if (!userData?.credits && !canWatchRecording) {
+      // Display the "Not Enough Credits" component if
+      // The user has no credits or negative credits
+      // and does not have access to this recording.
+      if (
+         (!userData?.credits || userData?.credits <= 0) &&
+         !canWatchRecording
+      ) {
          return <NotEnoughCreditsButton />
       }
 
