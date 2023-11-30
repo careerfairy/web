@@ -5,9 +5,8 @@ import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import { GetServerSidePropsContext } from "next"
-import { useRouter } from "next/router"
-import { Button } from "@mui/material"
 import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
+import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
 
 type Props = {
    groupId: string
@@ -15,12 +14,6 @@ type Props = {
 }
 
 const JobDetails: FC<Props> = ({ groupId, jobId }) => {
-   const { push } = useRouter()
-
-   const handleClickBack = () => {
-      void push(`/group/${groupId}/admin/jobs`)
-   }
-
    return (
       <GroupDashboardLayout
          titleComponent={"Jobs"}
@@ -34,12 +27,7 @@ const JobDetails: FC<Props> = ({ groupId, jobId }) => {
                groupId={groupId}
                shouldFetch={Boolean(jobId)}
             >
-               {(job) => (
-                  <>
-                     <Button onClick={handleClickBack}>Back</Button>
-                     Job details {job.title} from the Group {groupId}
-                  </>
-               )}
+               {(job) => <JobAdminDetails job={job} groupId={groupId} />}
             </JobFetchWrapper>
          </SuspenseWithBoundary>
       </GroupDashboardLayout>
