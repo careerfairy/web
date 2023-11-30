@@ -299,19 +299,15 @@ export default class DateUtil {
    }
 
    /**
-    * Transforms a duration in milliseconds into a human readable relative time string
-    * using the dayjs library. If the duration is negative, a fallback string is returned.
+    * Transforms a duration in milliseconds into a human readable relative time string formatted as "X days"
+    * using the dayjs library.
     *
     * @param {number} milliseconds - The duration in milliseconds to be transformed.
-    * @param {string} fallback - The fallback string to be returned if the duration is negative.
-    * @return {string} - The resulting human readable relative time string, e.g. "2 hours" or "0 days left".
-    *
+    * @return {string} - The resulting string formatted as "X days".
     */
-   static getHumanReadableTimeFromMilliseconds(
-      milliseconds: number,
-      fallback = "0 days left"
-   ) {
+   static getDaysLeftFromMilliseconds(milliseconds, fallback = "0 days left") {
       if (milliseconds < 0) return fallback
-      return dayjs.duration(milliseconds).humanize() // 2 hours, 2 days, 2 months, 2 years
+      const days = dayjs.duration(milliseconds).asDays()
+      return `${Math.floor(days)} days`
    }
 }
