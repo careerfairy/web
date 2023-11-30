@@ -1,12 +1,13 @@
 import React, { useState } from "react"
-import { Tabs, Tab, Select, MenuItem, MenuItemProps, Box } from "@mui/material"
+import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
+import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
 
 const styles = sxStyles({
    root: {
-      mx: {
-         md: "auto",
-      },
+      mx: "auto",
+      width: "93.58%",
    },
    controlHeader: {
       display: "flex",
@@ -15,16 +16,24 @@ const styles = sxStyles({
          xs: "column",
          md: "row",
       },
+      marginTop: { md: "2vh" },
+      marginBottom: { md: "4vh" },
    },
    tabs: {
       "*": {
          textTransform: "none !important",
          fontWeight: 400,
-         fontSize: "1rem",
+         fontSize: {
+            md: "1.2rem",
+         },
       },
       alignSelf: "center",
       ".Mui-selected": {
          fontWeight: 600,
+         color: "#6749EA !important",
+      },
+      ".MuiTabs-indicator": {
+         backgroundColor: "#6749EA",
       },
    },
    mobileLimiter: {
@@ -41,53 +50,13 @@ const styles = sxStyles({
          xs: "2px solid #EFEFEF",
       },
    },
-   selectRoot: {
-      width: "11.5rem",
-      borderRadius: 50,
-      color: "#7A7A8E",
-      paddingTop: 0,
-      paddingBottom: 0,
-      "& .MuiSelect-select": {
-         paddingTop: {
-            xs: 1.745,
-            md: 0,
-         },
-         paddingBottom: {
-            xs: 1.745,
-            md: 0,
-         },
-         paddingLeft: 2.5,
-      },
-      "& fieldset": {
-         marginTop: "5px",
-         marginBottom: "5px",
-         "&.MuiOutlinedInput-notchedOutline": {
-            borderColor: "rgba(0, 0, 0, 0.23) !important",
-         },
-      },
-   },
-   selectMenu: {
-      ".MuiList-padding": {
-         paddingTop: "0 !important",
-      },
-   },
-   selectMenuItem: {
-      color: "#3D3D47",
-      paddingTop: 1.5,
-      paddingBottom: 1.5,
-      "&.Mui-selected": {
-         backgroundColor: "#FAFAFE !important",
+   selectDrawer: {
+      margin: {
+         xs: "17px 0 12px 0",
+         md: 0,
       },
    },
 })
-
-const StyledMenuItem: React.FC<MenuItemProps> = ({ children, ...props }) => {
-   return (
-      <MenuItem {...props} sx={styles.selectMenuItem}>
-         {children}
-      </MenuItem>
-   )
-}
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
@@ -97,9 +66,12 @@ const GroupSparkAnalytics = () => {
       setTabValue(newValue)
    }
 
-   const handleSelectChange = (event) => {
-      setSelectValue(event.target.value)
-   }
+   const options = [
+      { value: "7", label: "Past 7 days" },
+      { value: "30", label: "Past 30 days" },
+      { value: "180", label: "Past 6 months" },
+      { value: "365", label: "Last year" },
+   ]
 
    return (
       <Box sx={styles.root}>
@@ -108,36 +80,50 @@ const GroupSparkAnalytics = () => {
                value={tabValue}
                onChange={handleTabChange}
                aria-label="Spark Analytics Tabs"
-               textColor="secondary"
-               indicatorColor="secondary"
                sx={styles.tabs}
             >
                <Tab label="Overview" value="overview" />
                <Tab label="Audience" value="audience" />
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
-            <Select
-               value={selectValue}
-               onChange={handleSelectChange}
-               sx={styles.selectRoot}
-               MenuProps={{ sx: styles.selectMenu }}
-            >
-               <StyledMenuItem value="7">Past 7 days</StyledMenuItem>
-               <StyledMenuItem value="30">Past 30 days</StyledMenuItem>
-               <StyledMenuItem value="180">Past 6 months</StyledMenuItem>
-               <StyledMenuItem value="365">Last year</StyledMenuItem>
-            </Select>
+            <ResponsiveSelectWithDrawer
+               selectValue={selectValue}
+               setSelectValue={setSelectValue}
+               options={options}
+               selectContainerProps={{
+                  sx: styles.selectDrawer,
+               }}
+            />
          </Box>
          <Box>
             {tabValue === "overview" && (
-               <div style={{ maxWidth: "1110px", minWidth: "500px" }}>
-                  Overview content for {selectValue} days
-               </div>
+               <>
+                  <GroupSparkAnalyticsCardContainer title="Reach for the past 30 days">
+                     Overview: Reach for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Engagement for the past 30 days">
+                     Overview: Reach for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Your most watched Sparks">
+                     Overview: Most watched {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+               </>
             )}
             {tabValue === "audience" && (
-               <div style={{ maxWidth: "1110px", minWidth: "500px" }}>
-                  Audience content for {selectValue} days
-               </div>
+               <>
+                  <GroupSparkAnalyticsCardContainer title="Top 10 countries">
+                     Audience: Top 10 countries for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Top 10 universities">
+                     Audience: Top 10 universities for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Top 10 fields of study">
+                     Audience: Top 10 fields of study for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Level of study">
+                     Audience: Level of study for {selectValue} days
+                  </GroupSparkAnalyticsCardContainer>
+               </>
             )}
          </Box>
       </Box>
