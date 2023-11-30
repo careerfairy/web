@@ -46,11 +46,9 @@ type Props = {
 }
 
 const StatusChips = ({ presenter }: Props) => {
-   const timeLeftInMilliseconds = presenter.getPlanTimeLeft()
-   const timeLeft =
-      timeLeftInMilliseconds < 0
-         ? "0 days left"
-         : DateUtil.getHumanReadableTimeFromMilliseconds(timeLeftInMilliseconds)
+   const timeLeft = DateUtil.getDaysLeftFromMilliseconds(
+      presenter.getPlanTimeLeft()
+   )
 
    if (presenter.hasPlan()) {
       if (presenter.hasPlanExpired()) {
