@@ -16,8 +16,8 @@ const styles = sxStyles({
          xs: "column",
          md: "row",
       },
-      marginTop: { md: "2vh" },
-      marginBottom: { md: "4vh" },
+      marginTop: { md: "17px" },
+      marginBottom: { md: "20px" },
    },
    tabs: {
       "*": {
