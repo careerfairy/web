@@ -7,7 +7,6 @@ import {
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
 import { string } from "yup"
-import { registrationSourcesCacheKey } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import {
    CacheKeyOnCallFn,
    cacheOnCallValues,
@@ -20,7 +19,7 @@ import {
    PieChartWithPastData,
    TimePeriodParams,
    TimeseriesDataPoint,
-} from "./lib/sparks/analytics/SparksAnalytics"
+} from "./lib/sparks/analytics/SparksAnalyticsTypes"
 
 type ReachData = {
    totalViews: TimeseriesDataPoint[]
@@ -55,6 +54,10 @@ type SparksAnalyticsPayload = {
 const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
    cacheOnCallValues("sparks-analytics", cacheKeyFn, 600) // 5min
 
+const sparksAnalyticsCacheKey = (args: { groupId: string }) => {
+   return ["getSparksAnalytics", args.groupId]
+}
+
 const fetchTimePeriodData = (
    repoPromise: (timeperiod: TimePeriodParams) => Promise<any>
 ) => {
@@ -72,7 +75,7 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
          groupId: string().required(),
       }),
       userShouldBeGroupAdmin(),
-      cache((data) => registrationSourcesCacheKey({ ...data })),
+      cache((data) => sparksAnalyticsCacheKey({ ...data })),
       async (data, context) => {
          const groupId = data.groupId
          const sparksAnalyticsRepo = getSparksAnalyticsRepoInstance(groupId)
@@ -140,6 +143,7 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                sparksAnalyticsRepo.getRegistrationsPastYear(),
                sparksAnalyticsRepo.getPageClicksPastYear(),
                fetchTimePeriodData(
+                  // Binding is necessary here to ensure that the method gets called with the correct context (i.e., sparksAnalyticsRepo)
                   sparksAnalyticsRepo.getMostWatchedSparks.bind(
                      sparksAnalyticsRepo
                   )
