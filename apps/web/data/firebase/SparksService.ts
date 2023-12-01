@@ -384,7 +384,7 @@ export class SparksService {
     * @param userId The user who completed the onboarding
     */
    async markSparksB2BOnboardingAsCompleted(userId: string) {
-      const userRef = doc(FirestoreInstance, "users", userId).withConverter(
+      const userRef = doc(FirestoreInstance, "userData", userId).withConverter(
          createGenericConverter<UserData>()
       )
 
