@@ -45,7 +45,7 @@ const getExpirationDate = (groupPlanType: GroupPlanType) => {
    const duration =
       PLAN_CONSTANTS[groupPlanType]?.sparks.PLAN_DURATION_MILLISECONDS || 0
 
-   return DateUtil.formatDateToString(new Date(Date.now() + duration))
+   return DateUtil.formatDateToDayMonthYear(new Date(Date.now() + duration))
 }
 
 export default SuccessView
