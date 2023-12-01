@@ -310,4 +310,14 @@ export default class DateUtil {
       const days = dayjs.duration(milliseconds).asDays()
       return `${Math.floor(days)} days`
    }
+
+   /**
+    * Formats a JavaScript Date object to a string in the format "DD MMM YYYY".
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be formatted.
+    * @return {string} - The formatted date string. Example: "12 Oct 2020".
+    */
+   static formatDateToDayMonthYear(JSDate: Date) {
+      return dayjs(JSDate).format("DD MMM YYYY") // 12 Oct 2020
+   }
 }
