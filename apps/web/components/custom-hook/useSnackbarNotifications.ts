@@ -18,8 +18,14 @@ const useSnackbarNotifications = () => {
    )
 
    const errorNotification = useCallback(
-      (error: Error | string, message?: string, extra?: object) => {
-         return dispatch(sendGeneralError(error, message, extra))
+      (
+         sentryError: Error | string,
+         snackbarMessage?: string,
+         extraSentryInfo?: object
+      ) => {
+         return dispatch(
+            sendGeneralError(sentryError, snackbarMessage, extraSentryInfo)
+         )
       },
       [dispatch]
    )
