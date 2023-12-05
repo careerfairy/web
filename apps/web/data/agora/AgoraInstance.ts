@@ -1,7 +1,7 @@
 import { shouldUseEmulators } from "../../util/CommonUtil"
 
 // Project: Production
-let appID = process.env.NEXT_PRIVATE_PROD_AGORA_APP_ID
+let appID = process.env.AGORA_PRIVATE_PROD_APP_ID
 
 if (shouldUseEmulators()) {
    // Project: CareerFairyStreaming

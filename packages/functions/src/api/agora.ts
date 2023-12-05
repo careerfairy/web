@@ -4,7 +4,7 @@ import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordi
 import { isLocalEnvironment } from "../util"
 
 // Project: Production
-let appID = process.env.NEXT_PRIVATE_PROD_AGORA_APP_ID
+let appID = process.env.AGORA_PRIVATE_PROD_APP_ID
 let appCertificate = process.env.NEXT_PRIVATE_PROD_AGORA_APP_CERTIFICATE
 let customerKey = process.env.NEXT_PRIVATE_PROD_AGORA_CUSTOMER_KEY
 let customerSecret = process.env.NEXT_PRIVATE_PROD_AGORA_CUSTOMER_SECRET
@@ -12,11 +12,11 @@ let customerSecret = process.env.NEXT_PRIVATE_PROD_AGORA_CUSTOMER_SECRET
 if (isLocalEnvironment()) {
    // Project: CareerFairyStreaming
    appID = process.env.NEXT_PRIVATE_DEV_AGORA_APP_ID
-   appCertificate = process.env.NEXT_PRIVATE_DEV_AGORA_APP_CERTIFICATE
+   appCertificate = process.env.AGORA_PRIVATE_DEV_APP_CERTIFICATE
 
    // Restfull api credentials for customer id: mappend in .env.local
-   customerKey = process.env.NEXT_PRIVATE_DEV_AGORA_CUSTOMER_KEY
-   customerSecret = process.env.NEXT_PRIVATE_DEV_AGORA_CUSTOMER_SECRET
+   customerKey = process.env.AGORA_PRIVATE_DEV_CUSTOMER_KEY
+   customerSecret = process.env.AGORA_PRIVATE_DEV_CUSTOMER_SECRET
    console.log("Using AgoraSDK testing environment")
 }
 
@@ -30,8 +30,8 @@ export const agoraCredentials = {
 const staticUID = "1234232"
 
 // AWS Storage
-export const awsSecretKey = process.env.NEXT_PRIVATE_PROD_AWS_SECRET_KEY
-export const awsAccessKey = process.env.NEXT_PRIVATE_PROD_AWS_ACCESS_KEY
+export const awsSecretKey = process.env.AWS_PRIVATE_PROD_SECRET_KEY
+export const awsAccessKey = process.env.AWS_PRIVATE_PROD_ACCESS_KEY
 
 export default class AgoraClient {
    private readonly authorizationHeader
