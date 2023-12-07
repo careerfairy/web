@@ -5,13 +5,13 @@ import { isLocalEnvironment } from "../util"
 
 // Project: Production
 let appID = process.env.AGORA_PRIVATE_PROD_APP_ID
-let appCertificate = process.env.NEXT_PRIVATE_PROD_AGORA_APP_CERTIFICATE
-let customerKey = process.env.NEXT_PRIVATE_PROD_AGORA_CUSTOMER_KEY
-let customerSecret = process.env.NEXT_PRIVATE_PROD_AGORA_CUSTOMER_SECRET
+let appCertificate = process.env.AGORA_PRIVATE_PROD_APP_CERTIFICATE
+let customerKey = process.env.AGORA_PRIVATE_PROD_CUSTOMER_KEY
+let customerSecret = process.env.AGORA_PRIVATE_PROD_CUSTOMER_SECRET
 
 if (isLocalEnvironment()) {
    // Project: CareerFairyStreaming
-   appID = process.env.NEXT_PRIVATE_DEV_AGORA_APP_ID
+   appID = process.env.AGORA_PRIVATE_DEV_APP_ID
    appCertificate = process.env.AGORA_PRIVATE_DEV_APP_CERTIFICATE
 
    // Restfull api credentials for customer id: mappend in .env.local
