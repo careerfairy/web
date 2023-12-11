@@ -7,6 +7,7 @@ import {
    Box,
    MenuItem,
    BoxProps,
+   SxProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
@@ -107,7 +108,7 @@ export const ResponsiveSelectWithDrawer: React.FC<{
 
    const handleClick = isMobile ? () => setIsDrawerOpen(true) : undefined
 
-   const combineStyles = (myStyles, propsStyles) => [
+   const combineStyles = (myStyles: SxProps, propsStyles: SxProps) => [
       myStyles,
       ...(Array.isArray(propsStyles) ? propsStyles : [propsStyles]),
    ]
