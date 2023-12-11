@@ -1,7 +1,7 @@
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { UTMKeys, UTMParams } from "@careerfairy/shared-lib/commonTypes"
+import { UTMKeys } from "@careerfairy/shared-lib/commonTypes"
 import CookiesUtil from "../../util/CookiesUtil"
 
 const useStoreUTMQueryParams = () => {
