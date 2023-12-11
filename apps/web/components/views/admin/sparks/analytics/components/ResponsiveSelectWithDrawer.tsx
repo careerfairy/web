@@ -10,8 +10,9 @@ import {
    SxProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
 
-const styles = {
+const styles = sxStyles({
    selectRoot: {
       width: "11.5rem",
       borderRadius: 50,
@@ -82,7 +83,7 @@ const styles = {
          backgroundColor: "#FAFAFE !important",
       },
    },
-}
+})
 
 export const ResponsiveSelectWithDrawer: React.FC<{
    selectValue: string
