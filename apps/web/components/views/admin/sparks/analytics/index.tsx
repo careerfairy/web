@@ -60,7 +60,7 @@ const styles = sxStyles({
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
-   const [selectValue, setSelectValue] = useState("7")
+   const [selectValue, setSelectValue] = useState("30")
 
    const handleTabChange = (event, newValue) => {
       setTabValue(newValue)
