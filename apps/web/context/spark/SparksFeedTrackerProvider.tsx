@@ -13,10 +13,12 @@ import { useSelector } from "react-redux"
 import {
    activeSparkSelector,
    currentSparkIdSelector,
+   isOnFirstSparkSelector,
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { v4 as uuidv4 } from "uuid"
 import useFingerPrint from "../../components/custom-hook/useFingerPrint"
+import CookiesUtil from "util/CookiesUtil"
 
 const BATCH_SIZE = 10 // Maximum number of events that can be batched
 const BATCH_INTERVAL = 5000 // Interval for sending batched events (in ms)
@@ -58,6 +60,7 @@ export const SparksFeedTrackerProvider: FC<{
 
    const currentSparkId = useSelector(currentSparkIdSelector)
    const originalSparkId = useSelector(originalSparkIdSelector)
+   const isFirstSpark = useSelector(isOnFirstSparkSelector)
    const categoryId = useSelector(activeSparkSelector)?.category?.id || null
    const groupId = useSelector(activeSparkSelector)?.group.id || null
 
@@ -85,25 +88,30 @@ export const SparksFeedTrackerProvider: FC<{
 
          const referrer = document?.referrer || null
 
+         // Get UTM parameters from cookies
+         const utmParams = CookiesUtil.getUTMParams() || {}
+
+         // Only use UTM parameters if it's the first spark
          const {
             utm_source = null,
             utm_medium = null,
             utm_campaign = null,
             utm_term = null,
             utm_content = null,
-            referral = null,
-         } = router.query
+         } = isFirstSpark ? utmParams : {}
+
+         const { referral = null } = router.query
 
          const options: SparkEventClient = {
             visitorId,
             actionType: event,
             originalSparkId,
             categoryId,
-            utm_source: utm_source ? utm_source.toString() : null,
-            utm_medium: utm_medium ? utm_medium.toString() : null,
-            utm_campaign: utm_campaign ? utm_campaign.toString() : null,
-            utm_term: utm_term ? utm_term.toString() : null,
-            utm_content: utm_content ? utm_content.toString() : null,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            utm_term,
+            utm_content,
             groupId,
             referralCode: referral ? referral.toString() : null,
             sparkId: currentSparkId,
@@ -165,16 +173,17 @@ export const SparksFeedTrackerProvider: FC<{
       [
          currentSparkId,
          visitorId,
+         isFirstSpark,
          router.query,
          originalSparkId,
          categoryId,
+         groupId,
          userData?.universityCountryCode,
          userData?.fieldOfStudy?.id,
          userData?.levelOfStudy?.id,
          userData?.university?.code,
          userData?.university?.name,
          sessionId,
-         groupId,
          addEventToBatch,
       ]
    )
