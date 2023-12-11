@@ -3,7 +3,7 @@ import Mailgun from "mailgun.js"
 import formData = require("form-data")
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 
-const apiKey = "13db35c5779d693ddad243d21e9d5cba-e566273b-b2967fc4"
+const apiKey = process.env.MAILGUN_API_KEY
 const host = "https://api.eu.mailgun.net"
 let domain = "mail.careerfairy.io"
 
