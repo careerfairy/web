@@ -1,6 +1,6 @@
 import { Box, Button, Tabs, Tooltip, Typography } from "@mui/material"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import ChevronLeft from "@mui/icons-material/ChevronLeft"
@@ -13,6 +13,7 @@ import { SkeletonStackMultiple } from "../../../../../util/Skeletons"
 import SwipeableViews from "react-swipeable-views"
 import JobApplicants from "./JobApplicants"
 import JobDetails from "./JobDetails"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    wrapper: {
@@ -47,31 +48,37 @@ const styles = sxStyles({
       ml: 1,
       color: "#8E8E8E",
    },
+   tabs: {
+      borderBottom: "1px solid #D6D6E0",
+   },
 })
 
 type Props = {
    job: CustomJob
-   groupId: string
 }
 
-const tabs = [
-   {
-      label: "Applicants",
-      component: () => <JobApplicants />,
-   },
-   {
-      label: "Job Opening",
-      component: () => <JobDetails />,
-   },
-]
-
-const JobAdminDetails: FC<Props> = ({ job, groupId }) => {
+const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
+   const { group } = useGroup()
 
    const switchTabHandler = useCallback((...args) => {
       // clicking tabs handler
       setActiveTabIndex(args[1])
    }, [])
+
+   const tabs = useMemo(
+      () => [
+         {
+            label: "Applicants",
+            component: () => <JobApplicants />,
+         },
+         {
+            label: "Job Opening",
+            component: () => <JobDetails job={job} group={group} />,
+         },
+      ],
+      [group, job]
+   )
 
    return (
       <Stack spacing={3} sx={styles.wrapper}>
@@ -79,7 +86,7 @@ const JobAdminDetails: FC<Props> = ({ job, groupId }) => {
             component={Link}
             color={"black"}
             startIcon={<ChevronLeft sx={{ width: "24px", height: "24px" }} />}
-            href={`/group/${groupId}/admin/jobs`}
+            href={`/group/${group.id}/admin/jobs`}
             sx={styles.backButton}
          >
             {job.title}
@@ -97,6 +104,7 @@ const JobAdminDetails: FC<Props> = ({ job, groupId }) => {
                   },
                } as any
             }
+            sx={styles.tabs}
          >
             <Tab
                key={"Applicants"}
