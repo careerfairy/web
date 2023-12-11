@@ -88,7 +88,7 @@ export const SparksFeedTrackerProvider: FC<{
 
          const referrer = document?.referrer || null
 
-         // Get UTM parameters from the browser cookies
+         // Get UTM parameters from cookies
          const utmParams = CookiesUtil.getUTMParams() || {}
 
          // Only use UTM parameters if it's the first spark
