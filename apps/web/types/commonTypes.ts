@@ -1,3 +1,4 @@
+import { SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SystemStyleObject } from "@mui/system"
 
@@ -24,6 +25,22 @@ export function sxStyles<TObject extends SystemStyleObject<DefaultTheme>>(
    obj: TObject
 ): TObject {
    return obj
+}
+
+/**
+ * This function combines the styles provided by the component and the styles provided by the props.
+ * If the styles are not in an array, they are converted into an array.
+ * The function returns an array of styles.
+ *
+ * @param {SxProps} myStyles - The styles provided by the component.
+ * @param {SxProps} propsStyles - The styles provided by the props.
+ * @returns {Array} An array of styles.
+ */
+export function combineStyles(myStyles: SxProps, propsStyles: SxProps) {
+   return [
+      ...(Array.isArray(myStyles) ? myStyles : [myStyles]),
+      ...(Array.isArray(propsStyles) ? propsStyles : [propsStyles]),
+   ]
 }
 
 /**
