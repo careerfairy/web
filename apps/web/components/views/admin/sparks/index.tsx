@@ -4,6 +4,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
 import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
+import SparksDialog from "./sparks-dialog/SparksDialog"
 
 const Sparks = () => {
    return (
@@ -21,6 +22,7 @@ const SparksComponent = () => {
    return (
       <Fragment>
          {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
+         <SparksDialog />
       </Fragment>
    )
 }
