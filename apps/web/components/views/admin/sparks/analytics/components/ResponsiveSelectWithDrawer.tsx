@@ -10,7 +10,7 @@ import {
    SxProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    selectRoot: {
@@ -108,11 +108,6 @@ export const ResponsiveSelectWithDrawer: React.FC<{
    }
 
    const handleClick = isMobile ? () => setIsDrawerOpen(true) : undefined
-
-   const combineStyles = (myStyles: SxProps, propsStyles: SxProps) => [
-      myStyles,
-      ...(Array.isArray(propsStyles) ? propsStyles : [propsStyles]),
-   ]
 
    const drawerOptions = useMemo(
       () =>
