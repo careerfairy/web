@@ -76,7 +76,7 @@ export const getWindow = () => {
 }
 
 /**
- * Check if the query params indicate that the user is coming from the newsletter
+ * Check if the query params indicate that the user is coming from the newsletter.
  */
 export const isFromNewsletter = (query: ParsedUrlQuery) => {
    return (
