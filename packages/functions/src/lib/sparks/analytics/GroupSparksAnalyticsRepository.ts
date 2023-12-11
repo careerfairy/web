@@ -28,7 +28,7 @@ import {
 } from "./queries/Audience"
 
 /**
- * Interface for the SparksAnalyticsRepository
+ * Interface for the GroupSparksAnalyticsRepository
  * @interface
  */
 interface IGroupSparksAnalyticsRepository {

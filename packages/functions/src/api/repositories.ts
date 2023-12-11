@@ -42,7 +42,7 @@ import {
 } from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
-import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/SparksAnalyticsRepository"
+import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
