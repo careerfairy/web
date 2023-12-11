@@ -2,11 +2,11 @@ import { FC } from "react"
 import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
-import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import { GetServerSidePropsContext } from "next"
 import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
 import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
+import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
 
 type Props = {
    groupId: string
@@ -21,15 +21,16 @@ const JobDetails: FC<Props> = ({ groupId, jobId }) => {
          topBarCta={<CreateJobButton />}
       >
          <DashboardHead title="CareerFairy | Jobs" />
-         <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
+         <SuspenseWithBoundary>
             <JobFetchWrapper
                jobId={jobId}
                groupId={groupId}
                shouldFetch={Boolean(jobId)}
             >
-               {(job) => <JobAdminDetails job={job} groupId={groupId} />}
+               {(job) => <JobAdminDetails job={job} />}
             </JobFetchWrapper>
          </SuspenseWithBoundary>
+         <JobDialog />
       </GroupDashboardLayout>
    )
 }
