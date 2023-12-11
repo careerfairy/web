@@ -29,7 +29,7 @@ const views = [
       key: "create-form",
       Component: () => <JobFormDialog />,
    },
-]
+] as const
 
 export type JobDialogStep = (typeof views)[number]["key"]
 
