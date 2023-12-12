@@ -32,9 +32,19 @@ const UserLayout: FC<{
             sx={{
                justifyContent: "center",
                alignItems: "center",
+
+               /**
+                * This is a hack to prevent layout shift.
+                * The spinner is detached from the state cycle, causing both the spinner and the layout to render simultaneously.
+                * Ideally, if there's an early return (like the spinner), the layout shouldn't be rendered.
+                * This change ensures that the layout is rendered on top of the spinner, not pushed down by it.
+                */
+               position: "fixed",
+               width: "100%",
+               zIndex: -1,
             }}
          >
-            <CircularProgress />
+            <CircularProgress id={"auth-loading-spinner"} />
          </Page>
       )
    }
