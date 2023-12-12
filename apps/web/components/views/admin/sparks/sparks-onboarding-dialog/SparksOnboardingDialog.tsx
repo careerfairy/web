@@ -1,32 +1,43 @@
-import { LoadingButton } from "@mui/lab"
-import { DialogActions } from "@mui/material"
-import Dialog from "@mui/material/Dialog"
-import DialogTitle from "@mui/material/DialogTitle"
+import { Stack } from "@mui/material"
+import Dialog, { DialogProps } from "@mui/material/Dialog"
 import { useAuth } from "HOCs/AuthProvider"
-import useSparksB2BOnboardingCompletion from "./useSparksB2BOnboardingCompletion"
+import { sxStyles } from "types/commonTypes"
+import { OnboardingProvider } from "./OnboardingProvider"
+import TimelineStepper from "./TimelineStepper"
+import TimelineView from "./TimelineView"
+
+const styles = sxStyles({
+   paper: {
+      maxWidth: 858,
+      br: 2,
+   },
+})
 
 const SparksOnboardingDialog = () => {
    const { userData } = useAuth()
 
    const onboardingCompleted = Boolean(userData.hasCompletedSparksB2BOnboarding)
 
-   const { trigger: completeOnboarding, isMutating } =
-      useSparksB2BOnboardingCompletion(userData.id)
-
    return (
-      <Dialog open={!onboardingCompleted}>
-         <DialogTitle>Sparks Onboarding</DialogTitle>
-         <DialogActions>
-            <LoadingButton
-               loading={isMutating}
-               variant="contained"
-               onClick={completeOnboarding}
-            >
-               Simulate onboarding completion
-            </LoadingButton>
-         </DialogActions>
-      </Dialog>
+      <OnboardingProvider>
+         <Dialog
+            maxWidth="xl"
+            PaperProps={PaperProps}
+            fullWidth
+            // open={!onboardingCompleted}
+            open={true}
+         >
+            <Stack p={2} spacing={3} direction="row">
+               <TimelineStepper />
+               <TimelineView />
+            </Stack>
+         </Dialog>
+      </OnboardingProvider>
    )
+}
+
+const PaperProps: DialogProps["PaperProps"] = {
+   sx: styles.paper,
 }
 
 export default SparksOnboardingDialog
