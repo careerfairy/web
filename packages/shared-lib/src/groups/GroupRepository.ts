@@ -34,11 +34,7 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "./customJobs"
+import { CustomJob, PublicCustomJob } from "./customJobs"
 import { Timestamp } from "../firebaseTypes"
 
 const cloneDeep = require("lodash.clonedeep")
@@ -293,7 +289,7 @@ export interface IGroupRepository {
     * @param jobId
     * @param groupId
     */
-   getCustomJobById(jobId: string, groupId: string): Promise<PublicCustomJob>
+   getCustomJobById(jobId: string, groupId: string): Promise<CustomJob>
 
    /**
     * To update an existing job with a new applicant
@@ -1196,10 +1192,7 @@ export class FirebaseGroupRepository
       await ref.update(updatedJob)
    }
 
-   async getCustomJobById(
-      jobId: string,
-      groupId: string
-   ): Promise<PublicCustomJob> {
+   async getCustomJobById(jobId: string, groupId: string): Promise<CustomJob> {
       const ref = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -1209,9 +1202,7 @@ export class FirebaseGroupRepository
       const snapshot = await ref.get()
 
       if (snapshot.exists) {
-         return pickPublicDataFromCustomJob(
-            this.addIdToDoc<CustomJob>(snapshot)
-         )
+         return this.addIdToDoc<CustomJob>(snapshot)
       }
       return null
    }

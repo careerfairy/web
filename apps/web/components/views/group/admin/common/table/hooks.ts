@@ -11,15 +11,24 @@ import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNoti
 import { useCopyToClipboard } from "react-use"
 import { UserDataEntry } from "./UserLivestreamDataTable"
 import { Query } from "@firebase/firestore"
+import { UserData } from "@careerfairy/shared-lib/users"
 
-export const useDownloadCV = (user: UserDataEntry) => {
+export const useDownloadCV = (user: UserDataEntry | UserData) => {
    const { errorNotification } = useSnackbarNotifications()
    const [downloadingPDF, setDownloadingPDF] = useState(false)
 
    const handleDownloadCV = useCallback(async () => {
+      let resume: string
+
+      if (isUserDataEntry(user)) {
+         resume = user.resumeUrl
+      } else {
+         resume = user.userResume
+      }
+
       try {
          setDownloadingPDF(true)
-         await handleDownloadPDF(user.resumeUrl, getFileName(user))
+         await handleDownloadPDF(resume, getFileName(user))
       } catch (e) {
          errorNotification(e, "Error downloading CV")
       } finally {
@@ -34,6 +43,12 @@ export const useDownloadCV = (user: UserDataEntry) => {
       }),
       [downloadingPDF, handleDownloadCV]
    )
+}
+
+const isUserDataEntry = (
+   user: UserDataEntry | UserData
+): user is UserDataEntry => {
+   return user ? "resumeUrl" in user : false
 }
 
 export const useDownloadAllCVs = (
