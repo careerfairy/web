@@ -49,7 +49,7 @@ type OnboardingProviderProps = {
 export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
    const { userData } = useAuth()
 
-   const [activeStep, setActiveStep] = useState(1)
+   const [activeStep, setActiveStep] = useState(0)
 
    const handleNext = useCallback(() => {
       if (activeStep < steps.length - 1) {
