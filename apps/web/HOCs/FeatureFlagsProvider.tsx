@@ -28,7 +28,8 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  *
  * They can be activated via query string, e.g:
  * - ?atsAdminPageFlag=true
- *
+ * - ?sparksAdminPageFlag=true
+ * - ?sparksB2BOnboardingFlag=true
  */
 export const flagsInitialState = {
    /**
