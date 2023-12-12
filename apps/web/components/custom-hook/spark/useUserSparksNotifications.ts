@@ -1,4 +1,11 @@
-import { collection, query, where } from "firebase/firestore"
+import {
+   collection,
+   orderBy,
+   query,
+   serverTimestamp,
+   startAt,
+   where,
+} from "firebase/firestore"
 import { useMemo } from "react"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
@@ -8,14 +15,16 @@ import { toDate } from "@careerfairy/shared-lib/firebaseTypes"
 const getUserSparkNotifications = (userId: string, groupId?: string) => {
    return query(
       collection(FirestoreInstance, "userData", userId, "sparksNotifications"),
-      ...(groupId ? [where("groupId", "==", groupId)] : [])
+      ...(groupId ? [where("groupId", "==", groupId)] : []),
+      where("startDate", ">", new Date())
    )
 }
 
 const getPublicSparkNotifications = (groupId?: string) => {
    return query(
       collection(FirestoreInstance, "publicSparksNotifications"),
-      ...(groupId ? [where("id", "==", groupId)] : [])
+      ...(groupId ? [where("id", "==", groupId)] : []),
+      where("startDate", ">", new Date())
    )
 }
 
