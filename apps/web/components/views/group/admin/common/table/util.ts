@@ -3,6 +3,7 @@ import { UserDataEntry } from "./UserLivestreamDataTable"
 import JSZip from "jszip"
 import { getDocs, Query } from "@firebase/firestore"
 import { CSVData } from "../../../../../custom-hook/useMetaDataActions"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 export type DownloadData = {
    url: string
@@ -58,7 +59,7 @@ export const getAllUsers = async (
    return snapshot.docs.map((doc) => converterFn(doc.data()))
 }
 
-export const getFileName = (userData: UserDataEntry) =>
+export const getFileName = (userData: UserDataEntry | UserData) =>
    `${userData.firstName} ${userData.lastName} CV - ${prettyLocalizedDate(
       new Date()
    )}`
