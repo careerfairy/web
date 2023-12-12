@@ -157,8 +157,8 @@ const Player: FC<Props> = ({
                      <Box sx={styles.countDown}>
                         {!boughtAccess ? (
                            <RecordingTitle>
-                              Only <CountDown stream={livestreamPresenter} />{" "}
-                              left to rewatch for free!
+                              Recording Unlocked for{" "}
+                              <CountDown stream={livestreamPresenter} />{" "}
                            </RecordingTitle>
                         ) : (
                            <RecordingTitle>
