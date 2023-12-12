@@ -8,8 +8,8 @@ import TimelineView from "./TimelineView"
 
 const styles = sxStyles({
    paper: {
-      maxWidth: 858,
       br: 2,
+      maxWidth: 858,
    },
 })
 
@@ -24,10 +24,16 @@ const SparksOnboardingDialog = () => {
             maxWidth="xl"
             PaperProps={PaperProps}
             fullWidth
-            // open={!onboardingCompleted}
-            open={true}
+            open={!onboardingCompleted}
          >
-            <Stack p={2} spacing={3} direction="row">
+            <Stack
+               p={2}
+               spacing={3}
+               direction={{
+                  xs: "column",
+                  sm: "row",
+               }}
+            >
                <TimelineStepper />
                <TimelineView />
             </Stack>

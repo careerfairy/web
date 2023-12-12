@@ -7,27 +7,30 @@ import {
    Stepper,
    Typography,
    stepConnectorClasses,
-   stepLabelClasses,
    styled,
 } from "@mui/material"
-import { useOnboarding } from "./OnboardingProvider"
 import { sxStyles } from "types/commonTypes"
+import { useOnboarding } from "./OnboardingProvider"
 
 const styles = sxStyles({
    root: {
       px: 2.5,
       py: 4,
+      pt: "38.5px",
       bgcolor: "#FAFAFA",
-      minWidth: 240,
       borderRadius: 2,
    },
    stepLabelWrapper: {
       py: 0,
+      mb: "-6.5px",
+      mt: "-6.5px",
    },
    stepLabel: {
       fontSize: "1.285rem !important",
       color: "secondary.main",
       textWrap: "noWrap",
+      fontWeight: 500,
+      transition: (theme) => theme.transitions.create("color"),
    },
    labelDisabled: {
       color: "#6B6B7F",
@@ -95,27 +98,17 @@ const StepIcon = ({ active, completed }: StepIconProps) => {
 }
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
-   marginLeft: 10,
-   [`&.${stepConnectorClasses.alternativeLabel}`]: {
-      //   top: 22,
-   },
-   [`&.${stepConnectorClasses.active}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-         //  backgroundImage:
-         //     "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
-      },
-   },
-   [`&.${stepConnectorClasses.completed}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-         //  backgroundImage: "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
-      },
-   },
+   marginLeft: 6,
    [`& .${stepConnectorClasses.line}`]: {
-      height: 30,
+      height: 42,
+      borderColor: theme.palette.secondary.main,
       borderWidth: 2,
       bgcolor: "#E0E0E0",
-      //   border: 0,
-      //   borderRadius: 1,
+   },
+   [`&.${stepConnectorClasses.disabled}`]: {
+      [`& .${stepConnectorClasses.line}`]: {
+         borderColor: "#EBEBEF",
+      },
    },
 }))
 
