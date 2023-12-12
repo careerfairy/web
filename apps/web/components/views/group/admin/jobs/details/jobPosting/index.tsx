@@ -1,16 +1,16 @@
 import { Paper } from "@mui/material"
-import CustomJobAdminDetails from "../../../../jobs/components/b2b/CustomJobAdminDetails"
+import CustomJobAdminDetails from "../../../../../jobs/components/b2b/CustomJobAdminDetails"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import { FC, useCallback } from "react"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { useDispatch } from "react-redux"
-import { openJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
+import { openJobsDialog } from "../../../../../../../store/reducers/adminJobsReducer"
 
 type Props = {
    job: CustomJob
    group: Group
 }
-const JobDetails: FC<Props> = ({ job, group }) => {
+const JobPosting: FC<Props> = ({ job, group }) => {
    const dispatch = useDispatch()
 
    const handleClick = useCallback(() => {
@@ -29,4 +29,4 @@ const JobDetails: FC<Props> = ({ job, group }) => {
    )
 }
 
-export default JobDetails
+export default JobPosting
