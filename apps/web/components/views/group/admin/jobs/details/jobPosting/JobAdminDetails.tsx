@@ -1,19 +1,20 @@
 import { Box, Button, Tabs, Tooltip, Typography } from "@mui/material"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import React, { FC, useCallback, useMemo, useState } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import ChevronLeft from "@mui/icons-material/ChevronLeft"
-import Link from "../../../../common/Link"
+import Link from "../../../../../common/Link"
 import Tab from "@mui/material/Tab"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { SwipeablePanel } from "../../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import { SkeletonStackMultiple } from "../../../../../util/Skeletons"
+import { SwipeablePanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
+import { SkeletonStackMultiple } from "../../../../../../util/Skeletons"
 import SwipeableViews from "react-swipeable-views"
-import JobApplicants from "./JobApplicants"
-import JobDetails from "./JobDetails"
-import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { UserData } from "@careerfairy/shared-lib/users"
+import JobPosting from "./index"
+import JobApplicants from "../jobApplicants"
 
 const styles = sxStyles({
    wrapper: {
@@ -55,9 +56,10 @@ const styles = sxStyles({
 
 type Props = {
    job: CustomJob
+   applicants: UserData[]
 }
 
-const JobAdminDetails: FC<Props> = ({ job }) => {
+const JobAdminDetails: FC<Props> = ({ job, applicants }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
 
@@ -70,14 +72,16 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       () => [
          {
             label: "Applicants",
-            component: () => <JobApplicants />,
+            component: () => (
+               <JobApplicants job={job} applicants={applicants} />
+            ),
          },
          {
             label: "Job Opening",
-            component: () => <JobDetails job={job} group={group} />,
+            component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [group, job]
+      [applicants, group, job]
    )
 
    return (
