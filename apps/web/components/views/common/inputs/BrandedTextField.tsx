@@ -53,7 +53,11 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
             >
                <span> {props.label} </span>
                {props.requiredText ? <span>{props.requiredText}</span> : null}
-               {props.tooltipText ? getBrandedTooltip(props.tooltipText) : null}
+               {props.tooltipText ? (
+                  <span className="branded-tooltip">
+                     {getBrandedTooltip(props.tooltipText)}
+                  </span>
+               ) : null}
             </Box>
          </Typography>
       }
@@ -73,6 +77,12 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    "& label span": {
       fontWeight: 500,
       color: "#6F6F80",
+      "&:hover": {
+         cursor: "pointer",
+      },
+   },
+   ".branded-tooltip": {
+      marginBottom: "3px",
    },
    "& label.Mui-focused": {
       color: "#9999B1",
