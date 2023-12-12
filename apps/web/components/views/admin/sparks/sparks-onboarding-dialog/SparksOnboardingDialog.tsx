@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material"
+import { Stack, StackProps } from "@mui/material"
 import Dialog, { DialogProps } from "@mui/material/Dialog"
 import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
@@ -26,20 +26,18 @@ const SparksOnboardingDialog = () => {
             fullWidth
             open={!onboardingCompleted}
          >
-            <Stack
-               p={2}
-               spacing={3}
-               direction={{
-                  xs: "column",
-                  sm: "row",
-               }}
-            >
+            <Stack p={2} spacing={3} direction={direction}>
                <TimelineStepper />
                <TimelineView />
             </Stack>
          </Dialog>
       </OnboardingProvider>
    )
+}
+
+const direction: StackProps["direction"] = {
+   xs: "column",
+   sm: "row",
 }
 
 const PaperProps: DialogProps["PaperProps"] = {
