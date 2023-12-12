@@ -1,6 +1,6 @@
 import { Grid, Typography } from "@mui/material"
 import { FormikValues } from "formik"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import {
    pickPublicDataFromCustomJob,
    PublicCustomJob,
@@ -29,6 +29,11 @@ const CustomJobSection = ({
 }: Props) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const allCustomJobs = useGroupCustomJobs(groupId)
+
+   const allCustomJobsPresenter = useMemo(
+      () => allCustomJobs.map(pickPublicDataFromCustomJob),
+      [allCustomJobs]
+   )
    const [showForm, setShowForm] = useState(false)
 
    const handleChange = useCallback(
@@ -133,7 +138,7 @@ const CustomJobSection = ({
                   label="Job related to this event"
                   placeholder="Select a job"
                   values={values.customJobs}
-                  jobs={allCustomJobs}
+                  jobs={allCustomJobsPresenter}
                   disabled={isSubmitting}
                   handleChange={handleChange}
                   handleOpenCreateJobForm={handleOpenCreateJobForm}
