@@ -33,6 +33,7 @@ import {
    ComponentType,
    createContext,
    FC,
+   JSXElementConstructor,
    useCallback,
    useContext,
    useEffect,
@@ -44,6 +45,7 @@ import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import { SxProps } from "@mui/material/styles"
+import { TransitionProps } from "@mui/material/transitions"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -57,13 +59,11 @@ const styles = sxStyles({
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
-      borderRadius: 5,
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: 770,
       overflowY: "auto",
-      top: { xs: "70px", md: 0 },
    },
    content: {
       p: 0,
@@ -145,6 +145,10 @@ const styles = sxStyles({
          bgcolor: "#EDEDED",
          color: "#BBBBBB",
       },
+   },
+   actionsContainer: {
+      display: "flex",
+      height: "90px",
    },
 })
 
@@ -305,10 +309,10 @@ const SteppedDialog = <K extends string>({
          open={open}
          onClose={handleClose}
          TransitionComponent={
-            isMobile
-               ? steps === 1
-                  ? SlideUpTransition
-                  : SlideLeftTransition
+            transition
+               ? transition
+               : isMobile
+               ? SlideLeftTransition
                : SlideUpTransition
          }
          maxWidth="md"
@@ -357,13 +361,13 @@ const Title: FC<TypographyProps<"h1">> = ({ sx, ...props }) => {
    )
 }
 
-const Subtitle: FC<TypographyProps<"h2">> = (props) => {
+const Subtitle: FC<TypographyProps<"h2">> = ({ sx, ...props }) => {
    return (
       <Typography
          color={"#1F1F29"}
          component="h2"
          maxWidth={385}
-         sx={styles.subtitle}
+         sx={[styles.subtitle, ...(Array.isArray(sx) ? sx : [sx])]}
          {...props}
       />
    )
@@ -372,6 +376,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
 type SteppedDialogContainerProps = BoxProps & {
    width?: string | number
    hideCloseButton?: boolean
+   withActions?: boolean
    containerSx?: SxProps<Theme>
 }
 
@@ -381,6 +386,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    hideCloseButton,
    children,
    containerSx,
+   withActions,
 }) => {
    const stepper = useStepper()
 
@@ -409,6 +415,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
                </Box>
             )}
          </MuiContainer>
+         {withActions ? <Box sx={styles.actionsContainer} /> : null}
       </Box>
    )
 }
