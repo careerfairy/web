@@ -2,12 +2,25 @@ import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 
-type FlagKeys = "atsAdminPageFlag" | "sparksAdminPageFlag"
+type FlagKeys =
+   | "atsAdminPageFlag"
+   | "sparksAdminPageFlag"
+   | "sparksB2BOnboardingFlag"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
 const paramsHaveGroupIds = (params: ParsedUrlQuery, groupIds: string[]) => {
    return groupIds.includes(params?.groupId?.toString())
+}
+
+/**
+ * Create a function that will return true if the path and params match the given groupIds
+ * @param groupIds
+ **/
+const createFeatureFlagEnableCondition = (groupIds: string[]) => {
+   return (path: string, params: ParsedUrlQuery) => {
+      return paramsHaveGroupIds(params, groupIds)
+   }
 }
 
 /**
@@ -17,26 +30,32 @@ const paramsHaveGroupIds = (params: ParsedUrlQuery, groupIds: string[]) => {
  * - ?atsAdminPageFlag=true
  *
  */
-export const flagsInitialState: Record<FlagKeys, FeatureFlag> = {
+export const flagsInitialState = {
    /**
     * Group Admin Dashboard ATS
     * Hide or Show
     */
    atsAdminPageFlag: {
       enabled: false,
-      conditionalEnable: (path: string, params: ParsedUrlQuery) => {
-         // Enable ATS for the following groups
-         return paramsHaveGroupIds(params, testGoups)
-      },
+      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
+   /**
+    * Group Admin Dashboard Sparks
+    * Hide or Show
+    */
    sparksAdminPageFlag: {
       enabled: false,
-      conditionalEnable: (path: string, params: ParsedUrlQuery) => {
-         // Enable Sparks for the following groups
-         return paramsHaveGroupIds(params, testGoups)
-      },
+      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
-}
+   /**
+    * Sparks B2B Onboarding Dialog
+    * Hide or Show
+    */
+   sparksB2BOnboardingFlag: {
+      enabled: false,
+      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
+   },
+} satisfies Record<FlagKeys, FeatureFlag>
 
 /**
  * Feature Flags provider
