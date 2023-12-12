@@ -113,7 +113,7 @@ export default class AgoraClient {
                },
                storageConfig: {
                   vendor: 1, // AWS S3
-                  region: 7, // EU_CENTRAL_1
+                  region: 7, // EU_CENTRAL_1.
                   bucket: "agora-cf-cloud-recordings",
                   accessKey: awsAccessKey,
                   secretKey: awsSecretKey,
