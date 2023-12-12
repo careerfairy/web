@@ -214,7 +214,6 @@ const SparksFeedCarousel: FC = () => {
    useEffect(() => {
       if (emblaApi) {
          emblaApi.scrollTo(currentPlayingIndex)
-         dispatch(setVideoPlaying(true))
       }
    }, [emblaApi, currentPlayingIndex])
 
@@ -244,6 +243,7 @@ const SparksFeedCarousel: FC = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeToSparkByIndex(index))
             dispatch(removeCurrentEventNotifications())
+            dispatch(setVideoPlaying(true))
          }
 
          emblaApi.on("scroll", onScroll)
