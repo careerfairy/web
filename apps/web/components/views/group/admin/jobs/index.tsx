@@ -7,6 +7,6 @@ const JobsContent = () => {
    const { group } = useGroupFromState()
    const allJobs = useGroupCustomJobs(group.groupId)
 
-   return allJobs.length > 0 ? <JobList /> : <EmptyJobsView />
+   return allJobs.length > 0 ? <JobList jobs={allJobs} /> : <EmptyJobsView />
 }
 export default JobsContent

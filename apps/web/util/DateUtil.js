@@ -79,6 +79,13 @@ export default class DateUtil {
       })
    }
 
+   static getTomorrowDate() {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+
+      return tomorrow
+   }
+
    static getTimeAgo(JSDate) {
       return dayjs(JSDate).fromNow() // 2 hours ago, 2 days ago, 2 months ago, 2 years ago
    }
