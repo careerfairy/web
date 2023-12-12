@@ -1,23 +1,17 @@
 import SteppedDialog, {
    useStepper,
-} from "../../../stepped-dialog/SteppedDialog"
-import useGroupFromState from "../../../../custom-hook/useGroupFromState"
-import React, { useCallback, useEffect, useMemo } from "react"
-import { sxStyles } from "../../../../../types/commonTypes"
+} from "../../../../stepped-dialog/SteppedDialog"
+import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
+import React, { useCallback, useMemo } from "react"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import { AlertTriangle } from "react-feather"
 import Stack from "@mui/material/Stack"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { groupRepo } from "../../../../../data/RepositoryInstances"
+import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { Form, Formik } from "formik"
-import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
+import { BrandedTextFieldField } from "../../../../common/inputs/BrandedTextField"
 import * as Yup from "yup"
-import { useDispatch, useSelector } from "react-redux"
-import {
-   closePrivacyPolicyDialog,
-   openPrivacyPolicyDialog,
-} from "../../../../../store/reducers/adminJobsReducer"
-import { jobsPrivacyPolicyDialogOpenSelector } from "../../../../../store/selectors/adminJobsSelectors"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -34,8 +28,7 @@ const styles = sxStyles({
       px: 2,
    },
    content: {
-      mt: { xs: 1, md: "100px" },
-      minHeight: "500px",
+      my: { xs: 1, md: "80px" },
    },
    info: {
       display: "flex",
@@ -45,7 +38,6 @@ const styles = sxStyles({
    title: {
       fontSize: { xs: "20px", md: "24px" },
    },
-   form: {},
    input: {
       width: "100%",
       mt: 4,
@@ -53,42 +45,8 @@ const styles = sxStyles({
 })
 
 const PrivacyPolicyDialog = () => {
-   const dispatch = useDispatch()
    const { group } = useGroupFromState()
-   const privacyPolicyActive = useMemo(
-      () => Boolean(group.privacyPolicyActive),
-      [group.privacyPolicyActive]
-   )
-   const isOpen = useSelector(jobsPrivacyPolicyDialogOpenSelector)
-
-   useEffect(() => {
-      if (!privacyPolicyActive) {
-         dispatch(openPrivacyPolicyDialog())
-      }
-   }, [])
-
-   const handleClose = () => {
-      dispatch(closePrivacyPolicyDialog())
-   }
-
-   if (privacyPolicyActive) {
-      return null
-   }
-
-   return (
-      <SteppedDialog
-         key={isOpen ? "open" : "closed"}
-         bgcolor="#FCFCFC"
-         handleClose={handleClose}
-         open={isOpen}
-         views={view}
-      />
-   )
-}
-
-const Content = () => {
-   const { group } = useGroupFromState()
-   const { handleClose } = useStepper()
+   const { moveToNext } = useStepper()
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const initialValues = useMemo(
@@ -110,13 +68,20 @@ const Content = () => {
                privacyPolicyUrl: values.privacyPolicyUrl,
             }
             await groupRepo.updateGroupMetadata(group.groupId, privacyPolicy)
-            successNotification("Privacy policy successfull updated")
+            successNotification("Privacy policy successfully updated")
          } catch (error) {
-            errorNotification(error, "An error has occured")
+            errorNotification(error, "An error has occurred")
+         } finally {
+            moveToNext()
          }
       },
-      [group.groupId, successNotification, errorNotification]
+      [group.groupId, successNotification, errorNotification, moveToNext]
    )
+
+   const handleSkip = useCallback(() => {
+      moveToNext()
+   }, [moveToNext])
+
    return (
       <Formik<FormValues>
          initialValues={initialValues}
@@ -128,6 +93,7 @@ const Content = () => {
             <SteppedDialog.Container
                containerSx={styles.content}
                sx={styles.wrapContainer}
+               withActions
             >
                <>
                   <SteppedDialog.Content sx={styles.container}>
@@ -166,7 +132,7 @@ const Content = () => {
                      <SteppedDialog.Button
                         variant="outlined"
                         color="grey"
-                        onClick={handleClose}
+                        onClick={handleSkip}
                      >
                         Skip
                      </SteppedDialog.Button>
@@ -188,13 +154,6 @@ const Content = () => {
       </Formik>
    )
 }
-
-const view = [
-   {
-      key: "select-creator",
-      Component: () => <Content />,
-   },
-]
 
 type FormValues = {
    privacyPolicyActive: boolean
