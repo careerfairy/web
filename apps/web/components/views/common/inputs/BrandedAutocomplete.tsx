@@ -4,7 +4,6 @@ import BrandedTextField, { BrandedTextFieldProps } from "./BrandedTextField"
 
 import { ListItemText, MenuItem } from "@mui/material"
 import BrandedCheckbox from "./BrandedCheckbox"
-import BrandedRadio from "./BrandedRadio"
 
 type BrandedAutocompleteProps<T extends { id: string; name: string } = any> =
    Omit<
@@ -42,16 +41,15 @@ const BrandedAutocomplete = styled(
                key={option.id}
                sx={{
                   '&[aria-selected="true"]': {
-                     backgroundColor: "white !important",
+                     backgroundColor: "#FAFAFA !important",
                   },
                }}
             >
-               <ListItemText primary={getOptionLabel(option)} />
-               {props.multiple ? (
-                  <BrandedCheckbox checked={selected} />
-               ) : (
-                  <BrandedRadio checked={selected} />
-               )}
+               <ListItemText
+                  primary={getOptionLabel(option)}
+                  sx={{ padding: "16px" }}
+               />
+               {props.multiple ? <BrandedCheckbox checked={selected} /> : null}
             </MenuItem>
          )}
          color="primary"
