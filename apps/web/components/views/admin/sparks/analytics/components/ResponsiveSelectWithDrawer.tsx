@@ -7,7 +7,6 @@ import {
    Box,
    MenuItem,
    BoxProps,
-   SxProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { combineStyles, sxStyles } from "types/commonTypes"
