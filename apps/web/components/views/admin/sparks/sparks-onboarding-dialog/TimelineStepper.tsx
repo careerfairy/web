@@ -22,7 +22,7 @@ const styles = sxStyles({
    },
    stepLabelWrapper: {
       py: 0,
-      mb: "-6.5px",
+      mb: "-7.5px",
       mt: "-6.5px",
    },
    stepLabel: {
@@ -31,6 +31,16 @@ const styles = sxStyles({
       textWrap: "noWrap",
       fontWeight: 500,
       transition: (theme) => theme.transitions.create("color"),
+      // ensures the container doesn't resize when the label becomes bold, we don't want a fixed width because it's not responsive
+      "&::after": {
+         display: "block",
+         content: "attr(title)",
+         fontWeight: 700,
+         height: "1px",
+         color: "transparent",
+         overflow: "hidden",
+         visibility: "hidden",
+      },
    },
    labelDisabled: {
       color: "#6B6B7F",
@@ -58,7 +68,7 @@ const TimelineStepper = () => {
    return (
       <Box sx={styles.root}>
          <Stepper
-            connector={<ColorlibConnector />}
+            connector={<StyledStepConnector />}
             activeStep={activeStep}
             orientation="vertical"
          >
@@ -69,6 +79,7 @@ const TimelineStepper = () => {
                      sx={styles.stepLabelWrapper}
                   >
                      <Typography
+                        title={step.stepLabel}
                         sx={[
                            styles.stepLabel,
                            getStepCompleted(activeStep, index) &&
@@ -97,7 +108,7 @@ const StepIcon = ({ active, completed }: StepIconProps) => {
    )
 }
 
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
    marginLeft: 6,
    [`& .${stepConnectorClasses.line}`]: {
       height: 42,
