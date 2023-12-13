@@ -81,9 +81,6 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
          cursor: "pointer",
       },
    },
-   ".branded-tooltip": {
-      marginBottom: "3px",
-   },
    "& label.Mui-focused": {
       color: "#9999B1",
    },
