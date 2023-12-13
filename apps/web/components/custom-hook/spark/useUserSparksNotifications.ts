@@ -8,14 +8,16 @@ import { toDate } from "@careerfairy/shared-lib/firebaseTypes"
 const getUserSparkNotifications = (userId: string, groupId?: string) => {
    return query(
       collection(FirestoreInstance, "userData", userId, "sparksNotifications"),
-      ...(groupId ? [where("groupId", "==", groupId)] : [])
+      ...(groupId ? [where("groupId", "==", groupId)] : []),
+      where("startDate", ">", new Date())
    )
 }
 
 const getPublicSparkNotifications = (groupId?: string) => {
    return query(
       collection(FirestoreInstance, "publicSparksNotifications"),
-      ...(groupId ? [where("id", "==", groupId)] : [])
+      ...(groupId ? [where("id", "==", groupId)] : []),
+      where("startDate", ">", new Date())
    )
 }
 
