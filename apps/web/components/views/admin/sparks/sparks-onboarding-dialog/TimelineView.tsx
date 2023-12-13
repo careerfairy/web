@@ -12,7 +12,8 @@ const styles = sxStyles({
 })
 
 const TimelineView = () => {
-   const { activeStep, steps, handleNext, handleBack } = useOnboarding()
+   const { activeStep, steps, handleNext, handleBack, completeOnboarding } =
+      useOnboarding()
    return (
       <Box sx={styles.root}>
          {steps[activeStep].view}
@@ -20,7 +21,14 @@ const TimelineView = () => {
             Demo Back
          </Button>
          <Button variant="contained" color="secondary" onClick={handleNext}>
-            Demo Next
+            Demo Skip
+         </Button>
+         <Button
+            variant="contained"
+            color="primary"
+            onClick={completeOnboarding}
+         >
+            Demo Complete
          </Button>
       </Box>
    )
