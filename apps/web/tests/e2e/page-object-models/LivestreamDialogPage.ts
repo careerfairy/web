@@ -147,7 +147,7 @@ export default class LivestreamDialogPage extends CommonPage {
       if (free) {
          // Only 0d 23h 59min 47sec left to rewatch for free!
          await expect(
-            this.page.getByText("left to rewatch for free!")
+            this.page.getByText("Recording Unlocked for")
          ).toBeVisible()
       } else {
          await expect(
