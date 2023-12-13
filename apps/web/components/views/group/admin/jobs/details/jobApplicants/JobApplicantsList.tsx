@@ -9,7 +9,6 @@ import {
    Typography,
 } from "@mui/material"
 import React, { FC, useCallback, useEffect, useState } from "react"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { useDownloadCV } from "../../../common/table/hooks"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { getResizedUrl } from "../../../../../../helperFunctions/HelperFunctions"
@@ -17,6 +16,7 @@ import { Link } from "@careerfairy/streaming/components"
 import { LoadingButton } from "@mui/lab"
 import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
 import { sxStyles } from "../../../../../../../types/commonTypes"
+import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 
 const styles = sxStyles({
    listItem: {
@@ -37,9 +37,6 @@ const styles = sxStyles({
    userName: {
       fontSize: "16px",
       fontWeight: "600",
-   },
-   cursorPointer: {
-      cursor: "pointer",
    },
    fieldOfStudy: {
       fontSize: "14px",
@@ -77,14 +74,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   applicants: UserData[]
+   applicants: UserDataEntry[]
 }
 
 const JobApplicantsList: FC<Props> = ({ applicants }) => {
    return (
       <Stack spacing={2} my={3}>
          {applicants.map((user) => (
-            <ApplicationItem key={user.id} applicant={user} />
+            <ApplicationItem key={user.email} applicant={user} />
          ))}
       </Stack>
    )
@@ -110,7 +107,7 @@ type ApplicantsTooltip = {
 }
 
 type ApplicationItemProps = {
-   applicant: UserData
+   applicant: UserDataEntry
 }
 const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
    const { handleDownloadCV, downloadingPDF } = useDownloadCV(applicant)
@@ -118,19 +115,19 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
       useState<ApplicantsTooltip>({
          userFullName: {
             visible: false,
-            id: `userName-${applicant.id}`,
+            id: `userName-${applicant.email}`,
          },
          userUniversityCountry: {
             visible: false,
-            id: `userUniversityCountry-${applicant.id}`,
+            id: `userUniversityCountry-${applicant.email}`,
          },
          userUniversityName: {
             visible: false,
-            id: `userUniversityName-${applicant.id}`,
+            id: `userUniversityName-${applicant.email}`,
          },
          userFieldOfStudy: {
             visible: false,
-            id: `userFieldOfStudy-${applicant.id}`,
+            id: `userFieldOfStudy-${applicant.email}`,
          },
       })
 
@@ -142,16 +139,27 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
          window.removeEventListener("resize", handleApplicantsDataTooltip)
    }, [])
 
-   const userFullName = applicant.firstName
-      ? `${applicant.firstName} ${applicant.lastName}`
-      : "Unknown"
-   const userUniversityCountry =
-      universityCountryMap?.[applicant.universityCountryCode]
-   const userUniversityName = applicant.university?.name
-   const userFieldOfStudy = applicant.fieldOfStudy?.name
-   const userLevelOfStudy = applicant.levelOfStudy?.name || "Unknown"
+   const {
+      firstName,
+      lastName,
+      universityCountryCode,
+      universityName,
+      fieldOfStudy,
+      levelOfStudy,
+   } = applicant
 
+   const userFullName = `${firstName} ${lastName}`
+   const userUniversityCountry = universityCountryMap?.[universityCountryCode]
+
+   /**
+    * Handles the visibility of tooltips for applicant data.
+    * If the content of applicant details overflows its display container,
+    * triggers the tooltip to display the full string.
+    * The function checks and updates the tooltip visibility based on the width
+    * of the content compared to its container, ensuring accurate tooltip display.
+    */
    const handleApplicantsDataTooltip = useCallback(() => {
+      // Get references to DOM elements using their IDs
       const userFullNameElement = document.getElementById(
          applicantsTooltip.userFullName.id
       )
@@ -165,6 +173,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
          applicantsTooltip.userUniversityName.id
       )
 
+      // Check if the content of each element overflows its container
       const newApplicantsTooltip: ApplicantsTooltip = {
          userFullName: {
             id: applicantsTooltip.userFullName.id,
@@ -182,7 +191,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
             id: applicantsTooltip.userUniversityCountry.id,
             visible:
                userUniversityCountryElement.scrollWidth >
-               userFieldOfStudyElement.clientWidth,
+               userUniversityCountryElement.clientWidth,
          },
          userUniversityName: {
             id: applicantsTooltip.userUniversityName.id,
@@ -192,6 +201,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
          },
       }
 
+      // Update the state with the new visibility information
       setApplicantsTooltip(newApplicantsTooltip)
    }, [
       applicantsTooltip.userFieldOfStudy.id,
@@ -223,12 +233,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                         id={applicantsTooltip.userFullName.id}
                         variant={"body1"}
                         noWrap
-                        sx={[
-                           styles.userName,
-                           applicantsTooltip.userFullName.visible
-                              ? styles.cursorPointer
-                              : null,
-                        ]}
+                        sx={styles.userName}
                      >
                         {userFullName}
                      </Typography>
@@ -238,7 +243,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                      arrow
                      title={
                         applicantsTooltip.userFieldOfStudy.visible
-                           ? userFieldOfStudy
+                           ? fieldOfStudy
                            : ""
                      }
                   >
@@ -246,14 +251,9 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                         id={applicantsTooltip.userFieldOfStudy.id}
                         variant={"body1"}
                         noWrap
-                        sx={[
-                           styles.fieldOfStudy,
-                           applicantsTooltip.userFieldOfStudy.visible
-                              ? styles.cursorPointer
-                              : null,
-                        ]}
+                        sx={styles.userData}
                      >
-                        {userFieldOfStudy}
+                        {fieldOfStudy}
                      </Typography>
                   </Tooltip>
                </Box>
@@ -272,12 +272,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                      id={applicantsTooltip.userUniversityCountry.id}
                      variant={"body1"}
                      noWrap
-                     sx={[
-                        styles.userData,
-                        applicantsTooltip.userUniversityCountry.visible
-                           ? styles.cursorPointer
-                           : null,
-                     ]}
+                     sx={styles.userData}
                   >
                      {userUniversityCountry}
                   </Typography>
@@ -289,7 +284,7 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                   arrow
                   title={
                      applicantsTooltip.userUniversityName.visible
-                        ? userUniversityName
+                        ? universityName
                         : ""
                   }
                >
@@ -297,21 +292,16 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                      id={applicantsTooltip.userUniversityName.id}
                      variant={"body1"}
                      noWrap
-                     sx={[
-                        styles.userData,
-                        applicantsTooltip.userUniversityName.visible
-                           ? styles.cursorPointer
-                           : null,
-                     ]}
+                     sx={styles.userData}
                   >
-                     {userUniversityName}
+                     {universityName}
                   </Typography>
                </Tooltip>
             </Grid>
 
             <Grid item md={2} sx={styles.userUniversityDataSection}>
                <Typography variant={"body1"} sx={styles.userData}>
-                  {userLevelOfStudy}
+                  {levelOfStudy}
                </Typography>
             </Grid>
 
@@ -319,20 +309,20 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                <Button
                   component={Link}
                   target={"_blank"}
-                  href={applicant.linkedinUrl || ""}
+                  href={applicant.linkedInUrl || ""}
                   variant={
-                     Boolean(applicant.linkedinUrl) ? "outlined" : "contained"
+                     Boolean(applicant.linkedInUrl) ? "outlined" : "contained"
                   }
                   size="small"
                   color={"grey"}
-                  disabled={!Boolean(applicant.linkedinUrl)}
+                  disabled={!Boolean(applicant.linkedInUrl)}
                   sx={styles.linkedInBtn}
                >
                   Linked
                </Button>
 
                <LoadingButton
-                  disabled={!Boolean(applicant.userResume)}
+                  disabled={!Boolean(applicant.resumeUrl)}
                   loading={downloadingPDF}
                   onClick={handleDownloadCV}
                   sx={styles.downloadCvBtn}

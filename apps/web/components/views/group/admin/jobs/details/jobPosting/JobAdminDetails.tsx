@@ -12,7 +12,6 @@ import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import { SkeletonStackMultiple } from "../../../../../../util/Skeletons"
 import SwipeableViews from "react-swipeable-views"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { UserData } from "@careerfairy/shared-lib/users"
 import JobPosting from "./index"
 import JobApplicants from "../jobApplicants"
 
@@ -56,10 +55,9 @@ const styles = sxStyles({
 
 type Props = {
    job: CustomJob
-   applicants: UserData[]
 }
 
-const JobAdminDetails: FC<Props> = ({ job, applicants }) => {
+const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
 
@@ -72,16 +70,14 @@ const JobAdminDetails: FC<Props> = ({ job, applicants }) => {
       () => [
          {
             label: "Applicants",
-            component: () => (
-               <JobApplicants job={job} applicants={applicants} />
-            ),
+            component: () => <JobApplicants job={job} />,
          },
          {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [applicants, group, job]
+      [group, job]
    )
 
    return (
