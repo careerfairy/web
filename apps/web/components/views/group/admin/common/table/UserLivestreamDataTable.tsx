@@ -118,6 +118,7 @@ export type UserDataEntry = {
    levelOfStudy: string
    resumeUrl: string
    linkedInUrl: string
+   avatar?: string
 }
 
 const baseOptions: Options<UserDataEntry> = {
