@@ -243,7 +243,6 @@ const SparksFeedCarousel: FC = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeToSparkByIndex(index))
             dispatch(removeCurrentEventNotifications())
-            console.log("Video Select: " + isPlaying)
             if (!isPlaying) dispatch(setVideoPlaying(true))
          }
 
