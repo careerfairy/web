@@ -14,6 +14,7 @@ import SwipeableViews from "react-swipeable-views"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import JobPosting from "./index"
 import JobApplicants from "../jobApplicants"
+import NoApplicantsData from "../jobApplicants/NoApplicantsData"
 
 const styles = sxStyles({
    wrapper: {
@@ -60,6 +61,10 @@ type Props = {
 const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
+   const allowToDisplayApplicantsData = useMemo(
+      () => group.privacyPolicyActive,
+      [group.privacyPolicyActive]
+   )
 
    const switchTabHandler = useCallback((...args) => {
       // clicking tabs handler
@@ -70,14 +75,19 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       () => [
          {
             label: "Applicants",
-            component: () => <JobApplicants job={job} />,
+            component: () =>
+               allowToDisplayApplicantsData ? (
+                  <JobApplicants job={job} />
+               ) : (
+                  <NoApplicantsData />
+               ),
          },
          {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
       ],
-      [group, job]
+      [allowToDisplayApplicantsData, group, job]
    )
 
    return (
