@@ -237,13 +237,13 @@ const SparksFeedCarousel: FC = () => {
       const onSettle = () => {
          clearTimeout(timeoutId)
          setScrolling(false)
+         dispatch(setVideoPlaying(true))
       }
       if (emblaApi) {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeToSparkByIndex(index))
             dispatch(removeCurrentEventNotifications())
-            dispatch(setVideoPlaying(true))
          }
 
          emblaApi.on("scroll", onScroll)
