@@ -39,9 +39,10 @@ import bigQueryClient from "./bigQueryClient"
 import {
    sparkEventsHandler,
    sparkSecondsWatchedHanlder,
-} from "../lib/bigQuery/IBigQueryService"
+} from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
+import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -92,3 +93,9 @@ export const sparkRepo: ISparkFunctionsRepository =
 
 export const publicSparksNotificationsRepo: IPublicSparksNotificationsRepository =
    new PublicSparksNotificationsRepository(firestore as any)
+
+export const getSparksAnalyticsRepoInstance = (
+   groupId: string
+): GroupSparksAnalyticsRepository => {
+   return new GroupSparksAnalyticsRepository(groupId, bigQueryClient)
+}
