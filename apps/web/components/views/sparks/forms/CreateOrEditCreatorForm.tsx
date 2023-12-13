@@ -4,11 +4,12 @@ import React, { FC, ReactNode } from "react"
 import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, Tooltip } from "@mui/material"
 import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
 import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 import { sxStyles } from "types/commonTypes"
 import AvatarUpload from "./inputs/AvatarUpload"
+import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 
 const styles = sxStyles({
    avaGrid: {
@@ -70,6 +71,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         label="First Name"
                         placeholder="John"
                         fullWidth
+                        requiredText={"(required)"}
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -79,6 +81,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         label="Last Name"
                         placeholder="Doe"
                         fullWidth
+                        requiredText={"(required)"}
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -86,9 +89,10 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         name="position"
                         type="text"
                         label="Position"
-                        placeholder="Ex: Marketing Manager"
+                        placeholder="E.g.,: Marketing Manager"
                         autoComplete="organization-title"
                         fullWidth
+                        requiredText={"(required)"}
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -96,7 +100,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         name="linkedInUrl"
                         type="text"
                         label="LinkedIn Link"
-                        placeholder="Ex: linkedin.com/in/user"
+                        placeholder="E.g.,: linkedin.com/in/user"
                         autoComplete="url"
                         fullWidth
                      />
@@ -106,9 +110,11 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         name="email"
                         type="text"
                         label="Email address"
-                        placeholder="ex: John@careerfairy.io"
+                        placeholder="E.g.,: John@careerfairy.io"
                         disabled={Boolean(values.id)} // if we are editing a creator, we don't want to allow changing the email
                         fullWidth
+                        requiredText={"(required)"}
+                        tooltipText={EMAIL_TOOLTIP_INFO}
                      />
                   </Grid>
                   <Grid item xs={12}>
@@ -116,7 +122,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         name="story"
                         type="text"
                         label="Personal story"
-                        placeholder="Tell us about yourself!"
+                        placeholder="Tell talent a little more about your story and professional background!"
                         fullWidth
                         multiline
                         rows={4}
