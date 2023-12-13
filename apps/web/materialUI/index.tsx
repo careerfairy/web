@@ -457,7 +457,7 @@ const getComponents = (theme: DefaultTheme): Components => ({
          {
             props: { color: "grey", variant: "text" },
             style: {
-               color: theme.palette.text.primary,
+               color: "#8E8E8E",
                backgroundColor: "transparent",
                "&:hover": {
                   backgroundColor: alpha(
