@@ -74,19 +74,19 @@ const GroupNavList = () => {
                     Icon: SparksIcon,
                     title: "Sparks",
                     childLinks: [
-                     {
-                        id: "videos",
-                        href: `/${baseHrefPath}/${group.id}/admin/sparks`,
-                        pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
-                        title: "Videos",
-                     },
-                     {
-                        id: "analytics",
-                        href: `/${baseHrefPath}/${group.id}/admin/sparks/analytics`,
-                        pathname: `/${baseHrefPath}/${baseParam}/admin/sparks/analytics`,
-                        title: "Analytics",
-                     },
-                  ],
+                       {
+                          id: "videos",
+                          href: `/${baseHrefPath}/${group.id}/admin/sparks`,
+                          pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
+                          title: "Videos",
+                       },
+                       {
+                          id: "analytics",
+                          href: `/${baseHrefPath}/${group.id}/admin/sparks/analytics`,
+                          pathname: `/${baseHrefPath}/${baseParam}/admin/sparks/analytics`,
+                          title: "Analytics",
+                       },
+                    ],
                  },
               ]
             : []),
@@ -112,7 +112,7 @@ const GroupNavList = () => {
                  {
                     id: "customJobs",
                     href: `/${baseHrefPath}/${group.id}/admin/jobs`,
-                    pathname: `/${baseHrefPath}/${baseParam}/admin/jobs`,
+                    pathname: `/${baseHrefPath}/${baseParam}/admin/jobs/[[...jobId]]`,
                     Icon: Briefcase,
                     title: "Jobs",
                  },
