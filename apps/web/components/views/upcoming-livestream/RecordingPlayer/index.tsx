@@ -85,7 +85,7 @@ const RecordingPlayer = ({
 
                   {!boughtAccess ? (
                      <RecordingTitle isMobile={isMobile}>
-                        Recording Unlocked for <CountDown stream={stream} />
+                        Recording unlocked for <CountDown stream={stream} />
                      </RecordingTitle>
                   ) : (
                      <RecordingTitle isMobile={isMobile}>
