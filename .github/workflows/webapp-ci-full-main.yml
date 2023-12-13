@@ -198,9 +198,6 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-              NEXT_PUBLIC_FIREBASE_EMULATORS: true
-              APP_ENV: test
-              NODE_OPTIONS: "--max_old_space_size=8192"
               ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
               ALGOLIA_INDEX_NAME: ${{ secrets.ALGOLIA_INDEX_NAME }}
