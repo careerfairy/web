@@ -7,6 +7,7 @@ import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
 import { Briefcase, Edit } from "react-feather"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    wrapper: {
@@ -65,6 +66,11 @@ const styles = sxStyles({
       color: "#A0A0A0",
       width: "max-content",
    },
+   mobileEditBtnSection: {
+      mb: 3,
+      display: "flex",
+      justifyContent: "center",
+   },
 })
 
 type Props = {
@@ -79,12 +85,28 @@ const CustomJobAdminDetails: FC<Props> = ({
    companyName,
    companyLogoUrl,
 }) => {
+   const isMobile = useIsMobile()
    const jobDeadline = job.deadline
       ? DateUtil.formatDateToString(job.deadline.toDate())
       : ""
 
    return (
       <Box sx={styles.wrapper}>
+         {isMobile ? (
+            <Box sx={styles.mobileEditBtnSection}>
+               <Button
+                  variant={"outlined"}
+                  startIcon={<Edit size="18" color="#A0A0A0" />}
+                  color={"grey"}
+                  sx={styles.editButton}
+                  fullWidth
+                  onClick={handleEdit}
+               >
+                  Edit job posting
+               </Button>
+            </Box>
+         ) : null}
+
          <Box sx={styles.header}>
             <Box sx={styles.headerLeftSide}>
                <Avatar
@@ -107,18 +129,20 @@ const CustomJobAdminDetails: FC<Props> = ({
                   ) : null}
                </Box>
             </Box>
-            <Box>
-               <Button
-                  variant={"outlined"}
-                  startIcon={<Edit size="18" color="#A0A0A0" />}
-                  color={"grey"}
-                  sx={styles.editButton}
-                  fullWidth
-                  onClick={handleEdit}
-               >
-                  Edit job posting
-               </Button>
-            </Box>
+            {isMobile ? null : (
+               <Box>
+                  <Button
+                     variant={"outlined"}
+                     startIcon={<Edit size="18" color="#A0A0A0" />}
+                     color={"grey"}
+                     sx={styles.editButton}
+                     fullWidth
+                     onClick={handleEdit}
+                  >
+                     Edit job posting
+                  </Button>
+               </Box>
+            )}
          </Box>
 
          <Box sx={styles.content}>
