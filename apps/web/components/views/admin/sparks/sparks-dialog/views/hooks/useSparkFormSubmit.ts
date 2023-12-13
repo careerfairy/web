@@ -87,7 +87,6 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                   groupId,
                   creatorId: values.creator.id,
                })
-               trackEvent(SparkEventActions.Create)
             }
 
             setSubmitting(false)
