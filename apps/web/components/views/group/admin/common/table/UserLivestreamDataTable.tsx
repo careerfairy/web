@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useCallback, useMemo } from "react"
+import React, { FC, ReactNode, useCallback, useMemo, MouseEvent } from "react"
 import MaterialTable, {
    Column,
    Components,
@@ -143,7 +143,6 @@ const UserLivestreamDataTable: FC<TableProps> = ({
       converterFn,
       results,
       rowsPerPage,
-      setRowsPerPage,
       noResultsWithoutFilters,
       userType,
    } = useUserDataTable()
@@ -151,17 +150,6 @@ const UserLivestreamDataTable: FC<TableProps> = ({
    const data = useMemo(
       () => results.data?.map(converterFn) || [],
       [converterFn, results.data]
-   )
-
-   const handlePageChange = useCallback(
-      (newPage: number) => {
-         if (newPage > results.page - 1) {
-            void results.next()
-         } else {
-            results.prev()
-         }
-      },
-      [results]
    )
 
    const options = useMemo<Options<UserDataEntry>>(
@@ -184,13 +172,6 @@ const UserLivestreamDataTable: FC<TableProps> = ({
       [userType]
    )
 
-   const handlePageSizeChange = useCallback(
-      (pageSize: number) => {
-         setRowsPerPage(pageSize)
-      },
-      [setRowsPerPage]
-   )
-
    // If no filters are active, and the query returns no results, we know that there are no users at all
    // So we show a message saying that
    if (noResultsWithoutFilters) {
@@ -207,10 +188,8 @@ const UserLivestreamDataTable: FC<TableProps> = ({
             localization={localization}
             options={options}
             actions={actions}
-            onRowsPerPageChange={handlePageSizeChange}
             totalCount={results.countQueryResponse.count ?? undefined}
             page={results.page - 1}
-            onPageChange={handlePageChange}
             components={customComponents}
          />
       </Box>
@@ -221,9 +200,16 @@ const actions: MaterialTableProps<UserDataEntry>["actions"] = [
    { icon: "custom", onClick: () => {} },
 ]
 
-const Footer = (paginationProps: any) => {
-   const { converterFn, title, results, filtersInactive, userType } =
-      useUserDataTable()
+const Footer = ({ rowsPerPageOptions, labelRowsPerPage }: any) => {
+   const {
+      converterFn,
+      title,
+      results,
+      filtersInactive,
+      userType,
+      setRowsPerPage,
+      rowsPerPage,
+   } = useUserDataTable()
 
    const { downloadingAllCVs, handleDownloadAllCVs } = useDownloadAllCVs(
       results.fullQuery,
@@ -244,6 +230,26 @@ const Footer = (paginationProps: any) => {
 
    const disabled = results.countQueryResponse?.count === 0
 
+   const handlePageSizeChange = useCallback(
+      (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+         const eventValue = event.target.value
+
+         setRowsPerPage(parseInt(eventValue))
+      },
+      [setRowsPerPage]
+   )
+
+   const onPageChange = useCallback(
+      (_: MouseEvent, page: number) => {
+         if (page > results.page - 1) {
+            void results.next()
+         } else {
+            results.prev()
+         }
+      },
+      [results]
+   )
+
    return (
       <>
          <Stack
@@ -257,7 +263,15 @@ const Footer = (paginationProps: any) => {
             }}
          >
             <span>
-               <TablePagination {...paginationProps} />
+               <TablePagination
+                  count={results.countQueryResponse?.count || 0}
+                  onPageChange={onPageChange}
+                  page={results.page - 1}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={rowsPerPageOptions}
+                  labelRowsPerPage={labelRowsPerPage}
+                  onRowsPerPageChange={handlePageSizeChange}
+               />
             </span>
             <Stack
                divider={<Divider orientation="vertical" flexItem />}
