@@ -8,7 +8,7 @@ let appID = process.env.AGORA_APP_ID
 let appCertificate = process.env.AGORA_APP_CERTIFICATE
 let customerKey = process.env.AGORA_CUSTOMER_KEY
 let customerSecret = process.env.AGORA_CUSTOMER_SECRET
-console.log("WG-TBD-ENV: " + JSON.stringify(process.env))
+console.log("WG-TBD-ENV-empty_dot_env: " + JSON.stringify(process.env))
 if (isLocalEnvironment()) {
    // Project: CareerFairyStreaming
    console.log("Using AgoraSDK testing environment")

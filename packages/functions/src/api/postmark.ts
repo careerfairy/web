@@ -4,7 +4,7 @@ import { ServerClient } from "postmark"
 import { Callback, MessageSendingResponse } from "postmark/dist/client/models"
 import { isLocalEnvironment, isTestEnvironment } from "../util"
 let serverToken = process.env.POSTMARK_SERVER_TOKEN
-console.log("WG-TBD-ENV: " + JSON.stringify(process.env))
+console.log("WG-TBD-ENV-empty_dot_env: " + JSON.stringify(process.env))
 // on local emulators use the sandbox environment
 if (isLocalEnvironment()) {
    console.log(

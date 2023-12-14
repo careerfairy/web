@@ -242,7 +242,7 @@ jobs:
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
-           if: ${{ failure() }}
+           if: ${{ true }}
            uses: actions/upload-artifact@v3
            with:
               name: ${{ matrix.shard }}-playwright-report
@@ -250,7 +250,7 @@ jobs:
               retention-days: 30
 
          - name: Upload debug logs
-           if: ${{ failure() }}
+           if: ${{ true }}
            uses: actions/upload-artifact@v3
            with:
               name: ${{ matrix.shard }}-debug-logs

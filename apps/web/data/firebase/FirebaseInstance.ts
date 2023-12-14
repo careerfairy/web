@@ -15,7 +15,7 @@ export const firebaseConfig = {
    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
 }
-console.log("WG-TBD-ENV: " + JSON.stringify(process.env))
+console.log("WG-TBD-ENV-empty_dot_env: " + JSON.stringify(process.env))
 export const region = "europe-west1"
 
 /**
