@@ -163,7 +163,7 @@ jobs:
    e2e_tests:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       needs: [build_app_for_tests]
-      # only run if there are changes on the webapp & shared lib
+      # only run if there are changes on the webapp & shared lib -
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
