@@ -1,4 +1,3 @@
-// constants/video/transformedVideos.ts
 import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
 import { sparksTutorialVideoUrl } from "./videos"
 
