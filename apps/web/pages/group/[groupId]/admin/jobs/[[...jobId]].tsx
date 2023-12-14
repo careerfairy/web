@@ -8,6 +8,7 @@ import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
 import JobsContent from "../../../../../components/views/group/admin/jobs"
 import { GetServerSidePropsContext } from "next"
 import { FC } from "react"
+import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
 
 type Props = {
    groupId: string
@@ -22,7 +23,7 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
          topBarCta={<CreateJobButton />}
       >
          <DashboardHead title="CareerFairy | Jobs" />
-         <SuspenseWithBoundary>
+         <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
             {Boolean(jobId) ? (
                <JobFetchWrapper
                   jobId={jobId}

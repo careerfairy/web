@@ -11,6 +11,7 @@ import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNoti
 import { useCopyToClipboard } from "react-use"
 import { UserDataEntry } from "./UserLivestreamDataTable"
 import { Query } from "@firebase/firestore"
+
 export const useDownloadCV = (user: UserDataEntry) => {
    const { errorNotification } = useSnackbarNotifications()
    const [downloadingPDF, setDownloadingPDF] = useState(false)
@@ -34,6 +35,7 @@ export const useDownloadCV = (user: UserDataEntry) => {
       [downloadingPDF, handleDownloadCV]
    )
 }
+
 export const useDownloadAllCVs = (
    fullQuery: Query,
    converterFn: (unknown) => UserDataEntry,
