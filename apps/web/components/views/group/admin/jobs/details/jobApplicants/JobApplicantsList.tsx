@@ -33,6 +33,7 @@ const styles = sxStyles({
       textTransform: "none",
       height: "32px",
       width: "75px",
+      background: "#FAFAFE",
       ml: 2,
    },
 })

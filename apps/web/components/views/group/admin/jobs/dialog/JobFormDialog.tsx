@@ -193,7 +193,7 @@ const getInitialValues = (
    if (job) {
       let pastJob = false
 
-      if (job?.deadline.toDate() < new Date()) {
+      if (job.deadline?.toDate() < new Date()) {
          // The deadline for this job has already expired
          // In this case, we will proceed to update the job fields without validating the deadline
          pastJob = true

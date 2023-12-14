@@ -53,8 +53,6 @@ const styles = sxStyles({
    companyAvatar: {
       width: 63,
       height: 63,
-      background: (theme) => theme.palette.common.white,
-      boxShadow: (theme) => theme.shadows[2],
    },
    description: {
       fontSize: "16px",

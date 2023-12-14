@@ -1,20 +1,20 @@
-import { Box, Button, Tabs, Tooltip, Typography } from "@mui/material"
+import { Box, Tabs, Tooltip, Typography } from "@mui/material"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import React, { FC, useCallback, useMemo, useState } from "react"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import ChevronLeft from "@mui/icons-material/ChevronLeft"
-import Link from "../../../../../common/Link"
+import Link from "../../../../common/Link"
 import Tab from "@mui/material/Tab"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { SwipeablePanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import { SkeletonStackMultiple } from "../../../../../../util/Skeletons"
+import { SwipeablePanel } from "../../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { SkeletonStackMultiple } from "../../../../../util/Skeletons"
 import SwipeableViews from "react-swipeable-views"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import JobPosting from "./index"
-import JobApplicants from "../jobApplicants"
-import NoApplicantsData from "../jobApplicants/NoApplicantsData"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import JobPosting from "./jobPosting"
+import JobApplicants from "./jobApplicants"
+import NoApplicantsData from "./jobApplicants/NoApplicantsData"
 
 const styles = sxStyles({
    wrapper: {
@@ -22,12 +22,12 @@ const styles = sxStyles({
       my: 2,
    },
    backButton: {
+      display: "flex",
+      alignItems: "center",
       height: "36px",
-      p: 0,
       fontSize: { md: "24px" },
-      fontWeight: { md: "600" },
-      textTransform: "none",
-      width: "fit-content",
+      fontWeight: "600",
+      color: "black !important",
    },
    indicator: {
       backgroundColor: "#6749EA !important",
@@ -92,15 +92,15 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
 
    return (
       <Stack spacing={3} sx={styles.wrapper}>
-         <Button
+         <Box
             component={Link}
-            color={"black"}
-            startIcon={<ChevronLeft sx={{ width: "24px", height: "24px" }} />}
+            noLinkStyle
             href={`/group/${group.id}/admin/jobs`}
             sx={styles.backButton}
          >
+            <ChevronLeft sx={{ width: "24px", height: "24px" }} />
             {job.title}
-         </Button>
+         </Box>
 
          <Tabs
             value={activeTabIndex}
