@@ -56,6 +56,7 @@ const styles = sxStyles({
       height: 14,
       borderRadius: "50%",
       bgcolor: "#EBEBEF",
+      marginTop: "-1px",
    },
    stepIconActive: {
       bgcolor: "secondary.main",
@@ -82,11 +83,11 @@ const TimelineStepper = () => {
                         title={step.stepLabel}
                         sx={[
                            styles.stepLabel,
-                           getStepCompleted(activeStep, index) &&
+                           isStepCompleted(activeStep, index) &&
                               styles.labelCompleted,
-                           getStepDisabled(activeStep, index) &&
+                           isStepDisabled(activeStep, index) &&
                               styles.labelDisabled,
-                           getActiveStep(activeStep, index) &&
+                           isActiveStep(activeStep, index) &&
                               styles.labelActive,
                         ]}
                      >
@@ -114,7 +115,6 @@ const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
       height: 42,
       borderColor: theme.palette.secondary.main,
       borderWidth: 2,
-      bgcolor: "#E0E0E0",
    },
    [`&.${stepConnectorClasses.disabled}`]: {
       [`& .${stepConnectorClasses.line}`]: {
@@ -123,15 +123,15 @@ const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
    },
 }))
 
-const getStepCompleted = (activeStep: number, index: number) => {
+const isStepCompleted = (activeStep: number, index: number) => {
    return activeStep > index
 }
 
-const getStepDisabled = (activeStep: number, index: number) => {
+const isStepDisabled = (activeStep: number, index: number) => {
    return activeStep < index
 }
 
-const getActiveStep = (activeStep: number, index: number) => {
+const isActiveStep = (activeStep: number, index: number) => {
    return activeStep === index
 }
 
