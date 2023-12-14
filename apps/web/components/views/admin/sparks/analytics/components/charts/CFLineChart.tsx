@@ -1,3 +1,4 @@
+import { FC } from "react"
 import * as React from "react"
 import {
    ChartsXAxis,
@@ -50,35 +51,35 @@ const years = [
 ]
 
 const UKGDPperCapita = [
-   26189, 25792.014, 25790.186, 26349.342, 27277.543, 27861.215, 28472.248,
-   29259.764, 30077.385, 30932.537, 31946.037, 32660.441, 33271.3, 34232.426,
-   34865.78, 35623.625, 36214.07, 36816.676, 36264.79, 34402.36, 34754.473,
-   34971, 35185, 35618, 36436, 36941, 37334, 37782.83, 38058.086,
+   26189, 25792, 25790, 26349, 27277, 27861, 28472, 29259, 30077, 30932, 31946,
+   32660, 33271, 34232, 34865, 35623, 36214, 36816, 36264, 34402, 34754, 34971,
+   35185, 35618, 36436, 36941, 37334, 37782, 38058,
 ]
 
 const styles = sxStyles({
    chart: {
-      ".MuiLineElement-root": {
+      "& .MuiLineElement-root": {
          strokeWidth: 1,
          stroke: "#6749EA",
       },
-      ".MuiAreaElement-root": {
+      "& .MuiAreaElement-root": {
          fill: "#6749EA11",
       },
-      ".MuiChartsAxisHighlight-root": {
+      "& .MuiChartsAxisHighlight-root": {
          stroke: "#6749EA33",
          strokeWidth: 1,
       },
-      ".MuiChartsAxis-tickLabel": {
+      "& .MuiChartsAxis-tickLabel": {
          fontSize: "14px",
          letterSpacing: "0em",
          fill: "#6B6B7F",
       },
-      ".MuiChartsAxis-tick": {
+      "& .MuiChartsAxis-tick": {
          stroke: "#F3F3F5",
          strokeWidth: 1,
       },
-      ".MuiChartsAxis-bottom": {
+      /*
+      "& .MuiChartsAxis-bottom": {
          ".MuiChartsAxis-tickContainer": {
             ":first-of-type": {
                // to prevent server-side rendering issues
@@ -94,10 +95,7 @@ const styles = sxStyles({
             },
          },
       },
-   },
-   popperRoot: {
-      inset: "10px auto auto 10px !important",
-      margin: 10,
+      */
    },
 })
 
@@ -135,20 +133,37 @@ const CustomLineHighlightElement = (props) => {
 }
 
 const CustomTooltip = (props) => {
-   const { axisData } = props
+   const { axisData, label, series } = props
+
+   console.log(props)
 
    if (!axisData) return null
 
+   const date = new Date(axisData.x.value)
+   const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+   }
+   const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date)
+
+   const yValue = series[axisData.x.index]
+
+   console.log(axisData)
+
    return (
-      <StyledChartTooltip
-         title={"Friday, 19 Oct 2023"}
-         value={"17"}
-         label={"Views"}
-      />
+      <StyledChartTooltip title={formattedDate} value={yValue} label={label} />
    )
 }
 
-const CFLineChart = () => {
+type CFLineChartProps = {
+   tooltipLabel: string
+}
+
+const CFLineChart: FC<CFLineChartProps> = (props) => {
+   const { tooltipLabel } = props
+
    return (
       <ResponsiveChartContainer
          sx={styles.chart}
@@ -156,7 +171,7 @@ const CFLineChart = () => {
             {
                id: "Years",
                data: years,
-               scaleType: "time",
+               scaleType: "point",
                valueFormatter: (date) => date.getFullYear().toString(),
             },
          ]}
@@ -172,8 +187,6 @@ const CFLineChart = () => {
                } as HighlightScope,
             },
          ]}
-         margin={{ left: 20, top: 10, right: 60 }}
-         width={1039}
          height={313}
       >
          <CustomBackground />
@@ -193,7 +206,13 @@ const CFLineChart = () => {
          />
          <ChartsTooltip
             slots={{
-               axisContent: CustomTooltip,
+               axisContent: (props) => (
+                  <CustomTooltip
+                     {...props}
+                     label={tooltipLabel}
+                     series={UKGDPperCapita}
+                  />
+               ),
             }}
          />
       </ResponsiveChartContainer>
