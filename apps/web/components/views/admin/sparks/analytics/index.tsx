@@ -6,6 +6,7 @@ import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyti
 import { CFLineChart } from "./components/charts/CFLineChart"
 import ChartSwitchButton from "./components/charts/ChartSwitchButton"
 import SparksStaticCard from "./components/SparksStaticCard"
+import CFPieChart from "./components/charts/CFPieChart"
 
 const styles = sxStyles({
    root: {
@@ -208,13 +209,13 @@ const GroupSparkAnalytics = () => {
                         <SparksStaticCard />
                      </Box>
                   </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Wololo"></GroupSparkAnalyticsCardContainer>
                </>
             )}
             {tabValue === "audience" && (
                <>
                   <GroupSparkAnalyticsCardContainer title="Top 10 countries">
                      Audience: Top 10 countries for {selectValue} days
+                     <CFPieChart />
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Top 10 universities">
                      Audience: Top 10 universities for {selectValue} days
