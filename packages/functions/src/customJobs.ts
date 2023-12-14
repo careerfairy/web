@@ -28,10 +28,12 @@ export const userApplyToCustomJob = functions
 
             // Get custom job data and verify if the user already has any information related to the job application.
             // If such information exists, it indicates that the user has previously applied to this specific job, and no further action is needed.
-            const [jobToApply, userCustomJobApplication] = await Promise.all([
-               groupRepo.getCustomJobById(jobId, groupId),
-               userRepo.getCustomJobApplication(userId, jobId),
-            ])
+            const [jobToApply, userCustomJobApplication, user] =
+               await Promise.all([
+                  groupRepo.getCustomJobById(jobId, groupId),
+                  userRepo.getCustomJobApplication(userId, jobId),
+                  userRepo.getUserDataById(userId),
+               ])
 
             if (userCustomJobApplication) {
                functions.logger.log(
@@ -42,11 +44,7 @@ export const userApplyToCustomJob = functions
 
             return Promise.allSettled([
                userRepo.applyUserToCustomJob(userId, jobToApply),
-               groupRepo.applyUserToCustomJob(
-                  userId,
-                  jobToApply.groupId,
-                  jobId
-               ),
+               groupRepo.applyUserToCustomJob(user, jobToApply),
             ])
          })
       )

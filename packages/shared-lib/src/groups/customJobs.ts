@@ -1,5 +1,6 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat"
+import { UserData } from "../users"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
  * CustomJob is attached to a single group but can be related to multiple live streams
@@ -65,4 +66,18 @@ export const pickPublicDataFromCustomJob = (
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
    }
+}
+
+export interface CustomJobStats extends Identifiable {
+   jobId: string
+   documentType: "customJobStats" // simplify groupCollection Queries
+   //increases every time a talent clicks on the jobPostingUrl
+   clicks: number
+   job: CustomJob
+}
+
+export interface CustomJobApplicants extends Identifiable {
+   documentType: "customJobApplicants" // simplify groupCollection Queries
+   jobId: string
+   user: UserData
 }
