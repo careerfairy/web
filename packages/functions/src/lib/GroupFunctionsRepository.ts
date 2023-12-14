@@ -33,6 +33,11 @@ import { auth, Timestamp } from "../api/firestoreAdmin"
 import { UserRecord } from "firebase-admin/auth"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
+import {
+   CustomJob,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/groups/customJobs"
+import * as functions from "firebase-functions"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -138,6 +143,22 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves when the plan has been successfully stopped.
     */
    stopPlan(groupId: string): Promise<void>
+
+   /**
+    * This method creates the customJobStats collection based on the received customJob
+    * @param customJobChange
+    */
+   createCustomJobStats(
+      customJobChange: Change<DocumentSnapshot>
+   ): Promise<void>
+
+   /**
+    * This method syncs the customJobsStats job field based on the received customJob
+    * @param customJobChange
+    */
+   syncCustomJobDataToCustomJobStats(
+      customJobChange: Change<DocumentSnapshot>
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -608,6 +629,46 @@ export class GroupFunctionsRepository
          .doc(groupId)
 
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
+   }
+
+   async createCustomJobStats(
+      customJobChange: Change<DocumentSnapshot>
+   ): Promise<void> {
+      const newCustomJob = customJobChange.after.data() as CustomJob
+
+      const ref = this.firestore
+         .collection("customJobStats")
+         .doc(newCustomJob.id)
+
+      functions.logger.log(
+         `Create CustomJobStats for the job ${newCustomJob.id}.`
+      )
+
+      const newJobStat: CustomJobStats = {
+         documentType: "customJobStats",
+         jobId: newCustomJob.id,
+         clicks: 0,
+         job: newCustomJob,
+         id: newCustomJob.id,
+      }
+
+      return ref.set(newJobStat, { merge: true })
+   }
+
+   async syncCustomJobDataToCustomJobStats(
+      customJobChange: Change<DocumentSnapshot>
+   ): Promise<void> {
+      const newCustomJob = customJobChange.after.data() as CustomJob
+
+      functions.logger.log(
+         `Sync CustomJobStats with job ${newCustomJob.id} data.`
+      )
+
+      const ref = this.firestore
+         .collection("customJobStats")
+         .doc(newCustomJob.id)
+
+      return ref.update({ job: newCustomJob })
    }
 }
 
