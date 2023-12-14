@@ -50,9 +50,9 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
 
    const handleClickApplyBtn = useCallback(async () => {
       setIsApplying(true)
-      await groupRepo.incrementCustomJobClicks(job.groupId, job.id)
+      await groupRepo.incrementCustomJobClicks(job.id)
       setIsApplying(false)
-   }, [job.groupId, job.id])
+   }, [job.id])
 
    return useMemo(
       () => ({ alreadyApplied, handleApply, isApplying, handleClickApplyBtn }),

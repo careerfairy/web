@@ -51,12 +51,11 @@ export class UserFunctionsRepository
       const updatedCustomJob: PublicCustomJob =
          pickPublicDataFromCustomJob(newCustomJob)
 
-      functions.logger.log(
-         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id}.`
-      )
-
       const applicants = newCustomJob.applicants || []
 
+      functions.logger.log(
+         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applicants.length} applicants.`
+      )
       applicants.forEach((applicant) => {
          const ref = this.firestore
             .collection("userData")

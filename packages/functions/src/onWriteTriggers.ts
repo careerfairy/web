@@ -315,5 +315,15 @@ export const onWriteCustomJobs = functions
          userRepo.syncCustomJobDataToUser(change)
       )
 
+      if (changeTypes.isUpdate) {
+         sideEffectPromises.push(
+            groupRepo.syncCustomJobDataToCustomJobStats(change)
+         )
+      }
+
+      if (changeTypes.isCreate) {
+         sideEffectPromises.push(groupRepo.createCustomJobStats(change))
+      }
+
       return handleSideEffects(sideEffectPromises)
    })
