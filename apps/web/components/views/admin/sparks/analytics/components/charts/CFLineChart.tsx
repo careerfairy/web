@@ -14,6 +14,8 @@ import {
    LineHighlightPlot,
    LinePlot,
 } from "@mui/x-charts/LineChart"
+import StyledChartTooltip from "./StyledChartTooltip"
+import { sxStyles } from "types/commonTypes"
 
 const years = [
    new Date(1990, 0, 1),
@@ -54,7 +56,52 @@ const UKGDPperCapita = [
    34971, 35185, 35618, 36436, 36941, 37334, 37782.83, 38058.086,
 ]
 
-function CustomBackground() {
+const styles = sxStyles({
+   chart: {
+      ".MuiLineElement-root": {
+         strokeWidth: 1,
+         stroke: "#6749EA",
+      },
+      ".MuiAreaElement-root": {
+         fill: "#6749EA11",
+      },
+      ".MuiChartsAxisHighlight-root": {
+         stroke: "#6749EA33",
+         strokeWidth: 1,
+      },
+      ".MuiChartsAxis-tickLabel": {
+         fontSize: "14px",
+         letterSpacing: "0em",
+         fill: "#6B6B7F",
+      },
+      ".MuiChartsAxis-tick": {
+         stroke: "#F3F3F5",
+         strokeWidth: 1,
+      },
+      ".MuiChartsAxis-bottom": {
+         ".MuiChartsAxis-tickContainer": {
+            ":first-of-type": {
+               // to prevent server-side rendering issues
+               text: {
+                  textAnchor: "start",
+               },
+            },
+            ":last-of-type": {
+               // to prevent server-side rendering issues
+               text: {
+                  textAnchor: "end",
+               },
+            },
+         },
+      },
+   },
+   popperRoot: {
+      inset: "10px auto auto 10px !important",
+      margin: 10,
+   },
+})
+
+const CustomBackground = () => {
    const { left, top, width, height } = useDrawingArea()
 
    return (
@@ -68,35 +115,10 @@ function CustomBackground() {
    )
 }
 
-const CustomTooltipContent = (props) => {
-   const { axisData } = props
-
-   if (!axisData) return null
-   // Customize your tooltip appearance here
-   return (
-      <div style={{ backgroundColor: "red" }}>
-         <p>{axisData.x.value.toString()}</p>
-         <p>{axisData.y.value}</p>
-      </div>
-   )
-}
-
-function CustomTick(props) {
+const CustomYTick = (props) => {
    const { width } = useDrawingArea()
 
    return <line x2={-1 * width} stroke="#F3F3F5" strokeWidth={1} />
-}
-
-function CustomTickLabel(props) {
-   // The props include the data for the tick label
-   const { x, y, text } = props
-
-   // You can render any custom SVG element here
-   return (
-      <text x={x} y={y} textAnchor="start" fill="#666">
-         {text}
-      </text>
-   )
 }
 
 const CustomLineHighlightElement = (props) => {
@@ -112,21 +134,24 @@ const CustomLineHighlightElement = (props) => {
    )
 }
 
+const CustomTooltip = (props) => {
+   const { axisData } = props
+
+   if (!axisData) return null
+
+   return (
+      <StyledChartTooltip
+         title={"Friday, 19 Oct 2023"}
+         value={"17"}
+         label={"Views"}
+      />
+   )
+}
+
 const CFLineChart = () => {
    return (
       <ResponsiveChartContainer
-         sx={{
-            "& .MuiLineElement-root": {
-               strokeWidth: 1,
-               stroke: "#6749EA",
-            },
-            "& .MuiAreaElement-series-MyChartData": {
-               fill: "#6749EA11",
-            },
-            ".MuiChartsAxisHighlight-root": {
-               zIndex: "90 !important",
-            },
-         }}
+         sx={styles.chart}
          xAxis={[
             {
                id: "Years",
@@ -137,7 +162,6 @@ const CFLineChart = () => {
          ]}
          series={[
             {
-               id: "MyChartData",
                type: "line",
                data: UKGDPperCapita,
                area: true,
@@ -149,8 +173,8 @@ const CFLineChart = () => {
             },
          ]}
          margin={{ left: 20, top: 10, right: 60 }}
-         width={600}
-         height={300}
+         width={1039}
+         height={313}
       >
          <CustomBackground />
          <ChartsXAxis disableLine />
@@ -158,8 +182,7 @@ const CFLineChart = () => {
             position="right"
             disableLine
             slots={{
-               axisTick: CustomTick,
-               axisTickLabel: CustomTickLabel,
+               axisTick: CustomYTick,
             }}
          />
          <AreaPlot />
@@ -170,7 +193,7 @@ const CFLineChart = () => {
          />
          <ChartsTooltip
             slots={{
-               axisContent: CustomTooltipContent,
+               axisContent: CustomTooltip,
             }}
          />
       </ResponsiveChartContainer>
