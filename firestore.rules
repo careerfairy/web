@@ -267,6 +267,16 @@ service cloud.firestore {
             }
         }
 
+        match /customJobStats/{jobStatsId} {
+            allow read: if true;
+            allow write: if isSignedIn();
+
+            match /customJobApplicants/{applicantId} {
+                allow read: if true;
+                allow write: if isSignedIn();
+            }
+        }
+
         match /sparks/{sparkId} {
             allow read: if true;
             allow write: if false;
