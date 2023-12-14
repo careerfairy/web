@@ -146,7 +146,7 @@ const Player: FC<Props> = ({
    )
 
    const { data: recordingToken } = useRecordingToken(stream.id)
-
+   // Updated recording title - WG
    return (
       <Box sx={styles.root}>
          <Box sx={styles.playerWrapper} mt={1}>
