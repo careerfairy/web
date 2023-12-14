@@ -6,8 +6,7 @@ export const isOnLastSparkSelector = (state: RootState) => {
 }
 
 export const isOnFirstSparkSelector = (state: RootState) => {
-   const index = state.sparksFeed.currentPlayingIndex
-   return index === 0
+   return state.sparksFeed.currentPlayingIndex === 0
 }
 
 export const isOnEdgeSelector = (state: RootState) => {
