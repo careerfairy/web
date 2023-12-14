@@ -1,9 +1,10 @@
-import { Avatar, Box, Grid, Tooltip, Typography } from "@mui/material"
+import { Box, Grid, Tooltip, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../../../../helperFunctions/HelperFunctions"
 import React, { FC, useCallback, useEffect, useState } from "react"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { sxStyles } from "../../../../../../../types/commonTypes"
+import ColorizedAvatar from "../../../../../common/ColorizedAvatar"
 
 const styles = sxStyles({
    companyAvatar: {
@@ -154,10 +155,11 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
    return (
       <>
          <Grid item md={3} display={"flex"}>
-            <Avatar
+            <ColorizedAvatar
                sx={styles.companyAvatar}
-               alt={`User ${userFullName} avatar`}
-               src={getResizedUrl(applicant.avatar, "xs")}
+               firstName={applicant.firstName}
+               lastName={applicant.lastName}
+               imageUrl={getResizedUrl(applicant.avatar, "xs")}
             />
 
             <Box ml={2} sx={styles.userDataSection}>

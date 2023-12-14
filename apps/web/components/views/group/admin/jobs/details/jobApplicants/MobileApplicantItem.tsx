@@ -1,9 +1,10 @@
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import React, { FC } from "react"
-import { Avatar, Box, Grid, Typography } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { getResizedUrl } from "../../../../../../helperFunctions/HelperFunctions"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import ColorizedAvatar from "../../../../../common/ColorizedAvatar"
 
 const styles = sxStyles({
    wrapper: {
@@ -58,10 +59,11 @@ const MobileApplicantItem: FC<Props> = ({ applicant }) => {
    return (
       <Grid item xs={12}>
          <Box sx={styles.wrapper}>
-            <Avatar
+            <ColorizedAvatar
                sx={styles.companyAvatar}
-               alt={`User ${userFullName} avatar`}
-               src={getResizedUrl(applicant.avatar, "xs")}
+               firstName={applicant.firstName}
+               lastName={applicant.lastName}
+               imageUrl={getResizedUrl(applicant.avatar, "xs")}
             />
 
             <Typography variant={"body1"} sx={styles.userName}>
