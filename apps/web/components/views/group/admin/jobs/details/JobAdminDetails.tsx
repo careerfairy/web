@@ -61,15 +61,16 @@ type Props = {
 const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
-   const allowToDisplayApplicantsData = useMemo(
-      () => group.privacyPolicyActive,
-      [group.privacyPolicyActive]
-   )
 
-   const switchTabHandler = useCallback((...args) => {
-      // clicking tabs handler
-      setActiveTabIndex(args[1])
-   }, [])
+   const allowToDisplayApplicantsData = group.privacyPolicyActive
+
+   const switchTabHandler = useCallback(
+      (_: React.SyntheticEvent, newTabIndex: number) => {
+         // clicking tabs handler
+         setActiveTabIndex(newTabIndex)
+      },
+      []
+   )
 
    const tabs = useMemo(
       () => [
@@ -107,13 +108,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             onChange={switchTabHandler}
             textColor="secondary"
             aria-label="job details tabs"
-            TabIndicatorProps={
-               {
-                  sx: {
-                     ...styles.indicator,
-                  },
-               } as any
-            }
+            TabIndicatorProps={{ sx: styles.indicator }}
             sx={styles.tabs}
          >
             <Tab

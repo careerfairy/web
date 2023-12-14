@@ -37,16 +37,15 @@ const NoApplicantsData = () => {
             <AlertOctagon size={68} color={"#6749EA"} />
 
             <Typography sx={styles.title}>
-               Unable to display applicants’ data
+               Unable to display applicants&apos; data
             </Typography>
 
             <Typography sx={styles.message}>
-               {/* eslint-disable-next-line react/no-unescaped-entities */}
-               Your company's privacy policy is necessary to display applicant
-               data for new job openings. It wasn’t added to your company
-               profile when this job opening was created. As a result, you won’t
-               be able to access applicants’ data for this particular job
-               opening.
+               Your company&apos;s privacy policy is necessary to display
+               applicant data for new job openings. It wasn&apos;t added to your
+               company profile when this job opening was created. As a result,
+               you won&apos;t be able to access applicants&apos; data for this
+               particular job opening.
             </Typography>
          </Stack>
       </Box>
