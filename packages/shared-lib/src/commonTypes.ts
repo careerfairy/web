@@ -29,7 +29,7 @@ export const UTMKeys = [
    "utm_campaign",
    "utm_term",
    "utm_content",
-]
+] satisfies (keyof UTMParams)[]
 
 export type OptionGroup = {
    id: string
