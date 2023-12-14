@@ -3,7 +3,7 @@ import CreateJobButton from "../../../../../components/views/admin/jobs/componen
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
-import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/jobPosting/JobAdminDetails"
+import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
 import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
 import JobsContent from "../../../../../components/views/group/admin/jobs"
 import { GetServerSidePropsContext } from "next"
