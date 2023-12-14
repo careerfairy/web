@@ -5,6 +5,7 @@ import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDra
 import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
 import { CFLineChart } from "./components/charts/CFLineChart"
 import ChartSwitchButton from "./components/charts/ChartSwitchButton"
+import SparksStaticCard from "./components/SparksStaticCard"
 
 const styles = sxStyles({
    root: {
@@ -59,6 +60,44 @@ const styles = sxStyles({
       },
    },
 })
+
+const years = [
+   new Date(1990, 0, 1),
+   new Date(1991, 0, 1),
+   new Date(1992, 0, 1),
+   new Date(1993, 0, 1),
+   new Date(1994, 0, 1),
+   new Date(1995, 0, 1),
+   new Date(1996, 0, 1),
+   new Date(1997, 0, 1),
+   new Date(1998, 0, 1),
+   new Date(1999, 0, 1),
+   new Date(2000, 0, 1),
+   new Date(2001, 0, 1),
+   new Date(2002, 0, 1),
+   new Date(2003, 0, 1),
+   new Date(2004, 0, 1),
+   new Date(2005, 0, 1),
+   new Date(2006, 0, 1),
+   new Date(2007, 0, 1),
+   new Date(2008, 0, 1),
+   new Date(2009, 0, 1),
+   new Date(2010, 0, 1),
+   new Date(2011, 0, 1),
+   new Date(2012, 0, 1),
+   new Date(2013, 0, 1),
+   new Date(2014, 0, 1),
+   new Date(2015, 0, 1),
+   new Date(2016, 0, 1),
+   new Date(2017, 0, 1),
+   new Date(2018, 0, 1),
+]
+
+const UKGDPperCapita = [
+   26189, 25792, 25790, 26349, 27277, 27861, 28472, 29259, 30077, 30932, 31946,
+   32660, 33271, 34232, 34865, 35623, 36214, 36816, 36264, 34402, 34754, 34971,
+   35185, 35618, 36436, 36941, 37334, 37782, 38058,
+]
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
@@ -119,7 +158,7 @@ const GroupSparkAnalytics = () => {
                            active={false}
                         />
                      </Box>
-                     <CFLineChart />
+                     <CFLineChart tooltipLabel="Views" />
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Engagement for the past 30 days">
                      Overview: Reach for {selectValue} days
@@ -150,11 +189,26 @@ const GroupSparkAnalytics = () => {
                            active={false}
                         />
                      </Box>
-                     <CFLineChart />
+                     <Box sx={{ marginLeft: "-20px" }}>
+                        <CFLineChart
+                           tooltipLabel="Likes"
+                           xAxisData={years}
+                           seriesData={UKGDPperCapita}
+                        />
+                     </Box>
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Your most watched Sparks">
                      Overview: Most watched {selectValue} days
+                     <Box
+                        sx={{
+                           display: "flex",
+                           gap: 1.5,
+                        }}
+                     >
+                        <SparksStaticCard />
+                     </Box>
                   </GroupSparkAnalyticsCardContainer>
+                  <GroupSparkAnalyticsCardContainer title="Wololo"></GroupSparkAnalyticsCardContainer>
                </>
             )}
             {tabValue === "audience" && (
