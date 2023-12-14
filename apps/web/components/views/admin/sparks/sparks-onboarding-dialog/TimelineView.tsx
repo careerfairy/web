@@ -1,11 +1,17 @@
-import { Box, Typography, TypographyProps } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
+import {
+   Box,
+   Button,
+   ButtonProps,
+   Typography,
+   TypographyProps,
+} from "@mui/material"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { useOnboarding } from "./OnboardingProvider"
 
 const styles = sxStyles({
    root: {
       minHeight: {
-         xs: 300,
+         xs: "auto",
          sm: 432,
       },
       display: "flex",
@@ -15,6 +21,10 @@ const styles = sxStyles({
    title: {
       fontSize: "1.741rem",
       fontWeight: 700,
+   },
+   button: {
+      textTransform: "none",
+      height: 40,
    },
 })
 
@@ -36,7 +46,16 @@ const Description = (props: TypographyProps) => (
    />
 )
 
+const TimelineButton = (props: ButtonProps) => (
+   <Button
+      sx={combineStyles(styles.button, props.sx)}
+      size="medium"
+      {...props}
+   />
+)
+
 TimelineView.Title = Title
 TimelineView.Description = Description
+TimelineView.Button = TimelineButton
 
 export default TimelineView
