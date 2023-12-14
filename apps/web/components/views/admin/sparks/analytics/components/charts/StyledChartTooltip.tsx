@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Card } from "@mui/material"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -10,9 +10,6 @@ const styles = sxStyles({
       padding: "12px",
       fontWeight: 400,
       color: "#5C5C6A",
-      boxShadow: "none",
-      filter: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
-      WebkitFilter: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
    },
    title: {
       fontSize: "14px",
@@ -47,13 +44,13 @@ const StyledChartTooltip: FC<CFChartTooltipProps> = (
    const { title, value, label } = props
 
    return (
-      <Box sx={styles.root}>
+      <Card sx={styles.root}>
          <div style={styles.title}>{title}</div>
          <div style={styles.wrapper}>
             <span style={styles.value}>{value}</span>
             <span style={styles.label}>{label}</span>
          </div>
-      </Box>
+      </Card>
    )
 }
 
