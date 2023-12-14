@@ -1,8 +1,8 @@
-import { Button, Stack } from "@mui/material"
+import { Stack } from "@mui/material"
 import PartyPopperIcon from "components/views/common/icons/PartyPopperIcon"
 import { sxStyles } from "types/commonTypes"
-import { useOnboarding } from "./OnboardingProvider"
-import TimelineView from "./TimelineView"
+import { useOnboarding } from "../OnboardingProvider"
+import TimelineView from "../TimelineView"
 
 const styles = sxStyles({
    root: {
@@ -10,9 +10,6 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       height: "100%",
-      "& button": {
-         textTransform: "none",
-      },
    },
    icon: {
       color: "secondary.main",
@@ -21,7 +18,7 @@ const styles = sxStyles({
    },
 })
 
-const WelcomeView = () => {
+const Welcome = () => {
    const { handleNext, completeOnboarding } = useOnboarding()
 
    return (
@@ -47,15 +44,23 @@ const WelcomeView = () => {
             </TimelineView.Description>
          </Stack>
          <Stack spacing={0.5}>
-            <Button onClick={handleNext} variant="contained" color="secondary">
+            <TimelineView.Button
+               onClick={handleNext}
+               variant="contained"
+               color="secondary"
+            >
                Watch tutorial
-            </Button>
-            <Button onClick={completeOnboarding} variant="text" color="grey">
+            </TimelineView.Button>
+            <TimelineView.Button
+               onClick={completeOnboarding}
+               variant="text"
+               color="grey"
+            >
                Skip
-            </Button>
+            </TimelineView.Button>
          </Stack>
       </Stack>
    )
 }
 
-export default WelcomeView
+export default Welcome
