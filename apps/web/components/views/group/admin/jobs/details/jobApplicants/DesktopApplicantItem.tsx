@@ -1,6 +1,6 @@
 import { Box, Grid, Tooltip, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../../../../helperFunctions/HelperFunctions"
-import React, { FC, useCallback, useEffect, useState } from "react"
+import React, { FC, useCallback, useEffect, useRef, useState } from "react"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { sxStyles } from "../../../../../../../types/commonTypes"
@@ -31,46 +31,27 @@ const styles = sxStyles({
 })
 
 type ApplicantsTooltip = {
-   userFullName: {
-      visible: boolean
-      id: string
-   }
-   userUniversityCountry: {
-      visible: boolean
-      id: string
-   }
-   userUniversityName: {
-      visible: boolean
-      id: string
-   }
-   userFieldOfStudy: {
-      visible: boolean
-      id: string
-   }
+   isUserFullNameVisible: boolean
+   isUserUniversityCountryVisible: boolean
+   isUserUniversityNameVisible: boolean
+   isUserFieldOfStudyVisible: boolean
 }
 
 type Props = {
    applicant: UserDataEntry
 }
 const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
+   const userFullNameRef = useRef(null)
+   const userFieldOfStudyRef = useRef(null)
+   const userUniversityCountryRef = useRef(null)
+   const userUniversityNameRef = useRef(null)
+
    const [applicantsTooltip, setApplicantsTooltip] =
       useState<ApplicantsTooltip>({
-         userFullName: {
-            visible: false,
-            id: `userName-${applicant.email}`,
-         },
-         userUniversityCountry: {
-            visible: false,
-            id: `userUniversityCountry-${applicant.email}`,
-         },
-         userUniversityName: {
-            visible: false,
-            id: `userUniversityName-${applicant.email}`,
-         },
-         userFieldOfStudy: {
-            visible: false,
-            id: `userFieldOfStudy-${applicant.email}`,
-         },
+         isUserFullNameVisible: false,
+         isUserUniversityCountryVisible: false,
+         isUserUniversityNameVisible: false,
+         isUserFieldOfStudyVisible: false,
       })
 
    useEffect(() => {
@@ -101,56 +82,21 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
     * of the content compared to its container, ensuring accurate tooltip display.
     */
    const handleApplicantsDataTooltip = useCallback(() => {
-      // Get references to DOM elements using their IDs
-      const userFullNameElement = document.getElementById(
-         applicantsTooltip.userFullName.id
-      )
-      const userFieldOfStudyElement = document.getElementById(
-         applicantsTooltip.userFieldOfStudy.id
-      )
-      const userUniversityCountryElement = document.getElementById(
-         applicantsTooltip.userUniversityCountry.id
-      )
-      const userUniversityNameElement = document.getElementById(
-         applicantsTooltip.userUniversityName.id
-      )
-
       // Check if the content of each element overflows its container
       const newApplicantsTooltip: ApplicantsTooltip = {
-         userFullName: {
-            id: applicantsTooltip.userFullName.id,
-            visible:
-               userFullNameElement.scrollWidth >
-               userFullNameElement.clientWidth,
-         },
-         userFieldOfStudy: {
-            id: applicantsTooltip.userFieldOfStudy.id,
-            visible:
-               userFieldOfStudyElement.scrollWidth >
-               userFieldOfStudyElement.clientWidth,
-         },
-         userUniversityCountry: {
-            id: applicantsTooltip.userUniversityCountry.id,
-            visible:
-               userUniversityCountryElement.scrollWidth >
-               userUniversityCountryElement.clientWidth,
-         },
-         userUniversityName: {
-            id: applicantsTooltip.userUniversityName.id,
-            visible:
-               userUniversityNameElement.scrollWidth >
-               userUniversityNameElement.clientWidth,
-         },
+         isUserFullNameVisible: isOverflowing(userFullNameRef.current),
+         isUserFieldOfStudyVisible: isOverflowing(userFieldOfStudyRef.current),
+         isUserUniversityCountryVisible: isOverflowing(
+            userUniversityCountryRef.current
+         ),
+         isUserUniversityNameVisible: isOverflowing(
+            userUniversityNameRef.current
+         ),
       }
 
       // Update the state with the new visibility information
       setApplicantsTooltip(newApplicantsTooltip)
-   }, [
-      applicantsTooltip.userFieldOfStudy.id,
-      applicantsTooltip.userFullName.id,
-      applicantsTooltip.userUniversityCountry.id,
-      applicantsTooltip.userUniversityName.id,
-   ])
+   }, [])
 
    return (
       <>
@@ -166,11 +112,11 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
                <Tooltip
                   arrow
                   title={
-                     applicantsTooltip.userFullName.visible ? userFullName : ""
+                     applicantsTooltip.isUserFullNameVisible ? userFullName : ""
                   }
                >
                   <Typography
-                     id={applicantsTooltip.userFullName.id}
+                     ref={userFullNameRef}
                      variant={"body1"}
                      noWrap
                      sx={styles.userName}
@@ -182,13 +128,13 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
                <Tooltip
                   arrow
                   title={
-                     applicantsTooltip.userFieldOfStudy.visible
+                     applicantsTooltip.isUserFieldOfStudyVisible
                         ? fieldOfStudy
                         : ""
                   }
                >
                   <Typography
-                     id={applicantsTooltip.userFieldOfStudy.id}
+                     ref={userFieldOfStudyRef}
                      variant={"body1"}
                      noWrap
                      sx={styles.userData}
@@ -203,13 +149,13 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
             <Tooltip
                arrow
                title={
-                  applicantsTooltip.userUniversityCountry.visible
+                  applicantsTooltip.isUserUniversityCountryVisible
                      ? userUniversityCountry
                      : ""
                }
             >
                <Typography
-                  id={applicantsTooltip.userUniversityCountry.id}
+                  ref={userUniversityCountryRef}
                   variant={"body1"}
                   noWrap
                   sx={styles.userData}
@@ -223,13 +169,13 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
             <Tooltip
                arrow
                title={
-                  applicantsTooltip.userUniversityName.visible
+                  applicantsTooltip.isUserUniversityNameVisible
                      ? universityName
                      : ""
                }
             >
                <Typography
-                  id={applicantsTooltip.userUniversityName.id}
+                  ref={userUniversityNameRef}
                   variant={"body1"}
                   noWrap
                   sx={styles.userData}
@@ -247,5 +193,9 @@ const DesktopApplicantItem: FC<Props> = ({ applicant }) => {
       </>
    )
 }
+
+// Check if content overflows its container
+const isOverflowing = (element: HTMLElement) =>
+   element.scrollWidth > element.clientWidth
 
 export default DesktopApplicantItem
