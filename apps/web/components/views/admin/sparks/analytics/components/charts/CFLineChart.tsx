@@ -18,44 +18,6 @@ import {
 import StyledChartTooltip from "./StyledChartTooltip"
 import { sxStyles } from "types/commonTypes"
 
-const years = [
-   new Date(1990, 0, 1),
-   new Date(1991, 0, 1),
-   new Date(1992, 0, 1),
-   new Date(1993, 0, 1),
-   new Date(1994, 0, 1),
-   new Date(1995, 0, 1),
-   new Date(1996, 0, 1),
-   new Date(1997, 0, 1),
-   new Date(1998, 0, 1),
-   new Date(1999, 0, 1),
-   new Date(2000, 0, 1),
-   new Date(2001, 0, 1),
-   new Date(2002, 0, 1),
-   new Date(2003, 0, 1),
-   new Date(2004, 0, 1),
-   new Date(2005, 0, 1),
-   new Date(2006, 0, 1),
-   new Date(2007, 0, 1),
-   new Date(2008, 0, 1),
-   new Date(2009, 0, 1),
-   new Date(2010, 0, 1),
-   new Date(2011, 0, 1),
-   new Date(2012, 0, 1),
-   new Date(2013, 0, 1),
-   new Date(2014, 0, 1),
-   new Date(2015, 0, 1),
-   new Date(2016, 0, 1),
-   new Date(2017, 0, 1),
-   new Date(2018, 0, 1),
-]
-
-const UKGDPperCapita = [
-   26189, 25792, 25790, 26349, 27277, 27861, 28472, 29259, 30077, 30932, 31946,
-   32660, 33271, 34232, 34865, 35623, 36214, 36816, 36264, 34402, 34754, 34971,
-   35185, 35618, 36436, 36941, 37334, 37782, 38058,
-]
-
 const styles = sxStyles({
    chart: {
       "& .MuiLineElement-root": {
@@ -78,7 +40,6 @@ const styles = sxStyles({
          stroke: "#F3F3F5",
          strokeWidth: 1,
       },
-      /*
       "& .MuiChartsAxis-bottom": {
          ".MuiChartsAxis-tickContainer": {
             ":first-of-type": {
@@ -95,9 +56,12 @@ const styles = sxStyles({
             },
          },
       },
-      */
    },
 })
+
+const formatDate = (date, options) => {
+   return new Intl.DateTimeFormat("en-GB", options).format(date)
+}
 
 const CustomBackground = () => {
    const { left, top, width, height } = useDrawingArea()
@@ -146,7 +110,7 @@ const CustomTooltip = (props) => {
       month: "short",
       year: "numeric",
    }
-   const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date)
+   const formattedDate = formatDate(date, options)
 
    const yValue = series[axisData.x.index]
 
@@ -159,10 +123,28 @@ const CustomTooltip = (props) => {
 
 type CFLineChartProps = {
    tooltipLabel: string
+   xAxisData?: any
+   seriesData?: (number | null)[]
 }
 
-const CFLineChart: FC<CFLineChartProps> = (props) => {
-   const { tooltipLabel } = props
+const defaultXaxisData = [
+   new Date(1970, 0, 5), // Monday, 5 Jan 1970
+   new Date(1970, 0, 6), // Tuesday, 6 Jan 1970
+   new Date(1970, 0, 7), // Wednesday, 7 Jan 1970
+   new Date(1970, 0, 8), // Thursday, 8 Jan 1970
+   new Date(1970, 0, 9), // Friday, 9 Jan 1970
+   new Date(1970, 0, 10), // Saturday, 10 Jan 1970
+   new Date(1970, 0, 11), // Sunday, 11 Jan 1970
+]
+const defaultSeriesData = [0, 10, 20, 30, 40, 50, 60]
+
+const CFLineChart: FC<CFLineChartProps> = ({
+   tooltipLabel,
+   xAxisData = defaultXaxisData,
+   seriesData = defaultSeriesData,
+}) => {
+   const isEmpty =
+      xAxisData === defaultXaxisData || seriesData === defaultSeriesData
 
    return (
       <ResponsiveChartContainer
@@ -170,15 +152,24 @@ const CFLineChart: FC<CFLineChartProps> = (props) => {
          xAxis={[
             {
                id: "Years",
-               data: years,
-               scaleType: "point",
-               valueFormatter: (date) => date.getFullYear().toString(),
+               data: xAxisData,
+               scaleType: "time",
+               valueFormatter: (date) => {
+                  const options = isEmpty
+                     ? { weekday: "long" }
+                     : {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                       }
+                  return formatDate(date, options).toString()
+               },
             },
          ]}
          series={[
             {
                type: "line",
-               data: UKGDPperCapita,
+               data: seriesData,
                area: true,
                color: "#6749EA",
                highlightScope: {
@@ -190,7 +181,10 @@ const CFLineChart: FC<CFLineChartProps> = (props) => {
          height={313}
       >
          <CustomBackground />
-         <ChartsXAxis disableLine />
+         <ChartsXAxis
+            disableLine
+            tickInterval={isEmpty ? defaultXaxisData : undefined}
+         />
          <ChartsYAxis
             position="right"
             disableLine
@@ -198,23 +192,27 @@ const CFLineChart: FC<CFLineChartProps> = (props) => {
                axisTick: CustomYTick,
             }}
          />
-         <AreaPlot />
-         <LinePlot />
-         <ChartsAxisHighlight x="line" />
-         <LineHighlightPlot
-            slots={{ lineHighlight: CustomLineHighlightElement }}
-         />
-         <ChartsTooltip
-            slots={{
-               axisContent: (props) => (
-                  <CustomTooltip
-                     {...props}
-                     label={tooltipLabel}
-                     series={UKGDPperCapita}
-                  />
-               ),
-            }}
-         />
+         {!isEmpty && (
+            <>
+               <AreaPlot />
+               <LinePlot />
+               <ChartsAxisHighlight x="line" />
+               <LineHighlightPlot
+                  slots={{ lineHighlight: CustomLineHighlightElement }}
+               />
+               <ChartsTooltip
+                  slots={{
+                     axisContent: (props) => (
+                        <CustomTooltip
+                           {...props}
+                           label={tooltipLabel}
+                           series={seriesData}
+                        />
+                     ),
+                  }}
+               />
+            </>
+         )}
       </ResponsiveChartContainer>
    )
 }
