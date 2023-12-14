@@ -1,0 +1,62 @@
+import { Box } from "@mui/material"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      marginTop: 2.5,
+      marginLeft: "-50%",
+      marginRight: "50%",
+      bgcolor: "#FFFFFF",
+      borderRadius: "8px",
+      padding: "12px",
+      fontWeight: 400,
+      color: "#5C5C6A",
+      boxShadow: "none",
+      filter: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
+      WebkitFilter: "drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))",
+   },
+   title: {
+      fontSize: "14px",
+      lineHeight: "24px",
+      textAlign: "left",
+   },
+   wrapper: {
+      textAlign: "left",
+   },
+   value: {
+      fontSize: "20px",
+      lineHeight: "30px",
+      color: "#6749EA",
+      marginRight: 3,
+      fontWeight: 600,
+   },
+   label: {
+      fontSize: "12px",
+      lineHeight: "20px",
+   },
+})
+
+type CFChartTooltipProps = {
+   title: string
+   value: string
+   label: string
+}
+
+const StyledChartTooltip: FC<CFChartTooltipProps> = (
+   props: CFChartTooltipProps
+) => {
+   const { title, value, label } = props
+
+   return (
+      <Box sx={styles.root}>
+         <div style={styles.title}>{title}</div>
+         <div style={styles.wrapper}>
+            <span style={styles.value}>{value}</span>
+            <span style={styles.label}>{label}</span>
+         </div>
+      </Box>
+   )
+}
+
+export default StyledChartTooltip
