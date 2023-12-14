@@ -4,9 +4,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
-      marginTop: 2.5,
-      marginLeft: "-50%",
-      marginRight: "50%",
+      margin: "15px",
       bgcolor: "#FFFFFF",
       borderRadius: "8px",
       padding: "12px",
