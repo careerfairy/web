@@ -40,22 +40,6 @@ const styles = sxStyles({
          stroke: "#F3F3F5",
          strokeWidth: 1,
       },
-      "& .MuiChartsAxis-bottom": {
-         ".MuiChartsAxis-tickContainer": {
-            ":first-of-type": {
-               // to prevent server-side rendering issues
-               text: {
-                  textAnchor: "start",
-               },
-            },
-            ":last-of-type": {
-               // to prevent server-side rendering issues
-               text: {
-                  textAnchor: "end",
-               },
-            },
-         },
-      },
    },
 })
 
@@ -99,8 +83,6 @@ const CustomLineHighlightElement = (props) => {
 const CustomTooltip = (props) => {
    const { axisData, label, series } = props
 
-   console.log(props)
-
    if (!axisData) return null
 
    const date = new Date(axisData.x.value)
@@ -113,8 +95,6 @@ const CustomTooltip = (props) => {
    const formattedDate = formatDate(date, options)
 
    const yValue = series[axisData.x.index]
-
-   console.log(axisData)
 
    return (
       <StyledChartTooltip title={formattedDate} value={yValue} label={label} />
