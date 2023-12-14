@@ -20,7 +20,7 @@ export type Filters = {
    selectedUniversity: University
    selectedFieldOfStudy: FieldOfStudy
    selectedLevelOfStudy: LevelOfStudy
-   userIds: string[]
+   userIds?: string[]
 }
 const usePaginatedUsersCollection = (
    targetCollectionRef: CollectionReference | Query,
