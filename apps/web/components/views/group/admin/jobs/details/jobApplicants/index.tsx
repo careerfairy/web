@@ -4,7 +4,9 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import JobApplicantsList from "./JobApplicantsList"
-import usePaginatedUsersCollection from "../../../analytics-new/live-stream/users/usePaginatedUsersCollection"
+import usePaginatedUsersCollection, {
+   Filters,
+} from "../../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import { collection } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
@@ -46,7 +48,7 @@ const JobApplicants: FC<Props> = ({ job }) => {
       []
    )
 
-   const filters = useMemo(
+   const filters = useMemo<Partial<Filters>>(
       () => ({
          //  If there are applicants for the job, the filter includes their user IDs,
          //  otherwise, it includes an empty string to ensure the filter is applied,
