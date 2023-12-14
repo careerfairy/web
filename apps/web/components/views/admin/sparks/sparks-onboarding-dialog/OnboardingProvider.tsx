@@ -8,6 +8,7 @@ import {
 } from "react"
 import useSparksB2BOnboardingCompletion from "./useSparksB2BOnboardingCompletion"
 import { useAuth } from "HOCs/AuthProvider"
+import WelcomeView from "./WelcomeView"
 
 export type OnboardingStep = {
    stepLabel: string
@@ -17,7 +18,7 @@ export type OnboardingStep = {
 const steps = [
    {
       stepLabel: "Welcome to Sparks",
-      view: <div>Step 1</div>,
+      view: <WelcomeView />,
    },
    {
       stepLabel: "Tutorial",
