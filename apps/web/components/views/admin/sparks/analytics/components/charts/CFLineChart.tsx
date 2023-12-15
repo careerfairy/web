@@ -4,9 +4,11 @@ import {
    ChartsXAxis,
    ChartsYAxis,
    ChartsTooltip,
+   LineSeriesType,
    useDrawingArea,
    HighlightScope,
    ChartsAxisHighlight,
+   ChartsAxisContentProps,
    ResponsiveChartContainer,
 } from "@mui/x-charts"
 import {
@@ -85,7 +87,7 @@ const CustomBackground = () => {
    )
 }
 
-const CustomYTick = () => {
+const CustomYTick: FC = () => {
    const { width } = useDrawingArea()
 
    return <line x2={-1 * width} stroke="#F3F3F5" strokeWidth={1} />
@@ -96,13 +98,12 @@ const CustomLineHighlightElement: FC<LineHighlightElementProps> = (props) => {
 }
 
 type CustomTooltipProps = {
-   axisData: any
    label: string
-   series: any[]
-}
+   seriesData?: LineSeriesType["data"]
+} & ChartsAxisContentProps
 
-const CustomTooltip = (props: CustomTooltipProps) => {
-   const { axisData, label, series } = props
+const CustomTooltip: FC<CustomTooltipProps> = (props) => {
+   const { axisData, label, seriesData } = props
 
    if (!axisData) return null
 
@@ -115,7 +116,7 @@ const CustomTooltip = (props: CustomTooltipProps) => {
    }
    const formattedDate = formatDate(date, options)
 
-   const yValue = series[axisData.x.index].toLocaleString() // Groups digits with comma separator, example: 10123 => 10,123
+   const yValue = seriesData[axisData.x.index].toLocaleString() // Groups digits with comma separator, example: 10123 => 10,123
 
    return (
       <StyledChartTooltip title={formattedDate} value={yValue} label={label} />
@@ -124,11 +125,11 @@ const CustomTooltip = (props: CustomTooltipProps) => {
 
 type CFLineChartProps = {
    tooltipLabel: string
-   xAxisData?: any
-   seriesData?: (number | null)[]
+   xAxisData?: any[]
+   seriesData?: LineSeriesType["data"]
 }
 
-const lineChartValueFormatter = (date, isChartEmpty) => {
+const lineChartValueFormatter = (date: Date, isChartEmpty: boolean): string => {
    const options = isChartEmpty
       ? { weekday: "long" }
       : {
@@ -199,7 +200,7 @@ const CFLineChart: FC<CFLineChartProps> = ({
                         <CustomTooltip
                            {...props}
                            label={tooltipLabel}
-                           series={seriesData}
+                           seriesData={seriesData}
                         />
                      ),
                   }}
