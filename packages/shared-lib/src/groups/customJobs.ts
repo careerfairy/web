@@ -82,4 +82,6 @@ export interface CustomJobApplicant extends Identifiable {
    documentType: "customJobApplicant" // simplify groupCollection Queries
    jobId: string
    user: UserData
+   groupId: string // Makes it easier to query for all applicants in a group
+   appliedAt: firebase.firestore.Timestamp
 }

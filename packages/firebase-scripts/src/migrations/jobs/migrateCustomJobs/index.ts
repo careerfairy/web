@@ -76,7 +76,7 @@ function createCustomJobStatsInCollection(
 }
 
 /**
- * Helper function to create CustomJobApplicant documents in /customJobs/[jobId]/applicants collection
+ * Helper function to create CustomJobApplicant documents in /jobApplications collection
  * The data is based on the provided customJob object and the user data retrieved by the applicantId
  * @param customJob - The custom job to be created
  * @param bulkWriter - The Firestore BulkWriter to use for batch operations
@@ -87,7 +87,7 @@ async function createCustomJobApplicantsInCollection(
    counter: Counter
 ) {
    if (!Array.isArray(customJob.applicants) || !customJob.applicants.length) {
-      return // No applicants to migrate
+      return // No applicants to migrate skip...
    }
 
    const applicantPromises = customJob.applicants.map((applicantId) =>
@@ -100,19 +100,23 @@ async function createCustomJobApplicantsInCollection(
    applicantsData.forEach((userData, index) => {
       if (userData) {
          // Check if user data exists
-         const applicantId = customJob.applicants[index]
+         const userEmail = customJob.applicants[index]
+
+         const applicationId = `${customJob.id}_${userEmail}`
 
          const customJobApplicant: CustomJobApplicant = {
             documentType: "customJobApplicant",
             jobId: customJob.id,
             user: userData,
-            id: applicantId,
+            id: applicationId,
+            appliedAt: customJob.createdAt ?? (new Date() as any), // js Dates get converted to Timestamps
+            groupId: customJob.groupId ?? null,
          }
+
          const customJobApplicantRef = firestore
-            .collection("customJobStats")
-            .doc(customJob.id)
-            .collection("applicants")
-            .doc(applicantId)
+            .collection("jobApplications")
+            .doc(applicationId)
+
          bulkWriter.set(customJobApplicantRef, customJobApplicant)
          counter.writeIncrement()
          counter.customCountIncrement("Migrated Applicants")
