@@ -1220,6 +1220,8 @@ export class FirebaseGroupRepository
          jobId: job.id,
          user,
          id: ref.id,
+         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         groupId: job.groupId,
       }
 
       return await ref.set(newJobApplicant, { merge: true })
