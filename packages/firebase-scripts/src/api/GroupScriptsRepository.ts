@@ -19,6 +19,7 @@ import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import { Creator } from "@careerfairy/shared-lib/dist/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/dist/sparks/sparks"
 import admin = require("firebase-admin")
+import { CustomJob } from "@careerfairy/shared-lib/src/groups/customJobs"
 
 export interface IGroupScriptsRepository extends IGroupRepository {
    getAllLegacyAdmins<T extends boolean>(
@@ -74,6 +75,11 @@ export interface IGroupScriptsRepository extends IGroupRepository {
    getAllSparks<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, Spark>[]>
+
+   getGroupCustomJobs<T extends boolean>(
+      groupId: string,
+      withRef?: T
+   ): Promise<DataWithRef<T, CustomJob>[]>
 }
 
 export class GroupScriptsRepository
@@ -244,5 +250,17 @@ export class GroupScriptsRepository
       const sparks = await this.firestore.collection("sparks").get()
 
       return mapFirestoreDocuments<Spark, T>(sparks, withRef)
+   }
+
+   async getGroupCustomJobs<T extends boolean>(
+      groupId: string,
+      withRef?: T
+   ): Promise<DataWithRef<T, CustomJob>[]> {
+      const customJobs = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customJobs")
+         .get()
+      return mapFirestoreDocuments<CustomJob, T>(customJobs, withRef)
    }
 }
