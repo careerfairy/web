@@ -41,8 +41,29 @@ const styles = sxStyles({
          strokeWidth: 1,
       },
    },
+   lineHighlightElement: {
+      stroke: "#6749EA",
+      strokeWidth: 3,
+      fill: "#F3F3F5",
+   },
 })
 
+const CHART_HEIGHT = 313 // Design specification
+
+const defaultDataForEmptyView = {
+   xAxis: [
+      new Date(1970, 0, 5), // Monday, 5 Jan 1970
+      new Date(1970, 0, 6), // Tuesday, 6 Jan 1970
+      new Date(1970, 0, 7), // Wednesday, 7 Jan 1970
+      new Date(1970, 0, 8), // Thursday, 8 Jan 1970
+      new Date(1970, 0, 9), // Friday, 9 Jan 1970
+      new Date(1970, 0, 10), // Saturday, 10 Jan 1970
+      new Date(1970, 0, 11), // Sunday, 11 Jan 1970
+   ],
+   series: [0, 10, 20, 30, 40, 50, 60],
+}
+
+// Utility function to keep date format consistent accross the different elements of the chart
 const formatDate = (date, options) => {
    return new Intl.DateTimeFormat("en-GB", options).format(date)
 }
@@ -68,16 +89,7 @@ const CustomYTick = (props) => {
 }
 
 const CustomLineHighlightElement = (props) => {
-   return (
-      <LineHighlightElement
-         {...props}
-         sx={{
-            stroke: "#6749EA",
-            strokeWidth: 3,
-            fill: "#F3F3F5",
-         }}
-      />
-   )
+   return <LineHighlightElement {...props} sx={styles.lineHighlightElement} />
 }
 
 const CustomTooltip = (props) => {
@@ -107,24 +119,25 @@ type CFLineChartProps = {
    seriesData?: (number | null)[]
 }
 
-const defaultXaxisData = [
-   new Date(1970, 0, 5), // Monday, 5 Jan 1970
-   new Date(1970, 0, 6), // Tuesday, 6 Jan 1970
-   new Date(1970, 0, 7), // Wednesday, 7 Jan 1970
-   new Date(1970, 0, 8), // Thursday, 8 Jan 1970
-   new Date(1970, 0, 9), // Friday, 9 Jan 1970
-   new Date(1970, 0, 10), // Saturday, 10 Jan 1970
-   new Date(1970, 0, 11), // Sunday, 11 Jan 1970
-]
-const defaultSeriesData = [0, 10, 20, 30, 40, 50, 60]
+const lineChartValueFormatter = (date, isChartEmpty) => {
+   const options = isChartEmpty
+      ? { weekday: "long" }
+      : {
+           day: "numeric",
+           month: "short",
+           year: "numeric",
+        }
+   return formatDate(date, options).toString()
+}
 
 const CFLineChart: FC<CFLineChartProps> = ({
    tooltipLabel,
-   xAxisData = defaultXaxisData,
-   seriesData = defaultSeriesData,
+   xAxisData = defaultDataForEmptyView.xAxis,
+   seriesData = defaultDataForEmptyView.series,
 }) => {
    const isEmpty =
-      xAxisData === defaultXaxisData || seriesData === defaultSeriesData
+      xAxisData === defaultDataForEmptyView.xAxis ||
+      seriesData === defaultDataForEmptyView.series
 
    return (
       <ResponsiveChartContainer
@@ -134,16 +147,7 @@ const CFLineChart: FC<CFLineChartProps> = ({
                id: "Years",
                data: xAxisData,
                scaleType: "time",
-               valueFormatter: (date) => {
-                  const options = isEmpty
-                     ? { weekday: "long" }
-                     : {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                       }
-                  return formatDate(date, options).toString()
-               },
+               valueFormatter: (date) => lineChartValueFormatter(date, isEmpty),
             },
          ]}
          series={[
@@ -158,12 +162,12 @@ const CFLineChart: FC<CFLineChartProps> = ({
                } as HighlightScope,
             },
          ]}
-         height={313}
+         height={CHART_HEIGHT}
       >
          <CustomBackground />
          <ChartsXAxis
             disableLine
-            tickInterval={isEmpty ? defaultXaxisData : undefined}
+            tickInterval={isEmpty ? defaultDataForEmptyView.xAxis : undefined}
          />
          <ChartsYAxis
             position="right"
