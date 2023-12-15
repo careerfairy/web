@@ -1,5 +1,4 @@
 import { FC } from "react"
-import * as React from "react"
 import {
    ChartsXAxis,
    ChartsYAxis,
@@ -18,8 +17,8 @@ import {
    LineHighlightElement,
    LineHighlightElementProps,
 } from "@mui/x-charts/LineChart"
-import StyledChartTooltip from "./StyledChartTooltip"
 import { sxStyles } from "types/commonTypes"
+import StyledChartTooltip from "./StyledChartTooltip"
 
 const styles = sxStyles({
    chart: {
@@ -76,15 +75,7 @@ const formatDate = (date, options) => {
 const CustomBackground = () => {
    const { left, top, width, height } = useDrawingArea()
 
-   return (
-      <rect
-         x={left}
-         y={top - 10}
-         width={width}
-         height={height + 10}
-         fill="#FCFCFE"
-      />
-   )
+   return <rect x={left} y={top} width={width} height={height} fill="#FCFCFE" />
 }
 
 const CustomYTick: FC = () => {
