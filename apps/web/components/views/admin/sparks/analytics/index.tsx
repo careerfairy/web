@@ -7,6 +7,7 @@ import { CFLineChart } from "./components/charts/CFLineChart"
 import ChartSwitchButton from "./components/charts/ChartSwitchButton"
 import SparksStaticCard from "./components/SparksStaticCard"
 import CFPieChart from "./components/charts/CFPieChart"
+import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 
 const styles = sxStyles({
    root: {
