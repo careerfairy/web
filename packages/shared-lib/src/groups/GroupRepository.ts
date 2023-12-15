@@ -34,7 +34,7 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
-import { CustomJob, CustomJobApplicants, PublicCustomJob } from "./customJobs"
+import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
 import { Timestamp } from "../firebaseTypes"
 
 const cloneDeep = require("lodash.clonedeep")
@@ -1215,8 +1215,8 @@ export class FirebaseGroupRepository
          .collection("customJobApplicants")
          .doc(user.userEmail)
 
-      const newJobApplicant: CustomJobApplicants = {
-         documentType: "customJobApplicants",
+      const newJobApplicant: CustomJobApplicant = {
+         documentType: "customJobApplicant",
          jobId: job.id,
          user,
          id: ref.id,
