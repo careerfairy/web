@@ -115,7 +115,7 @@ const CustomTooltip: FC<CustomTooltipProps> = (props) => {
 }
 
 type CFLineChartProps = {
-   tooltipLabel: string
+   tooltipLabel?: string
    xAxisData?: any[]
    seriesData?: LineSeriesType["data"]
 }
