@@ -3,11 +3,9 @@ import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
-import { CFLineChart } from "./components/charts/CFLineChart"
-import ChartSwitchButton from "./components/charts/ChartSwitchButton"
-import SparksStaticCard from "./components/SparksStaticCard"
 import CFPieChart from "./components/charts/CFPieChart"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
+import SparksOverviewTab from "./SparksOverviewTab"
 
 const styles = sxStyles({
    root: {
@@ -208,77 +206,12 @@ const GroupSparkAnalytics = () => {
          </Box>
          <Box>
             {tabValue === "overview" && (
-               <>
-                  <GroupSparkAnalyticsCardContainer title="Reach for the past 30 days">
-                     Overview: Reach for {selectValue} days
-                     <Box
-                        sx={{
-                           display: "flex",
-                           gap: 1.5,
-                        }}
-                     >
-                        <ChartSwitchButton
-                           label={"Total views"}
-                           value={"1.5k"}
-                           active={true}
-                        />
-                        <ChartSwitchButton
-                           label={"Unique viewers"}
-                           value={"1.1k"}
-                           active={false}
-                        />
-                     </Box>
-                     <CFLineChart />
-                  </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Engagement for the past 30 days">
-                     Overview: Reach for {selectValue} days
-                     <Box
-                        sx={{
-                           display: "flex",
-                           gap: 1.5,
-                        }}
-                     >
-                        <ChartSwitchButton
-                           label={"Likes"}
-                           value={"450"}
-                           active={true}
-                        />
-                        <ChartSwitchButton
-                           label={"Shares"}
-                           value={"800"}
-                           active={false}
-                        />
-                        <ChartSwitchButton
-                           label={"Registrations"}
-                           value={"10"}
-                           active={false}
-                        />
-                        <ChartSwitchButton
-                           label={"Page clicks"}
-                           value={"23"}
-                           active={false}
-                        />
-                     </Box>
-                     <Box sx={{ marginLeft: "-20px" }}>
-                        <CFLineChart
-                           tooltipLabel="Likes"
-                           xAxisData={years}
-                           seriesData={UKGDPperCapita}
-                        />
-                     </Box>
-                  </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Your most watched Sparks">
-                     Overview: Most watched {selectValue} days
-                     <Box
-                        sx={{
-                           display: "flex",
-                           gap: 1.5,
-                        }}
-                     >
-                        <SparksStaticCard spark={spark} />
-                     </Box>
-                  </GroupSparkAnalyticsCardContainer>
-               </>
+               <SparksOverviewTab
+                  timeFilter={selectValue}
+                  reachData={undefined}
+                  engagementData={{ xAxis: years, series: UKGDPperCapita }}
+                  mostSomethingData={spark}
+               />
             )}
             {tabValue === "audience" && (
                <>
