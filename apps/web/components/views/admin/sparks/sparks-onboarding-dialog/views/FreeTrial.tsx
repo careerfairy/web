@@ -64,7 +64,7 @@ const FreeTrial = () => {
          </Box>
          <Box sx={styles.centered}>
             <TimelineView.Description pb={4} color="#7A7A8E">
-               You can upload up to 6 public Spark from 1 employee
+               You can upload up to 6 public Sparks from 1 employee
             </TimelineView.Description>
             <TimelineView.Button
                onClick={completeOnboarding}
