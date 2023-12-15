@@ -6,6 +6,8 @@ import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyti
 import CFPieChart from "./components/charts/CFPieChart"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksOverviewTab from "./SparksOverviewTab"
+import useSparksAnalytics from "components/custom-hook/useSparksAnalytics"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    root: {
@@ -170,6 +172,18 @@ const pieChartProcessedData = pieChartRawData.map((d, i) => {
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] = useState("30")
+
+   const { group } = useGroup()
+
+   const {
+      reach,
+      engagement,
+      most,
+      topCountries,
+      topUniversities,
+      topFieldsOfStudy,
+      levelsOfStudy,
+   } = useSparksAnalytics("KLVvqtghvCqPv7NI1fYv")
 
    const handleTabChange = (event, newValue) => {
       setTabValue(newValue)
