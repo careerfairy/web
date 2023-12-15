@@ -22,6 +22,8 @@ export const adminJobsSlice = createSlice({
       },
       closeJobsDialog: (state) => {
          state.jobsDialogOpen = false
+         state.deleteJobDialogOpen = false
+         state.selectedJobId = null
       },
       openDeleteJobDialogOpen: (
          state,
@@ -30,20 +32,12 @@ export const adminJobsSlice = createSlice({
          state.deleteJobDialogOpen = true
          state.selectedJobId = action.payload
       },
-      closeDeleteJobDialogOpen: (state) => {
-         state.deleteJobDialogOpen = false
-         state.selectedJobId = null
-      },
    },
 })
 
 // Export actions
-export const {
-   openJobsDialog,
-   closeJobsDialog,
-   openDeleteJobDialogOpen,
-   closeDeleteJobDialogOpen,
-} = adminJobsSlice.actions
+export const { openJobsDialog, closeJobsDialog, openDeleteJobDialogOpen } =
+   adminJobsSlice.actions
 
 // Export reducer
 export default adminJobsSlice.reducer
