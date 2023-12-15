@@ -77,7 +77,8 @@ function createCustomJobStatsInCollection(
 
 /**
  * Helper function to create CustomJobApplicant documents in /jobApplications collection
- * The data is based on the provided customJob object and the user data retrieved by the applicantId
+ * The data is based on the provided customJob object and the user data retrieved by the applicantId.
+ * The ID of the document is a combination of the customJob ID and the applicant's email address eg. "customJobId_applicantEmail"
  * @param customJob - The custom job to be created
  * @param bulkWriter - The Firestore BulkWriter to use for batch operations
  */
