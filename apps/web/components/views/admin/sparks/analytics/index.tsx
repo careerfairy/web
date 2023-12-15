@@ -100,6 +100,74 @@ const UKGDPperCapita = [
    35185, 35618, 36436, 36941, 37334, 37782, 38058,
 ]
 
+const spark = {
+   id: "GtAz8lKg9POi9TVrJSxs",
+   category: { id: "company-culture" as SparkCategory["id"] },
+   question: "What's one great benefit of working at ABB?",
+   video: {
+      thumbnailUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/sparks%2Fthumbnails%2Fec15e7ae-a46a-4dc5-8681-09fff96d0227.jpeg?alt=media&token=2e4a781f-65ae-4720-af50-4fe9f05c6eb4",
+   },
+   group: { universityName: "ABB" },
+   creator: {
+      firstName: "Antonia Maria",
+      lastName: "Mauch",
+      avatarUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/groups%2FlgHmyR0XipDBcYm0UPtH%2Fcreator-avatars%2F567fb7db-4497-486d-8317-0ae399ad2df2.png?alt=media&token=42ae5f6c-6b03-4a49-942c-7fde52584a87",
+   },
+}
+
+const pieChartRawData = [
+   {
+      university: "Other",
+      total_talent: 34,
+   },
+   {
+      university: "ETHZ - ETH Zurich",
+      total_talent: 14,
+   },
+   {
+      university: "Universität St. Gallen",
+      total_talent: 10,
+   },
+   {
+      university: "EPFL - EPF Lausanne",
+      total_talent: 6,
+   },
+   {
+      university: "ZHAW - Zürcher Hochschule für Angewandte Wissenschaften",
+      total_talent: 5,
+   },
+   {
+      university: "University of Zürich",
+      total_talent: 5,
+   },
+   {
+      university: "Technische Universität Darmstadt",
+      total_talent: 4,
+   },
+   {
+      university: "Technische Universität Wien",
+      total_talent: 4,
+   },
+   {
+      university: "University of Basel",
+      total_talent: 3,
+   },
+   {
+      university: "Universität Bern",
+      total_talent: 3,
+   },
+]
+
+const pieChartProcessedData = pieChartRawData.map((d, i) => {
+   return {
+      id: i,
+      value: d.total_talent,
+      label: d.university,
+   }
+})
+
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
    const [selectValue, setSelectValue] = useState("30")
@@ -114,57 +182,6 @@ const GroupSparkAnalytics = () => {
       { value: "180", label: "Past 6 months" },
       { value: "365", label: "Last year" },
    ]
-
-   const pieChartRawData = [
-      {
-         university: "Other",
-         total_talent: 34,
-      },
-      {
-         university: "ETHZ - ETH Zurich",
-         total_talent: 14,
-      },
-      {
-         university: "Universität St. Gallen",
-         total_talent: 10,
-      },
-      {
-         university: "EPFL - EPF Lausanne",
-         total_talent: 6,
-      },
-      {
-         university: "ZHAW - Zürcher Hochschule für Angewandte Wissenschaften",
-         total_talent: 5,
-      },
-      {
-         university: "University of Zürich",
-         total_talent: 5,
-      },
-      {
-         university: "Technische Universität Darmstadt",
-         total_talent: 4,
-      },
-      {
-         university: "Technische Universität Wien",
-         total_talent: 4,
-      },
-      {
-         university: "University of Basel",
-         total_talent: 3,
-      },
-      {
-         university: "Universität Bern",
-         total_talent: 3,
-      },
-   ]
-
-   const pieChartProcessedData = pieChartRawData.map((d, i) => {
-      return {
-         id: i,
-         value: d.total_talent,
-         label: d.university,
-      }
-   })
 
    return (
       <Box sx={styles.root}>
@@ -257,7 +274,7 @@ const GroupSparkAnalytics = () => {
                            gap: 1.5,
                         }}
                      >
-                        <SparksStaticCard />
+                        <SparksStaticCard spark={spark} />
                      </Box>
                   </GroupSparkAnalyticsCardContainer>
                </>
