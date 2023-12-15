@@ -169,7 +169,7 @@ const pieChartProcessedData = pieChartRawData.map((d, i) => {
 
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
-   const [selectValue, setSelectValue] = useState("30")
+   const [selectTimeFilter, setSelectTimeFilter] = useState("30")
 
    const handleTabChange = (event, newValue) => {
       setTabValue(newValue)
@@ -196,8 +196,8 @@ const GroupSparkAnalytics = () => {
             </Tabs>
             <Box component="span" sx={styles.mobileLimiter} />
             <ResponsiveSelectWithDrawer
-               selectValue={selectValue}
-               setSelectValue={setSelectValue}
+               selectValue={selectTimeFilter}
+               setSelectValue={setSelectTimeFilter}
                options={options}
                selectContainerProps={{
                   sx: styles.selectDrawer,
@@ -207,7 +207,7 @@ const GroupSparkAnalytics = () => {
          <Box>
             {tabValue === "overview" && (
                <SparksOverviewTab
-                  timeFilter={selectValue}
+                  timeFilter={selectTimeFilter}
                   reachData={undefined}
                   engagementData={{ xAxis: years, series: UKGDPperCapita }}
                   mostSomethingData={spark}
@@ -216,17 +216,18 @@ const GroupSparkAnalytics = () => {
             {tabValue === "audience" && (
                <>
                   <GroupSparkAnalyticsCardContainer title="Top 10 countries">
-                     Audience: Top 10 countries for {selectValue} days
+                     Audience: Top 10 countries for {selectTimeFilter} days
                      <CFPieChart data={pieChartProcessedData} />
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Top 10 universities">
-                     Audience: Top 10 universities for {selectValue} days
+                     Audience: Top 10 universities for {selectTimeFilter} days
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Top 10 fields of study">
-                     Audience: Top 10 fields of study for {selectValue} days
+                     Audience: Top 10 fields of study for {selectTimeFilter}{" "}
+                     days
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Level of study">
-                     Audience: Level of study for {selectValue} days
+                     Audience: Level of study for {selectTimeFilter} days
                   </GroupSparkAnalyticsCardContainer>
                </>
             )}
