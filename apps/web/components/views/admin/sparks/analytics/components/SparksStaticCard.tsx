@@ -18,13 +18,11 @@ import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 
 const styles = sxStyles({
-   cardDetails: {
-      cursor: "pointer",
-      justifyContent: "flex-end",
-      gap: "6px",
-   },
    card: {
-      width: ["100%", "100%", 281],
+      width: {
+         xs: "100%",
+         md: 281,
+      },
       boxShadow: "none",
       borderRadius: "12px",
       border: "1px solid #F3F3F5",
@@ -64,7 +62,7 @@ const styles = sxStyles({
       height: { xs: 476, sm: 406 },
       objectFit: "cover",
    },
-   cardMediaBox: {
+   sparksTypeAndTitle: {
       position: "absolute",
       bottom: "6px",
       left: "12px",
@@ -72,8 +70,18 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       gap: "6px",
+      zIndex: 2,
    },
-   cardMediaTypography: {
+   cardMediaGradientOverlay: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      background: `
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 78.12%, rgba(0, 0, 0, 0.6) 100%),linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 17.71%)
+      `,
+      zIndex: 1,
+   },
+   sparksTitle: {
       fontsize: "16px",
       fontweight: "400",
       letterspacing: "0em",
@@ -92,7 +100,7 @@ const styles = sxStyles({
       letterSpacing: "0em",
       color: "#6B6B7F",
    },
-   statContainerBox: {
+   statIcon: {
       "& svg": {
          width: "12px",
          paddingTop: "3px",
@@ -101,7 +109,7 @@ const styles = sxStyles({
          },
       },
    },
-   statContainerBoxValue: {
+   statValue: {
       fontSize: "14px",
       fontWeight: "400",
       lineHeight: "24px",
@@ -123,8 +131,8 @@ const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
          spacing={1}
          sx={styles.statContainer}
       >
-         <Box sx={styles.statContainerBox}>{icon}</Box>
-         <Box sx={styles.statContainerBoxValue}>{value}</Box>
+         <Box sx={styles.statIcon}>{icon}</Box>
+         <Box sx={styles.statValue}>{value}</Box>
       </Stack>
    )
 }
@@ -161,18 +169,17 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ spark }) => {
             sx={styles.cardHeader}
          />
          <Box sx={{ position: "relative" }}>
+            <Box sx={styles.sparksTypeAndTitle}>
+               <SparkCategoryChip categoryId={spark.category.id} />
+               <Typography sx={styles.sparksTitle}>{spark.question}</Typography>
+            </Box>
+            <Box sx={styles.cardMediaGradientOverlay} />
             <CardMedia
                component="img"
                sx={styles.cardMedia}
                image={spark.video.thumbnailUrl}
                alt="Spark's thumbnail"
             />
-            <Box sx={styles.cardMediaBox}>
-               <SparkCategoryChip categoryId={spark.category.id} />
-               <Typography sx={styles.cardMediaTypography}>
-                  {spark.question}
-               </Typography>
-            </Box>
          </Box>
          <CardActions sx={styles.cardActions}>
             <StatContainer
