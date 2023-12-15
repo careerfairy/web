@@ -84,4 +84,5 @@ export interface CustomJobApplicant extends Identifiable {
    user: UserData
    groupId: string // Makes it easier to query for all applicants in a group
    appliedAt: firebase.firestore.Timestamp
+   livestreamId: string // The associated livestream where the user applied to the job
 }
