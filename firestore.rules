@@ -215,11 +215,6 @@ service cloud.firestore {
                 allow write: if isCareerCenterAdmin() || isCFAdmin();
             }
 
-            match /customJobs/{jobId} {
-                allow read: if true;
-                allow write: if true;
-            }
-
             match /ats/{integrationId} {
                 allow read, write: if isSignedIn() && (isCareerCenterAdmin() || isCFAdmin());
             }
@@ -267,13 +262,18 @@ service cloud.firestore {
             }
         }
 
-        match /customJobStats/{jobStatsId} {
+        match /customJobs/{jobId} {
             allow read: if true;
             allow write: if isSignedIn();
+        }
+
+        match /customJobStats/{jobStatsId} {
+            allow read: if true;
+            allow write: if allowIncrementField('clicks');
 
             match /customJobApplicants/{applicantId} {
                 allow read: if true;
-                allow write: if isSignedIn();
+                allow write: if isSignedInAndIsSameUser(applicantId);
             }
         }
 
