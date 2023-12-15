@@ -3,17 +3,18 @@ import * as React from "react"
 import {
    ChartsXAxis,
    ChartsYAxis,
-   ResponsiveChartContainer,
-   useDrawingArea,
    ChartsTooltip,
+   useDrawingArea,
    HighlightScope,
    ChartsAxisHighlight,
+   ResponsiveChartContainer,
 } from "@mui/x-charts"
 import {
    AreaPlot,
-   LineHighlightElement,
-   LineHighlightPlot,
    LinePlot,
+   LineHighlightPlot,
+   LineHighlightElement,
+   LineHighlightElementProps,
 } from "@mui/x-charts/LineChart"
 import StyledChartTooltip from "./StyledChartTooltip"
 import { sxStyles } from "types/commonTypes"
@@ -84,17 +85,23 @@ const CustomBackground = () => {
    )
 }
 
-const CustomYTick = (props) => {
+const CustomYTick = () => {
    const { width } = useDrawingArea()
 
    return <line x2={-1 * width} stroke="#F3F3F5" strokeWidth={1} />
 }
 
-const CustomLineHighlightElement = (props) => {
+const CustomLineHighlightElement: FC<LineHighlightElementProps> = (props) => {
    return <LineHighlightElement {...props} sx={styles.lineHighlightElement} />
 }
 
-const CustomTooltip = (props) => {
+type CustomTooltipProps = {
+   axisData: any
+   label: string
+   series: any[]
+}
+
+const CustomTooltip = (props: CustomTooltipProps) => {
    const { axisData, label, series } = props
 
    if (!axisData) return null
@@ -108,7 +115,7 @@ const CustomTooltip = (props) => {
    }
    const formattedDate = formatDate(date, options)
 
-   const yValue = series[axisData.x.index].toLocaleString() // groups digits with comma separator, example: 10123 => 10,123
+   const yValue = series[axisData.x.index].toLocaleString() // Groups digits with comma separator, example: 10123 => 10,123
 
    return (
       <StyledChartTooltip title={formattedDate} value={yValue} label={label} />
