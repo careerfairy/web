@@ -156,7 +156,7 @@ test.describe("Personal Information", () => {
       // click on delete account confirmation button
       await Promise.all([
          profilePage.clickDeleteAccountConfirmationButton(),
-         profilePage.page.waitForNavigation(),
+         profilePage.page.waitForURL(`**/login?absolutePath**`),
       ])
 
       // expect being on the login page
