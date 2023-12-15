@@ -18,6 +18,10 @@ const styles = sxStyles({
          xs: 0,
          sm: 6.25,
       },
+      pb: {
+         xs: 2,
+         sm: 0,
+      },
       borderRadius: "16px",
       "& video": {
          borderRadius: "16px",
