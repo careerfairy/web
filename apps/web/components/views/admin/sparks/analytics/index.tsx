@@ -115,6 +115,57 @@ const GroupSparkAnalytics = () => {
       { value: "365", label: "Last year" },
    ]
 
+   const pieChartRawData = [
+      {
+         university: "Other",
+         total_talent: 34,
+      },
+      {
+         university: "ETHZ - ETH Zurich",
+         total_talent: 14,
+      },
+      {
+         university: "Universität St. Gallen",
+         total_talent: 10,
+      },
+      {
+         university: "EPFL - EPF Lausanne",
+         total_talent: 6,
+      },
+      {
+         university: "ZHAW - Zürcher Hochschule für Angewandte Wissenschaften",
+         total_talent: 5,
+      },
+      {
+         university: "University of Zürich",
+         total_talent: 5,
+      },
+      {
+         university: "Technische Universität Darmstadt",
+         total_talent: 4,
+      },
+      {
+         university: "Technische Universität Wien",
+         total_talent: 4,
+      },
+      {
+         university: "University of Basel",
+         total_talent: 3,
+      },
+      {
+         university: "Universität Bern",
+         total_talent: 3,
+      },
+   ]
+
+   const pieChartProcessedData = pieChartRawData.map((d, i) => {
+      return {
+         id: i,
+         value: d.total_talent,
+         label: d.university,
+      }
+   })
+
    return (
       <Box sx={styles.root}>
          <Box sx={styles.controlHeader}>
@@ -159,7 +210,7 @@ const GroupSparkAnalytics = () => {
                            active={false}
                         />
                      </Box>
-                     <CFLineChart tooltipLabel="Views" />
+                     <CFLineChart />
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Engagement for the past 30 days">
                      Overview: Reach for {selectValue} days
@@ -215,7 +266,7 @@ const GroupSparkAnalytics = () => {
                <>
                   <GroupSparkAnalyticsCardContainer title="Top 10 countries">
                      Audience: Top 10 countries for {selectValue} days
-                     <CFPieChart />
+                     <CFPieChart data={pieChartProcessedData} />
                   </GroupSparkAnalyticsCardContainer>
                   <GroupSparkAnalyticsCardContainer title="Top 10 universities">
                      Audience: Top 10 universities for {selectValue} days
