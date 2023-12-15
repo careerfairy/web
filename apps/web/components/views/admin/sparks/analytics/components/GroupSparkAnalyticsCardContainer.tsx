@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactElement } from "react"
 import { Box, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
@@ -20,7 +20,7 @@ const styles = sxStyles({
 })
 
 type GroupSparkAnalyticsCardContainerProps = {
-   title: string
+   title: string | ReactElement
    children: React.ReactNode
 }
 
@@ -29,7 +29,11 @@ export const GroupSparkAnalyticsCardContainer: React.FC<
 > = ({ title, children }) => {
    return (
       <Box sx={styles.root}>
-         <Typography sx={styles.title}>{title}</Typography>
+         {typeof title === "string" ? (
+            <Typography sx={styles.title}>{title}</Typography>
+         ) : (
+            title
+         )}
          {children}
       </Box>
    )
