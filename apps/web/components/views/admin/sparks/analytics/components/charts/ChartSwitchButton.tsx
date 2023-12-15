@@ -2,6 +2,14 @@ import { FC } from "react"
 import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
+const COLORS = {
+   ACTIVE_BG_COLOR: "#6749EA",
+   ACTIVE_TEXT_COLOR: "#FFFFFF",
+   INACTIVE_BG_COLOR: "#F6F6FA",
+   INACTIVE_TEXT_COLOR: "#6B6B7F",
+   INACTIVE_BORDER_COLOR: "#EEEEEE",
+}
+
 const styles = sxStyles({
    root: {
       borderRadius: "4px",
@@ -14,13 +22,13 @@ const styles = sxStyles({
       userSelect: "none",
    },
    active: {
-      backgroundColor: "#6749EA",
-      color: "#FFFFFF",
+      backgroundColor: COLORS.ACTIVE_BG_COLOR,
+      color: COLORS.ACTIVE_TEXT_COLOR,
    },
    notActive: {
-      backgroundColor: "#F6F6FA",
-      color: "#6B6B7F",
-      border: "1px solid #EEEEEE",
+      backgroundColor: COLORS.INACTIVE_BG_COLOR,
+      color: COLORS.INACTIVE_TEXT_COLOR,
+      border: `1px solid ${COLORS.INACTIVE_BORDER_COLOR}`,
    },
    label: {
       fontWeight: 400,
@@ -36,7 +44,7 @@ type ChartSwitchButtonProps = {
    label: string
    value: string
    active: boolean
-   onClick?: () => void
+   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
 const ChartSwitchButton: FC<ChartSwitchButtonProps> = ({
