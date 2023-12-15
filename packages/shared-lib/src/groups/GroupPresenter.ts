@@ -305,7 +305,7 @@ export class GroupPresenter {
     * The duration is calculated from the plan's start and end dates
     */
    getPlanTimeLeft() {
-      return this.getExpiresAt() - this.getStartedAt()
+      return this.getExpiresAt() - Date.now()
    }
 
    /**
