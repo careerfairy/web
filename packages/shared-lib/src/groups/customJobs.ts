@@ -21,11 +21,11 @@ export interface CustomJob extends Identifiable {
    // optional fields
    salary?: string
    // applicants ids
-   applicants?: string[]
+   applicants?: string[] //TODO: deprecated migrate to CustomJobApplicants sub collection from CustomJobStats collection
    // livestreams ids where this job opening is shown
    livestreams: string[]
    //increases every time a talent clicks on the jobPostingUrl
-   clicks: number
+   clicks: number //TODO: deprecated migrate to CustomJobStats collection
 }
 
 export type PublicCustomJob = Pick<
@@ -68,6 +68,7 @@ export const pickPublicDataFromCustomJob = (
    }
 }
 
+// collection path /customJobStats
 export interface CustomJobStats extends Identifiable {
    jobId: string
    documentType: "customJobStats" // simplify groupCollection Queries
@@ -76,6 +77,7 @@ export interface CustomJobStats extends Identifiable {
    job: CustomJob
 }
 
+// collection path /customJobStats/{jobId}/customJobApplicants
 export interface CustomJobApplicants extends Identifiable {
    documentType: "customJobApplicants" // simplify groupCollection Queries
    jobId: string
