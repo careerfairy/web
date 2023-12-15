@@ -7,6 +7,7 @@ import {
    Box,
    MenuItem,
    BoxProps,
+   MenuProps,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { combineStyles, sxStyles } from "types/commonTypes"
@@ -89,6 +90,7 @@ export const ResponsiveSelectWithDrawer: React.FC<{
    setSelectValue: (value: string) => void
    options: { value: string; label: string }[]
    selectProps?: SelectProps
+   selectMenuProps?: Partial<MenuProps>
    selectContainerProps?: BoxProps
    drawerProps?: SwipeableDrawerProps
 }> = ({
@@ -96,6 +98,7 @@ export const ResponsiveSelectWithDrawer: React.FC<{
    setSelectValue,
    options,
    selectProps,
+   selectMenuProps,
    selectContainerProps,
    drawerProps,
 }) => {
@@ -134,7 +137,10 @@ export const ResponsiveSelectWithDrawer: React.FC<{
                   onChange={handleSelectChange}
                   {...selectProps}
                   sx={combineStyles(styles.selectRoot, selectProps?.sx)}
-                  MenuProps={{ sx: styles.selectMenu }}
+                  MenuProps={{
+                     sx: combineStyles(styles.selectMenu, selectMenuProps?.sx),
+                     ...selectMenuProps,
+                  }}
                >
                   {options.map((option, index) => (
                      <MenuItem
