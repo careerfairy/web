@@ -44,7 +44,7 @@ export const userApplyToCustomJob = functions
 
             return Promise.allSettled([
                userRepo.applyUserToCustomJob(userId, jobToApply),
-               groupRepo.applyUserToCustomJob(user, jobToApply),
+               groupRepo.applyUserToCustomJob(user, jobToApply, livestreamId),
             ])
          })
       )

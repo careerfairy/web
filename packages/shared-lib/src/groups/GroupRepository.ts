@@ -302,8 +302,13 @@ export interface IGroupRepository {
     * To update an existing job with a new applicant
     * @param user
     * @param job
+    * @param livestreamId
     */
-   applyUserToCustomJob(user: UserData, job: CustomJob): Promise<void>
+   applyUserToCustomJob(
+      user: UserData,
+      job: CustomJob,
+      livestreamId: string
+   ): Promise<void>
 
    /**
     * To increment the 'clicks' field on a specific customJob
@@ -1208,7 +1213,11 @@ export class FirebaseGroupRepository
       return null
    }
 
-   async applyUserToCustomJob(user: UserData, job: CustomJob): Promise<void> {
+   async applyUserToCustomJob(
+      user: UserData,
+      job: CustomJob,
+      livestreamId: string
+   ): Promise<void> {
       const ref = this.firestore
          .collection("customJobStats")
          .doc(job.id)
@@ -1222,6 +1231,7 @@ export class FirebaseGroupRepository
          id: ref.id,
          appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
          groupId: job.groupId,
+         livestreamId,
       }
 
       return await ref.set(newJobApplicant, { merge: true })
