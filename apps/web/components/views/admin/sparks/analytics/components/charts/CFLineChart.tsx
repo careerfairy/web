@@ -31,14 +31,16 @@ const styles = sxStyles({
          stroke: "#6749EA33",
          strokeWidth: 1,
       },
-      "& .MuiChartsAxis-tickLabel": {
-         fontSize: "14px",
-         letterSpacing: "0em",
-         fill: "#6B6B7F",
-      },
-      "& .MuiChartsAxis-tick": {
-         stroke: "#F3F3F5",
-         strokeWidth: 1,
+      "& .MuiChartsAxis-tickContainer": {
+         "& .MuiChartsAxis-tickLabel": {
+            fontSize: "14px",
+            letterSpacing: "0em",
+            fill: "#6B6B7F",
+         },
+         "& .MuiChartsAxis-tick": {
+            stroke: "#F3F3F5",
+            strokeWidth: 1,
+         },
       },
    },
    lineHighlightElement: {
@@ -106,7 +108,7 @@ const CustomTooltip = (props) => {
    }
    const formattedDate = formatDate(date, options)
 
-   const yValue = series[axisData.x.index]
+   const yValue = series[axisData.x.index].toLocaleString() // groups digits with comma separator, example: 10123 => 10,123
 
    return (
       <StyledChartTooltip title={formattedDate} value={yValue} label={label} />
