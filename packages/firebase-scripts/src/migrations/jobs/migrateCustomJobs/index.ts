@@ -6,6 +6,15 @@ import {
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, userRepo } from "../../../repositories"
 import { BulkWriter } from "firebase-admin/firestore"
+import * as cliProgress from "cli-progress"
+import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
+import Counter from "../../../lib/Counter"
+import { logAction } from "../../../util/logger"
+
+const jobProgressBar = new cliProgress.SingleBar(
+   getCLIBarOptions("Processing Custom Jobs", "Custom Jobs Processed"),
+   cliProgress.Presets.shades_classic
+)
 
 /**
  * Helper function to create a new CustomJob document in /customJobs collection
@@ -16,7 +25,8 @@ import { BulkWriter } from "firebase-admin/firestore"
  */
 function createCustomJobInCollection(
    customJob: CustomJob,
-   bulkWriter: BulkWriter
+   bulkWriter: BulkWriter,
+   counter: Counter
 ) {
    // Copy the customJob object to avoid mutating the original object
    const newCustomJob: CustomJob = {
@@ -29,6 +39,8 @@ function createCustomJobInCollection(
 
    const newCustomJobRef = firestore.collection("customJobs").doc(customJob.id)
    bulkWriter.set(newCustomJobRef, newCustomJob)
+   counter.writeIncrement()
+   counter.customCountIncrement("Migrated Custom Jobs")
 
    return newCustomJob
 }
@@ -43,7 +55,8 @@ function createCustomJobInCollection(
 function createCustomJobStatsInCollection(
    customJob: CustomJob,
    newCustomJob: CustomJob,
-   bulkWriter: BulkWriter
+   bulkWriter: BulkWriter,
+   counter: Counter
 ) {
    const customJobStats: CustomJobStats = {
       jobId: customJob.id,
@@ -58,6 +71,8 @@ function createCustomJobStatsInCollection(
       .doc(customJob.id)
 
    bulkWriter.set(customJobStatsRef, customJobStats)
+   counter.writeIncrement()
+   counter.customCountIncrement("Migrated Custom Job Stats")
 }
 
 /**
@@ -68,12 +83,19 @@ function createCustomJobStatsInCollection(
  */
 async function createCustomJobApplicantsInCollection(
    customJob: CustomJob,
-   bulkWriter: BulkWriter
+   bulkWriter: BulkWriter,
+   counter: Counter
 ) {
+   if (!Array.isArray(customJob.applicants) || !customJob.applicants.length) {
+      return // No applicants to migrate
+   }
+
    const applicantPromises = customJob.applicants.map((applicantId) =>
       userRepo.getUserDataById(applicantId)
    )
-   const applicantsData = await Promise.all(applicantPromises)
+
+   const applicantsData = (await Promise.all(applicantPromises)) || []
+   counter.addToReadCount(applicantPromises.length)
 
    applicantsData.forEach((userData, index) => {
       if (userData) {
@@ -92,9 +114,13 @@ async function createCustomJobApplicantsInCollection(
             .collection("applicants")
             .doc(applicantId)
          bulkWriter.set(customJobApplicantRef, customJobApplicant)
+         counter.writeIncrement()
+         counter.customCountIncrement("Migrated Applicants")
       }
    })
 }
+
+const counter = new Counter()
 
 /**
  * Main function to run the migration
@@ -102,16 +128,45 @@ async function createCustomJobApplicantsInCollection(
  */
 export async function run() {
    const bulkWriter = firestore.bulkWriter()
-   const groups = await groupRepo.getAllGroups()
 
-   for (const group of groups) {
-      const customJobs = await groupRepo.getGroupCustomJobs(group.id)
+   try {
+      const customJobs = await logAction(
+         () => groupRepo.getAllCustomJobs(),
+         "Fetching all custom jobs"
+      )
+
+      counter.addToReadCount(customJobs.length)
+
+      jobProgressBar.start(customJobs.length, 0)
+
       for (const customJob of customJobs) {
-         const newCustomJob = createCustomJobInCollection(customJob, bulkWriter)
-         createCustomJobStatsInCollection(customJob, newCustomJob, bulkWriter)
-         await createCustomJobApplicantsInCollection(customJob, bulkWriter)
-      }
-   }
+         const newCustomJob = createCustomJobInCollection(
+            customJob,
+            bulkWriter,
+            counter
+         )
+         createCustomJobStatsInCollection(
+            customJob,
+            newCustomJob,
+            bulkWriter,
+            counter
+         )
+         await createCustomJobApplicantsInCollection(
+            customJob,
+            bulkWriter,
+            counter
+         )
 
-   await bulkWriter.close()
+         jobProgressBar.increment()
+      }
+
+      jobProgressBar.stop()
+
+      await logAction(() => bulkWriter.close(), "Closing BulkWriter")
+   } catch (error) {
+      console.error(error)
+      throwMigrationError(error.message)
+   } finally {
+      counter.print()
+   }
 }
