@@ -109,7 +109,7 @@ async function createCustomJobApplicantsInCollection(
             id: applicantId,
          }
          const customJobApplicantRef = firestore
-            .collection("customJobs")
+            .collection("customJobStats")
             .doc(customJob.id)
             .collection("applicants")
             .doc(applicantId)
