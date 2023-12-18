@@ -12,7 +12,7 @@ export class CustomJobService {
       jobId: string,
       userId: string
    ): Promise<HttpsCallableResult> {
-      return this.firebaseFunctions.httpsCallable("userApplyToCustomJob")({
+      return this.firebaseFunctions.httpsCallable("userApplyToCustomJob_v2")({
          livestreamId,
          userId,
          jobId,
