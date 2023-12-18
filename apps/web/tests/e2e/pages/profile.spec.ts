@@ -159,6 +159,9 @@ test.describe("Personal Information", () => {
          profilePage.page.waitForURL(`**/login?absolutePath**`),
       ])
 
+      // wait for the login button to be visible
+      await profilePage.page.waitForSelector("data-testid=login-button")
+
       // expect being on the login page
       const thereIsLoginButton = await profilePage.page
          .locator("data-testid=login-button")
