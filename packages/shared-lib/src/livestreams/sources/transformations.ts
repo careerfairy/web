@@ -13,7 +13,7 @@ import {
    fromDateFirestoreFn,
    toDate,
 } from "../../firebaseTypes"
-import { PublicCustomJob } from "../../groups/customJobs"
+import { PublicCustomJob } from "../../customJobs/customJobs"
 
 export type RegistrationSourceWithDates = {
    source: Omit<RegistrationSource, "match">

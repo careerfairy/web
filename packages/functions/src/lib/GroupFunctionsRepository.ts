@@ -31,13 +31,7 @@ import DocumentSnapshot = firestore.DocumentSnapshot
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { auth, Timestamp } from "../api/firestoreAdmin"
 import { UserRecord } from "firebase-admin/auth"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
-import {
-   CustomJob,
-   CustomJobStats,
-} from "@careerfairy/shared-lib/groups/customJobs"
-import * as functions from "firebase-functions"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -116,13 +110,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null>
 
    /**
-    * To sync the connection between the livestream and the pre-existing custom jobs within the group document
-    */
-   syncLivestreamIdWithCustomJobs(
-      livestream: Change<DocumentSnapshot>
-   ): Promise<void>
-
-   /**
     * Starts a plan for a group.
     *
     * This method sets the 'plan' field of the group document to the specified plan type and sets the 'startedAt' field to the current time.
@@ -143,22 +130,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves when the plan has been successfully stopped.
     */
    stopPlan(groupId: string): Promise<void>
-
-   /**
-    * This method creates the customJobStats collection based on the received customJob
-    * @param customJobChange
-    */
-   createCustomJobStats(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void>
-
-   /**
-    * This method syncs the customJobsStats job field based on the received customJob
-    * @param customJobChange
-    */
-   syncCustomJobDataToCustomJobStats(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -535,73 +506,6 @@ export class GroupFunctionsRepository
       })
    }
 
-   async syncLivestreamIdWithCustomJobs(
-      livestream: Change<DocumentSnapshot>
-   ): Promise<void> {
-      const batch = this.firestore.batch()
-      const newLivestream = livestream.after?.data() as LivestreamEvent
-      const previousLivestream = livestream.before?.data() as LivestreamEvent
-
-      const groupId =
-         newLivestream?.groupIds?.[0] || previousLivestream?.groupIds?.[0]
-      const livestreamId = newLivestream?.id || previousLivestream?.id
-
-      const newJobs = newLivestream?.customJobs || []
-      const oldJobs = previousLivestream?.customJobs || []
-
-      // To get a list of jobs that have been removed as a result of this update or deletion action
-      const jobsToRemoveLivestreamId = oldJobs.filter(
-         ({ id: oldJobId }) =>
-            !newJobs.some(({ id: newJobId }) => newJobId === oldJobId)
-      )
-
-      // To get a list of jobs that have been added as a result of this update or creation action
-      const jobsToAddLivestreamId = newJobs.filter(
-         ({ id: newJobId }) =>
-            !oldJobs.some(({ id: oldJobId }) => oldJobId === newJobId)
-      )
-
-      if (Boolean(!groupId) || Boolean(!livestreamId)) {
-         // If there are no valid group id or livestream id at this moment, no additional work is required
-         return
-      }
-
-      if (
-         jobsToAddLivestreamId.length === 0 &&
-         jobsToRemoveLivestreamId.length === 0
-      ) {
-         // If there are no jobs to be added or removed, it indicates that no changes have been made to the custom job field
-         // so no additional work is required
-         return
-      }
-
-      jobsToAddLivestreamId.forEach((job) => {
-         const ref = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("customJobs")
-            .doc(job.id)
-
-         batch.update(ref, {
-            livestreams: this.fieldValue.arrayUnion(livestreamId),
-         })
-      })
-
-      jobsToRemoveLivestreamId.forEach((job) => {
-         const ref = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("customJobs")
-            .doc(job.id)
-
-         batch.update(ref, {
-            livestreams: this.fieldValue.arrayRemove(livestreamId),
-         })
-      })
-
-      return await batch.commit()
-   }
-
    async startPlan(groupId: string, planType: GroupPlanType): Promise<void> {
       const groupRef = this.firestore
          .collection(this.COLLECTION_NAME)
@@ -629,46 +533,6 @@ export class GroupFunctionsRepository
          .doc(groupId)
 
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
-   }
-
-   async createCustomJobStats(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void> {
-      const newCustomJob = customJobChange.after.data() as CustomJob
-
-      const ref = this.firestore
-         .collection("customJobStats")
-         .doc(newCustomJob.id)
-
-      functions.logger.log(
-         `Create CustomJobStats for the job ${newCustomJob.id}.`
-      )
-
-      const newJobStat: CustomJobStats = {
-         documentType: "customJobStats",
-         jobId: newCustomJob.id,
-         clicks: 0,
-         job: newCustomJob,
-         id: newCustomJob.id,
-      }
-
-      return ref.set(newJobStat, { merge: true })
-   }
-
-   async syncCustomJobDataToCustomJobStats(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void> {
-      const newCustomJob = customJobChange.after.data() as CustomJob
-
-      functions.logger.log(
-         `Sync CustomJobStats with job ${newCustomJob.id} data.`
-      )
-
-      const ref = this.firestore
-         .collection("customJobStats")
-         .doc(newCustomJob.id)
-
-      return ref.update({ job: newCustomJob })
    }
 }
 

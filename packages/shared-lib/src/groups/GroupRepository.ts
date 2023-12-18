@@ -34,8 +34,6 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
-import { CustomJob, CustomJobApplicants, PublicCustomJob } from "./customJobs"
-import { Timestamp } from "../firebaseTypes"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -266,50 +264,6 @@ export interface IGroupRepository {
     * @returns A Promise that resolves when the banner image URL is updated.
     */
    updateGroupBanner(groupId: string, image: ImageType): Promise<void>
-
-   /**
-    * To create a custom job as sub collection of the group document
-    * @param job
-    * @param groupId
-    */
-   createGroupCustomJob(
-      job: PublicCustomJob,
-      groupId: string
-   ): Promise<CustomJob>
-
-   /**
-    * To update a existing custom job on the sub collection of the group document
-    * @param job
-    * @param groupId
-    */
-   updateGroupCustomJob(job: PublicCustomJob, groupId: string): Promise<void>
-
-   /**
-    * To delete a custom job on the sub collection of the group document
-    * @param jobId
-    * @param groupId
-    */
-   deleteGroupCustomJob(jobId: string, groupId: string): Promise<void>
-
-   /**
-    * To get a custom job by id on the sub collection of the group document
-    * @param jobId
-    * @param groupId
-    */
-   getCustomJobById(jobId: string, groupId: string): Promise<CustomJob>
-
-   /**
-    * To update an existing job with a new applicant
-    * @param user
-    * @param job
-    */
-   applyUserToCustomJob(user: UserData, job: CustomJob): Promise<void>
-
-   /**
-    * To increment the 'clicks' field on a specific customJob
-    * @param jobId
-    */
-   incrementCustomJobClicks(jobId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -1147,100 +1101,6 @@ export class FirebaseGroupRepository
       }
 
       return groupRef.update(toUpdate)
-   }
-
-   async createGroupCustomJob(
-      job: PublicCustomJob,
-      groupId: string
-   ): Promise<CustomJob> {
-      const ref = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("customJobs")
-         .doc()
-
-      const newJob: CustomJob = {
-         documentType: "groupCustomJob",
-         ...job,
-         createdAt: this.fieldValue.serverTimestamp() as Timestamp,
-         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-         livestreams: [],
-         applicants: [],
-         clicks: 0,
-         id: ref.id,
-      }
-
-      await ref.set(newJob, { merge: true })
-
-      return newJob
-   }
-
-   async updateGroupCustomJob(
-      job: PublicCustomJob,
-      groupId: string
-   ): Promise<void> {
-      const ref = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("customJobs")
-         .doc(job.id)
-
-      const updatedJob: Partial<CustomJob> = {
-         ...job,
-         updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-      }
-
-      await ref.update(updatedJob)
-   }
-
-   async getCustomJobById(jobId: string, groupId: string): Promise<CustomJob> {
-      const ref = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("customJobs")
-         .doc(jobId)
-
-      const snapshot = await ref.get()
-
-      if (snapshot.exists) {
-         return this.addIdToDoc<CustomJob>(snapshot)
-      }
-      return null
-   }
-
-   async applyUserToCustomJob(user: UserData, job: CustomJob): Promise<void> {
-      const ref = this.firestore
-         .collection("customJobStats")
-         .doc(job.id)
-         .collection("customJobApplicants")
-         .doc(user.userEmail)
-
-      const newJobApplicant: CustomJobApplicants = {
-         documentType: "customJobApplicants",
-         jobId: job.id,
-         user,
-         id: ref.id,
-      }
-
-      return await ref.set(newJobApplicant, { merge: true })
-   }
-
-   async incrementCustomJobClicks(jobId: string): Promise<void> {
-      const ref = this.firestore.collection("customJobStats").doc(jobId)
-
-      return ref.update({
-         clicks: this.fieldValue.increment(1),
-      })
-   }
-
-   async deleteGroupCustomJob(groupId: string, jobId: string): Promise<void> {
-      const customJobRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("customJobs")
-         .doc(jobId)
-
-      return customJobRef.delete()
    }
 }
 

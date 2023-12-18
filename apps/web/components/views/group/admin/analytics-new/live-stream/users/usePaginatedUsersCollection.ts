@@ -20,7 +20,7 @@ export type Filters = {
    selectedUniversity: University
    selectedFieldOfStudy: FieldOfStudy
    selectedLevelOfStudy: LevelOfStudy
-   userIds?: string[]
+   jobId?: string
 }
 const usePaginatedUsersCollection = (
    targetCollectionRef: CollectionReference | Query,
@@ -76,8 +76,8 @@ const usePaginatedUsersCollection = (
          )
       }
 
-      if (filters?.userIds) {
-         constraints.push(where(documentPaths.userEmail, "in", filters.userIds))
+      if (filters?.jobId) {
+         constraints.push(where(documentPaths.jobId, "==", filters.jobId))
       }
 
       return {
@@ -98,7 +98,7 @@ const usePaginatedUsersCollection = (
       filters.selectedUniversity,
       filters.selectedFieldOfStudy,
       filters.selectedLevelOfStudy,
-      filters.userIds,
+      filters.jobId,
       targetCollectionRef,
       limit,
       documentPaths.orderBy,
@@ -107,7 +107,7 @@ const usePaginatedUsersCollection = (
       documentPaths.userUniversityCode,
       documentPaths.userFieldOfStudyId,
       documentPaths.userLevelOfStudyId,
-      documentPaths.userEmail,
+      documentPaths.jobId,
    ])
 
    return usePaginatedCollection<unknown>(options)

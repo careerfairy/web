@@ -14,13 +14,13 @@ import { v4 as uuidv4 } from "uuid"
 import {
    JobType,
    PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../../util/constants"
 import { Box } from "@mui/material"
 import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
-import { groupRepo } from "../../../../../../data/RepositoryInstances"
+import { customJobRepo } from "../../../../../../data/RepositoryInstances"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import Loader from "../../../../loader/Loader"
 
@@ -80,10 +80,10 @@ const JobFormDialog = () => {
             }
 
             if (selectedJobId) {
-               await groupRepo.updateGroupCustomJob(formattedJob, group.groupId)
+               await customJobRepo.updateCustomJob(formattedJob)
                successNotification("Job successfully updated")
             } else {
-               await groupRepo.createGroupCustomJob(formattedJob, group.groupId)
+               await customJobRepo.createCustomJob(formattedJob)
                successNotification("Job successfully created")
             }
          } catch (error) {
@@ -92,20 +92,13 @@ const JobFormDialog = () => {
             handleClose()
          }
       },
-      [
-         selectedJobId,
-         group.groupId,
-         successNotification,
-         errorNotification,
-         handleClose,
-      ]
+      [selectedJobId, successNotification, errorNotification, handleClose]
    )
 
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
          <JobFetchWrapper
             jobId={selectedJobId}
-            groupId={group.groupId}
             shouldFetch={Boolean(selectedJobId)}
          >
             {(job) => (

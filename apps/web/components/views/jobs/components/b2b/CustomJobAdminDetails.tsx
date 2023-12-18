@@ -1,4 +1,4 @@
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC } from "react"
 import { Avatar, Box, Button, Stack } from "@mui/material"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"

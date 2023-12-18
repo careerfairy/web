@@ -14,7 +14,7 @@ import {
    Stack,
 } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
