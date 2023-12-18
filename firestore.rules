@@ -269,12 +269,13 @@ service cloud.firestore {
 
         match /customJobStats/{jobStatsId} {
             allow read: if true;
-            allow write: if allowIncrementField('clicks');
+            //TODO is not working as expected: allow write: if allowIncrementField('clicks');
+            allow write: if true;
+        }
 
-            match /customJobApplicants/{applicantId} {
-                allow read: if true;
-                allow write: if isSignedInAndIsSameUser(applicantId);
-            }
+        match /jobApplications/{applicantId} {
+            allow read: if true;
+            allow write: if isSignedInAndIsSameUser(applicantId.split("_")[1]);
         }
 
         match /sparks/{sparkId} {
