@@ -10,14 +10,12 @@ export class CustomJobService {
    async applyToAJob(
       livestreamId: string,
       jobId: string,
-      userId: string,
-      groupId: string
+      userId: string
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable("userApplyToCustomJob")({
          livestreamId,
          userId,
          jobId,
-         groupId,
       })
    }
 }

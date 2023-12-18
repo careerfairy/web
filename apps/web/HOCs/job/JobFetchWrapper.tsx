@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
-import useGroupCustomJob from "../../components/custom-hook/useGroupCustomJob"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useCustomJob from "../../components/custom-hook/useCustomJob"
 
 /**
  * Props for JobFetcher component.
@@ -10,7 +10,6 @@ import useGroupCustomJob from "../../components/custom-hook/useGroupCustomJob"
  * @property {(job: CustomJob | null) => ReactNode} children - A function that returns a ReactNode, given a Job.
  */
 type JobFetcherProps = {
-   groupId: string
    jobId?: string
    children: (job: CustomJob | null) => ReactNode
 }
@@ -20,8 +19,8 @@ type JobFetcherProps = {
  * @param {JobFetcherProps} props - The props for the component.
  * @returns {ReactNode} - The child components.
  */
-const JobFetcher: FC<JobFetcherProps> = ({ groupId, jobId, children }) => {
-   const job = useGroupCustomJob(groupId, jobId)
+const JobFetcher: FC<JobFetcherProps> = ({ jobId, children }) => {
+   const job = useCustomJob(jobId)
    return <>{children(job)}</>
 }
 
@@ -44,16 +43,11 @@ type WrapperProps = {
  */
 const JobFetchWrapper: FC<WrapperProps & JobFetcherProps> = ({
    shouldFetch,
-   groupId,
    jobId,
    children,
 }) => {
    if (shouldFetch) {
-      return (
-         <JobFetcher groupId={groupId} jobId={jobId}>
-            {children}
-         </JobFetcher>
-      )
+      return <JobFetcher jobId={jobId}>{children}</JobFetcher>
    } else {
       return <>{children(null)}</>
    }

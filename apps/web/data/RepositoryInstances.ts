@@ -33,6 +33,10 @@ import {
    FirebaseRewardRepository,
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
+import {
+   FirebaseCustomJobRepository,
+   ICustomJobRepository,
+} from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
 
 const firestoreInstance = firebaseApp.firestore()
 
@@ -72,3 +76,6 @@ export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
    FieldValue,
    Timestamp
 )
+
+export const customJobRepo: ICustomJobRepository =
+   new FirebaseCustomJobRepository(firestoreInstance, FieldValue)

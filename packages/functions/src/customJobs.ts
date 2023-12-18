@@ -4,7 +4,7 @@ import { onCallWrapper } from "./util"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { string } from "yup"
-import { groupRepo, userRepo } from "./api/repositories"
+import { userRepo, customJobRepo } from "./api/repositories"
 
 export const userApplyToCustomJob = functions
    .region(config.region)
@@ -17,11 +17,10 @@ export const userApplyToCustomJob = functions
             livestreamId: string(),
             userId: string().required(),
             jobId: string().required(),
-            groupId: string().required(),
          }),
          userAuthExists(),
          onCallWrapper(async (data) => {
-            const { livestreamId, userId, jobId, groupId } = data
+            const { livestreamId, userId, jobId } = data
             functions.logger.log(
                `Starting custom job ${jobId} apply process for the user ${userId} on the livestream ${livestreamId}`
             )
@@ -30,7 +29,7 @@ export const userApplyToCustomJob = functions
             // If such information exists, it indicates that the user has previously applied to this specific job, and no further action is needed.
             const [jobToApply, userCustomJobApplication, user] =
                await Promise.all([
-                  groupRepo.getCustomJobById(jobId, groupId),
+                  customJobRepo.getCustomJobById(jobId),
                   userRepo.getCustomJobApplication(userId, jobId),
                   userRepo.getUserDataById(userId),
                ])
@@ -42,9 +41,15 @@ export const userApplyToCustomJob = functions
                return null
             }
 
+            // create job application
+            // Add job application details on the user document
             return Promise.allSettled([
                userRepo.applyUserToCustomJob(userId, jobToApply),
-               groupRepo.applyUserToCustomJob(user, jobToApply),
+               customJobRepo.applyUserToCustomJob(
+                  user,
+                  jobToApply,
+                  livestreamId
+               ),
             ])
          })
       )

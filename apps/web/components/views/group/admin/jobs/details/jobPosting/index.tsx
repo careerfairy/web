@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material"
 import CustomJobAdminDetails from "../../../../../jobs/components/b2b/CustomJobAdminDetails"
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FC, useCallback } from "react"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { useDispatch } from "react-redux"
