@@ -143,7 +143,11 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
       )
    }
 
-   return 0 // We should never get here
+   const defaultPlanViewIndex = views.findIndex(
+      (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksTrial
+   )
+
+   return defaultPlanViewIndex
 }
 
 export const usePlanConfirmationDialog = () => {
