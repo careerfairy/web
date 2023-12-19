@@ -24,10 +24,10 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
 
    const { loading, events } = useRecommendedEvents(options)
 
-   const emblaOptionsMemoized = useMemo<EmblaOptionsType>(
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
       () => ({
          axis: "x",
-         loop: true,
+         loop: false,
          align: "center",
          // duration: 15,
          dragThreshold: 0.5,
@@ -69,7 +69,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
             isRecommended
          />
          <EventsPreviewCarousel
-            options={emblaOptionsMemoized}
+            options={eventsCarouselEmblaOptions}
             limit={limit}
             title={!hideTitle && "RECOMMENDED FOR YOU - EMBLA"}
             events={events}
