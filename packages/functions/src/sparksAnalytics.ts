@@ -13,42 +13,9 @@ import {
 } from "./middlewares/cacheMiddleware"
 import { getSparksAnalyticsRepoInstance } from "./api/repositories"
 import {
-   LinearBarWithPastData,
-   MostSomethingBase,
-   MostSomethingWithPastData,
-   PieChartWithPastData,
    TimePeriodParams,
-   TimeseriesDataPoint,
-} from "./lib/sparks/analytics/GroupSparksAnalyticsTypes"
-
-type ReachData = {
-   totalViews: TimeseriesDataPoint[]
-   uniqueViewers: TimeseriesDataPoint[]
-}
-
-type EngagementData = {
-   likes: TimeseriesDataPoint[]
-   shares: TimeseriesDataPoint[]
-   registrations: TimeseriesDataPoint[]
-   pageClicks: TimeseriesDataPoint[]
-}
-
-type MostWatchedData = {
-   watched: MostSomethingWithPastData
-   liked: MostSomethingWithPastData
-   shared: MostSomethingWithPastData
-   recent: MostSomethingBase
-}
-
-type SparksAnalyticsPayload = {
-   reach: ReachData
-   engagement: EngagementData
-   most: MostWatchedData
-   topCountries: LinearBarWithPastData
-   topUniversities: LinearBarWithPastData
-   topFieldsOfStudy: PieChartWithPastData
-   levelsOfStudy: PieChartWithPastData
-}
+   SparksAnalyticsDTO,
+} from "@careerfairy/shared-lib/sparks/groupAnalytics"
 
 // Define cache settings
 const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
@@ -177,7 +144,7 @@ export const getSparksAnalytics = functions.region(config.region).https.onCall(
                ),
             ])
 
-            const SparksAnalyticsPayload: SparksAnalyticsPayload = {
+            const SparksAnalyticsPayload: SparksAnalyticsDTO = {
                reach: {
                   totalViews: totalViews,
                   uniqueViewers: uniqueViewers,
