@@ -11,11 +11,18 @@ import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
-import { PlanConstants, getPlanConstants } from "./planConstants"
+import {
+   PLAN_CONSTANTS,
+   PlanConstants,
+   getPlanConstants,
+} from "./planConstants"
 import { toDate } from "../firebaseTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
+
+const creationDuration =
+   PLAN_CONSTANTS.trial.sparks.TRIAL_CREATION_PERIOD_MILLISECONDS
 
 export const BANNER_IMAGE_SPECS = {
    minWidth: 800,
@@ -381,6 +388,37 @@ export class GroupPresenter {
       return this.plan?.startedAt?.getTime() || 0
    }
 
+   getTrialContentCreationProgress() {
+      const nowTime = Date.now()
+      return Math.floor(
+         ((nowTime - this.getStartedAt()) / creationDuration) * 100
+      )
+   }
+
+   getContentCreationEndTime() {
+      return this.getStartedAt() + creationDuration
+   }
+
+   getRemainderProgress() {
+      const nowTime = Date.now()
+      const contentCreationEndTime = this.getContentCreationEndTime()
+      return Math.floor(
+         ((nowTime - contentCreationEndTime) /
+            (this.getExpiresAt() - contentCreationEndTime)) *
+            100
+      )
+   }
+
+   getContentCreationPeriodEnded() {
+      const nowTime = Date.now()
+      return Boolean(nowTime > this.getContentCreationEndTime())
+   }
+
+   getRemainingDaysLeftForContentCreation() {
+      const nowTime = Date.now()
+      return getDaysLeft(this.getContentCreationEndTime() - nowTime)
+   }
+
    getCompanyLogoUrl() {
       return this.logo ? this.logo.url : this.logoUrl
    }
@@ -399,4 +437,9 @@ const createPlanObject = (plan: GroupPlan | null) => {
       }
    }
    return null
+}
+
+const getDaysLeft = (time: number) => {
+   const daysLeft = Math.ceil(time / (1000 * 60 * 60 * 24))
+   return daysLeft > 0 ? daysLeft : 0
 }

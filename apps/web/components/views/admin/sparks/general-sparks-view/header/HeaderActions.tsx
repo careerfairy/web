@@ -17,6 +17,7 @@ import GetInspiredButton from "../../components/GetInspiredButton"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import SparksCounter from "./SparksCounter"
+import TrialModeNotice from "./TrialModeNotice/TrialModeNotice"
 
 const styles = sxStyles({
    mobileRoot: {
@@ -107,6 +108,7 @@ const HeaderActions = () => {
             <span>
                <ToggleHiddenSparksButton />
             </span>
+            <TrialModeNotice />
          </Stack>
       )
    }
