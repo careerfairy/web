@@ -10,7 +10,7 @@ import React, { memo, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({

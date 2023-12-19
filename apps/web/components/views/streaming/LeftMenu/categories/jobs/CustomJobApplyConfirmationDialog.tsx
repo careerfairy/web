@@ -6,7 +6,7 @@ import {
    DialogContent,
    Typography,
 } from "@mui/material"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../../types/commonTypes"

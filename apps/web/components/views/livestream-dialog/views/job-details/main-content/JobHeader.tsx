@@ -10,7 +10,7 @@ import Skeleton from "@mui/material/Skeleton"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { alpha } from "@mui/material/styles"
 import { MapPin as LocationIcon } from "react-feather"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({

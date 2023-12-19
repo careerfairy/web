@@ -22,7 +22,10 @@ import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { Application } from "../ats/Application"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
-import { CustomJob, pickPublicDataFromCustomJob } from "../groups/customJobs"
+import {
+   CustomJob,
+   pickPublicDataFromCustomJob,
+} from "../customJobs/customJobs"
 import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
