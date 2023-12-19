@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react"
-import useSnackbarNotifications from "./useSnackbarNotifications"
+import useSnackbarNotifications from "../useSnackbarNotifications"
 import useCustomJob from "./useCustomJob"
-import { customJobRepo } from "../../data/RepositoryInstances"
+import { customJobRepo } from "../../../data/RepositoryInstances"
 
 const useCustomJobDelete = (jobId: string) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()

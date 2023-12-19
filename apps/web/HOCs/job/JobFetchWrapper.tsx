@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJob from "../../components/custom-hook/useCustomJob"
+import useCustomJob from "../../components/custom-hook/custom-job/useCustomJob"
 
 /**
  * Props for JobFetcher component.

@@ -9,7 +9,7 @@ import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
 import { Trash2 as DeleteIcon, Radio } from "react-feather"
 import { Box, Stack } from "@mui/material"
-import useCustomJobDelete from "../../../../../custom-hook/useCustomJobDelete"
+import useCustomJobDelete from "../../../../../custom-hook/custom-job/useCustomJobDelete"
 
 const styles = sxStyles({
    wrapContainer: {

@@ -12,7 +12,7 @@ import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
 import { customJobRepo } from "../../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
-import useGroupCustomJobs from "../../../../custom-hook/useGroupCustomJobs"
+import useGroupCustomJobs from "../../../../custom-hook/custom-job/useGroupCustomJobs"
 
 type Props = {
    groupId: string

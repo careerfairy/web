@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from "react"
-import useUserCustomJob from "./useUserCustomJob"
-import { dataLayerEvent } from "../../util/analyticsUtils"
-import useSnackbarNotifications from "./useSnackbarNotifications"
-import { useAuth } from "../../HOCs/AuthProvider"
+import useUserCustomJob from "../useUserCustomJob"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
+import useSnackbarNotifications from "../useSnackbarNotifications"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { customJobServiceInstance } from "../../data/firebase/CustomJobService"
-import { customJobRepo } from "../../data/RepositoryInstances"
+import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
+import { customJobRepo } from "../../../data/RepositoryInstances"
 
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
