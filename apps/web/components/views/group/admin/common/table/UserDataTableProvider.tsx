@@ -21,6 +21,7 @@ import { UserDataEntry } from "./UserLivestreamDataTable"
  * */
 export type DocumentPaths = {
    userEmail: string
+   jobId?: string
    userFieldOfStudyName: string
    userFieldOfStudyId: string
    userLevelOfStudyName: string
@@ -103,6 +104,7 @@ const UserLivestreamDataTableContext =
          orderDirection: "asc",
          userLinkedIn: "",
          userEmail: "",
+         jobId: "",
          userResume: "",
       },
       targetCollectionQuery: null,

@@ -4,13 +4,13 @@ import React, { useCallback, useMemo, useState } from "react"
 import {
    pickPublicDataFromCustomJob,
    PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import FormGroup from "../../FormGroup"
 import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
-import { groupRepo } from "../../../../../data/RepositoryInstances"
+import { customJobRepo } from "../../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import useGroupCustomJobs from "../../../../custom-hook/useGroupCustomJobs"
 
@@ -54,11 +54,8 @@ const CustomJobSection = ({
    const handleCreateNewJob = useCallback(
       async (customJob: PublicCustomJob) => {
          try {
-            // Create a new custom job on Group subCollection
-            const createdJob = await groupRepo.createGroupCustomJob(
-               customJob,
-               groupId
-            )
+            // Create a new custom job on CustomJobs collection
+            const createdJob = await customJobRepo.createCustomJob(customJob)
 
             setFieldValue("customJobs", [
                pickPublicDataFromCustomJob(createdJob),
@@ -71,13 +68,7 @@ const CustomJobSection = ({
             errorNotification("Something went wrong, try again")
          }
       },
-      [
-         errorNotification,
-         groupId,
-         setFieldValue,
-         successNotification,
-         values.customJobs,
-      ]
+      [errorNotification, setFieldValue, successNotification, values.customJobs]
    )
 
    const handleRemoveJob = useCallback(
@@ -99,7 +90,7 @@ const CustomJobSection = ({
             )
 
             // Update custom job on Group subCollection
-            await groupRepo.updateGroupCustomJob(updatedJob, groupId)
+            await customJobRepo.updateCustomJob(updatedJob)
 
             setFieldValue("customJobs", [
                ...values.customJobs.slice(0, updatedJobIndex),
@@ -112,13 +103,7 @@ const CustomJobSection = ({
             errorNotification("Something went wrong, try again")
          }
       },
-      [
-         errorNotification,
-         groupId,
-         setFieldValue,
-         successNotification,
-         values.customJobs,
-      ]
+      [errorNotification, setFieldValue, successNotification, values.customJobs]
    )
 
    return (

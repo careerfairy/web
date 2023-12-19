@@ -15,7 +15,7 @@ import {
    JobType,
    jobTypeOptions,
    PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../util/constants"
 import { datePickerDefaultStyles } from "../../../calendar/utils"

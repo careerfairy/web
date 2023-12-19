@@ -3,13 +3,15 @@ import { Search as FindIcon } from "react-feather"
 import { Box, Card } from "@mui/material"
 import React, { FC, useCallback, useState } from "react"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import { useRouter } from "next/router"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import { getParts } from "../../../../util/search"
 import RenderParts from "../../../common/search/RenderParts"
-import { SortedJobs } from "./JobList"
 
 const styles = sxStyles({
    search: {
@@ -22,7 +24,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   options: SortedJobs[]
+   options: CustomJob[]
 }
 const JobSearch: FC<Props> = ({ options }) => {
    const { push } = useRouter()

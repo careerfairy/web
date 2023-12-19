@@ -60,7 +60,7 @@ import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 const useStyles = makeStyles((theme) =>
    createStyles({

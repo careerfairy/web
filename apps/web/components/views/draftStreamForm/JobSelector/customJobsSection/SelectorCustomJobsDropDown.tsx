@@ -1,4 +1,4 @@
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import MultiListSelect from "../../../common/MultiListSelect"
 import React, { useMemo } from "react"
 import {

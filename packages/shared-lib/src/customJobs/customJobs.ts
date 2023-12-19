@@ -8,7 +8,7 @@ import { UserData } from "../users"
 export interface CustomJob extends Identifiable {
    // job belongs to a group
    groupId: string
-   documentType: "groupCustomJob" // simplify groupCollection Queries
+   documentType: "customJobs" // simplify groupCollection Queries
 
    title: string
    description: string
@@ -17,15 +17,13 @@ export interface CustomJob extends Identifiable {
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
    updatedAt: firebase.firestore.Timestamp
+   clicks?: number // TODO: this field is deprecated, it should be removed after the release
+   applicants?: string[] // TODO: this field is deprecated, it should be removed after the release
 
    // optional fields
    salary?: string
-   // applicants ids
-   applicants?: string[]
    // livestreams ids where this job opening is shown
    livestreams: string[]
-   //increases every time a talent clicks on the jobPostingUrl
-   clicks: number
 }
 
 export type PublicCustomJob = Pick<
@@ -68,16 +66,24 @@ export const pickPublicDataFromCustomJob = (
    }
 }
 
+// collection path /customJobStats
 export interface CustomJobStats extends Identifiable {
-   jobId: string
    documentType: "customJobStats" // simplify groupCollection Queries
-   //increases every time a talent clicks on the jobPostingUrl
+   jobId: string
+   groupId: string
+   // increases every time a talent clicks on the jobPostingUrl
    clicks: number
+   // increases every time an application is created related to this job
+   applicants: number
    job: CustomJob
 }
 
-export interface CustomJobApplicants extends Identifiable {
-   documentType: "customJobApplicants" // simplify groupCollection Queries
+// collection path /jobApplications
+export interface CustomJobApplicant extends Identifiable {
+   documentType: "customJobApplicant" // simplify groupCollection Queries
    jobId: string
    user: UserData
+   groupId: string // Makes it easier to query for all applicants in a group
+   appliedAt: firebase.firestore.Timestamp
+   livestreamId: string // The associated livestream where the user applied to the job
 }
