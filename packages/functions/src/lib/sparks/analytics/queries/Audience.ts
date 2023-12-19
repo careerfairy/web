@@ -1,8 +1,8 @@
 export function top10Countries(timePeriod: string) {
    return `
     SELECT
-      ifNull(universityCountry, countryCode) as Country,
-      COUNT(distinct(userId)) AS total_talent
+      ifNull(universityCountry, countryCode) AS label,
+      COUNT(distinct(userId)) AS value
     FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
@@ -16,8 +16,8 @@ export function top10Countries(timePeriod: string) {
 export function top10Universities(timePeriod: string) {
    return `
     SELECT
-      universityName as university,
-      COUNT(distinct(userId)) AS total_talent
+      universityName AS lable,
+      COUNT(distinct(userId)) AS value
     FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
@@ -31,8 +31,8 @@ export function top10Universities(timePeriod: string) {
 export function top10FieldsOfStudy(timePeriod: string) {
    return `
     SELECT
-      fieldOfStudy as field_of_study,
-      COUNT(distinct(userId)) AS total_talent
+      fieldOfStudy AS label,
+      COUNT(distinct(userId)) AS value
     FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
@@ -45,8 +45,8 @@ export function top10FieldsOfStudy(timePeriod: string) {
 export function topLevelsOfStudy(timePeriod: string) {
    return `
     SELECT
-      levelOfStudy as level_of_study,
-      COUNT(distinct(userId)) AS total_talent
+      levelOfStudy AS label,
+      COUNT(distinct(userId)) AS value
     FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
