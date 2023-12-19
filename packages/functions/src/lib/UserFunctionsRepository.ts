@@ -7,6 +7,7 @@ import {
 import { DateTime } from "luxon"
 import {
    CustomJob,
+   CustomJobApplicant,
    pickPublicDataFromCustomJob,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -16,6 +17,12 @@ export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
    syncCustomJobDataToUser(customJob: CustomJob): Promise<void>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
+
+   /**
+    * This method adds a deleted flag to the customJobStats document
+    * @param deletedCustomJob
+    */
+   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
 }
 
 export class UserFunctionsRepository
@@ -41,11 +48,12 @@ export class UserFunctionsRepository
          pickPublicDataFromCustomJob(customJob)
 
       const applicantsSnapshot = await this.firestore
-         .collectionGroup("customJobApplicants")
-         .where("id", "==", customJob.id)
+         .collection("jobApplications")
+         .where("jobId", "==", customJob.id)
          .get()
 
-      const applicants = applicantsSnapshot.docs || []
+      const applicants =
+         mapFirestoreDocuments<CustomJobApplicant>(applicantsSnapshot)
 
       functions.logger.log(
          `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applicants.length} applicants.`
@@ -70,5 +78,18 @@ export class UserFunctionsRepository
          .get()
 
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
+   }
+
+   async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
+      const newCustomJOb = {
+         ...deletedCustomJob,
+         delete: true,
+      }
+
+      functions.logger.log(
+         `Delete user CustomJobApplicants with the job ${deletedCustomJob.id}.`
+      )
+
+      return this.syncCustomJobDataToUser(newCustomJOb)
    }
 }
