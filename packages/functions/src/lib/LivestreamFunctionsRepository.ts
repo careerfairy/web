@@ -125,11 +125,18 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<GroupAdminNewEventEmailInfo[]>
 
    /**
-    * Sync custom jobs data to the livestream
+    * Sync custom jobs data to the livestreams and drafts
     *
     * @param customJob
     */
    syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void>
+
+   /**
+    * Delete and sync custom jobs data to the linked livestreams and drafts
+    *
+    * @param deletedCustomJob
+    */
+   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -527,5 +534,75 @@ export class LivestreamFunctionsRepository
       )
 
       return void batch.commit()
+   }
+
+   async deleteAndSyncCustomJob(customJob: CustomJob): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const linkedLivestreams = customJob.livestreams
+      const deletedCustomJob: PublicCustomJob =
+         pickPublicDataFromCustomJob(customJob)
+
+      functions.logger.log(
+         `Deleting custom job ${deletedCustomJob.id} on all the linked live streams and drafts.`
+      )
+
+      // Fetch all linked livestreams and drafts
+      const [livestreamsSnaps, draftSnaps] = await Promise.all([
+         this.firestore
+            .collection("livestreams")
+            .where("id", "in", linkedLivestreams || [])
+            .get(),
+         this.firestore
+            .collection("draftLivestreams")
+            .where("groupIds", "array-contains", deletedCustomJob.groupId)
+            .get(),
+      ])
+
+      // To combine livestreams and drafts into the same Firestore batch operation
+      const snapShots = [livestreamsSnaps, draftSnaps]
+
+      snapShots.forEach((snap) =>
+         snap.forEach((doc) => {
+            const livestream = doc.data() as LivestreamEvent
+
+            if (livestream.customJobs?.length) {
+               // for the past livestreams we want to only add the deleted flag on the custom job
+               if (livestream.hasEnded) {
+                  const customJobToUpdateIndex =
+                     livestream.customJobs.findIndex(
+                        (currentJob) => currentJob.id === deletedCustomJob.id
+                     )
+
+                  batch.update(doc.ref, {
+                     customJobs: [
+                        ...livestream.customJobs.slice(
+                           0,
+                           customJobToUpdateIndex
+                        ),
+                        {
+                           ...deletedCustomJob,
+                           deleted: true,
+                        },
+                        ...livestream.customJobs.slice(
+                           customJobToUpdateIndex + 1
+                        ),
+                     ],
+                  })
+               }
+
+               // for the upcoming livestreams and drafts, we want to remove the deleted customJob from the list
+               else {
+                  const filteredCustomJobs = livestream.customJobs.filter(
+                     (currentJob) => currentJob.id != deletedCustomJob.id
+                  )
+
+                  batch.update(doc.ref, {
+                     customJobs: filteredCustomJobs,
+                  })
+               }
+            }
+         })
+      )
    }
 }
