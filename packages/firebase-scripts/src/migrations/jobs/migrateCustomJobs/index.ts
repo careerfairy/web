@@ -2,7 +2,7 @@ import {
    CustomJob,
    CustomJobApplicant,
    CustomJobStats,
-} from "@careerfairy/shared-lib/src/groups/customJobs"
+} from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, userRepo } from "../../../repositories"
 import { BulkWriter } from "firebase-admin/firestore"
@@ -21,6 +21,7 @@ const jobProgressBar = new cliProgress.SingleBar(
  * The data is based on the provided customJob object
  * @param customJob - The custom job to be created
  * @param bulkWriter - The Firestore BulkWriter to use for batch operations
+ * @param counter
  * @returns The newly created custom job
  */
 function createCustomJobInCollection(
@@ -51,6 +52,7 @@ function createCustomJobInCollection(
  * @param customJob - The custom job to be created
  * @param newCustomJob - The newly created custom job
  * @param bulkWriter - The Firestore BulkWriter to use for batch operations
+ * @param counter
  */
 function createCustomJobStatsInCollection(
    customJob: CustomJob,
@@ -64,6 +66,8 @@ function createCustomJobStatsInCollection(
       clicks: customJob.clicks ?? 0,
       job: newCustomJob,
       id: customJob.id,
+      groupId: customJob.groupId,
+      applicants: customJob.applicants?.length ?? 0,
    }
 
    const customJobStatsRef = firestore
@@ -81,6 +85,7 @@ function createCustomJobStatsInCollection(
  * The ID of the document is a combination of the customJob ID and the applicant's email address eg. "customJobId_applicantEmail"
  * @param customJob - The custom job to be created
  * @param bulkWriter - The Firestore BulkWriter to use for batch operations
+ * @param counter
  */
 async function createCustomJobApplicantsInCollection(
    customJob: CustomJob,

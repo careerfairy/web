@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import { CustomJobApplicants } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import JobApplicantsList from "./JobApplicantsList"
 import usePaginatedUsersCollection, {
@@ -140,7 +140,7 @@ const documentPaths: Partial<DocumentPaths> = {
    orderDirection: "desc",
 }
 
-const converterFn = (doc: Partial<CustomJobApplicants>): UserDataEntry => ({
+const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
    email: doc.user.userEmail,
    firstName: doc.user.firstName || "",
    lastName: doc.user.lastName || "",

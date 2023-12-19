@@ -17,6 +17,8 @@ export interface CustomJob extends Identifiable {
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
    updatedAt: firebase.firestore.Timestamp
+   clicks?: number // TODO: this field is deprecated, it should be removed after the release
+   applicants?: string[] // TODO: this field is deprecated, it should be removed after the release
 
    // optional fields
    salary?: string
