@@ -12,7 +12,7 @@ import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { StyledPagination } from "../../../common/CardCustom"
-import useCustomJobStats from "../../../../../../custom-hook/useCustomJobStats"
+import useCustomJobStats from "../../../../../../custom-hook/custom-job/useCustomJobStats"
 
 const styles = sxStyles({
    statsSection: {

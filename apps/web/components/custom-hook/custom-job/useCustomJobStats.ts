@@ -1,5 +1,5 @@
 import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useFirestoreDocument } from "./utils/useFirestoreDocument"
+import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
 /**
  * Fetch a single Custom Job Stats

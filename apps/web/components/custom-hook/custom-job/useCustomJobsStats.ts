@@ -1,6 +1,6 @@
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
-import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 /**
