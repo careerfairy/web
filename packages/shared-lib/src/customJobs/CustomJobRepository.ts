@@ -1,5 +1,5 @@
 import { UserData } from "../users"
-import { CustomJob, CustomJobApplicants, PublicCustomJob } from "./customJobs"
+import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat"
 import { Timestamp } from "../firebaseTypes"
@@ -127,7 +127,7 @@ export class FirebaseCustomJobRepository
          .collection("customJobStats")
          .doc(jobStatsId)
 
-      const newJobApplicant: CustomJobApplicants = {
+      const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
          jobId: job.id,
          user,
