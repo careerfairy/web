@@ -1,7 +1,7 @@
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 /**
  * Fetch Custom Jobs based on groupId
