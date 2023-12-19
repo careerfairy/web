@@ -72,7 +72,6 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
    return Boolean(sparksContent.length) ? (
       <Box sx={{ pl: 2 }}>
          <Stack spacing={1.25}>
-            <h1>WG</h1>
             <Box sx={styles.stack}>
                {header}
                {withControls ? (
