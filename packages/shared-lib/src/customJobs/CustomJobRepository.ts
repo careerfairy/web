@@ -6,28 +6,40 @@ import { Timestamp } from "../firebaseTypes"
 
 export interface ICustomJobRepository {
    /**
-    * To create a custom job as sub collection of the group document
+    * To create a custom job on the CustomJob root collection
     * @param job
     */
    createCustomJob(job: PublicCustomJob): Promise<CustomJob>
 
    /**
-    * To update an existing custom job on the sub collection of the group document
+    * To update an existing custom job on the CustomJob root collection
     * @param job
     */
    updateCustomJob(job: PublicCustomJob): Promise<void>
 
    /**
-    * To delete a custom job on the sub collection of the group document
+    * To delete a custom job on the CustomJob root collection
     * @param jobId
     */
    deleteCustomJob(jobId: string): Promise<void>
 
    /**
-    * To get a custom job by id on the sub collection of the group document
+    * To get a custom job by id from the CustomJob root collection
     * @param jobId
     */
    getCustomJobById(jobId: string): Promise<CustomJob>
+
+   // /**
+   //  * To get a custom job stats by id from the CustomJobStats root collection
+   //  * @param jobId
+   //  */
+   // getCustomJobStatsById(jobId: string): Promise<CustomJobStats>
+   //
+   // /**
+   //  * To get all custom job applications from the JobApplications root collection
+   //  * @param jobId
+   //  */
+   // getCustomJobApplications(jobId: string): Promise<CustomJobApplicant[]>
 
    /**
     * To create or update an existing jobApplication with a new applicant
@@ -109,6 +121,25 @@ export class FirebaseCustomJobRepository
       }
       return null
    }
+   //
+   // async getCustomJobStatsById(jobId: string): Promise<CustomJobStats> {
+   //    const jobStatsSnaps = await this.firestore
+   //        .collection("customJobStats")
+   //        .where("jobId", "==", jobId)
+   //        .limit(1)
+   //        .get()
+   //
+   //    return mapFirestoreDocuments<CustomJobStats>(jobStatsSnaps)?.[0]
+   // }
+   //
+   // async getCustomJobApplications(jobId: string): Promise<CustomJobApplicant[]> {
+   //    const jobApplicationsSnaps = await this.firestore
+   //        .collection("jobApplications")
+   //        .where("jobId", "==", jobId)
+   //        .get()
+   //
+   //    return mapFirestoreDocuments<CustomJobApplicant>(jobApplicationsSnaps)
+   // }
 
    async applyUserToCustomJob(
       user: UserData,
@@ -129,12 +160,12 @@ export class FirebaseCustomJobRepository
 
       const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
-         jobId: job.id,
-         user,
          id: applicationId,
-         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         jobId: job.id,
          groupId: job.groupId,
          livestreamId: livestreamId,
+         appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         user,
       }
 
       batch.set(jobApplicationRef, newJobApplicant, { merge: true })

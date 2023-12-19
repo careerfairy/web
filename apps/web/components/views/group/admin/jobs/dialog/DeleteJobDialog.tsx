@@ -1,18 +1,15 @@
 import SteppedDialog, {
    useStepper,
 } from "../../../../stepped-dialog/SteppedDialog"
-import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../store/selectors/adminJobsSelectors"
-import React, { useCallback, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Loader from "../../../../loader/Loader"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { Trash2 as DeleteIcon, Radio } from "react-feather"
 import { Box, Stack } from "@mui/material"
+import useCustomJobDelete from "../../../../../custom-hook/useCustomJobDelete"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -62,28 +59,15 @@ const styles = sxStyles({
 
 const DeleteJobDialog = () => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
-   const { group } = useGroupFromState()
    const { handleClose } = useStepper()
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-   const [isSubmitting, setIsSubmitting] = useState(false)
+   const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
 
-   const handleDeleteJob = useCallback(async () => {
-      setIsSubmitting(true)
-      try {
-         await groupRepo.deleteGroupCustomJob(selectedJobId, group.groupId)
-         successNotification("Job opening was deleted")
-      } catch (e) {
-         errorNotification(e)
-      } finally {
-         setIsSubmitting(false)
-      }
-   }, [errorNotification, group.groupId, selectedJobId, successNotification])
-
+   // TODO here check if the job as any livestream linked to it
+   //  and decide which layout to show
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
          <JobFetchWrapper
             jobId={selectedJobId}
-            groupId={group.groupId}
             shouldFetch={Boolean(selectedJobId)}
          >
             {(job) => (
@@ -123,10 +107,10 @@ const DeleteJobDialog = () => {
                            <SteppedDialog.Button
                               variant="contained"
                               color={"error"}
-                              disabled={isSubmitting}
+                              disabled={isDeleting}
                               type="submit"
-                              onClick={handleDeleteJob}
-                              loading={isSubmitting}
+                              onClick={handleDelete}
+                              loading={isDeleting}
                               sx={styles.actionBtn}
                            >
                               Yes, I&apos;m sure

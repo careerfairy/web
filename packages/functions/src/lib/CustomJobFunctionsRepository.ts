@@ -10,6 +10,7 @@ import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { DocumentSnapshot } from "firebase-admin/firestore"
+import { Timestamp } from "../api/firestoreAdmin"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    /**
@@ -30,6 +31,12 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncLivestreamIdWithCustomJobs(
       livestream: Change<DocumentSnapshot>
    ): Promise<void>
+
+   /**
+    * This method adds a deleted flag to the customJobStats document
+    * @param deletedCustomJob
+    */
+   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -129,5 +136,24 @@ export class CustomJobFunctionsRepository
       })
 
       return await batch.commit()
+   }
+
+   async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
+      functions.logger.log(
+         `Add deleted flag to the CustomJobStats with job ${deletedCustomJob.id}.`
+      )
+
+      const jobStatsId = `${deletedCustomJob.groupId}_${deletedCustomJob.id}`
+
+      const ref = this.firestore.collection("customJobStats").doc(jobStatsId)
+
+      return ref.update({
+         deleted: true,
+         deletedAt: Timestamp.now(),
+         jod: {
+            ...deletedCustomJob,
+            deleted: true,
+         },
+      })
    }
 }

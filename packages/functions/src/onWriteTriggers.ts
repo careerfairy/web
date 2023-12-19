@@ -332,7 +332,13 @@ export const onWriteCustomJobs = functions
       }
 
       if (changeTypes.isDelete) {
-         // TODO-GS: when deleting a custom job
+         const deletedCustomJob = change.before.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.deleteAndSyncCustomJob(deletedCustomJob),
+            livestreamsRepo.deleteAndSyncCustomJob(deletedCustomJob),
+            userRepo.deleteAndSyncCustomJob(deletedCustomJob)
+         )
       }
 
       return handleSideEffects(sideEffectPromises)

@@ -24,6 +24,7 @@ export interface CustomJob extends Identifiable {
    salary?: string
    // livestreams ids where this job opening is shown
    livestreams: string[]
+   deleted?: boolean
 }
 
 export type PublicCustomJob = Pick<
@@ -36,6 +37,7 @@ export type PublicCustomJob = Pick<
    | "postingUrl"
    | "deadline"
    | "salary"
+   | "deleted"
 >
 
 export type JobType =
@@ -63,6 +65,7 @@ export const pickPublicDataFromCustomJob = (
       postingUrl: job.postingUrl ?? null,
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
+      deleted: job.deleted ?? null,
    }
 }
 
@@ -76,6 +79,8 @@ export interface CustomJobStats extends Identifiable {
    // increases every time an application is created related to this job
    applicants: number
    job: CustomJob
+   deleted?: boolean
+   deletedAt?: firebase.firestore.Timestamp
 }
 
 // collection path /jobApplications
