@@ -89,7 +89,9 @@ test.describe("Access a recording when the user registered to the livestream", (
    test("Access the recording when signed out - inside access window", async ({
       page,
    }) => {
-      // reset data manually because we are not using the signedInFixture user that automatically resets data
+      // reset data manually because we are not using
+      // the signedInFixture user that automatically resets data
+      // like the other tests in this file
       await resetData()
 
       const user = await UserSeed.createUser(credentials.unregisteredEmail)
