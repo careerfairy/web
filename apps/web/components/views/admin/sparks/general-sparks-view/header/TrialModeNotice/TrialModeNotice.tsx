@@ -52,9 +52,8 @@ function TrialModeNotice() {
             <TrialStatusToolTip disabled={isMobile}>
                <Badge
                   sx={styles.badge}
-                  badgeContent={
-                     groupPresenter.trialPlanInCriticalState() ? "!" : ""
-                  }
+                  badgeContent={"!"}
+                  invisible={!groupPresenter.trialPlanInCriticalState()}
                >
                   <Stack spacing={1} direction="row" sx={styles.root}>
                      <Clock size={20} />
