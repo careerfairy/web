@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react"
-import EventsPreview, { EventsTypes } from "./EventsPreview"
+import { EventsTypes } from "./EventsPreviewCarousel"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
@@ -8,11 +8,6 @@ import { EmblaOptionsType } from "embla-carousel-react"
 
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    const { authenticatedUser } = useAuth()
-   const emblaOptions: EmblaOptionsType = {
-      slidesToScroll: "auto",
-      containScroll: "trimSnaps",
-      axis: "y",
-   }
 
    const childRef = useRef<ChildRefType | null>(null)
    const options = useMemo(
@@ -29,27 +24,9 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
          axis: "x",
          loop: false,
          align: "center",
-         // duration: 15,
          dragThreshold: 0.5,
-         // asdsa: "dsfs",
-         // dragFree: false,
          dragFree: false,
          inViewThreshold: 0,
-         /**
-          * Custom function to watch for changes to the slides.
-          * Reloads the Embla Carousel whenever the slides (sparks) are updated,
-          * to prevent flickering.
-          */
-         watchSlides: (emblaApi) => {
-            const reloadEmbla = (): void => {
-               const oldEngine = emblaApi.internalEngine()
-               emblaApi.reInit()
-
-               console.log("Re-Init Embla in Watch")
-            }
-
-            reloadEmbla()
-         },
       }),
       [events]
    )
@@ -60,14 +37,6 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    // Switch to emblaApi
    return (
       <div>
-         <EventsPreview
-            limit={limit}
-            title={!hideTitle && "RECOMMENDED FOR YOU"}
-            events={events}
-            type={EventsTypes.recommended}
-            loading={loading}
-            isRecommended
-         />
          <EventsPreviewCarousel
             options={eventsCarouselEmblaOptions}
             limit={limit}
