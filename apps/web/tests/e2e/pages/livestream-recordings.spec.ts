@@ -8,6 +8,10 @@ import { setupLivestreamData } from "../setupData"
 import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
+import {
+   clearAuthData,
+   clearFirestoreData,
+} from "@careerfairy/seed-data/emulators"
 
 // outside access window =(means) livestream is older than the max days to show recording
 
@@ -85,6 +89,9 @@ test.describe("Access a recording when the user registered to the livestream", (
    test("Access the recording when signed out - inside access window", async ({
       page,
    }) => {
+      // reset data manually because we are not using the signedInFixture user that automatically resets data
+      await resetData()
+
       const user = await UserSeed.createUser(credentials.unregisteredEmail)
 
       const { livestream } = await setupData({
@@ -105,7 +112,9 @@ test.describe("Access a recording when the user registered to the livestream", (
       // ensure we are on the login page, before filling out the form
       // or else it will start filling out the form on the sign up page
       // causing the test to fail
-      await page.waitForURL((url) => url.pathname === "/login")
+      await page.waitForURL((url) => url.pathname === "/login", {
+         waitUntil: "load", // wait for page to load before filling out form
+      })
 
       await LoginPage.login(page, {
          openPage: false,
@@ -185,4 +194,9 @@ async function setupData(opts: SetupDataOptions) {
    ])
 
    return { livestream }
+}
+
+async function resetData() {
+   await clearAuthData()
+   await clearFirestoreData()
 }
