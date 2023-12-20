@@ -28,8 +28,8 @@ import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 
 const slideSpacing = 21
-const desktopSlideWidth = 306 + slideSpacing
-const mobileSlideWidth = 280 + slideSpacing
+const desktopSlideWidth = 322 + slideSpacing
+const mobileSlideWidth = 321 + slideSpacing
 
 const styles = sxStyles({
    eventsHeader: {
@@ -51,7 +51,8 @@ const styles = sxStyles({
       backfaceVisibility: "hidden",
       display: "flex",
       touchAction: "pan-y",
-      marginLeft: `calc(${slideSpacing}px * -1)`,
+      // marginLeft: `calc(${slideSpacing}px *-1)`,
+      // marginLeft: `${slideSpacing}`,
    },
    slide: {
       flex: {
@@ -59,43 +60,18 @@ const styles = sxStyles({
          md: `0 0 ${desktopSlideWidth}px`,
       },
       minWidth: 0,
-      paddingLeft: `${slideSpacing}px`,
       position: "relative",
       height: {
          xs: 405,
          md: 443,
       },
+      paddingLeft: `calc(${slideSpacing}px - 5px)`,
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
    },
-})
-
-const stylesTest = sxStyles({
-   viewport: {
-      overflow: "hidden",
-   },
-   container: {
-      backfaceVisibility: "hidden",
-      display: "flex",
-      touchAction: "pan-y",
-      marginLeft: `calc(${slideSpacing}px * -1)`,
-   },
-   slide: {
-      flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
-      },
-      minWidth: 0,
-      paddingLeft: `${slideSpacing}px`,
+   previewContent: {
       position: "relative",
-      height: {
-         xs: 405,
-         md: 443,
-      },
-   },
-   paddingSlide: {
-      flex: `0 0 ${slideSpacing}px`,
    },
 })
 
@@ -117,7 +93,6 @@ export interface EventsProps {
    isRecommended?: boolean
    isEmbedded?: boolean
    options?: EmblaOptionsType
-   // onItemClick?: (spark: LivestreamEvent) => void
    children?: ReactNode[]
    isAdmin?: boolean
 }
@@ -173,7 +148,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          MARKETING_LANDING_PAGE_PATH
       )
 
-      // Lazy loading not working for now
       const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
          setCardsLoaded((prev) => ({
             ...prev,
@@ -191,8 +165,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             const inView = emblaApi
                .slidesInView()
                .filter((index) => !slidesInView.includes(index))
-
-            inView.forEach((vIndex) => console.log("InView: " + vIndex))
 
             handleCardsLoaded(inView)
 
@@ -265,10 +237,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         <Box sx={styles.container}>
                            {events?.length
                               ? events.map((event, index, arr) => (
-                                   <Box key={event.id} sx={styles.slide}>
+                                   <Box sx={styles.slide}>
                                       <EventPreviewCard
                                          key={index}
                                          loading={
+                                            loading &&
                                             !cardsLoaded[index] &&
                                             !cardsLoaded[
                                                arr.length - (index + 1)
