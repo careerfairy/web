@@ -80,10 +80,11 @@ test.describe("Group Analytics", () => {
             livestream
          )
 
-         await completeRegistration(livestreamDialogPage, true, true)
-
-         // Reload the page to make the live stream analytics fetch(swr) the newly created live stream
-         await groupPage.page.reload()
+         await Promise.all([
+            completeRegistration(livestreamDialogPage, true, true),
+            // Reload the page to make the live stream analytics fetch(swr) the newly created live stream
+            groupPage.page.reload(),
+         ])
 
          await verifyAnalyticsCard(groupPage, "Registrations", "1", true)
 
