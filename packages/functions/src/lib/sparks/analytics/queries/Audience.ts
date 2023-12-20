@@ -7,8 +7,8 @@ export function top10Countries(timePeriod: string) {
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       AND ifNull(universityCountry, countryCode) is not null
-    GROUP BY Country
-    ORDER BY total_talent DESC
+    GROUP BY label
+    ORDER BY value DESC
     LIMIT 10
   `
 }
@@ -16,14 +16,14 @@ export function top10Countries(timePeriod: string) {
 export function top10Universities(timePeriod: string) {
    return `
     SELECT
-      universityName AS lable,
+      universityName AS label,
       COUNT(distinct(userId)) AS value
     FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       AND universityName is not null
-    GROUP BY universityName
-    ORDER BY total_talent DESC
+    GROUP BY label
+    ORDER BY value DESC
     LIMIT 10
   `
 }
@@ -37,8 +37,8 @@ export function top10FieldsOfStudy(timePeriod: string) {
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       AND fieldOfStudy is not null
-    GROUP BY field_of_study
-    ORDER BY total_talent DESC
+    GROUP BY label
+    ORDER BY value DESC
     LIMIT 10
   `
 }
@@ -51,7 +51,7 @@ export function topLevelsOfStudy(timePeriod: string) {
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       AND levelOfStudy is not null
-    GROUP BY level_of_study
-    ORDER BY total_talent
+    GROUP BY label
+    ORDER BY value
   `
 }
