@@ -9,7 +9,6 @@ import { EmblaOptionsType } from "embla-carousel-react"
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    const { authenticatedUser } = useAuth()
 
-   const childRef = useRef<ChildRefType | null>(null)
    const options = useMemo(
       () => ({
          limit,
@@ -34,20 +33,19 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    if (!authenticatedUser?.email || !events?.length) {
       return null
    }
-   // Switch to emblaApi
    return (
       <div>
          <EventsPreviewCarousel
             options={eventsCarouselEmblaOptions}
             limit={limit}
-            title={!hideTitle && "RECOMMENDED FOR YOU - EMBLA"}
+            title={!hideTitle && "RECOMMENDED FOR YOU"}
             events={events}
             type={EventsTypes.recommended}
             loading={loading}
             isRecommended
             isAdmin={true}
             hidePreview={false}
-            ref={childRef}
+            seeMoreLink="/next-livestreams"
          />
       </div>
    )

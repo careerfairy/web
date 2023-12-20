@@ -23,9 +23,9 @@ import RegistrationModal from "components/views/common/registration-modal"
 import { Typography, Stack, useMediaQuery, useTheme } from "@mui/material"
 import ShareLivestreamModal from "components/views/common/ShareLivestreamModal"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
-import { Link } from "react-feather"
 import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
+import Link from "next/link"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
@@ -195,7 +195,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               }}
                               variant={"h2"}
                            >
-                              {title} - EMBLA
+                              {title}
                            </Heading>
                         ) : (
                            <Heading>{title}</Heading>
