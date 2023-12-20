@@ -11,11 +11,20 @@ import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
 import { ImageType } from "../commonTypes"
-import { PlanConstants, getPlanConstants } from "./planConstants"
+import {
+   PLAN_CONSTANTS,
+   PlanConstants,
+   getPlanConstants,
+} from "./planConstants"
 import { toDate } from "../firebaseTypes"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
+const DAYS_LEFT_TO_WARN_CONTENT_CREATION = 3
+const DAYS_LEFT_TO_WARN_TRIAL = 14
+
+const creationDuration =
+   PLAN_CONSTANTS.trial.sparks.TRIAL_CREATION_PERIOD_MILLISECONDS
 
 export const BANNER_IMAGE_SPECS = {
    minWidth: 800,
@@ -312,7 +321,7 @@ export class GroupPresenter {
     * To get the number of days left for this specific group's plan
     */
    getPlanDaysLeft() {
-      return Math.ceil(this.getPlanTimeLeft() / (1000 * 60 * 60 * 24))
+      return getDaysLeft(this.getPlanTimeLeft())
    }
 
    /**
@@ -338,31 +347,6 @@ export class GroupPresenter {
    }
 
    /**
-    * To get the number of days left in the trial plan creation period
-    * @returns the number of days left in the trial plan creation period, 0 if the trial plan creation period has ended, null if not on trial plan
-    */
-   getTrialPlanCreationPeriodLeft() {
-      if (this.isTrialPlan()) {
-         const currentTime = new Date().getTime()
-         const trialPlanCreationPeriodEnd =
-            this.getStartedAt() +
-            this.planConstants.sparks.TRIAL_CREATION_PERIOD_MILLISECONDS
-
-         if (currentTime > trialPlanCreationPeriodEnd) {
-            // If the current time is past the end of the trial plan creation period, return 0
-            return 0
-         } else {
-            // Calculate the time left in milliseconds
-            const timeLeftInMilliseconds =
-               trialPlanCreationPeriodEnd - currentTime
-            return timeLeftInMilliseconds
-         }
-      }
-
-      return null // Return null if not on trial plan
-   }
-
-   /**
     * To check if the plan for this specific group has started
     * The check is done by comparing the current time with the plan's start time
     *
@@ -379,6 +363,92 @@ export class GroupPresenter {
 
    getStartedAt() {
       return this.plan?.startedAt?.getTime() || 0
+   }
+
+   getTrialContentCreationProgress() {
+      const nowTime = Date.now()
+      return Math.floor(
+         ((nowTime - this.getStartedAt()) / creationDuration) * 100
+      )
+   }
+
+   getContentCreationEndTime() {
+      return this.getStartedAt() + creationDuration
+   }
+
+   getProgressAfterContentCreation() {
+      const nowTime = Date.now()
+      const contentCreationEndTime = this.getContentCreationEndTime()
+      const expiresAt = this.getExpiresAt()
+
+      // If the content creation end time is equal to or later than the expiration time,
+      // return 0 to indicate that no time remains for the remainder period.
+      // This scenario should not normally occur and could indicate a logical error.
+      if (contentCreationEndTime >= expiresAt) {
+         return 0
+      }
+
+      const remainder = Math.floor(
+         ((nowTime - contentCreationEndTime) /
+            (expiresAt - contentCreationEndTime)) *
+            100
+      )
+
+      return remainder < 0 ? 0 : remainder
+   }
+
+   getIsInContentCreationPeriod() {
+      const nowTime = Date.now()
+      const contentCreationEndTime = this.getContentCreationEndTime()
+      const expiresAt = this.getExpiresAt()
+
+      return nowTime < contentCreationEndTime && nowTime < expiresAt
+   }
+
+   getRemainingDaysLeftForContentCreation() {
+      if (this.hasPlanExpired()) {
+         return 0
+      }
+
+      const nowTime = Date.now()
+      const contentCreationEndTime = this.getContentCreationEndTime()
+      const expiresAt = this.getExpiresAt()
+
+      // If the content creation end time is later than the expiration time,
+      // use the expiration time as the end of the content creation period.
+      const effectiveEndTime = Math.min(contentCreationEndTime, expiresAt)
+
+      const remainingTime = effectiveEndTime - nowTime
+      return getDaysLeft(remainingTime)
+   }
+
+   getContentCreationAboutToExpire() {
+      const daysLeft = this.getRemainingDaysLeftForContentCreation()
+
+      if (daysLeft === 0) {
+         return false // Don't show warning on the last day
+      }
+
+      return daysLeft <= DAYS_LEFT_TO_WARN_CONTENT_CREATION
+   }
+
+   getTrialAboutToExpire() {
+      const daysLeft = this.getPlanDaysLeft()
+
+      if (daysLeft === 0) {
+         return false // Don't show warning on the last day
+      }
+
+      return daysLeft <= DAYS_LEFT_TO_WARN_TRIAL
+   }
+
+   trialPlanInCriticalState() {
+      return (
+         this.isTrialPlan() &&
+         (this.getTrialAboutToExpire() ||
+            this.getContentCreationAboutToExpire() ||
+            (!this.getIsInContentCreationPeriod() && !this.publicSparks))
+      )
    }
 
    getCompanyLogoUrl() {
@@ -399,4 +469,9 @@ const createPlanObject = (plan: GroupPlan | null) => {
       }
    }
    return null
+}
+
+const getDaysLeft = (time: number) => {
+   const daysLeft = Math.ceil(time / (1000 * 60 * 60 * 24))
+   return daysLeft > 0 ? daysLeft : 0
 }
