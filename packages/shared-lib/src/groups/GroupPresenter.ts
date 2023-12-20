@@ -319,6 +319,11 @@ export class GroupPresenter {
     * To get the number of days left for this specific group's plan
     */
    getPlanDaysLeft() {
+      const expiryTime = this.plan.expiresAt
+      console.log(
+         "🚀 ~ file: GroupPresenter.ts:323 ~ GroupPresenter ~ getPlanDaysLeft ~ expiryTime:",
+         expiryTime
+      )
       return Math.ceil(this.getPlanTimeLeft() / (1000 * 60 * 60 * 24))
    }
 
@@ -402,11 +407,22 @@ export class GroupPresenter {
    getRemainderProgress() {
       const nowTime = Date.now()
       const contentCreationEndTime = this.getContentCreationEndTime()
-      return Math.floor(
+      const expiresAt = this.getExpiresAt()
+
+      // If the content creation end time is equal to or later than the expiration time,
+      // return 0 to indicate that no time remains for the remainder period.
+      // This scenario should not normally occur and could indicate a logical error.
+      if (contentCreationEndTime >= expiresAt) {
+         return 0
+      }
+
+      const remainder = Math.floor(
          ((nowTime - contentCreationEndTime) /
-            (this.getExpiresAt() - contentCreationEndTime)) *
+            (expiresAt - contentCreationEndTime)) *
             100
       )
+
+      return remainder < 0 ? 0 : remainder
    }
 
    getContentCreationPeriodEnded() {
@@ -416,7 +432,15 @@ export class GroupPresenter {
 
    getRemainingDaysLeftForContentCreation() {
       const nowTime = Date.now()
-      return getDaysLeft(this.getContentCreationEndTime() - nowTime)
+      const contentCreationEndTime = this.getContentCreationEndTime()
+      const expiresAt = this.getExpiresAt()
+
+      // If the content creation end time is later than the expiration time,
+      // use the expiration time as the end of the content creation period.
+      const effectiveEndTime = Math.min(contentCreationEndTime, expiresAt)
+
+      const remainingTime = effectiveEndTime - nowTime
+      return getDaysLeft(remainingTime)
    }
 
    getCompanyLogoUrl() {

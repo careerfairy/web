@@ -1,4 +1,3 @@
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import {
    Box,
    LinearProgress,
@@ -10,6 +9,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import StyledToolTip from "materialUI/GlobalTooltips/StyledToolTip"
 import { ReactElement } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import Message from "./Message"
 
 const styles = sxStyles({
    tooltip: {
@@ -63,8 +63,6 @@ type Props = {
 
 const daysLeftToWarnContentCreation = 3
 const daysLeftToWarnTrial = 14
-const creationDuration =
-   PLAN_CONSTANTS.trial.sparks.TRIAL_CREATION_PERIOD_MILLISECONDS
 
 const TrialStatusToolTip = ({ children }: Props) => {
    return (
@@ -86,18 +84,39 @@ const TrialStatusToolTip = ({ children }: Props) => {
 const Content = () => {
    const { groupPresenter } = useGroup()
 
-   const hasEnoughSparks = groupPresenter.publicSparks
    const contentCreationProgress =
       groupPresenter.getTrialContentCreationProgress()
+
    const remainderProgress = groupPresenter.getRemainderProgress()
+
    const contentCreationPeriodEnded =
       groupPresenter.getContentCreationPeriodEnded()
+
    const remainingDaysLeftForPlan = groupPresenter.getPlanDaysLeft()
 
    const remainingDaysLeftForContentCreation =
       groupPresenter.getRemainingDaysLeftForContentCreation()
 
    const shouldWarnTrial = remainingDaysLeftForPlan <= daysLeftToWarnTrial
+
+   const contentCreationAboutToExpire =
+      remainingDaysLeftForContentCreation <= daysLeftToWarnContentCreation
+
+   console.log({
+      remainingDaysLeftForPlan,
+      contentCreationProgress,
+      remainderProgress,
+      contentCreationPeriodEnded,
+   })
+
+   if (groupPresenter.hasPlanExpired()) {
+      return (
+         <Typography sx={styles.message}>
+            Your trial has expired. Please contact your key success manager to
+            unlock the full power of Sparks.
+         </Typography>
+      )
+   }
 
    return (
       <Box sx={styles.content}>
@@ -111,13 +130,13 @@ const Content = () => {
             <StatusTitle
                title="on content creation period"
                daysLeft={remainingDaysLeftForContentCreation}
-               shouldError={!hasEnoughSparks}
+               shouldError={contentCreationAboutToExpire}
             />
          )}
          <Box sx={styles.progressSection}>
             <Progress
                sx={styles.contentCreationBar}
-               color={hasEnoughSparks ? "secondary" : "error"}
+               color={contentCreationAboutToExpire ? "error" : "secondary"}
                value={contentCreationProgress}
             />
             <Divider />
@@ -127,6 +146,10 @@ const Content = () => {
                value={remainderProgress}
             />
          </Box>
+         <Message
+            contentCreationPeriodExpired={contentCreationPeriodEnded}
+            contentCreationAboutToExpire={contentCreationAboutToExpire}
+         />
       </Box>
    )
 }
@@ -187,11 +210,6 @@ const StatusTitle = (props: MessageProps) => {
          {props.title}
       </Typography>
    )
-}
-
-const getDaysLeft = (time: number) => {
-   const daysLeft = Math.ceil(time / (1000 * 60 * 60 * 24))
-   return daysLeft > 0 ? daysLeft : 0
 }
 
 export default TrialStatusToolTip
