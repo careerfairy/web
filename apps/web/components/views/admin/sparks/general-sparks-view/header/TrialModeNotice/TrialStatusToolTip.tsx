@@ -29,6 +29,7 @@ const TrialStatusToolTip = ({ children, disabled }: Props) => {
          }}
          title={<TrialStatusContent />}
          open={disabled ? false : undefined}
+         placement="bottom"
       >
          {children}
       </StyledToolTip>
