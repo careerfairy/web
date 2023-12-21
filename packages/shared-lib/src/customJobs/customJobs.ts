@@ -79,7 +79,7 @@ export interface CustomJobStats extends Identifiable {
    // increases every time an application is created related to this job
    applicants: number
    job: CustomJob
-   deleted?: boolean
+   deleted: boolean
    deletedAt?: firebase.firestore.Timestamp
 }
 

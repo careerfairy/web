@@ -539,23 +539,28 @@ export class LivestreamFunctionsRepository
    async deleteAndSyncCustomJob(customJob: CustomJob): Promise<void> {
       const batch = this.firestore.batch()
 
-      const linkedLivestreams = customJob.livestreams
+      const linkedLivestreams = customJob?.livestreams || []
       const deletedCustomJob: PublicCustomJob =
          pickPublicDataFromCustomJob(customJob)
 
       functions.logger.log(
-         `Deleting custom job ${deletedCustomJob.id} on all the linked live streams and drafts.`
+         `Deleting custom job ${deletedCustomJob.id} on ${linkedLivestreams.length} linked live streams and drafts.`
       )
+
+      // if no linked live streams no work needed
+      if (linkedLivestreams.length === 0) {
+         return
+      }
 
       // Fetch all linked livestreams and drafts
       const [livestreamsSnaps, draftSnaps] = await Promise.all([
          this.firestore
             .collection("livestreams")
-            .where("id", "in", linkedLivestreams || [])
+            .where("id", "in", linkedLivestreams)
             .get(),
          this.firestore
             .collection("draftLivestreams")
-            .where("groupIds", "array-contains", deletedCustomJob.groupId)
+            .where("id", "in", linkedLivestreams)
             .get(),
       ])
 
@@ -604,5 +609,7 @@ export class LivestreamFunctionsRepository
             }
          })
       )
+
+      return void batch.commit()
    }
 }

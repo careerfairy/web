@@ -60,6 +60,7 @@ export class CustomJobFunctionsRepository
          job: newCustomJob,
          id: jobStatsId,
          applicants: 0,
+         deleted: false,
       }
 
       return ref.set(newJobStat, { merge: true })
@@ -127,13 +128,19 @@ export class CustomJobFunctionsRepository
          })
       })
 
-      jobsToRemoveLivestreamId.forEach((job) => {
+      for (const job of jobsToRemoveLivestreamId) {
          const ref = this.firestore.collection("customJobs").doc(job.id)
 
-         batch.update(ref, {
-            livestreams: this.fieldValue.arrayRemove(livestreamId),
-         })
-      })
+         const docSnap = await ref.get()
+
+         // when deleting the livestream from a job
+         // is required to confirm if the job does still exist
+         if (docSnap.exists) {
+            batch.update(ref, {
+               livestreams: this.fieldValue.arrayRemove(livestreamId),
+            })
+         }
+      }
 
       return await batch.commit()
    }
@@ -150,7 +157,7 @@ export class CustomJobFunctionsRepository
       return ref.update({
          deleted: true,
          deletedAt: Timestamp.now(),
-         jod: {
+         job: {
             ...deletedCustomJob,
             deleted: true,
          },

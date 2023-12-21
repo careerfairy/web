@@ -116,20 +116,22 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
 
          <JobApplicantsList applicants={applicants} />
 
-         <StyledPagination
-            count={
-               paginatedResults.nextDisabled
-                  ? paginatedResults.page
-                  : paginatedResults.page + 1
-            }
-            page={paginatedResults.page}
-            color="secondary"
-            disabled={paginatedResults.loading}
-            onChange={onPageChange}
-            siblingCount={0}
-            boundaryCount={0}
-            size="small"
-         />
+         {applicants.length ? (
+            <StyledPagination
+               count={
+                  paginatedResults.nextDisabled
+                     ? paginatedResults.page
+                     : paginatedResults.page + 1
+               }
+               page={paginatedResults.page}
+               color="secondary"
+               disabled={paginatedResults.loading}
+               onChange={onPageChange}
+               siblingCount={0}
+               boundaryCount={0}
+               size="small"
+            />
+         ) : null}
       </>
    )
 }

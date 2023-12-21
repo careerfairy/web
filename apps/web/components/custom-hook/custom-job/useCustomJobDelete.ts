@@ -7,7 +7,7 @@ const useCustomJobDelete = (jobId: string) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const job = useCustomJob(jobId)
 
-   const alreadyDeleted: boolean = Boolean(job.deleted)
+   const alreadyDeleted: boolean = job?.deleted
 
    const [isDeleting, setIsDeleting] = useState(false)
 
