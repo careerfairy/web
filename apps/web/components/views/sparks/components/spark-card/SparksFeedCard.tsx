@@ -27,7 +27,7 @@ import {
 } from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import SparkEventFullCardNotification from "./Notifications/SparkEventFullCardNotification"
 import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNotification"
 import useFingerPrint from "components/custom-hook/useFingerPrint"

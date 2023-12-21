@@ -1,5 +1,4 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
