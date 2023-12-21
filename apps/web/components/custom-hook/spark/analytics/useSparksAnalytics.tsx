@@ -1,7 +1,9 @@
+import { useMemo } from "react"
 import useSWR from "swr"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
-} from "./utils/useFunctionsSWRFetcher"
+} from "../../utils/useFunctionsSWRFetcher"
+import { convertToClientModel } from "components/custom-hook/spark/analytics/dataTransformers"
 
 const useSparksAnalytics = (groupId: string) => {
    const fetcher = useFunctionsSWR()
@@ -12,7 +14,9 @@ const useSparksAnalytics = (groupId: string) => {
       reducedRemoteCallsOptions
    )
 
-   return data
+   return useMemo(() => {
+      return convertToClientModel(data)
+   }, [data])
 }
 
 export default useSparksAnalytics
