@@ -7,10 +7,10 @@ import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 /**
- * Fetches the stats for a given spark if it belongs to the given group.
+ * Fetches the data of a given spark if it belongs to the given group.
  **/
 const useGroupSpark = (groupId: string, sparkId: string) => {
-   const livestreamStatsQuery = useMemo(() => {
+   const sparkByIdQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
          where(documentId(), "==", sparkId),
@@ -20,7 +20,7 @@ const useGroupSpark = (groupId: string, sparkId: string) => {
    }, [groupId, sparkId])
 
    return (
-      useFirestoreCollection<Spark>(livestreamStatsQuery, {
+      useFirestoreCollection<Spark>(sparkByIdQuery, {
          idField: "id",
       }).data?.[0] ?? null
    )
