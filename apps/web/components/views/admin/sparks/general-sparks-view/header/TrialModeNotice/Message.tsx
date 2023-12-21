@@ -21,8 +21,8 @@ const styles = sxStyles({
 const CreationPeriodMessage = () => {
    return (
       <MessageText>
-         Get your content ready during our exclusive period and start your trial
-         right away.
+         Get your content ready during our exclusive content creation period and
+         start your trial right away.
          <DoubleBreak />
          Use our content creation period to organise and film your videos. Once
          satisfied, start your trial seamlessly without any delays.
@@ -94,8 +94,7 @@ const TrialEndingMessage = () => {
          <DoubleBreak />
          Elevate your success with Sparks. Access comprehensive analytics,
          create more engaging content, and attract the right talent all year
-         round. Talk to your key success manager to unlock the full power of
-         Sparks.
+         round. Talk to your Success Manager to unlock the full power of Sparks.
       </MessageText>
    )
 }
@@ -150,8 +149,7 @@ const Message = ({
 
    // #3 - Creation period & already met the publishing criteria
    if (isInContentCreationPeriod && metPublishingCriteria) {
-      // TODO: Needs figma design, fallback to #1 component
-      return <CreationPeriodMessage />
+      return <TrialEndingMessage />
    }
 
    // #4 - Real trial period & not yet met the publishing criteria
