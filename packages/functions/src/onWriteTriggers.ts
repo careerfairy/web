@@ -94,6 +94,29 @@ export const syncLivestreams = functions
       return handleSideEffects(sideEffectPromises)
    })
 
+export const syncDraftLivestreams = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("draftLivestreams/{livestreamId}")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncDraftLivestreamsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      sideEffectPromises.push(
+         customJobRepo.syncLivestreamIdWithCustomJobs(change)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
 export const syncUserLivestreamData = functions
    .runWith(defaultTriggerRunTimeConfig)
    .region(config.region)
