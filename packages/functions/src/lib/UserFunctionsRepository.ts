@@ -52,16 +52,16 @@ export class UserFunctionsRepository
          .where("jobId", "==", customJob.id)
          .get()
 
-      const applicants =
-         mapFirestoreDocuments<CustomJobApplicant>(applicantsSnapshot)
+      const applications =
+         mapFirestoreDocuments<CustomJobApplicant>(applicantsSnapshot) || []
 
       functions.logger.log(
-         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applicants.length} applicants.`
+         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applications?.length} applications.`
       )
-      applicants.forEach((applicant) => {
+      applications.forEach((application) => {
          const ref = this.firestore
             .collection("userData")
-            .doc(applicant.id)
+            .doc(application.user.id)
             .collection("customJobApplications")
             .doc(customJob.id)
 
@@ -81,9 +81,9 @@ export class UserFunctionsRepository
    }
 
    async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
-      const newCustomJOb = {
+      const newCustomJOb: CustomJob = {
          ...deletedCustomJob,
-         delete: true,
+         deleted: true,
       }
 
       functions.logger.log(

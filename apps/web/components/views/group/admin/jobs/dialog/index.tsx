@@ -23,6 +23,7 @@ const styles = sxStyles({
    },
    smallDialog: {
       maxWidth: 450,
+      top: { xs: "48vh", md: 0 },
    },
 })
 const views = [
