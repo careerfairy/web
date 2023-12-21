@@ -1,6 +1,6 @@
 export const totalViewsPastYear = `
   SELECT 
-    FORMAT_TIMESTAMP("%F", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId
@@ -12,7 +12,7 @@ export const totalViewsPastYear = `
 
 export const uniqueViewersPastYear = `
   SELECT 
-    FORMAT_TIMESTAMP("%F", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(distinct(ifNull(userId, visitorId))) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId
