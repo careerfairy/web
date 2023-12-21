@@ -4,7 +4,7 @@ import {
    PieChartDataPoint,
    TimePeriodParams,
    TimeseriesDataPoint,
-} from "@careerfairy/shared-lib/sparks/groupAnalytics"
+} from "@careerfairy/shared-lib/sparks/analytics"
 import IBigQueryService from "../../bigQuery/IBigQueryService"
 import { BigQuery } from "@google-cloud/bigquery"
 import { totalViewsPastYear, uniqueViewersPastYear } from "./queries/Reach"

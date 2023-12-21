@@ -15,7 +15,7 @@ import { getSparksAnalyticsRepoInstance } from "./api/repositories"
 import {
    TimePeriodParams,
    SparksAnalyticsDTO,
-} from "@careerfairy/shared-lib/sparks/groupAnalytics"
+} from "@careerfairy/shared-lib/sparks/analytics"
 
 // Define cache settings
 const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
