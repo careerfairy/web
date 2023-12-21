@@ -4,10 +4,9 @@ import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
 import CFPieChart from "./components/charts/CFPieChart"
-import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
-import SparksOverviewTab from "./SparksOverviewTab"
-import useSparksAnalytics from "components/custom-hook/useSparksAnalytics"
-import { useGroup } from "layouts/GroupDashboardLayout"
+import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
+import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
+import { GroupSparkAnalyticsCardContainerTitle } from "./components/GroupSparkAnalyticsCardTitle"
 
 const styles = sxStyles({
    root: {
@@ -63,61 +62,6 @@ const styles = sxStyles({
    },
 })
 
-const years = [
-   new Date(1990, 0, 1),
-   new Date(1991, 0, 1),
-   new Date(1992, 0, 1),
-   new Date(1993, 0, 1),
-   new Date(1994, 0, 1),
-   new Date(1995, 0, 1),
-   new Date(1996, 0, 1),
-   new Date(1997, 0, 1),
-   new Date(1998, 0, 1),
-   new Date(1999, 0, 1),
-   new Date(2000, 0, 1),
-   new Date(2001, 0, 1),
-   new Date(2002, 0, 1),
-   new Date(2003, 0, 1),
-   new Date(2004, 0, 1),
-   new Date(2005, 0, 1),
-   new Date(2006, 0, 1),
-   new Date(2007, 0, 1),
-   new Date(2008, 0, 1),
-   new Date(2009, 0, 1),
-   new Date(2010, 0, 1),
-   new Date(2011, 0, 1),
-   new Date(2012, 0, 1),
-   new Date(2013, 0, 1),
-   new Date(2014, 0, 1),
-   new Date(2015, 0, 1),
-   new Date(2016, 0, 1),
-   new Date(2017, 0, 1),
-   new Date(2018, 0, 1),
-]
-
-const UKGDPperCapita = [
-   26189, 25792, 25790, 26349, 27277, 27861, 28472, 29259, 30077, 30932, 31946,
-   32660, 33271, 34232, 34865, 35623, 36214, 36816, 36264, 34402, 34754, 34971,
-   35185, 35618, 36436, 36941, 37334, 37782, 38058,
-]
-
-const spark = {
-   id: "GtAz8lKg9POi9TVrJSxs",
-   category: { id: "company-culture" as SparkCategory["id"] },
-   question: "What's one great benefit of working at ABB?",
-   video: {
-      thumbnailUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/sparks%2Fthumbnails%2Fec15e7ae-a46a-4dc5-8681-09fff96d0227.jpeg?alt=media&token=2e4a781f-65ae-4720-af50-4fe9f05c6eb4",
-   },
-   group: { universityName: "ABB" },
-   creator: {
-      firstName: "Antonia Maria",
-      lastName: "Mauch",
-      avatarUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/groups%2FlgHmyR0XipDBcYm0UPtH%2Fcreator-avatars%2F567fb7db-4497-486d-8317-0ae399ad2df2.png?alt=media&token=42ae5f6c-6b03-4a49-942c-7fde52584a87",
-   },
-}
-
 const pieChartRawData = [
    {
       university: "Other",
@@ -169,31 +113,25 @@ const pieChartProcessedData = pieChartRawData.map((d, i) => {
    }
 })
 
+type TimeFilter = {
+   value: TimePeriodParams
+   label: string
+}
+
 const GroupSparkAnalytics = () => {
    const [tabValue, setTabValue] = useState("overview")
-   const [selectTimeFilter, setSelectTimeFilter] = useState("30")
-
-   const { group } = useGroup()
-
-   const {
-      reach,
-      engagement,
-      most,
-      topCountries,
-      topUniversities,
-      topFieldsOfStudy,
-      levelsOfStudy,
-   } = useSparksAnalytics("KLVvqtghvCqPv7NI1fYv")
+   const [selectTimeFilter, setSelectTimeFilter] =
+      useState<TimeFilter["value"]>("30days")
 
    const handleTabChange = (event, newValue) => {
       setTabValue(newValue)
    }
 
-   const options = [
-      { value: "7", label: "Past 7 days" },
-      { value: "30", label: "Past 30 days" },
-      { value: "180", label: "Past 6 months" },
-      { value: "365", label: "Last year" },
+   const options: TimeFilter[] = [
+      { value: "7days", label: "Past 7 days" },
+      { value: "30days", label: "Past 30 days" },
+      { value: "6months", label: "Past 6 months" },
+      { value: "1year", label: "Last year" },
    ]
 
    return (
@@ -220,27 +158,34 @@ const GroupSparkAnalytics = () => {
          </Box>
          <Box>
             {tabValue === "overview" && (
-               <SparksOverviewTab
-                  timeFilter={selectTimeFilter}
-                  reachData={undefined}
-                  engagementData={{ xAxis: years, series: UKGDPperCapita }}
-                  mostSomethingData={spark}
-               />
+               <SparksOverviewTab timeFilter={selectTimeFilter} />
             )}
             {tabValue === "audience" && (
                <>
-                  <GroupSparkAnalyticsCardContainer title="Top 10 countries">
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Top 10 countries
+                     </GroupSparkAnalyticsCardContainerTitle>
                      Audience: Top 10 countries for {selectTimeFilter} days
                      <CFPieChart data={pieChartProcessedData} />
                   </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Top 10 universities">
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Top 10 universities
+                     </GroupSparkAnalyticsCardContainerTitle>
                      Audience: Top 10 universities for {selectTimeFilter} days
                   </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Top 10 fields of study">
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Top 10 fields of study
+                     </GroupSparkAnalyticsCardContainerTitle>
                      Audience: Top 10 fields of study for {selectTimeFilter}{" "}
                      days
                   </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer title="Level of study">
+                  <GroupSparkAnalyticsCardContainer>
+                     <GroupSparkAnalyticsCardContainerTitle>
+                        Level of study
+                     </GroupSparkAnalyticsCardContainerTitle>
                      Audience: Level of study for {selectTimeFilter} days
                   </GroupSparkAnalyticsCardContainer>
                </>
