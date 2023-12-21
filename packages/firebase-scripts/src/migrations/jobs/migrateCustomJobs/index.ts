@@ -61,6 +61,7 @@ function createCustomJobStatsInCollection(
    counter: Counter
 ) {
    const customJobStats: CustomJobStats = {
+      deleted: false,
       jobId: customJob.id,
       documentType: "customJobStats",
       clicks: customJob.clicks ?? 0,

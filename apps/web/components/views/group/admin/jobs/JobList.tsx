@@ -3,7 +3,7 @@ import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import { Box, Divider, Grid, Typography, Stack, ListItem } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { User } from "react-feather"
+import { User, CheckCircle } from "react-feather"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
@@ -54,11 +54,33 @@ const styles = sxStyles({
    stats: {
       background: "#FAFAFE",
       border: "#F6F6FA",
-      borderRadius: "10px",
-      p: { xs: "12px 12px", md: "12px 20px" },
+      borderRadius: "62px",
+      p: "12px 20px",
       alignItems: "center",
-      width: { xs: "100%", md: "unset" },
       justifyContent: "space-between",
+   },
+   mobileStats: {
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      background: "#FAFAFE",
+      border: "#F6F6FA",
+      borderRadius: "12px",
+      p: "12px 12px",
+   },
+   mobileStatsValues: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      mt: 2,
+   },
+   mobileStatsLabel: {
+      display: "flex",
+      alignSelf: "center",
+      color: "grey",
+   },
+   statsLabel: {
+      color: "grey",
    },
    applications: {
       display: "flex",
@@ -66,6 +88,16 @@ const styles = sxStyles({
 
       "& svg": {
          color: "secondary.main",
+         mr: 1,
+      },
+   },
+   initialized: {
+      display: "flex",
+      alignItems: "center",
+
+      "& svg": {
+         color: "grey",
+         mr: 1,
       },
    },
    mobileHeader: {
@@ -85,7 +117,8 @@ const styles = sxStyles({
    },
    editButtonDesktop: {
       display: "flex",
-      justifyContent: "end",
+      justifyContent: "center",
+      alignItems: "center",
    },
    listItem: {
       p: 0,
@@ -135,8 +168,8 @@ const JobList: FC<Props> = ({ jobsStats }) => {
                         <Grid
                            item
                            xs={12}
-                           md={6.5}
-                           lg={7}
+                           md={4.5}
+                           lg={5.5}
                            sx={styles.infoWrapper}
                         >
                            <Box sx={styles.mobileHeader}>
@@ -180,36 +213,45 @@ const JobList: FC<Props> = ({ jobsStats }) => {
                         <Grid
                            item
                            xs={12}
-                           md={5}
-                           lg={4.5}
+                           md={7}
+                           lg={6}
                            sx={styles.statsWrapper}
                         >
-                           <Stack
-                              spacing={2}
-                              sx={styles.stats}
-                              direction="row"
-                              divider={
-                                 <Divider orientation="vertical" flexItem />
-                              }
-                           >
-                              <Typography
-                                 variant={"subtitle1"}
-                                 color={"text.secondary"}
-                              >
-                                 {clicks} Clicks
-                              </Typography>
-
-                              <Box sx={styles.applications}>
-                                 <User size={24} />
-                                 <Typography
-                                    variant={"subtitle1"}
-                                    color={"secondary.main"}
-                                    ml={1}
+                           <>
+                              {isMobile ? (
+                                 renderMobileStats(clicks, applicants)
+                              ) : (
+                                 <Stack
+                                    spacing={2}
+                                    sx={styles.stats}
+                                    direction="row"
                                  >
-                                    {applicants} Applications
-                                 </Typography>
-                              </Box>
-                           </Stack>
+                                    <Typography sx={styles.statsLabel}>
+                                       Applications:
+                                    </Typography>
+
+                                    <Box sx={styles.initialized}>
+                                       <User size={16} />
+                                       <Typography
+                                          variant={"subtitle1"}
+                                          color={"text.secondary"}
+                                       >
+                                          {clicks} Initiated
+                                       </Typography>
+                                    </Box>
+
+                                    <Box sx={styles.applications}>
+                                       <CheckCircle size={16} />
+                                       <Typography
+                                          variant={"subtitle1"}
+                                          color={"secondary.main"}
+                                       >
+                                          {applicants} Confirmed
+                                       </Typography>
+                                    </Box>
+                                 </Stack>
+                              )}
+                           </>
                         </Grid>
 
                         {isMobile ? null : (
@@ -225,6 +267,28 @@ const JobList: FC<Props> = ({ jobsStats }) => {
       </Box>
    )
 }
+
+const renderMobileStats = (clicks: number, applicants: number) => (
+   <Box sx={styles.mobileStats}>
+      <Typography sx={styles.mobileStatsLabel}>Applications:</Typography>
+
+      <Box sx={styles.mobileStatsValues}>
+         <Box sx={styles.initialized}>
+            <User size={16} />
+            <Typography variant={"subtitle1"} color={"text.secondary"}>
+               {clicks} Initiated
+            </Typography>
+         </Box>
+
+         <Box sx={styles.applications}>
+            <CheckCircle size={16} />
+            <Typography variant={"subtitle1"} color={"secondary.main"}>
+               {applicants} Confirmed
+            </Typography>
+         </Box>
+      </Box>
+   </Box>
+)
 
 const formatJobPostingUrl = (postingUrl: string): string => {
    const withoutProtocol = postingUrl.split("://")[1]

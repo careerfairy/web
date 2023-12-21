@@ -25,7 +25,7 @@ const styles = sxStyles({
       border: "1px solid #F0EDFD",
    },
    statsLabel: {
-      fontSize: "14px",
+      fontSize: { xs: "12px", md: "14px" },
    },
    statsValue: {
       fontSize: "20px",
@@ -90,7 +90,7 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
                      color={"grey"}
                      sx={styles.statsLabel}
                   >
-                     Total clicks
+                     Initiated applications
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
                      {jobStats.clicks}
@@ -105,7 +105,7 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
                      color={"grey"}
                      sx={styles.statsLabel}
                   >
-                     Applications
+                     Confirmed applicants
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
                      {jobStats.applicants}
