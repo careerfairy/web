@@ -60,6 +60,9 @@ const TrialStatusContent = () => {
    const contentCreationBarCritical =
       contentCreationAboutToExpire || failedToMakeEnoughInContentCreationPeriod
 
+   const trialBarCritical =
+      trialAboutToExpire || failedToMakeEnoughInContentCreationPeriod
+
    if (groupPresenter.hasPlanExpired()) {
       return (
          <Typography sx={styles.title}>
@@ -71,7 +74,7 @@ const TrialStatusContent = () => {
 
    return (
       <Fragment>
-         {isInContentCreationPeriod ? (
+         {isInContentCreationPeriod && !groupPresenter.publicSparks ? (
             <StatusTitle
                title="on content creation period"
                daysLeft={remainingDaysLeftForContentCreation}
@@ -94,7 +97,7 @@ const TrialStatusContent = () => {
             <Progress
                sx={styles.trialBar}
                value={remainderProgressAfterContentCreation}
-               critical={trialAboutToExpire}
+               critical={trialBarCritical}
             />
          </Box>
          <Message
