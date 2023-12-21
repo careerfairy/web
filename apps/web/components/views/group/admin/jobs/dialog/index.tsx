@@ -5,6 +5,7 @@ import SteppedDialog, {
 import { useDispatch, useSelector } from "react-redux"
 import {
    deleteJobsDialogOpenSelector,
+   deleteJobWithLinkedLivestreamsDialogOpenSelector,
    jobsDialogOpenSelector,
    jobsFormSelectedJobIdSelector,
 } from "../../../../../../store/selectors/adminJobsSelectors"
@@ -23,7 +24,10 @@ const styles = sxStyles({
    },
    smallDialog: {
       maxWidth: 450,
-      top: { xs: "48vh", md: 0 },
+      top: { xs: "calc(100dvh - 320px)", md: 0 },
+   },
+   jobWithList: {
+      top: { xs: "calc(100dvh - 500px)", md: 0 },
    },
 })
 const views = [
@@ -56,6 +60,9 @@ const JobDialog = () => {
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
    const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const isDeleteJobDialogWithLinkedLivestreamsOpen = useSelector(
+      deleteJobWithLinkedLivestreamsDialogOpenSelector
+   )
 
    const handleCloseDialog = useCallback(() => {
       dispatch(closeJobsDialog())
@@ -80,7 +87,13 @@ const JobDialog = () => {
          views={views}
          initialStep={currentStep}
          transition={SlideUpTransition}
-         sx={[styles.dialog, isDeleteJobDialogOpen ? styles.smallDialog : null]}
+         sx={[
+            styles.dialog,
+            isDeleteJobDialogOpen ? styles.smallDialog : null,
+            isDeleteJobDialogWithLinkedLivestreamsOpen
+               ? styles.jobWithList
+               : null,
+         ]}
       />
    )
 }

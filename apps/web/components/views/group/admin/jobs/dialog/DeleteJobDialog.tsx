@@ -1,7 +1,7 @@
 import SteppedDialog, {
    useStepper,
 } from "../../../../stepped-dialog/SteppedDialog"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Loader from "../../../../loader/Loader"
@@ -10,21 +10,26 @@ import JobFetchWrapper from "../../../../../../HOCs/job/JobFetchWrapper"
 import { Trash2 as DeleteIcon, Radio } from "react-feather"
 import { List, ListItem, Stack } from "@mui/material"
 import useCustomJobDelete from "../../../../../custom-hook/custom-job/useCustomJobDelete"
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback, useEffect, useMemo } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { JobDialogStep } from "./index"
 import useCustomJobLinkedLivestreams from "../../../../../custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import Typography from "@mui/material/Typography"
+import { openDeleteJobWithLinkedLivestreams } from "../../../../../../store/reducers/adminJobsReducer"
 
 const styles = sxStyles({
    wrapContainer: {
       height: {
-         xs: "100%",
+         xs: "320px",
          md: "100%",
       },
    },
    reducePadding: {
       px: { xs: 3, md: "28px !important" },
+      height: {
+         xs: "500px",
+         md: "100%",
+      },
    },
    container: {
       display: "flex",
@@ -102,6 +107,7 @@ type DeleteDialogProps = {
    job: CustomJob | null
 }
 const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
+   const dispatch = useDispatch()
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { handleClose } = useStepper<JobDialogStep>()
    const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
@@ -110,6 +116,12 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
       () => job?.livestreams?.length,
       [job?.livestreams?.length]
    )
+
+   useEffect(() => {
+      if (hasLinkedLivestreams) {
+         dispatch(openDeleteJobWithLinkedLivestreams())
+      }
+   }, [dispatch, hasLinkedLivestreams])
 
    const handleJobDelete = useCallback(async () => {
       await handleDelete()
@@ -151,28 +163,26 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
                </SteppedDialog.Content>
 
                <SteppedDialog.Actions sx={styles.actions}>
-                  <>
-                     <SteppedDialog.Button
-                        variant="outlined"
-                        color="grey"
-                        onClick={handleClose}
-                        sx={[styles.cancelBtn, styles.actionBtn]}
-                     >
-                        Cancel
-                     </SteppedDialog.Button>
+                  <SteppedDialog.Button
+                     variant="outlined"
+                     color="grey"
+                     onClick={handleClose}
+                     sx={[styles.cancelBtn, styles.actionBtn]}
+                  >
+                     Cancel
+                  </SteppedDialog.Button>
 
-                     <SteppedDialog.Button
-                        variant="contained"
-                        color={"error"}
-                        disabled={isDeleting}
-                        type="submit"
-                        onClick={handleJobDelete}
-                        loading={isDeleting}
-                        sx={styles.actionBtn}
-                     >
-                        {hasLinkedLivestreams ? "Delete" : "Yes, I'm sure"}
-                     </SteppedDialog.Button>
-                  </>
+                  <SteppedDialog.Button
+                     variant="contained"
+                     color={"error"}
+                     disabled={isDeleting}
+                     type="submit"
+                     onClick={handleJobDelete}
+                     loading={isDeleting}
+                     sx={styles.actionBtn}
+                  >
+                     {hasLinkedLivestreams ? "Delete" : "Yes, I'm sure"}
+                  </SteppedDialog.Button>
                </SteppedDialog.Actions>
             </>
          </SteppedDialog.Container>
