@@ -87,7 +87,7 @@ const styles = sxStyles({
 
 export const ResponsiveSelectWithDrawer: React.FC<{
    selectValue: string
-   setSelectValue: (value: string) => void
+   setSelectValue: React.Dispatch<React.SetStateAction<string>>
    options: { value: string; label: string }[]
    selectProps?: SelectProps
    selectMenuProps?: Partial<MenuProps>
