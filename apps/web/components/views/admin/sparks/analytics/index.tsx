@@ -7,6 +7,7 @@ import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
 import { LockedSparkAnalytics } from "./components/LockedSparkAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    root: {
@@ -69,6 +70,7 @@ type TimeFilter = {
 
 const GroupSparkAnalytics = () => {
    const { groupPresenter } = useGroup()
+   const { userData } = useAuth()
 
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =
@@ -78,7 +80,8 @@ const GroupSparkAnalytics = () => {
       setTabValue(newValue)
    }
 
-   const shoulLockAnalytics = groupPresenter.isTrialPlan()
+   // CF Admins can see analytics in trial mode
+   const shoulLockAnalytics = groupPresenter.isTrialPlan() && !userData.isAdmin
 
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
