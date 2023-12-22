@@ -14,7 +14,7 @@ import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkA
 import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
 import ChartSwitchButton from "../components/charts/ChartSwitchButton"
 import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
-import { CFLineChart } from "../components/charts/CFLineChart"
+import CFLineChart from "../components/charts/CFLineChart"
 
 const engagementSelectOptions: AbstractButtonSelect<EngagementData> = {
    likes: "Likes",
