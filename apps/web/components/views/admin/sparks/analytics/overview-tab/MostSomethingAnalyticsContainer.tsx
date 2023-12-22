@@ -1,5 +1,5 @@
 import { FC, useState } from "react"
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
@@ -13,14 +13,6 @@ import {
 } from "@careerfairy/shared-lib/sparks/analytics"
 
 const styles = sxStyles({
-   sparksContainer: {
-      display: "flex",
-      flexDirection: {
-         xs: "column",
-         md: "row",
-      },
-      gap: 1.5,
-   },
    mostSomethingContainerTitleContainer: {
       fontSize: "20px",
       fontWeight: 600,
@@ -133,7 +125,7 @@ const MostSomethingAnalyticsContainer: FC<
             setSelectMostSomething={setSelectMostSomethingValue}
             options={mostSomethingSelectOptions}
          />
-         <Box sx={styles.sparksContainer}>
+         <Stack direction={{ sm: "column", md: "row" }} spacing={1.5}>
             {most[selectMostSomethingValue].map((sparkId, index) => (
                <SuspenseWithBoundary
                   key={`most-suspense-${sparkId}-${index}`}
@@ -145,7 +137,7 @@ const MostSomethingAnalyticsContainer: FC<
                   />
                </SuspenseWithBoundary>
             ))}
-         </Box>
+         </Stack>
       </GroupSparkAnalyticsCardContainer>
    )
 }
