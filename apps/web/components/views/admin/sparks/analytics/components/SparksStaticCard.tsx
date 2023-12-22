@@ -18,6 +18,7 @@ import LikeIcon from "components/views/common/icons/LikeIcon"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import useSparkStats from "components/custom-hook/spark/useSparkStats"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    card: {
@@ -129,7 +130,7 @@ const styles = sxStyles({
 
 type StatContainerProps = {
    icon: ReactElement
-   value: string
+   value: string | number
 }
 
 const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
@@ -155,11 +156,10 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
    const spark = useGroupSpark(group.id, sparkId)
    const { data: sparkStats } = useSparkStats(sparkId)
 
-   const impressions = sparkStats?.impressions.toString() || "0"
-   const likes = sparkStats?.likes.toString() || "0"
-   const shareCTA = sparkStats?.shareCTA.toString() || "0"
-   const numberOfCareerPageClicks =
-      sparkStats?.numberOfCareerPageClicks.toString() || "0"
+   const impressions = sparkStats?.impressions || "0"
+   const likes = sparkStats?.likes || "0"
+   const shareCTA = sparkStats?.shareCTA || "0"
+   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
 
    return (
       <Card variant="outlined" sx={styles.card}>
@@ -188,7 +188,7 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={spark.video.thumbnailUrl}
+               image={getResizedUrl(spark.video.thumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>
