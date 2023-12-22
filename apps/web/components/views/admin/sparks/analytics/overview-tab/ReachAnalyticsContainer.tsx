@@ -48,7 +48,7 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalViewsCount
-                        )} views for the ${timeFrameLabel}`}
+                        )} views over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={reachSelectOptions.totalViews}
@@ -60,7 +60,7 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalUniqueViewersCount
-                        )} unique viewers for the ${timeFrameLabel}`}
+                        )} unique viewers over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={reachSelectOptions.uniqueViewers}
@@ -73,7 +73,7 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
          ) : (
             <GroupSparkAnalyticsCardContainer>
                <GroupSparkAnalyticsCardContainerTitle>
-                  {`Reach for the ${timeFrameLabel}`}
+                  {`Reach over the ${timeFrameLabel}`}
                </GroupSparkAnalyticsCardContainerTitle>
                <ChartSwitchButtonGroupContainer>
                   <ChartSwitchButton
