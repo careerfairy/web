@@ -78,13 +78,13 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
                <ChartSwitchButtonGroupContainer>
                   <ChartSwitchButton
                      label={"Total views"}
-                     value={totalViewsCount}
+                     value={numberToString(totalViewsCount)}
                      active={reachSelectValue === "totalViews"}
                      onClick={() => setReachSelectValue("totalViews")}
                   />
                   <ChartSwitchButton
                      label={"Unique viewers"}
-                     value={totalUniqueViewersCount}
+                     value={numberToString(totalUniqueViewersCount)}
                      active={reachSelectValue === "uniqueViewers"}
                      onClick={() => setReachSelectValue("uniqueViewers")}
                   />
