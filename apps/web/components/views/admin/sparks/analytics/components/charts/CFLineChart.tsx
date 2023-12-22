@@ -69,7 +69,7 @@ const defaultDataForEmptyView = {
 }
 
 // Utility function to keep date format consistent accross the different elements of the chart
-const formatDate = (date, options) => {
+const formatDate = (date: Date, options: Intl.DateTimeFormatOptions) => {
    return new Intl.DateTimeFormat("en-GB", options).format(date)
 }
 
@@ -120,7 +120,7 @@ type CFLineChartProps = {
 } & Omit<TimeSeriesForCharts, "totalCount">
 
 const lineChartValueFormatter = (date: Date, isChartEmpty: boolean): string => {
-   const options = isChartEmpty
+   const options: Intl.DateTimeFormatOptions = isChartEmpty
       ? { weekday: "long" }
       : {
            day: "numeric",
@@ -199,4 +199,4 @@ const CFLineChart: FC<CFLineChartProps> = ({
    )
 }
 
-export { CFLineChart }
+export default CFLineChart
