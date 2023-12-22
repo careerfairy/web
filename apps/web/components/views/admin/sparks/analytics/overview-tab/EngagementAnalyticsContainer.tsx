@@ -107,25 +107,25 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
                <ChartSwitchButtonGroupContainer>
                   <ChartSwitchButton
                      label={"Likes"}
-                     value={totalLikesCount}
+                     value={numberToString(totalLikesCount)}
                      active={engagementSelectValue === "likes"}
                      onClick={() => setEngagementSelectValue("likes")}
                   />
                   <ChartSwitchButton
                      label={"Shares"}
-                     value={totalSharesCount}
+                     value={numberToString(totalSharesCount)}
                      active={engagementSelectValue === "shares"}
                      onClick={() => setEngagementSelectValue("shares")}
                   />
                   <ChartSwitchButton
                      label={"Registrations"}
-                     value={totalRegistrationsCount}
+                     value={numberToString(totalRegistrationsCount)}
                      active={engagementSelectValue === "registrations"}
                      onClick={() => setEngagementSelectValue("registrations")}
                   />
                   <ChartSwitchButton
                      label={"Page clicks"}
-                     value={totalPageClicksCount}
+                     value={numberToString(totalPageClicksCount)}
                      active={engagementSelectValue === "pageClicks"}
                      onClick={() => setEngagementSelectValue("pageClicks")}
                   />
