@@ -15,7 +15,7 @@ import { SlideUpTransition } from "../../../../common/transitions"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import PrivacyPolicyDialog from "./PrivacyPolicyDialog"
 import JobFormDialog from "./JobFormDialog"
-import DeleteJobDialog from "./DeleteJobDialog"
+import DeleteJobDialog from "./deleteJob/DeleteJobDialog"
 
 const styles = sxStyles({
    dialog: {
