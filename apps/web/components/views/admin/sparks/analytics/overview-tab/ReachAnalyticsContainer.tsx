@@ -12,7 +12,7 @@ import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyt
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
 import ChartSwitchButton from "../components/charts/ChartSwitchButton"
 import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
-import { CFLineChart } from "../components/charts/CFLineChart"
+import CFLineChart from "../components/charts/CFLineChart"
 import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
 
 const reachSelectOptions: AbstractButtonSelect<ReachData> = {
