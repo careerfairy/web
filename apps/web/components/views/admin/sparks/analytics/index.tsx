@@ -5,6 +5,8 @@ import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDra
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
+import { LockedSparkAnalytics } from "./components/LockedSparkAnalytics"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    root: {
@@ -66,6 +68,8 @@ type TimeFilter = {
 }
 
 const GroupSparkAnalytics = () => {
+   const { groupPresenter } = useGroup()
+
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimeFilter["value"]>("30days")
@@ -74,12 +78,18 @@ const GroupSparkAnalytics = () => {
       setTabValue(newValue)
    }
 
+   const shoulLockAnalytics = groupPresenter.isTrialPlan()
+
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
       { value: "30days", label: "Past 30 days" },
       { value: "6months", label: "Past 6 months" },
       { value: "1year", label: "Last year" },
    ]
+
+   if (shoulLockAnalytics) {
+      return <LockedSparkAnalytics />
+   }
 
    return (
       <Box sx={styles.root}>
