@@ -15,6 +15,7 @@ import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import JobPosting from "./jobPosting"
 import JobApplicants from "./jobApplicants"
 import NoApplicantsData from "./jobApplicants/NoApplicantsData"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    wrapper: {
@@ -61,6 +62,7 @@ type Props = {
 const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
+   const { push } = useRouter()
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -92,8 +94,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    )
 
    if (!Boolean(job)) {
-      // TODO-GS improve to have no job with this id
-      return null
+      return void push(`/group/${group.id}/admin/jobs`)
    }
 
    return (
