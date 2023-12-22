@@ -29,18 +29,6 @@ export interface ICustomJobRepository {
     */
    getCustomJobById(jobId: string): Promise<CustomJob>
 
-   // /**
-   //  * To get a custom job stats by id from the CustomJobStats root collection
-   //  * @param jobId
-   //  */
-   // getCustomJobStatsById(jobId: string): Promise<CustomJobStats>
-   //
-   // /**
-   //  * To get all custom job applications from the JobApplications root collection
-   //  * @param jobId
-   //  */
-   // getCustomJobApplications(jobId: string): Promise<CustomJobApplicant[]>
-
    /**
     * To create or update an existing jobApplication with a new applicant
     * Increase the applicants field on the corresponding jobStats document
@@ -121,25 +109,6 @@ export class FirebaseCustomJobRepository
       }
       return null
    }
-   //
-   // async getCustomJobStatsById(jobId: string): Promise<CustomJobStats> {
-   //    const jobStatsSnaps = await this.firestore
-   //        .collection("customJobStats")
-   //        .where("jobId", "==", jobId)
-   //        .limit(1)
-   //        .get()
-   //
-   //    return mapFirestoreDocuments<CustomJobStats>(jobStatsSnaps)?.[0]
-   // }
-   //
-   // async getCustomJobApplications(jobId: string): Promise<CustomJobApplicant[]> {
-   //    const jobApplicationsSnaps = await this.firestore
-   //        .collection("jobApplications")
-   //        .where("jobId", "==", jobId)
-   //        .get()
-   //
-   //    return mapFirestoreDocuments<CustomJobApplicant>(jobApplicationsSnaps)
-   // }
 
    async applyUserToCustomJob(
       user: UserData,
