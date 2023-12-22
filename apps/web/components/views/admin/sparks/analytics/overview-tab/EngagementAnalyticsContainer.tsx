@@ -53,7 +53,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalLikesCount
-                        )} likes for the ${timeFrameLabel}`}
+                        )} likes over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={engagementSelectOptions.likes}
@@ -65,7 +65,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalSharesCount
-                        )} shares for the ${timeFrameLabel}`}
+                        )} shares over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={engagementSelectOptions.shares}
@@ -77,7 +77,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalRegistrationsCount
-                        )} registrations for the ${timeFrameLabel}`}
+                        )} registrations over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={engagementSelectOptions.registrations}
@@ -89,7 +89,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
                            totalPageClicksCount
-                        )} page clicks for the ${timeFrameLabel}`}
+                        )} page clicks over the ${timeFrameLabel}`}
                      </GroupSparkAnalyticsCardContainerTitle>
                      <CFLineChart
                         tooltipLabel={engagementSelectOptions.pageClicks}
@@ -102,7 +102,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
          ) : (
             <GroupSparkAnalyticsCardContainer>
                <GroupSparkAnalyticsCardContainerTitle>
-                  {`Engagement for the ${timeFrameLabel}`}
+                  {`Engagement over the ${timeFrameLabel}`}
                </GroupSparkAnalyticsCardContainerTitle>
                <ChartSwitchButtonGroupContainer>
                   <ChartSwitchButton
