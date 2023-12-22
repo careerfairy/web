@@ -25,6 +25,10 @@ const styles = sxStyles({
          xs: "100%",
          md: 281,
       },
+      height: {
+         xs: "154vw",
+         md: "initial",
+      },
       boxShadow: "none",
       borderRadius: "12px",
       border: "1px solid #F3F3F5",
@@ -61,7 +65,10 @@ const styles = sxStyles({
       },
    },
    cardMedia: {
-      height: { xs: 476, sm: 406 },
+      height: {
+         xs: "calc(154vw - 62px - 55px)",
+         md: 406,
+      },
       objectFit: "cover",
    },
    sparksTypeAndTitle: {
