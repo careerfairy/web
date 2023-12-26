@@ -1,6 +1,6 @@
 import { FC, useState } from "react"
 import { Box } from "@mui/material"
-import { AbstractButtonSelect } from "./util"
+import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
 import {
    EngagementData,
    TimePeriodParams,
@@ -35,6 +35,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
    const isMobile = useIsMobile()
    const { group } = useGroup()
    const { engagement } = useSparksAnalytics(group.id)[timeFilter]
+   const resetChartsTooltip = useResetChartsTooltip()
 
    const [engagementSelectValue, setEngagementSelectValue] =
       useState<keyof EngagementData>("likes")
@@ -48,7 +49,7 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
       <>
          {isMobile ? (
             <GroupSparkAnalyticsCardContainer>
-               <BrandedSwipeableViews>
+               <BrandedSwipeableViews onStepChange={resetChartsTooltip}>
                   <>
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(

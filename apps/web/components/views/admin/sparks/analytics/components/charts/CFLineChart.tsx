@@ -137,6 +137,7 @@ const CFLineChart: FC<CFLineChartProps> = ({
    series = defaultDataForEmptyView.series,
 }) => {
    const isEmpty = xAxis.length === 0 || series.length === 0
+
    return (
       <ResponsiveChartContainer
          sx={styles.chart}
@@ -183,6 +184,7 @@ const CFLineChart: FC<CFLineChartProps> = ({
                   slots={{ lineHighlight: CustomLineHighlightElement }}
                />
                <ChartsTooltip
+                  key={`${tooltipLabel}-${Date.now()}`} // check util.ts to understand this better
                   slots={{
                      axisContent: (props) => (
                         <CustomTooltip
