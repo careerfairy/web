@@ -153,6 +153,7 @@ type SparksStaticCardProps = {
 
 const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
    const { group } = useGroup()
+
    const spark = useGroupSpark(group.id, sparkId)
    const { data: sparkStats } = useSparkStats(sparkId)
 
@@ -166,7 +167,7 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
          <CardHeader
             avatar={
                <CircularLogo
-                  src={spark.creator.avatarUrl}
+                  src={spark?.creator.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
