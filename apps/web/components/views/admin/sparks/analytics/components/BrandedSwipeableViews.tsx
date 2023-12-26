@@ -19,15 +19,20 @@ const styles = sxStyles({
 
 type BrandedSwipeableViewsProps = {
    children: React.ReactNode
+   onStepChange?: (step: number) => void
 }
 
 const BrandedSwipeableViews: FC<BrandedSwipeableViewsProps> = ({
    children,
+   onStepChange,
 }) => {
    const theme = useTheme()
    const [activeStep, setActiveStep] = useState(0)
 
    const handleStepChange = (step: number) => {
+      if (onStepChange) {
+         onStepChange(step)
+      }
       setActiveStep(step)
    }
 
