@@ -47,6 +47,7 @@ export const mostRecent = `
   SELECT spark_id AS sparkId
   FROM careerfairy-e1fd9.firestore_export.sparkStats_schema_sparkStats_latest
   WHERE spark_group_id = @groupId
+    AND deleted = FALSE
   ORDER BY spark_createdAt DESC
   LIMIT 3
 `
