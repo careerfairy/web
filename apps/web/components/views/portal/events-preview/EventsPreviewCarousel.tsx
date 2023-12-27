@@ -1,4 +1,10 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react"
+import React, {
+   ReactNode,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import Box from "@mui/material/Box"
 import useEmblaCarousel, {
    EmblaCarouselType,
@@ -9,9 +15,7 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
-import { useRouter } from "next/router"
-import { MARKETING_LANDING_PAGE_PATH } from "constants/routes"
-import { Typography, Stack } from "@mui/material"
+import { Typography, Stack, useMediaQuery, useTheme } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
@@ -52,7 +56,7 @@ const styles = sxStyles({
       position: "relative",
       height: {
          xs: 405,
-         md: 443,
+         md: 375,
       },
       paddingLeft: `calc(${slideSpacing}px - 5px)`,
    },
@@ -108,6 +112,17 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       const [emblaRef, emblaApi] = useEmblaCarousel(options, [
          WheelGesturesPlugin(wheelGesturesOptions),
       ])
+
+      const {
+         breakpoints: { up },
+      } = useTheme()
+      const isMedium = useMediaQuery(up("md"))
+      const isLarge = useMediaQuery(up("lg"))
+
+      const numSlides: number = useMemo(() => {
+         return isLarge ? 3 : isMedium ? 2 : 1
+      }, [isMedium, isLarge])
+      const numLoadingSlides = numSlides + 2
 
       React.useImperativeHandle(ref, () => ({
          goNext() {
@@ -201,39 +216,52 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            targetBlank={isEmbedded}
                         />
                      ) : null}
-                     <Box id={id} sx={styles.viewport} ref={emblaRef}>
-                        <Box sx={styles.container}>
-                           {events?.length
-                              ? events.map((event, index, arr) => (
-                                   <Box sx={styles.slide}>
-                                      <EventPreviewCard
-                                         key={index}
-                                         loading={
-                                            loading &&
-                                            !cardsLoaded[index] &&
-                                            !cardsLoaded[
-                                               arr.length - (index + 1)
-                                            ]
-                                         }
-                                         index={index}
-                                         totalElements={arr.length}
-                                         location={getLocation(type)}
-                                         event={event}
-                                         isRecommended={isRecommended}
-                                      />
-                                   </Box>
-                                ))
-                              : children?.map((child, i) => (
-                                   <Box key={i} sx={styles.slide}>
-                                      {child}
-                                   </Box>
-                                ))}
-                           {/**
-                            * This prevents the last slide from touching the right edge of the viewport.
-                            */}
-                           <Box sx={styles.paddingSlide}></Box>
+                     {
+                        <Box id={id} sx={styles.viewport} ref={emblaRef}>
+                           <Box sx={styles.container}>
+                              {loading
+                                 ? [...Array(numLoadingSlides)].map((_, i) => (
+                                      <Box key={i} sx={styles.slide}>
+                                         <EventPreviewCard
+                                            animation={
+                                               isEmpty ? false : undefined
+                                            }
+                                            loading
+                                         />
+                                      </Box>
+                                   ))
+                                 : events?.length
+                                 ? events.map((event, index, arr) => (
+                                      <Box sx={styles.slide}>
+                                         <EventPreviewCard
+                                            key={index}
+                                            loading={
+                                               loading &&
+                                               !cardsLoaded[index] &&
+                                               !cardsLoaded[
+                                                  arr.length - (index + 1)
+                                               ]
+                                            }
+                                            index={index}
+                                            totalElements={arr.length}
+                                            location={getLocation(type)}
+                                            event={event}
+                                            isRecommended={isRecommended}
+                                         />
+                                      </Box>
+                                   ))
+                                 : children?.map((child, i) => (
+                                      <Box key={i} sx={styles.slide}>
+                                         {child}
+                                      </Box>
+                                   ))}
+                              {/**
+                               * This prevents the last slide from touching the right edge of the viewport.
+                               */}
+                              <Box sx={styles.paddingSlide}></Box>
+                           </Box>
                         </Box>
-                     </Box>
+                     }
                   </Stack>
                </Box>
             ) : null}

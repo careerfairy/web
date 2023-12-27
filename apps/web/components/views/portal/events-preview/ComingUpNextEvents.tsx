@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react"
-import EventsPreview, { EventsTypes } from "./EventsPreview"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
@@ -7,6 +6,8 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const config = {
    suspense: false,
@@ -33,6 +34,18 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { data: events } = useFirestoreCollection<LivestreamEvent>(
       query,
       config
+   )
+
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+         loop: false,
+         align: "center",
+         dragThreshold: 0.5,
+         dragFree: true,
+         inViewThreshold: 0,
+      }),
+      [events]
    )
 
    useEffect(() => {
@@ -70,15 +83,16 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
-      <EventsPreview
+      <EventsPreviewCarousel
          id={"upcoming-events"}
-         limit={limit}
          title={"COMING UP NEXT"}
          type={EventsTypes.comingUp}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
          // No need to show loading as these events have already been queried server side
          loading={false}
+         options={eventsCarouselEmblaOptions}
+         isRecommended
       />
    )
 }

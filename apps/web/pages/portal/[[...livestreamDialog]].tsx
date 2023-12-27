@@ -10,9 +10,6 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../../components/util/SEO"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
-import EventsPreview, {
-   EventsTypes,
-} from "../../components/views/portal/events-preview/EventsPreview"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
@@ -37,6 +34,10 @@ import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/We
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
 import Heading from "components/views/portal/common/Heading"
+import EventsPreviewCarousel, {
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -73,6 +74,17 @@ const PortalPage = ({
       })
    }
 
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+         loop: false,
+         align: "center",
+         dragThreshold: 0.5,
+         dragFree: true,
+         inViewThreshold: 0,
+      }),
+      [events]
+   )
    return (
       <>
          <SEO
@@ -113,7 +125,7 @@ const PortalPage = ({
                               limit={20}
                            />
                            <MyNextEvents limit={20} />
-                           <EventsPreview
+                           <EventsPreviewCarousel
                               id={"past-events"}
                               title={"PAST EVENTS"}
                               type={EventsTypes.pastEvents}
@@ -121,6 +133,7 @@ const PortalPage = ({
                               seeMoreLink={"/next-livestreams?type=pastEvents"}
                               // No need to show loading as these events have already been queried server side
                               loading={false}
+                              options={eventsCarouselEmblaOptions}
                            />
                         </WidgetsWrapper>
                      </Container>
