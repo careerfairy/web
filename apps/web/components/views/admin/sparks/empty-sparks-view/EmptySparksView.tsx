@@ -8,7 +8,6 @@ import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import DateUtil from "util/DateUtil"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
