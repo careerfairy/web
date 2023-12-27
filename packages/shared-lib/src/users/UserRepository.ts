@@ -9,7 +9,6 @@ import {
    UserActivity,
    UserATSDocument,
    UserATSRelations,
-   UserCustomJobApplicationDocument,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
@@ -22,10 +21,6 @@ import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { Application } from "../ats/Application"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-} from "../customJobs/customJobs"
 import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
@@ -167,23 +162,6 @@ export interface IUserRepository {
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
 
    welcomeDialogComplete(userEmail: string): Promise<void>
-
-   /**
-    * Adds the custom job public info on the jobApplications sub collection from the User document
-    * @param userEmail
-    * @param job
-    */
-   applyUserToCustomJob(userEmail: string, job: CustomJob): Promise<void>
-
-   /**
-    * Gets the user custom job application by jobId
-    * @param userEmail
-    * @param jobId
-    */
-   getCustomJobApplication(
-      userEmail: string,
-      jobId: string
-   ): Promise<UserCustomJobApplicationDocument>
 
    /**
     * Deletes all the user notifications
@@ -785,42 +763,6 @@ export class FirebaseUserRepository
       }
 
       return docRef.update(toUpdate)
-   }
-
-   async applyUserToCustomJob(
-      userEmail: string,
-      job: CustomJob
-   ): Promise<void> {
-      const ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("customJobApplications")
-         .doc(job.id)
-
-      const jobToApply: UserCustomJobApplicationDocument = {
-         date: this.fieldValue.serverTimestamp() as Timestamp,
-         job: pickPublicDataFromCustomJob(job),
-         id: job.id,
-      }
-
-      return ref.set(jobToApply, { merge: true })
-   }
-
-   async getCustomJobApplication(
-      userEmail: string,
-      jobId: string
-   ): Promise<UserCustomJobApplicationDocument> {
-      const snap = await this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("customJobApplications")
-         .doc(jobId)
-         .get()
-
-      if (snap.exists) {
-         return this.addIdToDoc<UserCustomJobApplicationDocument>(snap)
-      }
-      return null
    }
 
    async deleteAllUserNotifications(userEmail: string): Promise<void> {

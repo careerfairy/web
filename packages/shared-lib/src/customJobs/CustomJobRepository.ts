@@ -30,8 +30,15 @@ export interface ICustomJobRepository {
    getCustomJobById(jobId: string): Promise<CustomJob>
 
    /**
+    * To get a custom job application by user and job id from the jobApplications root collection
+    * @param userId
+    * @param jobId
+    */
+   getUserJobApplication(userId: string, jobId: string): Promise<CustomJob>
+
+   /**
     * To create or update an existing jobApplication with a new applicant
-    * Increase the applicants field on the corresponding jobStats document
+    * Also increase the applicants field on the corresponding jobStats document
     * @param user
     * @param job
     * @param livestreamId
@@ -110,6 +117,24 @@ export class FirebaseCustomJobRepository
       return null
    }
 
+   async getUserJobApplication(
+      userId: string,
+      jobId: string
+   ): Promise<CustomJob> {
+      const applicationId = `${jobId}_${userId}`
+
+      const ref = this.firestore
+         .collection("jobApplications")
+         .doc(applicationId)
+
+      const snapshot = await ref.get()
+
+      if (snapshot.exists) {
+         return this.addIdToDoc<CustomJob>(snapshot)
+      }
+      return null
+   }
+
    async applyUserToCustomJob(
       user: UserData,
       job: CustomJob,
@@ -135,6 +160,7 @@ export class FirebaseCustomJobRepository
          livestreamId: livestreamId,
          appliedAt: this.fieldValue.serverTimestamp() as Timestamp,
          user,
+         job,
       }
 
       batch.set(jobApplicationRef, newJobApplicant, { merge: true })

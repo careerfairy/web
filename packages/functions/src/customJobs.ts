@@ -30,7 +30,7 @@ export const userApplyToCustomJob = functions
             const [jobToApply, userCustomJobApplication, user] =
                await Promise.all([
                   customJobRepo.getCustomJobById(jobId),
-                  userRepo.getCustomJobApplication(userId, jobId),
+                  customJobRepo.getUserJobApplication(userId, jobId),
                   userRepo.getUserDataById(userId),
                ])
 
@@ -43,14 +43,11 @@ export const userApplyToCustomJob = functions
 
             // create job application
             // Add job application details on the user document
-            return Promise.allSettled([
-               userRepo.applyUserToCustomJob(userId, jobToApply),
-               customJobRepo.applyUserToCustomJob(
-                  user,
-                  jobToApply,
-                  livestreamId
-               ),
-            ])
+            return customJobRepo.applyUserToCustomJob(
+               user,
+               jobToApply,
+               livestreamId
+            )
          })
       )
    )

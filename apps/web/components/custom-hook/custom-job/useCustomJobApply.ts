@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import useUserCustomJob from "../useUserCustomJob"
+import useUserJobApplication from "./useUserJobApplication"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -10,7 +10,7 @@ import { customJobRepo } from "../../../data/RepositoryInstances"
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
    const [isApplying, setIsApplying] = useState(false)
-   const userCustomJob = useUserCustomJob(userData?.id, job.id)
+   const userCustomJob = useUserJobApplication(userData?.id, job.id)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const alreadyApplied: boolean = !!userCustomJob

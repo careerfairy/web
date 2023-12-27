@@ -4,7 +4,6 @@ import {
    groupRepo,
    livestreamsRepo,
    sparkRepo,
-   userRepo,
 } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
@@ -349,8 +348,7 @@ export const onWriteCustomJobs = functions
 
          sideEffectPromises.push(
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
-            livestreamsRepo.syncCustomJobDataToLivestream(updatedCustomJob),
-            userRepo.syncCustomJobDataToUser(updatedCustomJob)
+            livestreamsRepo.syncCustomJobDataToLivestream(updatedCustomJob)
          )
       }
 
@@ -359,8 +357,7 @@ export const onWriteCustomJobs = functions
 
          sideEffectPromises.push(
             customJobRepo.deleteAndSyncCustomJob(deletedCustomJob),
-            livestreamsRepo.deleteAndSyncCustomJob(deletedCustomJob),
-            userRepo.deleteAndSyncCustomJob(deletedCustomJob)
+            livestreamsRepo.deleteAndSyncCustomJob(deletedCustomJob)
          )
       }
 

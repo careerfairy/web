@@ -5,24 +5,10 @@ import {
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
-import {
-   CustomJob,
-   CustomJobApplicant,
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import * as functions from "firebase-functions"
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
-   syncCustomJobDataToUser(customJob: CustomJob): Promise<void>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
-
-   /**
-    * This method adds a deleted flag to the customJobStats document
-    * @param deletedCustomJob
-    */
-   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
 }
 
 export class UserFunctionsRepository
@@ -41,36 +27,6 @@ export class UserFunctionsRepository
       return mapFirestoreDocuments(data)
    }
 
-   async syncCustomJobDataToUser(customJob: CustomJob): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(customJob)
-
-      const applicantsSnapshot = await this.firestore
-         .collection("jobApplications")
-         .where("jobId", "==", customJob.id)
-         .get()
-
-      const applications =
-         mapFirestoreDocuments<CustomJobApplicant>(applicantsSnapshot) || []
-
-      functions.logger.log(
-         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applications?.length} applications.`
-      )
-      applications.forEach((application) => {
-         const ref = this.firestore
-            .collection("userData")
-            .doc(application.user.id)
-            .collection("customJobApplications")
-            .doc(customJob.id)
-
-         batch.update(ref, { job: updatedCustomJob })
-      })
-
-      return void batch.commit()
-   }
-
    async getGroupFollowers(groupId: string): Promise<CompanyFollowed[]> {
       const querySnapshot = await this.firestore
          .collectionGroup("companiesUserFollows")
@@ -78,18 +34,5 @@ export class UserFunctionsRepository
          .get()
 
       return querySnapshot.docs?.map((doc) => doc.data() as CompanyFollowed)
-   }
-
-   async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
-      const newCustomJOb: CustomJob = {
-         ...deletedCustomJob,
-         deleted: true,
-      }
-
-      functions.logger.log(
-         `Delete user CustomJobApplicants with the job ${deletedCustomJob.id}.`
-      )
-
-      return this.syncCustomJobDataToUser(newCustomJOb)
    }
 }

@@ -119,6 +119,7 @@ async function createCustomJobApplicantsInCollection(
             appliedAt: customJob.createdAt ?? (new Date() as any), // js Dates get converted to Timestamps
             groupId: customJob.groupId ?? null,
             livestreamId: customJob.livestreams?.[0] ?? null, // default to first livestream for migration
+            job: customJob,
          }
 
          const customJobApplicantRef = firestore
