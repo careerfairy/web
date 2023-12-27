@@ -37,14 +37,14 @@ const styles = sxStyles({
    },
 })
 
-const contentMaxWidth = 460
+const CONTENT_MAX_WIDTH = 460
 
 const FreeTrial = () => {
    const { completeOnboarding } = useOnboarding()
 
    return (
       <Stack spacing={2.5} sx={styles.root}>
-         <Stack maxWidth={contentMaxWidth} spacing={1}>
+         <Stack maxWidth={CONTENT_MAX_WIDTH} spacing={1}>
             <Stack sx={styles.centered} spacing={1}>
                <Box component={Clock} sx={styles.icon} />
                <TimelineView.Title>
@@ -56,7 +56,7 @@ const FreeTrial = () => {
                </TimelineView.Description>
             </Stack>
          </Stack>
-         <Box maxWidth={contentMaxWidth} sx={styles.trialNoticeWrapper}>
+         <Box maxWidth={CONTENT_MAX_WIDTH} sx={styles.trialNoticeWrapper}>
             <Typography variant="body2" sx={styles.noticeText}>
                2-week content creation period <br /> 2 months in which Sparks
                are visible on CareerFairy

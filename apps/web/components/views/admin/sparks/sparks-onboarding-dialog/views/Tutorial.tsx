@@ -30,6 +30,16 @@ const styles = sxStyles({
    },
 })
 
+const videoConfig = {
+   file: {
+      attributes: {
+         controlsList: "nodownload noplaybackrate",
+         disablePictureInPicture: true,
+         playsInline: true,
+      },
+   },
+}
+
 const Tutorial = () => {
    const { handleNext, handleBack } = useOnboarding()
 
@@ -64,16 +74,6 @@ const Tutorial = () => {
          </Stack>
       </Box>
    )
-}
-
-const videoConfig = {
-   file: {
-      attributes: {
-         controlsList: "nodownload noplaybackrate",
-         disablePictureInPicture: true,
-         playsInline: true,
-      },
-   },
 }
 
 export default Tutorial

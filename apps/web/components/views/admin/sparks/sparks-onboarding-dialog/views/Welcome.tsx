@@ -11,6 +11,11 @@ const styles = sxStyles({
       alignItems: "center",
       height: "100%",
    },
+   content: {
+      alignItems: "center",
+      textAlign: "center",
+      maxWidth: 443,
+   },
    icon: {
       color: "secondary.main",
       width: 64,
@@ -22,19 +27,8 @@ const Welcome = () => {
    const { handleNext, completeOnboarding } = useOnboarding()
 
    return (
-      <Stack
-         spacing={4}
-         justifyContent="center"
-         alignItems="center"
-         sx={styles.root}
-      >
-         <Stack
-            justifyContent="center"
-            alignItems="center"
-            textAlign="center"
-            maxWidth={443}
-            spacing={1}
-         >
+      <Stack spacing={4} sx={styles.root}>
+         <Stack sx={styles.content} spacing={1}>
             <PartyPopperIcon sx={styles.icon} />
             <TimelineView.Title>Welcome to Sparks!</TimelineView.Title>
             <TimelineView.Description>
