@@ -1,17 +1,11 @@
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import DialogBody from "components/views/admin/company-plans/plan-confirmation-dialog/DialogBody"
 import { Clock } from "react-feather"
-import {
-   PlanConfirmationDialogKeys,
-   usePlanConfirmationDialog,
-   usePlanConfirmationDialogStepper,
-} from "./CompanyPlanConfirmationDialog"
+import { usePlanConfirmationDialog } from "./CompanyPlanConfirmationDialog"
 
 const ConfirmSparksTrialView = () => {
-   const { handleClose, isMutating, startPlan, groupToManage } =
+   const { handleClose, isMutating, groupToManage, startPlanAndGoToSuccess } =
       usePlanConfirmationDialog()
-
-   const { goToStep } = usePlanConfirmationDialogStepper()
 
    return (
       <DialogBody
@@ -22,11 +16,7 @@ const ConfirmSparksTrialView = () => {
                <DialogBody.ActionButton
                   buttonType="primary"
                   loading={isMutating}
-                  onClick={() =>
-                     startPlan(GroupPlanTypes.Trial).then(() =>
-                        goToStep(PlanConfirmationDialogKeys.Success)
-                     )
-                  }
+                  onClick={() => startPlanAndGoToSuccess(GroupPlanTypes.Trial)}
                >
                   Proceed
                </DialogBody.ActionButton>

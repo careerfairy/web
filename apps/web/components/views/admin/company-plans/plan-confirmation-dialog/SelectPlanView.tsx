@@ -7,11 +7,9 @@ import { sxStyles } from "types/commonTypes"
 import {
    PlanConfirmationDialogKeys,
    usePlanConfirmationDialog,
-   usePlanConfirmationDialogStepper,
 } from "./CompanyPlanConfirmationDialog"
 
 const styles = sxStyles({
-   icon: {},
    caption: {
       fontSize: "1.28571rem",
       fontWeight: 600,
@@ -39,8 +37,11 @@ const styles = sxStyles({
 })
 
 const SelectPlanView = () => {
-   const { groupToManage, handleClose } = usePlanConfirmationDialog()
-   const { goToStep } = usePlanConfirmationDialogStepper()
+   const {
+      groupToManage,
+      handleClose,
+      stepper: { goToStep },
+   } = usePlanConfirmationDialog()
    return (
       <>
          <DialogBody.CloseIconButton onClick={handleClose} />
