@@ -273,8 +273,12 @@ service cloud.firestore {
             allow write: if true;
         }
 
+        // To create a readable ID and prevent duplicate user applications to the same job,
+        // the applicantId consists of {jobId}_{userId}
         match /jobApplications/{applicantId} {
             allow read: if true;
+            // Here, we split the applicantId to call the isSignedInAndIsSameUser function
+            // only with the userId
             allow write: if isSignedInAndIsSameUser(applicantId.split("_")[1]);
         }
 
