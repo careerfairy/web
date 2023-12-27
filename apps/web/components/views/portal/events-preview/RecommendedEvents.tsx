@@ -7,7 +7,7 @@ import EventsPreviewCarousel, { ChildRefType } from "./EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    const options = useMemo(
       () => ({
@@ -24,7 +24,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
          loop: false,
          align: "center",
          dragThreshold: 0.5,
-         dragFree: false,
+         dragFree: true,
          inViewThreshold: 0,
       }),
       [events]
@@ -37,14 +37,12 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
       <div>
          <EventsPreviewCarousel
             options={eventsCarouselEmblaOptions}
-            limit={limit}
             title={!hideTitle && "RECOMMENDED FOR YOU"}
             events={events}
             type={EventsTypes.recommended}
             loading={loading}
             isRecommended
-            isAdmin={true}
-            hidePreview={false}
+            isAdmin={userData?.isAdmin}
             seeMoreLink="/next-livestreams"
          />
       </div>
