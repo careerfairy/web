@@ -150,7 +150,7 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
    return defaultPlanViewIndex
 }
 
-export const usePlanConfirmationDialog = () => {
+export const usePlanConfirmationDialogContext = () => {
    const context = React.useContext(PlanConfirmationDialogContext)
 
    if (context === undefined) {
@@ -162,6 +162,23 @@ export const usePlanConfirmationDialog = () => {
    return context
 }
 
+export const usePlanConfirmationDialog = () => {
+   const stepper = useStepper<PlanConfirmationDialogKey>()
+   const context = usePlanConfirmationDialogContext()
+
+   const startPlanAndGoToSuccess = useCallback(
+      async (planType: GroupPlanType) => {
+         await context.startPlan(planType)
+         stepper.goToStep(PlanConfirmationDialogKeys.Success)
+      },
+      [context, stepper]
+   )
+   return {
+      stepper,
+      startPlanAndGoToSuccess,
+      ...context,
+   }
+}
 export const usePlanConfirmationDialogStepper =
    useStepper<PlanConfirmationDialogKey>
 

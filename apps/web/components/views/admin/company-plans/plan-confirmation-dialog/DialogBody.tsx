@@ -16,7 +16,6 @@ import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    PlanConfirmationDialogKeys,
    usePlanConfirmationDialog,
-   usePlanConfirmationDialogStepper,
 } from "./CompanyPlanConfirmationDialog"
 
 const styles = sxStyles({
@@ -133,9 +132,12 @@ const CloseIconButton = ({ onClick }: Pick<IconButtonProps, "onClick">) => (
 )
 
 const SecondaryButton = () => {
-   const { handleClose, isMutating, groupToManage } =
-      usePlanConfirmationDialog()
-   const { goToStep } = usePlanConfirmationDialogStepper()
+   const {
+      handleClose,
+      isMutating,
+      groupToManage,
+      stepper: { goToStep },
+   } = usePlanConfirmationDialog()
 
    if (groupToManage.hasPlan()) {
       return (
