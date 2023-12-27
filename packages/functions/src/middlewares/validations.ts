@@ -1,6 +1,7 @@
 import {
    validateData,
    validateUserAuthExists,
+   validateUserIsCFAdmin,
    validateUserIsGroupAdmin as validateUserIsGroupAdminFn,
 } from "../lib/validations"
 import { OnCallMiddleware } from "./middlewares"
@@ -34,6 +35,22 @@ export const userShouldBeGroupAdmin = (): OnCallMiddleware<{
          group,
          userData,
       }
+
+      return next()
+   }
+}
+
+/**
+ * Validate if the user is a CF Admin
+ *
+ * Throws an exception if is not allowed
+ */
+export const userShouldBeCFAdmin = (): OnCallMiddleware => {
+   return async (_, context, next) => {
+      const idToken = await validateUserAuthExists(context)
+
+      // throws if user is not a CF Admin
+      await validateUserIsCFAdmin(idToken.email)
 
       return next()
    }
