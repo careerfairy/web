@@ -1,11 +1,10 @@
 import dayjs from "dayjs"
-
-var calendar = require("dayjs/plugin/calendar")
-var advancedFormat = require("dayjs/plugin/advancedFormat")
-var utc = require("dayjs/plugin/utc")
-var timezone = require("dayjs/plugin/timezone") // dependent on utc plugin
-var relativeTime = require("dayjs/plugin/relativeTime")
-var duration = require("dayjs/plugin/duration")
+import calendar from "dayjs/plugin/calendar"
+import advancedFormat from "dayjs/plugin/advancedFormat"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
+import relativeTime from "dayjs/plugin/relativeTime"
+import duration from "dayjs/plugin/duration"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -15,7 +14,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
 export default class DateUtil {
-   static getJobApplicationDate(JSDate) {
+   static getJobApplicationDate(JSDate: Date) {
       return dayjs(JSDate).format("DD MMM YYYY")
    }
    static getTodaysISODate() {
@@ -30,30 +29,30 @@ export default class DateUtil {
       return todaysYear + "-" + todaysMonth + "-" + todaysDate
    }
 
-   static monthAndDay(date) {
+   static monthAndDay(date: Date) {
       return dayjs(date).format("MMM DD")
    }
-   static eventPreviewDate(JSDate) {
+   static eventPreviewDate(JSDate: Date) {
       return dayjs(JSDate).format("MMMM Do, HH:mm")
    }
 
-   static dateWithYear(JSDate) {
+   static dateWithYear(JSDate: Date) {
       return dayjs(JSDate).format("LL LT") // October 21, 2019 10:00 AM
    }
 
-   static eventPreviewHour(JSDate) {
+   static eventPreviewHour(JSDate: Date) {
       return dayjs(JSDate).format("HH:mm")
    }
-   static getUpcomingDate(JSDate) {
+   static getUpcomingDate(JSDate: Date | string) {
       return dayjs(JSDate).format("dddd, MMM D, YYYY h:mm A")
    }
-   static getStreamTime(JSDate) {
+   static getStreamTime(JSDate: Date) {
       return dayjs(JSDate).format("hh:ss z")
    }
-   static getStreamDate(JSDate) {
+   static getStreamDate(JSDate: Date) {
       return dayjs(JSDate).format("dddd, MMMM D")
    }
-   static getRatingDate(JSDate) {
+   static getRatingDate(JSDate: Date | string) {
       return dayjs(JSDate).format("D MMMM YYYY")
    }
 
@@ -64,15 +63,15 @@ export default class DateUtil {
     * @param {Date} JSDate - The JavaScript Date object to be transformed.
     * @return {string} - The resulting string formatted as "DD/MM/YYYY".
     */
-   static formatDateToString(JSDate) {
+   static formatDateToString(JSDate: Date) {
       return dayjs(JSDate).format("DD/MM/YYYY")
    }
 
-   static eventStartDate(JSDate) {
+   static eventStartDate(JSDate: Date) {
       return dayjs(JSDate).format("DD/MM/YYYY HH:mm")
    }
 
-   static getRelativeDate(JSDate) {
+   static getRelativeDate(JSDate: Date) {
       const now = new Date()
       return dayjs(JSDate).calendar(now, {
          sameDay: "[Today,] h:mm", // The same day ( Today, 2:30  )
@@ -91,11 +90,11 @@ export default class DateUtil {
       return tomorrow
    }
 
-   static getTimeAgo(JSDate) {
+   static getTimeAgo(JSDate: Date) {
       return dayjs(JSDate).fromNow() // 2 hours ago, 2 days ago, 2 months ago, 2 years ago
    }
 
-   static getISODateTime(JSDate) {
+   static getISODateTime(JSDate: Date) {
       let year = JSDate.getFullYear()
       let month =
          JSDate.getMonth() + 1 > 9
@@ -127,7 +126,7 @@ export default class DateUtil {
       )
    }
 
-   static getAddEventDateTime(JSDate) {
+   static getAddEventDateTime(JSDate: Date) {
       let year = JSDate.getFullYear()
       let month =
          JSDate.getMonth() + 1 > 9
@@ -159,7 +158,7 @@ export default class DateUtil {
       )
    }
 
-   static getPrettyDate(JSDate) {
+   static getPrettyDate(JSDate: Date) {
       return (
          DateUtil.getMonth(JSDate.getMonth()) +
          " " +
@@ -171,7 +170,7 @@ export default class DateUtil {
       )
    }
 
-   static getPrettyDateWithoutHour(JSDate) {
+   static getPrettyDateWithoutHour(JSDate: Date) {
       return (
          JSDate.getDate() +
          " " +
@@ -181,7 +180,7 @@ export default class DateUtil {
       )
    }
 
-   static getPrettyDateShort(JSDate) {
+   static getPrettyDateShort(JSDate: Date) {
       return (
          JSDate.getDate() +
          "." +
@@ -193,17 +192,17 @@ export default class DateUtil {
       )
    }
 
-   static getPrettyDay(JSDate) {
+   static getPrettyDay(JSDate: Date) {
       return DateUtil.getMonth(JSDate.getMonth()) + " " + JSDate.getDate()
    }
 
-   static getPrettyTime(JSDate) {
+   static getPrettyTime(JSDate: Date) {
       return (
          JSDate.getHours() + ":" + DateUtil.getTimeMinutes(JSDate.getMinutes())
       )
    }
 
-   static getMonth(JsDateMonth, isAbbreviated = false) {
+   static getMonth(JsDateMonth: number, isAbbreviated = false) {
       switch (JsDateMonth) {
          case 0:
             return isAbbreviated ? "JAN" : "January"
@@ -234,7 +233,7 @@ export default class DateUtil {
       }
    }
 
-   static getDayExtension(JsDateDay) {
+   static getDayExtension(JsDateDay: number) {
       switch (JsDateDay) {
          case 1:
             return "st"
@@ -247,7 +246,7 @@ export default class DateUtil {
       }
    }
 
-   static getTimeMinutes(JsTimeMinutes) {
+   static getTimeMinutes(JsTimeMinutes: number) {
       if (JsTimeMinutes < 10) {
          return "0" + JsTimeMinutes
       } else {
@@ -261,14 +260,19 @@ export default class DateUtil {
       )
    }
 
-   static getDifferenceInDays(dateFrom, dateTo) {
+   static getDifferenceInDays(dateFrom: Date, dateTo: Date) {
       const differenceInTime = dateTo.getTime() - dateFrom.getTime()
       return differenceInTime / (1000 * 60 * 60 * 24)
    }
 
-   static calculateTimeLeft(time) {
-      const difference = time - new Date()
-      let timeLeft = {}
+   static calculateTimeLeft(time: Date) {
+      const difference = time.getTime() - new Date().getTime()
+      let timeLeft = {
+         Days: 0,
+         Hours: 0,
+         Minutes: 0,
+         Seconds: 0,
+      }
 
       if (difference > 0) {
          timeLeft = {
@@ -282,21 +286,21 @@ export default class DateUtil {
       return timeLeft
    }
 
-   static addDaysToDate(date, numberOfDays) {
+   static addDaysToDate(date: Date, numberOfDays: number) {
       const result = date
       result.setDate(date.getDate() + numberOfDays)
 
       return result
    }
 
-   static formatLiveDate(JSDate) {
+   static formatLiveDate(JSDate: Date) {
       const formattedDate = dayjs(JSDate).format(
          "dddd, DD MMM YYYY [at] h:mm A"
       )
       return `Live on ${formattedDate}` // Live on Monday, 12 Oct 2020 at 12:00 PM
    }
 
-   static formatPastDate(JSDate) {
+   static formatPastDate(JSDate: Date) {
       const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
       return `Live streamed on: ${formattedDate}` // Release date: 15 Dec 2022
    }
@@ -312,5 +316,15 @@ export default class DateUtil {
       if (milliseconds < 0) return fallback
       const days = dayjs.duration(milliseconds).asDays()
       return `${Math.floor(days)} days`
+   }
+
+   /**
+    * Formats a JavaScript Date object to a string in the format "DD MMM YYYY".
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be formatted.
+    * @return {string} - The formatted date string. Example: "12 Oct 2020".
+    */
+   static formatDateToDayMonthYear(JSDate: Date) {
+      return dayjs(JSDate).format("DD MMM YYYY") // 12 Oct 2020
    }
 }
