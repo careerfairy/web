@@ -305,7 +305,14 @@ export class GroupPresenter {
     * The duration is calculated from the plan's start and end dates
     */
    getPlanTimeLeft() {
-      return this.getExpiresAt() - this.getStartedAt()
+      return this.getExpiresAt() - Date.now()
+   }
+
+   /**
+    * To get the number of days left for this specific group's plan
+    */
+   getPlanDaysLeft() {
+      return Math.ceil(this.getPlanTimeLeft() / (1000 * 60 * 60 * 24))
    }
 
    /**
@@ -315,6 +322,15 @@ export class GroupPresenter {
    hasPlanExpired() {
       const currentTime = new Date().getTime()
       return currentTime > this.getExpiresAt()
+   }
+
+   /**
+    * To check if the plan for this specific group exists
+    *
+    * @returns true if the plan exists, false otherwise
+    */
+   hasPlan() {
+      return this.plan !== null && this.plan !== undefined
    }
 
    /**
