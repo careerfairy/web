@@ -1,10 +1,4 @@
-import React, {
-   ReactNode,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import React, { ReactNode, useCallback, useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import useEmblaCarousel, {
    EmblaCarouselType,
@@ -16,16 +10,13 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { useRouter } from "next/router"
-import useRegistrationModal from "components/custom-hook/useRegistrationModal"
-import { useInterests } from "components/custom-hook/useCollection"
 import { MARKETING_LANDING_PAGE_PATH } from "constants/routes"
-import RegistrationModal from "components/views/common/registration-modal"
-import { Typography, Stack, useMediaQuery, useTheme } from "@mui/material"
-import ShareLivestreamModal from "components/views/common/ShareLivestreamModal"
+import { Typography, Stack } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import Link from "next/link"
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
@@ -51,8 +42,6 @@ const styles = sxStyles({
       backfaceVisibility: "hidden",
       display: "flex",
       touchAction: "pan-y",
-      // marginLeft: `calc(${slideSpacing}px *-1)`,
-      // marginLeft: `${slideSpacing}`,
    },
    slide: {
       flex: {
@@ -74,7 +63,10 @@ const styles = sxStyles({
       position: "relative",
    },
 })
-
+// Not used for now, but can be used for custom styling on drag
+const wheelGesturesOptions = {
+   wheelDraggingClass: "is-wheel-dragging",
+}
 export type ChildRefType = {
    goNext: () => void
    goPrev: () => void
@@ -85,7 +77,6 @@ export interface EventsProps {
    seeMoreLink?: string
    title?: string
    loading: boolean
-   limit?: number
    hidePreview?: boolean
    type: EventsTypes
    id?: string
@@ -103,7 +94,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          title,
          seeMoreLink,
          loading,
-         limit = 0,
          events,
          hidePreview,
          type,
@@ -114,7 +104,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          children,
          options,
       } = props
-      const [emblaRef, emblaApi] = useEmblaCarousel(options)
+
+      const [emblaRef, emblaApi] = useEmblaCarousel(options, [
+         WheelGesturesPlugin(wheelGesturesOptions),
+      ])
 
       React.useImperativeHandle(ref, () => ({
          goNext() {
@@ -125,28 +118,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          },
       }))
 
-      const {
-         query: { groupId },
-         pathname,
-      } = useRouter()
-
-      const { joinGroupModalData, handleCloseJoinModal } =
-         useRegistrationModal()
-      const { data: existingInterests } = useInterests()
-
-      const [shareEventDialog, setShareEventDialog] = useState(null)
-
-      const handleShareEventDialogClose = useCallback(() => {
-         setShareEventDialog(null)
-      }, [setShareEventDialog])
-
       const [cardsLoaded, setCardsLoaded] = useState({})
 
       const [slidesInView, setSlidesInView] = useState<number[]>([])
-
-      const isOnMarketingLandingPage = pathname.includes(
-         MARKETING_LANDING_PAGE_PATH
-      )
 
       const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
          setCardsLoaded((prev) => ({
@@ -157,20 +131,29 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             ),
          }))
       }
-      const updateSlidesInView = useCallback((emblaApi: EmblaCarouselType) => {
-         setSlidesInView((slidesInView) => {
-            if (slidesInView.length === emblaApi.slideNodes().length) {
-               emblaApi.off("slidesInView", updateSlidesInView)
-            }
-            const inView = emblaApi
-               .slidesInView()
-               .filter((index) => !slidesInView.includes(index))
 
-            handleCardsLoaded(inView)
+      /**
+       * Lazily load cards based on what is currently in view.
+       * The @function handleCardsLoaded then updates the Events array based on the indexes which are
+       * currently in view.
+       */
+      const updateSlidesInView = useCallback(
+         (emblaApi: EmblaCarouselType) => {
+            setSlidesInView((slidesInView) => {
+               if (slidesInView.length === emblaApi.slideNodes().length) {
+                  emblaApi.off("slidesInView", updateSlidesInView)
+               }
+               const inView = emblaApi
+                  .slidesInView()
+                  .filter((index) => !slidesInView.includes(index))
 
-            return slidesInView.concat(inView)
-         })
-      }, [])
+               handleCardsLoaded(inView)
+
+               return slidesInView.concat(inView)
+            })
+         },
+         [emblaApi, setSlidesInView]
+      )
 
       useEffect(() => {
          if (!emblaApi) return
@@ -186,23 +169,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                <Box>
                   {!isEmbedded ? (
                      <Box sx={styles.eventsHeader}>
-                        {isOnMarketingLandingPage ? (
-                           <Heading
-                              sx={{
-                                 opacity: "unset",
-                                 color: "unset",
-                                 fontWeight: 500,
-                              }}
-                              variant={"h2"}
-                           >
-                              {title}
-                           </Heading>
-                        ) : (
-                           <Heading>{title}</Heading>
-                        )}
-                        {events?.length >= limit &&
-                        !isOnMarketingLandingPage &&
-                        seeMoreLink ? (
+                        {<Heading>{title}</Heading>}
+                        {events?.length >= 0 && seeMoreLink ? (
                            <Link href={seeMoreLink}>
                               <Typography sx={styles.seeMoreText} color="grey">
                                  See more
@@ -229,7 +197,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  ? "/next-livestreams"
                                  : "/next-livestreams?type=pastEvents"
                            }
-                           showButton={!isOnMarketingLandingPage}
+                           showButton={true}
                            targetBlank={isEmbedded}
                         />
                      ) : null}
@@ -249,7 +217,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                          }
                                          index={index}
                                          totalElements={arr.length}
-                                         interests={existingInterests}
                                          location={getLocation(type)}
                                          event={event}
                                          isRecommended={isRecommended}
@@ -269,24 +236,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      </Box>
                   </Stack>
                </Box>
-            ) : null}
-            {!isEmbedded && joinGroupModalData ? (
-               <RegistrationModal
-                  isRecommended={isRecommended}
-                  open={Boolean(joinGroupModalData)}
-                  onFinish={handleCloseJoinModal}
-                  promptOtherEventsOnFinal={!groupId}
-                  livestream={joinGroupModalData?.livestream}
-                  groups={joinGroupModalData?.groups}
-                  targetGroupId={joinGroupModalData?.targetGroupId}
-                  handleClose={handleCloseJoinModal}
-               />
-            ) : null}
-            {!isEmbedded && shareEventDialog ? (
-               <ShareLivestreamModal
-                  livestreamData={shareEventDialog}
-                  handleClose={handleShareEventDialogClose}
-               />
             ) : null}
          </>
       )
