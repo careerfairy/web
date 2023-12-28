@@ -1,5 +1,5 @@
 import { FC, useState } from "react"
-import { AbstractButtonSelect } from "../util"
+import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
 import {
    ReachData,
    TimePeriodParams,
@@ -32,6 +32,7 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
    const isMobile = useIsMobile()
    const { group } = useGroup()
    const { reach } = useSparksAnalytics(group.id)[timeFilter]
+   const resetChartsTooltip = useResetChartsTooltip()
 
    const [reachSelectValue, setReachSelectValue] =
       useState<keyof ReachData>("totalViews")
@@ -43,7 +44,7 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
       <>
          {isMobile ? (
             <GroupSparkAnalyticsCardContainer>
-               <BrandedSwipeableViews>
+               <BrandedSwipeableViews onStepChange={resetChartsTooltip}>
                   <>
                      <GroupSparkAnalyticsCardContainerTitle>
                         {`${numberToString(
