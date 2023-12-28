@@ -21,6 +21,7 @@ import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctio
 import GeneralLayout from "../layouts/GeneralLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { StreamCreationProvider } from "../components/views/draftStreamForm/StreamForm/StreamCreationProvider"
+import { customJobServiceInstance } from "../data/firebase/CustomJobService"
 
 const DraftStream = () => {
    const firebaseService = useFirebaseService()
@@ -92,6 +93,7 @@ const DraftStream = () => {
       status,
       setStatus,
       selectedJobs,
+      selectedCustomJobs,
       metaData
    ) => {
       let livestream
@@ -120,6 +122,9 @@ const DraftStream = () => {
             livestream.hasJobs = selectedJobs.length > 0
          }
 
+         livestream.hasCustomJobs = selectedCustomJobs?.length > 0
+         const selectedCustomJobsIds = selectedCustomJobs.map((job) => job.id)
+
          if (metaData) {
             livestream.companySizes = metaData.companySizes
             livestream.companyIndustries = metaData.companyIndustries
@@ -143,6 +148,11 @@ const DraftStream = () => {
                promotion
             )
 
+            await customJobServiceInstance.updateCustomJobWithLinkedLivestreams(
+               livestream.id,
+               selectedCustomJobsIds
+            )
+
             // console.log("-> Draft livestream was updated with id", id);
          } else {
             const author = {
@@ -154,6 +164,12 @@ const DraftStream = () => {
                author,
                {}
             )
+
+            await customJobServiceInstance.updateCustomJobWithLinkedLivestreams(
+               livestream.id,
+               selectedCustomJobsIds
+            )
+
             // console.log("-> Draft livestream was created with id", id);
             push(`/draft-stream?draftStreamId=${id}`).catch()
          }

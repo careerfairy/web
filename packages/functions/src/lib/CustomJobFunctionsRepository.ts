@@ -7,9 +7,6 @@ import {
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as functions from "firebase-functions"
-import { Change } from "firebase-functions"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Timestamp } from "../api/firestoreAdmin"
 
 export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
@@ -26,17 +23,16 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncCustomJobDataToCustomJobStats(updatedCustomJob: CustomJob): Promise<void>
 
    /**
-    * To sync the connection between the livestream and the pre-existing custom jobs
-    */
-   syncLivestreamIdWithCustomJobs(
-      livestream: Change<DocumentSnapshot>
-   ): Promise<void>
-
-   /**
     * This method adds a deleted flag to the customJobStats document
     * @param deletedCustomJob
     */
    deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
+
+   /**
+    * This method removes the livestream ID from all the linked Jobs
+    * @param livestreamId
+    */
+   removeLinkedLivestream(livestreamId: string): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -80,71 +76,6 @@ export class CustomJobFunctionsRepository
       return ref.update({ job: updatedCustomJob })
    }
 
-   async syncLivestreamIdWithCustomJobs(
-      livestream: Change<DocumentSnapshot>
-   ): Promise<void> {
-      const batch = this.firestore.batch()
-      const newLivestream = livestream.after?.data() as LivestreamEvent
-      const previousLivestream = livestream.before?.data() as LivestreamEvent
-
-      const groupId =
-         newLivestream?.groupIds?.[0] || previousLivestream?.groupIds?.[0]
-      const livestreamId = newLivestream?.id || previousLivestream?.id
-
-      const newJobs = newLivestream?.customJobs || []
-      const oldJobs = previousLivestream?.customJobs || []
-
-      // To get a list of jobs that have been removed as a result of this update or deletion action
-      const jobsToRemoveLivestreamId = oldJobs.filter(
-         ({ id: oldJobId }) =>
-            !newJobs.some(({ id: newJobId }) => newJobId === oldJobId)
-      )
-
-      // To get a list of jobs that have been added as a result of this update or creation action
-      const jobsToAddLivestreamId = newJobs.filter(
-         ({ id: newJobId }) =>
-            !oldJobs.some(({ id: oldJobId }) => oldJobId === newJobId)
-      )
-
-      if (Boolean(!groupId) || Boolean(!livestreamId)) {
-         // If there are no valid group id or livestream id at this moment, no additional work is required
-         return
-      }
-
-      if (
-         jobsToAddLivestreamId.length === 0 &&
-         jobsToRemoveLivestreamId.length === 0
-      ) {
-         // If there are no jobs to be added or removed, it indicates that no changes have been made to the custom job field
-         // so no additional work is required
-         return
-      }
-
-      jobsToAddLivestreamId.forEach((job) => {
-         const ref = this.firestore.collection("customJobs").doc(job.id)
-
-         batch.update(ref, {
-            livestreams: this.fieldValue.arrayUnion(livestreamId),
-         })
-      })
-
-      for (const job of jobsToRemoveLivestreamId) {
-         const ref = this.firestore.collection("customJobs").doc(job.id)
-
-         const docSnap = await ref.get()
-
-         // when deleting the livestream from a job
-         // is required to confirm if the job does still exist
-         if (docSnap.exists) {
-            batch.update(ref, {
-               livestreams: this.fieldValue.arrayRemove(livestreamId),
-            })
-         }
-      }
-
-      return await batch.commit()
-   }
-
    async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
       functions.logger.log(
          `Add deleted flag to the CustomJobStats with job ${deletedCustomJob.id}.`
@@ -162,5 +93,28 @@ export class CustomJobFunctionsRepository
             deleted: true,
          },
       })
+   }
+
+   async removeLinkedLivestream(livestreamId: string): Promise<void> {
+      const batch = this.firestore.batch()
+
+      functions.logger.log(`Remove linked jobs from livestream ${livestreamId}`)
+
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("livestreams", "array-contains", livestreamId)
+         .get()
+
+      if (docs.empty) {
+         return
+      }
+
+      docs.forEach((doc) => {
+         batch.update(doc.ref, {
+            livestreams: this.fieldValue.arrayRemove(livestreamId),
+         })
+      })
+
+      return batch.commit()
    }
 }

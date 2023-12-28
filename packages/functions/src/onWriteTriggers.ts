@@ -86,32 +86,13 @@ export const syncLivestreams = functions
          }
       }
 
-      sideEffectPromises.push(
-         customJobRepo.syncLivestreamIdWithCustomJobs(change)
-      )
+      if (changeTypes.isDelete) {
+         const deletedValue = change.before?.data() as LivestreamEvent
 
-      return handleSideEffects(sideEffectPromises)
-   })
-
-export const syncDraftLivestreams = functions
-   .runWith(defaultTriggerRunTimeConfig)
-   .region(config.region)
-   .firestore.document("draftLivestreams/{livestreamId}")
-   .onWrite(async (change, context) => {
-      const changeTypes = getChangeTypes(change)
-
-      logStart({
-         changeTypes,
-         context,
-         message: "syncDraftLivestreamsOnWrite",
-      })
-
-      // An array of promise side effects to be executed in parallel
-      const sideEffectPromises: Promise<unknown>[] = []
-
-      sideEffectPromises.push(
-         customJobRepo.syncLivestreamIdWithCustomJobs(change)
-      )
+         sideEffectPromises.push(
+            customJobRepo.removeLinkedLivestream(deletedValue.id)
+         )
+      }
 
       return handleSideEffects(sideEffectPromises)
    })
@@ -347,8 +328,7 @@ export const onWriteCustomJobs = functions
          const updatedCustomJob = change.after.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
-            livestreamsRepo.syncCustomJobDataToLivestream(updatedCustomJob)
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob)
          )
       }
 
@@ -356,8 +336,7 @@ export const onWriteCustomJobs = functions
          const deletedCustomJob = change.before.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.deleteAndSyncCustomJob(deletedCustomJob),
-            livestreamsRepo.deleteAndSyncCustomJob(deletedCustomJob)
+            customJobRepo.deleteAndSyncCustomJob(deletedCustomJob)
          )
       }
 

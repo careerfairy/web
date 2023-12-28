@@ -1170,7 +1170,7 @@ export class LivestreamsDataParser {
 
    filterByHasJobs() {
       this.livestreams = this.livestreams?.filter(
-         ({ jobs, customJobs }) => jobs?.length > 0 || customJobs?.length > 0
+         ({ jobs, hasCustomJobs }) => jobs?.length > 0 || hasCustomJobs
       )
       return this
    }

@@ -12,7 +12,6 @@ import {
    LivestreamStatus,
    Speaker,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
-   LivestreamCustomJobAssociationPresenter,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { AdminGroupsClaim } from "../users"
@@ -21,10 +20,6 @@ import {
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
-import {
-   formatLivestreamCustomJobAssociationToPublicCustomJob,
-   formatPublicCustomJobToLivestreamCustomJobAssociation,
-} from "./sources/transformations"
 
 export const MAX_DAYS_TO_SHOW_RECORDING = 5
 
@@ -83,7 +78,7 @@ export class LivestreamPresenter extends BaseModel {
        * During livestream creating, jobs can be associated with the livestream
        */
       public readonly jobs: LivestreamJobAssociation[],
-      public readonly customJobs: LivestreamCustomJobAssociationPresenter[],
+      public readonly hasCustomJobs: boolean,
 
       /**
        * An empty array means the livestream should target all the fields of study
@@ -247,10 +242,7 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    hasJobs(): boolean {
-      return (
-         (this.jobs && this.jobs.length > 0) ||
-         (this.customJobs && this.customJobs.length > 0)
-      )
+      return (this.jobs && this.jobs.length > 0) || this.hasCustomJobs
    }
 
    getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
@@ -307,9 +299,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
 
          livestream.jobs ?? [],
-         formatPublicCustomJobToLivestreamCustomJobAssociation(
-            livestream.customJobs
-         ) ?? [],
+         livestream.hasCustomJobs ?? false,
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
@@ -373,7 +363,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.address,
          livestream.denyRecordingAccess,
          livestream.jobs,
-         livestream.customJobs,
+         livestream.hasCustomJobs,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
@@ -457,10 +447,7 @@ export class LivestreamPresenter extends BaseModel {
          isFaceToFace: this.isFaceToFace,
          isHybrid: this.isHybrid,
          jobs: this.jobs,
-         customJobs: formatLivestreamCustomJobAssociationToPublicCustomJob(
-            this.customJobs,
-            fromDate
-         ),
+         hasCustomJobs: this.hasCustomJobs,
          targetFieldsOfStudy: this.targetFieldsOfStudy,
          targetLevelsOfStudy: this.targetLevelsOfStudy,
          speakers: this.speakers,

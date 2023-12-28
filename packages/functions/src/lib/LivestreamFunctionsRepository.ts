@@ -38,11 +38,6 @@ import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -123,20 +118,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       streamId: string,
       origin: string
    ): Promise<GroupAdminNewEventEmailInfo[]>
-
-   /**
-    * Sync custom jobs data to the livestreams and drafts
-    *
-    * @param customJob
-    */
-   syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void>
-
-   /**
-    * Delete and sync custom jobs data to the linked livestreams and drafts
-    *
-    * @param deletedCustomJob
-    */
-   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -478,138 +459,5 @@ export class LivestreamFunctionsRepository
       }
 
       return admins
-   }
-
-   async syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(customJob)
-
-      functions.logger.log(
-         `Sync livestreams with updated job ${updatedCustomJob.id}.`
-      )
-
-      // To fetch all livestreams and drafts
-      const [livestreamsSnaps, draftSnaps] = await Promise.all([
-         this.firestore
-            .collection("livestreams")
-            .where("groupIds", "array-contains", updatedCustomJob.groupId)
-            .where("start", ">=", new Date())
-            .get(),
-         this.firestore
-            .collection("draftLivestreams")
-            .where("groupIds", "array-contains", updatedCustomJob.groupId)
-            .get(),
-      ])
-
-      // To combine livestreams and drafts into the same Firestore batch operation
-      const snapShots = [livestreamsSnaps, draftSnaps]
-
-      snapShots.forEach((snap) =>
-         snap.forEach((doc) => {
-            const livestream = doc.data() as LivestreamEvent
-
-            if (livestream.customJobs?.length) {
-               const customJobToUpdateIndex = livestream.customJobs.findIndex(
-                  (currentJob) => currentJob.id === updatedCustomJob.id
-               )
-
-               if (customJobToUpdateIndex >= 0) {
-                  batch.update(doc.ref, {
-                     customJobs: [
-                        ...livestream.customJobs.slice(
-                           0,
-                           customJobToUpdateIndex
-                        ),
-                        updatedCustomJob,
-                        ...livestream.customJobs.slice(
-                           customJobToUpdateIndex + 1
-                        ),
-                     ],
-                  })
-               }
-            }
-         })
-      )
-
-      return void batch.commit()
-   }
-
-   async deleteAndSyncCustomJob(customJob: CustomJob): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const linkedLivestreams = customJob?.livestreams || []
-      const deletedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(customJob)
-
-      functions.logger.log(
-         `Deleting custom job ${deletedCustomJob.id} on ${linkedLivestreams.length} linked live streams and drafts.`
-      )
-
-      // if no linked live streams no work needed
-      if (linkedLivestreams.length === 0) {
-         return
-      }
-
-      // Fetch all linked livestreams and drafts
-      const [livestreamsSnaps, draftSnaps] = await Promise.all([
-         this.firestore
-            .collection("livestreams")
-            .where("id", "in", linkedLivestreams)
-            .get(),
-         this.firestore
-            .collection("draftLivestreams")
-            .where("id", "in", linkedLivestreams)
-            .get(),
-      ])
-
-      // To combine livestreams and drafts into the same Firestore batch operation
-      const snapShots = [livestreamsSnaps, draftSnaps]
-
-      snapShots.forEach((snap) =>
-         snap.forEach((doc) => {
-            const livestream = doc.data() as LivestreamEvent
-
-            if (livestream.customJobs?.length) {
-               // for the past livestreams we want to only add the deleted flag on the custom job
-               if (livestream.hasEnded) {
-                  const customJobToUpdateIndex =
-                     livestream.customJobs.findIndex(
-                        (currentJob) => currentJob.id === deletedCustomJob.id
-                     )
-
-                  batch.update(doc.ref, {
-                     customJobs: [
-                        ...livestream.customJobs.slice(
-                           0,
-                           customJobToUpdateIndex
-                        ),
-                        {
-                           ...deletedCustomJob,
-                           deleted: true,
-                        },
-                        ...livestream.customJobs.slice(
-                           customJobToUpdateIndex + 1
-                        ),
-                     ],
-                  })
-               }
-
-               // for the upcoming livestreams and drafts, we want to remove the deleted customJob from the list
-               else {
-                  const filteredCustomJobs = livestream.customJobs.filter(
-                     (currentJob) => currentJob.id != deletedCustomJob.id
-                  )
-
-                  batch.update(doc.ref, {
-                     customJobs: filteredCustomJobs,
-                  })
-               }
-            }
-         })
-      )
-
-      return void batch.commit()
    }
 }

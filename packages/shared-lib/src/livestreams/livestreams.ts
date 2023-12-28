@@ -136,8 +136,8 @@ export interface LivestreamEvent extends Identifiable {
     */
    jobs?: LivestreamJobAssociation[]
 
-   // Custom Jobs
-   customJobs?: PublicCustomJob[]
+   // Has Custom Jobs
+   hasCustomJobs?: boolean
    /**
     * Firestore has limitations when querying for jobs != []
     */

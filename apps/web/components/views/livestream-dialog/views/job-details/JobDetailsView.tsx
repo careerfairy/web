@@ -19,6 +19,7 @@ import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
 import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
 import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
+import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
 
 type Props = {
    jobId: string
@@ -49,6 +50,8 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+   const customJob = useCustomJob(jobId)
+
    let job: Job | PublicCustomJob
 
    job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
@@ -56,7 +59,8 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    if (!job) {
       // If entered here, it means that the current job is no Ats Job or don't exist
       // In this situation, let's validate if it's a customJob
-      job = livestream?.customJobs?.find((customJob) => customJob.id === jobId)
+      // TODO-GS: confirm all this logic on the livestream room
+      job = customJob
    }
 
    const isAtsJob = useIsAtsJob(job)

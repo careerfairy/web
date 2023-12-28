@@ -193,7 +193,6 @@ exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
-exports.syncDraftLivestreams = onWriteTriggers.syncDraftLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
@@ -217,6 +216,7 @@ exports.onCreateSparkStats = onCreateTriggers.onCreateSparkStats
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
+exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
 exports.createSpark_v3 = groupSparks.createSpark
@@ -242,3 +242,7 @@ exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
+exports.updateCustomJobWithLinkedLivestreams =
+   customJobs.updateCustomJobWithLinkedLivestreams
+exports.transferCustomJobsFromDraftToPublishedLivestream =
+   customJobs.transferCustomJobsFromDraftToPublishedLivestream

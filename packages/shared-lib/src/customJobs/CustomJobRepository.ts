@@ -7,9 +7,15 @@ import { Timestamp } from "../firebaseTypes"
 export interface ICustomJobRepository {
    /**
     * To create a custom job on the CustomJob root collection
+    * If linkedLivestreamId adds on the livestreams array field
+    *
     * @param job
+    * @param linkedLivestreamId
     */
-   createCustomJob(job: PublicCustomJob): Promise<CustomJob>
+   createCustomJob(
+      job: PublicCustomJob,
+      linkedLivestreamId?: string
+   ): Promise<CustomJob>
 
    /**
     * To update an existing custom job on the CustomJob root collection
@@ -55,6 +61,24 @@ export interface ICustomJobRepository {
     * @param groupId
     */
    incrementCustomJobClicks(jobId: string, groupId: string): Promise<void>
+
+   /**
+    * Get all the custom jobs linked by a specific live stream
+    * @param livestreamId
+    */
+   getCustomJobsByLivestreamId(livestreamId: string): Promise<CustomJob[]>
+
+   /**
+    * Update the livestream id as linked livestream to the customJobs
+    * @param livestreamId
+    * @param jobIdsToUpdate
+    * @param toRemove
+    */
+   updateCustomJobWithLinkedLivestreams(
+      livestreamId: string,
+      jobIdsToUpdate: string[],
+      toRemove?: boolean
+   ): Promise<void>
 }
 
 export class FirebaseCustomJobRepository
@@ -70,7 +94,10 @@ export class FirebaseCustomJobRepository
       super()
    }
 
-   async createCustomJob(job: PublicCustomJob): Promise<CustomJob> {
+   async createCustomJob(
+      job: PublicCustomJob,
+      linkedLivestreamId: string
+   ): Promise<CustomJob> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc()
 
       const newJob: CustomJob = {
@@ -78,7 +105,7 @@ export class FirebaseCustomJobRepository
          ...job,
          createdAt: this.fieldValue.serverTimestamp() as Timestamp,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
-         livestreams: [],
+         livestreams: linkedLivestreamId ? [linkedLivestreamId] : [],
          id: ref.id,
       }
 
@@ -87,10 +114,10 @@ export class FirebaseCustomJobRepository
       return newJob
    }
 
-   async updateCustomJob(job: PublicCustomJob): Promise<void> {
+   async updateCustomJob(job: CustomJob): Promise<void> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
 
-      const updatedJob: Partial<CustomJob> = {
+      const updatedJob: CustomJob = {
          ...job,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
       }
@@ -180,5 +207,44 @@ export class FirebaseCustomJobRepository
       return ref.update({
          clicks: this.fieldValue.increment(1),
       })
+   }
+
+   async getCustomJobsByLivestreamId(
+      livestreamId: string
+   ): Promise<CustomJob[]> {
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("livestreams", "array-contains", livestreamId)
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<CustomJob>(docs.docs)
+   }
+
+   async updateCustomJobWithLinkedLivestreams(
+      livestreamId: string,
+      jobIdsToUpdate: string[],
+      toRemove: boolean
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      jobIdsToUpdate.forEach((jobId) => {
+         const ref = this.firestore.collection(this.COLLECTION_NAME).doc(jobId)
+
+         if (toRemove) {
+            batch.update(ref, {
+               livestreams: this.fieldValue.arrayRemove(livestreamId),
+            })
+         } else {
+            batch.update(ref, {
+               livestreams: this.fieldValue.arrayUnion(livestreamId),
+            })
+         }
+      })
+
+      return batch.commit()
    }
 }
