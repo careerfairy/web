@@ -1,5 +1,5 @@
 import { FC, useState } from "react"
-import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
+import { AbstractButtonSelect } from "../util"
 import {
    ReachData,
    TimePeriodParams,
@@ -14,6 +14,7 @@ import ChartSwitchButton from "../components/charts/ChartSwitchButton"
 import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
 import CFLineChart from "../components/charts/CFLineChart"
 import BrandedSwipeableViews from "../components/BrandedSwipeableViews"
+import { Box } from "@mui/material"
 
 const reachSelectOptions: AbstractButtonSelect<ReachData> = {
    totalViews: "Views",
@@ -32,7 +33,6 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
    const isMobile = useIsMobile()
    const { group } = useGroup()
    const { reach } = useSparksAnalytics(group.id)[timeFilter]
-   const resetChartsTooltip = useResetChartsTooltip()
 
    const [reachSelectValue, setReachSelectValue] =
       useState<keyof ReachData>("totalViews")
@@ -40,36 +40,38 @@ const ReachAnalyticsContainer: FC<ReachAnalyticsContainerProps> = ({
    const totalViewsCount = reach.totalViews.totalCount
    const totalUniqueViewersCount = reach.uniqueViewers.totalCount
 
+   const steps = [
+      <Box key={0} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalViewsCount
+            )} views over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={reachSelectOptions.totalViews}
+            xAxis={reach.totalViews.xAxis}
+            series={reach.totalViews.series}
+         />
+      </Box>,
+      <Box key={1} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalUniqueViewersCount
+            )} unique viewers over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={reachSelectOptions.uniqueViewers}
+            xAxis={reach.uniqueViewers.xAxis}
+            series={reach.uniqueViewers.series}
+         />
+      </Box>,
+   ]
+
    return (
       <>
          {isMobile ? (
             <GroupSparkAnalyticsCardContainer>
-               <BrandedSwipeableViews onStepChange={resetChartsTooltip}>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalViewsCount
-                        )} views over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={reachSelectOptions.totalViews}
-                        xAxis={reach.totalViews.xAxis}
-                        series={reach.totalViews.series}
-                     />
-                  </>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalUniqueViewersCount
-                        )} unique viewers over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={reachSelectOptions.uniqueViewers}
-                        xAxis={reach.uniqueViewers.xAxis}
-                        series={reach.uniqueViewers.series}
-                     />
-                  </>
-               </BrandedSwipeableViews>
+               <BrandedSwipeableViews steps={steps} />
             </GroupSparkAnalyticsCardContainer>
          ) : (
             <GroupSparkAnalyticsCardContainer>

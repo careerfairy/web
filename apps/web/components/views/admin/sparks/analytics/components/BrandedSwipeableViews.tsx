@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material/styles"
 import MobileStepper from "@mui/material/MobileStepper"
 import SwipeableViews from "react-swipeable-views"
 import { sxStyles } from "types/commonTypes"
+import { TabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 
 const styles = sxStyles({
    stepper: {
@@ -18,13 +19,13 @@ const styles = sxStyles({
 })
 
 type BrandedSwipeableViewsProps = {
-   children: React.ReactNode
    onStepChange?: (step: number) => void
+   steps: React.ReactNode[]
 }
 
 const BrandedSwipeableViews: FC<BrandedSwipeableViewsProps> = ({
-   children,
    onStepChange,
+   steps,
 }) => {
    const theme = useTheme()
    const [activeStep, setActiveStep] = useState(0)
@@ -44,11 +45,15 @@ const BrandedSwipeableViews: FC<BrandedSwipeableViewsProps> = ({
             onChangeIndex={handleStepChange}
             enableMouseEvents
          >
-            {children}
+            {steps.map((step, index) => (
+               <TabPanel key={index} value={index} activeValue={activeStep}>
+                  {step}
+               </TabPanel>
+            ))}
          </SwipeableViews>
          <MobileStepper
             position="static"
-            steps={React.Children.toArray(children).length}
+            steps={steps.length}
             activeStep={activeStep}
             backButton={null}
             nextButton={null}

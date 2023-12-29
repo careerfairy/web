@@ -1,6 +1,6 @@
 import { FC, useState } from "react"
 import { Box } from "@mui/material"
-import { AbstractButtonSelect, useResetChartsTooltip } from "../util"
+import { AbstractButtonSelect } from "../util"
 import {
    EngagementData,
    TimePeriodParams,
@@ -35,7 +35,6 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
    const isMobile = useIsMobile()
    const { group } = useGroup()
    const { engagement } = useSparksAnalytics(group.id)[timeFilter]
-   const resetChartsTooltip = useResetChartsTooltip()
 
    const [engagementSelectValue, setEngagementSelectValue] =
       useState<keyof EngagementData>("likes")
@@ -45,60 +44,62 @@ const EngagementAnalyticsContainer: FC<EngagementAnalyticsContainerProps> = ({
    const totalRegistrationsCount = engagement.registrations.totalCount
    const totalPageClicksCount = engagement.pageClicks.totalCount
 
+   const steps = [
+      <Box key={0} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalLikesCount
+            )} likes over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={engagementSelectOptions.likes}
+            xAxis={engagement.likes.xAxis}
+            series={engagement.likes.series}
+         />
+      </Box>,
+      <Box key={1} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalSharesCount
+            )} shares over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={engagementSelectOptions.shares}
+            xAxis={engagement.shares.xAxis}
+            series={engagement.shares.series}
+         />
+      </Box>,
+      <Box key={2} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalRegistrationsCount
+            )} registrations over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={engagementSelectOptions.registrations}
+            xAxis={engagement.registrations.xAxis}
+            series={engagement.registrations.series}
+         />
+      </Box>,
+      <Box key={3} height={394}>
+         <GroupSparkAnalyticsCardContainerTitle>
+            {`${numberToString(
+               totalPageClicksCount
+            )} page clicks over the ${timeFrameLabel}`}
+         </GroupSparkAnalyticsCardContainerTitle>
+         <CFLineChart
+            tooltipLabel={engagementSelectOptions.pageClicks}
+            xAxis={engagement.pageClicks.xAxis}
+            series={engagement.pageClicks.series}
+         />
+      </Box>,
+   ]
+
    return (
       <>
          {isMobile ? (
             <GroupSparkAnalyticsCardContainer>
-               <BrandedSwipeableViews onStepChange={resetChartsTooltip}>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalLikesCount
-                        )} likes over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={engagementSelectOptions.likes}
-                        xAxis={engagement.likes.xAxis}
-                        series={engagement.likes.series}
-                     />
-                  </>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalSharesCount
-                        )} shares over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={engagementSelectOptions.shares}
-                        xAxis={engagement.shares.xAxis}
-                        series={engagement.shares.series}
-                     />
-                  </>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalRegistrationsCount
-                        )} registrations over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={engagementSelectOptions.registrations}
-                        xAxis={engagement.registrations.xAxis}
-                        series={engagement.registrations.series}
-                     />
-                  </>
-                  <>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        {`${numberToString(
-                           totalPageClicksCount
-                        )} page clicks over the ${timeFrameLabel}`}
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     <CFLineChart
-                        tooltipLabel={engagementSelectOptions.pageClicks}
-                        xAxis={engagement.pageClicks.xAxis}
-                        series={engagement.pageClicks.series}
-                     />
-                  </>
-               </BrandedSwipeableViews>
+               <BrandedSwipeableViews steps={steps} />
             </GroupSparkAnalyticsCardContainer>
          ) : (
             <GroupSparkAnalyticsCardContainer>
