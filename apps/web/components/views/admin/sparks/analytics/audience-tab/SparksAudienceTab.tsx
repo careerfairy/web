@@ -37,7 +37,7 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
          </Grid>
          <Grid item xs={12} md={6}>
             <GroupSparkAnalyticsCardContainer>
-               <GroupSparkAnalyticsCardContainerTitle>
+               <GroupSparkAnalyticsCardContainerTitle sx={{ marginBottom: 0 }}>
                   Top 10 fields of study
                </GroupSparkAnalyticsCardContainerTitle>
                <CFPieChart data={topFieldsOfStudy} />
@@ -45,7 +45,7 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
          </Grid>
          <Grid item xs={12} md={6}>
             <GroupSparkAnalyticsCardContainer>
-               <GroupSparkAnalyticsCardContainerTitle>
+               <GroupSparkAnalyticsCardContainerTitle sx={{ marginBottom: 0 }}>
                   Level of study
                </GroupSparkAnalyticsCardContainerTitle>
                <CFPieChart data={levelsOfStudy} />
