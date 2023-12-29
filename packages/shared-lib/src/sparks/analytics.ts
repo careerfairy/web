@@ -17,6 +17,7 @@ export type MostSomethingWithPastData = WithPastData<string[]>
 export type LinearBarDataPoint = {
    label: string
    value: number
+   percentage: number
 }
 export type LinearBarWithPastData = WithPastData<LinearBarDataPoint[]>
 
@@ -67,7 +68,7 @@ export type TimeSeriesForCharts = {
 }
 export type TimeSeriesForChartsWithPastData = WithPastData<TimeSeriesForCharts>
 
-export type SparkAnalyticsUIOverview = {
+export type SparkAnalyticsClientOverview = {
    reach: {
       totalViews: TimeSeriesForCharts
       uniqueViewers: TimeSeriesForCharts
@@ -83,14 +84,15 @@ export type SparkAnalyticsUIOverview = {
    }
 }
 
-export type SparkAnalyticsUIAudience = {
+export type SparkAnalyticsClientAudience = {
    topCountries: LinearBarDataPoint[]
    topUniversities: LinearBarDataPoint[]
    topFieldsOfStudy: PieChartDataPoint[]
    levelsOfStudy: PieChartDataPoint[]
 }
 
-export type SparkAnalyticsUI = SparkAnalyticsUIOverview &
-   SparkAnalyticsUIAudience
+export type SparkAnalyticsClient = SparkAnalyticsClientOverview &
+   SparkAnalyticsClientAudience
 
-export type SparkAnalyticsUIWithPastData = WithPastData<SparkAnalyticsUI>
+export type SparkAnalyticsClientWithPastData =
+   WithPastData<SparkAnalyticsClient>
