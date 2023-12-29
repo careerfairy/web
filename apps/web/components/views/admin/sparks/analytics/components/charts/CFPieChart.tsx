@@ -118,7 +118,7 @@ const getColorMap = (dataLength: number) => {
 
 const PieChartContent: FC<PieChartData> = ({ data }) => {
    const isMobile = useIsMobile()
-   const containerSize = isMobile ? 326 : 400
+   const containerHeight = isMobile ? 326 : 400
    const colors = getColorMap(data.length)
 
    return (
@@ -132,8 +132,7 @@ const PieChartContent: FC<PieChartData> = ({ data }) => {
                faded: { innerRadius: 0, additionalRadius: 0 },
             },
          ]}
-         width={containerSize}
-         height={containerSize}
+         height={containerHeight}
          colors={colors}
       >
          <PiePlot />
