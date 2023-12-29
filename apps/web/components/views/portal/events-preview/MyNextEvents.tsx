@@ -35,7 +35,7 @@ const MyNextEvents = ({ limit }: Props) => {
          dragFree: true,
          inViewThreshold: 0,
       }),
-      [events]
+      []
    )
 
    const isLoading = status === "loading"

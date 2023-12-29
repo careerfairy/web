@@ -167,7 +167,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                return slidesInView.concat(inView)
             })
          },
-         [emblaApi, setSlidesInView]
+         [setSlidesInView]
       )
 
       useEffect(() => {
@@ -232,15 +232,19 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                    ))
                                  : events?.length
                                  ? events.map((event, index, arr) => (
-                                      <Box sx={styles.slide}>
+                                      <Box
+                                         sx={styles.slide}
+                                         key={"events-box-" + index}
+                                      >
                                          <EventPreviewCard
-                                            key={index}
+                                            key={"event-preview-card-" + index}
                                             loading={
-                                               loading &&
-                                               !cardsLoaded[index] &&
-                                               !cardsLoaded[
-                                                  arr.length - (index + 1)
-                                               ]
+                                               (loading &&
+                                                  !cardsLoaded[index] &&
+                                                  !cardsLoaded[
+                                                     arr.length - (index + 1)
+                                                  ]) ||
+                                               false
                                             }
                                             index={index}
                                             totalElements={arr.length}

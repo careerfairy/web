@@ -27,7 +27,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
          dragFree: true,
          inViewThreshold: 0,
       }),
-      [events]
+      []
    )
 
    if (!authenticatedUser?.email || !events?.length) {

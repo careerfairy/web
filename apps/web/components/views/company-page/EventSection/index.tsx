@@ -1,16 +1,15 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { useCallback, useState } from "react"
+import { useMemo, useState } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import useIsMobile from "../../../custom-hook/useIsMobile"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import RegistrationModal from "../../common/registration-modal"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-import StreamCarousel from "./StreamCarousel"
+import EventsPreviewCarousel, {
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const styles = sxStyles({
    root: {
@@ -49,22 +48,23 @@ const EventSection = () => {
       pastLivestreams,
       sectionRefs: { eventSectionRef },
    } = useCompanyPage()
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+         loop: false,
+         align: "center",
+         dragThreshold: 0.5,
+         dragFree: true,
+         inViewThreshold: 0,
+      }),
+      []
+   )
+   const query = `companyId=${group.id}`
    const isMounted = useMountedState()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
-
-   const handleOpenEvent = useCallback(
-      (event: LivestreamEvent) => {
-         setEventToEdit(event)
-         handleOpenDialog()
-      },
-      [handleOpenDialog]
-   )
-
-   const upcomingHasMore = upcomingLivestreams?.length > MAX_UPCOMING_STREAMS
-   const pastHasMore = pastLivestreams?.length > MAX_PAST_STREAMS
 
    return isMounted() ? (
       <Box sx={styles.root}>
@@ -73,21 +73,23 @@ const EventSection = () => {
             tabValue={TabValue.livesStreams}
          />
          <Stack spacing={8}>
-            <StreamCarousel
-               livestreams={upcomingLivestreams ?? []}
-               type="upcoming"
+            <EventsPreviewCarousel
+               options={eventsCarouselEmblaOptions}
                title="Next Live Streams"
-               handleOpenEvent={handleOpenEvent}
-               hasMore={upcomingHasMore}
+               events={upcomingLivestreams ?? []}
+               type={EventsTypes.comingUp}
+               seeMoreLink={`/next-livestreams?${query}`}
+               loading={false}
             />
 
             {Boolean(pastLivestreams?.length) ? (
-               <StreamCarousel
-                  livestreams={pastLivestreams ?? []}
-                  type="past"
+               <EventsPreviewCarousel
+                  options={eventsCarouselEmblaOptions}
                   title="Past Live Streams"
-                  handleOpenEvent={handleOpenEvent}
-                  hasMore={pastHasMore}
+                  events={pastLivestreams ?? []}
+                  type={EventsTypes.pastEvents}
+                  seeMoreLink={`/past-livestreams?${query}`}
+                  loading={false}
                />
             ) : (
                <></>

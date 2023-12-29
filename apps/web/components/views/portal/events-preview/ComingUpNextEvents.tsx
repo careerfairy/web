@@ -79,7 +79,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          newLocalEvents.unshift(eventFromQuery)
       }
       setLocalEvents(newLocalEvents || [])
-   }, [eventFromQuery, events])
+   }, [eventFromQuery, events, localEvents])
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
