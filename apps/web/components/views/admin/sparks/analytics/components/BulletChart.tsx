@@ -55,13 +55,13 @@ const BulletChart: FC<BulletChartProps> = ({ data }) => {
                      <LinearProgress
                         variant="determinate"
                         color="secondary"
-                        value={item.value}
+                        value={item.percentage}
                         sx={styles.linearProgress}
                      />
                   </Box>
-                  <Box sx={styles.value}>{`${item.value} (${Math.round(
-                     item.percentage
-                  )}%)`}</Box>
+                  <Box sx={styles.value}>
+                     {`${item.value} (${Math.round(item.percentage)}%)`}
+                  </Box>
                </>
             )
          })}
