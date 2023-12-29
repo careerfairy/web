@@ -13,7 +13,10 @@ import Stack from "@mui/material/Stack"
 import JobCTAButton from "./main-content/JobCTAButton"
 import NotFoundView from "../common/NotFoundView"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
@@ -59,8 +62,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    if (!job) {
       // If entered here, it means that the current job is no Ats Job or don't exist
       // In this situation, let's validate if it's a customJob
-      // TODO-GS: confirm all this logic on the livestream room
-      job = customJob
+      job = pickPublicDataFromCustomJob(customJob)
    }
 
    const isAtsJob = useIsAtsJob(job)

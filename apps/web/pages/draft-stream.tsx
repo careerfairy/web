@@ -119,10 +119,10 @@ const DraftStream = () => {
 
          if (selectedJobs) {
             livestream.jobs = selectedJobs
-            livestream.hasJobs = selectedJobs.length > 0
          }
 
-         livestream.hasCustomJobs = selectedCustomJobs?.length > 0
+         livestream.hasJobs =
+            selectedJobs.length > 0 || selectedCustomJobs?.length > 0
          const selectedCustomJobsIds = selectedCustomJobs.map((job) => job.id)
 
          if (metaData) {

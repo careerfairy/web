@@ -58,7 +58,7 @@ const LivestreamDetailsView: FC = () => {
       updatedStats
    )
 
-   const hasJobs = livestreamPresenter.hasJobs()
+   const hasJobs = livestreamPresenter.hasJobs
 
    const isFloatingActionButton = isMobile || !heroInView
 

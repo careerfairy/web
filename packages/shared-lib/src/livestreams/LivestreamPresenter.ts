@@ -72,13 +72,13 @@ export class LivestreamPresenter extends BaseModel {
       public readonly isHybrid: boolean,
       public readonly address: string,
       public readonly denyRecordingAccess: boolean,
+      public readonly hasJobs: boolean,
 
       // ATS Jobs
       /**
        * During livestream creating, jobs can be associated with the livestream
        */
       public readonly jobs: LivestreamJobAssociation[],
-      public readonly hasCustomJobs: boolean,
 
       /**
        * An empty array means the livestream should target all the fields of study
@@ -241,10 +241,6 @@ export class LivestreamPresenter extends BaseModel {
       }
    }
 
-   hasJobs(): boolean {
-      return (this.jobs && this.jobs.length > 0) || this.hasCustomJobs
-   }
-
    getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
       return this.jobs.find((job) => job.jobId === jobId) ?? null
    }
@@ -297,9 +293,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isHybrid ?? false,
          livestream.address ?? "",
          livestream.denyRecordingAccess ?? false,
-
+         livestream.hasJobs ?? false,
          livestream.jobs ?? [],
-         livestream.hasCustomJobs ?? false,
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
@@ -362,8 +357,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isHybrid,
          livestream.address,
          livestream.denyRecordingAccess,
+         livestream.hasJobs,
          livestream.jobs,
-         livestream.hasCustomJobs,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
@@ -446,8 +441,8 @@ export class LivestreamPresenter extends BaseModel {
          timezone: this.timezone,
          isFaceToFace: this.isFaceToFace,
          isHybrid: this.isHybrid,
+         hasJobs: this.hasJobs,
          jobs: this.jobs,
-         hasCustomJobs: this.hasCustomJobs,
          targetFieldsOfStudy: this.targetFieldsOfStudy,
          targetLevelsOfStudy: this.targetLevelsOfStudy,
          speakers: this.speakers,

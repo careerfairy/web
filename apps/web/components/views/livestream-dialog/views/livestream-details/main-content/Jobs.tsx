@@ -81,7 +81,7 @@ const Jobs: FC<Props> = (props) => {
 }
 
 const JobsComponent: FC<Props> = ({ presenter }) => {
-   const livestreamCustomJobs = useGroupCustomJobs(presenter.companyId, {
+   const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
       livestreamId: presenter.id,
    })
 

@@ -23,7 +23,7 @@ type Props = {
 }
 const JobList = ({ livestream }: Props) => {
    const { jobs: atsJobs } = useLivestreamJobs(undefined, livestream.jobs)
-   const livestreamCustomJobs = useGroupCustomJobs(livestream.companyId, {
+   const livestreamCustomJobs = useGroupCustomJobs(livestream.groupIds[0], {
       livestreamId: livestream.id,
    })
 
