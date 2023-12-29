@@ -6,9 +6,9 @@ export function top10Countries(timePeriod: string) {
         COUNT(distinct(userId)) AS counting,
       FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
       WHERE groupId = @groupId
-        AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), ${timePeriod}))
+        AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
         AND ifNull(universityCountry, countryCode) IS NOT NULL
-        AND ifNull(universityCountry, countryCode) != "OTHER"
+        AND LOWER(ifNull(universityCountry, countryCode)) != LOWER("OTHER")
         AND userId IS NOT NULL
       GROUP BY label
       HAVING COUNT(distinct(userId)) != 0
@@ -40,6 +40,7 @@ export function top10Universities(timePeriod: string) {
       WHERE groupId = @groupId
         AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
         AND universityName IS NOT NULL
+        AND LOWER(universityName) != LOWER("Other")
       GROUP BY label
       HAVING COUNT(distinct(userId)) != 0
     ), total AS (
