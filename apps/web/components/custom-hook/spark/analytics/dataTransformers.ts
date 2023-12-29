@@ -1,13 +1,16 @@
 // Collection of helper functions for data mapping between the backend and frontend
 
 import {
+   LinearBarDataPoint,
    MostSomethingBase,
-   SparkAnalyticsUIWithPastData,
+   PieChartDataPoint,
+   SparkAnalyticsClientWithPastData,
    SparksAnalyticsDTO,
    TimePeriodParams,
    TimeSeriesForCharts,
    TimeseriesDataPoint,
 } from "@careerfairy/shared-lib/src/sparks/analytics"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
 
 type FilterTimeSeriesDataByTimeFrame = {
    (
@@ -39,11 +42,11 @@ const mapMostSomethingData = (data): MostSomethingBase => {
    return data.map((d) => d.sparkId)
 }
 
-const getxAxisData = (data) => {
+const getxAxisData = (data): Date[] => {
    return data.map((d) => new Date(d.x))
 }
 
-const getSeriesData = (data) => {
+const getSeriesData = (data): number[] => {
    return data.map((d) => d.y)
 }
 
@@ -59,16 +62,48 @@ const transformTimeSeriesDataForChart = (data): TimeSeriesForCharts => {
    }
 }
 
-const getTotalCount = (data) => {
+const getTotalCount = (data): number => {
    if (data.length == 0) return 0
    return data.reduce((sum, current) => sum + current)
 }
 
-const transformDataForClient = (data, value, isMonth) => {
+const transformDataForClient = (data, value, isMonth): TimeSeriesForCharts => {
    const filteredData = filterTimeSeriesDataByTimeFrame(data, value, isMonth)
    const chartData = transformTimeSeriesDataForChart(filteredData)
 
    return chartData
+}
+
+const replaceLabelByName = (data, lookup): PieChartDataPoint[] => {
+   return data.map((dataPoint) => {
+      return {
+         ...dataPoint,
+         label: lookup[dataPoint.label],
+      }
+   })
+}
+
+const mapPieChartData = (data): PieChartDataPoint[] =>
+   data.map((d, i) => {
+      return {
+         id: i,
+         value: Math.round(d.value),
+         label: d.label,
+      }
+   })
+
+const transformPieChartData = (data, lookup): PieChartDataPoint[] => {
+   const mappedData = mapPieChartData(data)
+   return replaceLabelByName(mappedData, lookup)
+}
+
+const mapCountryCodes = (data): LinearBarDataPoint[] => {
+   return data.map((d) => {
+      return {
+         ...d,
+         label: universityCountriesMap[d.label],
+      }
+   })
 }
 
 type TimeFrame = {
@@ -78,16 +113,18 @@ type TimeFrame = {
 }
 
 export const convertToClientModel = (
-   data: SparksAnalyticsDTO
-): SparkAnalyticsUIWithPastData => {
+   data: SparksAnalyticsDTO,
+   fieldsOfStudyLookup,
+   levelsOfStudyLookup
+): SparkAnalyticsClientWithPastData | {} => {
    const {
       reach,
       engagement,
       most,
-      /*topCountries,
-    topUniversities,
-    topFieldsOfStudy,
-    levelsOfStudy,*/
+      topCountries,
+      topUniversities,
+      topFieldsOfStudy,
+      levelsOfStudy,
    } = data
 
    const timeFrames: TimeFrame[] = [
@@ -97,7 +134,7 @@ export const convertToClientModel = (
       { timeFrame: "1year", value: 12, isMonth: true },
    ]
 
-   const analytics: any = timeFrames.reduce(
+   const analytics: SparkAnalyticsClientWithPastData | {} = timeFrames.reduce(
       (acc, { timeFrame, value, isMonth }) => {
          acc[timeFrame] = {
             reach: {
@@ -136,10 +173,16 @@ export const convertToClientModel = (
                shared: mapMostSomethingData(most.shared[timeFrame]),
                recent: mapMostSomethingData(most.recent),
             },
-            topCountries: null,
-            topUniversities: null,
-            topFieldsOfStudy: null,
-            levelsOfStudy: null,
+            topCountries: mapCountryCodes(topCountries[timeFrame]),
+            topUniversities: topUniversities[timeFrame],
+            topFieldsOfStudy: transformPieChartData(
+               topFieldsOfStudy[timeFrame],
+               fieldsOfStudyLookup
+            ),
+            levelsOfStudy: transformPieChartData(
+               levelsOfStudy[timeFrame],
+               levelsOfStudyLookup
+            ),
          }
          return acc
       },
