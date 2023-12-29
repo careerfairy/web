@@ -10,21 +10,13 @@ import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { useMountedState } from "react-use"
-import useEmblaCarousel, {
-   EmblaCarouselType,
-   EmblaOptionsType,
-} from "embla-carousel-react"
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import React from "react"
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
 
-// Not used for now, but can be used for custom styling on drag
-const wheelGesturesOptions = {
-   wheelDraggingClass: "is-wheel-dragging",
-}
-const slideSpacing = 21
-const desktopSlideWidth = 550 + slideSpacing
-const mobileSlideWidth = 321 + slideSpacing
+const slideSpacing = 42
+const desktopSlideWidth = 535 + slideSpacing
+const mobileSlideWidth = 330 + slideSpacing
 
 // TODO: Clear properties unused
 const styles = sxStyles({
@@ -39,18 +31,6 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
-   eventsHeader: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      px: 2,
-   },
-   seeMoreText: {
-      color: "text.secondary",
-      fontSize: "1.2rem",
-      fontWeight: 600,
-   },
-
    viewport: {
       overflow: "hidden",
    },
@@ -62,21 +42,18 @@ const styles = sxStyles({
    slide: {
       flex: {
          xs: `0 0 ${mobileSlideWidth}px`,
+         sm: `0 0 ${mobileSlideWidth}px`,
          md: `0 0 ${desktopSlideWidth}px`,
       },
+
       minWidth: 0,
       position: "relative",
-      height: {
-         xs: 405,
-         md: 375,
+      "&:not(:first-of-type)": {
+         marginLeft: `calc(${slideSpacing}px - 5px)`,
       },
-      paddingLeft: `calc(${slideSpacing}px - 5px)`,
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
-   },
-   previewContent: {
-      position: "relative",
    },
 })
 
@@ -111,44 +88,20 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
          [handleOpenDialog]
       )
 
-      const handleSteps = useCallback(
-         (increment = false) => {
-            if (increment) {
-               setStep((prevStep) => (prevStep + 1) % group.testimonials.length)
-            } else {
-               if (step) {
-                  setStep((prevStep) => prevStep - 1)
-               } else {
-                  setStep(group.testimonials.length - 1)
-               }
-            }
-         },
-         [group?.testimonials?.length, step]
-      )
       const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
          () => ({
-            axis: "x",
-            loop: false,
-            align: "center",
-            dragThreshold: 0.5,
-            dragFree: true,
-            inViewThreshold: 0,
+            // axis: "x",
+            // loop: false,
+            // align: "center",
+            // dragThreshold: 0.5,
+            // dragFree: true,
+            // inViewThreshold: 0,
          }),
          []
       )
 
-      const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
-         setCardsLoaded((prev) => ({
-            ...prev,
-            ...cardsIndexLoaded.reduce(
-               (acc, curr) => ({ ...acc, [curr]: true }),
-               {}
-            ),
-         }))
-      }
       const [emblaRef, emblaApi] = useEmblaCarousel(
-         testimonialsCarouselEmblaOptions,
-         [WheelGesturesPlugin(wheelGesturesOptions)]
+         testimonialsCarouselEmblaOptions
       )
 
       React.useImperativeHandle(ref, () => ({
@@ -160,48 +113,13 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
          },
       }))
 
-      const [cardsLoaded, setCardsLoaded] = useState({})
-
-      const [slidesInView, setSlidesInView] = useState<number[]>([])
-
-      /**
-       * Lazily load cards based on what is currently in view.
-       * The @function handleCardsLoaded then updates the items array based on the indexes which are
-       * currently in view.
-       */
-      const updateSlidesInView = useCallback(
-         (emblaApi: EmblaCarouselType) => {
-            setSlidesInView((slidesInView) => {
-               if (slidesInView.length === emblaApi.slideNodes().length) {
-                  emblaApi.off("slidesInView", updateSlidesInView)
-               }
-               const inView = emblaApi
-                  .slidesInView()
-                  .filter((index) => !slidesInView.includes(index))
-
-               handleCardsLoaded(inView)
-
-               return slidesInView.concat(inView)
-            })
-         },
-         [setSlidesInView]
-      )
-
-      useEffect(() => {
-         if (!emblaApi) return
-
-         updateSlidesInView(emblaApi)
-         emblaApi.on("slidesInView", updateSlidesInView)
-         emblaApi.on("reInit", updateSlidesInView)
-      }, [emblaApi, updateSlidesInView])
-
       if (!group?.testimonials?.length && !editMode) {
          return null
       }
 
       return isMounted() ? (
          <>
-            <Box position={"relative"}>
+            <Box>
                <SectionAnchor
                   ref={testimonialSectionRef}
                   tabValue={TabValue.testimonials}
@@ -226,7 +144,8 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                                  color="inherit"
                                  sx={styles.arrowIcon}
                                  onClick={() => {
-                                    handleSteps()
+                                    if (emblaApi.canScrollPrev())
+                                       emblaApi.scrollPrev()
                                  }}
                               >
                                  <ArrowLeft fontSize={"large"} />
@@ -235,7 +154,8 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                                  color="inherit"
                                  sx={styles.arrowIcon}
                                  onClick={() => {
-                                    handleSteps(true)
+                                    if (emblaApi.canScrollNext())
+                                       emblaApi.scrollNext()
                                  }}
                               >
                                  <ArrowRight fontSize={"large"} />
@@ -250,24 +170,36 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                   {group?.testimonials?.length > 0 ? (
                      <Box sx={styles.viewport} ref={emblaRef}>
                         <Box sx={styles.container}>
-                           <Box sx={styles.slide} key={"testimonial-slide-box"}>
-                              {editMode ? (
-                                 <>
-                                    {group.testimonials.map(
-                                       (testimonial, index) => (
-                                          <TestimonialCard
-                                             key={testimonial.id}
-                                             testimonial={testimonial}
-                                             handleEditTestimonial={
-                                                handleEditTestimonial
-                                             }
-                                          />
-                                       )
-                                    )}
-                                 </>
-                              ) : (
-                                 <>
-                                    {group?.testimonials?.[step] ? (
+                           {editMode || true ? ( // TODO: Remove since it should always loop the array ?
+                              <>
+                                 {group.testimonials.map((testimonial) => (
+                                    <Box
+                                       sx={styles.slide}
+                                       key={
+                                          "testimonial-slide-box-" +
+                                          testimonial.id
+                                       }
+                                    >
+                                       <TestimonialCard
+                                          key={testimonial.id}
+                                          testimonial={testimonial}
+                                          handleEditTestimonial={
+                                             handleEditTestimonial
+                                          }
+                                       />
+                                    </Box>
+                                 ))}
+                              </>
+                           ) : (
+                              <>
+                                 {group?.testimonials?.[step] ? (
+                                    <Box
+                                       sx={styles.slide}
+                                       key={
+                                          "testimonial-slide-box-" +
+                                          group.testimonials[step].id
+                                       }
+                                    >
                                        <TestimonialCard
                                           key={group.testimonials[step].id}
                                           testimonial={group.testimonials[step]}
@@ -275,10 +207,14 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                                              handleEditTestimonial
                                           }
                                        />
-                                    ) : null}
-                                 </>
-                              )}
-                           </Box>
+                                    </Box>
+                                 ) : null}
+                              </>
+                           )}
+                           {/**
+                            * This prevents the last slide from touching the right edge of the viewport.
+                            */}
+                           <Box sx={styles.paddingSlide}></Box>
                         </Box>
                      </Box>
                   ) : (

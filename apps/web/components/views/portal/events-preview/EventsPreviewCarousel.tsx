@@ -21,6 +21,7 @@ import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
@@ -32,6 +33,13 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       px: 2,
+   },
+   description: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      px: 2,
+      paddingTop: 2,
    },
    seeMoreText: {
       color: "text.secondary",
@@ -78,6 +86,7 @@ export type ChildRefType = {
 
 export interface EventsProps {
    events: LivestreamEvent[]
+   eventDescription?: string
    seeMoreLink?: string
    title?: string
    loading: boolean
@@ -107,11 +116,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          isEmbedded = false,
          children,
          options,
+         eventDescription,
       } = props
 
       const [emblaRef, emblaApi] = useEmblaCarousel(options, [
          WheelGesturesPlugin(wheelGesturesOptions),
       ])
+      const isMobile = useIsMobile()
 
       const {
          breakpoints: { up },
@@ -194,6 +205,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         ) : null}
                      </Box>
                   ) : null}
+
                   <Stack sx={styles.previewContent}>
                      {isEmpty ? (
                         <EmptyMessageOverlay
@@ -216,6 +228,17 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                            targetBlank={isEmbedded}
                         />
                      ) : null}
+                     {!isMobile && (
+                        <Box sx={styles.description}>
+                           <Typography
+                              variant="h6"
+                              fontWeight={"400"}
+                              color="textSecondary"
+                           >
+                              {eventDescription}
+                           </Typography>
+                        </Box>
+                     )}
                      {
                         <Box id={id} sx={styles.viewport} ref={emblaRef}>
                            <Box sx={styles.container}>

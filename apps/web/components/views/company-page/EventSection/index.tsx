@@ -10,6 +10,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {
@@ -47,7 +48,9 @@ const EventSection = () => {
       upcomingLivestreams,
       pastLivestreams,
       sectionRefs: { eventSectionRef },
+      editMode,
    } = useCompanyPage()
+   const isMobile = useIsMobile()
    const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
       () => ({
          axis: "x",
@@ -65,6 +68,18 @@ const EventSection = () => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
+   const upcomingEventsDescription = useMemo(() => {
+      if (editMode) {
+         return "Below are your published live streams, these will be shown on your company page."
+      }
+      return "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."
+   }, [editMode])
+   const pastEventsDescription = useMemo(() => {
+      if (editMode) {
+         return "Here are the recordings of your previous live streams, which will be featured on your company page."
+      }
+      return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
+   }, [editMode, group.universityName])
 
    return isMounted() ? (
       <Box sx={styles.root}>
@@ -77,6 +92,7 @@ const EventSection = () => {
                options={eventsCarouselEmblaOptions}
                title="Next Live Streams"
                events={upcomingLivestreams ?? []}
+               eventDescription={upcomingEventsDescription}
                type={EventsTypes.comingUp}
                seeMoreLink={`/next-livestreams?${query}`}
                loading={false}
@@ -87,6 +103,7 @@ const EventSection = () => {
                   options={eventsCarouselEmblaOptions}
                   title="Past Live Streams"
                   events={pastLivestreams ?? []}
+                  eventDescription={pastEventsDescription}
                   type={EventsTypes.pastEvents}
                   seeMoreLink={`/past-livestreams?${query}`}
                   loading={false}
