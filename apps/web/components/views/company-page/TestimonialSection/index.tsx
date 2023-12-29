@@ -119,7 +119,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
 
       return isMounted() ? (
          <>
-            <Box>
+            <Box position="relative">
                <SectionAnchor
                   ref={testimonialSectionRef}
                   tabValue={TabValue.testimonials}
