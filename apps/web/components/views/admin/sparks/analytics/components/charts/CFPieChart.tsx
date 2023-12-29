@@ -10,8 +10,14 @@ import {
 } from "@mui/x-charts"
 import StyledChartTooltip from "./StyledChartTooltip"
 import { sxStyles } from "types/commonTypes"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
+   chart: {
+      "& .MuiPieArc-root": {
+         strokeWidth: 0,
+      },
+   },
    legendLabel: {
       color: "#5C5C6A",
       fontSize: "16px",
@@ -62,6 +68,7 @@ const ChartLegendContentEntry: FC<ChartLegendContentEntryProps> = ({
             <Box
                width={16}
                height={16}
+               minWidth={16}
                borderRadius="50%"
                bgcolor={color}
                marginRight={1}
@@ -102,18 +109,30 @@ const CustomTooltip: FC<ChartsItemContentProps> = ({ itemData, series }) => {
    )
 }
 
+const getColorMap = (dataLength: number) => {
+   const step = Math.floor(colorMapDesc.length / dataLength)
+   return colorMapDesc.filter((_, index) => index % step === 0)
+}
+
 const PieChartContent: FC<PieChartData> = ({ data }) => {
+   const isMobile = useIsMobile()
+   const containerSize = isMobile ? 326 : 400
+   const colors = getColorMap(data.length)
+
    return (
       <ResponsiveChartContainer
+         sx={styles.chart}
          series={[
             {
                type: "pie",
                data: data,
+               highlightScope: { faded: "global", highlighted: "item" },
+               faded: { innerRadius: 0, additionalRadius: 0 },
             },
          ]}
-         width={400}
-         height={400}
-         colors={colorMapDesc}
+         width={containerSize}
+         height={containerSize}
+         colors={colors}
       >
          <PiePlot />
          <ChartsTooltip
