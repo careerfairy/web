@@ -26,13 +26,31 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
     * This method adds a deleted flag to the customJobStats document
     * @param deletedCustomJob
     */
-   deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void>
+   syncDeletedCustomJobDataToCustomJobStats(
+      deletedCustomJob: CustomJob
+   ): Promise<void>
 
    /**
     * This method removes the livestream ID from all the linked Jobs
     * @param livestreamId
     */
    removeLinkedLivestream(livestreamId: string): Promise<void>
+
+   /**
+    * This method syncs the JobApplication job field based on the received customJob
+    * @param updatedCustomJob
+    */
+   syncCustomJobDataToJobApplications(
+      updatedCustomJob: CustomJob
+   ): Promise<void>
+
+   /**
+    * This method adds a deleted flag to the JobApplications document
+    * @param deletedCustomJob
+    */
+   syncDeletedCustomJobDataToJobApplications(
+      deletedCustomJob: CustomJob
+   ): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -57,6 +75,7 @@ export class CustomJobFunctionsRepository
          id: jobStatsId,
          applicants: 0,
          deleted: false,
+         deletedAt: null,
       }
 
       return ref.set(newJobStat, { merge: true })
@@ -76,7 +95,9 @@ export class CustomJobFunctionsRepository
       return ref.update({ job: updatedCustomJob })
    }
 
-   async deleteAndSyncCustomJob(deletedCustomJob: CustomJob): Promise<void> {
+   async syncDeletedCustomJobDataToCustomJobStats(
+      deletedCustomJob: CustomJob
+   ): Promise<void> {
       functions.logger.log(
          `Add deleted flag to the CustomJobStats with job ${deletedCustomJob.id}.`
       )
@@ -88,10 +109,6 @@ export class CustomJobFunctionsRepository
       return ref.update({
          deleted: true,
          deletedAt: Timestamp.now(),
-         job: {
-            ...deletedCustomJob,
-            deleted: true,
-         },
       })
    }
 
@@ -112,6 +129,65 @@ export class CustomJobFunctionsRepository
       docs.forEach((doc) => {
          batch.update(doc.ref, {
             livestreams: this.fieldValue.arrayRemove(livestreamId),
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async syncCustomJobDataToJobApplications(
+      updatedCustomJob: CustomJob
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      functions.logger.log(
+         `Sync JobApplications with job ${updatedCustomJob.id} data.`
+      )
+
+      const docs = await this.firestore
+         .collection("JobApplications")
+         .where("jobId", "==", updatedCustomJob.id)
+         .get()
+
+      if (docs.empty) {
+         return
+      }
+
+      docs.forEach((doc) => {
+         batch.update(doc.ref, {
+            job: updatedCustomJob,
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async syncDeletedCustomJobDataToJobApplications(
+      deletedCustomJob: CustomJob
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      functions.logger.log(
+         `Add deleted flag to the JobApplications with job ${deletedCustomJob.id}.`
+      )
+
+      const docs = await this.firestore
+         .collection("JobApplications")
+         .where("jobId", "==", deletedCustomJob.id)
+         .get()
+
+      if (docs.empty) {
+         return
+      }
+
+      const customJobWithDeletedFlag: CustomJob = {
+         ...deletedCustomJob,
+         deleted: true,
+      }
+
+      docs.forEach((doc) => {
+         batch.update(doc.ref, {
+            job: customJobWithDeletedFlag,
          })
       })
 

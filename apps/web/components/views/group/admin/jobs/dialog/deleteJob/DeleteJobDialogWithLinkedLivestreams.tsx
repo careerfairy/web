@@ -2,7 +2,7 @@ import { Radio } from "react-feather"
 import SteppedDialog from "../../../../../stepped-dialog/SteppedDialog"
 import { Box, CircularProgress, List, ListItem } from "@mui/material"
 import Typography from "@mui/material/Typography"
-import React, { FC, useMemo } from "react"
+import React, { FC } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useCustomJobLinkedLivestreams from "../../../../../../custom-hook/custom-job/useCustomJobLinkedLivestreams"
@@ -44,10 +44,7 @@ type Props = {
    job: CustomJob | null
 }
 const DeleteJobDialogWithLinkedLivestreams: FC<Props> = ({ job }) => {
-   const hasLinkedLivestreams = useMemo(
-      () => job?.livestreams?.length,
-      [job?.livestreams?.length]
-   )
+   const hasLinkedLivestreams = Boolean(job?.livestreams?.length)
 
    return (
       <>

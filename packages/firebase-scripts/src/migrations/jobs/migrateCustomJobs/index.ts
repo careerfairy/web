@@ -69,6 +69,7 @@ function createCustomJobStatsInCollection(
       id: customJob.id,
       groupId: customJob.groupId,
       applicants: customJob.applicants?.length ?? 0,
+      deletedAt: null,
    }
 
    const customJobStatsRef = firestore

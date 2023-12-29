@@ -65,7 +65,7 @@ export const pickPublicDataFromCustomJob = (
       postingUrl: job.postingUrl ?? null,
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
-      deleted: job.deleted ?? null,
+      deleted: job.deleted ?? false,
    }
 }
 
@@ -80,7 +80,7 @@ export interface CustomJobStats extends Identifiable {
    applicants: number
    job: CustomJob
    deleted: boolean
-   deletedAt?: firebase.firestore.Timestamp
+   deletedAt: firebase.firestore.Timestamp | null
 }
 
 // collection path /jobApplications

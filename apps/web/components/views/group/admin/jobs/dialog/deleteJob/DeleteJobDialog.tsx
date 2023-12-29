@@ -10,7 +10,7 @@ import JobFetchWrapper from "../../../../../../../HOCs/job/JobFetchWrapper"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { Stack } from "@mui/material"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
-import React, { FC, useCallback, useEffect, useState } from "react"
+import React, { FC, useCallback, useEffect } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { JobDialogStep } from "../index"
 import { openDeleteJobWithLinkedLivestreams } from "../../../../../../../store/reducers/adminJobsReducer"
@@ -92,13 +92,8 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ job }) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { handleClose } = useStepper<JobDialogStep>()
    const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
-   const [hasLinkedLivestreams, setHasLinkedLivestreams] = useState(false)
 
-   useEffect(() => {
-      if (!isDeleting) {
-         setHasLinkedLivestreams(job?.livestreams?.length > 0)
-      }
-   }, [isDeleting, job?.livestreams?.length])
+   const hasLinkedLivestreams = !isDeleting && job?.livestreams?.length > 0
 
    useEffect(() => {
       if (hasLinkedLivestreams) {

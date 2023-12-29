@@ -328,7 +328,8 @@ export const onWriteCustomJobs = functions
          const updatedCustomJob = change.after.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob)
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
+            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
       }
 
@@ -336,7 +337,12 @@ export const onWriteCustomJobs = functions
          const deletedCustomJob = change.before.data() as CustomJob
 
          sideEffectPromises.push(
-            customJobRepo.deleteAndSyncCustomJob(deletedCustomJob)
+            customJobRepo.syncDeletedCustomJobDataToCustomJobStats(
+               deletedCustomJob
+            ),
+            customJobRepo.syncDeletedCustomJobDataToJobApplications(
+               deletedCustomJob
+            )
          )
       }
 
