@@ -11,6 +11,7 @@ import {
 import StyledChartTooltip from "./StyledChartTooltip"
 import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    chart: {
@@ -24,6 +25,7 @@ const styles = sxStyles({
       fontWeight: "400",
       lineHeight: "27px",
       letterSpacing: "0em",
+      ...getMaxLineStyles(1),
    },
    legendValue: {
       color: "#8E8E8E",
