@@ -1,31 +1,30 @@
 export function top10Countries(timePeriod: string) {
    return `
-    WITH total AS (
+    WITH filtered_events AS (
+      SELECT 
+        ifNull(universityCountry, countryCode) as label,
+        COUNT(distinct(userId)) AS counting,
+      FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+      WHERE groupId = @groupId
+        AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), ${timePeriod}))
+        AND ifNull(universityCountry, countryCode) IS NOT NULL
+        AND ifNull(universityCountry, countryCode) != "OTHER"
+        AND userId IS NOT NULL
+      GROUP BY label
+      HAVING COUNT(distinct(userId)) != 0
+    ), total AS (
       SELECT SUM(counting) AS total_count FROM (
-        SELECT 
-          ifNull(universityCountry, countryCode) AS label,
-          COUNT(distinct(userId)) AS counting,
-        FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
-        WHERE groupId = @groupId
-          AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-          AND ifNull(universityCountry, countryCode) IS NOT NULL
-          AND userId IS NOT NULL
-        GROUP BY label
+        SELECT counting
+        FROM filtered_events
       )
     )
     
     SELECT
-      ifNull(universityCountry, countryCode) AS label,
-      COUNT(distinct(userId)) AS value,
-      (COUNT(distinct(userId)) / total.total_count) * 100 AS percentage
-    FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+      fe.label,
+      fe.counting AS value,
+      (fe.counting / total.total_count) * 100 AS percentage
+    FROM filtered_events fe
     CROSS JOIN total
-    WHERE groupId = @groupId
-      AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-      AND ifNull(universityCountry, countryCode) IS NOT NULL
-      AND userId IS NOT NULL
-    GROUP BY label, total.total_count
-    HAVING COUNT(distinct(userId)) != 0
     ORDER BY value DESC
     LIMIT 10
   `
@@ -33,24 +32,27 @@ export function top10Countries(timePeriod: string) {
 
 export function top10Universities(timePeriod: string) {
    return `
-    WITH total AS (
-      SELECT COUNT(distinct(userId)) AS total_count
+    WITH filtered_events AS (
+      SELECT
+        universityName AS label,
+        COUNT(distinct(userId)) AS counting,
       FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
       WHERE groupId = @groupId
         AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
         AND universityName IS NOT NULL
+      GROUP BY label
+      HAVING COUNT(distinct(userId)) != 0
+    ), total AS (
+      SELECT SUM(counting) AS total_count
+      FROM filtered_events
     )
+    
     SELECT
-      universityName AS label,
-      COUNT(distinct(userId)) AS value,
-      (COUNT(distinct(userId)) / total.total_count) * 100 AS percentage
-    FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+      fe.label,
+      fe.counting AS value,
+      (fe.counting / total.total_count) * 100 AS percentage
+    FROM filtered_events fe
     CROSS JOIN total
-    WHERE groupId = @groupId
-      AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-      AND universityName IS NOT NULL
-    GROUP BY label, total.total_count
-    HAVING COUNT(distinct(userId)) != 0
     ORDER BY value DESC
     LIMIT 10
   `
