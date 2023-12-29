@@ -1,12 +1,19 @@
 export function top10Countries(timePeriod: string) {
    return `
     WITH total AS (
-      SELECT COUNT(distinct(userId)) AS total_count
-      FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
-      WHERE groupId = @groupId
-        AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
-        AND ifNull(universityCountry, countryCode) IS NOT NULL
+      SELECT SUM(counting) AS total_count FROM (
+        SELECT 
+          ifNull(universityCountry, countryCode) AS label,
+          COUNT(distinct(userId)) AS counting,
+        FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
+        WHERE groupId = @groupId
+          AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
+          AND ifNull(universityCountry, countryCode) IS NOT NULL
+          AND userId IS NOT NULL
+        GROUP BY label
+      )
     )
+    
     SELECT
       ifNull(universityCountry, countryCode) AS label,
       COUNT(distinct(userId)) AS value,
@@ -16,6 +23,7 @@ export function top10Countries(timePeriod: string) {
     WHERE groupId = @groupId
       AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
       AND ifNull(universityCountry, countryCode) IS NOT NULL
+      AND userId IS NOT NULL
     GROUP BY label, total.total_count
     HAVING COUNT(distinct(userId)) != 0
     ORDER BY value DESC
