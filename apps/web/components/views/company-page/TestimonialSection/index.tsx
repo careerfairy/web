@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Add from "@mui/icons-material/Add"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
@@ -10,7 +10,10 @@ import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { useMountedState } from "react-use"
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
+import useEmblaCarousel, {
+   EmblaOptionsType,
+   EmblaCarouselType,
+} from "embla-carousel-react"
 import React from "react"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import AutoHeight from "embla-carousel-auto-height"
@@ -84,7 +87,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
          },
          [handleOpenDialog]
       )
-
+      const autoheight = useRef(AutoHeight())
       const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
          () => ({
             axis: "x",
@@ -98,8 +101,8 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
       )
 
       const [emblaRef, emblaApi] = useEmblaCarousel(
-         testimonialsCarouselEmblaOptions,
-         [AutoHeight()]
+         testimonialsCarouselEmblaOptions
+         // [autoheight.current] // TODO: Not working
       )
 
       React.useImperativeHandle(ref, () => ({
