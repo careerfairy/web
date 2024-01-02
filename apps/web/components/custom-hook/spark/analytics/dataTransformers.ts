@@ -12,31 +12,34 @@ import {
 } from "@careerfairy/shared-lib/src/sparks/analytics"
 import { universityCountriesMap } from "components/util/constants/universityCountries"
 
-type FilterTimeSeriesDataByTimeFrame = {
-   (
-      data: TimeseriesDataPoint[],
-      timeFrame: number,
-      isMonth?: boolean
-   ): TimeseriesDataPoint[]
-}
+type FilterTimeSeriesDataByTimeFrame = (
+   data: TimeseriesDataPoint[],
+   timeFrameValue: number
+) => TimeseriesDataPoint[]
 
-const filterTimeSeriesDataByTimeFrame: FilterTimeSeriesDataByTimeFrame = (
+const filterTimeSeriesDataByTimeFrameInDays: FilterTimeSeriesDataByTimeFrame = (
    data,
-   timeFrame,
-   isMonth = false
+   timeFrameValue
 ) => {
    const cutoff = new Date()
-   if (isMonth) {
-      cutoff.setMonth(cutoff.getMonth() - timeFrame)
-   } else {
-      cutoff.setDate(cutoff.getDate() - timeFrame)
-   }
+   cutoff.setDate(cutoff.getDate() - timeFrameValue)
 
    return data.filter((item) => {
       const itemDate = new Date(item.x)
       return itemDate >= cutoff
    })
 }
+
+const filterTimeSeriesDataByTimeFrameInMonths: FilterTimeSeriesDataByTimeFrame =
+   (data, timeFrameValue) => {
+      const cutoff = new Date()
+      cutoff.setMonth(cutoff.getMonth() - timeFrameValue)
+
+      return data.filter((item) => {
+         const itemDate = new Date(item.x)
+         return itemDate >= cutoff
+      })
+   }
 
 const mapMostSomethingData = (data): MostSomethingBase => {
    return data.map((d) => d.sparkId)
@@ -67,8 +70,12 @@ const getTotalCount = (data): number => {
    return data.reduce((sum, current) => sum + current)
 }
 
-const transformDataForClient = (data, value, isMonth): TimeSeriesForCharts => {
-   const filteredData = filterTimeSeriesDataByTimeFrame(data, value, isMonth)
+const transformDataForClient = (
+   data,
+   value,
+   timeFrameFilterCallback
+): TimeSeriesForCharts => {
+   const filteredData = timeFrameFilterCallback(data, value)
    const chartData = transformTimeSeriesDataForChart(filteredData)
 
    return chartData
@@ -106,10 +113,10 @@ const mapCountryCodes = (data): LinearBarDataPoint[] => {
    })
 }
 
-type TimeFrame = {
+type FilterableTimeFrame = {
    timeFrame: TimePeriodParams
    value: number
-   isMonth: boolean
+   timeFrameFilterCallback: FilterTimeSeriesDataByTimeFrame
 }
 
 export const convertToClientModel = (
@@ -127,67 +134,88 @@ export const convertToClientModel = (
       levelsOfStudy,
    } = data
 
-   const timeFrames: TimeFrame[] = [
-      { timeFrame: "7days", value: 7, isMonth: false },
-      { timeFrame: "30days", value: 30, isMonth: false },
-      { timeFrame: "6months", value: 6, isMonth: true },
-      { timeFrame: "1year", value: 12, isMonth: true },
+   const timeFramesFilters: FilterableTimeFrame[] = [
+      {
+         timeFrame: "7days",
+         value: 7,
+         timeFrameFilterCallback: filterTimeSeriesDataByTimeFrameInDays,
+      },
+      {
+         timeFrame: "30days",
+         value: 30,
+         timeFrameFilterCallback: filterTimeSeriesDataByTimeFrameInDays,
+      },
+      {
+         timeFrame: "6months",
+         value: 6,
+         timeFrameFilterCallback: filterTimeSeriesDataByTimeFrameInMonths,
+      },
+      {
+         timeFrame: "1year",
+         value: 12,
+         timeFrameFilterCallback: filterTimeSeriesDataByTimeFrameInMonths,
+      },
    ]
 
-   const analytics: SparkAnalyticsClientWithPastData | {} = timeFrames.reduce(
-      (acc, { timeFrame, value, isMonth }) => {
-         acc[timeFrame] = {
-            reach: {
-               totalViews: transformDataForClient(
-                  reach.totalViews,
-                  value,
-                  isMonth
+   const analytics: SparkAnalyticsClientWithPastData | {} =
+      timeFramesFilters.reduce(
+         (acc, { timeFrame, value, timeFrameFilterCallback }) => {
+            acc[timeFrame] = {
+               reach: {
+                  totalViews: transformDataForClient(
+                     reach.totalViews,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+                  uniqueViewers: transformDataForClient(
+                     reach.uniqueViewers,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+               },
+               engagement: {
+                  likes: transformDataForClient(
+                     engagement.likes,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+                  shares: transformDataForClient(
+                     engagement.shares,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+                  registrations: transformDataForClient(
+                     engagement.registrations,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+                  pageClicks: transformDataForClient(
+                     engagement.pageClicks,
+                     value,
+                     timeFrameFilterCallback
+                  ),
+               },
+               most: {
+                  watched: mapMostSomethingData(most.watched[timeFrame]),
+                  liked: mapMostSomethingData(most.liked[timeFrame]),
+                  shared: mapMostSomethingData(most.shared[timeFrame]),
+                  recent: mapMostSomethingData(most.recent),
+               },
+               topCountries: mapCountryCodes(topCountries[timeFrame]),
+               topUniversities: topUniversities[timeFrame],
+               topFieldsOfStudy: transformPieChartData(
+                  topFieldsOfStudy[timeFrame],
+                  fieldsOfStudyLookup
                ),
-               uniqueViewers: transformDataForClient(
-                  reach.uniqueViewers,
-                  value,
-                  isMonth
+               levelsOfStudy: transformPieChartData(
+                  levelsOfStudy[timeFrame],
+                  levelsOfStudyLookup
                ),
-            },
-            engagement: {
-               likes: transformDataForClient(engagement.likes, value, isMonth),
-               shares: transformDataForClient(
-                  engagement.shares,
-                  value,
-                  isMonth
-               ),
-               registrations: transformDataForClient(
-                  engagement.registrations,
-                  value,
-                  isMonth
-               ),
-               pageClicks: transformDataForClient(
-                  engagement.pageClicks,
-                  value,
-                  isMonth
-               ),
-            },
-            most: {
-               watched: mapMostSomethingData(most.watched[timeFrame]),
-               liked: mapMostSomethingData(most.liked[timeFrame]),
-               shared: mapMostSomethingData(most.shared[timeFrame]),
-               recent: mapMostSomethingData(most.recent),
-            },
-            topCountries: mapCountryCodes(topCountries[timeFrame]),
-            topUniversities: topUniversities[timeFrame],
-            topFieldsOfStudy: transformPieChartData(
-               topFieldsOfStudy[timeFrame],
-               fieldsOfStudyLookup
-            ),
-            levelsOfStudy: transformPieChartData(
-               levelsOfStudy[timeFrame],
-               levelsOfStudyLookup
-            ),
-         }
-         return acc
-      },
-      {}
-   )
+            }
+            return acc
+         },
+         {}
+      )
 
    return analytics
 }
