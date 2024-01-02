@@ -40,17 +40,23 @@ const styles = sxStyles({
       touchAction: "pan-y",
    },
    slide: {
-      flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         sm: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
-      },
-
-      minWidth: 0,
-      position: "relative",
+      // width: "inherit",
+      // flex: {
+      //    xs: `0 0 ${mobileSlideWidth}px`,
+      //    sm: `0 0 ${mobileSlideWidth}px`,
+      //    md: `0 0 ${mobileSlideWidth}px`,
+      //    lg: `0 0 calc(${desktopSlideWidth}px - 80px)`,
+      //    xl: `0 0 calc(${desktopSlideWidth}px)`,
+      // },
+      minWidth: mobileSlideWidth,
       "&:not(:first-of-type)": {
-         marginLeft: `calc(${slideSpacing}px - 5px)`,
+         paddingX: 3,
+         // marginLeft: `calc(${slideSpacing}px - 5px)`,
       },
+      // "&:first-of-type": {
+      //    paddingRight: 3
+      // },
+      paddingRight: 3,
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
@@ -166,7 +172,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                   )}
                </Box>
 
-               <Box mt={2}>
+               <Box mt={1}>
                   {group?.testimonials?.length > 0 ? (
                      <Box sx={styles.viewport} ref={emblaRef}>
                         <Box sx={styles.container}>
@@ -214,7 +220,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                            {/**
                             * This prevents the last slide from touching the right edge of the viewport.
                             */}
-                           <Box sx={styles.paddingSlide}></Box>
+                           {/* <Box sx={styles.paddingSlide}></Box> */}
                         </Box>
                      </Box>
                   ) : (
