@@ -90,7 +90,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
 
       const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
          () => ({
-            // axis: "x",
+            axis: "x",
             // loop: false,
             // align: "center",
             // dragThreshold: 0.5,
