@@ -13,6 +13,7 @@ import { useMountedState } from "react-use"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import React from "react"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import AutoHeight from "embla-carousel-auto-height"
 
 const slideSpacing = 42
 const desktopSlideWidth = 535 + slideSpacing
@@ -33,30 +34,20 @@ const styles = sxStyles({
    },
    viewport: {
       overflow: "hidden",
+      height: "auto",
    },
    container: {
       backfaceVisibility: "hidden",
       display: "flex",
       touchAction: "pan-y",
+      alignItems: "flex-start",
    },
    slide: {
-      // width: "inherit",
-      // flex: {
-      //    xs: `0 0 ${mobileSlideWidth}px`,
-      //    sm: `0 0 ${mobileSlideWidth}px`,
-      //    md: `0 0 ${mobileSlideWidth}px`,
-      //    lg: `0 0 calc(${desktopSlideWidth}px - 80px)`,
-      //    xl: `0 0 calc(${desktopSlideWidth}px)`,
-      // },
-      minWidth: mobileSlideWidth,
+      flex: "0 0 100%",
+
       "&:not(:first-of-type)": {
-         paddingX: 3,
-         // marginLeft: `calc(${slideSpacing}px - 5px)`,
+         paddingX: 2,
       },
-      // "&:first-of-type": {
-      //    paddingRight: 3
-      // },
-      paddingRight: 3,
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
@@ -107,7 +98,8 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
       )
 
       const [emblaRef, emblaApi] = useEmblaCarousel(
-         testimonialsCarouselEmblaOptions
+         testimonialsCarouselEmblaOptions,
+         [AutoHeight()]
       )
 
       React.useImperativeHandle(ref, () => ({
@@ -217,10 +209,6 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                                  ) : null}
                               </>
                            )}
-                           {/**
-                            * This prevents the last slide from touching the right edge of the viewport.
-                            */}
-                           {/* <Box sx={styles.paddingSlide}></Box> */}
                         </Box>
                      </Box>
                   ) : (
