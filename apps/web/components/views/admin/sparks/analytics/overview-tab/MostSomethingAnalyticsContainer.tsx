@@ -25,12 +25,14 @@ const styles = sxStyles({
    },
    mostSomethingSelect: {
       width: "100%",
-      textTransform: "lowercase",
       color: "#6749EA",
       fontSize: "20px",
       fontWeight: 600,
       lineHeight: "30px",
       letterSpacing: "0em",
+      ".MuiSelect-select:first-letter": {
+         textTransform: "lowercase",
+      },
    },
    mostSomethingSelectMenu: {
       marginTop: 4,
@@ -125,7 +127,7 @@ const MostSomethingAnalyticsContainer: FC<
             setSelectMostSomething={setSelectMostSomethingValue}
             options={mostSomethingSelectOptions}
          />
-         <Stack direction={{ sm: "column", md: "row" }} spacing={1.5}>
+         <Stack direction={{ sm: "column", md: "row" }} gap={1.5}>
             {most[selectMostSomethingValue].map((sparkId, index) => (
                <SuspenseWithBoundary
                   key={`most-suspense-${sparkId}-${index}`}
