@@ -50,7 +50,6 @@ const EventSection = () => {
       sectionRefs: { eventSectionRef },
       editMode,
    } = useCompanyPage()
-   const isMobile = useIsMobile()
    const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
       () => ({
          axis: "x",

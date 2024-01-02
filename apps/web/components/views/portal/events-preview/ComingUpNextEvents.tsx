@@ -45,7 +45,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          dragFree: true,
          inViewThreshold: 0,
       }),
-      [events]
+      []
    )
 
    useEffect(() => {

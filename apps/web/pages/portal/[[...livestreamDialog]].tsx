@@ -83,7 +83,7 @@ const PortalPage = ({
          dragFree: true,
          inViewThreshold: 0,
       }),
-      [events]
+      []
    )
    return (
       <>
