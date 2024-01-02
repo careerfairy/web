@@ -24,7 +24,7 @@ const CustomJobEntryApply = ({
    livestreamId,
    handleApplyClick,
 }: Props) => {
-   const { handleClickApplyBtn, isApplying } = useCustomJobApply(
+   const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
       livestreamId
    )
@@ -45,7 +45,7 @@ const CustomJobEntryApply = ({
             variant="contained"
             color="primary"
             startIcon={
-               isApplying ? (
+               isClickingOnApplyBtn ? (
                   <CircularProgress size={20} color="inherit" />
                ) : (
                   <ExternalLink size={18} />
@@ -53,7 +53,7 @@ const CustomJobEntryApply = ({
             }
             onClick={handleClick}
          >
-            {isApplying ? "Applying" : "Apply now"}
+            {isClickingOnApplyBtn ? "Applying" : "Apply now"}
          </Button>
       </>
    )

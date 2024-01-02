@@ -191,7 +191,11 @@ export class FirebaseCustomJobRepository
       }
 
       batch.set(jobApplicationRef, newJobApplicant, { merge: true })
-      batch.update(jobStatsRef, { applicants: this.fieldValue.increment(1) })
+
+      if (!user.userEmail.includes("@careerfairy")) {
+         // we only want to increment the count if the user is not from CareerFairy
+         batch.update(jobStatsRef, { applicants: this.fieldValue.increment(1) })
+      }
 
       return batch.commit()
    }

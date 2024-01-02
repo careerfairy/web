@@ -66,11 +66,11 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
    )
 
    const applicants = useMemo(() => {
-      return paginatedResults.data?.map(converterFn) || []
+      return paginatedResults.data?.filter(filterFn).map(converterFn) || []
    }, [paginatedResults])
 
    const onPageChange = useCallback(
-      (_, page: number) => {
+      (_: React.ChangeEvent<unknown>, page: number) => {
          if (page > paginatedResults.page) {
             paginatedResults.next()
          } else {
@@ -156,5 +156,9 @@ const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
       universityCountryMap?.[doc.user.universityCountryCode] || "",
    avatar: doc.user.avatar,
 })
+
+// to filter out all the applications done by CareerFairy users
+const filterFn = (doc: Partial<CustomJobApplicant>) =>
+   !doc.user.userEmail.includes("@careerfairy")
 
 export default JobApplicants
