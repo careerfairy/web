@@ -3,16 +3,11 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import JobApplicantsList from "./JobApplicantsList"
-import usePaginatedUsersCollection, {
-   Filters,
-} from "../../../analytics-new/live-stream/users/usePaginatedUsersCollection"
-import { collection } from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { StyledPagination } from "../../../common/CardCustom"
 import useCustomJobStats from "../../../../../../custom-hook/custom-job/useCustomJobStats"
+import usePaginatedJobApplicants from "../../../../../../custom-hook/custom-job/usePaginatedJobApplicants"
 
 const styles = sxStyles({
    statsSection: {
@@ -46,24 +41,7 @@ type Props = {
 const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
    const jobStats = useCustomJobStats(jobId, groupId)
 
-   const collectionQuery = useMemo(
-      () => collection(FirestoreInstance, "jobApplications"),
-      []
-   )
-
-   const filters = useMemo<Partial<Filters>>(
-      () => ({
-         jobId,
-      }),
-      [jobId]
-   )
-
-   const paginatedResults = usePaginatedUsersCollection(
-      collectionQuery,
-      documentPaths,
-      10,
-      filters
-   )
+   const paginatedResults = usePaginatedJobApplicants(jobId)
 
    const applicants = useMemo(() => {
       return paginatedResults.data?.filter(filterFn).map(converterFn) || []
@@ -134,12 +112,6 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
          ) : null}
       </>
    )
-}
-
-const documentPaths: Partial<DocumentPaths> = {
-   jobId: "jobId",
-   orderBy: `appliedAt`,
-   orderDirection: "desc",
 }
 
 const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
