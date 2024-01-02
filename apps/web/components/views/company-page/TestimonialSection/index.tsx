@@ -13,6 +13,7 @@ import { useMountedState } from "react-use"
 import useEmblaCarousel, {
    EmblaOptionsType,
    EmblaCarouselType,
+   EmblaPluginType,
 } from "embla-carousel-react"
 import React from "react"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
@@ -101,8 +102,12 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
       )
 
       const [emblaRef, emblaApi] = useEmblaCarousel(
-         testimonialsCarouselEmblaOptions
-         // [autoheight.current] // TODO: Not working
+         testimonialsCarouselEmblaOptions,
+         /**
+          * Mapping array with the autoheight, as using the Array directly gives a casting error.
+          * Even though the heights are dynamically set for the container (even with error).
+          */
+         [autoheight.current].map((p) => p as unknown as EmblaPluginType)
       )
 
       React.useImperativeHandle(ref, () => ({
