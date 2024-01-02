@@ -10,6 +10,7 @@ import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
+import { SparksAnalyticsDTO } from "@careerfairy/shared-lib/sparks/analytics"
 
 const useSparksAnalytics = (groupId: string) => {
    const { data: fieldsOfStudy } =
@@ -22,7 +23,7 @@ const useSparksAnalytics = (groupId: string) => {
 
    const fetcher = useFunctionsSWR()
 
-   const { data } = useSWR(
+   const { data } = useSWR<SparksAnalyticsDTO>(
       ["getSparksAnalytics", { groupId }],
       fetcher,
       reducedRemoteCallsOptions
