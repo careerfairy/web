@@ -4,11 +4,10 @@ import SteppedDialog, {
 import { useDispatch, useSelector } from "react-redux"
 import { jobsFormSelectedJobIdSelector } from "../../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import Loader from "../../../../../loader/Loader"
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import JobFetchWrapper from "../../../../../../../HOCs/job/JobFetchWrapper"
 import { Trash2 as DeleteIcon } from "react-feather"
-import { Stack } from "@mui/material"
+import { CircularProgress, Stack } from "@mui/material"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
 import React, { FC, useCallback, useEffect } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -73,7 +72,7 @@ const DeleteJobDialog = () => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
 
    return (
-      <SuspenseWithBoundary fallback={<Loader />}>
+      <SuspenseWithBoundary fallback={<CircularProgress />}>
          <JobFetchWrapper
             jobId={selectedJobId}
             shouldFetch={Boolean(selectedJobId)}

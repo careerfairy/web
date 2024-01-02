@@ -17,12 +17,11 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../../util/constants"
-import { Box } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
 import { customJobRepo } from "../../../../../../data/RepositoryInstances"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import Loader from "../../../../loader/Loader"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -96,7 +95,7 @@ const JobFormDialog = () => {
    )
 
    return (
-      <SuspenseWithBoundary fallback={<Loader />}>
+      <SuspenseWithBoundary fallback={<CircularProgress />}>
          <JobFetchWrapper
             jobId={selectedJobId}
             shouldFetch={Boolean(selectedJobId)}

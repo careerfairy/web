@@ -47,10 +47,14 @@ export type JobType =
    | "Internship"
 
 export const jobTypeOptions = [
-   { value: "Full-time", label: "Full-time" },
-   { value: "Part-time", label: "Part-time" },
-   { value: "Graduate Programme", label: "Graduate Programme" },
-   { value: "Internship", label: "Internship" },
+   { value: "Full-time", label: "Full-time", id: "Full-time" },
+   { value: "Part-time", label: "Part-time", id: "Part-time" },
+   {
+      value: "Graduate Programme",
+      label: "Graduate Programme",
+      id: "Graduate Programme",
+   },
+   { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
 export const pickPublicDataFromCustomJob = (
