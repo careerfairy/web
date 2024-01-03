@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import Add from "@mui/icons-material/Add"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
@@ -12,18 +12,12 @@ import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { useMountedState } from "react-use"
 import useEmblaCarousel, {
    EmblaOptionsType,
-   EmblaCarouselType,
    EmblaPluginType,
 } from "embla-carousel-react"
 import React from "react"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import AutoHeight from "embla-carousel-auto-height"
 
-const slideSpacing = 42
-const desktopSlideWidth = 535 + slideSpacing
-const mobileSlideWidth = 330 + slideSpacing
-
-// TODO: Clear properties unused
 const styles = sxStyles({
    titleSection: {
       display: "flex",
@@ -48,13 +42,9 @@ const styles = sxStyles({
    },
    slide: {
       flex: "0 0 100%",
-
       "&:not(:first-of-type)": {
          paddingX: 2,
       },
-   },
-   paddingSlide: {
-      flex: `0 0 ${slideSpacing}px`,
    },
 })
 
@@ -66,15 +56,11 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
          sectionRefs: { testimonialSectionRef },
       } = useCompanyPage()
       const [testimonialToEdit, setTestimonialToEdit] = useState(null)
-      const [step, setStep] = useState(0)
+
       const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
          useDialogStateHandler()
 
       const isMounted = useMountedState()
-
-      useEffect(() => {
-         setStep(0)
-      }, [group?.testimonials])
 
       const handleCloseDialogClick = useCallback(() => {
          handleCloseDialog()
@@ -92,11 +78,6 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
       const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
          () => ({
             axis: "x",
-            // loop: false,
-            // align: "center",
-            // dragThreshold: 0.5,
-            // dragFree: true,
-            // inViewThreshold: 0,
          }),
          []
       )
@@ -107,7 +88,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
           * Mapping array with the autoheight, as using the Array directly gives a casting error.
           * Even though the heights are dynamically set for the container (even with error).
           */
-         [autoheight.current].map((p) => p as unknown as EmblaPluginType)
+         [autoheight.current as unknown as EmblaPluginType]
       )
 
       React.useImperativeHandle(ref, () => ({

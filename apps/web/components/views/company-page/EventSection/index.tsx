@@ -10,7 +10,6 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {

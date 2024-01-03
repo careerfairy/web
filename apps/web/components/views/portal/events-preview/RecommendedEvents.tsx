@@ -1,9 +1,9 @@
-import React, { useMemo, useRef } from "react"
+import React, { useMemo } from "react"
 import { EventsTypes } from "./EventsPreviewCarousel"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import EventsPreviewCarousel, { ChildRefType } from "./EventsPreviewCarousel"
+import EventsPreviewCarousel from "./EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
