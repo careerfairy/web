@@ -177,47 +177,24 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                   {group?.testimonials?.length > 0 ? (
                      <Box sx={styles.viewport} ref={emblaRef}>
                         <Box sx={styles.container}>
-                           {editMode || true ? ( // TODO: Remove since it should always loop the array ?
-                              <>
-                                 {group?.testimonials?.map((testimonial) => (
-                                    <Box
-                                       sx={styles.slide}
-                                       key={
-                                          "testimonial-slide-box-" +
-                                          testimonial.id
+                           <>
+                              {group?.testimonials?.map((testimonial) => (
+                                 <Box
+                                    sx={styles.slide}
+                                    key={
+                                       "testimonial-slide-box-" + testimonial.id
+                                    }
+                                 >
+                                    <TestimonialCard
+                                       key={testimonial.id}
+                                       testimonial={testimonial}
+                                       handleEditTestimonial={
+                                          handleEditTestimonial
                                        }
-                                    >
-                                       <TestimonialCard
-                                          key={testimonial.id}
-                                          testimonial={testimonial}
-                                          handleEditTestimonial={
-                                             handleEditTestimonial
-                                          }
-                                       />
-                                    </Box>
-                                 ))}
-                              </>
-                           ) : (
-                              <>
-                                 {group?.testimonials?.[step] ? (
-                                    <Box
-                                       sx={styles.slide}
-                                       key={
-                                          "testimonial-slide-box-" +
-                                          group.testimonials[step].id
-                                       }
-                                    >
-                                       <TestimonialCard
-                                          key={group.testimonials[step].id}
-                                          testimonial={group.testimonials[step]}
-                                          handleEditTestimonial={
-                                             handleEditTestimonial
-                                          }
-                                       />
-                                    </Box>
-                                 ) : null}
-                              </>
-                           )}
+                                    />
+                                 </Box>
+                              ))}
+                           </>
                         </Box>
                      </Box>
                   ) : (
