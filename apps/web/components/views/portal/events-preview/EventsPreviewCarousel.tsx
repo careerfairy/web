@@ -22,6 +22,7 @@ import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
@@ -43,10 +44,15 @@ const styles = sxStyles({
    },
    seeMoreText: {
       color: "text.secondary",
-      fontSize: "1.2rem",
-      fontWeight: 600,
+      // fontSize: "1.2rem",
+      // fontWeight: 600,
+      textDecoration: "underline",
    },
-
+   eventTitle: {
+      color: "#000000",
+      opacity: 1,
+      fontWeight: "bold",
+   },
    viewport: {
       overflow: "hidden",
    },
@@ -79,34 +85,21 @@ const styles = sxStyles({
 const wheelGesturesOptions = {
    wheelDraggingClass: "is-wheel-dragging",
 }
-export type ChildRefType = {
-   goNext: () => void
-   goPrev: () => void
-}
 
-export interface EventsProps {
-   events: LivestreamEvent[]
-   eventDescription?: string
-   seeMoreLink?: string
-   title?: string
-   loading: boolean
-   hidePreview?: boolean
-   type: EventsTypes
-   id?: string
-   isEmpty?: boolean
-   isRecommended?: boolean
-   isEmbedded?: boolean
-   options?: EmblaOptionsType
-   children?: ReactNode[]
-   isAdmin?: boolean
+const defaultEmblaOptions: EmblaOptionsType = {
+   axis: "x",
+   loop: false,
+   align: "center",
+   dragThreshold: 0.5,
+   dragFree: true,
+   inViewThreshold: 0,
 }
-
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
    (props, ref) => {
       const {
          title,
          seeMoreLink,
-         loading,
+         loading = false,
          events,
          hidePreview,
          type,
@@ -115,8 +108,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          isRecommended,
          isEmbedded = false,
          children,
-         options,
+         options = defaultEmblaOptions,
          eventDescription,
+         styling = {
+            compact: false,
+            seeMoreSx: styles.seeMoreText,
+            eventTitle: styles.eventTitle,
+         },
       } = props
 
       const [emblaRef, emblaApi] = useEmblaCarousel(options, [
@@ -189,113 +187,117 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          emblaApi.on("reInit", updateSlidesInView)
       }, [emblaApi, updateSlidesInView])
 
-      return (
-         <>
-            {!hidePreview ? (
-               <Box>
-                  {!isEmbedded ? (
-                     <Box sx={styles.eventsHeader}>
-                        {<Heading>{title}</Heading>}
-                        {events?.length >= 0 && seeMoreLink ? (
-                           <Link href={seeMoreLink}>
-                              <Typography sx={styles.seeMoreText} color="grey">
-                                 See more
-                              </Typography>
-                           </Link>
-                        ) : null}
-                     </Box>
+      const eventsCarouselPreview = (
+         <Box>
+            {!isEmbedded ? (
+               <Box sx={styles.eventsHeader}>
+                  {<Heading sx={styles.eventTitle}>{title}</Heading>}
+                  {events?.length >= 0 && seeMoreLink ? (
+                     <Link href={seeMoreLink}>
+                        <Typography sx={styling.seeMoreSx} color="grey">
+                           See all
+                        </Typography>
+                     </Link>
                   ) : null}
-
-                  <Stack sx={styles.previewContent}>
-                     {isEmpty ? (
-                        <EmptyMessageOverlay
-                           message={
-                              type === EventsTypes.myNext
-                                 ? "Time to register to your next event!"
-                                 : "There currently aren't any scheduled events"
-                           }
-                           buttonText={
-                              type === EventsTypes.myNext
-                                 ? "Browse Events"
-                                 : "See Past Events"
-                           }
-                           buttonLink={
-                              type === EventsTypes.myNext
-                                 ? "/next-livestreams"
-                                 : "/next-livestreams?type=pastEvents"
-                           }
-                           showButton={true}
-                           targetBlank={isEmbedded}
-                        />
-                     ) : null}
-                     {!isMobile && (
-                        <Box sx={styles.description}>
-                           <Typography
-                              variant="h6"
-                              fontWeight={"400"}
-                              color="textSecondary"
-                           >
-                              {eventDescription}
-                           </Typography>
-                        </Box>
-                     )}
-                     {
-                        <Box id={id} sx={styles.viewport} ref={emblaRef}>
-                           <Box sx={styles.container}>
-                              {loading
-                                 ? [...Array(numLoadingSlides)].map((_, i) => (
-                                      <Box key={i} sx={styles.slide}>
-                                         <EventPreviewCard
-                                            animation={
-                                               isEmpty ? false : undefined
-                                            }
-                                            loading
-                                         />
-                                      </Box>
-                                   ))
-                                 : events?.length
-                                 ? events.map((event, index, arr) => (
-                                      <Box
-                                         sx={styles.slide}
-                                         key={"events-box-" + index}
-                                      >
-                                         <EventPreviewCard
-                                            key={"event-preview-card-" + index}
-                                            loading={
-                                               (loading &&
-                                                  !cardsLoaded[index] &&
-                                                  !cardsLoaded[
-                                                     arr.length - (index + 1)
-                                                  ]) ||
-                                               false
-                                            }
-                                            index={index}
-                                            totalElements={arr.length}
-                                            location={getLocation(type)}
-                                            event={event}
-                                            isRecommended={isRecommended}
-                                         />
-                                      </Box>
-                                   ))
-                                 : children?.map((child, i) => (
-                                      <Box key={i} sx={styles.slide}>
-                                         {child}
-                                      </Box>
-                                   ))}
-                              {/**
-                               * This prevents the last slide from touching the right edge of the viewport.
-                               */}
-                              <Box sx={styles.paddingSlide}></Box>
-                           </Box>
-                        </Box>
-                     }
-                  </Stack>
                </Box>
             ) : null}
+
+            <Stack sx={styles.previewContent}>
+               {isEmpty ? (
+                  <EmptyMessageOverlay
+                     message={
+                        type === EventsTypes.myNext
+                           ? "Time to register to your next event!"
+                           : "There currently aren't any scheduled events"
+                     }
+                     buttonText={
+                        type === EventsTypes.myNext
+                           ? "Browse Events"
+                           : "See Past Events"
+                     }
+                     buttonLink={
+                        type === EventsTypes.myNext
+                           ? "/next-livestreams"
+                           : "/next-livestreams?type=pastEvents"
+                     }
+                     showButton={true}
+                     targetBlank={isEmbedded}
+                  />
+               ) : null}
+               {!isMobile && (
+                  <Box sx={styles.description}>
+                     <Typography
+                        variant="h6"
+                        fontWeight={"400"}
+                        color="textSecondary"
+                     >
+                        {eventDescription}
+                     </Typography>
+                  </Box>
+               )}
+               {
+                  <Box id={id} sx={styles.viewport} ref={emblaRef}>
+                     <Box sx={styles.container}>
+                        {loading
+                           ? [...Array(numLoadingSlides)].map((_, i) => (
+                                <Box key={i} sx={styles.slide}>
+                                   <EventPreviewCard
+                                      animation={isEmpty ? false : undefined}
+                                      loading
+                                   />
+                                </Box>
+                             ))
+                           : events?.length
+                           ? events.map((event, index, arr) => (
+                                <Box
+                                   sx={styles.slide}
+                                   key={"events-box-" + index}
+                                >
+                                   <EventPreviewCard
+                                      key={"event-preview-card-" + index}
+                                      loading={
+                                         (loading &&
+                                            !cardsLoaded[index] &&
+                                            !cardsLoaded[
+                                               arr.length - (index + 1)
+                                            ]) ||
+                                         false
+                                      }
+                                      index={index}
+                                      totalElements={arr.length}
+                                      location={getLocation(type)}
+                                      event={event}
+                                      isRecommended={isRecommended}
+                                   />
+                                </Box>
+                             ))
+                           : children?.map((child, i) => (
+                                <Box key={i} sx={styles.slide}>
+                                   {child}
+                                </Box>
+                             ))}
+                        {/**
+                         * This prevents the last slide from touching the right edge of the viewport.
+                         */}
+                        <Box sx={styles.paddingSlide}></Box>
+                     </Box>
+                  </Box>
+               }
+            </Stack>
+         </Box>
+      )
+      return (
+         <>
+            <ConditionalWrapper
+               condition={!hidePreview}
+               truthyChildren={eventsCarouselPreview}
+               falsyChidren={null}
+            />
          </>
       )
    }
 )
+
 const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    switch (eventType) {
       case EventsTypes.myNext:
@@ -313,6 +315,33 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    }
 }
 
+export type EventsCarouselStyling = {
+   compact: boolean
+   seeMoreSx: any
+   eventTitle: any
+}
+export type ChildRefType = {
+   goNext: () => void
+   goPrev: () => void
+}
+
+export type EventsProps = {
+   events: LivestreamEvent[]
+   eventDescription?: string
+   seeMoreLink?: string
+   title?: string
+   loading?: boolean
+   hidePreview?: boolean
+   type: EventsTypes
+   id?: string
+   isEmpty?: boolean
+   isRecommended?: boolean
+   isEmbedded?: boolean
+   options?: EmblaOptionsType
+   children?: ReactNode[]
+   isAdmin?: boolean
+   styling?: EventsCarouselStyling
+}
 export enum EventsTypes {
    /**
     * Top Picks for User based on the interests they selected at signup

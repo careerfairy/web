@@ -87,24 +87,20 @@ const EventSection = () => {
          />
          <Stack spacing={8}>
             <EventsPreviewCarousel
-               options={eventsCarouselEmblaOptions}
                title="Next Live Streams"
                events={upcomingLivestreams ?? []}
                eventDescription={upcomingEventsDescription}
                type={EventsTypes.comingUp}
                seeMoreLink={`/next-livestreams?${query}`}
-               loading={false}
             />
 
             {Boolean(pastLivestreams?.length) ? (
                <EventsPreviewCarousel
-                  options={eventsCarouselEmblaOptions}
                   title="Past Live Streams"
                   events={pastLivestreams ?? []}
                   eventDescription={pastEventsDescription}
                   type={EventsTypes.pastEvents}
                   seeMoreLink={`/past-livestreams?${query}`}
-                  loading={false}
                />
             ) : (
                <></>

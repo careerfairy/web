@@ -83,19 +83,17 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          newLocalEvents.unshift(eventFromQuery)
       }
       setLocalEvents(newLocalEvents || [])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [eventFromQuery, events])
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
       <EventsPreviewCarousel
          id={"upcoming-events"}
-         title={"COMING UP NEXT"}
+         title={"Upcoming live streams"}
          type={EventsTypes.comingUp}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
-         // No need to show loading as these events have already been queried server side
-         loading={false}
-         options={eventsCarouselEmblaOptions}
          isRecommended
       />
    )
