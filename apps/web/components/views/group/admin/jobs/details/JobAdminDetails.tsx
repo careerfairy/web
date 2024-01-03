@@ -80,7 +80,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Applicants",
             component: () =>
                allowToDisplayApplicantsData ? (
-                  <JobApplicants jobId={job.id} groupId={group.groupId} />
+                  <JobApplicants jobId={job.id} />
                ) : (
                   <NoApplicantsData />
                ),

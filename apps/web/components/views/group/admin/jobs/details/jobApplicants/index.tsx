@@ -35,11 +35,10 @@ const styles = sxStyles({
 
 type Props = {
    jobId: string
-   groupId: string
 }
 
-const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
-   const jobStats = useCustomJobStats(jobId, groupId)
+const JobApplicants: FC<Props> = ({ jobId }) => {
+   const jobStats = useCustomJobStats(jobId)
 
    const paginatedResults = usePaginatedJobApplicants(jobId)
 

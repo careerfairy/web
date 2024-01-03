@@ -58,9 +58,9 @@ export class CustomJobFunctionsRepository
    implements ICustomJobFunctionsRepository
 {
    async createCustomJobStats(newCustomJob: CustomJob): Promise<void> {
-      const jobStatsId = `${newCustomJob.groupId}_${newCustomJob.id}`
-
-      const ref = this.firestore.collection("customJobStats").doc(jobStatsId)
+      const ref = this.firestore
+         .collection("customJobStats")
+         .doc(newCustomJob.id)
 
       functions.logger.log(
          `Create CustomJobStats for the job ${newCustomJob.id}.`
@@ -72,7 +72,7 @@ export class CustomJobFunctionsRepository
          groupId: newCustomJob.groupId,
          clicks: 0,
          job: newCustomJob,
-         id: jobStatsId,
+         id: newCustomJob.id,
          applicants: 0,
          deleted: false,
          deletedAt: null,
@@ -88,9 +88,9 @@ export class CustomJobFunctionsRepository
          `Sync CustomJobStats with job ${updatedCustomJob.id} data.`
       )
 
-      const jobStatsId = `${updatedCustomJob.groupId}_${updatedCustomJob.id}`
-
-      const ref = this.firestore.collection("customJobStats").doc(jobStatsId)
+      const ref = this.firestore
+         .collection("customJobStats")
+         .doc(updatedCustomJob.id)
 
       return ref.update({ job: updatedCustomJob })
    }
@@ -102,9 +102,9 @@ export class CustomJobFunctionsRepository
          `Add deleted flag to the CustomJobStats with job ${deletedCustomJob.id}.`
       )
 
-      const jobStatsId = `${deletedCustomJob.groupId}_${deletedCustomJob.id}`
-
-      const ref = this.firestore.collection("customJobStats").doc(jobStatsId)
+      const ref = this.firestore
+         .collection("customJobStats")
+         .doc(deletedCustomJob.id)
 
       return ref.update({
          deleted: true,

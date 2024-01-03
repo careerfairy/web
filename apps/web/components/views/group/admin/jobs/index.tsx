@@ -5,10 +5,10 @@ import useCustomJobsStats from "../../../../custom-hook/custom-job/useCustomJobs
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
-   const allJobsStats = useCustomJobsStats(group.groupId)
+   const allJobsWithStats = useCustomJobsStats(group.groupId)
 
-   return allJobsStats.length > 0 ? (
-      <JobList jobsStats={allJobsStats} />
+   return allJobsWithStats.length > 0 ? (
+      <JobList jobsWithStats={allJobsWithStats} />
    ) : (
       <EmptyJobsView />
    )

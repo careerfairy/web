@@ -58,9 +58,8 @@ export interface ICustomJobRepository {
    /**
     * To increment the 'clicks' field on a specific customJob
     * @param jobId
-    * @param groupId
     */
-   incrementCustomJobClicks(jobId: string, groupId: string): Promise<void>
+   incrementCustomJobClicks(jobId: string): Promise<void>
 
    /**
     * Get all the custom jobs linked by a specific live stream
@@ -169,7 +168,6 @@ export class FirebaseCustomJobRepository
    ): Promise<void> {
       const batch = this.firestore.batch()
       const applicationId = `${job.id}_${user.userEmail}`
-      const jobStatsId = `${job.groupId}_${job.id}`
 
       const jobApplicationRef = this.firestore
          .collection("jobApplications")
@@ -177,7 +175,7 @@ export class FirebaseCustomJobRepository
 
       const jobStatsRef = this.firestore
          .collection("customJobStats")
-         .doc(jobStatsId)
+         .doc(job.id)
 
       const newJobApplicant: CustomJobApplicant = {
          documentType: "customJobApplicant",
@@ -200,13 +198,8 @@ export class FirebaseCustomJobRepository
       return batch.commit()
    }
 
-   async incrementCustomJobClicks(
-      jobId: string,
-      groupId: string
-   ): Promise<void> {
-      const jobStatsId = `${groupId}_${jobId}`
-
-      const ref = this.firestore.collection("customJobStats").doc(jobStatsId)
+   async incrementCustomJobClicks(jobId: string): Promise<void> {
+      const ref = this.firestore.collection("customJobStats").doc(jobId)
 
       return ref.update({
          clicks: this.fieldValue.increment(1),

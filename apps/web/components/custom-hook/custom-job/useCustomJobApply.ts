@@ -44,7 +44,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
 
    const { trigger: handleClickApplyBtn, isMutating: isClickingOnApplyBtn } =
       useSWRMutation(`user-${userData?.id}-clicksOnCustomJob-${job.id}`, () =>
-         customJobRepo.incrementCustomJobClicks(job.id, job.groupId)
+         customJobRepo.incrementCustomJobClicks(job.id)
       )
 
    return {

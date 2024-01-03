@@ -130,9 +130,9 @@ const styles = sxStyles({
 })
 
 type Props = {
-   jobsStats: CustomJobStats[]
+   jobsWithStats: CustomJobStats[]
 }
-const JobList: FC<Props> = ({ jobsStats }) => {
+const JobList: FC<Props> = ({ jobsWithStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
@@ -145,8 +145,8 @@ const JobList: FC<Props> = ({ jobsStats }) => {
    )
 
    const jobsOptions = useMemo(
-      () => jobsStats.map((jobStats) => jobStats.job),
-      [jobsStats]
+      () => jobsWithStats.map((jobWithStats) => jobWithStats.job),
+      [jobsWithStats]
    )
 
    return (
@@ -157,7 +157,7 @@ const JobList: FC<Props> = ({ jobsStats }) => {
          </Stack>
 
          <Stack spacing={2}>
-            {jobsStats.map(({ job, clicks, applicants }) => (
+            {jobsWithStats.map(({ job, clicks, applicants }) => (
                <ListItem
                   key={job.id}
                   sx={styles.listItem}
