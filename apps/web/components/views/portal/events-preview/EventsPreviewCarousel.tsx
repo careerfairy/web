@@ -75,7 +75,7 @@ const styles = sxStyles({
       position: "relative",
    },
 })
-// Not used for now, but can be used for custom styling on drag
+
 const wheelGesturesOptions = {
    wheelDraggingClass: "is-wheel-dragging",
 }
