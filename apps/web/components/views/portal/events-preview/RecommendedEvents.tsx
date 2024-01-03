@@ -36,8 +36,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    return (
       <div>
          <EventsPreviewCarousel
-            options={eventsCarouselEmblaOptions}
-            title={!hideTitle && "RECOMMENDED FOR YOU"}
+            title={!hideTitle && "Recommended for you"}
             events={events}
             type={EventsTypes.recommended}
             loading={loading}

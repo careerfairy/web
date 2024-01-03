@@ -74,7 +74,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
          },
          [handleOpenDialog]
       )
-      const autoheight = useRef(AutoHeight())
+
       const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
          () => ({
             axis: "x",
@@ -88,7 +88,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
           * Mapping array with the autoheight, as using the Array directly gives a casting error.
           * Even though the heights are dynamically set for the container (even with error).
           */
-         [autoheight.current as unknown as EmblaPluginType]
+         [AutoHeight() as unknown as EmblaPluginType]
       )
 
       React.useImperativeHandle(ref, () => ({

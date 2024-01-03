@@ -127,13 +127,10 @@ const PortalPage = ({
                            <MyNextEvents limit={20} />
                            <EventsPreviewCarousel
                               id={"past-events"}
-                              title={"PAST EVENTS"}
+                              title={"Past live streams"}
                               type={EventsTypes.pastEvents}
                               events={events}
-                              seeMoreLink={"/next-livestreams?type=pastEvents"}
-                              // No need to show loading as these events have already been queried server side
-                              loading={false}
-                              options={eventsCarouselEmblaOptions}
+                              seeMoreLink={"/past-livestreams"}
                            />
                         </WidgetsWrapper>
                      </Container>

@@ -50,9 +50,8 @@ const MyNextEvents = ({ limit }: Props) => {
          type={EventsTypes.myNext}
          events={events}
          isEmpty={Boolean(!isLoading && !events.length)}
-         title={"MY NEXT EVENTS"}
+         title={"My registrations"}
          loading={isLoading || (!isLoading && !events.length)}
-         options={eventsCarouselEmblaOptions}
       />
    )
 }

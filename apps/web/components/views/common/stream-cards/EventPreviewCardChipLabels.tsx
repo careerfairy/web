@@ -1,9 +1,11 @@
 import { Badge, Box, Chip, Stack, Typography } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
-
+import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined"
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
+import { red } from "@mui/material/colors"
 
 const styles = sxStyles({
    wrapper: {
@@ -54,25 +56,25 @@ const EventPreviewCardChipLabels = ({
       )
    }
 
-   if (hasRegistered && !isPast) {
-      rightChip = (
-         <Chip
-            key={"booked-chip"}
-            icon={<CheckIcon />}
-            color="primary"
-            label={"Booked!"}
-         />
-      )
-   }
-
    if (isLive) {
       leftChips.push(
          <Chip
             key={"live-chip"}
             icon={<LiveIcon />}
             color="error"
-            label={"LIVE"}
+            label={"Live"}
             sx={{ width: { xs: "fit-content", md: "auto" } }}
+         />
+      )
+   }
+
+   if (hasRegistered && !isPast) {
+      leftChips.push(
+         <Chip
+            key={"booked-chip"}
+            icon={<TaskAltOutlinedIcon color="success" />}
+            color="info"
+            label={"Registered"}
          />
       )
    }
@@ -80,19 +82,11 @@ const EventPreviewCardChipLabels = ({
    if (hasJobToApply) {
       leftChips.push(
          <Chip
-            key={"easy-apply-chip"}
-            deleteIcon={
-               <Badge
-                  color="primary"
-                  variant="dot"
-                  overlap="circular"
-                  sx={styles.badge}
-               />
-            }
+            key={"hiring-now-chip"}
+            icon={<BusinessCenterOutlinedIcon color="secondary" />}
             sx={{ pr: 1 }}
-            onDelete={() => {}}
             color={"info"}
-            label={"Easy Apply"}
+            label={"Hiring now"}
          />
       )
    }
@@ -121,6 +115,11 @@ const EventPreviewCardChipLabels = ({
             key={"available-chip"}
             sx={{ pr: 1 }}
             color={"info"}
+            icon={
+               <TaskAltOutlinedIcon
+                  color={recordingAvailableDays > 1 ? "secondary" : "error"}
+               />
+            }
             label={
                <Box display={"flex"}>
                   <Typography fontWeight={500}>Available for</Typography>

@@ -289,6 +289,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          if (!loading) {
             setIsPast(checkIfPast(event))
          }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [event?.start, loading])
 
       const startDate = useMemo<Date>(
