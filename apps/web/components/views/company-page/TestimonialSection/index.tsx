@@ -134,42 +134,43 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                   <Typography variant="h4" fontWeight={"600"} color="black">
                      Testimonial
                   </Typography>
-                  {editMode ? (
-                     <IconButton
-                        data-testid={"testimonial-section-edit-button"}
-                        color="secondary"
-                        onClick={handleOpenDialog}
-                     >
-                        <Add fontSize={"large"} />
-                     </IconButton>
-                  ) : (
-                     <>
-                        {group?.testimonials?.length > 1 ? (
-                           <Box>
-                              <IconButton
-                                 color="inherit"
-                                 sx={styles.arrowIcon}
-                                 onClick={() => {
-                                    if (emblaApi.canScrollPrev())
-                                       emblaApi.scrollPrev()
-                                 }}
-                              >
-                                 <ArrowLeft fontSize={"large"} />
-                              </IconButton>
-                              <IconButton
-                                 color="inherit"
-                                 sx={styles.arrowIcon}
-                                 onClick={() => {
-                                    if (emblaApi.canScrollNext())
-                                       emblaApi.scrollNext()
-                                 }}
-                              >
-                                 <ArrowRight fontSize={"large"} />
-                              </IconButton>
-                           </Box>
-                        ) : null}
-                     </>
-                  )}
+                  <>
+                     {editMode ? (
+                        <IconButton
+                           data-testid={"testimonial-section-edit-button"}
+                           color="secondary"
+                           onClick={handleOpenDialog}
+                        >
+                           <Add fontSize={"large"} />
+                        </IconButton>
+                     ) : (
+                        <> </>
+                     )}
+                     {group?.testimonials?.length > 1 ? (
+                        <Box>
+                           <IconButton
+                              color="inherit"
+                              sx={styles.arrowIcon}
+                              onClick={() => {
+                                 if (emblaApi.canScrollPrev())
+                                    emblaApi.scrollPrev()
+                              }}
+                           >
+                              <ArrowLeft fontSize={"large"} />
+                           </IconButton>
+                           <IconButton
+                              color="inherit"
+                              sx={styles.arrowIcon}
+                              onClick={() => {
+                                 if (emblaApi.canScrollNext())
+                                    emblaApi.scrollNext()
+                              }}
+                           >
+                              <ArrowRight fontSize={"large"} />
+                           </IconButton>
+                        </Box>
+                     ) : null}
+                  </>
                </Box>
 
                <Box mt={1}>
@@ -178,7 +179,7 @@ const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
                         <Box sx={styles.container}>
                            {editMode || true ? ( // TODO: Remove since it should always loop the array ?
                               <>
-                                 {group.testimonials.map((testimonial) => (
+                                 {group?.testimonials?.map((testimonial) => (
                                     <Box
                                        sx={styles.slide}
                                        key={
