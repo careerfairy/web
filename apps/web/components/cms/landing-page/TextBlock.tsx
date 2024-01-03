@@ -7,7 +7,7 @@ const styles = sxStyles({
    title: {
       textAlign: "center",
       mb: 4,
-      "& :first-child": {
+      "& :first-of-type": {
          fontWeight: 500,
       },
    },
