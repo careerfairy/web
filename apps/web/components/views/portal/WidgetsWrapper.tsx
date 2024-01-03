@@ -10,7 +10,7 @@ const WidgetsWrapper: FC<{
    <Box
       sx={(theme) => ({
          py: { xs: smallPadding, sm: largePadding },
-         "& > *:not(:first-child)": {
+         "& > *:not(:first-of-type)": {
             py: {
                xs: smallPadding,
                sm: largePadding,

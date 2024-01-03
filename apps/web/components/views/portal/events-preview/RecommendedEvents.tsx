@@ -1,11 +1,13 @@
-import React, { useMemo } from "react"
-import EventsPreview, { EventsTypes } from "./EventsPreview"
+import React, { useMemo, useRef } from "react"
+import { EventsTypes } from "./EventsPreviewCarousel"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import EventsPreviewCarousel, { ChildRefType } from "./EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    const options = useMemo(
       () => ({
@@ -16,19 +18,34 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
 
    const { loading, events } = useRecommendedEvents(options)
 
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+         loop: false,
+         align: "center",
+         dragThreshold: 0.5,
+         dragFree: true,
+         inViewThreshold: 0,
+      }),
+      []
+   )
+
    if (!authenticatedUser?.email || !events?.length) {
       return null
    }
-
    return (
-      <EventsPreview
-         limit={limit}
-         title={!hideTitle && "RECOMMENDED FOR YOU"}
-         events={events}
-         type={EventsTypes.recommended}
-         loading={loading}
-         isRecommended
-      />
+      <div>
+         <EventsPreviewCarousel
+            options={eventsCarouselEmblaOptions}
+            title={!hideTitle && "RECOMMENDED FOR YOU"}
+            events={events}
+            type={EventsTypes.recommended}
+            loading={loading}
+            isRecommended
+            isAdmin={userData?.isAdmin}
+            seeMoreLink="/next-livestreams"
+         />
+      </div>
    )
 }
 
