@@ -25,7 +25,7 @@ const styles = {
    },
    imgGrid: {
       overflow: "hidden",
-      "& :first-child": {
+      "& :first-of-type": {
          width: "100%",
          height: "100%",
       },

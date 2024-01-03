@@ -1,16 +1,16 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { useCallback, useState } from "react"
+import { useMemo, useState } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import useIsMobile from "../../../custom-hook/useIsMobile"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import RegistrationModal from "../../common/registration-modal"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-import StreamCarousel from "./StreamCarousel"
+import EventsPreviewCarousel, {
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { EmblaOptionsType } from "embla-carousel-react"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {
@@ -48,23 +48,37 @@ const EventSection = () => {
       upcomingLivestreams,
       pastLivestreams,
       sectionRefs: { eventSectionRef },
+      editMode,
    } = useCompanyPage()
+   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+         loop: false,
+         align: "center",
+         dragThreshold: 0.5,
+         dragFree: true,
+         inViewThreshold: 0,
+      }),
+      []
+   )
+   const query = `companyId=${group.id}`
    const isMounted = useMountedState()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
-
-   const handleOpenEvent = useCallback(
-      (event: LivestreamEvent) => {
-         setEventToEdit(event)
-         handleOpenDialog()
-      },
-      [handleOpenDialog]
-   )
-
-   const upcomingHasMore = upcomingLivestreams?.length > MAX_UPCOMING_STREAMS
-   const pastHasMore = pastLivestreams?.length > MAX_PAST_STREAMS
+   const upcomingEventsDescription = useMemo(() => {
+      if (editMode) {
+         return "Below are your published live streams, these will be shown on your company page."
+      }
+      return "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."
+   }, [editMode])
+   const pastEventsDescription = useMemo(() => {
+      if (editMode) {
+         return "Here are the recordings of your previous live streams, which will be featured on your company page."
+      }
+      return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
+   }, [editMode, group.universityName])
 
    return isMounted() ? (
       <Box sx={styles.root}>
@@ -73,21 +87,25 @@ const EventSection = () => {
             tabValue={TabValue.livesStreams}
          />
          <Stack spacing={8}>
-            <StreamCarousel
-               livestreams={upcomingLivestreams ?? []}
-               type="upcoming"
+            <EventsPreviewCarousel
+               options={eventsCarouselEmblaOptions}
                title="Next Live Streams"
-               handleOpenEvent={handleOpenEvent}
-               hasMore={upcomingHasMore}
+               events={upcomingLivestreams ?? []}
+               eventDescription={upcomingEventsDescription}
+               type={EventsTypes.comingUp}
+               seeMoreLink={`/next-livestreams?${query}`}
+               loading={false}
             />
 
             {Boolean(pastLivestreams?.length) ? (
-               <StreamCarousel
-                  livestreams={pastLivestreams ?? []}
-                  type="past"
+               <EventsPreviewCarousel
+                  options={eventsCarouselEmblaOptions}
                   title="Past Live Streams"
-                  handleOpenEvent={handleOpenEvent}
-                  hasMore={pastHasMore}
+                  events={pastLivestreams ?? []}
+                  eventDescription={pastEventsDescription}
+                  type={EventsTypes.pastEvents}
+                  seeMoreLink={`/past-livestreams?${query}`}
+                  loading={false}
                />
             ) : (
                <></>
