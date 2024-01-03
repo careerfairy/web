@@ -9,12 +9,12 @@ type TimeFrameMapToLabels = {
    [key in TimePeriodParams]: string
 }
 
-export const timeFrameLabels: TimeFrameMapToLabels = {
+export const timeFrameLabels = {
    "7days": "past 7 days",
    "30days": "past 30 days",
    "6months": "past 6 months",
    "1year": "last year",
-} as const
+} as const satisfies TimeFrameMapToLabels
 
 /*
    This fixes a mobile issue where the tooltip would not disappear after a view swipe.   
