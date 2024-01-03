@@ -52,6 +52,7 @@ import sparksAnalytics = require("./sparksAnalytics")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 import groupPlans = require("./groupPlans")
+import search = require("./search")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -250,3 +251,7 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
 
 // Group Subscription Plan Functions
 exports.startPlan = groupPlans.startPlan
+
+// Search
+exports.fullIndexSync = search.fullIndexSync
+exports.indexCollectionLivestreams = search.indexCollectionLivestreams
