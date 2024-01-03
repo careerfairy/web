@@ -50,6 +50,7 @@ import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
+import search = require("./search")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -239,3 +240,7 @@ exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
 
 // Custom Jobs
 exports.userApplyToCustomJob = customJobs.userApplyToCustomJob
+
+// Search
+exports.fullIndexSync = search.fullIndexSync
+exports.indexCollectionLivestreams = search.indexCollectionLivestreams

@@ -4,7 +4,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/analytics"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
 import bigQueryClient from "../../api/bigQueryClient"
-import { getBigQueryTablePrefix, isProductionEnvironment } from "../../util"
+import { getEnvPrefix, isProductionEnvironment } from "../../util"
 import sparkEvents from "./schema-views/sparkEvents.json"
 import sparkSecondsWatched from "./schema-views/sparkSecondsWatched.json"
 import { logger } from "firebase-functions"
@@ -33,7 +33,7 @@ class BigQueryServiceCore<TRow> {
    ) {
       this.bigQueryClient = bigQueryClient
       this.datasetId = datasetId
-      this.tableId = `${tableId}${getBigQueryTablePrefix()}`
+      this.tableId = `${tableId}${getEnvPrefix()}`
       this.tableOptions = tableOptions
    }
 
