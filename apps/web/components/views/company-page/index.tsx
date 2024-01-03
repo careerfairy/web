@@ -48,7 +48,7 @@ export const TabValue = {
 export type TabValueType = (typeof TabValue)[keyof typeof TabValue]
 
 export const getTabLabel = (tabId: TabValueType) => {
-   let func = () => {
+   return () => {
       switch (tabId) {
          case TabValue.profile:
             return "About"
@@ -62,10 +62,6 @@ export const getTabLabel = (tabId: TabValueType) => {
             return ""
       }
    }
-   let res = func()
-
-   console.log("Tab[" + tabId + "] - " + res)
-   return res
 }
 
 export type SectionRefs = {
