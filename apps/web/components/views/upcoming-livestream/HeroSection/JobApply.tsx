@@ -20,7 +20,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Skeleton from "@mui/material/Skeleton"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 const styles = sxStyles({
    itemWrapper: {

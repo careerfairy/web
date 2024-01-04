@@ -1,5 +1,6 @@
 import functions = require("firebase-functions")
 import {
+   customJobRepo,
    groupRepo,
    livestreamsRepo,
    sparkRepo,
@@ -23,6 +24,7 @@ import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks
 import { firestore } from "./api/firestoreAdmin"
 import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
 import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -85,7 +87,9 @@ export const syncLivestreams = functions
          }
       }
 
-      sideEffectPromises.push(groupRepo.syncLivestreamIdWithCustomJobs(change))
+      sideEffectPromises.push(
+         customJobRepo.syncLivestreamIdWithCustomJobs(change)
+      )
 
       return handleSideEffects(sideEffectPromises)
    })
@@ -296,7 +300,7 @@ export const onWriteSpark = functions
 export const onWriteCustomJobs = functions
    .runWith(defaultTriggerRunTimeConfig)
    .region(config.region)
-   .firestore.document("careerCenterData/{groupId}/customJobs/{jobId}")
+   .firestore.document("customJobs/{jobId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
 
@@ -309,20 +313,26 @@ export const onWriteCustomJobs = functions
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
-      // Run side effects for all custom jobs changes
-      sideEffectPromises.push(
-         livestreamsRepo.syncCustomJobDataToLivestream(change),
-         userRepo.syncCustomJobDataToUser(change)
-      )
-
-      if (changeTypes.isUpdate) {
+      if (changeTypes.isCreate) {
+         const newCustomJob = change.after.data() as CustomJob
          sideEffectPromises.push(
-            groupRepo.syncCustomJobDataToCustomJobStats(change)
+            customJobRepo.createCustomJobStats(newCustomJob)
          )
       }
 
-      if (changeTypes.isCreate) {
-         sideEffectPromises.push(groupRepo.createCustomJobStats(change))
+      // Run side effects for all custom jobs changes
+      if (changeTypes.isUpdate) {
+         const updatedCustomJob = change.after.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
+            livestreamsRepo.syncCustomJobDataToLivestream(updatedCustomJob),
+            userRepo.syncCustomJobDataToUser(updatedCustomJob)
+         )
+      }
+
+      if (changeTypes.isDelete) {
+         // TODO-GS: when deleting a custom job
       }
 
       return handleSideEffects(sideEffectPromises)

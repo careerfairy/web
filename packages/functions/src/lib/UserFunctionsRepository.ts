@@ -5,19 +5,16 @@ import {
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
-import { Change } from "firebase-functions"
-import { firestore } from "firebase-admin"
-import DocumentSnapshot = firestore.DocumentSnapshot
 import {
    CustomJob,
    pickPublicDataFromCustomJob,
    PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as functions from "firebase-functions"
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
-   syncCustomJobDataToUser(customJob: Change<DocumentSnapshot>): Promise<void>
+   syncCustomJobDataToUser(customJob: CustomJob): Promise<void>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 }
 
@@ -37,21 +34,18 @@ export class UserFunctionsRepository
       return mapFirestoreDocuments(data)
    }
 
-   async syncCustomJobDataToUser(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void> {
-      if (!customJobChange.after.exists) {
-         // Custom job was deleted, so we don't need to do nothing
-         return
-      }
-
+   async syncCustomJobDataToUser(customJob: CustomJob): Promise<void> {
       const batch = this.firestore.batch()
-      const newCustomJob = customJobChange.after.data() as CustomJob
 
       const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(newCustomJob)
+         pickPublicDataFromCustomJob(customJob)
 
-      const applicants = newCustomJob.applicants || []
+      const applicantsSnapshot = await this.firestore
+         .collectionGroup("customJobApplicants")
+         .where("id", "==", customJob.id)
+         .get()
+
+      const applicants = applicantsSnapshot.docs || []
 
       functions.logger.log(
          `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applicants.length} applicants.`
@@ -59,9 +53,9 @@ export class UserFunctionsRepository
       applicants.forEach((applicant) => {
          const ref = this.firestore
             .collection("userData")
-            .doc(applicant)
+            .doc(applicant.id)
             .collection("customJobApplications")
-            .doc(newCustomJob.id)
+            .doc(customJob.id)
 
          batch.update(ref, { job: updatedCustomJob })
       })

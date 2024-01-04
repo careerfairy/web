@@ -2,7 +2,7 @@ import { Button, CircularProgress } from "@mui/material"
 import { ExternalLink } from "react-feather"
 import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
 
 const styles = sxStyles({

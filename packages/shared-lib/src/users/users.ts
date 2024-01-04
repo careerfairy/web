@@ -16,7 +16,7 @@ import {
 import { Job } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
-import { PublicCustomJob } from "../groups/customJobs"
+import { PublicCustomJob } from "../customJobs/customJobs"
 
 export interface UserData extends Identifiable {
    authId: string

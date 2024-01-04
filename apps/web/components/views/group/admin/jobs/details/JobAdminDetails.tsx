@@ -1,5 +1,5 @@
 import { Box, Tabs, Tooltip, Typography } from "@mui/material"
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
@@ -78,7 +78,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Applicants",
             component: () =>
                allowToDisplayApplicantsData ? (
-                  <JobApplicants job={job} />
+                  <JobApplicants jobId={job.id} groupId={group.groupId} />
                ) : (
                   <NoApplicantsData />
                ),
@@ -90,6 +90,11 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       ],
       [allowToDisplayApplicantsData, group, job]
    )
+
+   if (!Boolean(job)) {
+      // TODO-GS improve to have no job with this id
+      return null
+   }
 
    return (
       <Stack spacing={3} sx={styles.wrapper}>
