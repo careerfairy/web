@@ -87,7 +87,7 @@ const EventSection = () => {
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <Stack spacing={8}>
+         <Stack spacing={1}>
             <EventsPreviewCarousel
                title="Next Live Streams"
                events={upcomingLivestreams ?? []}
