@@ -17,6 +17,7 @@ import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { QueryConstraint } from "@firebase/firestore"
 import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants"
+import { useLivestreamSearchAlgolia } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 
 const styles = sxStyles({
    root: {
@@ -104,6 +105,9 @@ const LivestreamSearch: FC<Props> = ({
    )
 
    const { data: livestreamHits } = useLivestreamSearch(inputValue, options)
+
+   const { data } = useLivestreamSearchAlgolia(inputValue)
+   console.log("🚀 ~ file: LivestreamSearch.tsx:110 ~ data:", data)
 
    const renderOption = useCallback(
       (

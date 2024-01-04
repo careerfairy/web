@@ -4,6 +4,7 @@ const config = {
    apiKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY,
    appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
 }
+console.log("🚀 ~ file: AlgoliaInstance.ts:7 ~ config:", config)
 
 // const asElementTypes = <T>(et: { [K in keyof T]: SearchIndex }) => et
 
@@ -14,6 +15,6 @@ export const createAlgoliaInstance = (): SearchClient => {
    return algoliasearch(config.appId, config.apiKey)
 }
 
-const algoliaIndexes = createAlgoliaInstance()
+const algoliaSearchClient = createAlgoliaInstance()
 
-export default algoliaIndexes
+export default algoliaSearchClient
