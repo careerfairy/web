@@ -1,8 +1,20 @@
+import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { useState } from "react"
 
 export type AbstractButtonSelect<T> = {
    [key in keyof T]: string
 }
+
+type TimeFrameMapToLabels = {
+   [key in TimePeriodParams]: string
+}
+
+export const timeFrameLabels = {
+   "7days": "past 7 days",
+   "30days": "past 30 days",
+   "6months": "past 6 months",
+   "1year": "last year",
+} as const satisfies TimeFrameMapToLabels
 
 /*
    This fixes a mobile issue where the tooltip would not disappear after a view swipe.   

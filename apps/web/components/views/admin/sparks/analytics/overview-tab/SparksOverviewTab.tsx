@@ -4,17 +4,7 @@ import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import ReachAnalyticsContainer from "./ReachAnalyticsContainer"
 import EngagementAnalyticsContainer from "./EngagementAnalyticsContainer"
 import MostSomethingAnalyticsContainer from "./MostSomethingAnalyticsContainer"
-
-type TimeFrameMapToLabels = {
-   [key in TimePeriodParams]: string
-}
-
-const timeFrameLabels: TimeFrameMapToLabels = {
-   "7days": "past 7 days",
-   "30days": "past 30 days",
-   "6months": "past 6 months",
-   "1year": "last year",
-} as const
+import { timeFrameLabels } from "../util"
 
 type SparksOverviewTabProps = {
    timeFilter: TimePeriodParams
