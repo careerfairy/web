@@ -22,7 +22,7 @@ const styles = sxStyles({
       background: "black",
    },
    cardWrapperContainerCircle: {
-      border: "30px solid #229584",
+      border: "15px solid #229584",
       background: "#2ABAA5",
       width: {
          xs: "90vw",
