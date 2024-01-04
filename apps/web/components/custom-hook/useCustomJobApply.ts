@@ -3,9 +3,9 @@ import useUserCustomJob from "./useUserCustomJob"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 import useSnackbarNotifications from "./useSnackbarNotifications"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { customJobServiceInstance } from "../../data/firebase/CustomJobService"
-import { groupRepo } from "../../data/RepositoryInstances"
+import { customJobRepo } from "../../data/RepositoryInstances"
 
 const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
    const { userData } = useAuth()
@@ -22,8 +22,7 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
             await customJobServiceInstance.applyToAJob(
                livestreamId,
                job.id,
-               userData?.id,
-               job.groupId
+               userData?.id
             )
             successNotification(
                "You have successfully applied to the job!",
@@ -50,9 +49,9 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
 
    const handleClickApplyBtn = useCallback(async () => {
       setIsApplying(true)
-      await groupRepo.incrementCustomJobClicks(job.id)
+      await customJobRepo.incrementCustomJobClicks(job.id, job.groupId)
       setIsApplying(false)
-   }, [job.id])
+   }, [job.groupId, job.id])
 
    return useMemo(
       () => ({ alreadyApplied, handleApply, isApplying, handleClickApplyBtn }),

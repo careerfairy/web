@@ -42,7 +42,7 @@ import {
    CustomJob,
    pickPublicDataFromCustomJob,
    PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -126,10 +126,10 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
 
    /**
     * Sync custom jobs data to the livestream
+    *
+    * @param customJob
     */
-   syncCustomJobDataToLivestream(
-      customJob: Change<DocumentSnapshot>
-   ): Promise<void>
+   syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -473,19 +473,11 @@ export class LivestreamFunctionsRepository
       return admins
    }
 
-   async syncCustomJobDataToLivestream(
-      customJobChange: Change<DocumentSnapshot>
-   ): Promise<void> {
-      if (!customJobChange.after.exists) {
-         // Custom job was deleted, so we don't need to do nothing
-         return
-      }
-
+   async syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void> {
       const batch = this.firestore.batch()
-      const newCustomJob = customJobChange.after.data() as CustomJob
 
       const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(newCustomJob)
+         pickPublicDataFromCustomJob(customJob)
 
       functions.logger.log(
          `Sync livestreams with updated job ${updatedCustomJob.id}.`
@@ -495,12 +487,12 @@ export class LivestreamFunctionsRepository
       const [livestreamsSnaps, draftSnaps] = await Promise.all([
          this.firestore
             .collection("livestreams")
-            .where("groupIds", "array-contains", newCustomJob.groupId)
+            .where("groupIds", "array-contains", updatedCustomJob.groupId)
             .where("start", ">=", new Date())
             .get(),
          this.firestore
             .collection("draftLivestreams")
-            .where("groupIds", "array-contains", newCustomJob.groupId)
+            .where("groupIds", "array-contains", updatedCustomJob.groupId)
             .get(),
       ])
 

@@ -43,6 +43,10 @@ import {
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
+import {
+   CustomJobFunctionsRepository,
+   ICustomJobFunctionsRepository,
+} from "../lib/CustomJobFunctionsRepository"
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
@@ -99,3 +103,6 @@ export const getSparksAnalyticsRepoInstance = (
 ): GroupSparksAnalyticsRepository => {
    return new GroupSparksAnalyticsRepository(groupId, bigQueryClient)
 }
+
+export const customJobRepo: ICustomJobFunctionsRepository =
+   new CustomJobFunctionsRepository(firestore as any, FieldValue)
