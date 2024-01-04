@@ -43,7 +43,11 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
    const paginatedResults = usePaginatedJobApplicants(jobId)
 
    const applicants = useMemo(() => {
-      return paginatedResults.data?.filter(filterFn).map(converterFn) || []
+      return (
+         paginatedResults.data
+            ?.filter(filterCFUsersApplications)
+            .map(convertJobApplicantToUserData) || []
+      )
    }, [paginatedResults])
 
    const onPageChange = useCallback(
@@ -113,7 +117,9 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
    )
 }
 
-const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
+const convertJobApplicantToUserData = (
+   doc: Partial<CustomJobApplicant>
+): UserDataEntry => ({
    email: doc.user.userEmail,
    firstName: doc.user.firstName || "",
    lastName: doc.user.lastName || "",
@@ -129,7 +135,7 @@ const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
 })
 
 // to filter out all the applications done by CareerFairy users
-const filterFn = (doc: Partial<CustomJobApplicant>) =>
+const filterCFUsersApplications = (doc: Partial<CustomJobApplicant>) =>
    !doc.user.userEmail.includes("@careerfairy")
 
 export default JobApplicants

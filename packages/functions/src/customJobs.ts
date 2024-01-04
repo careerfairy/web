@@ -2,7 +2,11 @@ import functions = require("firebase-functions")
 import config from "./config"
 import { onCallWrapper } from "./util"
 import { middlewares } from "./middlewares/middlewares"
-import { dataValidation, userAuthExists } from "./middlewares/validations"
+import {
+   dataValidation,
+   userAuthExists,
+   userShouldBeGroupAdmin,
+} from "./middlewares/validations"
 import { string, array } from "yup"
 import { userRepo, customJobRepo } from "./api/repositories"
 
@@ -63,7 +67,6 @@ export const updateCustomJobWithLinkedLivestreams = functions
             livestreamId: string().required(),
             jobIds: array().of(string()),
          }),
-         userAuthExists(),
          onCallWrapper(async (data) => {
             const { livestreamId, jobIds } = data
 
@@ -129,7 +132,7 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
             draftId: string().required(),
             livestreamId: string().required(),
          }),
-         userAuthExists(),
+         userShouldBeGroupAdmin(),
          onCallWrapper(async (data) => {
             const { draftId, livestreamId } = data
 

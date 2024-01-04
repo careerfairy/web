@@ -13,7 +13,7 @@ type Options = {
  * @param groupId
  * @param options
  */
-const useCustomJobsStats = (groupId: string, options: Options = {}) => {
+const useGroupCustomJobsStats = (groupId: string, options: Options = {}) => {
    const { deletedJobs = false } = options
 
    const collectionRef = query(
@@ -30,4 +30,4 @@ const useCustomJobsStats = (groupId: string, options: Options = {}) => {
    return data
 }
 
-export default useCustomJobsStats
+export default useGroupCustomJobsStats

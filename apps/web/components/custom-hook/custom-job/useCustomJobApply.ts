@@ -28,16 +28,17 @@ const useCustomJobApply = (job: PublicCustomJob, livestreamId: string) => {
                error,
                "Sorry! Something failed, maybe try again later"
             )
-            dataLayerEvent("livestream_custom_job_application_complete", {
-               jobId: job?.id,
-               jobName: job?.title,
-            })
          },
          onSuccess: () => {
             successNotification(
                "You have successfully applied to the job!",
                "Congrats"
             )
+
+            dataLayerEvent("livestream_custom_job_application_complete", {
+               jobId: job?.id,
+               jobName: job?.title,
+            })
          },
       }
    )
