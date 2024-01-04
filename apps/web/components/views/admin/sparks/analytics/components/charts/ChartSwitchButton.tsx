@@ -42,7 +42,7 @@ const styles = sxStyles({
 
 type ChartSwitchButtonProps = {
    label: string
-   value: string
+   value: string | number
    active: boolean
    onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }

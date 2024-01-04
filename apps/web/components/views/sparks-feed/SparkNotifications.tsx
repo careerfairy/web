@@ -22,7 +22,7 @@ import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import LivestreamDialog from "../livestream-dialog/LivestreamDialog"
 import { useAuth } from "HOCs/AuthProvider"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 
 type Props = {
    userEmail: string

@@ -3,7 +3,7 @@ import {
    SparkEventActions,
    SparkEventClient,
    SparkSecondWatchedClient,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAuth } from "HOCs/AuthProvider"
 import useBatchedEvents from "components/custom-hook/utils/useBatchedEvents"
 import { sparkService } from "data/firebase/SparksService"

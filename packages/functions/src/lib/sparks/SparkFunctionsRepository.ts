@@ -38,7 +38,7 @@ import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService
 import {
    SparkEvent,
    SparkSecondWatched,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import * as functions from "firebase-functions"
 import { userRepo } from "../../api/repositories"

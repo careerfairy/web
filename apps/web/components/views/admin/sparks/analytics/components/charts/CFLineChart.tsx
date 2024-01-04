@@ -17,6 +17,7 @@ import {
    LineHighlightElement,
    LineHighlightElementProps,
 } from "@mui/x-charts/LineChart"
+import { TimeSeriesForCharts } from "@careerfairy/shared-lib/sparks/analytics"
 import { sxStyles } from "types/commonTypes"
 import StyledChartTooltip from "./StyledChartTooltip"
 
@@ -68,7 +69,7 @@ const defaultDataForEmptyView = {
 }
 
 // Utility function to keep date format consistent accross the different elements of the chart
-const formatDate = (date, options) => {
+const formatDate = (date: Date, options: Intl.DateTimeFormatOptions) => {
    return new Intl.DateTimeFormat("en-GB", options).format(date)
 }
 
@@ -96,7 +97,7 @@ type CustomTooltipProps = {
 const CustomTooltip: FC<CustomTooltipProps> = (props) => {
    const { axisData, label, seriesData } = props
 
-   if (!axisData) return null
+   if (!axisData || !axisData.x) return null
 
    const date = new Date(axisData.x.value)
    const options: Intl.DateTimeFormatOptions = {
@@ -116,29 +117,26 @@ const CustomTooltip: FC<CustomTooltipProps> = (props) => {
 
 type CFLineChartProps = {
    tooltipLabel?: string
-   xAxisData?: any[]
-   seriesData?: LineSeriesType["data"]
-}
+} & Omit<TimeSeriesForCharts, "totalCount">
 
 const lineChartValueFormatter = (date: Date, isChartEmpty: boolean): string => {
-   const options = isChartEmpty
+   const options: Intl.DateTimeFormatOptions = isChartEmpty
       ? { weekday: "long" }
       : {
            day: "numeric",
            month: "short",
            year: "numeric",
         }
+
    return formatDate(date, options).toString()
 }
 
 const CFLineChart: FC<CFLineChartProps> = ({
    tooltipLabel,
-   xAxisData = defaultDataForEmptyView.xAxis,
-   seriesData = defaultDataForEmptyView.series,
+   xAxis = defaultDataForEmptyView.xAxis,
+   series = defaultDataForEmptyView.series,
 }) => {
-   const isEmpty =
-      xAxisData === defaultDataForEmptyView.xAxis ||
-      seriesData === defaultDataForEmptyView.series
+   const isEmpty = xAxis.length === 0 || series.length === 0
 
    return (
       <ResponsiveChartContainer
@@ -146,15 +144,15 @@ const CFLineChart: FC<CFLineChartProps> = ({
          xAxis={[
             {
                id: "Years",
-               data: xAxisData,
-               scaleType: "time",
+               data: isEmpty ? defaultDataForEmptyView.xAxis : xAxis,
+               scaleType: "point",
                valueFormatter: (date) => lineChartValueFormatter(date, isEmpty),
             },
          ]}
          series={[
             {
                type: "line",
-               data: seriesData,
+               data: isEmpty ? defaultDataForEmptyView.series : series,
                area: true,
                color: "#6749EA",
                highlightScope: {
@@ -186,12 +184,13 @@ const CFLineChart: FC<CFLineChartProps> = ({
                   slots={{ lineHighlight: CustomLineHighlightElement }}
                />
                <ChartsTooltip
+                  key={`${tooltipLabel}-${Date.now()}`} // check util.ts to understand this better
                   slots={{
                      axisContent: (props) => (
                         <CustomTooltip
                            {...props}
                            label={tooltipLabel}
-                           seriesData={seriesData}
+                           seriesData={series}
                         />
                      ),
                   }}
@@ -202,4 +201,4 @@ const CFLineChart: FC<CFLineChartProps> = ({
    )
 }
 
-export { CFLineChart }
+export default CFLineChart

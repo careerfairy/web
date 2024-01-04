@@ -18,7 +18,7 @@ import {
    SparkEventClient,
    SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import {
    Query,
    collection,
