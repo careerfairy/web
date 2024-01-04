@@ -241,7 +241,7 @@ exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
 exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
-exports.userApplyToCustomJob = customJobs.userApplyToCustomJob
+exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
 
 // Group Subscription Plan Functions
 exports.startPlan = groupPlans.startPlan

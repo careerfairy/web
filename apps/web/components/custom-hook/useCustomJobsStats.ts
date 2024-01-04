@@ -1,25 +1,25 @@
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 /**
- * Fetch Custom Jobs based on groupId
+ * Fetch Custom Jobs Stats
  *
  * @param groupId
  */
-const useGroupCustomJobs = (groupId: string) => {
+const useCustomJobsStats = (groupId: string) => {
    const collectionRef = query(
-      collection(useFirestore(), "customJobs"),
+      collection(useFirestore(), "customJobStats"),
       where("groupId", "==", groupId),
-      orderBy("createdAt", "desc")
+      orderBy("job.createdAt", "desc")
    )
 
-   const { data } = useFirestoreCollection<CustomJob>(collectionRef, {
+   const { data } = useFirestoreCollection<CustomJobStats>(collectionRef, {
       idField: "id", // this field will be added to the firestore object
    })
 
    return data
 }
 
-export default useGroupCustomJobs
+export default useCustomJobsStats

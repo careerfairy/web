@@ -7,7 +7,7 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
 import React, { useCallback, useState } from "react"

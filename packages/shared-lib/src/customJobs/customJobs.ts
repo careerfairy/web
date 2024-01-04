@@ -8,7 +8,7 @@ import { UserData } from "../users"
 export interface CustomJob extends Identifiable {
    // job belongs to a group
    groupId: string
-   documentType: "groupCustomJob" // simplify groupCollection Queries
+   documentType: "customJobs" // simplify groupCollection Queries
 
    title: string
    description: string
@@ -17,15 +17,13 @@ export interface CustomJob extends Identifiable {
    deadline: firebase.firestore.Timestamp
    createdAt: firebase.firestore.Timestamp
    updatedAt: firebase.firestore.Timestamp
+   clicks?: number // TODO: this field is deprecated, it should be removed after the release
+   applicants?: string[] // TODO: this field is deprecated, it should be removed after the release
 
    // optional fields
    salary?: string
-   // applicants ids
-   applicants?: string[] //TODO: deprecated migrate to CustomJobApplicants sub collection from CustomJobStats collection
    // livestreams ids where this job opening is shown
    livestreams: string[]
-   //increases every time a talent clicks on the jobPostingUrl
-   clicks: number //TODO: deprecated migrate to CustomJobStats collection
 }
 
 export type PublicCustomJob = Pick<
@@ -70,14 +68,17 @@ export const pickPublicDataFromCustomJob = (
 
 // collection path /customJobStats
 export interface CustomJobStats extends Identifiable {
-   jobId: string
    documentType: "customJobStats" // simplify groupCollection Queries
-   //increases every time a talent clicks on the jobPostingUrl
+   jobId: string
+   groupId: string
+   // increases every time a talent clicks on the jobPostingUrl
    clicks: number
+   // increases every time an application is created related to this job
+   applicants: number
    job: CustomJob
 }
 
-// collection path /customJobStats/{jobId}/customJobApplicants
+// collection path /jobApplications
 export interface CustomJobApplicant extends Identifiable {
    documentType: "customJobApplicant" // simplify groupCollection Queries
    jobId: string
