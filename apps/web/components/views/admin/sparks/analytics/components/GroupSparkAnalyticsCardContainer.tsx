@@ -5,6 +5,7 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       width: "100%",
+      height: "100%",
       backgroundColor: "#FFFFFF",
       borderRadius: "8px",
       padding: "16px 12px",

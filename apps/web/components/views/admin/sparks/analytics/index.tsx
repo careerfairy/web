@@ -2,11 +2,9 @@ import React, { useState } from "react"
 import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
-import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
-import CFPieChart from "./components/charts/CFPieChart"
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { GroupSparkAnalyticsCardContainerTitle } from "./components/GroupSparkAnalyticsCardTitle"
+import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
 
 const styles = sxStyles({
    root: {
@@ -62,57 +60,6 @@ const styles = sxStyles({
    },
 })
 
-const pieChartRawData = [
-   {
-      university: "Other",
-      total_talent: 34,
-   },
-   {
-      university: "ETHZ - ETH Zurich",
-      total_talent: 14,
-   },
-   {
-      university: "Universität St. Gallen",
-      total_talent: 10,
-   },
-   {
-      university: "EPFL - EPF Lausanne",
-      total_talent: 6,
-   },
-   {
-      university: "ZHAW - Zürcher Hochschule für Angewandte Wissenschaften",
-      total_talent: 5,
-   },
-   {
-      university: "University of Zürich",
-      total_talent: 5,
-   },
-   {
-      university: "Technische Universität Darmstadt",
-      total_talent: 4,
-   },
-   {
-      university: "Technische Universität Wien",
-      total_talent: 4,
-   },
-   {
-      university: "University of Basel",
-      total_talent: 3,
-   },
-   {
-      university: "Universität Bern",
-      total_talent: 3,
-   },
-]
-
-const pieChartProcessedData = pieChartRawData.map((d, i) => {
-   return {
-      id: i,
-      value: d.total_talent,
-      label: d.university,
-   }
-})
-
 type TimeFilter = {
    value: TimePeriodParams
    label: string
@@ -161,34 +108,7 @@ const GroupSparkAnalytics = () => {
                <SparksOverviewTab timeFilter={selectTimeFilter} />
             )}
             {tabValue === "audience" && (
-               <>
-                  <GroupSparkAnalyticsCardContainer>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        Top 10 countries
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     Audience: Top 10 countries for {selectTimeFilter} days
-                     <CFPieChart data={pieChartProcessedData} />
-                  </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        Top 10 universities
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     Audience: Top 10 universities for {selectTimeFilter} days
-                  </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        Top 10 fields of study
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     Audience: Top 10 fields of study for {selectTimeFilter}{" "}
-                     days
-                  </GroupSparkAnalyticsCardContainer>
-                  <GroupSparkAnalyticsCardContainer>
-                     <GroupSparkAnalyticsCardContainerTitle>
-                        Level of study
-                     </GroupSparkAnalyticsCardContainerTitle>
-                     Audience: Level of study for {selectTimeFilter} days
-                  </GroupSparkAnalyticsCardContainer>
-               </>
+               <SparksAudienceTab timeFilter={selectTimeFilter} />
             )}
          </Box>
       </Box>
