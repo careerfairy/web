@@ -61,6 +61,9 @@ const livestreamIndex = {
       "isDraft",
       "speakers",
    ],
+   shouldIndex: (doc) => !doc.test, // Don't index test livestreams
+   fullIndexSyncQueryConsraints: (collectionRef) =>
+      collectionRef.where("test", "==", false),
 } satisfies Index<LivestreamEvent>
 
 export const knownIndexes = {
