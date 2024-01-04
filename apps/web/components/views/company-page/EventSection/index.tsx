@@ -50,17 +50,6 @@ const EventSection = () => {
       sectionRefs: { eventSectionRef },
       editMode,
    } = useCompanyPage()
-   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
-      () => ({
-         axis: "x",
-         loop: false,
-         align: "center",
-         dragThreshold: 0.5,
-         dragFree: true,
-         inViewThreshold: 0,
-      }),
-      []
-   )
    const query = `companyId=${group.id}`
    const isMounted = useMountedState()
    const isMobile = useIsMobile()

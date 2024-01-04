@@ -7,7 +7,6 @@ import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/Lives
 import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
-import { EmblaOptionsType } from "embla-carousel-react"
 
 const config = {
    suspense: false,
@@ -36,18 +35,6 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       config
    )
 
-   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
-      () => ({
-         axis: "x",
-         loop: false,
-         align: "center",
-         dragThreshold: 0.5,
-         dragFree: true,
-         inViewThreshold: 0,
-      }),
-      []
-   )
-
    useEffect(() => {
       if (livestreamId) {
          const unsubscribe = livestreamRepo.listenToSingleEvent(
@@ -63,10 +50,6 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       }
    }, [livestreamId])
 
-   /**
-    * TODO: Should add to dependency array for @constant localEvents, but adding it results in
-    * maximum depth reached.
-    */
    useEffect(() => {
       const newLocalEvents =
          localEvents.length && !events?.length

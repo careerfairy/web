@@ -20,19 +20,15 @@ import {
    Stack,
    useMediaQuery,
    useTheme,
-   CardActionArea,
-   Theme,
    SxProps,
    IconButton,
 } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Heading from "../common/Heading"
-import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { isInIframe } from "components/helperFunctions/HelperFunctions"
 import { ArrowLeft, ArrowRight } from "react-feather"
 
 const slideSpacing = 21
@@ -61,8 +57,6 @@ const styles = sxStyles({
    },
    seeMoreText: {
       color: "text.secondary",
-      // fontSize: "1.2rem",
-      // fontWeight: 600,
       textDecoration: "underline",
    },
    eventTitle: {
