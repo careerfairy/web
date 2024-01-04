@@ -6,11 +6,11 @@
  * @returns Any type, dictated by truthy or falsy children.
  */
 const ConditionalWrapper = (input: ConditionalWrapperType) =>
-   input.condition ? input.truthyChildren : input.falsyChidren
+   input.condition ? input.children : input.fallback
 
 export type ConditionalWrapperType = {
    condition?: boolean
-   truthyChildren: any
-   falsyChidren: any
+   children: React.ReactNode
+   fallback?: React.ReactNode
 }
 export default ConditionalWrapper
