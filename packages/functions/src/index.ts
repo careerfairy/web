@@ -53,6 +53,8 @@ import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 import groupPlans = require("./groupPlans")
 import search = require("./search")
+import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
+import { knownIndexes } from "./lib/search/searchIndexes"
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -254,4 +256,8 @@ exports.startPlan = groupPlans.startPlan
 
 // Search
 exports.fullIndexSync = search.fullIndexSync
-exports.indexCollectionLivestreams = search.indexCollectionLivestreams
+
+// Deploy each bundle as a separate function
+// npx firelink deploy --only functions:searchIndex-livestreams
+//
+exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
