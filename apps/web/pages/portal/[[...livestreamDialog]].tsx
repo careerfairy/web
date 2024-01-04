@@ -74,17 +74,6 @@ const PortalPage = ({
       })
    }
 
-   const eventsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
-      () => ({
-         axis: "x",
-         loop: false,
-         align: "center",
-         dragThreshold: 0.5,
-         dragFree: true,
-         inViewThreshold: 0,
-      }),
-      []
-   )
    return (
       <>
          <SEO

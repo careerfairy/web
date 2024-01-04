@@ -4,7 +4,6 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
-import { EmblaOptionsType } from "embla-carousel-react"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import Heading from "../common/Heading"
@@ -13,9 +12,6 @@ const config = {
    suspense: false,
    initialData: [],
 }
-
-const desktopCircleWidth = 45
-const mobileCircleWidth = 85
 
 const styles = sxStyles({
    eventsBackground: {
@@ -55,7 +51,6 @@ const styles = sxStyles({
       paddingTop: 5,
       paddingBottom: 4,
       backgroundColor: "black",
-      // display: "flex",
       marginLeft: 2,
       position: "relative",
       width: "100%",
@@ -65,8 +60,6 @@ const styles = sxStyles({
          background: "#2ABAA5",
          borderRadius: "100%",
          boxShadow: "0.375em 0.375em 0 0 rgba(15, 28, 63, 0.125)",
-         // height: "371px",
-         //   width: "5em"
       },
    },
    noRegistrations: {
@@ -136,7 +129,6 @@ const MyNextEvents = ({ limit }: Props) => {
          }}
       >
          <Box sx={styles.cardWrapper}>
-            {/* <Box sx={styles.cardWrapperContainerCircleOne}> */}
             <Box sx={styles.cardWrapperContainerCircle}>
                <Stack
                   spacing={1.25}
@@ -159,7 +151,7 @@ const MyNextEvents = ({ limit }: Props) => {
                      >
                         You don’t have any registrations to upcoming live
                         streams! Browse, register, discover new opportunities
-                        and kick-start your career .
+                        and kick-start your career.
                      </Typography>
                   </Box>
                   <Box>
@@ -171,7 +163,6 @@ const MyNextEvents = ({ limit }: Props) => {
                      </Button>
                   </Box>
                </Stack>
-               {/* </Box> */}
             </Box>
          </Box>
       </EventsPreviewCarousel>
