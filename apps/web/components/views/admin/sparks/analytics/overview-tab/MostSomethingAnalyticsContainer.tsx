@@ -26,12 +26,14 @@ const styles = sxStyles({
    },
    mostSomethingSelect: {
       width: "100%",
-      textTransform: "lowercase",
       color: "#6749EA",
       fontSize: "20px",
       fontWeight: 600,
       lineHeight: "30px",
       letterSpacing: "0em",
+      ".MuiSelect-select:first-letter": {
+         textTransform: "lowercase",
+      },
    },
    mostSomethingSelectMenu: {
       marginTop: 4,

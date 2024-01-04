@@ -51,6 +51,7 @@ import userSparks = require("./userSparks")
 import sparksAnalytics = require("./sparksAnalytics")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
+import groupPlans = require("./groupPlans")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -241,3 +242,6 @@ exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob = customJobs.userApplyToCustomJob
+
+// Group Subscription Plan Functions
+exports.startPlan = groupPlans.startPlan

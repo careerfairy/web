@@ -22,7 +22,7 @@ import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { Application } from "../ats/Application"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Create } from "../commonTypes"
-import { PublicCustomJob } from "../groups/customJobs"
+import { CustomJob, pickPublicDataFromCustomJob } from "../groups/customJobs"
 import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
@@ -170,7 +170,7 @@ export interface IUserRepository {
     * @param userEmail
     * @param job
     */
-   applyUserToCustomJob(userEmail: string, job: PublicCustomJob): Promise<void>
+   applyUserToCustomJob(userEmail: string, job: CustomJob): Promise<void>
 
    /**
     * Gets the user custom job application by jobId
@@ -786,7 +786,7 @@ export class FirebaseUserRepository
 
    async applyUserToCustomJob(
       userEmail: string,
-      job: PublicCustomJob
+      job: CustomJob
    ): Promise<void> {
       const ref = this.firestore
          .collection("userData")
@@ -796,7 +796,7 @@ export class FirebaseUserRepository
 
       const jobToApply: UserCustomJobApplicationDocument = {
          date: this.fieldValue.serverTimestamp() as Timestamp,
-         job: job,
+         job: pickPublicDataFromCustomJob(job),
          id: job.id,
       }
 

@@ -1,16 +1,17 @@
+import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
 import { parseCookies, setCookie } from "nookies"
 
 type ParseJwtProps = { token?: string; isServerSide?: boolean }
 
 export default class CookiesUtil {
-   static setUTMParams = (value: object) => {
+   static setUTMParams = (value: UTMParams) => {
       return setCookie(null, "utm_params", JSON.stringify(value), {
          maxAge: 3 * 24 * 60 * 60, // 3 days, same as Google Analytics
          path: "/", // make it available to all pages
       })
    }
 
-   static getUTMParams = () => {
+   static getUTMParams = (): UTMParams => {
       const existing = parseCookies(null)["utm_params"]
       return existing ? JSON.parse(existing) : null
    }

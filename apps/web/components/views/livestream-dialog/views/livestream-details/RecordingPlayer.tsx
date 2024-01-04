@@ -146,7 +146,7 @@ const Player: FC<Props> = ({
    )
 
    const { data: recordingToken } = useRecordingToken(stream.id)
-
+   // Updated recording title - WG
    return (
       <Box sx={styles.root}>
          <Box sx={styles.playerWrapper} mt={1}>
@@ -157,8 +157,8 @@ const Player: FC<Props> = ({
                      <Box sx={styles.countDown}>
                         {!boughtAccess ? (
                            <RecordingTitle>
-                              Only <CountDown stream={livestreamPresenter} />{" "}
-                              left to rewatch for free!
+                              Recording unlocked for{" "}
+                              <CountDown stream={livestreamPresenter} />
                            </RecordingTitle>
                         ) : (
                            <RecordingTitle>

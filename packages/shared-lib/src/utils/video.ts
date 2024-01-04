@@ -11,7 +11,7 @@ type TransformationParams = {
    format?: "auto" | "mp4" | "webm"
 }
 
-export const imageKitLoader = (params: TransformationParams) => {
+export const imageKitLoader = (params: TransformationParams): string => {
    let { src, width, height, quality, aspectRatio, maxSizeCrop, format } =
       params
 

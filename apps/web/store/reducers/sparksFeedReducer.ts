@@ -49,7 +49,7 @@ const initialState: SparksState = {
    showEventDetailsDialog: false,
    cardNotification: null,
    cameFromCompanyPageLink: null,
-   videosMuted: false,
+   videosMuted: true,
    playing: true,
    eventToRegisterTo: null,
 }
