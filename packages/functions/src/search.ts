@@ -13,9 +13,9 @@ import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
 const DOCS_PER_INDEXING = 250
 
 /**
- * Syncs the full index on an HTTP GET request.
- * Validates the indexName, initializes the Algolia index, and retrieves the Firestore collection.
- * Syncs all documents in batches to the Algolia index.
+ * 1. Fetches an entire firestore collection from Firestore in batches of 250 documents.
+ * 2. Indexes the documents in Algolia.
+ * 3. Repeats until all document batches have been indexed.
  */
 export const fullIndexSync = functions
    .runWith(defaultTriggerRunTimeConfig)

@@ -107,7 +107,7 @@ export type Index<T = any> = {
     */
    collectionPath: string
    /**
-    * Fields to index
+    * Fields to index. be sure to avoid indexing fields that are too large since Algolia has a limit of 10kb per record.
     * @example ["id", "title", "summary"]
     */
    fields: (keyof T & string)[]
@@ -118,19 +118,19 @@ export type Index<T = any> = {
 }
 
 /**
- * Generates a set of functions that will generate a bundle
+ * Generates a set of functions that will generate an index in Algolia for each bundle.
  */
-export function generateFunctionsFromIndexes(bundles: Record<string, Index>) {
+export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
    const exports = {}
 
-   for (const bundleName in bundles) {
-      const { collectionPath, fields, indexName } = bundles[bundleName]
+   for (const indexName in indexes) {
+      const { collectionPath, fields } = indexes[indexName]
 
       const indexClient = initAlgoliaIndex(indexName)
 
       const documentPath = collectionPath + "/{docId}"
 
-      exports[bundleName] = functions
+      exports[indexName] = functions
          .runWith(defaultTriggerRunTimeConfig)
          .region(config.region)
          .firestore.document(documentPath)
