@@ -36,7 +36,8 @@ export const fullIndexSync = functions
             .oneOf<IndexName>(
                indexNames,
                `Index name must be one of ${indexNames.join(", ")}`
-            ),
+            )
+            .required("Index name is required as a query parameter"),
       })
 
       const { indexName } = await schema.validate(req.query)
