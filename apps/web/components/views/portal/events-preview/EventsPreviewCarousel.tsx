@@ -15,7 +15,15 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
-import { Typography, Stack, useMediaQuery, useTheme } from "@mui/material"
+import {
+   Typography,
+   Stack,
+   useMediaQuery,
+   useTheme,
+   CardActionArea,
+   Theme,
+   SxProps,
+} from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Heading from "../common/Heading"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
@@ -23,6 +31,7 @@ import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { isInIframe } from "components/helperFunctions/HelperFunctions"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
@@ -113,7 +122,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          styling = {
             compact: false,
             seeMoreSx: styles.seeMoreText,
-            eventTitle: styles.eventTitle,
+            eventTitleSx: styles.eventTitle,
+            viewportSx: undefined,
+            backgroundSx: undefined,
          },
       } = props
 
@@ -187,112 +198,111 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          emblaApi.on("reInit", updateSlidesInView)
       }, [emblaApi, updateSlidesInView])
 
-      const eventsCarouselPreview = (
-         <Box>
-            {!isEmbedded ? (
-               <Box sx={styles.eventsHeader}>
-                  {<Heading sx={styles.eventTitle}>{title}</Heading>}
-                  {events?.length >= 0 && seeMoreLink ? (
-                     <Link href={seeMoreLink}>
-                        <Typography sx={styling.seeMoreSx} color="grey">
-                           See all
-                        </Typography>
-                     </Link>
-                  ) : null}
-               </Box>
-            ) : null}
-
-            <Stack sx={styles.previewContent}>
-               {isEmpty ? (
-                  <EmptyMessageOverlay
-                     message={
-                        type === EventsTypes.myNext
-                           ? "Time to register to your next event!"
-                           : "There currently aren't any scheduled events"
-                     }
-                     buttonText={
-                        type === EventsTypes.myNext
-                           ? "Browse Events"
-                           : "See Past Events"
-                     }
-                     buttonLink={
-                        type === EventsTypes.myNext
-                           ? "/next-livestreams"
-                           : "/next-livestreams?type=pastEvents"
-                     }
-                     showButton={true}
-                     targetBlank={isEmbedded}
-                  />
-               ) : null}
-               {!isMobile && (
-                  <Box sx={styles.description}>
-                     <Typography
-                        variant="h6"
-                        fontWeight={"400"}
-                        color="textSecondary"
-                     >
-                        {eventDescription}
-                     </Typography>
+      const getLoadingCard = () => {
+         return (
+            <>
+               {[...Array(numLoadingSlides)].map((_, i) => (
+                  <Box key={i} sx={styles.slide}>
+                     <EventPreviewCard
+                        animation={isEmpty ? false : undefined}
+                        loading
+                     />
                   </Box>
-               )}
-               {
-                  <Box id={id} sx={styles.viewport} ref={emblaRef}>
-                     <Box sx={styles.container}>
-                        {loading
-                           ? [...Array(numLoadingSlides)].map((_, i) => (
-                                <Box key={i} sx={styles.slide}>
-                                   <EventPreviewCard
-                                      animation={isEmpty ? false : undefined}
-                                      loading
-                                   />
-                                </Box>
-                             ))
-                           : events?.length
-                           ? events.map((event, index, arr) => (
-                                <Box
-                                   sx={styles.slide}
-                                   key={"events-box-" + index}
-                                >
-                                   <EventPreviewCard
-                                      key={"event-preview-card-" + index}
-                                      loading={
-                                         (loading &&
-                                            !cardsLoaded[index] &&
-                                            !cardsLoaded[
-                                               arr.length - (index + 1)
-                                            ]) ||
-                                         false
-                                      }
-                                      index={index}
-                                      totalElements={arr.length}
-                                      location={getLocation(type)}
-                                      event={event}
-                                      isRecommended={isRecommended}
-                                   />
-                                </Box>
-                             ))
-                           : children?.map((child, i) => (
-                                <Box key={i} sx={styles.slide}>
-                                   {child}
-                                </Box>
-                             ))}
-                        {/**
-                         * This prevents the last slide from touching the right edge of the viewport.
-                         */}
-                        <Box sx={styles.paddingSlide}></Box>
-                     </Box>
-                  </Box>
-               }
-            </Stack>
-         </Box>
-      )
+               ))}
+            </>
+         )
+      }
       return (
          <>
-            <ConditionalWrapper
-               condition={!hidePreview}
-               truthyChildren={eventsCarouselPreview}
-               falsyChidren={null}
-            />
+            <ConditionalWrapper condition={!hidePreview}>
+               <Box>
+                  {
+                     <ConditionalWrapper condition={!isEmbedded}>
+                        <Box sx={styles.eventsHeader}>
+                           {<Heading sx={styles.eventTitle}>{title}</Heading>}
+                           <ConditionalWrapper
+                              condition={
+                                 events?.length >= 0 &&
+                                 seeMoreLink !== undefined
+                              }
+                           >
+                              <Link href={seeMoreLink}>
+                                 <Typography
+                                    sx={styling.seeMoreSx}
+                                    color="grey"
+                                 >
+                                    See all
+                                 </Typography>
+                              </Link>
+                           </ConditionalWrapper>
+                        </Box>
+                     </ConditionalWrapper>
+                  }
+
+                  <Stack sx={styles.previewContent}>
+                     {
+                        <ConditionalWrapper condition={!isMobile}>
+                           <Box sx={styles.description}>
+                              <Typography
+                                 variant="h6"
+                                 fontWeight={"400"}
+                                 color="textSecondary"
+                              >
+                                 {eventDescription}
+                              </Typography>
+                           </Box>
+                        </ConditionalWrapper>
+                     }
+                     {
+                        <Box
+                           id={id}
+                           sx={[styles.viewport, styling.viewportSx]}
+                           ref={emblaRef}
+                        >
+                           <Box sx={[styles.container]}>
+                              <ConditionalWrapper
+                                 condition={!loading}
+                                 fallback={getLoadingCard()}
+                              >
+                                 <ConditionalWrapper
+                                    condition={events?.length > 0}
+                                    fallback={children}
+                                 >
+                                    {events.map((event, index, arr) => (
+                                       <Box
+                                          sx={styles.slide}
+                                          key={"events-box-" + index}
+                                       >
+                                          <EventPreviewCard
+                                             key={"event-preview-card-" + index}
+                                             loading={
+                                                (loading &&
+                                                   !cardsLoaded[index] &&
+                                                   !cardsLoaded[
+                                                      arr.length - (index + 1)
+                                                   ]) ||
+                                                false
+                                             }
+                                             index={index}
+                                             totalElements={arr.length}
+                                             location={getLocation(type)}
+                                             event={event}
+                                             isRecommended={isRecommended}
+                                          />
+                                       </Box>
+                                    ))}
+                                 </ConditionalWrapper>
+                              </ConditionalWrapper>
+                              {/**
+                               * This prevents the last slide from touching the right edge of the viewport.
+                               */}
+                              <Box sx={styles.paddingSlide}></Box>
+                           </Box>
+                        </Box>
+                     }
+                  </Stack>
+               </Box>
+            </ConditionalWrapper>
          </>
       )
    }
@@ -316,9 +326,11 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
 }
 
 export type EventsCarouselStyling = {
-   compact: boolean
-   seeMoreSx: any
-   eventTitle: any
+   compact?: boolean
+   seeMoreSx?: SxProps
+   eventTitleSx?: SxProps
+   viewportSx?: SxProps
+   backgroundSx?: SxProps
 }
 export type ChildRefType = {
    goNext: () => void
@@ -338,7 +350,7 @@ export type EventsProps = {
    isRecommended?: boolean
    isEmbedded?: boolean
    options?: EmblaOptionsType
-   children?: ReactNode[]
+   children?: ReactNode
    isAdmin?: boolean
    styling?: EventsCarouselStyling
 }
