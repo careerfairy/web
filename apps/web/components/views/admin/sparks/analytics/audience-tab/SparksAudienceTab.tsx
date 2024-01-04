@@ -7,6 +7,10 @@ import CFPieChart from "../components/charts/CFPieChart"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import BulletChart from "../components/BulletChart"
+import {
+   EmptyDataCheckerForBulletChart,
+   EmptyDataCheckerForPieChart,
+} from "./EmptyDataCheckers"
 
 type SparksAudienceTabProps = {
    timeFilter: TimePeriodParams
@@ -24,7 +28,9 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                <GroupSparkAnalyticsCardContainerTitle>
                   Top 10 countries
                </GroupSparkAnalyticsCardContainerTitle>
-               <BulletChart data={topCountries} />
+               <EmptyDataCheckerForBulletChart>
+                  <BulletChart data={topCountries} />
+               </EmptyDataCheckerForBulletChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
          <Grid item xs={12} md={6}>
@@ -32,7 +38,9 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                <GroupSparkAnalyticsCardContainerTitle>
                   Top 10 universities
                </GroupSparkAnalyticsCardContainerTitle>
-               <BulletChart data={topUniversities} />
+               <EmptyDataCheckerForBulletChart>
+                  <BulletChart data={topUniversities} />
+               </EmptyDataCheckerForBulletChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
          <Grid item xs={12} md={6}>
@@ -40,7 +48,9 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                <GroupSparkAnalyticsCardContainerTitle sx={{ marginBottom: 0 }}>
                   Top 10 fields of study
                </GroupSparkAnalyticsCardContainerTitle>
-               <CFPieChart data={topFieldsOfStudy} />
+               <EmptyDataCheckerForPieChart>
+                  <CFPieChart data={topFieldsOfStudy} />
+               </EmptyDataCheckerForPieChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
          <Grid item xs={12} md={6}>
@@ -48,7 +58,9 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                <GroupSparkAnalyticsCardContainerTitle sx={{ marginBottom: 0 }}>
                   Level of study
                </GroupSparkAnalyticsCardContainerTitle>
-               <CFPieChart data={levelsOfStudy} />
+               <EmptyDataCheckerForPieChart>
+                  <CFPieChart data={levelsOfStudy} />
+               </EmptyDataCheckerForPieChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
       </Grid>
