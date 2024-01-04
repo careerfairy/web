@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import JobApplicantsList from "./JobApplicantsList"
 import usePaginatedUsersCollection, {
@@ -13,6 +12,7 @@ import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { StyledPagination } from "../../../common/CardCustom"
+import useCustomJobStats from "../../../../../../custom-hook/useCustomJobStats"
 
 const styles = sxStyles({
    statsSection: {
@@ -39,23 +39,23 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: CustomJob
+   jobId: string
+   groupId: string
 }
 
-const JobApplicants: FC<Props> = ({ job }) => {
+const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
+   const jobStats = useCustomJobStats(jobId, groupId)
+
    const collectionQuery = useMemo(
-      () => collection(FirestoreInstance, "userData"),
+      () => collection(FirestoreInstance, "jobApplications"),
       []
    )
 
    const filters = useMemo<Partial<Filters>>(
       () => ({
-         //  If there are applicants for the job, the filter includes their user IDs,
-         //  otherwise, it includes an empty string to ensure the filter is applied,
-         //  but no results are returned
-         userIds: job.applicants.length ? job.applicants : [""],
+         jobId,
       }),
-      [job.applicants]
+      [jobId]
    )
 
    const paginatedResults = usePaginatedUsersCollection(
@@ -93,7 +93,7 @@ const JobApplicants: FC<Props> = ({ job }) => {
                      Total clicks
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
-                     {job.clicks}
+                     {jobStats.clicks}
                   </Typography>
                </Box>
             </Grid>
@@ -108,7 +108,7 @@ const JobApplicants: FC<Props> = ({ job }) => {
                      Applications
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
-                     {job.applicants?.length || 0}
+                     {jobStats.applicants}
                   </Typography>
                </Box>
             </Grid>
@@ -135,24 +135,24 @@ const JobApplicants: FC<Props> = ({ job }) => {
 }
 
 const documentPaths: Partial<DocumentPaths> = {
-   userEmail: "id",
-   orderBy: `firstName`,
-   orderDirection: "asc",
+   jobId: "jobId",
+   orderBy: `appliedAt`,
+   orderDirection: "desc",
 }
 
-const converterFn = (doc: Partial<UserData>): UserDataEntry => ({
-   email: doc.userEmail,
-   firstName: doc.firstName || "",
-   lastName: doc.lastName || "",
-   universityName: doc.university?.name || "",
-   universityCountryCode: doc.universityCountryCode || "",
-   fieldOfStudy: doc.fieldOfStudy?.name || "",
-   levelOfStudy: doc.levelOfStudy?.name || "",
-   linkedInUrl: doc.linkedinUrl || "",
-   resumeUrl: doc.userResume || "",
+const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
+   email: doc.user.userEmail,
+   firstName: doc.user.firstName || "",
+   lastName: doc.user.lastName || "",
+   universityName: doc.user.university?.name || "",
+   universityCountryCode: doc.user.universityCountryCode || "",
+   fieldOfStudy: doc.user.fieldOfStudy?.name || "",
+   levelOfStudy: doc.user.levelOfStudy?.name || "",
+   linkedInUrl: doc.user.linkedinUrl || "",
+   resumeUrl: doc.user.userResume || "",
    universityCountryName:
-      universityCountryMap?.[doc.universityCountryCode] || "",
-   avatar: doc.avatar,
+      universityCountryMap?.[doc.user.universityCountryCode] || "",
+   avatar: doc.user.avatar,
 })
 
 export default JobApplicants

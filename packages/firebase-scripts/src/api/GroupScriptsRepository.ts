@@ -19,7 +19,7 @@ import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import { Creator } from "@careerfairy/shared-lib/dist/groups/creators"
 import { Spark } from "@careerfairy/shared-lib/dist/sparks/sparks"
 import admin = require("firebase-admin")
-import { CustomJob } from "@careerfairy/shared-lib/src/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 
 export interface IGroupScriptsRepository extends IGroupRepository {
    getAllLegacyAdmins<T extends boolean>(

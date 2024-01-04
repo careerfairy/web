@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker"
 import BrandedTextField, {
    BrandedTextFieldField,
 } from "../../../../common/inputs/BrandedTextField"
-import { jobTypeOptions } from "@careerfairy/shared-lib/groups/customJobs"
+import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
 import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
 import { datePickerDefaultStyles } from "../../../../calendar/utils"

@@ -1,12 +1,11 @@
 import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
-import { CustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import { Box, Divider, Grid, Typography, Stack, ListItem } from "@mui/material"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { User } from "react-feather"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useRouter } from "next/router"
-import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import JobMenu from "./JobMenu"
 import JobSearch from "./JobSearch"
@@ -96,12 +95,11 @@ const styles = sxStyles({
       },
    },
 })
-export type SortedJobs = Omit<CustomJob, "createdAt"> & { createdAt: Date }
 
 type Props = {
-   jobs: CustomJob[]
+   jobsStats: CustomJobStats[]
 }
-const JobList: FC<Props> = ({ jobs }) => {
+const JobList: FC<Props> = ({ jobsStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
@@ -113,26 +111,20 @@ const JobList: FC<Props> = ({ jobs }) => {
       [group.groupId, push]
    )
 
-   const sortedJobs = useMemo(
-      (): SortedJobs[] =>
-         jobs
-            .map((job) => ({
-               ...job,
-               createdAt: job.createdAt?.toDate(),
-            }))
-            .sort(dynamicSort("createdAt", "asc")),
-      [jobs]
+   const jobsOptions = useMemo(
+      () => jobsStats.map((jobStats) => jobStats.job),
+      [jobsStats]
    )
 
    return (
       <Box sx={styles.wrapper}>
          <Stack spacing={2} sx={styles.searchWrapper}>
             {isMobile ? <CreateJobButton sx={styles.createButton} /> : null}
-            <JobSearch options={sortedJobs} />
+            <JobSearch options={jobsOptions} />
          </Stack>
 
          <Stack spacing={2}>
-            {sortedJobs.map((job) => (
+            {jobsStats.map(({ job, clicks, applicants }) => (
                <ListItem
                   key={job.id}
                   sx={styles.listItem}
@@ -204,8 +196,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                                  variant={"subtitle1"}
                                  color={"text.secondary"}
                               >
-                                 {" "}
-                                 {job.clicks} Clicks{" "}
+                                 {clicks} Clicks
                               </Typography>
 
                               <Box sx={styles.applications}>
@@ -215,8 +206,7 @@ const JobList: FC<Props> = ({ jobs }) => {
                                     color={"secondary.main"}
                                     ml={1}
                                  >
-                                    {" "}
-                                    {job.applicants.length} Applications{" "}
+                                    {applicants} Applications
                                  </Typography>
                               </Box>
                            </Stack>

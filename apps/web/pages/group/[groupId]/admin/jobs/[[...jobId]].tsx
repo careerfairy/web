@@ -9,6 +9,7 @@ import JobsContent from "../../../../../components/views/group/admin/jobs"
 import { GetServerSidePropsContext } from "next"
 import { FC } from "react"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 type Props = {
    groupId: string
@@ -25,12 +26,8 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
          <DashboardHead title="CareerFairy | Jobs" />
          <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
             {Boolean(jobId) ? (
-               <JobFetchWrapper
-                  jobId={jobId}
-                  groupId={groupId as string}
-                  shouldFetch={Boolean(jobId)}
-               >
-                  {(job) => <JobAdminDetails job={job} />}
+               <JobFetchWrapper jobId={jobId} shouldFetch={Boolean(jobId)}>
+                  {(job: CustomJob) => <JobAdminDetails job={job} />}
                </JobFetchWrapper>
             ) : (
                <JobsContent />
