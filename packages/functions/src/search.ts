@@ -1,7 +1,11 @@
 import * as functions from "firebase-functions"
 import * as yup from "yup"
 
-import { DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore"
+import {
+   DocumentSnapshot,
+   Query,
+   QuerySnapshot,
+} from "firebase-admin/firestore"
 import { IndexName, indexNames, knownIndexes } from "./lib/search/searchIndexes"
 
 import { firestore } from "./api/firestoreAdmin"
@@ -39,9 +43,18 @@ export const fullIndexSync = functions
 
       const index = initAlgoliaIndex(indexName)
 
-      const { collectionPath, fields } = knownIndexes[indexName]
+      const {
+         collectionPath,
+         fields,
+         shouldIndex,
+         fullIndexSyncQueryConsraints,
+      } = knownIndexes[indexName]
 
-      const collectionRef = firestore.collection(collectionPath)
+      let collectionRef: Query = firestore.collection(collectionPath)
+
+      if (fullIndexSyncQueryConsraints) {
+         collectionRef = fullIndexSyncQueryConsraints(collectionRef)
+      }
 
       const snap = await collectionRef.count().get()
 
@@ -59,13 +72,19 @@ export const fullIndexSync = functions
 
          documentSnapshots = await query.get()
 
+         const docsToIndex = documentSnapshots.docs.filter((doc) => {
+            const docData = doc.data()
+            // If shouldIndex is defined and returns false, skip indexing
+            return !shouldIndex || shouldIndex(docData)
+         })
+
          const batch = index.saveObjects(
-            documentSnapshots.docs.map((doc) => getData(doc, fields))
+            docsToIndex.map((doc) => getData(doc, fields))
          )
 
          await batch.wait()
 
-         syncedDocuments += documentSnapshots.size
+         syncedDocuments += docsToIndex.length
          functions.logger.info(
             `Synced ${syncedDocuments} of ${totalDocuments} documents`
          )
