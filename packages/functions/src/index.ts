@@ -257,7 +257,7 @@ exports.startPlan = groupPlans.startPlan
 // Search
 exports.fullIndexSync = search.fullIndexSync
 
-// Deploy each bundle as a separate function
+// Deploy each index as a separate function
 // npx firelink deploy --only functions:searchIndex-livestreams
 //
 exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
