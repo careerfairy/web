@@ -147,7 +147,7 @@ const styles = sxStyles({
  * @property {string} key - A unique identifier for the View
  * @property {ComponentType} Component - A React component that will be rendered for the View
  */
-interface View {
+export type View = {
    key: string
    Component: ComponentType
 }
@@ -160,7 +160,7 @@ interface View {
  * @property {boolean} open - A boolean that controls whether the dialog is open or closed
  * @property {Array<View>} views - An array of views that the dialog will display
  */
-interface StepperDialogProps {
+type StepperDialogProps = {
    handleClose: () => void
    open: boolean
    views: ReadonlyArray<View>
@@ -168,6 +168,8 @@ interface StepperDialogProps {
    bgcolor?: string
    transition?: JSXElementConstructor<TransitionProps>
    sx?: SxProps<Theme>
+   disableFullScreen?: boolean
+   maxWidth?: number
 }
 
 /**
@@ -179,7 +181,7 @@ interface StepperDialogProps {
  * @property {Function} moveToPrev - A function that moves to the previous step in the SteppedDialog
  * @property {Function} goToStep - A function that goes to a specific step in the SteppedDialog
  */
-interface StepperContextValue<K extends string = string> {
+type StepperContextValue<K extends string = string> = {
    currentStep: number
    moveToNext: () => void
    moveToPrev: () => void
@@ -237,6 +239,8 @@ const SteppedDialog = <K extends string>({
    initialStep = 0,
    transition,
    sx,
+   disableFullScreen,
+   maxWidth,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -304,13 +308,14 @@ const SteppedDialog = <K extends string>({
          }
          maxWidth="md"
          fullWidth
-         fullScreen={isMobile}
+         fullScreen={isMobile ? !disableFullScreen : null}
          closeAfterTransition={true}
          PaperProps={{
             sx: [
                styles.dialogPaper,
                {
                   bgcolor,
+                  maxWidth,
                },
                ...(Array.isArray(sx) ? sx : [sx]),
             ],
