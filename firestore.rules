@@ -123,11 +123,6 @@ service cloud.firestore {
                 allow write: if false;
             }
 
-            match /customJobApplications/{jobId} {
-                allow read: if true;
-                allow write: if false;
-            }
-
             match /activities/{id} {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }

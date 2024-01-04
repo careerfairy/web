@@ -38,11 +38,6 @@ import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -123,13 +118,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       streamId: string,
       origin: string
    ): Promise<GroupAdminNewEventEmailInfo[]>
-
-   /**
-    * Sync custom jobs data to the livestream
-    *
-    * @param customJob
-    */
-   syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -471,61 +459,5 @@ export class LivestreamFunctionsRepository
       }
 
       return admins
-   }
-
-   async syncCustomJobDataToLivestream(customJob: CustomJob): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(customJob)
-
-      functions.logger.log(
-         `Sync livestreams with updated job ${updatedCustomJob.id}.`
-      )
-
-      // To fetch all livestreams and drafts
-      const [livestreamsSnaps, draftSnaps] = await Promise.all([
-         this.firestore
-            .collection("livestreams")
-            .where("groupIds", "array-contains", updatedCustomJob.groupId)
-            .where("start", ">=", new Date())
-            .get(),
-         this.firestore
-            .collection("draftLivestreams")
-            .where("groupIds", "array-contains", updatedCustomJob.groupId)
-            .get(),
-      ])
-
-      // To combine livestreams and drafts into the same Firestore batch operation
-      const snapShots = [livestreamsSnaps, draftSnaps]
-
-      snapShots.forEach((snap) =>
-         snap.forEach((doc) => {
-            const livestream = doc.data() as LivestreamEvent
-
-            if (livestream.customJobs?.length) {
-               const customJobToUpdateIndex = livestream.customJobs.findIndex(
-                  (currentJob) => currentJob.id === updatedCustomJob.id
-               )
-
-               if (customJobToUpdateIndex >= 0) {
-                  batch.update(doc.ref, {
-                     customJobs: [
-                        ...livestream.customJobs.slice(
-                           0,
-                           customJobToUpdateIndex
-                        ),
-                        updatedCustomJob,
-                        ...livestream.customJobs.slice(
-                           customJobToUpdateIndex + 1
-                        ),
-                     ],
-                  })
-               }
-            }
-         })
-      )
-
-      return void batch.commit()
    }
 }

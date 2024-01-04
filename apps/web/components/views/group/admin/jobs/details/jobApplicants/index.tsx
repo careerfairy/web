@@ -3,16 +3,11 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import React, { FC, useCallback, useMemo } from "react"
 import JobApplicantsList from "./JobApplicantsList"
-import usePaginatedUsersCollection, {
-   Filters,
-} from "../../../analytics-new/live-stream/users/usePaginatedUsersCollection"
-import { collection } from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
 import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { StyledPagination } from "../../../common/CardCustom"
-import useCustomJobStats from "../../../../../../custom-hook/useCustomJobStats"
+import useCustomJobStats from "../../../../../../custom-hook/custom-job/useCustomJobStats"
+import usePaginatedJobApplicants from "../../../../../../custom-hook/custom-job/usePaginatedJobApplicants"
 
 const styles = sxStyles({
    statsSection: {
@@ -25,7 +20,7 @@ const styles = sxStyles({
       border: "1px solid #F0EDFD",
    },
    statsLabel: {
-      fontSize: "14px",
+      fontSize: { xs: "12px", md: "14px" },
    },
    statsValue: {
       fontSize: "20px",
@@ -40,37 +35,23 @@ const styles = sxStyles({
 
 type Props = {
    jobId: string
-   groupId: string
 }
 
-const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
-   const jobStats = useCustomJobStats(jobId, groupId)
+const JobApplicants: FC<Props> = ({ jobId }) => {
+   const jobStats = useCustomJobStats(jobId)
 
-   const collectionQuery = useMemo(
-      () => collection(FirestoreInstance, "jobApplications"),
-      []
-   )
-
-   const filters = useMemo<Partial<Filters>>(
-      () => ({
-         jobId,
-      }),
-      [jobId]
-   )
-
-   const paginatedResults = usePaginatedUsersCollection(
-      collectionQuery,
-      documentPaths,
-      10,
-      filters
-   )
+   const paginatedResults = usePaginatedJobApplicants(jobId)
 
    const applicants = useMemo(() => {
-      return paginatedResults.data?.map(converterFn) || []
+      return (
+         paginatedResults.data
+            ?.filter(filterCFUsersApplications)
+            .map(convertJobApplicantToUserData) || []
+      )
    }, [paginatedResults])
 
    const onPageChange = useCallback(
-      (_, page: number) => {
+      (_: React.ChangeEvent<unknown>, page: number) => {
          if (page > paginatedResults.page) {
             paginatedResults.next()
          } else {
@@ -90,7 +71,7 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
                      color={"grey"}
                      sx={styles.statsLabel}
                   >
-                     Total clicks
+                     Initiated applications
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
                      {jobStats.clicks}
@@ -105,7 +86,7 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
                      color={"grey"}
                      sx={styles.statsLabel}
                   >
-                     Applications
+                     Confirmed applicants
                   </Typography>
                   <Typography variant={"body1"} sx={styles.statsValue}>
                      {jobStats.applicants}
@@ -116,31 +97,29 @@ const JobApplicants: FC<Props> = ({ jobId, groupId }) => {
 
          <JobApplicantsList applicants={applicants} />
 
-         <StyledPagination
-            count={
-               paginatedResults.nextDisabled
-                  ? paginatedResults.page
-                  : paginatedResults.page + 1
-            }
-            page={paginatedResults.page}
-            color="secondary"
-            disabled={paginatedResults.loading}
-            onChange={onPageChange}
-            siblingCount={0}
-            boundaryCount={0}
-            size="small"
-         />
+         {applicants.length ? (
+            <StyledPagination
+               count={
+                  paginatedResults.nextDisabled
+                     ? paginatedResults.page
+                     : paginatedResults.page + 1
+               }
+               page={paginatedResults.page}
+               color="secondary"
+               disabled={paginatedResults.loading}
+               onChange={onPageChange}
+               siblingCount={0}
+               boundaryCount={0}
+               size="small"
+            />
+         ) : null}
       </>
    )
 }
 
-const documentPaths: Partial<DocumentPaths> = {
-   jobId: "jobId",
-   orderBy: `appliedAt`,
-   orderDirection: "desc",
-}
-
-const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
+const convertJobApplicantToUserData = (
+   doc: Partial<CustomJobApplicant>
+): UserDataEntry => ({
    email: doc.user.userEmail,
    firstName: doc.user.firstName || "",
    lastName: doc.user.lastName || "",
@@ -154,5 +133,9 @@ const converterFn = (doc: Partial<CustomJobApplicant>): UserDataEntry => ({
       universityCountryMap?.[doc.user.universityCountryCode] || "",
    avatar: doc.user.avatar,
 })
+
+// to filter out all the applications done by CareerFairy users
+const filterCFUsersApplications = (doc: Partial<CustomJobApplicant>) =>
+   !doc.user.userEmail.includes("@careerfairy")
 
 export default JobApplicants

@@ -10,7 +10,7 @@ import React, { memo, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
@@ -29,8 +29,8 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
-   handleSelectJob: (job: Job | PublicCustomJob) => void
+   job: Job | CustomJob
+   handleSelectJob: (job: Job | CustomJob) => void
 }
 const JobItem = ({ job, handleSelectJob }: Props) => {
    const isAtsJob = useIsAtsJob(job)

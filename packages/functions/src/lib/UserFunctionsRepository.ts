@@ -5,16 +5,9 @@ import {
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
-import {
-   CustomJob,
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import * as functions from "firebase-functions"
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(): Promise<UserData[]>
-   syncCustomJobDataToUser(customJob: CustomJob): Promise<void>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 }
 
@@ -32,35 +25,6 @@ export class UserFunctionsRepository
          .get()
 
       return mapFirestoreDocuments(data)
-   }
-
-   async syncCustomJobDataToUser(customJob: CustomJob): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const updatedCustomJob: PublicCustomJob =
-         pickPublicDataFromCustomJob(customJob)
-
-      const applicantsSnapshot = await this.firestore
-         .collectionGroup("customJobApplicants")
-         .where("id", "==", customJob.id)
-         .get()
-
-      const applicants = applicantsSnapshot.docs || []
-
-      functions.logger.log(
-         `Sync CustomJobApplicants with updated job ${updatedCustomJob.id} to ${applicants.length} applicants.`
-      )
-      applicants.forEach((applicant) => {
-         const ref = this.firestore
-            .collection("userData")
-            .doc(applicant.id)
-            .collection("customJobApplications")
-            .doc(customJob.id)
-
-         batch.update(ref, { job: updatedCustomJob })
-      })
-
-      return void batch.commit()
    }
 
    async getGroupFollowers(groupId: string): Promise<CompanyFollowed[]> {
