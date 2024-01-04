@@ -217,6 +217,7 @@ exports.onCreateSparkStats = onCreateTriggers.onCreateSparkStats
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
+exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
 exports.createSpark_v3 = groupSparks.createSpark
@@ -242,6 +243,10 @@ exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
+exports.updateCustomJobWithLinkedLivestreams =
+   customJobs.updateCustomJobWithLinkedLivestreams
+exports.transferCustomJobsFromDraftToPublishedLivestream =
+   customJobs.transferCustomJobsFromDraftToPublishedLivestream
 
 // Group Subscription Plan Functions
 exports.startPlan = groupPlans.startPlan

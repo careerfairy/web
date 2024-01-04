@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid"
 import * as actions from "store/actions"
 import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { customJobServiceInstance } from "../../data/firebase/CustomJobService"
 
 /**
  * State & Actions for the Create/Edit livestream dialog form
@@ -84,6 +85,12 @@ export const useLivestreamDialog = (group: Group) => {
                stream: newStream,
                submitTime,
             })
+
+            await customJobServiceInstance.transferCustomJobsFromDraftToPublishedLivestream(
+               streamObj.id,
+               publishedStreamId
+            )
+
             await deleteLivestream(streamObj.id, "draftLivestreams")
             await replace(
                `/group/${group.id}/admin/events?eventId=${publishedStreamId}`

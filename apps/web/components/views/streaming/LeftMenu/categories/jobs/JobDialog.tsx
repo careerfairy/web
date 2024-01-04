@@ -1,6 +1,6 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { ReactElement, useCallback, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
 import JobEntryApply from "./JobEntryApply"
@@ -151,7 +151,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
       [livestream.id]
    )
 
-   const renderApplyButton = useMemo((): JSX.Element => {
+   const renderApplyButton = useMemo((): ReactElement => {
       if (isAtsJob) {
          return (
             <Box mr={4}>

@@ -4,7 +4,6 @@ import {
    groupRepo,
    livestreamsRepo,
    sparkRepo,
-   userRepo,
 } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
@@ -87,9 +86,13 @@ export const syncLivestreams = functions
          }
       }
 
-      sideEffectPromises.push(
-         customJobRepo.syncLivestreamIdWithCustomJobs(change)
-      )
+      if (changeTypes.isDelete) {
+         const deletedValue = change.before?.data() as LivestreamEvent
+
+         sideEffectPromises.push(
+            customJobRepo.removeLinkedLivestream(deletedValue.id)
+         )
+      }
 
       return handleSideEffects(sideEffectPromises)
    })
@@ -326,13 +329,21 @@ export const onWriteCustomJobs = functions
 
          sideEffectPromises.push(
             customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
-            livestreamsRepo.syncCustomJobDataToLivestream(updatedCustomJob),
-            userRepo.syncCustomJobDataToUser(updatedCustomJob)
+            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
          )
       }
 
       if (changeTypes.isDelete) {
-         // TODO-GS: when deleting a custom job
+         const deletedCustomJob = change.before.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.syncDeletedCustomJobDataToCustomJobStats(
+               deletedCustomJob
+            ),
+            customJobRepo.syncDeletedCustomJobDataToJobApplications(
+               deletedCustomJob
+            )
+         )
       }
 
       return handleSideEffects(sideEffectPromises)

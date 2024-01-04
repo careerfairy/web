@@ -1,12 +1,13 @@
-import React, { Dispatch, useMemo } from "react"
+import React, { Dispatch, SetStateAction, useEffect, useMemo } from "react"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"
-import { FormikValues } from "formik"
 import CustomJobSection from "./customJobsSection/CustomJobSection"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import { CircularProgress } from "@mui/material"
+import useGroupCustomJobs from "../../../custom-hook/custom-job/useGroupCustomJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 type Props = {
    groupId: string
@@ -14,9 +15,10 @@ type Props = {
    selectedItems: LivestreamJobAssociation[]
    sectionRef: any
    classes: any
-   values: FormikValues
-   setFieldValue: (field: string, value: any) => void
    isSubmitting: boolean
+   streamId: string
+   selectedCustomJobs: CustomJob[]
+   onSelectedCustomJobs: Dispatch<SetStateAction<CustomJob[]>>
 }
 
 /**
@@ -32,8 +34,9 @@ const JobSelectorCategory = ({
    selectedItems,
    sectionRef,
    classes,
-   values,
-   setFieldValue,
+   streamId,
+   selectedCustomJobs,
+   onSelectedCustomJobs,
    isSubmitting,
 }: Props) => {
    return (
@@ -47,8 +50,9 @@ const JobSelectorCategory = ({
                groupId={groupId}
                selectedItems={selectedItems}
                onSelectItems={onSelectItems}
-               values={values}
-               setFieldValue={setFieldValue}
+               streamId={streamId}
+               selectedCustomJobs={selectedCustomJobs}
+               onSelectedCustomJobs={onSelectedCustomJobs}
                isSubmitting={isSubmitting}
             />
          </SuspenseWithBoundary>
@@ -60,19 +64,31 @@ type JobSectionProps = {
    groupId: string
    onSelectItems: Dispatch<any>
    selectedItems: LivestreamJobAssociation[]
-   values: FormikValues
-   setFieldValue: (field: string, value: any) => void
+   streamId: string
+   selectedCustomJobs: CustomJob[]
+   onSelectedCustomJobs: Dispatch<SetStateAction<CustomJob[]>>
    isSubmitting: boolean
 }
 const JobSection = ({
    groupId,
    selectedItems,
    onSelectItems,
-   values,
-   setFieldValue,
+   streamId,
+   selectedCustomJobs,
+   onSelectedCustomJobs,
    isSubmitting,
 }: JobSectionProps) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
+   const allCustomJobs = useGroupCustomJobs(groupId)
+   const initialSelectedJobs = useGroupCustomJobs(groupId, {
+      livestreamId: streamId,
+   })
+
+   useEffect(() => {
+      if (initialSelectedJobs && streamId) {
+         onSelectedCustomJobs(initialSelectedJobs)
+      }
+   }, [])
 
    // First sync should be complete to fetch the jobs
    const filteredAccounts = useMemo(() => {
@@ -87,12 +103,16 @@ const JobSection = ({
          onSelectItems={onSelectItems}
       />
    ) : (
-      <CustomJobSection
-         groupId={groupId}
-         values={values}
-         setFieldValue={setFieldValue}
-         isSubmitting={isSubmitting}
-      />
+      <SuspenseWithBoundary fallback={<CircularProgress />}>
+         <CustomJobSection
+            groupId={groupId}
+            streamId={streamId}
+            allJobs={allCustomJobs}
+            selectedCustomJobs={selectedCustomJobs}
+            onSelectedCustomJobs={onSelectedCustomJobs}
+            isSubmitting={isSubmitting}
+         />
+      </SuspenseWithBoundary>
    )
 }
 
