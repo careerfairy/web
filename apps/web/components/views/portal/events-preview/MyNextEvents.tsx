@@ -159,7 +159,7 @@ const MyNextEvents = ({ limit }: Props) => {
                      >
                         You don’t have any registrations to upcoming live
                         streams! Browse, register, discover new opportunities
-                        and kick-start your career.
+                        and kick-start your career .
                      </Typography>
                   </Box>
                   <Box>
