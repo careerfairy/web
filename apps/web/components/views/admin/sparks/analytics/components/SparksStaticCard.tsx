@@ -10,18 +10,25 @@ import {
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
-import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import ShareIcon from "components/views/common/icons/ShareIcon"
 import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
 import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
+import useSparkStats from "components/custom-hook/spark/useSparkStats"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    card: {
       width: {
          xs: "100%",
          md: 281,
+      },
+      height: {
+         xs: "154vw",
+         md: "initial",
       },
       boxShadow: "none",
       borderRadius: "12px",
@@ -59,7 +66,10 @@ const styles = sxStyles({
       },
    },
    cardMedia: {
-      height: { xs: 476, sm: 406 },
+      height: {
+         xs: "calc(154vw - 62px - 55px)",
+         md: 406,
+      },
       objectFit: "cover",
    },
    sparksTypeAndTitle: {
@@ -120,7 +130,7 @@ const styles = sxStyles({
 
 type StatContainerProps = {
    icon: ReactElement
-   value: string
+   value: string | number
 }
 
 const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
@@ -138,33 +148,35 @@ const StatContainer: FC<StatContainerProps> = ({ icon, value }) => {
 }
 
 type SparksStaticCardProps = {
-   spark: any // TODO: to change later
+   sparkId: string
 }
 
-const SparksStaticCard: FC<SparksStaticCardProps> = ({ spark }) => {
-   // TODO: create something similar to useSparks() but for one spark only based on spark's id
-   const { data: sparkStats } = useSparkStats(spark.id)
+const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
+   const { group } = useGroup()
 
-   const impressions = sparkStats?.impressions.toString() || "0"
-   const likes = sparkStats?.likes.toString() || "0"
-   const shareCTA = sparkStats?.shareCTA.toString() || "0"
-   const numberOfCareerPageClicks =
-      sparkStats?.numberOfCareerPageClicks.toString() || "0"
+   const spark = useGroupSpark(group.id, sparkId)
+   const { data: sparkStats } = useSparkStats(sparkId)
+
+   const impressions = sparkStats?.impressions || "0"
+   const likes = sparkStats?.likes || "0"
+   const shareCTA = sparkStats?.shareCTA || "0"
+   const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
 
    return (
       <Card variant="outlined" sx={styles.card}>
          <CardHeader
             avatar={
                <CircularLogo
-                  src={spark.creator.avatarUrl}
+                  src={spark?.creator.avatarUrl}
                   alt={"Creator's Avatar"}
                   objectFit="cover"
                   size={46}
                />
             }
+            // Only use the first name in firstName if user has two names
             title={`${spark.creator.firstName.split(" ")[0]} ${
                spark.creator.lastName
-            }`} // Only use the first name in firstName if user has two names
+            }`}
             subheader={`From ${spark.group.universityName}`}
             sx={styles.cardHeader}
          />
@@ -177,7 +189,7 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ spark }) => {
             <CardMedia
                component="img"
                sx={styles.cardMedia}
-               image={spark.video.thumbnailUrl}
+               image={getResizedUrl(spark.video.thumbnailUrl, "md")}
                alt="Spark's thumbnail"
             />
          </Box>

@@ -1,6 +1,6 @@
 export const timeseriesLikesPastYear = `
   SELECT
-    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId
@@ -12,7 +12,7 @@ export const timeseriesLikesPastYear = `
 
 export const timeseriesSharesPastYear = `
   SELECT
-    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId
@@ -24,7 +24,7 @@ export const timeseriesSharesPastYear = `
 
 export const timeseriesRegistrationsPastYear = `
   SELECT
-    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId
@@ -37,7 +37,7 @@ export const timeseriesRegistrationsPastYear = `
 
 export const timeseriesPageClicksPastYear = `
   SELECT
-    TIMESTAMP_TRUNC(timestamp, DAY) AS x,
+    FORMAT_TIMESTAMP("%Y-%m-%dT%H:%M:%SZ", TIMESTAMP_TRUNC(timestamp, DAY)) AS x,
     COUNT(sparkId) AS y
   FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
   WHERE groupId = @groupId

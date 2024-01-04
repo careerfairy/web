@@ -1,6 +1,6 @@
 import React from "react"
-import { Box, Typography } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
+import { Box, SxProps } from "@mui/material"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -9,28 +9,15 @@ const styles = sxStyles({
       borderRadius: "8px",
       padding: "16px 12px",
    },
-   title: {
-      fontSize: "20px",
-      fontWeight: 600,
-      lineHeight: "30px",
-      letterSpacing: "0em",
-      textAlign: "left",
-      marginBottom: "21px",
-   },
 })
 
 type GroupSparkAnalyticsCardContainerProps = {
-   title: string
    children: React.ReactNode
+   sx?: SxProps
 }
 
 export const GroupSparkAnalyticsCardContainer: React.FC<
    GroupSparkAnalyticsCardContainerProps
-> = ({ title, children }) => {
-   return (
-      <Box sx={styles.root}>
-         <Typography sx={styles.title}>{title}</Typography>
-         {children}
-      </Box>
-   )
+> = ({ children, sx }) => {
+   return <Box sx={combineStyles(styles.root, sx)}>{children}</Box>
 }

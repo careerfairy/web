@@ -1,7 +1,7 @@
 import {
    SparkEvent,
    SparkSecondWatched,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import BigQueryCreateInsertService from "../BigQueryCreateInsertService"
 import bigQueryClient from "../../../api/bigQueryClient"
 import sparkEvents from "./schema-views/sparkEvents.json"
