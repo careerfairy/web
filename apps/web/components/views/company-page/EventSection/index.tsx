@@ -10,6 +10,7 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {
@@ -62,6 +63,7 @@ const EventSection = () => {
    )
    const query = `companyId=${group.id}`
    const isMounted = useMountedState()
+   const isMobile = useIsMobile()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -92,6 +94,14 @@ const EventSection = () => {
                eventDescription={upcomingEventsDescription}
                type={EventsTypes.comingUp}
                seeMoreLink={`/next-livestreams?${query}`}
+               styling={{
+                  compact: isMobile,
+                  seeMoreSx: {
+                     textDecoration: "underline",
+                     color: "#2ABAA5",
+                  },
+                  showArrows: isMobile,
+               }}
             />
 
             {Boolean(pastLivestreams?.length) ? (
@@ -101,6 +111,14 @@ const EventSection = () => {
                   eventDescription={pastEventsDescription}
                   type={EventsTypes.pastEvents}
                   seeMoreLink={`/past-livestreams?${query}`}
+                  styling={{
+                     compact: isMobile,
+                     seeMoreSx: {
+                        textDecoration: "underline",
+                        color: "#2ABAA5",
+                     },
+                     showArrows: isMobile,
+                  }}
                />
             ) : (
                <></>
