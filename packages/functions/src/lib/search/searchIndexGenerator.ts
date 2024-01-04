@@ -8,7 +8,7 @@ import {
    logUpdateIndex,
 } from "./util"
 
-import { DocumentSnapshot } from "firebase-admin/firestore"
+import { DocumentSnapshot, Query } from "firebase-admin/firestore"
 import { SearchIndex } from "algoliasearch"
 import config from "../../config"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
@@ -115,6 +115,18 @@ export type Index<T = any> = {
     * Name of the index in Algolia
     */
    indexName: string
+   /**
+    * Function that determines whether or not to index a document. If not provided, all documents will be indexed.
+    * @param doc The document to index
+    * @returns  Whether or not to index the document
+    */
+   shouldIndex?: (doc: Partial<T>) => boolean
+   /**
+    * Function that returns a query to use to filter the documents to index.
+    * @param collectionQuery The collection query to filter
+    * @returns The query to use to filter the documents to index
+    */
+   fullIndexSyncQueryConsraints?: (collectionQuery: Query) => Query
 }
 
 /**
@@ -124,7 +136,7 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
    const exports = {}
 
    for (const indexName in indexes) {
-      const { collectionPath, fields } = indexes[indexName]
+      const { collectionPath, fields, shouldIndex } = indexes[indexName]
 
       const indexClient = initAlgoliaIndex(indexName)
 
@@ -136,6 +148,20 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
          .firestore.document(documentPath)
          .onWrite(async (change) => {
             const changeType = getChangeTypeEnum(change)
+            // Get the document data
+            const docData = change.after.exists
+               ? change.after.data()
+               : change.before.data()
+
+            // If shouldIndex is defined and returns false, skip indexing
+            if (shouldIndex && !shouldIndex(docData)) {
+               functions.logger.debug(
+                  `Skipping indexing for document ${
+                     change.after.id || change.before.id
+                  }`
+               )
+               return
+            }
 
             switch (changeType) {
                case ChangeType.CREATE:
