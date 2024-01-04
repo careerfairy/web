@@ -23,6 +23,7 @@ import {
    CardActionArea,
    Theme,
    SxProps,
+   IconButton,
 } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Heading from "../common/Heading"
@@ -32,12 +33,19 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
+import { ArrowLeft, ArrowRight } from "react-feather"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
 const mobileSlideWidth = 321 + slideSpacing
 
 const styles = sxStyles({
+   arrowIcon: {
+      padding: 0,
+      minHeight: { xs: "25px", md: "30px" },
+      minWidth: { xs: "25px", md: "30px" },
+      ml: 2,
+   },
    eventsHeader: {
       display: "flex",
       justifyContent: "space-between",
@@ -120,11 +128,12 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          options = defaultEmblaOptions,
          eventDescription,
          styling = {
-            compact: false,
+            compact: true,
             seeMoreSx: styles.seeMoreText,
             eventTitleSx: styles.eventTitle,
             viewportSx: undefined,
             backgroundSx: undefined,
+            showArrows: false,
          },
       } = props
 
@@ -198,6 +207,40 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          emblaApi.on("reInit", updateSlidesInView)
       }, [emblaApi, updateSlidesInView])
 
+      const seeMoreComponent = (
+         <ConditionalWrapper
+            condition={events?.length >= 0 && seeMoreLink !== undefined}
+         >
+            <Link href={seeMoreLink}>
+               <Typography sx={styling.seeMoreSx} color="grey">
+                  See all
+               </Typography>
+            </Link>
+         </ConditionalWrapper>
+      )
+      const arrowsComponent = (
+         <Box>
+            <IconButton
+               color="inherit"
+               sx={styles.arrowIcon}
+               onClick={() => {
+                  if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
+               }}
+            >
+               <ArrowLeft fontSize={"large"} />
+            </IconButton>
+            <IconButton
+               color="inherit"
+               sx={styles.arrowIcon}
+               onClick={() => {
+                  if (emblaApi.canScrollNext()) emblaApi.scrollNext()
+               }}
+            >
+               <ArrowRight fontSize={"large"} />
+            </IconButton>
+         </Box>
+      )
+
       const getLoadingCard = () => {
          return (
             <>
@@ -217,40 +260,60 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             <ConditionalWrapper condition={!hidePreview}>
                <Box>
                   {
-                     <ConditionalWrapper condition={!isEmbedded}>
+                     <ConditionalWrapper
+                        condition={!isEmbedded && styling.compact}
+                     >
                         <Box sx={styles.eventsHeader}>
                            {<Heading sx={styles.eventTitle}>{title}</Heading>}
                            <ConditionalWrapper
-                              condition={
-                                 events?.length >= 0 &&
-                                 seeMoreLink !== undefined
-                              }
+                              condition={styling.showArrows}
+                              fallback={seeMoreComponent}
                            >
-                              <Link href={seeMoreLink}>
-                                 <Typography
-                                    sx={styling.seeMoreSx}
-                                    color="grey"
-                                 >
-                                    See all
-                                 </Typography>
-                              </Link>
+                              {arrowsComponent}
                            </ConditionalWrapper>
                         </Box>
                      </ConditionalWrapper>
                   }
-
+                  {
+                     <ConditionalWrapper
+                        condition={!isEmbedded && !styling.compact}
+                     >
+                        <Box sx={styles.eventsHeader}>
+                           {<Heading sx={styles.eventTitle}>{title}</Heading>}
+                        </Box>
+                     </ConditionalWrapper>
+                  }
                   <Stack sx={styles.previewContent}>
                      {
                         <ConditionalWrapper condition={!isMobile}>
-                           <Box sx={styles.description}>
-                              <Typography
-                                 variant="h6"
-                                 fontWeight={"400"}
-                                 color="textSecondary"
-                              >
-                                 {eventDescription}
-                              </Typography>
-                           </Box>
+                           <Stack>
+                              <Box sx={styles.description}>
+                                 <Typography
+                                    variant="h6"
+                                    fontWeight={"400"}
+                                    color="textSecondary"
+                                 >
+                                    {eventDescription}
+                                 </Typography>
+                              </Box>
+                           </Stack>
+                        </ConditionalWrapper>
+                     }
+                     {
+                        <ConditionalWrapper
+                           condition={!isEmbedded && !styling.compact}
+                        >
+                           <Stack
+                              direction="row"
+                              spacing={2}
+                              justifyContent="space-between"
+                              alignItems="center"
+                              ml={2}
+                              mt={1}
+                           >
+                              <Box>{seeMoreComponent}</Box>
+                              {arrowsComponent}
+                           </Stack>
                         </ConditionalWrapper>
                      }
                      {
@@ -331,6 +394,7 @@ export type EventsCarouselStyling = {
    eventTitleSx?: SxProps
    viewportSx?: SxProps
    backgroundSx?: SxProps
+   showArrows?: boolean
 }
 export type ChildRefType = {
    goNext: () => void
