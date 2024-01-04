@@ -125,17 +125,12 @@ const MostSomethingAnalyticsContainer: FC<
             setSelectMostSomething={setSelectMostSomethingValue}
             options={mostSomethingSelectOptions}
          />
-         <Stack direction={{ sm: "column", md: "row" }} spacing={1.5}>
+         <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
             {most[selectMostSomethingValue].map((sparkId, index) => (
-               <SuspenseWithBoundary
-                  key={`most-suspense-${sparkId}-${index}`}
-                  fallback="Loading..."
-               >
-                  <SparksStaticCard
-                     key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
-                     sparkId={sparkId}
-                  />
-               </SuspenseWithBoundary>
+               <SparksStaticCard
+                  key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
+                  sparkId={sparkId}
+               />
             ))}
          </Stack>
       </GroupSparkAnalyticsCardContainer>
