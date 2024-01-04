@@ -3,7 +3,7 @@ import { ExternalLink } from "react-feather"
 import React, { useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
+import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
 
 const styles = sxStyles({
    btn: {
@@ -24,7 +24,7 @@ const CustomJobEntryApply = ({
    livestreamId,
    handleApplyClick,
 }: Props) => {
-   const { handleClickApplyBtn, isApplying } = useCustomJobApply(
+   const { handleClickApplyBtn, isClickingOnApplyBtn } = useCustomJobApply(
       job,
       livestreamId
    )
@@ -45,7 +45,7 @@ const CustomJobEntryApply = ({
             variant="contained"
             color="primary"
             startIcon={
-               isApplying ? (
+               isClickingOnApplyBtn ? (
                   <CircularProgress size={20} color="inherit" />
                ) : (
                   <ExternalLink size={18} />
@@ -53,7 +53,7 @@ const CustomJobEntryApply = ({
             }
             onClick={handleClick}
          >
-            {isApplying ? "Applying" : "Apply now"}
+            {isClickingOnApplyBtn ? "Applying" : "Apply now"}
          </Button>
       </>
    )

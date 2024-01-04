@@ -13,12 +13,16 @@ import Stack from "@mui/material/Stack"
 import JobCTAButton from "./main-content/JobCTAButton"
 import NotFoundView from "../common/NotFoundView"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   pickPublicDataFromCustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
 import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
 import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
 import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
+import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
 
 type Props = {
    jobId: string
@@ -49,6 +53,8 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
+   const customJob = useCustomJob(jobId)
+
    let job: Job | PublicCustomJob
 
    job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
@@ -56,7 +62,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    if (!job) {
       // If entered here, it means that the current job is no Ats Job or don't exist
       // In this situation, let's validate if it's a customJob
-      job = livestream?.customJobs?.find((customJob) => customJob.id === jobId)
+      job = pickPublicDataFromCustomJob(customJob)
    }
 
    const isAtsJob = useIsAtsJob(job)

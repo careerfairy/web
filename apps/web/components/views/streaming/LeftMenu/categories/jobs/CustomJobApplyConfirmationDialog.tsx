@@ -7,7 +7,7 @@ import {
    Typography,
 } from "@mui/material"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
+import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import IconButton from "@mui/material/IconButton"

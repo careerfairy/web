@@ -24,6 +24,7 @@ export interface CustomJob extends Identifiable {
    salary?: string
    // livestreams ids where this job opening is shown
    livestreams: string[]
+   deleted?: boolean
 }
 
 export type PublicCustomJob = Pick<
@@ -36,6 +37,7 @@ export type PublicCustomJob = Pick<
    | "postingUrl"
    | "deadline"
    | "salary"
+   | "deleted"
 >
 
 export type JobType =
@@ -45,10 +47,14 @@ export type JobType =
    | "Internship"
 
 export const jobTypeOptions = [
-   { value: "Full-time", label: "Full-time" },
-   { value: "Part-time", label: "Part-time" },
-   { value: "Graduate Programme", label: "Graduate Programme" },
-   { value: "Internship", label: "Internship" },
+   { value: "Full-time", label: "Full-time", id: "Full-time" },
+   { value: "Part-time", label: "Part-time", id: "Part-time" },
+   {
+      value: "Graduate Programme",
+      label: "Graduate Programme",
+      id: "Graduate Programme",
+   },
+   { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
 export const pickPublicDataFromCustomJob = (
@@ -63,6 +69,7 @@ export const pickPublicDataFromCustomJob = (
       postingUrl: job.postingUrl ?? null,
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
+      deleted: job.deleted ?? false,
    }
 }
 
@@ -76,6 +83,8 @@ export interface CustomJobStats extends Identifiable {
    // increases every time an application is created related to this job
    applicants: number
    job: CustomJob
+   deleted: boolean
+   deletedAt: firebase.firestore.Timestamp | null
 }
 
 // collection path /jobApplications
@@ -86,4 +95,5 @@ export interface CustomJobApplicant extends Identifiable {
    groupId: string // Makes it easier to query for all applicants in a group
    appliedAt: firebase.firestore.Timestamp
    livestreamId: string // The associated livestream where the user applied to the job
+   job: CustomJob
 }

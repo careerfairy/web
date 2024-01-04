@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react"
+import React, { FC, useMemo } from "react"
 import Box from "@mui/material/Box"
 import SectionTitle from "./SectionTitle"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -12,16 +12,17 @@ import Link from "../../../../common/Link"
 import { useRouter } from "next/router"
 import { LinkProps } from "next/dist/client/link"
 import { buildDialogLink } from "../../../util"
-import {
-   LivestreamCustomJobAssociationPresenter,
-   LivestreamJobAssociation,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
+import useGroupCustomJobs from "../../../../../custom-hook/custom-job/useGroupCustomJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import Loader from "../../../../loader/Loader"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -72,21 +73,24 @@ const Jobs: FC<Props> = (props) => {
    return (
       <Box>
          <SectionTitle>Linked Jobs</SectionTitle>
-         <JobsComponent {...props} />
+         <SuspenseWithBoundary fallback={<Loader />}>
+            <JobsComponent {...props} />
+         </SuspenseWithBoundary>
       </Box>
    )
 }
 
-export const JobsComponent: FC<Props> = ({ presenter }) => {
-   let jobsToPresent: (
-      | LivestreamJobAssociation
-      | LivestreamCustomJobAssociationPresenter
-   )[]
+const JobsComponent: FC<Props> = ({ presenter }) => {
+   const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
+      livestreamId: presenter.id,
+   })
+
+   let jobsToPresent: (LivestreamJobAssociation | CustomJob)[]
 
    if (presenter.jobs && presenter.jobs.length > 0) {
       jobsToPresent = presenter.jobs
    } else {
-      jobsToPresent = presenter.customJobs
+      jobsToPresent = livestreamCustomJobs
    }
 
    return (
@@ -99,7 +103,7 @@ export const JobsComponent: FC<Props> = ({ presenter }) => {
 }
 
 type JobItemProps = {
-   job: LivestreamJobAssociation | LivestreamCustomJobAssociationPresenter
+   job: LivestreamJobAssociation | CustomJob
    presenter: LivestreamPresenter
 }
 
