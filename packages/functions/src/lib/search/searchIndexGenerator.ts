@@ -1,0 +1,162 @@
+import * as functions from "firebase-functions"
+
+import { ChangeType, getChangeTypeEnum } from "../../util"
+import {
+   initAlgoliaIndex,
+   logCreateIndex,
+   logDeleteIndex,
+   logUpdateIndex,
+} from "./util"
+
+import { DocumentSnapshot } from "firebase-admin/firestore"
+import { SearchIndex } from "algoliasearch"
+import config from "../../config"
+import { defaultTriggerRunTimeConfig } from "../triggers/util"
+
+export const getData = (snapshot: DocumentSnapshot, fields: string[]) => {
+   const payload: {
+      [key: string]: boolean | string | number
+   } = {
+      objectID: snapshot.id,
+   }
+
+   const data = snapshot.data()
+
+   return fields.reduce((acc, field) => {
+      if (field in data && data[field] !== undefined && data[field] !== null) {
+         acc[field] = data[field] as any
+      }
+      return acc
+   }, payload)
+}
+
+const handleCreateDocument = async (
+   snapshot: DocumentSnapshot,
+   fields: string[],
+   index: SearchIndex
+) => {
+   try {
+      const data = getData(snapshot, fields)
+
+      functions.logger.debug({
+         ...data,
+      })
+
+      logCreateIndex(snapshot.id, data)
+      await index.partialUpdateObject(data, { createIfNotExists: true })
+   } catch (e) {
+      functions.logger.error(e)
+   }
+}
+
+const handleUpdateDocument = async (
+   before: DocumentSnapshot,
+   after: DocumentSnapshot,
+   fields: string[],
+   index: SearchIndex
+) => {
+   try {
+      functions.logger.debug("Detected a change, execute indexing")
+
+      const beforeData = before.data()
+      // loop through the after data snapshot to see if any properties were removed
+      const undefinedAttrs = Object.keys(beforeData).filter(
+         (key) => after.get(key) === undefined || after.get(key) === null
+      )
+      functions.logger.debug("undefinedAttrs", undefinedAttrs)
+
+      const data = getData(after, fields)
+      // if no attributes were removed, then use partial update of the record.
+      if (undefinedAttrs.length === 0) {
+         logUpdateIndex(after.id, data)
+         functions.logger.debug("execute partialUpdateObject")
+
+         await index.partialUpdateObject(data, {
+            createIfNotExists: true,
+         })
+      } else {
+         // Else if an attribute was removed, then use save object of the record.
+
+         // delete null value attributes before saving.
+         undefinedAttrs.forEach((attr) => delete data[attr])
+
+         logUpdateIndex(after.id, data)
+         functions.logger.debug("execute saveObject")
+         await index.saveObject(data)
+      }
+   } catch (e) {
+      functions.logger.error(e)
+   }
+}
+
+const handleDeleteDocument = async (
+   deleted: DocumentSnapshot,
+   index: SearchIndex
+) => {
+   try {
+      logDeleteIndex(deleted.id)
+      await index.deleteObject(deleted.id)
+   } catch (e) {
+      functions.logger.error(e)
+   }
+}
+
+export type Index<T = any> = {
+   /**
+    * Path to the collection to index (e.g. "livestreams" or "livestreams/{docId}/questions")
+    */
+   collectionPath: string
+   /**
+    * Fields to index
+    * @example ["id", "title", "summary"]
+    */
+   fields: (keyof T & string)[]
+   /**
+    * Name of the index in Algolia
+    */
+   indexName: string
+}
+
+/**
+ * Generates a set of functions that will generate a bundle
+ */
+export function generateFunctionsFromIndexes(bundles: Record<string, Index>) {
+   const exports = {}
+
+   for (const bundleName in bundles) {
+      const { collectionPath, fields, indexName } = bundles[bundleName]
+
+      const indexClient = initAlgoliaIndex(indexName)
+
+      const documentPath = collectionPath + "/{docId}"
+
+      exports[bundleName] = functions
+         .runWith(defaultTriggerRunTimeConfig)
+         .region(config.region)
+         .firestore.document(documentPath)
+         .onWrite(async (change) => {
+            const changeType = getChangeTypeEnum(change)
+
+            switch (changeType) {
+               case ChangeType.CREATE:
+                  await handleCreateDocument(change.after, fields, indexClient)
+                  break
+               case ChangeType.UPDATE:
+                  await handleUpdateDocument(
+                     change.before,
+                     change.after,
+                     fields,
+                     indexClient
+                  )
+                  break
+               case ChangeType.DELETE:
+                  await handleDeleteDocument(change.before, indexClient)
+                  break
+               default:
+                  throw new Error(`Unknown change type ${changeType}`)
+            }
+         })
+   }
+
+   return exports
+}
