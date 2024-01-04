@@ -22,15 +22,15 @@ const styles = sxStyles({
       background: "black",
    },
    cardWrapperContainerCircle: {
-      border: "20px solid #229584",
+      border: "30px solid #229584",
       background: "#2ABAA5",
       width: {
-         xs: "100vw",
+         xs: "90vw",
          md: "60vw",
          lg: "45vw",
       },
       height: {
-         xs: "80vw",
+         xs: "90vw",
          md: "60vw",
          lg: "45vw",
       },
@@ -125,8 +125,14 @@ const MyNextEvents = ({ limit }: Props) => {
          isEmpty={Boolean(!isLoading && !events.length)}
          title={"My registrations"}
          loading={isLoading}
+         seeMoreLink="/next-livestreams/my-registrations" // TODO: does not make sense when showing the empty message
          styling={{
             backgroundSx: styles.eventsBackground,
+            compact: true,
+            seeMoreSx: {
+               textDecoration: "underline",
+            },
+            showArrows: false,
          }}
       >
          <Box sx={styles.cardWrapper}>
