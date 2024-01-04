@@ -11,6 +11,7 @@ import {
    MostSomethingData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
+import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
 
 const styles = sxStyles({
    mostSomethingContainerTitleContainer: {
@@ -125,14 +126,18 @@ const MostSomethingAnalyticsContainer: FC<
             setSelectMostSomething={setSelectMostSomethingValue}
             options={mostSomethingSelectOptions}
          />
-         <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-            {most[selectMostSomethingValue].map((sparkId, index) => (
-               <SparksStaticCard
-                  key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
-                  sparkId={sparkId}
-               />
-            ))}
-         </Stack>
+         {most[selectMostSomethingValue]?.length === 0 ? (
+            <EmptyDataCheckerForMostSomething />
+         ) : (
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+               {most[selectMostSomethingValue].map((sparkId, index) => (
+                  <SparksStaticCard
+                     key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
+                     sparkId={sparkId}
+                  />
+               ))}
+            </Stack>
+         )}
       </GroupSparkAnalyticsCardContainer>
    )
 }
