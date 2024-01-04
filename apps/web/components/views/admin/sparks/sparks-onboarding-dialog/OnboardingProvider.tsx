@@ -8,6 +8,9 @@ import {
 } from "react"
 import useSparksB2BOnboardingCompletion from "./useSparksB2BOnboardingCompletion"
 import { useAuth } from "HOCs/AuthProvider"
+import Welcome from "./views/Welcome"
+import Tutorial from "./views/Tutorial"
+import FreeTrial from "./views/FreeTrial"
 
 export type OnboardingStep = {
    stepLabel: string
@@ -17,15 +20,15 @@ export type OnboardingStep = {
 const steps = [
    {
       stepLabel: "Welcome to Sparks",
-      view: <div>Step 1</div>,
+      view: <Welcome />,
    },
    {
       stepLabel: "Tutorial",
-      view: <div>Step 2</div>,
+      view: <Tutorial />,
    },
    {
       stepLabel: "Your free trial",
-      view: <div>Step 3</div>,
+      view: <FreeTrial />,
    },
 ] satisfies OnboardingStep[]
 
