@@ -73,7 +73,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    return (
       <EventsPreviewCarousel
          id={"upcoming-events"}
-         title={"Upcoming live streams"}
+         title={COMMING_UP_NEXT_EVENT_TITLE}
          type={EventsTypes.comingUp}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
@@ -81,7 +81,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       />
    )
 }
-
+export const COMMING_UP_NEXT_EVENT_TITLE = "Upcoming live streams"
 interface Props {
    limit?: number
    serverSideEvents?: LivestreamEvent[]
