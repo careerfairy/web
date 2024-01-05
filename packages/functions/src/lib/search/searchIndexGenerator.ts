@@ -12,6 +12,7 @@ import { DocumentSnapshot, Query } from "firebase-admin/firestore"
 import { SearchIndex } from "algoliasearch"
 import config from "../../config"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
+import { type Settings } from "@algolia/client-search"
 
 export const getData = (snapshot: DocumentSnapshot, fields: string[]) => {
    const payload: {
@@ -111,6 +112,8 @@ export type Index<T = any> = {
     * @example ["id", "title", "summary"]
     */
    fields: (keyof T & string)[]
+
+   indexSettings?: Settings
    /**
     * Name of the index in Algolia
     */
@@ -136,9 +139,8 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
    const exports = {}
 
    for (const indexName in indexes) {
-      const { collectionPath, fields, shouldIndex } = indexes[indexName]
-
-      const indexClient = initAlgoliaIndex(indexName)
+      const { collectionPath, fields, shouldIndex, indexSettings } =
+         indexes[indexName]
 
       const documentPath = collectionPath + "/{docId}"
 
@@ -147,6 +149,7 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
          .region(config.region)
          .firestore.document(documentPath)
          .onWrite(async (change) => {
+            const indexClient = await initAlgoliaIndex(indexName, indexSettings)
             const changeType = getChangeTypeEnum(change)
             // Get the document data
             const docData = change.after.exists

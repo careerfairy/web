@@ -42,14 +42,15 @@ export const fullIndexSync = functions
 
       const { indexName } = await schema.validate(req.query)
 
-      const index = initAlgoliaIndex(indexName)
-
       const {
          collectionPath,
          fields,
          shouldIndex,
          fullIndexSyncQueryConsraints,
+         indexSettings,
       } = knownIndexes[indexName]
+
+      const index = await initAlgoliaIndex(indexName, indexSettings)
 
       let collectionRef: Query = firestore.collection(collectionPath)
 

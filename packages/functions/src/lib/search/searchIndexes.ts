@@ -61,6 +61,9 @@ const livestreamIndex = {
       "isDraft",
       "speakers",
    ],
+   indexSettings: {
+      searchableAttributes: ["company", "title"],
+   },
    shouldIndex: (doc) => !doc.test, // Don't index test livestreams
    fullIndexSyncQueryConsraints: (collectionRef) =>
       collectionRef.where("test", "==", false),
