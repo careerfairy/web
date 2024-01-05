@@ -1,23 +1,39 @@
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
-import { Box, LinearProgress } from "@mui/material"
+import { Box, LinearProgress, Typography } from "@mui/material"
 import { LinearBarDataPoint } from "@careerfairy/shared-lib/sparks/analytics"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
       display: "grid",
       gridTemplateColumns: {
-         xs: "0.55fr 1fr auto",
+         xs: "1fr",
          md: "0.3fr 1fr auto",
       },
-      rowGap: "1em",
+      rowGap: {
+         xs: "2em",
+         md: "1em",
+      },
       columnGap: "2em",
       alignItems: "center",
    },
+   labelContainerMobile: {
+      display: "grid",
+      gridTemplateColumns: "1fr auto",
+      columnGap: 1,
+      marginBottom: "-1.5em",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+   },
    label: {
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
+      ...getMaxLineStyles(1),
+      color: "#5C5C6A",
+      fontSize: "16px",
+   },
+   labelMobile: {
+      ...getMaxLineStyles(2),
       color: "#5C5C6A",
       fontSize: "16px",
    },
@@ -45,13 +61,27 @@ type BulletChartProps = {
 }
 
 const BulletChart: FC<BulletChartProps> = ({ data }) => {
+   const isMobile = useIsMobile()
    return (
       <Box sx={styles.root}>
-         {data.map((item) => {
+         {data.map((item, index) => {
+            const value = `${item.value} (${Math.round(item.percentage)}%)`
             return (
                <>
-                  <Box sx={styles.label}>{item.label}</Box>
-                  <Box>
+                  <Box
+                     key={`bullet-chart-label-${index}`}
+                     sx={Boolean(isMobile) && styles.labelContainerMobile}
+                  >
+                     <Typography
+                        sx={isMobile ? styles.labelMobile : styles.label}
+                     >
+                        {item.label}
+                     </Typography>
+                     {Boolean(isMobile) && (
+                        <Typography sx={styles.value}>{value}</Typography>
+                     )}
+                  </Box>
+                  <Box key={`bullet-chart-${index}`}>
                      <LinearProgress
                         variant="determinate"
                         color="secondary"
@@ -59,9 +89,11 @@ const BulletChart: FC<BulletChartProps> = ({ data }) => {
                         sx={styles.linearProgress}
                      />
                   </Box>
-                  <Box sx={styles.value}>
-                     {`${item.value} (${Math.round(item.percentage)}%)`}
-                  </Box>
+                  {Boolean(!isMobile) && (
+                     <Box key={`bullet-chart-value-${index}`} sx={styles.value}>
+                        {value}
+                     </Box>
+                  )}
                </>
             )
          })}
