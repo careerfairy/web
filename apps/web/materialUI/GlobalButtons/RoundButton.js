@@ -45,13 +45,13 @@ const RoundButton = ({ withGradient, className, color, sx, ...props }) => {
       <Button
          color={color}
          className={className}
-         sx={[
+         sx={combineStyles(
             styles.root,
-            ...(Array.isArray(sx) ? sx : [sx]),
+            sx,
             withGradient
                ? (theme) => styles.withGradient(theme, { colors })
-               : undefined,
-         ]}
+               : undefined
+         )}
          {...props}
       />
    )

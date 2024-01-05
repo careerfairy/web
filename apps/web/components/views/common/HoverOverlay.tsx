@@ -1,6 +1,6 @@
 import { Box, type BoxProps, Link, alpha } from "@mui/material"
 import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    hoverOverlay: (theme) => ({
@@ -29,7 +29,7 @@ type Props = {
 
 const HoverOverlay: FC<Props> = ({ icon, href, sx }) => {
    return (
-      <Box sx={[styles.hoverOverlay, ...(Array.isArray(sx) ? sx : [sx])]}>
+      <Box sx={combineStyles(styles.hoverOverlay, sx)}>
          <Link href={href} underline="none">
             {icon}
          </Link>

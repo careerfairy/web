@@ -1,6 +1,6 @@
 import { FC, forwardRef, ReactNode } from "react"
 import Stack from "@mui/material/Stack"
-import { sxStyles } from "../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 import { Box, Container, IconButton } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
@@ -115,10 +115,7 @@ const BaseDialogView: Props = ({
 
    return (
       <>
-         <Stack
-            spacing={4.75}
-            sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
-         >
+         <Stack spacing={4.75} sx={combineStyles(styles.root, sx)}>
             {heroContent}
             {mainContent}
             {handleClose ? (
@@ -200,11 +197,11 @@ export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
       return (
          <Box
             id="live-stream-dialog-hero"
-            sx={[
+            sx={combineStyles(
                styles.heroContent,
                noMinHeight && styles.noMinHeight,
-               ...(Array.isArray(sx) ? sx : [sx]),
-            ]}
+               sx
+            )}
             ref={ref}
          >
             <Container
@@ -260,7 +257,7 @@ export const MainContent: FC<MainContentProps> = ({
    sx,
 }) => {
    return (
-      <Box sx={[styles.mainContent, ...(Array.isArray(sx) ? sx : [sx])]}>
+      <Box sx={combineStyles(styles.mainContent, sx)}>
          {children}
          <BackAndCloseButton
             onBackClick={onBackClick}
