@@ -1,69 +1,83 @@
+import { FC, ReactNode } from "react"
+import { sxStyles } from "types/commonTypes"
 import { Skeleton, Stack } from "@mui/material"
+import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
-import ChartSwitchButtonGroupContainer from "../components/ChartSwitchButtonGroupContainer"
+
+const styles = sxStyles({
+   title: {
+      height: "calc(3rem)",
+      width: {
+         xs: "100%",
+         md: "30%",
+      },
+   },
+   button: {
+      height: "48px",
+      width: "200px",
+   },
+   chart: {
+      marginTop: 3.5,
+      height: "273px",
+   },
+   chartSwipeIndicatorsContainer: {
+      marginTop: 2,
+      justifyContent: "center",
+      display: {
+         xs: "flex",
+         md: "none",
+      },
+   },
+   chartSwipeIndicator: {
+      height: "10px",
+      width: "10px",
+   },
+   sparkStaticCard: {
+      width: {
+         xs: "100%",
+         md: 281,
+      },
+      height: {
+         xs: "154vw",
+         md: "523px",
+      },
+   },
+   buttonGroupContainer: {
+      display: {
+         xs: "none",
+         md: "flex",
+      },
+   },
+})
 
 const ContainerTitleSkeleton = () => {
-   return (
-      <Skeleton
-         variant="text"
-         animation="wave"
-         sx={{
-            height: "calc(3rem)",
-            width: {
-               xs: "100%",
-               md: "30%",
-            },
-         }}
-      />
-   )
+   return <Skeleton variant="text" animation="wave" sx={styles.title} />
 }
 
 const ChartSwitchButtonSkeleton = () => {
-   return (
-      <Skeleton
-         variant="rounded"
-         animation="wave"
-         sx={{
-            height: "48px",
-            width: "200px",
-         }}
-      />
-   )
+   return <Skeleton variant="rounded" animation="wave" sx={styles.button} />
 }
 
-const ChartSkeleton = ({ numOfBullets }) => {
+type ChartSkeletonProps = {
+   numOfBullets: number
+}
+
+const ChartSkeleton: FC<ChartSkeletonProps> = ({ numOfBullets }) => {
    return (
       <>
-         <Skeleton
-            variant="rectangular"
-            animation="wave"
-            sx={{
-               marginTop: 3.5,
-               height: "273px",
-            }}
-         />
+         <Skeleton variant="rectangular" animation="wave" sx={styles.chart} />
          <Stack
             direction="row"
-            marginTop={2}
             spacing={0.5}
-            justifyContent="center"
-            sx={{
-               display: {
-                  xs: "flex",
-                  md: "none",
-               },
-            }}
+            sx={styles.chartSwipeIndicatorsContainer}
          >
             {Array.from({ length: numOfBullets }, (_, index) => (
                <Skeleton
                   key={`chart-mobile-bullet-${index}`}
                   variant="circular"
                   animation="wave"
-                  sx={{
-                     height: "10px",
-                     width: "10px",
-                  }}
+                  sx={styles.chartSwipeIndicator}
                />
             ))}
          </Stack>
@@ -76,21 +90,18 @@ const SparkStaticCardSkeleton = () => {
       <Skeleton
          variant="rounded"
          animation="wave"
-         sx={{
-            width: {
-               xs: "100%",
-               md: 281,
-            },
-            height: {
-               xs: "154vw",
-               md: "523px",
-            },
-         }}
+         sx={styles.sparkStaticCard}
       />
    )
 }
 
-const BaseContainerSkeleton = ({ children }) => {
+type BaseContainerSkeletonProps = {
+   children: ReactNode
+}
+
+const BaseContainerSkeleton: FC<BaseContainerSkeletonProps> = ({
+   children,
+}) => {
    return (
       <GroupSparkAnalyticsCardContainer>
          <GroupSparkAnalyticsCardContainerTitle>
@@ -101,17 +112,16 @@ const BaseContainerSkeleton = ({ children }) => {
    )
 }
 
-const BaseChartContainerSkeleton = ({ numOfButtons }) => {
+type BaseChartContainerSkeletonProps = {
+   numOfButtons: number
+}
+
+const BaseChartContainerSkeleton: FC<BaseChartContainerSkeletonProps> = ({
+   numOfButtons,
+}) => {
    return (
       <BaseContainerSkeleton>
-         <ChartSwitchButtonGroupContainer
-            sx={{
-               display: {
-                  xs: "none",
-                  md: "flex",
-               },
-            }}
-         >
+         <ChartSwitchButtonGroupContainer sx={styles.buttonGroupContainer}>
             {Array.from({ length: numOfButtons }, (_, index) => (
                <ChartSwitchButtonSkeleton
                   key={`chart-switch-button-skeleton-${index}`}

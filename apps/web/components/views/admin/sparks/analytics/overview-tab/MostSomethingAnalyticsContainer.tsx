@@ -8,6 +8,7 @@ import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDr
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import {
    MostSomethingData,
+   SparkAnalyticsClientWithPastData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
 import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
@@ -115,7 +116,8 @@ const MostSomethingAnalyticsContainer: FC<
    MostSomethingAnalyticsContainerProps
 > = ({ timeFilter }) => {
    const { group } = useGroup()
-   const { most } = useSparksAnalytics(group.id)[timeFilter]
+   const { most }: SparkAnalyticsClientWithPastData[TimePeriodParams] =
+      useSparksAnalytics(group.id)[timeFilter]
 
    const [selectMostSomethingValue, setSelectMostSomethingValue] =
       useState<keyof MostSomethingData>("watched")

@@ -1,4 +1,20 @@
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 import { Box, Stack, Typography } from "@mui/material"
+
+const styles = sxStyles({
+   container: {
+      justifyContent: "center",
+      marginTop: 4,
+      marginBottom: 4,
+   },
+   pieChartPlaceholder: {
+      width: "285px",
+      height: "285px",
+      borderRadius: "50%",
+      backgroundColor: "#F4F4F4",
+   },
+})
 
 const EmptyMessage = () => {
    return (
@@ -6,31 +22,29 @@ const EmptyMessage = () => {
    )
 }
 
-const EmptyDataCheckerForBulletChart = ({ children }) => {
+type ChildrenWithDataArray = {
+   data: any[]
+}
+
+type EmptyDataCheckerProps = {
+   children: React.ReactElement<ChildrenWithDataArray>
+}
+
+const EmptyDataCheckerForBulletChart: FC<EmptyDataCheckerProps> = ({
+   children,
+}) => {
    return <>{children.props.data.length === 0 ? <EmptyMessage /> : children}</>
 }
 
-const EmptyDataCheckerForPieChart = ({ children }) => {
-   const containerSize = "285px"
-   const margin = 4
+const EmptyDataCheckerForPieChart: FC<EmptyDataCheckerProps> = ({
+   children,
+}) => {
    return (
       <>
          {children.props.data.length === 0 ? (
             <>
-               <Stack
-                  direction="row"
-                  justifyContent="center"
-                  marginTop={margin}
-                  marginBottom={margin}
-               >
-                  <Box
-                     sx={{
-                        width: containerSize,
-                        height: containerSize,
-                        borderRadius: "50%",
-                        backgroundColor: "#F4F4F4",
-                     }}
-                  />
+               <Stack direction="row" sx={styles.container}>
+                  <Box sx={styles.pieChartPlaceholder} />
                </Stack>
                <EmptyMessage />
             </>
