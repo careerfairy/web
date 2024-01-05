@@ -1,8 +1,6 @@
 import { Locator, Page } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import { credentials } from "../../constants"
-import { COMMING_UP_NEXT_EVENT_TITLE } from "components/views/portal/events-preview/ComingUpNextEvents"
-import { MY_NEXT_EVENTS_TITLE } from "components/views/portal/events-preview/MyNextEvents"
 
 export class LoginPage {
    readonly page: Page
@@ -19,10 +17,8 @@ export class LoginPage {
       this.passwordTextField = page.locator('input[name="password"]')
       this.emailTextField = page.locator('input[name="email"]')
       this.loginButton = page.locator("data-testid=login-button")
-      this.portalPageUpcomingHeader = page.locator(
-         `text=${COMMING_UP_NEXT_EVENT_TITLE}`
-      )
-      this.portalNextEventsHeader = page.locator(`text=${MY_NEXT_EVENTS_TITLE}`)
+      this.portalPageUpcomingHeader = page.locator(`text=Upcoming live streams`)
+      this.portalNextEventsHeader = page.locator(`text=My registrations`)
       this.passwordResetLink = page.locator(
          "data-testid=forgot-password-page-link"
       )

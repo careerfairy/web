@@ -9,7 +9,6 @@ import { LoginPage } from "../page-object-models/LoginPage"
 import { setupLivestreamData, setupUserSignUpData } from "../setupData"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 import { SignupPage } from "../page-object-models/SignupPage"
-import { REGISTERED_LABEL } from "components/views/common/stream-cards/EventPreviewCardChipLabels"
 
 test.describe("Livestream Registration Signed In", () => {
    test("successful registration on a livestream event from the portal page", async ({
@@ -27,7 +26,7 @@ test.describe("Livestream Registration Signed In", () => {
       const livestreamCard = page
          .getByTestId(`livestream-card-${livestream.id}`)
          .first()
-      await expect(livestreamCard.getByText(REGISTERED_LABEL)).toBeVisible()
+      await expect(livestreamCard.getByText("Registered")).toBeVisible()
       await expect(livestreamCard.getByText(livestream.title)).toBeVisible()
 
       // confirm the userLivestreamData was created
@@ -42,7 +41,7 @@ test.describe("Livestream Registration Signed In", () => {
       await livestreamDialogPage.cancelRegistrationClick()
       await expect(livestreamDialogPage.registrationButton).toBeVisible()
       await livestreamDialogPage.closeDialog()
-      await expect(livestreamCard.getByText(REGISTERED_LABEL)).not.toBeVisible()
+      await expect(livestreamCard.getByText("Registered")).not.toBeVisible()
    })
 
    test("successful registration on a livestream event with no group questions", async ({
