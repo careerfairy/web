@@ -4,7 +4,6 @@ import { sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import SparksStaticCard from "../components/SparksStaticCard"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import {
