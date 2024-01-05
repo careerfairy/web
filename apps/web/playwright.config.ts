@@ -99,7 +99,7 @@ const config: PlaywrightTestConfig = {
 
    /* Run your local dev server before starting the tests */
    webServer: {
-      command: `npx firebase emulators:exec "npm run start -w @careerfairy/webapp" ${
+      command: `npx firebase emulators:exec "npm run dev -w @careerfairy/webapp" ${
          process.env.CI ? "" : "--ui"
       } --only auth,firestore,functions,storage`,
       cwd: "../../",

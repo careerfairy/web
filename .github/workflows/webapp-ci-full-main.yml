@@ -61,12 +61,30 @@ jobs:
          - name: Build
            run: npm run build
            env:
-              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
+
+              # Webapp
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
+              NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+              GRAPHCMS_PROJECT_API: ${{ secrets.GRAPHCMS_PROJECT_API }}
+              GRAPHCMS_PROD_AUTH_TOKEN: ${{ secrets.GRAPHCMS_PROD_AUTH_TOKEN }}
+              GRAPHCMS_PREVIEW_SECRET: ${{ secrets.GRAPHCMS_PREVIEW_SECRET }}
+              WEBFLOW_URL: ${{ secrets.WEBFLOW_URL }}
+              # NEXT_PUBLIC_FIREBASE_EMULATORS: ${{ secrets.NEXT_PUBLIC_FIREBASE_EMULATORS }} # Probably ignore
+              NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+              NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+              NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+              NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+              NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+              NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+              NEXT_PUBLIC_AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
+
+              # Functions & Webapp
               ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+
+              # Functions
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-              ALGOLIA_INDEX_NAME: ${{ secrets.ALGOLIA_INDEX_NAME }}
-              ALGOLIA_STREAM_INDEX_NAME: ${{ secrets.ALGOLIA_STREAM_INDEX_NAME }}
               POSTMARK_TEMPLATE_EMAIL_VERIFICATION: ${{ secrets.POSTMARK_TEMPLATE_EMAIL_VERIFICATION }}
               POSTMARK_TEMPLATE_PASSWORD_RESET: ${{ secrets.POSTMARK_TEMPLATE_PASSWORD_RESET }}
               POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION: ${{ secrets.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION }}
@@ -85,19 +103,6 @@ jobs:
               BIGQUERY_TABLE_PREFIX: ${{ secrets.BIGQUERY_TABLE_PREFIX }}
               MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
               POSTMARK_SERVER_TOKEN: ${{ secrets.POSTMARK_SERVER_TOKEN }}
-              GRAPHCMS_PROJECT_API: ${{ secrets.GRAPHCMS_PROJECT_API }}
-              GRAPHCMS_PROD_AUTH_TOKEN: ${{ secrets.GRAPHCMS_PROD_AUTH_TOKEN }}
-              GRAPHCMS_PREVIEW_SECRET: ${{ secrets.GRAPHCMS_PREVIEW_SECRET }}
-              NEXT_PUBLIC_FIREBASE_EMULATORS: ${{ secrets.NEXT_PUBLIC_FIREBASE_EMULATORS }} # Probably ignore
-              NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
-              NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
-              WEBFLOW_URL: ${{ secrets.WEBFLOW_URL }}
-              REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-              REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
-              REACT_APP_FIREBASE_DATABASE_URL: ${{ secrets.REACT_APP_FIREBASE_DATABASE_URL }}
-              REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
-              REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
-              REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
               AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
               AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
               AGORA_APP_ID: ${{ secrets.AGORA_APP_ID }}
@@ -105,6 +110,12 @@ jobs:
               AGORA_CUSTOMER_KEY: ${{ secrets.AGORA_CUSTOMER_KEY }}
               AGORA_CUSTOMER_SECRET: ${{ secrets.AGORA_CUSTOMER_SECRET }}
               SIGNATURE_SECRET: ${{ secrets.SIGNATURE_SECRET }} # Needed ?
+              FIREBASE_CLIENT_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+              FIREBASE_CLIENT_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+              FIREBASE_CLIENT_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+              FIREBASE_CLIENT_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+              FIREBASE_CLIENT_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+              FIREBASE_CLIENT_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 
          # Check which folders have changed
          # So that we can skip future jobs
