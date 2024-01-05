@@ -8,7 +8,6 @@ import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import DateUtil from "util/DateUtil"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -110,16 +109,12 @@ const EmptySparksView: FC = () => {
 const TrialPlanCreationPeriodInfo = () => {
    const { groupPresenter } = useGroup()
 
-   const creationTimeLeft = groupPresenter.getTrialPlanCreationPeriodLeft()
+   const contentCreationDaysLeft =
+      groupPresenter.getRemainingDaysLeftForContentCreation()
 
-   const planReadableTimeLeft = DateUtil.getDaysLeftFromMilliseconds(
-      groupPresenter.getPlanTimeLeft()
-   )
+   const planDaysLeft = groupPresenter.getPlanDaysLeft()
 
-   const creationReadableTimeleft =
-      DateUtil.getDaysLeftFromMilliseconds(creationTimeLeft)
-
-   const creationPeriodExpired = creationTimeLeft === 0 // 0 means expired, see method
+   const creationPeriodExpired = contentCreationDaysLeft === 0 // 0 means expired, see method
 
    if (creationPeriodExpired) {
       return (
@@ -128,7 +123,7 @@ const TrialPlanCreationPeriodInfo = () => {
                Your content creation period has ended; however, you still have
                time. Upload your Sparks and make the most of the remaining{" "}
                <Box sx={styles.warningColor} component="span">
-                  {planReadableTimeLeft}
+                  {planDaysLeft} days left
                </Box>{" "}
                of your trial.
             </Typography>
@@ -140,7 +135,7 @@ const TrialPlanCreationPeriodInfo = () => {
       <Typography sx={styles.infoText}>
          Your content creation period ends in{" "}
          <Box sx={styles.warningColor} component="span">
-            {creationReadableTimeleft}
+            {contentCreationDaysLeft} days left
          </Box>
          .
       </Typography>
