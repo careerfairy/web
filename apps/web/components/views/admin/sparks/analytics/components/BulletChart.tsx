@@ -18,6 +18,10 @@ const styles = sxStyles({
       },
       columnGap: "2em",
       alignItems: "center",
+      "& .BulletChartLabel": {
+         color: "#5C5C6A",
+         fontSize: "16px",
+      },
    },
    labelContainerMobile: {
       display: "grid",
@@ -29,13 +33,9 @@ const styles = sxStyles({
    },
    label: {
       ...getMaxLineStyles(1),
-      color: "#5C5C6A",
-      fontSize: "16px",
    },
    labelMobile: {
       ...getMaxLineStyles(2),
-      color: "#5C5C6A",
-      fontSize: "16px",
    },
    linearProgress: {
       height: "17px",
@@ -73,6 +73,7 @@ const BulletChart: FC<BulletChartProps> = ({ data }) => {
                      sx={Boolean(isMobile) && styles.labelContainerMobile}
                   >
                      <Typography
+                        className="BulletChartLabel"
                         sx={isMobile ? styles.labelMobile : styles.label}
                      >
                         {item.label}
