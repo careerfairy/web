@@ -77,9 +77,6 @@ export interface IGroupScriptsRepository extends IGroupRepository {
    ): Promise<DataWithRef<T, Spark>[]>
 
    getAllLegacyGroupCustomJobs(): Promise<DataWithRef<true, CustomJob>[]>
-   getAllNewCustomJobs(
-      withRef?: boolean
-   ): Promise<DataWithRef<boolean, CustomJob>[]>
 }
 
 export class GroupScriptsRepository
@@ -260,15 +257,7 @@ export class GroupScriptsRepository
          .get()
 
       return mapFirestoreDocuments<CustomJob, true>(customJobs, true).filter(
-         (doc) => doc._ref.parent.parent.id === "careerCenterData"
+         (doc) => doc._ref?.parent?.parent?.parent?.id === "careerCenterData"
       )
-   }
-
-   async getAllNewCustomJobs(
-      withRef?: boolean
-   ): Promise<DataWithRef<boolean, CustomJob>[]> {
-      const customJobs = await this.firestore.collection("customJobs").get()
-
-      return mapFirestoreDocuments<CustomJob, boolean>(customJobs, withRef)
    }
 }
