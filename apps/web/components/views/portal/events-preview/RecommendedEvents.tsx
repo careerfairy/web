@@ -42,7 +42,6 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
             loading={loading}
             isRecommended
             isAdmin={userData?.isAdmin}
-            seeMoreLink="/next-livestreams"
          />
       </div>
    )

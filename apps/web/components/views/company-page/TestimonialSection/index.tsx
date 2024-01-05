@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import Add from "@mui/icons-material/Add"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
@@ -49,7 +49,7 @@ const styles = sxStyles({
 })
 
 const TestimonialSection = React.forwardRef<ChildRefType, TestimonialProps>(
-   (props, ref) => {
+   (_, ref) => {
       const {
          group,
          editMode,

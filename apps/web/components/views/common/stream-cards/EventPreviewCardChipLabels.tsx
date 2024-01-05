@@ -1,11 +1,10 @@
-import { Badge, Box, Chip, Stack, Typography } from "@mui/material"
+import { Box, Chip, Stack, Typography } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined"
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import { red } from "@mui/material/colors"
 
 const styles = sxStyles({
    wrapper: {
