@@ -17,8 +17,10 @@ export class LoginPage {
       this.passwordTextField = page.locator('input[name="password"]')
       this.emailTextField = page.locator('input[name="email"]')
       this.loginButton = page.locator("data-testid=login-button")
-      this.portalPageUpcomingHeader = page.locator(`text=Upcoming live streams`)
-      this.portalNextEventsHeader = page.locator(`text=My registrations`)
+      this.portalPageUpcomingHeader = page.locator(
+         "text=¡Upcoming live streams'"
+      )
+      this.portalNextEventsHeader = page.locator("text=¡My registrations'")
       this.passwordResetLink = page.locator(
          "data-testid=forgot-password-page-link"
       )

@@ -95,12 +95,12 @@ const Testimonial = ({
             >
                {title}
             </Typography>
-            {content && (
+            {content ? (
                <Typography variant="body1" marginY={3}>
                   {content}
                </Typography>
-            )}
-            {rating && (
+            ) : null}
+            {rating ? (
                <Box display={"flex"}>
                   <Rating
                      readOnly
@@ -114,7 +114,7 @@ const Testimonial = ({
                      {rating}
                   </Typography>
                </Box>
-            )}
+            ) : null}
          </>
       )
    }, [content, isQuote, rating, title])

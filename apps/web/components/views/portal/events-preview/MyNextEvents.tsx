@@ -51,11 +51,10 @@ const styles = sxStyles({
       paddingTop: 5,
       paddingBottom: 4,
       backgroundColor: "black",
-      marginLeft: 2,
+      // marginLeft: 2,
       position: "relative",
       width: "100%",
       maxHeight: "292px",
-
       cardInnerWrapper: {
          background: "#2ABAA5",
          borderRadius: "100%",
@@ -86,6 +85,9 @@ const styles = sxStyles({
          color: "#229584",
          backgroundColor: "white",
          textTransform: "none",
+         "&:hover": {
+            backgroundColor: "#F3F3F5",
+         },
       },
    },
 })
@@ -126,6 +128,7 @@ const MyNextEvents = ({ limit }: Props) => {
                textDecoration: "underline",
             },
             showArrows: false,
+            padding: true,
          }}
       >
          <Box sx={styles.cardWrapper}>

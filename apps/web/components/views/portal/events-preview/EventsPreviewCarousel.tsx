@@ -28,13 +28,14 @@ import Heading from "../common/Heading"
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { ArrowLeft, ArrowRight } from "react-feather"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 321 + slideSpacing
+const mobileSlideWidth = 302 + slideSpacing
 
+//TODO: Redo padding for the portal page and move props above to the company page
 const styles = sxStyles({
    arrowIcon: {
       padding: 0,
@@ -46,17 +47,20 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      px: 2,
+      pr: 2,
    },
    description: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      px: 2,
+      // px: 2,
       paddingTop: 2,
    },
    seeMoreText: {
       color: "text.secondary",
+      textDecoration: "underline",
+   },
+   underlined: {
       textDecoration: "underline",
    },
    eventTitle: {
@@ -83,13 +87,18 @@ const styles = sxStyles({
          xs: 405,
          md: 375,
       },
-      paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      "&:not(:first-child)": {
+         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
    },
    paddingSlide: {
       flex: `0 0 ${slideSpacing}px`,
    },
    previewContent: {
       position: "relative",
+   },
+   mainBox: {
+      paddingLeft: 2,
    },
 })
 
@@ -128,12 +137,16 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             viewportSx: undefined,
             backgroundSx: undefined,
             showArrows: false,
+            headerAsLink: false,
+            padding: true,
+            slide: styles.slide,
          },
       } = props
 
       const [emblaRef, emblaApi] = useEmblaCarousel(options, [
          WheelGesturesPlugin(wheelGesturesOptions),
       ])
+
       const isMobile = useIsMobile()
 
       const {
@@ -239,7 +252,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          return (
             <>
                {[...Array(numLoadingSlides)].map((_, i) => (
-                  <Box key={i} sx={styles.slide}>
+                  <Box key={i} sx={styling.slide}>
                      <EventPreviewCard
                         animation={isEmpty ? false : undefined}
                         loading
@@ -249,16 +262,34 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </>
          )
       }
+      const getHeading = (headingStyles: SxProps) => {
+         return <Heading sx={headingStyles}>{title}</Heading>
+      }
       return (
          <>
             <ConditionalWrapper condition={!hidePreview}>
-               <Box>
+               <Box sx={styling.padding ? styles.mainBox : null}>
                   {
                      <ConditionalWrapper
                         condition={!isEmbedded && styling.compact}
                      >
                         <Box sx={styles.eventsHeader}>
-                           {<Heading sx={styles.eventTitle}>{title}</Heading>}
+                           <Box sx={styles.eventsHeader}>
+                              <ConditionalWrapper
+                                 condition={
+                                    seeMoreLink !== undefined &&
+                                    styling.headerAsLink
+                                 }
+                                 fallback={getHeading([styles.eventTitle])}
+                              >
+                                 <Link href={seeMoreLink}>
+                                    {getHeading([
+                                       styles.eventTitle,
+                                       styles.underlined,
+                                    ])}
+                                 </Link>
+                              </ConditionalWrapper>
+                           </Box>
                            <ConditionalWrapper
                               condition={styling.showArrows}
                               fallback={seeMoreComponent}
@@ -302,7 +333,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               spacing={2}
                               justifyContent="space-between"
                               alignItems="center"
-                              ml={2}
+                              // ml={2}
                               mt={1}
                            >
                               <Box>{seeMoreComponent}</Box>
@@ -314,7 +345,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         <Box
                            id={id}
                            sx={[styles.viewport, styling.viewportSx]}
-                           ref={emblaRef}
+                           ref={events.length > 1 ? emblaRef : null}
                         >
                            <Box sx={[styles.container]}>
                               <ConditionalWrapper
@@ -326,7 +357,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                     fallback={children}
                                  >
                                     {events.map((event, index, arr) => (
-                                       <Box sx={styles.slide} key={event.id}>
+                                       <Box sx={styling.slide} key={event.id}>
                                           <EventPreviewCard
                                              key={event.id}
                                              loading={
@@ -386,6 +417,9 @@ export type EventsCarouselStyling = {
    viewportSx?: SxProps
    backgroundSx?: SxProps
    showArrows?: boolean
+   headerAsLink?: boolean
+   padding?: boolean
+   slide?: SxProps
 }
 export type ChildRefType = {
    goNext: () => void
