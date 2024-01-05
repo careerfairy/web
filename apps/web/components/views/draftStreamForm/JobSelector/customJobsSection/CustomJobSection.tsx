@@ -1,41 +1,53 @@
 import { Grid, Typography } from "@mui/material"
-import { FormikValues } from "formik"
-import React, { useCallback, useState } from "react"
+import React, {
+   Dispatch,
+   SetStateAction,
+   useCallback,
+   useMemo,
+   useState,
+} from "react"
 import {
+   CustomJob,
    pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/groups/customJobs"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import FormGroup from "../../FormGroup"
 import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
-import { groupRepo } from "../../../../../data/RepositoryInstances"
+import { customJobRepo } from "../../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
-import useGroupCustomJobs from "../../../../custom-hook/useGroupCustomJobs"
 
 type Props = {
    groupId: string
-   values: FormikValues
-   setFieldValue: (fieldName: string, value: any) => void
    isSubmitting: boolean
+   streamId: string
+   selectedCustomJobs: CustomJob[]
+   onSelectedCustomJobs: Dispatch<SetStateAction<CustomJob[]>>
+   allJobs: CustomJob[]
 }
 
 const CustomJobSection = ({
    groupId,
-   values,
-   setFieldValue,
+   streamId,
+   allJobs,
+   selectedCustomJobs,
+   onSelectedCustomJobs,
    isSubmitting,
 }: Props) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const allCustomJobs = useGroupCustomJobs(groupId)
+
+   const allCustomJobsPresenter = useMemo(
+      () => allJobs.map(pickPublicDataFromCustomJob),
+      [allJobs]
+   )
    const [showForm, setShowForm] = useState(false)
 
    const handleChange = useCallback(
-      (name: string, value: PublicCustomJob[]) => {
-         setFieldValue(name, value)
+      (_: string, value: CustomJob[]) => {
+         onSelectedCustomJobs(value)
       },
-      [setFieldValue]
+      [onSelectedCustomJobs]
    )
 
    const handleOpenCreateJobForm = useCallback(() => {
@@ -47,18 +59,19 @@ const CustomJobSection = ({
    }, [])
 
    const handleCreateNewJob = useCallback(
-      async (customJob: PublicCustomJob) => {
+      async (customJob: CustomJob) => {
          try {
-            // Create a new custom job on Group subCollection
-            const createdJob = await groupRepo.createGroupCustomJob(
+            // Create a new custom job on CustomJobs collection
+            const createdJob = await customJobRepo.createCustomJob(
                customJob,
-               groupId
+               streamId
             )
 
-            setFieldValue("customJobs", [
-               pickPublicDataFromCustomJob(createdJob),
-               ...values.customJobs,
+            onSelectedCustomJobs((prevJobs: CustomJob[]) => [
+               createdJob,
+               ...prevJobs,
             ])
+
             setShowForm(false)
 
             successNotification("New job opening was created")
@@ -66,40 +79,34 @@ const CustomJobSection = ({
             errorNotification("Something went wrong, try again")
          }
       },
-      [
-         errorNotification,
-         groupId,
-         setFieldValue,
-         successNotification,
-         values.customJobs,
-      ]
+      [errorNotification, onSelectedCustomJobs, streamId, successNotification]
    )
 
    const handleRemoveJob = useCallback(
       (jobId: string) => {
-         const filteredJobs = values.customJobs.filter(
-            (job: PublicCustomJob) => job.id !== jobId
+         const filteredJobs = selectedCustomJobs.filter(
+            (job: CustomJob) => job.id !== jobId
          )
 
-         setFieldValue("customJobs", filteredJobs)
+         onSelectedCustomJobs(filteredJobs)
       },
-      [setFieldValue, values.customJobs]
+      [onSelectedCustomJobs, selectedCustomJobs]
    )
 
    const handleEditJob = useCallback(
-      async (updatedJob: PublicCustomJob) => {
+      async (updatedJob: CustomJob) => {
          try {
-            const updatedJobIndex = values.customJobs.findIndex(
-               (job: PublicCustomJob) => job.id === updatedJob.id
+            const updatedJobIndex = selectedCustomJobs.findIndex(
+               (job: CustomJob) => job.id === updatedJob.id
             )
 
             // Update custom job on Group subCollection
-            await groupRepo.updateGroupCustomJob(updatedJob, groupId)
+            await customJobRepo.updateCustomJob(updatedJob)
 
-            setFieldValue("customJobs", [
-               ...values.customJobs.slice(0, updatedJobIndex),
+            onSelectedCustomJobs((prevJobs: CustomJob[]) => [
+               ...prevJobs.slice(0, updatedJobIndex),
                updatedJob,
-               ...values.customJobs.slice(updatedJobIndex + 1),
+               ...prevJobs.slice(updatedJobIndex + 1),
             ])
 
             successNotification("Job opening was updated")
@@ -109,10 +116,9 @@ const CustomJobSection = ({
       },
       [
          errorNotification,
-         groupId,
-         setFieldValue,
+         onSelectedCustomJobs,
+         selectedCustomJobs,
          successNotification,
-         values.customJobs,
       ]
    )
 
@@ -132,8 +138,8 @@ const CustomJobSection = ({
                   name="customJobs"
                   label="Job related to this event"
                   placeholder="Select a job"
-                  values={values.customJobs}
-                  jobs={allCustomJobs}
+                  values={selectedCustomJobs}
+                  jobs={allCustomJobsPresenter}
                   disabled={isSubmitting}
                   handleChange={handleChange}
                   handleOpenCreateJobForm={handleOpenCreateJobForm}
@@ -150,7 +156,7 @@ const CustomJobSection = ({
                   </Collapse>
                }
 
-               {values.customJobs.map((job: PublicCustomJob) => (
+               {selectedCustomJobs.map((job: CustomJob) => (
                   <CustomJobPreview
                      key={job.id}
                      job={job}

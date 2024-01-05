@@ -3,8 +3,8 @@ import Box from "@mui/material/Box"
 import React, { useCallback } from "react"
 import { HelpCircle } from "react-feather"
 import { Button, CircularProgress, Stack, Typography } from "@mui/material"
-import useCustomJobApply from "../../../../../custom-hook/useCustomJobApply"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useLiveStreamDialog } from "../../../LivestreamDialog"
 
 const styles = sxStyles({

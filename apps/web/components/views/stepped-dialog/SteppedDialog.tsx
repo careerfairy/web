@@ -1,4 +1,16 @@
-import { Dialog, useTheme } from "@mui/material"
+import {
+   Box,
+   BoxProps,
+   Container as MuiContainer,
+   Dialog,
+   IconButton,
+   Stack,
+   StackProps,
+   Theme,
+   Typography,
+   TypographyProps,
+   useTheme,
+} from "@mui/material"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import SwipeableViews from "react-swipeable-views"
 
@@ -7,6 +19,8 @@ import { AnimatedTabPanel } from "materialUI/GlobalPanels/GlobalPanels"
 import {
    ComponentType,
    createContext,
+   FC,
+   JSXElementConstructor,
    useCallback,
    useContext,
    useEffect,
@@ -15,6 +29,14 @@ import {
 } from "react"
 import { sxStyles } from "types/commonTypes"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import CloseIcon from "@mui/icons-material/CloseRounded"
+import { LoadingButton, LoadingButtonProps } from "@mui/lab"
+import { SxProps } from "@mui/material/styles"
+import { TransitionProps } from "@mui/material/transitions"
+
+const actionsHeight = 87
+const mobileTopPadding = 20
+const mobileBreakpoint = "md"
 
 const styles = sxStyles({
    slide: {
@@ -24,16 +46,96 @@ const styles = sxStyles({
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
-      borderRadius: {
-         md: 5,
-      },
       display: "flex",
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: 770,
+      overflowY: "auto",
    },
    content: {
       p: 0,
+   },
+   title: {
+      letterSpacing: {
+         xs: "-0.04343rem",
+         [mobileBreakpoint]: "-0.04886rem",
+      },
+      fontSize: {
+         xs: "2.28571rem", // 32px
+         [mobileBreakpoint]: "2.57143rem", // 36px
+      },
+      fontWeight: 600,
+      lineHeight: "150%",
+      textAlign: {
+         [mobileBreakpoint]: "center",
+      },
+   },
+   subtitle: {
+      color: "text.secondary",
+      fontSize: "1.14286rem",
+      fontStyle: "normal",
+      fontWeight: 400,
+      lineHeight: "150%",
+      letterSpacing: "-0.02171rem",
+      mx: {
+         [mobileBreakpoint]: "auto",
+      },
+      textAlign: {
+         mobile: "center",
+      },
+   },
+   containerWrapper: {
+      flexDirection: "column",
+      py: `${mobileTopPadding}px`,
+      px: { xs: 3, md: 6 },
+      position: "relative",
+      height: {
+         xs: "90dvh",
+         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 778px)",
+      },
+   },
+   container: {
+      px: "unset !important",
+   },
+   closeBtn: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      zIndex: 1,
+      pt: {
+         xs: 2.5,
+         [mobileBreakpoint]: 2.125,
+      },
+      pr: {
+         xs: 2,
+         [mobileBreakpoint]: 2.5,
+      },
+      color: "text.primary",
+      "& svg": {
+         width: 32,
+         height: 32,
+         color: "text.primary",
+      },
+   },
+   fixedBottomContent: {
+      position: "fixed",
+      bottom: 0,
+      width: "100%",
+      p: 2.5,
+      borderTop: "1px solid #F0F0F0",
+      height: actionsHeight,
+      bgcolor: "#FCFCFC",
+   },
+   button: {
+      textTransform: "none",
+      "&:disabled": {
+         bgcolor: "#EDEDED",
+         color: "#BBBBBB",
+      },
+   },
+   actionsContainer: {
+      display: "flex",
+      height: "90px",
    },
 })
 
@@ -45,7 +147,7 @@ const styles = sxStyles({
  * @property {string} key - A unique identifier for the View
  * @property {ComponentType} Component - A React component that will be rendered for the View
  */
-interface View {
+export type View = {
    key: string
    Component: ComponentType
 }
@@ -58,12 +160,16 @@ interface View {
  * @property {boolean} open - A boolean that controls whether the dialog is open or closed
  * @property {Array<View>} views - An array of views that the dialog will display
  */
-interface StepperDialogProps {
+type StepperDialogProps = {
    handleClose: () => void
    open: boolean
    views: ReadonlyArray<View>
    initialStep?: number
    bgcolor?: string
+   transition?: JSXElementConstructor<TransitionProps>
+   sx?: SxProps<Theme>
+   disableFullScreen?: boolean
+   maxWidth?: number
 }
 
 /**
@@ -75,11 +181,12 @@ interface StepperDialogProps {
  * @property {Function} moveToPrev - A function that moves to the previous step in the SteppedDialog
  * @property {Function} goToStep - A function that goes to a specific step in the SteppedDialog
  */
-interface StepperContextValue<K extends string = string> {
+type StepperContextValue<K extends string = string> = {
    currentStep: number
    moveToNext: () => void
    moveToPrev: () => void
    goToStep: (key: K) => void
+   handleClose: () => void
 }
 
 const StepperContext = createContext<StepperContextValue>({
@@ -87,6 +194,7 @@ const StepperContext = createContext<StepperContextValue>({
    moveToNext: () => {},
    moveToPrev: () => {},
    goToStep: () => {},
+   handleClose: () => {},
 })
 
 /**
@@ -129,6 +237,10 @@ const SteppedDialog = <K extends string>({
    views,
    bgcolor,
    initialStep = 0,
+   transition,
+   sx,
+   disableFullScreen,
+   maxWidth,
 }: StepperDialogProps) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -178,8 +290,9 @@ const SteppedDialog = <K extends string>({
          moveToNext,
          moveToPrev,
          goToStep,
+         handleClose,
       }),
-      [currentStep, goToStep, moveToNext, moveToPrev]
+      [currentStep, goToStep, handleClose, moveToNext, moveToPrev]
    )
 
    return (
@@ -187,18 +300,24 @@ const SteppedDialog = <K extends string>({
          open={open}
          onClose={handleClose}
          TransitionComponent={
-            isMobile ? SlideLeftTransition : SlideUpTransition
+            transition
+               ? transition
+               : isMobile
+               ? SlideLeftTransition
+               : SlideUpTransition
          }
          maxWidth="md"
          fullWidth
-         fullScreen={isMobile}
+         fullScreen={isMobile ? !disableFullScreen : null}
          closeAfterTransition={true}
          PaperProps={{
             sx: [
                styles.dialogPaper,
                {
                   bgcolor,
+                  maxWidth,
                },
+               ...(Array.isArray(sx) ? sx : [sx]),
             ],
          }}
       >
@@ -223,5 +342,131 @@ const SteppedDialog = <K extends string>({
       </Dialog>
    )
 }
+
+const Title: FC<TypographyProps<"h1">> = ({ sx, ...props }) => {
+   return (
+      <Typography
+         component="h1"
+         sx={[styles.title, ...(Array.isArray(sx) ? sx : [sx])]}
+         {...props}
+      />
+   )
+}
+
+const Subtitle: FC<TypographyProps<"h2">> = ({ sx, ...props }) => {
+   return (
+      <Typography
+         color={"#1F1F29"}
+         component="h2"
+         maxWidth={385}
+         sx={[styles.subtitle, ...(Array.isArray(sx) ? sx : [sx])]}
+         {...props}
+      />
+   )
+}
+
+type SteppedDialogContainerProps = BoxProps & {
+   width?: string | number
+   hideCloseButton?: boolean
+   withActions?: boolean
+   containerSx?: SxProps<Theme>
+}
+
+const Container: FC<SteppedDialogContainerProps> = ({
+   width,
+   sx,
+   hideCloseButton,
+   children,
+   containerSx,
+   withActions,
+}) => {
+   const stepper = useStepper()
+
+   return (
+      <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
+         <MuiContainer
+            sx={[
+               styles.container,
+               width
+                  ? {
+                       width: {
+                          [mobileBreakpoint]: width,
+                       },
+                    }
+                  : null,
+               ...(Array.isArray(containerSx) ? containerSx : [containerSx]),
+            ]}
+            maxWidth="md"
+         >
+            {children}
+            {hideCloseButton ? null : (
+               <Box sx={styles.closeBtn}>
+                  <IconButton onClick={stepper.handleClose}>
+                     <CloseIcon />
+                  </IconButton>
+               </Box>
+            )}
+         </MuiContainer>
+         {withActions ? <Box sx={styles.actionsContainer} /> : null}
+      </Box>
+   )
+}
+
+type ContentProps = BoxProps<"span"> & {}
+
+const Content: FC<ContentProps> = ({ sx, ...props }) => {
+   return (
+      <Box
+         component="span"
+         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.content]}
+         {...props}
+      />
+   )
+}
+
+const Actions: FC<StackProps> = ({ children, sx, ...props }) => {
+   const stepper = useStepper()
+
+   return (
+      <Stack
+         justifyContent={"flex-end"}
+         direction="row"
+         left={`${stepper.currentStep * 100}%`}
+         alignItems="center"
+         spacing={2}
+         zIndex={1}
+         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.fixedBottomContent]}
+         {...props}
+      >
+         {children}
+      </Stack>
+   )
+}
+
+const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
+   return <Box height={height} />
+}
+
+const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
+   return (
+      <span>
+         <LoadingButton
+            sx={[...(Array.isArray(sx) ? sx : [sx]), styles.button]}
+            color="secondary"
+            {...props}
+         >
+            {children}
+         </LoadingButton>
+      </span>
+   )
+}
+
+SteppedDialog.Title = Title
+SteppedDialog.Subtitle = Subtitle
+SteppedDialog.Container = Container
+SteppedDialog.Actions = Actions
+SteppedDialog.Button = CustomButton
+SteppedDialog.ActionsOffset = ActionsOffset
+SteppedDialog.Content = Content
 
 export default SteppedDialog

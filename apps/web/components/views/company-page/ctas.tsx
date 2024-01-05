@@ -35,7 +35,8 @@ const styles = sxStyles({
 
 const commonPoints = [
    "Receive personalised recommendations",
-   "Be notified when new live streams or open positions are published",
+   "Be invited to their new live streams and open positions",
+   "Get notified when a company publishes a new Spark",
 ]
 const followPoints = commonPoints
 

@@ -1,4 +1,4 @@
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { sparkService } from "data/firebase/SparksService"
 import { useMemo } from "react"

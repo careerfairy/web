@@ -4,18 +4,9 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
 import ReactPlayer, { Config } from "react-player"
 import { sxStyles } from "types/commonTypes"
-import { sparksTutorialVideoUrl } from "constants/videos"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { imageKitLoader } from "@careerfairy/shared-lib/utils/video"
-
-const sparksTutorialVideoUrlImageKit: string = imageKitLoader({
-   src: sparksTutorialVideoUrl,
-   width: 1280,
-   height: 720,
-   quality: 80,
-   maxSizeCrop: true,
-})
+import { sparksTutorialVideoUrlImageKit } from "constants/transformedVideos"
 
 const styles = sxStyles({
    btnWatchNow: {

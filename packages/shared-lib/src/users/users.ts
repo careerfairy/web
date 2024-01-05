@@ -16,7 +16,6 @@ import {
 import { Job } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
-import { PublicCustomJob } from "../groups/customJobs"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -100,6 +99,11 @@ export interface UserData extends Identifiable {
     * User has already seen the first onboarding video
     */
    welcomeDialogComplete?: boolean
+
+   /**
+    * Indicates if the user has completed the Sparks onboarding process
+    */
+   hasCompletedSparksB2BOnboarding?: boolean
 }
 
 /*
@@ -267,14 +271,6 @@ export interface UserJobApplicationDocument extends Identifiable {
    rejectedAt?: Timestamp
    currentStage?: string
    rejectReason?: string
-}
-
-/**
- * userData/{id}/customJobApplications/{doc}
- */
-export interface UserCustomJobApplicationDocument extends Identifiable {
-   date: Timestamp
-   job: PublicCustomJob
 }
 
 /**

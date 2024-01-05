@@ -34,11 +34,11 @@ import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
 import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import BigQueryServiceCore from "../bigQuery/IBigQueryService"
+import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
 import {
    SparkEvent,
    SparkSecondWatched,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import * as functions from "firebase-functions"
 import { userRepo } from "../../api/repositories"
@@ -266,8 +266,8 @@ export class SparkFunctionsRepository
       readonly storage: Storage,
       readonly logger: FunctionsLogger,
       readonly feedReplisher: SparksFeedReplenisher,
-      readonly sparkEventHandler: BigQueryServiceCore<SparkEvent>,
-      readonly sparkSecondsWatchedHandler: BigQueryServiceCore<SparkSecondWatched>
+      readonly sparkEventHandler: BigQueryCreateInsertService<SparkEvent>,
+      readonly sparkSecondsWatchedHandler: BigQueryCreateInsertService<SparkSecondWatched>
    ) {
       super()
    }

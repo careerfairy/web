@@ -11,7 +11,7 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
-import { PublicCustomJob } from "../groups/customJobs"
+import { PublicCustomJob } from "../customJobs/customJobs"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 4
@@ -136,8 +136,6 @@ export interface LivestreamEvent extends Identifiable {
     */
    jobs?: LivestreamJobAssociation[]
 
-   // Custom Jobs
-   customJobs?: PublicCustomJob[]
    /**
     * Firestore has limitations when querying for jobs != []
     */

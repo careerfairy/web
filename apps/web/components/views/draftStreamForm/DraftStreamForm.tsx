@@ -60,7 +60,7 @@ import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
-import { PublicCustomJob } from "@careerfairy/shared-lib/groups/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -170,6 +170,7 @@ interface Props {
       status: string,
       setStatus: (status: string) => void,
       selectedJobs: LivestreamJobAssociation[],
+      selectedCustomJobs: CustomJob[],
       metaData: MetaData
    ) => void
    isActualLivestream?: boolean
@@ -198,7 +199,6 @@ export interface DraftFormValues {
    summary: string
    reasonsToJoinLivestream: string
    speakers: Record<string, Partial<Speaker>>
-   customJobs?: PublicCustomJob[]
    status: {}
    language: {
       code: string
@@ -276,6 +276,7 @@ const DraftStreamForm = ({
    const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
       []
    )
+   const [selectedCustomJobs, setSelectedCustomJobs] = useState<CustomJob[]>([])
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
    const { formHasChanged, setFormHasChanged, showPromotionInputs } =
@@ -305,7 +306,6 @@ const DraftStreamForm = ({
       summary: "",
       reasonsToJoinLivestream: "",
       speakers: { [uuidv4()]: speakerObj },
-      customJobs: [],
       status: {},
       language: languageCodes[0],
       targetFieldsOfStudy: [],
@@ -437,7 +437,6 @@ const DraftStreamForm = ({
                      livestream,
                      speakerQuery
                   ),
-                  customJobs: livestream?.customJobs || [],
                   status: livestream.status || {},
                   // @ts-ignore
                   language: livestream.language || languageCodes[0],
@@ -786,6 +785,7 @@ const DraftStreamForm = ({
                               status,
                               setStatus,
                               selectedJobs,
+                              selectedCustomJobs,
                               metaData
                            )
                         }}
@@ -881,8 +881,9 @@ const DraftStreamForm = ({
                                     selectedItems={selectedJobs}
                                     sectionRef={jobInfoRef}
                                     classes={classes}
-                                    values={values}
-                                    setFieldValue={setFieldValue}
+                                    streamId={draftStreamId as string}
+                                    selectedCustomJobs={selectedCustomJobs}
+                                    onSelectedCustomJobs={setSelectedCustomJobs}
                                     isSubmitting={isSubmitting}
                                  />
 

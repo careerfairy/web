@@ -1,9 +1,9 @@
 import functions = require("firebase-functions")
 import {
+   customJobRepo,
    groupRepo,
    livestreamsRepo,
    sparkRepo,
-   userRepo,
 } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
@@ -23,6 +23,7 @@ import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks
 import { firestore } from "./api/firestoreAdmin"
 import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
 import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -85,7 +86,13 @@ export const syncLivestreams = functions
          }
       }
 
-      sideEffectPromises.push(groupRepo.syncLivestreamIdWithCustomJobs(change))
+      if (changeTypes.isDelete) {
+         const deletedValue = change.before?.data() as LivestreamEvent
+
+         sideEffectPromises.push(
+            customJobRepo.removeLinkedLivestream(deletedValue.id)
+         )
+      }
 
       return handleSideEffects(sideEffectPromises)
    })
@@ -296,7 +303,7 @@ export const onWriteSpark = functions
 export const onWriteCustomJobs = functions
    .runWith(defaultTriggerRunTimeConfig)
    .region(config.region)
-   .firestore.document("careerCenterData/{groupId}/customJobs/{jobId}")
+   .firestore.document("customJobs/{jobId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
 
@@ -309,11 +316,35 @@ export const onWriteCustomJobs = functions
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
+      if (changeTypes.isCreate) {
+         const newCustomJob = change.after.data() as CustomJob
+         sideEffectPromises.push(
+            customJobRepo.createCustomJobStats(newCustomJob)
+         )
+      }
+
       // Run side effects for all custom jobs changes
-      sideEffectPromises.push(
-         livestreamsRepo.syncCustomJobDataToLivestream(change),
-         userRepo.syncCustomJobDataToUser(change)
-      )
+      if (changeTypes.isUpdate) {
+         const updatedCustomJob = change.after.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.syncCustomJobDataToCustomJobStats(updatedCustomJob),
+            customJobRepo.syncCustomJobDataToJobApplications(updatedCustomJob)
+         )
+      }
+
+      if (changeTypes.isDelete) {
+         const deletedCustomJob = change.before.data() as CustomJob
+
+         sideEffectPromises.push(
+            customJobRepo.syncDeletedCustomJobDataToCustomJobStats(
+               deletedCustomJob
+            ),
+            customJobRepo.syncDeletedCustomJobDataToJobApplications(
+               deletedCustomJob
+            )
+         )
+      }
 
       return handleSideEffects(sideEffectPromises)
    })

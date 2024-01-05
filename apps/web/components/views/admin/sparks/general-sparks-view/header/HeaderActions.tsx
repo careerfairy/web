@@ -17,19 +17,27 @@ import GetInspiredButton from "../../components/GetInspiredButton"
 import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import SparksCounter from "./SparksCounter"
+import TrialModeNotice from "./TrialModeNotice/TrialModeNotice"
 
 const styles = sxStyles({
+   root: {
+      boxShadow: "0px 0px 24px 0px rgba(20, 20, 20, 0.08)",
+      borderRadius: 4,
+      overflow: "hidden",
+   },
    mobileRoot: {
       bgcolor: "background.paper",
       p: 2,
       borderRadius: 4,
       alignItems: "center",
+      boxShadow: "0px 0px 8px 0px rgba(20, 20, 20, 0.06)",
+      border: "1px solid #F9F9F9",
    },
    mobileProgressIndicator: {
       p: 2,
-      mt: -1,
       borderRadius: (theme) => theme.spacing(0, 0, 4, 4),
       alignItems: "center",
+      justifyContent: "center",
    },
    btn: {
       textTransform: "none",
@@ -60,6 +68,7 @@ const HeaderActions = () => {
    const { group, groupPresenter } = useGroup()
 
    const maxPublicSparks = groupPresenter.getMaxPublicSparks()
+   const isTrialPlan = groupPresenter.isTrialPlan()
 
    const { data: publicSparks } = useGroupSparks(group.groupId, {
       isPublished: true,
@@ -71,7 +80,10 @@ const HeaderActions = () => {
    if (isMobile) {
       return (
          <Stack spacing={5.5}>
-            <Box>
+            <Box
+               sx={styles.root}
+               bgcolor={isCriticalState ? "#FFE8E8" : "#FAFAFE"}
+            >
                <Stack sx={styles.mobileRoot} spacing={1}>
                   <CreateSparkButton>Upload a new Spark</CreateSparkButton>
                   <DividerWithText maxWidth={"50%"}>Or</DividerWithText>
@@ -90,35 +102,42 @@ const HeaderActions = () => {
                      <InfoTooltip />
                   </Stack>
                </Stack>
-               {group.publicSparks ? (
+               {group.publicSparks || isTrialPlan ? (
                   <Stack
+                     spacing={2}
+                     direction="row"
                      sx={styles.mobileProgressIndicator}
-                     bgcolor={isCriticalState ? "#FFE8E8" : "#F0EDFD"}
                   >
                      <SparksCounter
                         isCriticalState={isCriticalState}
                         publicSparks={publicSparks}
                         maxPublicSparks={maxPublicSparks}
                      />
+                     <TrialModeNotice />
                   </Stack>
                ) : null}
             </Box>
 
-            <span>
-               <ToggleHiddenSparksButton />
-            </span>
+            {isTrialPlan ? null : (
+               <span>
+                  <ToggleHiddenSparksButton />
+               </span>
+            )}
          </Stack>
       )
    }
 
    return (
       <Stack spacing={2} direction="row" justifyContent="space-between">
-         {group.publicSparks ? (
-            <SparksCounter
-               isCriticalState={isCriticalState}
-               publicSparks={publicSparks}
-               maxPublicSparks={maxPublicSparks}
-            />
+         {group.publicSparks || isTrialPlan ? (
+            <Stack spacing={2} direction="row" alignItems="center">
+               <SparksCounter
+                  isCriticalState={isCriticalState}
+                  publicSparks={publicSparks}
+                  maxPublicSparks={maxPublicSparks}
+               />
+               <TrialModeNotice />
+            </Stack>
          ) : (
             <Box component="span">
                <ToggleHiddenSparksButton />
@@ -131,7 +150,9 @@ const HeaderActions = () => {
             alignItems="center"
             direction="row"
          >
-            {group.publicSparks ? <ToggleHiddenSparksButton /> : null}
+            {group.publicSparks && !isTrialPlan ? (
+               <ToggleHiddenSparksButton />
+            ) : null}
             <GetInspiredButton />
             <InfoTooltip />
          </Stack>
