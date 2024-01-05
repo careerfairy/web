@@ -83,12 +83,13 @@ const ChartLegendContentEntry: FC<ChartLegendContentEntryProps> = ({
 }
 
 const ChartLegendContent: FC<PieChartData> = ({ data }) => {
+   const colors = getColorMap(data.length)
    return (
       <Stack>
          {data.map((d) => (
             <ChartLegendContentEntry
                key={d.id}
-               color={colorMapDesc[d.id]}
+               color={colors[d.id]}
                label={d.label}
                value={`${d.value}%`}
             />

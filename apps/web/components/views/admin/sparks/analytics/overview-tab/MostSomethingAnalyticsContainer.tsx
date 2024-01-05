@@ -4,13 +4,14 @@ import { sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
 import SparksStaticCard from "../components/SparksStaticCard"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { ResponsiveSelectWithDrawer } from "../components/ResponsiveSelectWithDrawer"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import {
    MostSomethingData,
+   SparkAnalyticsClientWithPastData,
    TimePeriodParams,
 } from "@careerfairy/shared-lib/sparks/analytics"
+import EmptyDataCheckerForMostSomething from "./EmptyDataCheckers"
 
 const styles = sxStyles({
    mostSomethingContainerTitleContainer: {
@@ -115,7 +116,8 @@ const MostSomethingAnalyticsContainer: FC<
    MostSomethingAnalyticsContainerProps
 > = ({ timeFilter }) => {
    const { group } = useGroup()
-   const { most } = useSparksAnalytics(group.id)[timeFilter]
+   const { most }: SparkAnalyticsClientWithPastData[TimePeriodParams] =
+      useSparksAnalytics(group.id)[timeFilter]
 
    const [selectMostSomethingValue, setSelectMostSomethingValue] =
       useState<keyof MostSomethingData>("watched")
@@ -127,19 +129,18 @@ const MostSomethingAnalyticsContainer: FC<
             setSelectMostSomething={setSelectMostSomethingValue}
             options={mostSomethingSelectOptions}
          />
-         <Stack direction={{ sm: "column", md: "row" }} gap={1.5}>
-            {most[selectMostSomethingValue].map((sparkId, index) => (
-               <SuspenseWithBoundary
-                  key={`most-suspense-${sparkId}-${index}`}
-                  fallback="Loading..."
-               >
+         {most[selectMostSomethingValue]?.length === 0 ? (
+            <EmptyDataCheckerForMostSomething />
+         ) : (
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+               {most[selectMostSomethingValue].map((sparkId, index) => (
                   <SparksStaticCard
                      key={`most-${selectMostSomethingValue}-${sparkId}-${index}`}
                      sparkId={sparkId}
                   />
-               </SuspenseWithBoundary>
-            ))}
-         </Stack>
+               ))}
+            </Stack>
+         )}
       </GroupSparkAnalyticsCardContainer>
    )
 }
