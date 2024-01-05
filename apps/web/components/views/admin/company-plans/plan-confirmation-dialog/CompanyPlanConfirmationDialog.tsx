@@ -1,18 +1,16 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import SteppedDialog, {
    View,
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import React, { createContext, useCallback, useMemo } from "react"
-import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import SelectPlanView from "./SelectPlanView"
 import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
 import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
 import SuccessView from "./SuccessView"
-import { groupPlanService } from "data/firebase/GroupPlanService"
+import { useStartPlanMutation } from "./useStartPlanMutation"
 
 type Props = {
    open: boolean
@@ -66,14 +64,6 @@ const PlanConfirmationDialogContext =
       updatedGroupPlanType: undefined,
    })
 
-const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
-   _,
-   { arg }
-) => {
-   await groupPlanService.startPlan(arg)
-   return arg.planType // We return the new plan type so that we can display it in the success view
-}
-
 const CompanyPlanConfirmationDialog = ({
    handleClose,
    open,
@@ -81,15 +71,9 @@ const CompanyPlanConfirmationDialog = ({
 }: Props) => {
    const initialStep = getInitialStep(groupToManage)
 
-   const { errorNotification } = useSnackbarNotifications()
-
-   const {
-      trigger,
-      isMutating,
-      data: updatedGroupPlanType,
-   } = useSWRMutation(`startPlan-${groupToManage.id}`, fetcher, {
-      onError: errorNotification,
-   })
+   const { trigger, isMutating, updatedGroupPlanType } = useStartPlanMutation(
+      groupToManage.id
+   )
 
    const startPlan = useCallback(
       async (planType: GroupPlanType) => {

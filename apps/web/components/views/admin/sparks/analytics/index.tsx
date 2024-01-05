@@ -2,10 +2,11 @@ import React, { useState } from "react"
 import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
+import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
+import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
-import { LockedSparkAnalytics } from "./components/LockedSparkAnalytics"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useAuth } from "HOCs/AuthProvider"
 
@@ -91,7 +92,7 @@ const GroupSparkAnalytics = () => {
    ]
 
    if (shoulLockAnalytics) {
-      return <LockedSparkAnalytics />
+      return <LockedSparksAnalytics />
    }
 
    return (
