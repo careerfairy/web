@@ -326,12 +326,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                     fallback={children}
                                  >
                                     {events.map((event, index, arr) => (
-                                       <Box
-                                          sx={styles.slide}
-                                          key={"events-box-" + index}
-                                       >
+                                       <Box sx={styles.slide} key={event.id}>
                                           <EventPreviewCard
-                                             key={"event-preview-card-" + index}
+                                             key={event.id}
                                              loading={
                                                 (loading &&
                                                    !cardsLoaded[index] &&
