@@ -74,7 +74,7 @@ const EventPreviewCardChipLabels = ({
             key={"booked-chip"}
             icon={<TaskAltOutlinedIcon color="success" />}
             color="info"
-            label={"Registered"}
+            label={REGISTERED_LABEL}
          />
       )
    }
@@ -143,4 +143,5 @@ const EventPreviewCardChipLabels = ({
    ) : null
 }
 
+export const REGISTERED_LABEL = "Registered"
 export default EventPreviewCardChipLabels
