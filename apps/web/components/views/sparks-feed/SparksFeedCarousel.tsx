@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 // import { Collapse } from "@mui/material"
 import Box, { BoxProps } from "@mui/material/Box"
@@ -365,11 +365,11 @@ type SlideProps = {
 const Slide: FC<SlideProps> = ({ children, fullScreen, sx, ...props }) => {
    return (
       <Box
-         sx={[
+         sx={combineStyles(
             styles.slide,
             fullScreen && styles.fullScreenSlide,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+            sx
+         )}
          {...props}
       >
          {children}
@@ -414,11 +414,11 @@ const ViewportBox = forwardRef(
       return (
          <Box
             ref={ref}
-            sx={[
+            sx={combineStyles(
                styles.viewport,
                isFullScreen && styles.fullScreenViewport,
-               ...(Array.isArray(sx) ? sx : [sx]),
-            ]}
+               sx
+            )}
             {...props}
          >
             <Box

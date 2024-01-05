@@ -3,7 +3,7 @@ import { DefaultTheme } from "@mui/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import React from "react"
 import ColorizedAvatar from "./ColorizedAvatar"
-import { StylesProps } from "../../../types/commonTypes"
+import { StylesProps, combineStyles } from "../../../types/commonTypes"
 import Link from "./Link"
 import { UserData } from "@careerfairy/shared-lib/users"
 
@@ -46,7 +46,7 @@ const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
 
    return (
       <ColorizedAvatar
-         sx={[
+         sx={combineStyles(
             styles.root,
             size
                ? sizes.includes(size as stringSizes)
@@ -59,8 +59,8 @@ const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
                        } * ${fontMultiplier})`,
                     }
                : undefined,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+            sx
+         )}
          loading={Boolean(!data)}
          firstName={data?.firstName}
          lastName={data?.lastName}

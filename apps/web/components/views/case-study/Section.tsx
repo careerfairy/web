@@ -3,6 +3,7 @@ import Container, { ContainerProps } from "@mui/material/Container"
 import Box from "@mui/material/Box"
 import { SxProps } from "@mui/material"
 import { Theme } from "@mui/material/styles"
+import { combineStyles } from "types/commonTypes"
 
 const styles = {
    root: {
@@ -31,7 +32,7 @@ const Section: FC<SectionProps> = ({
    return (
       <Box
          {...props}
-         sx={[
+         sx={combineStyles(
             styles.root,
             {
                bgcolor: backgroundColor,
@@ -49,14 +50,14 @@ const Section: FC<SectionProps> = ({
                   md: verticalSpacing,
                },
             },
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+            sx
+         )}
          component={"section"}
       >
          <Container sx={styles.container} disableGutters maxWidth={maxWidth}>
             {children}
          </Container>
-         {backgroundImages && (
+         {Boolean(backgroundImages) && (
             <Box sx={styles.imagesWrapper}>{backgroundImages}</Box>
          )}
       </Box>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react"
 import useDragging from "./useDragging"
 import { acceptedExt, checkType, getFileSizeMB } from "./utils"
 import { Box } from "@mui/material"
-import { sxStyles } from "../../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../../types/commonTypes"
 import { SxProps } from "@mui/system"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 
@@ -196,7 +196,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
    return (
       <Box
          component="label"
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+         sx={combineStyles(styles.root, sx)}
          className={classes}
          ref={labelRef}
          htmlFor={name}

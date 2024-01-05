@@ -1,5 +1,5 @@
 import { Box, Grid, Skeleton, Stack, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../../../../../types/commonTypes"
 import { alpha, SxProps } from "@mui/material/styles"
 import LinearProgress, {
    linearProgressClasses,
@@ -105,10 +105,7 @@ export const CardVotes = ({
       <Grid sx={cardVotesStyles.gridItem} item xs={12} md={6} lg={4}>
          <Stack
             spacing={1}
-            sx={[
-               cardVotesStyles.entryRoot,
-               ...(Array.isArray(sxRoot) ? sxRoot : [sxRoot]),
-            ]}
+            sx={combineStyles(cardVotesStyles.entryRoot, sxRoot)}
          >
             <Typography variant="body2">{totalVotes} votes</Typography>
             <Typography variant="h6" fontWeight={600}>
@@ -143,12 +140,7 @@ export const CardVotesOption = ({
             alignItems="center"
             sx={cardVotesStyles.optionDetails}
          >
-            <Box
-               sx={[
-                  cardVotesStyles.count,
-                  ...(Array.isArray(sxText) ? sxText : [sxText]),
-               ]}
-            >
+            <Box sx={combineStyles(cardVotesStyles.count, sxText)}>
                <Typography variant="body2" fontWeight={600}>
                   {count ?? 0}
                </Typography>
@@ -158,10 +150,7 @@ export const CardVotesOption = ({
             </Typography>
          </Stack>
          <LinearProgress
-            sx={[
-               cardVotesStyles.optionProgress,
-               ...(Array.isArray(sxProgress) ? sxProgress : [sxProgress]),
-            ]}
+            sx={combineStyles(cardVotesStyles.optionProgress, sxProgress)}
             variant="determinate"
             value={count ? (count / total) * 100 : 0}
          />

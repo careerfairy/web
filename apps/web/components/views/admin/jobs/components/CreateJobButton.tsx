@@ -1,6 +1,6 @@
 import { Button, ButtonProps } from "@mui/material"
 import { FC, useCallback } from "react"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "../../../../../store/reducers/adminJobsReducer"
 import { PlusCircle } from "react-feather"
@@ -22,7 +22,7 @@ const CreateJobButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
       <Button
          onClick={handleCreateJob}
          color="secondary"
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+         sx={combineStyles(styles.root, sx)}
          variant="contained"
          startIcon={<PlusCircle />}
          {...props}
