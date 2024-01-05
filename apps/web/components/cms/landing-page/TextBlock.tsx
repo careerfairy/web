@@ -28,11 +28,11 @@ const TextBlock = ({ textBlockTitle, content }: HygraphResponseTextBlock) => {
          <Box sx={styles.title}>
             <ThemedRichTextRenderer rawContent={textBlockTitle.raw} />
          </Box>
-         {content && (
+         {content ? (
             <Box sx={styles.content}>
                <ThemedRichTextRenderer rawContent={content.raw} />
             </Box>
-         )}
+         ) : null}
       </Box>
    )
 }

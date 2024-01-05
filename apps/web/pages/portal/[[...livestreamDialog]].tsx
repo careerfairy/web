@@ -37,7 +37,6 @@ import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { EmblaOptionsType } from "embla-carousel-react"
 
 const PortalPage = ({
    comingUpNextEvents,

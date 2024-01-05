@@ -1,4 +1,4 @@
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useMemo, useState } from "react"
 import { useMountedState } from "react-use"
@@ -9,9 +9,14 @@ import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamC
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { EmblaOptionsType } from "embla-carousel-react"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
+import StayUpToDateBanner from "./StayUpToDateBanner"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+
+const slideSpacing = 21
+const desktopSlideWidth = 322 + slideSpacing
+const mobileSlideWidth = 289 + slideSpacing
 const styles = sxStyles({
    root: {
       position: "relative",
@@ -40,6 +45,24 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
+   slide: {
+      flex: {
+         xs: `0 0 ${mobileSlideWidth}px`,
+         md: `0 0 ${desktopSlideWidth}px`,
+      },
+      minWidth: 0,
+      position: "relative",
+      height: {
+         xs: 405,
+         md: 375,
+      },
+      "&:not(:first-child)": {
+         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+      "&:first-child": {
+         marginLeft: 1,
+      },
+   },
 })
 
 const EventSection = () => {
@@ -54,8 +77,7 @@ const EventSection = () => {
    const isMounted = useMountedState()
    const isMobile = useIsMobile()
 
-   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
-      useDialogStateHandler()
+   const [isDialogOpen, handleCloseDialog] = useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
    const upcomingEventsDescription = useMemo(() => {
       if (editMode) {
@@ -70,30 +92,53 @@ const EventSection = () => {
       return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
    }, [editMode, group.universityName])
 
+   const stayUpToDateBanner = (
+      <>
+         <Typography
+            variant="h6"
+            fontWeight={"400"}
+            color="textSecondary"
+            // mb={2}
+         >
+            Watch live streams. Discover new career ideas, interesting jobs,
+            internships and programmes for students. Get hired.
+         </Typography>
+         <StayUpToDateBanner />
+      </>
+   )
    return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <Stack spacing={1}>
-            <EventsPreviewCarousel
-               title="Next Live Streams"
-               events={upcomingLivestreams ?? []}
-               eventDescription={upcomingEventsDescription}
-               type={EventsTypes.comingUp}
-               seeMoreLink={`/next-livestreams?${query}`}
-               styling={{
-                  compact: isMobile,
-                  seeMoreSx: {
-                     textDecoration: "underline",
-                     color: "#2ABAA5",
-                  },
-                  showArrows: isMobile,
-               }}
-            />
-
-            {Boolean(pastLivestreams?.length) ? (
+         <Stack spacing={4}>
+            <ConditionalWrapper
+               fallback={stayUpToDateBanner}
+               condition={
+                  upcomingLivestreams !== undefined &&
+                  upcomingLivestreams.length > 0
+               }
+            >
+               <EventsPreviewCarousel
+                  title="Next Live Streams"
+                  events={upcomingLivestreams ?? []}
+                  eventDescription={upcomingEventsDescription}
+                  type={EventsTypes.comingUp}
+                  seeMoreLink={`/next-livestreams?${query}`}
+                  styling={{
+                     compact: isMobile,
+                     seeMoreSx: {
+                        textDecoration: "underline",
+                        color: "#2ABAA5",
+                     },
+                     showArrows: isMobile,
+                     headerAsLink: isMobile,
+                     slide: styles.slide,
+                  }}
+               />
+            </ConditionalWrapper>
+            <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
                   title="Past Live Streams"
                   events={pastLivestreams ?? []}
@@ -107,11 +152,11 @@ const EventSection = () => {
                         color: "#2ABAA5",
                      },
                      showArrows: isMobile,
+                     headerAsLink: isMobile,
+                     slide: styles.slide,
                   }}
                />
-            ) : (
-               <></>
-            )}
+            </ConditionalWrapper>
          </Stack>
          {isDialogOpen ? (
             <StreamCreationProvider>

@@ -26,7 +26,7 @@ test.describe("Livestream Registration Signed In", () => {
       const livestreamCard = page
          .getByTestId(`livestream-card-${livestream.id}`)
          .first()
-      await expect(livestreamCard.getByText("Registered")).toBeVisible()
+      await expect(livestreamCard.getByText("'Registered'")).toBeVisible()
       await expect(livestreamCard.getByText(livestream.title)).toBeVisible()
 
       // confirm the userLivestreamData was created
