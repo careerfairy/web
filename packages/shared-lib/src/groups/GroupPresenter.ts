@@ -3,6 +3,7 @@ import {
    GroupOption,
    GroupPhoto,
    GroupPlan,
+   GroupPlanTypes,
    GroupQuestion,
    GroupVideo,
    Testimonial,
@@ -343,7 +344,7 @@ export class GroupPresenter {
    }
 
    isTrialPlan() {
-      return this.plan?.type === "trial"
+      return this.plan?.type === GroupPlanTypes.Trial
    }
 
    /**

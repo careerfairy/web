@@ -2,9 +2,13 @@ import React, { useState } from "react"
 import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
+import { GroupSparkAnalyticsCardContainer } from "./components/GroupSparkAnalyticsCardContainer"
+import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
 import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    root: {
@@ -66,6 +70,9 @@ type TimeFilter = {
 }
 
 const GroupSparkAnalytics = () => {
+   const { groupPresenter } = useGroup()
+   const { userData } = useAuth()
+
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimeFilter["value"]>("30days")
@@ -74,12 +81,19 @@ const GroupSparkAnalytics = () => {
       setTabValue(newValue)
    }
 
+   // CF Admins can see analytics in trial mode
+   const shoulLockAnalytics = groupPresenter.isTrialPlan() && !userData.isAdmin
+
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
       { value: "30days", label: "Past 30 days" },
       { value: "6months", label: "Past 6 months" },
       { value: "1year", label: "Last year" },
    ]
+
+   if (shoulLockAnalytics) {
+      return <LockedSparksAnalytics />
+   }
 
    return (
       <Box sx={styles.root}>
