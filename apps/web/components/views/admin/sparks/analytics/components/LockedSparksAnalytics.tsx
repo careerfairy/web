@@ -83,7 +83,7 @@ const lockedSparkAnalyticsMobileImage =
 
 const metrics = ["Reach", "Engagement", "Audience"]
 
-export const LockedSparkAnalytics = () => {
+export const LockedSparksAnalytics = () => {
    const isMobile = useIsMobile()
 
    const src = isMobile
