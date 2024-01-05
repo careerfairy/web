@@ -9,7 +9,7 @@ export class PortalPage extends CommonPage {
 
    constructor(page: Page) {
       super(page)
-      this.UpcomingEventsHeader = page.locator(`text=Upcoming live streams`)
+      this.UpcomingEventsHeader = page.locator(`text='Upcoming live streams'`)
       this.NextEventsHeader = page.locator(`text=My registrations`)
       this.cookieAcceptButton = page.locator("id=rcc-confirm-button")
       this.skipVideoButton = this.page.getByRole("button", {
