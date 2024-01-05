@@ -15,7 +15,12 @@ export const firebaseConfig = {
    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
 }
-console.log("WG-TBD-ENV-FIREBASE_INSTANCE: " + JSON.stringify(process.env))
+const APP_ENV = process.env.APP_ENV
+console.log("🚀 ~ file: FirebaseInstance.ts:19 ~ APP_ENV:", APP_ENV)
+console.log(
+   "🚀 ~ file: FirebaseInstance.ts:18 ~ firebaseConfig:",
+   firebaseConfig
+)
 export const region = "europe-west1"
 
 /**
@@ -33,7 +38,9 @@ export const createFirebaseInstance = (
       return existingApp
    }
 
+   console.log("🚀 Creating new firebase instance:", name)
    const app = firebase.initializeApp(firebaseConfig, name)
+   console.log("🚀 App initialized:", app.name)
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 

@@ -1,8 +1,7 @@
 import { shouldUseEmulators } from "../../util/CommonUtil"
 
 // Project: Production
-let appID = process.env.AGORA_APP_ID
-console.log("WG-TBD-ENV-AGORA_INSTANCE: " + JSON.stringify(process.env))
+let appID = process.env.NEXT_PUBLIC_AGORA_APP_ID
 if (shouldUseEmulators()) {
    // Project: CareerFairyStreaming
 
