@@ -12,6 +12,13 @@ import {
    EmptyDataCheckerForPieChart,
 } from "./EmptyDataCheckers"
 
+const updateRelativePercentage = (data, maxValue) => {
+   return data.map((item) => ({
+      ...item,
+      relativePercentage: (item.value / maxValue) * 100,
+   }))
+}
+
 type SparksAudienceTabProps = {
    timeFilter: TimePeriodParams
 }
@@ -21,6 +28,33 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]
 
+   /*
+    * The calculations below scale the bars' values relative to the maximum
+    * absolute value of the dataset. This creates a better user experience
+    * by giving the impression that the bars are larger. Using raw percentages
+    * would make the bars appear consistently small.
+    *
+    * @valueIllusionMargin ensures that the first bar (i.e. maximum absolute value)
+    * does not occupy the entire space, preventing it from being 100%.
+    */
+   const valueIllusionMargin = 1.075
+
+   const maxCountryValue =
+      Math.max(...topCountries.map((country) => country.value)) *
+      valueIllusionMargin
+   const maxUniversityValue =
+      Math.max(...topUniversities.map((university) => university.value)) *
+      valueIllusionMargin
+
+   const updatedTopCountries = updateRelativePercentage(
+      topCountries,
+      maxCountryValue
+   )
+   const updatedTopUniversities = updateRelativePercentage(
+      topUniversities,
+      maxUniversityValue
+   )
+
    return (
       <Grid container spacing={5} marginBottom={10} alignItems="stretch">
          <Grid item xs={12} md={6}>
@@ -29,7 +63,10 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                   Top 10 countries
                </GroupSparkAnalyticsCardContainerTitle>
                <EmptyDataCheckerForBulletChart>
-                  <BulletChart data={topCountries} />
+                  <BulletChart
+                     data={updatedTopCountries}
+                     valueIndexer="relativePercentage"
+                  />
                </EmptyDataCheckerForBulletChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
@@ -39,7 +76,10 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                   Top 10 universities
                </GroupSparkAnalyticsCardContainerTitle>
                <EmptyDataCheckerForBulletChart>
-                  <BulletChart data={topUniversities} />
+                  <BulletChart
+                     data={updatedTopUniversities}
+                     valueIndexer="relativePercentage"
+                  />
                </EmptyDataCheckerForBulletChart>
             </GroupSparkAnalyticsCardContainer>
          </Grid>
