@@ -191,6 +191,14 @@ const styles = sxStyles({
          },
       },
    },
+   startMonth: {
+      textAlign: "center",
+      fontFamily: "Poppins",
+      fontSize: "12px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "20px" /* 166.667% */,
+   },
 })
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
@@ -477,12 +485,15 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                           color={"#2ABAA5"}
                                           fontWeight={600}
                                        >
-                                          {getStartDay}
+                                          {
+                                             getStartDay //TODO-WG: Weight
+                                          }
                                        </Typography>
                                        <Typography
                                           variant={"body1"}
                                           color={"black !important"}
                                           fontWeight={500}
+                                          sx={styles.startMonth}
                                        >
                                           {getStartMonth}
                                        </Typography>
