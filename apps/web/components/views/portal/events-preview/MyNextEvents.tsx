@@ -116,9 +116,9 @@ const MyNextEvents = ({ limit }: Props) => {
          type={EventsTypes.myNext}
          events={events}
          isEmpty={Boolean(!isLoading && !events.length)}
-         title={"My registrations"}
+         title={MY_NEXT_EVENTS_TITLE}
          loading={isLoading}
-         seeMoreLink="/next-livestreams/my-registrations" // TODO: does not make sense when showing the empty message
+         seeMoreLink="/next-livestreams/my-registrations"
          styling={{
             backgroundSx: styles.eventsBackground,
             compact: true,
@@ -168,7 +168,7 @@ const MyNextEvents = ({ limit }: Props) => {
       </EventsPreviewCarousel>
    )
 }
-
+export const MY_NEXT_EVENTS_TITLE = "My registrations"
 interface Props {
    limit?: number
 }
