@@ -105,7 +105,6 @@ export const buildLivestreamObject = (
       questionsDisabled: values.questionsDisabled,
       triGrams: livestreamTriGrams(values.title, values.company),
       denyRecordingAccess: false,
-      customJobs: values.customJobs,
    }
 }
 

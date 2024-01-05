@@ -1,6 +1,6 @@
 import React from "react"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
-import QueryUsersOverview from "../../components/views/admin/queryUsers"
+import QueryUsersOverview from "../../components/views/admin/query-users"
 
 const QueryDataPage = () => {
    return (

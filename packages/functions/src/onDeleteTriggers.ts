@@ -4,7 +4,7 @@ import {
    defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
 import config from "./config"
-import { livestreamsRepo, sparkRepo } from "./api/repositories"
+import { customJobRepo, livestreamsRepo, sparkRepo } from "./api/repositories"
 import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
 
 export const onDeleteLivestreamPopularityEvents = functions
@@ -47,6 +47,27 @@ export const onDeleteUserSparkFeed = functions
 
       sideEffectPromises.push(
          sparkRepo.incrementFeedCount(userEmail, "decrement")
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onDeleteDraft = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("draftLivestreams/{livestreamId}")
+   .onDelete(async (change, context) => {
+      functions.logger.info(context.params)
+
+      const livestreamId = context.params.livestreamId
+
+      functions.logger.info(`Draft ${livestreamId} was deleted`)
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      sideEffectPromises.push(
+         customJobRepo.removeLinkedLivestream(livestreamId)
       )
 
       return handleSideEffects(sideEffectPromises)

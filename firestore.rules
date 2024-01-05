@@ -123,11 +123,6 @@ service cloud.firestore {
                 allow write: if false;
             }
 
-            match /customJobApplications/{jobId} {
-                allow read: if true;
-                allow write: if false;
-            }
-
             match /activities/{id} {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
@@ -215,11 +210,6 @@ service cloud.firestore {
                 allow write: if isCareerCenterAdmin() || isCFAdmin();
             }
 
-            match /customJobs/{jobId} {
-                allow read: if true;
-                allow write: if true;
-            }
-
             match /ats/{integrationId} {
                 allow read, write: if isSignedIn() && (isCareerCenterAdmin() || isCFAdmin());
             }
@@ -265,6 +255,26 @@ service cloud.firestore {
                 }
 
             }
+        }
+
+        match /customJobs/{jobId} {
+            allow read: if true;
+            allow write: if isSignedIn();
+        }
+
+        match /customJobStats/{jobStatsId} {
+            allow read: if true;
+            //TODO is not working as expected: allow write: if allowIncrementField('clicks');
+            allow write: if true;
+        }
+
+        // To create a readable ID and prevent duplicate user applications to the same job,
+        // the applicantId consists of {jobId}_{userId}
+        match /jobApplications/{applicantId} {
+            allow read: if true;
+            // Here, we split the applicantId to call the isSignedInAndIsSameUser function
+            // only with the userId
+            allow write: if isSignedInAndIsSameUser(applicantId.split("_")[1]);
         }
 
         match /sparks/{sparkId} {

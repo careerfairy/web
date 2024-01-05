@@ -2,7 +2,12 @@ import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip"
 import { styled } from "@mui/material/styles"
 
 const BrandedTooltip = styled(({ className, ...props }: TooltipProps) => (
-   <Tooltip {...props} arrow classes={{ popper: className }} />
+   <Tooltip
+      enterTouchDelay={0}
+      {...props}
+      arrow
+      classes={{ popper: className }}
+   />
 ))(({ theme }) => ({
    [`& .${tooltipClasses.arrow}`]: {
       color:

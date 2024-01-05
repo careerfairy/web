@@ -7,6 +7,7 @@ import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -39,10 +40,27 @@ const styles = sxStyles({
    btn: {
       textTransform: "none",
    },
+   infoText: {
+      fontSize: "1.14286rem",
+      letterSpacing: "-0.03121rem",
+      fontWeight: 400,
+   },
+   warningColor: {
+      color: "#FE9B0E",
+   },
+   infoBox: {
+      p: 1,
+      borderRadius: 4,
+      border: "1px solid #FFD79F",
+      bgcolor: "#FAFAFA",
+      maxWidth: 423,
+      mx: "auto",
+   },
 })
 
 const EmptySparksView: FC = () => {
    const dispatch = useDispatch()
+   const { groupPresenter } = useGroup()
 
    const handleOpen = useCallback(() => {
       dispatch(openSparkDialog(null))
@@ -59,16 +77,16 @@ const EmptySparksView: FC = () => {
                </Box>{" "}
                yet.
             </TitleText>
-            <Typography
-               mt={1.5}
-               fontSize="1.14286rem"
-               letterSpacing="-0.03121rem"
-               fontWeight={400}
-            >
+            <Typography mt={1.5} sx={styles.infoText}>
                Getting ready to start with the right content?
                <br /> We collected talent&apos;s most requested questions to
                inspire you
             </Typography>
+            {groupPresenter.isTrialPlan() ? (
+               <Box mt={2.5}>
+                  <TrialPlanCreationPeriodInfo />
+               </Box>
+            ) : null}
             <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
                <GetInspiredButton />
                <Button
@@ -85,6 +103,42 @@ const EmptySparksView: FC = () => {
             </Stack>
          </Box>
       </SparksContainer>
+   )
+}
+
+const TrialPlanCreationPeriodInfo = () => {
+   const { groupPresenter } = useGroup()
+
+   const contentCreationDaysLeft =
+      groupPresenter.getRemainingDaysLeftForContentCreation()
+
+   const planDaysLeft = groupPresenter.getPlanDaysLeft()
+
+   const creationPeriodExpired = contentCreationDaysLeft === 0 // 0 means expired, see method
+
+   if (creationPeriodExpired) {
+      return (
+         <Box sx={styles.infoBox}>
+            <Typography sx={styles.infoText}>
+               Your content creation period has ended; however, you still have
+               time. Upload your Sparks and make the most of the remaining{" "}
+               <Box sx={styles.warningColor} component="span">
+                  {planDaysLeft} days left
+               </Box>{" "}
+               of your trial.
+            </Typography>
+         </Box>
+      )
+   }
+
+   return (
+      <Typography sx={styles.infoText}>
+         Your content creation period ends in{" "}
+         <Box sx={styles.warningColor} component="span">
+            {contentCreationDaysLeft} days left
+         </Box>
+         .
+      </Typography>
    )
 }
 

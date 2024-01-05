@@ -9,6 +9,7 @@ import {
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    tooltip: {
@@ -46,15 +47,17 @@ const SparksCounter: FC<Props> = ({
    publicSparks,
    maxPublicSparks,
 }) => {
+   const { groupPresenter } = useGroup()
+   const isTrialPlan = groupPresenter.isTrialPlan()
+
+   const tooltipMessage = getTooltipMessage(
+      isTrialPlan,
+      isCriticalState,
+      maxPublicSparks
+   )
+
    return (
-      <BrandedTooltip
-         title={
-            isCriticalState
-               ? renderCriticalMessage()
-               : renderDefaultMessage(maxPublicSparks)
-         }
-         sx={styles.tooltip}
-      >
+      <BrandedTooltip title={tooltipMessage} sx={styles.tooltip}>
          <Box alignSelf={"center"}>
             <Typography variant={"body1"} sx={styles.progressCount}>
                {publicSparks.length}/{maxPublicSparks} Spark slots
@@ -97,5 +100,29 @@ const renderDefaultMessage = (maxPublicSparks: number) => (
       </Typography>
    </Box>
 )
+
+const renderTrialMessage = (maxPublicSparks: number) => (
+   <Box>
+      <Typography variant={"body1"} fontSize={16}>
+         {`You can publish a maximum of ${maxPublicSparks} Sparks as part of the trial.`}
+      </Typography>
+   </Box>
+)
+
+const getTooltipMessage = (
+   isTrialPlan: boolean,
+   isCriticalState: boolean,
+   maxPublicSparks: number
+) => {
+   if (isTrialPlan) {
+      return renderTrialMessage(maxPublicSparks)
+   }
+
+   if (isCriticalState) {
+      return renderCriticalMessage()
+   }
+
+   return renderDefaultMessage(maxPublicSparks)
+}
 
 export default SparksCounter

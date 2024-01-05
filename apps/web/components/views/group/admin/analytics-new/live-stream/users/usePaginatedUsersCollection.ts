@@ -23,16 +23,16 @@ export type Filters = {
 }
 const usePaginatedUsersCollection = (
    targetCollectionRef: CollectionReference | Query,
-   documentPaths: DocumentPaths,
+   documentPaths: Partial<DocumentPaths>,
    limit = 10,
-   filters: Filters
+   filters: Partial<Filters>
 ) => {
    // @ts-ignore we're sorting by a nested field here
    const options: UsePaginatedCollection<unknown> = useMemo(() => {
       const constraints: QueryConstraint[] = []
 
       // If one or more countries are selected, we only want to show users from those countries
-      if (filters.selectedCountryCodes.length) {
+      if (filters?.selectedCountryCodes?.length) {
          constraints.push(
             where(
                documentPaths.userUniversityCountryCode,
@@ -43,7 +43,7 @@ const usePaginatedUsersCollection = (
       }
 
       // If a university is selected, we only want to show users from that university
-      if (filters.selectedUniversity) {
+      if (filters?.selectedUniversity) {
          constraints.push(
             where(
                documentPaths.userUniversityCode,
@@ -54,7 +54,7 @@ const usePaginatedUsersCollection = (
       }
 
       // If a field of study is selected, we only want to show users from that field of study
-      if (filters.selectedFieldOfStudy) {
+      if (filters?.selectedFieldOfStudy) {
          constraints.push(
             where(
                documentPaths.userFieldOfStudyId,
@@ -65,7 +65,7 @@ const usePaginatedUsersCollection = (
       }
 
       // If a level of study is selected, we only want to show users from that level of study
-      if (filters.selectedLevelOfStudy) {
+      if (filters?.selectedLevelOfStudy) {
          constraints.push(
             where(
                documentPaths.userLevelOfStudyId,

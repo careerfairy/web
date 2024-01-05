@@ -32,7 +32,7 @@ import {
    currentSparkIdSelector,
    selectedSparkCategoriesSelector,
 } from "store/selectors/sparksFeedSelectors"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/analytics"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import Link from "../common/Link"
 import {

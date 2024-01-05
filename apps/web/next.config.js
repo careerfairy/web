@@ -315,6 +315,8 @@ const moduleExports = {
    eslint: {
       ignoreDuringBuilds: true,
    },
+   // this is an open issue on MUI's GitHub: https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
+   transpilePackages: ["@mui/x-charts"],
 }
 
 // test or development environment

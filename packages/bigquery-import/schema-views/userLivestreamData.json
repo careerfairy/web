@@ -33,6 +33,10 @@
             {
                "name": "isRecommended",
                "type": "boolean"
+            },
+            {
+               "name": "sparkId",
+               "type": "string"
             }
          ],
          "name": "registered",

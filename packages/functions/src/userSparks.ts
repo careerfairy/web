@@ -16,7 +16,7 @@ import {
    SparkSecondWatched,
    SparkEventClient,
    SparkSecondsWatchedClientPayload,
-} from "@careerfairy/shared-lib/sparks/analytics"
+} from "@careerfairy/shared-lib/sparks/telemetry"
 import { getCountryCode } from "./util"
 
 export const getSparksFeed = functions.region(config.region).https.onCall(

@@ -48,8 +48,10 @@ import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
 import userSparks = require("./userSparks")
+import sparksAnalytics = require("./sparksAnalytics")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
+import groupPlans = require("./groupPlans")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -215,6 +217,7 @@ exports.onCreateSparkStats = onCreateTriggers.onCreateSparkStats
 exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
+exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
 exports.createSpark_v3 = groupSparks.createSpark
@@ -236,6 +239,14 @@ exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
 // Spark Analytics Functions
 exports.trackSparkEvents_v3 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
+exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
-exports.userApplyToCustomJob = customJobs.userApplyToCustomJob
+exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob
+exports.updateCustomJobWithLinkedLivestreams =
+   customJobs.updateCustomJobWithLinkedLivestreams
+exports.transferCustomJobsFromDraftToPublishedLivestream =
+   customJobs.transferCustomJobsFromDraftToPublishedLivestream
+
+// Group Subscription Plan Functions
+exports.startPlan = groupPlans.startPlan

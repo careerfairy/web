@@ -161,6 +161,10 @@
       {
          "name": "universities",
          "type": "stringified_map"
+      },
+      {
+         "name": "reasonsToJoinLivestream",
+         "type": "string"
       }
    ]
 }

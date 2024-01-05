@@ -1,20 +1,66 @@
 import {
+   Box,
    FilledInputProps,
    InputLabelProps,
    SelectProps,
+   Typography,
    lighten,
 } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
 import { useField } from "formik"
-import { FC } from "react"
+import { FC, ReactElement } from "react"
+import BrandedTooltip from "../tooltips/BrandedTooltip"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
 
-export type BrandedTextFieldProps = Omit<FilledTextFieldProps, "variant">
+export interface CustomBrandedTextFieldProps {
+   /**
+    * Text to be shown when an input is required.
+    * This property is used instead of required to prevent the default * from showing
+    * when the Component has required=true
+    */
+   requiredText?: String
+   /**
+    * Text for the additional tooltip, empty if not provided
+    */
+   tooltipText?: String
+}
 
+export type BrandedTextFieldProps = Omit<
+   FilledTextFieldProps & CustomBrandedTextFieldProps,
+   "variant"
+>
+
+function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
+   return (
+      <BrandedTooltip title={title}>
+         <InfoIcon color="secondary" />
+      </BrandedTooltip>
+   )
+}
 const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    <TextField
       variant="filled"
       {...props}
+      label={
+         <Typography>
+            <Box
+               component="span"
+               display="flex"
+               alignItems="center center"
+               columnGap={1}
+               rowGap={0}
+            >
+               <span> {props.label} </span>
+               {props.requiredText ? <span>{props.requiredText}</span> : null}
+               {props.tooltipText ? (
+                  <span className="branded-tooltip">
+                     {getBrandedTooltip(props.tooltipText)}
+                  </span>
+               ) : null}
+            </Box>
+         </Typography>
+      }
       InputProps={Object.assign({}, inputProps, props.InputProps)}
       InputLabelProps={Object.assign(
          {},
@@ -27,6 +73,13 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
+   },
+   "& label span": {
+      fontWeight: 500,
+      color: "#6F6F80",
+      "&:hover": {
+         cursor: "pointer",
+      },
    },
    "& label.Mui-focused": {
       color: "#9999B1",
