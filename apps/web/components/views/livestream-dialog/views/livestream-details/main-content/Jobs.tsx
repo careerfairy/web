@@ -86,8 +86,9 @@ const JobsComponent: FC<Props> = ({ presenter }) => {
    })
 
    useEffect(() => {
+      // fo bar
       const foo = livestreamCustomJobs
-   }, [])
+   }, [livestreamCustomJobs])
 
    let jobsToPresent: (LivestreamJobAssociation | CustomJob)[]
 
