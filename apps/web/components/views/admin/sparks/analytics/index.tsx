@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, Tab, Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
@@ -80,6 +80,10 @@ const GroupSparkAnalytics = () => {
    const handleTabChange = (event, newValue) => {
       setTabValue(newValue)
    }
+
+   useEffect(() => {
+      const foo = groupPresenter
+   }, [groupPresenter])
 
    // CF Admins can see analytics in trial mode
    const shoulLockAnalytics = groupPresenter.isTrialPlan() && !userData.isAdmin
