@@ -192,7 +192,7 @@ const CompanyPageOverview = ({
             <Container disableGutters maxWidth="lg">
                <Grid container spacing={4}>
                   <Grid item xs={12} md={6}>
-                     <Stack px={3} spacing={{ xs: 4, md: 5 }}>
+                     <Stack px={3} spacing={{ xs: 2, md: 5 }}>
                         <AboutSection />
                         {group.publicSparks ? (
                            <SparksSection key={group.id} groupId={group.id} />

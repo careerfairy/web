@@ -13,7 +13,26 @@ const config = {
    initialData: [],
 }
 
+const slideSpacing = 21
+const desktopSlideWidth = 322 + slideSpacing
+const mobileSlideWidth = 302 + slideSpacing
+
 const styles = sxStyles({
+   slide: {
+      flex: {
+         xs: `0 0 ${mobileSlideWidth}px`,
+         md: `0 0 ${desktopSlideWidth}px`,
+      },
+      minWidth: 0,
+      position: "relative",
+      height: {
+         xs: 355,
+         md: 355,
+      },
+      "&:not(:first-child)": {
+         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+   },
    eventsBackground: {
       background: "black",
    },
@@ -121,15 +140,6 @@ const MyNextEvents = ({ limit }: Props) => {
          title={MY_NEXT_EVENTS_TITLE}
          loading={isLoading}
          seeMoreLink="/next-livestreams/my-registrations"
-         styling={{
-            backgroundSx: styles.eventsBackground,
-            compact: true,
-            seeMoreSx: {
-               textDecoration: "underline",
-            },
-            showArrows: false,
-            padding: true,
-         }}
       >
          <Box sx={styles.cardWrapper}>
             <Box sx={styles.cardWrapperContainerCircle}>
