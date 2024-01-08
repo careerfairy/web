@@ -35,6 +35,9 @@ function TrialModeNotice() {
    const isMobile = useIsMobile()
    const [statusDrawerOpen, handleOpenStatusDrawer, handleCloseStatusDrawer] =
       useDialogStateHandler()
+
+   if (!groupPresenter.isTrialPlan()) return null
+
    return (
       <>
          <Box
