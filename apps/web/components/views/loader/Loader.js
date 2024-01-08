@@ -1,23 +1,24 @@
-import { CircularProgress } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      position: "relative",
+      zIndex: -1, // workaround to fix loading spinner showing on top of other elements
+   },
+
+   progress: {
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+   },
+})
 
 const Loader = () => {
    return (
-      <div className="loading-container">
-         <CircularProgress
-            src="/loader.gif"
-            style={{ position: "fixed", top: "50%", left: "50%" }}
-         />
-         <style jsx>{`
-            .loading-container {
-               position: absolute;
-               top: 0;
-               left: 0;
-               background-color: white;
-               height: 100%;
-               width: 100%;
-            }
-         `}</style>
-      </div>
+      <Box sx={styles.root} className="loading-container">
+         <CircularProgress sx={styles.progress} />
+      </Box>
    )
 }
 
