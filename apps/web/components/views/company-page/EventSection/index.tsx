@@ -56,12 +56,12 @@ const styles = sxStyles({
          xs: 405,
          md: 375,
       },
-      "&:not(:first-child)": {
+      "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
       },
-      "&:first-child": {
-         marginLeft: 1,
-      },
+      // "&:first-of-type": {
+      //    marginLeft: 1,
+      // },
    },
 })
 
