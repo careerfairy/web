@@ -89,7 +89,14 @@
       "vercel": "^31.0.1"
    },
    "lint-staged": {
-      "**/*": "prettier --write --ignore-unknown"
+      "apps/*/src/**/*.{ts,tsx,js,jsx}": [
+         "eslint --max-warnings=0",
+         "prettier --write --ignore-unknown"
+      ],
+      "packages/*/src/**/*.{ts,tsx,js,jsx}": [
+         "eslint --max-warnings=0",
+         "prettier --write --ignore-unknown"
+      ]
    },
    "packageManager": "npm@9.8.1",
    "engines": {

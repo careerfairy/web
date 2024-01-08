@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react"
+import React, { FC, useEffect, useMemo } from "react"
 import Box from "@mui/material/Box"
 import SectionTitle from "./SectionTitle"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -84,6 +84,10 @@ const JobsComponent: FC<Props> = ({ presenter }) => {
    const livestreamCustomJobs = useGroupCustomJobs(presenter.groupIds[0], {
       livestreamId: presenter.id,
    })
+
+   useEffect(() => {
+      const foo = livestreamCustomJobs
+   }, [])
 
    let jobsToPresent: (LivestreamJobAssociation | CustomJob)[]
 
