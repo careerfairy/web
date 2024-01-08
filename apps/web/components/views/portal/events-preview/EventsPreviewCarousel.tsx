@@ -48,6 +48,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
+      pb: 0,
    },
    description: {
       display: "flex",
@@ -64,9 +65,13 @@ const styles = sxStyles({
       textDecoration: "underline",
    },
    eventTitle: {
-      color: "#000000",
-      opacity: 1,
-      fontWeight: "bold",
+      /* Desktop/Heading 5/H5 - SemiBold - Desktop */
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px" /* 150% */,
+      color: "black",
    },
    viewport: {
       overflow: "hidden",
@@ -84,8 +89,8 @@ const styles = sxStyles({
       minWidth: 0,
       position: "relative",
       height: {
-         xs: 405,
-         md: 375,
+         xs: 355,
+         md: 355,
       },
       "&:not(:first-child)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
@@ -140,6 +145,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             headerAsLink: false,
             padding: true,
             slide: styles.slide,
+            title: styles.eventTitle,
+            titleVariant: "h6",
+            eventsHeader: styles.eventsHeader,
          },
       } = props
 
@@ -216,7 +224,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
 
       const seeMoreComponent = (
          <ConditionalWrapper
-            condition={events?.length >= 0 && seeMoreLink !== undefined}
+            condition={events?.length > 1 && seeMoreLink !== undefined}
          >
             <Link href={seeMoreLink}>
                <Typography sx={styling.seeMoreSx} color="grey">
@@ -226,8 +234,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          </ConditionalWrapper>
       )
       const arrowsComponent = (
-         <ConditionalWrapper condition={emblaApi !== undefined}>
-            <Box>
+         <ConditionalWrapper
+            condition={emblaApi !== undefined && events?.length > 1}
+         >
+            <Stack direction={"row"}>
                <IconButton
                   color="inherit"
                   sx={styles.arrowIcon}
@@ -246,7 +256,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                >
                   <ArrowRight fontSize={"large"} />
                </IconButton>
-            </Box>
+            </Stack>
          </ConditionalWrapper>
       )
 
@@ -264,8 +274,18 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </>
          )
       }
-      const getHeading = (headingStyles: SxProps) => {
-         return <Heading sx={headingStyles}>{title}</Heading>
+      const getHeading = (headingStyles: SxProps, variant?: any) => {
+         // return  <Heading variant={variant ? variant : "h6"} sx={headingStyles} >{title}</Heading>
+         return (
+            <Typography
+               variant={variant ? variant : "h6"}
+               sx={headingStyles}
+               fontWeight={"600"}
+               color="black"
+            >
+               {title}
+            </Typography>
+         )
       }
       return (
          <>
@@ -275,20 +295,23 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      <ConditionalWrapper
                         condition={!isEmbedded && styling.compact}
                      >
-                        <Box sx={styles.eventsHeader}>
-                           <Box sx={styles.eventsHeader}>
+                        <Box sx={styling.eventsHeader}>
+                           <Box sx={styling.eventsHeader}>
                               <ConditionalWrapper
                                  condition={
                                     seeMoreLink !== undefined &&
                                     styling.headerAsLink
                                  }
-                                 fallback={getHeading([styles.eventTitle])}
+                                 fallback={getHeading(
+                                    [styling.title],
+                                    styling.titleVariant
+                                 )}
                               >
-                                 <Link href={seeMoreLink}>
-                                    {getHeading([
-                                       styles.eventTitle,
-                                       styles.underlined,
-                                    ])}
+                                 <Link href={seeMoreLink} color="black">
+                                    {getHeading(
+                                       [styling.title, styles.underlined],
+                                       styling.titleVariant
+                                    )}
                                  </Link>
                               </ConditionalWrapper>
                            </Box>
@@ -305,8 +328,19 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      <ConditionalWrapper
                         condition={!isEmbedded && !styling.compact}
                      >
-                        <Box sx={styles.eventsHeader}>
-                           {<Heading sx={styles.eventTitle}>{title}</Heading>}
+                        <Box sx={styling.eventsHeader}>
+                           <Typography
+                              variant={
+                                 styling.titleVariant
+                                    ? styling.titleVariant
+                                    : "h6"
+                              }
+                              sx={styling.title}
+                              fontWeight={"600"}
+                              color="black"
+                           >
+                              {title}
+                           </Typography>
                         </Box>
                      </ConditionalWrapper>
                   }
@@ -347,7 +381,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         <Box
                            id={id}
                            sx={[styles.viewport, styling.viewportSx]}
-                           ref={events.length > 1 ? emblaRef : null}
+                           ref={emblaRef}
                         >
                            <Box sx={[styles.container]}>
                               <ConditionalWrapper
@@ -422,6 +456,9 @@ export type EventsCarouselStyling = {
    headerAsLink?: boolean
    padding?: boolean
    slide?: SxProps
+   title?: SxProps
+   titleVariant?: any
+   eventsHeader?: SxProps
 }
 export type ChildRefType = {
    goNext: () => void

@@ -11,16 +11,9 @@ const WidgetsWrapper: FC<{
       sx={(theme) => ({
          py: { xs: smallPadding, sm: largePadding },
          "& > *:not(:first-of-type)": {
-            py: {
+            pt: {
                xs: smallPadding,
-               sm: largePadding,
-               // borderTop: `0.5px solid ${theme.palette.grey["400"]}`,
-            },
-         },
-         "& > *": {
-            pb: {
-               xs: smallPadding,
-               sm: largePadding,
+               sm: smallPadding,
             },
          },
       })}

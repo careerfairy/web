@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useMemo, useState } from "react"
 import { useMountedState } from "react-use"
@@ -53,15 +53,27 @@ const styles = sxStyles({
       minWidth: 0,
       position: "relative",
       height: {
-         xs: 405,
-         md: 375,
+         xs: 355,
+         md: 355,
       },
       "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
       },
-      // "&:first-of-type": {
-      //    marginLeft: 1,
-      // },
+   },
+   eventTitle: {
+      /* Desktop/Heading 5/H5 - SemiBold - Desktop */
+      fontFamily: "Poppins",
+      fontStyle: "normal",
+      fontWeight: "600",
+      color: "black",
+      lineHeight: "27px" /* 150% */,
+   },
+   eventsHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      pr: 2,
+      pb: 1,
    },
 })
 
@@ -92,20 +104,13 @@ const EventSection = () => {
       return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
    }, [editMode, group.universityName])
 
-   const stayUpToDateBanner = (
-      <>
-         <Typography
-            variant="h6"
-            fontWeight={"400"}
-            color="textSecondary"
-            // mb={2}
-         >
-            Watch live streams. Discover new career ideas, interesting jobs,
-            internships and programmes for students. Get hired.
-         </Typography>
-         <StayUpToDateBanner />
-      </>
-   )
+   const stayUpToDateBanner = (title: String) => {
+      return (
+         <>
+            <StayUpToDateBanner />
+         </>
+      )
+   }
    return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
@@ -113,8 +118,30 @@ const EventSection = () => {
             tabValue={TabValue.livesStreams}
          />
          <Stack spacing={4}>
-            <ConditionalWrapper
-               fallback={stayUpToDateBanner}
+            <EventsPreviewCarousel
+               title="Next Live Streams"
+               events={upcomingLivestreams ?? []}
+               eventDescription={upcomingEventsDescription}
+               type={EventsTypes.comingUp}
+               seeMoreLink={`/next-livestreams?${query}`}
+               styling={{
+                  compact: isMobile,
+                  seeMoreSx: {
+                     textDecoration: "underline",
+                     color: "#2ABAA5",
+                  },
+                  showArrows: isMobile,
+                  headerAsLink: isMobile,
+                  slide: styles.slide,
+                  title: styles.eventTitle,
+                  titleVariant: "h4",
+                  eventsHeader: styles.eventsHeader,
+               }}
+            >
+               {stayUpToDateBanner("Next Live Streams")}
+            </EventsPreviewCarousel>
+            {/* <ConditionalWrapper
+               fallback={stayUpToDateBanner("Next Live Streams")}
                condition={
                   upcomingLivestreams !== undefined &&
                   upcomingLivestreams.length > 0
@@ -137,7 +164,7 @@ const EventSection = () => {
                      slide: styles.slide,
                   }}
                />
-            </ConditionalWrapper>
+            </ConditionalWrapper> */}
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
                   title="Past Live Streams"
@@ -154,6 +181,9 @@ const EventSection = () => {
                      showArrows: isMobile,
                      headerAsLink: isMobile,
                      slide: styles.slide,
+                     title: styles.eventTitle,
+                     titleVariant: "h4",
+                     eventsHeader: styles.eventsHeader,
                   }}
                />
             </ConditionalWrapper>
