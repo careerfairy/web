@@ -1,7 +1,7 @@
 import { Box, Chip, Stack, Typography } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
-import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined"
+import { Briefcase, CheckCircle } from "react-feather"
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -71,9 +71,10 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"booked-chip"}
-            icon={<TaskAltOutlinedIcon color="success" />}
+            icon={<CheckCircle color="#00D247" width={18} height={18} />}
+            sx={{ pl: 1, pr: 2, alignItems: "center" }}
             color="info"
-            label={REGISTERED_LABEL}
+            label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
          />
       )
    }
@@ -82,10 +83,10 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"hiring-now-chip"}
-            icon={<BusinessCenterOutlinedIcon color="secondary" />}
-            sx={{ pr: 1 }}
+            icon={<Briefcase color={"#3A70E2"} width={18} height={18} />}
+            sx={{ pl: 1, pr: 2, alignItems: "center" }}
             color={"info"}
-            label={"Hiring now"}
+            label={<Typography fontWeight={400}>Hiring now</Typography>}
          />
       )
    }

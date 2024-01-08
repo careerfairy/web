@@ -485,9 +485,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                           color={"#2ABAA5"}
                                           fontWeight={600}
                                        >
-                                          {
-                                             getStartDay //TODO-WG: Weight
-                                          }
+                                          {getStartDay}
                                        </Typography>
                                        <Typography
                                           variant={"body1"}
@@ -514,7 +512,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                  className="hidePastDateOnHover"
                                  sx={{
                                     display: "flex",
-                                    mb: 1,
+                                    marginY: 1,
                                     justifyContent: "space-between",
                                  }}
                               >
