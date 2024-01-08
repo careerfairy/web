@@ -4,7 +4,7 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       position: "relative",
-      zIndex: -1,
+      zIndex: -1, // workaround to fix loading spinner showing on top of other elements
    },
 
    progress: {
