@@ -226,26 +226,28 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          </ConditionalWrapper>
       )
       const arrowsComponent = (
-         <Box>
-            <IconButton
-               color="inherit"
-               sx={styles.arrowIcon}
-               onClick={() => {
-                  if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
-               }}
-            >
-               <ArrowLeft fontSize={"large"} />
-            </IconButton>
-            <IconButton
-               color="inherit"
-               sx={styles.arrowIcon}
-               onClick={() => {
-                  if (emblaApi.canScrollNext()) emblaApi.scrollNext()
-               }}
-            >
-               <ArrowRight fontSize={"large"} />
-            </IconButton>
-         </Box>
+         <ConditionalWrapper condition={emblaApi !== undefined}>
+            <Box>
+               <IconButton
+                  color="inherit"
+                  sx={styles.arrowIcon}
+                  onClick={() => {
+                     if (emblaApi.canScrollPrev()) emblaApi.scrollPrev()
+                  }}
+               >
+                  <ArrowLeft fontSize={"large"} />
+               </IconButton>
+               <IconButton
+                  color="inherit"
+                  sx={styles.arrowIcon}
+                  onClick={() => {
+                     if (emblaApi.canScrollNext()) emblaApi.scrollNext()
+                  }}
+               >
+                  <ArrowRight fontSize={"large"} />
+               </IconButton>
+            </Box>
+         </ConditionalWrapper>
       )
 
       const getLoadingCard = () => {
