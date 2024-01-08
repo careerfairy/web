@@ -89,11 +89,7 @@
       "vercel": "^31.0.1"
    },
    "lint-staged": {
-      "apps/*/src/**/*.{ts,tsx,js,jsx}": [
-         "eslint --max-warnings=0",
-         "prettier --write --ignore-unknown"
-      ],
-      "packages/*/src/**/*.{ts,tsx,js,jsx}": [
+      "**/*.{js,jsx,ts,tsx}": [
          "eslint --max-warnings=0",
          "prettier --write --ignore-unknown"
       ]
