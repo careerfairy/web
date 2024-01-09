@@ -51,6 +51,7 @@ const EventPreviewCardChipLabels = ({
             icon={<CheckIcon />}
             color="primary"
             label={"Attended"}
+            sx={{ boxShadow: "0 0 5px #000" }}
          />
       )
    }
@@ -62,7 +63,13 @@ const EventPreviewCardChipLabels = ({
             icon={<LiveIcon />}
             color="error"
             label={"Live"}
-            sx={{ width: { xs: "fit-content", md: "auto" } }}
+            sx={{
+               width: {
+                  xs: "fit-content",
+                  md: "auto",
+                  boxShadow: "0 0 5px #000",
+               },
+            }}
          />
       )
    }
@@ -77,6 +84,7 @@ const EventPreviewCardChipLabels = ({
                pr: 0,
                alignItems: "center",
                width: { xs: "fit-content", md: "auto" },
+               boxShadow: "0 0 5px #000",
             }}
             color="info"
             label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
@@ -94,6 +102,8 @@ const EventPreviewCardChipLabels = ({
                pr: 0,
                alignItems: "center",
                width: { xs: "fit-content", md: "auto" },
+               boxShadow: "0 0 5px #000",
+               // border: "1px solid darkgrey" // TODO-WG: Check if not preferrable over blurred background
             }}
             color={"info"}
             label={<Typography fontWeight={400}>Hiring now</Typography>}
@@ -123,7 +133,7 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"available-chip"}
-            sx={{ pr: 0 }}
+            sx={{ pr: 0, boxShadow: "0 0 5px #000" }}
             color={"info"}
             icon={
                <TaskAltOutlinedIcon

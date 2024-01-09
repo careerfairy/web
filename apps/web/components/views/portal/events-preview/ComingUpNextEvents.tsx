@@ -133,6 +133,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       query,
       config
    )
+   if (isLoggedIn) defaultStyling.mainWrapperBoxSx.mt = 0
 
    useEffect(() => {
       if (livestreamId) {
