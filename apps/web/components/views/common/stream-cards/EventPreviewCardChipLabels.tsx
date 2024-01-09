@@ -72,7 +72,7 @@ const EventPreviewCardChipLabels = ({
          <Chip
             key={"booked-chip"}
             icon={<CheckCircle color="#00D247" width={18} height={18} />}
-            sx={{ pl: 1, pr: 2, alignItems: "center" }}
+            sx={{ pl: 1, pr: 0, alignItems: "center" }}
             color="info"
             label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
          />

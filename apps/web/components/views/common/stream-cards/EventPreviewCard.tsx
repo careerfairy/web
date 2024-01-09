@@ -109,8 +109,6 @@ const styles = sxStyles({
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
-      // marginBottom: 2,
-      // marginTop: 0
    },
    mainContentWrapper: {
       position: "relative",
@@ -443,7 +441,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               hasParticipated={hasParticipated}
                               isPast={isPast}
                               isLive={isLive}
-                              hasRegistered={hasRegistered || false}
+                              hasRegistered={hasRegistered}
                               hasJobToApply={hasJobsToApply}
                               recordingAvailableDays={getRecordingAvailableDays}
                            />
