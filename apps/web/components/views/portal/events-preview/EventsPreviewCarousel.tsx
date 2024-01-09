@@ -46,7 +46,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0.5,
+      pb: 0,
    },
    description: {
       display: "flex",
@@ -86,8 +86,8 @@ const styles = sxStyles({
       minWidth: 0,
       position: "relative",
       height: {
-         xs: 355,
-         md: 355,
+         xs: 363,
+         md: 363,
       },
       "&:not(:first-child)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
