@@ -38,6 +38,8 @@ async function run(): Promise<void> {
    await createUser("habib@careerfairy.io", true)
    await createUser("maximilian@careerfairy.io")
    await createUser("goncalo@careerfairy.io")
+   await createUser("walter@careerfairy.io")
+   await createUser("matilde.ramos@careerfairy.io")
 
    emulatorsProcess.on("exit", () => {
       h1Text(

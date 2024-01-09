@@ -60,6 +60,11 @@ function createCustomJobStatsInCollection(
    bulkWriter: BulkWriter,
    counter: Counter
 ) {
+   const filteredApplicants =
+      customJob.applicants?.filter(
+         (applicantId) => !applicantId.includes("@careerfairy")
+      ) ?? []
+
    const customJobStats: CustomJobStats = {
       deleted: false,
       jobId: customJob.id,
@@ -68,7 +73,7 @@ function createCustomJobStatsInCollection(
       job: newCustomJob,
       id: customJob.id,
       groupId: customJob.groupId,
-      applicants: customJob.applicants?.length ?? 0,
+      applicants: filteredApplicants.length,
       deletedAt: null,
    }
 
