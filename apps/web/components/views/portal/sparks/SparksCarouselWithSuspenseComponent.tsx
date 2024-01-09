@@ -31,13 +31,9 @@ type Props = {
    handleSparksClicked: (spark: Spark) => void
 }
 
-const eventsCarouselEmblaOptions: EmblaOptionsType = {
-   axis: "x",
+const sparksCarouselEmblaOptions: EmblaOptionsType = {
    loop: false,
-   align: "center",
-   dragThreshold: 0.5,
-   dragFree: true,
-   inViewThreshold: 0,
+   skipSnaps: true,
 }
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
@@ -111,7 +107,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
                sparks={sparksContent}
                onSparkClick={handleSparksClicked}
                isAdmin={false}
-               options={eventsCarouselEmblaOptions}
+               options={sparksCarouselEmblaOptions}
             />
          </Stack>
       </Box>
