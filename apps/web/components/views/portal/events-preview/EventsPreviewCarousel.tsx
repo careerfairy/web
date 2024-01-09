@@ -289,10 +289,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </Typography>
          )
       }
+      const mainBoxSxStyles = [styling.mainWrapperBoxSx]
+      styling.padding && mainBoxSxStyles.push(styles.mainBox)
+
       return (
          <>
             <ConditionalWrapper condition={!hidePreview}>
-               <Box sx={styling.padding ? styles.mainBox : null}>
+               <Box sx={mainBoxSxStyles}>
                   {
                      <ConditionalWrapper
                         condition={!isEmbedded && styling.compact}
@@ -469,6 +472,7 @@ export type EventsCarouselStyling = {
    title?: SxProps
    titleVariant?: any
    eventsHeader?: SxProps
+   mainWrapperBoxSx?: any
 }
 export type ChildRefType = {
    goNext: () => void

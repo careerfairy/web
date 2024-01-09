@@ -6,11 +6,110 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "./EventsPreviewCarousel"
+import { sxStyles } from "types/commonTypes"
 
 const config = {
    suspense: false,
    initialData: [],
+}
+const slideSpacing = 21
+const desktopSlideWidth = 322 + slideSpacing
+const mobileSlideWidth = 302 + slideSpacing
+
+const styles = sxStyles({
+   arrowIcon: {
+      padding: 0,
+      minHeight: { xs: "25px", md: "30px" },
+      minWidth: { xs: "25px", md: "30px" },
+      ml: 2,
+   },
+   eventsHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      pr: 2,
+      pb: 0.5,
+   },
+   description: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 2,
+   },
+   seeMoreText: {
+      color: "text.secondary",
+      textDecoration: "underline",
+      pr: 1,
+   },
+   underlined: {
+      textDecoration: "underline",
+   },
+   eventTitle: {
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px",
+      color: "black",
+   },
+   viewport: {
+      overflow: "hidden",
+   },
+   container: {
+      backfaceVisibility: "hidden",
+      display: "flex",
+      touchAction: "pan-y",
+   },
+   slide: {
+      flex: {
+         xs: `0 0 ${mobileSlideWidth}px`,
+         md: `0 0 ${desktopSlideWidth}px`,
+      },
+      minWidth: 0,
+      position: "relative",
+      height: {
+         xs: 363,
+         md: 363,
+      },
+      "&:not(:first-child)": {
+         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+   },
+   paddingSlide: {
+      flex: `0 0 ${slideSpacing}px`,
+   },
+   previewContent: {
+      position: "relative",
+   },
+   mainBox: {
+      paddingLeft: 2,
+   },
+   titleLink: {
+      color: "#000",
+      "&:hover": {
+         color: "#000",
+      },
+   },
+})
+const defaultStyling: EventsCarouselStyling = {
+   compact: true,
+   seeMoreSx: styles.seeMoreText,
+   eventTitleSx: styles.eventTitle,
+   viewportSx: styles.viewport,
+   showArrows: false,
+   headerAsLink: false,
+   padding: true,
+   slide: styles.slide,
+   title: styles.eventTitle,
+   titleVariant: "h6",
+   eventsHeader: styles.eventsHeader,
+   mainWrapperBoxSx: {
+      mt: 2,
+   },
 }
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
@@ -78,6 +177,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
          isRecommended
+         styling={defaultStyling}
       />
    )
 }
