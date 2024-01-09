@@ -60,6 +60,7 @@ const styles = sxStyles({
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
       },
    },
+
    eventTitle: {
       fontFamily: "Poppins",
       fontStyle: "normal",
@@ -72,7 +73,16 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 1,
+      pb: 0.5,
+   },
+   seeMoreText: {
+      color: "text.secondary",
+      textDecoration: "underline",
+      pr: 1,
+      pb: 10,
+   },
+   viewportSx: {
+      overflow: "hidden",
    },
 })
 
@@ -125,10 +135,8 @@ const EventSection = () => {
                seeMoreLink={`/next-livestreams?${query}`}
                styling={{
                   compact: isMobile,
-                  seeMoreSx: {
-                     textDecoration: "underline",
-                     color: "#2ABAA5",
-                  },
+                  seeMoreSx: styles.seeMoreText,
+                  viewportSx: styles.viewportSx,
                   showArrows: isMobile,
                   headerAsLink: isMobile,
                   slide: styles.slide,
@@ -152,6 +160,7 @@ const EventSection = () => {
                         textDecoration: "underline",
                         color: "#2ABAA5",
                      },
+                     viewportSx: styles.viewportSx,
                      showArrows: isMobile,
                      headerAsLink: isMobile,
                      slide: styles.slide,
