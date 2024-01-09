@@ -72,7 +72,12 @@ const EventPreviewCardChipLabels = ({
          <Chip
             key={"booked-chip"}
             icon={<CheckCircle color="#00D247" width={18} height={18} />}
-            sx={{ pl: 1, pr: 0, alignItems: "center" }}
+            sx={{
+               pl: 0.5,
+               pr: 0,
+               alignItems: "center",
+               width: { xs: "fit-content", md: "auto" },
+            }}
             color="info"
             label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
          />
@@ -84,7 +89,12 @@ const EventPreviewCardChipLabels = ({
          <Chip
             key={"hiring-now-chip"}
             icon={<Briefcase color={"#3A70E2"} width={18} height={18} />}
-            sx={{ pl: 1, pr: 2, alignItems: "center" }}
+            sx={{
+               pl: 0.5,
+               pr: 0,
+               alignItems: "center",
+               width: { xs: "fit-content", md: "auto" },
+            }}
             color={"info"}
             label={<Typography fontWeight={400}>Hiring now</Typography>}
          />
@@ -113,7 +123,7 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"available-chip"}
-            sx={{ pr: 1 }}
+            sx={{ pr: 0 }}
             color={"info"}
             icon={
                <TaskAltOutlinedIcon
