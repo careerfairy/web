@@ -127,6 +127,15 @@ const styles = sxStyles({
       fontWeight: "600",
       lineHeight: "27px",
       color: "black",
+      pb: 1,
+   },
+   eventTitleEmpty: {
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px",
+      color: "black",
    },
    viewportSx: {
       overflow: "hidden",
@@ -168,7 +177,8 @@ const MyNextEvents = ({ limit }: Props) => {
             showArrows: false,
             headerAsLink: false,
             slide: styles.slide,
-            title: styles.eventTitle,
+            title:
+               events?.length > 0 ? styles.eventTitle : styles.eventTitleEmpty,
             eventsHeader: styles.eventsHeader,
             titleVariant: "h6",
             padding: true,
