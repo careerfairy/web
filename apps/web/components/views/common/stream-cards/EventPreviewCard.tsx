@@ -62,6 +62,7 @@ const styles = sxStyles({
       transition: (theme: Theme) => theme.transitions.create(["opacity"]),
    },
    backgroundImageWrapper: {
+      filter: "brightness(75%)",
       display: "flex",
       height: "40%",
       width: "100%",
