@@ -171,6 +171,7 @@ const MyNextEvents = ({ limit }: Props) => {
                      <Button
                         sx={styles.noRegistrations.redirectButton}
                         variant="contained"
+                        href="/next-livestreams"
                      >
                         <Typography>Check all live streams</Typography>
                      </Button>
