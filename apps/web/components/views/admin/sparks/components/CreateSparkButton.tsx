@@ -2,7 +2,7 @@ import { Button, ButtonProps } from "@mui/material"
 import { FC, useCallback } from "react"
 import { useDispatch } from "react-redux"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -21,7 +21,7 @@ const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
       <Button
          onClick={handleOpen}
          color="secondary"
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+         sx={combineStyles(styles.root, sx)}
          variant="contained"
          {...props}
       >

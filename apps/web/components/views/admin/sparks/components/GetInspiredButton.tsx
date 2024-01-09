@@ -1,7 +1,7 @@
 import { Button, ButtonProps } from "@mui/material"
 import { sparksGetInspiredPdf } from "constants/files"
 import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -12,7 +12,7 @@ const styles = sxStyles({
 const GetInspiredButton: FC<ButtonProps<"a">> = ({ sx, ...props }) => {
    return (
       <Button
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+         sx={combineStyles(styles.root, sx)}
          color="secondary"
          variant="outlined"
          component="a"

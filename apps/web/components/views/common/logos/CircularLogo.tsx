@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Avatar, type AvatarProps, Box } from "@mui/material"
 import Image, { ImageProps } from "next/legacy/image"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const getStyles = (size: number) =>
    sxStyles({
@@ -48,7 +48,7 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
       return (
          <Avatar
             variant="circular"
-            sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+            sx={combineStyles(styles.root, sx)}
             ref={ref}
          >
             <Box borderRadius={borderRadius}>

@@ -5,6 +5,7 @@ import Image from "next/legacy/image"
 import { GraphCMSImageLoader } from "./util"
 import { caseStudyCompanyCoverImageDimensions } from "./constants"
 import React from "react"
+import { combineStyles } from "types/commonTypes"
 
 const styles = {
    root: {
@@ -25,7 +26,7 @@ interface Props {
 const Video = ({ videoUrl, sx, maxWidth, coverImageUrl }: Props) => {
    return (
       <Box
-         sx={[
+         sx={combineStyles(
             styles.root,
             {
                "& video": {
@@ -33,8 +34,8 @@ const Video = ({ videoUrl, sx, maxWidth, coverImageUrl }: Props) => {
                   maxWidth,
                },
             },
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+            sx
+         )}
       >
          {videoUrl ? (
             <video playsInline controls width="100%">
