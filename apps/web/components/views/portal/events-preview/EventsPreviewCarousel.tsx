@@ -102,6 +102,12 @@ const styles = sxStyles({
    mainBox: {
       paddingLeft: 2,
    },
+   titleLink: {
+      color: "#000",
+      "&:hover": {
+         color: "#000",
+      },
+   },
 })
 
 const wheelGesturesOptions = {
@@ -302,7 +308,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                     styling.titleVariant
                                  )}
                               >
-                                 <Link href={seeMoreLink} color="#000000">
+                                 <Link
+                                    href={seeMoreLink}
+                                    style={styles.titleLink}
+                                 >
                                     {getHeading(
                                        [styling.title, styles.underlined],
                                        styling.titleVariant
