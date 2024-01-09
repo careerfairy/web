@@ -4,6 +4,7 @@ import { Theme, SxProps } from "@mui/material/styles"
 import { OverridableStringUnion } from "@mui/types"
 import { Variant } from "@mui/material/styles/createTypography"
 import { TypographyPropsVariantOverrides } from "@mui/material/Typography/Typography"
+import { combineStyles } from "types/commonTypes"
 
 const styles = {
    root: {
@@ -15,10 +16,7 @@ const styles = {
 
 const Heading = ({ sx, children, variant = "h5" }: Props) => {
    return (
-      <Typography
-         variant={variant}
-         sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
-      >
+      <Typography variant={variant} sx={combineStyles(styles.root, sx)}>
          {children}
       </Typography>
    )

@@ -4,7 +4,7 @@ import Drawer from "@mui/material/Drawer"
 import { useRouter } from "next/router"
 import * as actions from "../../../store/actions"
 import { useDispatch, useSelector } from "react-redux"
-import { StylesProps } from "../../../types/commonTypes"
+import { StylesProps, combineStyles } from "../../../types/commonTypes"
 import { RootState } from "../../../store"
 import { MainLogo } from "../../logos"
 import { SxProps } from "@mui/material"
@@ -119,12 +119,12 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
       dispatch(actions.openNavDrawer())
    }
 
-   const sxProps = [
+   const sxProps = combineStyles(
       styles.drawer,
       styles.persistentDrawer,
       drawerOpen ? styles.drawerOpen : styles.drawerClosed,
-      ...(Array.isArray(sx) ? sx : [sx]),
-   ]
+      sx
+   )
 
    if (canShowAnimationForPath(pathname)) {
       sxProps.push(styles.drawerAnimation)
@@ -145,11 +145,7 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
    ) : (
       <Drawer
          anchor="left"
-         sx={[
-            styles.drawer,
-            styles.tempDrawer,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+         sx={combineStyles(styles.drawer, styles.tempDrawer, sx)}
          PaperProps={{
             sx: {
                borderRadius: 0,

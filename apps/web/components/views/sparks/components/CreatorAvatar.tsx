@@ -2,6 +2,7 @@ import { Avatar, AvatarProps } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import Image from "next/legacy/image"
 import { FC, useMemo, useState } from "react"
+import { combineStyles } from "types/commonTypes"
 
 type Props = {
    /**
@@ -17,13 +18,14 @@ const CreatorAvatar: FC<Props> = ({ creator, size, sx, ...props }) => {
    const [imgSrc, setImgSrc] = useState(getResizedUrl(creator.avatarUrl, "md"))
 
    const styles = useMemo<AvatarProps["sx"]>(
-      () => [
-         ...(Array.isArray(sx) ? sx : [sx]),
-         size && {
-            width: size,
-            height: size,
-         },
-      ],
+      () =>
+         combineStyles(
+            sx,
+            size && {
+               width: size,
+               height: size,
+            }
+         ),
       [sx, size]
    )
 
