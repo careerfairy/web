@@ -24,7 +24,6 @@ import {
    IconButton,
 } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
-import Heading from "../common/Heading"
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -35,7 +34,6 @@ const slideSpacing = 21
 const desktopSlideWidth = 322 + slideSpacing
 const mobileSlideWidth = 302 + slideSpacing
 
-//TODO: Redo padding for the portal page and move props above to the company page
 const styles = sxStyles({
    arrowIcon: {
       padding: 0,
@@ -54,23 +52,22 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      // px: 2,
       paddingTop: 2,
    },
    seeMoreText: {
       color: "text.secondary",
       textDecoration: "underline",
+      pr: 1,
    },
    underlined: {
       textDecoration: "underline",
    },
    eventTitle: {
-      /* Desktop/Heading 5/H5 - SemiBold - Desktop */
       fontFamily: "Poppins",
       fontSize: "18px",
       fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "27px" /* 150% */,
+      lineHeight: "27px",
       color: "black",
    },
    viewport: {
@@ -110,7 +107,19 @@ const styles = sxStyles({
 const wheelGesturesOptions = {
    wheelDraggingClass: "is-wheel-dragging",
 }
-
+const defaultStyling: EventsCarouselStyling = {
+   compact: true,
+   seeMoreSx: styles.seeMoreText,
+   eventTitleSx: styles.eventTitle,
+   viewportSx: styles.viewport,
+   showArrows: false,
+   headerAsLink: false,
+   padding: true,
+   slide: styles.slide,
+   title: styles.eventTitle,
+   titleVariant: "h6",
+   eventsHeader: styles.eventsHeader,
+}
 const defaultEmblaOptions: EmblaOptionsType = {
    axis: "x",
    loop: false,
@@ -135,20 +144,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          children,
          options = defaultEmblaOptions,
          eventDescription,
-         styling = {
-            compact: true,
-            seeMoreSx: styles.seeMoreText,
-            eventTitleSx: styles.eventTitle,
-            viewportSx: undefined,
-            backgroundSx: undefined,
-            showArrows: false,
-            headerAsLink: false,
-            padding: true,
-            slide: styles.slide,
-            title: styles.eventTitle,
-            titleVariant: "h6",
-            eventsHeader: styles.eventsHeader,
-         },
+         styling = defaultStyling,
       } = props
 
       const [emblaRef, emblaApi] = useEmblaCarousel(options, [
@@ -368,7 +364,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               spacing={2}
                               justifyContent="space-between"
                               alignItems="center"
-                              // ml={2}
                               mt={1}
                            >
                               <Box>{seeMoreComponent}</Box>
@@ -377,11 +372,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                         </ConditionalWrapper>
                      }
                      {
-                        <Box
-                           id={id}
-                           sx={[styles.viewport, styling.viewportSx]}
-                           ref={emblaRef}
-                        >
+                        <Box id={id} sx={styling.viewportSx} ref={emblaRef}>
                            <Box sx={[styles.container]}>
                               <ConditionalWrapper
                                  condition={!loading}
@@ -450,7 +441,6 @@ export type EventsCarouselStyling = {
    seeMoreSx?: SxProps
    eventTitleSx?: SxProps
    viewportSx?: SxProps
-   backgroundSx?: SxProps
    showArrows?: boolean
    headerAsLink?: boolean
    padding?: boolean
