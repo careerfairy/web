@@ -61,12 +61,11 @@ const styles = sxStyles({
       },
    },
    eventTitle: {
-      /* Desktop/Heading 5/H5 - SemiBold - Desktop */
       fontFamily: "Poppins",
       fontStyle: "normal",
       fontWeight: "600",
       color: "black",
-      lineHeight: "27px" /* 150% */,
+      lineHeight: "27px",
    },
    eventsHeader: {
       display: "flex",
@@ -140,31 +139,6 @@ const EventSection = () => {
             >
                {stayUpToDateBanner("Next Live Streams")}
             </EventsPreviewCarousel>
-            {/* <ConditionalWrapper
-               fallback={stayUpToDateBanner("Next Live Streams")}
-               condition={
-                  upcomingLivestreams !== undefined &&
-                  upcomingLivestreams.length > 0
-               }
-            >
-               <EventsPreviewCarousel
-                  title="Next Live Streams"
-                  events={upcomingLivestreams ?? []}
-                  eventDescription={upcomingEventsDescription}
-                  type={EventsTypes.comingUp}
-                  seeMoreLink={`/next-livestreams?${query}`}
-                  styling={{
-                     compact: isMobile,
-                     seeMoreSx: {
-                        textDecoration: "underline",
-                        color: "#2ABAA5",
-                     },
-                     showArrows: isMobile,
-                     headerAsLink: isMobile,
-                     slide: styles.slide,
-                  }}
-               />
-            </ConditionalWrapper> */}
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
                   title="Past Live Streams"
