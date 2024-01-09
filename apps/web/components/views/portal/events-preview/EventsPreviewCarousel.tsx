@@ -48,7 +48,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0,
+      pb: 0.5,
    },
    description: {
       display: "flex",
@@ -275,7 +275,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          )
       }
       const getHeading = (headingStyles: SxProps, variant?: any) => {
-         // return  <Heading variant={variant ? variant : "h6"} sx={headingStyles} >{title}</Heading>
          return (
             <Typography
                variant={variant ? variant : "h6"}
@@ -307,7 +306,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                     styling.titleVariant
                                  )}
                               >
-                                 <Link href={seeMoreLink} color="black">
+                                 <Link href={seeMoreLink} color="#000000">
                                     {getHeading(
                                        [styling.title, styles.underlined],
                                        styling.titleVariant

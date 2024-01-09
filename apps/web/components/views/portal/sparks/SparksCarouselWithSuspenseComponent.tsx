@@ -23,12 +23,20 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
+   sparksContentPaddingLeft: 2,
 })
-
+const defaultSparksCustomStyling: SparksStyling = {
+   sparksContentPaddingLeft: 2,
+}
 type Props = {
    header: ReactNode
    groupId?: String
    handleSparksClicked: (spark: Spark) => void
+   styling?: SparksStyling
+}
+type FallbackComponentProps = {
+   header: ReactNode
+   styling?: SparksStyling
 }
 
 const sparksCarouselEmblaOptions: EmblaOptionsType = {
@@ -39,6 +47,7 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
    groupId,
    handleSparksClicked,
+   styling = defaultSparksCustomStyling,
 }) => {
    const [isClient, setIsClient] = useState(false)
    useEffect(() => {
@@ -47,11 +56,14 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    }, [])
 
    return isClient ? (
-      <SuspenseWithBoundary fallback={<FallbackComponent header={header} />}>
+      <SuspenseWithBoundary
+         fallback={<FallbackComponent header={header} styling={styling} />}
+      >
          <Component
             header={header}
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
+            styling={styling}
          />
       </SuspenseWithBoundary>
    ) : (
@@ -59,9 +71,12 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    )
 }
 
-const FallbackComponent: FC<Pick<Props, "header">> = ({ header }) => {
+const FallbackComponent: FC<FallbackComponentProps> = ({
+   header,
+   styling = defaultSparksCustomStyling,
+}) => {
    return (
-      <Box sx={{ pl: 2 }}>
+      <Box sx={{ pl: styling.sparksContentPaddingLeft }}>
          <Stack direction={"column"} sx={{ gap: "10px" }}>
             {header}
             <SparksCarouselSkeleton numSlides={8} />
@@ -70,12 +85,17 @@ const FallbackComponent: FC<Pick<Props, "header">> = ({ header }) => {
    )
 }
 
-const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
+const Component: FC<Props> = ({
+   header,
+   groupId,
+   handleSparksClicked,
+   styling = defaultSparksCustomStyling,
+}) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
    const withControls = Boolean(groupId)
    return Boolean(sparksContent.length) ? (
-      <Box sx={{ pl: 2 }}>
+      <Box sx={{ pl: styling.sparksContentPaddingLeft }}>
          <Stack spacing={1.25}>
             <Box sx={styles.stack}>
                {header}
@@ -113,5 +133,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
       </Box>
    ) : null
 }
-
+export type SparksStyling = {
+   sparksContentPaddingLeft?: number
+}
 export default SparksCarouselWithSuspenseComponent
