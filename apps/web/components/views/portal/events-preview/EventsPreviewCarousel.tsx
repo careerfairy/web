@@ -424,7 +424,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               {/**
                                * This prevents the last slide from touching the right edge of the viewport.
                                */}
-                              <Box sx={styles.paddingSlide}></Box>
+                              <ConditionalWrapper
+                                 condition={events?.length > 0}
+                              >
+                                 <Box sx={styles.paddingSlide}></Box>
+                              </ConditionalWrapper>
                            </Box>
                         </Box>
                      }

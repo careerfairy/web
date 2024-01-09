@@ -7,6 +7,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
 import EventsPreviewCarousel, {
+   EventsCarouselStyling,
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -72,14 +73,12 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      pr: 2,
-      pb: 0.5,
+      pr: 0,
+      pb: 1,
    },
    seeMoreText: {
-      color: "text.secondary",
       textDecoration: "underline",
-      pr: 1,
-      pb: 10,
+      color: "#2ABAA5",
    },
    viewportSx: {
       overflow: "hidden",
@@ -113,6 +112,18 @@ const EventSection = () => {
       return `Have you missed a live stream from ${group.universityName}? Don't worry, you can re-watch them all here.`
    }, [editMode, group.universityName])
 
+   const eventsCarouselStyling: EventsCarouselStyling = {
+      compact: isMobile,
+      seeMoreSx: styles.seeMoreText,
+      viewportSx: styles.viewportSx,
+      showArrows: isMobile,
+      headerAsLink: isMobile,
+      slide: styles.slide,
+      title: styles.eventTitle,
+      titleVariant: "h4",
+      eventsHeader: styles.eventsHeader,
+   }
+
    const stayUpToDateBanner = (title: String) => {
       return (
          <>
@@ -120,6 +131,7 @@ const EventSection = () => {
          </>
       )
    }
+
    return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
@@ -133,17 +145,7 @@ const EventSection = () => {
                eventDescription={upcomingEventsDescription}
                type={EventsTypes.comingUp}
                seeMoreLink={`/next-livestreams?${query}`}
-               styling={{
-                  compact: isMobile,
-                  seeMoreSx: styles.seeMoreText,
-                  viewportSx: styles.viewportSx,
-                  showArrows: isMobile,
-                  headerAsLink: isMobile,
-                  slide: styles.slide,
-                  title: styles.eventTitle,
-                  titleVariant: "h4",
-                  eventsHeader: styles.eventsHeader,
-               }}
+               styling={eventsCarouselStyling}
             >
                {stayUpToDateBanner("Next Live Streams")}
             </EventsPreviewCarousel>
@@ -154,20 +156,7 @@ const EventSection = () => {
                   eventDescription={pastEventsDescription}
                   type={EventsTypes.pastEvents}
                   seeMoreLink={`/past-livestreams?${query}`}
-                  styling={{
-                     compact: isMobile,
-                     seeMoreSx: {
-                        textDecoration: "underline",
-                        color: "#2ABAA5",
-                     },
-                     viewportSx: styles.viewportSx,
-                     showArrows: isMobile,
-                     headerAsLink: isMobile,
-                     slide: styles.slide,
-                     title: styles.eventTitle,
-                     titleVariant: "h4",
-                     eventsHeader: styles.eventsHeader,
-                  }}
+                  styling={eventsCarouselStyling}
                />
             </ConditionalWrapper>
          </Stack>
