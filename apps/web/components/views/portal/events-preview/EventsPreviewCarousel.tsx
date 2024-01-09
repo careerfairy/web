@@ -365,6 +365,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               justifyContent="space-between"
                               alignItems="center"
                               mt={1}
+                              mb={1}
                            >
                               <Box>{seeMoreComponent}</Box>
                               {arrowsComponent}
