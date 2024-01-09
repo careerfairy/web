@@ -65,6 +65,11 @@ const ComponentSkeleton: FC = () => {
 
 const options: EmblaOptionsType = {
    align: "start",
+   axis: "y",
+   loop: false,
+   dragThreshold: 0.5,
+   dragFree: true,
+   inViewThreshold: 0,
 }
 
 export default CreatorSparks

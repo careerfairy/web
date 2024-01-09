@@ -1,5 +1,5 @@
 import { Box, IconButton, Stack } from "@mui/material"
-import { FC, ReactNode, useEffect, useRef, useState } from "react"
+import { FC, ReactNode, useEffect, useMemo, useRef, useState } from "react"
 import SparksCarousel, {
    ChildRefType,
 } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
@@ -9,6 +9,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const styles = sxStyles({
    stack: {
@@ -30,6 +31,14 @@ type Props = {
    handleSparksClicked: (spark: Spark) => void
 }
 
+const eventsCarouselEmblaOptions: EmblaOptionsType = {
+   axis: "x",
+   loop: false,
+   align: "center",
+   dragThreshold: 0.5,
+   dragFree: true,
+   inViewThreshold: 0,
+}
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
    groupId,
@@ -102,6 +111,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
                sparks={sparksContent}
                onSparkClick={handleSparksClicked}
                isAdmin={false}
+               options={eventsCarouselEmblaOptions}
             />
          </Stack>
       </Box>
