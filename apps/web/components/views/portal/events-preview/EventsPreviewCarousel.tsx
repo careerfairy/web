@@ -46,7 +46,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0,
+      pb: 0.5,
    },
    description: {
       display: "flex",
@@ -153,9 +153,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          styling = defaultStyling,
       } = props
 
-      const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-         WheelGesturesPlugin(wheelGesturesOptions),
-      ])
+      const [emblaRef, emblaApi] = useEmblaCarousel(
+         options,
+         events?.length > 1 ? [WheelGesturesPlugin(wheelGesturesOptions)] : []
+      )
 
       const isMobile = useIsMobile()
 
@@ -350,7 +351,13 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                   }
                   <Stack sx={styles.previewContent}>
                      {
-                        <ConditionalWrapper condition={!isMobile}>
+                        <ConditionalWrapper
+                           condition={
+                              !isMobile &&
+                              eventDescription !== undefined &&
+                              eventDescription.length > 0
+                           }
+                        >
                            <Stack>
                               <Box sx={styles.description}>
                                  <Typography

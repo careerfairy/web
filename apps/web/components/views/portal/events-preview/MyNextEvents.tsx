@@ -66,11 +66,10 @@ const styles = sxStyles({
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
       background: "#3D3D47",
-      marginTop: 2,
+      marginY: 1,
       paddingTop: 5,
       paddingBottom: 4,
       backgroundColor: "black",
-      // marginLeft: 2,
       position: "relative",
       width: "100%",
       maxHeight: "292px",
@@ -109,10 +108,32 @@ const styles = sxStyles({
          },
       },
    },
+   eventsHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      pr: 2,
+      pb: 0,
+   },
+   seeMoreText: {
+      color: "text.secondary",
+      textDecoration: "underline",
+      pr: 1,
+   },
+   eventTitle: {
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px",
+      color: "black",
+   },
+   viewportSx: {
+      overflow: "hidden",
+   },
 })
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()
-
    const registeredEventsQuery = useMemo(() => {
       return livestreamRepo.registeredEventsQuery(
          authenticatedUser.email,
@@ -140,6 +161,18 @@ const MyNextEvents = ({ limit }: Props) => {
          title={MY_NEXT_EVENTS_TITLE}
          loading={isLoading}
          seeMoreLink="/next-livestreams/my-registrations"
+         styling={{
+            compact: true,
+            seeMoreSx: styles.seeMoreText,
+            // viewportSx: styles.viewportSx,
+            showArrows: false,
+            headerAsLink: false,
+            slide: styles.slide,
+            title: styles.eventTitle,
+            eventsHeader: styles.eventsHeader,
+            titleVariant: "h6",
+            padding: true,
+         }}
       >
          <Box sx={styles.cardWrapper}>
             <Box sx={styles.cardWrapperContainerCircle}>
