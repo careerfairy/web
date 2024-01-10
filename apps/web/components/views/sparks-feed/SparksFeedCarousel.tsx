@@ -46,6 +46,7 @@ import EmptyFilterView from "./EmptyFilterView"
 import FeedCardSlide from "./FeedCardSlide"
 import SparkNotifications from "./SparkNotifications"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -153,13 +154,11 @@ const SparksFeedCarousel: FC = () => {
       () => ({
          axis: "y",
          loop: false,
-         align: "center",
-         duration: 15,
+         align: "start",
+         duration: 100,
          dragThreshold: 0.5,
-         asdsa: "dsfs",
-         // dragFree: false,
          dragFree: false,
-         inViewThreshold: 0,
+         inViewThreshold: 0.75,
          /**
           * Custom function to watch for changes to the slides.
           * Reloads the Embla Carousel whenever the slides (sparks) are updated,
@@ -194,7 +193,9 @@ const SparksFeedCarousel: FC = () => {
       [noSparks]
    )
 
-   const [emblaRef, emblaApi] = useEmblaCarousel(options)
+   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
+      WheelGesturesPlugin(),
+   ])
 
    /**
     * Custom plugin hooks for Embla Carousel
