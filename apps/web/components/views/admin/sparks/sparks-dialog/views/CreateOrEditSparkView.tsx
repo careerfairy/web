@@ -99,11 +99,7 @@ const CreateOrEditSparkView = () => {
    }
 
    return (
-      <SparkFetchWrapper
-         sparkId={selectedSparkId}
-         groupId={group.id}
-         shouldFetch={Boolean(selectedSparkId)}
-      >
+      <SparkFetchWrapper sparkId={selectedSparkId}>
          {(spark) => (
             <SparksDialog.Container width={725}>
                <SparksDialog.Content>

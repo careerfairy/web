@@ -1,5 +1,7 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import useGroupCreator from "components/custom-hook/creator/useGroupCreator"
+import FirestoreConditionalDocumentFetcher, {
+   WrapperProps,
+} from "HOCs/FirestoreConditionalDocumentFetcher"
 import { FC, ReactNode } from "react"
 
 /**
@@ -12,32 +14,8 @@ import { FC, ReactNode } from "react"
 type CreatorFetcherProps = {
    groupId: string
    selectedCreatorId?: string
+   // eslint-disable-next-line no-unused-vars
    children: (creator: Creator | null) => ReactNode
-}
-
-/**
- * Fetches the creator using the provided group and creator IDs.
- * @param {CreatorFetcherProps} props - The props for the component.
- * @returns {ReactNode} - The child components.
- */
-const CreatorFetcher: FC<CreatorFetcherProps> = ({
-   groupId,
-   selectedCreatorId,
-   children,
-}) => {
-   const { data: creator } = useGroupCreator(groupId, selectedCreatorId)
-   return <>{children(creator)}</>
-}
-
-/**
- * Props for CreatorFetchWrapper component.
- * @typedef {Object} WrapperProps
- * @property {boolean} shouldFetch - Indicates whether the creator data should be fetched.
- * @property {() => ReactNode} [fallbackComponent] - A function that returns a ReactNode to be rendered when shouldFetch is false.
- */
-type WrapperProps = {
-   shouldFetch: boolean
-   fallbackComponent?: () => ReactNode
 }
 
 /**
@@ -49,24 +27,24 @@ type WrapperProps = {
  * @returns {ReactNode} - The child components.
  */
 const CreatorFetchWrapper: FC<WrapperProps & CreatorFetcherProps> = ({
-   shouldFetch,
    groupId,
    selectedCreatorId,
    children,
    fallbackComponent,
 }) => {
-   if (shouldFetch) {
-      return (
-         <CreatorFetcher
-            groupId={groupId}
-            selectedCreatorId={selectedCreatorId}
-         >
-            {children}
-         </CreatorFetcher>
-      )
-   } else {
-      return fallbackComponent ? fallbackComponent() : <>{children(null)}</>
-   }
+   const collection = "careerCenterData"
+   const pathSegments = [groupId, "creators", selectedCreatorId]
+
+   return (
+      <FirestoreConditionalDocumentFetcher
+         shouldFetch={Boolean(selectedCreatorId)}
+         collection={collection}
+         pathSegments={pathSegments}
+         fallbackComponent={fallbackComponent}
+      >
+         {children}
+      </FirestoreConditionalDocumentFetcher>
+   )
 }
 
 export default CreatorFetchWrapper

@@ -117,7 +117,6 @@ const CreatorSelectedView = () => {
          <CreatorFetchWrapper
             selectedCreatorId={selectedCreatorId}
             groupId={group.id}
-            shouldFetch={Boolean(selectedCreatorId)}
             fallbackComponent={() => (
                <CreatorView
                   handleClickEdit={handleClickEdit}
@@ -141,6 +140,7 @@ const CreatorSelectedView = () => {
 
 const CreatorView: FC<{
    creator?: Creator
+   // eslint-disable-next-line no-unused-vars
    handleClickEdit: (creator: Creator) => void
    handleBack: () => void
    handleNext: () => void

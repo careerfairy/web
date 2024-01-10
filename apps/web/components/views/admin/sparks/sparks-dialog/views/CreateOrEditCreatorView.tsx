@@ -29,7 +29,6 @@ const CreateOrEditCreatorView = () => {
       <CreatorFetchWrapper
          selectedCreatorId={selectedCreatorId}
          groupId={group.id}
-         shouldFetch={Boolean(selectedCreatorId)}
       >
          {(creator) => (
             <SparksDialog.Container>
