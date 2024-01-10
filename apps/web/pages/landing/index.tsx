@@ -55,14 +55,6 @@ export const getStaticProps: GetStaticProps = async ({
    preview = true,
    locale,
 }) => {
-   // Disabling this page for now (ticket 701)
-   return {
-      redirect: {
-         destination: "/",
-         permanent: false,
-      },
-   }
-
    if (process.env.APP_ENV === "test") {
       return {
          notFound: true,
