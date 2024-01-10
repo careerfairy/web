@@ -47,7 +47,10 @@ export const getStaticProps: GetStaticProps = async ({
 }) => {
    // Disabling this page for now (ticket 701)
    return {
-      notFound: true,
+      redirect: {
+         destination: "/",
+         permanent: false,
+      },
    }
 
    const marketingPage = await marketingPageRepo.getMarketingPage({
