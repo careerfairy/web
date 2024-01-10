@@ -45,6 +45,11 @@ export const getStaticProps: GetStaticProps = async ({
    preview = false,
    locale,
 }) => {
+   // Disabling this page for now (ticket 701)
+   return {
+      notFound: true,
+   }
+
    const marketingPage = await marketingPageRepo.getMarketingPage({
       slug: params.slug as string,
       preview,

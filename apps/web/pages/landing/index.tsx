@@ -1,4 +1,5 @@
 import { GetStaticProps } from "next"
+import ErrorPage from "next/error"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import {
    HygraphRemoteFieldOfStudyResponse,
@@ -55,6 +56,11 @@ export const getStaticProps: GetStaticProps = async ({
    preview = true,
    locale,
 }) => {
+   // Disabling this page for now (ticket 701)
+   return {
+      notFound: true,
+   }
+
    if (process.env.APP_ENV === "test") {
       return {
          notFound: true,
