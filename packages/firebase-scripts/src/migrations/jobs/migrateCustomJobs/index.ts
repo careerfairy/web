@@ -145,7 +145,7 @@ export async function run() {
 
    try {
       const customJobs = await logAction(
-         () => groupRepo.getAllCustomJobs(),
+         () => groupRepo.getAllLegacyGroupCustomJobs(),
          "Fetching all custom jobs"
       )
 
@@ -154,6 +154,8 @@ export async function run() {
       jobProgressBar.start(customJobs.length, 0)
 
       for (const customJob of customJobs) {
+         delete customJob._ref // remove the _ref field from the customJob object
+
          const newCustomJob = createCustomJobInCollection(
             customJob,
             bulkWriter,

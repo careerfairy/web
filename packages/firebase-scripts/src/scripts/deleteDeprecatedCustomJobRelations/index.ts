@@ -4,6 +4,7 @@ import Counter from "../../lib/Counter"
 import { logAction } from "../../util/logger"
 import * as cliProgress from "cli-progress"
 import { FieldValue } from "firebase-admin/firestore"
+import { groupRepo } from "../../repositories"
 
 const counter = new Counter()
 
@@ -21,14 +22,14 @@ export async function run() {
 
    try {
       const [
-         groupCustomJobsQuery,
+         allLegacyCustomJobsQuery,
          userJobApplicationsQuery,
          livestreamsQuery,
          draftLivestreamsQuery,
       ] = await logAction(
          () =>
             Promise.all([
-               firestore.collectionGroup("customJobs").get(),
+               groupRepo.getAllLegacyGroupCustomJobs(),
                firestore.collectionGroup("customJobApplications").get(),
                firestore.collection("livestreams").orderBy("customJobs").get(),
                firestore
@@ -40,7 +41,7 @@ export async function run() {
       )
 
       console.log(
-         `Start deleting ${groupCustomJobsQuery?.docs?.length} customJobs sucCollection documents`
+         `Start deleting ${allLegacyCustomJobsQuery?.length} customJobs sucCollection documents`
       )
       console.log(
          `Start deleting ${userJobApplicationsQuery?.docs?.length} userJobApplications subCollection documents`
@@ -52,9 +53,9 @@ export async function run() {
          `Start deleting ${draftLivestreamsQuery?.docs?.length} draft livestreams customJobs field`
       )
 
-      const totalDocsToDelete = [
-         ...(groupCustomJobsQuery?.docs || []),
-         ...(userJobApplicationsQuery?.docs || []),
+      const totalDocRefsToDelete = [
+         ...(allLegacyCustomJobsQuery?.map((d) => d._ref) || []),
+         ...(userJobApplicationsQuery?.docs.map((d) => d.ref) || []),
       ]
 
       const totalDocsToRemoveField = [
@@ -63,16 +64,16 @@ export async function run() {
       ]
 
       counter.addToReadCount(
-         totalDocsToDelete.length + totalDocsToRemoveField.length
+         totalDocRefsToDelete.length + totalDocsToRemoveField.length
       )
 
       jobProgressBar.start(
-         totalDocsToDelete.length + totalDocsToRemoveField.length,
+         totalDocRefsToDelete.length + totalDocsToRemoveField.length,
          0
       )
 
-      totalDocsToDelete.forEach((doc) => {
-         bulkWriter.delete(doc.ref)
+      totalDocRefsToDelete.forEach((ref) => {
+         bulkWriter.delete(ref as any)
 
          counter.writeIncrement()
          jobProgressBar.increment()
