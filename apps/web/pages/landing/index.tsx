@@ -1,5 +1,4 @@
 import { GetStaticProps } from "next"
-import ErrorPage from "next/error"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import {
    HygraphRemoteFieldOfStudyResponse,
