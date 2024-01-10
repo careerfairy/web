@@ -74,10 +74,7 @@ const DeleteJobDialog = () => {
 
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <JobFetchWrapper
-            jobId={selectedJobId}
-            shouldFetch={Boolean(selectedJobId)}
-         >
+         <JobFetchWrapper jobId={selectedJobId}>
             {(job) => <DeleteDialog job={job} />}
          </JobFetchWrapper>
       </SuspenseWithBoundary>

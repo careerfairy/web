@@ -1,41 +1,18 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
+import FirestoreConditionalDocumentFetcher, {
+   WrapperProps,
+} from "HOCs/FirestoreConditionalDocumentFetcher"
 import { FC, ReactNode } from "react"
 
 /**
  * Props for SparkFetcher component.
- * @typedef {Object} SparkFetcherProps
- * @property {string} groupId - The ID of the group.
  * @property {string} [sparkId] - The ID of the selected Spark.
  * @property {(spark: Spark | null) => ReactNode} children - A function that returns a ReactNode, given a Spark.
  */
 type SparkFetcherProps = {
-   groupId: string
-   sparkId?: string
+   sparkId: string
+   // eslint-disable-next-line no-unused-vars
    children: (spark: Spark | null) => ReactNode
-}
-
-/**
- * Fetches the Spark using the provided group and Spark IDs.
- * @param {SparkFetcherProps} props - The props for the component.
- * @returns {ReactNode} - The child components.
- */
-const SparkFetcher: FC<SparkFetcherProps> = ({
-   groupId,
-   sparkId,
-   children,
-}) => {
-   const spark = useGroupSpark(groupId, sparkId)
-   return <>{children(spark)}</>
-}
-
-/**
- * Props for SparkFetchWrapper component.
- * @typedef {Object} WrapperProps
- * @property {boolean} shouldFetch - Indicates whether the Spark data should be fetched.
- */
-type WrapperProps = {
-   shouldFetch: boolean
 }
 
 /**
@@ -47,20 +24,23 @@ type WrapperProps = {
  * @returns {ReactNode} - The child components.
  */
 const SparkFetchWrapper: FC<WrapperProps & SparkFetcherProps> = ({
-   shouldFetch,
-   groupId,
    sparkId,
    children,
+   fallbackComponent,
 }) => {
-   if (shouldFetch) {
-      return (
-         <SparkFetcher groupId={groupId} sparkId={sparkId}>
-            {children}
-         </SparkFetcher>
-      )
-   } else {
-      return <>{children(null)}</>
-   }
+   const collection = "sparks"
+   const pathSegments = [sparkId]
+
+   return (
+      <FirestoreConditionalDocumentFetcher
+         collection={collection}
+         pathSegments={pathSegments}
+         shouldFetch={Boolean(sparkId)}
+         fallbackComponent={fallbackComponent}
+      >
+         {children}
+      </FirestoreConditionalDocumentFetcher>
+   )
 }
 
 export default SparkFetchWrapper

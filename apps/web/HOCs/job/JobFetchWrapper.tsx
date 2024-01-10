@@ -1,6 +1,8 @@
 import { FC, ReactNode } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJob from "../../components/custom-hook/custom-job/useCustomJob"
+import FirestoreConditionalDocumentFetcher, {
+   WrapperProps,
+} from "HOCs/FirestoreConditionalDocumentFetcher"
 
 /**
  * Props for JobFetcher component.
@@ -11,26 +13,8 @@ import useCustomJob from "../../components/custom-hook/custom-job/useCustomJob"
  */
 type JobFetcherProps = {
    jobId?: string
+   // eslint-disable-next-line no-unused-vars
    children: (job: CustomJob | null) => ReactNode
-}
-
-/**
- * Fetches the Job using the provided group and Job ID.
- * @param {JobFetcherProps} props - The props for the component.
- * @returns {ReactNode} - The child components.
- */
-const JobFetcher: FC<JobFetcherProps> = ({ jobId, children }) => {
-   const job = useCustomJob(jobId)
-   return <>{children(job)}</>
-}
-
-/**
- * Props for JobFetchWrapper component.
- * @typedef {Object} WrapperProps
- * @property {boolean} shouldFetch - Indicates whether the Job data should be fetched.
- */
-type WrapperProps = {
-   shouldFetch: boolean
 }
 
 /**
@@ -42,15 +26,23 @@ type WrapperProps = {
  * @returns {ReactNode} - The child components.
  */
 const JobFetchWrapper: FC<WrapperProps & JobFetcherProps> = ({
-   shouldFetch,
    jobId,
    children,
+   fallbackComponent,
 }) => {
-   if (shouldFetch) {
-      return <JobFetcher jobId={jobId}>{children}</JobFetcher>
-   } else {
-      return <>{children(null)}</>
-   }
+   const collection = "customJobs"
+   const pathSegments = [jobId]
+
+   return (
+      <FirestoreConditionalDocumentFetcher
+         shouldFetch={Boolean(jobId)}
+         collection={collection}
+         pathSegments={pathSegments}
+         fallbackComponent={fallbackComponent}
+      >
+         {children}
+      </FirestoreConditionalDocumentFetcher>
+   )
 }
 
 export default JobFetchWrapper
