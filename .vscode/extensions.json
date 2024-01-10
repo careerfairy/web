@@ -1,0 +1,9 @@
+{
+   "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "toba.vsfire",
+      "mhutchie.git-graph",
+      "esbenp.prettier-vscode",
+      "streetsidesoftware.code-spell-checker"
+   ]
+}
