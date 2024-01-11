@@ -363,7 +363,7 @@ const videoFormSchema = object({
          .required("File is required")
          .test(
             "file-size",
-            "File size too large. Maximum size allowed is 150MB.",
+            "File size too large. Maximum size allowed is 100MB.",
             (value) => {
                if (!value) return true
 
