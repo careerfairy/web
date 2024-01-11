@@ -20,6 +20,7 @@
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
+      "@mui/styles": "^5.14.17",
       "@dnd-kit/core": "^6.0.8",
       "@dnd-kit/sortable": "^7.0.2",
       "@fingerprintjs/fingerprintjs": "^3.4.1",
@@ -27,7 +28,6 @@
       "@material-table/core": "^0.2.13",
       "@mergeapi/react-merge-link": "^2.0.6",
       "@mui/lab": "^5.0.0-alpha.150",
-      "@mui/styles": "^5.14.17",
       "@mui/x-date-pickers": "^5.0.1",
       "@react-pdf/renderer": "^3.1.14",
       "@reduxjs/toolkit": "^1.8.3",
