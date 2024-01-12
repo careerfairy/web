@@ -10,7 +10,6 @@
       "react/no-object-type-as-default-prop": "warn",
       "react/boolean-prop-naming": "warn",
       "react/hook-use-state": "warn",
-      "react/jsx-handler-names": "warn",
-      "no-unused-vars": "warn"
+      "react/jsx-handler-names": "warn"
    }
 }
