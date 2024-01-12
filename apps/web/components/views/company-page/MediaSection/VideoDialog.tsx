@@ -184,7 +184,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
          <Box display={"flex"} justifyContent={"flex-end"}>
             <LoadingButton
                loading={formik.isSubmitting}
-               disabled={formik.isSubmitting}
+               disabled={!formik.isValid || formik.isSubmitting}
                color="secondary"
                type={"submit"}
                variant={"contained"}
