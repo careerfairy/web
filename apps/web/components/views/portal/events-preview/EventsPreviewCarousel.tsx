@@ -339,7 +339,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               >
                                  {seeMoreComponent}
                               </ConditionalWrapper>
-                              {arrowsComponent}
+                              {(!isMobile && arrowsComponent) || null}
                            </Stack>
                         </Box>
                      </ConditionalWrapper>
