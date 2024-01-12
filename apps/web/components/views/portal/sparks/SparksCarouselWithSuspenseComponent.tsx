@@ -1,5 +1,5 @@
 import { Box, IconButton, Stack } from "@mui/material"
-import { FC, ReactNode, useEffect, useMemo, useRef, useState } from "react"
+import { FC, ReactNode, useEffect, useRef, useState } from "react"
 import SparksCarousel, {
    ChildRefType,
 } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
