@@ -4,6 +4,7 @@
       "prettier",
       "plugin:storybook/recommended"
    ],
+   "plugins": ["@typescript-eslint"],
    "rules": {
       "react/jsx-no-constructed-context-values": "warn",
       "react/jsx-no-leaked-render": "warn",
@@ -11,6 +12,6 @@
       "react/boolean-prop-naming": "warn",
       "react/hook-use-state": "warn",
       "react/jsx-handler-names": "warn",
-      "no-unused-vars": "warn"
+      "@typescript-eslint/no-unused-vars": "warn"
    }
 }
