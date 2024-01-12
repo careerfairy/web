@@ -56,8 +56,10 @@ const styles = sxStyles({
    },
    slide: {
       flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
+         xs: `0 0 90%`,
+         sm: `0 0 60%`,
+         md: `0 0 50%`,
+         lg: `0 0 40%`,
       },
       minWidth: 0,
       position: "relative",
@@ -65,8 +67,11 @@ const styles = sxStyles({
          xs: 363,
          md: 363,
       },
-      "&:not(:first-child)": {
+      "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+      "&:first-of-type": {
+         ml: 0.3,
       },
    },
    paddingSlide: {
