@@ -184,7 +184,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
          <Box display={"flex"} justifyContent={"flex-end"}>
             <LoadingButton
                loading={formik.isSubmitting}
-               disabled={formik.isSubmitting}
+               disabled={!formik.isValid || formik.isSubmitting}
                color="secondary"
                type={"submit"}
                variant={"contained"}
@@ -361,12 +361,16 @@ const videoFormSchema = object({
       is: (isEmbedded: boolean, url: string) => !isEmbedded && !url,
       then: mixed<File>()
          .required("File is required")
-         .test("file-size", "File size too large", (value) => {
-            if (!value) return true
+         .test(
+            "file-size",
+            "File size too large. Maximum size allowed is 100MB.",
+            (value) => {
+               if (!value) return true
 
-            // size must be less than 100MB
-            return value.size <= 104857600 // 100MB
-         })
+               // size must be less than 100MB
+               return value.size <= 104857600 // 100MB
+            }
+         )
          .test("file-type", "Invalid file type", (value) => {
             if (!value) return true
             return ["video/mp4", "video/webm", "video/ogg"].includes(value.type)
