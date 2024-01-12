@@ -60,6 +60,9 @@ const styles = sxStyles({
       "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
       },
+      "&:first-of-type": {
+         ml: 0.3,
+      },
    },
 
    eventTitle: {
@@ -124,14 +127,6 @@ const EventSection = () => {
       eventsHeader: styles.eventsHeader,
    }
 
-   const stayUpToDateBanner = (title: String) => {
-      return (
-         <>
-            <StayUpToDateBanner />
-         </>
-      )
-   }
-
    return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
@@ -147,7 +142,7 @@ const EventSection = () => {
                seeMoreLink={`/next-livestreams?${query}`}
                styling={eventsCarouselStyling}
             >
-               {stayUpToDateBanner("Next Live Streams")}
+               {<StayUpToDateBanner />}
             </EventsPreviewCarousel>
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
