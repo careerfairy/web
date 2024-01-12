@@ -14,8 +14,6 @@ const config = {
 }
 
 const slideSpacing = 21
-const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 302 + slideSpacing
 
 const styles = sxStyles({
    slide: {
@@ -175,8 +173,7 @@ const MyNextEvents = ({ limit }: Props) => {
          styling={{
             compact: true,
             seeMoreSx: styles.seeMoreText,
-            // viewportSx: styles.viewportSx,
-            showArrows: false,
+            showArrows: true,
             headerAsLink: false,
             slide: styles.slide,
             title:

@@ -7,8 +7,6 @@ import EventsPreviewCarousel from "./EventsPreviewCarousel"
 import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
-const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 302 + slideSpacing
 
 const styles = sxStyles({
    arrowIcon: {
@@ -95,7 +93,7 @@ const defaultStyling: EventsCarouselStyling = {
    seeMoreSx: styles.seeMoreText,
    eventTitleSx: styles.eventTitle,
    viewportSx: styles.viewport,
-   showArrows: false,
+   showArrows: true,
    headerAsLink: false,
    padding: true,
    slide: styles.slide,

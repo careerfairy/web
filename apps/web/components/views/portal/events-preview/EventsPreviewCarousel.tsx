@@ -1,5 +1,4 @@
 import React, {
-   FC,
    ReactNode,
    useCallback,
    useEffect,
@@ -32,8 +31,6 @@ import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
-const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 302 + slideSpacing
 
 const styles = sxStyles({
    arrowIcon: {
@@ -313,7 +310,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                               <ConditionalWrapper
                                  condition={
                                     seeMoreLink !== undefined &&
-                                    styling.headerAsLink
+                                    (styling.headerAsLink || isMobile)
                                  }
                                  fallback={getHeading(
                                     [styling.title],
@@ -331,8 +328,19 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  </Link>
                               </ConditionalWrapper>
                            </Box>
-                           {seeMoreComponent}
-                           {arrowsComponent}
+                           <Stack
+                              spacing={1}
+                              direction={"row"}
+                              justifyContent="space-between"
+                              alignItems="center"
+                           >
+                              <ConditionalWrapper
+                                 condition={!styling.headerAsLink && !isMobile}
+                              >
+                                 {seeMoreComponent}
+                              </ConditionalWrapper>
+                              {arrowsComponent}
+                           </Stack>
                         </Box>
                      </ConditionalWrapper>
                   }
