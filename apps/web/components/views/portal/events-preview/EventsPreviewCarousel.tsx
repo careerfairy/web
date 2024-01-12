@@ -285,7 +285,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       const getHeading = (headingStyles: SxProps, variant?: any) => {
          return (
             <Typography
-               variant={variant ? variant : "h6"}
+               variant={variant ? variant : "h6"} // Could be ommited since default is h6
                sx={headingStyles}
                fontWeight={"600"}
                color="black"
