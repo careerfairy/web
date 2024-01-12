@@ -17,8 +17,6 @@ const config = {
    initialData: [],
 }
 const slideSpacing = 21
-const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 302 + slideSpacing
 
 const styles = sxStyles({
    arrowIcon: {
@@ -66,10 +64,10 @@ const styles = sxStyles({
    },
    slide: {
       flex: {
-         xs: `0 0 85%`,
-         sm: `0 0 50%`,
-         md: `0 0 40%`,
-         lg: `0 0 30%`,
+         xs: `0 0 90%`,
+         sm: `0 0 60%`,
+         md: `0 0 50%`,
+         lg: `0 0 40%`,
       },
       minWidth: {
          xs: "310px",
@@ -108,7 +106,7 @@ const defaultStyling: EventsCarouselStyling = {
    seeMoreSx: styles.seeMoreText,
    eventTitleSx: styles.eventTitle,
    viewportSx: styles.viewport,
-   showArrows: false,
+   showArrows: true,
    headerAsLink: false,
    padding: true,
    slide: styles.slide,
