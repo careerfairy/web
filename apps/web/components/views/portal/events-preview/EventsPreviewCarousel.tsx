@@ -1,4 +1,5 @@
 import React, {
+   FC,
    ReactNode,
    useCallback,
    useEffect,
@@ -27,7 +28,7 @@ import EventPreviewCard from "components/views/common/stream-cards/EventPreviewC
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ArrowLeft, ArrowRight } from "react-feather"
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
@@ -80,8 +81,10 @@ const styles = sxStyles({
    },
    slide: {
       flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
+         xs: `0 0 90%`,
+         sm: `0 0 60%`,
+         md: `0 0 50%`,
+         lg: `0 0 40%`,
       },
       minWidth: 0,
       position: "relative",
@@ -89,8 +92,11 @@ const styles = sxStyles({
          xs: 363,
          md: 363,
       },
-      "&:not(:first-child)": {
+      "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+      "&:first-of-type": {
+         ml: 0.3,
       },
    },
    paddingSlide: {
@@ -118,7 +124,7 @@ const defaultStyling: EventsCarouselStyling = {
    seeMoreSx: styles.seeMoreText,
    eventTitleSx: styles.eventTitle,
    viewportSx: styles.viewport,
-   showArrows: false,
+   showArrows: true,
    headerAsLink: false,
    padding: true,
    slide: styles.slide,
@@ -205,6 +211,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                if (slidesInView.length === emblaApi.slideNodes().length) {
                   emblaApi.off("slidesInView", updateSlidesInView)
                }
+
                const inView = emblaApi
                   .slidesInView()
                   .filter((index) => !slidesInView.includes(index))
@@ -221,6 +228,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          if (!emblaApi) return
 
          updateSlidesInView(emblaApi)
+
          emblaApi.on("slidesInView", updateSlidesInView)
          emblaApi.on("reInit", updateSlidesInView)
       }, [emblaApi, updateSlidesInView])
@@ -323,12 +331,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  </Link>
                               </ConditionalWrapper>
                            </Box>
-                           <ConditionalWrapper
-                              condition={styling.showArrows}
-                              fallback={seeMoreComponent}
-                           >
-                              {arrowsComponent}
-                           </ConditionalWrapper>
+                           {seeMoreComponent}
+                           {arrowsComponent}
                         </Box>
                      </ConditionalWrapper>
                   }
@@ -338,11 +342,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      >
                         <Box sx={styling.eventsHeader}>
                            <Typography
-                              variant={
-                                 styling.titleVariant
-                                    ? styling.titleVariant
-                                    : "h6"
-                              }
+                              variant={styling.titleVariant}
                               sx={styling.title}
                               fontWeight={"600"}
                               color="black"
@@ -460,6 +460,7 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    }
 }
 
+type CarouselHeaderProps = {}
 export type EventsCarouselStyling = {
    compact?: boolean
    seeMoreSx?: SxProps
