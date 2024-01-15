@@ -7,6 +7,7 @@ import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import Heading from "../common/Heading"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const config = {
    suspense: false,
@@ -36,6 +37,9 @@ const styles = sxStyles({
    eventsBackground: {
       background: "black",
    },
+   contentWrapper: {
+      pl: 2,
+   },
    cardWrapperContainerCircle: {
       border: "15px solid #229584",
       background: "#2ABAA5",
@@ -56,6 +60,14 @@ const styles = sxStyles({
       alignItems: "center",
       boxShadow:
          "0px 11px 15px -7px rgba(34, 149, 132,0.2),0px 24px 38px 3px rgba(34, 149, 132, 0.14),0px 9px 46px 100px rgba(34, 149, 132, 0.12)",
+   },
+   title: {
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px",
+      color: "black",
    },
    cardWrapper: {
       display: "flex",
@@ -165,32 +177,20 @@ const MyNextEvents = ({ limit }: Props) => {
    if (!authenticatedUser.email) {
       return null
    }
+   const getEmptyRegistrationsBanner = () => {
+      return (
+         <Box sx={styles.contentWrapper}>
+            <Box>
+               <Typography
+                  variant={"h6"}
+                  sx={styles.title}
+                  fontWeight={"600"}
+                  color="black"
+               >
+                  My Registrations
+               </Typography>
+            </Box>
 
-   return (
-      <Box sx={styles.boxContainer}>
-         <EventsPreviewCarousel
-            id={"my-next-events"}
-            type={EventsTypes.myNext}
-            events={events}
-            isEmpty={Boolean(!isLoading && !events.length)}
-            title={MY_NEXT_EVENTS_TITLE}
-            loading={isLoading}
-            seeMoreLink="/next-livestreams/my-registrations"
-            styling={{
-               compact: true,
-               seeMoreSx: styles.seeMoreText,
-               showArrows: true,
-               headerAsLink: false,
-               slide: styles.slide,
-               title:
-                  events?.length > 0
-                     ? styles.eventTitle
-                     : styles.eventTitleEmpty,
-               eventsHeader: styles.eventsHeader,
-               titleVariant: "h6",
-               padding: true,
-            }}
-         >
             <Box sx={styles.cardWrapper}>
                <Box sx={styles.cardWrapperContainerCircle}>
                   <Stack
@@ -229,7 +229,36 @@ const MyNextEvents = ({ limit }: Props) => {
                   </Stack>
                </Box>
             </Box>
-         </EventsPreviewCarousel>
+         </Box>
+      )
+   }
+   return (
+      <Box sx={styles.boxContainer}>
+         <ConditionalWrapper fallback={getEmptyRegistrationsBanner()}>
+            <EventsPreviewCarousel
+               id={"my-next-events"}
+               type={EventsTypes.myNext}
+               events={events}
+               isEmpty={Boolean(!isLoading && !events.length)}
+               title={MY_NEXT_EVENTS_TITLE}
+               loading={isLoading}
+               seeMoreLink="/next-livestreams/my-registrations"
+               styling={{
+                  compact: true,
+                  seeMoreSx: styles.seeMoreText,
+                  showArrows: true,
+                  headerAsLink: false,
+                  slide: styles.slide,
+                  title:
+                     events?.length > 0
+                        ? styles.eventTitle
+                        : styles.eventTitleEmpty,
+                  eventsHeader: styles.eventsHeader,
+                  titleVariant: "h6",
+                  padding: true,
+               }}
+            ></EventsPreviewCarousel>
+         </ConditionalWrapper>
       </Box>
    )
 }
