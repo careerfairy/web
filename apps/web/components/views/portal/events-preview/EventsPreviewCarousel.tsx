@@ -27,8 +27,9 @@ import EventPreviewCard from "components/views/common/stream-cards/EventPreviewC
 import Link from "next/link"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "react-feather"
+import { ArrowLeft, ArrowRight } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { Variant } from "@mui/material/styles/createTypography"
 
 const slideSpacing = 21
 
@@ -185,6 +186,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
 
       const [cardsLoaded, setCardsLoaded] = useState({})
 
+      // Will trigger another warning for not having destructured in value + setter pair
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [slidesInView, setSlidesInView] = useState<number[]>([])
 
       const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
@@ -282,10 +285,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </>
          )
       }
-      const getHeading = (headingStyles: SxProps, variant?: any) => {
+      const getHeading = (headingStyles: SxProps, variant?: Variant) => {
          return (
             <Typography
-               variant={variant ? variant : "h6"} // Could be ommited since default is h6
+               variant={variant ? variant : "h6"} // Could be omitted since default is h6
                sx={headingStyles}
                fontWeight={"600"}
                color="black"
@@ -468,7 +471,6 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    }
 }
 
-type CarouselHeaderProps = {}
 export type EventsCarouselStyling = {
    compact?: boolean
    seeMoreSx?: SxProps
@@ -479,9 +481,9 @@ export type EventsCarouselStyling = {
    padding?: boolean
    slide?: SxProps
    title?: SxProps
-   titleVariant?: any
+   titleVariant?: Variant
    eventsHeader?: SxProps
-   mainWrapperBoxSx?: any
+   mainWrapperBoxSx?: unknown
 }
 export type ChildRefType = {
    goNext: () => void

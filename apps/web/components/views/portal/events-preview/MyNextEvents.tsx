@@ -225,7 +225,7 @@ const MyNextEvents = ({ limit }: Props) => {
    )
 }
 export const MY_NEXT_EVENTS_TITLE = "My registrations"
-interface Props {
+type Props = {
    limit?: number
 }
 
