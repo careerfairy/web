@@ -62,7 +62,7 @@ const livestreamIndex = {
       "speakers",
    ],
    shouldIndex: (doc) => !doc.test, // Don't index test livestreams
-   fullIndexSyncQueryConsraints: (collectionRef) =>
+   fullIndexSyncQueryConstraints: (collectionRef) =>
       collectionRef.where("test", "==", false),
 } satisfies Index<LivestreamEvent>
 
