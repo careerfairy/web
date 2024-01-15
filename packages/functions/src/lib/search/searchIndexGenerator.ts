@@ -126,7 +126,7 @@ export type Index<T = any> = {
     * @param collectionQuery The collection query to filter
     * @returns The query to use to filter the documents to index
     */
-   fullIndexSyncQueryConsraints?: (collectionQuery: Query) => Query
+   fullIndexSyncQueryConstraints?: (collectionQuery: Query) => Query
 }
 
 /**

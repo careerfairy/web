@@ -38,58 +38,80 @@ export const fullIndexSync = functions
                `Index name must be one of ${indexNames.join(", ")}`
             )
             .required("Index name is required as a query parameter"),
+         secretKey: yup
+            .string()
+            .required("Secret key is required as a query parameter")
+            .equals(
+               [process.env.ALGOLIA_FULL_SYNC_SECRET_KEY],
+               "Invalid secret key"
+            ),
       })
 
+      // Validate the request query against the schema
       const { indexName } = await schema.validate(req.query)
 
+      // Initialize the Algolia index
       const index = initAlgoliaIndex(indexName)
 
+      // Get the known indexes
       const {
          collectionPath,
          fields,
          shouldIndex,
-         fullIndexSyncQueryConsraints,
+         fullIndexSyncQueryConstraints,
       } = knownIndexes[indexName]
 
+      // Reference to the Firestore collection
       let collectionRef: Query = firestore.collection(collectionPath)
 
-      if (fullIndexSyncQueryConsraints) {
-         collectionRef = fullIndexSyncQueryConsraints(collectionRef)
+      // Apply constraints if any
+      if (fullIndexSyncQueryConstraints) {
+         collectionRef = fullIndexSyncQueryConstraints(collectionRef)
       }
 
+      // Get the total number of documents in the collection
       const snap = await collectionRef.count().get()
-
       const totalDocuments = snap.data().count
 
+      // Initialize the count of synced documents
       let syncedDocuments = 0
 
+      // Variables to hold the document snapshots and the last document snapshot
       let documentSnapshots: QuerySnapshot
       let startAfter: DocumentSnapshot | undefined
 
+      // Loop through the collection in batches
       do {
+         // Create a query for the batch
          const query = startAfter
             ? collectionRef.startAfter(startAfter).limit(DOCS_PER_INDEXING)
             : collectionRef.limit(DOCS_PER_INDEXING)
 
+         // Get the document snapshots for the batch
          documentSnapshots = await query.get()
 
+         // Filter out the documents that should not be indexed
          const docsToIndex = documentSnapshots.docs.filter((doc) => {
             const docData = doc.data()
             // If shouldIndex is defined and returns false, skip indexing
             return !shouldIndex || shouldIndex(docData)
          })
 
+         // Create a batch of documents to index
          const batch = index.saveObjects(
             docsToIndex.map((doc) => getData(doc, fields))
          )
 
+         // Wait for the batch to be indexed
          await batch.wait()
 
+         // Update the count of synced documents
          syncedDocuments += docsToIndex.length
          functions.logger.info(
             `Synced ${syncedDocuments} of ${totalDocuments} documents`
          )
 
+         // Set the last document snapshot for the next batch
          startAfter = documentSnapshots.docs[documentSnapshots.docs.length - 1]
       } while (documentSnapshots.size === DOCS_PER_INDEXING)
 
