@@ -254,7 +254,7 @@ export enum EventsTypes {
    comingUpMarketing = "comingUpMarketing",
 }
 
-export interface EventsProps {
+export type EventsProps = {
    events: LivestreamEvent[]
    seeMoreLink?: string
    title?: string

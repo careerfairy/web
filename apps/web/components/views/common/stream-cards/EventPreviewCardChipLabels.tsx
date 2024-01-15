@@ -22,6 +22,18 @@ const styles = sxStyles({
          borderRadius: "50%",
       },
    },
+   liveLeftChip: {
+      width: {
+         xs: "fit-content",
+         md: "auto",
+      },
+   },
+   leftChip: {
+      pl: 0.5,
+      pr: 0,
+      alignItems: "center",
+      width: { xs: "fit-content", md: "auto" },
+   },
 })
 
 type Props = {
@@ -41,7 +53,7 @@ const EventPreviewCardChipLabels = ({
    hasJobToApply,
    recordingAvailableDays,
 }: Props) => {
-   let leftChips = []
+   const leftChips = []
    let rightChip
 
    if (hasParticipated && isPast) {
@@ -63,13 +75,7 @@ const EventPreviewCardChipLabels = ({
             icon={<LiveIcon />}
             color="error"
             label={"Live"}
-            sx={{
-               width: {
-                  xs: "fit-content",
-                  md: "auto",
-                  boxShadow: "0 0 5px #000",
-               },
-            }}
+            sx={styles.liveLeftChip}
          />
       )
    }
@@ -79,13 +85,7 @@ const EventPreviewCardChipLabels = ({
          <Chip
             key={"booked-chip"}
             icon={<CheckCircle color="#00D247" width={18} height={18} />}
-            sx={{
-               pl: 0.5,
-               pr: 0,
-               alignItems: "center",
-               width: { xs: "fit-content", md: "auto" },
-               boxShadow: "0 0 5px #000",
-            }}
+            sx={styles.leftChip}
             color="info"
             label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
          />
@@ -97,14 +97,7 @@ const EventPreviewCardChipLabels = ({
          <Chip
             key={"hiring-now-chip"}
             icon={<Briefcase color={"#3A70E2"} width={18} height={18} />}
-            sx={{
-               pl: 0.5,
-               pr: 0,
-               alignItems: "center",
-               width: { xs: "fit-content", md: "auto" },
-               boxShadow: "0 0 5px #000",
-               // border: "1px solid darkgrey" // TODO-WG: Check if not preferrable over blurred background
-            }}
+            sx={styles.leftChip}
             color={"info"}
             label={<Typography fontWeight={400}>Hiring now</Typography>}
          />
@@ -133,7 +126,6 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"available-chip"}
-            sx={{ pr: 0, boxShadow: "0 0 5px #000" }}
             color={"info"}
             icon={
                <TaskAltOutlinedIcon

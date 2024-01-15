@@ -193,11 +193,15 @@ const styles = sxStyles({
    },
    startMonth: {
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "12px",
       fontStyle: "normal",
       fontWeight: "400",
-      lineHeight: "20px" /* 166.667% */,
+      lineHeight: "20px",
+   },
+   eventDateWrapper: {
+      display: "flex",
+      marginY: 1,
+      justifyContent: "space-between",
    },
 })
 
@@ -510,11 +514,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            {isPast ? (
                               <Box
                                  className="hidePastDateOnHover"
-                                 sx={{
-                                    display: "flex",
-                                    marginY: 1,
-                                    justifyContent: "space-between",
-                                 }}
+                                 sx={styles.eventDateWrapper}
                               >
                                  <Typography
                                     sx={{
