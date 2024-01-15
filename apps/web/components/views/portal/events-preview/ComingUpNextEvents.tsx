@@ -100,6 +100,9 @@ const styles = sxStyles({
          color: "#000",
       },
    },
+   mainWrapperBox: {
+      mt: 2,
+   },
 })
 const defaultStyling: EventsCarouselStyling = {
    compact: true,
@@ -113,9 +116,7 @@ const defaultStyling: EventsCarouselStyling = {
    title: styles.eventTitle,
    titleVariant: "h6",
    eventsHeader: styles.eventsHeader,
-   mainWrapperBoxSx: {
-      mt: 2,
-   },
+   mainWrapperBoxSx: styles.mainWrapperBox,
 }
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
