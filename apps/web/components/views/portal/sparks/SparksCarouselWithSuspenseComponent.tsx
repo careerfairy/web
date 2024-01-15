@@ -9,6 +9,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { EmblaOptionsType } from "embla-carousel-react"
 
 const styles = sxStyles({
    stack: {
@@ -30,6 +31,10 @@ type Props = {
    handleSparksClicked: (spark: Spark) => void
 }
 
+const sparksCarouselEmblaOptions: EmblaOptionsType = {
+   loop: false,
+   skipSnaps: true,
+}
 const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
    groupId,
@@ -102,6 +107,7 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked }) => {
                sparks={sparksContent}
                onSparkClick={handleSparksClicked}
                isAdmin={false}
+               options={sparksCarouselEmblaOptions}
             />
          </Stack>
       </Box>

@@ -5,6 +5,7 @@ import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { sxStyles } from "types/commonTypes"
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 const slideSpacing = 21
 const desktopSlideWidth = 306 + slideSpacing
@@ -54,7 +55,9 @@ type PropType = {
 const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
    (props, ref) => {
       const { options, sparks, onSparkClick, children, isAdmin } = props
-      const [emblaRef, emblaApi] = useEmblaCarousel(options)
+      const [emblaRef, emblaApi] = useEmblaCarousel(options, [
+         WheelGesturesPlugin(),
+      ])
 
       React.useImperativeHandle(ref, () => ({
          goNext() {
