@@ -65,9 +65,9 @@ const styles = sxStyles({
    slide: {
       flex: {
          xs: `0 0 90%`,
-         sm: `0 0 60%`,
-         md: `0 0 50%`,
-         lg: `0 0 40%`,
+         sm: `0 0 45%`,
+         md: `0 0 40%`,
+         lg: `0 0 30%`,
       },
       minWidth: {
          xs: "310px",
