@@ -19,9 +19,9 @@ const styles = sxStyles({
    slide: {
       flex: {
          xs: `0 0 90%`,
-         sm: `0 0 60%`,
-         md: `0 0 50%`,
-         lg: `0 0 40%`,
+         sm: `0 0 45%`,
+         md: `0 0 40%`,
+         lg: `0 0 30%`,
       },
       minWidth: 0,
       position: "relative",
@@ -63,10 +63,14 @@ const styles = sxStyles({
       alignItems: "center",
       borderRadius: "16px",
       border: "1px solid #D6D6E0",
-      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
       background: "#3D3D47",
       marginY: 1,
+      // marginRight: {
+      //    xs: 2,
+      //    xl: 0,
+
+      // },
       paddingTop: 5,
       paddingBottom: 4,
       backgroundColor: "black",
@@ -140,6 +144,12 @@ const styles = sxStyles({
    viewportSx: {
       overflow: "hidden",
    },
+   boxContainer: {
+      pr: {
+         xs: 2,
+         xl: 0,
+      },
+   },
 })
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()
@@ -162,66 +172,70 @@ const MyNextEvents = ({ limit }: Props) => {
    }
 
    return (
-      <EventsPreviewCarousel
-         id={"my-next-events"}
-         type={EventsTypes.myNext}
-         events={events}
-         isEmpty={Boolean(!isLoading && !events.length)}
-         title={MY_NEXT_EVENTS_TITLE}
-         loading={isLoading}
-         seeMoreLink="/next-livestreams/my-registrations"
-         styling={{
-            compact: true,
-            seeMoreSx: styles.seeMoreText,
-            showArrows: true,
-            headerAsLink: false,
-            slide: styles.slide,
-            title:
-               events?.length > 0 ? styles.eventTitle : styles.eventTitleEmpty,
-            eventsHeader: styles.eventsHeader,
-            titleVariant: "h6",
-            padding: true,
-         }}
-      >
-         <Box sx={styles.cardWrapper}>
-            <Box sx={styles.cardWrapperContainerCircle}>
-               <Stack
-                  spacing={1.25}
-                  alignItems="center"
-                  flexDirection={"column"}
-               >
-                  <Box>
-                     {
-                        <Heading sx={styles.noRegistrations.title}>
-                           No registrations Yet!
-                        </Heading>
-                     }
-                  </Box>
-                  <Box sx={styles.noRegistrations.descriptionWrapper}>
-                     <Typography
-                        sx={styles.noRegistrations.description}
-                        variant="h6"
-                        fontWeight={"400"}
-                        color="textSecondary"
-                     >
-                        You don’t have any registrations to upcoming live
-                        streams! Browse, register, discover new opportunities
-                        and kick-start your career.
-                     </Typography>
-                  </Box>
-                  <Box>
-                     <Button
-                        sx={styles.noRegistrations.redirectButton}
-                        variant="contained"
-                        href="/next-livestreams"
-                     >
-                        <Typography>Check all live streams</Typography>
-                     </Button>
-                  </Box>
-               </Stack>
+      <Box sx={styles.boxContainer}>
+         <EventsPreviewCarousel
+            id={"my-next-events"}
+            type={EventsTypes.myNext}
+            events={events}
+            isEmpty={Boolean(!isLoading && !events.length)}
+            title={MY_NEXT_EVENTS_TITLE}
+            loading={isLoading}
+            seeMoreLink="/next-livestreams/my-registrations"
+            styling={{
+               compact: true,
+               seeMoreSx: styles.seeMoreText,
+               showArrows: true,
+               headerAsLink: false,
+               slide: styles.slide,
+               title:
+                  events?.length > 0
+                     ? styles.eventTitle
+                     : styles.eventTitleEmpty,
+               eventsHeader: styles.eventsHeader,
+               titleVariant: "h6",
+               padding: true,
+            }}
+         >
+            <Box sx={styles.cardWrapper}>
+               <Box sx={styles.cardWrapperContainerCircle}>
+                  <Stack
+                     spacing={1.25}
+                     alignItems="center"
+                     flexDirection={"column"}
+                  >
+                     <Box>
+                        {
+                           <Heading sx={styles.noRegistrations.title}>
+                              No registrations Yet!
+                           </Heading>
+                        }
+                     </Box>
+                     <Box sx={styles.noRegistrations.descriptionWrapper}>
+                        <Typography
+                           sx={styles.noRegistrations.description}
+                           variant="h6"
+                           fontWeight={"400"}
+                           color="textSecondary"
+                        >
+                           You don’t have any registrations to upcoming live
+                           streams! Browse, register, discover new opportunities
+                           and kick-start your career.
+                        </Typography>
+                     </Box>
+                     <Box>
+                        <Button
+                           sx={styles.noRegistrations.redirectButton}
+                           variant="contained"
+                           href="/next-livestreams"
+                        >
+                           <Typography>Check all live streams</Typography>
+                        </Button>
+                     </Box>
+                  </Stack>
+               </Box>
             </Box>
-         </Box>
-      </EventsPreviewCarousel>
+         </EventsPreviewCarousel>
+      </Box>
    )
 }
 export const MY_NEXT_EVENTS_TITLE = "My registrations"
