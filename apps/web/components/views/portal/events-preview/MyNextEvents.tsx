@@ -66,11 +66,6 @@ const styles = sxStyles({
       overflow: "hidden",
       background: "#3D3D47",
       marginY: 1,
-      // marginRight: {
-      //    xs: 2,
-      //    xl: 0,
-
-      // },
       paddingTop: 5,
       paddingBottom: 4,
       backgroundColor: "black",
