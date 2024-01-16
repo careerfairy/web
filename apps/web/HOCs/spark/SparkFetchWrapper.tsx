@@ -11,7 +11,6 @@ import { FC, ReactNode } from "react"
  */
 type SparkFetcherProps = {
    sparkId: string
-   // eslint-disable-next-line no-unused-vars
    children: (spark: Spark | null) => ReactNode
 }
 

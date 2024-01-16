@@ -13,7 +13,6 @@ import FirestoreConditionalDocumentFetcher, {
  */
 type JobFetcherProps = {
    jobId?: string
-   // eslint-disable-next-line no-unused-vars
    children: (job: CustomJob | null) => ReactNode
 }
 
