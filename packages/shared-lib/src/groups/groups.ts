@@ -334,3 +334,10 @@ export type GroupAdminNewEventEmailInfo = {
     */
    nextLivestreamsLink: string
 }
+
+export type FilterCompanyOptions = {
+   companyIndustries?: string[]
+   companyCountries?: string[]
+   publicSparks?: boolean
+   companySize?: string[]
+}

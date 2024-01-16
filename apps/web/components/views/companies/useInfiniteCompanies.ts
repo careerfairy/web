@@ -11,7 +11,9 @@ import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepo
 /**
  * This is where you can add filters to the query as this hook grows
  * */
-type Filters = {
+export type Filters = {
+   // TODO:WG add additional filters to constrainst array and type
+   companyCountries?: string[]
    // industries?: string[]
    // companySizes?: string[]
 }
@@ -39,22 +41,23 @@ const useInfiniteCompanies = ({
 }
 
 export const getInfiniteQuery = (
-   pageSIze: number = 10,
+   pageSize = 10,
    filters: Filters = {}
 ): Query<Group> => {
    const constraints: QueryConstraint[] = []
 
-   // if (filters.industries) {
-   //    constraints.push(
-   //       where("companyIndustry", "in", filters.industries)
-   //    )
-
+   if (filters.companyCountries?.length > 0) {
+      constraints.push(
+         where("companyCountry.id", "in", filters.companyCountries)
+      )
+   }
+   // TODO:WG add additional filters to constrainst array and type
    return query(
       collection(FirestoreInstance, "careerCenterData"),
       where("publicProfile", "==", true),
       where("test", "==", false),
       ...constraints,
-      limit(pageSIze),
+      limit(pageSize),
       orderBy("normalizedUniversityName", "asc")
    ).withConverter(createGenericConverter<Group>())
 }

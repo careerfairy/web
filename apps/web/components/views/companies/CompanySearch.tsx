@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
-import { Box, Card, Grid } from "@mui/material"
+import { Box, Grid, Stack } from "@mui/material"
 import { getParts } from "../../util/search"
 import { sxStyles } from "../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
@@ -13,8 +13,14 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import AutocompleteSearch from "../common/AutocompleteSearch"
 import { useRouter } from "next/router"
 import { Search as FindIcon } from "react-feather"
+import Filter, { FilterEnum } from "../common/filter/Filter"
 
 const styles = sxStyles({
+   boxWrapper: {
+      flex: 1,
+      display: "flex",
+      marginX: { xs: 2, md: 3 },
+   },
    root: {
       flex: 1,
       display: "flex",
@@ -28,6 +34,23 @@ const styles = sxStyles({
       "&:hover": {
          backgroundColor: (theme) => theme.palette.action.hover + " !important",
       },
+   },
+   filter: {
+      flex: "15%",
+      display: "flex",
+      ml: 2,
+   },
+   filterWrapper: {
+      backgroundColor: "white",
+      borderRadius: "8px",
+      boxShadow: "0px 12px 32px 0px rgba(0, 0, 0, 0.04)",
+   },
+   searchWrapper: {
+      backgroundColor: "white",
+      flex: "85%",
+      display: "flex",
+      borderRadius: "8px",
+      boxShadow: "0px 12px 32px 0px rgba(0, 0, 0, 0.04)",
    },
 })
 
@@ -51,7 +74,14 @@ const CompanySearch: FC = () => {
    )
 
    const { data: companyHits, status } = useGroupSearch(inputValue, options)
-
+   /**
+    * Filter by Company: location, industry, sparks(y/n) or size.
+    */
+   // TODO:WG Add additional filters
+   const filtersToShow = useMemo(
+      () => [FilterEnum.companyCountries, FilterEnum.companyIndustries],
+      []
+   )
    const loading = status === "loading"
 
    const handleChange = useCallback(
@@ -97,23 +127,34 @@ const CompanySearch: FC = () => {
    )
 
    return (
-      <Card sx={styles.root}>
-         <AutocompleteSearch
-            id="company-search"
-            minCharacters={3}
-            loading={loading}
-            inputValue={inputValue}
-            handleChange={handleChange}
-            options={sortedGroups}
-            renderOption={renderOption}
-            isOptionEqualToValue={isOptionEqualToValue}
-            getOptionLabel={getOptionLabel}
-            setInputValue={setInputValue}
-            noOptionsText="No companies found"
-            placeholderText="Search for a company"
-            inputEndIcon={<FindIcon />}
-         />
-      </Card>
+      <Stack direction={"row"}>
+         <Box sx={styles.searchWrapper}>
+            <AutocompleteSearch
+               id="company-search"
+               minCharacters={3}
+               loading={loading}
+               inputValue={inputValue}
+               handleChange={handleChange}
+               options={sortedGroups}
+               renderOption={renderOption}
+               isOptionEqualToValue={isOptionEqualToValue}
+               getOptionLabel={getOptionLabel}
+               setInputValue={setInputValue}
+               noOptionsText="No companies found"
+               placeholderText="Search for a company"
+               inputEndIcon={<FindIcon />}
+            />
+         </Box>
+         <Box sx={styles.filter} justifyContent={"center"}>
+            <Stack direction={"row"} sx={styles.filterWrapper}>
+               <Filter
+                  filtersToShow={filtersToShow}
+                  // TODO:WG Pass results from length of Array in parent components
+                  numberOfResults={companyHits?.length}
+               />
+            </Stack>
+         </Box>
+      </Stack>
    )
 }
 
