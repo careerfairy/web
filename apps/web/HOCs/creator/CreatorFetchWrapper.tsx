@@ -14,7 +14,6 @@ import { FC, ReactNode } from "react"
 type CreatorFetcherProps = {
    groupId: string
    selectedCreatorId?: string
-   // eslint-disable-next-line no-unused-vars
    children: (creator: Creator | null) => ReactNode
 }
 
