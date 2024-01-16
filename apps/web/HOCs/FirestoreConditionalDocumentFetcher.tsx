@@ -9,7 +9,6 @@ import { ReactFireOptions } from "reactfire"
 type FirestoreFetcherProps<T extends Identifiable> = {
    collection: string
    pathSegments: string[]
-   // eslint-disable-next-line no-unused-vars
    children: (data: T | null) => ReactNode
    options?: ReactFireOptions
 }
