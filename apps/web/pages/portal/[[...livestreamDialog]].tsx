@@ -116,7 +116,7 @@ const PortalPage = ({
                            <EventsPreviewCarousel
                               id={"past-events"}
                               title={"Past live streams"}
-                              type={EventsTypes.pastEvents}
+                              type={EventsTypes.PAST_EVENTS}
                               events={events}
                               seeMoreLink={"/past-livestreams"}
                            />
@@ -165,9 +165,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       userStats,
       userData,
    ] = results.map((result) =>
-      result.status === "fulfilled"
-         ? (result as PromiseFulfilledResult<any>).value
-         : null
+      result.status === "fulfilled" ? result.value : null
    )
 
    const recordedEventsToShare = recordedEvents?.filter(

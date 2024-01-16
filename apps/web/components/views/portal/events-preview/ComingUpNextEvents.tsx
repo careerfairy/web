@@ -30,7 +30,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0.5,
+      pb: 1,
    },
    description: {
       display: "flex",
@@ -181,7 +181,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       <EventsPreviewCarousel
          id={"upcoming-events"}
          title={COMMING_UP_NEXT_EVENT_TITLE}
-         type={EventsTypes.comingUp}
+         type={EventsTypes.COMING_UP}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
          isRecommended

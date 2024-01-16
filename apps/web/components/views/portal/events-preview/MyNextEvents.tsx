@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { FC, useMemo } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
@@ -32,6 +32,9 @@ const styles = sxStyles({
       },
       "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+      "&:first-of-type": {
+         ml: 0.3,
       },
    },
    eventsBackground: {
@@ -151,7 +154,7 @@ const styles = sxStyles({
    viewportSx: {
       overflow: "hidden",
    },
-   boxContainer: {
+   boxContainerEmpty: {
       pr: {
          xs: 2,
          xl: 0,
@@ -177,67 +180,15 @@ const MyNextEvents = ({ limit }: Props) => {
    if (!authenticatedUser.email) {
       return null
    }
-   const getEmptyRegistrationsBanner = () => {
-      return (
-         <Box sx={styles.contentWrapper}>
-            <Box>
-               <Typography
-                  variant={"h6"}
-                  sx={styles.title}
-                  fontWeight={"600"}
-                  color="black"
-               >
-                  My Registrations
-               </Typography>
-            </Box>
-
-            <Box sx={styles.cardWrapper}>
-               <Box sx={styles.cardWrapperContainerCircle}>
-                  <Stack
-                     spacing={1.25}
-                     alignItems="center"
-                     flexDirection={"column"}
-                  >
-                     <Box>
-                        {
-                           <Heading sx={styles.noRegistrations.title}>
-                              No registrations Yet!
-                           </Heading>
-                        }
-                     </Box>
-                     <Box sx={styles.noRegistrations.descriptionWrapper}>
-                        <Typography
-                           sx={styles.noRegistrations.description}
-                           variant="h6"
-                           fontWeight={"400"}
-                           color="textSecondary"
-                        >
-                           You don’t have any registrations to upcoming live
-                           streams! Browse, register, discover new opportunities
-                           and kick-start your career.
-                        </Typography>
-                     </Box>
-                     <Box>
-                        <Button
-                           sx={styles.noRegistrations.redirectButton}
-                           variant="contained"
-                           href="/next-livestreams"
-                        >
-                           <Typography>Check all live streams</Typography>
-                        </Button>
-                     </Box>
-                  </Stack>
-               </Box>
-            </Box>
-         </Box>
-      )
-   }
    return (
-      <Box sx={styles.boxContainer}>
-         <ConditionalWrapper fallback={getEmptyRegistrationsBanner()}>
+      <Box sx={events?.length > 0 ? null : styles.boxContainerEmpty}>
+         <ConditionalWrapper
+            condition={events?.length > 0}
+            fallback={<EmptyRegistrationsBanner></EmptyRegistrationsBanner>}
+         >
             <EventsPreviewCarousel
                id={"my-next-events"}
-               type={EventsTypes.myNext}
+               type={EventsTypes.MY_NEXT}
                events={events}
                isEmpty={Boolean(!isLoading && !events.length)}
                title={MY_NEXT_EVENTS_TITLE}
@@ -249,6 +200,7 @@ const MyNextEvents = ({ limit }: Props) => {
                   showArrows: true,
                   headerAsLink: false,
                   slide: styles.slide,
+                  viewportSx: styles.viewportSx,
                   title:
                      events?.length > 0
                         ? styles.eventTitle
@@ -257,8 +209,61 @@ const MyNextEvents = ({ limit }: Props) => {
                   titleVariant: "h6",
                   padding: true,
                }}
-            ></EventsPreviewCarousel>
+            />
          </ConditionalWrapper>
+      </Box>
+   )
+}
+const EmptyRegistrationsBanner: FC = () => {
+   return (
+      <Box sx={styles.contentWrapper}>
+         <Box>
+            <Typography
+               variant={"h6"}
+               sx={styles.title}
+               fontWeight={"600"}
+               color="black"
+            >
+               My Registrations
+            </Typography>
+         </Box>
+
+         <Box sx={styles.cardWrapper}>
+            <Box sx={styles.cardWrapperContainerCircle}>
+               <Stack
+                  spacing={1.25}
+                  alignItems="center"
+                  flexDirection={"column"}
+               >
+                  <Box>
+                     <Heading sx={styles.noRegistrations.title}>
+                        No registrations Yet!
+                     </Heading>
+                  </Box>
+                  <Box sx={styles.noRegistrations.descriptionWrapper}>
+                     <Typography
+                        sx={styles.noRegistrations.description}
+                        variant="h6"
+                        fontWeight={"400"}
+                        color="textSecondary"
+                     >
+                        You don’t have any registrations to upcoming live
+                        streams! Browse, register, discover new opportunities
+                        and kick-start your career.
+                     </Typography>
+                  </Box>
+                  <Box>
+                     <Button
+                        sx={styles.noRegistrations.redirectButton}
+                        variant="contained"
+                        href="/next-livestreams"
+                     >
+                        <Typography>Check all live streams</Typography>
+                     </Button>
+                  </Box>
+               </Stack>
+            </Box>
+         </Box>
       </Box>
    )
 }

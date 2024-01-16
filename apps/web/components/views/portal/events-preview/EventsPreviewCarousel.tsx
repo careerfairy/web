@@ -45,7 +45,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0.5,
+      pb: 1,
    },
    description: {
       display: "flex",
@@ -305,148 +305,134 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          <>
             <ConditionalWrapper condition={!hidePreview}>
                <Box sx={mainBoxSxStyles}>
-                  {
-                     <ConditionalWrapper
-                        condition={!isEmbedded && styling.compact}
-                     >
-                        <Box sx={styling.eventsHeader}>
-                           <Box sx={styling.eventsHeader}>
-                              <ConditionalWrapper
-                                 condition={
-                                    seeMoreLink !== undefined &&
-                                    (styling.headerAsLink || isMobile)
-                                 }
-                                 fallback={getHeading(
-                                    [styling.title],
+                  <ConditionalWrapper
+                     condition={!isEmbedded && styling.compact}
+                  >
+                     <Box sx={styling.eventsHeader}>
+                        <Box>
+                           <ConditionalWrapper
+                              condition={
+                                 seeMoreLink !== undefined &&
+                                 (styling.headerAsLink || isMobile)
+                              }
+                              fallback={getHeading(
+                                 [styling.title],
+                                 styling.titleVariant
+                              )}
+                           >
+                              <Link href={seeMoreLink} style={styles.titleLink}>
+                                 {getHeading(
+                                    [styling.title, styles.underlined],
                                     styling.titleVariant
                                  )}
-                              >
-                                 <Link
-                                    href={seeMoreLink}
-                                    style={styles.titleLink}
-                                 >
-                                    {getHeading(
-                                       [styling.title, styles.underlined],
-                                       styling.titleVariant
-                                    )}
-                                 </Link>
-                              </ConditionalWrapper>
-                           </Box>
-                           <Stack
-                              spacing={1}
-                              direction={"row"}
-                              justifyContent="space-between"
-                              alignItems="center"
-                           >
-                              <ConditionalWrapper
-                                 condition={!styling.headerAsLink && !isMobile}
-                              >
-                                 {seeMoreComponent}
-                              </ConditionalWrapper>
-                              {(!isMobile && arrowsComponent) || null}
-                           </Stack>
+                              </Link>
+                           </ConditionalWrapper>
                         </Box>
+                        <Stack
+                           spacing={1}
+                           direction={"row"}
+                           justifyContent="space-between"
+                           alignItems="center"
+                        >
+                           <ConditionalWrapper
+                              condition={!styling.headerAsLink && !isMobile}
+                           >
+                              {seeMoreComponent}
+                           </ConditionalWrapper>
+                           {(!isMobile && arrowsComponent) || null}
+                        </Stack>
+                     </Box>
+                  </ConditionalWrapper>
+
+                  <ConditionalWrapper
+                     condition={!isEmbedded && !styling.compact}
+                  >
+                     <Box sx={styling.eventsHeader}>
+                        <Typography
+                           variant={styling.titleVariant}
+                           sx={styling.title}
+                           fontWeight={"600"}
+                           color="black"
+                        >
+                           {title}
+                        </Typography>
+                     </Box>
+                  </ConditionalWrapper>
+                  <Stack sx={styles.previewContent}>
+                     <ConditionalWrapper
+                        condition={
+                           !isMobile &&
+                           eventDescription !== undefined &&
+                           eventDescription.length > 0
+                        }
+                     >
+                        <Stack>
+                           <Box sx={styles.description}>
+                              <Typography
+                                 variant="h6"
+                                 fontWeight={"400"}
+                                 color="textSecondary"
+                              >
+                                 {eventDescription}
+                              </Typography>
+                           </Box>
+                        </Stack>
                      </ConditionalWrapper>
-                  }
-                  {
                      <ConditionalWrapper
                         condition={!isEmbedded && !styling.compact}
                      >
-                        <Box sx={styling.eventsHeader}>
-                           <Typography
-                              variant={styling.titleVariant}
-                              sx={styling.title}
-                              fontWeight={"600"}
-                              color="black"
-                           >
-                              {title}
-                           </Typography>
-                        </Box>
+                        <Stack
+                           direction="row"
+                           spacing={2}
+                           justifyContent="space-between"
+                           alignItems="center"
+                           mt={1}
+                           mb={1}
+                        >
+                           <Box>{seeMoreComponent}</Box>
+                           {arrowsComponent}
+                        </Stack>
                      </ConditionalWrapper>
-                  }
-                  <Stack sx={styles.previewContent}>
-                     {
-                        <ConditionalWrapper
-                           condition={
-                              !isMobile &&
-                              eventDescription !== undefined &&
-                              eventDescription.length > 0
-                           }
-                        >
-                           <Stack>
-                              <Box sx={styles.description}>
-                                 <Typography
-                                    variant="h6"
-                                    fontWeight={"400"}
-                                    color="textSecondary"
-                                 >
-                                    {eventDescription}
-                                 </Typography>
-                              </Box>
-                           </Stack>
-                        </ConditionalWrapper>
-                     }
-                     {
-                        <ConditionalWrapper
-                           condition={!isEmbedded && !styling.compact}
-                        >
-                           <Stack
-                              direction="row"
-                              spacing={2}
-                              justifyContent="space-between"
-                              alignItems="center"
-                              mt={1}
-                              mb={1}
+                     <Box id={id} sx={styling.viewportSx} ref={emblaRef}>
+                        <Box sx={[styles.container]}>
+                           <ConditionalWrapper
+                              condition={!loading}
+                              fallback={getLoadingCard()}
                            >
-                              <Box>{seeMoreComponent}</Box>
-                              {arrowsComponent}
-                           </Stack>
-                        </ConditionalWrapper>
-                     }
-                     {
-                        <Box id={id} sx={styling.viewportSx} ref={emblaRef}>
-                           <Box sx={[styles.container]}>
-                              <ConditionalWrapper
-                                 condition={!loading}
-                                 fallback={getLoadingCard()}
-                              >
-                                 <ConditionalWrapper
-                                    condition={events?.length > 0}
-                                    fallback={children}
-                                 >
-                                    {events.map((event, index, arr) => (
-                                       <Box sx={styling.slide} key={event.id}>
-                                          <EventPreviewCard
-                                             key={event.id}
-                                             loading={
-                                                (loading &&
-                                                   !cardsLoaded[index] &&
-                                                   !cardsLoaded[
-                                                      arr.length - (index + 1)
-                                                   ]) ||
-                                                false
-                                             }
-                                             index={index}
-                                             totalElements={arr.length}
-                                             location={getLocation(type)}
-                                             event={event}
-                                             isRecommended={isRecommended}
-                                          />
-                                       </Box>
-                                    ))}
-                                 </ConditionalWrapper>
-                              </ConditionalWrapper>
-                              {/**
-                               * This prevents the last slide from touching the right edge of the viewport.
-                               */}
                               <ConditionalWrapper
                                  condition={events?.length > 0}
+                                 fallback={children}
                               >
-                                 <Box sx={styles.paddingSlide}></Box>
+                                 {events.map((event, index, arr) => (
+                                    <Box sx={styling.slide} key={event.id}>
+                                       <EventPreviewCard
+                                          key={event.id}
+                                          loading={
+                                             (loading &&
+                                                !cardsLoaded[index] &&
+                                                !cardsLoaded[
+                                                   arr.length - (index + 1)
+                                                ]) ||
+                                             false
+                                          }
+                                          index={index}
+                                          totalElements={arr.length}
+                                          location={getLocation(type)}
+                                          event={event}
+                                          isRecommended={isRecommended}
+                                       />
+                                    </Box>
+                                 ))}
                               </ConditionalWrapper>
-                           </Box>
+                           </ConditionalWrapper>
+                           {/**
+                            * This prevents the last slide from touching the right edge of the viewport.
+                            */}
+                           <ConditionalWrapper condition={events?.length > 0}>
+                              <Box sx={styles.paddingSlide}></Box>
+                           </ConditionalWrapper>
                         </Box>
-                     }
+                     </Box>
                   </Stack>
                </Box>
             </ConditionalWrapper>
@@ -457,15 +443,15 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
 
 const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
    switch (eventType) {
-      case EventsTypes.myNext:
+      case EventsTypes.MY_NEXT:
          return ImpressionLocation.myNextEventsCarousel
-      case EventsTypes.pastEvents:
+      case EventsTypes.PAST_EVENTS:
          return ImpressionLocation.pastEventsCarousel
-      case EventsTypes.recommended:
+      case EventsTypes.RECOMMENDED:
          return ImpressionLocation.recommendedEventsCarousel
-      case EventsTypes.comingUp:
+      case EventsTypes.COMING_UP:
          return ImpressionLocation.comingUpCarousel
-      case EventsTypes.comingUpMarketing:
+      case EventsTypes.COMING_UP_MARKETING:
          return ImpressionLocation.marketingPageCarousel
       default:
          return ImpressionLocation.unknown
@@ -512,23 +498,23 @@ export enum EventsTypes {
    /**
     * Top Picks for User based on the interests they selected at signup
     */
-   recommended = "recommended",
+   RECOMMENDED = "recommended",
    /**
     * Non specific upcoming events on careerfairy ordered closest start date
     */
-   comingUp = "comingUp",
+   COMING_UP = "comingUp",
    /**
     * upcoming events on that user has registered to ordered closest start date
     */
-   myNext = "myNext",
+   MY_NEXT = "myNext",
    /**
     * Events that have already happened
     */
-   pastEvents = "pastEvents",
+   PAST_EVENTS = "pastEvents",
    /*
     * coming up marketing events
     * */
-   comingUpMarketing = "comingUpMarketing",
+   COMING_UP_MARKETING = "comingUpMarketing",
 }
 
 EventsPreviewCarousel.displayName = "EventsPreviewCarousel"
