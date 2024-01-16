@@ -1,6 +1,6 @@
 import { Box, Stack } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -77,7 +77,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 0,
-      pb: 1,
+      pb: 2,
    },
    seeMoreText: {
       textDecoration: "underline",
@@ -101,7 +101,7 @@ const EventSection = () => {
    const isMobile = useIsMobile()
 
    const [isDialogOpen, handleCloseDialog] = useDialogStateHandler()
-   const [eventToEdit, setEventToEdit] = useState(null)
+   const eventToEdit = useMemo(() => null, [])
    const upcomingEventsDescription = useMemo(() => {
       if (editMode) {
          return "Below are your published live streams, these will be shown on your company page."
@@ -138,7 +138,7 @@ const EventSection = () => {
                title="Next Live Streams"
                events={upcomingLivestreams ?? []}
                eventDescription={upcomingEventsDescription}
-               type={EventsTypes.comingUp}
+               type={EventsTypes.COMING_UP}
                seeMoreLink={`/next-livestreams?${query}`}
                styling={eventsCarouselStyling}
             >
@@ -149,7 +149,7 @@ const EventSection = () => {
                   title="Past Live Streams"
                   events={pastLivestreams ?? []}
                   eventDescription={pastEventsDescription}
-                  type={EventsTypes.pastEvents}
+                  type={EventsTypes.PAST_EVENTS}
                   seeMoreLink={`/past-livestreams?${query}`}
                   styling={eventsCarouselStyling}
                />
@@ -162,7 +162,7 @@ const EventSection = () => {
                   typeOfStream={"upcoming"}
                   open={isDialogOpen}
                   handlePublishStream={null}
-                  handleResetCurrentStream={() => {}}
+                  handleResetCurrentStream={undefined}
                   currentStream={eventToEdit}
                   onClose={handleCloseDialog}
                />

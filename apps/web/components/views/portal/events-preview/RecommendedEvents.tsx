@@ -125,7 +125,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
          <EventsPreviewCarousel
             title={!hideTitle && "Recommended for you"}
             events={events}
-            type={EventsTypes.recommended}
+            type={EventsTypes.RECOMMENDED}
             loading={loading}
             isRecommended
             isAdmin={userData?.isAdmin}

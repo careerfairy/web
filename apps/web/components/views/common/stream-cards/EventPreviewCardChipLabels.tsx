@@ -63,7 +63,6 @@ const EventPreviewCardChipLabels = ({
             icon={<CheckIcon />}
             color="primary"
             label={"Attended"}
-            sx={{ boxShadow: "0 0 5px #000" }}
          />
       )
    }
