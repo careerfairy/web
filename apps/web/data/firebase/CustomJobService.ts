@@ -50,13 +50,15 @@ export class CustomJobService {
     */
    async transferCustomJobsFromDraftToPublishedLivestream(
       draftId: string,
-      livestreamId: string
+      livestreamId: string,
+      groupId: string
    ): Promise<HttpsCallableResult> {
       return this.firebaseFunctions.httpsCallable(
          "transferCustomJobsFromDraftToPublishedLivestream"
       )({
          draftId,
          livestreamId,
+         groupId,
       })
    }
 }
