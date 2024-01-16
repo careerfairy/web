@@ -140,7 +140,6 @@ const CreatorSelectedView = () => {
 
 const CreatorView: FC<{
    creator?: Creator
-   // eslint-disable-next-line no-unused-vars
    handleClickEdit: (creator: Creator) => void
    handleBack: () => void
    handleNext: () => void
