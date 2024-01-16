@@ -147,6 +147,11 @@ const FilterSelector = () => {
                   disableElevation
                   color={filterActive ? "primary" : "grey"}
                >
+                  <Box sx={{ px: 1 }}>
+                     <Typography fontWeight={500} fontSize={"15px"}>
+                        Filters
+                     </Typography>
+                  </Box>
                   <FilterIcon />
                </Button>
             ) : (
