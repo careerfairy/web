@@ -105,7 +105,7 @@ export class SparksService {
    async trackSparkEvents(data: SparkEventClient[]) {
       return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
-         "trackSparkEvents_v3"
+         "trackSparkEvents_v4"
       )({
          events: data,
       })
@@ -148,15 +148,19 @@ export class SparksService {
       let baseQuery: Query
       let sortField: "addedToFeedAt" | "publishedAt" = "publishedAt"
 
-      if ("groupId" in options) {
+      if ("groupId" in options && options.groupId) {
          // Query sparks based on the specified group.
          baseQuery = query(
             collection(db, "sparks"),
-            where("group.id", "==", options.groupId!)
+            where("group.id", "==", options.groupId)
          )
 
          // Check if options specify a userId and that no categories are selected
-      } else if (options.userId && !options.sparkCategoryIds?.length) {
+      } else if (
+         "userId" in options &&
+         options.userId &&
+         !options.sparkCategoryIds?.length
+      ) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
@@ -369,7 +373,7 @@ export class SparksService {
          | "numberTimesCompletelyWatched"
          | "totalWatchedMinutes"
       >,
-      increment: number = 1
+      increment = 1
    ) {
       const sparkCounter = new Counter(
          FirestoreInstance.doc(`sparkStats/${sparkId}`),
@@ -410,6 +414,7 @@ export class SparksService {
    }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sparkService = new SparksService(FunctionsInstance as any)
 
 export default SparksService

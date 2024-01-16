@@ -129,6 +129,7 @@ export const SparkEventActions = {
    Impression: "Impression",
    Click_CareerPageCTA: "Click_CareerPageCTA",
    Click_CompanyPageCTA: "Click_CompanyPageCTA",
+   Click_DiscoverLivestreamCTA: "Click_DiscoverLivestreamCTA",
    Watched_CompleteSpark: "Watched_CompleteSpark",
    Played_Spark: "Played_Spark",
    Register_Event: "Register_Event",
