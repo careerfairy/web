@@ -77,7 +77,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
    const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false)
 
-   const { replace, push, pathname } = useRouter()
+   const { replace, push } = useRouter()
    const pathShouldShrink = usePathShouldShrink()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
@@ -100,7 +100,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   let shrunkInitialState: shrunkState = pathShouldShrink
+   const shrunkInitialState: shrunkState = pathShouldShrink
       ? "shrunk"
       : "disabled"
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
