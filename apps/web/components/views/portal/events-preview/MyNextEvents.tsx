@@ -160,6 +160,9 @@ const styles = sxStyles({
          xl: 0,
       },
    },
+   boxContainer: {
+      pb: 1,
+   },
 })
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()
@@ -181,7 +184,12 @@ const MyNextEvents = ({ limit }: Props) => {
       return null
    }
    return (
-      <Box sx={events?.length > 0 ? null : styles.boxContainerEmpty}>
+      <Box
+         sx={[
+            events?.length > 0 ? null : styles.boxContainerEmpty,
+            styles.boxContainer,
+         ]}
+      >
          <ConditionalWrapper
             condition={events?.length > 0}
             fallback={<EmptyRegistrationsBanner></EmptyRegistrationsBanner>}

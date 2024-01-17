@@ -1,15 +1,6 @@
-import React, {
-   ReactNode,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import React, { ReactNode, useMemo } from "react"
 import Box from "@mui/material/Box"
-import useEmblaCarousel, {
-   EmblaCarouselType,
-   EmblaOptionsType,
-} from "embla-carousel-react"
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
 import { sxStyles } from "types/commonTypes"
 import {
    ImpressionLocation,
@@ -185,55 +176,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          },
       }))
 
-      const [cardsLoaded, setCardsLoaded] = useState({})
-
-      // Will trigger another warning for not having destructured in value + setter pair
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [slidesInView, setSlidesInView] = useState<number[]>([])
-
-      const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
-         setCardsLoaded((prev) => ({
-            ...prev,
-            ...cardsIndexLoaded.reduce(
-               (acc, curr) => ({ ...acc, [curr]: true }),
-               {}
-            ),
-         }))
-      }
-
-      /**
-       * Lazily load cards based on what is currently in view.
-       * The @function handleCardsLoaded then updates the Events array based on the indexes which are
-       * currently in view.
-       */
-      const updateSlidesInView = useCallback(
-         (emblaApi: EmblaCarouselType) => {
-            setSlidesInView((slidesInView) => {
-               if (slidesInView.length === emblaApi.slideNodes().length) {
-                  emblaApi.off("slidesInView", updateSlidesInView)
-               }
-
-               const inView = emblaApi
-                  .slidesInView()
-                  .filter((index) => !slidesInView.includes(index))
-
-               handleCardsLoaded(inView)
-
-               return slidesInView.concat(inView)
-            })
-         },
-         [setSlidesInView]
-      )
-
-      useEffect(() => {
-         if (!emblaApi) return
-
-         updateSlidesInView(emblaApi)
-
-         emblaApi.on("slidesInView", updateSlidesInView)
-         emblaApi.on("reInit", updateSlidesInView)
-      }, [emblaApi, updateSlidesInView])
-
       const seeMoreComponent = (
          <ConditionalWrapper
             condition={events?.length > 1 && seeMoreLink !== undefined}
@@ -403,18 +345,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                  condition={events?.length > 0}
                                  fallback={children}
                               >
-                                 {events.map((event, index, arr) => (
+                                 {events?.map((event, index, arr) => (
                                     <Box sx={styling.slide} key={event.id}>
                                        <EventPreviewCard
                                           key={event.id}
-                                          loading={
-                                             (loading &&
-                                                !cardsLoaded[index] &&
-                                                !cardsLoaded[
-                                                   arr.length - (index + 1)
-                                                ]) ||
-                                             false
-                                          }
+                                          loading={loading}
                                           index={index}
                                           totalElements={arr.length}
                                           location={getLocation(type)}
