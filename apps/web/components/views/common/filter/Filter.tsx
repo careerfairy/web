@@ -12,6 +12,7 @@ export enum FilterEnum {
    companyCountries = "companyCountries",
    companySizes = "companySizes",
    companyIndustries = "companyIndustries",
+   companySparks = "companySparks",
    /**
     * If this filter is active, it means we are filtering by company
     * */
