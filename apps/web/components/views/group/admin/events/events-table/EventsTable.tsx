@@ -132,6 +132,7 @@ const EventsTable = ({
          }
          handleGetGroups()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [streams])
 
    const handleCloseEndOfEventDialog = () => {
@@ -199,7 +200,7 @@ const EventsTable = ({
 
    const handleCreateExternalLink = useCallback(
       (rowData) => {
-         let baseUrl = getBaseUrl()
+         const baseUrl = getBaseUrl()
          const draftId = rowData.id
          const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`
          copyStringToClipboard(targetPath)
@@ -462,7 +463,7 @@ const EventsTable = ({
    const handleRowClick = (event, rowData) => {
       setClickedRows((prevState) => {
          const newClickedRows = { ...prevState }
-         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id])
+         newClickedRows[rowData.id] = !newClickedRows[rowData.id]
          return newClickedRows
       })
    }
