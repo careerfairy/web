@@ -70,6 +70,16 @@ export const syncLivestreams = functions
                   )
                )
             })
+
+            // Notify every registered user of the livestream start
+            if (!newValue.test) {
+               console.log("livestream started")
+               sideEffectPromises.push(
+                  livestreamsRepo.createLivestreamStartUserNotifications(
+                     newValue
+                  )
+               )
+            }
          }
 
          if (newValue.startDate !== previousValue.startDate) {
