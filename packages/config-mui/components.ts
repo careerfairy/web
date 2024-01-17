@@ -1,8 +1,35 @@
 import { Components, Theme, alpha } from "@mui/material"
 
 export const getComponents = (theme: Theme): Components => ({
-   MuiButtonBase: {
-      defaultProps: {},
+   MuiBadge: {
+      styleOverrides: {
+         badge: {
+            boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
+            transform: "scale(1) translate(30%, -30%)",
+         },
+         anchorOriginTopRight: {
+            transform: "scale(1) translate(30%, -30%)",
+         },
+      },
+   },
+   MuiTooltip: {
+      defaultProps: {
+         arrow: true,
+      },
+      styleOverrides: {
+         tooltip: {
+            backgroundColor: "white",
+            color: "rgba(0, 0, 0, 0.87)",
+            px: 8,
+            py: 12,
+            borderRadius: 8,
+            boxShadow: "0px 8px 25px rgba(33, 32, 32, 0.1)",
+            fontSize: "1rem",
+         },
+         arrow: {
+            color: "white",
+         },
+      },
    },
    MuiButton: {
       variants: [
@@ -138,40 +165,7 @@ export const getComponents = (theme: Theme): Components => ({
          disableElevation: true,
       },
    },
-   MuiBadge: {
-      styleOverrides: {
-         badge: {
-            boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
-            transform: "scale(1) translate(30%, -30%)",
-         },
-         anchorOriginTopRight: {
-            transform: "scale(1) translate(30%, -30%)",
-         },
-      },
-   },
-   MuiTooltip: {
-      defaultProps: {
-         arrow: true,
-      },
-      styleOverrides: {
-         tooltip: {
-            backgroundColor: "white",
-            color: "rgba(0, 0, 0, 0.87)",
-            px: 8,
-            py: 12,
-            borderRadius: 8,
-            boxShadow: "0px 8px 25px rgba(33, 32, 32, 0.1)",
-            fontSize: "1rem", // TODO: check
-         },
-         arrow: {
-            color: "white",
-         },
-      },
-   },
-
-   // Name of the component
    MuiDialog: {
-      // Name of the style
       styleOverrides: {
          paper: {
             borderRadius: 20,
@@ -288,9 +282,7 @@ export const getComponents = (theme: Theme): Components => ({
    },
    MuiButtonGroup: {
       styleOverrides: {
-         // Name of the slot
          root: {
-            // Some CSS
             borderRadius: 30,
          },
       },
