@@ -71,8 +71,8 @@ const FeatureFlagsProvider = (props) => {
 
    // map initial flag states
    const [flags, setFlags] = useState<Record<FlagKeys, boolean>>(() => {
-      const map: any = {}
-      for (let key in flagsInitialState) {
+      const map = {} as Record<FlagKeys, boolean>
+      for (const key in flagsInitialState) {
          map[key] = flagsInitialState[key].enabled
       }
       return map
@@ -81,7 +81,7 @@ const FeatureFlagsProvider = (props) => {
    // update flags when changing pages / query string parameters
    useEffect(() => {
       // conditionally update flag states if present as query string parameters
-      for (let queryParam in router.query) {
+      for (const queryParam in router.query) {
          const param = queryParam.toString()
          if (Object.keys(flagsInitialState).includes(param)) {
             setFlags((prev) => ({
@@ -96,7 +96,7 @@ const FeatureFlagsProvider = (props) => {
       }
 
       // conditionally update flag states by running the fn conditionalEnable
-      for (let flagKey in flagsInitialState) {
+      for (const flagKey in flagsInitialState) {
          if (flagsInitialState[flagKey].conditionalEnable) {
             const enabled = flagsInitialState[flagKey].conditionalEnable(
                router.pathname,
