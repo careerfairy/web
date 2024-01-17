@@ -26,18 +26,22 @@ import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
 } from "@careerfairy/shared-lib/livestreams/stats"
-import { firestore } from "firebase-admin"
 import { isEmpty } from "lodash"
 import { addOperations } from "./stats/livestream"
 import type { FunctionsLogger } from "../util"
-import DocumentSnapshot = firestore.DocumentSnapshot
-import FieldValue = firestore.FieldValue
+import {
+   FieldValue,
+   Timestamp,
+   DocumentSnapshot,
+   firestore as firestoreAdmin,
+} from "../api/firestoreAdmin"
 import { DateTime } from "luxon"
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -118,6 +122,18 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       streamId: string,
       origin: string
    ): Promise<GroupAdminNewEventEmailInfo[]>
+
+   /**
+    * Notifies registered users of a starting livestream.
+    * Iterates over the array of registered users associated with the livestream, creates a new UserNotification object for each,
+    * and inserts it in the database.
+    *
+    * @param {LivestreamEvent} livestream
+    * @returns {Promise<void>}
+    */
+   createLivestreamStartUserNotifications(
+      livestream: LivestreamEvent
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -459,5 +475,45 @@ export class LivestreamFunctionsRepository
       }
 
       return admins
+   }
+
+   async createLivestreamStartUserNotifications(
+      livestream: LivestreamEvent
+   ): Promise<void> {
+      functions.logger.log(
+         `Started creating livestream start notifications for livestream ${livestream.id}`
+      )
+
+      const bulkWriter = firestoreAdmin.bulkWriter()
+
+      livestream.registeredUsers.forEach((user) => {
+         const ref = firestoreAdmin
+            .collection("userData")
+            .doc(user)
+            .collection("userNotifications")
+            .doc()
+
+         const newNotification: UserNotification = {
+            documentType: "userNotification",
+            actionUrl: `/portal/livestream/${livestream.id}`,
+            companyId: livestream.companyId,
+            livestreamId: livestream.id,
+            imageFormat: "circular",
+            imageUrl: livestream.companyLogoUrl,
+            message: `<strong>${livestream.title}</strong> is starting now: Join before it ends!`,
+            createdAt: Timestamp.now(),
+            id: ref.id,
+         }
+
+         bulkWriter.set(ref, newNotification, { merge: true }).catch((err) => {
+            functions.logger.log("Failed to add new notification with: ", err)
+         })
+      })
+
+      functions.logger.log(
+         `Notified ${livestream.registeredUsers.length} users of livestream start`
+      )
+
+      return void bulkWriter.close()
    }
 }
