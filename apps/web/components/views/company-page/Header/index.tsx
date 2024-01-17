@@ -6,6 +6,7 @@ import {
    Container,
    Slide,
    Tabs,
+   TabsOwnProps,
    Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -334,7 +335,9 @@ const Header = () => {
                                  allowScrollButtonsMobile
                                  textColor="inherit"
                                  TabIndicatorProps={
-                                    { sx: styles.indicator } as unknown
+                                    {
+                                       sx: styles.indicator,
+                                    } as TabsOwnProps["TabIndicatorProps"]
                                  }
                                  sx={styles.tabWrapper}
                               >

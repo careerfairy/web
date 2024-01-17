@@ -187,13 +187,6 @@ export const getComponents = (theme: Theme): Components => ({
          },
       },
    },
-   MuiPaper: {
-      styleOverrides: {
-         root: {
-            // borderRadius: 0,
-         },
-      },
-   },
    MuiOutlinedInput: {
       styleOverrides: {
          root: {
