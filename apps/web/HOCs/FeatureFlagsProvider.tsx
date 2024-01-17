@@ -6,6 +6,7 @@ type FlagKeys =
    | "atsAdminPageFlag"
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
+   | "livestreamCreationFlowV2"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
@@ -30,6 +31,7 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * - ?atsAdminPageFlag=true
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
+ * - ?livestreamCreationFlowV2=true
  */
 export const flagsInitialState = {
    /**
@@ -53,6 +55,14 @@ export const flagsInitialState = {
     * Hide or Show
     */
    sparksB2BOnboardingFlag: {
+      enabled: false,
+      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
+   },
+   /**
+    * B2B Live stream creation flow version 2
+    * Hide or Show
+    */
+   livestreamCreationFlowV2: {
       enabled: false,
       conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
