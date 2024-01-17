@@ -36,7 +36,7 @@ const styles = sxStyles({
       },
    },
    filter: {
-      flex: "15%",
+      flex: "10%",
       display: "flex",
       ml: 2,
    },
@@ -47,7 +47,7 @@ const styles = sxStyles({
    },
    searchWrapper: {
       backgroundColor: "white",
-      flex: "85%",
+      flex: "90%",
       display: "flex",
       borderRadius: "8px",
       boxShadow: "0px 12px 32px 0px rgba(0, 0, 0, 0.04)",
@@ -79,7 +79,12 @@ const CompanySearch: FC = () => {
     */
    // TODO:WG Add additional filters
    const filtersToShow = useMemo(
-      () => [FilterEnum.companyCountries, FilterEnum.companyIndustries],
+      () => [
+         FilterEnum.companySparks,
+         FilterEnum.companyCountries,
+         FilterEnum.companyIndustries,
+         FilterEnum.companySizes,
+      ],
       []
    )
    const loading = status === "loading"

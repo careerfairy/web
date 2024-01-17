@@ -137,6 +137,17 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          }
 
          switch (filter) {
+            case FilterEnum.companySparks:
+               toShow = {
+                  title: "Sparks",
+                  renderFn: () => (
+                     <CompanySizeSelector
+                        key={FilterEnum.companySizes}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
+               }
+               break
             case FilterEnum.companyCountries:
                toShow = {
                   title: "Country",
@@ -272,6 +283,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             case FilterEnum.companyCountries:
             case FilterEnum.companyIndustries:
             case FilterEnum.companySizes:
+            case FilterEnum.companySparks:
             case FilterEnum.fieldsOfStudy:
                return renderAutoCompleteFilter(filter)
          }
