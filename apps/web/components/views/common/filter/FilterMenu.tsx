@@ -35,7 +35,7 @@ import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
 const styles = sxStyles({
    paperRoot: {
       borderRadius: wishListBorderRadius,
-      boxShadow: (theme) => theme.boxShadows.dark_12_13,
+      boxShadow: (theme) => theme.legacy.boxShadows.dark_12_13,
    },
    content: {
       p: { xs: 1, md: 2 },

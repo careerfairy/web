@@ -1,7 +1,6 @@
 import { Poppins } from "next/font/google"
-import { createTheme } from "@mui/material/styles"
 
-import { themeOptions } from "@careerfairy/shared-ui"
+import { createBrandedTheme } from "@careerfairy/shared-ui"
 
 export const poppins = Poppins({
    subsets: ["latin"],
@@ -11,6 +10,7 @@ export const poppins = Poppins({
    display: "swap",
 })
 
-themeOptions.typography.fontFamily = poppins.style.fontFamily
-
-export const theme = createTheme(themeOptions)
+export const theme = createBrandedTheme({
+   mode: "light",
+   fontFamily: poppins.style.fontFamily,
+})

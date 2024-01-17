@@ -43,7 +43,7 @@ const styles = sxStyles({
    },
    companyTitle: {
       textShadow: (theme) => ({
-         md: theme.darkTextShadow,
+         md: theme.legacy.darkTextShadow,
       }),
    },
    companyTitleSticky: {
@@ -334,7 +334,7 @@ const Header = () => {
                                  allowScrollButtonsMobile
                                  textColor="inherit"
                                  TabIndicatorProps={
-                                    { sx: styles.indicator } as any
+                                    { sx: styles.indicator } as unknown
                                  }
                                  sx={styles.tabWrapper}
                               >

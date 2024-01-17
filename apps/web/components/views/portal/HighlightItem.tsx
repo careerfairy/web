@@ -39,7 +39,7 @@ const styles = sxStyles({
                xs: theme.spacing(itemSpacingSize * 0.3),
                md: theme.spacing(itemSpacingSize * 0.5),
             }),
-            textShadow: (theme) => theme.darkTextShadow,
+            textShadow: (theme) => theme.legacy.darkTextShadow,
          },
          "& .overlay": {
             opacity: 0.5,

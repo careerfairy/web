@@ -19,9 +19,15 @@
       "downlevelIteration": true,
       "paths": {
          "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"],
-         "@careerfairy/seed-data/*": ["../../packages/seed-data/src/*"]
+         "@careerfairy/seed-data/*": ["../../packages/seed-data/src/*"],
+         "@careerfairy/shared-ui/*": ["../../packages/shared-ui/src/*"]
       }
    },
-   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+   "include": [
+      "next-env.d.ts",
+      "**/*.ts",
+      "**/*.tsx",
+      "../../packages/config-mui/mui-theme.d.ts"
+   ],
    "exclude": ["node_modules"]
 }
