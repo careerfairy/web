@@ -200,7 +200,7 @@ const CompanyPageOverview = ({
                         ) : null}
                         {showFollowCompanyCta ? <FollowCompany /> : null}
                         {showSignUpCta ? <SignUp /> : null}
-                        {isMobile ? (
+                        {isMobile && !editMode ? (
                            <>
                               <EventSection />
                               <TestimonialSection />
