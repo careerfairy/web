@@ -120,6 +120,11 @@ const defaultStyling: EventsCarouselStyling = {
    mainWrapperBoxSx: styles.mainWrapperBox,
 }
 
+type Props = {
+   limit?: number
+   serverSideEvents?: LivestreamEvent[]
+}
+
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()
    const {
@@ -193,9 +198,5 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    )
 }
 export const COMMING_UP_NEXT_EVENT_TITLE = "Upcoming live streams"
-interface Props {
-   limit?: number
-   serverSideEvents?: LivestreamEvent[]
-}
 
 export default ComingUpNextEvents

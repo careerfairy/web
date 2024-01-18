@@ -204,7 +204,24 @@ const styles = sxStyles({
       justifyContent: "space-between",
    },
 })
-
+type EventPreviewCardProps = {
+   event?: LivestreamEvent
+   loading?: boolean
+   interests?: Interest[]
+   // Animate the loading animation, defaults to the "wave" prop
+   animation?: false | "wave" | "pulse"
+   isRecommended?: boolean
+   // The index of the event in the list
+   index?: number
+   // The total number of events in the list
+   totalElements?: number
+   location?: ImpressionLocation
+   ref?: React.Ref<HTMLDivElement>
+   bottomElement?: React.ReactNode
+   // If true, the chip labels will be hidden
+   hideChipLabels?: boolean
+   disableClick?: boolean
+}
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
@@ -671,25 +688,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       )
    }
 )
-
-type EventPreviewCardProps = {
-   event?: LivestreamEvent
-   loading?: boolean
-   interests?: Interest[]
-   // Animate the loading animation, defaults to the "wave" prop
-   animation?: false | "wave" | "pulse"
-   isRecommended?: boolean
-   // The index of the event in the list
-   index?: number
-   // The total number of events in the list
-   totalElements?: number
-   location?: ImpressionLocation
-   ref?: React.Ref<HTMLDivElement>
-   bottomElement?: React.ReactNode
-   // If true, the chip labels will be hidden
-   hideChipLabels?: boolean
-   disableClick?: boolean
-}
 
 EventPreviewCard.displayName = "EventPreviewCard"
 

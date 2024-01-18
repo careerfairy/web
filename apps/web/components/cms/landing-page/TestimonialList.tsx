@@ -27,11 +27,11 @@ const TestimonialList = ({
 }: HygraphResponseTestimonialListValue): JSX.Element => {
    return (
       <Box sx={styles.wrapper}>
-         {testimonialTitle && (
+         {testimonialTitle ? (
             <Box sx={styles.title}>
                <ThemedRichTextRenderer rawContent={testimonialTitle.raw} />
             </Box>
-         )}
+         ) : null}
          <TestimonialsSection
             testimonials={testimonials}
             sliderArrowColor={sliderArrowColor}

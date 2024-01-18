@@ -45,6 +45,43 @@ const styles = {
    },
 } as const
 
+export enum EventsTypes {
+   /**
+    * Top Picks for User based on the interests they selected at signup
+    */
+   recommended = "recommended",
+   /**
+    * Non specific upcoming events on careerfairy ordered closest start date
+    */
+   comingUp = "comingUp",
+   /**
+    * upcoming events on that user has registered to ordered closest start date
+    */
+   myNext = "myNext",
+   /**
+    * Events that have already happened
+    */
+   pastEvents = "pastEvents",
+   /*
+    * coming up marketing events
+    * */
+   comingUpMarketing = "comingUpMarketing",
+}
+
+export type EventsProps = {
+   events: LivestreamEvent[]
+   seeMoreLink?: string
+   title?: string
+   loading: boolean
+   limit?: number
+   hidePreview?: boolean
+   type: EventsTypes
+   id?: string
+   isEmpty?: boolean
+   isRecommended?: boolean
+   isEmbedded?: boolean
+}
+
 const EventsPreview = ({
    title,
    seeMoreLink,
@@ -230,42 +267,6 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
       default:
          return ImpressionLocation.unknown
    }
-}
-export enum EventsTypes {
-   /**
-    * Top Picks for User based on the interests they selected at signup
-    */
-   recommended = "recommended",
-   /**
-    * Non specific upcoming events on careerfairy ordered closest start date
-    */
-   comingUp = "comingUp",
-   /**
-    * upcoming events on that user has registered to ordered closest start date
-    */
-   myNext = "myNext",
-   /**
-    * Events that have already happened
-    */
-   pastEvents = "pastEvents",
-   /*
-    * coming up marketing events
-    * */
-   comingUpMarketing = "comingUpMarketing",
-}
-
-export type EventsProps = {
-   events: LivestreamEvent[]
-   seeMoreLink?: string
-   title?: string
-   loading: boolean
-   limit?: number
-   hidePreview?: boolean
-   type: EventsTypes
-   id?: string
-   isEmpty?: boolean
-   isRecommended?: boolean
-   isEmbedded?: boolean
 }
 
 export default EventsPreview
