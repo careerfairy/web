@@ -1,6 +1,13 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import Add from "@mui/icons-material/Add"
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   ButtonBase,
+   IconButton,
+   Stack,
+   Typography,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Link from "next/link"
@@ -192,14 +199,18 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                </Stack>
             ) : type === "upcoming" && editMode ? (
                <Link href={`/group/${group.id}/admin/events`}>
-                  <Button color="secondary" sx={styles.addEvent}>
+                  <Box
+                     component={ButtonBase}
+                     color="secondary"
+                     sx={styles.addEvent}
+                  >
                      <Box>
                         <Add sx={{ height: "58px", width: "58px" }} />
                         <Typography variant="subtitle2" color={"black"}>
                            Create new live stream
                         </Typography>
                      </Box>
-                  </Button>
+                  </Box>
                </Link>
             ) : (
                <>

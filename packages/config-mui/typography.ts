@@ -1,32 +1,10 @@
-import { Theme, ThemeOptions } from "@mui/material/styles"
+import { ThemeOptions } from "@mui/material/styles"
+import { breakpoints } from "./breakpoints"
 
-export const getTypography = (theme: Theme): ThemeOptions["typography"] => {
-   const desktop = theme.breakpoints.up("md")
-
-   const brandedH5 = {
-      fontSize: "1.28571rem", // 18px
-      lineHeight: 1.5,
-   }
-
-   const brandedH4 = {
-      fontSize: "1.28571rem", // 18px
-      lineHeight: 1.5,
-      [desktop]: {
-         fontSize: "1.42857rem", // 20px
-      },
-   }
-
-   const textMedium = {
-      fontSize: "1.14286rem", // 16px
-      lineHeight: 1.6875,
-      [desktop]: {},
-   }
-
-   const textSmall = {
-      fontSize: "1rem", // 14px
-      lineHeight: 1.71429,
-      [desktop]: {},
-   }
+export const getTypography = (
+   fontFamily: string
+): ThemeOptions["typography"] => {
+   const desktop = `@media (min-width:${breakpoints.values.md}px)`
 
    return {
       brandedH1: {
@@ -50,26 +28,81 @@ export const getTypography = (theme: Theme): ThemeOptions["typography"] => {
             fontSize: "1.42857rem", // 20px
          },
       },
-      brandedH4,
-      brandedH5,
-
-      medium: textMedium,
-      small: textSmall,
+      brandedH4: {
+         fontSize: "1.28571rem", // 18px
+         lineHeight: 1.5,
+         [desktop]: {
+            fontSize: "1.42857rem", // 20px
+         },
+      },
+      brandedH5: {
+         fontSize: "1.28571rem", // 18px
+         lineHeight: 1.5,
+      },
+      brandedBody: {
+         fontSize: "1.14286rem", // 16px
+         lineHeight: 1.5,
+      },
+      medium: {
+         fontSize: "1.14286rem", // 16px
+         lineHeight: 1.6875,
+      },
+      small: {
+         fontSize: "1rem", // 14px
+         lineHeight: 1.71429,
+      },
       xsmall: {
          fontSize: "0.85714rem", // 12px
          lineHeight: 1,
-         [desktop]: {},
       },
-      subtitle1: brandedH4,
-      subtitle2: brandedH5,
-      button: {},
-      caption: {},
-      overline: {},
-      fontWeightBold: 700,
-      fontWeightMedium: 600,
-      fontWeightRegular: 400,
-      fontWeightLight: 300,
-      htmlFontSize: theme.typography.htmlFontSize,
-      fontFamily: theme.typography.fontFamily,
+      htmlFontSize: 16,
+      fontFamily,
+
+      /**
+       * Need to apply the letter spacing to all the typography components
+       * due to mui not applying the letter spacing to the components when a
+       * custom font is used. This is not to break legacy typographies
+       * All these values are copied from the default mui theme
+       * Issue: https://github.com/mui/material-ui/issues/24889
+       */
+      h1: {
+         letterSpacing: "-0.01562em",
+      },
+      h2: {
+         letterSpacing: "-0.00833em",
+      },
+      h3: {
+         letterSpacing: "0em",
+      },
+      h4: {
+         letterSpacing: "0.00735em",
+      },
+      h5: {
+         letterSpacing: "0em",
+      },
+      h6: {
+         letterSpacing: "0.0075em",
+      },
+      subtitle1: {
+         letterSpacing: "0.00938em",
+      },
+      subtitle2: {
+         letterSpacing: "0.00714em",
+      },
+      body1: {
+         letterSpacing: "0.00938em",
+      },
+      body2: {
+         letterSpacing: "0.01071em",
+      },
+      button: {
+         letterSpacing: "0.02857em",
+      },
+      caption: {
+         letterSpacing: "0.03333em",
+      },
+      overline: {
+         letterSpacing: "0.08333em",
+      },
    }
 }

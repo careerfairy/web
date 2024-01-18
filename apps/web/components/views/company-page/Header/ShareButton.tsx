@@ -19,13 +19,7 @@ const ShareButton = () => {
          <Button
             onClick={handleOpenShareCompanyDialog}
             variant={"outlined"}
-            size={"small"}
-            sx={{
-               fontSize: {
-                  xs: "0.75rem",
-                  md: "0.875rem",
-               },
-            }}
+            size={"medium"}
             color={"primary"}
             startIcon={<ShareIcon />}
          >

@@ -2,15 +2,16 @@ import { Components, Theme, alpha } from "@mui/material"
 
 export const getComponents = (theme: Theme): Components => ({
    MuiBadge: {
-      styleOverrides: {
-         badge: {
-            boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
-            transform: "scale(1) translate(30%, -30%)",
-         },
-         anchorOriginTopRight: {
-            transform: "scale(1) translate(30%, -30%)",
-         },
-      },
+      // TODO: Refactor these style overrides just for streaming app design (make new variant)
+      // styleOverrides: {
+      //    badge: {
+      //       boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
+      //       transform: "scale(1) translate(30%, -30%)",
+      //    },
+      //    anchorOriginTopRight: {
+      //       transform: "scale(1) translate(30%, -30%)",
+      //    },
+      // },
    },
    MuiTooltip: {
       defaultProps: {
@@ -36,9 +37,8 @@ export const getComponents = (theme: Theme): Components => ({
          {
             props: { size: "small" },
             style: {
-               fontSize: "12",
-               padding: "12px 16px",
-               lineHeight: 0.575,
+               ...theme.typography.small,
+               padding: "4px 16px",
                "& svg": {
                   width: 14,
                   height: 14,
@@ -49,9 +49,8 @@ export const getComponents = (theme: Theme): Components => ({
          {
             props: { size: "medium" },
             style: {
-               fontSize: "14px",
-               padding: "14px 24px",
-               lineHeight: 0.8573,
+               ...theme.typography.brandedBody,
+               padding: "8px 24px",
                "& svg": {
                   width: 18,
                   height: 18,
@@ -62,9 +61,8 @@ export const getComponents = (theme: Theme): Components => ({
          {
             props: { size: "large" },
             style: {
-               fontSize: "16px",
+               ...theme.typography.brandedBody,
                padding: "12px 28px",
-               lineHeight: 1.5,
                "& svg": {
                   width: 18,
                   height: 18,

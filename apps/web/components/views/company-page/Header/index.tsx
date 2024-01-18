@@ -366,7 +366,14 @@ const ActionButtons = () => {
    return (
       <Stack spacing={1} pr={3} direction={"row"}>
          {showFollowButton ? (
-            <FollowButton color="primary" group={group} />
+            <FollowButton
+               sx={{
+                  fontSize: undefined,
+               }}
+               color="primary"
+               size="medium"
+               group={group}
+            />
          ) : null}
          {showShareButton ? <ShareButton /> : null}
       </Stack>

@@ -32,10 +32,7 @@ export const createBrandedTheme = ({
       breakpoints,
 
       // Initialize the typography with the default font family, needs to be set before initializing the theme
-      typography: {
-         fontFamily,
-         htmlFontSize: 16,
-      },
+      typography: getTypography(fontFamily),
 
       legacy: legacyStyles,
    } satisfies ThemeOptions
@@ -46,6 +43,5 @@ export const createBrandedTheme = ({
    // Create the full theme, which includes the base theme and custom components/typography
    return createTheme(theme, {
       components: getComponents(baseTheme),
-      typography: getTypography(baseTheme),
    })
 }

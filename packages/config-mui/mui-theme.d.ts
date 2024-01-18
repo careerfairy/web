@@ -91,6 +91,7 @@ declare module "@mui/material/styles" {
       brandedH3: React.CSSProperties
       brandedH4: React.CSSProperties
       brandedH5: React.CSSProperties
+      brandedBody: React.CSSProperties
    }
 
    interface TypographyVariantsOptions {
@@ -102,6 +103,7 @@ declare module "@mui/material/styles" {
       brandedH3?: React.CSSProperties
       brandedH4?: React.CSSProperties
       brandedH5?: React.CSSProperties
+      brandedBody?: React.CSSProperties
    }
 
    // Breakpoints
@@ -147,6 +149,7 @@ declare module "@mui/material/Typography" {
       brandedH3: true
       brandedH4: true
       brandedH5: true
+      brandedBody: true
    }
 }
 

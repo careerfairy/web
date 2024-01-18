@@ -311,7 +311,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             <Button
                onClick={handleClearQueries}
                variant={"text"}
-               size={"small"}
+               size={"medium"}
                color={"secondary"}
                disabled={numberOfActiveFilters < 1}
             >
@@ -323,9 +323,8 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                }
                color="primary"
                variant={"contained"}
-               size={"small"}
+               size={"medium"}
                onClick={handleClose}
-               sx={{ width: "130px", maxHeight: "40px" }}
             >
                {numberOfActiveFilters > 0
                   ? `${numberOfResults} Results`
