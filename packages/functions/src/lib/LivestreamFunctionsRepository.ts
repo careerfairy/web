@@ -496,7 +496,7 @@ export class LivestreamFunctionsRepository
          const newNotification: UserNotification = {
             documentType: "userNotification",
             actionUrl: `/portal/livestream/${livestream.id}`,
-            companyId: livestream.companyId,
+            companyId: livestream.groupIds[0],
             livestreamId: livestream.id,
             imageFormat: "circular",
             imageUrl: livestream.companyLogoUrl,
