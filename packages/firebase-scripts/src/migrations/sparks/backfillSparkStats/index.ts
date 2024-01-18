@@ -27,23 +27,25 @@ export async function run() {
 
       sparksProgressBar.start(sparksStats.length, 0)
 
-      for (const sparkStats of sparksStats) {
-         const group = await groupRepo.getGroupById(sparkStats.spark.group.id)
+      const groups = await Promise.all(
+         sparksStats.map((stat) => groupRepo.getGroupById(stat.spark.group.id))
+      )
+
+      for (const [index, stat] of sparksStats.entries()) {
+         const group = groups[index]
 
          const toUpdate: Partial<SparkStats> = {
-            category: sparkStats.spark.category,
+            category: stat.spark.category,
             ...(group?.companyIndustries && {
-               companyIndustries: group?.companyIndustries,
+               companyIndustries: group.companyIndustries,
             }),
             ...(group?.companyCountry && {
-               companyCountry: group?.companyCountry,
+               companyCountry: group.companyCountry,
             }),
-            ...(group?.companySize && { companySize: group?.companySize }),
+            ...(group?.companySize && { companySize: group.companySize }),
          }
 
-         const sparkStatsRef = firestore
-            .collection("sparkStats")
-            .doc(sparkStats.id)
+         const sparkStatsRef = firestore.collection("sparkStats").doc(stat.id)
 
          bulkWriter.update(sparkStatsRef, toUpdate)
          counter.writeIncrement()
