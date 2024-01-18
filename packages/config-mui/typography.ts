@@ -25,19 +25,20 @@ export const getTypography = (
          fontSize: "1.42857rem", // 20px
          lineHeight: 1.5,
          [desktop]: {
-            fontSize: "1.42857rem", // 20px
+            fontSize: "1.7142857143rem", // 24px
          },
       },
       brandedH4: {
          fontSize: "1.28571rem", // 18px
-         lineHeight: 1.5,
+         lineHeight: 1.55556,
          [desktop]: {
             fontSize: "1.42857rem", // 20px
+            lineHeight: 1.5,
          },
       },
       brandedH5: {
          fontSize: "1.28571rem", // 18px
-         lineHeight: 1.5,
+         lineHeight: 1.55556,
       },
       brandedBody: {
          fontSize: "1.14286rem", // 16px
@@ -45,7 +46,7 @@ export const getTypography = (
       },
       medium: {
          fontSize: "1.14286rem", // 16px
-         lineHeight: 1.6875,
+         lineHeight: 1.5,
       },
       small: {
          fontSize: "1rem", // 14px
@@ -53,7 +54,7 @@ export const getTypography = (
       },
       xsmall: {
          fontSize: "0.85714rem", // 12px
-         lineHeight: 1,
+         lineHeight: 1.333333,
       },
       htmlFontSize: 16,
       fontFamily,
