@@ -1,6 +1,6 @@
 import { Box, Link, Stack, Typography } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -14,6 +14,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 
 import StayUpToDateBanner from "./StayUpToDateBanner"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 const slideSpacing = 21
 const styles = sxStyles({
@@ -121,8 +122,18 @@ const EventSection = () => {
    const isMounted = useMountedState()
    const isMobile = useIsMobile()
 
-   const [isDialogOpen, handleCloseDialog] = useDialogStateHandler()
-   const eventToEdit = useMemo(() => null, [])
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
+
+   const [eventToEdit, setEventToEdit] = useState(null)
+   const handleOpenEvent = useCallback(
+      (event: LivestreamEvent) => {
+         setEventToEdit(event)
+         handleOpenDialog()
+      },
+      [handleOpenDialog]
+   )
+
    const upcomingEventsDescription = useMemo(() => {
       if (editMode) {
          return "Below are your published live streams, these will be shown on your company page."
@@ -173,6 +184,9 @@ const EventSection = () => {
                   type={EventsTypes.COMING_UP}
                   seeMoreLink={`/next-livestreams?${query}`}
                   styling={eventsCarouselStyling}
+                  hideChipLabels={editMode}
+                  showManageButton={editMode}
+                  handleOpenEvent={handleOpenEvent}
                />
             </ConditionalWrapper>
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
@@ -193,7 +207,9 @@ const EventSection = () => {
                   typeOfStream={"upcoming"}
                   open={isDialogOpen}
                   handlePublishStream={null}
-                  handleResetCurrentStream={undefined}
+                  handleResetCurrentStream={() => {
+                     /* default mpty function with comment to prevent linting */
+                  }}
                   currentStream={eventToEdit}
                   onClose={handleCloseDialog}
                />
