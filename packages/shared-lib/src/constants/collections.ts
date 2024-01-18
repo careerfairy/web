@@ -64,6 +64,7 @@ export const ALL_PROJECT_COLLECTION_IDS = [
    "roles",
    "savedRecruiters",
    "seenSparks",
+   "sharedSparks",
    "sparks",
    "sparksFeed",
    "sparksFeedMetrics",
