@@ -30,7 +30,7 @@ const defaultSparksCustomStyling: SparksStyling = {
 }
 type Props = {
    header: ReactNode
-   groupId?: String
+   groupId?: string
    handleSparksClicked: (spark: Spark) => void
    styling?: SparksStyling
 }
@@ -94,7 +94,7 @@ const Component: FC<Props> = ({
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
    const withControls = Boolean(groupId)
-   return Boolean(sparksContent.length) ? (
+   return sparksContent.length ? (
       <Box sx={{ pl: styling.sparksContentPaddingLeft }}>
          <Stack spacing={1.25}>
             <Box sx={styles.stack}>

@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 import { setCameFromCompanyPageLink } from "store/reducers/sparksFeedReducer"
 
 type Props = {
-   groupId: String
+   groupId: string
 }
 
 const SparksSection: FC<Props> = ({ groupId }) => {

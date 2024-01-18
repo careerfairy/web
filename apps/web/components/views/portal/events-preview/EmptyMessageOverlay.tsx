@@ -37,7 +37,7 @@ const EmptyMessageOverlay = ({
          >
             {message}
             <br />
-            {showButton && (
+            {showButton ? (
                <Button
                   onClick={buttonOnClick}
                   sx={{ mt: 2 }}
@@ -49,7 +49,7 @@ const EmptyMessageOverlay = ({
                >
                   {buttonText}
                </Button>
-            )}
+            ) : null}
          </Typography>
       </Box>
    )

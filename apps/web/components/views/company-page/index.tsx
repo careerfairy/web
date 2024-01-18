@@ -28,6 +28,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import NewsletterSection from "./NewsletterSection"
 import ProgressBanner from "./ProgressBanner"
 import SparksSection from "./SparksSection"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 type Props = {
    group: Group
@@ -99,7 +100,7 @@ const CompanyPageOverview = ({
    pastLivestreams,
 }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
-
+   const isMobile = useIsMobile()
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -199,8 +200,17 @@ const CompanyPageOverview = ({
                         ) : null}
                         {showFollowCompanyCta ? <FollowCompany /> : null}
                         {showSignUpCta ? <SignUp /> : null}
-                        <TestimonialSection />
-                        <EventSection />
+                        {isMobile ? (
+                           <>
+                              <EventSection />
+                              <TestimonialSection />
+                           </>
+                        ) : (
+                           <>
+                              <TestimonialSection />
+                              <EventSection />
+                           </>
+                        )}
                      </Stack>
                   </Grid>
                   <Grid item xs={12} md={6}>
