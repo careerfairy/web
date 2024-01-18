@@ -26,7 +26,7 @@ import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export const syncLivestreams = functions
-   .runWith(defaultTriggerRunTimeConfig)
+   .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onWrite(async (change, context) => {
