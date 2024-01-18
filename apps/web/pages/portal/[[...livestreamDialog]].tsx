@@ -37,6 +37,7 @@ import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -113,13 +114,17 @@ const PortalPage = ({
                               limit={20}
                            />
                            <MyNextEvents limit={20} />
-                           <EventsPreviewCarousel
-                              id={"past-events"}
-                              title={"Past live streams"}
-                              type={EventsTypes.PAST_EVENTS}
-                              events={events}
-                              seeMoreLink={"/past-livestreams"}
-                           />
+                           <ConditionalWrapper
+                              condition={Boolean(events?.length)}
+                           >
+                              <EventsPreviewCarousel
+                                 id={"past-events"}
+                                 title={"Past live streams"}
+                                 type={EventsTypes.PAST_EVENTS}
+                                 events={events}
+                                 seeMoreLink={"/past-livestreams"}
+                              />
+                           </ConditionalWrapper>
                         </WidgetsWrapper>
                      </Container>
                   </>

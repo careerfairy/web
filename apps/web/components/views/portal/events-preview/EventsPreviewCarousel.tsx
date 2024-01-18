@@ -130,6 +130,67 @@ const defaultEmblaOptions: EmblaOptionsType = {
    dragFree: true,
    inViewThreshold: 0,
 }
+
+export enum EventsTypes {
+   /**
+    * Top Picks for User based on the interests they selected at signup
+    */
+   RECOMMENDED = "recommended",
+   /**
+    * Non specific upcoming events on careerfairy ordered closest start date
+    */
+   COMING_UP = "comingUp",
+   /**
+    * upcoming events on that user has registered to ordered closest start date
+    */
+   MY_NEXT = "myNext",
+   /**
+    * Events that have already happened
+    */
+   PAST_EVENTS = "pastEvents",
+   /*
+    * coming up marketing events
+    * */
+   COMING_UP_MARKETING = "comingUpMarketing",
+}
+
+export type EventsCarouselStyling = {
+   compact?: boolean
+   seeMoreSx?: SxProps
+   eventTitleSx?: SxProps
+   viewportSx?: SxProps
+   showArrows?: boolean
+   headerAsLink?: boolean
+   padding?: boolean
+   slide?: SxProps
+   title?: SxProps
+   titleVariant?: Variant
+   eventsHeader?: SxProps
+   mainWrapperBoxSx?: unknown
+}
+export type ChildRefType = {
+   goNext: () => void
+   goPrev: () => void
+}
+
+export type EventsProps = {
+   events: LivestreamEvent[]
+   eventDescription?: string
+   seeMoreLink?: string
+   title?: string
+   loading?: boolean
+   hidePreview?: boolean
+   type: EventsTypes
+   id?: string
+   isEmpty?: boolean
+   isRecommended?: boolean
+   isEmbedded?: boolean
+   options?: EmblaOptionsType
+   children?: ReactNode
+   isAdmin?: boolean
+   styling?: EventsCarouselStyling
+}
+
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
    (props, ref) => {
       const {
@@ -148,11 +209,11 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          eventDescription,
          styling = defaultStyling,
       } = props
+      const emblaPlugins = []
+      if (events?.length)
+         emblaPlugins.push(WheelGesturesPlugin(wheelGesturesOptions))
 
-      const [emblaRef, emblaApi] = useEmblaCarousel(
-         options,
-         events?.length > 1 ? [WheelGesturesPlugin(wheelGesturesOptions)] : []
-      )
+      const [emblaRef, emblaApi] = useEmblaCarousel(options, emblaPlugins)
 
       const isMobile = useIsMobile()
 
@@ -391,65 +452,6 @@ const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
       default:
          return ImpressionLocation.unknown
    }
-}
-
-export type EventsCarouselStyling = {
-   compact?: boolean
-   seeMoreSx?: SxProps
-   eventTitleSx?: SxProps
-   viewportSx?: SxProps
-   showArrows?: boolean
-   headerAsLink?: boolean
-   padding?: boolean
-   slide?: SxProps
-   title?: SxProps
-   titleVariant?: Variant
-   eventsHeader?: SxProps
-   mainWrapperBoxSx?: unknown
-}
-export type ChildRefType = {
-   goNext: () => void
-   goPrev: () => void
-}
-
-export type EventsProps = {
-   events: LivestreamEvent[]
-   eventDescription?: string
-   seeMoreLink?: string
-   title?: string
-   loading?: boolean
-   hidePreview?: boolean
-   type: EventsTypes
-   id?: string
-   isEmpty?: boolean
-   isRecommended?: boolean
-   isEmbedded?: boolean
-   options?: EmblaOptionsType
-   children?: ReactNode
-   isAdmin?: boolean
-   styling?: EventsCarouselStyling
-}
-export enum EventsTypes {
-   /**
-    * Top Picks for User based on the interests they selected at signup
-    */
-   RECOMMENDED = "recommended",
-   /**
-    * Non specific upcoming events on careerfairy ordered closest start date
-    */
-   COMING_UP = "comingUp",
-   /**
-    * upcoming events on that user has registered to ordered closest start date
-    */
-   MY_NEXT = "myNext",
-   /**
-    * Events that have already happened
-    */
-   PAST_EVENTS = "pastEvents",
-   /*
-    * coming up marketing events
-    * */
-   COMING_UP_MARKETING = "comingUpMarketing",
 }
 
 EventsPreviewCarousel.displayName = "EventsPreviewCarousel"

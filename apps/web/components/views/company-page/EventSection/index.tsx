@@ -1,6 +1,6 @@
-import { Box, Stack } from "@mui/material"
+import { Box, Link, Stack, Typography } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { useMemo } from "react"
+import { FC, useMemo } from "react"
 import { useMountedState } from "react-use"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -16,12 +16,14 @@ import StayUpToDateBanner from "./StayUpToDateBanner"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
-const desktopSlideWidth = 322 + slideSpacing
-const mobileSlideWidth = 289 + slideSpacing
 const styles = sxStyles({
    root: {
       position: "relative",
       minHeight: (theme) => theme.spacing(50),
+   },
+   eventsWrapper: {
+      mt: 2,
+      mb: 2,
    },
    titleSection: {
       display: "flex",
@@ -48,10 +50,11 @@ const styles = sxStyles({
    },
    slide: {
       flex: {
-         xs: `0 0 ${mobileSlideWidth}px`,
-         md: `0 0 ${desktopSlideWidth}px`,
+         xs: `0 0 80%`,
+         sm: `0 0 45%`,
+         md: `0 0 65%`,
+         lg: `0 0 47%`,
       },
-      minWidth: 0,
       position: "relative",
       height: {
          xs: 355,
@@ -85,6 +88,24 @@ const styles = sxStyles({
    },
    viewportSx: {
       overflow: "hidden",
+   },
+   description: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 2,
+   },
+   titleLink: {
+      color: "#000",
+      "&:hover": {
+         color: "#000",
+      },
+   },
+   underlined: {
+      textDecoration: "underline",
+   },
+   stayUpWrapper: {
+      pb: 1,
    },
 })
 
@@ -133,17 +154,27 @@ const EventSection = () => {
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <Stack spacing={4}>
-            <EventsPreviewCarousel
-               title="Next Live Streams"
-               events={upcomingLivestreams ?? []}
-               eventDescription={upcomingEventsDescription}
-               type={EventsTypes.COMING_UP}
-               seeMoreLink={`/next-livestreams?${query}`}
-               styling={eventsCarouselStyling}
+         <Stack spacing={4} sx={isMobile ? styles.eventsWrapper : null}>
+            <ConditionalWrapper
+               condition={Boolean(upcomingLivestreams?.length)}
+               fallback={
+                  <StayUpToDateComponent
+                     title="Next Live Streams"
+                     description={upcomingEventsDescription}
+                     seeMoreLink={`/next-livestreams?${query}`}
+                     titleAsLink={isMobile}
+                  />
+               }
             >
-               {<StayUpToDateBanner />}
-            </EventsPreviewCarousel>
+               <EventsPreviewCarousel
+                  title="Next Live Streams"
+                  events={upcomingLivestreams ?? []}
+                  eventDescription={upcomingEventsDescription}
+                  type={EventsTypes.COMING_UP}
+                  seeMoreLink={`/next-livestreams?${query}`}
+                  styling={eventsCarouselStyling}
+               />
+            </ConditionalWrapper>
             <ConditionalWrapper condition={Boolean(pastLivestreams?.length)}>
                <EventsPreviewCarousel
                   title="Past Live Streams"
@@ -171,7 +202,65 @@ const EventSection = () => {
       </Box>
    ) : null
 }
+type StayUpToDateProps = {
+   title: string
+   description: string
+   titleAsLink?: boolean
+   seeMoreLink?: string
+}
+/**
+ *
+ * @param props Component properties, name title, description, isMobile and titleAsLink
+ * @returns  <StayUpToDateBanner> wrapped with Title and description and link for mobile
+ */
+export const StayUpToDateComponent: FC<StayUpToDateProps> = ({
+   title,
+   description,
+   titleAsLink,
+   seeMoreLink,
+}) => {
+   const showTitleAsLink = titleAsLink && seeMoreLink?.length > 0
 
+   const titleComponent = (
+      <Typography
+         variant={"h4"}
+         sx={[styles.eventTitle, showTitleAsLink ? styles.underlined : null]}
+         fontWeight={"600"}
+         color="black"
+      >
+         {title}
+      </Typography>
+   )
+   return (
+      <Box sx={styles.stayUpWrapper}>
+         <Box sx={styles.eventsHeader}>
+            {showTitleAsLink ? (
+               <Link href={seeMoreLink} style={styles.titleLink}>
+                  {titleComponent}
+               </Link>
+            ) : (
+               titleComponent
+            )}
+         </Box>
+
+         {(!showTitleAsLink && (
+            <Stack mb={2}>
+               <Box sx={styles.description}>
+                  <Typography
+                     variant="h6"
+                     fontWeight={"400"}
+                     color="textSecondary"
+                  >
+                     {description}
+                  </Typography>
+               </Box>
+            </Stack>
+         )) ||
+            null}
+         <StayUpToDateBanner />
+      </Box>
+   )
+}
 export const MAX_UPCOMING_STREAMS = 10
 export const MAX_PAST_STREAMS = 5
 

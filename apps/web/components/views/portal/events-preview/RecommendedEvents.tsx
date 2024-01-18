@@ -5,6 +5,7 @@ import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import EventsPreviewCarousel from "./EventsPreviewCarousel"
 import { sxStyles } from "types/commonTypes"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const slideSpacing = 21
 
@@ -20,7 +21,7 @@ const styles = sxStyles({
       justifyContent: "space-between",
       alignItems: "center",
       pr: 2,
-      pb: 0.5,
+      pb: 1,
    },
    description: {
       display: "flex",
@@ -105,6 +106,11 @@ const defaultStyling: EventsCarouselStyling = {
    },
 }
 
+type Props = {
+   limit?: FirebaseInArrayLimit
+   hideTitle?: boolean
+}
+
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    const { authenticatedUser, userData } = useAuth()
 
@@ -122,22 +128,19 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    }
    return (
       <div>
-         <EventsPreviewCarousel
-            title={!hideTitle && "Recommended for you"}
-            events={events}
-            type={EventsTypes.RECOMMENDED}
-            loading={loading}
-            isRecommended
-            isAdmin={userData?.isAdmin}
-            styling={defaultStyling}
-         />
+         <ConditionalWrapper condition={Boolean(events?.length)}>
+            <EventsPreviewCarousel
+               title={!hideTitle && "Recommended for you"}
+               events={events}
+               type={EventsTypes.RECOMMENDED}
+               loading={loading}
+               isRecommended
+               isAdmin={userData?.isAdmin}
+               styling={defaultStyling}
+            />
+         </ConditionalWrapper>
       </div>
    )
-}
-
-interface Props {
-   limit?: FirebaseInArrayLimit
-   hideTitle?: boolean
 }
 
 export default RecommendedEvents

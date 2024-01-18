@@ -107,7 +107,7 @@ const styles = sxStyles({
          fontSize: "16px",
          fontStyle: "normal",
          fontWeight: "400",
-         lineHeight: "27px" /* 168.75% */,
+         lineHeight: "27px",
          paddingX: "15px",
       },
       descriptionWrapper: {
@@ -191,7 +191,7 @@ const MyNextEvents = ({ limit }: Props) => {
          ]}
       >
          <ConditionalWrapper
-            condition={events?.length > 0}
+            condition={Boolean(events?.length)}
             fallback={<EmptyRegistrationsBanner></EmptyRegistrationsBanner>}
          >
             <EventsPreviewCarousel
