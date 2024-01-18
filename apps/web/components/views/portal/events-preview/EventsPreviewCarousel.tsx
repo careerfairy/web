@@ -13,6 +13,7 @@ import {
    useTheme,
    SxProps,
    IconButton,
+   Button,
 } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Link from "next/link"
@@ -104,6 +105,12 @@ const styles = sxStyles({
          color: "#000",
       },
    },
+   manageBtn: {
+      borderRadius: 10,
+      mx: "auto",
+      py: (theme) => `${theme.spacing(0.75)} !important`,
+      boxShadow: "none",
+   },
 })
 
 const wheelGesturesOptions = {
@@ -189,6 +196,9 @@ export type EventsProps = {
    children?: ReactNode
    isAdmin?: boolean
    styling?: EventsCarouselStyling
+   showManageButton?: boolean
+   hideChipLabels?: boolean
+   handleOpenEvent?: (event: LivestreamEvent) => void
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -208,6 +218,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          options = defaultEmblaOptions,
          eventDescription,
          styling = defaultStyling,
+         hideChipLabels,
+         showManageButton = false,
+         handleOpenEvent,
       } = props
       const emblaPlugins = []
       if (events?.length)
@@ -416,6 +429,37 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                           location={getLocation(type)}
                                           event={event}
                                           isRecommended={isRecommended}
+                                          hideChipLabels={hideChipLabels}
+                                          bottomElement={
+                                             showManageButton ? (
+                                                <Box
+                                                   display="flex"
+                                                   justifyContent="center"
+                                                   flexDirection="column"
+                                                   component="span"
+                                                   width="100%"
+                                                   px={1}
+                                                >
+                                                   <Button
+                                                      variant="contained"
+                                                      component="a"
+                                                      href="#"
+                                                      color="primary"
+                                                      onClick={(e) => {
+                                                         e.stopPropagation()
+                                                         return handleOpenEvent(
+                                                            event
+                                                         )
+                                                      }}
+                                                      fullWidth
+                                                      size="small"
+                                                      sx={styles.manageBtn}
+                                                   >
+                                                      MANAGE LIVE STREAM
+                                                   </Button>
+                                                </Box>
+                                             ) : null
+                                          }
                                        />
                                     </Box>
                                  ))}
