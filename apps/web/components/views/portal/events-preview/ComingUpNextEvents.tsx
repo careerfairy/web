@@ -11,7 +11,6 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "./EventsPreviewCarousel"
 import { sxStyles } from "types/commonTypes"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const config = {
    suspense: false,
@@ -184,17 +183,15 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
-      <ConditionalWrapper condition={Boolean(localEvents?.length)}>
-         <EventsPreviewCarousel
-            id={"upcoming-events"}
-            title={COMMING_UP_NEXT_EVENT_TITLE}
-            type={EventsTypes.COMING_UP}
-            events={formatLivestreamsEvents(localEvents)}
-            seeMoreLink={"/next-livestreams"}
-            isRecommended
-            styling={defaultStyling}
-         />
-      </ConditionalWrapper>
+      <EventsPreviewCarousel
+         id={"upcoming-events"}
+         title={COMMING_UP_NEXT_EVENT_TITLE}
+         type={EventsTypes.COMING_UP}
+         events={formatLivestreamsEvents(localEvents)}
+         seeMoreLink={"/next-livestreams"}
+         isRecommended
+         styling={defaultStyling}
+      />
    )
 }
 export const COMMING_UP_NEXT_EVENT_TITLE = "Upcoming live streams"
