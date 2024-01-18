@@ -172,6 +172,25 @@ export interface LikedSparks extends Identifiable {
    }
 }
 
+/**
+ * Collection path: /userData/{userId}/sharedSparks/{year}
+ * - The shared sparks are partitioned by year, so we will never hit the 1MB limit
+ * - From my estimates we can have about 20'000 shared sparks on a single document before we hit the 1MB limit
+ *
+ * - e.g: /userData/{userId}/sharedSparks/2022
+ * - e.g: /userData/{userId}/sharedSparks/2023
+ *
+ *
+ * This will allow us to scale indefinitely, with very little storage cost
+ */
+export interface SharedSparks extends Identifiable {
+   documentType: "sharedSparks"
+   userId: string
+   sparks: {
+      [sparkId: string]: Timestamp
+   }
+}
+
 export const createSeenSparksDocument = (
    userId: string,
    year: string | number
