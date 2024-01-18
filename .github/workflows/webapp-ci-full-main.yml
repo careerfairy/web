@@ -125,7 +125,7 @@ jobs:
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
+         needs.build_app_for_tests.outputs.package == 'true'
       strategy:
          fail-fast: false
          matrix:

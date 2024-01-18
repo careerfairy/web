@@ -37,7 +37,7 @@ export const syncLivestreams = functions
          context,
          message: "syncLivestreamsOnWrite",
       })
-
+      console.log("TODO-WG-TO_DELETE")
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
