@@ -417,7 +417,7 @@ export const isProductionEnvironment = () => {
    return process.env.NODE_ENV === "production"
 }
 
-export const getBigQueryTablePrefix = () => {
+export const getEnvPrefix = () => {
    if (isProductionEnvironment()) {
       return ""
    }
@@ -643,6 +643,22 @@ export const getChangeTypes = (
    const isDelete = before.exists && !after.exists
 
    return { isCreate, isUpdate, isDelete }
+}
+
+export enum ChangeType {
+   CREATE,
+   UPDATE,
+   DELETE,
+}
+
+export const getChangeTypeEnum = (change: Change<DocumentSnapshot>) => {
+   if (!change.after.exists) {
+      return ChangeType.DELETE
+   }
+   if (!change.before.exists) {
+      return ChangeType.CREATE
+   }
+   return ChangeType.UPDATE
 }
 
 export type FunctionsLogger = typeof functions.logger
