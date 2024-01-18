@@ -76,18 +76,56 @@ export const markSparkAsSeenByUser = functions
             context
          ) => {
             try {
+               functions.logger.info(
+                  `Attempting to mark spark ${data.sparkId} as seen by user ${context.auth.token.email}`
+               )
                const userEmail = context.auth.token.email
                const sparkId = data.sparkId
 
-               await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
-
-               await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
-
-               await sparkRepo.replenishUserFeed(userEmail)
+               functions.logger.info(
+                  `Attempting to mark spark ${sparkId} as seen by user ${userEmail}`
+               )
+               try {
+                  await sparkRepo.markSparkAsSeenByUser(userEmail, sparkId)
+                  functions.logger.info(
+                     `Successfully marked spark ${sparkId} as seen by user ${userEmail}`
+                  )
+               } catch (error) {
+                  functions.logger.error(
+                     `Error marking spark ${sparkId} as seen by user ${userEmail}: ${error}`
+                  )
+                  throw error
+               }
 
                functions.logger.info(
-                  `Marked spark ${sparkId} as seen by user ${userEmail}`
+                  `Attempting to remove spark ${sparkId} from user ${userEmail}'s feed`
                )
+               try {
+                  await sparkRepo.removeSparkFromUserFeed(userEmail, sparkId)
+                  functions.logger.info(
+                     `Successfully removed spark ${sparkId} from user ${userEmail}'s feed`
+                  )
+               } catch (error) {
+                  functions.logger.error(
+                     `Error removing spark ${sparkId} from user ${userEmail}'s feed: ${error}`
+                  )
+                  throw error
+               }
+
+               functions.logger.info(
+                  `Attempting to replenish user ${userEmail}'s feed`
+               )
+               try {
+                  await sparkRepo.replenishUserFeed(userEmail)
+                  functions.logger.info(
+                     `Successfully replenished user ${userEmail}'s feed`
+                  )
+               } catch (error) {
+                  functions.logger.error(
+                     `Error replenishing user ${userEmail}'s feed: ${error}`
+                  )
+                  throw error
+               }
             } catch (error) {
                logAndThrow("Error in marking spark as seen by user", {
                   data,
