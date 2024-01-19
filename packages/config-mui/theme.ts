@@ -41,7 +41,7 @@ export const createBrandedTheme = ({
    const baseTheme = createTheme(theme)
 
    // Create the full theme, which includes the base theme and custom components/typography
-   return createTheme(theme, {
+   return createTheme(baseTheme, {
       components: getComponents(baseTheme),
    })
 }
