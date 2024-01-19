@@ -6,19 +6,19 @@ import {
    LivestreamFormValues,
    LivestreamFormQuestionsTabValues,
    LivestreamFormSpeakersTabValues,
-} from "./form/types"
-import LivestreamFetchWrapper from "./LivestreamFetchWrapper"
+} from "../../../../../../components/views/group/admin/events/form/types"
+import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/LivestreamFetchWrapper"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
 import { Tab, Tabs } from "@mui/material"
 import { useState } from "react"
-import LivestreamFormJobsStep from "./form/views/jobs"
-import LivestreamFormQuestionsStep from "./form/views/questions"
-import LivestreamFormSpeakersStep from "./form/views/speakers"
-import LivestreamFormGeneralStep from "./form/views/general"
-import { livestreamFormValidationSchema } from "./form/validationSchemas"
+import LivestreamFormJobsStep from "../../../../../../components/views/group/admin/events/form/views/jobs"
+import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/form/views/questions"
+import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/form/views/speakers"
+import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/form/views/general"
+import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/form/validationSchemas"
 
 const formGeneralTabValues: LivestreamFormGeneralTabValues = {
    title: "",
