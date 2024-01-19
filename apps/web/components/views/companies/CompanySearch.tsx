@@ -54,7 +54,10 @@ const styles = sxStyles({
    },
 })
 
-const CompanySearch: FC = () => {
+export type CompanySearchProps = {
+   filterResults?: number
+}
+const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
    const [inputValue, setInputValue] = useState("")
    const { push } = useRouter()
 
@@ -77,7 +80,7 @@ const CompanySearch: FC = () => {
    /**
     * Filter by Company: location, industry, sparks(y/n) or size.
     */
-   // TODO:WG Add additional filters
+
    const filtersToShow = useMemo(
       () => [
          FilterEnum.companySparks,
@@ -155,7 +158,7 @@ const CompanySearch: FC = () => {
                <Filter
                   filtersToShow={filtersToShow}
                   // TODO:WG Pass results from length of Array in parent components
-                  numberOfResults={companyHits?.length}
+                  numberOfResults={filterResults}
                />
             </Stack>
          </Box>
