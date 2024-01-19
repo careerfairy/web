@@ -66,6 +66,16 @@ const styles = sxStyles({
          height: "100%",
       },
    },
+   loadingButton: {
+      width: "170px",
+      maxHeight: "40px",
+      textTransform: "none",
+      fontSize: "15px",
+   },
+   clearButton: {
+      textTransform: "none",
+      fontSize: "15px",
+   },
 })
 
 export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
@@ -325,6 +335,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                size={"medium"}
                color={"secondary"}
                disabled={numberOfActiveFilters < 1}
+               sx={styles.clearButton}
             >
                Clear filters
             </Button>
@@ -336,10 +347,11 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                variant={"contained"}
                size={"medium"}
                onClick={handleClose}
+               sx={styles.loadingButton}
             >
                {numberOfActiveFilters > 0
-                  ? `${numberOfResults} Results`
-                  : "All results"}
+                  ? `Apply Filters (${numberOfResults})`
+                  : "Apply Filters"}
             </LoadingButton>
          </DialogActions>
       </Dialog>
