@@ -373,7 +373,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
                   break
             }
 
-            // if a authenticated user shared a spark we want to track it
+            // if an authenticated user shared a spark we want to track it
             if (userData?.id) {
                sparkService.handleShareSpark(userData.id, sparkId)
             }
