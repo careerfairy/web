@@ -38,7 +38,10 @@ const styles = sxStyles({
    filter: {
       flex: "10%",
       display: "flex",
-      ml: 2,
+      ml: {
+         xs: 1,
+         md: 3,
+      },
    },
    filterWrapper: {
       backgroundColor: "white",
@@ -153,7 +156,7 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
                inputEndIcon={<FindIcon />}
             />
          </Box>
-         <Box sx={styles.filter} justifyContent={"center"}>
+         <Box sx={styles.filter} justifyContent={"end"}>
             <Stack direction={"row"} sx={styles.filterWrapper}>
                <Filter
                   filtersToShow={filtersToShow}
