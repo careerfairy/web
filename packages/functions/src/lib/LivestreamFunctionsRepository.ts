@@ -486,7 +486,7 @@ export class LivestreamFunctionsRepository
 
       const bulkWriter = firestoreAdmin.bulkWriter()
 
-      livestream.registeredUsers.forEach((user) => {
+      livestream.registeredUsers?.forEach((user) => {
          const ref = firestoreAdmin
             .collection("userData")
             .doc(user)
