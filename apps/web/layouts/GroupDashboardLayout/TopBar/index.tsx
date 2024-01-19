@@ -66,7 +66,7 @@ type Props = {
 }
 
 const TopBar = ({ title, cta }: Props) => {
-   const { livestreamDialog, shrunkLeftMenuState } = useGroup()
+   const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
 
