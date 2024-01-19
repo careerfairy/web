@@ -18,6 +18,7 @@ import LivestreamFormJobsStep from "./form/views/jobs"
 import LivestreamFormQuestionsStep from "./form/views/questions"
 import LivestreamFormSpeakersStep from "./form/views/speakers"
 import LivestreamFormGeneralStep from "./form/views/general"
+import { livestreamFormValidationSchema } from "./form/validationSchemas"
 
 const formGeneralTabValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -119,6 +120,7 @@ const LivestreamAdminDetailsPage = () => {
                      <Formik<LivestreamFormValues>
                         initialValues={formValues}
                         onSubmit={undefined}
+                        validationSchema={livestreamFormValidationSchema}
                      >
                         <>
                            {tabValue == TAB_VALUES.GENERAL && (
