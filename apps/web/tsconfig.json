@@ -27,9 +27,7 @@
       "next-env.d.ts",
       "**/*.ts",
       "**/*.tsx",
-      "../../packages/config-mui/mui-theme.d.ts",
-      "../streaming/store/streamingAppSlice/streamingAppSlice.ts",
-      "../streaming/store/streamingAppSlice/streamingAppSlice.ts"
+      "../../packages/config-mui/mui-theme.d.ts"
    ],
    "exclude": ["node_modules"]
 }
