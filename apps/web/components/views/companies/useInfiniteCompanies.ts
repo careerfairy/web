@@ -12,10 +12,10 @@ import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepo
  * This is where you can add filters to the query as this hook grows
  * */
 export type Filters = {
-   // TODO:WG add additional filters to constrainst array and type
    companyCountries?: string[]
-   // industries?: string[]
-   // companySizes?: string[]
+   companyIndustries?: string[]
+   companySize?: string[]
+   publicSparks?: boolean
 }
 
 export type UseInfiniteCompanies = {
@@ -51,7 +51,26 @@ export const getInfiniteQuery = (
          where("companyCountry.id", "in", filters.companyCountries)
       )
    }
-   // TODO:WG add additional filters to constrainst array and type
+   /**
+    * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
+    * Otherwise the filter is not applied, meaning filtering for companies which have publicSparks == false or any
+    * value is not possible when using this filter.
+    * This is intended.
+    */
+   if (filters.publicSparks) {
+      constraints.push(where("publicSparks", "==", true))
+   }
+
+   if (filters.companySize?.length) {
+      constraints.push(where("companySize", "in", filters.companySize))
+   }
+
+   if (filters.companyIndustries?.length) {
+      constraints.push(
+         where("companyIndustries.id", "in", filters.companyIndustries)
+      )
+   }
+
    return query(
       collection(FirestoreInstance, "careerCenterData"),
       where("publicProfile", "==", true),
