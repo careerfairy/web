@@ -197,26 +197,3 @@ jobs:
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
-   deploy_streaming:
-      name: "Deploy Streaming"
-      needs: [unit_tests]
-      if: needs.build_app_for_tests.outputs.streaming == 'true'
-      runs-on: ubuntu-latest
-      timeout-minutes: 20
-      steps:
-         - uses: actions/checkout@v3
-         - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1
-           id: vercel-deploy
-           with:
-              VERCEL_SCOPE: careerfairy-ssr
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STREAMING_PROJECT_ID }} # replace with the project ID of the streaming app
-              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
-              PR_LABELS: false
-              DELETE_EXISTING_COMMENT: false
-         - name: preview-url
-           run: |
-              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
