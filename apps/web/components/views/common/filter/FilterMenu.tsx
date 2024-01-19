@@ -32,6 +32,7 @@ import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
 import { SlideUpTransition } from "../transitions"
 import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
 import ToggleSelector from "./selectors/ToggleSelector"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    paperRoot: {
@@ -50,9 +51,11 @@ const styles = sxStyles({
    },
    actions: {
       px: { xs: 2, md: 4 },
+      py: 2,
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      borderTop: "1px solid #EEEEEE",
    },
    interestChip: {
       borderRadius: 1,
@@ -76,6 +79,14 @@ const styles = sxStyles({
       textTransform: "none",
       fontSize: "15px",
    },
+   dialog: {
+      mt: "73px",
+      borderRadius: "10px",
+   },
+   paper: {
+      borderTopLeftRadius: "15px",
+      borderTopRightRadius: "15px",
+   },
 })
 
 export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
@@ -86,6 +97,7 @@ type Props = {
 }
 
 const FilterMenu = ({ open, handleClose }: Props) => {
+   const isMobile = useIsMobile()
    const { pathname, push, query } = useRouter()
    const { filtersToShow, numberOfResults, numberOfActiveFilters } = useFilter()
 
@@ -308,6 +320,9 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          fullWidth
          TransitionComponent={SlideUpTransition}
          keepMounted={false} // Does not mount the children when dialog is closed
+         fullScreen={isMobile}
+         PaperProps={isMobile ? { sx: styles.paper } : undefined}
+         sx={isMobile ? styles.dialog : undefined}
       >
          <DialogTitle sx={styles.header}>
             <Typography fontWeight={600} fontSize={"24px"}>

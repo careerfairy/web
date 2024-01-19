@@ -51,13 +51,13 @@ const useInfiniteCollection = <T extends Identifiable>(
       [options.query, options.limit]
    )
 
-   const fullQuery = useMemo(
+   const countQuery = useMemo(
       () => query(options.countQuery),
       [options.countQuery]
    )
 
    const countQueryResponse = useCountQuery(
-      options.countQuery ? fullQuery : null
+      options.countQuery ? countQuery : null
    )
 
    const fetchDocuments = useCallback(
