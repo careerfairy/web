@@ -44,10 +44,10 @@ const useInfiniteCompanies = ({
 }
 
 const getFilterConstraints = (filters: Filters): QueryConstraint[] => {
-   const filterConstrinas: QueryConstraint[] = []
+   const filterConstraints: QueryConstraint[] = []
 
    if (filters.companyCountries?.length > 0) {
-      filterConstrinas.push(
+      filterConstraints.push(
          where("companyCountry.id", "in", filters.companyCountries)
       )
    }
@@ -58,20 +58,20 @@ const getFilterConstraints = (filters: Filters): QueryConstraint[] => {
     * This is intended.
     */
    if (filters.publicSparks) {
-      filterConstrinas.push(where("publicSparks", "==", true))
+      filterConstraints.push(where("publicSparks", "==", true))
    }
 
    if (filters.companySize?.length) {
-      filterConstrinas.push(where("companySize", "in", filters.companySize))
+      filterConstraints.push(where("companySize", "in", filters.companySize))
    }
 
    if (filters.companyIndustries?.length) {
-      filterConstrinas.push(
+      filterConstraints.push(
          where("companyIndustries.id", "in", filters.companyIndustries)
       )
    }
 
-   return filterConstrinas
+   return filterConstraints
 }
 export const getCountQuery = (filters: Filters = {}): Query<Group> => {
    const constraints: QueryConstraint[] = getFilterConstraints(filters)
