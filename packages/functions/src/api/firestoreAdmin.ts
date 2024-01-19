@@ -7,6 +7,7 @@ import {
    Timestamp,
    Firestore,
    FieldPath,
+   DocumentSnapshot,
 } from "firebase-admin/firestore"
 import { isLocalEnvironment } from "../util"
 
@@ -30,4 +31,11 @@ export const firestore = getFirestore()
 export const auth = getAuth()
 export const storage = getStorage()
 
-export { FieldValue, Timestamp, Storage, Firestore, FieldPath }
+export {
+   FieldValue,
+   Timestamp,
+   Storage,
+   Firestore,
+   FieldPath,
+   DocumentSnapshot,
+}
