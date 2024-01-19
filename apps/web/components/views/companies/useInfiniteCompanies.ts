@@ -22,32 +22,32 @@ export type UseInfiniteCompanies = {
    limit: number
    filters: Filters
    initialData?: Group[]
+   count?: boolean
 }
 
 const useInfiniteCompanies = ({
    filters,
    initialData,
    limit,
+   count,
 }: UseInfiniteCompanies) => {
    const options: UseInfiniteCollection<Group> = useMemo(() => {
       return {
          query: getInfiniteQuery(limit, filters),
          limit,
          initialData,
+         countQuery: count ? getCountQuery(filters) : null,
       }
-   }, [limit, filters, initialData])
+   }, [limit, filters, initialData, count])
 
    return useInfiniteCollection<Group>(options)
 }
 
-export const getInfiniteQuery = (
-   pageSize = 10,
-   filters: Filters = {}
-): Query<Group> => {
-   const constraints: QueryConstraint[] = []
+const getFilterConstraints = (filters: Filters): QueryConstraint[] => {
+   const filterConstrinas: QueryConstraint[] = []
 
    if (filters.companyCountries?.length > 0) {
-      constraints.push(
+      filterConstrinas.push(
          where("companyCountry.id", "in", filters.companyCountries)
       )
    }
@@ -58,18 +58,36 @@ export const getInfiniteQuery = (
     * This is intended.
     */
    if (filters.publicSparks) {
-      constraints.push(where("publicSparks", "==", true))
+      filterConstrinas.push(where("publicSparks", "==", true))
    }
 
    if (filters.companySize?.length) {
-      constraints.push(where("companySize", "in", filters.companySize))
+      filterConstrinas.push(where("companySize", "in", filters.companySize))
    }
 
    if (filters.companyIndustries?.length) {
-      constraints.push(
+      filterConstrinas.push(
          where("companyIndustries.id", "in", filters.companyIndustries)
       )
    }
+
+   return filterConstrinas
+}
+export const getCountQuery = (filters: Filters = {}): Query<Group> => {
+   const constraints: QueryConstraint[] = getFilterConstraints(filters)
+
+   return query(
+      collection(FirestoreInstance, "careerCenterData"),
+      where("publicProfile", "==", true),
+      where("test", "==", false),
+      ...constraints
+   ).withConverter(createGenericConverter<Group>())
+}
+export const getInfiniteQuery = (
+   pageSize = 10,
+   filters: Filters = {}
+): Query<Group> => {
+   const constraints: QueryConstraint[] = getFilterConstraints(filters)
 
    return query(
       collection(FirestoreInstance, "careerCenterData"),
