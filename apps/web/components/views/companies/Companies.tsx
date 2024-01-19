@@ -44,6 +44,7 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
          },
          initialData: hasFilters ? [] : initialData,
          limit: COMPANIES_PAGE_SIZE,
+         count: true,
       }),
       [
          companyCountries,
@@ -60,13 +61,19 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
       getMore,
       hasMore,
       loading,
+      totalCount,
    } = useInfiniteCompanies(options)
 
    const renderCompanies = isMounted() ? companies : initialData
 
    useEffect(() => {
-      setResults(renderCompanies.length)
-   }, [renderCompanies, setResults])
+      if (totalCount.error) {
+         console.log("TODO-WG: Error totalCount: " + totalCount.error)
+         return
+      }
+      console.log("TODO-WG: TotalCount: " + JSON.stringify(totalCount))
+      if (!totalCount.loading) setResults(totalCount.count)
+   }, [setResults, totalCount])
    return (
       <CustomInfiniteScroll hasMore={hasMore} next={getMore} loading={loading}>
          <Grid sx={styles.root} container spacing={2}>
