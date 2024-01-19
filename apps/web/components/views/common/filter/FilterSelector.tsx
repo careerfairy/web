@@ -142,16 +142,11 @@ const FilterSelector = () => {
             {isMobile ? (
                <Button
                   aria-describedby={id}
-                  sx={{ ...styles.filterButton, p: 1, minWidth: 0 }}
+                  sx={{ ...styles.filterButton, p: 1 }}
                   onClick={handleOpenFilterDialog}
                   disableElevation
                   color={filterActive ? "primary" : "grey"}
                >
-                  <Box sx={{ px: 1 }}>
-                     <Typography fontWeight={500} fontSize={"15px"}>
-                        Filters
-                     </Typography>
-                  </Box>
                   <FilterIcon />
                </Button>
             ) : (
@@ -163,7 +158,11 @@ const FilterSelector = () => {
                   disableElevation
                   color={"grey"}
                >
-                  <Typography fontWeight={500} fontSize={"15px"}>
+                  <Typography
+                     fontWeight={500}
+                     fontSize={"15px"}
+                     sx={{ pr: numberOfActiveFilters > 0 ? 0 : 4 }}
+                  >
                      Filters
                   </Typography>
                   {numberOfActiveFilters > 0 ? (

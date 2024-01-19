@@ -58,12 +58,12 @@ const ToggleSelector = ({
 }: Props) => {
    const { pathname, query } = useRouter()
 
-   const isRecordedCheck = useMemo(
+   const isFilterEnabled = useMemo(
       () => query[filterId] === "true",
       [query, filterId]
    )
 
-   const handleRecordedCheckChange = useCallback(
+   const handleFilterCheckChange = useCallback(
       (event, checked) => {
          const newQuery = {
             ...query,
@@ -100,8 +100,8 @@ const ToggleSelector = ({
                {description}
             </Typography>
             <AntSwitch
-               checked={isRecordedCheck}
-               onChange={handleRecordedCheckChange}
+               checked={isFilterEnabled}
+               onChange={handleFilterCheckChange}
             />
          </Box>
       </FormControl>
