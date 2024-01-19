@@ -1,4 +1,3 @@
-export * from "./CompanyIcon2"
 export * from "./QaIcon"
 export * from "./HandRaiseIcon"
 export * from "./PollIcon"

@@ -32,7 +32,7 @@ export const ToggleStreamModeButton = () => {
             component={Link}
             href={isHost ? "/streaming/viewer/123" : "/streaming/host/123"}
          >
-            {isHost ? "Currently host" : "currently viewer"}
+            {isHost ? "Currently host" : "Currently viewer"}
          </Button>
       </ButtonGroup>
    )

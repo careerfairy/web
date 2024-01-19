@@ -5,7 +5,7 @@ import React from "react"
 export const CompanyButton = () => {
    return (
       <CircularButton>
-         <CompanyIcon />
+         <CompanyIcon color="primary" />
       </CircularButton>
    )
 }
