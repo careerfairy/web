@@ -50,6 +50,7 @@ const Filter = ({ filtersToShow, numberOfResults }: Props) => {
             query.companyCountries,
             query.companySizes,
             query.companyIndustries,
+            query.companySparks,
             query.recordedOnly === "true" ? query.recordedOnly : null,
             query.fieldsOfStudy,
             query.companyId,

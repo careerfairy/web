@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react"
+import { FC, useEffect, useMemo } from "react"
 import { FilterCompanyOptions, Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
 import useInfiniteCompanies, {
@@ -23,25 +23,36 @@ const styles = sxStyles({
 
 type Props = {
    initialData?: Group[]
+   setResults?(counter: number): void
 }
 
-const Companies: FC<Props> = ({ initialData }) => {
+const Companies: FC<Props> = ({ initialData, setResults }) => {
    const isMounted = useMountedState()
    const { query } = useRouter()
 
-   const {
-      companyCountries,
-      // TODO:WG add additinal query variables
-   } = useMemo(() => getQueryVariables(query), [query])
+   const { companyCountries, publicSparks, companyIndustries, companySize } =
+      useMemo(() => getQueryVariables(query), [query])
 
-   const hasFilters = companyCountries?.length > 0 || false
+   const hasFilters = companyCountries?.length > 0 || publicSparks
    const options = useMemo<UseInfiniteCompanies>(
       () => ({
-         filters: { companyCountries: companyCountries },
+         filters: {
+            companyCountries: companyCountries,
+            publicSparks: publicSparks,
+            companyIndustries: companyIndustries,
+            companySize: companySize,
+         },
          initialData: hasFilters ? [] : initialData,
          limit: COMPANIES_PAGE_SIZE,
       }),
-      [initialData, companyCountries, hasFilters]
+      [
+         companyCountries,
+         publicSparks,
+         companyIndustries,
+         companySize,
+         hasFilters,
+         initialData,
+      ]
    )
 
    const {
@@ -50,7 +61,12 @@ const Companies: FC<Props> = ({ initialData }) => {
       hasMore,
       loading,
    } = useInfiniteCompanies(options)
+
    const renderCompanies = isMounted() ? companies : initialData
+
+   useEffect(() => {
+      setResults(renderCompanies.length)
+   }, [renderCompanies, setResults])
    return (
       <CustomInfiniteScroll hasMore={hasMore} next={getMore} loading={loading}>
          <Grid sx={styles.root} container spacing={2}>
@@ -100,8 +116,8 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
    return {
       companyCountries: queryParamToArr(query.companyCountries),
       companyIndustries: queryParamToArr(query.companyIndustries),
-      publicSparks: queryParamToBool(query.publicSparks as string),
-      companySize: queryParamToArr(query.companySize),
+      publicSparks: queryParamToBool(query.companySparks as string),
+      companySize: queryParamToArr(query.companySizes),
    }
 }
 

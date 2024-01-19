@@ -31,6 +31,7 @@ import LanguageSelector from "./selectors/LanguageSelector"
 import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
 import { SlideUpTransition } from "../transitions"
 import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
+import ToggleSelector from "./selectors/ToggleSelector"
 
 const styles = sxStyles({
    paperRoot: {
@@ -137,20 +138,9 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          }
 
          switch (filter) {
-            case FilterEnum.companySparks:
-               toShow = {
-                  title: "Sparks",
-                  renderFn: () => (
-                     <CompanySizeSelector
-                        key={FilterEnum.companySizes}
-                        handleChange={handleChangeMultiSelect}
-                     />
-                  ),
-               }
-               break
             case FilterEnum.companyCountries:
                toShow = {
-                  title: "Country",
+                  title: "Location",
                   renderFn: () => (
                      <CompanyCountrySelector
                         key={FilterEnum.companyCountries}
@@ -254,6 +244,16 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                      handleApplyFilter={handleApplyFilter}
                   />
                )
+            case FilterEnum.companySparks:
+               return (
+                  <ToggleSelector
+                     key={FilterEnum.companySparks}
+                     handleApplyFilter={handleApplyFilter}
+                     label="Sparks"
+                     description="Show only companies with Sparks"
+                     filterId={FilterEnum.companySparks}
+                  />
+               )
 
             case FilterEnum.interests:
                return (
@@ -283,7 +283,6 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             case FilterEnum.companyCountries:
             case FilterEnum.companyIndustries:
             case FilterEnum.companySizes:
-            case FilterEnum.companySparks:
             case FilterEnum.fieldsOfStudy:
                return renderAutoCompleteFilter(filter)
          }
