@@ -32,7 +32,8 @@ jobs:
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
-         streaming: ${{ steps.changes.outputs.streaming }}
+         shared-ui: ${{ steps.changes.outputs.shared-ui }}
+         config-mui: ${{ steps.changes.outputs.config-mui }}
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
          - uses: actions/checkout@v3
@@ -76,13 +77,11 @@ jobs:
                  webapp:
                    - 'apps/web/**'
                    - 'packages/shared-lib/**'
+                   - 'packages/shared-ui/**'
+                   - 'packages/config-mui/**'
                    - 'packages/seed-data/**'
                  shared-lib:
                    - 'packages/shared-lib/**'
-                 streaming: 
-                   - 'apps/streaming/**'
-                   - 'packages/shared-lib/**'
-                   - 'packages/shared-ui/**'
 
    # Run Unit Tests
    unit_tests:
@@ -92,8 +91,9 @@ jobs:
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true' ||
-         needs.build_app_for_tests.outputs.streaming == 'true'
+         needs.build_app_for_tests.outputs.shared-ui == 'true' ||
+         needs.build_app_for_tests.outputs.config-mui == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -125,6 +125,8 @@ jobs:
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.shared-ui == 'true' ||
+         needs.build_app_for_tests.outputs.config-mui == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
       strategy:
          fail-fast: false
@@ -193,30 +195,7 @@ jobs:
               PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
               PR_LABELS: false
               ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
-              DELETE_EXISTING_COMMENT: false
-         - name: preview-url
-           run: |
-              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
-   deploy_streaming:
-      name: "Deploy Streaming"
-      needs: [unit_tests]
-      if: needs.build_app_for_tests.outputs.streaming == 'true'
-      runs-on: ubuntu-latest
-      timeout-minutes: 20
-      steps:
-         - uses: actions/checkout@v3
-         - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1
-           id: vercel-deploy
-           with:
-              VERCEL_SCOPE: careerfairy-ssr
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STREAMING_PROJECT_ID }} # replace with the project ID of the streaming app
-              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
-              PR_LABELS: false
-              DELETE_EXISTING_COMMENT: false
+              DELETE_EXISTING_COMMENT: true
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}

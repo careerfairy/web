@@ -197,7 +197,6 @@ const TargetTalent: FC = () => {
                            sx={BaseStyles.saveBtn}
                            variant="contained"
                            color="secondary"
-                           size="small"
                         >
                            Save changes
                         </LoadingButton>
