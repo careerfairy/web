@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import { alpha } from "@mui/material/styles"
-import FilterIcon from "@mui/icons-material/FilterAltOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import { Box, Button, InputBase, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
@@ -13,6 +12,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 import { FilterEnum, useFilter } from "./Filter"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import { Filter } from "react-feather"
 
 const styles = sxStyles({
    root: {
@@ -147,12 +147,12 @@ const FilterSelector = () => {
                   disableElevation
                   color={filterActive ? "primary" : "grey"}
                >
-                  <FilterIcon />
+                  <Filter />
                </Button>
             ) : (
                <Button
                   aria-describedby={id}
-                  endIcon={<FilterIcon />}
+                  endIcon={<Filter />}
                   sx={styles.filterButton}
                   onClick={handleOpenFilterDialog}
                   disableElevation

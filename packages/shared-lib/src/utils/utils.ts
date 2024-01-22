@@ -8,7 +8,7 @@ import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
 export const getNestedProperty = (
-   obj: any,
+   obj: unknown,
    path: string | string[],
    separator = "."
 ) => {
@@ -80,8 +80,8 @@ export const sortLivestreamsDesc = (
    b: LivestreamEvent,
    reverse = false
 ): number => {
-   let aa = reverse ? b : a
-   let bb = reverse ? a : b
+   const aa = reverse ? b : a
+   const bb = reverse ? a : b
 
    if (aa.start instanceof Date && bb.start instanceof Date) {
       return bb.start.getTime() - aa.start.getTime()
@@ -179,7 +179,7 @@ export const addUtmTagsToLink = ({
 export const round = (num: number, decimalPlaces: number): number => {
    if (isNaN(num)) return num
 
-   let f = Math.pow(10, decimalPlaces)
+   const f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }
 
@@ -224,4 +224,35 @@ export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
       return text
    }
    return text.substring(0, maxLength - ellipsis.length) + ellipsis
+}
+
+/**
+ * Checks whether a given set of
+ * @param limit
+ * @param filters
+ * @returns
+ */
+export const isWithinNormalizationLimit = (
+   limit: number,
+   ...filters: Array<Array<unknown>>
+): boolean => {
+   console.log("🚀 ~ isWithinNormalizationLimit ~ filters:", filters)
+
+   const filterLengths = filters
+      .filter((items) => Boolean(items.length))
+      .map((items) => items.length)
+   console.log(
+      "🚀 ~ isWithinNormalizationLimit ~ filterLengths:",
+      filterLengths
+   )
+   const disjunctions = filterLengths.reduce((previous, current) => {
+      console.log(
+         "🚀 ~ isWithinNormalizationLimit ~ map ~ reduce:",
+         previous * current
+      )
+      return previous * current
+   }, 1)
+   console.log("🚀 ~ isWithinNormalizationLimit ~ disjunctions:", disjunctions)
+
+   return disjunctions < limit
 }
