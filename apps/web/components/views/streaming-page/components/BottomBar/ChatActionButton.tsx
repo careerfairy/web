@@ -1,4 +1,4 @@
-import { Badge } from "@mui/material"
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useActiveSidePanelView } from "components/custom-hook/streaming/useActiveSidePanelView"
 import { forwardRef } from "react"
 import { MessageCircle } from "react-feather"
@@ -14,7 +14,7 @@ export const ChatActionButton = forwardRef<
    )
 
    return (
-      <Badge color="error" badgeContent={2}>
+      <BrandedBadge color="error" badgeContent={2}>
          <ActionBarButtonStyled
             onClick={handleSetActive}
             active={isActive}
@@ -23,7 +23,7 @@ export const ChatActionButton = forwardRef<
          >
             <MessageCircle />
          </ActionBarButtonStyled>
-      </Badge>
+      </BrandedBadge>
    )
 })
 ChatActionButton.displayName = "ChatActionButton"

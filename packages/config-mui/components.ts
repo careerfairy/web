@@ -1,18 +1,6 @@
 import { Components, Theme, alpha } from "@mui/material"
 
 export const getComponents = (theme: Theme): Components => ({
-   MuiBadge: {
-      // TODO: Refactor these style overrides just for streaming app design (make new variant)
-      // styleOverrides: {
-      //    badge: {
-      //       boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
-      //       transform: "scale(1) translate(30%, -30%)",
-      //    },
-      //    anchorOriginTopRight: {
-      //       transform: "scale(1) translate(30%, -30%)",
-      //    },
-      // },
-   },
    MuiTooltip: {
       defaultProps: {
          arrow: true,

@@ -100,6 +100,53 @@ export const brand = {
    },
    tq: primary,
    purple: secondary,
+   info: {
+      main: "#3A70E2",
+      "50": "#EBF1FC",
+      "100": "#D8E2F9",
+      "200": "#C4D4F6",
+      "300": "#B0C6F3",
+      "400": "#89A9EE",
+      "500": "#618DE8",
+      "600": "#3A70E2",
+      "700": "#3465CB",
+   },
+   warning: {
+      // yellow/orange
+      main: "#FE9B0E",
+      "50": "#FFF5E7",
+      "100": "#FFEBCF",
+      "200": "#FFE1B7",
+      "300": "#FFD79F",
+      "400": "#FEC36E",
+      "500": "#FEAF3E",
+      "600": "#FE9B0E",
+      "700": "#E58C0D",
+   },
+   error: {
+      // red
+      main: "#FF1616",
+      "50": "#FFE8E8",
+      "100": "#FFD0D0",
+      "200": "#FFB9B9",
+      "300": "#FFA2A2",
+      "400": "#FF7373",
+      "500": "#FF4545",
+      "600": "#FF1616",
+      "700": "#E61414",
+   },
+   success: {
+      // green
+      main: "#00D247",
+      "50": "#E6FBED",
+      "100": "#CCF6DA",
+      "200": "#B3F2C8",
+      "300": "#99EDB5",
+      "400": "#66E491",
+      "500": "#33DB6C",
+      "600": "#00D247",
+      "700": "#00BD40",
+   },
 } satisfies ThemeOptions["brand"]
 
 export const getPalette = (mode: PaletteMode) => {
@@ -121,42 +168,9 @@ export const getPalette = (mode: PaletteMode) => {
          "800": "#1F1F23",
          "900": "#0F0F12",
       },
-      success: {
-         // green
-         main: "#00D247",
-         "50": "#E6FBED",
-         "100": "#CCF6DA",
-         "200": "#B3F2C8",
-         "300": "#99EDB5",
-         "400": "#66E491",
-         "500": "#33DB6C",
-         "600": "#00D247",
-         "700": "#00BD40",
-      },
-      warning: {
-         // yellow/orange
-         main: "#FE9B0E",
-         "50": "#FFF5E7",
-         "100": "#FFEBCF",
-         "200": "#FFE1B7",
-         "300": "#FFD79F",
-         "400": "#FEC36E",
-         "500": "#FEAF3E",
-         "600": "#FE9B0E",
-         "700": "#E58C0D",
-      },
-      error: {
-         // red
-         main: "#FF1616",
-         "50": "#FFE8E8",
-         "100": "#FFD0D0",
-         "200": "#FFB9B9",
-         "300": "#FFA2A2",
-         "400": "#FF7373",
-         "500": "#FF4545",
-         "600": "#FF1616",
-         "700": "#E61414",
-      },
+      success: brand.success,
+      warning: brand.warning,
+      error: brand.error,
       /**
        * Legacy info color
        */
@@ -177,20 +191,10 @@ export const getPalette = (mode: PaletteMode) => {
                  light: "#424242",
               }),
       },
-      // TODO: Many components use the legacy info color.
-      // We'll need to manually change their color before we can use the new figma info color below
+      // TODO: Many components use the legacy info color. We will still have the color accessible in the theme.brand.info for now.
+      // We'll need to manually change their color by extracting the theme => theme.brand.info instead of <Button variant="info"/>
       // Issue: https://linear.app/careerfairy/issue/CF-733/migrate-to-new-info-figma-color
-      // info: {
-      //    main: "#3A70E2",
-      //    "50": "#EBF1FC",
-      //    "100": "#D8E2F9",
-      //    "200": "#C4D4F6",
-      //    "300": "#B0C6F3",
-      //    "400": "#89A9EE",
-      //    "500": "#618DE8",
-      //    "600": "#3A70E2",
-      //    "700": "#3465CB",
-      // },
+      // info: brand.info,
       grey: {
          main: grey[300],
          dark: grey[400],

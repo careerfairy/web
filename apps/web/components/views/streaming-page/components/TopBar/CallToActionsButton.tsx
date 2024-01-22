@@ -1,4 +1,4 @@
-import { Badge } from "@mui/material"
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { CircularButton } from "./CircularButton"
 import { Link2 } from "react-feather"
 import React from "react"
@@ -13,10 +13,10 @@ export const CallToActionsButton = () => {
    }
 
    return (
-      <Badge color="error" badgeContent={2}>
+      <BrandedBadge color="error" variant="branded" badgeContent={2}>
          <CircularButton onClick={handleClick} color="primary">
             <Link2 />
          </CircularButton>
-      </Badge>
+      </BrandedBadge>
    )
 }
