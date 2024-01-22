@@ -66,7 +66,7 @@ type Props = {
 }
 
 const TopBar = ({ title, cta }: Props) => {
-   const { livestreamDialog, shrunkLeftMenuState } = useGroup()
+   const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
 
@@ -97,7 +97,7 @@ const TopBar = ({ title, cta }: Props) => {
                        onClick={() =>
                           livestreamDialog.handleOpenNewStreamModal()
                        }
-                       size={"small"}
+                       size={"large"}
                        variant={"outlined"}
                        color={"secondary"}
                     >

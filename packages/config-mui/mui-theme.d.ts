@@ -11,6 +11,10 @@ interface CustomThemeProps {
       white: ColorPartial
       tq: ColorPartial
       purple: ColorPartial
+      info: ColorPartial
+      success: ColorPartial
+      warning: ColorPartial
+      error: ColorPartial
    }
 
    /**
@@ -160,5 +164,12 @@ declare module "@mui/material/Button" {
       gold: true
       black: true
       navyBlue: true
+   }
+}
+
+// Badge
+declare module "@mui/material/Badge" {
+   interface BadgePropsVariantOverrides {
+      branded: true
    }
 }

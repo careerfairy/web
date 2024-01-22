@@ -1,18 +1,6 @@
 import { Components, Theme, alpha } from "@mui/material"
 
 export const getComponents = (theme: Theme): Components => ({
-   MuiBadge: {
-      // TODO: Refactor these style overrides just for streaming app design (make new variant)
-      // styleOverrides: {
-      //    badge: {
-      //       boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
-      //       transform: "scale(1) translate(30%, -30%)",
-      //    },
-      //    anchorOriginTopRight: {
-      //       transform: "scale(1) translate(30%, -30%)",
-      //    },
-      // },
-   },
    MuiTooltip: {
       defaultProps: {
          arrow: true,
@@ -68,6 +56,37 @@ export const getComponents = (theme: Theme): Components => ({
                   height: 18,
                   fontSize: 18,
                },
+            },
+         },
+         {
+            // Disabled outlined acts differently to our figma design, this variant fixes it
+            props: { disabled: true, variant: "outlined" },
+            style: {
+               backgroundColor: theme.brand.white[400],
+               color: theme.brand.black[600],
+               borderColor: "transparent",
+            },
+         },
+         /**
+          * For Outlined Buttons, we need to adjust the padding due to the
+          * outlined border(1px) causing the button to be larger
+          */
+         {
+            props: { variant: "outlined", size: "small" },
+            style: {
+               padding: "3px 15px",
+            },
+         },
+         {
+            props: { variant: "outlined", size: "medium" },
+            style: {
+               padding: "7px 23px",
+            },
+         },
+         {
+            props: { variant: "outlined", size: "large" },
+            style: {
+               padding: "11px 28px",
             },
          },
          {

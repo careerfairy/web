@@ -1,6 +1,6 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
 
-const CompanyIcon = (props: SvgIconProps) => {
+export const CompanyIcon = (props: SvgIconProps) => {
    return (
       <SvgIcon viewBox="0 0 20 20" {...props}>
          <svg
@@ -193,5 +193,3 @@ const CompanyIcon = (props: SvgIconProps) => {
       </SvgIcon>
    )
 }
-
-export default CompanyIcon

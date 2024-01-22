@@ -1,6 +1,8 @@
 import rootReducer from "./reducers"
 
 import thunk from "redux-thunk"
+import { ThunkAction, Action } from "@reduxjs/toolkit"
+
 import { applyMiddleware, compose, createStore } from "redux"
 import { getFirebase } from "react-redux-firebase"
 import { getFirestore, reduxFirestore } from "redux-firestore"
@@ -9,7 +11,7 @@ import firebaseApp from "../data/firebase/FirebaseInstance"
 
 const initialState = {}
 
-export const newStore = () => {
+const newStore = () => {
    let composeEnhancers = compose
    const isServer = typeof window === "undefined"
    //Check if function running on the sever or client
@@ -31,12 +33,18 @@ export const newStore = () => {
    )
 }
 
+export const store = newStore()
+
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
 
-export type RootState = ReturnType<typeof rootReducer>
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+export type AppThunk<ReturnType = void> = ThunkAction<
+   ReturnType,
+   RootState,
+   unknown,
+   Action<string>
+>
 
-export const wrapper = createWrapper(
-   newStore
-   // ,{ debug: true }
-)
+export const wrapper = createWrapper(() => store)
