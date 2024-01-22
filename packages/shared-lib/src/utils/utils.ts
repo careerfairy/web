@@ -8,7 +8,8 @@ import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
 export const getNestedProperty = (
-   obj: unknown,
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   obj: any,
    path: string | string[],
    separator = "."
 ) => {
