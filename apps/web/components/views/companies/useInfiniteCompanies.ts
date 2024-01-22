@@ -66,11 +66,13 @@ const getFilterConstraints = (filters: Filters): QueryConstraint[] => {
    }
 
    if (filters.companyIndustries?.length) {
+      const mappedFilters = filters.companyIndustries.map((industry) => {
+         return { name: industry, id: industry }
+      })
       filterConstraints.push(
-         where("companyIndustries.id", "in", filters.companyIndustries)
+         where("companyIndustries", "array-contains-any", mappedFilters)
       )
    }
-
    return filterConstraints
 }
 export const getCountQuery = (filters: Filters = {}): Query<Group> => {

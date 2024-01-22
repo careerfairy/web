@@ -11,6 +11,7 @@ import { COMPANIES_PAGE_SIZE } from "components/util/constants"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useMountedState } from "react-use"
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils/utils"
 
 const styles = sxStyles({
    flexItem: {
@@ -30,27 +31,26 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
    const isMounted = useMountedState()
    const { query } = useRouter()
 
-   const { companyCountries, publicSparks, companyIndustries, companySize } =
-      useMemo(() => getQueryVariables(query), [query])
+   const filterOptions = useMemo(() => getQueryVariables(query), [query])
 
-   const hasFilters = companyCountries?.length > 0 || publicSparks
+   const hasFilters = areCompanyFiltersApplied(filterOptions)
    const options = useMemo<UseInfiniteCompanies>(
       () => ({
          filters: {
-            companyCountries: companyCountries,
-            publicSparks: publicSparks,
-            companyIndustries: companyIndustries,
-            companySize: companySize,
+            companyCountries: filterOptions.companyCountries,
+            publicSparks: filterOptions.publicSparks,
+            companyIndustries: filterOptions.companyIndustries,
+            companySize: filterOptions.companySize,
          },
          initialData: hasFilters ? [] : initialData,
          limit: COMPANIES_PAGE_SIZE,
          count: true,
       }),
       [
-         companyCountries,
-         publicSparks,
-         companyIndustries,
-         companySize,
+         filterOptions.companyCountries,
+         filterOptions.publicSparks,
+         filterOptions.companyIndustries,
+         filterOptions.companySize,
          hasFilters,
          initialData,
       ]
@@ -68,12 +68,20 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
 
    useEffect(() => {
       if (totalCount.error) {
-         console.log("TODO-WG: Error totalCount: " + totalCount.error)
+         console.log("Error retrieving totalCount: " + totalCount.error)
          return
       }
-      console.log("TODO-WG: TotalCount: " + JSON.stringify(totalCount))
       if (!totalCount.loading) setResults(totalCount.count)
    }, [setResults, totalCount])
+
+   const normalizationLimit = isWithinNormalizationLimit(
+      FIRESTORE_QUERY_NORMALIZATION_LIMIT,
+      filterOptions.companyCountries,
+      filterOptions.companyIndustries,
+      filterOptions.companySize
+   )
+   console.log("🚀 ~ normalizationLimit:", normalizationLimit)
+
    return (
       <CustomInfiniteScroll hasMore={hasMore} next={getMore} loading={loading}>
          <Grid sx={styles.root} container spacing={2}>
@@ -100,6 +108,25 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
    )
 }
 
+const areCompanyFiltersApplied = (filters: FilterCompanyOptions): boolean => {
+   if (!filters) return false
+
+   return (
+      !isArrayEmpty(filters.companyCountries) ||
+      !isArrayEmpty(filters.companyIndustries) ||
+      !isArrayEmpty(filters.companySize) ||
+      filters.publicSparks
+   )
+}
+
+const isArrayEmpty = (arr): boolean => {
+   if (!Array.isArray(arr) || !arr.length) {
+      // array does not exist, is not an array, or is empty
+      // ⇒ do not attempt to process array
+      return true
+   }
+   return false
+}
 const queryParamToArr = (
    queryParam: string | string[] | undefined
 ): string[] => {
@@ -127,5 +154,7 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
       companySize: queryParamToArr(query.companySizes),
    }
 }
+
+const FIRESTORE_QUERY_NORMALIZATION_LIMIT = 30
 
 export default Companies
