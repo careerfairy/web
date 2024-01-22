@@ -105,8 +105,6 @@ const LivestreamAdminDetailsPage = () => {
          }
       >
          <DashboardHead title="CareerFairy | Editing Live Stream of " />
-         <h1>{livestreamId}</h1>
-         <h2>{groupId}</h2>
          <LivestreamFetchWrapper livestreamId={livestreamId as string}>
             {(livestream) => {
                const formValues: LivestreamFormValues = livestream
