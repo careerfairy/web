@@ -70,6 +70,8 @@ type Props = {
    children: ReactNode
    titleComponent: ReactNode
    topBarCta?: ReactNode
+   topBarNavigation?: ReactNode
+   bottomBarNavigation?: ReactNode
 }
 
 /**
@@ -83,6 +85,8 @@ const GroupDashboardLayoutProvider = ({
    children,
    titleComponent,
    topBarCta,
+   topBarNavigation,
+   bottomBarNavigation,
 }: Props) => {
    const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -116,7 +120,15 @@ const GroupDashboardLayoutProvider = ({
       <GroupDashboardContext.Provider value={value}>
          <AdminGenericLayout
             bgColor="#F7F8FC"
-            headerContent={<TopBar cta={topBarCta} title={titleComponent} />}
+            headerContent={
+               <TopBar
+                  cta={topBarCta}
+                  navigation={topBarNavigation}
+                  title={titleComponent}
+               />
+            }
+            showBottomNavContent={true}
+            bottomNavContent={bottomBarNavigation}
             drawerContent={<NavBar />}
             drawerOpen={state.layout.leftDrawerOpen}
             setDrawer={setLeftDrawer}
