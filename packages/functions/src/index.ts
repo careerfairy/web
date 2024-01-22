@@ -55,6 +55,7 @@ import groupPlans = require("./groupPlans")
 import search = require("./search")
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
+import companies = require("./companies")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -261,3 +262,6 @@ exports.fullIndexSync = search.fullIndexSync
 // npx firelink deploy --only functions:searchIndex-livestreams
 //
 exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
+
+// Company | Group Functions
+exports.fetchCompanies = companies.fetchCompanies
