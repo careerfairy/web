@@ -218,8 +218,10 @@ export const getPalette = (mode: PaletteMode) => {
               disabledBackground: "rgba(255, 255, 255, 0.12)",
            }
          : {
-              disabled: "#CACACA", // disabled background color
-              disabledBackground: "#F6F6FA", // disabled background color
+              disabled: brand.black[600], // disabled background color
+              disabledBackground: brand.white[400], // disabled background color
+              // no disabled opacity
+              disabledOpacity: 1,
            },
       background: isDark
          ? { default: "#1E1E1E", paper: "#424242" }

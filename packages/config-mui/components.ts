@@ -58,6 +58,15 @@ export const getComponents = (theme: Theme): Components => ({
                },
             },
          },
+         {
+            // Disabled outlined acts differently to our figma design, this variant fixes it
+            props: { disabled: true, variant: "outlined" },
+            style: {
+               backgroundColor: theme.brand.white[400],
+               color: theme.brand.black[600],
+               border: "none",
+            },
+         },
          /**
           * For Outlined Buttons, we need to adjust the padding due to the
           * outlined border(1px) causing the button to be larger
