@@ -6,6 +6,7 @@ import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
 import { GroupsDataParser } from "@careerfairy/shared-lib/groups/GroupRepository"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
 
 const FilterCompaniesOptionsSchema = {
    publicSparks: boolean(),
@@ -23,29 +24,31 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
       dataValidation(FilterCompaniesOptionsSchema),
       async (data: FilterCompanyOptions) => {
          const {
-            publicSparks = false,
             companyIndustries = [],
             companyCountries = [],
             companySize = [],
          } = data
-
-         const groups = await groupRepo.fetchCompanies(
-            { publicSparks, companyCountries, companyIndustries, companySize },
-            false
+         const compoundQuery = isWithinNormalizationLimit(
+            30,
+            data.companyCountries,
+            data.companyIndustries,
+            data.companySize
          )
+         const groups = await groupRepo.fetchCompanies(data, compoundQuery)
 
          let res = new GroupsDataParser(groups)
+         if (compoundQuery) {
+            if (companyIndustries.length > 0) {
+               res = res.filterByCompanyIndustry(companyIndustries)
+            }
 
-         if (companyIndustries.length > 0) {
-            res = res.filterByCompanyIndustry(companyIndustries)
-         }
+            if (companyCountries.length > 0) {
+               res = res.filterByCompanyCountry(companyCountries)
+            }
 
-         if (companyCountries.length > 0) {
-            res = res.filterByCompanyCountry(companyCountries)
-         }
-
-         if (companySize.length > 0) {
-            res = res.filterByCompanySize(companySize)
+            if (companySize.length > 0) {
+               res = res.filterByCompanySize(companySize)
+            }
          }
 
          return res.get().map(GroupPresenter.createFromDocument)

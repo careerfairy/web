@@ -12,7 +12,8 @@ type Props = {
 const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
    const { query } = useRouter()
    const [resultCount, setResultCount] = useState<number>(null)
-   // TODO:WG Destructure query parameters onto custom type, removing the need for the JSON.stringify
+   // TODO:WG Destructure query parameters onto custom type, removing the need for the JSON.stringify - to be checked
+   // still in use
    return (
       <Container maxWidth="xl">
          <Grid container spacing={2}>
