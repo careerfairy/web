@@ -11,7 +11,7 @@ export const styles = {
          paddingLeft: 0,
       },
       [theme.breakpoints.up("lg")]: {
-         paddingLeft: theme.drawerWidth.small,
+         paddingLeft: theme.legacy.drawerWidth.small,
       },
       [theme.breakpoints.down("sm")]: {
          paddingTop: "56px",

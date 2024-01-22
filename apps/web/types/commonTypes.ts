@@ -1,5 +1,4 @@
-import { SxProps } from "@mui/material"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { SxProps, Theme } from "@mui/material"
 import { SystemStyleObject } from "@mui/system"
 
 /**
@@ -10,7 +9,7 @@ export interface Identifiable {
 }
 
 export type StylesProps = {
-   [propName: string]: SystemStyleObject<DefaultTheme>
+   [propName: string]: SystemStyleObject<Theme>
 }
 
 /**
@@ -21,7 +20,7 @@ export type StylesProps = {
  *
  * @param obj
  */
-export function sxStyles<TObject extends SystemStyleObject<DefaultTheme>>(
+export function sxStyles<TObject extends SystemStyleObject<Theme>>(
    obj: TObject
 ): TObject {
    return obj

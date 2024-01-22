@@ -43,8 +43,14 @@ const styles = sxStyles({
       maxWidth: "150px",
       fontSize: "15px",
       textTransform: "none",
+      "& svg": {
+         width: 20,
+         height: 20,
+      },
    },
    roundNumber: {
+      width: 25,
+      height: 25,
       fontWeight: 500,
       borderRadius: "50%",
       ml: 1,

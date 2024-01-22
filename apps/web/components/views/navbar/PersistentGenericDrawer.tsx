@@ -14,11 +14,11 @@ const styles: StylesProps = {
    tempDrawer: {
       zIndex: (theme) => theme.zIndex.drawer + 1,
       "& > .MuiDrawer-paper": {
-         width: (theme) => theme.drawerWidth.small,
+         width: (theme) => theme.legacy.drawerWidth.small,
       },
    },
    drawerOpen: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
       borderRadius: 0,
    },
    drawerClosed: {
@@ -36,7 +36,7 @@ const styles: StylesProps = {
       },
    },
    persistentDrawer: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
       flexShrink: 0,
       zIndex: (theme) => theme.zIndex.drawer + 1,
       "& > .MuiDrawer-paper": {
@@ -104,12 +104,14 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
       return () => {
          closeDrawer()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [pathname, isPersistent])
 
    useEffect(() => {
       if (isPersistent) {
          openDrawer()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isPersistent])
 
    const closeDrawer = () => {

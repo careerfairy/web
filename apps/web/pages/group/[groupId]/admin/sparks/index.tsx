@@ -14,7 +14,7 @@ const AdminSparksPage = () => {
       <GroupDashboardLayout
          titleComponent={"Sparks"}
          groupId={groupId as string}
-         topBarCta={<CreateSparkButton />}
+         topBarCta={<CreateSparkButton size="large" />}
       >
          <DashboardHead title="CareerFairy | My Sparks" />
          <Sparks />

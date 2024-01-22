@@ -4,6 +4,7 @@ import {
    ListItemAvatar,
    ListItemText,
    Step,
+   StepIconProps,
    StepLabel,
    Stepper,
    Tooltip,
@@ -41,7 +42,7 @@ const styles = createStyles({
    tooltip: {
       backgroundColor: "background.paper",
       color: "text.primary",
-      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_8_25_10,
+      boxShadow: (theme: DefaultTheme) => theme.legacy.boxShadows.dark_8_25_10,
       padding: 2,
       borderRadius: "10px",
    },
@@ -110,7 +111,7 @@ export const BadgeStepper = ({ badge }: { badge: Badge }) => {
                      {
                         badge,
                         isCurrent: activeStep === index,
-                     } as any
+                     } as Partial<StepIconProps>
                   }
                   sx={styles.stepLabel}
                />

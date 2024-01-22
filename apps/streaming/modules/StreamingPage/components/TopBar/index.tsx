@@ -28,9 +28,17 @@ const styles = sxStyles({
       pt: 2.75,
       pb: 1.75,
    },
-   toolbar: {
+   toolbar: (theme) => ({
       minHeight: "auto !important",
-   },
+      "@media (min-width:0px)": {
+         "@media (orientation: landscape)": {
+            minHeight: 48,
+         },
+      },
+      [`@media (min-width:${theme.breakpoints.values.tablet}px)`]: {
+         minHeight: 108,
+      },
+   }),
 })
 
 export const TopBar = () => {
