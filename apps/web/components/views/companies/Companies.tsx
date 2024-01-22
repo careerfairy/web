@@ -7,7 +7,10 @@ import useInfiniteCompanies, {
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
 import CustomInfiniteScroll from "../common/CustomInfiniteScroll"
-import { COMPANIES_PAGE_SIZE } from "components/util/constants"
+import {
+   COMPANIES_PAGE_SIZE,
+   DEFAULT_FIRESTORE_QUERY_NORMALIZATION_LIMIT,
+} from "components/util/constants"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useMountedState } from "react-use"
@@ -75,7 +78,7 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
    }, [setResults, totalCount])
 
    const normalizationLimit = isWithinNormalizationLimit(
-      FIRESTORE_QUERY_NORMALIZATION_LIMIT,
+      DEFAULT_FIRESTORE_QUERY_NORMALIZATION_LIMIT,
       filterOptions.companyCountries,
       filterOptions.companyIndustries,
       filterOptions.companySize
@@ -154,7 +157,5 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
       companySize: queryParamToArr(query.companySizes),
    }
 }
-
-const FIRESTORE_QUERY_NORMALIZATION_LIMIT = 30
 
 export default Companies
