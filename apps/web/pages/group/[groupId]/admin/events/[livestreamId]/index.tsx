@@ -12,13 +12,16 @@ import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
-import { Tab, Tabs } from "@mui/material"
-import { useState } from "react"
 import LivestreamFormJobsStep from "../../../../../../components/views/group/admin/events/form/views/jobs"
 import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/form/views/questions"
 import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/form/views/speakers"
 import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/form/views/general"
 import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/form/validationSchemas"
+import { useState } from "react"
+import LivestreamAdminDetailTopBarNavigation, {
+   TAB_VALUES,
+} from "./navigation/LivestreamAdminDetailTopBarNavigation"
+import LivestreamAdminDetailBottomBarNavigation from "./navigation/LivestreamAdminDetailBottomBarNavigation"
 
 const formGeneralTabValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -73,13 +76,6 @@ const convertLivestreamObjectToForm = (
    )
 }
 
-enum TAB_VALUES {
-   GENERAL,
-   SPEAKERS,
-   QUESTIONS,
-   JOBS,
-}
-
 const LivestreamAdminDetailsPage = () => {
    const {
       query: { groupId, livestreamId },
@@ -95,6 +91,18 @@ const LivestreamAdminDetailsPage = () => {
          titleComponent={"Live stream Details"}
          groupId={groupId as string}
          topBarCta={<LivestreamButtonActions />} // TODO to be implemented properly in CF-527
+         topBarNavigation={
+            <LivestreamAdminDetailTopBarNavigation
+               tabValue={tabValue}
+               tabOnChange={handleTabChange}
+            />
+         }
+         bottomBarNavigation={
+            <LivestreamAdminDetailBottomBarNavigation
+               currentTab={tabValue}
+               changeTab={setTabValue}
+            />
+         }
       >
          <DashboardHead title="CareerFairy | Editing Live Stream of " />
          <h1>{livestreamId}</h1>
@@ -107,16 +115,6 @@ const LivestreamAdminDetailsPage = () => {
 
                return (
                   <>
-                     <Tabs
-                        value={tabValue}
-                        onChange={handleTabChange}
-                        aria-label="Livestream Creation Form Tabs"
-                     >
-                        <Tab label="General" value={TAB_VALUES.GENERAL} />
-                        <Tab label="Speakers" value={TAB_VALUES.SPEAKERS} />
-                        <Tab label="Questions" value={TAB_VALUES.QUESTIONS} />
-                        <Tab label="Jobs" value={TAB_VALUES.JOBS} />
-                     </Tabs>
                      <Formik<LivestreamFormValues>
                         initialValues={formValues}
                         onSubmit={undefined}
