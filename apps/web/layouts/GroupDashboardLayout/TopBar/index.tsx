@@ -17,60 +17,66 @@ import { useGroup } from ".."
 import { ReactNode } from "react"
 import { useRouter } from "next/router"
 
-const styles = sxStyles({
-   root: {
-      display: "flex",
-      flex: 1,
-      alignItems: "center",
-      borderBottom: (theme) =>
-         `2px solid ${alpha(theme.palette.divider, 0.03)}`,
-      px: {
-         xs: 2,
-         sm: 5,
+const getStyles = (hasNavigationBar?: boolean) =>
+   sxStyles({
+      root: {
+         display: "flex",
+         flexWrap: "wrap",
+         flex: 1,
+         alignItems: "center",
+         borderBottom: (theme) =>
+            `2px solid ${alpha(theme.palette.divider, 0.03)}`,
+         px: {
+            xs: 2,
+            sm: 5,
+         },
+         py: {
+            xs: 0,
+            md: 3.2,
+         },
+         paddingBottom: hasNavigationBar ? "0 !important" : "initial",
       },
-      py: {
-         xs: 0,
-         md: 3.2,
+      leftSection: {
+         display: "flex",
       },
-   },
-   leftSection: {
-      display: "flex",
-   },
-   btnWrapper: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      mr: 1,
-   },
-   menuButton: {
-      borderRadius: 3,
-      overflow: "hidden",
-   },
-   title: {
-      fontSize: {
-         xs: "1.2rem",
-         sm: "2rem",
+      btnWrapper: {
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+         mr: 1,
       },
-      ...getMaxLineStyles(1),
-   },
-   floatingButton: {
-      position: "fixed",
-      bottom: 20,
-      right: 20,
-   },
-})
+      menuButton: {
+         borderRadius: 3,
+         overflow: "hidden",
+      },
+      title: {
+         fontSize: {
+            xs: "1.2rem",
+            sm: "2rem",
+         },
+         ...getMaxLineStyles(1),
+      },
+      floatingButton: {
+         position: "fixed",
+         bottom: 20,
+         right: 20,
+      },
+   })
 
 type Props = {
    title: ReactNode
-   cta?: React.ReactNode
+   cta?: ReactNode
+   navigation?: ReactNode
 }
 
-const TopBar = ({ title, cta }: Props) => {
+const TopBar = ({ title, cta, navigation }: Props) => {
    const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
+
+   const styles = getStyles(Boolean(navigation))
 
    return (
       <Box sx={styles.root}>
@@ -108,12 +114,14 @@ const TopBar = ({ title, cta }: Props) => {
             <UserAvatarWithDetails />
             <NotificationsButton />
          </Stack>
+         {Boolean(navigation) && navigation}
       </Box>
    )
 }
 
 const MobileToggleButton = () => {
    const { toggleLeftDrawer } = useGroupDashboard()
+   const styles = getStyles()
 
    return (
       <Box sx={styles.btnWrapper}>

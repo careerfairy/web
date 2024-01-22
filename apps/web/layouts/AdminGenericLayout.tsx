@@ -103,7 +103,8 @@ type Props = {
    children: React.ReactNode
    drawerContent: React.ReactNode
    headerContent: React.ReactNode
-   bottomNavContent?: JSX.Element
+   bottomNavContent?: JSX.Element | React.ReactNode
+   showBottomNavContent?: boolean
    dropdownNav?: JSX.Element
    drawerOpen: boolean
    setDrawer?: (open: boolean) => void
@@ -119,6 +120,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    drawerContent,
    headerContent,
    bottomNavContent,
+   showBottomNavContent,
    dropdownNav,
    drawerOpen,
    setDrawer,
@@ -186,7 +188,9 @@ const AdminGenericLayout: React.FC<Props> = ({
                {children}
             </Box>
             {/* Bottom navigation bar */}
-            {isMobile && bottomNavContent ? bottomNavContent : null}
+            {(isMobile || showBottomNavContent) && bottomNavContent
+               ? bottomNavContent
+               : null}
          </Box>
       </Box>
    )

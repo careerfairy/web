@@ -70,6 +70,8 @@ type GroupDashboardLayoutProps = {
    titleComponent: React.ReactNode
    children: React.ReactNode
    topBarCta?: React.ReactNode
+   topBarNavigation?: React.ReactNode
+   bottomBarNavigation?: React.ReactNode
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, titleComponent } = props
@@ -221,6 +223,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider
                topBarCta={props.topBarCta}
+               topBarNavigation={props.topBarNavigation}
+               bottomBarNavigation={props.bottomBarNavigation}
                titleComponent={titleComponent}
             >
                {children}
