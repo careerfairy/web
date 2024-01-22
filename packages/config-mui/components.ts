@@ -64,7 +64,7 @@ export const getComponents = (theme: Theme): Components => ({
             style: {
                backgroundColor: theme.brand.white[400],
                color: theme.brand.black[600],
-               border: "none",
+               borderColor: "transparent",
             },
          },
          /**
