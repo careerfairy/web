@@ -13,10 +13,6 @@ import { useRouter } from "next/router"
 import { LinkProps } from "next/dist/client/link"
 import { buildDialogLink } from "../../../util"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import useIsAtsLivestreamJobAssociation from "../../../../../custom-hook/useIsAtsLivestreamJobAssociation"
 import useGroupCustomJobs from "../../../../../custom-hook/custom-job/useGroupCustomJobs"
@@ -108,18 +104,9 @@ type JobItemProps = {
 }
 
 const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
-   const isMobile = useIsMobile()
    const router = useRouter()
-   const { successNotification } = useSnackbarNotifications()
-   const { authenticatedUser, userStats } = useAuth()
    const { mode, goToJobDetails } = useLiveStreamDialog()
    const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
-
-   const { userHasBoughtRecording } = useRecordingAccess(
-      authenticatedUser.email,
-      presenter,
-      userStats
-   )
 
    let jobId: string, jobName: string
 
@@ -131,30 +118,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       jobName = job.title
    }
 
-   const isPast = presenter.isPast()
-   const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
    const isPageMode = mode === "page"
-
-   const buttonDisabled = useMemo<boolean>(() => {
-      const isUpcoming = !isPast
-
-      if (isUpcoming) {
-         // You can't see the job details if the livestream is upcoming
-         return true
-      }
-
-      if (userHasBoughtRecording) {
-         // You can see the job details if you bought the recording
-         return false
-      }
-
-      if (!hasRegistered) {
-         // You can't see the job details if you are not registered
-         return true
-      }
-
-      return !presenter.canApplyToJobsOutsideOfStream()
-   }, [isPast, userHasBoughtRecording, hasRegistered, presenter])
 
    const jobLink = useMemo<LinkProps["href"]>(
       () =>
@@ -182,6 +146,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             sm: "row",
          }}
          justifyContent="space-between"
+         alignItems="center"
          sx={styles.jobItemRoot}
          spacing={2}
       >
