@@ -58,6 +58,28 @@ export const getComponents = (theme: Theme): Components => ({
                },
             },
          },
+         /**
+          * For Outlined Buttons, we need to adjust the padding due to the
+          * outlined border(1px) causing the button to be larger
+          */
+         {
+            props: { variant: "outlined", size: "small" },
+            style: {
+               padding: "3px 15px",
+            },
+         },
+         {
+            props: { variant: "outlined", size: "medium" },
+            style: {
+               padding: "7px 23px",
+            },
+         },
+         {
+            props: { variant: "outlined", size: "large" },
+            style: {
+               padding: "11px 28px",
+            },
+         },
          {
             props: { variant: "outlined", color: "secondary" },
             style: {
