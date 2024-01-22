@@ -228,32 +228,28 @@ export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
 }
 
 /**
- * Checks whether a given set of
- * @param limit
- * @param filters
- * @returns
+ * Checks whether a given set of Query String filters, are within the imposed limit by Firestore
+ * when used in queries. Applying only to filters of Collection type. To prevent a query from becoming too computationally expensive,
+ * Cloud Firestore limits a query to a maximum of 30 disjunctions in disjunctive normal form.
+ * @see https://firebase.google.com/docs/firestore/query-data/queries?hl=en#limits_on_or_queries
+ * @param limit Limit imposed by Firestore.
+ * @param filters Collection of Arrays of various filters of any type, where only the length of each
+ * Array in the collection @param filters is taken into consideration for limit check.
+ * @returns Boolean indicating whether the provided @param filters, given the length of each individual collection it
+ * holds, will exceed or not, the imposed @param limit .
  */
 export const isWithinNormalizationLimit = (
    limit: number,
    ...filters: Array<Array<unknown>>
 ): boolean => {
-   console.log("🚀 ~ isWithinNormalizationLimit ~ filters:", filters)
-
-   const filterLengths = filters
+   // Filter empty collections, would result in zero multiplication
+   // Map the collection to lengths for calculation
+   const sanitizedFilters = filters
       .filter((items) => Boolean(items.length))
       .map((items) => items.length)
-   console.log(
-      "🚀 ~ isWithinNormalizationLimit ~ filterLengths:",
-      filterLengths
-   )
-   const disjunctions = filterLengths.reduce((previous, current) => {
-      console.log(
-         "🚀 ~ isWithinNormalizationLimit ~ map ~ reduce:",
-         previous * current
-      )
-      return previous * current
-   }, 1)
-   console.log("🚀 ~ isWithinNormalizationLimit ~ disjunctions:", disjunctions)
 
-   return disjunctions < limit
+   return (
+      sanitizedFilters.reduce((previous, current) => previous * current, 1) <
+      limit
+   )
 }
