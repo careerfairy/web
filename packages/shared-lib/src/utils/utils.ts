@@ -191,6 +191,12 @@ export const containsAny = (source: string[], target: string[]): boolean => {
    return source?.some((item) => target?.includes(item))
 }
 
+export const arrayContainsAny = <Type>(
+   source: Type[],
+   target: Type[]
+): boolean => {
+   return source?.some((item) => target?.includes(item))
+}
 /**
  * Remove duplicates values
  * @param arr

@@ -3,6 +3,7 @@ import {
    IGroupRepository,
 } from "@careerfairy/shared-lib/groups/GroupRepository"
 import {
+   FilterCompanyOptions,
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
@@ -11,7 +12,10 @@ import {
 } from "@careerfairy/shared-lib/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   createCompatGenericConverter,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
@@ -110,6 +114,15 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * the associations between users and companies
     */
    getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null>
+
+   /**
+    * Fetches companies based on the filters provided in @param options .
+    * @param options Supported filters, more can be added
+    */
+   fetchCompanies(
+      options: FilterCompanyOptions,
+      useCoumpoundQueries?: boolean
+   ): Promise<Group[]>
 
    /**
     * Starts a plan for a group.
@@ -216,12 +229,27 @@ export class GroupFunctionsRepository
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            auth.setCustomUserClaims(user.uid, user.customClaims)
+            void auth.setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
    }
 
+   async fetchCompanies(
+      options: FilterCompanyOptions,
+      useCoumpoundQueries?: boolean
+   ): Promise<Group[]> {
+      let q = this.firestore
+         .collection("careerCenterData")
+         .withConverter(
+            createCompatGenericConverter<Group>()
+         ) as unknown as FirebaseFirestore.Query<Group>
+
+      q = applyCompanyFilters(q, options, useCoumpoundQueries)
+
+      const snaps = await q.get()
+      return snaps.docs.map((d) => d.data())
+   }
    /*
     * Stores the group admin role in the user's custom claims
     * */
@@ -363,7 +391,7 @@ export class GroupFunctionsRepository
             questionRefs.forEach((questionRef) => {
                batch.delete(questionRef)
             })
-            batch.commit()
+            void batch.commit()
             throw error
          })
       )
@@ -594,4 +622,49 @@ const removeTempGroupQuestionIds = (groupQuestions?: GroupQuestion[]) => {
          return groupQuestion
       }) || []
    )
+}
+
+const applyCompanyFilters = (
+   query: FirebaseFirestore.Query<Group>,
+   filters: FilterCompanyOptions,
+   useCompound?: boolean
+): FirebaseFirestore.Query<Group> => {
+   query = query.where("publicProfile", "==", true)
+   query = query.where("test", "==", false)
+
+   /**
+    * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
+    * Otherwise the filter is not applied, meaning filtering for companies which have publicSparks == false or any
+    * value is not possible when using this filter.
+    * This is intended.
+    */
+   if (filters.publicSparks) {
+      query = query.where("publicSparks", "==", true)
+   }
+
+   if (useCompound) {
+      if (filters.companyCountries?.length > 0) {
+         query = query.where(
+            "companyCountry.id",
+            "in",
+            filters.companyCountries
+         )
+      }
+
+      if (filters.companySize?.length) {
+         query = query.where("companySize", "in", filters.companySize)
+      }
+
+      if (filters.companyIndustries?.length) {
+         const mappedFilters = filters.companyIndustries.map((industry) => {
+            return { name: industry, id: industry }
+         })
+         query = query.where(
+            "companyIndustries",
+            "array-contains-any",
+            mappedFilters
+         )
+      }
+   }
+   return query
 }
