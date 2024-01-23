@@ -1,7 +1,7 @@
 import { Button, Grid, ListItem, Stack } from "@mui/material"
 import React, { FC } from "react"
 import { useDownloadCV } from "../../../common/table/hooks"
-import { Link } from "@careerfairy/streaming/components"
+import Link from "components/views/common/Link"
 import { LoadingButton } from "@mui/lab"
 import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
 import { sxStyles } from "../../../../../../../types/commonTypes"
@@ -73,19 +73,17 @@ const ApplicationItem: FC<ApplicationItemProps> = ({ applicant }) => {
                   component={Link}
                   target={"_blank"}
                   href={applicant.linkedInUrl || ""}
-                  variant={
-                     Boolean(applicant.linkedInUrl) ? "outlined" : "contained"
-                  }
+                  variant={applicant.linkedInUrl ? "outlined" : "contained"}
                   size="small"
                   color={"grey"}
-                  disabled={!Boolean(applicant.linkedInUrl)}
+                  disabled={!applicant.linkedInUrl}
                   sx={styles.linkedInBtn}
                >
                   LinkedIn
                </Button>
 
                <LoadingButton
-                  disabled={!Boolean(applicant.resumeUrl)}
+                  disabled={!applicant.resumeUrl}
                   loading={downloadingPDF}
                   onClick={handleDownloadCV}
                   sx={styles.downloadCvBtn}

@@ -14,7 +14,7 @@ const StyledToolTip = styled(({ className, ...props }: TooltipProps) => (
       px: theme.spacing(1),
       py: theme.spacing(1.5),
       borderRadius: theme.spacing(1),
-      boxShadow: theme.boxShadows.dark_8_25_10,
+      boxShadow: theme.legacy.boxShadows.dark_8_25_10,
    },
    [`& .${tooltipClasses.arrow}`]: {
       color: "white",

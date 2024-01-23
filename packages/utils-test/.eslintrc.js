@@ -6,6 +6,7 @@ module.exports = {
       project: true,
       tsconfigRootDir: __dirname,
    },
+   parser: "@typescript-eslint/parser",
 
-   extends: ["eslint-config-base"],
+   plugins: ["@typescript-eslint"],
 }

@@ -97,7 +97,7 @@ const TopBar = ({ title, cta }: Props) => {
                        onClick={() =>
                           livestreamDialog.handleOpenNewStreamModal()
                        }
-                       size={"small"}
+                       size={"large"}
                        variant={"outlined"}
                        color={"secondary"}
                     >

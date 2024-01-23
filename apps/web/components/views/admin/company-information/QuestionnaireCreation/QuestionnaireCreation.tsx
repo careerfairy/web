@@ -1,5 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { PlusCircle } from "react-feather"
 
 import { GroupQuestion } from "@careerfairy/shared-lib/groups"
@@ -139,7 +139,7 @@ const QuestionarieCreation: FC<Props> = ({ groupQuestions }) => {
             fullWidth
             startIcon={<PlusCircle />}
          >
-            <Typography variant="button">Add question</Typography>
+            <Typography variant="inherit">Add question</Typography>
          </Button>
       </Stack>
    )

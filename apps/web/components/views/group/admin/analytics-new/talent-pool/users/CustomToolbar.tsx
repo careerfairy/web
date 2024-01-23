@@ -73,6 +73,7 @@ const CustomToolbar = () => {
                disabled={results.countQueryResponse?.count === 0}
                variant="outlined"
                color="secondary"
+               size="large"
             >
                EXPORT POOL
             </LoadingButton>

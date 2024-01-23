@@ -88,7 +88,8 @@ export const useLivestreamDialog = (group: Group) => {
 
             await customJobServiceInstance.transferCustomJobsFromDraftToPublishedLivestream(
                streamObj.id,
-               publishedStreamId
+               publishedStreamId,
+               group.id
             )
 
             await deleteLivestream(streamObj.id, "draftLivestreams")

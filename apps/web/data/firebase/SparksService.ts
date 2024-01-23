@@ -9,6 +9,7 @@ import {
    GetFeedData,
    LikedSparks,
    RemoveNotificationFromUserData,
+   SharedSparks,
    Spark,
    SparkStats,
    UpdateSparkData,
@@ -395,6 +396,36 @@ export class SparksService {
       return updateDoc(userRef, {
          hasCompletedSparksB2BOnboarding: true,
       })
+   }
+
+   /**
+    * This function handles the sharing of a spark by a user.
+    * It creates a new document in the 'sharedSparks' collection for the current year,
+    * and adds the shared spark to this document.
+    *
+    * @param userId - The id of the user sharing the spark
+    * @param sparkId - The id of the spark being shared
+    */
+   async handleShareSpark(userId: string, sparkId: string) {
+      const currentYear = DateTime.now().year
+      const docRef = doc(
+         FirestoreInstance,
+         "userData",
+         userId,
+         "sharedSparks",
+         currentYear.toString()
+      ).withConverter(createGenericConverter<SharedSparks>())
+
+      const createShareSparksDoc: PartialWithFieldValue<SharedSparks> = {
+         documentType: "sharedSparks",
+         userId,
+         id: currentYear.toString(),
+         sparks: {
+            [sparkId]: Timestamp.now(),
+         },
+      }
+
+      await setDoc<SharedSparks>(docRef, createShareSparksDoc, { merge: true })
    }
 
    private createLikedSparksObject(

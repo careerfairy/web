@@ -82,7 +82,7 @@ const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
          color="primary"
       >
          <Typography fontSize={"15px"} fontWeight={"600"}>
-            ADD PHOTO
+            Add photo
          </Typography>
       </LoadingButton>
    )
