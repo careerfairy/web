@@ -1,4 +1,4 @@
-import { store } from "../pages/_app"
+import { store } from "store"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -99,9 +99,16 @@ export const getServerSideGroup = async (groupId: string): Promise<Group> => {
 /**
  * To parse the events coming from server side
  */
-export const mapFromServerSide = (events: { [p: string]: any }[]) => {
+
+export const mapFromServerSide = (
+   events: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [p: string]: any
+   }[]
+) => {
    if (!events) return []
    return events.map((e) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       LivestreamPresenter.parseDocument(e as any, fromDate)
    )
 }
@@ -148,9 +155,9 @@ export const getUserTokenFromCookie = (
 
 export const parseJwtServerSide = (token?: string) => {
    if (!token) return null
-   let base64Url = token.split(".")[1]
-   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
-   let jsonPayload = decodeURIComponent(
+   const base64Url = token.split(".")[1]
+   const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+   const jsonPayload = decodeURIComponent(
       atob(base64)
          .split("")
          .map(function (c) {

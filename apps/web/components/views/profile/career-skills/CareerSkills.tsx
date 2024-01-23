@@ -47,7 +47,7 @@ const styles = sxStyles({
    },
    contextInfo: {
       padding: 2,
-      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_8_25_10,
+      boxShadow: (theme: DefaultTheme) => theme.legacy.boxShadows.dark_8_25_10,
    },
    unlockedSummary: {
       justifyContent: "start",
@@ -178,14 +178,14 @@ const ContextInfo = () => {
                   }}
                />
 
-               {contextInfoDetail.showRequirements && (
+               {contextInfoDetail.showRequirements ? (
                   <>
                      <Typography mb={1}>Requirements:</Typography>
                      <RequirementsForABadge
                         badge={contextInfoDetail.badgeRequired}
                      />
                   </>
-               )}
+               ) : null}
             </Card>
          </Box>
       </Grid>

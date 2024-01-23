@@ -55,7 +55,7 @@ const styles = sxStyles({
       "& .MuiPaper-root": {
          boxShadow: "none",
       },
-      boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
+      boxShadow: (theme) => theme.legacy.boxShadows.dark_8_25_10,
       borderRadius: "10px",
       backgroundColor: "background.paper",
       "& thead": {
@@ -201,7 +201,13 @@ const actions: MaterialTableProps<UserDataEntry>["actions"] = [
    { icon: "custom", onClick: () => {} },
 ]
 
-const Footer = ({ rowsPerPageOptions, labelRowsPerPage }: any) => {
+const Footer = ({
+   rowsPerPageOptions,
+   labelRowsPerPage,
+}: {
+   rowsPerPageOptions: number[]
+   labelRowsPerPage: string
+}) => {
    const {
       converterFn,
       title,

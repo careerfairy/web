@@ -2,7 +2,7 @@ import React, { FC } from "react"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 import UploadBannerIcon from "@mui/icons-material/CameraAltOutlined"
 import { sxStyles } from "../../../../types/commonTypes"
 import { darken } from "@mui/material/styles"
@@ -57,10 +57,9 @@ const BannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
                startIcon={<UploadBannerIcon />}
                variant="contained"
                color="grey"
+               size="large"
             >
-               <Typography fontSize={"15px"} fontWeight={"600"}>
-                  EDIT COVER PHOTO
-               </Typography>
+               Edit cover photo
             </LoadingButton>
          </Box>
       </ImagePickerContainer>

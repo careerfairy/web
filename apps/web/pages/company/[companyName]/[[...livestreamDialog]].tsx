@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
@@ -21,6 +21,7 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { groupRepo } from "../../../data/RepositoryInstances"
 import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import {
+   deserializeGroupClient,
    getLivestreamsAndDialogData,
    mapFromServerSide,
 } from "../../../util/serverUtil"
@@ -37,7 +38,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    livestreamDialogData,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
-   const { universityName, id } = serverSideGroup
+   const { universityName, id } = deserializeGroupClient(serverSideGroup)
 
    const viewRef = useTrackPageView({
       trackDocumentId: id,
@@ -72,8 +73,10 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 }
 
 export const getStaticProps: GetStaticProps<{
-   serverSideGroup: Group
+   serverSideGroup: SerializedGroup
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSideUpcomingLivestreams: { [p: string]: any }[]
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    serverSidePastLivestreams: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
 }> = async (ctx) => {
@@ -94,7 +97,7 @@ export const getStaticProps: GetStaticProps<{
 
             return {
                props: {
-                  serverSideGroup,
+                  serverSideGroup: serializeGroup(serverSideGroup),
                   serverSideUpcomingLivestreams:
                      serverSideUpcomingLivestreams?.map(
                         LivestreamPresenter.serializeDocument

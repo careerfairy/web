@@ -75,6 +75,7 @@ const LivestreamSearchNav = () => {
             <ExportPdfButton
                livestreamId={currentStreamStats?.livestream?.id}
                groupId={group.id}
+               size="large"
             >
                Export PDF
             </ExportPdfButton>

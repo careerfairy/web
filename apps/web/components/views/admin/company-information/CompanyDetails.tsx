@@ -184,7 +184,6 @@ const CompanyDetails = () => {
                            onClick={() => handleSubmit()}
                            loading={isSubmitting}
                            disabled={!dirty}
-                           size="small"
                            sx={BaseStyles.saveBtn}
                            variant="contained"
                            color="secondary"

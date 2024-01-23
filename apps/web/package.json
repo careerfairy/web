@@ -20,6 +20,8 @@
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
+      "@careerfairy/config-mui": "*",
+      "@careerfairy/shared-ui": "*",
       "@dnd-kit/core": "^6.0.8",
       "@dnd-kit/sortable": "^7.0.2",
       "@fingerprintjs/fingerprintjs": "^3.4.1",

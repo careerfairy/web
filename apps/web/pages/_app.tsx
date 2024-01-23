@@ -2,7 +2,7 @@ import * as React from "react"
 import "styles.css"
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import config from "@stahl.luke/react-reveal/globals"
-import { newStore, wrapper } from "../store"
+import { store, wrapper } from "../store"
 import NextNProgress from "nextjs-progressbar"
 import { brandedLightTheme } from "../materialUI"
 import Head from "next/head"
@@ -62,7 +62,6 @@ const rrfConfig = {
    },
 }
 
-export const store = newStore()
 const rrfProps = {
    firebase: firebaseApp,
    config: rrfConfig,
@@ -127,8 +126,11 @@ function MyApp(props) {
 const ReactFireProviders = ({ children }) => {
    return (
       <FirebaseAppProvider firebaseConfig={firebaseConfig} suspense={true}>
+         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
          <FirestoreProvider sdk={FirestoreInstance as any}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <ReactFireAuthProvider sdk={AuthInstance as any}>
+               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                <FunctionsProvider sdk={FunctionsInstance as any}>
                   {children}
                </FunctionsProvider>

@@ -6,6 +6,7 @@ import {
    Container,
    Slide,
    Tabs,
+   TabsOwnProps,
    Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -43,7 +44,7 @@ const styles = sxStyles({
    },
    companyTitle: {
       textShadow: (theme) => ({
-         md: theme.darkTextShadow,
+         md: theme.legacy.darkTextShadow,
       }),
    },
    companyTitleSticky: {
@@ -334,7 +335,9 @@ const Header = () => {
                                  allowScrollButtonsMobile
                                  textColor="inherit"
                                  TabIndicatorProps={
-                                    { sx: styles.indicator } as any
+                                    {
+                                       sx: styles.indicator,
+                                    } as TabsOwnProps["TabIndicatorProps"]
                                  }
                                  sx={styles.tabWrapper}
                               >
@@ -363,7 +366,14 @@ const ActionButtons = () => {
    return (
       <Stack spacing={1} pr={3} direction={"row"}>
          {showFollowButton ? (
-            <FollowButton color="primary" group={group} />
+            <FollowButton
+               sx={{
+                  fontSize: undefined,
+               }}
+               color="primary"
+               size="medium"
+               group={group}
+            />
          ) : null}
          {showShareButton ? <ShareButton /> : null}
       </Stack>
