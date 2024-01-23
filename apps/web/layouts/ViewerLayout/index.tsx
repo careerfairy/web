@@ -40,6 +40,8 @@ import { sxStyles } from "../../types/commonTypes"
 import { RootState } from "../../store"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
+import { appendCurrentQueryParams } from "components/util/url"
 
 const styles = sxStyles({
    root: {
@@ -155,7 +157,7 @@ const ViewerLayout = (props) => {
                      if (!doc.exists) {
                         void push("/streaming/error")
                      }
-                     let storedToken = doc.data().value
+                     const storedToken = doc.data().value
                      if (storedToken !== token) {
                         setNotAuthorized(false)
                      }
@@ -174,6 +176,7 @@ const ViewerLayout = (props) => {
    }, [token, currentLivestream?.test, currentLivestream?.id])
 
    useEffect(() => {
+      // eslint-disable-next-line no-extra-boolean-cast
       if (Boolean(isRecordingWindow)) {
          void dispatch(actions.setFocusMode(true, mobile))
       }
@@ -223,8 +226,8 @@ const ViewerLayout = (props) => {
          if (currentLivestream.test && authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email)
          } else if (currentLivestream.test || currentLivestream.openStream) {
-            let uuid = uuidv4()
-            let joiningId = uuid.replace(/-/g, "")
+            const uuid = uuidv4()
+            const joiningId = uuid.replace(/-/g, "")
             setStreamerId(currentLivestream.id + joiningId)
          } else if (authenticatedUser?.email) {
             setStreamerId(currentLivestream.id + authenticatedUser.email)
@@ -313,10 +316,17 @@ const ViewerLayout = (props) => {
    const onRegistrationQuestionsAnswered = useCallback(async () => {
       setHasAnsweredLivestreamGroupQuestions(true)
       handleCloseDialog()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    useRewardLivestreamAttendance(currentLivestream)
    useCountLivestreamAttendanceMinutes(currentLivestream)
+
+   useConditionalRedirect(
+      // Do not redirect to new UI if the current stream is a breakout room, as we don't support the new UI for breakout rooms
+      isBreakout ? false : currentLivestream?.useNewUI,
+      appendCurrentQueryParams(`/streaming/viewer/${livestreamId}`)
+   )
 
    if (notAuthorized) {
       void replace({

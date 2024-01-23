@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactNode, memo } from "react"
 import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
@@ -16,10 +16,12 @@ type Props = {
    children: ReactNode
 }
 
-export const Layout = ({ children }: Props) => {
+export const Layout = memo(({ children }: Props) => {
    return (
       <Box sx={styles.root} component="main">
          {children}
       </Box>
    )
-}
+})
+
+Layout.displayName = "Layout"

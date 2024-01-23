@@ -76,10 +76,12 @@ export const StreamProvider: FC<StreamProviderProps> = ({
    )
 }
 
-export const useStreamContext = () => {
+export const useStreamingContext = () => {
    const context = useContext(StreamContext)
    if (context === undefined) {
-      throw new Error("useStreamContext must be used within a StreamProvider")
+      throw new Error(
+         "useStreamingContext must be used within a StreamProvider"
+      )
    }
    return context
 }

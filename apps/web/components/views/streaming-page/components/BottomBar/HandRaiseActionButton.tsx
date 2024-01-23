@@ -1,6 +1,6 @@
 import { HandRaiseIcon } from "components/views/common/icons"
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
-import { useStreamContext } from "components/views/streaming-page/context"
+import { useStreamingContext } from "components/views/streaming-page/context"
 import { forwardRef } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
@@ -9,7 +9,7 @@ export const HandRaiseActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
-   const { isHost } = useStreamContext()
+   const { isHost } = useStreamingContext()
 
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.HAND_RAISE

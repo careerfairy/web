@@ -1,6 +1,6 @@
 import { sxStyles } from "types/commonTypes"
 import React from "react"
-import { useStreamContext } from "../context"
+import { useStreamingContext } from "../context"
 import { Button, ButtonGroup } from "@mui/material"
 import Link from "components/views/common/Link"
 
@@ -15,7 +15,7 @@ const styles = sxStyles({
 })
 
 export const ToggleStreamModeButton = () => {
-   const { isHost, toggleIsStreaming, isStreaming } = useStreamContext()
+   const { isHost, toggleIsStreaming, isStreaming } = useStreamingContext()
    return (
       <ButtonGroup
          size="small"
