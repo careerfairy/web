@@ -131,6 +131,7 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
          dataValidation({
             draftId: string().required(),
             livestreamId: string().required(),
+            groupId: string().required(),
          }),
          userShouldBeGroupAdmin(),
          onCallWrapper(async (data) => {

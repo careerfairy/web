@@ -43,6 +43,7 @@ import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
 import useMenuState from "components/custom-hook/useMenuState"
 import LoginButton from "../common/LoginButton"
 import LikeActiveIcon from "../common/icons/LikeActiveIcon"
+import { sparkService } from "data/firebase/SparksService"
 
 const actionWidth = 52
 
@@ -371,9 +372,14 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
                   trackEvent(SparkEventActions.Share_Other)
                   break
             }
+
+            // if an authenticated user shared a spark we want to track it
+            if (userData?.id) {
+               sparkService.handleShareSpark(userData.id, sparkId)
+            }
          }
       },
-      [clickedComponents, trackEvent]
+      [clickedComponents, sparkId, trackEvent, userData?.id]
    )
 
    const handleShare = useCallback(async () => {

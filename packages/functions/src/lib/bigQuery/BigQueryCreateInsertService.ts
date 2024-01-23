@@ -1,6 +1,6 @@
 import BigQueryServiceCore from "./IBigQueryService"
 import { BigQuery, TableMetadata } from "@google-cloud/bigquery"
-import { getBigQueryTablePrefix, isProductionEnvironment } from "../../util"
+import { getEnvPrefix, isProductionEnvironment } from "../../util"
 import { logger } from "firebase-functions"
 
 class BigQueryCreateInsertService<TRow> extends BigQueryServiceCore {
@@ -22,7 +22,7 @@ class BigQueryCreateInsertService<TRow> extends BigQueryServiceCore {
    ) {
       super(bigQueryClient)
       this.datasetId = datasetId
-      this.tableId = `${tableId}${getBigQueryTablePrefix()}`
+      this.tableId = `${tableId}${getEnvPrefix()}`
       this.tableOptions = tableOptions
    }
 

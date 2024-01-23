@@ -370,21 +370,21 @@ export class GroupDashboardPage extends CommonPage {
    async addCompanyPhotos() {
       // upload 3 photos
       await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         this.page.getByRole("button", { name: "Add photo" }),
          imageLogoPath
       )
       await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         this.page.getByRole("button", { name: "Add photo" }),
          imageLogoPath
       )
       await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         this.page.getByRole("button", { name: "Add photo" }),
          imageLogoPath
       )
    }
 
    async addCompanyVideo() {
-      await this.page.getByRole("button", { name: "ADD VIDEO" }).click()
+      await this.page.getByRole("button", { name: "Add video" }).click()
 
       await this.page
          .getByPlaceholder("Enter the title of video")

@@ -1,7 +1,7 @@
 import React from "react"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { Button, Tooltip, Typography } from "@mui/material"
+import { Button, Tooltip, TooltipProps, Typography } from "@mui/material"
 import SaveIcon from "@mui/icons-material/Save"
 import IconButton from "@mui/material/IconButton"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
@@ -18,7 +18,7 @@ const styles = sxStyles({
    tooltip: {
       backgroundColor: "background.paper",
       color: "text.primary",
-      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_8_25_10,
+      boxShadow: (theme: DefaultTheme) => theme.legacy.boxShadows.dark_8_25_10,
       padding: 1,
       borderRadius: "10px",
    },
@@ -85,11 +85,19 @@ export const SaveRecruiterButtonNoAccess = () => {
    )
 }
 
-const WrapperTooltip = ({ children, title, position = "right" }) => {
+const WrapperTooltip = ({
+   children,
+   title,
+   position = "right",
+}: {
+   children: TooltipProps["children"]
+   title: TooltipProps["title"]
+   position?: TooltipProps["placement"]
+}) => {
    return (
       <Tooltip
          title={title}
-         placement={position as any}
+         placement={position}
          componentsProps={{
             tooltip: {
                sx: styles.tooltip,

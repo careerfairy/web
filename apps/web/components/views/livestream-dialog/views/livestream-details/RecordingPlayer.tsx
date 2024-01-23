@@ -59,7 +59,7 @@ const styles = sxStyles({
       "& .react-player": {
          borderRadius: 2,
          overflow: "hidden",
-         boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
+         boxShadow: (theme) => theme.legacy.boxShadows.dark_8_25_10,
       },
       display: "flex",
       justifyContent: "center",
