@@ -184,7 +184,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                break
             case FilterEnum.companySizes:
                toShow = {
-                  title: "Company Size",
+                  title: "Company size",
                   renderFn: () => (
                      <CompanySizeSelector
                         key={FilterEnum.companySizes}

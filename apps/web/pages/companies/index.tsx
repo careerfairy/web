@@ -30,6 +30,7 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
    )
 }
 
+// TODO-WG: Apply server side filtering with service
 export const getServerSideProps = async () => {
    const snaps = await getDocs(getInfiniteQuery(COMPANIES_PAGE_SIZE))
 
