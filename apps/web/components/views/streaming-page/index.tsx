@@ -16,9 +16,9 @@ type Props = {
 export const StreamingPage = ({ isHost }: Props) => {
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <LivestreamNotFoundRedirectWrapper>
+         <LivestreamValidationWrapper>
             <Component isHost={isHost} />
-         </LivestreamNotFoundRedirectWrapper>
+         </LivestreamValidationWrapper>
       </SuspenseWithBoundary>
    )
 }
@@ -60,9 +60,12 @@ type ConditionalRedirectWrapperProps = {
 }
 
 /**
- * Ensures children components render only with live stream data available, redirecting otherwise.
+ * All validation logic for the live stream data is handled here.
+ * TODO:
+ * - Validate token if host and not test stream
+ * - Validate user must be logged-in except for (test/open) streams
  */
-export const LivestreamNotFoundRedirectWrapper = ({
+export const LivestreamValidationWrapper = ({
    children,
 }: ConditionalRedirectWrapperProps) => {
    const livestream = useLivestreamData()
@@ -71,7 +74,10 @@ export const LivestreamNotFoundRedirectWrapper = ({
 
    useConditionalRedirect(!livestreamExists, "/portal")
 
-   if (!livestreamExists) return null
+   if (!livestreamExists) {
+      // Since we're using suspense, if there's no live stream data, it means it doesn't exist
+      return null
+   }
 
    return <>{children}</>
 }
