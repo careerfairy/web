@@ -14,6 +14,7 @@ import {
    SxProps,
    IconButton,
    Button,
+   TypographyProps,
 } from "@mui/material"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Link from "next/link"
@@ -21,7 +22,6 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { Variant } from "@mui/material/styles/createTypography"
 
 const slideSpacing = 21
 
@@ -171,7 +171,7 @@ export type EventsCarouselStyling = {
    padding?: boolean
    slide?: SxProps
    title?: SxProps
-   titleVariant?: Variant
+   titleVariant?: TypographyProps["variant"]
    eventsHeader?: SxProps
    mainWrapperBoxSx?: unknown
 }
@@ -302,7 +302,10 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
             </>
          )
       }
-      const getHeading = (headingStyles: SxProps, variant?: Variant) => {
+      const getHeading = (
+         headingStyles: SxProps,
+         variant?: TypographyProps["variant"]
+      ) => {
          return (
             <Typography
                variant={variant ? variant : "h6"} // Could be omitted since default is h6
