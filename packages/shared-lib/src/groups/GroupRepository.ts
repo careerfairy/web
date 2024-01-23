@@ -36,7 +36,8 @@ import {
 import { Create, ImageType } from "../commonTypes"
 import { containsAny } from "../utils/utils"
 
-import cloneDeep = require("lodash.clonedeep")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cloneDeep = require("lodash.clonedeep")
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
