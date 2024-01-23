@@ -31,6 +31,9 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { auth, Timestamp } from "../api/firestoreAdmin"
 import { UserRecord } from "firebase-admin/auth"
 import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
+import * as functions from "firebase-functions"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { ServerClient } from "postmark"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -129,6 +132,17 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves when the plan has been successfully stopped.
     */
    stopPlan(groupId: string): Promise<void>
+
+   /**
+    * Sends a Sparks trial welcome email.
+    *
+    * This method fetches all the group admins of the given group and sends a batch of emails through Postmark.
+    *
+    * @param groupId - The ID of the group to send the email to.
+    * @param client - The Postmark client.
+    * @returns A promise that resolves when the email was sent.
+    */
+   sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -535,6 +549,41 @@ export class GroupFunctionsRepository
          .doc(groupId)
 
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
+   }
+
+   async sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void> {
+      const admins = await this.getGroupAdmins(groupId);
+
+      const emails = admins?.map(({ email, firstName, groupId }) => ({
+         TemplateId: Number(
+            process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME
+         ),
+         From: "CareerFairy <noreply@careerfairy.io>",
+         To: email,
+         TemplateModel: {
+            user_name: firstName,
+            company_sparks_link: addUtmTagsToLink({
+               link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
+               campaign: "sparks",
+               content: "trial_welcome",
+            }),
+         },
+      }))
+
+      client.sendEmailBatchWithTemplates(emails).then(
+         (responses) => {
+            responses.forEach(() =>
+               functions.logger.log(
+                  "Successfully sent batch sparks trial welcome email"
+               )
+            )
+         },
+         (error) => {
+            functions.logger.error(
+               "Error sending sparks trial welcome email:" + error
+            )
+         }
+      )
    }
 }
 

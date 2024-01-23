@@ -12,7 +12,7 @@ export class GroupPlanService {
    async startPlan(data: StartPlanData) {
       return httpsCallable<StartPlanData, void>(
          this.functions,
-         "startPlan"
+         "startPlan_v2"
       )(data)
    }
 }
