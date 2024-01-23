@@ -60,19 +60,7 @@ export type AddCreatorData = Pick<
    | "story"
 >
 
-export type UpdateCreatorData = Partial<
-   Pick<
-      Creator,
-      | "firstName"
-      | "lastName"
-      | "position"
-      | "avatarUrl"
-      | "linkedInUrl"
-      | "story"
-      | "email"
-   >
-> &
-   Identifiable
+export type UpdateCreatorData = Partial<AddCreatorData> & Identifiable
 
 export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
    return {
