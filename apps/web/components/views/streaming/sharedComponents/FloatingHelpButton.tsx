@@ -1,11 +1,11 @@
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined"
-import Button from "@mui/material/Button"
 import { alpha } from "@mui/material/styles"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { useSelector } from "react-redux"
 import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
+import { Box, ButtonBase } from "@mui/material"
 
 const styles = sxStyles({
    root: {
@@ -39,16 +39,15 @@ const FloatingHelpButton = ({ openSupportInLeftMenu }: Props) => {
    const disabled = selectedState === "support" && leftMenuOpen
 
    return (
-      <Button
-         size={"small"}
-         color={"grey"}
+      <Box
+         component={ButtonBase}
          disabled={disabled}
          onClick={openSupportInLeftMenu}
          sx={styles.root}
       >
          <HelpOutlineOutlinedIcon />
          Help
-      </Button>
+      </Box>
    )
 }
 

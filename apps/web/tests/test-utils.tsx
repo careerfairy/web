@@ -1,7 +1,7 @@
 import React, { FC, ReactElement } from "react"
 import { render, RenderOptions } from "@testing-library/react"
 import { AuthProvider } from "../HOCs/AuthProvider"
-import { store } from "../pages/_app"
+import { store } from "store"
 import firebaseApp from "../data/firebase/FirebaseInstance"
 
 import { Provider } from "react-redux"
@@ -30,7 +30,7 @@ const AllTheProviders: FC<{
    children: ReactElement
 }> = ({ children }) => {
    return (
-      <RouterContext.Provider value={{ ...mockRouter }}>
+      <RouterContext.Provider value={mockRouter}>
          <Provider store={store}>
             <AuthProvider>
                <ThemeProviderWrapper>

@@ -38,7 +38,7 @@ const CompanyVideo = () => {
                   color="primary"
                >
                   <Typography fontSize={"15px"} fontWeight={"600"}>
-                     ADD VIDEO
+                     Add video
                   </Typography>
                </LoadingButton>
             ) : null}

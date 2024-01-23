@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
@@ -8,7 +8,7 @@ import {
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import CompanyIcon from "components/views/common/icons/CompanyIcon"
+import { CompanyIcon } from "components/views/common/icons"
 
 const initialHeaderLinks = [
    {
