@@ -1,17 +1,17 @@
-import { Typography } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
-import { StreamingPage } from "components/views/streaming-page"
+import dynamic from "next/dynamic"
+import { useMountedState } from "react-use"
+
+const StreamingPage = dynamic(
+   // Use next/dynamic to import the StreamingPage component without ssr as the Agora SDK uses the window object
+   // https://github.com/AgoraIO-Community/Agora-RTC-React/blob/master/example/nextjs/pages/index.tsx
+   import("components/views/streaming-page").then((a) => a.StreamingPage),
+   { ssr: false }
+)
 
 const StreamingHost = () => {
-   const { userData } = useAuth()
+   const mounted = useMountedState()
 
-   return userData?.isAdmin ? (
-      <StreamingPage isHost />
-   ) : (
-      <Typography variant="brandedH4" color="error">
-         Please log in as cf admin to access this page
-      </Typography>
-   )
+   return mounted() ? <StreamingPage isHost /> : null
 }
 
 export default StreamingHost
