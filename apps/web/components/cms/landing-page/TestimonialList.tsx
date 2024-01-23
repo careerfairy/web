@@ -9,7 +9,7 @@ const styles = sxStyles({
    title: {
       marginX: { xs: 2, lg: 24, xl: 52 },
       textAlign: "center",
-      "& :first-child": {
+      "& :first-of-type": {
          fontWeight: 500,
       },
    },
@@ -27,11 +27,11 @@ const TestimonialList = ({
 }: HygraphResponseTestimonialListValue): JSX.Element => {
    return (
       <Box sx={styles.wrapper}>
-         {testimonialTitle && (
+         {testimonialTitle ? (
             <Box sx={styles.title}>
                <ThemedRichTextRenderer rawContent={testimonialTitle.raw} />
             </Box>
-         )}
+         ) : null}
          <TestimonialsSection
             testimonials={testimonials}
             sliderArrowColor={sliderArrowColor}

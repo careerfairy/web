@@ -17,8 +17,10 @@ export class LoginPage {
       this.passwordTextField = page.locator('input[name="password"]')
       this.emailTextField = page.locator('input[name="email"]')
       this.loginButton = page.locator("data-testid=login-button")
-      this.portalPageUpcomingHeader = page.locator("text=COMING UP NEXT")
-      this.portalNextEventsHeader = page.locator("text=MY NEXT EVENTS")
+      this.portalPageUpcomingHeader = page.locator(
+         "text='Upcoming live streams'"
+      )
+      this.portalNextEventsHeader = page.locator("text='My registrations'")
       this.passwordResetLink = page.locator(
          "data-testid=forgot-password-page-link"
       )
@@ -41,7 +43,7 @@ export class LoginPage {
       return this.signupLink?.click()
    }
 
-   async open(path: string = "/login") {
+   async open(path = "/login") {
       await this.page.goto(path)
    }
 
