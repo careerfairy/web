@@ -14,7 +14,7 @@ import { Timer } from "./Timer"
 import { sxStyles } from "types/commonTypes"
 import { ViewCount } from "./ViewCount"
 import { CallToActionsButton } from "./CallToActionsButton"
-import { useStreamContext } from "../../context/StreamContext"
+import { useStreamingContext } from "../../context/StreamContext"
 import { ToggleStartLiveStreamButton } from "./ToggleStartLiveStreamButton"
 import { ConnectionStatus } from "./ConnectionStatus"
 import { ReactNode } from "react"
@@ -42,7 +42,7 @@ const styles = sxStyles({
 })
 
 export const TopBar = () => {
-   const { isHost } = useStreamContext()
+   const { isHost } = useStreamingContext()
 
    return (
       <AppBar
@@ -99,7 +99,7 @@ const HostView = () => (
 )
 
 const ViewerView = () => {
-   const { isStreaming } = useStreamContext()
+   const { isStreaming } = useStreamingContext()
 
    return (
       <StackComponent justifyContent="flex-end">

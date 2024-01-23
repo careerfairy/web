@@ -1,7 +1,7 @@
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { sxStyles } from "types/commonTypes"
 import { Box, Divider, Stack } from "@mui/material"
-import { useStreamContext } from "components/views/streaming-page/context"
+import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
 import { SettingsActionButton } from "./SettingsActionButton"
 import { JobsActionButton } from "./JobsActionButton"
@@ -32,7 +32,7 @@ const styles = sxStyles({
 })
 
 export const BottomBar = () => {
-   const { isHost } = useStreamContext()
+   const { isHost } = useStreamingContext()
 
    return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
 }
@@ -125,7 +125,7 @@ const getViewerActionNames = (
 const ViewerView = () => {
    const isMobile = useStreamIsMobile()
 
-   const { isStreaming } = useStreamContext()
+   const { isStreaming } = useStreamingContext()
 
    return (
       <ActionsBar>
