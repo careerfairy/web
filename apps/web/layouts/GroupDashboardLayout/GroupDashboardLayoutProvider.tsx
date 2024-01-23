@@ -127,7 +127,7 @@ const GroupDashboardLayoutProvider = ({
                   title={titleComponent}
                />
             }
-            showBottomNavContent={true}
+            showBottomNavContent
             bottomNavContent={bottomBarNavigation}
             drawerContent={<NavBar />}
             drawerOpen={state.layout.leftDrawerOpen}

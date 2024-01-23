@@ -1,11 +1,9 @@
 import { ElementType, FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import { Box, Button, IconButton } from "@mui/material"
-import { ChevronLeft, ChevronRight, IconProps } from "react-feather"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { ChevronLeft, ChevronRight, IconProps } from "react-feather"
 import { TAB_VALUES } from "./LivestreamAdminDetailTopBarNavigation"
-
-const isDisabledClassName = "isDisabled"
 
 const styles = sxStyles({
    root: {
@@ -25,25 +23,17 @@ const styles = sxStyles({
          xs: 2,
       },
    },
-   navigationButton: {
-      backgroundColor: {
-         xs: "#F6F6FA",
-         md: "inherit",
-      },
-      [`&.${isDisabledClassName}`]: {
-         opacity: {
-            xs: "20%",
-            md: "initial",
-         },
-      },
-      padding: {
-         xs: 0,
-      },
+   navigationButtonMobile: {
+      backgroundColor: "#F6F6FA",
+      padding: 0,
       svg: {
-         stroke: (theme) => ({
-            xs: "black",
-            md: theme.palette.primary.main,
-         }),
+         stroke: "black",
+      },
+   },
+   navigationButtonDisabled: {
+      opacity: {
+         xs: "20%",
+         md: "initial",
       },
    },
 })
@@ -60,51 +50,33 @@ const ButtonOrIconButton: FC<ButtonOrIconButtonProps> = ({
    return isMobile ? (
       <IconButton {...props}>{children}</IconButton>
    ) : (
-      <Button {...props}>{children}</Button>
+      <Button color="secondary" variant="contained" {...props}>
+         {children}
+      </Button>
    )
 }
 
 type ButtonContentProps = {
    label: string
-   iconPositionOnDesktop: "left" | "right"
    Icon: ElementType<IconProps>
 }
 
-const ButtonContent: FC<ButtonContentProps> = ({
-   label,
-   iconPositionOnDesktop,
-   Icon,
-}) => {
+const ButtonContent: FC<ButtonContentProps> = ({ label, Icon }) => {
    const isMobile = useIsMobile()
 
-   const desktopIconSize = 18
    const mobileIconSize = 32
 
-   return isMobile ? (
-      <Icon size={mobileIconSize} />
-   ) : (
-      <>
-         {iconPositionOnDesktop === "left" ? (
-            <>
-               <Icon size={desktopIconSize} /> {label}
-            </>
-         ) : (
-            <>
-               {label} <Icon size={desktopIconSize} />
-            </>
-         )}
-      </>
-   )
+   return isMobile ? <Icon size={mobileIconSize} /> : <>{label}</>
 }
 
 const changeToNewTab = (
    currentTab: TAB_VALUES,
    changeTab: LivestreamAdminDetailBottomBarNavigationProps["changeTab"],
-   step: number
+   numStepsToMove: number
 ): void => {
    const tabValues = Object.values(TAB_VALUES)
    const currentTabIndex = tabValues.indexOf(currentTab)
-   const newTab = tabValues[currentTabIndex + step]
+   const newTab = tabValues[currentTabIndex + numStepsToMove]
    changeTab(newTab)
 }
 
@@ -116,34 +88,35 @@ type LivestreamAdminDetailBottomBarNavigationProps = {
 const LivestreamAdminDetailBottomBarNavigation: FC<
    LivestreamAdminDetailBottomBarNavigationProps
 > = ({ currentTab, changeTab }) => {
+   const isMobile = useIsMobile()
+   const isDesktop = !isMobile
+
    const isBackButtonDisabled = currentTab === TAB_VALUES.GENERAL
    const isNextButtonDisabled = currentTab === TAB_VALUES.JOBS
 
    return (
       <Box sx={styles.root}>
          <ButtonOrIconButton
-            sx={styles.navigationButton}
+            sx={[
+               isMobile && styles.navigationButtonMobile,
+               isBackButtonDisabled && styles.navigationButtonDisabled,
+            ]}
             disabled={isBackButtonDisabled}
             onClick={() => changeToNewTab(currentTab, changeTab, -1)}
-            className={Boolean(isBackButtonDisabled) && isDisabledClassName}
+            startIcon={Boolean(isDesktop) && <ChevronLeft />}
          >
-            <ButtonContent
-               label={"Back"}
-               iconPositionOnDesktop="left"
-               Icon={ChevronLeft}
-            />
+            <ButtonContent label={"Back"} Icon={ChevronLeft} />
          </ButtonOrIconButton>
          <ButtonOrIconButton
-            sx={styles.navigationButton}
+            sx={[
+               isMobile && styles.navigationButtonMobile,
+               isNextButtonDisabled && styles.navigationButtonDisabled,
+            ]}
             disabled={currentTab === TAB_VALUES.JOBS}
             onClick={() => changeToNewTab(currentTab, changeTab, 1)}
-            className={Boolean(isNextButtonDisabled) && isDisabledClassName}
+            endIcon={Boolean(isDesktop) && <ChevronRight />}
          >
-            <ButtonContent
-               label={"Next"}
-               iconPositionOnDesktop="right"
-               Icon={ChevronRight}
-            />
+            <ButtonContent label={"Next"} Icon={ChevronRight} />
          </ButtonOrIconButton>
       </Box>
    )
