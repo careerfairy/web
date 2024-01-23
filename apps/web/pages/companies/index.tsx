@@ -4,9 +4,9 @@ import SEO from "../../components/util/SEO"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import CompaniesPageOverview from "../../components/views/companies/CompaniesPageOverview"
 import { InferGetServerSidePropsType, NextPage } from "next"
-import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
+// import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
 import { deserializeGroups } from "util/serverUtil"
-import { companyService } from "data/firebase/CompanyService"
+// import { companyService } from "data/firebase/CompanyService"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -29,12 +29,12 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
 
 // TODO-WG: Apply server side filtering with service
 export const getServerSideProps = async () => {
-   const filterOptions: FilterCompanyOptions = {}
-   const companies = await companyService.fetchLivestreams(filterOptions)
+   // const filterOptions: FilterCompanyOptions = {}
+   // const companies = await companyService.fetchLivestreams(filterOptions)
 
    return {
       props: {
-         serverSideCompanies: companies,
+         serverSideCompanies: [],
       },
    }
 }
