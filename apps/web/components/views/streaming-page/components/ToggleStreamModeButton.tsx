@@ -3,6 +3,7 @@ import React from "react"
 import { useStreamingContext } from "../context"
 import { Button, ButtonGroup } from "@mui/material"
 import Link from "components/views/common/Link"
+import { appendCurrentQueryParams } from "components/util/url"
 
 const styles = sxStyles({
    root: {
@@ -15,7 +16,8 @@ const styles = sxStyles({
 })
 
 export const ToggleStreamModeButton = () => {
-   const { isHost, toggleIsStreaming, isStreaming } = useStreamingContext()
+   const { isHost, toggleIsStreaming, isStreaming, livestreamId } =
+      useStreamingContext()
    return (
       <ButtonGroup
          size="small"
@@ -30,7 +32,11 @@ export const ToggleStreamModeButton = () => {
          )}
          <Button
             component={Link}
-            href={isHost ? "/streaming/viewer/123" : "/streaming/host/123"}
+            href={appendCurrentQueryParams(
+               isHost
+                  ? `/streaming/viewer/${livestreamId}`
+                  : `/streaming/host/${livestreamId}`
+            )}
          >
             {isHost ? "Currently host" : "Currently viewer"}
          </Button>
