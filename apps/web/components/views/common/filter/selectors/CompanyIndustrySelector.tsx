@@ -49,7 +49,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
             allValues={CompanyIndustryValues}
             setFieldValue={handleChange}
             inputProps={{
-               placeholder: "Look for other company industries",
+               placeholder: "Search industry",
             }}
             getValueFn={multiListSelectMapValueFn}
             chipProps={{
