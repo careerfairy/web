@@ -56,7 +56,6 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
       </Grid>
    )
 }
-
 const queryParamToArr = (
    queryParam: string | string[] | undefined
 ): string[] => {
