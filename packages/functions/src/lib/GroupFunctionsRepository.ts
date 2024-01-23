@@ -629,9 +629,6 @@ const applyCompanyFilters = (
    filters: FilterCompanyOptions,
    useCompound?: boolean
 ): FirebaseFirestore.Query<Group> => {
-   query = query.where("publicProfile", "==", true)
-   query = query.where("test", "==", false)
-
    /**
     * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
     * Otherwise the filter is not applied, meaning filtering for companies which have publicSparks == false or any
@@ -666,5 +663,9 @@ const applyCompanyFilters = (
          )
       }
    }
+
+   query = query.where("publicProfile", "==", true)
+   query = query.where("test", "==", false)
+
    return query
 }
