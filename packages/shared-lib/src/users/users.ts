@@ -319,7 +319,7 @@ export const userAlreadyAppliedForJob = (
    relations: UserATSDocument,
    jobId: string
 ) => {
-   for (let relation of Object.values(relations?.atsRelations)) {
+   for (const relation of Object.values(relations?.atsRelations)) {
       if (relation?.jobApplications?.[jobId]) {
          return true
       }

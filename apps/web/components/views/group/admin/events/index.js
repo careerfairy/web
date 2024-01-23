@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/jsx-handler-names */
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import { alpha } from "@mui/material/styles"
@@ -98,6 +100,7 @@ const EventsOverview = () => {
 
    useEffect(() => {
       if (eventId) {
+         // eslint-disable-next-line no-extra-semi
          ;(async function getQueryEvent() {
             try {
                setFetchingQueryEvent(true)
@@ -107,7 +110,9 @@ const EventsOverview = () => {
                if (typeOfStream && targetStream) {
                   setTabValue(typeOfStream)
                }
-            } catch (e) {}
+            } catch (e) {
+               /* empty */
+            }
             setFetchingQueryEvent(false)
          })()
       }
@@ -167,7 +172,7 @@ const EventsOverview = () => {
                   eventId={eventId}
                   setGroupsDictionary={setGroupsDictionary}
                   hasAccessToRegisteredStudents={
-                     userData?.isAdmin &&
+                     Boolean(userData?.isAdmin) &&
                      Boolean(
                         group?.universityCode || group?.privacyPolicyActive
                      )

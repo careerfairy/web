@@ -6,6 +6,7 @@ type FlagKeys =
    | "atsAdminPageFlag"
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
+   | "livestreamCreationFlowV2"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
@@ -30,6 +31,7 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * - ?atsAdminPageFlag=true
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
+ * - ?livestreamCreationFlowV2=true
  */
 export const flagsInitialState = {
    /**
@@ -56,6 +58,14 @@ export const flagsInitialState = {
       enabled: false,
       conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
+   /**
+    * B2B Live stream creation flow version 2
+    * Hide or Show
+    */
+   livestreamCreationFlowV2: {
+      enabled: false,
+      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
+   },
 } satisfies Record<FlagKeys, FeatureFlag>
 
 /**
@@ -71,8 +81,8 @@ const FeatureFlagsProvider = (props) => {
 
    // map initial flag states
    const [flags, setFlags] = useState<Record<FlagKeys, boolean>>(() => {
-      const map: any = {}
-      for (let key in flagsInitialState) {
+      const map = {} as Record<FlagKeys, boolean>
+      for (const key in flagsInitialState) {
          map[key] = flagsInitialState[key].enabled
       }
       return map
@@ -81,7 +91,7 @@ const FeatureFlagsProvider = (props) => {
    // update flags when changing pages / query string parameters
    useEffect(() => {
       // conditionally update flag states if present as query string parameters
-      for (let queryParam in router.query) {
+      for (const queryParam in router.query) {
          const param = queryParam.toString()
          if (Object.keys(flagsInitialState).includes(param)) {
             setFlags((prev) => ({
@@ -96,7 +106,7 @@ const FeatureFlagsProvider = (props) => {
       }
 
       // conditionally update flag states by running the fn conditionalEnable
-      for (let flagKey in flagsInitialState) {
+      for (const flagKey in flagsInitialState) {
          if (flagsInitialState[flagKey].conditionalEnable) {
             const enabled = flagsInitialState[flagKey].conditionalEnable(
                router.pathname,
