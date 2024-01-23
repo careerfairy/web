@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react"
-import { useRouter } from "next/router"
 
 /**
  * Custom hook to perform a conditional redirect using Next.js router.
@@ -11,13 +10,14 @@ export const useConditionalRedirect = (
    shouldRedirect: boolean,
    targetUrl: string
 ) => {
-   const router = useRouter()
    const hasRedirected = useRef(false)
 
    useEffect(() => {
       if (shouldRedirect && !hasRedirected.current) {
-         router.replace(targetUrl)
+         // we use the window.location.replace method instead of the router.replace method
+         // As the router.replace method is inconsistent
+         window.location.replace(targetUrl)
          hasRedirected.current = true
       }
-   }, [shouldRedirect, targetUrl, router])
+   }, [shouldRedirect, targetUrl])
 }
