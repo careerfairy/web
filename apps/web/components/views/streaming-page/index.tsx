@@ -61,9 +61,13 @@ type ConditionalRedirectWrapperProps = {
 
 /**
  * All validation logic for the live stream data is handled here.
+ * Ensures all the children have the data needed without having to check for it in each component.
+ *
  * TODO:
- * - Validate token if host and not test stream
+ * - Validate token if user is host and not test stream
  * - Validate user must be logged-in except for (test/open) streams
+ * - Validate if viewer and has registered for event
+ * - Validate browser is compatible with Agora
  */
 export const LivestreamValidationWrapper = ({
    children,
