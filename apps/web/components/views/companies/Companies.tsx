@@ -28,7 +28,7 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
 
    const filterOptions = useMemo(() => getQueryVariables(query), [query])
    /**
-    * TODO-WG: Could pass useCoumpound directly
+    * TODO-WG: Could pass useCoumpound directly - No changes yet
     */
    const { companies } = useCompaniesSWR(filterOptions)
 
