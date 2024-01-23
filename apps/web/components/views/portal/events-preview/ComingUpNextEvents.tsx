@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react"
-import EventsPreview, { EventsTypes } from "./EventsPreview"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
@@ -7,10 +6,122 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import EventsPreviewCarousel, {
+   EventsCarouselStyling,
+   EventsTypes,
+} from "./EventsPreviewCarousel"
+import { sxStyles } from "types/commonTypes"
 
 const config = {
    suspense: false,
    initialData: [],
+}
+const slideSpacing = 21
+
+const styles = sxStyles({
+   arrowIcon: {
+      padding: 0,
+      minHeight: { xs: "25px", md: "30px" },
+      minWidth: { xs: "25px", md: "30px" },
+      ml: 2,
+   },
+   eventsHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      pr: 2,
+      pb: 1,
+   },
+   description: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 2,
+   },
+   seeMoreText: {
+      color: "text.secondary",
+      textDecoration: "underline",
+      pr: 1,
+   },
+   underlined: {
+      textDecoration: "underline",
+   },
+   eventTitle: {
+      fontFamily: "Poppins",
+      fontSize: "18px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "27px",
+      color: "black",
+   },
+   viewport: {
+      overflow: "hidden",
+   },
+   container: {
+      backfaceVisibility: "hidden",
+      display: "flex",
+      touchAction: "pan-y",
+   },
+   slide: {
+      flex: {
+         xs: `0 0 90%`,
+         sm: `0 0 45%`,
+         md: `0 0 40%`,
+         lg: `0 0 30%`,
+      },
+      minWidth: {
+         xs: "310px",
+         md: "360px",
+      },
+      position: "relative",
+      height: {
+         xs: 363,
+         md: 363,
+      },
+      "&:not(:first-of-type)": {
+         paddingLeft: `calc(${slideSpacing}px - 5px)`,
+      },
+      "&:first-of-type": {
+         ml: 0.3,
+      },
+   },
+   paddingSlide: {
+      flex: `0 0 ${slideSpacing}px`,
+   },
+   previewContent: {
+      position: "relative",
+   },
+   mainBox: {
+      paddingLeft: 2,
+   },
+   titleLink: {
+      color: "#000",
+      "&:hover": {
+         color: "#000",
+      },
+   },
+   mainWrapperBox: {
+      mt: 2,
+   },
+})
+const defaultStyling: EventsCarouselStyling = {
+   compact: true,
+   seeMoreSx: styles.seeMoreText,
+   eventTitleSx: styles.eventTitle,
+   viewportSx: styles.viewport,
+   showArrows: true,
+   headerAsLink: false,
+   padding: true,
+   slide: styles.slide,
+   title: styles.eventTitle,
+   titleVariant: "h6",
+   eventsHeader: styles.eventsHeader,
+   mainWrapperBoxSx: styles.mainWrapperBox,
+}
+
+type Props = {
+   limit?: number
+   serverSideEvents?: LivestreamEvent[]
 }
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
@@ -34,6 +145,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       query,
       config
    )
+   if (isLoggedIn) defaultStyling.mainWrapperBoxSx = {}
 
    useEffect(() => {
       if (livestreamId) {
@@ -66,26 +178,22 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          newLocalEvents.unshift(eventFromQuery)
       }
       setLocalEvents(newLocalEvents || [])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [eventFromQuery, events])
 
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
-      <EventsPreview
+      <EventsPreviewCarousel
          id={"upcoming-events"}
-         limit={limit}
-         title={"COMING UP NEXT"}
-         type={EventsTypes.comingUp}
+         title={COMMING_UP_NEXT_EVENT_TITLE}
+         type={EventsTypes.COMING_UP}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
-         // No need to show loading as these events have already been queried server side
-         loading={false}
+         isRecommended
+         styling={defaultStyling}
       />
    )
 }
-
-interface Props {
-   limit?: number
-   serverSideEvents?: LivestreamEvent[]
-}
+export const COMMING_UP_NEXT_EVENT_TITLE = "Upcoming live streams"
 
 export default ComingUpNextEvents

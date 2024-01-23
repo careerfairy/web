@@ -10,17 +10,10 @@ const WidgetsWrapper: FC<{
    <Box
       sx={(theme) => ({
          py: { xs: smallPadding, sm: largePadding },
-         "& > *:not(:first-child)": {
-            py: {
+         "& > *:not(:first-of-type)": {
+            pt: {
                xs: smallPadding,
-               sm: largePadding,
-               // borderTop: `0.5px solid ${theme.palette.grey["400"]}`,
-            },
-         },
-         "& > *": {
-            pb: {
-               xs: smallPadding,
-               sm: largePadding,
+               sm: smallPadding,
             },
          },
       })}

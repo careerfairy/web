@@ -26,7 +26,7 @@ test.describe("Livestream Registration Signed In", () => {
       const livestreamCard = page
          .getByTestId(`livestream-card-${livestream.id}`)
          .first()
-      await expect(livestreamCard.getByText("Booked!")).toBeVisible()
+      await expect(livestreamCard.getByText("Registered")).toBeVisible()
       await expect(livestreamCard.getByText(livestream.title)).toBeVisible()
 
       // confirm the userLivestreamData was created
@@ -41,7 +41,7 @@ test.describe("Livestream Registration Signed In", () => {
       await livestreamDialogPage.cancelRegistrationClick()
       await expect(livestreamDialogPage.registrationButton).toBeVisible()
       await livestreamDialogPage.closeDialog()
-      await expect(livestreamCard.getByText("Booked!")).not.toBeVisible()
+      await expect(livestreamCard.getByText("Registered")).not.toBeVisible()
    })
 
    test("successful registration on a livestream event with no group questions", async ({

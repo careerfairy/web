@@ -1,7 +1,7 @@
 import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import Add from "@mui/icons-material/Add"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
@@ -10,6 +10,13 @@ import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import { useMountedState } from "react-use"
+import useEmblaCarousel, {
+   EmblaOptionsType,
+   EmblaPluginType,
+} from "embla-carousel-react"
+import React from "react"
+import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import AutoHeight from "embla-carousel-auto-height"
 
 const styles = sxStyles({
    titleSection: {
@@ -23,24 +30,36 @@ const styles = sxStyles({
       minWidth: { xs: "25px", md: "30px" },
       ml: 2,
    },
+   viewport: {
+      overflow: "hidden",
+      height: "auto",
+   },
+   container: {
+      backfaceVisibility: "hidden",
+      display: "flex",
+      touchAction: "pan-y",
+      alignItems: "flex-start",
+   },
+   slide: {
+      flex: "0 0 100%",
+      "&:not(:first-of-type)": {
+         paddingX: 2,
+      },
+   },
 })
 
-const TestimonialSection = () => {
+const TestimonialSection = React.forwardRef<ChildRefType>((_, ref) => {
    const {
       group,
       editMode,
       sectionRefs: { testimonialSectionRef },
    } = useCompanyPage()
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
-   const [step, setStep] = useState(0)
+
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
    const isMounted = useMountedState()
-
-   useEffect(() => {
-      setStep(0)
-   }, [group?.testimonials])
 
    const handleCloseDialogClick = useCallback(() => {
       handleCloseDialog()
@@ -55,20 +74,30 @@ const TestimonialSection = () => {
       [handleOpenDialog]
    )
 
-   const handleSteps = useCallback(
-      (increment = false) => {
-         if (increment) {
-            setStep((prevStep) => (prevStep + 1) % group.testimonials.length)
-         } else {
-            if (step) {
-               setStep((prevStep) => prevStep - 1)
-            } else {
-               setStep(group.testimonials.length - 1)
-            }
-         }
-      },
-      [group?.testimonials?.length, step]
+   const testimonialsCarouselEmblaOptions = useMemo<EmblaOptionsType>(
+      () => ({
+         axis: "x",
+      }),
+      []
    )
+
+   const [emblaRef, emblaApi] = useEmblaCarousel(
+      testimonialsCarouselEmblaOptions,
+      /**
+       * Mapping array with the autoheight, as using the Array directly gives a casting error.
+       * Even though the heights are dynamically set for the container (even with error).
+       */
+      [AutoHeight() as unknown as EmblaPluginType]
+   )
+
+   React.useImperativeHandle(ref, () => ({
+      goNext() {
+         emblaApi.scrollNext()
+      },
+      goPrev() {
+         emblaApi.scrollPrev()
+      },
+   }))
 
    if (!group?.testimonials?.length && !editMode) {
       return null
@@ -76,76 +105,76 @@ const TestimonialSection = () => {
 
    return isMounted() ? (
       <>
-         <Box position={"relative"}>
+         <Box position="relative">
             <SectionAnchor
                ref={testimonialSectionRef}
                tabValue={TabValue.testimonials}
             />
             <Box sx={styles.titleSection}>
-               <Typography variant="h4" fontWeight={"600"} color="black">
-                  Testimonial
+               <Typography variant="h4" fontWeight={"600"} color="black" mb={1}>
+                  Testimonials
                </Typography>
-               {editMode ? (
-                  <IconButton
-                     data-testid={"testimonial-section-edit-button"}
-                     color="secondary"
-                     onClick={handleOpenDialog}
-                  >
-                     <Add fontSize={"large"} />
-                  </IconButton>
-               ) : (
-                  <>
-                     {group?.testimonials?.length > 1 ? (
-                        <Box>
-                           <IconButton
-                              color="inherit"
-                              sx={styles.arrowIcon}
-                              onClick={() => {
-                                 handleSteps()
-                              }}
-                           >
-                              <ArrowLeft fontSize={"large"} />
-                           </IconButton>
-                           <IconButton
-                              color="inherit"
-                              sx={styles.arrowIcon}
-                              onClick={() => {
-                                 handleSteps(true)
-                              }}
-                           >
-                              <ArrowRight fontSize={"large"} />
-                           </IconButton>
-                        </Box>
-                     ) : null}
-                  </>
-               )}
+               <>
+                  {editMode ? (
+                     <IconButton
+                        data-testid={"testimonial-section-edit-button"}
+                        color="secondary"
+                        onClick={handleOpenDialog}
+                     >
+                        <Add fontSize={"large"} />
+                     </IconButton>
+                  ) : (
+                     <> </>
+                  )}
+                  {group?.testimonials?.length > 1 ? (
+                     <Box>
+                        <IconButton
+                           color="inherit"
+                           sx={styles.arrowIcon}
+                           onClick={() => {
+                              if (emblaApi.canScrollPrev())
+                                 emblaApi.scrollPrev()
+                           }}
+                        >
+                           <ArrowLeft fontSize={"large"} />
+                        </IconButton>
+                        <IconButton
+                           color="inherit"
+                           sx={styles.arrowIcon}
+                           onClick={() => {
+                              if (emblaApi.canScrollNext())
+                                 emblaApi.scrollNext()
+                           }}
+                        >
+                           <ArrowRight fontSize={"large"} />
+                        </IconButton>
+                     </Box>
+                  ) : null}
+               </>
             </Box>
 
-            <Box mt={2}>
+            <Box mt={1}>
                {group?.testimonials?.length > 0 ? (
-                  <>
-                     {editMode ? (
+                  <Box sx={styles.viewport} ref={emblaRef}>
+                     <Box sx={styles.container}>
                         <>
-                           {group.testimonials.map((testimonial) => (
-                              <TestimonialCard
-                                 key={testimonial.id}
-                                 testimonial={testimonial}
-                                 handleEditTestimonial={handleEditTestimonial}
-                              />
+                           {group?.testimonials?.map((testimonial) => (
+                              <Box
+                                 sx={styles.slide}
+                                 key={"testimonial-slide-box-" + testimonial.id}
+                              >
+                                 <TestimonialCard
+                                    key={testimonial.id}
+                                    testimonial={testimonial}
+                                    handleEditTestimonial={
+                                       handleEditTestimonial
+                                    }
+                                 />
+                              </Box>
                            ))}
                         </>
-                     ) : (
-                        <>
-                           {group?.testimonials?.[step] ? (
-                              <TestimonialCard
-                                 key={group.testimonials[step].id}
-                                 testimonial={group.testimonials[step]}
-                                 handleEditTestimonial={handleEditTestimonial}
-                              />
-                           ) : null}
-                        </>
-                     )}
-                  </>
+                     </Box>
+                  </Box>
                ) : (
                   <Typography
                      variant="h6"
@@ -173,6 +202,6 @@ const TestimonialSection = () => {
          ) : null}
       </>
    ) : null
-}
-
+})
+TestimonialSection.displayName = "TestimonialSection"
 export default TestimonialSection
