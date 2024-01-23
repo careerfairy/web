@@ -4,6 +4,7 @@ import { FilterCompanyOptions, Group } from "@careerfairy/shared-lib/groups"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 type Result = {
    companies: Group[]
@@ -12,6 +13,10 @@ type Result = {
 const companiesReducedCallsOptions = {
    ...reducedRemoteCallsOptions,
    suspense: false,
+   onError: (error, key) =>
+      errorLogAndNotify(error, {
+         message: `Error fetching companies with options: ${key}`,
+      }),
 }
 const useCompaniesSWR = (options?: FilterCompanyOptions): Result => {
    const fetcher = useFunctionsSWR<Group[]>()
