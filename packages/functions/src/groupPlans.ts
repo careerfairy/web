@@ -9,6 +9,7 @@ import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
 import { groupRepo } from "./api/repositories"
+import { client } from "./api/postmark"
 
 const setgroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
    planType: mixed().oneOf(Object.values(GroupPlanTypes)).required(),
@@ -26,6 +27,13 @@ export const startPlan = functions.region(config.region).https.onCall(
             functions.logger.info(
                `Successfully set group plan for group ${data.groupId} to ${data.planType}`
             )
+
+            if (data.planType === GroupPlanTypes.Trial) {
+
+               functions.logger.info("Sending out trial welcome emails");
+
+               await groupRepo.sendTrialWelcomeEmail(data.groupId, client);
+            }
          } catch (error) {
             logAndThrow("Error in setting group plan", {
                data,
