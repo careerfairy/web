@@ -130,6 +130,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                MenuProps={MenuProps}
             >
                {CompanyIndustryValues.map((companyIndustry) => (
+                  //@ts-ignore - necessary to load object into value
                   <MenuItem key={companyIndustry.id} value={companyIndustry}>
                      {companyIndustry.name}
                   </MenuItem>
