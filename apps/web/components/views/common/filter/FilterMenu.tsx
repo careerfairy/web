@@ -118,6 +118,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
    const handleChangeMultiSelect = useCallback(
       (name: string, selectedOption: OptionGroup[]) => {
          const options = mapOptions(selectedOption)
+         console.log("🚀 ~ FilterMenu ~ options:", options)
 
          const newOptions = options.join(",")
 
