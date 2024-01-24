@@ -7,6 +7,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import Skeleton from "@mui/material/Skeleton"
+import { Check } from "react-feather"
 
 const styles = sxStyles({
    companyName: {
@@ -48,10 +49,30 @@ type ReasonToJoinProps = {
 }
 
 const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
-   const reasonsToJoinLivestream = presenter.reasonsToJoinLivestream.trim()
-   const hasReasonsToJoinLivestream = Boolean(reasonsToJoinLivestream)
+   const reasonsToJoinLivestream_v1 = presenter.reasonsToJoinLivestream.trim()
+   const reasonsToJoinLivestream_v2 =
+      presenter.reasonsToJoinLivestream_v2.filter(
+         (reason) => reason.trim() !== ""
+      )
 
-   if (!hasReasonsToJoinLivestream) {
+   const hasReasonsToJoinLivestream_v1 = Boolean(reasonsToJoinLivestream_v1)
+   const hasReasonsToJoinLivestream_v2 = Boolean(
+      reasonsToJoinLivestream_v2 && reasonsToJoinLivestream_v2.length > 0
+   )
+
+   const reasonsToJoinLivestream = hasReasonsToJoinLivestream_v2
+      ? reasonsToJoinLivestream_v2
+      : reasonsToJoinLivestream_v1.split("\n")
+
+   console.log(
+      reasonsToJoinLivestream_v1,
+      hasReasonsToJoinLivestream_v1,
+      reasonsToJoinLivestream_v2,
+      hasReasonsToJoinLivestream_v2,
+      reasonsToJoinLivestream
+   )
+
+   if (!hasReasonsToJoinLivestream_v1 && !hasReasonsToJoinLivestream_v2) {
       return null
    }
 
@@ -59,9 +80,12 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
       <Box>
          <SectionTitle>Why should you join the Live Stream?</SectionTitle>
          <LinkifyText>
-            <Stack spacing={2.25}>
-               {reasonsToJoinLivestream.split("\n").map((reason) => (
+            <Stack spacing={2.25} justifyContent="center">
+               {reasonsToJoinLivestream.map((reason) => (
                   <Typography key={reason} sx={styles.reasons}>
+                     {Boolean(hasReasonsToJoinLivestream_v2) && (
+                        <Check color="#29BAA5" />
+                     )}{" "}
                      {reason}
                   </Typography>
                ))}
