@@ -252,8 +252,14 @@ const StreamerLayout = (props) => {
    )
 
    useConditionalRedirect(
-      // Conditional redirect to new UI if token is validated and livestream is not a breakout session
-      tokenChecked && !isBreakout ? currentLivestream?.useNewUI : false,
+      /**
+       * Redirect to the new UI ONLY under the following conditions:
+       * - The stream is not a breakout room (new UI does not support breakout rooms)
+       * - The token has been verified OR it's a test stream
+       */
+      !isBreakout && (tokenChecked || currentLivestream?.test)
+         ? currentLivestream?.useNewUI
+         : false,
       appendCurrentQueryParams(`/streaming/host/${livestreamId}`)
    )
 
