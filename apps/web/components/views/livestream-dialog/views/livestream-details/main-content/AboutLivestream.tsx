@@ -71,14 +71,6 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
       ? reasonsToJoinLivestream_v2
       : reasonsToJoinLivestream_v1.split("\n")
 
-   console.log(
-      reasonsToJoinLivestream_v1,
-      hasReasonsToJoinLivestream_v1,
-      reasonsToJoinLivestream_v2,
-      hasReasonsToJoinLivestream_v2,
-      reasonsToJoinLivestream
-   )
-
    if (!hasReasonsToJoinLivestream_v1 && !hasReasonsToJoinLivestream_v2) {
       return null
    }
