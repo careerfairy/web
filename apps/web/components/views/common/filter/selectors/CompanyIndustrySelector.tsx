@@ -13,6 +13,7 @@ import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useRouter } from "next/router"
 import {
    Box,
+   Checkbox,
    Chip,
    FormControl,
    InputLabel,
@@ -39,6 +40,16 @@ const styles = sxStyles({
    selectIcon: { px: 2 },
    selectedChipsWrapper: { display: "flex", flexWrap: "wrap", gap: 1 },
    mainForm: { width: "100%", mt: 2 },
+   optionsDropdownWrapper: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      alignContent: "center",
+      label: {
+         flexGrow: 1,
+      },
+   },
 })
 type Props = {
    handleChange: (name: string, selectedOptions: OptionGroup[]) => void
@@ -60,6 +71,40 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
       return selectedIndustries
    }, [query.companyIndustries])
 
+   const isOptionSelected = (option: OptionGroup): boolean => {
+      return (
+         getSelectedCompanyIndustry().find(
+            (selectedIndustry) => selectedIndustry.id === option.id
+         ) !== undefined
+      )
+   }
+   const onDeleteOptionGroup = (optionGroup: OptionGroup): void => {
+      console.log("🚀 ~ Select ~ OnDelete  optionGroup: ", optionGroup)
+      const updatedIndustries = getSelectedCompanyIndustry().filter(
+         (selectedIndustry) => selectedIndustry.id !== optionGroup.id
+      )
+      console.log(
+         "🚀 ~ Select ~ onDelete ~ updatedIndustries:",
+         updatedIndustries
+      )
+      handleChange(selectorFilterKey, updatedIndustries)
+   }
+   const onSelectOptionGroup = (selectedOption) => {
+      console.log(
+         "🚀 ~ CompanyIndustrySelector ~ selectedOption:",
+         selectedOption
+      )
+      const selectedIndustryOptions = formatToOptionArray(
+         selectedOption.map(multiListSelectMapIdValueFn),
+         CompanyIndustryValues
+      )
+      console.log(
+         "🚀 ~ selectedIndustryOptions ~ selectedIndustryOptions:",
+         selectedIndustryOptions
+      )
+
+      handleChange(selectorFilterKey, selectedIndustryOptions)
+   }
    return (
       <>
          <MultiCheckboxSelect
@@ -78,26 +123,9 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                label="Search industry"
                placeholder="Search industry"
                onChange={(e) => {
-                  console.log(
-                     "🚀 ~ CompanyIndustrySelector ~ value:",
-                     e.target.value
+                  onSelectOptionGroup(
+                     e.target.value as unknown as OptionGroup[]
                   )
-                  const selectedOption = e.target
-                     .value as unknown as OptionGroup[]
-                  console.log(
-                     "🚀 ~ CompanyIndustrySelector ~ selectedOption:",
-                     selectedOption
-                  )
-                  const selectedIndustryOptions = formatToOptionArray(
-                     selectedOption.map(multiListSelectMapIdValueFn),
-                     CompanyIndustryValues
-                  )
-                  console.log(
-                     "🚀 ~ selectedIndustryOptions ~ selectedIndustryOptions:",
-                     selectedIndustryOptions
-                  )
-
-                  handleChange(selectorFilterKey, selectedIndustryOptions)
                }}
                IconComponent={() => (
                   <Box sx={styles.selectIcon}>
@@ -108,22 +136,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                   <Box sx={styles.selectedChipsWrapper}>
                      <CompanyIndustryOptionChip
                         items={selected}
-                        onDelete={(optionGroup) => {
-                           console.log(
-                              "🚀 ~ Select ~ OnDelete  optionGroup: ",
-                              optionGroup
-                           )
-                           const updatedIndustries =
-                              getSelectedCompanyIndustry().filter(
-                                 (selectedIndustry) =>
-                                    selectedIndustry.id !== optionGroup.id
-                              )
-                           console.log(
-                              "🚀 ~ Select ~ onDelete ~ updatedIndustries:",
-                              updatedIndustries
-                           )
-                           handleChange(selectorFilterKey, updatedIndustries)
-                        }}
+                        onDelete={onDeleteOptionGroup}
                      />
                   </Box>
                )}
@@ -132,7 +145,28 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                {CompanyIndustryValues.map((companyIndustry) => (
                   //@ts-ignore - necessary to load object into value
                   <MenuItem key={companyIndustry.id} value={companyIndustry}>
-                     {companyIndustry.name}
+                     <Box sx={styles.optionsDropdownWrapper}>
+                        <span style={styles.optionsDropdownWrapper.label}>
+                           {companyIndustry.name}
+                        </span>
+                        <Checkbox
+                           checked={isOptionSelected(companyIndustry)}
+                           onChange={(e) => {
+                              console.log(
+                                 "🚀 ~ Checkbox ~ Onchange ~ CompanyIndustrySelector ~ checked:",
+                                 e.target.checked
+                              )
+
+                              if (e.target.checked)
+                                 onSelectOptionGroup(
+                                    getSelectedCompanyIndustry().concat(
+                                       companyIndustry
+                                    )
+                                 )
+                              else onDeleteOptionGroup(companyIndustry)
+                           }}
+                        />
+                     </Box>
                   </MenuItem>
                ))}
             </Select>
@@ -141,11 +175,11 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
    )
 }
 
-type CompanyIndustryChipOptions = {
+type CompanyIndustryChipOptionsProps = {
    items: OptionGroup[]
    onDelete: (optionGroup: OptionGroup) => void
 }
-const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptions> = ({
+const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptionsProps> = ({
    items,
    onDelete,
 }) => {
@@ -168,4 +202,5 @@ const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptions> = ({
       />
    ))
 }
+
 export default CompanyIndustrySelector
