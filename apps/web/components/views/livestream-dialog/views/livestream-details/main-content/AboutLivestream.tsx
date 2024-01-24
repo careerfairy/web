@@ -17,9 +17,16 @@ const styles = sxStyles({
       fontSize: "1.285rem",
       whiteSpace: "pre-line",
    },
+   reasonsContainer: {
+      display: "flex",
+      alignItems: "center",
+   },
    reasons: {
       whiteSpace: "pre-line",
       fontSize: "1.1428rem",
+   },
+   reasonsCheck: {
+      marginRight: 10,
    },
 })
 
@@ -80,11 +87,18 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
       <Box>
          <SectionTitle>Why should you join the Live Stream?</SectionTitle>
          <LinkifyText>
-            <Stack spacing={2.25} justifyContent="center">
+            <Stack spacing={2.25} sx={styles}>
                {reasonsToJoinLivestream.map((reason) => (
-                  <Typography key={reason} sx={styles.reasons}>
+                  <Typography
+                     key={reason}
+                     sx={[
+                        styles.reasons,
+                        Boolean(hasReasonsToJoinLivestream_v2) &&
+                           styles.reasonsContainer,
+                     ]}
+                  >
                      {Boolean(hasReasonsToJoinLivestream_v2) && (
-                        <Check color="#29BAA5" />
+                        <Check color="#29BAA5" style={styles.reasonsCheck} />
                      )}{" "}
                      {reason}
                   </Typography>
