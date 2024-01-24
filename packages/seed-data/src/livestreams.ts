@@ -151,7 +151,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       livestreamId: string,
       subCollections = ["userLivestreamData", "questions"]
    ): Promise<LivestreamEventWithSubcollections> {
-      let res = {}
+      const res = {}
 
       subCollections.forEach((name) => {
          res[name] = null
@@ -163,7 +163,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
 
       const livestream = await livestreamRef.get()
 
-      for (let subCollectionsKey in res) {
+      for (const subCollectionsKey in res) {
          const querySnapshot = await livestreamRef
             .collection(subCollectionsKey)
             .get()
@@ -176,6 +176,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          }
       }
 
+      // @ts-ignore
       return {
          // @ts-ignore
          livestream: {
@@ -351,7 +352,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       const tomorrow = new Date()
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      let data: LivestreamEvent = {
+      const data: LivestreamEvent = {
          backgroundImageUrl: faker.image.abstract(),
          company,
          companyId: uuidv4(),
@@ -359,6 +360,11 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          duration: faker.random.arrayElement([30, 60, 90, 120]),
          summary: faker.lorem.paragraph(),
          reasonsToJoinLivestream: faker.lorem.paragraphs(),
+         reasonsToJoinLivestream_v2: [
+            faker.lorem.sentences(2),
+            faker.lorem.sentences(2),
+            faker.lorem.sentences(2),
+         ],
          hidden: false,
          id: uuidv4().replace(/-/g, ""),
          language: {
