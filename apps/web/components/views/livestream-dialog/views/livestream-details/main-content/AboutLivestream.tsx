@@ -58,9 +58,7 @@ type ReasonToJoinProps = {
 const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
    const reasonsToJoinLivestream_v1 = presenter.reasonsToJoinLivestream.trim()
    const reasonsToJoinLivestream_v2 =
-      presenter.reasonsToJoinLivestream_v2.filter(
-         (reason) => reason.trim() !== ""
-      )
+      presenter.reasonsToJoinLivestream_v2.filter((reason) => reason)
 
    const hasReasonsToJoinLivestream_v1 = Boolean(reasonsToJoinLivestream_v1)
    const hasReasonsToJoinLivestream_v2 = Boolean(
