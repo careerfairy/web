@@ -8,6 +8,7 @@ const livestreamIndex = {
       "id",
       "summary",
       "reasonsToJoinLivestream",
+      "reasonsToJoinLivestream_v2",
       "backgroundImageUrl",
       "company",
       "companyId",
