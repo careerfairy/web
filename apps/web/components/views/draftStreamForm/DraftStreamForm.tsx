@@ -165,7 +165,7 @@ interface Props {
       },
       updateMode: boolean,
       draftStreamId: string,
-      setFormData: (data: any) => void,
+      setFormData: (data: unknown) => void,
       setDraftId: (id: string) => void,
       status: string,
       setStatus: (status: string) => void,
@@ -174,8 +174,11 @@ interface Props {
       metaData: MetaData
    ) => void
    isActualLivestream?: boolean
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    formRef: MutableRefObject<any>
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    submitButtonRef?: MutableRefObject<any>
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    saveChangesButtonRef?: MutableRefObject<any>
    currentStream?: LivestreamEvent
    canPublish?: boolean
@@ -198,8 +201,9 @@ export interface DraftFormValues {
    hidden: boolean
    summary: string
    reasonsToJoinLivestream: string
+   reasonsToJoinLivestream_v2: string[]
    speakers: Record<string, Partial<Speaker>>
-   status: {}
+   status: object
    language: {
       code: string
       name: string
@@ -257,11 +261,13 @@ const DraftStreamForm = ({
       []
    )
 
-   let {
-      query: { careerCenterIds, draftStreamId },
+   let { draftStreamId } = router.query
+   const {
+      query: { careerCenterIds },
       replace,
       pathname,
    } = router
+
    draftStreamId = draftStreamId || currentStream?.id
    const { enqueueSnackbar } = useSnackbar()
    const [status, setStatus] = useState("")
@@ -305,6 +311,7 @@ const DraftStreamForm = ({
       hidden: false,
       summary: "",
       reasonsToJoinLivestream: "",
+      reasonsToJoinLivestream_v2: [],
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
@@ -358,7 +365,7 @@ const DraftStreamForm = ({
             flattenedOptions: handleFlattenOptions(group),
          }))
 
-         let selectedGroups = []
+         const selectedGroups = []
          const targetSelectedGroupIds = [
             ...new Set([...UrlIds, ...draftStreamGroupIds]),
          ]
@@ -390,6 +397,7 @@ const DraftStreamForm = ({
 
    useEffect(() => {
       if (draftStreamId) {
+         // eslint-disable-next-line no-extra-semi
          ;(async () => {
             setAllFetched(false)
             const targetId = draftStreamId as string
@@ -414,7 +422,7 @@ const DraftStreamForm = ({
             }
 
             if (livestreamQuery.exists) {
-               let livestream = livestreamQuery.data() as LivestreamEvent
+               const livestream = livestreamQuery.data() as LivestreamEvent
 
                const newFormData: DraftFormValues = {
                   id: targetId,
@@ -433,6 +441,7 @@ const DraftStreamForm = ({
                   summary: livestream.summary || "",
                   reasonsToJoinLivestream:
                      livestream.reasonsToJoinLivestream || "",
+                  reasonsToJoinLivestream_v2: [],
                   speakers: getStreamSubCollectionSpeakers(
                      livestream,
                      speakerQuery
@@ -477,12 +486,14 @@ const DraftStreamForm = ({
             setAllFetched(true)
          })()
       } else if (careerCenterIds || group?.id) {
+         // eslint-disable-next-line no-extra-semi
          ;(async function () {
             setAllFetched(false)
             await handleSetOnlyUrlIds()
             setAllFetched(true)
          })()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [draftStreamId, router, submitted, existingInterests])
 
    // to handle the visibility of the Host and Questions Steps
@@ -510,6 +521,7 @@ const DraftStreamForm = ({
             prevSteps.filter(({ label }) => label !== "Host and Questions")
          )
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [existingGroups?.length])
 
    useEffect(() => {
@@ -567,7 +579,7 @@ const DraftStreamForm = ({
       setStatus(SUBMIT_FOR_APPROVAL)
    }
 
-   const isNotAdmin = !Boolean(userData?.isAdmin || group?.id)
+   const isNotAdmin = !userData?.isAdmin && !group?.id
    const isGroupAdmin = useCallback(
       (groupId) => (group && group.id === groupId) || userData?.isAdmin,
       [group, userData?.isAdmin]
@@ -627,7 +639,7 @@ const DraftStreamForm = ({
                   marginTop: 16,
                }}
             >
-               {userData && (
+               {Boolean(userData) && (
                   <Button
                      variant="contained"
                      href="/profile"
@@ -919,7 +931,7 @@ const DraftStreamForm = ({
                                     justifyContent="end"
                                     mr={3}
                                  >
-                                    {canPublish && (
+                                    {Boolean(canPublish) && (
                                        <Button
                                           startIcon={
                                              <PublishIcon fontSize="large" />
@@ -929,7 +941,7 @@ const DraftStreamForm = ({
                                           disabled={isSubmitting || isPending()}
                                           size="large"
                                           endIcon={
-                                             isSubmitting && (
+                                             Boolean(isSubmitting) && (
                                                 <CircularProgress
                                                    size={20}
                                                    color="inherit"
@@ -959,7 +971,7 @@ const DraftStreamForm = ({
                                           setStatus(SAVE_WITH_NO_VALIDATION)
                                        }}
                                        endIcon={
-                                          isSubmitting && (
+                                          Boolean(isSubmitting) && (
                                              <CircularProgress
                                                 size={20}
                                                 color="inherit"
