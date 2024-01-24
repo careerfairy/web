@@ -122,7 +122,7 @@ export interface LivestreamEvent extends Identifiable {
     */
    liveSpeakers?: LiveSpeaker[]
    lastUpdatedAuthorInfo?: AuthorInfo
-   universities?: any[]
+   universities?: unknown[]
    questionsDisabled?: boolean
 
    /**
@@ -185,6 +185,12 @@ export interface LivestreamEvent extends Identifiable {
     * and the company name. Used for full text search
     */
    triGrams: Record<string, true>
+
+   /**
+    * If true, Redirects to the new streaming page at: /streaming/(viewer|host)/{livestreamId}
+    * If false, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
+    */
+   useNewUI?: boolean
 }
 
 /**
