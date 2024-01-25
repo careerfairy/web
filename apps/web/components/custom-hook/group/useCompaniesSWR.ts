@@ -26,7 +26,7 @@ const useCompaniesSWR = (options?: FilterCompanyOptions): Result => {
       fetcher,
       companiesReducedCallsOptions
    )
-
+   console.log("🚀 ~ useCompaniesSWR ~ options:", options)
    return useMemo(() => {
       const companies = (data?.length && data) || []
       return {

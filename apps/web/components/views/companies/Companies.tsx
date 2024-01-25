@@ -7,6 +7,7 @@ import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useMountedState } from "react-use"
 import useCompaniesSWR from "components/custom-hook/group/useCompaniesSWR"
+import { CompanyIndustryValues } from "constants/forms"
 
 const styles = sxStyles({
    flexItem: {
@@ -81,6 +82,7 @@ const getQueryVariables = (query: ParsedUrlQuery): FilterCompanyOptions => {
       companyIndustries: queryParamToArr(query.companyIndustries),
       publicSparks: queryParamToBool(query.companySparks as string),
       companySize: queryParamToArr(query.companySizes),
+      allCompanyIndustries: CompanyIndustryValues,
    }
 }
 

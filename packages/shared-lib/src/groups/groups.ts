@@ -1,4 +1,4 @@
-import { Identifiable, ImageType } from "../commonTypes"
+import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
@@ -340,4 +340,5 @@ export type FilterCompanyOptions = {
    companyCountries?: string[]
    publicSparks?: boolean
    companySize?: string[]
+   allCompanyIndustries?: OptionGroup[]
 }

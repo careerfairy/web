@@ -6,6 +6,7 @@ import CompaniesPageOverview from "../../components/views/companies/CompaniesPag
 import { InferGetServerSidePropsType, NextPage } from "next"
 import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
 import { companyService } from "data/firebase/CompanyService"
+import { CompanyIndustryValues } from "constants/forms"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -49,6 +50,7 @@ const getQueryVariables = (query): FilterCompanyOptions => {
       companyIndustries: queryParamToArr(query.companyIndustries),
       publicSparks: queryParamToBool(query.companySparks as string),
       companySize: queryParamToArr(query.companySizes),
+      allCompanyIndustries: CompanyIndustryValues,
    }
 }
 
@@ -56,11 +58,8 @@ export const getServerSideProps = async (ctx) => {
    const query = getQueryVariables(ctx.query)
    console.log("🚀 ~ getServerSideProps ~ query:", query)
 
-   const companies = await companyService.fetchLivestreams(query)
-   console.log(
-      "🚀 ~ getServerSideProps ~ companies:",
-      companies.map((c) => c.universityName)
-   )
+   const companies = await companyService.fetchCompanies(query)
+   console.log("🚀 ~ getServerSideProps ~ companies.length:", companies.length)
 
    return {
       props: {

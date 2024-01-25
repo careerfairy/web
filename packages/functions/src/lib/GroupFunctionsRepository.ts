@@ -38,6 +38,7 @@ import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 import * as functions from "firebase-functions"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { ServerClient } from "postmark"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -121,7 +122,8 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     */
    fetchCompanies(
       options: FilterCompanyOptions,
-      useCoumpoundQueries?: boolean
+      useCoumpoundQueries?: boolean,
+      allCompanyIndustries?: OptionGroup[]
    ): Promise<Group[]>
 
    /**
@@ -237,7 +239,8 @@ export class GroupFunctionsRepository
 
    async fetchCompanies(
       options: FilterCompanyOptions,
-      useCoumpoundQueries?: boolean
+      useCoumpoundQueries?: boolean,
+      allCompanyIndustries?: OptionGroup[]
    ): Promise<Group[]> {
       let q = this.firestore
          .collection("careerCenterData")
@@ -245,7 +248,13 @@ export class GroupFunctionsRepository
             createCompatGenericConverter<Group>()
          ) as unknown as FirebaseFirestore.Query<Group>
 
-      q = applyCompanyFilters(q, options, useCoumpoundQueries)
+      q = applyCompanyFilters(
+         q,
+         options,
+         useCoumpoundQueries,
+         allCompanyIndustries
+      )
+      console.log("🚀 ~ function ~ options:", options)
 
       const snaps = await q.get()
       return snaps.docs.map((d) => d.data())
@@ -627,7 +636,8 @@ const removeTempGroupQuestionIds = (groupQuestions?: GroupQuestion[]) => {
 const applyCompanyFilters = (
    query: FirebaseFirestore.Query<Group>,
    filters: FilterCompanyOptions,
-   useCompound?: boolean
+   useCompound?: boolean,
+   allCompanyIndustries?: OptionGroup[]
 ): FirebaseFirestore.Query<Group> => {
    /**
     * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
@@ -653,9 +663,20 @@ const applyCompanyFilters = (
       }
 
       if (filters.companyIndustries?.length) {
-         const mappedFilters = filters.companyIndustries.map((industry) => {
-            return { name: industry, id: industry }
-         })
+         console.log(
+            "🚀 ~ mappedFilters ~ allCompanyIndustries:",
+            allCompanyIndustries
+         )
+         // const mappedFilters = filters.companyIndustries.map((industry) => {
+
+         //    return { name: industry, id: industry }
+         // })
+         const mappedFilters = formatToOptionArray(
+            filters.companyIndustries,
+            allCompanyIndustries
+         )
+
+         console.log("🚀 ~ mappedFilters ~ mappedFilters:", mappedFilters)
          query = query.where(
             "companyIndustries",
             "array-contains-any",
@@ -668,4 +689,11 @@ const applyCompanyFilters = (
    query = query.where("test", "==", false)
 
    return query
+}
+
+const formatToOptionArray = (
+   selectedIds: string[],
+   allOptions: OptionGroup[]
+): OptionGroup[] => {
+   return allOptions.filter(({ id }) => selectedIds?.includes(id))
 }

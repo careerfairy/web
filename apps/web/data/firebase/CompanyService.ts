@@ -9,7 +9,7 @@ export class CompanyService {
     * Fetches Companies (Groups) with the given query options
     * @param data  The query options
     * */
-   async fetchLivestreams(data: FilterCompanyOptions) {
+   async fetchCompanies(data: FilterCompanyOptions) {
       const { data: companies } = await httpsCallable<typeof data, Group[]>(
          this.functions,
          "fetchCompanies"
