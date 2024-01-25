@@ -254,8 +254,6 @@ export class GroupFunctionsRepository
          useCoumpoundQueries,
          allCompanyIndustries
       )
-      console.log("🚀 ~ function ~ options:", options)
-
       const snaps = await q.get()
       return snaps.docs.map((d) => d.data())
    }
@@ -663,20 +661,10 @@ const applyCompanyFilters = (
       }
 
       if (filters.companyIndustries?.length) {
-         console.log(
-            "🚀 ~ mappedFilters ~ allCompanyIndustries:",
-            allCompanyIndustries
-         )
-         // const mappedFilters = filters.companyIndustries.map((industry) => {
-
-         //    return { name: industry, id: industry }
-         // })
          const mappedFilters = formatToOptionArray(
             filters.companyIndustries,
             allCompanyIndustries
          )
-
-         console.log("🚀 ~ mappedFilters ~ mappedFilters:", mappedFilters)
          query = query.where(
             "companyIndustries",
             "array-contains-any",

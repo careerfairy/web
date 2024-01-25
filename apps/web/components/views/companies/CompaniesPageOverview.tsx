@@ -5,11 +5,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import CompanySearch from "./CompanySearch"
 import { useRouter } from "next/router"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-// TODO-WG- Replace with useMountedState
-// const Companies = dynamic(
-//    () => import("./Companies"),
-//    { ssr: false }
-// )
+
 type Props = {
    serverSideCompanies: Group[]
 }
@@ -17,7 +13,7 @@ type Props = {
 const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
    const { query } = useRouter()
    const [resultCount, setResultCount] = useState<number>(null)
-   // TODO-WG Destructure query parameters onto custom type
+
    return (
       <Container maxWidth="xl">
          <SuspenseWithBoundary fallback={<CircularProgress />} hide={true}>
