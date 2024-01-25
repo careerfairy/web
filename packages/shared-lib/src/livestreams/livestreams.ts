@@ -35,6 +35,8 @@ export interface LivestreamEvent extends Identifiable {
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   countryIds?: string[]
+   universityIds?: string[]
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
    isRecording?: boolean
@@ -105,13 +107,13 @@ export interface LivestreamEvent extends Identifiable {
     * An empty array means the livestream should target all the countries
     * [] -> All countries
     */
-   targetCountries: string[]
+   targetCountries?: string[]
 
    /**
     * An empty array means the livestream should target all the universities
     * [] -> All universities
     */
-   targetUniversities: string[]
+   targetUniversities?: string[]
 
    /**
     * An empty array means the livestream should target all the fields of study
