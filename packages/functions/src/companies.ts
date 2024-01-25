@@ -13,6 +13,14 @@ const FilterCompaniesOptionsSchema = {
    companySize: array().of(string()),
    companyIndustries: array().of(string()),
    companyCountries: array().of(string()),
+   allCompanyIndustries: array()
+      .of(
+         object().shape({
+            id: string(),
+            name: string(),
+         })
+      )
+      .optional(),
 }
 
 const schema = object().shape(FilterCompaniesOptionsSchema)
@@ -27,6 +35,7 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
             companyIndustries = [],
             companyCountries = [],
             companySize = [],
+            allCompanyIndustries,
          } = data
          const compoundQuery = isWithinNormalizationLimit(
             30,
@@ -34,10 +43,16 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
             data.companyIndustries,
             data.companySize
          )
-         const groups = await groupRepo.fetchCompanies(data, compoundQuery)
+         console.log("🚀 ~ compoundQuery:", compoundQuery)
+         console.log("🚀 ~ data:", data)
+         const groups = await groupRepo.fetchCompanies(
+            data,
+            compoundQuery,
+            allCompanyIndustries
+         )
 
          let res = new GroupsDataParser(groups)
-         if (compoundQuery) {
+         if (!compoundQuery) {
             if (companyIndustries.length > 0) {
                res = res.filterByCompanyIndustry(companyIndustries)
             }
@@ -50,7 +65,6 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
                res = res.filterByCompanySize(companySize)
             }
          }
-
          return res.get().map(GroupPresenter.createFromDocument)
       }
    )

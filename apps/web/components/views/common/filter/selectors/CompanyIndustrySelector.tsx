@@ -9,7 +9,7 @@ import {
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
 import React, { FC, useCallback } from "react"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+
 import { useRouter } from "next/router"
 import {
    Box,
@@ -20,9 +20,9 @@ import {
    MenuItem,
    Select,
 } from "@mui/material"
-import { Search, XCircle } from "react-feather"
+import { Search, X, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
 const MenuProps = {
@@ -37,7 +37,15 @@ const MenuProps = {
 const selectorFilterKey = "companyIndustries"
 
 const styles = sxStyles({
-   selectIcon: { px: 2 },
+   selectIcon: {
+      px: 2,
+      pt: 1,
+   },
+   mousePointer: {
+      "&:hover": {
+         cursor: "pointer",
+      },
+   },
    selectedChipsWrapper: { display: "flex", flexWrap: "wrap", gap: 1 },
    mainForm: { width: "100%", mt: 2 },
    optionsDropdownWrapper: {
@@ -129,7 +137,18 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                }}
                IconComponent={() => (
                   <Box sx={styles.selectIcon}>
-                     <Search></Search>
+                     {getSelectedCompanyIndustry().length > 1 ? (
+                        <Box sx={styles.mousePointer}>
+                           <X
+                              color="#2ABAA5"
+                              onClick={() => {
+                                 onSelectOptionGroup([])
+                              }}
+                           ></X>
+                        </Box>
+                     ) : (
+                        <Search></Search>
+                     )}
                   </Box>
                )}
                renderValue={(selected) => (
@@ -151,6 +170,9 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                         </span>
                         <Checkbox
                            checked={isOptionSelected(companyIndustry)}
+                           onMouseDown={(event) => {
+                              event.stopPropagation()
+                           }}
                            onChange={(e) => {
                               console.log(
                                  "🚀 ~ Checkbox ~ Onchange ~ CompanyIndustrySelector ~ checked:",
