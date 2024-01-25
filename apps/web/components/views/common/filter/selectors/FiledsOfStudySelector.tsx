@@ -61,9 +61,11 @@ const FieldsOfStudySelector = ({ handleChange }: Props) => {
             allValues={relevantFieldsOfStudy}
             setFieldValue={handleChange}
             getValueFn={multiListSelectMapValueFn}
+            useStyledCheckbox
          />
 
          <MultiListSelect
+            useStyledCheckbox
             inputName={"fieldsOfStudy"}
             isCheckbox
             selectedItems={getSelectedFieldOfStudy()}
