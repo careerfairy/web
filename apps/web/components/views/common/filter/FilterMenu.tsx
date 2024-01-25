@@ -365,7 +365,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                onClick={handleClose}
                sx={styles.loadingButton}
             >
-               {numberOfActiveFilters > 0
+               {numberOfActiveFilters > 0 && numberOfResults > 0
                   ? `${numberOfResults} Results`
                   : `Apply Filters`}
             </LoadingButton>

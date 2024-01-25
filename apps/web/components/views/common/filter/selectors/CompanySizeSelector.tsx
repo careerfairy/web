@@ -41,6 +41,7 @@ const CompanySizeSelector = ({ handleChange }: Props) => {
          allValues={mappedCompanySizesCodes}
          setFieldValue={handleChange}
          getValueFn={multiListSelectMapValueFn}
+         useStyledCheckbox
       />
    )
 }
