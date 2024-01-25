@@ -20,6 +20,7 @@ export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
    summary?: string
    reasonsToJoinLivestream?: string
+   reasonsToJoinLivestream_v2?: string[]
    backgroundImageUrl?: string
    company?: string
    companyId?: string
