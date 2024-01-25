@@ -13,7 +13,7 @@ import {
    Speaker,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "./livestreams"
-import { FieldOfStudy } from "../fieldOfStudy"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { AdminGroupsClaim } from "../users"
 import {
    fromDateConverter,
@@ -85,12 +85,26 @@ export class LivestreamPresenter extends BaseModel {
        * An empty array means the livestream should target all the fields of study
        * [] -> All fields of study
        */
+      public readonly targetCountries: string[],
+
+      /**
+       * An empty array means the livestream should target all the fields of study
+       * [] -> All fields of study
+       */
+      public readonly targetUniversities: string[],
+
+      /**
+       * An empty array means the livestream should target all the fields of study
+       * [] -> All fields of study
+       */
       public readonly targetFieldsOfStudy: FieldOfStudy[],
+
       /**
        * An empty array means the livestream should target all the levels of study
        * [] -> All levels of study
        */
-      public readonly targetLevelsOfStudy: FieldOfStudy[],
+      public readonly targetLevelsOfStudy: LevelOfStudy[],
+
       public readonly speakers: Speaker[],
       public readonly liveSpeakers: LiveSpeaker[],
       public readonly triGrams: LivestreamEvent["triGrams"],
@@ -297,6 +311,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
          livestream.jobs ?? [],
+         livestream.targetCountries ?? [],
+         livestream.targetUniversities ?? [],
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
@@ -362,6 +378,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess,
          livestream.hasJobs,
          livestream.jobs,
+         livestream.targetCountries,
+         livestream.targetUniversities,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
@@ -446,6 +464,8 @@ export class LivestreamPresenter extends BaseModel {
          isHybrid: this.isHybrid,
          hasJobs: this.hasJobs,
          jobs: this.jobs,
+         targetCountries: this.targetCountries,
+         targetUniversities: this.targetUniversities,
          targetFieldsOfStudy: this.targetFieldsOfStudy,
          targetLevelsOfStudy: this.targetLevelsOfStudy,
          speakers: this.speakers,
