@@ -13,16 +13,17 @@ import React, { FC, useCallback } from "react"
 import { useRouter } from "next/router"
 import {
    Box,
-   Checkbox,
    Chip,
    FormControl,
    InputLabel,
    MenuItem,
    Select,
 } from "@mui/material"
-import { Search, X, XCircle } from "react-feather"
+import { Search, X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { StyledCheckbox } from "components/views/group/admin/common/inputs"
+import CancelIcon from "@mui/icons-material/Cancel"
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
 const MenuProps = {
@@ -121,6 +122,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
             allValues={RelevantCompanyIndustryValues}
             setFieldValue={handleChange}
             getValueFn={multiListSelectMapValueFn}
+            useStyledCheckbox
          />
          <FormControl sx={styles.mainForm}>
             <InputLabel id="chip-label">Search industry</InputLabel>
@@ -168,7 +170,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                         <span style={styles.optionsDropdownWrapper.label}>
                            {companyIndustry.name}
                         </span>
-                        <Checkbox
+                        <StyledCheckbox
                            checked={isOptionSelected(companyIndustry)}
                            onMouseDown={(event) => {
                               event.stopPropagation()
@@ -213,7 +215,7 @@ const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptionsProps> = ({
          key={optionGroup.id}
          label={optionGroup.name}
          color="primary"
-         deleteIcon={<XCircle></XCircle>}
+         deleteIcon={<CancelIcon></CancelIcon>}
          onDelete={() => {
             console.log(
                "🚀 ~ CompanyIndustryOptionChip ~ OnDelete  optionGroup: ",

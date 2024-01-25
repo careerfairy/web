@@ -37,6 +37,7 @@ const CompanyCountrySelector = ({ handleChange }: Props) => {
          allValues={RelevantCompanyCountryValues}
          setFieldValue={handleChange}
          getValueFn={multiListSelectMapValueFn}
+         useStyledCheckbox
       />
    )
 }

@@ -35,6 +35,7 @@ const LanguageSelector = ({ handleChange }: Props) => {
          allValues={languageOptionCodes}
          setFieldValue={handleChange}
          getValueFn={multiListSelectMapValueFn}
+         useStyledCheckbox
       />
    )
 }
