@@ -30,6 +30,7 @@ import {
 } from "./stats"
 import { OrderByDirection } from "firebase/firestore"
 import { Create, ImageType } from "../commonTypes"
+import { Timestamp } from "../firebaseTypes"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -296,7 +297,7 @@ export class FirebaseLivestreamRepository
       limit?: number,
       order: OrderByDirection = "asc"
    ): firebase.firestore.Query {
-      let query = this.firestore
+      const query = this.firestore
          .collection("draftLivestreams")
          .where("groupIds", "array-contains", groupId)
          .orderBy("start", order)
@@ -434,8 +435,10 @@ export class FirebaseLivestreamRepository
       const data: UserParticipatingStats = {
          id: userData.id,
          livestreamId: livestream.id,
-         totalMinutes: this.fieldValue.increment(1) as any,
-         minutes: this.fieldValue.arrayUnion(elapsedMinutes) as any,
+         totalMinutes: this.fieldValue.increment(1) as unknown as number,
+         minutes: this.fieldValue.arrayUnion(
+            elapsedMinutes
+         ) as unknown as string[],
          livestream,
          user: userData,
       }
@@ -506,7 +509,7 @@ export class FirebaseLivestreamRepository
       return this.mapLivestreamCollections(snapshots).get()
    }
 
-   upcomingEventsQuery(showHidden: boolean = false, limit?: number) {
+   upcomingEventsQuery(showHidden = false, limit?: number) {
       let query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
@@ -543,8 +546,8 @@ export class FirebaseLivestreamRepository
       let livestreams = []
       let i: number,
          j: number,
-         tempArray: FieldOfStudy[] = [],
-         chunk = 10
+         tempArray: FieldOfStudy[] = []
+      const chunk = 10
       /*
        * In case there are more than 10 fieldsOfStudy
        * array-contains-any can only do 10 at a time
@@ -579,7 +582,7 @@ export class FirebaseLivestreamRepository
       limit,
       showHidden = false,
    }) {
-      let query = this.getPastEventsFromQuery({
+      const query = this.getPastEventsFromQuery({
          fromDate,
          filterByGroupId,
          limit,
@@ -864,9 +867,9 @@ export class FirebaseLivestreamRepository
    }
 
    async getLivestreamsWithJobs(
-      groupId: any
+      groupId: string
    ): Promise<LivestreamEvent[] | null> {
-      let docs = await this.firestore
+      const docs = await this.firestore
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("hasJobs", "==", true)
@@ -878,10 +881,10 @@ export class FirebaseLivestreamRepository
    async getApplications(
       livestreamIds: string[]
    ): Promise<UserLivestreamData[]> {
-      let chunks = chunkArray(livestreamIds, 10)
-      let promises = []
+      const chunks = chunkArray(livestreamIds, 10)
+      const promises = []
 
-      for (let chunk of chunks) {
+      for (const chunk of chunks) {
          promises.push(
             this.firestore
                .collectionGroup("userLivestreamData")
@@ -892,7 +895,7 @@ export class FirebaseLivestreamRepository
          )
       }
 
-      let responses = await Promise.allSettled(promises)
+      const responses = await Promise.allSettled(promises)
 
       return responses
          .filter((r) => {
@@ -921,10 +924,10 @@ export class FirebaseLivestreamRepository
    }
 
    async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
-      let chunks = chunkArray(ids, 10)
-      let promises = []
+      const chunks = chunkArray(ids, 10)
+      const promises = []
 
-      for (let chunk of chunks) {
+      for (const chunk of chunks) {
          promises.push(
             this.firestore
                .collection("livestreams")
@@ -934,7 +937,7 @@ export class FirebaseLivestreamRepository
          )
       }
 
-      let responses = await Promise.allSettled(promises)
+      const responses = await Promise.allSettled(promises)
 
       return responses
          .filter((r) => {
@@ -1059,9 +1062,11 @@ export class FirebaseLivestreamRepository
          documentType: "recordingStatsUser",
          livestreamId,
          userId,
-         minutesWatched: this.fieldValue.increment(minutesWatched) as any,
+         minutesWatched: this.fieldValue.increment(
+            minutesWatched
+         ) as unknown as number,
          recordingBought: usedCredits,
-         date: this.fieldValue.serverTimestamp() as any,
+         date: this.fieldValue.serverTimestamp() as unknown as Timestamp,
       }
 
       if (livestreamStartDate) {
@@ -1088,9 +1093,11 @@ export class FirebaseLivestreamRepository
       const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,
-         minutesWatched: this.fieldValue.increment(minutesWatched) as any,
-         viewers: this.fieldValue.arrayUnion(userId) as any,
-         views: this.fieldValue.increment(1) as any,
+         minutesWatched: this.fieldValue.increment(
+            minutesWatched
+         ) as unknown as number,
+         viewers: this.fieldValue.arrayUnion(userId) as unknown as string[],
+         views: this.fieldValue.increment(1) as unknown as number,
       }
 
       if (usedCredits) {
@@ -1098,7 +1105,7 @@ export class FirebaseLivestreamRepository
          // array for analytics purposes
          details.viewersThroughCredits = this.fieldValue.arrayUnion(
             userId
-         ) as any
+         ) as unknown as string[]
       }
 
       // when we want only to increment the minutes watch of a specific recording
