@@ -26,15 +26,15 @@ export const getStreamSubCollectionSpeakers = (
 ): Record<string, Speaker> => {
    if (!speakerQuery.empty && !livestream.speakers) {
       // if this stream doc has no speakers array and but has a sub-collection
-      let speakersObj: Record<string, Speaker> = {}
+      const speakersObj: Record<string, Speaker> = {}
       speakerQuery.forEach((query) => {
-         let speaker = query.data()
+         const speaker = query.data()
          speaker.id = query.id
          speakersObj[speaker.id] = speaker
       })
       return speakersObj
    } else if (livestream.speakers?.length) {
-      let speakersObj = {}
+      const speakersObj = {}
       livestream.speakers.forEach((speaker: Speaker) => {
          if (!speaker.background) {
             speaker.background = ""
@@ -153,7 +153,7 @@ export const handleAddTargetCategories = (
 }
 
 export const handleFlattenOptions = (group) => {
-   let optionsArray = []
+   const optionsArray = []
    if (group.categories && group.categories.length) {
       group.categories.forEach((category) => {
          if (category.options && category.options.length) {
@@ -164,7 +164,7 @@ export const handleFlattenOptions = (group) => {
    return optionsArray
 }
 export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
-   let optionsArray = []
+   const optionsArray = []
    if (group.categories && group.categories.length) {
       group.categories.forEach((category) => {
          if (
@@ -185,7 +185,7 @@ export const validateStreamForm = (
    noValidation = false,
    isPastStream = false
 ) => {
-   let errors: FormikErrors<DraftFormValues> = {
+   const errors: FormikErrors<DraftFormValues> = {
       speakers: {},
    }
    if (!values.companyLogoUrl) {
