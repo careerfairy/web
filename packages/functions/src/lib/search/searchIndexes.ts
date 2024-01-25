@@ -42,6 +42,8 @@ const livestreamIndex = {
       "impressions",
       "recommendedImpressions",
       "speakerSwitchMode",
+      "targetCountries",
+      "targetUniversities",
       "targetFieldsOfStudy",
       "targetLevelsOfStudy",
       "lastUpdated",
