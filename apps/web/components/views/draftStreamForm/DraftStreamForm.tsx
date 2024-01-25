@@ -201,7 +201,6 @@ export interface DraftFormValues {
    hidden: boolean
    summary: string
    reasonsToJoinLivestream: string
-   reasonsToJoinLivestream_v2: string[]
    speakers: Record<string, Partial<Speaker>>
    status: object
    language: {
@@ -311,7 +310,6 @@ const DraftStreamForm = ({
       hidden: false,
       summary: "",
       reasonsToJoinLivestream: "",
-      reasonsToJoinLivestream_v2: [],
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
@@ -441,7 +439,6 @@ const DraftStreamForm = ({
                   summary: livestream.summary || "",
                   reasonsToJoinLivestream:
                      livestream.reasonsToJoinLivestream || "",
-                  reasonsToJoinLivestream_v2: [],
                   speakers: getStreamSubCollectionSpeakers(
                      livestream,
                      speakerQuery
