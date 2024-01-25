@@ -88,30 +88,16 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
       )
    }
    const onDeleteOptionGroup = (optionGroup: OptionGroup): void => {
-      console.log("🚀 ~ Select ~ OnDelete  optionGroup: ", optionGroup)
       const updatedIndustries = getSelectedCompanyIndustry().filter(
          (selectedIndustry) => selectedIndustry.id !== optionGroup.id
-      )
-      console.log(
-         "🚀 ~ Select ~ onDelete ~ updatedIndustries:",
-         updatedIndustries
       )
       handleChange(selectorFilterKey, updatedIndustries)
    }
    const onSelectOptionGroup = (selectedOption) => {
-      console.log(
-         "🚀 ~ CompanyIndustrySelector ~ selectedOption:",
-         selectedOption
-      )
       const selectedIndustryOptions = formatToOptionArray(
          selectedOption.map(multiListSelectMapIdValueFn),
          CompanyIndustryValues
       )
-      console.log(
-         "🚀 ~ selectedIndustryOptions ~ selectedIndustryOptions:",
-         selectedIndustryOptions
-      )
-
       handleChange(selectorFilterKey, selectedIndustryOptions)
    }
    return (
@@ -176,11 +162,6 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
                               event.stopPropagation()
                            }}
                            onChange={(e) => {
-                              console.log(
-                                 "🚀 ~ Checkbox ~ Onchange ~ CompanyIndustrySelector ~ checked:",
-                                 e.target.checked
-                              )
-
                               if (e.target.checked)
                                  onSelectOptionGroup(
                                     getSelectedCompanyIndustry().concat(
@@ -217,10 +198,6 @@ const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptionsProps> = ({
          color="primary"
          deleteIcon={<CancelIcon></CancelIcon>}
          onDelete={() => {
-            console.log(
-               "🚀 ~ CompanyIndustryOptionChip ~ OnDelete  optionGroup: ",
-               optionGroup
-            )
             onDelete(optionGroup)
          }}
       />
