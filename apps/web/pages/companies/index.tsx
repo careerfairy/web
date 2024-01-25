@@ -56,11 +56,7 @@ const getQueryVariables = (query): FilterCompanyOptions => {
 
 export const getServerSideProps = async (ctx) => {
    const query = getQueryVariables(ctx.query)
-   console.log("🚀 ~ getServerSideProps ~ query:", query)
-
    const companies = await companyService.fetchCompanies(query)
-   console.log("🚀 ~ getServerSideProps ~ companies.length:", companies.length)
-
    return {
       props: {
          serverSideCompanies: companies,

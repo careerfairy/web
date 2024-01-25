@@ -28,9 +28,7 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
    const { query } = useRouter()
 
    const filterOptions = useMemo(() => getQueryVariables(query), [query])
-   /**
-    * TODO-WG: Could pass useCoumpound directly - No changes yet
-    */
+
    const { companies } = useCompaniesSWR(filterOptions)
 
    const renderCompanies = isMounted() ? companies : initialData
