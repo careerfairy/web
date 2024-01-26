@@ -6,22 +6,22 @@ import {
    LivestreamFormValues,
    LivestreamFormQuestionsTabValues,
    LivestreamFormSpeakersTabValues,
-} from "../../../../../../components/views/group/admin/events/form/types"
-import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/LivestreamFetchWrapper"
+} from "../../../../../../components/views/group/admin/events/detail/form/types"
+import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
-import LivestreamFormJobsStep from "../../../../../../components/views/group/admin/events/form/views/jobs"
-import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/form/views/questions"
-import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/form/views/speakers"
-import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/form/views/general"
-import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/form/validationSchemas"
+import LivestreamFormJobsStep from "../../../../../../components/views/group/admin/events/detail/form/views/jobs"
+import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions"
+import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/detail/form/views/speakers"
+import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general"
+import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
 import { useState } from "react"
 import LivestreamAdminDetailTopBarNavigation, {
    TAB_VALUES,
-} from "./navigation/LivestreamAdminDetailTopBarNavigation"
-import LivestreamAdminDetailBottomBarNavigation from "./navigation/LivestreamAdminDetailBottomBarNavigation"
+} from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
+import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
 
 const formGeneralTabValues: LivestreamFormGeneralTabValues = {
    title: "",
