@@ -4,11 +4,15 @@ import { ComponentProps } from "react"
 
 type Props = {
    active?: boolean
+   deviceOn?: boolean
 }
 
 export const ActionBarButtonStyled = styled(IconButton, {
-   shouldForwardProp: shouldForwardProp<Props>(["active"]),
+   shouldForwardProp: shouldForwardProp<Props>(["active", "deviceOn"]),
 })<Props>(({ theme, active }) => ({
+   display: "flex",
+   justifyContent: "center",
+   alignItems: "center",
    width: 38,
    height: 38,
    [theme.breakpoints.up("tablet")]: {
@@ -28,6 +32,11 @@ export const ActionBarButtonStyled = styled(IconButton, {
          fontSize: 28,
          width: 28,
          height: 28,
+      },
+   },
+   "&:disabled": {
+      "& svg": {
+         color: "inherit",
       },
    },
 }))

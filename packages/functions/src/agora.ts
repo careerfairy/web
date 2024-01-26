@@ -1,15 +1,17 @@
-import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from "agora-access-token"
+import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from "agora-token"
 import functions = require("firebase-functions")
 import { agoraCredentials } from "./api/agora"
 import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
+import { AgoraTokenRequest } from "@careerfairy/shared-lib/agora/token"
 
 export const fetchAgoraRtcToken = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onCall(async (data: AgoraTokenRequest) => {
       const { isStreamer, uid, sentToken, channelName, streamDocumentPath } =
          data
       const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER
+
       const expirationTimeInSeconds = 21600
       const currentTimestamp = Math.floor(Date.now() / 1000)
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -32,12 +34,13 @@ export const fetchAgoraRtcToken = functions
                return { status: 400, message: "Invalid token" }
             }
          }
-         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+         const rtcToken = RtcTokenBuilder.buildTokenWithUserAccount(
             agoraCredentials.appID,
             agoraCredentials.appCertificate,
             channelName,
             uid,
             rtcRole,
+            privilegeExpiredTs,
             privilegeExpiredTs
          )
          return {
@@ -45,12 +48,13 @@ export const fetchAgoraRtcToken = functions
             token: { rtcToken: rtcToken },
          }
       } else {
-         const rtcToken = RtcTokenBuilder.buildTokenWithUid(
+         const rtcToken = RtcTokenBuilder.buildTokenWithUserAccount(
             agoraCredentials.appID,
             agoraCredentials.appCertificate,
             channelName,
             uid,
             rtcRole,
+            privilegeExpiredTs,
             privilegeExpiredTs
          )
          return {
@@ -64,7 +68,6 @@ export const fetchAgoraRtmToken = functions
    .region(config.region)
    .https.onCall(async (data) => {
       const { uid } = data
-      const rtmRole = 0
       const expirationTimeInSeconds = 21600
       const currentTimestamp = Math.floor(Date.now() / 1000)
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -77,7 +80,6 @@ export const fetchAgoraRtmToken = functions
          agoraCredentials.appID,
          agoraCredentials.appCertificate,
          uid,
-         rtmRole,
          privilegeExpiredTs
       )
 
