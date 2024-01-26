@@ -1,4 +1,4 @@
-import { ResponsiveStreamButton } from "../common"
+import { ResponsiveStreamButton } from "../Buttons"
 import { sxStyles } from "types/commonTypes"
 
 import { Eye } from "react-feather"
