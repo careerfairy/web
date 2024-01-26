@@ -101,7 +101,7 @@ export const ActionsSpeedDial = () => {
    const [open, setOpen] = useState(false)
    const ref = useRef(null)
 
-   const { isHost, isStreaming } = useStreamingContext()
+   const { isHost, shouldStream } = useStreamingContext()
 
    const isMobile = useStreamIsMobile()
 
@@ -115,7 +115,7 @@ export const ActionsSpeedDial = () => {
 
    const actions = isHost
       ? getStreamerActions(isMobile)
-      : getViewerActions(isMobile, isStreaming)
+      : getViewerActions(isMobile, shouldStream)
 
    return (
       <Box sx={[styles.root, styles.responsive]}>
