@@ -19,8 +19,8 @@
       "build-storybook": "storybook build"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*",
       "@careerfairy/config-mui": "*",
+      "@careerfairy/shared-lib": "*",
       "@careerfairy/shared-ui": "*",
       "@dnd-kit/core": "^6.0.8",
       "@dnd-kit/sortable": "^7.0.2",
@@ -36,6 +36,7 @@
       "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
       "agora-extension-virtual-background": "^1.1.3",
+      "agora-rtc-react": "^2.1.0",
       "agora-rtc-sdk-ng": "^4.18.0",
       "agora-rtm-sdk": "^1.6.0-205",
       "algoliasearch": "^4.13.0",
