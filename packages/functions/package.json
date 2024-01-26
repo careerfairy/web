@@ -20,7 +20,7 @@
    "dependencies": {
       "@careerfairy/shared-lib": "*",
       "@google-cloud/bigquery": "^6.2.0",
-      "agora-access-token": "^2.0.4",
+      "agora-token": "^2.0.3",
       "algoliasearch": "^4.22.0",
       "axios": "^0.27.2",
       "dotenv": "^8.2.0",

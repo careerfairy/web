@@ -1,4 +1,4 @@
-import { RtcRole, RtcTokenBuilder } from "agora-access-token"
+import { RtcRole, RtcTokenBuilder } from "agora-token"
 import axios, { Method } from "axios"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { isLocalEnvironment } from "../util"
@@ -156,12 +156,13 @@ export default class AgoraClient {
    static createRTCToken(channelName: string, expirationTimeSeconds = 21600) {
       const currentTimestamp = Math.floor(Date.now() / 1000)
       const privilegeExpiredTs = currentTimestamp + expirationTimeSeconds
-      return RtcTokenBuilder.buildTokenWithUid(
+      return RtcTokenBuilder.buildTokenWithUserAccount(
          appID,
          appCertificate,
          channelName,
-         staticUID as any,
+         staticUID,
          RtcRole.SUBSCRIBER,
+         privilegeExpiredTs,
          privilegeExpiredTs
       )
    }
