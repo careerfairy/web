@@ -7,7 +7,7 @@ import {
    UserStats,
 } from "../users"
 import firebase from "firebase/compat/app"
-import { FieldOfStudy } from "../fieldOfStudy"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
@@ -35,6 +35,8 @@ export interface LivestreamEvent extends Identifiable {
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   countryIds?: string[]
+   universityIds?: string[]
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
    isRecording?: boolean
@@ -102,6 +104,18 @@ export interface LivestreamEvent extends Identifiable {
    speakerSwitchMode?: "manual"
 
    /**
+    * An empty array means the livestream should target all the countries
+    * [] -> All countries
+    */
+   targetCountries?: string[]
+
+   /**
+    * An empty array means the livestream should target all the universities
+    * [] -> All universities
+    */
+   targetUniversities?: string[]
+
+   /**
     * An empty array means the livestream should target all the fields of study
     * [] -> All fields of study
     */
@@ -111,7 +125,7 @@ export interface LivestreamEvent extends Identifiable {
     * An empty array means the livestream should target all the levels of study
     * [] -> All levels of study
     */
-   targetLevelsOfStudy?: FieldOfStudy[]
+   targetLevelsOfStudy?: LevelOfStudy[]
 
    lastUpdated?: firebase.firestore.Timestamp
    /**
