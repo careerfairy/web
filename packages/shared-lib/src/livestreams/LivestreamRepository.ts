@@ -55,6 +55,13 @@ export type RegisteredEventsOptions = {
    orderByDirection?: "asc" | "desc"
 }
 
+export type ParticipatedEventsOptions = {
+   limit?: number
+   from?: Date
+   to?: Date
+   orderByDirection?: "asc" | "desc"
+}
+
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
@@ -66,6 +73,11 @@ export interface ILivestreamRepository {
    getRegisteredEvents(
       userEmail: string,
       options?: RegisteredEventsOptions
+   ): Promise<LivestreamEvent[]>
+
+   getParticipatedEvents(
+      userEmail: string,
+      options?: ParticipatedEventsOptions
    ): Promise<LivestreamEvent[]>
 
    getRecommendEvents(
@@ -672,6 +684,41 @@ export class FirebaseLivestreamRepository
       return this.mapLivestreamCollections(snapshots).get()
    }
 
+   async getParticipatedEvents(
+      userEmail: string,
+      options: ParticipatedEventsOptions = {}
+   ): Promise<LivestreamEvent[]> {
+      let livestreamRef = this.firestore
+         .collection("livestreams")
+         .where("test", "==", false)
+         .where("participatingStudents", "array-contains", userEmail)
+
+      if (options.orderByDirection) {
+         livestreamRef = livestreamRef.orderBy(
+            "start",
+            options.orderByDirection
+         )
+      } else {
+         livestreamRef = livestreamRef.orderBy("start", "asc")
+      }
+
+      if (options.from) {
+         livestreamRef = livestreamRef.where("start", ">", options.from)
+      }
+
+      if (options.to) {
+         livestreamRef = livestreamRef.where("start", "<", options.to)
+      }
+
+      if (options.limit) {
+         livestreamRef = livestreamRef.limit(options.limit)
+      }
+
+      const snapshots = await livestreamRef.get()
+
+      return this.mapLivestreamCollections(snapshots).get()
+   }
+
    listenToRegisteredEvents(
       userEmail: string,
       limit: number,
@@ -1049,8 +1096,8 @@ export class FirebaseLivestreamRepository
        * This is a balance to have a reduced number of documents and still
        * be able to easily query this data
        */
-      const nearesHourTimestamp = getNearestHourTimestamp()
-      const docId = `${userId}_${nearesHourTimestamp}`
+      const nearsHourTimestamp = getNearestHourTimestamp()
+      const docId = `${userId}_${nearsHourTimestamp}`
 
       const docRef = this.firestore
          .collection("livestreams")

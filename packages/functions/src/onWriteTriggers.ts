@@ -274,8 +274,10 @@ export const onWriteSpark = functions
       }
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
+         const group = await groupRepo.getGroupById(afterData.group.id)
+
          sideEffectPromises.push(
-            sparkRepo.syncSparkToSparkStatsDocument(afterData)
+            sparkRepo.syncSparkToSparkStatsDocument(afterData, group)
          )
 
          if (

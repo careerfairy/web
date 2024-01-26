@@ -62,6 +62,17 @@ export const bundles = {
                .where("hidden", "==", false),
       },
    },
+   allSparksStats: {
+      name: "allSparksStats",
+      cacheControl: "public, max-age=900", // 15min
+      queries: {
+         "all-sparks-stats": (firestore) =>
+            firestore
+               .collection("sparkStats")
+               .where("spark.published", "==", true)
+               .where("deleted", "==", false),
+      },
+   },
 } satisfies { [key: string]: Bundle }
 
 export type BundleName = keyof typeof bundles

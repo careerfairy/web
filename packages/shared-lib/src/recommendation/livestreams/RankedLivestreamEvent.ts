@@ -1,5 +1,5 @@
-import { FieldOfStudy } from "../fieldOfStudy"
-import { LivestreamEvent } from "../livestreams"
+import { FieldOfStudy } from "../../fieldOfStudy"
+import { LivestreamEvent } from "../../livestreams"
 
 export class RankedLivestreamEvent {
    public points: number
@@ -48,10 +48,6 @@ export class RankedLivestreamEvent {
       this.points += points
    }
 
-   // removePoints(points: number) {
-   //    this.points -= points
-   // }
-
    getPoints() {
       return this.points
    }
@@ -67,7 +63,7 @@ export function sortRankedLivestreamEventByPoints(
 
 export const handlePromisesAllSettled = async <TPromiseResolve>(
    promises: Promise<TPromiseResolve>[],
-   errorLogger: (...args: any[]) => void
+   errorLogger: (...args: unknown[]) => void
 ): Promise<TPromiseResolve[]> => {
    const results = await Promise.allSettled(promises)
    const resolvedResults: TPromiseResolve[] = []

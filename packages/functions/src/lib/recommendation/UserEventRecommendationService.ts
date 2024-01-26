@@ -3,17 +3,17 @@ import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRe
 import { UserData } from "@careerfairy/shared-lib/users"
 import RecommendationServiceCore, {
    IRecommendationService,
-} from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+} from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    handlePromisesAllSettled,
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "@careerfairy/shared-lib/recommendation/RankedLivestreamEvent"
+} from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
 import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
-import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/services/RankedLivestreamRepository"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
 
 /**
  * Best livestreams for a user based on their Metadata
@@ -34,6 +34,12 @@ export default class UserEventRecommendationService
       super(functions.logger, debug)
    }
 
+   /**
+    * Asynchronous function to get recommendations
+    *
+    * @param limit - The maximum number of recommended events to retrieve
+    * @returns A promise that resolves to an array of recommended event IDs
+    */
    async getRecommendations(limit = 10): Promise<string[]> {
       const promises: Promise<RankedLivestreamEvent[]>[] = []
 
@@ -66,6 +72,12 @@ export default class UserEventRecommendationService
       )
    }
 
+   /**
+    * Asynchronous function to get recommended events based on user actions
+    *
+    * @param limit - The maximum number of recommended events to retrieve
+    * @returns A promise that resolves to an array of recommended event IDs
+    */
    private async getRecommendedEventsBasedOnUserActions(
       limit: number
    ): Promise<RankedLivestreamEvent[]> {
@@ -87,6 +99,12 @@ export default class UserEventRecommendationService
       return removeDuplicateDocuments(sortedResults)
    }
 
+   /**
+    * Asynchronous function to get recommended events based on previously watched events
+    *
+    * @param limit - The maximum number of recommended events to retrieve
+    * @returns A promise that resolves to an array of recommended event IDs
+    */
    private async getRecommendedEventsBasedOnPreviousWatchedEvents(
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {

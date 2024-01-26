@@ -2,7 +2,7 @@ import { removeDuplicateDocuments } from "../BaseFirebaseRepository"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "./RankedLivestreamEvent"
+} from "./livestreams/RankedLivestreamEvent"
 
 export class RecommendationsBuilder {
    protected results: RankedLivestreamEvent[] = []

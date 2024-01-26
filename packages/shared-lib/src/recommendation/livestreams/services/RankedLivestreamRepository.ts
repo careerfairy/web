@@ -1,10 +1,10 @@
-import { FieldOfStudy } from "../../fieldOfStudy"
-import { LivestreamEvent } from "../../livestreams"
-import { sortLivestreamsDesc } from "../../utils"
+import { FieldOfStudy } from "../../../fieldOfStudy"
+import { LivestreamEvent } from "../../../livestreams"
+import { sortLivestreamsDesc } from "../../../utils"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "../RankedLivestreamEvent"
+} from "../../livestreams/RankedLivestreamEvent"
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
@@ -151,8 +151,7 @@ export class RankedLivestreamRepository {
    }
 
    public getEventsBasedOnSpokenLanguages(
-      spokenLanguages: string[],
-      limit = 10
+      spokenLanguages: string[]
    ): RankedLivestreamEvent[] {
       return this.rankEvents({
          pointsPerMatch: this.pointsPerSpokenLanguageMatch,
