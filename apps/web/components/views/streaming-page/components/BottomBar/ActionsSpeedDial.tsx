@@ -8,7 +8,8 @@ import { useStreamingContext } from "components/views/streaming-page/context"
 import { useState, useRef, ReactNode } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
-import { ActionName, allActions } from "."
+import { ActionName } from "."
+import { allActions } from "./allActions"
 
 const styles = sxStyles({
    root: {
