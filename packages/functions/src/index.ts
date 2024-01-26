@@ -67,7 +67,7 @@ exports.resendPostmarkEmailVerificationEmailWithPin_eu =
 exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
-exports.fetchAgoraRtcToken_eu = agora.fetchAgoraRtcToken
+exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
 
 // Backup

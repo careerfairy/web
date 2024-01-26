@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { v4 as uuidv4 } from "uuid"
 import {
    FORTY_FIVE_MINUTES_IN_MILLISECONDS,
@@ -92,7 +93,7 @@ class FirebaseService {
 
    fetchAgoraRtcToken = async (data) => {
       const fetchAgoraRtcToken = this.functions.httpsCallable(
-         "fetchAgoraRtcToken_eu"
+         "fetchAgoraRtcToken_v2"
       )
       return await fetchAgoraRtcToken(data)
    }
