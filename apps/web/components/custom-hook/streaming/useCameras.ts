@@ -1,11 +1,16 @@
 import useSWR from "swr"
-import AgoraRTC from "agora-rtc-sdk-ng"
-import { IAgoraRTCError } from "agora-rtc-react"
+import { IAgoraRTCError, IAgoraRTC } from "agora-rtc-react"
+import { isServer } from "components/helperFunctions/HelperFunctions"
 
-const fetcher = async () =>
-   AgoraRTC.getDevices().then((devices) =>
+const fetcher = async () => {
+   if (isServer()) return []
+   const AgoraRTCModule = (await import(
+      "agora-rtc-sdk-ng"
+   )) as unknown as IAgoraRTC
+   return AgoraRTCModule.getDevices().then((devices) =>
       devices.filter((device) => device.kind === "videoinput")
    )
+}
 
 export const useCameras = (shouldFetch: boolean) => {
    return useSWR<MediaDeviceInfo[], IAgoraRTCError>(
