@@ -28,6 +28,7 @@ export const BrandedBadge = styled(Badge, {
 })(({ theme, anchorOrigin }) => {
    return {
       "& .MuiBadge-badge": {
+         color: theme.palette.common.white,
          boxShadow: `0 0 0 1px ${theme.brand.white[50]}`,
          transform: getPositionTransform(anchorOrigin),
       },

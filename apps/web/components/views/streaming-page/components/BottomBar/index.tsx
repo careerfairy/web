@@ -104,11 +104,11 @@ const getViewerActionNames = (
 const ViewerView = () => {
    const isMobile = useStreamIsMobile()
 
-   const { isStreaming } = useStreamingContext()
+   const { shouldStream } = useStreamingContext()
 
    return (
       <ActionsBar>
-         {getViewerActionNames(isMobile, isStreaming).map(
+         {getViewerActionNames(isMobile, shouldStream).map(
             (action, index) =>
                BottomBarActions[action] || <DividerComponent key={index} />
          )}
