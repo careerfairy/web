@@ -1,12 +1,18 @@
 import useSWR from "swr"
-import AgoraRTC from "agora-rtc-sdk-ng"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { IAgoraRTCError } from "agora-rtc-react"
 
-const fetcher = async () =>
-   AgoraRTC.getDevices().then((devices) =>
+import { IAgoraRTC, IAgoraRTCError } from "agora-rtc-react"
+import { isServer } from "components/helperFunctions/HelperFunctions"
+
+const fetcher = async () => {
+   if (isServer()) return []
+   const AgoraRTCModule = (await import(
+      "agora-rtc-sdk-ng"
+   )) as unknown as IAgoraRTC
+   return AgoraRTCModule.getDevices().then((devices) =>
       devices.filter((device) => device.kind === "audioinput")
    )
+}
 
 export const useMicrophones = (shouldFetch: boolean) => {
    return useSWR<MediaDeviceInfo[], IAgoraRTCError>(
