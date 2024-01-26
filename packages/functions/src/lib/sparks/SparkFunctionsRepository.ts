@@ -11,7 +11,9 @@ import {
 import {
    AddSparkSparkData,
    DeletedSpark,
+   LikedSparks,
    SeenSparks,
+   SharedSparks,
    Spark,
    SparkStats,
    UpdateSparkData,
@@ -246,15 +248,44 @@ export interface ISparkFunctionsRepository {
    /**
     * Syncs a spark to the spark stats document
     * @param spark The spark to sync
+    * @param group The group of the spark
     * @returns void
     */
-   syncSparkToSparkStatsDocument(spark: Spark): Promise<void>
+   syncSparkToSparkStatsDocument(spark: Spark, group: Group): Promise<void>
 
    /**
     * Create spark notification
     * @param spark
     */
    createSparkUserNotification(spark: Spark): Promise<void>
+
+   /**
+    * Get shared sparks for a user
+    * @param userId The user id
+    * @returns Promise of an array of SharedSparks
+    */
+   getUserSharedSpark(userId: string): Promise<SharedSparks[]>
+
+   /**
+    * Get liked sparks for a user
+    * @param userId The user id
+    * @returns Promise of an array of LikedSparks
+    */
+   getUserLikedSparks(userId: string): Promise<LikedSparks[]>
+
+   /**
+    * Get seen sparks for a user
+    * @param userId The user id
+    * @returns Promise of an array of SeenSparks
+    */
+   getUserSeenSparks(userId: string): Promise<SeenSparks[]>
+
+   /**
+    * Get sparks by their ids
+    * @param sparkIds The array of spark ids
+    * @returns Promise of an array of Spark
+    */
+   getSparksByIds(sparkIds: string[]): Promise<Spark[]>
 }
 
 export class SparkFunctionsRepository
@@ -265,7 +296,7 @@ export class SparkFunctionsRepository
       readonly firestore: Firestore,
       readonly storage: Storage,
       readonly logger: FunctionsLogger,
-      readonly feedReplisher: SparksFeedReplenisher,
+      readonly feedReplenisher: SparksFeedReplenisher,
       readonly sparkEventHandler: BigQueryCreateInsertService<SparkEvent>,
       readonly sparkSecondsWatchedHandler: BigQueryCreateInsertService<SparkSecondWatched>
    ) {
@@ -567,8 +598,10 @@ export class SparkFunctionsRepository
    async replenishUserFeed(userId: string): Promise<void> {
       const userSparkFeedMetrics = await this.getUserFeedMetrics(userId)
 
-      // TODO: Should be replaced with recommendation engine dependency injection in the future
-      return this.feedReplisher.replenishUserFeed(userId, userSparkFeedMetrics)
+      return this.feedReplenisher.replenishUserFeed(
+         userId,
+         userSparkFeedMetrics
+      )
    }
 
    async markSparkAsSeenByUser(userId: string, sparkId: string): Promise<void> {
@@ -628,7 +661,7 @@ export class SparkFunctionsRepository
       const bulkWriter = this.firestore.bulkWriter()
 
       sparksFromFeedToBeDeletedSnap.docs.forEach((sparkDoc) => {
-         bulkWriter.delete(sparkDoc.ref)
+         void bulkWriter.delete(sparkDoc.ref)
       })
 
       await bulkWriter.close()
@@ -657,7 +690,7 @@ export class SparkFunctionsRepository
 
          addAddedToFeedAt(spark)
 
-         bulkWriter.set(userSparkFeedRef, spark, { merge: true })
+         void bulkWriter.set(userSparkFeedRef, spark, { merge: true })
       })
 
       await bulkWriter.close()
@@ -677,12 +710,12 @@ export class SparkFunctionsRepository
       if (sparkNoLongerPublic) {
          // If the spark is no longer public, delete it from all user feeds
          allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
-            bulkWriter.delete(sparkDoc.ref)
+            void bulkWriter.delete(sparkDoc.ref)
          })
       } else {
          // If the spark is still public, update it in all user feeds
          allUserMatchingSparksSnap.docs.forEach((sparkDoc) => {
-            bulkWriter.update(sparkDoc.ref, spark)
+            void bulkWriter.update(sparkDoc.ref, spark)
          })
       }
 
@@ -729,7 +762,7 @@ export class SparkFunctionsRepository
          .get()
 
       snapShot.docs.forEach((doc) => {
-         bulkWriter.delete(doc.ref)
+         void bulkWriter.delete(doc.ref)
       })
 
       return void bulkWriter.close()
@@ -784,7 +817,10 @@ export class SparkFunctionsRepository
       return void sparkStatsRef.update(sparkStats)
    }
 
-   async syncSparkToSparkStatsDocument(spark: Spark): Promise<void> {
+   async syncSparkToSparkStatsDocument(
+      spark: Spark,
+      group: Group
+   ): Promise<void> {
       const sparkStatsRef = this.firestore
          .collection("sparkStats")
          .doc(spark.id)
@@ -813,6 +849,9 @@ export class SparkFunctionsRepository
             uniquePlays: 0,
             deleted: false,
             deletedAt: null,
+            companyIndustries: group.companyIndustries ?? [],
+            companyCountry: group.companyCountry ?? null,
+            companySize: group.companySize ?? "",
          }
 
          return void sparkStatsRef.set(sparkStats)
@@ -861,10 +900,64 @@ export class SparkFunctionsRepository
             id: ref.id,
          }
 
-         bulkWriter.set(ref, newNotification, { merge: true })
+         void bulkWriter.set(ref, newNotification, { merge: true })
       })
 
       return void bulkWriter.close()
+   }
+
+   async getUserSharedSpark(userId: string): Promise<SharedSparks[]> {
+      const userSharedSparksSnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("sharedSparks")
+         .withConverter(createGenericConverter<SharedSparks>())
+         .get()
+
+      return userSharedSparksSnapshot.docs.map((doc) => doc.data())
+   }
+
+   async getUserLikedSparks(userId: string): Promise<LikedSparks[]> {
+      const userLikedSparksSnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("likedSparks")
+         .withConverter(createGenericConverter<LikedSparks>())
+         .get()
+
+      return userLikedSparksSnapshot.docs.map((doc) => doc.data())
+   }
+
+   async getUserSeenSparks(userId: string): Promise<SeenSparks[]> {
+      const userSeenSparksSnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("seenSparks")
+         .withConverter(createGenericConverter<SeenSparks>())
+         .get()
+
+      return userSeenSparksSnapshot.docs.map((doc) => doc.data())
+   }
+
+   async getSparksByIds(sparkIds: string[]): Promise<Spark[]> {
+      const uniqueSparkIds = Array.from(new Set(sparkIds))
+      const sparkRefs = uniqueSparkIds.map((sparkId) =>
+         this.firestore
+            .collection("sparks")
+            .withConverter(createGenericConverter<Spark>())
+            .doc(sparkId)
+      )
+
+      const sparkSnapshots = await Promise.all(
+         sparkRefs.map((ref) => ref.get())
+      )
+
+      return sparkSnapshots
+         .filter((snap) => snap.exists)
+         .map((snapshot) => ({
+            ...snapshot.data(),
+            id: snapshot.id,
+         }))
    }
 }
 

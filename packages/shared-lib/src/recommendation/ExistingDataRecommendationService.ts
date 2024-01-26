@@ -3,8 +3,8 @@ import { UserData } from "../users"
 import { Logger } from "../utils/types"
 import RecommendationServiceCore, {
    IRecommendationService,
-} from "./IRecommendationService"
-import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
+} from "./livestreams/IRecommendationService"
+import { RankedLivestreamEvent } from "./livestreams/RankedLivestreamEvent"
 
 /**
  * Sorts the best events for the given user from the received events

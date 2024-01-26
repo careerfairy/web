@@ -110,6 +110,12 @@ export interface SparkStats extends Identifiable {
    companySize?: string
 
    category?: SparkCategory
+
+   /**
+    * Incremented on certain popularityEvents
+    * Updated via functions onCreate trigger
+    */
+   popularity?: number
 }
 
 /**

@@ -284,6 +284,9 @@ export type PublicGroup = Pick<
    | "publicSparks"
    | "publicProfile"
    | "careerPageUrl"
+   | "targetedCountries"
+   | "targetedUniversities"
+   | "targetedFieldsOfStudy"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
