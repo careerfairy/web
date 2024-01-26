@@ -13,7 +13,7 @@ import {
    Speaker,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "./livestreams"
-import { FieldOfStudy } from "../fieldOfStudy"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { AdminGroupsClaim } from "../users"
 import {
    fromDateConverter,
@@ -51,8 +51,6 @@ export class LivestreamPresenter extends BaseModel {
       public readonly recommendedImpressions: number,
       public readonly groupIds: string[],
       public readonly interestsIds: string[],
-      public readonly levelOfStudyIds: string[],
-      public readonly fieldOfStudyIds: string[],
       public readonly isRecording: boolean,
       public readonly hasNoTalentPool: boolean,
       public readonly test: boolean,
@@ -85,12 +83,26 @@ export class LivestreamPresenter extends BaseModel {
        * An empty array means the livestream should target all the fields of study
        * [] -> All fields of study
        */
+      public readonly targetCountries: string[],
+
+      /**
+       * An empty array means the livestream should target all the fields of study
+       * [] -> All fields of study
+       */
+      public readonly targetUniversities: string[],
+
+      /**
+       * An empty array means the livestream should target all the fields of study
+       * [] -> All fields of study
+       */
       public readonly targetFieldsOfStudy: FieldOfStudy[],
+
       /**
        * An empty array means the livestream should target all the levels of study
        * [] -> All levels of study
        */
-      public readonly targetLevelsOfStudy: FieldOfStudy[],
+      public readonly targetLevelsOfStudy: LevelOfStudy[],
+
       public readonly speakers: Speaker[],
       public readonly liveSpeakers: LiveSpeaker[],
       public readonly triGrams: LivestreamEvent["triGrams"],
@@ -273,8 +285,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.recommendedImpressions ?? 0,
          livestream.groupIds ?? [],
          livestream.interestsIds ?? [],
-         livestream.levelOfStudyIds || [],
-         livestream.fieldOfStudyIds || [],
          livestream.isRecording ?? false,
          livestream.hasNoTalentPool ?? false,
          livestream.test ?? false,
@@ -297,6 +307,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
          livestream.jobs ?? [],
+         livestream.targetCountries ?? [],
+         livestream.targetUniversities ?? [],
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
@@ -338,8 +350,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.recommendedImpressions,
          livestream.groupIds,
          livestream.interestsIds,
-         livestream.levelOfStudyIds,
-         livestream.fieldOfStudyIds,
          livestream.isRecording,
          livestream.hasNoTalentPool,
          livestream.test,
@@ -362,6 +372,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess,
          livestream.hasJobs,
          livestream.jobs,
+         livestream.targetCountries,
+         livestream.targetUniversities,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
@@ -422,8 +434,6 @@ export class LivestreamPresenter extends BaseModel {
          recommendedImpressions: this.recommendedImpressions,
          groupIds: this.groupIds,
          interestsIds: this.interestsIds,
-         levelOfStudyIds: this.levelOfStudyIds,
-         fieldOfStudyIds: this.fieldOfStudyIds,
          isRecording: this.isRecording,
          hasNoTalentPool: this.hasNoTalentPool,
          test: this.test,
@@ -446,6 +456,8 @@ export class LivestreamPresenter extends BaseModel {
          isHybrid: this.isHybrid,
          hasJobs: this.hasJobs,
          jobs: this.jobs,
+         targetCountries: this.targetCountries,
+         targetUniversities: this.targetUniversities,
          targetFieldsOfStudy: this.targetFieldsOfStudy,
          targetLevelsOfStudy: this.targetLevelsOfStudy,
          speakers: this.speakers,
