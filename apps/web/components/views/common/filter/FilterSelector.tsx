@@ -47,6 +47,7 @@ const styles = sxStyles({
          width: 20,
          height: 20,
       },
+      color: "#3D3D47",
    },
    roundNumber: {
       width: 25,
@@ -153,10 +154,9 @@ const FilterSelector = () => {
                <Button
                   aria-describedby={id}
                   endIcon={<Filter />}
-                  sx={styles.filterButton}
+                  sx={[styles.filterButton]}
                   onClick={handleOpenFilterDialog}
                   disableElevation
-                  color={"grey"}
                >
                   <Typography
                      fontWeight={500}
