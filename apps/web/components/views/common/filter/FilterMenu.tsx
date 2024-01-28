@@ -78,6 +78,7 @@ const styles = sxStyles({
    clearButton: {
       textTransform: "none",
       fontSize: "15px",
+      color: "#8E8E8E",
    },
    dialog: {
       mt: "73px",
@@ -363,7 +364,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                onClick={handleClose}
                sx={styles.loadingButton}
             >
-               {numberOfActiveFilters > 0 && numberOfResults > 0
+               {numberOfActiveFilters > 0
                   ? `${numberOfResults} Results`
                   : `Apply Filters`}
             </LoadingButton>

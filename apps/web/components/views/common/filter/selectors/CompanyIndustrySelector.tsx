@@ -11,33 +11,18 @@ import {
 import React, { FC, useCallback } from "react"
 
 import { useRouter } from "next/router"
-import {
-   Box,
-   Chip,
-   FormControl,
-   InputLabel,
-   MenuItem,
-   Select,
-} from "@mui/material"
-import { Search, X } from "react-feather"
+import { Autocomplete, Box, SxProps, TextField } from "@mui/material"
+import { Search } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { StyledCheckbox } from "components/views/group/admin/common/inputs"
-import CancelIcon from "@mui/icons-material/Cancel"
-const ITEM_HEIGHT = 48
-const ITEM_PADDING_TOP = 8
-const MenuProps = {
-   PaperProps: {
-      style: {
-         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-         width: 250,
-      },
-   },
-}
 
-const selectorFilterKey = "companyIndustries"
+const SELECTOR_FILTER_KEY = "companyIndustries"
 
 const styles = sxStyles({
+   dropdownCheckbox: {
+      transform: "scale(1.2)",
+   },
    selectIcon: {
       px: 2,
       pt: 1,
@@ -57,6 +42,15 @@ const styles = sxStyles({
       alignContent: "center",
       label: {
          flexGrow: 1,
+      },
+   },
+   chips: {
+      color: "primary",
+   },
+   autoComplete: {
+      mt: 1,
+      "& .MuiAutocomplete-popupIndicator": {
+         transform: "none",
       },
    },
 })
@@ -80,128 +74,113 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
       return selectedIndustries
    }, [query.companyIndustries])
 
-   const isOptionSelected = (option: OptionGroup): boolean => {
-      return (
-         getSelectedCompanyIndustry().find(
-            (selectedIndustry) => selectedIndustry.id === option.id
-         ) !== undefined
-      )
-   }
-   const onDeleteOptionGroup = (optionGroup: OptionGroup): void => {
-      const updatedIndustries = getSelectedCompanyIndustry().filter(
-         (selectedIndustry) => selectedIndustry.id !== optionGroup.id
-      )
-      handleChange(selectorFilterKey, updatedIndustries)
-   }
-   const onSelectOptionGroup = (selectedOption) => {
+   const onSelectOptionGroup = (selectedOption: OptionGroup[]) => {
+      console.log("🚀 ~ onSelectOptionGroup ~ selectedOption:", selectedOption)
       const selectedIndustryOptions = formatToOptionArray(
          selectedOption.map(multiListSelectMapIdValueFn),
          CompanyIndustryValues
       )
-      handleChange(selectorFilterKey, selectedIndustryOptions)
+      console.log(
+         "🚀 ~ onSelectOptionGroup ~ selectedIndustryOptions:",
+         selectedIndustryOptions
+      )
+      handleChange(SELECTOR_FILTER_KEY, selectedIndustryOptions)
    }
+
+   const getOptionLabel = (optionId): string => {
+      const formattedOption = formatToOptionArray(
+         optionId,
+         CompanyIndustryValues
+      )
+      if (formattedOption.length) {
+         return formattedOption.at(0).name
+      }
+      return "error: unknow option"
+   }
+   const selectededCompanies = getSelectedCompanyIndustry()
+   const autoCompleteCompaniesOptions = CompanyIndustryValues.map(
+      multiListSelectMapIdValueFn
+   )
+
    return (
       <>
          <MultiCheckboxSelect
-            inputName={selectorFilterKey}
-            selectedItems={getSelectedCompanyIndustry()}
+            inputName={SELECTOR_FILTER_KEY}
+            selectedItems={selectededCompanies}
             allValues={RelevantCompanyIndustryValues}
             setFieldValue={handleChange}
             getValueFn={multiListSelectMapValueFn}
             useStyledCheckbox
          />
-         <FormControl sx={styles.mainForm}>
-            <InputLabel id="chip-label">Search industry</InputLabel>
-            <Select
-               labelId="chip-label"
-               multiple
-               value={getSelectedCompanyIndustry()}
-               label="Search industry"
-               placeholder="Search industry"
-               onChange={(e) => {
-                  onSelectOptionGroup(
-                     e.target.value as unknown as OptionGroup[]
-                  )
-               }}
-               IconComponent={() => (
-                  <Box sx={styles.selectIcon}>
-                     {getSelectedCompanyIndustry().length > 1 ? (
-                        <Box sx={styles.mousePointer}>
-                           <X
-                              color="#2ABAA5"
-                              onClick={() => {
-                                 onSelectOptionGroup([])
-                              }}
-                           ></X>
-                        </Box>
-                     ) : (
-                        <Search></Search>
-                     )}
-                  </Box>
-               )}
-               renderValue={(selected) => (
-                  <Box sx={styles.selectedChipsWrapper}>
-                     <CompanyIndustryOptionChip
-                        items={selected}
-                        onDelete={onDeleteOptionGroup}
-                     />
-                  </Box>
-               )}
-               MenuProps={MenuProps}
-            >
-               {CompanyIndustryValues.map((companyIndustry) => (
-                  //@ts-ignore - necessary to load object into value
-                  <MenuItem key={companyIndustry.id} value={companyIndustry}>
-                     <Box sx={styles.optionsDropdownWrapper}>
-                        <span style={styles.optionsDropdownWrapper.label}>
-                           {companyIndustry.name}
-                        </span>
-                        <StyledCheckbox
-                           checked={isOptionSelected(companyIndustry)}
-                           onMouseDown={(event) => {
-                              event.stopPropagation()
-                           }}
-                           onChange={(e) => {
-                              if (e.target.checked)
-                                 onSelectOptionGroup(
-                                    getSelectedCompanyIndustry().concat(
-                                       companyIndustry
-                                    )
-                                 )
-                              else onDeleteOptionGroup(companyIndustry)
-                           }}
-                        />
-                     </Box>
-                  </MenuItem>
-               ))}
-            </Select>
-         </FormControl>
+         <AutoCompleteOption
+            options={autoCompleteCompaniesOptions}
+            value={selectededCompanies.map((c) => c.id)}
+            getOptionLabel={getOptionLabel}
+            onSelectOptionsGroup={onSelectOptionGroup}
+            sx={styles.autoComplete}
+         />
       </>
    )
 }
 
-type CompanyIndustryChipOptionsProps = {
-   items: OptionGroup[]
-   onDelete: (optionGroup: OptionGroup) => void
+type AutoCompleteOptionProps = {
+   options: string[]
+   value: string[]
+   onSelectOptionsGroup: (selectedOptions: OptionGroup[]) => void
+   getOptionLabel: (option: string) => string
+   sx?: SxProps
 }
-const CompanyIndustryOptionChip: FC<CompanyIndustryChipOptionsProps> = ({
-   items,
-   onDelete,
+const AutoCompleteOption: FC<AutoCompleteOptionProps> = ({
+   options,
+   value,
+   getOptionLabel,
+   onSelectOptionsGroup,
+   sx,
 }) => {
-   return items.map((optionGroup) => (
-      <Chip
-         onMouseDown={(event) => {
-            event.stopPropagation()
+   return (
+      <Autocomplete
+         sx={sx}
+         disabledItemsFocusable
+         disableCloseOnSelect
+         popupIcon={<Search></Search>}
+         multiple
+         getOptionLabel={getOptionLabel}
+         options={options}
+         ChipProps={styles.chips}
+         value={value}
+         onChange={(_, selectedOptions) => {
+            const newOptions = selectedOptions.map((option) => option)
+            console.log("🚀 ~ newOptions:", newOptions)
+            onSelectOptionsGroup(
+               formatToOptionArray(newOptions, CompanyIndustryValues)
+            )
          }}
-         key={optionGroup.id}
-         label={optionGroup.name}
-         color="primary"
-         deleteIcon={<CancelIcon></CancelIcon>}
-         onDelete={() => {
-            onDelete(optionGroup)
+         renderInput={(params) => (
+            <Box>
+               <TextField {...params} placeholder="Search industry" />
+            </Box>
+         )}
+         renderOption={(props, option, { selected }) => {
+            const industryOption = formatToOptionArray(
+               [option],
+               CompanyIndustryValues
+            ).at(0)
+            return (
+               <li {...props}>
+                  <Box sx={styles.optionsDropdownWrapper}>
+                     {industryOption.name}
+                     <StyledCheckbox
+                        checked={selected}
+                        sx={styles.dropdownCheckbox}
+                        classes={{ root: "custom-checkbox-root" }}
+                        // iconSx={styles.iconSx}
+                        // checkedIconSx={styles.checkedIconSx}
+                     />
+                  </Box>
+               </li>
+            )
          }}
       />
-   ))
+   )
 }
-
 export default CompanyIndustrySelector
