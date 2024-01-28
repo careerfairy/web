@@ -20,7 +20,17 @@ const styles = sxStyles({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "tertiary.main",
+      bgcolor: "lightgrey",
+      color: "F0EDFD",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   checkedIconSx: {
+      width: 20,
+      height: 20,
+      borderRadius: 1,
+      bgcolor: "#F0EDFD",
       color: "black",
       display: "flex",
       justifyContent: "center",
@@ -88,7 +98,7 @@ export const StyledCheckbox = (
          color={"default"}
          icon={<Box sx={styles.checkboxIconWrapper} />}
          checkedIcon={
-            <Box sx={styles.checkboxIconWrapper}>
+            <Box sx={styles.checkedIconSx}>
                <CheckRoundedIcon fontSize={"small"} />
             </Box>
          }
