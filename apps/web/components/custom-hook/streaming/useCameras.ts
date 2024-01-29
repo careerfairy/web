@@ -1,15 +1,11 @@
+import { type IAgoraRTCError } from "agora-rtc-react"
+import { getAgoraRTC } from "components/views/streaming-page/util"
 import useSWR from "swr"
-import { IAgoraRTCError, IAgoraRTC } from "agora-rtc-react"
-import { isServer } from "components/helperFunctions/HelperFunctions"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const fetcher = async () => {
-   if (isServer()) return []
-   const AgoraRTCModule = (await import(
-      "agora-rtc-sdk-ng"
-   )) as unknown as IAgoraRTC
-   return AgoraRTCModule.getDevices().then((devices) =>
-      devices.filter((device) => device.kind === "videoinput")
-   )
+   const AgoraRTC = await getAgoraRTC()
+   return AgoraRTC.getCameras()
 }
 
 export const useCameras = (shouldFetch: boolean) => {
@@ -17,7 +13,7 @@ export const useCameras = (shouldFetch: boolean) => {
       shouldFetch ? "cameras" : null,
       fetcher,
       {
-         onError: console.error,
+         onError: errorLogAndNotify,
          fallbackData: [],
       }
    )

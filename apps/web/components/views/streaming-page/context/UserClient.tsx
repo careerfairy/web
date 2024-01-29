@@ -1,19 +1,33 @@
-import type { ClientConfig } from "agora-rtc-react"
-import AgoraRTC, { AgoraRTCProvider } from "agora-rtc-react"
-import type { ReactNode } from "react"
+import { useState, useEffect, ReactNode, useRef } from "react"
+import type { ClientConfig, IAgoraRTCClient } from "agora-rtc-react"
+import dynamic from "next/dynamic"
+import { getAgoraRTC } from "../util"
 
-interface ClientProps {
-   children: ReactNode
-   clientConfig?: ClientConfig
-}
+// Prevents nextjs Build/Dev error
+const AgoraRTCProviderPrimitive = dynamic(
+   () => import("agora-rtc-react").then((mod) => mod.AgoraRTCProvider),
+   {
+      ssr: false,
+   }
+)
 
-const config: ClientConfig = {
-   mode: "live",
-   codec: "vp8",
-}
+export const UserClientProvider = (props: { children: ReactNode }) => {
+   const clientConfigRef = useRef<ClientConfig>({ mode: "live", codec: "vp8" })
+   const [client, setClient] = useState<IAgoraRTCClient>()
 
-const client = AgoraRTC.createClient(config)
+   useEffect(() => {
+      const initSdk = async () => {
+         const AgoraRTC = await getAgoraRTC()
+         setClient(AgoraRTC.createClient(clientConfigRef.current))
+      }
+      initSdk()
+   }, [])
 
-export const UserClientProvider = ({ children }: ClientProps) => {
-   return <AgoraRTCProvider client={client}>{children}</AgoraRTCProvider>
+   return (
+      client && (
+         <AgoraRTCProviderPrimitive client={client}>
+            {props.children}
+         </AgoraRTCProviderPrimitive>
+      )
+   )
 }

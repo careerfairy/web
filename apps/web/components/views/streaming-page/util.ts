@@ -1,4 +1,4 @@
-import { AgoraRTCReactError, IAgoraRTCError } from "agora-rtc-react"
+import { type IAgoraRTCError, useLocalCameraTrack } from "agora-rtc-react"
 import { v4 as uuidv4 } from "uuid"
 
 const randomId = uuidv4().replace(/-/g, "")
@@ -41,20 +41,26 @@ export const getDeviceButtonColor = (
    return active ? "primary" : "error"
 }
 
+/**
+ * Need to use this helper to infer the error type as it cannot be imported directly from "agora-rtc-react"
+ * due to an agora Nextjs build error
+ */
+type IAgoraRTCReactError = Pick<
+   ReturnType<typeof useLocalCameraTrack>,
+   "error"
+>["error"]
+
 export const getRTCErrorCode = (
-   error: IAgoraRTCError | AgoraRTCReactError
+   error: IAgoraRTCError | IAgoraRTCReactError
 ): IAgoraRTCError["code"] => {
    if (!error) {
       return undefined
    }
 
-   if (
-      error instanceof AgoraRTCReactError &&
-      typeof error.rtcError !== "string"
-   ) {
-      return error.rtcError.code
-   } else if ("code" in error) {
+   if ("code" in error) {
       return error.code
+   } else if (typeof error.rtcError !== "string") {
+      return error.rtcError.code
    }
    return undefined
 }
@@ -66,7 +72,7 @@ type ErrorMessages = {
 }
 
 export const getDeviceErrorMessage = (
-   error: IAgoraRTCError | AgoraRTCReactError,
+   error: IAgoraRTCError | IAgoraRTCReactError,
    messages: ErrorMessages
 ) => {
    if (!error) return ""
@@ -81,4 +87,9 @@ export const getDeviceErrorMessage = (
       default:
          return messages.unknown
    }
+}
+
+// Helper to safely import the AgoraRTCReact module on the client to avoid server-side build errors
+export const getAgoraRTC = async () => {
+   return (await import("agora-rtc-react")).default
 }
