@@ -3,7 +3,6 @@ import { CircularProgress, Container, Grid } from "@mui/material"
 import Companies from "./Companies"
 import { Group } from "@careerfairy/shared-lib/groups"
 import CompanySearch from "./CompanySearch"
-import { useRouter } from "next/router"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 type Props = {
@@ -11,7 +10,6 @@ type Props = {
 }
 
 const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
-   const { query } = useRouter()
    const [resultCount, setResultCount] = useState<number>(null)
 
    return (
@@ -24,7 +22,7 @@ const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
                <Grid item xs={12}>
                   <Companies
                      initialData={serverSideCompanies}
-                     key={JSON.stringify(query)}
+                     // key={JSON.stringify(query)}
                      setResults={setResultCount}
                   />
                </Grid>

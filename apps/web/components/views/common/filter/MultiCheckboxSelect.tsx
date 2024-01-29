@@ -86,7 +86,7 @@ const MultiCheckboxSelect = ({
       () =>
          type !== "doubleColumn"
             ? allValues
-            : allValues.slice(0, allValues.length / 2 + 1),
+            : allValues.slice(0, allValues.length / 2),
       [allValues, type]
    )
 
@@ -94,7 +94,7 @@ const MultiCheckboxSelect = ({
       () =>
          type !== "doubleColumn"
             ? undefined
-            : allValues.slice(allValues.length / 2 + 1),
+            : allValues.slice(allValues.length / 2),
       [allValues, type]
    )
 
