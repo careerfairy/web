@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography"
 import { useRouter } from "next/router"
 import { sxStyles } from "../../../../types/commonTypes"
 import { mapOptions } from "../../signup/utils"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+
 import { FilterEnum, useFilter } from "./Filter"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
@@ -33,6 +33,7 @@ import { SlideUpTransition } from "../transitions"
 import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
 import ToggleSelector from "./selectors/ToggleSelector"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 
 const styles = sxStyles({
    paperRoot: {
@@ -366,7 +367,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             >
                {numberOfActiveFilters > 0
                   ? `${numberOfResults} Results`
-                  : `Apply Filters`}
+                  : `Apply filters`}
             </LoadingButton>
          </DialogActions>
       </Dialog>

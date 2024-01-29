@@ -8,7 +8,7 @@ export const linkedInRegex = new RegExp(
    "^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/(pub|in|profile)\\/[\\w]"
 )
 
-export const videoUrlRegex: RegExp =
+export const videoUrlRegex =
    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|twitch\.tv|firebasestorage\.googleapis\.com|localhost|127\.0\.0\.1)(:\d{1,5})?\/.*$/
 
 export const possibleGenders = [
@@ -1472,7 +1472,7 @@ export const CompanyIndustryValues: OptionGroup[] = [
       name: "Legal",
    },
    {
-      id: "Leisure,Travel&Tourism",
+      id: "Leisure_Travel&Tourism",
       name: "Leisure, Travel & Tourism",
    },
    {

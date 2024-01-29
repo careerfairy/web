@@ -1,7 +1,7 @@
 import { FormControl, Switch } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
-import React, { useCallback, useMemo } from "react"
+import React, { useMemo } from "react"
 import { styled } from "@mui/material/styles"
 import { useRouter } from "next/router"
 
@@ -63,31 +63,23 @@ const ToggleSelector = ({
       [query, filterId]
    )
 
-   const handleFilterCheckChange = useCallback(
-      (event, checked) => {
-         const newQuery = {
-            ...query,
-            [filterId]: checked,
-            page: 0,
-         }
-
-         handleApplyFilter({ pathName: pathname, query: newQuery })
-      },
-      [handleApplyFilter, pathname, query, filterId]
-   )
+   const handleFilterCheckChange = (_, checked) => {
+      const newQuery = {
+         ...query,
+         [filterId]: checked,
+         page: 0,
+      }
+      handleApplyFilter({ pathName: pathname, query: newQuery })
+   }
 
    return (
-      <FormControl
-         key={"toggle-selector-".concat(filterId)}
-         variant={"outlined"}
-         fullWidth
-      >
+      <FormControl key={"toggle-selector"} variant={"outlined"} fullWidth>
          <Typography
             htmlFor="recorded-only"
             component={"label"}
             variant={"h5"}
             fontWeight={600}
-            id={"toggle-selector-".concat(filterId).concat("-label")}
+            id="toggle-selector-typography-label"
          >
             {label}
          </Typography>

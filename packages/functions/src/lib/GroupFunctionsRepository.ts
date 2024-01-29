@@ -244,6 +244,7 @@ export class GroupFunctionsRepository
    ): Promise<Group[]> {
       let q = this.firestore
          .collection("careerCenterData")
+         .orderBy("normalizedUniversityName")
          .withConverter(
             createCompatGenericConverter<Group>()
          ) as unknown as FirebaseFirestore.Query<Group>
@@ -656,20 +657,22 @@ const applyCompanyFilters = (
          )
       }
 
-      if (filters.companySize?.length) {
+      if (filters.companySize?.length > 0) {
          query = query.where("companySize", "in", filters.companySize)
       }
 
-      if (filters.companyIndustries?.length) {
+      if (filters.companyIndustries?.length > 0) {
          const mappedFilters = formatToOptionArray(
             filters.companyIndustries,
             allCompanyIndustries
          )
-         query = query.where(
-            "companyIndustries",
-            "array-contains-any",
-            mappedFilters
-         )
+         query = mappedFilters.length
+            ? query.where(
+                 "companyIndustries",
+                 "array-contains-any",
+                 mappedFilters
+              )
+            : query
       }
    }
 
@@ -683,5 +686,9 @@ const formatToOptionArray = (
    selectedIds: string[],
    allOptions: OptionGroup[]
 ): OptionGroup[] => {
-   return allOptions.filter(({ id }) => selectedIds?.includes(id))
+   return allOptions
+      .map((option) => {
+         return { ...option, id: option.id.replace("_", ",") }
+      })
+      .filter(({ id }) => selectedIds?.includes(id))
 }
