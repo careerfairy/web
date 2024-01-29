@@ -75,14 +75,9 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
    }, [query.companyIndustries])
 
    const onSelectOptionGroup = (selectedOption: OptionGroup[]) => {
-      console.log("🚀 ~ onSelectOptionGroup ~ selectedOption:", selectedOption)
       const selectedIndustryOptions = formatToOptionArray(
          selectedOption.map(multiListSelectMapIdValueFn),
          CompanyIndustryValues
-      )
-      console.log(
-         "🚀 ~ onSelectOptionGroup ~ selectedIndustryOptions:",
-         selectedIndustryOptions
       )
       handleChange(SELECTOR_FILTER_KEY, selectedIndustryOptions)
    }
@@ -150,7 +145,6 @@ const AutoCompleteOption: FC<AutoCompleteOptionProps> = ({
          value={value}
          onChange={(_, selectedOptions) => {
             const newOptions = selectedOptions.map((option) => option)
-            console.log("🚀 ~ newOptions:", newOptions)
             onSelectOptionsGroup(
                formatToOptionArray(newOptions, CompanyIndustryValues)
             )

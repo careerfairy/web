@@ -28,7 +28,6 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
    const { query } = useRouter()
 
    const filterOptions = useMemo(() => getQueryVariables(query), [query])
-
    const { companies } = useCompaniesSWR(filterOptions)
 
    const renderCompanies = isMounted() ? companies : initialData
@@ -60,7 +59,10 @@ const queryParamToArr = (
 ): string[] => {
    if (!queryParam) return []
    if (Array.isArray(queryParam)) return queryParam.sort()
-   return queryParam.split(",").sort() // to make sure the order is always the same for caching the key
+   return queryParam
+      .split(",")
+      .map((q) => q.replace("_", ",")) // As of now, deals with companyIndustries containing ','. i.e: Leisure,Travel&Tourism
+      .sort() // to make sure the order is always the same for caching the key
 }
 
 const queryParamToBool = (
