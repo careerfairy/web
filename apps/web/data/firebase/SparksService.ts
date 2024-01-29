@@ -446,6 +446,8 @@ export class SparksService {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sparkService = new SparksService(FunctionsInstance as any)
+export const sparkService = new SparksService(
+   FunctionsInstance as unknown as Functions
+)
 
 export default SparksService
