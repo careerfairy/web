@@ -93,7 +93,7 @@ export class SparksService {
          SerializedSpark[]
       >(
          this.functions,
-         "getSparksFeed"
+         "getSparksFeed_v2"
       )(data)
 
       return serializedSparks.map(SparkPresenter.deserialize)
@@ -410,6 +410,8 @@ export class SparksService {
    }
 }
 
-export const sparkService = new SparksService(FunctionsInstance as any)
+export const sparkService = new SparksService(
+   FunctionsInstance as unknown as Functions
+)
 
 export default SparksService
