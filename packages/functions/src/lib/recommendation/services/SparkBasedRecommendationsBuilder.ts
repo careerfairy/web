@@ -14,25 +14,6 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
       super(limit)
    }
 
-   // Get the most common country of interests and add the corresponding sparks to the results
-   public mostCommonCountryOfInterests() {
-      const mostCommonCountryOfInterestIds =
-         getMostCommonArrayValues<SparkStats>(this.sparks, (spark) =>
-            spark.spark.group.targetedCountries.map((e) => e.id)
-         )
-
-      if (mostCommonCountryOfInterestIds.length) {
-         this.addResults(
-            this.rankedSparkRepo.getSparksBasedOnCountriesOfInterest(
-               mostCommonCountryOfInterestIds,
-               this.limit
-            )
-         )
-      }
-
-      return this
-   }
-
    // Get the most common company country code and add the corresponding sparks to the results
    public mostCommonCompanyCountryCode() {
       const mostCommonCompanyCountryCode = getMostCommonArrayValues<SparkStats>(
@@ -63,25 +44,6 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
          this.addResults(
             this.rankedSparkRepo.getSparksBasedOnIndustries(
                mostCommonCompanyIndustries,
-               this.limit
-            )
-         )
-      }
-
-      return this
-   }
-
-   // Get the most common field of studies and add the corresponding sparks to the results
-   public mostCommonFieldOfStudies() {
-      const mostCommonFieldOfStudies = getMostCommonArrayValues<SparkStats>(
-         this.sparks,
-         (spark) => spark.spark.group.targetedFieldsOfStudy.map((e) => e.id)
-      )
-
-      if (mostCommonFieldOfStudies.length) {
-         this.addResults(
-            this.rankedSparkRepo.getSparksBasedOnFieldOfStudies(
-               mostCommonFieldOfStudies,
                this.limit
             )
          )
@@ -130,11 +92,9 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    // Deduct the seen sparks and add the remaining sparks to the results
    public deductSeenSparks() {
-      if (this.sparks.length) {
-         this.addResults(
-            this.rankedSparkRepo.deductSeenSparks(this.sparks.map((s) => s.id))
-         )
-      }
+      this.addResults(
+         this.rankedSparkRepo.deductSeenSparks(this.sparks.map((s) => s.id))
+      )
 
       return this
    }

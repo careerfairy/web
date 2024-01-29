@@ -70,6 +70,7 @@ export const bundles = {
             firestore
                .collection("sparkStats")
                .where("spark.published", "==", true)
+               .where("spark.group.publicSparks", "==", true)
                .where("deleted", "==", false),
       },
    },

@@ -29,7 +29,8 @@ export class RankedSparkRepository {
    private readonly pointsPerCompanySizeMatch = 1
    private readonly pointsPerQuestionCategoryMatch = 4
 
-   private readonly pointsToDeductPerSeenSpark = -20
+   private readonly pointsToDeductPerSeenSpark = -30
+   // private readonly pointsPerTrialPlan = 15
 
    private readonly sparks: RankedSpark[]
 
@@ -42,6 +43,9 @@ export class RankedSparkRepository {
       this.sparks = filtered.map(RankedSpark.create)
    }
 
+   public getAllInitialRankedSparks(): RankedSpark[] {
+      return this.sparks
+   }
    /**
     * Get sparks based on the countries of interest
     *
