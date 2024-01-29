@@ -287,6 +287,7 @@ export type PublicGroup = Pick<
    | "targetedCountries"
    | "targetedUniversities"
    | "targetedFieldsOfStudy"
+   | "plan"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {

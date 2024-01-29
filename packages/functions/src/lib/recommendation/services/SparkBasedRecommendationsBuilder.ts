@@ -99,6 +99,17 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
       return this
    }
 
+   // Get the trial plan sparks and add the remaining sparks to the results
+   public trialPlanSparks() {
+      this.addResults(
+         this.rankedSparkRepo.getSparksBasedOnTrialPlan(
+            this.sparks.map((s) => s.id)
+         )
+      )
+
+      return this
+   }
+
    // Get the most common livestream company country code and add the corresponding sparks to the results
    public mostCommonLivestreamCompanyCountryCode() {
       const mostCommonLivestreamCompanyCountries =
