@@ -30,7 +30,7 @@ export class RankedSparkRepository {
    private readonly pointsPerQuestionCategoryMatch = 4
 
    private readonly pointsToDeductPerSeenSpark = -30
-   // private readonly pointsPerTrialPlan = 15
+   private readonly pointsPerTrialPlan = 15
 
    private readonly sparks: RankedSpark[]
 
@@ -153,6 +153,28 @@ export class RankedSparkRepository {
          targetUserIds: fieldOfStudyIds,
          targetSparkIdsGetter: (spark) =>
             spark.getCompanyTargetFieldsOfStudyIds(),
+      })
+   }
+
+   /**
+    * Get sparks based on the trial plan
+    *
+    * @param trialPlanIds - Array of trial plan IDs
+    * @returns Array of ranked sparks based on the trial plan
+    */
+   public getSparksBasedOnTrialPlan(trialPlanIds: string[]): RankedSpark[] {
+      // Get sparks filtered by trial plan
+      const sparks = this.getSparksFilteredByField(
+         "id",
+         trialPlanIds,
+         trialPlanIds.length
+      )
+
+      return this.rankSparks({
+         pointsPerMatch: this.pointsPerTrialPlan,
+         rankedSparks: sparks,
+         targetUserIds: trialPlanIds,
+         targetSparkIdsGetter: (spark) => [spark.getId()],
       })
    }
 

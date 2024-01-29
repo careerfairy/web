@@ -19,6 +19,7 @@ import { combineRankedDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepo
 import { SparkBasedRecommendationsBuilder } from "./services/SparkBasedRecommendationsBuilder"
 import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/serivce/RankedSparkRepository"
 import functions = require("firebase-functions")
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 export default class SparkRecommendationService
    extends RecommendationSparksServiceCore
@@ -60,6 +61,9 @@ export default class SparkRecommendationService
 
          // Fetch top {limit} recommended Sparks based on the user actions, e.g. the events they have attended
          promises.push(this.getRecommendedSparksBasedOnUserActions(limit))
+
+         // Fetch recommended Sparks based on the group's trial plan
+         promises.push(this.getRecommendedSparksBasedOnTrialPlan())
       }
 
       // Await all promises
@@ -150,6 +154,26 @@ export default class SparkRecommendationService
    }
 
    /**
+    * Function to get recommended sparks based on trial plan
+    */
+   private async getRecommendedSparksBasedOnTrialPlan(): Promise<
+      RankedSpark[]
+   > {
+      const trialPlanSparks = this.allSparks.filter(
+         (spark) => spark.spark.group.plan.type === GroupPlanTypes.Trial
+      )
+
+      const sparksBasedRecommendations = new SparkBasedRecommendationsBuilder(
+         this.allSparks.length,
+         trialPlanSparks,
+         this.participatedEvents,
+         new RankedSparkRepository(this.allSparks)
+      )
+
+      return sparksBasedRecommendations.trialPlanSparks().get()
+   }
+
+   /**
     * Function to get all recommended sparks based on seen sparks
     */
    private async getAllRecommendedSparksBasedOnSeenSparks(): Promise<
@@ -158,6 +182,7 @@ export default class SparkRecommendationService
       const seenSparks = this.allSparks.filter((spark) =>
          this.seenSparkIds.includes(spark.id)
       )
+
       const sparksBasedOnSeenSparks = new SparkBasedRecommendationsBuilder(
          this.allSparks.length,
          seenSparks,
