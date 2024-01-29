@@ -35,7 +35,7 @@ export const StreamingPage = ({ isHost }: Props) => {
    )
 }
 
-export const Component = ({ isHost }: Props) => {
+const Component = ({ isHost }: Props) => {
    const livestream = useLivestreamData()
    const { authenticatedUser } = useAuth()
    const { query } = useRouter()
