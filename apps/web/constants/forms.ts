@@ -1,5 +1,5 @@
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { DropdownItem } from "../components/views/common/GenericDropdown"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
