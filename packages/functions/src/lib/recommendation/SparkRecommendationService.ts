@@ -44,6 +44,8 @@ export default class SparkRecommendationService
    async getRecommendations(limit = 30): Promise<string[]> {
       const promises: Promise<RankedSpark[]>[] = []
 
+      promises.push(this.getAllInitialRecommendations())
+
       if (this.user) {
          // Fetch top {limit} recommended events based on the user's Metadata
          promises.push(
@@ -58,9 +60,6 @@ export default class SparkRecommendationService
 
          // Fetch top {limit} recommended Sparks based on the user actions, e.g. the events they have attended
          promises.push(this.getRecommendedSparksBasedOnUserActions(limit))
-
-         // deduct points for all the Seen Sparks
-         promises.push(this.updateRecommendedSparksBasedOnSeenSparks())
       }
 
       // Await all promises
@@ -69,7 +68,20 @@ export default class SparkRecommendationService
          this.log.error
       )
 
-      return this.process(recommendedSparks, limit, this.allSparks, this.user)
+      return this.process(recommendedSparks, limit, this.user)
+   }
+
+   /**
+    * Function to get all initial recommendations
+    *
+    * @returns A promise that resolves to an array of ranked sparks
+    */
+   private async getAllInitialRecommendations(): Promise<RankedSpark[]> {
+      // Create a new instance of RankedSparkRepository using allSparks
+      const rankedSparksService = new RankedSparkRepository(this.allSparks)
+
+      // Return all initial ranked sparks
+      return rankedSparksService.getAllInitialRankedSparks()
    }
 
    /**
@@ -98,6 +110,8 @@ export default class SparkRecommendationService
             limit,
             this.seenSparkIds.slice(0, 20)
          ),
+         // deduct points for all the Seen Sparks and returns all the recommended sparks
+         this.getAllRecommendedSparksBasedOnSeenSparks(),
       ]
 
       // Await all promises
@@ -119,7 +133,7 @@ export default class SparkRecommendationService
     * @param limit - The maximum number of recommended sparks to retrieve
     */
    private async getRecommendedSparksBasedOnPreviousWatchedEvents(
-      limit = 30
+      limit: number
    ): Promise<RankedSpark[]> {
       const sparksBasedRecommendations = new SparkBasedRecommendationsBuilder(
          limit,
@@ -136,23 +150,22 @@ export default class SparkRecommendationService
    }
 
    /**
-    * Function to update recommended sparks based on seen sparks
+    * Function to get all recommended sparks based on seen sparks
     */
-   private async updateRecommendedSparksBasedOnSeenSparks(): Promise<
+   private async getAllRecommendedSparksBasedOnSeenSparks(): Promise<
       RankedSpark[]
    > {
       const seenSparks = this.allSparks.filter((spark) =>
          this.seenSparkIds.includes(spark.id)
       )
-
-      const sparksBasedRecommendations = new SparkBasedRecommendationsBuilder(
-         30,
+      const sparksBasedOnSeenSparks = new SparkBasedRecommendationsBuilder(
+         this.allSparks.length,
          seenSparks,
          this.participatedEvents,
          new RankedSparkRepository(this.allSparks)
       )
 
-      return sparksBasedRecommendations.deductSeenSparks().get()
+      return sparksBasedOnSeenSparks.deductSeenSparks().get()
    }
 
    /**
@@ -163,7 +176,7 @@ export default class SparkRecommendationService
     * @returns A promise that resolves to an array of recommended sparks
     */
    private async getRecommendedSparksBasedOnSparksInteractions(
-      limit = 10,
+      limit: number,
       sparkIds: string[]
    ): Promise<RankedSpark[]> {
       const sparkInteractions = this.allSparks.filter((spark) =>
@@ -232,9 +245,6 @@ function getSortedSparkIds(
    const sortedEntries = sparkEntries.sort(
       (a, b) => new Date(b[1]).getTime() - new Date(a[1]).getTime()
    )
-
-   // Take the first {limit} elements
-   // const lastSparks = sortedEntries.slice(0, limit)
 
    // Extract the sparkIds from the entries
    const result = sortedEntries.map((entry) => entry[0])

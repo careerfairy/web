@@ -1,10 +1,6 @@
-import {
-   combineRankedDocuments,
-   removeDuplicateDocuments,
-} from "../../BaseFirebaseRepository"
+import { combineRankedDocuments } from "../../BaseFirebaseRepository"
 import { SparkStats } from "../../sparks/sparks"
 import { UserData } from "../../users/users"
-import { sortDocumentByPopularity } from "../../utils"
 import { Logger } from "../../utils/types"
 import { RankedSpark, sortRankedSparksByPoints } from "./RankedSpark"
 import { RankedSparkRepository } from "./serivce/RankedSparkRepository"
@@ -39,7 +35,6 @@ export default class RecommendationSparksServiceCore {
    protected process(
       results: RankedSpark[] | RankedSpark[][],
       limit: number,
-      fallBackSparks: SparkStats[],
       user?: UserData
    ) {
       // Combine the results of recommended sparks
@@ -48,6 +43,7 @@ export default class RecommendationSparksServiceCore {
       // Sort the combined results by points
       const sortedRecommendedSparks = sortRankedSparksByPoints(combinedResults)
 
+      // Log metadata if debug mode is enabled
       if (this.debug) {
          this.log?.info("Metadata", {
             userMetaData: {
@@ -68,15 +64,8 @@ export default class RecommendationSparksServiceCore {
          })
       }
 
-      // fill sparks if required
-      const filledSparks = this.fillMissingSparks(
-         sortedRecommendedSparks,
-         limit,
-         fallBackSparks
-      )
-
       // Return the top {limit} events
-      const recommendedIds = filledSparks
+      const recommendedIds = sortedRecommendedSparks
          .map((event) => event.id)
          .slice(0, limit)
 
@@ -87,36 +76,6 @@ export default class RecommendationSparksServiceCore {
       }
 
       return recommendedIds
-   }
-
-   /**
-    * Fill the rest of the sparks with the fallback sparks
-    *
-    * Useful when the user doesn't have enough metadata fields (user based recommendations will be empty)
-    * also when generating the newsletter, for old accounts, we don't have enough data to generate recommendations
-    * sorted by popularity
-    */
-   private fillMissingSparks(
-      deDupedSparks: RankedSpark[],
-      limit: number,
-      fallBackSparks: SparkStats[]
-   ) {
-      let filledSparks = [...deDupedSparks]
-      if (deDupedSparks.length < limit) {
-         const mappedFallBackSparks = fallBackSparks
-            .sort(sortDocumentByPopularity)
-            .map((spark) => new RankedSpark(spark))
-
-         filledSparks = filledSparks.concat(mappedFallBackSparks)
-         filledSparks = removeDuplicateDocuments(filledSparks)
-         if (this.debug) {
-            this.log?.info(
-               `Required to fill missing events because user only had ${deDupedSparks.length} sparks.`
-            )
-         }
-      }
-
-      return filledSparks
    }
 
    /**
