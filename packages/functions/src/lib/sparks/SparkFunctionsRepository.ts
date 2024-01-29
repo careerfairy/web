@@ -21,7 +21,6 @@ import {
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { shuffle } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
@@ -43,7 +42,9 @@ import {
 } from "@careerfairy/shared-lib/sparks/telemetry"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import * as functions from "firebase-functions"
-import { userRepo } from "../../api/repositories"
+import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
+import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import SparkRecommendationService from "../recommendation/SparkRecommendationService"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -483,18 +484,22 @@ export class SparkFunctionsRepository
    async generateSparksFeed(userId: string): Promise<SerializedSpark[]> {
       const batch = this.firestore.batch()
 
-      const sparksSnap = await this.firestore
-         .collection("sparks")
-         .withConverter(createGenericConverter<Spark>())
-         .where("group.publicSparks", "==", true)
-         .orderBy("publishedAt", "desc")
-         .limit(this.TARGET_SPARK_COUNT)
-         .get()
+      const dataFetcher = new SparksDataFetcher(
+         userId,
+         livestreamsRepo,
+         userRepo,
+         sparkRepo
+      )
+      const recommendationService = await SparkRecommendationService.create(
+         dataFetcher
+      )
 
-      const sparks = sparksSnap.docs.map((doc) => doc.data())
+      const recommendedSparkIds =
+         await recommendationService.getRecommendations(this.TARGET_SPARK_COUNT)
 
-      // Randomize sparkIds array
-      shuffle(sparks)
+      const recommendedSparks = await sparkRepo.getSparksByIds(
+         recommendedSparkIds
+      )
 
       // Store in UserFeed
       const userFeed: Omit<UserSparksFeedMetrics, "numberOfSparks"> = {
@@ -509,7 +514,7 @@ export class SparkFunctionsRepository
       batch.set(feedRef, userFeed, { merge: true })
 
       // Store in UserFeed
-      sparks.forEach((spark) => {
+      recommendedSparks.forEach((spark) => {
          const sparkRef = this.firestore
             .collection("userData")
             .doc(userId)
@@ -523,7 +528,7 @@ export class SparkFunctionsRepository
 
       await batch.commit()
 
-      return sparks.map(SparkPresenter.serialize)
+      return recommendedSparks.map(SparkPresenter.serialize)
    }
 
    async getUserSparksFeed(
