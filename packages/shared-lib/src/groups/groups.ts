@@ -301,6 +301,10 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       publicSparks: group.publicSparks ?? null,
       publicProfile: group.publicProfile ?? false,
       careerPageUrl: group.careerPageUrl ?? null,
+      targetedCountries: group.targetedCountries ?? [],
+      targetedUniversities: group.targetedUniversities ?? [],
+      targetedFieldsOfStudy: group.targetedFieldsOfStudy ?? [],
+      plan: group.plan ?? null,
    }
 }
 
