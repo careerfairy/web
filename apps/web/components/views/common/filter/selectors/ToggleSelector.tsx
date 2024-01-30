@@ -70,6 +70,7 @@ const ToggleSelector = ({
             [filterId]: checked,
             page: 0,
          }
+         console.log("🚀 ~ newQuery:", newQuery)
          handleApplyFilter({ pathName: pathname, query: newQuery })
       },
       [filterId, handleApplyFilter, pathname, query]
