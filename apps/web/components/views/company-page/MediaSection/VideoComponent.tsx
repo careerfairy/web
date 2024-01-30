@@ -1,6 +1,6 @@
 import { sxStyles } from "../../../../types/commonTypes"
 import { GroupVideo } from "@careerfairy/shared-lib/groups"
-import React, { FC, useState } from "react"
+import React, { FC, useMemo, useState } from "react"
 import { Box, Button, IconButton, Typography } from "@mui/material"
 import ReactPlayer, { Config } from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
@@ -8,6 +8,7 @@ import EditIcon from "@mui/icons-material/Edit"
 import Image from "next/legacy/image"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { videoImagePlaceholder } from "../../../../constants/images"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const styles = sxStyles({
    videoWrapper: {
@@ -47,6 +48,18 @@ const styles = sxStyles({
       inset: 0,
       backgroundColor: "rgba(0,0,0,0.5)",
    },
+   playOverlayEmpty: {
+      borderRadius: 3,
+      position: "absolute",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      inset: 0,
+      backgroundColor: "rgba(0,0,0,0.0)",
+      "&:hover": {
+         cursor: "pointer",
+      },
+   },
    editBtnWrapper: {
       position: "absolute",
       top: 0,
@@ -77,6 +90,9 @@ type Props = {
 }
 const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
    const [playVideo, setPlayVideo] = useState(false)
+   const isVimeo = useMemo(() => {
+      return isVimeoByUrl(video.url)
+   }, [video.url])
 
    if (!video) {
       return (
@@ -98,7 +114,11 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
          <Box sx={styles.videoWrapper}>
             <ReactPlayer
                id={"company-video-player"}
-               controls={isVimeo(video.url) || playVideo}
+               // Vimeo SDK has an issue, see https://github.com/CookPete/react-player/issues/520
+               // If the controls varible @playVideo changes, it does not reflect and so even after play
+               // vimeo controls are not shown making pausing not possible. For them to be shown it must be set
+               // at first time as true
+               controls={playVideo}
                playing={playVideo}
                config={editMode ? undefined : config}
                width={"100%"}
@@ -106,7 +126,14 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
                url={video.url}
                onEnded={() => setPlayVideo(false)}
             />
-            {playVideo ? null : (
+            {playVideo ? (
+               <ConditionalWrapper condition={isVimeo}>
+                  <Box
+                     sx={styles.playOverlayEmpty}
+                     onClick={() => setPlayVideo(false)}
+                  />
+               </ConditionalWrapper>
+            ) : (
                <Box sx={styles.playOverlay}>
                   <IconButton onClick={() => setPlayVideo(true)}>
                      <PlayIcon sx={styles.icon} />
@@ -145,7 +172,7 @@ const config: Config = {
  * @param url Video URL as non empty string
  * @returns true if video contains domain 'vimeo.com', could be enhanced
  */
-const isVimeo = (url: string): boolean => {
+const isVimeoByUrl = (url: string): boolean => {
    return url.includes("vimeo.com")
 }
 
