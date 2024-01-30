@@ -24,7 +24,7 @@ const styles = sxStyles({
 
 type Props = {
    initialData?: Group[]
-   setResults?(counter: number): void
+   setResults?: (counter: number) => void
 }
 
 const Companies: FC<Props> = ({ initialData, setResults }) => {
