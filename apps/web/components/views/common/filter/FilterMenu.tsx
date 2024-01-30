@@ -359,6 +359,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                loading={
                   numberOfActiveFilters > 0 && numberOfResults === undefined
                }
+               disabled={Boolean(!numberOfResults)}
                color="primary"
                variant={"contained"}
                size={"medium"}
