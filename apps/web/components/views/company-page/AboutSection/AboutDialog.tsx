@@ -15,6 +15,7 @@ import { groupRepo } from "../../../../data/RepositoryInstances"
 import * as yup from "yup"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
+import dynamic from "next/dynamic";
 
 type Props = {
    handleClose: () => void
@@ -24,6 +25,8 @@ const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
+   const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false });
+   const inputRef = React.useRef(0);
 
    const initialValues = useMemo(
       () => ({
@@ -78,7 +81,6 @@ const AboutDialog = ({ handleClose }: Props) => {
                      <Typography variant="body2" color="textSecondary">
                         * Indicates Required
                      </Typography>
-
                      {isMobile ? (
                         <CompanyMetadata
                            handleChange={handleChange}
@@ -118,6 +120,16 @@ const AboutDialog = ({ handleClose }: Props) => {
                            variant="outlined"
                            minRows={4}
                            className="multiLineInput"
+                           inputRef={inputRef}
+                           InputProps={{
+                              inputComponent: DynamicCustomRichTextEditor as any,
+                              inputRef: inputRef
+                              
+                           }}
+                           inputProps={{
+                              value: values.extraInfo,
+                              onChange: handleChange,
+                           }}
                         />
                         <Collapse
                            in={Boolean(errors.extraInfo)}
