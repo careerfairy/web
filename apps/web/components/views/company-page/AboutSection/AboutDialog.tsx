@@ -75,6 +75,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                handleBlur,
                handleSubmit,
                isSubmitting,
+               setFieldValue,
             }) => (
                <form onSubmit={handleSubmit}>
                   <Stack spacing={4}>
@@ -128,7 +129,8 @@ const AboutDialog = ({ handleClose }: Props) => {
                            }}
                            inputProps={{
                               value: values.extraInfo,
-                              onChange: handleChange,
+                              setFieldValue: setFieldValue,
+                              name: "extraInfo"
                            }}
                         />
                         <Collapse
