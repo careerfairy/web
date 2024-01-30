@@ -1,17 +1,26 @@
 import ReactQuill, {ReactQuillProps} from 'react-quill';
-import 'react-quill/dist/quill.bubble.css';
+// import 'react-quill/dist/quill.bubble.css';
+import 'react-quill/dist/quill.snow.css';
+
 import {forwardRef} from "react"; // import the styles
 
+type Props = ReactQuillProps & {
+    setFieldValue: (field: string, name: string) => void
+    name: string
+}
 
 // eslint-disable-next-line react/display-name
-const CustomRichTextEditorRef = forwardRef<ReactQuill, ReactQuillProps>(
+const CustomRichTextEditorRef = forwardRef<ReactQuill, Props>(
     (props, ref) => {
+        const { setFieldValue, name } = props
+
         return (
             <ReactQuill
-                {...props}
-                theme="bubble"
-                modules={modules}
-                ref={ref}
+            {...props}
+            // theme="bubble"
+            onChange={(values) => setFieldValue(name, values)}
+            modules={modules}
+            ref={ref}
             />
         )
 });
