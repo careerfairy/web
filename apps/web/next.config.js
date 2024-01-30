@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withSentryConfig } = require("@sentry/nextjs")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
 
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
@@ -66,6 +68,7 @@ const csp = {
       "https://cdn.dreamdata.cloud",
       "https://d3e54v103j8qbb.cloudfront.net",
       "https://assets-global.website-files.com",
+      "https://player.vimeo.com",
    ],
    "style-src": [
       "'self'",
@@ -109,6 +112,7 @@ const csp = {
       "blob:",
       "https://cdn.dreamdata.cloud",
       "https://px.ads.linkedin.com",
+      "https://vimeo.com",
    ],
    "img-src": [
       "'self'",
