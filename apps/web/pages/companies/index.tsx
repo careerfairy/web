@@ -7,6 +7,10 @@ import { InferGetServerSidePropsType, NextPage } from "next"
 import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
 import { companyService } from "data/firebase/CompanyService"
 import { CompanyIndustryValues } from "constants/forms"
+import {
+   queryParamToArr,
+   queryParamToBool,
+} from "@careerfairy/shared-lib/utils"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -23,21 +27,6 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
          <ScrollToTop hasBottomNavBar />
       </>
    )
-}
-
-const queryParamToArr = (
-   queryParam: string | string[] | undefined
-): string[] => {
-   if (!queryParam) return []
-   if (Array.isArray(queryParam)) return queryParam.sort()
-   return queryParam.split(",").sort() // to make sure the order is always the same for caching the key
-}
-
-const queryParamToBool = (
-   queryParam: string | string[] | undefined
-): boolean => {
-   if (!queryParam || Array.isArray(queryParam)) return false
-   return queryParam?.toLowerCase() === "true" || false
 }
 /**
  *

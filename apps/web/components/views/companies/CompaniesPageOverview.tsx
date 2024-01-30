@@ -22,7 +22,6 @@ const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
                <Grid item xs={12}>
                   <Companies
                      initialData={serverSideCompanies}
-                     // key={JSON.stringify(query)}
                      setResults={setResultCount}
                   />
                </Grid>

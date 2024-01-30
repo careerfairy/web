@@ -54,6 +54,7 @@ const styles = sxStyles({
       },
    },
 })
+
 type Props = {
    handleChange: (name: string, selectedOptions: OptionGroup[]) => void
 }
@@ -82,17 +83,8 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
       handleChange(SELECTOR_FILTER_KEY, selectedIndustryOptions)
    }
 
-   const getOptionLabel = (optionId): string => {
-      const formattedOption = formatToOptionArray(
-         optionId,
-         CompanyIndustryValues
-      )
-      if (formattedOption.length) {
-         return formattedOption.at(0).name
-      }
-      return "error: unknow option"
-   }
    const selectededCompanies = getSelectedCompanyIndustry()
+
    const autoCompleteCompaniesOptions = CompanyIndustryValues.map(
       multiListSelectMapIdValueFn
    )
@@ -137,7 +129,7 @@ const AutoCompleteOption: FC<AutoCompleteOptionProps> = ({
          sx={sx}
          disabledItemsFocusable
          disableCloseOnSelect
-         popupIcon={<Search></Search>}
+         popupIcon={<Search />}
          multiple
          getOptionLabel={getOptionLabel}
          options={options}
@@ -167,8 +159,6 @@ const AutoCompleteOption: FC<AutoCompleteOptionProps> = ({
                         checked={selected}
                         sx={styles.dropdownCheckbox}
                         classes={{ root: "custom-checkbox-root" }}
-                        // iconSx={styles.iconSx}
-                        // checkedIconSx={styles.checkedIconSx}
                      />
                   </Box>
                </li>
@@ -177,4 +167,13 @@ const AutoCompleteOption: FC<AutoCompleteOptionProps> = ({
       />
    )
 }
+
+const getOptionLabel = (optionId): string => {
+   const formattedOption = formatToOptionArray(optionId, CompanyIndustryValues)
+   if (formattedOption.length) {
+      return formattedOption.at(0).name
+   }
+   return "error: unknow option"
+}
+
 export default CompanyIndustrySelector

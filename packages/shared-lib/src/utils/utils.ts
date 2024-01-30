@@ -232,3 +232,21 @@ export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
    }
    return text.substring(0, maxLength - ellipsis.length) + ellipsis
 }
+
+export const queryParamToArr = (
+   queryParam: string | string[] | undefined
+): string[] => {
+   if (!queryParam) return []
+   if (Array.isArray(queryParam)) return queryParam.sort()
+   return queryParam
+      .split(",")
+      .map((q) => q.replace("_", ",")) // As of now, deals with companyIndustries containing ','. i.e: Leisure,Travel&Tourism
+      .sort() // to make sure the order is always the same for caching the key
+}
+
+export const queryParamToBool = (
+   queryParam: string | string[] | undefined
+): boolean => {
+   if (!queryParam || Array.isArray(queryParam)) return false
+   return queryParam?.toLowerCase() === "true" || false
+}

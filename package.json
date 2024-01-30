@@ -96,6 +96,5 @@
    "packageManager": "npm@9.8.1",
    "engines": {
       "npm": ">=9"
-   },
-   "fireConfig": {}
+   }
 }

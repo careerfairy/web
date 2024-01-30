@@ -18,6 +18,7 @@ import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 import { ParsedUrlQuery } from "querystring"
+import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -40,14 +41,6 @@ const styles = sxStyles({
       borderRadius: wishListBorderRadius,
    },
 })
-
-const queryParamToArr = (
-   queryParam: string | string[] | undefined
-): string[] => {
-   if (!queryParam) return []
-   if (Array.isArray(queryParam)) return queryParam.sort()
-   return queryParam.split(",").sort() // to make sure the order is always the same for caching the key
-}
 
 const getQueryVariables = (query: ParsedUrlQuery) => {
    const recordedOnly = query.recordedOnly as string
@@ -92,12 +85,12 @@ const NextLiveStreamsWithFilter = ({
 
    const filtersToShow = useMemo(
       () => [
-         companyId ? FilterEnum.companyId : null,
-         hasPastEvents ? FilterEnum.recordedOnly : null,
-         FilterEnum.languages,
-         FilterEnum.companyCountries,
-         FilterEnum.companyIndustries,
-         FilterEnum.fieldsOfStudy,
+         companyId ? FilterEnum.COMPANY_ID : null,
+         hasPastEvents ? FilterEnum.RECORDED_ONLY : null,
+         FilterEnum.LANGUAGES,
+         FilterEnum.COMPANY_COUNTRIES,
+         FilterEnum.COMPANY_INDUSTRIES,
+         FilterEnum.FIELDS_OF_STUDY,
       ],
       [companyId, hasPastEvents]
    )
