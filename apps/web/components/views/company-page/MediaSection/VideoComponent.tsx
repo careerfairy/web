@@ -138,7 +138,6 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
 
 const config: Config = {
    file: { attributes: { controlsList: "nodownload" } },
-   vimeo: { playerOptions: { controls: true } },
 }
 
 /**
