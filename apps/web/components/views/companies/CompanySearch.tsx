@@ -42,6 +42,7 @@ const styles = sxStyles({
          xs: 1,
          md: 3,
       },
+      justifyContent: "end",
    },
    filterWrapper: {
       backgroundColor: "white",
@@ -86,10 +87,10 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
 
    const filtersToShow = useMemo(
       () => [
-         FilterEnum.companySparks,
-         FilterEnum.companyCountries,
-         FilterEnum.companyIndustries,
-         FilterEnum.companySizes,
+         FilterEnum.COMPANY_SPARKS,
+         FilterEnum.COMPANY_COUNTRIES,
+         FilterEnum.COMPANY_INDUSTRIES,
+         FilterEnum.COMPANY_SIZES,
       ],
       []
    )
@@ -156,11 +157,10 @@ const CompanySearch: FC<CompanySearchProps> = ({ filterResults }) => {
                inputEndIcon={<FindIcon />}
             />
          </Box>
-         <Box sx={styles.filter} justifyContent={"end"}>
+         <Box sx={styles.filter}>
             <Stack direction={"row"} sx={styles.filterWrapper}>
                <Filter
                   filtersToShow={filtersToShow}
-                  // TODO:WG Pass results from length of Array in parent components
                   numberOfResults={filterResults}
                />
             </Stack>

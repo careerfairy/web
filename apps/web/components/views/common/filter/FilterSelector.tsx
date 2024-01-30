@@ -71,7 +71,7 @@ const FilterSelector = () => {
       useDialogStateHandler()
 
    const showSearch = useMemo(
-      () => filtersToShow.includes(FilterEnum.search),
+      () => filtersToShow.includes(FilterEnum.SEARCH),
       [filtersToShow]
    )
    const filterActive = Boolean(numberOfActiveFilters > 0)
@@ -154,7 +154,7 @@ const FilterSelector = () => {
                <Button
                   aria-describedby={id}
                   endIcon={<Filter />}
-                  sx={[styles.filterButton]}
+                  sx={styles.filterButton}
                   onClick={handleOpenFilterDialog}
                   disableElevation
                >

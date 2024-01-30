@@ -8,6 +8,10 @@ import { ParsedUrlQuery } from "querystring"
 import { useMountedState } from "react-use"
 import useCompaniesSWR from "components/custom-hook/group/useCompaniesSWR"
 import { CompanyIndustryValues } from "constants/forms"
+import {
+   queryParamToArr,
+   queryParamToBool,
+} from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
    flexItem: {
@@ -54,23 +58,7 @@ const Companies: FC<Props> = ({ initialData, setResults }) => {
       </Grid>
    )
 }
-const queryParamToArr = (
-   queryParam: string | string[] | undefined
-): string[] => {
-   if (!queryParam) return []
-   if (Array.isArray(queryParam)) return queryParam.sort()
-   return queryParam
-      .split(",")
-      .map((q) => q.replace("_", ",")) // As of now, deals with companyIndustries containing ','. i.e: Leisure,Travel&Tourism
-      .sort() // to make sure the order is always the same for caching the key
-}
 
-const queryParamToBool = (
-   queryParam: string | string[] | undefined
-): boolean => {
-   if (!queryParam || Array.isArray(queryParam)) return false
-   return queryParam?.toLowerCase() === "true" || false
-}
 /**
  *
  * @param query Query string object, all aplied filters are passed by query string parameters.

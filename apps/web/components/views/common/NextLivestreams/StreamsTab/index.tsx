@@ -23,19 +23,19 @@ const styles = sxStyles({
 
 type Props = {
    handleChange: (event, newEvent) => void
-   value: any
+   value: string
    tabsColor?: string
    hasFilter?: boolean
    hideTabs?: boolean
 }
 
 const filtersToShow = [
-   FilterEnum.languages,
-   FilterEnum.interests,
+   FilterEnum.LANGUAGES,
+   FilterEnum.INTERESTS,
    // FilterEnum.jobCheck, TODO: Removed temporarily
-   FilterEnum.companyCountries,
-   FilterEnum.companySizes,
-   FilterEnum.companyIndustries,
+   FilterEnum.COMPANY_COUNTRIES,
+   FilterEnum.COMPANY_SIZES,
+   FilterEnum.COMPANY_INDUSTRIES,
 ]
 
 const StreamsTab = ({
@@ -58,14 +58,12 @@ const StreamsTab = ({
                   value={value}
                   onChange={handleChange}
                   textColor="inherit"
-                  TabIndicatorProps={
-                     {
-                        sx: {
-                           ...styles.indicator,
-                           backgroundColor: tabsColor,
-                        },
-                     } as any
-                  }
+                  TabIndicatorProps={{
+                     sx: {
+                        ...styles.indicator,
+                        backgroundColor: tabsColor,
+                     },
+                  }}
                   variant={hasFilter ? "standard" : "fullWidth"}
                   aria-label="full width tabs example"
                   sx={{ width: "100%", minWidth: "fit-content" }}

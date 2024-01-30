@@ -161,56 +161,56 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          }
 
          switch (filter) {
-            case FilterEnum.companyCountries:
+            case FilterEnum.COMPANY_COUNTRIES:
                toShow = {
                   title: "Location",
                   renderFn: () => (
                      <CompanyCountrySelector
-                        key={FilterEnum.companyCountries}
+                        key={FilterEnum.COMPANY_COUNTRIES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.companyIndustries:
+            case FilterEnum.COMPANY_INDUSTRIES:
                toShow = {
                   title: "Industry",
                   renderFn: () => (
                      <CompanyIndustrySelector
-                        key={FilterEnum.companyIndustries}
+                        key={FilterEnum.COMPANY_INDUSTRIES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.companySizes:
+            case FilterEnum.COMPANY_SIZES:
                toShow = {
                   title: "Company size",
                   renderFn: () => (
                      <CompanySizeSelector
-                        key={FilterEnum.companySizes}
+                        key={FilterEnum.COMPANY_SIZES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.languages:
+            case FilterEnum.LANGUAGES:
                toShow = {
                   title: "Language",
                   renderFn: () => (
                      <LanguageSelector
-                        key={FilterEnum.languages}
+                        key={FilterEnum.LANGUAGES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.fieldsOfStudy:
+            case FilterEnum.FIELDS_OF_STUDY:
                toShow = {
                   title: "Field of study",
                   renderFn: () => (
                      <FieldsOfStudySelector
-                        key={FilterEnum.fieldsOfStudy}
+                        key={FilterEnum.FIELDS_OF_STUDY}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -257,56 +257,56 @@ const FilterMenu = ({ open, handleClose }: Props) => {
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
-            case FilterEnum.companyId:
-               return <ActiveCompanyFilter key={FilterEnum.companyId} />
+            case FilterEnum.COMPANY_ID:
+               return <ActiveCompanyFilter key={FilterEnum.COMPANY_ID} />
 
-            case FilterEnum.recordedOnly:
+            case FilterEnum.RECORDED_ONLY:
                return (
                   <RecordedOnlyToggle
-                     key={FilterEnum.recordedOnly}
+                     key={FilterEnum.RECORDED_ONLY}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
-            case FilterEnum.companySparks:
+            case FilterEnum.COMPANY_SPARKS:
                return (
                   <ToggleSelector
-                     key={FilterEnum.companySparks}
+                     key={FilterEnum.COMPANY_SPARKS}
                      handleApplyFilter={handleApplyFilter}
                      label="Sparks"
                      description="Show only companies with Sparks"
-                     filterId={FilterEnum.companySparks}
+                     filterId={FilterEnum.COMPANY_SPARKS}
                   />
                )
 
-            case FilterEnum.interests:
+            case FilterEnum.INTERESTS:
                return (
                   <InterestsSelector
-                     key={FilterEnum.interests}
+                     key={FilterEnum.INTERESTS}
                      handleChange={handleChangeMultiSelect}
                   />
                )
 
-            case FilterEnum.jobCheck:
+            case FilterEnum.JOB_CHECK:
                return (
                   <JobCheck
-                     key={FilterEnum.jobCheck}
+                     key={FilterEnum.JOB_CHECK}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
 
-            case FilterEnum.sortBy:
+            case FilterEnum.SORT_BY:
                return (
                   <SortBySelector
-                     key={FilterEnum.sortBy}
+                     key={FilterEnum.SORT_BY}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
 
-            case FilterEnum.languages:
-            case FilterEnum.companyCountries:
-            case FilterEnum.companyIndustries:
-            case FilterEnum.companySizes:
-            case FilterEnum.fieldsOfStudy:
+            case FilterEnum.LANGUAGES:
+            case FilterEnum.COMPANY_COUNTRIES:
+            case FilterEnum.COMPANY_INDUSTRIES:
+            case FilterEnum.COMPANY_SIZES:
+            case FilterEnum.FIELDS_OF_STUDY:
                return renderAutoCompleteFilter(filter)
          }
       },
