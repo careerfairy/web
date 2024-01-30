@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { Grid } from "@mui/material"
 import CreateWishButton from "./CreateWishButton"
 import Filter, { FilterEnum } from "../common/filter/Filter"
@@ -9,9 +9,9 @@ interface Props {
 }
 
 const filtersToShow = [
-   FilterEnum.search,
-   FilterEnum.sortBy,
-   FilterEnum.interests,
+   FilterEnum.SEARCH,
+   FilterEnum.SORT_BY,
+   FilterEnum.INTERESTS,
 ]
 
 const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {

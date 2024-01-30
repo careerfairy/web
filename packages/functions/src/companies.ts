@@ -42,7 +42,7 @@ export const fetchCompanies = functions.region(config.region).https.onCall(
             data.companyIndustries,
             data.companySize
          )
-         console.log("🚀 ~ compoundQuery:", compoundQuery)
+
          const groups = await groupRepo.fetchCompanies(
             data,
             compoundQuery,

@@ -3,30 +3,30 @@ import { useRouter } from "next/router"
 import FilterSelector from "./FilterSelector"
 
 export enum FilterEnum {
-   sortBy = "sortBy",
-   languages = "languages",
-   interests = "interests",
-   jobCheck = "jobCheck",
-   search = "search",
-   fieldsOfStudy = "fieldsOfStudy",
-   companyCountries = "companyCountries",
-   companySizes = "companySizes",
-   companyIndustries = "companyIndustries",
-   companySparks = "companySparks",
+   SORT_BY = "sortBy",
+   LANGUAGES = "languages",
+   INTERESTS = "interests",
+   JOB_CHECK = "jobCheck",
+   SEARCH = "search",
+   FIELDS_OF_STUDY = "fieldsOfStudy",
+   COMPANY_COUNTRIES = "companyCountries",
+   COMPANY_SIZES = "companySizes",
+   COMPANY_INDUSTRIES = "companyIndustries",
+   COMPANY_SPARKS = "companySparks",
    /**
     * If this filter is active, it means we are filtering by company
     * */
-   companyId = "companyId",
-   recordedOnly = "recordedOnly",
+   COMPANY_ID = "companyId",
+   RECORDED_ONLY = "recordedOnly",
 }
 
-type IFilterContext = {
+type FilterContextType = {
    numberOfActiveFilters: number
    filtersToShow: FilterEnum[]
    numberOfResults: number
 }
 
-const FilterContext = createContext<IFilterContext>({
+const FilterContext = createContext<FilterContextType>({
    numberOfActiveFilters: 0,
    filtersToShow: [],
    numberOfResults: 0,
@@ -58,7 +58,7 @@ const Filter = ({ filtersToShow, numberOfResults }: Props) => {
       [query]
    )
 
-   const value = useMemo<IFilterContext>(
+   const value = useMemo<FilterContextType>(
       () => ({
          numberOfActiveFilters,
          filtersToShow,
