@@ -23,7 +23,7 @@ const CompanyCountrySelector = ({ handleChange }: Props) => {
 
       if (queryCompanyCountry) {
          selectedCountry = formatToOptionArray(
-            queryCompanyCountry.split(","),
+            queryCompanyCountry.split(",").map(decodeURIComponent),
             CompanyCountryValues
          )
       }

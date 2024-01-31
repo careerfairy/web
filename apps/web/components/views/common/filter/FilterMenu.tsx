@@ -119,7 +119,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
 
    const handleChangeMultiSelect = useCallback(
       (name: string, selectedOption: OptionGroup[]) => {
-         const options = mapOptions(selectedOption)
+         const options = mapOptions(selectedOption).map(encodeURIComponent)
          const newOptions = options.join(",")
 
          const newQuery = {

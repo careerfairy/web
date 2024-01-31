@@ -68,7 +68,7 @@ const CompanyIndustrySelector = ({ handleChange }: Props) => {
 
       if (queryIndustries) {
          selectedIndustries = formatToOptionArray(
-            queryIndustries.split(","),
+            queryIndustries.split(",").map(decodeURIComponent),
             CompanyIndustryValues
          )
       }
