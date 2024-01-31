@@ -33,6 +33,9 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
    },
+   loaderWrapper: {
+      bgcolor: (theme) => theme.brand.black[800],
+   },
    loader: {
       position: "absolute",
       top: "50%",
@@ -102,7 +105,7 @@ export const LocalMicrophoneAndCameraUser = ({
             volume={volume}
          />
          {Boolean(isLoading) && (
-            <CenteredContainer>
+            <CenteredContainer sx={styles.loaderWrapper}>
                <CircularProgress size={50} />
             </CenteredContainer>
          )}
