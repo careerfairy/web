@@ -11,7 +11,13 @@ const styles = sxStyles({
       maxWidth: "100%",
       "& .MuiSelect-select": {},
    },
+   icon: {
+      mx: 1.5,
+      mt: "14px",
+      fontSize: 24,
+   },
 })
+
 type DeviceSelectProps = SelectProps & {
    label: string
    options: MediaDeviceInfo[]
@@ -35,17 +41,16 @@ const DeviceSelect = ({
       <BrandedTextField
          id={`select-${label.toLowerCase()}`}
          select
-         label={permissionDenied ? `Permission needed` : label}
+         label={label}
          disabled={permissionDenied}
          sx={styles.root}
-         InputLabelProps={{
-            shrink: !permissionDenied,
-         }}
          fullWidth
          size="medium"
-         value={getValue(value, options)}
+         value={
+            permissionDenied ? "Permission Denied" : getValue(value, options)
+         }
          SelectProps={{
-            IconComponent: () => <ExpandMoreIcon />,
+            IconComponent: () => <ExpandMoreIcon sx={styles.icon} />,
          }}
          // @ts-ignore
          onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
@@ -53,6 +58,11 @@ const DeviceSelect = ({
          }}
          {...props}
       >
+         {Boolean(permissionDenied) && (
+            <MenuItem disabled value={"Permission Denied"}>
+               Permission Denied
+            </MenuItem>
+         )}
          {options.map((option) => (
             <MenuItem key={option.deviceId} value={option.deviceId}>
                {option.label}

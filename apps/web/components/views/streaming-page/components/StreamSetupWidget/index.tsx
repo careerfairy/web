@@ -1,3 +1,4 @@
+import { BlurIcon, PlaceholderImageIcon } from "components/views/common/icons"
 import {
    Box,
    Dialog,
@@ -6,27 +7,22 @@ import {
    Drawer,
    Grid,
 } from "@mui/material"
-import { BlurIcon, PlaceholderImageIcon } from "components/views/common/icons"
+import { CameraSelect, MicrophoneSelect } from "./DeviceSelect"
 import {
    MicActionButton,
    ResponsiveStreamButton,
    VideoActionButton,
 } from "../Buttons"
-import { CameraSelect, MicrophoneSelect } from "./DeviceSelect"
 
-import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { BackgroundModeButton } from "./BackgroundModeButton"
 import { Fragment } from "react"
+import { SetupCameraVideo } from "./SetupCameraVideo"
 import { Slash } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamingContext } from "../../context"
-import { LocalMicrophoneAndCameraUser } from "../streaming/LocalMicrophoneAndCameraUser"
-import { BackgroundModeButton } from "./BackgroundModeButton"
 
 const styles = sxStyles({
-   buttons: {
-      display: "flex",
-      justifyContent: "flex-end",
-   },
    dialog: {
       "& .MuiDialog-paper": {
          minWidth: 600,
@@ -48,13 +44,6 @@ const styles = sxStyles({
       p: 4,
       pb: 3,
       borderBottom: "none",
-   },
-   deviceSelect: {
-      minWidth: 200,
-   },
-   video: {
-      aspectRatio: "16/9",
-      width: "100%",
    },
 })
 
@@ -91,7 +80,7 @@ const Content = () => {
       <Fragment>
          <DialogContent sx={styles.dialogContent} dividers>
             <Box>
-               <LocalMicrophoneAndCameraUser sx={styles.video} />
+               <SetupCameraVideo />
                <Box pb={1.5} />
                <Grid container spacing={1.5}>
                   <Grid item xs={4}>
@@ -114,10 +103,10 @@ const Content = () => {
                <Box pb={{ xs: 1.5, sm: 3 }} />
                <Grid container spacing={1}>
                   <Grid item xs={12} sm={6}>
-                     <CameraSelect />
+                     <MicrophoneSelect />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                     <MicrophoneSelect />
+                     <CameraSelect />
                   </Grid>
                </Grid>
             </Box>
