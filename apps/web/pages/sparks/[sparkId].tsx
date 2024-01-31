@@ -1,6 +1,6 @@
 import {
    SerializedSpark,
-   SparkPresenter,
+SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
@@ -95,6 +95,7 @@ const SparksPage: NextPage<
     */
    useEffect(() => {
       if (
+         // eslint-disable-next-line no-extra-boolean-cast
          Boolean(
             !isFetchingNextSparks &&
                hasNoMoreSparks &&
