@@ -20,6 +20,10 @@ import {
 } from "react"
 import { useStreamingContext } from "./Streaming"
 
+type LocalTracksProviderProps = {
+   children: ReactNode
+}
+
 type LocalTracksContextProps = {
    localCameraTrack: ReturnType<typeof useLocalCameraTrack>
    localMicrophoneTrack: ReturnType<typeof useLocalMicrophoneTrack>
@@ -36,10 +40,6 @@ type LocalTracksContextProps = {
    cameraError: IAgoraRTCError | AgoraRTCReactError
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
-}
-
-type LocalTracksProviderProps = {
-   children: ReactNode
 }
 
 const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
@@ -101,16 +101,15 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
     */
    useEffect(() => {
-      AgoraRTC.getDevices()
-         .then((devices) => {
-            setActiveCameraId(
-               devices.find((device) => device.kind === "videoinput")
-                  ?.deviceId ?? ""
-            )
-            setActiveMicrophoneId(
-               devices.find((device) => device.kind === "audioinput")
-                  ?.deviceId ?? ""
-            )
+      AgoraRTC.getCameras()
+         .then((cameras) => {
+            setActiveCameraId(cameras[0]?.deviceId ?? "")
+         })
+         .catch(console.error)
+
+      AgoraRTC.getMicrophones()
+         .then((microphones) => {
+            setActiveMicrophoneId(microphones[0]?.deviceId ?? "")
          })
          .catch(console.error)
 

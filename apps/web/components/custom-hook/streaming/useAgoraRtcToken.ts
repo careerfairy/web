@@ -1,7 +1,8 @@
 import { AgoraTokenRequest } from "@careerfairy/shared-lib/agora/token"
 import { livestreamService } from "data/firebase/LivestreamService"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 export type UseAgoraRtcToken = {
    /** The Agora RTC token */
@@ -12,6 +13,30 @@ export type UseAgoraRtcToken = {
    isError: boolean
    /** Fetch the Agora RTC token */
    reFetchToken: () => Promise<string>
+}
+
+const options: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   /**
+    * Since the Agora RTC Token returned from the cloud function has a life-time of 6 hours, we can safely
+    * cache the token for 10 minutes to reduce our network footprint.
+    */
+   dedupingInterval: 600000, // 10 minutes
+   focusThrottleInterval: 600000, // 10 minutes
+   onError: (error, key) => {
+      console.log("error", error)
+      console.log("key", key)
+      return errorLogAndNotify(error, {
+         message: "Failed to fetch Agora RTC token",
+         args: {
+            channelName: key[0],
+            isStreamer: key[1],
+            sentToken: key[2],
+            streamDocumentPath: key[3],
+            uid: key[4],
+         },
+      })
+   },
 }
 
 /**
@@ -35,11 +60,7 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
       isValidating: tokenIsValidating,
       error: tokenError,
       mutate,
-   } = useSWR(
-      key,
-      () => livestreamService.fetchAgoraRtcToken(args),
-      reducedRemoteCallsOptions
-   )
+   } = useSWR(key, () => livestreamService.fetchAgoraRtcToken(args), options)
 
    return {
       token,
