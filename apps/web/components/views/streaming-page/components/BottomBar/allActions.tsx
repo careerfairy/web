@@ -12,7 +12,7 @@ import {
    VideoActionButton,
 } from "../Buttons"
 
-export const allActions = {
+export const AllActions = {
    "Hand raise": <HandRaiseActionButton key="Hand raise" />,
    "Q&A": <QaActionButton key="Q&A" />,
    Polls: <PollActionButton key="Polls" />,
@@ -26,3 +26,5 @@ export const allActions = {
    Video: <VideoActionButton key="Video" />,
    Divider: null,
 } as const
+
+export type ActionName = keyof typeof AllActions
