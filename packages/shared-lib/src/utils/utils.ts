@@ -238,10 +238,7 @@ export const queryParamToArr = (
 ): string[] => {
    if (!queryParam) return []
    if (Array.isArray(queryParam)) return queryParam.sort()
-   return queryParam
-      .split(",")
-      .map((q) => q.replace("_", ",")) // As of now, deals with companyIndustries containing ','. i.e: Leisure,Travel&Tourism
-      .sort() // to make sure the order is always the same for caching the key
+   return queryParam.split(",").map(decodeURIComponent).sort() // to make sure the order is always the same for caching the key
 }
 
 export const queryParamToBool = (

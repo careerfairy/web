@@ -1472,7 +1472,7 @@ export const CompanyIndustryValues: OptionGroup[] = [
       name: "Legal",
    },
    {
-      id: "Leisure_Travel&Tourism",
+      id: "Leisure,Travel&Tourism",
       name: "Leisure, Travel & Tourism",
    },
    {
