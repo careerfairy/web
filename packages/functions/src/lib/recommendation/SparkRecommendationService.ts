@@ -17,9 +17,10 @@ import RecommendationSparksServiceCore, {
 } from "@careerfairy/shared-lib/recommendation/sparks/IRecommendationSparksService"
 import { combineRankedDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { SparkBasedRecommendationsBuilder } from "./services/SparkBasedRecommendationsBuilder"
-import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/serivce/RankedSparkRepository"
+import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/service/RankedSparkRepository"
 import functions = require("firebase-functions")
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { Timestamp } from "../../api/firestoreAdmin"
 
 export default class SparkRecommendationService
    extends RecommendationSparksServiceCore
@@ -159,13 +160,18 @@ export default class SparkRecommendationService
    private async getRecommendedSparksBasedOnTrialPlan(): Promise<
       RankedSpark[]
    > {
-      const trialPlanSparks = this.allSparks.filter(
-         (spark) => spark.spark.group.plan.type === GroupPlanTypes.Trial
+      const now = Timestamp.now().toMillis()
+
+      const validTrialPlanSparks = this.allSparks.filter((spark) =>
+         Boolean(
+            spark.spark.group.plan?.type === GroupPlanTypes.Trial &&
+               spark.spark.group.plan.expiresAt.toMillis() > now
+         )
       )
 
       const sparksBasedRecommendations = new SparkBasedRecommendationsBuilder(
          this.allSparks.length,
-         trialPlanSparks,
+         validTrialPlanSparks,
          this.participatedEvents,
          new RankedSparkRepository(this.allSparks)
       )

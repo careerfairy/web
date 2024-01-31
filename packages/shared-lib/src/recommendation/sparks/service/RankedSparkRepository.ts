@@ -6,7 +6,7 @@ import { RankedSpark, sortRankedSparksByPoints } from "../RankedSpark"
 type RankSparkArgs = {
    rankedSparks: RankedSpark[]
    targetUserIds: unknown[]
-   targetSparkIdsGetter: (stream: RankedSpark) => unknown[]
+   targetSparkIdsGetter: (stream: RankedSpark) => string[]
    pointsPerMatch: number
    pointsPerMissingMatch?: number
 }

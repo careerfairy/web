@@ -3,8 +3,8 @@ import { SparkStats } from "../../sparks/sparks"
 import { UserData } from "../../users/users"
 import { Logger } from "../../utils/types"
 import { RankedSpark, sortRankedSparksByPoints } from "./RankedSpark"
-import { RankedSparkRepository } from "./serivce/RankedSparkRepository"
-import { UserBasedRecommendationsBuilder } from "./serivce/UserBasedRecommendationsBuilder"
+import { RankedSparkRepository } from "./service/RankedSparkRepository"
+import { UserBasedRecommendationsBuilder } from "./service/UserBasedRecommendationsBuilder"
 
 /**
  * The outputted IDs of recommendations for the given {@link IdToRecommend}

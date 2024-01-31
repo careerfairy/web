@@ -89,7 +89,6 @@ export class SparksFeedReplenisher {
 
          const batch = this.firestore.batch()
 
-         // Function to fill feed from recommended sparks
          const fillFeedFromRecommendedSparks = (sparks: Spark[]) => {
             sparks.forEach((spark) => {
                const sparkRef = this.firestore
@@ -123,10 +122,8 @@ export class SparksFeedReplenisher {
 
          fillFeedFromRecommendedSparks(recommendedSparks)
 
-         // // Commit the batch
          await batch.commit()
 
-         // Set the replenishing status to "finished"
          await this.setReplenishingFlag(userId, "finished")
          return
       } catch (error) {

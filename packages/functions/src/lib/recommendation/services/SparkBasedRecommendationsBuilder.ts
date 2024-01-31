@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { getMostCommonArrayValues } from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
 import { RecommendationsBuilder } from "@careerfairy/shared-lib/recommendation/sparks/RecommendationsBuilder"
-import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/serivce/RankedSparkRepository"
+import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/service/RankedSparkRepository"
 import { SparkStats } from "@careerfairy/shared-lib/sparks/sparks"
 
 export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {

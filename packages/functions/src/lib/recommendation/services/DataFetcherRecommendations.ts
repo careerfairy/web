@@ -126,16 +126,25 @@ export class SparksDataFetcher {
 
    // Get shared sparks for the user
    getSharedSparks(): Promise<SharedSparks[]> {
-      return this.sparksRepo.getUserSharedSpark(this.userId)
+      return this.sparksRepo.getUserSparkInteraction<SharedSparks>(
+         this.userId,
+         "sharedSparks"
+      )
    }
 
    // Get liked sparks for the user
    getLikedSparks(): Promise<LikedSparks[]> {
-      return this.sparksRepo.getUserLikedSparks(this.userId)
+      return this.sparksRepo.getUserSparkInteraction<LikedSparks>(
+         this.userId,
+         "likedSparks"
+      )
    }
 
    // Get seen sparks for the user
    getSeenSparks(): Promise<SeenSparks[]> {
-      return this.sparksRepo.getUserSeenSparks(this.userId)
+      return this.sparksRepo.getUserSparkInteraction<SeenSparks>(
+         this.userId,
+         "seenSparks"
+      )
    }
 }

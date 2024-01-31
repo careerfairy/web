@@ -11,9 +11,7 @@ import {
 import {
    AddSparkSparkData,
    DeletedSpark,
-   LikedSparks,
    SeenSparks,
-   SharedSparks,
    Spark,
    SparkStats,
    UpdateSparkData,
@@ -45,6 +43,7 @@ import * as functions from "firebase-functions"
 import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
+import { Identifiable } from "@careerfairy/shared-lib/src/commonTypes"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -261,25 +260,15 @@ export interface ISparkFunctionsRepository {
    createSparkUserNotification(spark: Spark): Promise<void>
 
    /**
-    * Get shared sparks for a user
+    * Get sparks for a user based on interactions
     * @param userId The user id
-    * @returns Promise of an array of SharedSparks
-    */
-   getUserSharedSpark(userId: string): Promise<SharedSparks[]>
-
-   /**
-    * Get liked sparks for a user
-    * @param userId The user id
-    * @returns Promise of an array of LikedSparks
-    */
-   getUserLikedSparks(userId: string): Promise<LikedSparks[]>
-
-   /**
-    * Get seen sparks for a user
-    * @param userId The user id
+    * @param subCollectionName The user's sub collection name
     * @returns Promise of an array of SeenSparks
     */
-   getUserSeenSparks(userId: string): Promise<SeenSparks[]>
+   getUserSparkInteraction<T extends Identifiable>(
+      userId: string,
+      subCollectionName: string
+   ): Promise<T[]>
 
    /**
     * Get sparks by their ids
@@ -911,34 +900,15 @@ export class SparkFunctionsRepository
       return void bulkWriter.close()
    }
 
-   async getUserSharedSpark(userId: string): Promise<SharedSparks[]> {
-      const userSharedSparksSnapshot = await this.firestore
-         .collection("userData")
-         .doc(userId)
-         .collection("sharedSparks")
-         .withConverter(createGenericConverter<SharedSparks>())
-         .get()
-
-      return userSharedSparksSnapshot.docs.map((doc) => doc.data())
-   }
-
-   async getUserLikedSparks(userId: string): Promise<LikedSparks[]> {
-      const userLikedSparksSnapshot = await this.firestore
-         .collection("userData")
-         .doc(userId)
-         .collection("likedSparks")
-         .withConverter(createGenericConverter<LikedSparks>())
-         .get()
-
-      return userLikedSparksSnapshot.docs.map((doc) => doc.data())
-   }
-
-   async getUserSeenSparks(userId: string): Promise<SeenSparks[]> {
+   async getUserSparkInteraction<T extends Identifiable>(
+      userId: string,
+      subCollectionName: string
+   ): Promise<T[]> {
       const userSeenSparksSnapshot = await this.firestore
          .collection("userData")
          .doc(userId)
-         .collection("seenSparks")
-         .withConverter(createGenericConverter<SeenSparks>())
+         .collection(subCollectionName)
+         .withConverter(createGenericConverter<T>())
          .get()
 
       return userSeenSparksSnapshot.docs.map((doc) => doc.data())
