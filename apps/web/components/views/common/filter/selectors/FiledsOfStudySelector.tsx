@@ -38,7 +38,7 @@ const FieldsOfStudySelector = ({ handleChange }: Props) => {
 
       if (queryFieldOfStudies) {
          selectedFieldOfStudies = formatToOptionArray(
-            queryFieldOfStudies.split(","),
+            queryFieldOfStudies.split(",").map(decodeURIComponent),
             fieldsOfStudy
          )
       }
