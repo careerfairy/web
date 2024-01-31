@@ -19,6 +19,7 @@ import {
    useState,
 } from "react"
 import { useStreamingContext } from "./Streaming"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -105,13 +106,13 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          .then((cameras) => {
             setActiveCameraId(cameras[0]?.deviceId ?? "")
          })
-         .catch(console.error)
+         .catch(errorLogAndNotify)
 
       AgoraRTC.getMicrophones()
          .then((microphones) => {
             setActiveMicrophoneId(microphones[0]?.deviceId ?? "")
          })
-         .catch(console.error)
+         .catch(errorLogAndNotify)
 
       return () => {
          setActiveCameraId("")
