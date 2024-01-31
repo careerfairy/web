@@ -3,7 +3,7 @@ import { sxStyles } from "types/commonTypes"
 import { Box, Divider, Stack } from "@mui/material"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { AllActions } from "./AllActions"
+import { AllActions } from "./AllActionComponents"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
 
 const styles = sxStyles({
