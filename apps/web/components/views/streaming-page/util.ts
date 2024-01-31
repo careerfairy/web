@@ -45,13 +45,13 @@ export const getDeviceButtonColor = (
  * Need to use this helper to infer the error type as it cannot be imported directly from "agora-rtc-react"
  * due to an agora Nextjs build error
  */
-type IAgoraRTCReactError = Pick<
+type TAgoraRTCReactError = Pick<
    ReturnType<typeof useLocalCameraTrack>,
    "error"
 >["error"]
 
 export const getRTCErrorCode = (
-   error: IAgoraRTCError | IAgoraRTCReactError
+   error: IAgoraRTCError | TAgoraRTCReactError
 ): IAgoraRTCError["code"] => {
    if (!error) {
       return undefined
@@ -72,7 +72,7 @@ type ErrorMessages = {
 }
 
 export const getDeviceErrorMessage = (
-   error: IAgoraRTCError | IAgoraRTCReactError,
+   error: IAgoraRTCError | TAgoraRTCReactError,
    messages: ErrorMessages
 ) => {
    if (!error) return ""
