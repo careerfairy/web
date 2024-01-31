@@ -34,7 +34,7 @@ const DeviceSelect = ({
    return (
       <BrandedTextField
          id={`select-${label.toLowerCase()}`}
-         select={true}
+         select
          label={permissionDenied ? `Permission needed` : label}
          disabled={permissionDenied}
          sx={styles.root}

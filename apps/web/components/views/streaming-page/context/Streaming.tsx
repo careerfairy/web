@@ -7,7 +7,6 @@ import {
    FC,
    ReactNode,
    createContext,
-   useCallback,
    useContext,
    useEffect,
    useMemo,
@@ -19,8 +18,6 @@ import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
 type StreamContextProps = {
    livestreamId: string
    isHost: boolean
-   // for demo purposes
-   toggleIsStreaming: () => void
    // If the user should be streaming
    shouldStream: boolean
    // The token gotten from the url /streaming/host/[streamId]?token="1234"
@@ -35,14 +32,14 @@ type StreamContextProps = {
    isJoining: boolean
 }
 
+const StreamContext = createContext<StreamContextProps | undefined>(undefined)
+
 type StreamProviderProps = {
    children: ReactNode
    livestreamId: string
    isHost: boolean
    agoraUserId: string
 }
-
-const StreamContext = createContext<StreamContextProps | undefined>(undefined)
 
 export const StreamingProvider: FC<StreamProviderProps> = ({
    livestreamId,
@@ -59,28 +56,18 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const dispatch = useAppDispatch()
 
-   const handRaiseActive = activeView === ActiveViews.HAND_RAISE
+   const isHandRaiseActive = activeView === ActiveViews.HAND_RAISE
 
    useEffect(() => {
       // if the user is not a host and the hand raise panel is active,
       // switch to chat
-      if (!isHost && handRaiseActive) {
+      if (!isHost && isHandRaiseActive) {
          dispatch(setActiveView(ActiveViews.CHAT))
       }
-   }, [isHost, handRaiseActive, dispatch])
+   }, [isHost, isHandRaiseActive, dispatch])
 
-   // for demo purposes
-   const [shouldStream, setShouldStream] = useState<boolean>(isHost)
-
-   // for demo purposes
-   const toggleIsStreaming = useCallback(() => {
-      if (isHost && !shouldStream) {
-         setShouldStream(true)
-         return
-      }
-
-      setShouldStream(!shouldStream)
-   }, [isHost, shouldStream])
+   const shouldStream = isHost
+   // TODO: OR Viewer has raised their hand and the host has accepted them
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
@@ -109,7 +96,6 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       () => ({
          livestreamId,
          isHost,
-         toggleIsStreaming,
          shouldStream: isHost ? true : shouldStream,
          streamerAuthToken: hostAuthToken,
          agoraUserId,
@@ -121,7 +107,6 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       [
          livestreamId,
          isHost,
-         toggleIsStreaming,
          shouldStream,
          hostAuthToken,
          agoraUserId,
