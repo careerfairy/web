@@ -8,7 +8,7 @@ type Props = {
 
 export const ActionBarButtonStyled = styled(IconButton, {
    shouldForwardProp: shouldForwardProp<Props>(["active"]),
-})<Props>(({ theme, active }) => ({
+})<Props>(({ theme, active, color }) => ({
    width: 38,
    height: 38,
    [theme.breakpoints.up("tablet")]: {
@@ -23,7 +23,7 @@ export const ActionBarButtonStyled = styled(IconButton, {
       fontSize: 24,
       width: 24,
       height: 24,
-      color: theme.palette.primary.main,
+      color: color || theme.palette.primary.main,
       [theme.breakpoints.up("tablet")]: {
          fontSize: 28,
          width: 28,
