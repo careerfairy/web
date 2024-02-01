@@ -8,7 +8,7 @@ import { useStreamingContext } from "components/views/streaming-page/context"
 import { useState, useRef, ReactNode } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
-import { ActionName, allActions } from "."
+import { AllActions, ActionName } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -134,7 +134,7 @@ export const ActionsSpeedDial = () => {
             {actions.map((action) => (
                <SpeedDialAction
                   key={action}
-                  icon={allActions[action]}
+                  icon={AllActions[action]}
                   tooltipTitle={action}
                   FabProps={{
                      sx: [styles.noShadow, styles.speedDialAction],

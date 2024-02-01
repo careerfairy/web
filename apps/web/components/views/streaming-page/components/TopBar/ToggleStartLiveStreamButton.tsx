@@ -1,4 +1,4 @@
-import { ResponsiveStreamButton } from "../common"
+import { ResponsiveStreamButton } from "../Buttons"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useState } from "react"
 

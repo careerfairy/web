@@ -1,6 +1,6 @@
 import { sxStyles } from "types/commonTypes"
 
-import { ResponsiveStreamButton } from "../common"
+import { ResponsiveStreamButton } from "../Buttons"
 import { CheckCircle, Wifi } from "react-feather"
 import React from "react"
 

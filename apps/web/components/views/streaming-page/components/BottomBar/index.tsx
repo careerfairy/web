@@ -3,18 +3,8 @@ import { sxStyles } from "types/commonTypes"
 import { Box, Divider, Stack } from "@mui/material"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { SettingsActionButton } from "./SettingsActionButton"
-import { JobsActionButton } from "./JobsActionButton"
-import { ReactionsActionButton } from "./ReactionsActionButton"
-import { ChatActionButton } from "./ChatActionButton"
-import { PollActionButton } from "./PollActionButton"
-import { HandRaiseActionButton } from "./HandRaiseActionButton"
-import { QaActionButton } from "./QaActionButton"
-import { CTAActionButton } from "./CTAActionButton"
-import { ShareActionButton } from "./ShareActionButton"
+import { AllActions } from "./AllActionComponents"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
-import { MicActionButton } from "./MicActionButton"
-import { VideoActionButton } from "./VideoActionButton"
 
 const styles = sxStyles({
    root: {
@@ -39,25 +29,14 @@ export const BottomBar = () => {
 
 const DividerComponent = () => <Divider orientation="vertical" flexItem />
 
-export const allActions = {
-   "Hand raise": <HandRaiseActionButton key="Hand raise" />,
-   "Q&A": <QaActionButton key="Q&A" />,
-   Polls: <PollActionButton key="Polls" />,
-   Jobs: <JobsActionButton key="Jobs" />,
-   Reactions: <ReactionsActionButton key="Reactions" />,
-   Chat: <ChatActionButton key="Chat" />,
-   Settings: <SettingsActionButton key="Settings" />,
-   CTA: <CTAActionButton key="CTA" />,
-   Share: <ShareActionButton key="Share" />,
-   Mic: <MicActionButton key="Mic" />,
-   Video: <VideoActionButton key="Video" />,
-   Divider: null,
+export const BottomBarActions = {
+   ...AllActions,
    SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
-export type ActionName = keyof typeof allActions
+export type BottomBarActionName = keyof typeof BottomBarActions
 
-const getHostActionNames = (isMobile: boolean): ActionName[] => {
+const getHostActionNames = (isMobile: boolean): BottomBarActionName[] => {
    if (isMobile) {
       return ["Mic", "Video", "Share", "Divider", "Q&A", "Chat", "SpeedDial"]
    }
@@ -84,7 +63,7 @@ const HostView = () => {
       <ActionsBar>
          {getHostActionNames(isMobile).map(
             (action, index) =>
-               allActions[action] || <DividerComponent key={index} />
+               BottomBarActions[action] || <DividerComponent key={index} />
          )}
       </ActionsBar>
    )
@@ -92,7 +71,7 @@ const HostView = () => {
 const getViewerActionNames = (
    isMobile: boolean,
    isStreaming: boolean
-): ActionName[] => {
+): BottomBarActionName[] => {
    if (isStreaming) {
       if (isMobile) {
          return [
@@ -131,7 +110,7 @@ const ViewerView = () => {
       <ActionsBar>
          {getViewerActionNames(isMobile, isStreaming).map(
             (action, index) =>
-               allActions[action] || <DividerComponent key={index} />
+               BottomBarActions[action] || <DividerComponent key={index} />
          )}
       </ActionsBar>
    )
