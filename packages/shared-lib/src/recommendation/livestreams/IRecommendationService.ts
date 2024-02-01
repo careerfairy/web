@@ -3,10 +3,8 @@ import { LivestreamEvent } from "../../livestreams"
 import { UserData } from "../../users"
 import { Logger } from "../../utils/types"
 import { sortDocumentByPopularity } from "../../utils/utils"
-import {
-   RankedLivestreamEvent,
-   sortRankedLivestreamEventByPoints,
-} from "./RankedLivestreamEvent"
+import { sortRankedByPoints } from "../utils"
+import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./services/UserBasedRecommendationsBuilder"
 
@@ -43,7 +41,9 @@ export default class RecommendationServiceCore {
       user?: UserData
    ) {
       // Sort the results by points
-      const sortedResults = sortRankedLivestreamEventByPoints(results.flat())
+      const sortedResults = sortRankedByPoints<RankedLivestreamEvent>(
+         results.flat()
+      )
 
       // Remove duplicates (be sure to remove duplicates before sorting)
       const deDupedEvents = removeDuplicateDocuments(sortedResults)

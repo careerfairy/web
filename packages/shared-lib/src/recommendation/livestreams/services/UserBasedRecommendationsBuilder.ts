@@ -1,5 +1,5 @@
 import { UserData } from "../../../users"
-import { RecommendationsBuilder } from "../../RecommendationsBuilder"
+import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
 export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {

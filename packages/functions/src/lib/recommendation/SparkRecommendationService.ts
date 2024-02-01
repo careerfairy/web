@@ -7,11 +7,11 @@ import {
    SparkStats,
 } from "@careerfairy/shared-lib/sparks/sparks"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { RankedSpark } from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
 import {
+   sortRankedByPoints,
    handlePromisesAllSettled,
-   sortRankedSparksByPoints,
-   RankedSpark,
-} from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
+} from "@careerfairy/shared-lib/recommendation/utils"
 import RecommendationSparksServiceCore, {
    IRecommendationSparksService,
 } from "@careerfairy/shared-lib/recommendation/sparks/IRecommendationSparksService"
@@ -129,7 +129,7 @@ export default class SparkRecommendationService
       )
 
       // Sort the combined results by points
-      return sortRankedSparksByPoints(combinedResults)
+      return sortRankedByPoints<RankedSpark>(combinedResults)
    }
 
    /**

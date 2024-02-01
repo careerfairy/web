@@ -1,5 +1,6 @@
 import { removeDuplicateDocuments } from "../../BaseFirebaseRepository"
-import { RankedSpark, sortRankedSparksByPoints } from "./RankedSpark"
+import { sortRankedByPoints } from "../utils"
+import { RankedSpark } from "./RankedSpark"
 
 export class RecommendationsBuilder {
    protected results: RankedSpark[] = []
@@ -16,6 +17,6 @@ export class RecommendationsBuilder {
       )
 
       // return the list already sorted
-      return sortRankedSparksByPoints(uniqueEvents).slice(0, this.limit)
+      return sortRankedByPoints<RankedSpark>(uniqueEvents).slice(0, this.limit)
    }
 }

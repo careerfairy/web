@@ -1,5 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { getMostCommonArrayValues } from "@careerfairy/shared-lib/recommendation/sparks/RankedSpark"
+import { getMostCommonArrayValues } from "@careerfairy/shared-lib/recommendation/utils"
 import { RecommendationsBuilder } from "@careerfairy/shared-lib/recommendation/sparks/RecommendationsBuilder"
 import { RankedSparkRepository } from "@careerfairy/shared-lib/recommendation/sparks/service/RankedSparkRepository"
 import { SparkStats } from "@careerfairy/shared-lib/sparks/sparks"

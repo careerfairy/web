@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
+import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import DateUtil from "util/DateUtil"

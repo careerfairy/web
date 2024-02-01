@@ -6,11 +6,11 @@ import RecommendationServiceCore, {
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
 import {
    handlePromisesAllSettled,
-   RankedLivestreamEvent,
-   sortRankedLivestreamEventByPoints,
-} from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
+   sortRankedByPoints,
+} from "@careerfairy/shared-lib/recommendation/utils"
 import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
 import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
@@ -91,7 +91,7 @@ export default class UserEventRecommendationService
          await handlePromisesAllSettled(promises, this.log.error)
 
       // sort the results by points
-      const sortedResults = sortRankedLivestreamEventByPoints(
+      const sortedResults = sortRankedByPoints<RankedLivestreamEvent>(
          arrayOfRecommendedEventsBasedOnUserActions.flat()
       )
 

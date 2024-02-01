@@ -1,9 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import {
-   getMostCommonArrayValues,
-   getMostCommonFieldsOfStudies,
-} from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
-import { RecommendationsBuilder } from "@careerfairy/shared-lib/recommendation/RecommendationsBuilder"
+import { getMostCommonFieldsOfStudies } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
+import { getMostCommonArrayValues } from "@careerfairy/shared-lib/recommendation/utils"
+import { RecommendationsBuilder } from "@careerfairy/shared-lib/recommendation/livestreams/RecommendationsBuilder"
 import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
 
 export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilder {
@@ -17,7 +15,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
 
    // Get the most common interest IDs from the livestream events
    public mostCommonInterests() {
-      const mostCommonInterestIds = getMostCommonArrayValues(
+      const mostCommonInterestIds = getMostCommonArrayValues<LivestreamEvent>(
          this.livestreams,
          (event) => event.interestsIds
       )
@@ -37,7 +35,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
 
    // Get the most common countries from the livestream events
    public mostCommonCountries() {
-      const mostCommonCountries = getMostCommonArrayValues(
+      const mostCommonCountries = getMostCommonArrayValues<LivestreamEvent>(
          this.livestreams,
          (event) => event.companyCountries
       )
@@ -57,7 +55,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
 
    // Get the most common industries from the livestream events
    public mostCommonIndustries() {
-      const mostCommonIndustries = getMostCommonArrayValues(
+      const mostCommonIndustries = getMostCommonArrayValues<LivestreamEvent>(
          this.livestreams,
          (event) => event.companyIndustries
       )
@@ -77,7 +75,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
 
    // Get the most common company sizes from the livestream events
    public mostCommonCompanySizes() {
-      const mostCommonCompanySizes = getMostCommonArrayValues(
+      const mostCommonCompanySizes = getMostCommonArrayValues<LivestreamEvent>(
          this.livestreams,
          (event) => event.companySizes
       )

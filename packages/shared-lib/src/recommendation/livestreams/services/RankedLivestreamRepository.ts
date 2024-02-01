@@ -1,10 +1,8 @@
 import { FieldOfStudy } from "../../../fieldOfStudy"
 import { LivestreamEvent } from "../../../livestreams"
 import { sortLivestreamsDesc } from "../../../utils"
-import {
-   RankedLivestreamEvent,
-   sortRankedLivestreamEventByPoints,
-} from "../../livestreams/RankedLivestreamEvent"
+import { RankedLivestreamEvent } from "../../livestreams/RankedLivestreamEvent"
+import { sortRankedByPoints } from "../../utils"
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
@@ -207,6 +205,6 @@ export class RankedLivestreamRepository {
          rankedLivestream.addPoints(numMatches * pointsPerMatch)
       })
 
-      return sortRankedLivestreamEventByPoints(rankedLivestreams) // Sort the events by points
+      return sortRankedByPoints<RankedLivestreamEvent>(rankedLivestreams) // Sort the events by points
    }
 }

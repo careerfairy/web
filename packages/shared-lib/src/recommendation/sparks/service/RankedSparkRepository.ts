@@ -1,7 +1,8 @@
 import { GroupOption, PublicGroup } from "../../../groups"
 import { Spark, SparkStats } from "../../../sparks/sparks"
 import { sortSparkStats } from "../../../utils/utils"
-import { RankedSpark, sortRankedSparksByPoints } from "../RankedSpark"
+import { sortRankedByPoints } from "../../utils"
+import { RankedSpark } from "../RankedSpark"
 
 type RankSparkArgs = {
    rankedSparks: RankedSpark[]
@@ -417,6 +418,6 @@ export class RankedSparkRepository {
          rankedSpark.addPoints(numMatches * pointsPerMatch)
       })
 
-      return sortRankedSparksByPoints(rankedSparks) // Sort the events by points
+      return sortRankedByPoints<RankedSpark>(rankedSparks) // Sort the events by points
    }
 }

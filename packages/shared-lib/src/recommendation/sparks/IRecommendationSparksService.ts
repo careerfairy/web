@@ -2,7 +2,8 @@ import { combineRankedDocuments } from "../../BaseFirebaseRepository"
 import { SparkStats } from "../../sparks/sparks"
 import { UserData } from "../../users/users"
 import { Logger } from "../../utils/types"
-import { RankedSpark, sortRankedSparksByPoints } from "./RankedSpark"
+import { sortRankedByPoints } from "../utils"
+import { RankedSpark } from "./RankedSpark"
 import { RankedSparkRepository } from "./service/RankedSparkRepository"
 import { UserBasedRecommendationsBuilder } from "./service/UserBasedRecommendationsBuilder"
 
@@ -41,7 +42,8 @@ export default class RecommendationSparksServiceCore {
       const combinedResults = combineRankedDocuments(results)
 
       // Sort the combined results by points
-      const sortedRecommendedSparks = sortRankedSparksByPoints(combinedResults)
+      const sortedRecommendedSparks =
+         sortRankedByPoints<RankedSpark>(combinedResults)
 
       // Log metadata if debug mode is enabled
       if (this.debug) {
