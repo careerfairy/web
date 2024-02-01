@@ -16,8 +16,7 @@ const styles = sxStyles({
 })
 
 export const ToggleStreamModeButton = () => {
-   const { isHost, toggleIsStreaming, isStreaming, livestreamId } =
-      useStreamingContext()
+   const { isHost, livestreamId } = useStreamingContext()
    return (
       <ButtonGroup
          size="small"
@@ -25,11 +24,6 @@ export const ToggleStreamModeButton = () => {
          sx={styles.root}
          variant="contained"
       >
-         {isHost ? null : (
-            <Button onClick={toggleIsStreaming}>
-               {isStreaming ? "Stop streaming" : "Start streaming"}
-            </Button>
-         )}
          <Button
             component={Link}
             href={appendCurrentQueryParams(

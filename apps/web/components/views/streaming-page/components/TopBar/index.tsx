@@ -14,7 +14,7 @@ import { Timer } from "./Timer"
 import { sxStyles } from "types/commonTypes"
 import { ViewCount } from "./ViewCount"
 import { CallToActionsButton } from "./CallToActionsButton"
-import { useStreamingContext } from "../../context/StreamContext"
+import { useStreamingContext } from "../../context/Streaming"
 import { ToggleStartLiveStreamButton } from "./ToggleStartLiveStreamButton"
 import { ConnectionStatus } from "./ConnectionStatus"
 import { ReactNode } from "react"
@@ -99,7 +99,7 @@ const HostView = () => (
 )
 
 const ViewerView = () => {
-   const { isStreaming } = useStreamingContext()
+   const { shouldStream } = useStreamingContext()
 
    return (
       <StackComponent justifyContent="flex-end">
@@ -107,7 +107,7 @@ const ViewerView = () => {
             <ViewCount />
          </MarginBox>
          <CallToActionsButton />
-         {isStreaming ? <ConnectionStatus /> : null}
+         {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
          <CheckJobsButton />
       </StackComponent>
