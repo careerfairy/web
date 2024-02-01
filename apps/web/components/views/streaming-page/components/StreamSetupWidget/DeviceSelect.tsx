@@ -37,9 +37,10 @@ const DeviceSelect = ({
    permissionDenied,
    ...props
 }: DeviceSelectProps) => {
+   const inputId = `select-${label.toLowerCase()}` // Generate a unique ID based on the label, replacing spaces with hyphens
+
    return (
       <BrandedTextField
-         id={`select-${label.toLowerCase()}`}
          select
          label={label}
          disabled={permissionDenied}
@@ -52,6 +53,8 @@ const DeviceSelect = ({
          SelectProps={{
             IconComponent: () => <ExpandMoreIcon sx={styles.icon} />,
          }}
+         InputLabelProps={{ htmlFor: inputId }}
+         inputProps={{ id: inputId }}
          // @ts-ignore
          onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
             return onDeviceSelect(event.target.value as string)
