@@ -11,7 +11,6 @@ import { QAndAPanel } from "./QAndAPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
 import { ReactNode } from "react"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { useStreamIsLandscape } from "components/custom-hook/streaming/useStreamIsLandscape"
 
 const drawerWidth = 328
 
@@ -49,8 +48,7 @@ const viewComponents = {
 } satisfies Record<ActiveView | "default", ReactNode>
 
 export const SidePanel = () => {
-   const isMobile = useStreamIsMobile("desktop")
-   const isLandScape = useStreamIsLandscape()
+   const isMobile = useStreamIsMobile()
 
    const dispatch = useAppDispatch()
    const { isOpen, activeView } = useAppSelector(sidePanelSelector)
@@ -61,7 +59,7 @@ export const SidePanel = () => {
 
    const content = viewComponents[activeView] ?? viewComponents.default
 
-   if (isMobile || isLandScape) {
+   if (isMobile) {
       return (
          <SwipeableDrawer
             onOpen={handleToggle}

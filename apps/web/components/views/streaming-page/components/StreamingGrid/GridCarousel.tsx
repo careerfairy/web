@@ -1,0 +1,153 @@
+import { useState, useEffect, useCallback, useMemo, ReactNode } from "react"
+import useEmblaCarousel, {
+   EmblaCarouselType,
+   EmblaOptionsType,
+} from "embla-carousel-react"
+import { combineStyles, sxStyles } from "types/commonTypes"
+import {
+   Box,
+   ButtonBase,
+   ButtonBaseProps,
+   Collapse,
+   Stack,
+} from "@mui/material"
+
+const SLIDE_SIZE = "100%"
+
+export const MOBILE_SPACING = 0.75
+export const DESKTOP_SPACING = 2
+
+const styles = sxStyles({
+   root: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      position: "relative",
+   },
+   viewport: {
+      overflow: "hidden",
+      flex: 1,
+   },
+   container: {
+      backfaceVisibility: "hidden",
+      display: "flex",
+      touchAction: "pan-y",
+      marginLeft: {
+         xs: MOBILE_SPACING * -1,
+         tablet: DESKTOP_SPACING * -1,
+      },
+      height: "100%",
+   },
+   slide: {
+      flex: `0 0 ${SLIDE_SIZE}`,
+      minWidth: "0",
+      position: "relative",
+      paddingLeft: {
+         xs: MOBILE_SPACING,
+         tablet: DESKTOP_SPACING,
+      },
+   },
+   collapseContainer: {
+      position: "absolute", // To ensure the dots don't change component height
+      bottom: 0,
+      width: "100%",
+      transform: "translateY(100%)", // Move the container down by its own height
+   },
+   dot: {
+      width: 10,
+      height: 10,
+      borderRadius: "50%",
+      backgroundColor: "#D9D9D9",
+      transition: (theme) => theme.transitions.create("background-color"),
+   },
+   dotSelected: {
+      backgroundColor: "#808080",
+   },
+})
+
+type Props = {
+   nodes: ReactNode[]
+}
+
+export const GridCarousel = ({ nodes }: Props) => {
+   const options = useMemo<EmblaOptionsType>(
+      () => ({
+         active: nodes.length > 1,
+      }),
+      [nodes]
+   )
+   const [emblaRef, emblaApi] = useEmblaCarousel(options)
+   const [selectedIndex, setSelectedIndex] = useState(0)
+   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
+   const scrollTo = useCallback(
+      (index: number) => emblaApi && emblaApi.scrollTo(index),
+      [emblaApi]
+   )
+
+   const onInit = useCallback((emblaApi: EmblaCarouselType) => {
+      setScrollSnaps(emblaApi.scrollSnapList())
+   }, [])
+
+   const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+      setSelectedIndex(emblaApi.selectedScrollSnap())
+   }, [])
+
+   useEffect(() => {
+      if (!emblaApi) return
+
+      onInit(emblaApi)
+      onSelect(emblaApi)
+      emblaApi.on("reInit", onInit)
+      emblaApi.on("reInit", onSelect)
+      emblaApi.on("select", onSelect)
+   }, [emblaApi, onInit, onSelect])
+
+   return (
+      <Box sx={styles.root}>
+         <Box sx={styles.viewport} ref={emblaRef}>
+            <Box sx={styles.container}>
+               {nodes.map((node, idx) => (
+                  <Box sx={styles.slide} key={idx}>
+                     {node}
+                  </Box>
+               ))}
+            </Box>
+         </Box>
+
+         <Collapse sx={styles.collapseContainer} in={nodes.length > 1}>
+            <Stack
+               direction="row"
+               justifyContent="center"
+               pt={{
+                  xs: 1.25,
+                  tablet: 1.5,
+               }}
+               spacing={0.875}
+            >
+               {scrollSnaps.map((_, index) => (
+                  <DotButton
+                     key={index}
+                     onClick={() => scrollTo(index)}
+                     sx={index === selectedIndex && styles.dotSelected}
+                  />
+               ))}
+            </Stack>
+         </Collapse>
+      </Box>
+   )
+}
+
+export const DotButton = (props: ButtonBaseProps) => {
+   const { children, sx, ...restProps } = props
+
+   return (
+      <ButtonBase
+         type="button"
+         sx={combineStyles(styles.dot, sx)}
+         {...restProps}
+      >
+         {children}
+      </ButtonBase>
+   )
+}
