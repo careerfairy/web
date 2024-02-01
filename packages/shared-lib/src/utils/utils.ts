@@ -8,6 +8,7 @@ import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
 export const getNestedProperty = (
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    obj: any,
    path: string | string[],
    separator = "."
@@ -80,8 +81,8 @@ export const sortLivestreamsDesc = (
    b: LivestreamEvent,
    reverse = false
 ): number => {
-   let aa = reverse ? b : a
-   let bb = reverse ? a : b
+   const aa = reverse ? b : a
+   const bb = reverse ? a : b
 
    if (aa.start instanceof Date && bb.start instanceof Date) {
       return bb.start.getTime() - aa.start.getTime()
@@ -179,7 +180,7 @@ export const addUtmTagsToLink = ({
 export const round = (num: number, decimalPlaces: number): number => {
    if (isNaN(num)) return num
 
-   let f = Math.pow(10, decimalPlaces)
+   const f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }
 
@@ -190,6 +191,12 @@ export const containsAny = (source: string[], target: string[]): boolean => {
    return source?.some((item) => target?.includes(item))
 }
 
+export const arrayContainsAny = <Type>(
+   source: Type[],
+   target: Type[]
+): boolean => {
+   return source?.some((item) => target?.includes(item))
+}
 /**
  * Remove duplicates values
  * @param arr
@@ -224,4 +231,46 @@ export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
       return text
    }
    return text.substring(0, maxLength - ellipsis.length) + ellipsis
+}
+
+export const queryParamToArr = (
+   queryParam: string | string[] | undefined
+): string[] => {
+   if (!queryParam) return []
+   if (Array.isArray(queryParam)) return queryParam.sort()
+   return queryParam.split(",").map(decodeURIComponent).sort() // to make sure the order is always the same for caching the key
+}
+
+export const queryParamToBool = (
+   queryParam: string | string[] | undefined
+): boolean => {
+   if (!queryParam || Array.isArray(queryParam)) return false
+   return queryParam?.toLowerCase() === "true" || false
+}
+
+/**
+ * Checks whether a given set of Query String filters, are within the imposed limit by Firestore
+ * when used in queries. Applying only to filters of Collection type. To prevent a query from becoming too computationally expensive,
+ * Cloud Firestore limits a query to a maximum of 30 disjunctions in disjunctive normal form.
+ * @see https://firebase.google.com/docs/firestore/query-data/queries?hl=en#limits_on_or_queries
+ * @param limit Limit imposed by Firestore.
+ * @param filters Collection of Arrays of various filters of any type, where only the length of each
+ * Array in the collection @param filters is taken into consideration for limit check.
+ * @returns Boolean indicating whether the provided @param filters, given the length of each individual collection it
+ * holds, will exceed or not, the imposed @param limit .
+ */
+export const isWithinNormalizationLimit = (
+   limit: number,
+   ...filters: Array<Array<unknown>>
+): boolean => {
+   // Filter empty collections, would result in zero multiplication
+   // Map the collection to lengths for calculation
+   const sanitizedFilters = filters
+      .filter((items) => Boolean(items.length))
+      .map((items) => items.length)
+
+   return (
+      sanitizedFilters.reduce((previous, current) => previous * current, 1) <
+      limit
+   )
 }

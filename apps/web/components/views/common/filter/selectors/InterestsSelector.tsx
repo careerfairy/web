@@ -23,7 +23,10 @@ const InterestsSelector = ({ handleChange }: Props) => {
       let selectedTags = []
 
       if (queryTags) {
-         selectedTags = formatToOptionArray(queryTags.split(","), interests)
+         selectedTags = formatToOptionArray(
+            queryTags.split(",").map(decodeURIComponent),
+            interests
+         )
       }
       return selectedTags
    }, [interests, query.interests])

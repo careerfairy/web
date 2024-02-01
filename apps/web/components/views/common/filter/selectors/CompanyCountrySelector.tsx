@@ -23,7 +23,7 @@ const CompanyCountrySelector = ({ handleChange }: Props) => {
 
       if (queryCompanyCountry) {
          selectedCountry = formatToOptionArray(
-            queryCompanyCountry.split(","),
+            queryCompanyCountry.split(",").map(decodeURIComponent),
             CompanyCountryValues
          )
       }
@@ -37,6 +37,7 @@ const CompanyCountrySelector = ({ handleChange }: Props) => {
          allValues={RelevantCompanyCountryValues}
          setFieldValue={handleChange}
          getValueFn={multiListSelectMapValueFn}
+         useStyledCheckbox
       />
    )
 }

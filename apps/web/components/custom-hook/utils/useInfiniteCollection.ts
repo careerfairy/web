@@ -10,12 +10,14 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { doc, getDoc } from "firebase/firestore"
+import { doc, getDoc, query } from "firebase/firestore"
+import useCountQuery, { CountQuery } from "../useCountQuery"
 
 export interface UseInfiniteCollection<T> {
    query: Query<T>
    limit: number
    initialData?: T[]
+   countQuery?: Query<T>
 }
 
 export interface InfiniteCollection<T extends Identifiable> {
@@ -27,6 +29,7 @@ export interface InfiniteCollection<T extends Identifiable> {
    handleClientSideUpdate: (docId: string, updateData: Partial<T>) => void
    getAll: () => Promise<void>
    query: Query<T>
+   totalCount: CountQuery
 }
 
 const useInfiniteCollection = <T extends Identifiable>(
@@ -46,6 +49,15 @@ const useInfiniteCollection = <T extends Identifiable>(
    const queryWithLimit = useMemo(
       () => firestoreQuery(options.query, limit(options.limit)),
       [options.query, options.limit]
+   )
+
+   const countQuery = useMemo(
+      () => query(options.countQuery),
+      [options.countQuery]
+   )
+
+   const countQueryResponse = useCountQuery(
+      options.countQuery ? countQuery : null
    )
 
    const fetchDocuments = useCallback(
@@ -165,6 +177,7 @@ const useInfiniteCollection = <T extends Identifiable>(
       handleClientSideUpdate,
       getAll,
       query: options.query,
+      totalCount: countQueryResponse,
    }
 }
 

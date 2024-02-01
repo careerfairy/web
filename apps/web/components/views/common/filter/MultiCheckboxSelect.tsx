@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable react/no-object-type-as-default-prop */
 import React, { Dispatch, memo, useCallback, useMemo } from "react"
 import {
    Checkbox,
@@ -24,12 +27,15 @@ const styles = sxStyles({
    },
    labelText: {
       fontWeight: 400,
-      fontSize: "18px",
+      fontSize: "16px",
    },
    column: {
       display: "flex",
       flexDirection: "column",
       width: "100%",
+   },
+   styledCheckbox: {
+      transform: "scale(1.2)",
    },
 })
 
@@ -50,7 +56,7 @@ const MultiCheckboxSelect = ({
          const name = event.target.name
          const selectedOption = allValues.find((value) => value.id === name)
 
-         let dataToBubbleUp = checked
+         const dataToBubbleUp = checked
             ? [...selectedItems, selectedOption]
             : selectedItems.filter((value) => value.id !== name)
 
@@ -80,7 +86,7 @@ const MultiCheckboxSelect = ({
       () =>
          type !== "doubleColumn"
             ? allValues
-            : allValues.slice(0, allValues.length / 2 + 1),
+            : allValues.slice(0, allValues.length / 2),
       [allValues, type]
    )
 
@@ -88,7 +94,7 @@ const MultiCheckboxSelect = ({
       () =>
          type !== "doubleColumn"
             ? undefined
-            : allValues.slice(allValues.length / 2 + 1),
+            : allValues.slice(allValues.length / 2),
       [allValues, type]
    )
 
@@ -98,7 +104,13 @@ const MultiCheckboxSelect = ({
             key={getKeyFn(option)}
             onChange={handleChange}
             name={getKeyFn(option)}
-            control={useStyledCheckbox ? <StyledCheckbox /> : <Checkbox />}
+            control={
+               useStyledCheckbox ? (
+                  <StyledCheckbox sx={styles.styledCheckbox} />
+               ) : (
+                  <Checkbox />
+               )
+            }
             label={
                <Typography sx={styles.labelText}>
                   {getLabelFn(option)}
