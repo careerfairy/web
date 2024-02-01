@@ -20,19 +20,19 @@ export class RankedSpark {
    }
 
    getCompanyCountryId(): string {
-      return this.model.companyCountry.id
+      return this.model.spark.group.companyCountry.id
    }
 
    getCompanyIndustryIds(): string[] {
-      return this.model.companyIndustries.map((e) => e.id)
+      return this.model.spark.group.companyIndustries.map((e) => e.id)
    }
 
    getCompanySize(): string {
-      return this.model.companySize
+      return this.model.spark.group.companySize
    }
 
    getCategoryId(): string {
-      return this.model.category.id
+      return this.model.spark.category.id
    }
 
    getCompanyTargetCountriesIds(): string[] {

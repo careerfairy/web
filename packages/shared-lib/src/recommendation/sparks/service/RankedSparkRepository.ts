@@ -1,5 +1,5 @@
 import { GroupOption, PublicGroup } from "../../../groups"
-import { SparkStats } from "../../../sparks/sparks"
+import { Spark, SparkStats } from "../../../sparks/sparks"
 import { sortSparkStats } from "../../../utils/utils"
 import { RankedSpark, sortRankedSparksByPoints } from "../RankedSpark"
 
@@ -190,10 +190,11 @@ export class RankedSparkRepository {
       limit = 30
    ): RankedSpark[] {
       // Get sparks filtered by company's country
-      const sparks = this.getSparksFilteredByField(
+      const sparks = this.getSparksFilteredByGroupArrayFields(
          "companyCountry",
          companyCountryIds,
-         limit
+         limit,
+         "id"
       )
 
       return this.rankSparks({
@@ -216,10 +217,11 @@ export class RankedSparkRepository {
       limit = 30
    ): RankedSpark[] {
       // Get sparks filtered by company's industries
-      const sparks = this.getSparksFilteredByField(
+      const sparks = this.getSparksFilteredByGroupArrayFields(
          "companyIndustries",
          industriesIds,
-         limit
+         limit,
+         "id"
       )
 
       return this.rankSparks({
@@ -241,7 +243,7 @@ export class RankedSparkRepository {
       companySizes: string[],
       limit = 30
    ): RankedSpark[] {
-      const sparks = this.getSparksFilteredByField(
+      const sparks = this.getSparksFilteredByGroupArrayFields(
          "companySize",
          companySizes,
          limit
@@ -304,7 +306,7 @@ export class RankedSparkRepository {
    }
 
    /**
-    * Filter sparks by a specific field ID
+    * Filter sparks by a specific fields
     *
     * @param field - The field to filter by
     * @param values - Array of values to match
@@ -312,13 +314,13 @@ export class RankedSparkRepository {
     * @returns Array of ranked sparks filtered by the specified field ID
     */
    private getSparksFilteredByField(
-      field: keyof SparkStats,
+      field: keyof Spark,
       values: unknown[],
       limit: number
    ): RankedSpark[] {
       return this.sparks
          .filter((rankedSpark) => {
-            const sparkFieldValue = rankedSpark.model[field]
+            const sparkFieldValue = rankedSpark.model.spark[field]
 
             if (sparkFieldValue && Array.isArray(sparkFieldValue)) {
                return sparkFieldValue.some((value) => values.includes(value.id))
@@ -354,18 +356,35 @@ export class RankedSparkRepository {
       field: keyof PublicGroup,
       values: unknown[],
       limit: number,
-      validationField: keyof GroupOption | "country"
+      validationField?: keyof GroupOption | "country"
    ): RankedSpark[] {
       return this.sparks
          .filter((spark) => {
-            const sparkArrayField = spark.model.spark.group[field]
+            const sparkFieldValue = spark.model.spark.group[field]
 
-            if (!sparkArrayField || !Array.isArray(sparkArrayField))
-               return false
+            if (
+               sparkFieldValue &&
+               Array.isArray(sparkFieldValue) &&
+               validationField
+            ) {
+               return sparkFieldValue.some((value) =>
+                  values.includes(value[validationField])
+               )
+            }
 
-            return sparkArrayField.some((value) =>
-               values.includes(value[validationField])
-            )
+            if (sparkFieldValue && typeof sparkFieldValue === "string") {
+               return values.includes(sparkFieldValue)
+            }
+
+            if (
+               sparkFieldValue &&
+               typeof sparkFieldValue === "object" &&
+               "id" in sparkFieldValue
+            ) {
+               return values.includes(sparkFieldValue?.id)
+            }
+
+            return false
          })
          .slice(0, limit)
    }

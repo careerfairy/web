@@ -248,10 +248,9 @@ export interface ISparkFunctionsRepository {
    /**
     * Syncs a spark to the spark stats document
     * @param spark The spark to sync
-    * @param group The group of the spark
     * @returns void
     */
-   syncSparkToSparkStatsDocument(spark: Spark, group: Group): Promise<void>
+   syncSparkToSparkStatsDocument(spark: Spark): Promise<void>
 
    /**
     * Create spark notification
@@ -811,10 +810,7 @@ export class SparkFunctionsRepository
       return void sparkStatsRef.update(sparkStats)
    }
 
-   async syncSparkToSparkStatsDocument(
-      spark: Spark,
-      group: Group
-   ): Promise<void> {
+   async syncSparkToSparkStatsDocument(spark: Spark): Promise<void> {
       const sparkStatsRef = this.firestore
          .collection("sparkStats")
          .doc(spark.id)
@@ -843,9 +839,6 @@ export class SparkFunctionsRepository
             uniquePlays: 0,
             deleted: false,
             deletedAt: null,
-            companyIndustries: group.companyIndustries ?? [],
-            companyCountry: group.companyCountry ?? null,
-            companySize: group.companySize ?? "",
          }
 
          return void sparkStatsRef.set(sparkStats)

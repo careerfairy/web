@@ -18,7 +18,7 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
    public mostCommonCompanyCountryCode() {
       const mostCommonCompanyCountryCode = getMostCommonArrayValues<SparkStats>(
          this.sparks,
-         (spark) => [spark.companyCountry?.id]
+         (spark) => [spark.spark.group.companyCountry?.id]
       )
 
       if (mostCommonCompanyCountryCode.length) {
@@ -37,7 +37,7 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
    public mostCommonCompanyIndustries() {
       const mostCommonCompanyIndustries = getMostCommonArrayValues<SparkStats>(
          this.sparks,
-         (spark) => spark.companyIndustries?.map((e) => e?.id)
+         (spark) => spark.spark.group.companyIndustries?.map((e) => e?.id)
       )
 
       if (mostCommonCompanyIndustries.length) {
@@ -56,7 +56,7 @@ export class SparkBasedRecommendationsBuilder extends RecommendationsBuilder {
    public mostCommonCompanySizes() {
       const mostCommonCompanySizes = getMostCommonArrayValues<SparkStats>(
          this.sparks,
-         (spark) => [spark.companySize]
+         (spark) => [spark.spark.group.companySize]
       )
 
       if (mostCommonCompanySizes.length) {
