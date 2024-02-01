@@ -80,6 +80,9 @@ const styles = sxStyles({
       textTransform: "none",
       fontSize: "15px",
       color: "#8E8E8E",
+      "&:hover": {
+         backgroundColor: "#EEEEEE",
+      },
    },
    dialog: {
       mt: "73px",
