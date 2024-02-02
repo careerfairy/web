@@ -13,6 +13,7 @@ import {
 import EditDialog from "../EditDialog"
 import AboutDialog from "./AboutDialog"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const styles = sxStyles({
    wrapper: {
@@ -111,7 +112,7 @@ const AboutSection = () => {
             {showIcons ? renderIcons() : null}
             <Box mt={2}>
                <Typography variant="h6" fontWeight={"400"} color="black">
-                  {extraInfo}
+                  <SanitizedHTML htmlString={extraInfo} />
                </Typography>
             </Box>
          </Box>

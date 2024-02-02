@@ -8,7 +8,7 @@ import {
 } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik } from "formik"
-import React, { useCallback, useMemo } from "react"
+import React, { MutableRefObject, useCallback, useMemo, useRef } from "react"
 import { useCompanyPage } from "../index"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
@@ -16,6 +16,8 @@ import * as yup from "yup"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import dynamic from "next/dynamic";
+import ReactQuill from "react-quill"
+import { CustomRichTextEditorProps } from "../../../util/CustomRichTextEditor"
 
 type Props = {
    handleClose: () => void
@@ -25,8 +27,19 @@ const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
-   const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false });
-   const inputRef = React.useRef(0);
+   //const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false });
+
+   const DynamicCustomRichTextEditor = dynamic(async () => {
+      const { default: CustomRichTextEditor } = await import('../../../util/CustomRichTextEditor');
+  
+      // eslint-disable-next-line react/display-name
+      return ({ forwardedRef, ...props }: CustomRichTextEditorProps & { forwardedRef: MutableRefObject<ReactQuill>}) => {
+         console.log(forwardedRef)
+         return (<CustomRichTextEditor ref={forwardedRef} {...props} />)
+      };
+    }, { ssr: false })
+
+   const richTextInputRef = useRef<ReactQuill>();
 
    const initialValues = useMemo(
       () => ({
@@ -121,17 +134,18 @@ const AboutDialog = ({ handleClose }: Props) => {
                            variant="outlined"
                            minRows={4}
                            className="multiLineInput"
-                           inputRef={inputRef}
                            InputProps={{
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               inputComponent: DynamicCustomRichTextEditor as any,
-                              inputRef: inputRef
-                              
+                              inputRef: richTextInputRef
                            }}
                            inputProps={{
                               value: values.extraInfo,
                               setFieldValue: setFieldValue,
-                              name: "extraInfo"
-                           }}
+                              name: "extraInfo",
+                              disabled: isSubmitting,
+                              forwardedRef: richTextInputRef,
+                           }} 
                         />
                         <Collapse
                            in={Boolean(errors.extraInfo)}
@@ -164,6 +178,7 @@ const AboutDialog = ({ handleClose }: Props) => {
 const schema = yup.object().shape({
    extraInfo: yup
       .string()
+      .transform(value => value.replace(/<[^>]+>/g, '')) // Strip HTML tags
       .required("Please describe your company")
       .min(
          GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,

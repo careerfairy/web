@@ -1,43 +1,37 @@
 import ReactQuill, {ReactQuillProps} from 'react-quill';
-// import 'react-quill/dist/quill.bubble.css';
+import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
-
 import {forwardRef} from "react"; // import the styles
 
-type Props = ReactQuillProps & {
-    setFieldValue: (field: string, name: string) => void
-    name: string
+export type CustomRichTextEditorProps = ReactQuillProps & {
+    setFieldValue: (field: string, name: string) => void;
+    name: string;
+    disabled?: boolean;
+    minRows?: number;
+    rows?: number;
+    placeholder?: string;
 }
 
 // eslint-disable-next-line react/display-name
-const CustomRichTextEditorRef = forwardRef<ReactQuill, Props>(
-    (props, ref) => {
-        const { setFieldValue, name } = props
-
+const CustomRichTextEditor = forwardRef<ReactQuill, CustomRichTextEditorProps>((props, ref) => {
+        const { setFieldValue, name, disabled, placeholder } = props
+        
         return (
             <ReactQuill
-            {...props}
-            // theme="bubble"
-            onChange={(values) => setFieldValue(name, values)}
-            modules={modules}
-            ref={ref}
-            />
+                {...props}
+                theme="snow"
+                ref={ref}
+                onChange={(values) => setFieldValue(name, values)}
+                modules={modules}
+                readOnly={disabled}
+                placeholder={placeholder}
+            >
+                {props.children}
+            </ReactQuill>
         )
 });
 
-/*const CustomRichTextEditor: FC<ReactQuillProps> = ({children, ...props}) => {
-    console.log(props)
 
-    return (
-        <ReactQuill
-            {...props}
-            theme="bubble"
-            modules={modules}
-        >
-            {children}
-        </ReactQuill>
-    )
-}*/
 
 // set some default props because we don't want all the features enabled
 const modules = {
@@ -45,9 +39,8 @@ const modules = {
         [{'header': [1, 2, false]}],
         ['bold', 'italic', 'underline', 'strike', 'blockquote'],
         [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-        ['link', 'image'],
         ['clean']
     ],
 }
 
-export default CustomRichTextEditorRef
+export default CustomRichTextEditor

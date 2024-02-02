@@ -5,6 +5,7 @@ import React from "react"
 import { useCompanyPage } from "../index"
 import { Edit2 as EditIcon } from "react-feather"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 type Props = {
    testimonial: Testimonial
@@ -131,7 +132,7 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
                   fontWeight={400}
                   color={"text.secondary"}
                >
-                  {description}
+                  <SanitizedHTML htmlString={description} />
                </Typography>
             </Box>
          </Box>

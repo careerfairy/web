@@ -113,3 +113,24 @@ body {
 a {
    text-decoration: none;
 }
+
+.ql-snow.ql-toolbar {
+   border: none !important;
+   border-bottom: 1px solid #ccc !important;
+   margin-bottom: 1rem;
+}
+
+.ql-container.ql-snow {
+   border: none !important;
+}
+
+.ql-container {
+   font-family: inherit !important;
+   font-size: inherit !important;
+}
+
+.ql-editor {
+   font-size: inherit;
+   font-family: inherit;
+   padding: 0 !important;
+}
