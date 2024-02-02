@@ -650,3 +650,27 @@ export type FilterLivestreamsOptions = {
    companyCountries?: string[]
    targetFieldsOfStudy?: FieldOfStudy[]
 }
+/**
+ * Options for livestream token fetching
+ *  - SECURE: Fetches the secureToken
+ *  - RECORDING: Fecthes the recordingToken
+ */
+export type LivestreamsTokenOptions = {
+   livestreamId: string
+   type: "SECURE" | "RECORDING"
+}
+/**
+ * Response for a livestream token request
+ */
+export type LivestreamsTokenResponse = {
+   token: string
+}
+
+/**
+ * Response for a livestream token request
+ */
+export type CategoryDataOption = {
+   livestream?: LivestreamEvent
+   breakoutRoomId?: string | string[] // Could be unnecessary
+   userData?: UserData
+}
