@@ -12,7 +12,7 @@ const useRegisteredUsersSWR = (options: UseRegisteredUsersOptions) => {
       () => (!options.livestreamId ? null : JSON.stringify(options)),
       [options]
    )
-   // console.log("🚀 ~ options:", options)
+
    const swrFetcher = useCallback(
       () =>
          livestreamService.fetchLivestreamRegisteredUsers(options.livestreamId),

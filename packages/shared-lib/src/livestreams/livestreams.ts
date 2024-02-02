@@ -671,6 +671,6 @@ export type LivestreamsTokenResponse = {
  */
 export type CategoryDataOption = {
    livestream?: LivestreamEvent
-   breakoutRoomId?: string | string[] // Could be unnecessary
+   breakoutRoomId?: string | string[]
    userData?: UserData
 }

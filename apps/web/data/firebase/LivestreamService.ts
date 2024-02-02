@@ -106,14 +106,6 @@ export class LivestreamService {
       } = options
 
       try {
-         console.log(
-            "🚀 ~ LivestreamService ~ checkCategoryData ~ test: userData -> " +
-               userData +
-               " , test ->  " +
-               currentLivestream?.test +
-               ", map -> " +
-               currentLivestream?.groupQuestionsMap
-         )
          if (
             userData &&
             !currentLivestream?.test &&
@@ -122,10 +114,6 @@ export class LivestreamService {
          ) {
             const livestreamGroups = await firebase.getGroupsWithIds(
                currentLivestream.groupIds
-            )
-            console.log(
-               "🚀 ~ LivestreamService ~ checkCategoryData ~ livestreamGroups:",
-               livestreamGroups
             )
 
             const [{ hasAgreedToAll }, answeredLivestreamGroupQuestions] =
