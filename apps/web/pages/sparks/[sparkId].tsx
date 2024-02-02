@@ -1,6 +1,6 @@
 import {
    SerializedSpark,
-SparkPresenter,
+   SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
 import SparkSeo from "components/views/sparks/components/SparkSeo"

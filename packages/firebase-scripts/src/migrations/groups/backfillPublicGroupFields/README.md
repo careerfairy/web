@@ -1,6 +1,6 @@
 # Back-fill Public Group Fields
 
-The purpose of this migration is to add the `targetedCountries`, `targetedFieldsOfStudy`, `targetedUniversities` and `plan` fields from the `Group` document to the `PublicGroup` type.
+The purpose of this migration is to add the `targetedCountries`, `targetedFieldsOfStudy`, `targetedUniversities`, `companyIndustries`, `companyCountry`, `companySize` and `plan` fields from the `Group` document to the `PublicGroup` type.
 
 It's required to update the following collections:
 
