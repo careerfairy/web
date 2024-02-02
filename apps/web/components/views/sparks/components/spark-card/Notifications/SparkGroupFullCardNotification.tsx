@@ -25,6 +25,7 @@ const styles = sxStyles({
    },
    title: {
       fontWeight: "bold",
+      fontSize: "32px !important",
 
       "@media (max-height: 800px)": {
          fontSize: "22px !important",
@@ -111,10 +112,10 @@ const SparkGroupFullCardNotification: FC<Props> = ({ group }) => {
             </Box>
          </Avatar>
          <Box sx={styles.header}>
-            <Typography variant={"h3"} sx={styles.title}>
+            <Typography variant={"h2"} sx={styles.title}>
                That’s all from
             </Typography>
-            <Typography variant={"h3"} sx={styles.title} mt={1}>
+            <Typography variant={"h2"} sx={styles.title} mt={1}>
                {group.universityName}
             </Typography>
 
