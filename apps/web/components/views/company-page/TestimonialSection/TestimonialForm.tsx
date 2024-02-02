@@ -9,9 +9,11 @@ import {
 } from "@mui/material"
 import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
 import { UserPlus } from "react-feather"
-import React from "react"
+import React, { useRef } from "react"
 import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
 import { FormikValues } from "formik"
+import ReactQuill from "react-quill"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
    multiline: {
@@ -75,6 +77,8 @@ const TestimonialForm = ({
    disabledAddMoreTestimonials,
 }: Props) => {
    const isLast = index === Object.keys(values.testimonials).length - 1
+   const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false })
+   const richTextInputRef = useRef<ReactQuill>();
 
    return (
       <>
@@ -116,6 +120,17 @@ const TestimonialForm = ({
                         value={testimonial.testimonial}
                         variant="outlined"
                         sx={styles.multiline}
+                        InputProps={{
+                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           inputComponent: DynamicCustomRichTextEditor as any,
+                           inputRef: richTextInputRef
+                        }}
+                        inputProps={{
+                           value: testimonial.testimonial,
+                           setFieldValue: setFieldValue,
+                           name: `testimonials.${objectKey}.testimonial`,
+                           disabled: isSubmitting,
+                        }} 
                      />
                      <Collapse
                         in={Boolean(testimonialError)}
