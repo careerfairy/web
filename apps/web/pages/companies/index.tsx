@@ -4,12 +4,13 @@ import SEO from "../../components/util/SEO"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import CompaniesPageOverview from "../../components/views/companies/CompaniesPageOverview"
 import { InferGetServerSidePropsType, NextPage } from "next"
-import { getInfiniteQuery } from "../../components/views/companies/useInfiniteCompanies"
-import { getDocs } from "@firebase/firestore"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Group, serializeGroup } from "@careerfairy/shared-lib/groups"
-import { COMPANIES_PAGE_SIZE } from "components/util/constants"
-import { deserializeGroups } from "util/serverUtil"
+import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
+import { companyService } from "data/firebase/CompanyService"
+import { CompanyIndustryValues } from "constants/forms"
+import {
+   queryParamToArr,
+   queryParamToBool,
+} from "@careerfairy/shared-lib/utils"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -21,22 +22,33 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
             title={"CareerFairy | Companies"}
          />
          <GenericDashboardLayout pageDisplayName={"Companies"}>
-            <CompaniesPageOverview
-               serverSideCompanies={deserializeGroups(serverSideCompanies)}
-            />
+            <CompaniesPageOverview serverSideCompanies={serverSideCompanies} />
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
    )
 }
+/**
+ *
+ * @param query Query string object, all aplied filters are passed by query string parameters.
+ * @returns @type FilterCompanyOptions mapped from the query string object
+ */
+const getQueryVariables = (query): FilterCompanyOptions => {
+   return {
+      companyCountries: queryParamToArr(query.companyCountries),
+      companyIndustries: queryParamToArr(query.companyIndustries),
+      publicSparks: queryParamToBool(query.companySparks as string),
+      companySize: queryParamToArr(query.companySizes),
+      allCompanyIndustries: CompanyIndustryValues,
+   }
+}
 
-export const getServerSideProps = async () => {
-   const snaps = await getDocs(getInfiniteQuery(COMPANIES_PAGE_SIZE))
-
+export const getServerSideProps = async (ctx) => {
+   const query = getQueryVariables(ctx.query)
+   const companies = await companyService.fetchCompanies(query)
    return {
       props: {
-         serverSideCompanies:
-            mapFirestoreDocuments<Group>(snaps).map(serializeGroup),
+         serverSideCompanies: companies,
       },
    }
 }

@@ -1,4 +1,4 @@
-import { Identifiable, ImageType } from "../commonTypes"
+import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
@@ -347,4 +347,12 @@ export type GroupAdminNewEventEmailInfo = {
     * Link to the public live stream event page in the platform
     */
    nextLivestreamsLink: string
+}
+
+export type FilterCompanyOptions = {
+   companyIndustries?: string[]
+   companyCountries?: string[]
+   publicSparks?: boolean
+   companySize?: string[]
+   allCompanyIndustries?: OptionGroup[]
 }
