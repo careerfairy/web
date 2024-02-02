@@ -2,8 +2,9 @@ import { Box, Button, ButtonGroup } from "@mui/material"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { GridCarousel } from "../GridCarousel"
-import useGalleryLayout from "./useGalleryLayout"
 import { LayoutGrid } from "../LayoutGrid"
+import { useGalleryLayout } from "./useGalleryLayout"
+import { usePaginatedGridLayout } from "../hooks/usePaginatedGridLayout"
 
 const styles = sxStyles({
    root: {
@@ -21,10 +22,7 @@ const styles = sxStyles({
    },
 })
 
-const generateRemoteStreamers = (
-   streamers: number[],
-   count: number
-): number[] => {
+const generateRemoteStreamers = (count: number): number[] => {
    // Generates an array of unique numbers starting from 1 up to `count`
    return Array.from({ length: count }, (_, index) => index + 1)
 }
@@ -32,10 +30,10 @@ const generateRemoteStreamers = (
 export const GalleryLayout = () => {
    // Dummy data generation for demo
    const [numStreamers, setNumStreamers] = useState(2)
-   const remoteStreamers = generateRemoteStreamers([0], numStreamers)
+   const remoteStreamers = generateRemoteStreamers(numStreamers)
 
-   const { galleryPages, layout, numOfPages } =
-      useGalleryLayout(remoteStreamers)
+   const layout = useGalleryLayout(remoteStreamers.length)
+   const gridPages = usePaginatedGridLayout(remoteStreamers, layout)
 
    return (
       <Box sx={styles.root}>
@@ -54,13 +52,12 @@ export const GalleryLayout = () => {
             </ButtonGroup>
          </Box>
          <GridCarousel
-            nodes={galleryPages.map((pageStreamers, pageIndex) => (
+            nodes={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
                   elements={pageStreamers}
-                  pageIndex={pageIndex}
                   isLastButNotFirstPage={
-                     pageIndex === numOfPages - 1 && pageIndex !== 0
+                     pageIndex === gridPages.length - 1 && pageIndex !== 0
                   }
                   layout={layout}
                   renderGridItem={(element) => (
