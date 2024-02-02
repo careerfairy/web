@@ -24,7 +24,6 @@ const styles = sxStyles({
 
 type Props<ElementType> = {
    elements: ElementType[]
-   pageIndex: number
    isLastButNotFirstPage: boolean
    layout: { columns: number; rows: number }
    renderGridItem: (element: ElementType) => ReactNode
@@ -50,7 +49,6 @@ const calculateAdjustedHeight = (
 
 export const LayoutGrid = <ElementType,>({
    elements,
-   pageIndex,
    isLastButNotFirstPage,
    layout,
    renderGridItem,
@@ -70,9 +68,7 @@ export const LayoutGrid = <ElementType,>({
       >
          <Grid
             container
-            item
             spacing={spacingValue}
-            key={pageIndex}
             justifyContent={isLastButNotFirstPage ? "flex-start" : "center"}
          >
             {elements.map(renderGridItem)}
