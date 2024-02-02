@@ -1,10 +1,10 @@
 import { Box, Button, ButtonGroup } from "@mui/material"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { GridCarousel } from "../GridCarousel"
 import { LayoutGrid } from "../LayoutGrid"
 import { useGalleryLayout } from "./useGalleryLayout"
-import { usePaginatedGridLayout } from "../hooks/usePaginatedGridLayout"
+import { getPaginatedGridLayout } from "../util"
 
 const styles = sxStyles({
    root: {
@@ -33,7 +33,11 @@ export const GalleryLayout = () => {
    const remoteStreamers = generateRemoteStreamers(numStreamers)
 
    const layout = useGalleryLayout(remoteStreamers.length)
-   const gridPages = usePaginatedGridLayout(remoteStreamers, layout)
+
+   const gridPages = useMemo(
+      () => getPaginatedGridLayout(remoteStreamers, layout),
+      [remoteStreamers, layout]
+   )
 
    return (
       <Box sx={styles.root}>

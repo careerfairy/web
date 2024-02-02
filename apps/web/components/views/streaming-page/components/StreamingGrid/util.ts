@@ -1,5 +1,4 @@
-import { useMemo } from "react"
-import { Layout } from "../types"
+import { Layout } from "./types"
 
 /**
  * A custom hook that paginates elements based on the provided layout.
@@ -11,19 +10,15 @@ import { Layout } from "../types"
  * @param {Layout} layout - The layout configuration, including the number of columns and rows per page.
  * @returns {Array<Array<ElementType>>} An array of pages, each containing a subset of elements.
  */
-export const usePaginatedGridLayout = <ElementType>(
+export const getPaginatedGridLayout = <ElementType>(
    elements: ElementType[],
    layout: Layout
 ): Array<Array<ElementType>> => {
    const itemsPerPage = layout.columns * layout.rows
    const numOfPages = Math.ceil(elements.length / itemsPerPage)
 
-   return useMemo(
-      () =>
-         Array.from({ length: numOfPages }, (_, pageIndex) => {
-            const start = pageIndex * itemsPerPage
-            return elements.slice(start, start + itemsPerPage)
-         }),
-      [elements, itemsPerPage, numOfPages]
-   )
+   return Array.from({ length: numOfPages }, (_, pageIndex) => {
+      const start = pageIndex * itemsPerPage
+      return elements.slice(start, start + itemsPerPage)
+   })
 }
