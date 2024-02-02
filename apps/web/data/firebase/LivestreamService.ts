@@ -1,14 +1,31 @@
 import {
+   CategoryDataOption as LivestreamCategoryDataOption,
    FilterLivestreamsOptions,
+   LivestreamEvent,
    LivestreamQueryOptions,
+   LivestreamsTokenOptions,
+   LivestreamsTokenResponse,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
-import { FunctionsInstance } from "./FirebaseInstance"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import {
    AgoraTokenRequest,
    AgoraTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
+import {
+   Query,
+   collection,
+   getDocs,
+   limit,
+   query,
+   where,
+} from "firebase/firestore"
+import FirebaseService from "./FirebaseService"
+import GroupsUtil from "data/util/GroupsUtil"
+import { groupRepo } from "data/RepositoryInstances"
+import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
@@ -34,6 +51,128 @@ export class LivestreamService {
       return mapFromServerSide(serializedLivestreams)
    }
 
+   /**
+    * Fetches token related to livestreams, via a function call
+    * @param options Fetch options, namely the id of the live stream and type of token to be retrieved - SECURE or RECORDING
+    * @returns Token value as string
+    */
+   async fetchLivestreamToken(options: LivestreamsTokenOptions) {
+      const fetchLivestreamToken = httpsCallable<
+         LivestreamsTokenOptions,
+         LivestreamsTokenResponse
+      >(this.functions, "fetchLivestreamToken")
+
+      const {
+         data: { token },
+      } = await fetchLivestreamToken(options)
+
+      return token
+   }
+
+   /**
+    * Retrieves all the registered users for a given livestream ID
+    * @param livestreamId Document ID of the LivestreamEvent
+    * @returns List of user emails who have registered to the Livestream in @param livestreamId
+    */
+   async fetchLivestreamRegisteredUsers(livestreamId: string) {
+      const baseQuery: Query = query(
+         collection(FirestoreInstance, "livestreams"),
+         where("id", "==", livestreamId),
+         limit(1)
+      )
+
+      const snapshot = await getDocs(baseQuery)
+      if (!snapshot.docs.length) return []
+
+      return (snapshot.docs.at(0).data() as unknown as LivestreamEvent)
+         .registeredUsers
+   }
+
+   /**
+    * Validates category data for a livestream, determing if a certain user as answeared and perfomed all steps
+    * for a livestream registration. Current logic is a migration of the validation done in the old streaming application.
+    * @param firebase Firebase service
+    * @param options Category validation data (livestream, userData and breakoutroomId)
+    * @returns true if user has all questions answeared, false otherwise
+    */
+   async checkCategoryData(
+      firebase: FirebaseService,
+      options: LivestreamCategoryDataOption
+   ) {
+      const {
+         livestream: currentLivestream,
+         userData: userData,
+         breakoutRoomId: breakoutRoomId,
+      } = options
+
+      try {
+         console.log(
+            "🚀 ~ LivestreamService ~ checkCategoryData ~ test: userData -> " +
+               userData +
+               " , test ->  " +
+               currentLivestream?.test +
+               ", map -> " +
+               currentLivestream?.groupQuestionsMap
+         )
+         if (
+            userData &&
+            !currentLivestream?.test &&
+            currentLivestream?.groupQuestionsMap &&
+            !breakoutRoomId
+         ) {
+            const livestreamGroups = await firebase.getGroupsWithIds(
+               currentLivestream.groupIds
+            )
+            console.log(
+               "🚀 ~ LivestreamService ~ checkCategoryData ~ livestreamGroups:",
+               livestreamGroups
+            )
+
+            const [{ hasAgreedToAll }, answeredLivestreamGroupQuestions] =
+               await Promise.all([
+                  GroupsUtil.getPolicyStatus(
+                     livestreamGroups,
+                     userData.userEmail,
+                     firebase.checkIfUserAgreedToGroupPolicy
+                  ),
+                  groupRepo.mapUserAnswersToLivestreamGroupQuestions(
+                     userData,
+                     currentLivestream
+                  ),
+               ])
+
+            /*
+             * Here we check if the user has answered all the questions for the livestream
+             * by looking at the user's answers and the livestreams questions in userData/userGroups
+             * */
+            const hasAnsweredAllQuestions =
+               checkIfUserHasAnsweredAllLivestreamGroupQuestions(
+                  answeredLivestreamGroupQuestions
+               )
+
+            // The user might have answered all the questions but not registered to the event,
+            // so we check if the user has registered to the event
+            const hasRegisteredToEvent =
+               currentLivestream?.registeredUsers?.includes?.(
+                  userData.userEmail
+               )
+
+            if (
+               !hasAnsweredAllQuestions || // if the user has not answered all the event questions
+               !hasRegisteredToEvent || // if the user has not registered to the event
+               !hasAgreedToAll // if the user has not agreed to all the policies
+            ) {
+               // we show the registration modal
+               return false
+            }
+            return true
+         }
+         return false
+      } catch (e) {
+         errorLogAndNotify(e)
+         return false
+      }
+   }
    /**
     * Fetches an Agora RTC token with the given data
     * @param data The data required to fetch the RTC token
