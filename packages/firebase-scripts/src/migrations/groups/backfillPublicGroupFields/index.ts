@@ -98,6 +98,9 @@ export async function run() {
             targetedUniversities: group.targetedUniversities ?? [],  
             targetedFieldsOfStudy: group.targetedFieldsOfStudy ?? [],   
             plan: group.plan ?? null, 
+            companyIndustries: group.companyIndustries ?? [],
+            companyCountry: group.companyCountry ?? null,
+            companySize: group.companySize ?? null,
          }
 
          await updateSparksGroup(
