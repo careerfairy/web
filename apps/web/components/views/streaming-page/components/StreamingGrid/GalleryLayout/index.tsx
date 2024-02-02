@@ -52,7 +52,7 @@ export const GalleryLayout = () => {
             </ButtonGroup>
          </Box>
          <GridCarousel
-            nodes={gridPages.map((pageStreamers, pageIndex) => (
+            gridPages={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
                   elements={pageStreamers}
