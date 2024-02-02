@@ -66,15 +66,15 @@ const styles = sxStyles({
 })
 
 type Props = {
-   nodes: ReactNode[]
+   gridPages: ReactNode[]
 }
 
-export const GridCarousel = ({ nodes }: Props) => {
+export const GridCarousel = ({ gridPages }: Props) => {
    const options = useMemo<EmblaOptionsType>(
       () => ({
-         active: nodes.length > 1,
+         active: gridPages.length > 1,
       }),
-      [nodes]
+      [gridPages.length]
    )
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
    const [selectedIndex, setSelectedIndex] = useState(0)
@@ -107,7 +107,7 @@ export const GridCarousel = ({ nodes }: Props) => {
       <Box sx={styles.root}>
          <Box sx={styles.viewport} ref={emblaRef}>
             <Box sx={styles.container}>
-               {nodes.map((node, idx) => (
+               {gridPages.map((node, idx) => (
                   <Box sx={styles.slide} key={idx}>
                      {node}
                   </Box>
@@ -115,7 +115,7 @@ export const GridCarousel = ({ nodes }: Props) => {
             </Box>
          </Box>
 
-         <Collapse sx={styles.collapseContainer} in={nodes.length > 1}>
+         <Collapse sx={styles.collapseContainer} in={gridPages.length > 1}>
             <Stack
                direction="row"
                justifyContent="center"
