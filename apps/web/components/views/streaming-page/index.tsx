@@ -10,7 +10,7 @@ import {
    UserClientProvider,
    LocalTracksProvider,
 } from "./context"
-import { Fragment, ReactNode, useMemo } from "react"
+import { Fragment, useMemo } from "react"
 import { CircularProgress } from "@mui/material"
 import { StreamSetupWidget } from "./components/StreamSetupWidget"
 import {
@@ -20,6 +20,7 @@ import {
 } from "./util"
 import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
+import { LivestreamValidationWrapper } from "./components/LivestreamValidationWrapper"
 
 type Props = {
    isHost: boolean
@@ -28,7 +29,7 @@ type Props = {
 export const StreamingPage = ({ isHost }: Props) => {
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <LivestreamValidationWrapper>
+         <LivestreamValidationWrapper isHost={isHost}>
             <Component isHost={isHost} />
          </LivestreamValidationWrapper>
       </SuspenseWithBoundary>
@@ -88,35 +89,4 @@ const Component = ({ isHost }: Props) => {
          </StreamingProvider>
       </UserClientProvider>
    )
-}
-
-type ConditionalRedirectWrapperProps = {
-   children: ReactNode
-}
-
-/**
- * All validation logic for the live stream data is handled here.
- * Ensures all the children have the data needed without having to check for it in each component.
- *
- * TODO:
- * - Validate token if user is host and not test stream
- * - Validate user must be logged-in except for (test/open) streams
- * - Validate if viewer and has registered for event
- * - Validate browser is compatible with Agora
- */
-export const LivestreamValidationWrapper = ({
-   children,
-}: ConditionalRedirectWrapperProps) => {
-   const livestream = useLivestreamData()
-
-   const livestreamExists = Boolean(livestream)
-
-   useConditionalRedirect(!livestreamExists, "/portal")
-
-   if (!livestreamExists) {
-      // Since we're using suspense, if there's no live stream data, it means it doesn't exist
-      return null
-   }
-
-   return <>{children}</>
 }
