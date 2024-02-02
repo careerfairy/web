@@ -117,6 +117,22 @@ cd packages/functions
 npx firelink deploy --only functions:slackHandleInteractions
 ```
 
+## Deploy a bundle
+
+```sh
+cd packages/functions
+npx firelink deploy --only functions:bundle-pastYearLivestreams
+```
+
+When adding new bundles, it's likely that you'd want to ensure the Firebase Hosting mappings are also updated
+
+```sh
+cd packages/functions
+npx firebase deploy --only hosting
+```
+
+To verify the deployment of your bundle and ensure it is mapped correctly, visit: https://functions.careerfairy.io/bundle-pastYearLivestreams
+
 ## Start the firebase emulators with data
 
 Run the script `packages/fetch-firestore-data` (check its readme for more info):
