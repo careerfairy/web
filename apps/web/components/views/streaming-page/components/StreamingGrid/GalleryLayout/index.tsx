@@ -7,7 +7,7 @@ import { LayoutGrid } from "../LayoutGrid"
 import { useSortedStreams } from "../useSortedStreams"
 import { getPaginatedGridLayout } from "../util"
 import { useGalleryLayout } from "./useGalleryLayout"
-import { RemoteStreamer } from "../../streaming/RemoteStreamer"
+import { RemoteStreamer } from "../../streaming"
 
 const styles = sxStyles({
    root: {
