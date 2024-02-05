@@ -159,25 +159,3 @@ export const createCompatGenericConverter = <
       } as T
    },
 })
-export const createCustomGenericConverter = <T extends Identifiable>(
-   fromMutation?: (snapshot, options) => T,
-   toFirestoreMutation?: (T) => T
-): FirestoreDataConverter<T> => ({
-   toFirestore(modelObject: T) {
-      return (
-         (toFirestoreMutation && toFirestoreMutation(modelObject)) ||
-         modelObject
-      )
-   },
-
-   fromFirestore(snapshot, options): T {
-      return (
-         (!fromMutation &&
-            ({
-               ...snapshot.data(options),
-               id: snapshot.id,
-            } as T)) ||
-         fromMutation(snapshot, options)
-      )
-   },
-})
