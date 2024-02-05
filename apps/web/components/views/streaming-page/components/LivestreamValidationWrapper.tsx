@@ -2,9 +2,9 @@ import { useAuth } from "HOCs/AuthProvider"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import useLivestreamCategoryDataSWR from "components/custom-hook/live-stream/useLivestreamCategoryDataSWR"
 import useLivestreamSecureTokenSWR from "components/custom-hook/live-stream/useLivestreamSecureToken"
-import useRegisteredUsersSWR from "components/custom-hook/live-stream/useRegisteredUsersSWR"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
+import { appendCurrentQueryParams } from "components/util/url"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
@@ -36,7 +36,7 @@ export const LivestreamValidationWrapper = ({
    const { userData, isLoggedIn, authenticatedUser, isLoggedOut } = useAuth()
 
    const {
-      query: { breakoutRoomId, token },
+      query: { token },
    } = useRouter()
 
    const firebase = useFirebaseService()
@@ -51,54 +51,47 @@ export const LivestreamValidationWrapper = ({
       livestreamId: livestream.id,
    })
 
-   const { data: registeredUsers, mutate: refetchRegisteredUsers } =
-      useRegisteredUsersSWR({
-         livestreamId: livestream.id,
-      })
-
    const { data: hasAnswearedAllQuestions, mutate: refetchQuestions } =
       useLivestreamCategoryDataSWR(firebase, {
          livestream: livestream,
          userData: userData,
-         breakoutRoomId: breakoutRoomId,
       })
 
    // Custom validations
-   // 1. user is a host and the stream is not a test stream -> accessible
+   const isUserRegistered = livestream.registeredUsers?.includes(
+      authenticatedUser.email
+   )
+
+   // 1. user is a host and the stream is not a test stream -> accessible - OK
    const isHostNotTestLivestream = isHost && !livestream.test
-   // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page
+   // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page - OK
    const isHostNotTestStreamInvalidLink =
       isHostNotTestLivestream && token !== livestreamToken?.data?.value
-   // 3. user is logged out,test or open stream -> accessible
+   // 3. user is logged out,test or open stream -> accessible - OK
    const isLoggedOutTestOpenStream =
       isLoggedOut && (livestream.test || livestream.openStream)
-   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
+   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri - NOK (redirect ok but blank)
    const isLoggedOutNotTestOpenStream =
       isLoggedOut && !(livestream.test || livestream.openStream)
-   // 5. user is a viewer and has registered for the event -> accessible
-   const isViewerRegistered =
-      !isHost &&
-      isLoggedIn &&
-      registeredUsers?.includes(authenticatedUser.email)
-   // 6. user is a viewer and has not registered for the event -> registration dialog
+
+   // 5. user is a viewer and has registered for the event -> accessible - OK
+   const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
+   // 6. user is a viewer and has not registered for the event -> registration dialog - NOK (skipping questions)
    const isViewerNotRegistered =
-      !isHost &&
-      authenticatedUser.isLoaded &&
-      isLoggedIn &&
-      !registeredUsers?.includes(authenticatedUser.email) // Redirect register
+      !isHost && authenticatedUser.isLoaded && isLoggedIn && !isUserRegistered // Redirect register
 
    useConditionalRedirect(isHostNotTestStreamInvalidLink, "/streaming/error")
 
    const encodedPath = encodeURIComponent(
-      `streaming/${redirectAs}/${livestream.id}`
+      appendCurrentQueryParams(`streaming/${redirectAs}/${livestream.id}`)
    )
+
    useConditionalRedirect(
       isLoggedOutNotTestOpenStream,
       `/login?absolutePath=${encodedPath}`
    )
 
    const afterRegistrationMutations = () => {
-      refetchRegisteredUsers()
       refetchQuestions()
    }
    const allowRules = [
@@ -108,12 +101,13 @@ export const LivestreamValidationWrapper = ({
    ]
 
    const allow = Boolean(allowRules.find(Boolean))
+   console.log("🚀 ~ allow:", allow)
 
-   if (isViewerNotRegistered) {
+   if (!allow && isViewerNotRegistered) {
       return (
          <>
             <LivestreamDialog
-               open={true}
+               open
                updatedStats={null}
                serverUserEmail={authenticatedUser.email}
                livestreamId={livestream.id}
@@ -126,7 +120,11 @@ export const LivestreamValidationWrapper = ({
       )
    }
 
-   if (!allow || !isBrowserAgoraCompatible || !hasAnswearedAllQuestions) {
+   if (
+      !allow ||
+      !isBrowserAgoraCompatible ||
+      (isUserRegistered && !hasAnswearedAllQuestions)
+   ) {
       // Since we're using suspense, if there's no live stream data, it means it doesn't exist
       return null
    }
