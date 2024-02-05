@@ -1,48 +1,19 @@
-import { LocalVideoTrack, LocalAudioTrack } from "agora-rtc-react"
+import {
+   LocalVideoTrack,
+   LocalAudioTrack,
+   useCurrentUID,
+} from "agora-rtc-react"
 import type { ReactNode } from "react"
 
-import { Box, BoxProps, CircularProgress } from "@mui/material"
-import { combineStyles, sxStyles } from "types/commonTypes"
+import { Box, BoxProps } from "@mui/material"
 import { useLocalTracks } from "../../context"
-import { CenteredContainer } from "./CenteredContainer"
-
-const styles = sxStyles({
-   root: {
-      position: "relative",
-      borderRadius: 2,
-      overflow: "hidden",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-   },
-   videoTrack: {
-      "& > div": {
-         backgroundColor: (theme) => theme.brand.white[500] + " !important",
-         overflow: "hidden",
-      },
-   },
-   videoContain: {
-      "& .agora_video_player": {
-         objectFit: "contain !important",
-      },
-   },
-   childrenWrapper: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-   },
-   loaderWrapper: {
-      bgcolor: (theme) => theme.brand.black[800],
-   },
-   loader: {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-   },
-})
+import { FloatingContent, VideoTrackWrapper } from "./VideoTrackWrapper"
+import { UserCover } from "./UserCover"
+import { Loader } from "./Loader"
+import { useAuth } from "HOCs/AuthProvider"
+import { styles } from "./styles"
+import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
+import { useAppSelector } from "components/custom-hook/store"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -77,6 +48,11 @@ export const LocalMicrophoneAndCameraUser = ({
    children,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
+   const uid = useCurrentUID()
+
+   const isSpeaking = useAppSelector(userIsSpeakingSelector(uid))
+
+   const { userData } = useAuth()
    const {
       localCameraTrack: { localCameraTrack, isLoading },
       localMicrophoneTrack: { localMicrophoneTrack },
@@ -89,7 +65,7 @@ export const LocalMicrophoneAndCameraUser = ({
    playAudio = playAudio ?? Boolean(micOn)
 
    return (
-      <Box {...props} sx={combineStyles(styles.root, props.sx)}>
+      <VideoTrackWrapper isSpeaking={isSpeaking} {...props}>
          <Box
             sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
             component={LocalVideoTrack}
@@ -104,12 +80,16 @@ export const LocalMicrophoneAndCameraUser = ({
             track={localMicrophoneTrack}
             volume={volume}
          />
-         {Boolean(isLoading) && (
-            <CenteredContainer sx={styles.loaderWrapper}>
-               <CircularProgress size={50} />
-            </CenteredContainer>
-         )}
-         <Box sx={styles.childrenWrapper}>{children}</Box>
-      </Box>
+         {Boolean(isLoading) && <Loader />}
+         {!playVideo ? (
+            <UserCover
+               firstName={userData?.firstName}
+               lastName={userData?.lastName}
+               avatarUrl={userData?.avatar}
+            />
+         ) : null}
+
+         <FloatingContent>{children}</FloatingContent>
+      </VideoTrackWrapper>
    )
 }
