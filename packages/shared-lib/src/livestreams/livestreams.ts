@@ -656,6 +656,5 @@ export type FilterLivestreamsOptions = {
  */
 export type CategoryDataOption = {
    livestream?: LivestreamEvent
-   breakoutRoomId?: string | string[]
    userData?: UserData
 }
