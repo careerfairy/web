@@ -9,16 +9,6 @@ const styles = sxStyles({
       width: "100%",
       borderRadius: "10px",
       height: "100%",
-
-      /**
-       * Demo styles
-       */
-      backgroundColor: "red",
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1.5rem",
    },
 })
 
