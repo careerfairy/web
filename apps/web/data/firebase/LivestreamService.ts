@@ -3,8 +3,6 @@ import {
    FilterLivestreamsOptions,
    LivestreamEvent,
    LivestreamQueryOptions,
-   LivestreamsTokenOptions,
-   LivestreamsTokenResponse,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -49,24 +47,6 @@ export class LivestreamService {
       )(data)
 
       return mapFromServerSide(serializedLivestreams)
-   }
-
-   /**
-    * Fetches token related to livestreams, via a function call
-    * @param options Fetch options, namely the id of the live stream and type of token to be retrieved - SECURE or RECORDING
-    * @returns Token value as string
-    */
-   async fetchLivestreamToken(options: LivestreamsTokenOptions) {
-      const fetchLivestreamToken = httpsCallable<
-         LivestreamsTokenOptions,
-         LivestreamsTokenResponse
-      >(this.functions, "fetchLivestreamToken")
-
-      const {
-         data: { token },
-      } = await fetchLivestreamToken(options)
-
-      return token
    }
 
    /**

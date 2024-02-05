@@ -118,7 +118,6 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
 exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
-exports.fetchLivestreamToken = livestreams.fetchLivestreamToken
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook

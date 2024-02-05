@@ -21,17 +21,21 @@ import {
 import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { LivestreamValidationWrapper } from "./components/LivestreamValidationWrapper"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 type Props = {
    isHost: boolean
 }
 
 export const StreamingPage = ({ isHost }: Props) => {
+   const { authenticatedUser } = useAuth()
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <LivestreamValidationWrapper isHost={isHost}>
-            <Component isHost={isHost} />
-         </LivestreamValidationWrapper>
+         <ConditionalWrapper condition={authenticatedUser.isLoaded}>
+            <LivestreamValidationWrapper isHost={isHost}>
+               <Component isHost={isHost} />
+            </LivestreamValidationWrapper>
+         </ConditionalWrapper>
       </SuspenseWithBoundary>
    )
 }

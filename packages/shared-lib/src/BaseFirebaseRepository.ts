@@ -16,7 +16,7 @@ export default class BaseFirebaseRepository {
    addIdToDocs<T extends Identifiable>(docs: DocumentSnapshot[]): T[] {
       const result = []
 
-      for (let doc of docs) {
+      for (const doc of docs) {
          result.push(this.addIdToDoc(doc))
       }
 
@@ -157,5 +157,27 @@ export const createCompatGenericConverter = <
          ...snapshot.data(options),
          id: snapshot.id,
       } as T
+   },
+})
+export const createCustomGenericConverter = <T extends Identifiable>(
+   fromMutation?: (snapshot, options) => T,
+   toFirestoreMutation?: (T) => T
+): FirestoreDataConverter<T> => ({
+   toFirestore(modelObject: T) {
+      return (
+         (toFirestoreMutation && toFirestoreMutation(modelObject)) ||
+         modelObject
+      )
+   },
+
+   fromFirestore(snapshot, options): T {
+      return (
+         (!fromMutation &&
+            ({
+               ...snapshot.data(options),
+               id: snapshot.id,
+            } as T)) ||
+         fromMutation(snapshot, options)
+      )
    },
 })

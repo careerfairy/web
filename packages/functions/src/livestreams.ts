@@ -7,10 +7,7 @@ import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
-import {
-   LivestreamEvent,
-   LivestreamsTokenOptions,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { FieldValue, firestore } from "./api/firestoreAdmin"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -327,11 +324,6 @@ const FilterLivestreamsOptionsSchema = {
    targetFieldsOfStudy: array().of(FieldOfStudySchema),
 }
 
-const LivestreamTokenOptionsSchema = {
-   livestreamId: string(),
-   type: mixed<"SECURE" | "RECORDING">().oneOf(["SECURE", "RECORDING"]),
-}
-
 const schema = object().shape(FilterLivestreamsOptionsSchema)
 
 type FilterLivestreamsOptions = InferType<typeof schema>
@@ -384,46 +376,3 @@ export const fetchLivestreams = functions.region(config.region).https.onCall(
       }
    )
 )
-
-export const fetchLivestreamToken = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation(LivestreamTokenOptionsSchema),
-         async (options: LivestreamsTokenOptions) => {
-            const { type, livestreamId } = options
-
-            const livestreamFirestoreCollection =
-               firestore.collection("livestreams")
-            const livestreamDoc = await livestreamFirestoreCollection
-               .doc(livestreamId)
-               .get()
-            const livestream = livestreamDoc.data()
-
-            const tokenDocumentPath =
-               type === "SECURE" ? "secureToken" : "recordingToken"
-
-            if (livestream) {
-               const storedTokenDoc = await livestreamFirestoreCollection
-                  .doc(livestreamId)
-                  .collection("tokens")
-                  .doc(tokenDocumentPath)
-                  .get()
-               let tokenValue = ""
-               if (storedTokenDoc) {
-                  tokenValue = storedTokenDoc.data()?.value
-               } else {
-                  return {
-                     status: 404,
-                     message: "Invalid stream ID: " + livestreamId,
-                  }
-               }
-               return { status: 200, token: tokenValue }
-            }
-            return {
-               status: 400,
-               message: "Invalid stream ID: " + livestreamId,
-            }
-         }
-      )
-   )

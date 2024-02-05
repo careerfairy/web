@@ -1,45 +1,22 @@
-import { LivestreamsTokenOptions } from "@careerfairy/shared-lib/livestreams"
-import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
-import { livestreamService } from "data/firebase/LivestreamService"
-import useSWR, { SWRConfiguration } from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
 export type useLivestreamSecureTokenOptions = {
    livestreamId: string
    disabled?: boolean
 }
 
+type TokenSWR = {
+   value: string
+   id: string
+}
 const useLivestreamSecureTokenSWR = (
    options: useLivestreamSecureTokenOptions
 ) => {
-   const key = options ? [options.livestreamId, options.disabled] : null
-
-   const fetchLivestreamToken: LivestreamsTokenOptions = {
-      livestreamId: options.livestreamId,
-      type: "SECURE",
-   }
-   return useSWR(
-      key,
-      () => livestreamService.fetchLivestreamToken(fetchLivestreamToken),
-      swrOptions
-   )
-
-   //    return {
-   //       token,
-   //       isLoading: tokenIsValidating,
-   //       isError: Boolean(tokenError),
-   //       reFetchToken: mutate,
-   //    }
-}
-
-const swrOptions: SWRConfiguration = {
-   ...reducedRemoteCallsOptions,
-   keepPreviousData: true,
-   suspense: true,
-   onError: (error, key) =>
-      errorLogAndNotify(error, {
-         message: `Error fetching livestreams with options: ${key}`,
-      }),
+   return useFirestoreDocument<TokenSWR>("livestreams", [
+      options.livestreamId,
+      "tokens",
+      "secureToken",
+   ])
 }
 
 export default useLivestreamSecureTokenSWR
