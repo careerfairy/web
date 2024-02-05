@@ -1,24 +1,15 @@
 import {
    CategoryDataOption as LivestreamCategoryDataOption,
    FilterLivestreamsOptions,
-   LivestreamEvent,
    LivestreamQueryOptions,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
-import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import { FunctionsInstance } from "./FirebaseInstance"
 import {
    AgoraTokenRequest,
    AgoraTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import {
-   Query,
-   collection,
-   getDocs,
-   limit,
-   query,
-   where,
-} from "firebase/firestore"
 import FirebaseService from "./FirebaseService"
 import GroupsUtil from "data/util/GroupsUtil"
 import { groupRepo } from "data/RepositoryInstances"
@@ -50,25 +41,6 @@ export class LivestreamService {
    }
 
    /**
-    * Retrieves all the registered users for a given livestream ID
-    * @param livestreamId Document ID of the LivestreamEvent
-    * @returns List of user emails who have registered to the Livestream in @param livestreamId
-    */
-   async fetchLivestreamRegisteredUsers(livestreamId: string) {
-      const baseQuery: Query = query(
-         collection(FirestoreInstance, "livestreams"),
-         where("id", "==", livestreamId),
-         limit(1)
-      )
-
-      const snapshot = await getDocs(baseQuery)
-      if (!snapshot.docs.length) return []
-
-      return (snapshot.docs.at(0).data() as unknown as LivestreamEvent)
-         .registeredUsers
-   }
-
-   /**
     * Validates category data for a livestream, determing if a certain user as answeared and perfomed all steps
     * for a livestream registration. Current logic is a migration of the validation done in the old streaming application.
     * @param firebase Firebase service
@@ -79,18 +51,13 @@ export class LivestreamService {
       firebase: FirebaseService,
       options: LivestreamCategoryDataOption
    ) {
-      const {
-         livestream: currentLivestream,
-         userData: userData,
-         breakoutRoomId: breakoutRoomId,
-      } = options
+      const { livestream: currentLivestream, userData: userData } = options
 
       try {
          if (
             userData &&
             !currentLivestream?.test &&
-            currentLivestream?.groupQuestionsMap &&
-            !breakoutRoomId
+            currentLivestream?.groupQuestionsMap
          ) {
             const livestreamGroups = await firebase.getGroupsWithIds(
                currentLivestream.groupIds
