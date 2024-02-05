@@ -58,24 +58,29 @@ export const LivestreamValidationWrapper = ({
       })
 
    // Custom validations
+
    const isUserRegistered = livestream.registeredUsers?.includes(
       authenticatedUser.email
    )
 
    // 1. user is a host and the stream is not a test stream -> accessible - OK
    const isHostNotTestLivestream = isHost && !livestream.test
+
    // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page - OK
    const isHostNotTestStreamInvalidLink =
       isHostNotTestLivestream && token !== livestreamToken?.data?.value
+
    // 3. user is logged out,test or open stream -> accessible - OK
    const isLoggedOutTestOpenStream =
       isLoggedOut && (livestream.test || livestream.openStream)
+
    // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri - NOK (redirect ok but blank)
    const isLoggedOutNotTestOpenStream =
       isLoggedOut && !(livestream.test || livestream.openStream)
 
    // 5. user is a viewer and has registered for the event -> accessible - OK
    const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
+
    // 6. user is a viewer and has not registered for the event -> registration dialog - NOK (skipping questions)
    const isViewerNotRegistered =
       !isHost && authenticatedUser.isLoaded && isLoggedIn && !isUserRegistered // Redirect register
