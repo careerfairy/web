@@ -5,11 +5,12 @@ import useLivestreamSecureTokenSWR from "components/custom-hook/live-stream/useL
 import useRegisteredUsersSWR from "components/custom-hook/live-stream/useRegisteredUsersSWR"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
-import useRegistrationModal from "components/custom-hook/useRegistrationModal"
-import RegistrationModal from "components/views/common/registration-modal"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"
+
+const isBrowserAgoraCompatible = AgoraRTC.checkSystemRequirements()
 
 type ConditionalRedirectWrapperProps = {
    children: ReactNode
@@ -30,7 +31,8 @@ export const LivestreamValidationWrapper = ({
    children,
    isHost,
 }: ConditionalRedirectWrapperProps) => {
-   const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
+   const redirectAs = isHost ? "host" : "viewer"
+
    const { userData, isLoggedIn, authenticatedUser, isLoggedOut } = useAuth()
 
    const {
@@ -60,95 +62,71 @@ export const LivestreamValidationWrapper = ({
          userData: userData,
          breakoutRoomId: breakoutRoomId,
       })
-   console.log("🚀 ~ questions: ", hasAnswearedAllQuestions)
-   // Custom validations
-   console.log("🚀 ~  ~ Custom validations ~  ~ ")
 
+   // Custom validations
    // 1. user is a host and the stream is not a test stream -> accessible
    const isHostNotTestLivestream = isHost && !livestream.test
-   console.log("🚀 ~ isHostNotTestLivestream:", isHostNotTestLivestream)
-
    // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page
-   // TODO: Confirm what is invalid link ? Token validation only ?
    const isHostNotTestStreamInvalidLink =
-      isHostNotTestLivestream && token !== livestreamToken?.data
-   console.log(
-      "🚀 ~ isHostNotTestLivestreamInvalidLink:",
-      isHostNotTestStreamInvalidLink
-   )
-
+      isHostNotTestLivestream && token !== livestreamToken?.data?.value
    // 3. user is logged out,test or open stream -> accessible
    const isLoggedOutTestOpenStream =
-      authenticatedUser.isLoaded &&
-      isLoggedOut &&
-      (livestream.test || livestream.openStream)
-   console.log("🚀 ~ isLoggedOutTestOpenStream:", isLoggedOutTestOpenStream)
-
-   // 4. user is logged out, not test or open stream -> not accessible, /streaming/error page ?
-   // TODO: Confirm redirect to error or nothing ?
-   // TODO: Check if isLoggedOut needs isLoaded
+      isLoggedOut && (livestream.test || livestream.openStream)
+   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
    const isLoggedOutNotTestOpenStream =
       isLoggedOut && !(livestream.test || livestream.openStream)
-   console.log(
-      "🚀 ~ isLoggedOutNotTestOpenStream:",
-      isLoggedOutNotTestOpenStream
-   )
-
    // 5. user is a viewer and has registered for the event -> accessible
    const isViewerRegistered =
       !isHost &&
-      authenticatedUser.isLoaded &&
       isLoggedIn &&
       registeredUsers?.includes(authenticatedUser.email)
-   console.log("🚀 ~ isViewerRegistered:", isViewerRegistered)
-
    // 6. user is a viewer and has not registered for the event -> registration dialog
    const isViewerNotRegistered =
       !isHost &&
       authenticatedUser.isLoaded &&
       isLoggedIn &&
       !registeredUsers?.includes(authenticatedUser.email) // Redirect register
-   console.log("🚀 ~ isViewerNotRegistered:", isViewerNotRegistered)
 
-   // 7. user is using a browser that is compatible with Agora
-   const isBrowserAgoraCompatible = AgoraRTC.checkSystemRequirements()
-   console.log("🚀 ~ isBrowserAgoraCompatible:", isBrowserAgoraCompatible)
+   useConditionalRedirect(isHostNotTestStreamInvalidLink, "/streaming/error")
 
+   const encodedPath = encodeURIComponent(
+      `streaming/${redirectAs}/${livestream.id}`
+   )
    useConditionalRedirect(
-      livestreamExists &&
-         (isHostNotTestStreamInvalidLink || isLoggedOutNotTestOpenStream),
-      "/streaming/error"
+      isLoggedOutNotTestOpenStream,
+      `/login?absolutePath=${encodedPath}`
    )
 
    const afterRegistrationMutations = () => {
-      console.log("🚀 ~ user Registration finished - mutating")
       refetchRegisteredUsers()
       refetchQuestions()
    }
+   const allowRules = [
+      isHostNotTestLivestream,
+      isLoggedOutTestOpenStream,
+      isViewerRegistered,
+   ]
 
-   const allow =
-      [
-         isHostNotTestLivestream,
-         isLoggedOutTestOpenStream,
-         isViewerRegistered,
-      ].find(Boolean) !== undefined
-   console.log("🚀 ~ allow:", allow)
+   const allow = Boolean(allowRules.find(Boolean))
 
    if (isViewerNotRegistered) {
       return (
          <>
-            <RegistrationModal
-               open
-               onFinish={afterRegistrationMutations}
-               livestream={livestream}
-               groups={joinGroupModalData?.groups}
-               handleClose={handleCloseJoinModal}
+            <LivestreamDialog
+               open={true}
+               updatedStats={null}
+               serverUserEmail={authenticatedUser.email}
+               livestreamId={livestream.id}
+               handleClose={() => {}}
+               page={"details"}
+               mode="stand-alone"
+               onRegisterSuccess={afterRegistrationMutations}
             />
          </>
       )
    }
 
-   if (!livestreamExists || !allow || !isBrowserAgoraCompatible) {
+   if (!allow || !isBrowserAgoraCompatible || !hasAnswearedAllQuestions) {
       // Since we're using suspense, if there's no live stream data, it means it doesn't exist
       return null
    }
