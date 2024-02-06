@@ -1,8 +1,6 @@
-import { removeDuplicateDocuments } from "../BaseFirebaseRepository"
-import {
-   RankedLivestreamEvent,
-   sortRankedLivestreamEventByPoints,
-} from "./RankedLivestreamEvent"
+import { removeDuplicateDocuments } from "../../BaseFirebaseRepository"
+import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
+import { sortRankedByPoints } from "../utils"
 
 export class RecommendationsBuilder {
    protected results: RankedLivestreamEvent[] = []
@@ -19,7 +17,7 @@ export class RecommendationsBuilder {
       )
 
       // return the list already sorted
-      return sortRankedLivestreamEventByPoints(uniqueEvents).slice(
+      return sortRankedByPoints<RankedLivestreamEvent>(uniqueEvents).slice(
          0,
          this.limit
       )

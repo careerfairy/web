@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
-import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
+import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
@@ -37,7 +37,7 @@ export const MAX_CTA_DISPLAY_COUNT = 5
 export type CarouselContent = CTASlide | LivestreamEventWithType
 export type SerializedContent =
    | CTASlide
-   | ({ [field: string]: any } & { contentType: "LivestreamEvent" })
+   | ({ [field: string]: unknown } & { contentType: "LivestreamEvent" })
 
 /**
  *
@@ -245,6 +245,7 @@ export class CarouselContentService {
          .map((item) => {
             switch (item.contentType) {
                case "LivestreamEvent":
+                  // eslint-disable-next-line no-case-declarations
                   const stream = mapFromServerSide([item])[0]
                   return {
                      ...stream,

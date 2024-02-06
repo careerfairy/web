@@ -1,6 +1,6 @@
-import { LivestreamEvent } from "../livestreams"
-import { UserData } from "../users"
-import { Logger } from "../utils/types"
+import { LivestreamEvent } from "../../livestreams"
+import { UserData } from "../../users"
+import { Logger } from "../../utils/types"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "./IRecommendationService"

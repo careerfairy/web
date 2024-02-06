@@ -1,15 +1,12 @@
 import {
-   SeenSparks,
-   SeenSparksMap,
    Spark,
    UserSparksFeedMetrics,
-   createSeenSparksMap,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { shuffle } from "@careerfairy/shared-lib/utils"
-import { DateTime, Duration } from "luxon"
-import { createGenericConverter } from "../../util/firestore-admin"
 import { Firestore, Timestamp } from "../../api/firestoreAdmin"
 import { addAddedToFeedAt } from "../../util/sparks"
+import SparkRecommendationService from "../recommendation/SparkRecommendationService"
+import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 
 /**
  * The SparksFeedReplenisher class is responsible for replenishing the user's feed
@@ -59,36 +56,15 @@ export class SparksFeedReplenisher {
       await ref.update(toUpdate)
    }
 
-   /**
-    * Fetches and returns all seen sparks for a user.
-    *
-    * @param userId - The ID of the user
-    * @returns A promise resolving to a SeenSparksMap
-    */
-   private async getUserSeenSparks(userId: string): Promise<SeenSparksMap> {
-      const seenSparksMap: SeenSparksMap = {}
-
-      const seenSparksSnap = await this.firestore
-         .collection(`userData/${userId}/seenSparks`)
-         .withConverter(createGenericConverter<SeenSparks>())
-         .get()
-
-      if (seenSparksSnap.empty) return seenSparksMap
-
-      const seenSparksDocs = seenSparksSnap.docs.map((doc) => doc.data())
-
-      return createSeenSparksMap(seenSparksDocs)
-   }
-
    // Public methods...
 
    /**
-    * Replenishes the feed of a given user.
+    * Replenishes the user's feed by fetching and adding new sparks.
     *
-    * This method does the following:
+    * This method performs the following actions:
     * 1. Checks if a replenishment process is already underway.
-    * 2. Determines how many more sparks are needed.
-    * 3. Fetches and adds new sparks.
+    * 2. Determines the additional sparks required to meet the target count.
+    * 3. Fetches and adds new sparks to the user's feed.
     * 4. Commits the added sparks to the user's feed.
     *
     * @param userId - The ID of the user whose feed is to be replenished
@@ -98,14 +74,6 @@ export class SparksFeedReplenisher {
       userId: string,
       feed: UserSparksFeedMetrics
    ): Promise<void> {
-      const addedSparkIds = new Set<string>()
-
-      const allFetchedSparks: Spark[] = []
-
-      const EXPIRY_DURATION = Duration.fromObject({ weeks: 1 }).as(
-         "milliseconds"
-      ) // One week in milliseconds
-
       // Check if a replenish process is already underway
       if (feed.replenishStatus === "started") {
          return
@@ -119,108 +87,43 @@ export class SparksFeedReplenisher {
       try {
          await this.setReplenishingFlag(userId, "started")
 
-         let neededSparks = this.TARGET_SPARK_COUNT - currentSparkCount
-
          const batch = this.firestore.batch()
-         const allSeenSparksMap = await this.getUserSeenSparks(userId)
-         const expiredSeenSparksMap: SeenSparksMap = {}
-         const currentTime = DateTime.now()
 
-         Object.entries(allSeenSparksMap).forEach(([sparKId, lastSeen]) => {
-            if (
-               currentTime.diff(
-                  DateTime.fromJSDate(lastSeen.toDate()),
-                  "milliseconds"
-               ).milliseconds > EXPIRY_DURATION
-            ) {
-               expiredSeenSparksMap[sparKId] = lastSeen
-            }
-         })
+         const fillFeedFromRecommendedSparks = (sparks: Spark[]) => {
+            sparks.forEach((spark) => {
+               const sparkRef = this.firestore
+                  .collection("userData")
+                  .doc(userId)
+                  .collection("sparksFeed")
+                  .doc(spark.id)
 
-         // Helper function to fill newSparks from a snapshot
-         const fillFromSnapshot = (
-            snap: FirebaseFirestore.QuerySnapshot<Spark>
-         ) => {
-            snap.docs.forEach((doc) => {
-               const spark = doc.data()
-               const sparkId = doc.id
+               addAddedToFeedAt(spark)
 
-               if (
-                  // Only add the spark if the user hasn't seen it
-                  !allSeenSparksMap[sparkId] ||
-                  // Or if the user hasn't seen it in a week
-                  expiredSeenSparksMap[sparkId]
-               ) {
-                  addAddedToFeedAt(spark)
-                  batch.set(
-                     this.firestore
-                        .collection("userData")
-                        .doc(userId)
-                        .collection("sparksFeed")
-                        .doc(sparkId),
-                     spark,
-                     { merge: true }
-                  )
-                  addedSparkIds.add(sparkId) // Add to addedSparkIds set
-                  neededSparks--
-               }
-               // Add to all fetched sparks
-               allFetchedSparks.push(spark)
+               batch.set(sparkRef, spark, { merge: true })
             })
          }
 
-         // Step 1: Fetch most recent, unseen sparks
-         let lastSeenDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null
-         while (neededSparks > 0) {
-            let query = this.firestore
-               .collection("sparks")
-               .where("group.publicSparks", "==", true)
-               .withConverter(createGenericConverter<Spark>())
-               .orderBy("publishedAt", "desc")
-               .limit(this.TARGET_SPARK_COUNT) // Fetch 20 sparks at a time
+         const dataFetcher = new SparksDataFetcher(
+            userId,
+            livestreamsRepo,
+            userRepo,
+            sparkRepo
+         )
+         const recommendationService = await SparkRecommendationService.create(
+            dataFetcher
+         )
 
-            if (lastSeenDoc) query = query.startAfter(lastSeenDoc)
+         const recommendedSparkIds =
+            await recommendationService.getRecommendations(30)
 
-            const sparksSnap = await query.get()
+         const recommendedSparks = await sparkRepo.getSparksByIds(
+            recommendedSparkIds
+         )
 
-            if (sparksSnap.empty) break // No more sparks available
+         fillFeedFromRecommendedSparks(recommendedSparks)
 
-            fillFromSnapshot(sparksSnap)
-
-            lastSeenDoc = sparksSnap.docs[sparksSnap.docs.length - 1]
-         }
-
-         // Step 2: Add random
-         if (neededSparks > 0) {
-            // Backfill remaining neededSparks
-
-            shuffle(allFetchedSparks) // Shuffle to increase randomness
-
-            allFetchedSparks
-               // Filter out added sparks to avoid duplicates
-               .filter((spark) => !addedSparkIds.has(spark.id))
-               // Filter out seen sparks
-               .slice(0, neededSparks)
-               .forEach((spark) => {
-                  addAddedToFeedAt(spark)
-
-                  batch.set(
-                     this.firestore
-                        .collection("userData")
-                        .doc(userId)
-                        .collection("sparksFeed")
-                        .doc(spark.id),
-                     spark,
-                     { merge: true }
-                  )
-                  addedSparkIds.add(spark.id) // Add to addedSparkIds set
-               })
-         }
-
-         // Commit the batch
          await batch.commit()
 
-         // Set the replenishing status to "finished"
          await this.setReplenishingFlag(userId, "finished")
          return
       } catch (error) {
