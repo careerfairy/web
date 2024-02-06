@@ -29,6 +29,7 @@ type Props = {
 
 export const StreamingPage = ({ isHost }: Props) => {
    const { authenticatedUser } = useAuth()
+
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
          <ConditionalWrapper condition={authenticatedUser.isLoaded}>

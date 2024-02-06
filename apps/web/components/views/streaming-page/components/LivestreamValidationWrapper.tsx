@@ -4,7 +4,6 @@ import useLivestreamCategoryDataSWR from "components/custom-hook/live-stream/use
 import useLivestreamSecureTokenSWR from "components/custom-hook/live-stream/useLivestreamSecureToken"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
-import { appendCurrentQueryParams } from "components/util/url"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
@@ -20,23 +19,17 @@ type ConditionalRedirectWrapperProps = {
 /**
  * All validation logic for the live stream data is handled here.
  * Ensures all the children have the data needed without having to check for it in each component.
- *
- * TODO:
- * - Validate token if user is host and not test stream
- * - Validate user must be logged-in except for (test/open) streams
- * - Validate if viewer and has registered for event
- * - Validate browser is compatible with Agora
  */
 export const LivestreamValidationWrapper = ({
    children,
    isHost,
 }: ConditionalRedirectWrapperProps) => {
-   const redirectAs = isHost ? "host" : "viewer"
-
    const { userData, isLoggedIn, authenticatedUser, isLoggedOut } = useAuth()
 
    const {
       query: { token },
+      asPath,
+      replace,
    } = useRouter()
 
    const firebase = useFirebaseService()
@@ -48,7 +41,7 @@ export const LivestreamValidationWrapper = ({
    useConditionalRedirect(!livestreamExists, "/portal")
 
    const livestreamToken = useLivestreamSecureTokenSWR({
-      livestreamId: livestream.id,
+      livestreamId: livestream?.id,
    })
 
    const { data: hasAnswearedAllQuestions, mutate: refetchQuestions } =
@@ -59,12 +52,12 @@ export const LivestreamValidationWrapper = ({
 
    // Custom validations
 
-   const isUserRegistered = livestream.registeredUsers?.includes(
+   const isUserRegistered = livestream?.registeredUsers?.includes(
       authenticatedUser.email
    )
 
    // 1. user is a host and the stream is not a test stream -> accessible - OK
-   const isHostNotTestLivestream = isHost && !livestream.test
+   const isHostNotTestLivestream = isHost && !livestream?.test
 
    // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page - OK
    const isHostNotTestStreamInvalidLink =
@@ -72,11 +65,11 @@ export const LivestreamValidationWrapper = ({
 
    // 3. user is logged out,test or open stream -> accessible - OK
    const isLoggedOutTestOpenStream =
-      isLoggedOut && (livestream.test || livestream.openStream)
+      isLoggedOut && (livestream?.test || livestream?.openStream)
 
    // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri - NOK (redirect ok but blank)
    const isLoggedOutNotTestOpenStream =
-      isLoggedOut && !(livestream.test || livestream.openStream)
+      isLoggedOut && !(livestream?.test || livestream?.openStream)
 
    // 5. user is a viewer and has registered for the event -> accessible - OK
    const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
@@ -87,14 +80,12 @@ export const LivestreamValidationWrapper = ({
 
    useConditionalRedirect(isHostNotTestStreamInvalidLink, "/streaming/error")
 
-   const encodedPath = encodeURIComponent(
-      appendCurrentQueryParams(`streaming/${redirectAs}/${livestream.id}`)
-   )
-
-   useConditionalRedirect(
-      isLoggedOutNotTestOpenStream,
-      `/login?absolutePath=${encodedPath}`
-   )
+   if (isLoggedOutNotTestOpenStream) {
+      void replace({
+         pathname: `/login`,
+         query: { absolutePath: asPath },
+      })
+   }
 
    const afterRegistrationMutations = () => {
       refetchQuestions()
@@ -106,7 +97,6 @@ export const LivestreamValidationWrapper = ({
    ]
 
    const allow = Boolean(allowRules.find(Boolean))
-   console.log("🚀 ~ allow:", allow)
 
    if (!allow && isViewerNotRegistered) {
       return (
@@ -115,9 +105,10 @@ export const LivestreamValidationWrapper = ({
                open
                updatedStats={null}
                serverUserEmail={authenticatedUser.email}
-               livestreamId={livestream.id}
+               serverSideLivestream={livestream}
+               livestreamId={livestream?.id}
                handleClose={() => {}}
-               page={"details"}
+               page={"register"}
                mode="stand-alone"
                onRegisterSuccess={afterRegistrationMutations}
             />
