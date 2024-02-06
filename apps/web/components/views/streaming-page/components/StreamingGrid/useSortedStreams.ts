@@ -7,7 +7,8 @@ import { LocalUser, RemoteUser } from "../../types"
 
 /**
  * Basic implementation of sorting algorithm
- * TODO: Only relocate user when not in the first screen of the grid, eg when the user is in the first screen, don't relocate it
+ * TODO: Only relocate user when not in the first screen of the grid, eg when the user is in the first screen, don't relocate it.
+ *       Screen size can be gotten from layout rows * columns
  * TODO: Don't sort the entire array only SWAP with inactive users on the first screen
  */
 export const useSortedStreams = (): (LocalUser | RemoteUser)[] => {
@@ -18,18 +19,23 @@ export const useSortedStreams = (): (LocalUser | RemoteUser)[] => {
    const { localUser } = useLocalTracks()
 
    return useMemo(() => {
-      const sortedRemoteStreamers = remoteStreamers.map((user) => ({
-         user: user,
+      // Map remoteStreamers to include the 'type' property
+      const mappedRemoteStreamers = remoteStreamers.map<RemoteUser>((user) => ({
+         user,
          type: "remote" as const,
       }))
 
+      const combinedStreamers: (LocalUser | RemoteUser)[] =
+         mappedRemoteStreamers
+
       if (localUser) {
-         return [...sortedRemoteStreamers, localUser].sort(
-            (a, b) =>
-               audioLevels.get(a.user.uid)?.level -
-               audioLevels.get(b.user.uid)?.level
-         )
+         combinedStreamers.push(localUser)
       }
-      return sortedRemoteStreamers
+
+      return combinedStreamers.sort((a, b) => {
+         const levelA = audioLevels.get(a.user.uid)?.level || 0
+         const levelB = audioLevels.get(b.user.uid)?.level || 0
+         return levelB - levelA // Sort in descending order
+      })
    }, [audioLevels, localUser, remoteStreamers])
 }
