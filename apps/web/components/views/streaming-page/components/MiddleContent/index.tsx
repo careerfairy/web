@@ -1,6 +1,7 @@
 import { sxStyles } from "types/commonTypes"
 import { Container, Stack } from "@mui/material"
-import { SidePanel, StreamingGrid } from ".."
+import { StreamingGrid } from "../StreamingGrid"
+import { SidePanel } from "../SidePanel"
 import {
    useSideDrawer,
    useStreamIsLandscape,
