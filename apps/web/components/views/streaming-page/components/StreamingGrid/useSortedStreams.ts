@@ -9,7 +9,9 @@ import { LocalUser, RemoteUser } from "../../types"
  * Basic implementation of sorting algorithm
  * TODO: Only relocate user when not in the first screen of the grid, eg when the user is in the first screen, don't relocate it.
  *       Screen size can be gotten from layout rows * columns
- * TODO: Don't sort the entire array only SWAP with inactive users on the first screen
+ * TODO: Don't sort the entire array only SWAP with inactive users on the first screen.
+ *       Can be achieved by comparing previous and current state with usePrevious from react use
+ *
  */
 export const useSortedStreams = (): (LocalUser | RemoteUser)[] => {
    const remoteStreamers = useRemoteUsers()
