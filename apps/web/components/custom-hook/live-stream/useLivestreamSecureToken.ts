@@ -2,7 +2,6 @@ import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
 export type useLivestreamSecureTokenOptions = {
    livestreamId: string
-   disabled?: boolean
 }
 
 type TokenSWR = {
