@@ -25,13 +25,12 @@ export interface StreamingAppState {
     * A mapping from user IDs to objects containing their current audio levels and the timestamp of the last update.
     * Audio levels are represented as integers ranging from 0 to 100.
     */
-   audioLevels: Map<
-      UID,
-      {
+   audioLevels: {
+      [key in UID]: {
          level: number
-         lastUpdated: number
+         lastSpokeAt: number | null
       }
-   >
+   }
 }
 
 const initialState: StreamingAppState = {
@@ -43,7 +42,7 @@ const initialState: StreamingAppState = {
    topBar: {
       viewCount: 0, // hardcoded number for now
    },
-   audioLevels: new Map(),
+   audioLevels: {},
 }
 
 const streamingAppSlice = createSlice({
@@ -91,15 +90,15 @@ const streamingAppSlice = createSlice({
          state,
          action: PayloadAction<{ uid: UID; level: number }[]>
       ) {
-         state.audioLevels = new Map(
-            action.payload.map(({ uid, level }) => [
-               uid,
-               {
-                  level,
-                  lastUpdated: Date.now(),
-               },
-            ])
-         )
+         action.payload.forEach(({ uid, level }) => {
+            state.audioLevels[uid] = {
+               level,
+               lastSpokeAt:
+                  level > 60
+                     ? Date.now()
+                     : state.audioLevels[uid]?.lastSpokeAt || null,
+            }
+         })
       },
    },
 })
