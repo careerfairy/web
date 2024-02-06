@@ -70,6 +70,8 @@ export const RemoteStreamer = ({
       "audio"
    )
 
+   const tempName = user.uid.toString()
+
    const isLoading = videoIsLoading || audioIsLoading
 
    playVideo = playVideo ?? user?.hasVideo
@@ -92,7 +94,10 @@ export const RemoteStreamer = ({
          {Boolean(isLoading) && <Loader />}
          {/* TODO: Add logic to get remote user name from UID */}
          {!playVideo ? (
-            <UserCover firstName={"R"} lastName={user.uid.toString()} />
+            <UserCover
+               firstName={tempName[0]}
+               lastName={tempName[tempName.length - 1]}
+            />
          ) : null}
          <FloatingContent>{children}</FloatingContent>
       </VideoTrackWrapper>
