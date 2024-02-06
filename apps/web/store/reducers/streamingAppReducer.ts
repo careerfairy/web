@@ -22,7 +22,7 @@ export interface StreamingAppState {
       viewCount: number
    }
    /**
-    * A mapping from user IDs to objects containing their current audio levels and the timestamp of the last update.
+    * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
     * Audio levels are represented as integers ranging from 0 to 100.
     */
    audioLevels: {
