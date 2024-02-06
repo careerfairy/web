@@ -35,8 +35,8 @@ export const useSortedStreams = (): (LocalUser | RemoteUser)[] => {
       }
 
       return combinedStreamers.sort((a, b) => {
-         const levelA = audioLevels.get(a.user.uid)?.level || 0
-         const levelB = audioLevels.get(b.user.uid)?.level || 0
+         const levelA = audioLevels[a.user.uid]?.level || 0
+         const levelB = audioLevels[b.user.uid]?.level || 0
          return levelB - levelA // Sort in descending order
       })
    }, [audioLevels, localUser, remoteStreamers])

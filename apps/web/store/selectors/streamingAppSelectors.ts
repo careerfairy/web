@@ -19,4 +19,4 @@ export const audioLevelsSelector = (state: RootState) =>
    state.streamingApp.audioLevels
 
 export const userIsSpeakingSelector = (userId: UID) => (state: RootState) =>
-   Boolean(state.streamingApp.audioLevels.get(userId)?.level > 60)
+   Boolean(state.streamingApp.audioLevels[userId]?.level > 60)
