@@ -8,6 +8,7 @@ import { useSortedStreams } from "../useSortedStreams"
 import { getPaginatedGridLayout } from "../util"
 import { useGalleryLayout } from "./useGalleryLayout"
 import { RemoteStreamer } from "../../streaming"
+import { TrackBoundary } from "agora-rtc-react"
 
 const styles = sxStyles({
    root: {
@@ -28,28 +29,30 @@ export const GalleryLayout = () => {
    )
 
    return (
-      <Box sx={styles.root}>
-         <GridCarousel
-            gridPages={gridPages.map((pageStreamers, pageIndex) => (
-               <LayoutGrid
-                  key={pageIndex}
-                  elements={pageStreamers}
-                  isLastButNotFirstPage={
-                     pageIndex === gridPages.length - 1 && pageIndex !== 0
-                  }
-                  layout={layout}
-                  renderGridItem={(user) => (
-                     <LayoutGrid.Item
-                        key={user.user.uid}
-                        layoutColumns={layout.columns}
-                     >
-                        <GridItemContent user={user} />
-                     </LayoutGrid.Item>
-                  )}
-               />
-            ))}
-         />
-      </Box>
+      <TrackBoundary>
+         <Box sx={styles.root}>
+            <GridCarousel
+               gridPages={gridPages.map((pageStreamers, pageIndex) => (
+                  <LayoutGrid
+                     key={pageIndex}
+                     elements={pageStreamers}
+                     isLastButNotFirstPage={
+                        pageIndex === gridPages.length - 1 && pageIndex !== 0
+                     }
+                     layout={layout}
+                     renderGridItem={(user) => (
+                        <LayoutGrid.Item
+                           key={user.user.uid}
+                           layoutColumns={layout.columns}
+                        >
+                           <GridItemContent user={user} />
+                        </LayoutGrid.Item>
+                     )}
+                  />
+               ))}
+            />
+         </Box>
+      </TrackBoundary>
    )
 }
 

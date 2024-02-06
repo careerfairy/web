@@ -93,9 +93,9 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    useEffect(() => {
       if (isConnected) {
-         client.setClientRole(shouldStream ? "host" : "audience")
+         client.setClientRole(shouldStream && isReady ? "host" : "audience")
       }
-   }, [client, isConnected, shouldStream])
+   }, [client, isConnected, isReady, shouldStream])
 
    useEffect(() => {
       if (isConnected) {

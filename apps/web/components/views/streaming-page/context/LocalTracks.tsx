@@ -106,6 +106,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
     */
    useEffect(() => {
+      if (!shouldStream) return
+
       AgoraRTC.getCameras()
          .then((cameras) => {
             setActiveCameraId(cameras[0]?.deviceId ?? "")
@@ -122,7 +124,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          setActiveCameraId("")
          setActiveMicrophoneId("")
       }
-   }, [])
+   }, [shouldStream])
 
    useEffect(() => {
       AgoraRTC.onCameraChanged = (dev) => {
@@ -198,7 +200,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
             type: "local",
             user: {
                uid: currentUserUID,
-               hasAudio: microphoneMuted,
+               hasAudio: !microphoneMuted,
                hasVideo: cameraOn,
                audioTrack: microphoneTrack.localMicrophoneTrack,
                videoTrack: cameraTrack.localCameraTrack,
