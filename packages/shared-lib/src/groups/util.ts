@@ -1,4 +1,4 @@
-import { Group, SerializedGroup } from "."
+import { Group, PublicGroup, SerializedGroup, SerializedPublicGroup } from "."
 import { fromDateFirestoreFn } from "../firebaseTypes"
 
 export const serializeGroup = (group: Group): SerializedGroup => {
@@ -17,6 +17,40 @@ export const deserializeGroup = (
 ): Group => {
    const { planType, planStartedAtString, planExpiresAtString, ...rest } = group
 
+   return {
+      ...rest,
+      plan: planType
+         ? {
+              type: planType,
+              startedAt: planStartedAtString
+                 ? fromDate(new Date(planStartedAtString))
+                 : null,
+              expiresAt: planExpiresAtString
+                 ? fromDate(new Date(planExpiresAtString))
+                 : null,
+           }
+         : null,
+   }
+}
+
+export const serializePublicGroup = (
+   publicGroup: PublicGroup
+): SerializedPublicGroup => {
+   const { plan, ...rest } = publicGroup
+   return {
+      ...rest,
+      planType: plan?.type ?? null,
+      planStartedAtString: plan?.startedAt?.toDate().toISOString() ?? null,
+      planExpiresAtString: plan?.expiresAt?.toDate().toISOString() ?? null,
+   }
+}
+
+export const deserializePublicGroup = (
+   publicGroup: SerializedPublicGroup,
+   fromDate: fromDateFirestoreFn
+): PublicGroup => {
+   const { planType, planStartedAtString, planExpiresAtString, ...rest } =
+      publicGroup
    return {
       ...rest,
       plan: planType

@@ -1,12 +1,10 @@
-import { removeDuplicateDocuments } from "../BaseFirebaseRepository"
-import { LivestreamEvent } from "../livestreams"
-import { UserData } from "../users"
-import { sortLivestreamsByPopularity } from "../utils"
-import { Logger } from "../utils/types"
-import {
-   RankedLivestreamEvent,
-   sortRankedLivestreamEventByPoints,
-} from "./RankedLivestreamEvent"
+import { removeDuplicateDocuments } from "../../BaseFirebaseRepository"
+import { LivestreamEvent } from "../../livestreams"
+import { UserData } from "../../users"
+import { Logger } from "../../utils/types"
+import { sortDocumentByPopularity } from "../../utils/utils"
+import { sortRankedByPoints } from "../utils"
+import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./services/UserBasedRecommendationsBuilder"
 
@@ -43,7 +41,9 @@ export default class RecommendationServiceCore {
       user?: UserData
    ) {
       // Sort the results by points
-      const sortedResults = sortRankedLivestreamEventByPoints(results.flat())
+      const sortedResults = sortRankedByPoints<RankedLivestreamEvent>(
+         results.flat()
+      )
 
       // Remove duplicates (be sure to remove duplicates before sorting)
       const deDupedEvents = removeDuplicateDocuments(sortedResults)
@@ -107,7 +107,7 @@ export default class RecommendationServiceCore {
       let filledEvents = [...deDupedEvents]
       if (deDupedEvents.length < limit) {
          const fallbackEvents = fallBackLivestreams
-            .sort(sortLivestreamsByPopularity)
+            .sort(sortDocumentByPopularity)
             .map((event) => new RankedLivestreamEvent(event))
 
          filledEvents = filledEvents.concat(fallbackEvents)

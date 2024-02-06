@@ -1,6 +1,6 @@
 import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
-import { GroupOption, PublicGroup } from "../groups"
+import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
 
 /**
@@ -103,13 +103,11 @@ export interface SparkStats extends Identifiable {
 
    deletedAt: Timestamp
 
-   companyIndustries?: GroupOption[]
-
-   companyCountry?: GroupOption
-
-   companySize?: string
-
-   category?: SparkCategory
+   /**
+    * Incremented on certain popularityEvents
+    * Updated via functions onCreate trigger
+    */
+   popularity?: number
 }
 
 /**

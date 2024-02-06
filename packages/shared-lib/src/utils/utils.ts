@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "../livestreams"
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
+import { SparkStats } from "../sparks/sparks"
 
 /*
  *
@@ -8,8 +9,7 @@ import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
 export const getNestedProperty = (
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   obj: any,
+   obj: unknown,
    path: string | string[],
    separator = "."
 ) => {
@@ -97,12 +97,36 @@ export const sortLivestreamsDesc = (
 }
 
 /**
- * Sort by popularity if both livestreams have a popularity value
+ * Sort Spark Stats from more recent to oldest
+ * @param a
+ * @param b
+ * @param ascending ordering
+ */
+export const sortSparkStats = (
+   a: SparkStats,
+   b: SparkStats,
+   ascending = false
+): number => {
+   const aa = ascending ? b : a
+   const bb = ascending ? a : b
+
+   if (
+      aa.spark.createdAt instanceof Date &&
+      bb.spark.createdAt instanceof Date
+   ) {
+      return bb.spark.createdAt.getTime() - aa.spark.createdAt.getTime()
+   }
+
+   return 0
+}
+
+/**
+ * Sort by popularity if both documents have a popularity value
  * Otherwise keeps the current order
  */
-export const sortLivestreamsByPopularity = (
-   a: LivestreamEvent,
-   b: LivestreamEvent
+export const sortDocumentByPopularity = <T extends { popularity?: number }>(
+   a: T,
+   b: T
 ): number => {
    if (Boolean(b.popularity) && Boolean(a.popularity)) {
       return b.popularity - a.popularity

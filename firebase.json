@@ -24,6 +24,10 @@
          {
             "source": "/bundle-futureLivestreamsNext15Days",
             "function": "bundle-futureLivestreamsNext15Days"
+         },
+         {
+            "source": "/bundle-allSparksStats",
+            "function": "bundle-allSparksStats"
          }
       ]
    },

@@ -1,4 +1,4 @@
-import { UserData } from "../../users"
+import { UserData } from "../../../users"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
@@ -72,8 +72,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
          // Fetch the top recommended events based on the user's spoken languages
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnSpokenLanguages(
-               this.user.spokenLanguages,
-               this.limit
+               this.user.spokenLanguages
             )
          )
       }
