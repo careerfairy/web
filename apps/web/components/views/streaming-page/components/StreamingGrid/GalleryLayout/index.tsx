@@ -61,7 +61,6 @@ type GridItemContentProps = {
 }
 
 const GridItemContent = ({ user }: GridItemContentProps) => {
-   console.log("🚀 ~ file: index.tsx:64 ~ GridItemContent ~ user:", user)
    if (user.type === "local") {
       return <LocalMicrophoneAndCameraUser />
    }
