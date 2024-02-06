@@ -24,8 +24,7 @@ export const LivestreamValidationWrapper = ({
    children,
    isHost,
 }: ConditionalRedirectWrapperProps) => {
-   const { userData, isLoggedIn, authenticatedUser, isLoggedOut } = useAuth()
-
+   const { userData, isLoggedIn, isLoggedOut, authenticatedUser } = useAuth()
    const {
       query: { token },
       asPath,
@@ -56,27 +55,28 @@ export const LivestreamValidationWrapper = ({
       authenticatedUser.email
    )
 
-   // 1. user is a host and the stream is not a test stream -> accessible - OK
+   // 1. user is a host and the stream is not a test stream -> accessible
    const isHostNotTestLivestream = isHost && !livestream?.test
 
-   // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page - OK
+   // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page
    const isHostNotTestStreamInvalidLink =
-      isHostNotTestLivestream && token !== livestreamToken?.data?.value
+      isHostNotTestLivestream &&
+      Boolean(token) &&
+      token !== livestreamToken?.data?.value
 
-   // 3. user is logged out,test or open stream -> accessible - OK
+   // 3. user is logged out,test or open stream -> accessible
    const isLoggedOutTestOpenStream =
       isLoggedOut && (livestream?.test || livestream?.openStream)
 
-   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri - NOK (redirect ok but blank)
+   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
    const isLoggedOutNotTestOpenStream =
       isLoggedOut && !(livestream?.test || livestream?.openStream)
 
-   // 5. user is a viewer and has registered for the event -> accessible - OK
+   // 5. user is a viewer and has registered for the event -> accessible
    const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
 
-   // 6. user is a viewer and has not registered for the event -> registration dialog - NOK (skipping questions)
-   const isViewerNotRegistered =
-      !isHost && authenticatedUser.isLoaded && isLoggedIn && !isUserRegistered // Redirect register
+   // 6. user is a viewer and has not registered for the event -> registration dialog
+   const isViewerNotRegistered = !isHost && isLoggedIn && !isUserRegistered // Redirect register
 
    useConditionalRedirect(isHostNotTestStreamInvalidLink, "/streaming/error")
 
