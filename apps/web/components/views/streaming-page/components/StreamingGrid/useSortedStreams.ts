@@ -37,7 +37,7 @@ export const useSortedStreams = (
             // If the number of streams is greater than the page size, we might need to sort the streams.
 
             // Find the first currently active speaker outside the first page.
-            const activeSpeakerIndex = newSortedStreams.findIndex(
+            const firstActiveSpeakerIndex = newSortedStreams.findIndex(
                (stream, index) => {
                   return (
                      index >= pageSize &&
@@ -46,30 +46,32 @@ export const useSortedStreams = (
                }
             )
 
-            if (activeSpeakerIndex !== -1) {
-               // Find the least recently active speaker in the first page.
-               const sortedByLastSpokeAt = newSortedStreams
-                  .slice(0, pageSize)
-                  .sort((a, b) => {
-                     // Sort by last spoke at (most recent to least recent)
-                     const lastSpokeAtA =
-                        audioLevels[a.user.uid]?.lastSpokeAt || 0
-                     const lastSpokeAtB =
-                        audioLevels[b.user.uid]?.lastSpokeAt || 0
-                     return lastSpokeAtA - lastSpokeAtB
-                  })
+            if (firstActiveSpeakerIndex !== -1) {
+               // Find the least recently active speaker in the entire array or default to the first one
+               const leastActiveSpeakerIndex = newSortedStreams.reduce(
+                  (leastActiveIndex, currentStream, currentIndex) => {
+                     if (currentIndex >= pageSize) return leastActiveIndex // Only consider the first page
 
-               // Find the least active speaker on the first page
-               const leastActiveSpeakerIndex = sortedByLastSpokeAt.findIndex(
-                  (streamer) =>
-                     audioLevels[streamer.user.uid]?.lastSpokeAt !== undefined
+                     const currentLastSpokeAt =
+                        audioLevels[currentStream.user.uid]?.lastSpokeAt || 0
+                     const leastActiveLastSpokeAt =
+                        audioLevels[newSortedStreams[leastActiveIndex].user.uid]
+                           ?.lastSpokeAt || 0
+
+                     // Update the leastActiveIndex if the current stream's lastSpokeAt is earlier
+                     return currentLastSpokeAt < leastActiveLastSpokeAt ||
+                        leastActiveLastSpokeAt === 0
+                        ? currentIndex
+                        : leastActiveIndex
+                  },
+                  0
                )
 
                // Use swapPositions to swap the most currently active speaker from the second page with the least recently active speaker on the first page.
                newSortedStreams = swapPositions(
                   newSortedStreams,
                   leastActiveSpeakerIndex,
-                  activeSpeakerIndex
+                  firstActiveSpeakerIndex
                )
             }
          }
