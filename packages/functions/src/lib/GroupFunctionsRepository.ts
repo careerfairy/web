@@ -160,11 +160,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
 
    /**
-    * Fetches all groups that are on Sparks trial plan.
+    * Fetches all groups that are on a plan.
     *
     * @returns A promise that resolves with an array of Group objects.
     */
-   getAllGroupsOnSparksTrialPlan(): Promise<Group[]>
+   getAllGroupsOnPlan(): Promise<Group[]>
 
    /**
     * Sends a reminder email to the group admins when the trial plan creation period is near to end.
@@ -624,7 +624,7 @@ export class GroupFunctionsRepository
       })
    }
 
-   async getAllGroupsOnSparksTrialPlan(): Promise<Group[]> {
+   async getAllGroupsOnPlan(): Promise<Group[]> {
       const snaps = await this.firestore
          .collection("careerCenterData")
          .orderBy("plan")

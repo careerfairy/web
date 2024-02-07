@@ -59,7 +59,7 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
    .onRun(async () => {
       try {
          // get all the groups on sparks trial plan
-         const groups = await groupRepo.getAllGroupsOnSparksTrialPlan()
+         const groups = await groupRepo.getAllGroupsOnPlan()
 
          const filteredGroups = groups.filter((group) => {
             const groupPresenter = GroupPresenter.createFromDocument(group)
