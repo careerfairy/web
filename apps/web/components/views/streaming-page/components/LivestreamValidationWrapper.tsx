@@ -4,6 +4,7 @@ import useLivestreamCategoryDataSWR from "components/custom-hook/live-stream/use
 import useLivestreamSecureTokenSWR from "components/custom-hook/live-stream/useLivestreamSecureToken"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
@@ -11,7 +12,7 @@ import { ReactNode } from "react"
 
 const isBrowserAgoraCompatible = AgoraRTC.checkSystemRequirements()
 
-type ConditionalRedirectWrapperProps = {
+type LivestreamValidationWrapperProps = {
    children: ReactNode
    isHost?: boolean
 }
@@ -23,7 +24,20 @@ type ConditionalRedirectWrapperProps = {
 export const LivestreamValidationWrapper = ({
    children,
    isHost,
-}: ConditionalRedirectWrapperProps) => {
+}: LivestreamValidationWrapperProps) => {
+   return (
+      <LivestreamExistenceWrapper>
+         <LivestreamValidationsComponent isHost={isHost}>
+            {children}
+         </LivestreamValidationsComponent>
+      </LivestreamExistenceWrapper>
+   )
+}
+
+const LivestreamValidationsComponent = ({
+   children,
+   isHost,
+}: LivestreamValidationWrapperProps) => {
    const { userData, isLoggedIn, isLoggedOut, authenticatedUser } = useAuth()
    const {
       query: { token },
@@ -35,12 +49,8 @@ export const LivestreamValidationWrapper = ({
 
    const livestream = useLivestreamData()
 
-   const livestreamExists = Boolean(livestream)
-
-   useConditionalRedirect(!livestreamExists, "/portal")
-
    const livestreamToken = useLivestreamSecureTokenSWR({
-      livestreamId: livestream?.id,
+      livestreamId: livestream.id,
    })
 
    const { data: hasAnswearedAllQuestions, mutate: refetchQuestions } =
@@ -51,12 +61,12 @@ export const LivestreamValidationWrapper = ({
 
    // Custom validations
 
-   const isUserRegistered = livestream?.registeredUsers?.includes(
+   const isUserRegistered = livestream.registeredUsers?.includes(
       authenticatedUser.email
    )
 
    // 1. user is a host and the stream is not a test stream -> accessible
-   const isHostNotTestLivestream = isHost && !livestream?.test
+   const isHostNotTestLivestream = isHost && !livestream.test
 
    // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page
    const isHostNotTestStreamInvalidLink =
@@ -66,11 +76,11 @@ export const LivestreamValidationWrapper = ({
 
    // 3. user is logged out,test or open stream -> accessible
    const isLoggedOutTestOpenStream =
-      isLoggedOut && (livestream?.test || livestream?.openStream)
+      isLoggedOut && (livestream.test || livestream.openStream)
 
    // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
    const isLoggedOutNotTestOpenStream =
-      isLoggedOut && !(livestream?.test || livestream?.openStream)
+      !isHost && isLoggedOut && !(livestream.test || livestream.openStream)
 
    // 5. user is a viewer and has registered for the event -> accessible
    const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
@@ -106,7 +116,7 @@ export const LivestreamValidationWrapper = ({
                updatedStats={null}
                serverUserEmail={authenticatedUser.email}
                serverSideLivestream={livestream}
-               livestreamId={livestream?.id}
+               livestreamId={livestream.id}
                handleClose={() => {}}
                page={"register"}
                mode="stand-alone"
@@ -126,4 +136,23 @@ export const LivestreamValidationWrapper = ({
    }
 
    return <>{children}</>
+}
+
+type LivestreamExistenceWrapperProps = {
+   children: React.ReactNode
+}
+const LivestreamExistenceWrapper = ({
+   children,
+}: LivestreamExistenceWrapperProps) => {
+   const livestream = useLivestreamData()
+
+   const livestreamExists = Boolean(livestream)
+
+   useConditionalRedirect(!livestreamExists, "/portal")
+
+   return (
+      <ConditionalWrapper condition={livestreamExists}>
+         {children}
+      </ConditionalWrapper>
+   )
 }

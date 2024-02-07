@@ -652,9 +652,9 @@ export type FilterLivestreamsOptions = {
 }
 
 /**
- * Response for a livestream token request
+ * Options for checkForCategoryData, used for custom hook useLivestreamCategoryDataSWR.
  */
 export type CategoryDataOption = {
-   livestream?: LivestreamEvent
-   userData?: UserData
+   livestream: LivestreamEvent
+   userData: UserData
 }
