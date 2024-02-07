@@ -49,9 +49,7 @@ const LivestreamValidationsComponent = ({
 
    const livestream = useLivestreamData()
 
-   const livestreamToken = useLivestreamSecureTokenSWR({
-      livestreamId: livestream.id,
-   })
+   const livestreamToken = useLivestreamSecureTokenSWR(livestream.id)
 
    const { data: hasAnswearedAllQuestions, mutate: refetchQuestions } =
       useLivestreamCategoryDataSWR(firebase, {
@@ -110,19 +108,17 @@ const LivestreamValidationsComponent = ({
 
    if (!allow && isViewerNotRegistered) {
       return (
-         <>
-            <LivestreamDialog
-               open
-               updatedStats={null}
-               serverUserEmail={authenticatedUser.email}
-               serverSideLivestream={livestream}
-               livestreamId={livestream.id}
-               handleClose={() => {}}
-               page={"register"}
-               mode="stand-alone"
-               onRegisterSuccess={afterRegistrationMutations}
-            />
-         </>
+         <LivestreamDialog
+            open
+            updatedStats={null}
+            serverUserEmail={authenticatedUser.email}
+            serverSideLivestream={livestream}
+            livestreamId={livestream.id}
+            handleClose={() => {}}
+            page={"register"}
+            mode="stand-alone"
+            onRegisterSuccess={afterRegistrationMutations}
+         />
       )
    }
 
