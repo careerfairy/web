@@ -1,4 +1,4 @@
-import { useJoin, useRTCClient } from "agora-rtc-react"
+import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
 import { agoraCredentials } from "data/agora/AgoraInstance"
@@ -31,6 +31,7 @@ type StreamContextProps = {
    isReady: boolean
    setIsReady: (isReady: boolean) => void
    isJoining: boolean
+   currentRole: ClientRole
 }
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
@@ -50,6 +51,9 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 }) => {
    const { query } = useRouter()
    const [isReady, setIsReady] = useState(false)
+
+   // Default role is always audience according to SDK
+   const [currentRole, setCurrentRole] = useState<ClientRole>("audience")
 
    const hostAuthToken = query.token?.toString() || ""
 
@@ -93,9 +97,13 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    useEffect(() => {
       if (isConnected) {
-         client.setClientRole(shouldStream ? "host" : "audience")
+         const newRole = shouldStream && isReady ? "host" : "audience"
+         client
+            .setClientRole(newRole)
+            .then(() => setCurrentRole(newRole))
+            .catch(errorLogAndNotify)
       }
-   }, [client, isConnected, shouldStream])
+   }, [client, isConnected, isReady, shouldStream])
 
    useEffect(() => {
       if (isConnected) {
@@ -114,6 +122,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          isReady,
          setIsReady,
          isJoining: isLoading,
+         currentRole,
       }),
       [
          livestreamId,
@@ -124,6 +133,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          response.token,
          isReady,
          isLoading,
+         currentRole,
       ]
    )
 
