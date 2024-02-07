@@ -77,7 +77,7 @@ const setFirstAvailableDevice = (
 export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    children,
 }) => {
-   const { isReady, shouldStream } = useStreamingContext()
+   const { isReady, shouldStream, currentRole } = useStreamingContext()
    const currentUserUID = useCurrentUID()
 
    const [cameraOn, setCameraOn] = useState(true)
@@ -191,7 +191,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const toggleCamera = useCallback(() => setCameraOn((prev) => !prev), [])
 
-   const readToPublish = shouldStream && isReady
+   const readToPublish = shouldStream && isReady && currentRole === "host"
 
    const localUser = useMemo<LocalUser | null>(() => {
       // If the user is ready to publish, return the local user object
