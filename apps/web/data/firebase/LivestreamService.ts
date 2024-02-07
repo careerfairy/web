@@ -53,6 +53,7 @@ export class LivestreamService {
    ) {
       const { livestream: currentLivestream, userData: userData } = options
 
+      if (currentLivestream.test) return true
       try {
          if (
             userData &&

@@ -1,18 +1,12 @@
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
-type UseLivestreamSecureTokenOptions = {
-   livestreamId: string
-}
-
 type TokenSWRResponse = {
    value: string
    id: string
 }
-const useLivestreamSecureTokenSWR = (
-   options: UseLivestreamSecureTokenOptions
-) => {
+const useLivestreamSecureTokenSWR = (livestreamId: string) => {
    return useFirestoreDocument<TokenSWRResponse>("livestreams", [
-      options.livestreamId,
+      livestreamId,
       "tokens",
       "secureToken",
    ])
