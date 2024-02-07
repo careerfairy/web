@@ -5,7 +5,7 @@ const StreamingPage = dynamic(
    // Use next/dynamic to import the StreamingPage component without ssr as the Agora SDK uses the window object
    // https://github.com/AgoraIO-Community/Agora-RTC-React/blob/master/example/nextjs/pages/index.tsx
    import("components/views/streaming-page").then((a) => a.StreamingPage),
-   { ssr: false, loading: () => <div>Loading...</div> }
+   { ssr: false }
 )
 const StreamingViewer = () => {
    const [loaded, setLoaded] = useState(false)
