@@ -82,12 +82,15 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
-   const { isLoading, isConnected } = useJoin({
-      appid: agoraCredentials.appID,
-      channel: livestreamId,
-      token: response.token,
-      uid: agoraUserId,
-   })
+   const { isLoading, isConnected } = useJoin(
+      {
+         appid: agoraCredentials.appID,
+         channel: livestreamId,
+         token: response.token,
+         uid: agoraUserId,
+      },
+      Boolean(!response.isLoading && response.token) // Allow to join/re-join when the token is changed
+   )
 
    const client = useRTCClient()
 
