@@ -10,10 +10,11 @@ import { useLocalTracks } from "../../context"
 import { FloatingContent, VideoTrackWrapper } from "./VideoTrackWrapper"
 import { UserCover } from "./UserCover"
 import { Loader } from "./Loader"
-import { useAuth } from "HOCs/AuthProvider"
 import { styles } from "./styles"
 import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
 import { useAppSelector } from "components/custom-hook/store"
+import { DetailsOverlay } from "./DetailsOverlay"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -36,6 +37,10 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to contain the video inside the container or fill it.
     */
    readonly containVideo?: boolean
+   /**
+    * Whether to hide the details overlay.
+    */
+   readonly hideDetails?: boolean
 } & BoxProps
 
 /**
@@ -45,6 +50,7 @@ export const LocalMicrophoneAndCameraUser = ({
    playAudio = false,
    playVideo,
    volume,
+   hideDetails,
    children,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
@@ -52,7 +58,8 @@ export const LocalMicrophoneAndCameraUser = ({
 
    const isSpeaking = useAppSelector(userIsSpeakingSelector(uid))
 
-   const { userData } = useAuth()
+   const { data: streamerDetails } = useStreamerDetails(uid)
+
    const {
       localCameraTrack: { localCameraTrack, isLoading },
       localMicrophoneTrack: { localMicrophoneTrack },
@@ -81,15 +88,15 @@ export const LocalMicrophoneAndCameraUser = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
-         {!playVideo ? (
-            <UserCover
-               firstName={userData?.firstName}
-               lastName={userData?.lastName}
-               avatarUrl={userData?.avatar}
-            />
-         ) : null}
+         {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
 
          <FloatingContent>{children}</FloatingContent>
+         {hideDetails ? null : (
+            <DetailsOverlay
+               micMuted={!micOn || micMuted}
+               streamerDetails={streamerDetails}
+            />
+         )}
       </VideoTrackWrapper>
    )
 }

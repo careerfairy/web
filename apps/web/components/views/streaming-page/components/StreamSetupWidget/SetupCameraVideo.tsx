@@ -14,7 +14,7 @@ export const SetupCameraVideo = () => {
    const { cameraOn } = useLocalTracks()
 
    return (
-      <LocalMicrophoneAndCameraUser sx={styles.video}>
+      <LocalMicrophoneAndCameraUser hideDetails sx={styles.video}>
          {!cameraOn && <CameraDisabledOverlay />}
       </LocalMicrophoneAndCameraUser>
    )
