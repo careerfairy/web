@@ -19,11 +19,11 @@ export interface CustomBrandedTextFieldProps {
     * This property is used instead of required to prevent the default * from showing
     * when the Component has required=true
     */
-   requiredText?: String
+   requiredText?: string
    /**
     * Text for the additional tooltip, empty if not provided
     */
-   tooltipText?: String
+   tooltipText?: string
 }
 
 export type BrandedTextFieldProps = Omit<
@@ -31,7 +31,7 @@ export type BrandedTextFieldProps = Omit<
    "variant"
 >
 
-function getBrandedTooltip(title: String): ReactElement<typeof BrandedTooltip> {
+function getBrandedTooltip(title: string): ReactElement<typeof BrandedTooltip> {
    return (
       <BrandedTooltip title={title}>
          <InfoIcon color="secondary" />
@@ -69,7 +69,7 @@ const BrandedTextField = styled((props: BrandedTextFieldProps) => (
       )}
       SelectProps={Object.assign({}, selectProps, props.SelectProps)}
    />
-))(({ theme, error, size }) => ({
+))(({ theme, error }) => ({
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
@@ -118,7 +118,7 @@ const selectProps: Partial<SelectProps> = {
    },
 }
 
-export const BrandedTextFieldField: FC<BrandedTextFieldProps> = ({
+export const FormBrandedTextField: FC<BrandedTextFieldProps> = ({
    name,
    ...props
 }) => {
