@@ -31,7 +31,7 @@ export const DetailsOverlay = ({ micMuted, streamerDetails }: Props) => {
             justifyContent="space-between"
             alignItems="end"
          >
-            <Stack>
+            <Stack spacing={0.5}>
                <Typography variant="brandedBody" fontWeight={600}>
                   {streamerDetails.firstName || ""}{" "}
                   {streamerDetails.lastName || ""}

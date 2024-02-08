@@ -36,13 +36,11 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
 
    const options = useMemo<SWRConfiguration>(
       () => ({
-         ...reducedRemoteCallsOptions,
          /**
-          * Since the Agora RTC Token returned from the cloud function has a life-time of 6 hours, we can safely
-          * cache the token for 10 minutes to reduce our network footprint.
+          * Token is only re-fetched when the args change
+          * Not on focus, blur, or other events
           */
-         dedupingInterval: 600000, // 10 minutes
-         focusThrottleInterval: 600000, // 10 minutes
+         ...reducedRemoteCallsOptions,
          onError: (error, key) => {
             console.log("error", error)
             console.log("key", key)
@@ -58,6 +56,7 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
                },
             })
          },
+         suspense: false,
       }),
       [authenticatedUser?.uid]
    )
@@ -67,11 +66,12 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
       isValidating: tokenIsValidating,
       error: tokenError,
       mutate,
+      isLoading,
    } = useSWR(key, () => livestreamService.fetchAgoraRtcToken(args), options)
 
    return {
       token,
-      isLoading: tokenIsValidating,
+      isLoading: tokenIsValidating || isLoading,
       isError: Boolean(tokenError),
       reFetchToken: mutate,
    }
