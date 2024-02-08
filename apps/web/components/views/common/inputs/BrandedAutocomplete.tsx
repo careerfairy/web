@@ -1,26 +1,36 @@
-import { Autocomplete, AutocompleteProps } from "@mui/material"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { FC } from "react"
 import { styled } from "@mui/material/styles"
-import BrandedTextField, { BrandedTextFieldProps } from "./BrandedTextField"
-
-import { ListItemText, MenuItem } from "@mui/material"
 import BrandedCheckbox from "./BrandedCheckbox"
+import { ListItemText, MenuItem } from "@mui/material"
+import { Autocomplete, AutocompleteProps } from "@mui/material"
+import BrandedTextField, {
+   BrandedTextFieldProps,
+   FormBrandedTextField,
+} from "./BrandedTextField"
+import { useField } from "formik"
 
-type BrandedAutocompleteProps<T extends { id: string; name: string } = any> =
-   Omit<
-      AutocompleteProps<T, boolean, boolean, boolean>,
-      "renderInput" | "renderTags"
-   > & {
-      textFieldProps?: BrandedTextFieldProps
-      limit?: number
-   }
+type StyledBrandedAutocompleteProps<
+   T extends { id: string; name: string } = any
+> = Omit<AutocompleteProps<T, boolean, boolean, boolean>, "renderTags"> & {
+   textFieldProps?: BrandedTextFieldProps
+   limit?: number
+}
 
-const BrandedAutocomplete = styled(
+export type BrandedAutocompleteProps = Omit<
+   StyledBrandedAutocompleteProps,
+   "renderInput"
+>
+
+type FormBrandedAutocompleteProps = BrandedAutocompleteProps & { name: string }
+
+const StyledBrandedAutocomplete = styled(
    ({
       limit,
-      textFieldProps,
       getOptionLabel,
+      renderInput,
       ...props
-   }: BrandedAutocompleteProps) => (
+   }: StyledBrandedAutocompleteProps) => (
       <Autocomplete
          getOptionDisabled={(optionEl) => {
             if (!props.multiple || !limit) return false
@@ -46,6 +56,7 @@ const BrandedAutocomplete = styled(
                }}
             >
                <ListItemText
+                  key={`${option.id}-text`}
                   primary={getOptionLabel(option)}
                   sx={{ padding: "16px" }}
                />
@@ -54,11 +65,43 @@ const BrandedAutocomplete = styled(
          )}
          color="primary"
          getOptionLabel={getOptionLabel}
+         renderInput={renderInput}
+      />
+   )
+)({})
+
+const BrandedAutocomplete: FC<BrandedAutocompleteProps> = ({
+   textFieldProps,
+   ...props
+}) => {
+   return (
+      <StyledBrandedAutocomplete
+         {...props}
          renderInput={(params) => (
             <BrandedTextField {...params} {...textFieldProps} />
          )}
       />
    )
-)({})
+}
+
+export const FormBrandedAutocomplete: FC<FormBrandedAutocompleteProps> = ({
+   name,
+   textFieldProps,
+   ...props
+}) => {
+   const [{ onBlur }, ,] = useField(name)
+   return (
+      <StyledBrandedAutocomplete
+         renderInput={(params) => (
+            <FormBrandedTextField name={name} {...params} {...textFieldProps} />
+         )}
+         {...props}
+         onChange={async (...args) => {
+            await props.onChange(...args)
+            await onBlur({ target: { name } })
+         }}
+      />
+   )
+}
 
 export default BrandedAutocomplete
