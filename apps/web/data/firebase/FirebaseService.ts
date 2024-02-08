@@ -791,7 +791,7 @@ class FirebaseService {
       return livestreamCollRef.add({
          companyId: "CareerFairy",
          test: true,
-         id: "testLivestream",
+         id: livestreamCollRef.id,
          universities: [],
          createdAt: this.getServerTimestamp(),
          start: firebase.firestore.Timestamp.fromDate(
@@ -812,7 +812,6 @@ class FirebaseService {
          .doc(livestreamId)
       batch.update(livestreamRef, {
          currentSpeakerId: livestreamId,
-         id: livestreamId,
       })
       const chatsRef = livestreamRef.collection("chatEntries")
       testChats.forEach((chat) => {
@@ -839,7 +838,6 @@ class FirebaseService {
          handRaiseActive: false,
          currentSpeakerId: streamRef.id,
          activeCallToActionIds: [],
-         id: streamRef.id,
       })
 
       // Declare all the refs
