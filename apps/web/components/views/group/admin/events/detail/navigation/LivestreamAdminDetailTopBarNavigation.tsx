@@ -21,6 +21,9 @@ const styles = sxStyles({
       ".MuiTabs-indicator": {
          backgroundColor: "#6749EA",
       },
+      ".MuiTouchRipple-child": {
+         backgroundColor: "#EBEBEF",
+      },
    },
 })
 
