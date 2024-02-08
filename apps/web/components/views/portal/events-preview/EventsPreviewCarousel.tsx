@@ -88,6 +88,7 @@ const styles = sxStyles({
       },
       "&:first-of-type": {
          ml: 0.3,
+         height: 355,
       },
    },
    paddingSlide: {
