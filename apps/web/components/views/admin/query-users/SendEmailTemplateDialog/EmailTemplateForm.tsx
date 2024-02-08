@@ -22,7 +22,7 @@ import SendTestEmailDialog from "./SendTestEmailDialog"
 import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
 import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions"
 import { TemplateDialogStepProps } from "./SendEmailTemplateDialog"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 const now = new Date()
 
@@ -96,7 +96,7 @@ const EmailTemplateForm = ({
 
    const handleConfirmSendTestEmail = useCallback(
       async (data) => {
-         let dataWithTestEmails = { ...data, senderEmail: userData.userEmail }
+         const dataWithTestEmails = { ...data, senderEmail: userData.userEmail }
          // ensure that the emails
          dataWithTestEmails.testEmails = testEmails || []
          try {
@@ -166,7 +166,7 @@ const EmailTemplateForm = ({
             return (
                <>
                   <Box p={1} position="relative">
-                     {formik.isSubmitting && (
+                     {Boolean(formik.isSubmitting) && (
                         <div className={classes.loaderWrapper}>
                            <CircularProgress />
                         </div>
@@ -183,15 +183,18 @@ const EmailTemplateForm = ({
                                        key={field.name}
                                        item
                                        xs={12}
-                                       md={field.small && 6}
+                                       md={Boolean(field.small) && 6}
                                     >
                                        <ImageSelect
                                           error={
-                                             formik.touched[field.name] &&
-                                             formik.errors[field.name]
+                                             Boolean(
+                                                formik.touched[field.name]
+                                             ) &&
+                                             Boolean(formik.errors[field.name])
                                           }
                                           value={formik.values[field.name]}
                                           // @ts-ignore
+                                          // eslint-disable-next-line react/jsx-handler-names
                                           handleBlur={formik.handleBlur}
                                           formName={field.name}
                                           setFieldValue={formik.setFieldValue}
@@ -212,7 +215,7 @@ const EmailTemplateForm = ({
                                        key={field.name}
                                        item
                                        xs={12}
-                                       md={field.small && 6}
+                                       md={Boolean(field.small) && 6}
                                     >
                                        <TextField
                                           fullWidth
@@ -224,8 +227,12 @@ const EmailTemplateForm = ({
                                              sendingEmails
                                           }
                                           multiline={field.multiLine}
-                                          minRows={field.multiLine && 3}
-                                          maxRows={field.multiLine && 20}
+                                          minRows={
+                                             Boolean(field.multiLine) && 3
+                                          }
+                                          maxRows={
+                                             Boolean(field.multiLine) && 20
+                                          }
                                           inputProps={{
                                              maxLength: field.maxLength,
                                           }}
@@ -235,13 +242,17 @@ const EmailTemplateForm = ({
                                           value={formik.values[field.name]}
                                           onChange={formik.handleChange}
                                           error={
-                                             formik.touched[field.name] &&
+                                             Boolean(
+                                                formik.touched[field.name]
+                                             ) &&
                                              Boolean(formik.errors[field.name])
                                           }
                                           // @ts-ignore
                                           helperText={
-                                             formik.touched[field.name] &&
-                                             formik.errors[field.name]
+                                             Boolean(
+                                                formik.touched[field.name]
+                                             ) &&
+                                             Boolean(formik.errors[field.name])
                                           }
                                        />
                                     </Grid>
@@ -253,16 +264,21 @@ const EmailTemplateForm = ({
                                        key={field.name}
                                        item
                                        xs={12}
-                                       md={field.small && 6}
+                                       md={Boolean(field.small) && 6}
                                     >
                                        <DateTimePicker
                                           // @ts-ignore
                                           id={field.name}
                                           clearable
                                           disablePast
-                                          renderInput={(params) => (
-                                             <TextField fullWidth {...params} />
-                                          )}
+                                          slots={{
+                                             textField: (params) => (
+                                                <TextField
+                                                   fullWidth
+                                                   {...params}
+                                                />
+                                             ),
+                                          }}
                                           label={field.label}
                                           // @ts-ignore
                                           labelFunc={(date) =>
@@ -288,12 +304,16 @@ const EmailTemplateForm = ({
                                           minDate={now}
                                           inputVariant="outlined"
                                           error={
-                                             formik.touched[field.name] &&
+                                             Boolean(
+                                                formik.touched[field.name]
+                                             ) &&
                                              Boolean(formik.errors[field.name])
                                           }
                                           helperText={
-                                             formik.touched[field.name] &&
-                                             formik.errors[field.name]
+                                             Boolean(
+                                                formik.touched[field.name]
+                                             ) &&
+                                             Boolean(formik.errors[field.name])
                                           }
                                           date={formik.values[field.name]}
                                           openPicker={true}
