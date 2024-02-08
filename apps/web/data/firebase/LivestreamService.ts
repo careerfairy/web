@@ -41,11 +41,11 @@ export class LivestreamService {
    }
 
    /**
-    * Validates category data for a livestream, determining if a certain user as answeared and perfomed all steps
+    * Validates category data for a livestream, determining if a certain user as answered and performed all steps
     * for a livestream registration and accepted all policies if any. Current logic is a migration of the validation done in the old streaming application.
     * @param firebase Firebase service
     * @param options Category validation data (livestream and userData)
-    * @returns true if user has all questions answeared and policies accepted, false otherwise
+    * @returns true if user has all questions answered and policies accepted, false otherwise
     */
    async checkCategoryData(
       firebase: FirebaseService,
