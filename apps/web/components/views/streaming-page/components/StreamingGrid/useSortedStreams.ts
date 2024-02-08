@@ -19,7 +19,14 @@ export const useSortedStreams = (
 
    useEffect(() => {
       setSortedStreams((prevSortedStreams) => {
-         let newSortedStreams = [...prevSortedStreams]
+         // update the streams with the latest stream data
+         let newSortedStreams = prevSortedStreams.map(
+            (s) =>
+               streams.find((stream) => stream.user.uid === s.user.uid) || null
+         )
+
+         // Remove streams that are no longer present
+         newSortedStreams = newSortedStreams.filter(Boolean)
 
          // Ensure all current streams are present, adding new ones to the end.
          streams.forEach((stream) => {
@@ -28,13 +35,8 @@ export const useSortedStreams = (
             }
          })
 
-         // Remove streams that are no longer present
-         newSortedStreams = newSortedStreams.filter((s) =>
-            streams.find((stream) => stream.user.uid === s.user.uid)
-         )
-
          if (newSortedStreams.length > pageSize) {
-            // If the number of streams is greater than the page size, we might need to sort the streams.
+            // Only sort the streams if the number of streams is greater than the page size.
 
             // Find the first currently active speaker outside the first page.
             const firstActiveSpeakerIndex = newSortedStreams.findIndex(
