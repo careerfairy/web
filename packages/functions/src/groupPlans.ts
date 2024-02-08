@@ -59,12 +59,12 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
    .onRun(async () => {
       try {
          // get all the groups on sparks trial plan
-         const groups = await groupRepo.getAllGroupsOnPlan()
+         const groups = await groupRepo.getAllGroupsWithAPlan()
 
          const filteredGroups = groups.filter((group) => {
             const groupPresenter = GroupPresenter.createFromDocument(group)
 
-            return groupPresenter.trialPlanContentCreationCriticalState()
+            return groupPresenter.isTrialPlanContentCreationInCriticalState()
          })
 
          functions.logger.info(
@@ -72,7 +72,7 @@ export const sendReminderToNearEndSparksTrialPlanCreationPeriod = functions
          )
 
          filteredGroups.forEach((group) => {
-            void groupRepo.sendTrialPlanCreationPeriodNearToEndReminder(
+            void groupRepo.sendTrialPlanCreationPeriodInCriticalStateReminder(
                group,
                client
             )

@@ -164,7 +164,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     *
     * @returns A promise that resolves with an array of Group objects.
     */
-   getAllGroupsOnPlan(): Promise<Group[]>
+   getAllGroupsWithAPlan(): Promise<Group[]>
 
    /**
     * Sends a reminder email to the group admins when the trial plan creation period is near to end.
@@ -175,7 +175,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @param client - The Postmark client.
     * @returns A promise that resolves when the reminder email was sent.
     */
-   sendTrialPlanCreationPeriodNearToEndReminder(
+   sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
       client: ServerClient
    ): Promise<void>
@@ -624,7 +624,7 @@ export class GroupFunctionsRepository
       })
    }
 
-   async getAllGroupsOnPlan(): Promise<Group[]> {
+   async getAllGroupsWithAPlan(): Promise<Group[]> {
       const snaps = await this.firestore
          .collection("careerCenterData")
          .orderBy("plan")
@@ -634,7 +634,7 @@ export class GroupFunctionsRepository
       return mapFirestoreDocuments<Group>(snaps)
    }
 
-   async sendTrialPlanCreationPeriodNearToEndReminder(
+   async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
       client: ServerClient
    ): Promise<void> {

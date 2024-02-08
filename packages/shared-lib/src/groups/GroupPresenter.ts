@@ -452,7 +452,7 @@ export class GroupPresenter {
       )
    }
 
-   trialPlanContentCreationCriticalState() {
+   isTrialPlanContentCreationInCriticalState() {
       const daysLeft = this.getRemainingDaysLeftForContentCreation()
 
       return (
