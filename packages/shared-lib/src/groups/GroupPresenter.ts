@@ -452,6 +452,17 @@ export class GroupPresenter {
       )
    }
 
+   isTrialPlanContentCreationInCriticalState() {
+      const daysLeft = this.getRemainingDaysLeftForContentCreation()
+
+      return (
+         !this.hasPlanExpired() &&
+         this.isTrialPlan() &&
+         daysLeft === DAYS_LEFT_TO_WARN_CONTENT_CREATION &&
+         !this.publicSparks
+      )
+   }
+
    getCompanyLogoUrl() {
       return this.logo ? this.logo.url : this.logoUrl
    }
