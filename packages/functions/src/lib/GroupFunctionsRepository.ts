@@ -158,6 +158,27 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves when the email was sent.
     */
    sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
+
+   /**
+    * Fetches all groups that are on a plan.
+    *
+    * @returns A promise that resolves with an array of Group objects.
+    */
+   getAllGroupsWithAPlan(): Promise<Group[]>
+
+   /**
+    * Sends a reminder email to the group admins when the trial plan creation period is near to end.
+    *
+    * This method fetches all the group admins of the given group and sends a batch of reminder emails through Postmark.
+    *
+    * @param group - The group for which the reminder email is to be sent.
+    * @param client - The Postmark client.
+    * @returns A promise that resolves when the reminder email was sent.
+    */
+   sendTrialPlanCreationPeriodInCriticalStateReminder(
+      group: Group,
+      client: ServerClient
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -587,39 +608,51 @@ export class GroupFunctionsRepository
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
    }
 
-   async sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void> {
-      const admins = await this.getGroupAdmins(groupId);
+   async sendTrialWelcomeEmail(
+      groupId: string,
+      client: ServerClient
+   ): Promise<void> {
+      const admins = await this.getGroupAdmins(groupId)
 
-      const emails = admins?.map(({ email, firstName, groupId }) => ({
-         TemplateId: Number(
-            process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME
-         ),
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: email,
-         TemplateModel: {
-            user_name: firstName,
-            company_sparks_link: addUtmTagsToLink({
-               link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
-               campaign: "sparks",
-               content: "trial_welcome",
-            }),
-         },
-      }))
+      sendSparksTrialPlanEmail({
+         client,
+         admins,
+         templateId: process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME,
+         content: "trial_welcome",
+         successMessage: "Successfully sent batch sparks trial welcome email",
+         errorMessage: "Error sending sparks trial welcome email:",
+      })
+   }
 
-      client.sendEmailBatchWithTemplates(emails).then(
-         (responses) => {
-            responses.forEach(() =>
-               functions.logger.log(
-                  "Successfully sent batch sparks trial welcome email"
-               )
-            )
-         },
-         (error) => {
-            functions.logger.error(
-               "Error sending sparks trial welcome email:" + error
-            )
-         }
-      )
+   async getAllGroupsWithAPlan(): Promise<Group[]> {
+      const snaps = await this.firestore
+         .collection("careerCenterData")
+         .orderBy("plan")
+         .withConverter(createCompatGenericConverter<Group>())
+         .get()
+
+      return mapFirestoreDocuments<Group>(snaps)
+   }
+
+   async sendTrialPlanCreationPeriodInCriticalStateReminder(
+      group: Group,
+      client: ServerClient
+   ): Promise<void> {
+      const admins = await this.getGroupAdmins(group.id)
+
+      sendSparksTrialPlanEmail({
+         client,
+         admins,
+         templateId:
+            process.env
+               .POSTMARK_TEMPLATE_SPARKS_TRIAL_PLAN_CREATION_PERIOD_NEAR_TO_END,
+         content: "trial_contentcreation_end",
+         successMessage:
+            "Successfully sent batch sparks trial plan creation period near to end reminder",
+         errorMessage:
+            "Error sending sparks trial plan creation period near to end reminder:",
+         companyName: group.universityName,
+      })
    }
 }
 
@@ -691,4 +724,48 @@ const formatToOptionArray = (
          return { ...option, id: option.id.replace("_", ",") }
       })
       .filter(({ id }) => selectedIds?.includes(id))
+}
+
+type SendSparksTrialPlanEmailProps = {
+   client: ServerClient
+   admins: GroupAdmin[]
+   templateId: string | undefined
+   content: string
+   successMessage: string
+   errorMessage: string
+   companyName?: string
+}
+
+const sendSparksTrialPlanEmail = ({
+   client,
+   admins,
+   templateId,
+   content,
+   successMessage,
+   errorMessage,
+   companyName,
+}: SendSparksTrialPlanEmailProps): void => {
+   const emails = admins?.map(({ email, firstName, groupId }) => ({
+      TemplateId: Number(templateId),
+      From: "CareerFairy <noreply@careerfairy.io>",
+      To: email,
+      TemplateModel: {
+         user_name: firstName,
+         company_sparks_link: addUtmTagsToLink({
+            link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
+            campaign: "sparks",
+            content: content,
+         }),
+         ...(companyName && { company_name: companyName }),
+      },
+   }))
+
+   client.sendEmailBatchWithTemplates(emails).then(
+      (responses) => {
+         responses.forEach(() => functions.logger.log(successMessage))
+      },
+      (error) => {
+         functions.logger.error(errorMessage + error)
+      }
+   )
 }

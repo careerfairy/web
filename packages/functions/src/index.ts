@@ -253,7 +253,9 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
 
 // Group Subscription Plan Functions
-exports.startPlan_v2 = groupPlans.startPlan
+exports.startPlan_v3 = groupPlans.startPlan
+exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
+   groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
 
 // Search
 exports.fullIndexSync = search.fullIndexSync
