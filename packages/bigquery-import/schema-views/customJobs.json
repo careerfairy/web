@@ -5,15 +5,15 @@
          "type": "string"
       },
       {
-         "name": "applicants",
-         "type": "stringified_map"
-      },
-      {
-         "name": "clicks",
-         "type": "number"
-      },
-      {
          "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "title",
+         "type": "string"
+      },
+      {
+         "name": "description",
          "type": "string"
       },
       {
@@ -21,12 +21,28 @@
          "type": "string"
       },
       {
+         "name": "deadline",
+         "type": "timestamp"
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "updatedAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "salary",
+         "type": "string"
+      },
+      {
          "name": "livestreams",
          "type": "stringified_map"
       },
       {
-         "name": "title",
-         "type": "string"
+         "name": "deleted",
+         "type": "boolean"
       }
    ]
 }
