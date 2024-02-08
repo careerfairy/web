@@ -5,28 +5,35 @@ const randomId = uuidv4().replace(/-/g, "")
 
 export type GetUserStreamIdOptions = {
    isRecordingWindow: boolean
-   useRandomId: boolean
+   useTempId: boolean
    streamId: string
    userId?: string
+   creatorId?: string
 }
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
    if (options.isRecordingWindow) {
-      return `recording-${randomId}` as const
+      return `recording-${randomId}-${options.streamId}` as const
    }
 
-   if (options.useRandomId || !options.userId) {
-      return `anon-${options.streamId}${randomId}` as const
+   if (options.creatorId) {
+      return `creator-${options.creatorId}-${options.streamId}` as const
    }
 
-   return `user-${options.userId}` as const
+   if (options.useTempId || !options.userId) {
+      return getTempId(options.streamId)
+   }
+
+   return `user-${options.userId}-${options.streamId}` as const
 }
 
-export const withLocalStorage = (key: string, generateValue: () => string) => {
-   let value = localStorage.getItem(key)
+const getTempId = (streamId: string) => {
+   // first check local storage
+   const value = localStorage.getItem("streamingUuid")
    if (!value) {
-      value = generateValue()
-      localStorage.setItem(key, value)
+      const newUid = `anon-${randomId}-${streamId}` as const
+      localStorage.setItem("streamingUuid", newUid)
+      return newUid
    }
    return value
 }

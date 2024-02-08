@@ -13,6 +13,8 @@ import { Loader } from "./Loader"
 import { styles } from "./styles"
 import { useAppSelector } from "components/custom-hook/store"
 import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import { DetailsOverlay } from "./DetailsOverlay"
 
 type Props = {
    /**
@@ -61,6 +63,8 @@ export const RemoteStreamer = ({
 }: Props) => {
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
+   const { data: streamerDetails } = useStreamerDetails(user.uid)
+
    const { track: videoTrack, isLoading: videoIsLoading } = useRemoteUserTrack(
       user,
       "video"
@@ -69,8 +73,6 @@ export const RemoteStreamer = ({
       user,
       "audio"
    )
-
-   const tempName = user.uid.toString()
 
    const isLoading = videoIsLoading || audioIsLoading
 
@@ -92,14 +94,12 @@ export const RemoteStreamer = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
-         {/* TODO: Add logic to get remote user name from UID */}
-         {!playVideo ? (
-            <UserCover
-               firstName={tempName[0]}
-               lastName={tempName[tempName.length - 1]}
-            />
-         ) : null}
+         {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          <FloatingContent>{children}</FloatingContent>
+         <DetailsOverlay
+            micMuted={!user.hasAudio}
+            streamerDetails={streamerDetails}
+         />
       </VideoTrackWrapper>
    )
 }
