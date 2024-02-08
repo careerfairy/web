@@ -61,6 +61,7 @@ import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/s
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -301,6 +302,7 @@ class FirebaseService {
 
       const calendarEvent = {
          name: livestream.title,
+         // eslint-disable-next-line no-useless-escape
          details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
          location: linkWithUTM,
          startsAt: livestreamStartDate.toISOString(),
@@ -381,13 +383,14 @@ class FirebaseService {
    doSignOut = () => this.auth.signOut().then(clearFirestoreCache)
 
    getUniversitiesFromCountryCode = (countryCode) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("universitiesByCountry")
          .doc(countryCode)
       return ref.get()
    }
 
    getUniversitiesFromMultipleCountryCode = async (countryCodes: string[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let ref: any = this.firestore.collection("universitiesByCountry")
 
       if (countryCodes.length > 0) {
@@ -425,12 +428,12 @@ class FirebaseService {
    // USER
 
    getUserData = (userEmail) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
+      const ref = this.firestore.collection("userData").doc(userEmail)
       return ref.get()
    }
 
    listenToUserData = (userEmail, callback) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
+      const ref = this.firestore.collection("userData").doc(userEmail)
       return ref.onSnapshot(callback)
    }
 
@@ -443,7 +446,7 @@ class FirebaseService {
       universityName,
       universityCountryCode
    ) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
+      const ref = this.firestore.collection("userData").doc(userEmail)
       return ref.update({
          id: userEmail,
          userEmail,
@@ -457,14 +460,14 @@ class FirebaseService {
    }
 
    setUserUnsubscribed = (userEmail) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
+      const ref = this.firestore.collection("userData").doc(userEmail)
       return ref.update({
          unsubscribed: true,
       })
    }
 
    listenToGroups = (callback) => {
-      let groupRefs = this.firestore
+      const groupRefs = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
       return groupRefs.onSnapshot(callback)
@@ -473,17 +476,19 @@ class FirebaseService {
    // COMPANIES
 
    getCompanies = () => {
-      let ref = this.firestore.collection("companyData").orderBy("rank", "asc")
+      const ref = this.firestore
+         .collection("companyData")
+         .orderBy("rank", "asc")
       return ref.get()
    }
 
    getCompanyById = (companyId) => {
-      let ref = this.firestore.collection("companyData").doc(companyId)
+      const ref = this.firestore.collection("companyData").doc(companyId)
       return ref.get()
    }
 
    getCompanyPositions = (companyName) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("companyData")
          .doc(companyName.replace(/\s/g, ""))
          .collection("currentPositions")
@@ -491,7 +496,7 @@ class FirebaseService {
    }
 
    getCompanyVideos = (companyId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("videos")
          .where("companyId", "==", companyId)
          .orderBy("priority", "asc")
@@ -505,7 +510,7 @@ class FirebaseService {
       // We want to get the future state of the group
       const updatedGroup = Object.assign({}, currentGroup, newCareerCenter)
 
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("careerCenterData")
          .doc(currentGroup.id)
 
@@ -519,7 +524,7 @@ class FirebaseService {
    }
 
    deleteCareerCenterFromAllUsers = (careerCenterId) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
       // get all relevant users
       return this.firestore
          .collection("userData")
@@ -529,11 +534,11 @@ class FirebaseService {
             querySnapshot.docs.forEach((userDoc, index) => {
                // get the user document
                const userRef = userDoc.ref
-               let userData = userDoc.data()
+               const userData = userDoc.data()
                // remove the careerCenterId from the groupIds Array in the userData field
                // remove the careerCenterId from the registeredGroups array of Objects
                if (userData.registeredGroups) {
-                  let registeredGroups = userData.registeredGroups
+                  const registeredGroups = userData.registeredGroups
                   const filteredRegisteredGroups = registeredGroups.filter(
                      (group) => group.groupId !== careerCenterId
                   )
@@ -562,12 +567,12 @@ class FirebaseService {
    }
 
    listenToCurrentVideo = (streamRef, callback) => {
-      let ref = streamRef.collection("videos").doc("video")
+      const ref = streamRef.collection("videos").doc("video")
       return ref.onSnapshot(callback)
    }
 
    updateCurrentVideoState = (streamRef, state) => {
-      let ref = streamRef.collection("videos").doc("video")
+      const ref = streamRef.collection("videos").doc("video")
       return ref.update({
          ...state,
          lastPlayed:
@@ -576,7 +581,7 @@ class FirebaseService {
    }
 
    setCurrentVideo = (streamRef, url, updater) => {
-      let ref = streamRef.collection("videos").doc("video")
+      const ref = streamRef.collection("videos").doc("video")
       const secondsIn = Number(getQueryStringFromUrl(url, "t"))
       return ref.set({
          url: url,
@@ -600,7 +605,7 @@ class FirebaseService {
    // MENTORS
 
    getMentors = () => {
-      let ref = this.firestore.collection("mentors")
+      const ref = this.firestore.collection("mentors")
       return ref.get()
    }
 
@@ -634,29 +639,29 @@ class FirebaseService {
             },
          ]
 
-         let batch = this.firestore.batch()
-         let livestreamsRef = this.firestore.collection(collection).doc()
+         const batch = this.firestore.batch()
+         const livestreamsRef = this.firestore.collection(collection).doc()
          livestream.author = author
-         livestream.created = this.getServerTimestamp() as any
+         livestream.created = this.getServerTimestamp() as Timestamp
          livestream.currentSpeakerId = livestreamsRef.id
          livestream.id = livestreamsRef.id
          batch.set(livestreamsRef, livestream, { merge: true })
 
          if (collection === "livestreams") {
-            let tokenRef = this.firestore
+            const tokenRef = this.firestore
                .collection(collection)
                .doc(livestreamsRef.id)
                .collection("tokens")
                .doc("secureToken")
 
-            let token = uuidv4()
+            const token = uuidv4()
             batch.set(tokenRef, {
                value: token,
             })
          }
 
          for (const rating of ratings) {
-            let ratingRef = this.firestore
+            const ratingRef = this.firestore
                .collection(collection)
                .doc(livestreamsRef.id)
                .collection("rating")
@@ -687,10 +692,9 @@ class FirebaseService {
 
    getGroupsInfo = async (arrayOfGroupIds) => {
       const groupsDictionary: Record<string, Group> = {}
-      let i,
-         j,
-         tempArray,
-         chunk = 800
+      let i, j, tempArray
+
+      const chunk = 800
       for (i = 0, j = arrayOfGroupIds.length; i < j; i += chunk) {
          tempArray = arrayOfGroupIds.slice(i, i + chunk)
          const groupSnaps = await Promise.all(
@@ -716,8 +720,8 @@ class FirebaseService {
    }
 
    deleteLivestream = async (livestreamId, collection) => {
-      let batch = this.firestore.batch()
-      let livestreamsRef = this.firestore
+      const batch = this.firestore.batch()
+      const livestreamsRef = this.firestore
          .collection(collection)
          .doc(livestreamId)
       batch.delete(livestreamsRef)
@@ -725,8 +729,8 @@ class FirebaseService {
    }
 
    addDraftLivestream = async (livestream) => {
-      let batch = this.firestore.batch()
-      let livestreamsRef = this.firestore.collection("draftLivestreams").doc()
+      const batch = this.firestore.batch()
+      const livestreamsRef = this.firestore.collection("draftLivestreams").doc()
       livestream.currentSpeakerId = livestreamsRef.id
       livestream.id = livestreamsRef.id
       livestream.created = this.getServerTimestamp()
@@ -737,7 +741,7 @@ class FirebaseService {
 
    updateLivestream = async (livestream, collection, promotion) => {
       const batch = this.firestore.batch()
-      let livestreamsRef = this.firestore
+      const livestreamsRef = this.firestore
          .collection(collection)
          .doc(livestream.id)
       livestream.lastUpdated = this.getServerTimestamp()
@@ -757,12 +761,12 @@ class FirebaseService {
    }
 
    getStreamById = (streamId, collection) => {
-      let livestreamsRef = this.firestore.collection(collection).doc(streamId)
+      const livestreamsRef = this.firestore.collection(collection).doc(streamId)
       return livestreamsRef.get()
    }
 
    getStreamSpeakers = (streamId, collection) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection(collection)
          .doc(streamId)
          .collection("speakers")
@@ -782,11 +786,12 @@ class FirebaseService {
    //TEST_LIVESTREAMS
 
    createTestLivestream = () => {
-      let livestreamCollRef = this.firestore.collection("livestreams")
+      const livestreamCollRef = this.firestore.collection("livestreams")
 
       return livestreamCollRef.add({
          companyId: "CareerFairy",
          test: true,
+         id: "testLivestream",
          universities: [],
          createdAt: this.getServerTimestamp(),
          start: firebase.firestore.Timestamp.fromDate(
@@ -802,50 +807,52 @@ class FirebaseService {
       testPolls
    ) => {
       const batch = this.firestore.batch()
-      let livestreamRef = this.firestore
+      const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
       batch.update(livestreamRef, {
          currentSpeakerId: livestreamId,
+         id: livestreamId,
       })
-      let chatsRef = livestreamRef.collection("chatEntries")
+      const chatsRef = livestreamRef.collection("chatEntries")
       testChats.forEach((chat) => {
-         let docRef = chatsRef.doc()
+         const docRef = chatsRef.doc()
          batch.set(docRef, chat)
       })
-      let questionsRef = livestreamRef.collection("questions")
+      const questionsRef = livestreamRef.collection("questions")
       testQuestions.forEach((question) => {
-         let docRef = questionsRef.doc()
+         const docRef = questionsRef.doc()
          batch.set(docRef, question)
       })
-      let pollsRef = livestreamRef.collection("polls")
+      const pollsRef = livestreamRef.collection("polls")
       testPolls.forEach((poll) => {
-         let docRef = pollsRef.doc()
+         const docRef = pollsRef.doc()
          batch.set(docRef, poll)
       })
       return batch.commit()
    }
    resetTestStream = async (streamRef, testChats, testQuestions, testPolls) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
 
       // reset hand raise and current speaker and activeCallToActionIds
       batch.update(streamRef, {
          handRaiseActive: false,
          currentSpeakerId: streamRef.id,
          activeCallToActionIds: [],
+         id: streamRef.id,
       })
 
       // Declare all the refs
-      let chatsRef = streamRef.collection("chatEntries")
-      let questionsRef = streamRef.collection("questions")
-      let pollsRef = streamRef.collection("polls")
-      let callToActionsRef = streamRef.collection("callToActions")
+      const chatsRef = streamRef.collection("chatEntries")
+      const questionsRef = streamRef.collection("questions")
+      const pollsRef = streamRef.collection("polls")
+      const callToActionsRef = streamRef.collection("callToActions")
 
       // Delete all existing docs
       const questionsDocs = await questionsRef.get()
       if (!questionsDocs.empty) {
          questionsDocs.forEach((doc) => {
-            let docRef = doc.ref
+            const docRef = doc.ref
             batch.delete(docRef)
          })
       }
@@ -853,7 +860,7 @@ class FirebaseService {
       const chatsDocs = await chatsRef.get()
       if (!chatsDocs.empty) {
          chatsDocs.forEach((doc) => {
-            let docRef = doc.ref
+            const docRef = doc.ref
             batch.delete(docRef)
          })
       }
@@ -861,7 +868,7 @@ class FirebaseService {
       const pollsDocs = await pollsRef.get()
       if (!pollsDocs.empty) {
          pollsDocs.forEach((doc) => {
-            let docRef = doc.ref
+            const docRef = doc.ref
             batch.delete(docRef)
          })
       }
@@ -869,7 +876,7 @@ class FirebaseService {
       const callToActionDocs = await callToActionsRef.get()
       if (!callToActionDocs.empty) {
          callToActionDocs.forEach((doc) => {
-            let docRef = doc.ref
+            const docRef = doc.ref
             batch.delete(docRef)
          })
       }
@@ -877,16 +884,16 @@ class FirebaseService {
       // Add in the new Docs
 
       testQuestions.forEach((question) => {
-         let docRef = questionsRef.doc()
+         const docRef = questionsRef.doc()
          batch.set(docRef, question)
       })
 
       testChats.forEach((chat) => {
-         let docRef = chatsRef.doc()
+         const docRef = chatsRef.doc()
          batch.set(docRef, chat)
       })
       testPolls.forEach((poll) => {
-         let docRef = pollsRef.doc()
+         const docRef = pollsRef.doc()
          batch.set(docRef, poll)
       })
 
@@ -896,26 +903,26 @@ class FirebaseService {
    //SCHEDULED_LIVESTREAMS
 
    getScheduledLivestreamById = (livestreamId) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.get()
    }
 
    setMainStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.update({
          streamIds: [streamId],
       })
    }
 
    addStreamIdToLivestreamStreamers = (livestreamId, streamId) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.update({
          streamIds: firebase.firestore.FieldValue.arrayUnion(streamId),
       })
    }
 
    removeStreamIdFromLivestreamStreamers = (livestreamId, streamId) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.update({
          streamIds: firebase.firestore.FieldValue.arrayRemove(streamId),
       })
@@ -935,7 +942,7 @@ class FirebaseService {
    }
 
    setLivestreamSpeakerSwitchMode = (livestreamId, mode) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.update({
          speakerSwitchMode: mode,
       })
@@ -948,7 +955,7 @@ class FirebaseService {
    }
 
    setLivestreamPresentation = (livestreamId, downloadUrl) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("presentations")
@@ -963,7 +970,7 @@ class FirebaseService {
       livestreamId: string,
       value: number
    ) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("presentations")
@@ -975,7 +982,7 @@ class FirebaseService {
    }
 
    listenToLivestreamPresentation = (livestreamId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("presentations")
@@ -984,13 +991,13 @@ class FirebaseService {
    }
 
    listenToScheduledLivestreamById = (livestreamId, callback) => {
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+      const ref = this.firestore.collection("livestreams").doc(livestreamId)
       return ref.onSnapshot(callback)
    }
 
    listenToLiveStreamsByUniversityId = (universityId, callback) => {
       const currentTime = new Date()
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("universities", "array-contains", universityId)
          .where("test", "==", false)
@@ -1001,7 +1008,7 @@ class FirebaseService {
 
    listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
       const ninetyMinutesInMilliseconds = 1000 * 60 * 90
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("test", "==", false)
@@ -1022,7 +1029,7 @@ class FirebaseService {
    }
 
    listenToDraftLiveStreamsByGroupId = (groupId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("draftLivestreams")
          .where("groupIds", "array-contains", groupId)
          .orderBy("start", "asc")
@@ -1030,9 +1037,9 @@ class FirebaseService {
    }
 
    getPastLiveStreamsByGroupId = (groupId) => {
-      let START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
+      const START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
       const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
@@ -1047,7 +1054,7 @@ class FirebaseService {
    }
 
    listenToPastLiveStreamsByGroupId = (groupId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
@@ -1062,7 +1069,7 @@ class FirebaseService {
    }
 
    getLivestreamSpeakers = (livestreamId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("speakers")
@@ -1070,7 +1077,7 @@ class FirebaseService {
    }
 
    getLivestreamSecureToken = (livestreamId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("tokens")
@@ -1078,12 +1085,12 @@ class FirebaseService {
       return ref.get()
    }
    getLivestreamSecureTokenWithRef = (streamRef) => {
-      let ref = streamRef.collection("tokens").doc("secureToken")
+      const ref = streamRef.collection("tokens").doc("secureToken")
       return ref.get()
    }
 
    getBreakoutRoomSecureToken = (livestreamId, breakoutRoomId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("breakoutRooms")
@@ -1114,7 +1121,7 @@ class FirebaseService {
    }
 
    listenToLivestreamQuestions = (livestreamId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
@@ -1131,7 +1138,7 @@ class FirebaseService {
    }
 
    listenToQuestionComments = (streamRef, questionId, callback) => {
-      let ref = streamRef
+      const ref = streamRef
          .collection("questions")
          .doc(questionId)
          .collection("comments")
@@ -1142,8 +1149,9 @@ class FirebaseService {
    updateSpeakersInLivestream = (livestreamRef, speaker) => {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamDoc) => {
-            let livestream: any = livestreamDoc.data()
-            let updatedSpeakers =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const livestream: any = livestreamDoc.data()
+            const updatedSpeakers =
                livestream.liveSpeakers?.filter(
                   (existingSpeaker) => existingSpeaker.id !== speaker.id
                ) || []
@@ -1165,10 +1173,11 @@ class FirebaseService {
    addSpeakerInLivestream = (livestreamRef, speaker) => {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamDoc) => {
-            let livestream: any = livestreamDoc.data()
-            let speakerRef = livestreamRef.collection("speakers").doc()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const livestream: any = livestreamDoc.data()
+            const speakerRef = livestreamRef.collection("speakers").doc()
             speaker.id = speakerRef.id
-            let updatedSpeakers = livestream.liveSpeakers
+            const updatedSpeakers = livestream.liveSpeakers
                ? [...livestream.liveSpeakers]
                : []
             updatedSpeakers.forEach((existingSpeaker) => {
@@ -1185,7 +1194,7 @@ class FirebaseService {
    }
 
    putQuestionComment = (streamRef, questionId, comment) => {
-      let ref = streamRef
+      const ref = streamRef
          .collection("questions")
          .doc(questionId)
          .collection("comments")
@@ -1197,8 +1206,8 @@ class FirebaseService {
       questionId,
       comment
    ) => {
-      let questionRef = livestreamRef.collection("questions").doc(questionId)
-      let commentRef = livestreamRef
+      const questionRef = livestreamRef.collection("questions").doc(questionId)
+      const commentRef = livestreamRef
          .collection("questions")
          .doc(questionId)
          .collection("comments")
@@ -1212,7 +1221,9 @@ class FirebaseService {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(questionRef).then((question) => {
             if (question.exists) {
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                const questionData: any = question.data()
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                const questionDataToUpdate: any = {
                   numberOfComments: firebase.firestore.FieldValue.increment(1),
                }
@@ -1269,7 +1280,7 @@ class FirebaseService {
       question: LivestreamQuestion,
       userEmail: string
    ): Promise<"upvoted" | "downvoted"> => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
@@ -1293,7 +1304,7 @@ class FirebaseService {
    }
 
    upvoteLivestreamQuestionWithRef = (streamRef, question, userEmail) => {
-      let ref = streamRef.collection("questions").doc(question.id)
+      const ref = streamRef.collection("questions").doc(question.id)
       return ref.update({
          votes: firebase.firestore.FieldValue.increment(1),
          emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
@@ -1302,7 +1313,7 @@ class FirebaseService {
 
    putLivestreamComment = (livestreamId, comment) => {
       comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date())
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("comments")
@@ -1314,7 +1325,7 @@ class FirebaseService {
       limit: number,
       callback: OnSnapshotCallback<LivestreamChatEntry>
    ) => {
-      let ref = streamRef
+      const ref = streamRef
          .collection("chatEntries")
          .limit(limit)
          .orderBy("timestamp", "desc")
@@ -1325,7 +1336,7 @@ class FirebaseService {
       streamRef: DocumentReference<firebase.firestore.DocumentData>,
       chatEntryId: string
    ) => {
-      let ref = streamRef.collection("chatEntries").doc(chatEntryId)
+      const ref = streamRef.collection("chatEntries").doc(chatEntryId)
       return ref.delete()
    }
 
@@ -1350,7 +1361,7 @@ class FirebaseService {
          heart: [],
          thumbsUp: [],
       }
-      let ref = streamRef.collection("chatEntries")
+      const ref = streamRef.collection("chatEntries")
       return ref.add(newChatEntry)
    }
 
@@ -1375,7 +1386,7 @@ class FirebaseService {
    }
 
    setLivestreamHasStarted = (hasStarted, streamRef) => {
-      const data: any = {
+      const data: Partial<LivestreamEvent> = {
          hasStarted,
       }
 
@@ -1385,7 +1396,7 @@ class FirebaseService {
    }
 
    getDetailLivestreamCareerCenters = (groupIds: string[]) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
          .where("groupId", "in", groupIds)
@@ -1398,20 +1409,20 @@ class FirebaseService {
       newCurrentQuestionId,
       streamRef
    ) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
       if (previousCurrentQuestionId) {
-         let ref = streamRef
+         const ref = streamRef
             .collection("questions")
             .doc(previousCurrentQuestionId)
          batch.update(ref, { type: "done" })
       }
-      let ref = streamRef.collection("questions").doc(newCurrentQuestionId)
+      const ref = streamRef.collection("questions").doc(newCurrentQuestionId)
       batch.update(ref, { type: "current" })
       return batch.commit()
    }
 
    removeLivestreamQuestion = (livestreamId, question) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
@@ -1423,14 +1434,14 @@ class FirebaseService {
    }
 
    deleteCareerCenter = (careerCenterId) => {
-      let careerCenterRef = this.firestore
+      const careerCenterRef = this.firestore
          .collection("careerCenterData")
          .doc(careerCenterId)
       return careerCenterRef.delete()
    }
 
    getCareerCenterByUniversityId = (universityId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
          .where("universityId", "==", universityId)
@@ -1438,12 +1449,12 @@ class FirebaseService {
    }
 
    listenToCareerCenterById = (groupId, callback) => {
-      let ref = this.firestore.collection("careerCenterData").doc(groupId)
+      const ref = this.firestore.collection("careerCenterData").doc(groupId)
       return ref.onSnapshot(callback)
    }
 
    getAllCareerCenters = () => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
       return ref.get()
@@ -1452,7 +1463,7 @@ class FirebaseService {
    getCareerCentersByGroupId = async (
       arrayOfIds: string[]
    ): Promise<Group[]> => {
-      let groups: Group[] = []
+      const groups: Group[] = []
       for (const id of arrayOfIds) {
          const snapshot = await this.firestore
             .collection("careerCenterData")
@@ -1467,16 +1478,17 @@ class FirebaseService {
    }
 
    getGroupsByGroupId = async (arrayOfIds = [""]) => {
-      let groups = []
       let i,
          j,
-         temparray,
-         chunk = 10
+         tempArray,
+         groups = []
+
+      const chunk = 10
       for (i = 0, j = arrayOfIds.length; i < j; i += chunk) {
-         temparray = arrayOfIds.slice(i, i + chunk)
+         tempArray = arrayOfIds.slice(i, i + chunk)
          const snapshots = await this.firestore
             .collection("careerCenterData")
-            .where("groupId", "in", temparray)
+            .where("groupId", "in", tempArray)
             .get()
          const snapGroups = snapshots.docs.map((doc) => ({
             id: doc.id,
@@ -1497,11 +1509,12 @@ class FirebaseService {
       arrayOfEmails = [],
       options = { withEmpty: false }
    ) => {
-      let totalUsers = []
       let i,
          j,
          tempArray,
-         chunk = 800
+         totalUsers = []
+
+      const chunk = 800
       for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
          tempArray = arrayOfEmails.slice(i, i + chunk)
          const userSnaps = await Promise.all(
@@ -1539,13 +1552,16 @@ class FirebaseService {
    getFollowingGroupsWithCache = async (groupIds = []) => {
       const uniqueGroupIds = Array.from(new Set(groupIds))
       const getFromCache = async (groupId) => {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          let snap: any = { notInCache: true, groupId }
          try {
             snap = await this.firestore
                .collection("careerCenterData")
                .doc(groupId)
                .get({ source: "cache" })
-         } catch (e) {}
+         } catch (e) {
+            /* empty */
+         }
          return snap
       }
       const groupSnapsFromCache = await Promise.all(
@@ -1578,7 +1594,7 @@ class FirebaseService {
    }
 
    listenToJoinedGroups = (groupIds, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("careerCenterData")
          .where("groupId", "in", groupIds)
       return ref.onSnapshot(callback)
@@ -1589,7 +1605,7 @@ class FirebaseService {
     * */
 
    createCallToAction = async (streamRef, values) => {
-      let callToActionRef = streamRef.collection("callToActions").doc()
+      const callToActionRef = streamRef.collection("callToActions").doc()
 
       const callToActionData = {
          buttonText: values.buttonText,
@@ -1617,7 +1633,7 @@ class FirebaseService {
    }
 
    updateCallToAction = (streamRef, callToActionId, newValues) => {
-      let callToActionRef = streamRef
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
       const updateData = {
@@ -1655,7 +1671,7 @@ class FirebaseService {
    }
 
    resendCallToAction = async (streamRef, callToActionId) => {
-      let callToActionRef = streamRef
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
       try {
@@ -1666,7 +1682,9 @@ class FirebaseService {
          })
 
          return await this.activateCallToAction(streamRef, callToActionId)
-      } catch (e) {}
+      } catch (e) {
+         /* empty */
+      }
    }
 
    clickOnCallToAction = async (
@@ -1675,7 +1693,7 @@ class FirebaseService {
       userId,
       options = { isDismissAction: false }
    ) => {
-      let callToActionRef = streamRef
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
 
@@ -1694,14 +1712,14 @@ class FirebaseService {
                firebase.firestore.FieldValue.increment(1),
          })
       }
-      let batch = this.firestore.batch()
-      let userRef = this.firestore.collection("userData").doc(userId)
+      const batch = this.firestore.batch()
+      const userRef = this.firestore.collection("userData").doc(userId)
 
-      let userInUsersWhoClickedLinkRef = callToActionRef
+      const userInUsersWhoClickedLinkRef = callToActionRef
          .collection("usersWhoClickedLink")
          .doc(userId)
 
-      let userInUsersWhoDismissedRef = callToActionRef
+      const userInUsersWhoDismissedRef = callToActionRef
          .collection("usersWhoDismissed")
          .doc(userId)
 
@@ -1714,9 +1732,9 @@ class FirebaseService {
             await userInUsersWhoClickedLinkRef.get()
          const hasAlreadyDismissed = userInUsersWhoDismissedSnap.exists
          const hasAlreadyClicked = userInUsersWhoClickedSnap.exists
-         let callToActionUpdateData = {}
+         const callToActionUpdateData = {}
          if (isDismissAction && hasAlreadyDismissed) {
-            let batch = this.firestore.batch()
+            const batch = this.firestore.batch()
             batch.update(userInUsersWhoDismissedRef, {
                ...userData,
                dismissedCallToActionAt: this.getServerTimestamp(),
@@ -1729,7 +1747,7 @@ class FirebaseService {
             return await batch.commit()
          }
          if (!isDismissAction && hasAlreadyClicked) {
-            let batch = this.firestore.batch()
+            const batch = this.firestore.batch()
             batch.update(userInUsersWhoClickedLinkRef, {
                ...userData,
                clickedCallToActionLinkAt: this.getServerTimestamp(),
@@ -1782,9 +1800,9 @@ class FirebaseService {
    }
 
    deleteCallToAction = (streamRef, callToActionId) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
 
-      let callToActionRef = streamRef
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
 
@@ -1799,9 +1817,9 @@ class FirebaseService {
    }
 
    activateCallToAction = async (streamRef, callToActionId) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
 
-      let callToActionRef = streamRef
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
 
@@ -1824,8 +1842,8 @@ class FirebaseService {
    }
 
    deactivateCallToAction = async (streamRef, callToActionId) => {
-      let batch = this.firestore.batch()
-      let callToActionRef = streamRef
+      const batch = this.firestore.batch()
+      const callToActionRef = streamRef
          .collection("callToActions")
          .doc(callToActionId)
 
@@ -1847,11 +1865,11 @@ class FirebaseService {
    }
 
    checkIfUserInteractedWithCallToAction = async (callToActionRef, userId) => {
-      let userInUsersWhoClickedLinkRef = callToActionRef
+      const userInUsersWhoClickedLinkRef = callToActionRef
          .collection("usersWhoClickedLink")
          .doc(userId)
 
-      let userInUsersWhoDismissedRef = callToActionRef
+      const userInUsersWhoDismissedRef = callToActionRef
          .collection("usersWhoDismissed")
          .doc(userId)
 
@@ -1945,7 +1963,7 @@ class FirebaseService {
    }
 
    optOutOfRating = (livestreamId, userEmail, ratingId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
@@ -1959,14 +1977,14 @@ class FirebaseService {
 
    checkIfUserRated = async (livestreamId, userEmail, typeOfRating) => {
       try {
-         let voterInVotersRef = this.firestore
+         const voterInVotersRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
             .doc(typeOfRating)
             .collection("voters")
             .doc(userEmail)
-         let voterInNonVotersRef = this.firestore
+         const voterInNonVotersRef = this.firestore
             .collection("livestreams")
             .doc(livestreamId)
             .collection("rating")
@@ -1982,8 +2000,8 @@ class FirebaseService {
    }
 
    createLivestreamPoll = (streamRef, pollQuestion, pollOptions) => {
-      let ref = streamRef.collection("polls")
-      let pollObject = {
+      const ref = streamRef.collection("polls")
+      const pollObject = {
          timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          question: pollQuestion,
          options: pollOptions,
@@ -1995,8 +2013,8 @@ class FirebaseService {
    }
 
    updateLivestreamPoll = (streamRef, pollId, pollQuestion, pollOptions) => {
-      let ref = streamRef.collection("polls").doc(pollId)
-      let pollObject = {
+      const ref = streamRef.collection("polls").doc(pollId)
+      const pollObject = {
          question: pollQuestion,
          options: pollOptions,
       }
@@ -2042,12 +2060,12 @@ class FirebaseService {
    }
 
    deleteLivestreamPoll = (streamRef, pollId) => {
-      let ref = streamRef.collection("polls").doc(pollId)
+      const ref = streamRef.collection("polls").doc(pollId)
       return ref.delete()
    }
 
    listenToPollEntries = (livestreamId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("polls")
@@ -2055,12 +2073,12 @@ class FirebaseService {
       return ref.onSnapshot(callback)
    }
    listenToPollEntriesWithStreamRef = (streamRef, callback) => {
-      let ref = streamRef.collection("polls").orderBy("timestamp", "asc")
+      const ref = streamRef.collection("polls").orderBy("timestamp", "asc")
       return ref.onSnapshot(callback)
    }
 
    voteForPollOption = (streamRef, pollId, userEmail, optionId) => {
-      let pollRef = streamRef
+      const pollRef = streamRef
          .collection("polls")
          .doc(pollId)
          .collection("voters")
@@ -2078,22 +2096,22 @@ class FirebaseService {
    }
 
    setPollState = (streamRef, pollId, state) => {
-      let ref = streamRef.collection("polls").doc(pollId)
+      const ref = streamRef.collection("polls").doc(pollId)
       return ref.update({ state: state })
    }
 
    listenToHandRaiseState = (streamRef, userEmail, callback) => {
-      let ref = streamRef.collection("handRaises").doc(userEmail)
+      const ref = streamRef.collection("handRaises").doc(userEmail)
       return ref.onSnapshot(callback)
    }
 
    listenToHandRaises = (streamRef, callback) => {
-      let ref = streamRef.collection("handRaises")
+      const ref = streamRef.collection("handRaises")
       return ref.onSnapshot(callback)
    }
 
    listenToActiveHandRaises = (streamRef, callback) => {
-      let ref = streamRef
+      const ref = streamRef
          .collection("handRaises")
          .where("state", "not-in", ["unrequested", "denied"])
       return ref.onSnapshot(callback)
@@ -2127,7 +2145,7 @@ class FirebaseService {
       userData,
       state?: HandRaiseState
    ) => {
-      let ref = streamRef.collection("handRaises").doc(userEmail)
+      const ref = streamRef.collection("handRaises").doc(userEmail)
       return ref.set({
          state: state || "requested",
          timestamp: this.getServerTimestamp(),
@@ -2136,7 +2154,7 @@ class FirebaseService {
    }
 
    updateHandRaiseRequest = (streamRef, userEmail, state) => {
-      let ref = streamRef.collection("handRaises").doc(userEmail)
+      const ref = streamRef.collection("handRaises").doc(userEmail)
       return ref.set(
          {
             state: state,
@@ -2147,12 +2165,12 @@ class FirebaseService {
    }
 
    listenToPolls = (streamRef, callback) => {
-      let ref = streamRef.collection("polls")
+      const ref = streamRef.collection("polls")
       return ref.onSnapshot(callback)
    }
 
    getPastLivestreams = () => {
-      let START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
+      const START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
       const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
       return this.firestore
          .collection("livestreams")
@@ -2209,7 +2227,7 @@ class FirebaseService {
          (group) => group.id
       )
 
-      let livestreamRef = this.firestore
+      const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
 
@@ -2259,7 +2277,7 @@ class FirebaseService {
 
       for (const groupId of idsOfGroupsWithPolicies) {
          // to be depreciated
-         let userInPolicyRef = this.firestore
+         const userInPolicyRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
             .collection("usersInPolicy")
@@ -2313,7 +2331,7 @@ class FirebaseService {
       userData: UserData
    ) => {
       const { userEmail } = userData
-      let livestreamRef = this.firestore
+      const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
       const userLivestreamDataRef = this.firestore
@@ -2345,10 +2363,10 @@ class FirebaseService {
       userData: UserData,
       livestream: LivestreamEvent
    ) => {
-      let userRef = this.firestore
+      const userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore
+      const streamRef = this.firestore
          .collection("livestreams")
          .doc(livestream.id)
       const userLivestreamDataRef = this.firestore
@@ -2389,7 +2407,7 @@ class FirebaseService {
                         userEmail: userData.userEmail,
                         user: userData,
                         mostRecentLivestream: livestream,
-                        joinedAt: this.getServerTimestamp() as any,
+                        joinedAt: this.getServerTimestamp() as Timestamp,
                      }
                      transaction.set(groupTalentEntryRef, data, { merge: true })
                   }
@@ -2430,13 +2448,13 @@ class FirebaseService {
       userData: UserData,
       livestream: LivestreamEvent
    ) => {
-      let userRef = this.firestore
+      const userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore
+      const streamRef = this.firestore
          .collection("livestreams")
          .doc(livestream.id)
-      let userLivestreamDataRef = this.firestore
+      const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestream.id)
          .collection("userLivestreamData")
@@ -2498,7 +2516,7 @@ class FirebaseService {
       userData: UserData,
       userStats: UserStats
    ) => {
-      let participantsRef = streamRef
+      const participantsRef = streamRef
          .collection("userLivestreamData")
          .withConverter(createCompatGenericConverter<UserLivestreamData>())
          .doc(userData.userEmail)
@@ -2565,7 +2583,7 @@ class FirebaseService {
    }
 
    checkIfUserAgreedToGroupPolicy = async (groupId, userEmail) => {
-      let userInPolicySnapshot = await this.firestore
+      const userInPolicySnapshot = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("usersInPolicy")
@@ -2580,7 +2598,7 @@ class FirebaseService {
       authorEmail: string,
       streamerId: string
    ) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("icons")
@@ -2596,7 +2614,7 @@ class FirebaseService {
       livestreamId: string,
       callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    ) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("icons")
@@ -2615,7 +2633,7 @@ class FirebaseService {
       const oneYear = 31536000000
       const oneYearAgo = new Date(Date.now() - oneYear)
       const maxDate = timeframe || oneYearAgo
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .where("test", "==", false)
          .where("start", ">", maxDate)
@@ -2625,7 +2643,7 @@ class FirebaseService {
    }
 
    updateFeedbackQuestion = async (livestreamId, feedbackId, data) => {
-      let feedbackRef = this.firestore
+      const feedbackRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
@@ -2634,7 +2652,7 @@ class FirebaseService {
    }
 
    deleteFeedbackQuestion = async (livestreamId, feedbackId) => {
-      let feedbackRef = this.firestore
+      const feedbackRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
@@ -2643,7 +2661,7 @@ class FirebaseService {
    }
 
    createFeedbackQuestion = async (livestreamId, data) => {
-      let feedbackRef = this.firestore
+      const feedbackRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
@@ -2651,19 +2669,19 @@ class FirebaseService {
    }
 
    listenToLivestreamRatings = (livestreamId, callback) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
       return ref.onSnapshot(callback)
    }
    listenToLivestreamRatingsWithStreamRef = (streamRef, callback) => {
-      let ref = streamRef.collection("rating")
+      const ref = streamRef.collection("rating")
       return ref.onSnapshot(callback)
    }
 
    getLivestreamRatingVoters = (ratingId, livestreamId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
@@ -2673,21 +2691,21 @@ class FirebaseService {
    }
 
    getFollowers = async (groupId) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("userData")
          .where("groupIds", "array-contains", groupId)
       return ref.get()
    }
 
    getStudentsOfGroupUniversity = async (groupUniversityCode) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("userData")
          .where("universityCode", "==", groupUniversityCode)
       return ref.get()
    }
 
    snapShotsToData = (snapShots) => {
-      let dataArray = []
+      const dataArray = []
       snapShots.forEach((doc) => {
          const data = doc.data()
          data.id = doc.id
@@ -2718,7 +2736,9 @@ class FirebaseService {
                typeOfStream = "draft"
             }
          }
-      } catch (e) {}
+      } catch (e) {
+         /* empty */
+      }
       return { targetStream, typeOfStream }
    }
 
@@ -2743,7 +2763,7 @@ class FirebaseService {
          }
          throw `Notification Already Exists as document ${notificationId}`
       }
-      let ref = this.firestore.collection("notifications")
+      const ref = this.firestore.collection("notifications")
       const newNotification = {
          details: details,
          open: true,
@@ -2758,7 +2778,7 @@ class FirebaseService {
          open,
          updated: this.getServerTimestamp(),
       }
-      let ref = this.firestore.collection("notifications").doc(notificationId)
+      const ref = this.firestore.collection("notifications").doc(notificationId)
       await ref.set(newNotification, { merge: true })
       return { id: notificationId }
    }
@@ -2773,7 +2793,7 @@ class FirebaseService {
    checkForNotification = (
       detailFieldsToCheck = { property1: "value1", property2: "property2" }
    ) => {
-      let query = this.firestore
+      const query = this.firestore
          .collection("notifications")
          .where("details", "==", detailFieldsToCheck)
          .limit(1)
@@ -3029,7 +3049,9 @@ class FirebaseService {
          type: "broadcast",
       }
       for (const breakoutSnap of breakoutRoomsSnaps.docs) {
-         let breakoutChatRef = breakoutSnap.ref.collection("chatEntries").doc()
+         const breakoutChatRef = breakoutSnap.ref
+            .collection("chatEntries")
+            .doc()
          batch.set(breakoutChatRef, broadcastMessage)
       }
 
@@ -3072,7 +3094,7 @@ class FirebaseService {
       userDataId,
       callback: (QuerySnapshot) => void
    ) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("userData")
          .doc(userDataId)
          .collection("rewards")
@@ -3081,9 +3103,9 @@ class FirebaseService {
    }
 
    rewardMarkManyAsSeen = (rewardRefs: DocumentReference[]) => {
-      let batch = this.firestore.batch()
+      const batch = this.firestore.batch()
 
-      for (let rewardRef of rewardRefs) {
+      for (const rewardRef of rewardRefs) {
          batch.update(rewardRef, { seenByUser: true })
       }
 
@@ -3113,7 +3135,7 @@ class FirebaseService {
 
       const data: Omit<LivestreamImpression, "id"> = {
          ...impressionData,
-         createdAt: this.getServerTimestamp() as any,
+         createdAt: this.getServerTimestamp() as Timestamp,
       }
 
       await this.firestore
@@ -3241,6 +3263,7 @@ class FirebaseService {
       const toUpdate: Pick<UserData, "creditsBannerCTADates"> = {
          creditsBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
             today
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
          ) as any,
       }
 
@@ -3261,6 +3284,7 @@ class FirebaseService {
       const toUpdate: Pick<UserData, "sparksBannerCTADates"> = {
          sparksBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
             today
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
          ) as any,
       }
 
