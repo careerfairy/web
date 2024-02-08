@@ -4,8 +4,8 @@ import React, { FC, ReactNode } from "react"
 import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
-import { Box, Grid, Tooltip } from "@mui/material"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { Box, Grid } from "@mui/material"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 import { sxStyles } from "types/commonTypes"
 import AvatarUpload from "./inputs/AvatarUpload"
@@ -65,7 +65,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      <Box mt={2} />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="firstName"
                         type="text"
                         label="First Name"
@@ -75,7 +75,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="lastName"
                         type="text"
                         label="Last Name"
@@ -85,7 +85,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="position"
                         type="text"
                         label="Position"
@@ -96,7 +96,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="linkedInUrl"
                         type="text"
                         label="LinkedIn Link"
@@ -106,7 +106,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      />
                   </Grid>
                   <Grid item xs={12}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="email"
                         type="text"
                         label="Email address"
@@ -118,7 +118,7 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                      />
                   </Grid>
                   <Grid item xs={12}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="story"
                         type="text"
                         label="Personal story"

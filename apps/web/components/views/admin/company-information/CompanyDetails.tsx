@@ -5,7 +5,7 @@ import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
@@ -96,17 +96,17 @@ const CompanyDetails = () => {
             }) => (
                <Form>
                   <Stack spacing={1.5}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="universityName"
                         label="Company name"
                         placeholder="E.g., CareerFairy"
                      />
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="careerPageUrl"
                         label="Career page URL"
                         placeholder="E.g., company.io/careers"
                      />
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="extraInfo"
                         multiline
                         rows={4}

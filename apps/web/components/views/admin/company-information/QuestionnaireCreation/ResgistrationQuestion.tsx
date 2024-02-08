@@ -17,7 +17,7 @@ import {
 import { Trash2 as DeleteIcon, Edit2, PlusCircle, Save } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
-import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "../../../common/inputs/BrandedTextField"
 import QuestionOption from "./QuestionOption"
 import { createAGroupQuestionOption } from "./QuestionaireCreationUtils"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
@@ -249,7 +249,7 @@ const RegistrationQuestion: FC<Props> = ({
                <Stack sx={styles.stack}>
                   <Box p={2} pb={0.75}>
                      {inputMode ? (
-                        <BrandedTextFieldField
+                        <FormBrandedTextField
                            label="Question"
                            placeholder="Insert your question here"
                            name={"name"}
@@ -378,6 +378,7 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
    ]),
    options: Yup.lazy((value) =>
       Yup.object(
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          Object.keys(value).reduce((shape: any, key: string) => {
             shape[key] = groupQuestionOptionSchema
             return shape
