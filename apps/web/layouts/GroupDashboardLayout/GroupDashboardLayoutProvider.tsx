@@ -72,6 +72,7 @@ type Props = {
    topBarCta?: ReactNode
    topBarNavigation?: ReactNode
    bottomBarNavigation?: ReactNode
+   backgroundColor?: string
 }
 
 /**
@@ -87,6 +88,7 @@ const GroupDashboardLayoutProvider = ({
    topBarCta,
    topBarNavigation,
    bottomBarNavigation,
+   backgroundColor,
 }: Props) => {
    const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -119,7 +121,7 @@ const GroupDashboardLayoutProvider = ({
    return (
       <GroupDashboardContext.Provider value={value}>
          <AdminGenericLayout
-            bgColor="#F7F8FC"
+            bgColor={backgroundColor ?? "#F7F8FC"}
             headerContent={
                <TopBar
                   cta={topBarCta}
