@@ -201,6 +201,7 @@ export interface DraftFormValues {
    hidden: boolean
    summary: string
    reasonsToJoinLivestream: string
+   reasonsToJoinLivestream_v2: string[]
    speakers: Record<string, Partial<Speaker>>
    status: object
    language: {
@@ -266,7 +267,6 @@ const DraftStreamForm = ({
       replace,
       pathname,
    } = router
-
    draftStreamId = draftStreamId || currentStream?.id
    const { enqueueSnackbar } = useSnackbar()
    const [status, setStatus] = useState("")
@@ -310,6 +310,7 @@ const DraftStreamForm = ({
       hidden: false,
       summary: "",
       reasonsToJoinLivestream: "",
+      reasonsToJoinLivestream_v2: [],
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
@@ -439,6 +440,7 @@ const DraftStreamForm = ({
                   summary: livestream.summary || "",
                   reasonsToJoinLivestream:
                      livestream.reasonsToJoinLivestream || "",
+                  reasonsToJoinLivestream_v2: [],
                   speakers: getStreamSubCollectionSpeakers(
                      livestream,
                      speakerQuery
