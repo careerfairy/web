@@ -1,7 +1,8 @@
-import { Badge, Box, Chip, Stack, Typography } from "@mui/material"
+import { Box, Chip, Stack, Typography } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
-
+import { Briefcase, CheckCircle } from "react-feather"
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 
@@ -20,6 +21,18 @@ const styles = sxStyles({
          height: 10,
          borderRadius: "50%",
       },
+   },
+   liveLeftChip: {
+      width: {
+         xs: "fit-content",
+         md: "auto",
+      },
+   },
+   leftChip: {
+      pl: 0.5,
+      pr: 0,
+      alignItems: "center",
+      width: { xs: "fit-content", md: "auto" },
    },
 })
 
@@ -40,7 +53,7 @@ const EventPreviewCardChipLabels = ({
    hasJobToApply,
    recordingAvailableDays,
 }: Props) => {
-   let leftChips = []
+   const leftChips = []
    let rightChip
 
    if (hasParticipated && isPast) {
@@ -54,25 +67,26 @@ const EventPreviewCardChipLabels = ({
       )
    }
 
-   if (hasRegistered && !isPast) {
-      rightChip = (
-         <Chip
-            key={"booked-chip"}
-            icon={<CheckIcon />}
-            color="primary"
-            label={"Booked!"}
-         />
-      )
-   }
-
    if (isLive) {
       leftChips.push(
          <Chip
             key={"live-chip"}
             icon={<LiveIcon />}
             color="error"
-            label={"LIVE"}
-            sx={{ width: { xs: "fit-content", md: "auto" } }}
+            label={"Live"}
+            sx={styles.liveLeftChip}
+         />
+      )
+   }
+
+   if (hasRegistered && !isPast) {
+      leftChips.push(
+         <Chip
+            key={"booked-chip"}
+            icon={<CheckCircle color="#00D247" width={18} height={18} />}
+            sx={styles.leftChip}
+            color="info"
+            label={<Typography fontWeight={400}>{REGISTERED_LABEL}</Typography>}
          />
       )
    }
@@ -80,19 +94,11 @@ const EventPreviewCardChipLabels = ({
    if (hasJobToApply) {
       leftChips.push(
          <Chip
-            key={"easy-apply-chip"}
-            deleteIcon={
-               <Badge
-                  color="primary"
-                  variant="dot"
-                  overlap="circular"
-                  sx={styles.badge}
-               />
-            }
-            sx={{ pr: 1 }}
-            onDelete={() => {}}
+            key={"hiring-now-chip"}
+            icon={<Briefcase color={"#3A70E2"} width={18} height={18} />}
+            sx={styles.leftChip}
             color={"info"}
-            label={"Easy Apply"}
+            label={<Typography fontWeight={400}>Hiring now</Typography>}
          />
       )
    }
@@ -119,8 +125,12 @@ const EventPreviewCardChipLabels = ({
       leftChips.push(
          <Chip
             key={"available-chip"}
-            sx={{ pr: 1 }}
             color={"info"}
+            icon={
+               <TaskAltOutlinedIcon
+                  color={recordingAvailableDays > 1 ? "secondary" : "error"}
+               />
+            }
             label={
                <Box display={"flex"}>
                   <Typography fontWeight={500}>Available for</Typography>
@@ -144,4 +154,5 @@ const EventPreviewCardChipLabels = ({
    ) : null
 }
 
+export const REGISTERED_LABEL = "Registered"
 export default EventPreviewCardChipLabels

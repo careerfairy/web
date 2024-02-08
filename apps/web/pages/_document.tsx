@@ -8,7 +8,7 @@ import Document, {
    DocumentInitialProps,
 } from "next/document"
 import createEmotionServer from "@emotion/server/create-instance"
-import { brandedLightTheme } from "materialUI"
+import { brandedLightTheme, poppins } from "materialUI"
 import createEmotionCache from "materialUI/createEmotionCache"
 import { isEmbedded, isGroupAdminPath, isStreamingPath } from "util/PathUtils"
 
@@ -22,9 +22,9 @@ interface DocumentProps extends DocumentInitialProps {
 
 export default function MyDocument(props: DocumentProps) {
    return (
-      <Html>
+      <Html lang="en" className={poppins.className}>
          <Head>
-            {props.shouldRunUsercentrics && (
+            {props.shouldRunUsercentrics ? (
                <>
                   <link rel="preconnect" href="//app.usercentrics.eu" />
                   <link rel="preconnect" href="//api.usercentrics.eu" />
@@ -44,18 +44,18 @@ export default function MyDocument(props: DocumentProps) {
                      async
                   ></script>
                </>
-            )}
+            ) : null}
 
-            {props.shouldSuppressUCBanner && (
+            {props.shouldSuppressUCBanner ? (
                <script
                   type="application/javascript"
                   dangerouslySetInnerHTML={{
                      __html: `var UC_UI_SUPPRESS_CMP_DISPLAY=true;`,
                   }}
                ></script>
-            )}
+            ) : null}
 
-            {props.shouldRunUsercentrics && props.shouldRunGTM && (
+            {props.shouldRunUsercentrics && props.shouldRunGTM ? (
                // eslint-disable-next-line @next/next/next-script-for-ga
                <script
                   id="google-analytics"
@@ -76,7 +76,7 @@ export default function MyDocument(props: DocumentProps) {
                   `,
                   }}
                ></script>
-            )}
+            ) : null}
             <link
                rel="preload"
                href="/fonts/subset-Poppins-Regular.woff2"

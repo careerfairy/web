@@ -43,7 +43,7 @@ const styles = sxStyles({
       height: "100%",
    },
    accordionRoot: {
-      boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
+      boxShadow: (theme) => theme.legacy.boxShadows.dark_8_25_10,
       "&:before": {
          backgroundColor: "transparent !important",
       },
@@ -164,7 +164,7 @@ const CategoryBreakdown = ({
                   : "For all events"
             }
             action={
-               currentStream && (
+               currentStream ? (
                   <Button
                      size="small"
                      variant="text"
@@ -173,7 +173,7 @@ const CategoryBreakdown = ({
                   >
                      Reset
                   </Button>
-               )
+               ) : null
             }
          />
 

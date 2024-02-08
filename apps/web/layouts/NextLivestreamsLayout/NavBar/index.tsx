@@ -31,10 +31,10 @@ const styles: StylesProps = {
       flexDirection: "column",
    },
    mobileDrawer: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
    },
    desktopDrawer: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
       top: 64,
       height: "calc(100% - 64px)",
       boxShadow: 1,
@@ -75,7 +75,7 @@ function LoginButton() {
 }
 
 interface FeedDrawerProps {
-   onMobileClose: () => any
+   onMobileClose: () => void
    openMobile: boolean
    drawerBottomLinks: PageLinkProps[]
    drawerTopLinks: PageLinkProps[]
@@ -114,19 +114,20 @@ const FeedDrawer = memo(
             }
             setGroups(newGroups)
          }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [groupIdInQuery, followingGroups])
 
       const content = (
          <Box sx={styles.root}>
             <Stack spacing={1}>
                <List sx={{ display: { lg: "none" } }}>
-                  {isLoggedOut && <LoginButton />}
+                  {isLoggedOut ? <LoginButton /> : null}
                   {drawerTopLinks.map((link) => (
                      <NavElement key={link.title} {...link} />
                   ))}
                   <Divider />
                </List>
-               {isLoggedOut && <NavPrompt />}
+               {isLoggedOut ? <NavPrompt /> : null}
             </Stack>
             <Box>
                {loading ? (
@@ -163,14 +164,14 @@ const FeedDrawer = memo(
                   {drawerBottomLinks.map((link) => (
                      <NavElement key={link.title} {...link} />
                   ))}
-                  {userData && (
+                  {userData ? (
                      <NavElement
                         href="#"
                         onClick={signOut}
                         icon={LogoutIcon}
                         title="LOGOUT"
                      />
-                  )}
+                  ) : null}
                </List>
             </Box>
          </Box>
@@ -209,5 +210,7 @@ const FeedDrawer = memo(
       )
    }
 )
+
+FeedDrawer.displayName = "FeedDrawer"
 
 export default FeedDrawer

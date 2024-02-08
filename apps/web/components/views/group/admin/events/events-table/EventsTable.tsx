@@ -40,6 +40,7 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 
 interface Props {
    streams: LivestreamEvent[]
@@ -97,6 +98,9 @@ const EventsTable = ({
       targetStream,
    })
 
+   const featureFlags = useFeatureFlags()
+   const router = useRouter()
+
    const dispatch = useDispatch()
 
    const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
@@ -132,6 +136,7 @@ const EventsTable = ({
          }
          handleGetGroups()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [streams])
 
    const handleCloseEndOfEventDialog = () => {
@@ -199,7 +204,7 @@ const EventsTable = ({
 
    const handleCreateExternalLink = useCallback(
       (rowData) => {
-         let baseUrl = getBaseUrl()
+         const baseUrl = getBaseUrl()
          const draftId = rowData.id
          const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`
          copyStringToClipboard(targetPath)
@@ -221,83 +226,104 @@ const EventsTable = ({
       setStreamIdToBeDeleted(streamId)
    }, [])
 
+   const handleEditStreamV2 = useCallback((groupId, livestreamId) => {
+      router.push(`/group/${groupId}/admin/events/${livestreamId}`)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [])
+
    const manageStreamActions = useCallback(
-      (rowData) => [
-         {
+      (rowData) => {
+         const editLivestreamInV2FlowOption = {
             icon: <EditIcon color="action" />,
-            tooltip: isDraft ? "Edit Draft Event" : "Edit Event",
-            onClick: () => handleEditStream(rowData),
-            hintTitle: isDraft ? "Edit Draft Event" : "Edit Event",
+            tooltip: "Edit Event V2",
+            onClick: () => handleEditStreamV2(group.groupId, rowData.id),
+            hintTitle: "Edit live stream in new flow",
             hintDescription:
-               "Edit the details of the event like the start date and speakers.",
-         },
-         pdfReportAction(rowData),
-         registeredStudentsAction(rowData),
-         participatedStudentsAction(rowData),
-         talentPoolAction(rowData),
-         {
-            icon: <GetStreamerLinksIcon color="action" />,
-            tooltip: "Get Streamer Links",
-            onClick: () => handleOpenStreamerLinksModal(rowData),
-            hidden: isDraft,
-            hintTitle: "Get Streamer Links",
-            hintDescription:
-               "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
-         },
-         {
-            icon: <DraftLinkIcon color="action" />,
-            tooltip: "Generate external Link to Edit Draft",
-            onClick: () => handleCreateExternalLink(rowData),
-            hidden: !isDraft,
-            hintTitle: "Generate external Link to Edit Draft",
-            hintDescription:
-               "Click here to create an external link that can be shared with a company or non-admin allowing them to edit or fill in the details of the event.",
-         },
-         {
-            icon: <DeleteIcon color="action" />,
-            tooltip: isDraft ? "Delete Draft" : "Delete Event",
-            onClick: () => handleClickDeleteStream(rowData.id),
-            hintTitle: isDraft ? "Delete Draft" : "Delete Event",
-            hidden: isDraft
-               ? false
-               : rowData.author?.groupId !== group.groupId &&
-                 !userData?.isAdmin,
-            hintDescription: userData?.isAdmin
-               ? "You can delete this event because you are a CF admin"
-               : "Deleting an event is a permanent action and cannot be undone.",
-         },
-         {
-            icon: publishingDraft ? (
-               <CircularProgress size={20} color="inherit" />
-            ) : (
-               <PublishIcon color="action" />
-            ),
-            tooltip: publishingDraft
-               ? "Publishing"
-               : !rowData.status?.pendingApproval
-               ? "Needs Approval"
-               : "Publish Stream",
-            onClick: !rowData.status?.pendingApproval
-               ? () => handleEditStream(rowData)
-               : () => handlePublishStream(rowData),
-            hidden: !isDraft,
-            disabled: publishingDraft,
-            hintTitle: "Publish Stream",
-            hintDescription:
-               "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
-         },
-         {
-            loadedButton: (
-               <MoreOptionsMenu
-                  handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
-                  rowData={rowData}
-                  hintTitle="More options"
-               />
-            ),
-            tooltip: "More options",
-            hidden: isDraft || !userData?.isAdmin,
-         },
-      ],
+               "Edit the details of the event like the start date and speakers in the new flow.",
+         }
+
+         const result = [
+            {
+               icon: <EditIcon color="action" />,
+               tooltip: isDraft ? "Edit Draft Event" : "Edit Event",
+               onClick: () => handleEditStream(rowData),
+               hintTitle: isDraft ? "Edit Draft Event" : "Edit Event",
+               hintDescription:
+                  "Edit the details of the event like the start date and speakers.",
+            },
+            pdfReportAction(rowData),
+            registeredStudentsAction(rowData),
+            participatedStudentsAction(rowData),
+            talentPoolAction(rowData),
+            {
+               icon: <GetStreamerLinksIcon color="action" />,
+               tooltip: "Get Streamer Links",
+               onClick: () => handleOpenStreamerLinksModal(rowData),
+               hidden: isDraft,
+               hintTitle: "Get Streamer Links",
+               hintDescription:
+                  "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
+            },
+            {
+               icon: <DraftLinkIcon color="action" />,
+               tooltip: "Generate external Link to Edit Draft",
+               onClick: () => handleCreateExternalLink(rowData),
+               hidden: !isDraft,
+               hintTitle: "Generate external Link to Edit Draft",
+               hintDescription:
+                  "Click here to create an external link that can be shared with a company or non-admin allowing them to edit or fill in the details of the event.",
+            },
+            {
+               icon: <DeleteIcon color="action" />,
+               tooltip: isDraft ? "Delete Draft" : "Delete Event",
+               onClick: () => handleClickDeleteStream(rowData.id),
+               hintTitle: isDraft ? "Delete Draft" : "Delete Event",
+               hidden: isDraft
+                  ? false
+                  : rowData.author?.groupId !== group.groupId &&
+                    !userData?.isAdmin,
+               hintDescription: userData?.isAdmin
+                  ? "You can delete this event because you are a CF admin"
+                  : "Deleting an event is a permanent action and cannot be undone.",
+            },
+            {
+               icon: publishingDraft ? (
+                  <CircularProgress size={20} color="inherit" />
+               ) : (
+                  <PublishIcon color="action" />
+               ),
+               tooltip: publishingDraft
+                  ? "Publishing"
+                  : !rowData.status?.pendingApproval
+                  ? "Needs Approval"
+                  : "Publish Stream",
+               onClick: !rowData.status?.pendingApproval
+                  ? () => handleEditStream(rowData)
+                  : () => handlePublishStream(rowData),
+               hidden: !isDraft,
+               disabled: publishingDraft,
+               hintTitle: "Publish Stream",
+               hintDescription:
+                  "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
+            },
+            {
+               loadedButton: (
+                  <MoreOptionsMenu
+                     handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
+                     rowData={rowData}
+                     hintTitle="More options"
+                  />
+               ),
+               tooltip: "More options",
+               hidden: isDraft || !userData?.isAdmin,
+            },
+         ]
+
+         if (featureFlags.sparksB2BOnboardingFlag)
+            return [editLivestreamInV2FlowOption, ...result]
+
+         return result
+      },
       [
          isDraft,
          pdfReportAction,
@@ -307,6 +333,8 @@ const EventsTable = ({
          group.groupId,
          userData?.isAdmin,
          publishingDraft,
+         featureFlags.sparksB2BOnboardingFlag,
+         handleEditStreamV2,
          handleEditStream,
          handleOpenStreamerLinksModal,
          handleCreateExternalLink,
@@ -462,7 +490,7 @@ const EventsTable = ({
    const handleRowClick = (event, rowData) => {
       setClickedRows((prevState) => {
          const newClickedRows = { ...prevState }
-         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id])
+         newClickedRows[rowData.id] = !newClickedRows[rowData.id]
          return newClickedRows
       })
    }

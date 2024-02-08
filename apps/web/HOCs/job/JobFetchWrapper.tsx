@@ -1,6 +1,8 @@
 import { FC, ReactNode } from "react"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJob from "../../components/custom-hook/custom-job/useCustomJob"
+import FirestoreConditionalDocumentFetcher, {
+   WrapperProps,
+} from "HOCs/FirestoreConditionalDocumentFetcher"
 
 /**
  * Props for JobFetcher component.
@@ -15,25 +17,6 @@ type JobFetcherProps = {
 }
 
 /**
- * Fetches the Job using the provided group and Job ID.
- * @param {JobFetcherProps} props - The props for the component.
- * @returns {ReactNode} - The child components.
- */
-const JobFetcher: FC<JobFetcherProps> = ({ jobId, children }) => {
-   const job = useCustomJob(jobId)
-   return <>{children(job)}</>
-}
-
-/**
- * Props for JobFetchWrapper component.
- * @typedef {Object} WrapperProps
- * @property {boolean} shouldFetch - Indicates whether the Job data should be fetched.
- */
-type WrapperProps = {
-   shouldFetch: boolean
-}
-
-/**
  * A Higher Order Component (HOC) that wraps around the JobFetcher component and conditionally fetches the Job data.
  * This component provides a level of abstraction to handle conditional rendering based on the `shouldFetch` prop.
  * If `shouldFetch` is true, it will render the JobFetcher component which in turn fetches data using the reactfire-based hook.
@@ -42,15 +25,23 @@ type WrapperProps = {
  * @returns {ReactNode} - The child components.
  */
 const JobFetchWrapper: FC<WrapperProps & JobFetcherProps> = ({
-   shouldFetch,
    jobId,
    children,
+   fallbackComponent,
 }) => {
-   if (shouldFetch) {
-      return <JobFetcher jobId={jobId}>{children}</JobFetcher>
-   } else {
-      return <>{children(null)}</>
-   }
+   const collection = "customJobs"
+   const pathSegments = [jobId]
+
+   return (
+      <FirestoreConditionalDocumentFetcher
+         shouldFetch={Boolean(jobId)}
+         collection={collection}
+         pathSegments={pathSegments}
+         fallbackComponent={fallbackComponent}
+      >
+         {children}
+      </FirestoreConditionalDocumentFetcher>
+   )
 }
 
 export default JobFetchWrapper

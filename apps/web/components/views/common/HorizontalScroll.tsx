@@ -1,6 +1,6 @@
 import React, { useRef, useState, FC, useCallback, useMemo } from "react"
 import { Box, SxProps } from "@mui/material"
-import { sxStyles } from "../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 import { BoxProps } from "@mui/material/Box"
 
 const styles = sxStyles({
@@ -52,13 +52,14 @@ const HorizontalScroll: FC<Props> = ({ children, sx, ...boxProps }) => {
    )
 
    const baseStyles = useMemo<BoxProps["sx"]>(
-      () => [
-         styles.root,
-         {
-            cursor: isDragging ? "grabbing" : "grab",
-         },
-         ...(Array.isArray(sx) ? sx : [sx]),
-      ],
+      () =>
+         combineStyles(
+            styles.root,
+            {
+               cursor: isDragging ? "grabbing" : "grab",
+            },
+            sx
+         ),
       [isDragging, sx]
    )
 

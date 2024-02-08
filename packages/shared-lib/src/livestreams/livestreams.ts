@@ -7,7 +7,7 @@ import {
    UserStats,
 } from "../users"
 import firebase from "firebase/compat/app"
-import { FieldOfStudy } from "../fieldOfStudy"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
@@ -20,6 +20,7 @@ export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
    summary?: string
    reasonsToJoinLivestream?: string
+   reasonsToJoinLivestream_v2?: string[]
    backgroundImageUrl?: string
    company?: string
    companyId?: string
@@ -34,6 +35,8 @@ export interface LivestreamEvent extends Identifiable {
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   countryIds?: string[]
+   universityIds?: string[]
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
    isRecording?: boolean
@@ -101,6 +104,18 @@ export interface LivestreamEvent extends Identifiable {
    speakerSwitchMode?: "manual"
 
    /**
+    * An empty array means the livestream should target all the countries
+    * [] -> All countries
+    */
+   targetCountries?: string[]
+
+   /**
+    * An empty array means the livestream should target all the universities
+    * [] -> All universities
+    */
+   targetUniversities?: string[]
+
+   /**
     * An empty array means the livestream should target all the fields of study
     * [] -> All fields of study
     */
@@ -110,7 +125,7 @@ export interface LivestreamEvent extends Identifiable {
     * An empty array means the livestream should target all the levels of study
     * [] -> All levels of study
     */
-   targetLevelsOfStudy?: FieldOfStudy[]
+   targetLevelsOfStudy?: LevelOfStudy[]
 
    lastUpdated?: firebase.firestore.Timestamp
    /**
@@ -122,7 +137,7 @@ export interface LivestreamEvent extends Identifiable {
     */
    liveSpeakers?: LiveSpeaker[]
    lastUpdatedAuthorInfo?: AuthorInfo
-   universities?: any[]
+   universities?: unknown[]
    questionsDisabled?: boolean
 
    /**
@@ -185,6 +200,12 @@ export interface LivestreamEvent extends Identifiable {
     * and the company name. Used for full text search
     */
    triGrams: Record<string, true>
+
+   /**
+    * If true, Redirects to the new streaming page at: /streaming/(viewer|host)/{livestreamId}
+    * If false, Redirects to the old streaming page at /streaming/{livestreamId}/(viewer|joining/main-streamer)
+    */
+   useNewUI?: boolean
 }
 
 /**
@@ -628,4 +649,12 @@ export type FilterLivestreamsOptions = {
    companyIndustries?: string[]
    companyCountries?: string[]
    targetFieldsOfStudy?: FieldOfStudy[]
+}
+
+/**
+ * Options for checkForCategoryData, used for custom hook useLivestreamCategoryDataSWR.
+ */
+export type CategoryDataOption = {
+   livestream: LivestreamEvent
+   userData: UserData
 }

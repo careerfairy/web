@@ -3,6 +3,7 @@ import {
    IGroupRepository,
 } from "@careerfairy/shared-lib/groups/GroupRepository"
 import {
+   FilterCompanyOptions,
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
@@ -11,7 +12,10 @@ import {
 } from "@careerfairy/shared-lib/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   createCompatGenericConverter,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
@@ -34,6 +38,7 @@ import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 import * as functions from "firebase-functions"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { ServerClient } from "postmark"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -112,6 +117,16 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null>
 
    /**
+    * Fetches companies based on the filters provided in @param options .
+    * @param options Supported filters, more can be added
+    */
+   fetchCompanies(
+      options: FilterCompanyOptions,
+      useCoumpoundQueries?: boolean,
+      allCompanyIndustries?: OptionGroup[]
+   ): Promise<Group[]>
+
+   /**
     * Starts a plan for a group.
     *
     * This method sets the 'plan' field of the group document to the specified plan type and sets the 'startedAt' field to the current time.
@@ -143,6 +158,27 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves when the email was sent.
     */
    sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void>
+
+   /**
+    * Fetches all groups that are on a plan.
+    *
+    * @returns A promise that resolves with an array of Group objects.
+    */
+   getAllGroupsWithAPlan(): Promise<Group[]>
+
+   /**
+    * Sends a reminder email to the group admins when the trial plan creation period is near to end.
+    *
+    * This method fetches all the group admins of the given group and sends a batch of reminder emails through Postmark.
+    *
+    * @param group - The group for which the reminder email is to be sent.
+    * @param client - The Postmark client.
+    * @returns A promise that resolves when the reminder email was sent.
+    */
+   sendTrialPlanCreationPeriodInCriticalStateReminder(
+      group: Group,
+      client: ServerClient
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -216,12 +252,33 @@ export class GroupFunctionsRepository
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            auth.setCustomUserClaims(user.uid, user.customClaims)
+            void auth.setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
    }
 
+   async fetchCompanies(
+      options: FilterCompanyOptions,
+      useCoumpoundQueries?: boolean,
+      allCompanyIndustries?: OptionGroup[]
+   ): Promise<Group[]> {
+      let q = this.firestore
+         .collection("careerCenterData")
+         .orderBy("normalizedUniversityName")
+         .withConverter(
+            createCompatGenericConverter<Group>()
+         ) as unknown as FirebaseFirestore.Query<Group>
+
+      q = applyCompanyFilters(
+         q,
+         options,
+         useCoumpoundQueries,
+         allCompanyIndustries
+      )
+      const snaps = await q.get()
+      return snaps.docs.map((d) => d.data())
+   }
    /*
     * Stores the group admin role in the user's custom claims
     * */
@@ -363,7 +420,7 @@ export class GroupFunctionsRepository
             questionRefs.forEach((questionRef) => {
                batch.delete(questionRef)
             })
-            batch.commit()
+            void batch.commit()
             throw error
          })
       )
@@ -551,39 +608,51 @@ export class GroupFunctionsRepository
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
    }
 
-   async sendTrialWelcomeEmail(groupId: string, client: ServerClient): Promise<void> {
-      const admins = await this.getGroupAdmins(groupId);
+   async sendTrialWelcomeEmail(
+      groupId: string,
+      client: ServerClient
+   ): Promise<void> {
+      const admins = await this.getGroupAdmins(groupId)
 
-      const emails = admins?.map(({ email, firstName, groupId }) => ({
-         TemplateId: Number(
-            process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME
-         ),
-         From: "CareerFairy <noreply@careerfairy.io>",
-         To: email,
-         TemplateModel: {
-            user_name: firstName,
-            company_sparks_link: addUtmTagsToLink({
-               link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
-               campaign: "sparks",
-               content: "trial_welcome",
-            }),
-         },
-      }))
+      sendSparksTrialPlanEmail({
+         client,
+         admins,
+         templateId: process.env.POSTMARK_TEMPLATE_SPARKS_TRIAL_WELCOME,
+         content: "trial_welcome",
+         successMessage: "Successfully sent batch sparks trial welcome email",
+         errorMessage: "Error sending sparks trial welcome email:",
+      })
+   }
 
-      client.sendEmailBatchWithTemplates(emails).then(
-         (responses) => {
-            responses.forEach(() =>
-               functions.logger.log(
-                  "Successfully sent batch sparks trial welcome email"
-               )
-            )
-         },
-         (error) => {
-            functions.logger.error(
-               "Error sending sparks trial welcome email:" + error
-            )
-         }
-      )
+   async getAllGroupsWithAPlan(): Promise<Group[]> {
+      const snaps = await this.firestore
+         .collection("careerCenterData")
+         .orderBy("plan")
+         .withConverter(createCompatGenericConverter<Group>())
+         .get()
+
+      return mapFirestoreDocuments<Group>(snaps)
+   }
+
+   async sendTrialPlanCreationPeriodInCriticalStateReminder(
+      group: Group,
+      client: ServerClient
+   ): Promise<void> {
+      const admins = await this.getGroupAdmins(group.id)
+
+      sendSparksTrialPlanEmail({
+         client,
+         admins,
+         templateId:
+            process.env
+               .POSTMARK_TEMPLATE_SPARKS_TRIAL_PLAN_CREATION_PERIOD_NEAR_TO_END,
+         content: "trial_contentcreation_end",
+         successMessage:
+            "Successfully sent batch sparks trial plan creation period near to end reminder",
+         errorMessage:
+            "Error sending sparks trial plan creation period near to end reminder:",
+         companyName: group.universityName,
+      })
    }
 }
 
@@ -593,5 +662,110 @@ const removeTempGroupQuestionIds = (groupQuestions?: GroupQuestion[]) => {
          delete groupQuestion.id
          return groupQuestion
       }) || []
+   )
+}
+
+const applyCompanyFilters = (
+   query: FirebaseFirestore.Query<Group>,
+   filters: FilterCompanyOptions,
+   useCompound?: boolean,
+   allCompanyIndustries?: OptionGroup[]
+): FirebaseFirestore.Query<Group> => {
+   /**
+    * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
+    * Otherwise the filter is not applied, meaning filtering for companies which have publicSparks == false or any
+    * value is not possible when using this filter.
+    * This is intended.
+    */
+   if (filters.publicSparks) {
+      query = query.where("publicSparks", "==", true)
+   }
+
+   if (useCompound) {
+      if (filters.companyCountries?.length > 0) {
+         query = query.where(
+            "companyCountry.id",
+            "in",
+            filters.companyCountries
+         )
+      }
+
+      if (filters.companySize?.length > 0) {
+         query = query.where("companySize", "in", filters.companySize)
+      }
+
+      if (filters.companyIndustries?.length > 0) {
+         const mappedFilters = formatToOptionArray(
+            filters.companyIndustries,
+            allCompanyIndustries
+         )
+         query = mappedFilters.length
+            ? query.where(
+                 "companyIndustries",
+                 "array-contains-any",
+                 mappedFilters
+              )
+            : query
+      }
+   }
+
+   query = query.where("publicProfile", "==", true)
+   query = query.where("test", "==", false)
+
+   return query
+}
+
+const formatToOptionArray = (
+   selectedIds: string[],
+   allOptions: OptionGroup[]
+): OptionGroup[] => {
+   return allOptions
+      .map((option) => {
+         return { ...option, id: option.id.replace("_", ",") }
+      })
+      .filter(({ id }) => selectedIds?.includes(id))
+}
+
+type SendSparksTrialPlanEmailProps = {
+   client: ServerClient
+   admins: GroupAdmin[]
+   templateId: string | undefined
+   content: string
+   successMessage: string
+   errorMessage: string
+   companyName?: string
+}
+
+const sendSparksTrialPlanEmail = ({
+   client,
+   admins,
+   templateId,
+   content,
+   successMessage,
+   errorMessage,
+   companyName,
+}: SendSparksTrialPlanEmailProps): void => {
+   const emails = admins?.map(({ email, firstName, groupId }) => ({
+      TemplateId: Number(templateId),
+      From: "CareerFairy <noreply@careerfairy.io>",
+      To: email,
+      TemplateModel: {
+         user_name: firstName,
+         company_sparks_link: addUtmTagsToLink({
+            link: `https://www.careerfairy.io/group/${groupId}/admin/sparks`,
+            campaign: "sparks",
+            content: content,
+         }),
+         ...(companyName && { company_name: companyName }),
+      },
+   }))
+
+   client.sendEmailBatchWithTemplates(emails).then(
+      (responses) => {
+         responses.forEach(() => functions.logger.log(successMessage))
+      },
+      (error) => {
+         functions.logger.error(errorMessage + error)
+      }
    )
 }

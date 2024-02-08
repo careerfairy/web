@@ -33,7 +33,7 @@ import {
    sparksDialogInitialStepSelector,
    sparksDialogOpenSelector,
 } from "store/selectors/adminSparksSelectors"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 
@@ -399,7 +399,7 @@ const Container: FC<SparksDialogContainerProps> = ({
    const { handleClose } = useSparksForm()
 
    return (
-      <Box sx={[styles.containerWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
+      <Box sx={combineStyles(styles.containerWrapper, sx)}>
          <MuiContainer
             sx={[
                styles.container,
@@ -430,11 +430,7 @@ type ContentProps = BoxProps<"span"> & {}
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
    return (
-      <Box
-         component="span"
-         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.content]}
-         {...props}
-      />
+      <Box component="span" sx={combineStyles(sx, styles.content)} {...props} />
    )
 }
 
@@ -450,7 +446,7 @@ const Actions: FC<StackProps> = ({ children, sx, ...props }) => {
          alignItems="center"
          spacing={2}
          zIndex={1}
-         sx={[...(Array.isArray(sx) ? sx : [sx]), styles.fixedBottomContent]}
+         sx={combineStyles(sx, styles.fixedBottomContent)}
          {...props}
       >
          {children}
@@ -466,7 +462,7 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
    return (
       <span>
          <LoadingButton
-            sx={[...(Array.isArray(sx) ? sx : [sx]), styles.button]}
+            sx={combineStyles(sx, styles.button)}
             color="secondary"
             {...props}
          >

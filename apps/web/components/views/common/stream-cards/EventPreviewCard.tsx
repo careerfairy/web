@@ -62,6 +62,7 @@ const styles = sxStyles({
       transition: (theme: Theme) => theme.transitions.create(["opacity"]),
    },
    backgroundImageWrapper: {
+      filter: "brightness(75%)",
       display: "flex",
       height: "40%",
       width: "100%",
@@ -109,7 +110,6 @@ const styles = sxStyles({
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
-      marginY: 2,
    },
    mainContentWrapper: {
       position: "relative",
@@ -191,8 +191,37 @@ const styles = sxStyles({
          },
       },
    },
+   startMonth: {
+      textAlign: "center",
+      fontSize: "12px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "20px",
+   },
+   eventDateWrapper: {
+      display: "flex",
+      marginY: 1,
+      justifyContent: "space-between",
+   },
 })
-
+type EventPreviewCardProps = {
+   event?: LivestreamEvent
+   loading?: boolean
+   interests?: Interest[]
+   // Animate the loading animation, defaults to the "wave" prop
+   animation?: false | "wave" | "pulse"
+   isRecommended?: boolean
+   // The index of the event in the list
+   index?: number
+   // The total number of events in the list
+   totalElements?: number
+   location?: ImpressionLocation
+   ref?: React.Ref<HTMLDivElement>
+   bottomElement?: React.ReactNode
+   // If true, the chip labels will be hidden
+   hideChipLabels?: boolean
+   disableClick?: boolean
+}
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (
       {
@@ -289,6 +318,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          if (!loading) {
             setIsPast(checkIfPast(event))
          }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [event?.start, loading])
 
       const startDate = useMemo<Date>(
@@ -482,6 +512,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                           variant={"body1"}
                                           color={"black !important"}
                                           fontWeight={500}
+                                          sx={styles.startMonth}
                                        >
                                           {getStartMonth}
                                        </Typography>
@@ -500,11 +531,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            {isPast ? (
                               <Box
                                  className="hidePastDateOnHover"
-                                 sx={{
-                                    display: "flex",
-                                    mb: 1,
-                                    justifyContent: "space-between",
-                                 }}
+                                 sx={styles.eventDateWrapper}
                               >
                                  <Typography
                                     sx={{
@@ -661,25 +688,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       )
    }
 )
-
-type EventPreviewCardProps = {
-   event?: LivestreamEvent
-   loading?: boolean
-   interests?: Interest[]
-   // Animate the loading animation, defaults to the "wave" prop
-   animation?: false | "wave" | "pulse"
-   isRecommended?: boolean
-   // The index of the event in the list
-   index?: number
-   // The total number of events in the list
-   totalElements?: number
-   location?: ImpressionLocation
-   ref?: React.Ref<HTMLDivElement>
-   bottomElement?: React.ReactNode
-   // If true, the chip labels will be hidden
-   hideChipLabels?: boolean
-   disableClick?: boolean
-}
 
 EventPreviewCard.displayName = "EventPreviewCard"
 

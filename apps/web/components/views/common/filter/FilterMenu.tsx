@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography"
 import { useRouter } from "next/router"
 import { sxStyles } from "../../../../types/commonTypes"
 import { mapOptions } from "../../signup/utils"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+
 import { FilterEnum, useFilter } from "./Filter"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
@@ -31,11 +31,14 @@ import LanguageSelector from "./selectors/LanguageSelector"
 import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
 import { SlideUpTransition } from "../transitions"
 import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
+import ToggleSelector from "./selectors/ToggleSelector"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 
 const styles = sxStyles({
    paperRoot: {
       borderRadius: wishListBorderRadius,
-      boxShadow: (theme) => theme.boxShadows.dark_12_13,
+      boxShadow: (theme) => theme.legacy.boxShadows.dark_12_13,
    },
    content: {
       p: { xs: 1, md: 2 },
@@ -49,9 +52,11 @@ const styles = sxStyles({
    },
    actions: {
       px: { xs: 2, md: 4 },
+      py: 2,
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
+      borderTop: "1px solid #EEEEEE",
    },
    interestChip: {
       borderRadius: 1,
@@ -65,6 +70,28 @@ const styles = sxStyles({
          height: "100%",
       },
    },
+   loadingButton: {
+      width: "170px",
+      maxHeight: "40px",
+      textTransform: "none",
+      fontSize: "15px",
+   },
+   clearButton: {
+      textTransform: "none",
+      fontSize: "15px",
+      color: "#8E8E8E",
+      "&:hover": {
+         backgroundColor: "#EEEEEE",
+      },
+   },
+   dialog: {
+      mt: "73px",
+      borderRadius: "10px",
+   },
+   paper: {
+      borderTopLeftRadius: "15px",
+      borderTopRightRadius: "15px",
+   },
 })
 
 export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
@@ -75,6 +102,7 @@ type Props = {
 }
 
 const FilterMenu = ({ open, handleClose }: Props) => {
+   const isMobile = useIsMobile()
    const { pathname, push, query } = useRouter()
    const { filtersToShow, numberOfResults, numberOfActiveFilters } = useFilter()
 
@@ -94,8 +122,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
 
    const handleChangeMultiSelect = useCallback(
       (name: string, selectedOption: OptionGroup[]) => {
-         const options = mapOptions(selectedOption)
-
+         const options = mapOptions(selectedOption).map(encodeURIComponent)
          const newOptions = options.join(",")
 
          const newQuery = {
@@ -137,56 +164,56 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          }
 
          switch (filter) {
-            case FilterEnum.companyCountries:
+            case FilterEnum.COMPANY_COUNTRIES:
                toShow = {
-                  title: "Country",
+                  title: "Location",
                   renderFn: () => (
                      <CompanyCountrySelector
-                        key={FilterEnum.companyCountries}
+                        key={FilterEnum.COMPANY_COUNTRIES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.companyIndustries:
+            case FilterEnum.COMPANY_INDUSTRIES:
                toShow = {
                   title: "Industry",
                   renderFn: () => (
                      <CompanyIndustrySelector
-                        key={FilterEnum.companyIndustries}
+                        key={FilterEnum.COMPANY_INDUSTRIES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.companySizes:
+            case FilterEnum.COMPANY_SIZES:
                toShow = {
-                  title: "Company Size",
+                  title: "Company size",
                   renderFn: () => (
                      <CompanySizeSelector
-                        key={FilterEnum.companySizes}
+                        key={FilterEnum.COMPANY_SIZES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.languages:
+            case FilterEnum.LANGUAGES:
                toShow = {
                   title: "Language",
                   renderFn: () => (
                      <LanguageSelector
-                        key={FilterEnum.languages}
+                        key={FilterEnum.LANGUAGES}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
                }
                break
-            case FilterEnum.fieldsOfStudy:
+            case FilterEnum.FIELDS_OF_STUDY:
                toShow = {
                   title: "Field of study",
                   renderFn: () => (
                      <FieldsOfStudySelector
-                        key={FilterEnum.fieldsOfStudy}
+                        key={FilterEnum.FIELDS_OF_STUDY}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -233,46 +260,56 @@ const FilterMenu = ({ open, handleClose }: Props) => {
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
-            case FilterEnum.companyId:
-               return <ActiveCompanyFilter key={FilterEnum.companyId} />
+            case FilterEnum.COMPANY_ID:
+               return <ActiveCompanyFilter key={FilterEnum.COMPANY_ID} />
 
-            case FilterEnum.recordedOnly:
+            case FilterEnum.RECORDED_ONLY:
                return (
                   <RecordedOnlyToggle
-                     key={FilterEnum.recordedOnly}
+                     key={FilterEnum.RECORDED_ONLY}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
+            case FilterEnum.COMPANY_SPARKS:
+               return (
+                  <ToggleSelector
+                     key={FilterEnum.COMPANY_SPARKS}
+                     handleApplyFilter={handleApplyFilter}
+                     label="Sparks"
+                     description="Show only companies with Sparks"
+                     filterId={FilterEnum.COMPANY_SPARKS}
+                  />
+               )
 
-            case FilterEnum.interests:
+            case FilterEnum.INTERESTS:
                return (
                   <InterestsSelector
-                     key={FilterEnum.interests}
+                     key={FilterEnum.INTERESTS}
                      handleChange={handleChangeMultiSelect}
                   />
                )
 
-            case FilterEnum.jobCheck:
+            case FilterEnum.JOB_CHECK:
                return (
                   <JobCheck
-                     key={FilterEnum.jobCheck}
+                     key={FilterEnum.JOB_CHECK}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
 
-            case FilterEnum.sortBy:
+            case FilterEnum.SORT_BY:
                return (
                   <SortBySelector
-                     key={FilterEnum.sortBy}
+                     key={FilterEnum.SORT_BY}
                      handleApplyFilter={handleApplyFilter}
                   />
                )
 
-            case FilterEnum.languages:
-            case FilterEnum.companyCountries:
-            case FilterEnum.companyIndustries:
-            case FilterEnum.companySizes:
-            case FilterEnum.fieldsOfStudy:
+            case FilterEnum.LANGUAGES:
+            case FilterEnum.COMPANY_COUNTRIES:
+            case FilterEnum.COMPANY_INDUSTRIES:
+            case FilterEnum.COMPANY_SIZES:
+            case FilterEnum.FIELDS_OF_STUDY:
                return renderAutoCompleteFilter(filter)
          }
       },
@@ -287,6 +324,9 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          fullWidth
          TransitionComponent={SlideUpTransition}
          keepMounted={false} // Does not mount the children when dialog is closed
+         fullScreen={isMobile}
+         PaperProps={isMobile ? { sx: styles.paper } : undefined}
+         sx={isMobile ? styles.dialog : undefined}
       >
          <DialogTitle sx={styles.header}>
             <Typography fontWeight={600} fontSize={"24px"}>
@@ -311,9 +351,10 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             <Button
                onClick={handleClearQueries}
                variant={"text"}
-               size={"small"}
+               size={"medium"}
                color={"secondary"}
                disabled={numberOfActiveFilters < 1}
+               sx={styles.clearButton}
             >
                Clear filters
             </Button>
@@ -321,15 +362,16 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                loading={
                   numberOfActiveFilters > 0 && numberOfResults === undefined
                }
+               disabled={Boolean(!numberOfResults)}
                color="primary"
                variant={"contained"}
-               size={"small"}
+               size={"medium"}
                onClick={handleClose}
-               sx={{ width: "130px", maxHeight: "40px" }}
+               sx={styles.loadingButton}
             >
                {numberOfActiveFilters > 0
                   ? `${numberOfResults} Results`
-                  : "All results"}
+                  : `Apply filters`}
             </LoadingButton>
          </DialogActions>
       </Dialog>

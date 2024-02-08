@@ -9,6 +9,7 @@ import {
    GetFeedData,
    LikedSparks,
    RemoveNotificationFromUserData,
+   SharedSparks,
    Spark,
    SparkStats,
    UpdateSparkData,
@@ -105,7 +106,7 @@ export class SparksService {
    async trackSparkEvents(data: SparkEventClient[]) {
       return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
-         "trackSparkEvents_v3"
+         "trackSparkEvents_v4"
       )({
          events: data,
       })
@@ -148,15 +149,19 @@ export class SparksService {
       let baseQuery: Query
       let sortField: "addedToFeedAt" | "publishedAt" = "publishedAt"
 
-      if ("groupId" in options) {
+      if ("groupId" in options && options.groupId) {
          // Query sparks based on the specified group.
          baseQuery = query(
             collection(db, "sparks"),
-            where("group.id", "==", options.groupId!)
+            where("group.id", "==", options.groupId)
          )
 
          // Check if options specify a userId and that no categories are selected
-      } else if (options.userId && !options.sparkCategoryIds?.length) {
+      } else if (
+         "userId" in options &&
+         options.userId &&
+         !options.sparkCategoryIds?.length
+      ) {
          // Query the specified user's sparks feed.
          baseQuery = query(
             collection(db, "userData", options.userId, "sparksFeed")
@@ -242,7 +247,7 @@ export class SparksService {
       if (!userId) return // Should not be called if not logged in
       return httpsCallable<{ sparkId: string }, void>(
          this.functions,
-         "markSparkAsSeenByUser"
+         "markSparkAsSeenByUser_v2"
       )({ sparkId })
    }
 
@@ -369,7 +374,7 @@ export class SparksService {
          | "numberTimesCompletelyWatched"
          | "totalWatchedMinutes"
       >,
-      increment: number = 1
+      increment = 1
    ) {
       const sparkCounter = new Counter(
          FirestoreInstance.doc(`sparkStats/${sparkId}`),
@@ -393,6 +398,36 @@ export class SparksService {
       })
    }
 
+   /**
+    * This function handles the sharing of a spark by a user.
+    * It creates a new document in the 'sharedSparks' collection for the current year,
+    * and adds the shared spark to this document.
+    *
+    * @param userId - The id of the user sharing the spark
+    * @param sparkId - The id of the spark being shared
+    */
+   async handleShareSpark(userId: string, sparkId: string) {
+      const currentYear = DateTime.now().year
+      const docRef = doc(
+         FirestoreInstance,
+         "userData",
+         userId,
+         "sharedSparks",
+         currentYear.toString()
+      ).withConverter(createGenericConverter<SharedSparks>())
+
+      const createShareSparksDoc: PartialWithFieldValue<SharedSparks> = {
+         documentType: "sharedSparks",
+         userId,
+         id: currentYear.toString(),
+         sparks: {
+            [sparkId]: Timestamp.now(),
+         },
+      }
+
+      await setDoc<SharedSparks>(docRef, createShareSparksDoc, { merge: true })
+   }
+
    private createLikedSparksObject(
       userId: string,
       sparkId: string,
@@ -410,6 +445,7 @@ export class SparksService {
    }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sparkService = new SparksService(
    FunctionsInstance as unknown as Functions
 )

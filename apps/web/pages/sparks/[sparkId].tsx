@@ -95,6 +95,7 @@ const SparksPage: NextPage<
     */
    useEffect(() => {
       if (
+         // eslint-disable-next-line no-extra-boolean-cast
          Boolean(
             !isFetchingNextSparks &&
                hasNoMoreSparks &&

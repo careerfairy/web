@@ -2,6 +2,7 @@ import PropTypes from "prop-types"
 import React, { useMemo } from "react"
 import { alpha, useTheme } from "@mui/material/styles"
 import { Button } from "@mui/material"
+import { combineStyles } from "types/commonTypes"
 
 const paddingSize = 4
 const paddingXFactor = 0.5
@@ -45,13 +46,13 @@ const RoundButton = ({ withGradient, className, color, sx, ...props }) => {
       <Button
          color={color}
          className={className}
-         sx={[
+         sx={combineStyles(
             styles.root,
-            ...(Array.isArray(sx) ? sx : [sx]),
+            sx,
             withGradient
                ? (theme) => styles.withGradient(theme, { colors })
-               : undefined,
-         ]}
+               : undefined
+         )}
          {...props}
       />
    )

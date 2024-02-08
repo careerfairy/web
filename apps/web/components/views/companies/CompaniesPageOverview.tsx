@@ -1,24 +1,32 @@
-import { FC } from "react"
-import { Container, Grid } from "@mui/material"
+import { FC, useState } from "react"
+import { CircularProgress, Container, Grid } from "@mui/material"
 import Companies from "./Companies"
 import { Group } from "@careerfairy/shared-lib/groups"
 import CompanySearch from "./CompanySearch"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 type Props = {
    serverSideCompanies: Group[]
 }
 
 const CompaniesPageOverview: FC<Props> = ({ serverSideCompanies }) => {
+   const [resultCount, setResultCount] = useState<number>(null)
+
    return (
       <Container maxWidth="xl">
-         <Grid container spacing={2}>
-            <Grid item xs={12}>
-               <CompanySearch />
+         <SuspenseWithBoundary fallback={<CircularProgress />} hide={true}>
+            <Grid container spacing={2}>
+               <Grid item xs={12}>
+                  <CompanySearch filterResults={resultCount} />
+               </Grid>
+               <Grid item xs={12}>
+                  <Companies
+                     initialData={serverSideCompanies}
+                     setResults={setResultCount}
+                  />
+               </Grid>
             </Grid>
-            <Grid item xs={12}>
-               <Companies initialData={serverSideCompanies} />
-            </Grid>
-         </Grid>
+         </SuspenseWithBoundary>
       </Container>
    )
 }
