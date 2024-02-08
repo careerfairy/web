@@ -12,27 +12,35 @@ type Props = {
 }
 
 const styles = sxStyles({
+   border: {
+      borderBottom: "1px solid black",
+      width: "100%",
+   },
    wrapper: {
       position: "relative",
 
       "&:not(:last-child)": {
          mb: 4,
       },
+      "& > .border": {
+         borderBottom: "1px solid #EBEBEF",
+         width: "100%",
+      },
    },
    titleSection: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      background: "#FDFDFD",
+      background: "#FCFCFE",
       minHeight: "80px",
       px: 4,
       borderRadius: "12px 12px 0 0",
-      border: "1px solid #EDE7FD",
+      border: "1px solid rgba(103, 73, 234, 0.30)",
       borderBottom: "none",
    },
    testimonial: {
       p: 4,
-      border: "1px solid #EDE7FD",
+      border: "1px solid rgba(103, 73, 234, 0.30)",
       borderTop: "none",
       borderRadius: "0 0 12px 12px",
       background: "white",
@@ -41,11 +49,13 @@ const styles = sxStyles({
       width: (theme) => ({ xs: theme.spacing(8), md: theme.spacing(12) }),
       height: (theme) => ({ xs: theme.spacing(8), md: theme.spacing(12) }),
    },
+
    avatarRing: {
       borderRadius: "50%",
       border: "2px solid",
       borderColor: (theme) => theme.palette.primary.main,
       padding: (theme) => theme.spacing(1),
+      background: "white",
    },
    avaWrapper: {
       position: "absolute",
@@ -88,28 +98,30 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
             </Typography>
             <Typography variant={"body1"}>{position}</Typography>
          </Box>
-
+         <div className="border" />
          <Box sx={styles.avaWrapper}>
-            {editMode ? (
-               <Box sx={styles.editIconWrapper}>
-                  <IconButton
-                     sx={styles.editIconButton}
-                     onClick={() => {
-                        handleEditTestimonial(testimonial)
-                     }}
-                  >
-                     <EditIcon size={isMobile ? 14 : 18} />
-                  </IconButton>
+            <span>
+               {editMode ? (
+                  <Box sx={styles.editIconWrapper}>
+                     <IconButton
+                        sx={styles.editIconButton}
+                        onClick={() => {
+                           handleEditTestimonial(testimonial)
+                        }}
+                     >
+                        <EditIcon size={isMobile ? 14 : 18} />
+                     </IconButton>
+                  </Box>
+               ) : null}
+               <Box sx={styles.avatarRing} boxShadow={3}>
+                  <Box
+                     component={Avatar}
+                     src={avatar}
+                     sx={styles.avatar}
+                     alt={"testimonialAvatar"}
+                  />
                </Box>
-            ) : null}
-            <Box sx={styles.avatarRing} boxShadow={3}>
-               <Box
-                  component={Avatar}
-                  src={avatar}
-                  sx={styles.avatar}
-                  alt={"testimonialAvatar"}
-               />
-            </Box>
+            </span>
          </Box>
 
          <Box sx={styles.testimonial}>

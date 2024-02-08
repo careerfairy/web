@@ -70,6 +70,8 @@ type GroupDashboardLayoutProps = {
    titleComponent: React.ReactNode
    children: React.ReactNode
    topBarCta?: React.ReactNode
+   topBarNavigation?: React.ReactNode
+   bottomBarNavigation?: React.ReactNode
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, titleComponent } = props
@@ -77,7 +79,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
    const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false)
 
-   const { replace, push, pathname } = useRouter()
+   const { replace, push } = useRouter()
    const pathShouldShrink = usePathShouldShrink()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
@@ -100,7 +102,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
 
    const isCorrectGroup = groupId === group?.id
 
-   let shrunkInitialState: shrunkState = pathShouldShrink
+   const shrunkInitialState: shrunkState = pathShouldShrink
       ? "shrunk"
       : "disabled"
    const [shrunkLeftMenuState, setShrunkLeftMenuState] =
@@ -221,6 +223,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider
                topBarCta={props.topBarCta}
+               topBarNavigation={props.topBarNavigation}
+               bottomBarNavigation={props.bottomBarNavigation}
                titleComponent={titleComponent}
             >
                {children}

@@ -1,4 +1,4 @@
-import { Identifiable, ImageType } from "../commonTypes"
+import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
@@ -82,6 +82,16 @@ export interface Group extends Identifiable {
  * It helps in avoiding errors when passing these timestamps to the client.
  */
 export interface SerializedGroup extends Omit<Group, "plan"> {
+   planType: GroupPlanType | null
+   planStartedAtString: string | null
+   planExpiresAtString: string | null
+}
+
+/**
+ * This interface is essential for server-side timestamp serialization.
+ * It helps in avoiding errors when passing these timestamps to the client.
+ */
+export interface SerializedPublicGroup extends Omit<PublicGroup, "plan"> {
    planType: GroupPlanType | null
    planStartedAtString: string | null
    planExpiresAtString: string | null
@@ -284,6 +294,13 @@ export type PublicGroup = Pick<
    | "publicSparks"
    | "publicProfile"
    | "careerPageUrl"
+   | "targetedCountries"
+   | "targetedUniversities"
+   | "targetedFieldsOfStudy"
+   | "plan"
+   | "companyIndustries"
+   | "companyCountry"
+   | "companySize"
 >
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
@@ -297,6 +314,13 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       publicSparks: group.publicSparks ?? null,
       publicProfile: group.publicProfile ?? false,
       careerPageUrl: group.careerPageUrl ?? null,
+      targetedCountries: group.targetedCountries ?? [],
+      targetedUniversities: group.targetedUniversities ?? [],
+      targetedFieldsOfStudy: group.targetedFieldsOfStudy ?? [],
+      plan: group.plan ?? null,
+      companyIndustries: group.companyIndustries ?? [],
+      companyCountry: group.companyCountry ?? null,
+      companySize: group.companySize ?? null,
    }
 }
 
@@ -333,4 +357,12 @@ export type GroupAdminNewEventEmailInfo = {
     * Link to the public live stream event page in the platform
     */
    nextLivestreamsLink: string
+}
+
+export type FilterCompanyOptions = {
+   companyIndustries?: string[]
+   companyCountries?: string[]
+   publicSparks?: boolean
+   companySize?: string[]
+   allCompanyIndustries?: OptionGroup[]
 }

@@ -121,7 +121,7 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
                      color={"info"}
                      startIcon={<EditIcon />}
                   >
-                     Edit Video
+                     Edit video
                   </Button>
                </Box>
             ) : null}

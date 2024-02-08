@@ -6,6 +6,11 @@ import {
 import { fromSerializedDate } from "../BaseModel"
 import { Spark, SparkCategory, SparkVideo } from "./sparks"
 import { imageKitLoader } from "../utils/video"
+import {
+   SerializedPublicGroup,
+   deserializePublicGroup,
+   serializePublicGroup,
+} from "../groups"
 
 interface SparkPresenterInterface
    extends Omit<
@@ -21,12 +26,13 @@ interface SparkPresenterInterface
 export interface SerializedSpark
    extends Omit<
       Spark,
-      "createdAt" | "updatedAt" | "publishedAt" | "addedToFeedAt"
+      "createdAt" | "updatedAt" | "publishedAt" | "addedToFeedAt" | "group"
    > {
    createdAt: number
    updatedAt: number
    publishedAt: number
    addedToFeedAt: number
+   group: SerializedPublicGroup
 }
 
 /**
@@ -96,6 +102,10 @@ export class SparkPresenter implements SparkPresenterInterface {
          updatedAt: fromSerializedDate(serializedSpark.updatedAt),
          publishedAt: fromSerializedDate(serializedSpark.publishedAt),
          addedToFeedAt: fromSerializedDate(serializedSpark.addedToFeedAt),
+         group: deserializePublicGroup(
+            serializedSpark.group,
+            Timestamp.fromDate
+         ),
       })
    }
 
@@ -142,6 +152,7 @@ export class SparkPresenter implements SparkPresenterInterface {
          addedToFeedAt: spark.addedToFeedAt
             ? spark.addedToFeedAt.getTime()
             : null,
+         group: serializePublicGroup(spark.group),
       }
    }
 

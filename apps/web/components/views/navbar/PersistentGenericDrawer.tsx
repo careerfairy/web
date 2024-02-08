@@ -4,7 +4,7 @@ import Drawer from "@mui/material/Drawer"
 import { useRouter } from "next/router"
 import * as actions from "../../../store/actions"
 import { useDispatch, useSelector } from "react-redux"
-import { StylesProps } from "../../../types/commonTypes"
+import { StylesProps, combineStyles } from "../../../types/commonTypes"
 import { RootState } from "../../../store"
 import { MainLogo } from "../../logos"
 import { SxProps } from "@mui/material"
@@ -14,11 +14,11 @@ const styles: StylesProps = {
    tempDrawer: {
       zIndex: (theme) => theme.zIndex.drawer + 1,
       "& > .MuiDrawer-paper": {
-         width: (theme) => theme.drawerWidth.small,
+         width: (theme) => theme.legacy.drawerWidth.small,
       },
    },
    drawerOpen: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
       borderRadius: 0,
    },
    drawerClosed: {
@@ -36,7 +36,7 @@ const styles: StylesProps = {
       },
    },
    persistentDrawer: {
-      width: (theme) => theme.drawerWidth.small,
+      width: (theme) => theme.legacy.drawerWidth.small,
       flexShrink: 0,
       zIndex: (theme) => theme.zIndex.drawer + 1,
       "& > .MuiDrawer-paper": {
@@ -104,12 +104,14 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
       return () => {
          closeDrawer()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [pathname, isPersistent])
 
    useEffect(() => {
       if (isPersistent) {
          openDrawer()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isPersistent])
 
    const closeDrawer = () => {
@@ -119,12 +121,12 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
       dispatch(actions.openNavDrawer())
    }
 
-   const sxProps = [
+   const sxProps = combineStyles(
       styles.drawer,
       styles.persistentDrawer,
       drawerOpen ? styles.drawerOpen : styles.drawerClosed,
-      ...(Array.isArray(sx) ? sx : [sx]),
-   ]
+      sx
+   )
 
    if (canShowAnimationForPath(pathname)) {
       sxProps.push(styles.drawerAnimation)
@@ -145,11 +147,7 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
    ) : (
       <Drawer
          anchor="left"
-         sx={[
-            styles.drawer,
-            styles.tempDrawer,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+         sx={combineStyles(styles.drawer, styles.tempDrawer, sx)}
          PaperProps={{
             sx: {
                borderRadius: 0,

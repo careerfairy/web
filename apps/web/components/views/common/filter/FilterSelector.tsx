@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import { alpha } from "@mui/material/styles"
-import FilterIcon from "@mui/icons-material/FilterAltOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import { Box, Button, InputBase, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
@@ -13,6 +12,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 import { FilterEnum, useFilter } from "./Filter"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import { Filter } from "react-feather"
 
 const styles = sxStyles({
    root: {
@@ -43,8 +43,15 @@ const styles = sxStyles({
       maxWidth: "150px",
       fontSize: "15px",
       textTransform: "none",
+      "& svg": {
+         width: 20,
+         height: 20,
+      },
+      color: "#3D3D47",
    },
    roundNumber: {
+      width: 25,
+      height: 25,
       fontWeight: 500,
       borderRadius: "50%",
       ml: 1,
@@ -64,7 +71,7 @@ const FilterSelector = () => {
       useDialogStateHandler()
 
    const showSearch = useMemo(
-      () => filtersToShow.includes(FilterEnum.search),
+      () => filtersToShow.includes(FilterEnum.SEARCH),
       [filtersToShow]
    )
    const filterActive = Boolean(numberOfActiveFilters > 0)
@@ -136,23 +143,26 @@ const FilterSelector = () => {
             {isMobile ? (
                <Button
                   aria-describedby={id}
-                  sx={{ ...styles.filterButton, p: 1, minWidth: 0 }}
+                  sx={{ ...styles.filterButton, p: 1 }}
                   onClick={handleOpenFilterDialog}
                   disableElevation
                   color={filterActive ? "primary" : "grey"}
                >
-                  <FilterIcon />
+                  <Filter />
                </Button>
             ) : (
                <Button
                   aria-describedby={id}
-                  endIcon={<FilterIcon />}
+                  endIcon={<Filter />}
                   sx={styles.filterButton}
                   onClick={handleOpenFilterDialog}
                   disableElevation
-                  color={"grey"}
                >
-                  <Typography fontWeight={500} fontSize={"15px"}>
+                  <Typography
+                     fontWeight={500}
+                     fontSize={"15px"}
+                     sx={{ pr: numberOfActiveFilters > 0 ? 0 : 4 }}
+                  >
                      Filters
                   </Typography>
                   {numberOfActiveFilters > 0 ? (

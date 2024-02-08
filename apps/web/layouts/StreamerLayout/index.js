@@ -27,6 +27,8 @@ import isEqual from "react-fast-compare"
 import { LEFT_MENU_WIDTH } from "../../constants/streams"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { useConditionalRedirect } from "../../components/custom-hook/useConditionalRedirect"
+import { appendCurrentQueryParams } from "components/util/url"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -96,7 +98,8 @@ const StreamerLayout = (props) => {
    const streamRef = useStreamRef()
    const smallScreen = useMediaQuery("(max-width:700px)")
    const [newNotification, setNewNotification] = useState(null)
-   const [notificationToRemove, setNotificationToRemove] = useState(null)
+   // eslint-disable-next-line react/hook-use-state
+   const [notificationToRemove] = useState(null)
    const [notifications, setNotifications] = useState([])
    const [streamerId, setStreamerId] = useState("")
    const dispatch = useDispatch()
@@ -140,6 +143,8 @@ const StreamerLayout = (props) => {
             })
          }
       }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [router, token, currentLivestream?.test, currentLivestream?.id])
 
    useEffect(() => {
@@ -156,6 +161,7 @@ const StreamerLayout = (props) => {
       if (currentLivestream && auto === "true") {
          checkIfStreamerHasInfo()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [currentLivestream?.liveSpeakers, auto])
 
    useEffect(() => {
@@ -178,12 +184,14 @@ const StreamerLayout = (props) => {
       if (newNotification) {
          setNotifications([...notifications, newNotification])
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [newNotification])
 
    useEffect(() => {
       if (smallScreen && showMenu) {
          closeLeftMenu()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [smallScreen])
 
    useEffect(() => {
@@ -193,6 +201,7 @@ const StreamerLayout = (props) => {
          )
          setNotifications(updatedNotifications)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [notificationToRemove])
 
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu())
@@ -215,6 +224,7 @@ const StreamerLayout = (props) => {
          setSliding(true)
          setSelectedState(state)
       },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [showMenu]
    )
 
@@ -239,6 +249,18 @@ const StreamerLayout = (props) => {
             : null,
       }),
       [currentLivestream, isBreakout, isMainStreamer, selectedState, streamerId]
+   )
+
+   useConditionalRedirect(
+      /**
+       * Redirect to the new UI ONLY under the following conditions:
+       * - The stream is not a breakout room (new UI does not support breakout rooms)
+       * - The token has been verified OR it's a test stream
+       */
+      !isBreakout && (tokenChecked || currentLivestream?.test)
+         ? currentLivestream?.useNewUI
+         : false,
+      appendCurrentQueryParams(`/streaming/host/${livestreamId}`)
    )
 
    const tokenIsValidated = () => {

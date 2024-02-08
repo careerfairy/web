@@ -1,6 +1,7 @@
 import Avatar, { AvatarProps } from "@mui/material/Avatar"
 import { useMemo } from "react"
 import { stringAvatar } from "../../../util/CommonUtil"
+import { combineStyles } from "types/commonTypes"
 
 /**
  * Avatar that shows the user Initials if there is no image
@@ -34,10 +35,7 @@ const ColorizedAvatar = ({
 
    return (
       <Avatar
-         sx={[
-            imageUrl ? null : avaProps.sx,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+         sx={combineStyles(imageUrl ? null : avaProps.sx, sx)}
          {...rest}
          alt={loading ? "" : `${firstName || ""} ${lastName || ""}`}
          src={imageUrl}

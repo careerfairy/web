@@ -11,50 +11,92 @@ import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepo
 /**
  * This is where you can add filters to the query as this hook grows
  * */
-type Filters = {
-   // industries?: string[]
-   // companySizes?: string[]
+export type Filters = {
+   companyCountries?: string[]
+   companyIndustries?: string[]
+   companySize?: string[]
+   publicSparks?: boolean
 }
 
 export type UseInfiniteCompanies = {
    limit: number
    filters: Filters
    initialData?: Group[]
+   count?: boolean
 }
 
 const useInfiniteCompanies = ({
    filters,
    initialData,
    limit,
+   count,
 }: UseInfiniteCompanies) => {
    const options: UseInfiniteCollection<Group> = useMemo(() => {
       return {
          query: getInfiniteQuery(limit, filters),
          limit,
          initialData,
+         countQuery: count ? getCountQuery(filters) : null,
       }
-   }, [limit, filters, initialData])
+   }, [limit, filters, initialData, count])
 
    return useInfiniteCollection<Group>(options)
 }
 
+const getFilterConstraints = (filters: Filters): QueryConstraint[] => {
+   const filterConstraints: QueryConstraint[] = []
+
+   if (filters.companyCountries?.length > 0) {
+      filterConstraints.push(
+         where("companyCountry.id", "in", filters.companyCountries)
+      )
+   }
+   /**
+    * The filter for @field publicSparks is only applied when value == true, filtering for 'true' only.
+    * Otherwise the filter is not applied, meaning filtering for companies which have publicSparks == false or any
+    * value is not possible when using this filter.
+    * This is intended.
+    */
+   if (filters.publicSparks) {
+      filterConstraints.push(where("publicSparks", "==", true))
+   }
+
+   if (filters.companySize?.length) {
+      filterConstraints.push(where("companySize", "in", filters.companySize))
+   }
+
+   if (filters.companyIndustries?.length) {
+      const mappedFilters = filters.companyIndustries.map((industry) => {
+         return { name: industry, id: industry }
+      })
+      filterConstraints.push(
+         where("companyIndustries", "array-contains-any", mappedFilters)
+      )
+   }
+   return filterConstraints
+}
+export const getCountQuery = (filters: Filters = {}): Query<Group> => {
+   const constraints: QueryConstraint[] = getFilterConstraints(filters)
+
+   return query(
+      collection(FirestoreInstance, "careerCenterData"),
+      where("publicProfile", "==", true),
+      where("test", "==", false),
+      ...constraints
+   ).withConverter(createGenericConverter<Group>())
+}
 export const getInfiniteQuery = (
-   pageSIze: number = 10,
+   pageSize = 10,
    filters: Filters = {}
 ): Query<Group> => {
-   const constraints: QueryConstraint[] = []
-
-   // if (filters.industries) {
-   //    constraints.push(
-   //       where("companyIndustry", "in", filters.industries)
-   //    )
+   const constraints: QueryConstraint[] = getFilterConstraints(filters)
 
    return query(
       collection(FirestoreInstance, "careerCenterData"),
       where("publicProfile", "==", true),
       where("test", "==", false),
       ...constraints,
-      limit(pageSIze),
+      limit(pageSize),
       orderBy("normalizedUniversityName", "asc")
    ).withConverter(createGenericConverter<Group>())
 }

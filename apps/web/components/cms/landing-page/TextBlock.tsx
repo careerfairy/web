@@ -7,7 +7,7 @@ const styles = sxStyles({
    title: {
       textAlign: "center",
       mb: 4,
-      "& :first-child": {
+      "& :first-of-type": {
          fontWeight: 500,
       },
    },
@@ -28,11 +28,11 @@ const TextBlock = ({ textBlockTitle, content }: HygraphResponseTextBlock) => {
          <Box sx={styles.title}>
             <ThemedRichTextRenderer rawContent={textBlockTitle.raw} />
          </Box>
-         {content && (
+         {content ? (
             <Box sx={styles.content}>
                <ThemedRichTextRenderer rawContent={content.raw} />
             </Box>
-         )}
+         ) : null}
       </Box>
    )
 }

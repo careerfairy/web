@@ -26,7 +26,7 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
          <DashboardHead title="CareerFairy | Jobs" />
          <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
             {Boolean(jobId) ? (
-               <JobFetchWrapper jobId={jobId} shouldFetch={Boolean(jobId)}>
+               <JobFetchWrapper jobId={jobId}>
                   {(job: CustomJob) => <JobAdminDetails job={job} />}
                </JobFetchWrapper>
             ) : (

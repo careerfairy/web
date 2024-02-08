@@ -184,7 +184,6 @@ const CompanyDetails = () => {
                            onClick={() => handleSubmit()}
                            loading={isSubmitting}
                            disabled={!dirty}
-                           size="small"
                            sx={BaseStyles.saveBtn}
                            variant="contained"
                            color="secondary"
@@ -225,7 +224,10 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
          })
       )
       .nullable()
-      .max(GROUP_CONSTANTS.MAX_INDUSTRY_COUNT, "Maximum of 5 industries")
+      .max(
+         GROUP_CONSTANTS.MAX_INDUSTRY_COUNT,
+         `Maximum of ${GROUP_CONSTANTS.MAX_INDUSTRY_COUNT} industries`
+      )
       .required("At least one industry is required"),
    companySize: Yup.object()
       .shape({

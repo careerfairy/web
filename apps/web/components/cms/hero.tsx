@@ -118,7 +118,7 @@ const styles = sxStyles({
    },
    whiteText: {
       color: "white",
-      textShadow: (theme) => theme.darkTextShadow,
+      textShadow: (theme) => theme.legacy.darkTextShadow,
    },
    fullScreenMain: {
       height: "100%",
@@ -233,7 +233,7 @@ const Hero: FC<
                         >
                            {titleText}
                         </Typography>
-                        {subtitleText && (
+                        {subtitleText ? (
                            <Typography
                               variant="h5"
                               sx={[
@@ -245,8 +245,8 @@ const Hero: FC<
                            >
                               {subtitleText}
                            </Typography>
-                        )}
-                        {buttons && (
+                        ) : null}
+                        {buttons ? (
                            <Stack
                               sx={styles.stack}
                               direction={{ xs: "column", md: "row" }}
@@ -277,12 +277,12 @@ const Hero: FC<
                                  </Box>
                               ))}
                            </Stack>
-                        )}
+                        ) : null}
                         {children}
                      </Box>
                   </Container>
-                  {image && !video && renderImage}
-                  {video && video?.url && renderVideo}
+                  {image && !video ? renderImage : null}
+                  {video && video?.url ? renderVideo : null}
                </Box>
             </Box>
          </PillsBackground>

@@ -104,9 +104,7 @@ const AboutSection = () => {
                      color="primary"
                      onClick={handleOpenDialog}
                   >
-                     <Typography fontSize={"15px"} fontWeight={"600"}>
-                        EDIT
-                     </Typography>
+                     Edit
                   </Button>
                ) : null}
             </Box>

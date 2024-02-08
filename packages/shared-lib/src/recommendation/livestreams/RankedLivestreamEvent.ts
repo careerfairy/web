@@ -1,0 +1,73 @@
+import { FieldOfStudy } from "../../fieldOfStudy"
+import { LivestreamEvent } from "../../livestreams"
+import { sortElementsByFrequency } from "../utils"
+
+export class RankedLivestreamEvent {
+   public points: number
+   public id: string
+
+   constructor(public model: LivestreamEvent) {
+      this.model = model
+      this.id = model.id
+      // Divide popularity by the median value and ensure the minimum value is 1
+      this.points = model?.popularity
+         ? model.popularity / 120 < 1
+            ? 1
+            : model.popularity / 120
+         : 1
+   }
+
+   static create(livestream: LivestreamEvent) {
+      return new RankedLivestreamEvent(livestream)
+   }
+
+   getFieldOfStudyIds(): string[] {
+      return this.model.targetFieldsOfStudy.map((e) => e.id) || []
+   }
+
+   getInterestIds(): string[] {
+      return this.model.interestsIds || []
+   }
+
+   getCompanyCountries(): string[] {
+      return this.model.companyCountries || []
+   }
+
+   getCompanyIndustries(): string[] {
+      return this.model.companyIndustries || []
+   }
+
+   getCompanySizes(): string[] {
+      return this.model.companySizes || []
+   }
+
+   getLanguage(): string {
+      return this.model.language.code || ""
+   }
+
+   addPoints(points: number) {
+      this.points += points
+   }
+
+   getPoints() {
+      return this.points
+   }
+}
+
+export function getMostCommonFieldsOfStudies(
+   livestreams: LivestreamEvent[]
+): FieldOfStudy[] {
+   // get all fields of study from livestreams
+   const fieldsOfStudy = livestreams
+      .flatMap((livestream) => livestream.targetFieldsOfStudy)
+      .filter(Boolean)
+
+   const sortedFieldOfStudyIds = sortElementsByFrequency(
+      fieldsOfStudy.map((fieldOfStudy) => fieldOfStudy.id)
+   )
+
+   // return the fields of study objects sorted by frequency
+   return sortedFieldOfStudyIds.map((fieldOfStudyId) =>
+      fieldsOfStudy.find((fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId)
+   )
+}

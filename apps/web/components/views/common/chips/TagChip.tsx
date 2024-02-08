@@ -4,6 +4,20 @@ import React from "react"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 import { ChipProps } from "@mui/material/Chip/Chip"
+import { combineStyles, sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   chipNormal: {
+      color: (theme) => theme.palette.common.black,
+      borderColor: (theme) => theme.palette.common.white,
+      backgroundColor: (theme) => theme.palette.common.white,
+   },
+   chipOutlined: {
+      color: (theme) => theme.palette.common.white,
+      borderColor: (theme) => theme.palette.common.white,
+      backgroundColor: "transparent",
+   },
+})
 
 const WhiteTagChip = ({
    variant = "outlined",
@@ -24,22 +38,11 @@ const WhiteTagChip = ({
       >
          <Chip
             icon={icon}
-            sx={[
+            sx={combineStyles(
                { margin: 0 },
-               variant === "outlined"
-                  ? {
-                       color: (theme) => theme.palette.common.white,
-                       borderColor: (theme) => theme.palette.common.white,
-                       backgroundColor: "transparent",
-                    }
-                  : {
-                       color: (theme) => theme.palette.common.black,
-                       borderColor: (theme) => theme.palette.common.white,
-                       backgroundColor: (theme) => theme.palette.common.white,
-                    },
-               // You cannot spread `sx` directly because `SxProps` (typeof sx) can be an array.
-               ...(Array.isArray(sx) ? sx : [sx]),
-            ]}
+               variant === "outlined" ? styles.chipOutlined : styles.chipNormal,
+               sx
+            )}
             label={label}
             variant={variant}
             color="info"

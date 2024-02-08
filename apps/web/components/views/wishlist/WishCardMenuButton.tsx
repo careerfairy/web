@@ -154,10 +154,7 @@ const WishCardMenuButton = ({
 
    return (
       <>
-         <IconButton
-            onClick={handleClick}
-            sx={[...(Array.isArray(sx) ? sx : [sx])]}
-         >
+         <IconButton onClick={handleClick} sx={sx}>
             <MoreHorizIcon />
          </IconButton>
          <Menu

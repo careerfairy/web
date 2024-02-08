@@ -117,7 +117,6 @@ const CreatorSelectedView = () => {
          <CreatorFetchWrapper
             selectedCreatorId={selectedCreatorId}
             groupId={group.id}
-            shouldFetch={Boolean(selectedCreatorId)}
             fallbackComponent={() => (
                <CreatorView
                   handleClickEdit={handleClickEdit}

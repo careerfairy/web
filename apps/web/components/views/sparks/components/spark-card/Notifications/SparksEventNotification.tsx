@@ -19,6 +19,8 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import useLivestream from "components/custom-hook/live-stream/useLivestream"
 import { useAuth } from "HOCs/AuthProvider"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
 
 const styles = sxStyles({
    root: {
@@ -71,6 +73,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    const dispatch = useDispatch()
    const isMobile = useIsMobile()
    const { authenticatedUser } = useAuth()
+   const { trackEvent } = useSparksFeedTracker()
 
    const eventNotification = useSelector(currentSparkEventNotificationSelector)
    const activeSpark = useSelector(activeSparkSelector)
@@ -98,7 +101,8 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    const discoverHandleClick = useCallback(() => {
       dispatch(setEventToRegisterTo(eventNotification?.eventId))
       dispatch(showEventDetailsDialog(true))
-   }, [dispatch, eventNotification?.eventId])
+      trackEvent(SparkEventActions.Click_DiscoverLivestreamCTA)
+   }, [dispatch, eventNotification?.eventId, trackEvent])
 
    const cancelHandleClick = useCallback(
       (ev) => {
