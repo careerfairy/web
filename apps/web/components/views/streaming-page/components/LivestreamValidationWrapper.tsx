@@ -64,20 +64,20 @@ const LivestreamValidationsComponent = ({
    )
 
    // 1. user is a host and the stream is not a test stream -> accessible
-   const isHostNotTestLivestream = isHost && !livestream.test
+   const isHostAndNotTestLivestream = isHost && !livestream.test
 
-   // 2. user is a host and the stream is not a test stream, invalid link -> /streaming/error page
-   const isHostNotTestStreamInvalidLink =
-      isHostNotTestLivestream &&
+   // 2. user is a host and the stream is not a test stream and token is invalid -> /streaming/error page
+   const isHostAndNotTestStreamAndInvalidToken =
+      isHostAndNotTestLivestream &&
       Boolean(token) &&
       token !== livestreamToken?.data?.value
 
    // 3. user is logged out,test or open stream -> accessible
-   const isLoggedOutTestOpenStream =
+   const isLoggedOutAndTestOrOpenStream =
       isLoggedOut && (livestream.test || livestream.openStream)
 
    // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
-   const isLoggedOutNotTestOpenStream =
+   const isLoggedOutAndNotTestOrOpenStream =
       !isHost && isLoggedOut && !(livestream.test || livestream.openStream)
 
    // 5. user is a viewer and has registered for the event -> accessible
@@ -86,9 +86,12 @@ const LivestreamValidationsComponent = ({
    // 6. user is a viewer and has not registered for the event -> registration dialog
    const isViewerNotRegistered = !isHost && isLoggedIn && !isUserRegistered // Redirect register
 
-   useConditionalRedirect(isHostNotTestStreamInvalidLink, "/streaming/error")
+   useConditionalRedirect(
+      isHostAndNotTestStreamAndInvalidToken,
+      "/streaming/error"
+   )
 
-   if (isLoggedOutNotTestOpenStream) {
+   if (isLoggedOutAndNotTestOrOpenStream) {
       void replace({
          pathname: `/login`,
          query: { absolutePath: asPath },
@@ -99,8 +102,8 @@ const LivestreamValidationsComponent = ({
       refetchQuestions()
    }
    const allowRules = [
-      isHostNotTestLivestream,
-      isLoggedOutTestOpenStream,
+      isHostAndNotTestLivestream,
+      isLoggedOutAndTestOrOpenStream,
       isViewerRegistered,
    ]
 
