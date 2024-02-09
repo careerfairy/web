@@ -4,15 +4,27 @@ import { sxStyles } from "types/commonTypes"
 import { Box, Grow, Stack, Typography } from "@mui/material"
 import { MicOff, Info } from "react-feather"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
       color: "white",
-      p: 2,
+      p: {
+         xs: 1,
+         tablet: 2,
+      },
       display: "flex",
    },
    micOff: {
       color: "error.600",
+   },
+   displayName: {
+      ...getMaxLineStyles(1),
+      fontWeight: 600,
+   },
+   role: {
+      ...getMaxLineStyles(1),
+      lineHeight: 1, // make the text height the exact height of the text instead of style-guide height
    },
 })
 
@@ -29,14 +41,17 @@ export const DetailsOverlay = ({ micMuted, streamerDetails }: Props) => {
             width="100%"
             direction="row"
             justifyContent="space-between"
-            alignItems="end"
+            alignItems="center"
+            spacing={0.3}
          >
-            <Stack spacing={0.5}>
-               <Typography variant="brandedBody" fontWeight={600}>
+            <Stack minWidth={0}>
+               <Typography variant="brandedBody" sx={styles.displayName}>
                   {streamerDetails.firstName || ""}{" "}
                   {streamerDetails.lastName || ""}
                </Typography>
-               <Typography variant="small">{streamerDetails.role}</Typography>
+               <Typography sx={styles.role} variant="small">
+                  {streamerDetails.role}
+               </Typography>
             </Stack>
             <Stack direction="row" spacing={1.5}>
                <Grow in={micMuted} unmountOnExit>
