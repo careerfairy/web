@@ -19,6 +19,7 @@ import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    collection,
    collectionGroup,
+   documentId,
    getDocs,
    limit,
    query,
@@ -170,7 +171,7 @@ export class LivestreamService {
       if (tag === "creator") {
          const creatorQuery = query(
             collectionGroup(FirestoreInstance, "creators"),
-            where("id", "==", identifier),
+            where(documentId(), "==", identifier),
             limit(1)
          ).withConverter(createGenericConverter<Creator>())
 
@@ -198,18 +199,17 @@ export class LivestreamService {
 
          const snapshot = await getDocs(userQuery)
 
-         if (snapshot.empty) {
-            return details
-         }
+         if (!snapshot.empty) {
+            const data = snapshot.docs[0].data()
 
-         const data = snapshot.docs[0].data()
-
-         details = {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            role: data.position || data.fieldOfStudy.name || "",
-            avatarUrl: data.avatar,
-            linkedInUrl: data.linkedinUrl,
+            details = {
+               firstName: data.firstName,
+               lastName: data.lastName,
+               // Use their position from the B2B Profile if available, otherwise use their field of study
+               role: data.position || data.fieldOfStudy.name || "",
+               avatarUrl: data.avatar,
+               linkedInUrl: data.linkedinUrl,
+            }
          }
       }
 
@@ -217,7 +217,7 @@ export class LivestreamService {
          details = {
             firstName: "Anonymous",
             lastName: "User",
-            role: "Anonymous",
+            role: "",
             avatarUrl: "",
             linkedInUrl: "",
          }

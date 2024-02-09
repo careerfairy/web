@@ -24,16 +24,15 @@ const styles = sxStyles({
    },
    role: {
       ...getMaxLineStyles(1),
-      lineHeight: 1, // make the text height the exact height of the text instead of style-guide height
    },
 })
 
 type Props = {
-   micMuted: boolean
+   micActive: boolean
    streamerDetails: StreamerDetails
 }
 
-export const DetailsOverlay = ({ micMuted, streamerDetails }: Props) => {
+export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
    return (
       <FloatingContent sx={styles.root}>
          <Stack
@@ -44,7 +43,7 @@ export const DetailsOverlay = ({ micMuted, streamerDetails }: Props) => {
             alignItems="center"
             spacing={0.3}
          >
-            <Stack minWidth={0}>
+            <Stack spacing={-0.5} minWidth={0}>
                <Typography variant="brandedBody" sx={styles.displayName}>
                   {streamerDetails.firstName || ""}{" "}
                   {streamerDetails.lastName || ""}
@@ -54,7 +53,7 @@ export const DetailsOverlay = ({ micMuted, streamerDetails }: Props) => {
                </Typography>
             </Stack>
             <Stack direction="row" spacing={1.5}>
-               <Grow in={micMuted} unmountOnExit>
+               <Grow in={!micActive} unmountOnExit>
                   <Box sx={styles.micOff} component={MicOff} />
                </Grow>
                <Info />
