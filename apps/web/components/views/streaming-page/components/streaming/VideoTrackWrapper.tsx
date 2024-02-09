@@ -8,14 +8,10 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       overflow: "hidden",
-      borderRadius: 2,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      transition: (theme) => theme.transitions.create("border"),
-   },
-   isSpeaking: {
-      border: (theme) => `2.5px solid ${theme.palette.primary.main}`,
+      borderRadius: "inherit",
    },
    floatingContent: {
       position: "absolute",
@@ -28,23 +24,8 @@ const styles = sxStyles({
    },
 })
 
-type VideoTrackWrapperProps = BoxProps & {
-   isSpeaking: boolean
-}
-
-export const VideoTrackWrapper = ({
-   isSpeaking,
-   ...props
-}: VideoTrackWrapperProps) => {
-   return (
-      <Box
-         {...props}
-         sx={combineStyles(
-            [styles.root, isSpeaking && styles.isSpeaking],
-            props.sx
-         )}
-      />
-   )
+export const VideoTrackWrapper = ({ ...props }: BoxProps) => {
+   return <Box {...props} sx={combineStyles(styles.root, props.sx)} />
 }
 
 export const FloatingContent = (props: BoxProps) => {

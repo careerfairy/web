@@ -13,8 +13,9 @@ import { Loader } from "./Loader"
 import { styles } from "./styles"
 import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
 import { useAppSelector } from "components/custom-hook/store"
-import { DetailsOverlay } from "./DetailsOverlay"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import { DetailsOverlay } from "./DetailsOverlay"
+import { SpeakingIndicator } from "./SpeakingIndicator"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -71,8 +72,10 @@ export const LocalMicrophoneAndCameraUser = ({
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)
 
+   const micActive = micOn && !micMuted
+
    return (
-      <VideoTrackWrapper isSpeaking={isSpeaking} {...props}>
+      <VideoTrackWrapper {...props}>
          <Box
             sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
             component={LocalVideoTrack}
@@ -89,11 +92,12 @@ export const LocalMicrophoneAndCameraUser = ({
          />
          {Boolean(isLoading) && <Loader />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
+         <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />
 
          <FloatingContent>{children}</FloatingContent>
          {hideDetails ? null : (
             <DetailsOverlay
-               micMuted={!micOn || micMuted}
+               micActive={micActive}
                streamerDetails={streamerDetails}
             />
          )}

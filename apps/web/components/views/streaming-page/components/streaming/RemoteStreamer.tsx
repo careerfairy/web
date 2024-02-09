@@ -15,6 +15,7 @@ import { useAppSelector } from "components/custom-hook/store"
 import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { DetailsOverlay } from "./DetailsOverlay"
+import { SpeakingIndicator } from "./SpeakingIndicator"
 
 type Props = {
    /**
@@ -80,7 +81,7 @@ export const RemoteStreamer = ({
    playAudio = playAudio ?? user?.hasAudio
 
    return (
-      <VideoTrackWrapper isSpeaking={isSpeaking} {...props}>
+      <VideoTrackWrapper {...props}>
          <Box
             component={RemoteVideoTrack}
             sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
@@ -95,9 +96,10 @@ export const RemoteStreamer = ({
          />
          {Boolean(isLoading) && <Loader />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
+         <SpeakingIndicator isSpeaking={isSpeaking} />
          <FloatingContent>{children}</FloatingContent>
          <DetailsOverlay
-            micMuted={!user.hasAudio}
+            micActive={user.hasAudio}
             streamerDetails={streamerDetails}
          />
       </VideoTrackWrapper>
