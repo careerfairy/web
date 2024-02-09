@@ -786,12 +786,12 @@ class FirebaseService {
    //TEST_LIVESTREAMS
 
    createTestLivestream = () => {
-      const livestreamCollRef = this.firestore.collection("livestreams")
+      const livestreamDocRef = this.firestore.collection("livestreams").doc()
 
-      return livestreamCollRef.add({
+      return livestreamDocRef.set({
          companyId: "CareerFairy",
          test: true,
-         id: livestreamCollRef.id,
+         id: livestreamDocRef.id,
          universities: [],
          createdAt: this.getServerTimestamp(),
          start: firebase.firestore.Timestamp.fromDate(
