@@ -117,6 +117,7 @@ export const getStreamsByDateWithRegisteredStudents = async (
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
       .where("test", "==", false)
+      .where("hidden", "==", false)
       .get()
       .then((querySnapshot) => {
          const streams = querySnapshot.docs?.map(
