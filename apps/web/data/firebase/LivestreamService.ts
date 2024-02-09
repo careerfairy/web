@@ -47,7 +47,7 @@ type StreamerDetails = {
  * Defines the options for setting a livestream's mode.
  * Depending on the mode, additional properties may be required:
  * - "default": No additional properties.
- * - "desktop": Requires `screenSharerId` to identify the screen sharer.
+ * - "desktop": Requires `screenSharerAgoraUID` to identify the screen sharer.
  * - "video": Requires `youtubeVideoURL` for the video to be shared.
  * - "presentation": Requires `pdfURL` for the PDF to be presented.
  */
@@ -55,7 +55,7 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
    Mode extends "default"
       ? { mode: "default" }
       : Mode extends "desktop"
-      ? { mode: "desktop"; screenSharerId: string }
+      ? { mode: "desktop"; screenSharerAgoraUID: string }
       : Mode extends "video"
       ? { mode: "video"; youtubeVideoURL: string }
       : Mode extends "presentation"
@@ -267,14 +267,14 @@ export class LivestreamService {
    ) {
       switch (options.mode) {
          case LivestreamModes.DESKTOP:
-            if (!options.screenSharerId) {
+            if (!options.screenSharerAgoraUID) {
                throw new Error(
                   "Agora UID is required to start sharing the screen"
                )
             }
             return this.updateLivestream(livestreamId, {
                mode: options.mode,
-               screenSharerId: options.screenSharerId,
+               screenSharerId: options.screenSharerAgoraUID,
             })
 
          case LivestreamModes.PRESENTATION:

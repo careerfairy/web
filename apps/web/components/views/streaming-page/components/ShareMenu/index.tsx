@@ -70,11 +70,9 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
       const PDFActive = livestream.mode === LivestreamModes.PRESENTATION
       const videoActive = livestream.mode === LivestreamModes.VIDEO
 
-      const { trigger: setLivestreamMode, isMutating: settingMode } =
-         useSetLivestreamMode({
-            agoraUid,
-            livestreamId: livestream.id,
-         })
+      const { trigger: setMode, isMutating: loading } = useSetLivestreamMode(
+         livestream.id
+      )
 
       const handleModeChange = (newMode: LivestreamMode) => {
          switch (newMode) {
@@ -83,9 +81,9 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                 * Immediately sets the mode to screen sharing
                 * TODO: Detect on client if user's agora ID matches that of livestream.screenSharerId and trigger the browser/agora screen sharing apis
                 */
-               setLivestreamMode({
+               setMode({
                   mode: LivestreamModes.DESKTOP,
-                  screenSharerId: agoraUid.toString(),
+                  screenSharerAgoraUID: agoraUid.toString(),
                })
                alert("Share screen not fully implemented yet")
                break
@@ -113,7 +111,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                alert("Share Youtube video not implemented yet")
                break
             default:
-               setLivestreamMode({
+               setMode({
                   mode: LivestreamModes.DEFAULT,
                })
                break
@@ -132,7 +130,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
             ref={ref}
          >
             <MenuItem
-               disabled={settingMode}
+               disabled={loading}
                onClick={() =>
                   handleModeChange(
                      PDFActive
@@ -147,7 +145,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                </Typography>
             </MenuItem>
             <MenuItem
-               disabled={settingMode}
+               disabled={loading}
                onClick={() =>
                   handleModeChange(
                      videoActive
@@ -162,7 +160,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                </Typography>
             </MenuItem>
             <MenuItem
-               disabled={settingMode}
+               disabled={loading}
                onClick={() =>
                   handleModeChange(
                      screenShareActive
