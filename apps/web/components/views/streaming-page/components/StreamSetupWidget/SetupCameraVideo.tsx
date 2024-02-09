@@ -7,6 +7,7 @@ const styles = sxStyles({
    video: {
       aspectRatio: "16/9",
       width: "100%",
+      borderRadius: "8px",
    },
 })
 
@@ -14,7 +15,11 @@ export const SetupCameraVideo = () => {
    const { cameraOn } = useLocalTracks()
 
    return (
-      <LocalMicrophoneAndCameraUser hideDetails sx={styles.video}>
+      <LocalMicrophoneAndCameraUser
+         hideDetails
+         hideSpeakingIndicator
+         sx={styles.video}
+      >
          {!cameraOn && <CameraDisabledOverlay />}
       </LocalMicrophoneAndCameraUser>
    )

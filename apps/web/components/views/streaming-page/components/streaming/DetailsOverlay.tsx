@@ -49,7 +49,7 @@ export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
                   {streamerDetails.lastName || ""}
                </Typography>
                <Typography sx={styles.role} variant="small">
-                  {streamerDetails.role}
+                  {streamerDetails.role || " "}
                </Typography>
             </Stack>
             <Stack direction="row" spacing={1.5}>

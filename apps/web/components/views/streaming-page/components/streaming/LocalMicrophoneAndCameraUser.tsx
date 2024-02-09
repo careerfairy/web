@@ -42,6 +42,11 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to hide the details overlay.
     */
    readonly hideDetails?: boolean
+
+   /**
+    * Whether to hide the speaking indicator.
+    */
+   readonly hideSpeakingIndicator?: boolean
 } & BoxProps
 
 /**
@@ -52,6 +57,7 @@ export const LocalMicrophoneAndCameraUser = ({
    playVideo,
    volume,
    hideDetails,
+   hideSpeakingIndicator,
    children,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
@@ -92,7 +98,9 @@ export const LocalMicrophoneAndCameraUser = ({
          />
          {Boolean(isLoading) && <Loader />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
-         <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />
+         {hideSpeakingIndicator ? null : (
+            <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />
+         )}
 
          <FloatingContent>{children}</FloatingContent>
          {hideDetails ? null : (
