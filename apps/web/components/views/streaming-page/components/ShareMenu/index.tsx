@@ -87,6 +87,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                   mode: LivestreamModes.DESKTOP,
                   screenSharerId: agoraUid.toString(),
                })
+               alert("Share screen not fully implemented yet")
                break
             case LivestreamModes.PRESENTATION:
                /**
