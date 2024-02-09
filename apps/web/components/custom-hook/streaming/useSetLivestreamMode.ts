@@ -1,41 +1,29 @@
-import { UID } from "agora-rtc-react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import {
    SetModeOptionsType,
    livestreamService,
 } from "data/firebase/LivestreamService"
-import useSWRMutation from "swr/mutation"
+import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { LivestreamMode } from "@careerfairy/shared-lib/livestreams"
 
-export type StreamerDetails = Awaited<
-   ReturnType<typeof livestreamService.getStreamerDetails>
+type FetcherType = MutationFetcher<
+   void, // return type
+   unknown, // error type
+   SetModeOptionsType<LivestreamMode> // args for the mutation method
 >
 
-type Options = {
-   livestreamId: string
-   agoraUid: UID
-}
-
-export const useSetLivestreamMode = (options: Options) => {
-   const key = Object.values(options).every(Boolean)
-      ? `set-livestream-mode-${options.livestreamId}`
-      : null
-
-   return useSWRMutation<
-      void,
-      Error,
-      string,
-      SetModeOptionsType<LivestreamMode>
-   >(key, (_, { arg: mode }) =>
+export const useSetLivestreamMode = (livestreamId: string) => {
+   const fetcher: FetcherType = async (_, options) =>
       livestreamService
-         .setLivestreamMode(options.livestreamId, mode)
+         .setLivestreamMode(livestreamId, options.arg)
          .catch((error) => {
             errorLogAndNotify(error, {
                message: "Failed to set livestream mode",
-               options,
-               mode,
+               livestreamId,
+               args: options.arg,
             })
             throw error
          })
-   )
+
+   return useSWRMutation(`set-livestream-mode-${livestreamId}`, fetcher)
 }
