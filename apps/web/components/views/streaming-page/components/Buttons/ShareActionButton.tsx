@@ -20,7 +20,7 @@ export const ShareActionButton = forwardRef<
          >
             <Airplay />
          </ActionBarButtonStyled>
-         <ShareMenu open={open} anchorEl={anchorEl} onClose={handleClose} />
+         <ShareMenu open={open} anchorEl={anchorEl} handleClose={handleClose} />
       </span>
    )
 })

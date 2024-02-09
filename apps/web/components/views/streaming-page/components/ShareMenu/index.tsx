@@ -1,4 +1,11 @@
+import {
+   LivestreamMode,
+   LivestreamModes,
+} from "@careerfairy/shared-lib/livestreams"
 import { MenuItem, MenuProps, Typography } from "@mui/material"
+import { useCurrentUID } from "agora-rtc-react"
+import { useLivestreamData } from "components/custom-hook/streaming"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import {
    PDFIcon,
    ShareScreenIcon,
@@ -50,31 +57,127 @@ const TransformOrigin: MenuProps["transformOrigin"] = {
    horizontal: "center",
 }
 
-export const ShareMenu = forwardRef<HTMLDivElement, MenuProps>((props, ref) => {
-   return (
-      <>
+type Props = MenuProps & {
+   handleClose: () => void
+}
+
+export const ShareMenu = forwardRef<HTMLDivElement, Props>(
+   ({ handleClose, ...props }, ref) => {
+      const livestream = useLivestreamData()
+      const agoraUid = useCurrentUID()
+
+      const screenShareActive = livestream.mode === LivestreamModes.DESKTOP
+      const PDFActive = livestream.mode === LivestreamModes.PRESENTATION
+      const videoActive = livestream.mode === LivestreamModes.VIDEO
+
+      const { trigger: setLivestreamMode, isMutating: settingMode } =
+         useSetLivestreamMode({
+            agoraUid,
+            livestreamId: livestream.id,
+         })
+
+      const handleModeChange = (newMode: LivestreamMode) => {
+         switch (newMode) {
+            case LivestreamModes.DESKTOP:
+               /**
+                * Immediately sets the mode to screen sharing
+                * TODO: Detect on client if user's agora ID matches that of livestream.screenSharerId and trigger the browser/agora screen sharing apis
+                */
+               setLivestreamMode({
+                  mode: LivestreamModes.DESKTOP,
+                  screenSharerId: agoraUid.toString(),
+               })
+               break
+            case LivestreamModes.PRESENTATION:
+               /**
+                * TODO:
+                * 1. Open PDF file picker
+                * 2. Upload the PDF to storage
+                * 3. **Save the storage URL  at /livestreams/{id}/presentations/presentation. Look at old implementation for reference
+                * 4. Set the mode to presentation
+                *
+                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
+                */
+               alert("Share PDF not implemented yet")
+               break
+            case LivestreamModes.VIDEO:
+               /**
+                * TODO:
+                * 1. Open the youtube video URL dialog form
+                * 2. Save the youtube video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
+                * 3. Set the mode to video
+                *
+                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
+                */
+               alert("Share Youtube video not implemented yet")
+               break
+            default:
+               setLivestreamMode({
+                  mode: LivestreamModes.DEFAULT,
+               })
+               break
+         }
+
+         handleClose()
+      }
+
+      return (
          <BrandedMenu
             {...props}
             anchorOrigin={AnchorOrigin}
             sx={styles.root}
             transformOrigin={TransformOrigin}
+            onClose={handleClose}
             ref={ref}
          >
-            <MenuItem>
+            <MenuItem
+               disabled={settingMode}
+               onClick={() =>
+                  handleModeChange(
+                     PDFActive
+                        ? LivestreamModes.DEFAULT
+                        : LivestreamModes.PRESENTATION
+                  )
+               }
+            >
                <PDFIcon />
-               <Typography variant="medium">Share PDF presentation</Typography>
+               <Typography variant="medium">
+                  {PDFActive ? "Stop sharing PDF" : "Share PDF presentation"}
+               </Typography>
             </MenuItem>
-            <MenuItem>
+            <MenuItem
+               disabled={settingMode}
+               onClick={() =>
+                  handleModeChange(
+                     videoActive
+                        ? LivestreamModes.DEFAULT
+                        : LivestreamModes.VIDEO
+                  )
+               }
+            >
                <VideoIcon />
-               <Typography variant="medium">Share video</Typography>
+               <Typography variant="medium">
+                  {videoActive ? "Stop sharing video" : "Share video"}
+               </Typography>
             </MenuItem>
-            <MenuItem>
+            <MenuItem
+               disabled={settingMode}
+               onClick={() =>
+                  handleModeChange(
+                     screenShareActive
+                        ? LivestreamModes.DEFAULT
+                        : LivestreamModes.DESKTOP
+                  )
+               }
+            >
                <ShareScreenIcon />
-               <Typography variant="medium">Share screen</Typography>
+               <Typography variant="medium">
+                  {screenShareActive ? "Stop sharing screen" : "Share screen"}
+               </Typography>
             </MenuItem>
          </BrandedMenu>
-      </>
-   )
-})
+      )
+   }
+)
 
 ShareMenu.displayName = "ShareMenu"

@@ -2,6 +2,9 @@ import {
    CategoryDataOption as LivestreamCategoryDataOption,
    FilterLivestreamsOptions,
    LivestreamQueryOptions,
+   LivestreamMode,
+   LivestreamEvent,
+   LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -17,12 +20,15 @@ import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/vi
 import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
+   UpdateData,
    collection,
    collectionGroup,
+   doc,
    documentId,
    getDocs,
    limit,
    query,
+   updateDoc,
    where,
 } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
@@ -36,6 +42,25 @@ type StreamerDetails = {
    avatarUrl: string
    linkedInUrl: string
 }
+
+/**
+ * Defines the options for setting a livestream's mode.
+ * Depending on the mode, additional properties may be required:
+ * - "default": No additional properties.
+ * - "desktop": Requires `screenSharerId` to identify the screen sharer.
+ * - "video": Requires `youtubeVideoURL` for the video to be shared.
+ * - "presentation": Requires `pdfURL` for the PDF to be presented.
+ */
+export type SetModeOptionsType<Mode extends LivestreamMode> =
+   Mode extends "default"
+      ? { mode: "default" }
+      : Mode extends "desktop"
+      ? { mode: "desktop"; screenSharerId: string }
+      : Mode extends "video"
+      ? { mode: "video"; youtubeVideoURL: string }
+      : Mode extends "presentation"
+      ? { mode: "presentation"; pdfURL: string }
+      : never
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
@@ -212,6 +237,78 @@ export class LivestreamService {
          role: "",
          avatarUrl: "",
          linkedInUrl: "",
+      }
+   }
+
+   private getLivestreamRef(livestreamId: string) {
+      return doc(FirestoreInstance, "livestreams", livestreamId).withConverter(
+         createGenericConverter<LivestreamEvent>()
+      )
+   }
+
+   private updateLivestream(
+      livestreamId: string,
+      data: UpdateData<LivestreamEvent>
+   ) {
+      return updateDoc(this.getLivestreamRef(livestreamId), data)
+   }
+
+   /**
+    * Sets the mode of a livestream to the provided mode (default, desktop, video, pdf)
+    * If the mode is 'desktop', the agoraUid is required to identify the screen sharer.
+    * Updates the livestream document with the new mode and, if applicable, the screenSharerId.
+    *
+    * @param params - The parameters required to start or stop sharing, including livestream ID, mode, and Agora UID.
+    * @returns A promise resolved with the update operation result.
+    */
+   async setLivestreamMode<Mode extends LivestreamMode>(
+      livestreamId: string,
+      options: SetModeOptionsType<Mode>
+   ) {
+      switch (options.mode) {
+         case LivestreamModes.DESKTOP:
+            if (!options.screenSharerId) {
+               throw new Error(
+                  "Agora UID is required to start sharing the screen"
+               )
+            }
+            return this.updateLivestream(livestreamId, {
+               mode: options.mode,
+               screenSharerId: options.screenSharerId,
+            })
+
+         case LivestreamModes.PRESENTATION:
+            if (!options.pdfURL) {
+               throw new Error("PDF URL is required to start a presentation")
+            }
+            /**
+             * TODO:
+             * Batch operations (both must succeed or fail)
+             * 1. Set mode to presentation on livestreams/{id}
+             * 2. Save the PDF url at /livestreams/{id}/presentations/presentation. Look at old implementation for reference
+             */
+            return
+
+         case LivestreamModes.VIDEO:
+            if (!options.youtubeVideoURL) {
+               throw new Error("YouTube video URL is required to start a video")
+            }
+            /**
+             * TODO:
+             * Batch operations (both must succeed or fail)
+             * 1. Set mode to video on livestreams/{id}
+             * 2. Save the video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
+             */
+            return
+
+         case LivestreamModes.DEFAULT:
+            return this.updateLivestream(livestreamId, {
+               mode: options.mode,
+               screenSharerId: "",
+            })
+
+         default:
+            throw new Error("Invalid mode provided")
       }
    }
 }
