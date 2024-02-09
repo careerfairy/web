@@ -139,7 +139,7 @@ export type ISpeakerObj = {
    email: string
 }
 
-const speakerObj = {
+export const speakerObj = {
    avatar: "",
    firstName: "",
    lastName: "",
@@ -147,6 +147,34 @@ const speakerObj = {
    background: "",
    email: "",
 } as ISpeakerObj
+
+export const getLivestreamInitialValues = (group) => ({
+   // add group logo if it has any and if it's not a university
+   companyLogoUrl: group?.universityCode ? "" : group?.logoUrl || "",
+   backgroundImageUrl: group?.universityCode ? "" : group?.bannerImageUrl || "",
+   // add group name if it has any and if it's not a university
+   company: group?.universityCode ? "" : group?.universityName || "",
+   companyId: "",
+   title: "WOLOLO",
+   interestsIds: [],
+   groupIds: [],
+   start: new Date(),
+   groupQuestionsMap: {},
+   duration: 60,
+   hidden: false,
+   summary: "",
+   reasonsToJoinLivestream: "",
+   reasonsToJoinLivestream_v2: [],
+   speakers: { [uuidv4()]: speakerObj },
+   status: {},
+   language: languageCodes[0],
+   targetFieldsOfStudy: [],
+   targetLevelsOfStudy: [],
+   promotionChannelsCodes: [],
+   promotionCountriesCodes: [],
+   promotionUniversitiesCodes: [],
+   questionsDisabled: false,
+})
 
 type StyleProps = {
    isGroupAdmin: boolean
@@ -292,35 +320,9 @@ const DraftStreamForm = ({
    const [draftId, setDraftId] = useState("")
 
    const [existingGroups, setExistingGroups] = useState([])
-   const [formData, setFormData] = useState<DraftFormValues>({
-      // add group logo if it has any and if it's not a university
-      companyLogoUrl: group?.universityCode ? "" : group?.logoUrl || "",
-      backgroundImageUrl: group?.universityCode
-         ? ""
-         : group?.bannerImageUrl || "",
-      // add group name if it has any and if it's not a university
-      company: group?.universityCode ? "" : group?.universityName || "",
-      companyId: "",
-      title: "",
-      interestsIds: [],
-      groupIds: [],
-      start: new Date(),
-      groupQuestionsMap: {},
-      duration: 60,
-      hidden: false,
-      summary: "",
-      reasonsToJoinLivestream: "",
-      reasonsToJoinLivestream_v2: [],
-      speakers: { [uuidv4()]: speakerObj },
-      status: {},
-      language: languageCodes[0],
-      targetFieldsOfStudy: [],
-      targetLevelsOfStudy: [],
-      promotionChannelsCodes: [],
-      promotionCountriesCodes: [],
-      promotionUniversitiesCodes: [],
-      questionsDisabled: false,
-   })
+   const [formData, setFormData] = useState<DraftFormValues>(
+      getLivestreamInitialValues(group)
+   )
 
    const metaData = useMemo<MetaData>(
       () => getMetaDataFromEventHosts(selectedGroups),
