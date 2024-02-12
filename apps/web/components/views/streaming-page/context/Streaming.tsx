@@ -14,6 +14,7 @@ import {
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 type StreamContextProps = {
    livestreamId: string
@@ -87,10 +88,20 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const client = useRTCClient()
 
    useEffect(() => {
+      client.enableDualStream().catch(errorLogAndNotify)
+   }, [client, shouldStream])
+
+   useEffect(() => {
       if (isConnected) {
          client.setClientRole(shouldStream ? "host" : "audience")
       }
    }, [client, isConnected, shouldStream])
+
+   useEffect(() => {
+      if (isConnected) {
+         client.enableAudioVolumeIndicator()
+      }
+   }, [client, isConnected])
 
    const value = useMemo<StreamContextProps>(
       () => ({

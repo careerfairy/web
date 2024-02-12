@@ -12,14 +12,14 @@ export type GetUserStreamIdOptions = {
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
    if (options.isRecordingWindow) {
-      return randomId
+      return `recording-${randomId}` as const
    }
 
    if (options.useRandomId || !options.userId) {
-      return `${options.streamId}${randomId}`
+      return `anon-${options.streamId}${randomId}` as const
    }
 
-   return `${options.streamId}${options.userId}`
+   return `user-${options.userId}` as const
 }
 
 export const withLocalStorage = (key: string, generateValue: () => string) => {

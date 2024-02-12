@@ -2,6 +2,7 @@ import AgoraRTC, {
    AgoraRTCReactError,
    DeviceInfo,
    IAgoraRTCError,
+   useCurrentUID,
    useLocalCameraTrack,
    useLocalMicrophoneTrack,
    usePublish,
@@ -20,6 +21,7 @@ import {
 } from "react"
 import { useStreamingContext } from "./Streaming"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { type LocalUser } from "../types"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -41,6 +43,7 @@ type LocalTracksContextProps = {
    cameraError: IAgoraRTCError | AgoraRTCReactError
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
+   localUser: LocalUser
 }
 
 const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
@@ -75,6 +78,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    children,
 }) => {
    const { isReady, shouldStream } = useStreamingContext()
+   const currentUserUID = useCurrentUID()
 
    const [cameraOn, setCameraOn] = useState(true)
 
@@ -102,6 +106,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
     */
    useEffect(() => {
+      if (!shouldStream) return
+
       AgoraRTC.getCameras()
          .then((cameras) => {
             setActiveCameraId(cameras[0]?.deviceId ?? "")
@@ -118,7 +124,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          setActiveCameraId("")
          setActiveMicrophoneId("")
       }
-   }, [])
+   }, [shouldStream])
 
    useEffect(() => {
       AgoraRTC.onCameraChanged = (dev) => {
@@ -187,6 +193,30 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const readToPublish = shouldStream && isReady
 
+   const localUser = useMemo<LocalUser | null>(() => {
+      // If the user is ready to publish, return the local user object
+      if (readToPublish) {
+         return {
+            type: "local",
+            user: {
+               uid: currentUserUID,
+               hasAudio: !microphoneMuted,
+               hasVideo: cameraOn,
+               audioTrack: microphoneTrack.localMicrophoneTrack,
+               videoTrack: cameraTrack.localCameraTrack,
+            },
+         }
+      }
+      return null
+   }, [
+      readToPublish,
+      currentUserUID,
+      microphoneMuted,
+      cameraOn,
+      microphoneTrack.localMicrophoneTrack,
+      cameraTrack.localCameraTrack,
+   ])
+
    usePublish(
       [microphoneTrack.localMicrophoneTrack, cameraTrack.localCameraTrack],
       readToPublish
@@ -209,6 +239,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameraError: cameraTrack.error || fetchCamerasError,
          cameraDevices: cameras,
          microphoneDevices: microphones,
+         localUser,
       }),
       [
          cameraTrack,
@@ -224,6 +255,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          fetchCamerasError,
          cameras,
          microphones,
+         localUser,
       ]
    )
 
