@@ -80,6 +80,14 @@ const LocalTracksProvider = dynamic(
    { ssr: false }
 )
 
+const AudioLevelsTracker = dynamic(
+   () =>
+      import("./components/streaming/AudioLevelsTracker").then(
+         (mod) => mod.AudioLevelsTracker
+      ),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -114,7 +122,7 @@ const Component = ({ isHost }: Props) => {
       isRecordingWindow: Boolean(query.isRecordingWindow),
       useRandomId: livestream.openStream || isHost,
       streamId: livestream.id,
-      userId: authenticatedUser.email,
+      userId: authenticatedUser.uid,
    }
 
    const agoraUserId = isHost
@@ -149,6 +157,7 @@ const Component = ({ isHost }: Props) => {
                <ToggleStreamModeButton />
             </LocalTracksProvider>
          </StreamingProvider>
+         <AudioLevelsTracker />
       </UserClientProvider>
    )
 }

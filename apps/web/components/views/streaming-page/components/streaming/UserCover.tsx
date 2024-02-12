@@ -1,0 +1,81 @@
+import { Avatar, Box, Typography, alpha } from "@mui/material"
+import Image from "next/image"
+import { sxStyles } from "types/commonTypes"
+import { FloatingContent } from "./VideoTrackWrapper"
+
+const MOBILE_AVATAR_SIZE = 104
+const DESKTOP_AVATAR_SIZE = 136
+
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background:
+         "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 79.5%, rgba(0, 0, 0, 0.12) 86.5%, rgba(0, 0, 0, 0.48) 100%), #EBEBEF",
+   },
+   image: {
+      width: {
+         xs: MOBILE_AVATAR_SIZE,
+         tablet: DESKTOP_AVATAR_SIZE,
+      },
+      height: {
+         xs: MOBILE_AVATAR_SIZE,
+         tablet: DESKTOP_AVATAR_SIZE,
+      },
+   },
+   border: {
+      border: "21px solid transparent",
+      borderRadius: "50%",
+      padding: "5px",
+      background: (theme) => alpha(theme.palette.neutral[100], 0.2),
+   },
+   initials: {
+      fontSize: {
+         xs: 48,
+         tablet: 64,
+      },
+      fontWeight: 500,
+   },
+})
+export interface UserCoverProps {
+   avatarUrl?: string
+   firstName: string
+   lastName: string
+}
+
+/**
+ * User Cover image OR initials
+ */
+export const UserCover = ({
+   avatarUrl,
+   firstName,
+   lastName,
+}: UserCoverProps) => {
+   return (
+      <FloatingContent sx={styles.root}>
+         <Box sx={styles.border}>
+            <Avatar sx={styles.image}>
+               {avatarUrl ? (
+                  <Image
+                     alt="cover"
+                     src={avatarUrl}
+                     layout="fill"
+                     objectFit="cover"
+                  />
+               ) : (
+                  <Typography variant="h1" sx={styles.initials}>
+                     {getInitials(firstName, lastName)}
+                  </Typography>
+               )}
+            </Avatar>
+         </Box>
+      </FloatingContent>
+   )
+}
+
+const getInitials = (firstName: string, lastName: string) => {
+   const firstInitial = (firstName && firstName[0].toUpperCase()) || "A"
+   const lastInitial = (lastName && lastName[0].toUpperCase()) || "A"
+   return `${firstInitial}${lastInitial}`
+}

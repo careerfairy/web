@@ -1,10 +1,14 @@
-import { Box, Button, ButtonGroup } from "@mui/material"
-import { useMemo, useState } from "react"
+import { Box } from "@mui/material"
+import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import { LocalMicrophoneAndCameraUser } from "../../streaming/LocalMicrophoneAndCameraUser"
 import { GridCarousel } from "../GridCarousel"
 import { LayoutGrid } from "../LayoutGrid"
-import { useGalleryLayout } from "./useGalleryLayout"
+import { useSortedStreams } from "../useSortedStreams"
 import { getPaginatedGridLayout } from "../util"
+import { useGalleryLayout } from "./useGalleryLayout"
+import { RemoteStreamer } from "../../streaming"
+import { TrackBoundary } from "agora-rtc-react"
 
 const styles = sxStyles({
    root: {
@@ -12,69 +16,53 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
    },
-
-   demoToggle: {
-      position: "fixed",
-      top: 0,
-      left: "50%",
-      transform: "translateX(-50%)",
-      p: 2,
-   },
 })
 
-const generateRemoteStreamers = (count: number): number[] => {
-   // Generates an array of unique numbers starting from 1 up to `count`
-   return Array.from({ length: count }, (_, index) => index + 1)
-}
-
 export const GalleryLayout = () => {
-   // Dummy data generation for demo
-   const [numStreamers, setNumStreamers] = useState(2)
-   const remoteStreamers = generateRemoteStreamers(numStreamers)
+   const streams = useSortedStreams()
 
-   const layout = useGalleryLayout(remoteStreamers.length)
+   const layout = useGalleryLayout(streams.length)
 
    const gridPages = useMemo(
-      () => getPaginatedGridLayout(remoteStreamers, layout),
-      [remoteStreamers, layout]
+      () => getPaginatedGridLayout(streams, layout),
+      [streams, layout]
    )
 
    return (
-      <Box sx={styles.root}>
-         <Box sx={styles.demoToggle}>
-            {/* Demo button to change the number of streamers */}
-            <ButtonGroup size="small" disableElevation variant="contained">
-               <Button
-                  disabled={numStreamers === 1}
-                  onClick={() => setNumStreamers(numStreamers - 1)}
-               >
-                  Decrease
-               </Button>
-               <Button onClick={() => setNumStreamers(numStreamers + 1)}>
-                  Increase
-               </Button>
-            </ButtonGroup>
+      <TrackBoundary>
+         <Box sx={styles.root}>
+            <GridCarousel
+               gridPages={gridPages.map((pageStreamers, pageIndex) => (
+                  <LayoutGrid
+                     key={pageIndex}
+                     elements={pageStreamers}
+                     isLastButNotFirstPage={
+                        pageIndex === gridPages.length - 1 && pageIndex !== 0
+                     }
+                     layout={layout}
+                     renderGridItem={(user) => (
+                        <LayoutGrid.Item
+                           key={user.user.uid}
+                           layoutColumns={layout.columns}
+                        >
+                           <GridItemContent user={user} />
+                        </LayoutGrid.Item>
+                     )}
+                  />
+               ))}
+            />
          </Box>
-         <GridCarousel
-            gridPages={gridPages.map((pageStreamers, pageIndex) => (
-               <LayoutGrid
-                  key={pageIndex}
-                  elements={pageStreamers}
-                  isLastButNotFirstPage={
-                     pageIndex === gridPages.length - 1 && pageIndex !== 0
-                  }
-                  layout={layout}
-                  renderGridItem={(element) => (
-                     <LayoutGrid.Item
-                        key={element}
-                        layoutColumns={layout.columns}
-                     >
-                        {element}
-                     </LayoutGrid.Item>
-                  )}
-               />
-            ))}
-         />
-      </Box>
+      </TrackBoundary>
    )
+}
+
+type GridItemContentProps = {
+   user: ReturnType<typeof useSortedStreams>[number]
+}
+
+const GridItemContent = ({ user }: GridItemContentProps) => {
+   if (user.type === "local") {
+      return <LocalMicrophoneAndCameraUser />
+   }
+   return <RemoteStreamer key={user.user.uid} user={user.user} />
 }
