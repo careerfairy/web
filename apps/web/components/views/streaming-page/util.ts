@@ -1,4 +1,5 @@
 import { type IAgoraRTCError, useLocalCameraTrack } from "agora-rtc-react"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { v4 as uuidv4 } from "uuid"
 
 const randomId = uuidv4().replace(/-/g, "")
@@ -13,18 +14,18 @@ export type GetUserStreamIdOptions = {
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
    if (options.isRecordingWindow) {
-      return `recording-${randomId}-${options.streamId}` as const
+      return `${STREAM_IDENTIFIERS.RECORDING}-${randomId}-${options.streamId}` as const
    }
 
    if (options.creatorId) {
-      return `creator-${options.creatorId}-${options.streamId}` as const
+      return `${STREAM_IDENTIFIERS.CREATOR}-${options.creatorId}-${options.streamId}` as const
    }
 
    if (options.useTempId || !options.userId) {
       return getTempId(options.streamId)
    }
 
-   return `user-${options.userId}-${options.streamId}` as const
+   return `${STREAM_IDENTIFIERS.USER}-${options.userId}-${options.streamId}` as const
 }
 
 const getTempId = (streamId: string) => {
@@ -33,9 +34,9 @@ const getTempId = (streamId: string) => {
    const tempId = localStorage.getItem(key)
    if (!tempId) {
       localStorage.setItem("tempId", tempId)
-      return `anon-${tempId}-${streamId}` as const
+      return `${STREAM_IDENTIFIERS.ANONYMOUS}-${tempId}-${streamId}` as const
    }
-   return `anon-${randomId}-${streamId}` as const
+   return `${STREAM_IDENTIFIERS.ANONYMOUS}-${randomId}-${streamId}` as const
 }
 
 export const getDeviceButtonColor = (
@@ -99,4 +100,8 @@ export const getDeviceErrorMessage = (
 // Helper to safely import the AgoraRTCReact module on the client to avoid server-side build errors
 export const getAgoraRTC = async () => {
    return (await import("agora-rtc-react")).default
+}
+
+export const getStreamerDisplayName = (firstName: string, lastName: string) => {
+   return [firstName, lastName].filter(Boolean).join(" ")
 }

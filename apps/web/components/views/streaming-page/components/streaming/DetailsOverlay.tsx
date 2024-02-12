@@ -5,6 +5,7 @@ import { Box, Grow, Stack, Typography } from "@mui/material"
 import { MicOff, Info } from "react-feather"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { getStreamerDisplayName } from "../../util"
 
 const styles = sxStyles({
    root: {
@@ -33,6 +34,11 @@ type Props = {
 }
 
 export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
+   const displayName = getStreamerDisplayName(
+      streamerDetails.firstName,
+      streamerDetails.lastName
+   )
+
    return (
       <FloatingContent sx={styles.root}>
          <Stack
@@ -44,13 +50,16 @@ export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
             spacing={0.3}
          >
             <Stack spacing={-0.5} minWidth={0}>
-               <Typography variant="brandedBody" sx={styles.displayName}>
-                  {streamerDetails.firstName || ""}{" "}
-                  {streamerDetails.lastName || ""}
-               </Typography>
-               <Typography sx={styles.role} variant="small">
-                  {streamerDetails.role || " "}
-               </Typography>
+               {Boolean(displayName) && (
+                  <Typography variant="brandedBody" sx={styles.displayName}>
+                     {displayName}
+                  </Typography>
+               )}
+               {Boolean(streamerDetails.role) && (
+                  <Typography sx={styles.role} variant="small">
+                     {streamerDetails.role}
+                  </Typography>
+               )}
             </Stack>
             <Stack direction="row" spacing={1.5}>
                <Grow in={!micActive} unmountOnExit>

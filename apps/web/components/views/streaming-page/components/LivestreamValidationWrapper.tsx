@@ -38,7 +38,7 @@ const LivestreamValidationsComponent = ({
    children,
    isHost,
 }: LivestreamValidationWrapperProps) => {
-   const { userData, isLoggedIn, isLoggedOut, authenticatedUser } = useAuth()
+   const { userData, isLoggedOut, authenticatedUser } = useAuth()
    const {
       query: { token },
       asPath,
@@ -51,7 +51,7 @@ const LivestreamValidationsComponent = ({
 
    const livestreamToken = useLivestreamSecureTokenSWR(livestream.id)
 
-   const { data: hasAnswearedAllQuestions, mutate: refetchQuestions } =
+   const { data: isUserRegistered, mutate: refetchQuestions } =
       useLivestreamCategoryDataSWR(firebase, {
          livestream: livestream,
          userData: userData,
@@ -59,39 +59,19 @@ const LivestreamValidationsComponent = ({
 
    // Custom validations
 
-   const isUserRegistered = livestream.registeredUsers?.includes(
-      authenticatedUser.email
-   )
+   const needsTokenValidation = isHost && !livestream.test
 
-   // 1. user is a host and the stream is not a test stream -> accessible
-   const isHostAndNotTestLivestream = isHost && !livestream.test
+   const isInvalidToken =
+      needsTokenValidation && token !== livestreamToken?.data?.value
 
-   // 2. user is a host and the stream is not a test stream and token is invalid -> /streaming/error page
-   const isHostAndNotTestStreamAndInvalidToken =
-      isHostAndNotTestLivestream &&
-      Boolean(token) &&
-      token !== livestreamToken?.data?.value
+   const needsToRegister = !isHost && !isUserRegistered
 
-   // 3. user is logged out,test or open stream -> accessible
-   const isLoggedOutAndTestOrOpenStream =
-      isLoggedOut && (livestream.test || livestream.openStream)
-
-   // 4. user is logged out, not test or open stream -> not accessible, login/redirectUri
-   const isLoggedOutAndNotTestOrOpenStream =
+   const needsToBeLoggedIn =
       !isHost && isLoggedOut && !(livestream.test || livestream.openStream)
 
-   // 5. user is a viewer and has registered for the event -> accessible
-   const isViewerRegistered = !isHost && isLoggedIn && isUserRegistered
+   useConditionalRedirect(isInvalidToken, "/streaming/error")
 
-   // 6. user is a viewer and has not registered for the event -> registration dialog
-   const isViewerNotRegistered = !isHost && isLoggedIn && !isUserRegistered // Redirect register
-
-   useConditionalRedirect(
-      isHostAndNotTestStreamAndInvalidToken,
-      "/streaming/error"
-   )
-
-   if (isLoggedOutAndNotTestOrOpenStream) {
+   if (needsToBeLoggedIn) {
       void replace({
          pathname: `/login`,
          query: { absolutePath: asPath },
@@ -101,15 +81,8 @@ const LivestreamValidationsComponent = ({
    const afterRegistrationMutations = () => {
       refetchQuestions()
    }
-   const allowRules = [
-      isHostAndNotTestLivestream,
-      isLoggedOutAndTestOrOpenStream,
-      isViewerRegistered,
-   ]
 
-   const allow = Boolean(allowRules.find(Boolean))
-
-   if (!allow && isViewerNotRegistered) {
+   if (needsToRegister) {
       return (
          <LivestreamDialog
             open
@@ -125,11 +98,14 @@ const LivestreamValidationsComponent = ({
       )
    }
 
-   if (
-      !allow ||
-      !isBrowserAgoraCompatible ||
-      (isUserRegistered && !hasAnswearedAllQuestions)
-   ) {
+   if (!isBrowserAgoraCompatible) {
+      /**
+       * TODO: Render compatibility error page
+       */
+      return <></>
+   }
+
+   if (isInvalidToken || needsToBeLoggedIn) {
       // Since we're using suspense, if there's no live stream data, it means it doesn't exist
       return null
    }
