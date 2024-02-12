@@ -36,4 +36,4 @@ export type RemoteUser = {
    user: IAgoraRTCRemoteUser
 }
 
-export type Stream = LocalUser | RemoteUser
+export type StreamUser = LocalUser | RemoteUser
