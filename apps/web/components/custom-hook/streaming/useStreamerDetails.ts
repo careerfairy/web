@@ -19,7 +19,14 @@ const initialData: StreamerDetails = {
 export const useStreamerDetails = (uid: UID) => {
    return useSWR<StreamerDetails>(
       uid ? `streamer-details-${uid}` : null,
-      async () => livestreamService.getStreamerDetails(uid.toString()),
+      async () => {
+         // Call the service only if uid is present
+         if (uid) {
+            return livestreamService.getStreamerDetails(uid.toString())
+         }
+         // Return initialData directly if uid is not present
+         return initialData
+      },
       {
          ...reducedRemoteCallsOptions,
          onError: errorLogAndNotify,

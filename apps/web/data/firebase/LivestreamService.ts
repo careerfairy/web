@@ -27,6 +27,7 @@ import {
 } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 
 type StreamerDetails = {
    firstName: string
@@ -148,18 +149,10 @@ export class LivestreamService {
    }
 
    async getStreamerDetails(uid: string): Promise<StreamerDetails> {
-      const [tag, identifier] = uid.split("-")
+      const [tag, identifier] = uid.split("-") as [StreamIdentifier, string]
 
-      let details: StreamerDetails = {
-         firstName: "",
-         lastName: "",
-         role: "",
-         avatarUrl: "",
-         linkedInUrl: "",
-      }
-
-      if (tag === "recording") {
-         details = {
+      if (tag === STREAM_IDENTIFIERS.RECORDING) {
+         return {
             firstName: "Recording",
             lastName: "Bot",
             role: "Recording",
@@ -168,7 +161,7 @@ export class LivestreamService {
          }
       }
 
-      if (tag === "creator") {
+      if (tag === STREAM_IDENTIFIERS.CREATOR) {
          const creatorQuery = query(
             collectionGroup(FirestoreInstance, "creators"),
             where(documentId(), "==", identifier),
@@ -180,7 +173,7 @@ export class LivestreamService {
          if (!snapshot.empty) {
             const data = snapshot.docs[0].data()
 
-            details = {
+            return {
                firstName: data.firstName,
                lastName: data.lastName,
                role: data.position,
@@ -190,7 +183,7 @@ export class LivestreamService {
          }
       }
 
-      if (tag === "user") {
+      if (tag === STREAM_IDENTIFIERS.USER) {
          const userQuery = query(
             collection(FirestoreInstance, "userData"),
             where("authId", "==", identifier),
@@ -202,7 +195,7 @@ export class LivestreamService {
          if (!snapshot.empty) {
             const data = snapshot.docs[0].data()
 
-            details = {
+            return {
                firstName: data.firstName,
                lastName: data.lastName,
                // Use their position from the B2B Profile if available, otherwise use their field of study
@@ -213,17 +206,13 @@ export class LivestreamService {
          }
       }
 
-      if (tag === "anon") {
-         details = {
-            firstName: "Anonymous",
-            lastName: "User",
-            role: "",
-            avatarUrl: "",
-            linkedInUrl: "",
-         }
+      return {
+         firstName: "Anonymous",
+         lastName: "User",
+         role: "",
+         avatarUrl: "",
+         linkedInUrl: "",
       }
-
-      return details
    }
 }
 
