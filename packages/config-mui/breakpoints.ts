@@ -10,7 +10,7 @@ export const breakpoints = {
       xl: 1920,
       // added
       mobile: 768,
-      tablet: 710,
+      tablet: 1023,
       desktop: 1920,
       sparksFullscreen: 989,
    },
