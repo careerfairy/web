@@ -1,2 +1,2 @@
-export * from "./LocalMicrophoneAndCameraUser"
+export * from "./LocalStream"
 export * from "./RemoteStreamer"

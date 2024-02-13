@@ -60,6 +60,7 @@ export const RemoteStreamer = ({
    playbackDeviceId,
    volume,
    children,
+   containVideo,
    ...props
 }: Props) => {
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
@@ -84,7 +85,7 @@ export const RemoteStreamer = ({
       <VideoTrackWrapper {...props}>
          <Box
             component={RemoteVideoTrack}
-            sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
+            sx={[styles.videoTrack, containVideo && styles.videoContain]}
             play={playVideo}
             track={videoTrack}
          />
