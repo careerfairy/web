@@ -20,8 +20,8 @@ const styles = sxStyles({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "lightgrey",
-      color: "F0EDFD",
+      bgcolor: "#EBEBEF",
+      color: "#F0EDFD",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -48,6 +48,9 @@ const styles = sxStyles({
       mt: "-6px !important",
       ml: "-3px !important",
    },
+   // checkbox: {
+   //    color: "#EBEBEF"
+   // }
 })
 
 export const StyledTextField: typeof TextField = styled(TextField)(
@@ -95,7 +98,7 @@ export const StyledCheckbox = (
    return (
       <Checkbox
          {...props}
-         color={"default"}
+         sx={styles.checkbox}
          icon={<Box sx={styles.checkboxIconWrapper} />}
          checkedIcon={
             <Box sx={styles.checkedIconSx}>
