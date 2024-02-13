@@ -48,9 +48,6 @@ const styles = sxStyles({
       mt: "-6px !important",
       ml: "-3px !important",
    },
-   // checkbox: {
-   //    color: "#EBEBEF"
-   // }
 })
 
 export const StyledTextField: typeof TextField = styled(TextField)(
