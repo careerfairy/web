@@ -187,7 +187,7 @@ const TextContent = () => {
                </span>
                <b>
                   <span>
-                     CareerFairy AG, Technoparkstrasse 1, 8005 Z&uuml;rich,
+                     CareerFairy AG, Hardturmstrasse 253, 8005 Z&uuml;rich,
                      Switzerland{" "}
                   </span>
                </b>
