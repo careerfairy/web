@@ -81,7 +81,7 @@ const AudienceTargeting = () => {
       <>
          <FormSectionHeader
             title="Target Students"
-            subtitle="Select target audience for this live stream"
+            subtitle="Select the target audience for this live stream"
             divider
          />
          <MultiChipSelect
