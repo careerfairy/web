@@ -1,11 +1,9 @@
 import { useCallback } from "react"
-import { useFormikContext } from "formik"
 import {
    useUniversityCountries,
    useFieldsOfStudy,
    useLevelsOfStudy,
 } from "components/custom-hook/useCollection"
-import { LivestreamFormValues } from "../../types"
 import { CompanyCountryValues } from "constants/forms"
 import FormSectionHeader from "../../FormSectionHeader"
 import MultiChipSelect from "./components/MultiChipSelect"
@@ -20,6 +18,7 @@ import {
    UniversityCountry,
    universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 
 type UniversityOption = University & {
    country: string
@@ -61,7 +60,7 @@ const getUniversityOptions = (
 const AudienceTargeting = () => {
    const {
       values: { general },
-   } = useFormikContext<LivestreamFormValues>()
+   } = useLivestreamFormValues()
    const { data: universitiesByCountry } = useUniversityCountries()
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const { data: allLevelsOfStudy } = useLevelsOfStudy()

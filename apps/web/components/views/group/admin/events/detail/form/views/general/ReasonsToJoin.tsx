@@ -1,7 +1,6 @@
 import FormSectionHeader from "../../FormSectionHeader"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ReasonsToJoin = () => {
    return (
       <>

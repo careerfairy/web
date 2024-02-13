@@ -1,6 +1,5 @@
-import { useFormikContext } from "formik"
 import MultiChipSelect from "./MultiChipSelect"
-import { LivestreamFormValues } from "../../../types"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 
 const ESTIMATED_DURATIONS = [
    { minutes: 15, name: "15 minutes" },
@@ -29,7 +28,7 @@ const ESTIMATED_DURATIONS = [
 const EstimatedDurationSelect = () => {
    const {
       values: { general },
-   } = useFormikContext<LivestreamFormValues>()
+   } = useLivestreamFormValues()
 
    const initialFormValue = ESTIMATED_DURATIONS.find(
       (duration) => duration.minutes === general.duration
