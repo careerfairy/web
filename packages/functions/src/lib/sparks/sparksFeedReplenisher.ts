@@ -114,7 +114,9 @@ export class SparksFeedReplenisher {
          )
 
          const recommendedSparkIds =
-            await recommendationService.getRecommendations(30)
+            await recommendationService.getRecommendations(
+               this.TARGET_SPARK_COUNT
+            )
 
          const recommendedSparks = await sparkRepo.getSparksByIds(
             recommendedSparkIds
