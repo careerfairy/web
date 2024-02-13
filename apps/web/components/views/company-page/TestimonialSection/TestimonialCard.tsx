@@ -127,13 +127,7 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
 
          <Box sx={styles.testimonial}>
             <Box width={"80%"} mb={2}>
-               <Typography
-                  variant={"body1"}
-                  fontWeight={400}
-                  color={"text.secondary"}
-               >
-                  <SanitizedHTML htmlString={description} />
-               </Typography>
+               <SanitizedHTML htmlString={description} color={"text.secondary"} />
             </Box>
          </Box>
       </Box>
