@@ -4,11 +4,11 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { IGroupFunctionsRepository } from "./GroupFunctionsRepository"
-import { NewsletterEmailBuilder } from "./NewsletterEmailBuilder"
-import { IRecommendationDataFetcher } from "./recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "./recommendation/UserEventRecommendationService"
-import { IUserFunctionsRepository } from "./UserFunctionsRepository"
+import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
+import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
+import { IRecommendationDataFetcher } from "../../recommendation/services/DataFetcherRecommendations"
+import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
+import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 
 /**
  * Data structure used to associate each user with his recommended livestreams

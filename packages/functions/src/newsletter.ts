@@ -4,8 +4,8 @@ import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
 import { groupRepo, userRepo, livestreamsRepo } from "./api/repositories"
 import config from "./config"
-import { NewsletterEmailBuilder } from "./lib/NewsletterEmailBuilder"
-import { NewsletterService } from "./lib/NewsletterService"
+import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
+import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
 
 /**
