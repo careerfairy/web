@@ -3,17 +3,17 @@ import {
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
 import { MenuItem, MenuProps, Typography } from "@mui/material"
-import { useLivestreamData } from "components/custom-hook/streaming"
 import {
    PDFIcon,
    ShareScreenIcon,
    VideoIcon,
 } from "components/views/common/icons"
+
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
+import { useLivestreamData } from "components/custom-hook/streaming"
 import { useScreenShareTracks } from "../../context/ScreenShareTracks"
-import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 
 const styles = sxStyles({
    root: {
@@ -64,8 +64,8 @@ type Props = MenuProps & {
 export const ShareMenu = forwardRef<HTMLDivElement, Props>(
    ({ handleClose, ...props }, ref) => {
       const livestream = useLivestreamData()
-      const { setScreenShareOn } = useScreenShareTracks()
-      const { trigger: setLivestreamMode } = useSetLivestreamMode(livestream.id)
+      const { handleStopScreenShare, handleStartScreenShareProcess } =
+         useScreenShareTracks()
 
       const screenShareActive = livestream.mode === LivestreamModes.DESKTOP
       const PDFActive = livestream.mode === LivestreamModes.PRESENTATION
@@ -74,17 +74,10 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
       const handleToggleMode = (newMode: LivestreamMode, active: boolean) => {
          switch (newMode) {
             case LivestreamModes.DESKTOP:
-               /**
-                * Immediately sets the mode to screen sharing
-                * TODO: Detect on client if user's agora ID matches that of livestream.screenSharerId and trigger the browser/agora screen sharing apis
-                */
                if (active) {
-                  setLivestreamMode({
-                     mode: LivestreamModes.DEFAULT,
-                  })
-                  setScreenShareOn(false)
+                  handleStopScreenShare()
                } else {
-                  setScreenShareOn(true)
+                  handleStartScreenShareProcess()
                }
                break
             case LivestreamModes.PRESENTATION:

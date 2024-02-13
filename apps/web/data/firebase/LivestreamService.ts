@@ -173,8 +173,24 @@ export class LivestreamService {
       return token.rtcToken
    }
 
-   async getStreamerDetails(uid: string): Promise<StreamerDetails> {
+   async getStreamerDetails(
+      uid: string,
+      depth: number = 0
+   ): Promise<StreamerDetails> {
       const [tag, identifier] = uid.split("-") as [StreamIdentifier, string]
+
+      const MAX_DEPTH = 1
+
+      if (depth > MAX_DEPTH) {
+         // Return a default or indicative StreamerDetails object instead of throwing an error
+         return {
+            firstName: "",
+            lastName: "",
+            role: "",
+            avatarUrl: "",
+            linkedInUrl: "",
+         }
+      }
 
       if (tag === STREAM_IDENTIFIERS.RECORDING) {
          return {
@@ -228,6 +244,23 @@ export class LivestreamService {
                avatarUrl: data.avatar,
                linkedInUrl: data.linkedinUrl,
             }
+         }
+      }
+
+      if (tag === STREAM_IDENTIFIERS.SCREEN_SHARE) {
+         // Get the user id from the uid
+         const userId = uid.replace(`${STREAM_IDENTIFIERS.SCREEN_SHARE}-`, "")
+         /**
+          * Recursively calls this function to retrieve user details for a screen-sharing user.
+          */
+         const details = await this.getStreamerDetails(userId, depth + 1)
+
+         return {
+            firstName: details.firstName,
+            lastName: details.lastName,
+            role: "Screen Share",
+            avatarUrl: details.avatarUrl,
+            linkedInUrl: "",
          }
       }
 
