@@ -14,12 +14,11 @@ import {
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo, useRef } from "react"
+import { useCallback, useMemo } from "react"
 import * as Yup from "yup"
 import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
-import dynamic from "next/dynamic"
-import ReactQuill from "react-quill"
+import CustomRichTextEditor from "../../../util/CustomRichTextEditor"
 
 const [title, description] = [
    "Details",
@@ -31,8 +30,6 @@ const [title, description] = [
 const CompanyDetails = () => {
    const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false })
-   const richTextInputRef = useRef<ReactQuill>();
 
    const initialValues = useMemo<FormValues>(
       () => ({
@@ -113,21 +110,14 @@ const CompanyDetails = () => {
                      <BrandedTextFieldField
                         name="extraInfo"
                         multiline
-                        rows={4}
                         label="Describe your company"
                         placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
+                        disabled={isSubmitting}
                         InputProps={{
                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                           inputComponent: DynamicCustomRichTextEditor as any,
-                           inputRef: richTextInputRef
+                           inputComponent: CustomRichTextEditor as any,
                            
                         }}
-                        inputProps={{
-                           value: values.extraInfo,
-                           setFieldValue: setFieldValue,
-                           name: "extraInfo",
-                           disabled: isSubmitting,
-                        }} 
                      />
                      <BrandedAutocomplete
                         id={"companyCountry"}

@@ -4,27 +4,38 @@ import 'react-quill/dist/quill.snow.css';
 import {forwardRef} from "react"; // import the styles
 
 export type CustomRichTextEditorProps = ReactQuillProps & {
-    setFieldValue: (field: string, name: string) => void;
     name: string;
     disabled?: boolean;
-    minRows?: number;
-    rows?: number;
-    placeholder?: string;
+    onChange: (event: { target: { name: string; value: string } }) => void;
+    onBlur: (event: { target: { name: string} }) => void;
 }
 
 // eslint-disable-next-line react/display-name
 const CustomRichTextEditor = forwardRef<ReactQuill, CustomRichTextEditorProps>((props, ref) => {
-        const { setFieldValue, name, disabled, placeholder } = props
-        
+        const {name, disabled, onChange, onBlur } = props
+
         return (
             <ReactQuill
                 {...props}
                 theme="snow"
                 ref={ref}
-                onChange={(values) => setFieldValue(name, values)}
+                onChange={(value) => {
+                    onChange({
+                      target: {
+                        name: name,
+                        value: value,
+                      },
+                    });
+                  }}
+                onBlur={() => { 
+                    onBlur({
+                        target: {
+                          name: name,
+                        },
+                      });
+                }}
                 modules={modules}
                 readOnly={disabled}
-                placeholder={placeholder}
             >
                 {props.children}
             </ReactQuill>

@@ -8,16 +8,14 @@ import {
 } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik } from "formik"
-import React, { MutableRefObject, useCallback, useMemo, useRef } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import * as yup from "yup"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
-import dynamic from "next/dynamic";
-import ReactQuill from "react-quill"
-import { CustomRichTextEditorProps } from "../../../util/CustomRichTextEditor"
+import CustomRichTextEditor from "../../../util/CustomRichTextEditor"
 
 type Props = {
    handleClose: () => void
@@ -27,19 +25,6 @@ const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
-   //const DynamicCustomRichTextEditor = dynamic(() => import('../../../util/CustomRichTextEditor'), { ssr: false });
-
-   const DynamicCustomRichTextEditor = dynamic(async () => {
-      const { default: CustomRichTextEditor } = await import('../../../util/CustomRichTextEditor');
-  
-      // eslint-disable-next-line react/display-name
-      return ({ forwardedRef, ...props }: CustomRichTextEditorProps & { forwardedRef: MutableRefObject<ReactQuill>}) => {
-         console.log(forwardedRef)
-         return (<CustomRichTextEditor ref={forwardedRef} {...props} />)
-      };
-    }, { ssr: false })
-
-   const richTextInputRef = useRef<ReactQuill>();
 
    const initialValues = useMemo(
       () => ({
@@ -88,7 +73,6 @@ const AboutDialog = ({ handleClose }: Props) => {
                handleBlur,
                handleSubmit,
                isSubmitting,
-               setFieldValue,
             }) => (
                <form onSubmit={handleSubmit}>
                   <Stack spacing={4}>
@@ -130,22 +114,14 @@ const AboutDialog = ({ handleClose }: Props) => {
                            onChange={handleChange}
                            required
                            error={Boolean(errors.extraInfo)}
-                           value={values.extraInfo}
+                           value={values.extraInfo ? values.extraInfo : "<p></p>"} //to avoid label getting on top of editor when empty
                            variant="outlined"
-                           minRows={4}
                            className="multiLineInput"
                            InputProps={{
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              inputComponent: DynamicCustomRichTextEditor as any,
-                              inputRef: richTextInputRef
+                              inputComponent: CustomRichTextEditor as any,
                            }}
-                           inputProps={{
-                              value: values.extraInfo,
-                              setFieldValue: setFieldValue,
-                              name: "extraInfo",
-                              disabled: isSubmitting,
-                              forwardedRef: richTextInputRef,
-                           }} 
+
                         />
                         <Collapse
                            in={Boolean(errors.extraInfo)}
