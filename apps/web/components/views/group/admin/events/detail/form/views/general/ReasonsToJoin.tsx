@@ -14,21 +14,21 @@ const ReasonsToJoin = () => {
             label="Reason #1"
             fullWidth
             requiredText="(required)"
-            placeholder="Ex: Find out, which job benefits await you as a [title of open position/program]"
+            placeholder="E.g.: Find out, which job benefits await you as a [title of open position/program]"
          />
          <FormBrandedTextField
             name="general.reasonsToJoin[1]"
             label="Reason #2"
             fullWidth
             requiredText="(required)"
-            placeholder="Ex: Learn what skills from your studies you can apply in this working environment."
+            placeholder="E.g.: Learn what skills from your studies you can apply in this working environment."
          />
          <FormBrandedTextField
             name="general.reasonsToJoin[2]"
             label="Reason #3"
             fullWidth
             requiredText="(required)"
-            placeholder="Ex: Start job application process in-stream and skip first round of interviews."
+            placeholder="E.g.: Start job application process in-stream and skip first round of interviews."
          />
       </>
    )
