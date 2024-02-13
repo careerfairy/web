@@ -36,13 +36,23 @@ const MultiChipSelect: FC<MultiChipSelectProps> = ({
 
    const showPlaceholder = !multiple || value?.length === 0
 
+   const isOptionEqualToValueHandler = (option, value) => {
+      const indexer = keyOptionIndexer || "id"
+      return option[indexer] === value?.[indexer]
+   }
+
+   const onChangeHandler = async (_, selectedOption) => {
+      const newValue = keyOptionIndexer
+         ? selectedOption?.[keyOptionIndexer]
+         : selectedOption
+      await setFieldValue(id, newValue)
+      await validateField(id)
+   }
+
    return (
       <FormBrandedAutocomplete
          name={id}
-         isOptionEqualToValue={(option, value) => {
-            const indexer = keyOptionIndexer || "id"
-            return option[indexer] === value?.[indexer]
-         }}
+         isOptionEqualToValue={isOptionEqualToValueHandler}
          getOptionLabel={(option) => option.name || ""}
          sx={BaseStyles.chipInput}
          textFieldProps={{
@@ -53,13 +63,7 @@ const MultiChipSelect: FC<MultiChipSelectProps> = ({
             placeholder: showPlaceholder ? placeholder : undefined,
             sx: styles.input,
          }}
-         onChange={async (_, selectedOption) => {
-            const newValue = keyOptionIndexer
-               ? selectedOption?.[keyOptionIndexer]
-               : selectedOption
-            await setFieldValue(id, newValue)
-            await validateField(id)
-         }}
+         onChange={onChangeHandler}
          {...props}
       />
    )
