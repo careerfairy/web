@@ -9,7 +9,7 @@ export type EmailNotificationType =
    | "feedbackDiscovery"
 
 export type EmailNotificationDetails = {
-   userEmail: string
+   receiverEmail: string
    sentBy: string
    type: EmailNotificationType
 }
@@ -17,4 +17,5 @@ export type EmailNotificationDetails = {
 export type EmailNotification = {
    createdAt: Timestamp
    details: EmailNotificationDetails
+   templateId: string
 } & Identifiable

@@ -56,6 +56,7 @@ import search = require("./search")
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
+import onboardingNewsletter = require("./onboardingNewsletter")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -102,6 +103,7 @@ exports.sendReminderForNonAttendeesByStreamId =
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
+exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =

@@ -1,10 +1,14 @@
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
-import { EmailNotificationType, EmailNotification } from "./notifications"
+import {
+   EmailNotificationType,
+   EmailNotification,
+   EmailNotificationDetails,
+} from "./notifications"
 import firebase from "firebase/compat/app"
 
-export interface INotificationRepository {
+export interface IEmailNotificationRepository {
    /**
     * Fetches all Notification related to the user email
     * @returns {Promise<EmailNotification[] | []>} A promise that resolves to an array of Notifications or an empty array
@@ -12,12 +16,14 @@ export interface INotificationRepository {
    getUserReceivedNotifications(
       email: string,
       type?: EmailNotificationType
-   ): Promise<EmailNotification[] | []>
+   ): Promise<EmailNotification[]>
+
+   getServerTimestamp()
 }
 
-export class NotificationFunctionsRepository
+export class EmailNotificationFunctionsRepository
    extends BaseFirebaseRepository
-   implements INotificationRepository
+   implements IEmailNotificationRepository
 {
    constructor(readonly firestore: firebase.firestore.Firestore) {
       super()
@@ -27,8 +33,8 @@ export class NotificationFunctionsRepository
       type?: EmailNotificationType
    ) {
       let query = this.firestore
-         .collection("notifications")
-         .where("details.receiver", "==", email)
+         .collection("emailNotifications")
+         .where("details.receiverEmail", "==", email)
 
       if (type) {
          query = query.where("details.type", "==", type)
@@ -40,49 +46,57 @@ export class NotificationFunctionsRepository
       return result.docs.map((doc) => doc.data())
    }
 
+   /**
+    * Adds new entries to the emailNotification collection, for each user email, checking before hand
+    * if there is already an email notification for the user and type
+    * @param emails
+    * @param type
+    */
    async createDiscoveryNotifications(
       emails: string[],
       type?: EmailNotificationType
    ) {
       const userToNotificationDetails = (userEmail: string) => {
          return {
-            requester: "anonymous",
-            receiver: userEmail,
-            // draftId: streamId,
+            sentBy: "careerfairy.io",
+            receiverEmail: userEmail,
             type: type,
-         }
+         } as EmailNotificationDetails
       }
 
       await Promise.all(
-         emails
-            .map(userToNotificationDetails)
-            .map((detail) => this.createNotification(detail, { force: true }))
+         emails.map(userToNotificationDetails).map(this.createNotification)
       )
    }
 
-   createNotification = async (details, options = { force: false }) => {
-      const prevNotification = await this.checkForNotification(details)
-      if (!prevNotification.empty && options.force === true) {
+   createNotification = async (details: EmailNotificationDetails) => {
+      const prevNotification = await this.checkForNotificationByType(
+         details.receiverEmail,
+         details.type
+      )
+      if (!prevNotification.empty) {
          throw `Notification Already Exists as document ${
             prevNotification.docs.at(0).id
          }`
       }
 
-      const ref = this.firestore.collection("notifications")
+      const ref = this.firestore.collection("emailNotifications")
       const newNotification = {
          details: details,
-         open: true,
-         created: this.getServerTimestamp(),
-      }
+         createdAt: this.getServerTimestamp(),
+      } as EmailNotification
+
       return ref.add(newNotification)
    }
 
-   checkForNotification = (
-      detailFieldsToCheck = { property1: "value1", property2: "property2" }
+   checkForNotificationByType = (
+      email: string,
+      type: EmailNotificationType
    ) => {
       const query = this.firestore
-         .collection("notifications")
-         .where("details", "==", detailFieldsToCheck)
+         .collection("emailNotifications")
+         .where("details.type", "==", type)
+         .where("details.receiverEmail", "==", email)
          .limit(1)
 
       return query.get()
