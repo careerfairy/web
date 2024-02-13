@@ -20,8 +20,8 @@ const styles = sxStyles({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "#EBEBEF",
-      color: "#F0EDFD",
+      bgcolor: (theme) => theme.palette.neutral[50],
+      color: (theme) => theme.palette.secondary.light,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -95,7 +95,6 @@ export const StyledCheckbox = (
    return (
       <Checkbox
          {...props}
-         sx={styles.checkbox}
          icon={<Box sx={styles.checkboxIconWrapper} />}
          checkedIcon={
             <Box sx={styles.checkedIconSx}>
