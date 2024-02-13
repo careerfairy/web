@@ -22,7 +22,10 @@ export type UseAgoraRtcToken = {
  * @param {object} args - The data required to fetch the RTC token.
  * @returns {UseAgoraRtcToken} The Agora RTC token and a function to fetch it.
  */
-export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
+export const useAgoraRtcToken = (
+   args: AgoraTokenRequest,
+   suspense?: boolean
+): UseAgoraRtcToken => {
    const { authenticatedUser } = useAuth()
    const key = args
       ? [
@@ -56,9 +59,9 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
                },
             })
          },
-         suspense: false,
+         suspense: Boolean(suspense),
       }),
-      [authenticatedUser?.uid]
+      [authenticatedUser?.uid, suspense]
    )
 
    const {

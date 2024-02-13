@@ -3,9 +3,7 @@ import {
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
 import { MenuItem, MenuProps, Typography } from "@mui/material"
-import { useCurrentUID } from "agora-rtc-react"
 import { useLivestreamData } from "components/custom-hook/streaming"
-import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import {
    PDFIcon,
    ShareScreenIcon,
@@ -14,6 +12,8 @@ import {
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
+import { useScreenShareTracks } from "../../context/ScreenShareTracks"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 
 const styles = sxStyles({
    root: {
@@ -64,28 +64,28 @@ type Props = MenuProps & {
 export const ShareMenu = forwardRef<HTMLDivElement, Props>(
    ({ handleClose, ...props }, ref) => {
       const livestream = useLivestreamData()
-      const agoraUid = useCurrentUID()
+      const { setScreenShareOn } = useScreenShareTracks()
+      const { trigger: setLivestreamMode } = useSetLivestreamMode(livestream.id)
 
       const screenShareActive = livestream.mode === LivestreamModes.DESKTOP
       const PDFActive = livestream.mode === LivestreamModes.PRESENTATION
       const videoActive = livestream.mode === LivestreamModes.VIDEO
 
-      const { trigger: setMode, isMutating: loading } = useSetLivestreamMode(
-         livestream.id
-      )
-
-      const handleModeChange = (newMode: LivestreamMode) => {
+      const handleToggleMode = (newMode: LivestreamMode, active: boolean) => {
          switch (newMode) {
             case LivestreamModes.DESKTOP:
                /**
                 * Immediately sets the mode to screen sharing
                 * TODO: Detect on client if user's agora ID matches that of livestream.screenSharerId and trigger the browser/agora screen sharing apis
                 */
-               setMode({
-                  mode: LivestreamModes.DESKTOP,
-                  screenSharerAgoraUID: agoraUid.toString(),
-               })
-               alert("Share screen not fully implemented yet")
+               if (active) {
+                  setLivestreamMode({
+                     mode: LivestreamModes.DEFAULT,
+                  })
+                  setScreenShareOn(false)
+               } else {
+                  setScreenShareOn(true)
+               }
                break
             case LivestreamModes.PRESENTATION:
                /**
@@ -111,9 +111,6 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                alert("Share Youtube video not implemented yet")
                break
             default:
-               setMode({
-                  mode: LivestreamModes.DEFAULT,
-               })
                break
          }
 
@@ -130,13 +127,8 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
             ref={ref}
          >
             <MenuItem
-               disabled={loading}
                onClick={() =>
-                  handleModeChange(
-                     PDFActive
-                        ? LivestreamModes.DEFAULT
-                        : LivestreamModes.PRESENTATION
-                  )
+                  handleToggleMode(LivestreamModes.PRESENTATION, PDFActive)
                }
             >
                <PDFIcon />
@@ -145,13 +137,8 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                </Typography>
             </MenuItem>
             <MenuItem
-               disabled={loading}
                onClick={() =>
-                  handleModeChange(
-                     videoActive
-                        ? LivestreamModes.DEFAULT
-                        : LivestreamModes.VIDEO
-                  )
+                  handleToggleMode(LivestreamModes.VIDEO, videoActive)
                }
             >
                <VideoIcon />
@@ -160,13 +147,8 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                </Typography>
             </MenuItem>
             <MenuItem
-               disabled={loading}
                onClick={() =>
-                  handleModeChange(
-                     screenShareActive
-                        ? LivestreamModes.DEFAULT
-                        : LivestreamModes.DESKTOP
-                  )
+                  handleToggleMode(LivestreamModes.DESKTOP, screenShareActive)
                }
             >
                <ShareScreenIcon />

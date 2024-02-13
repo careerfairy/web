@@ -17,6 +17,7 @@ import {
    useContext,
    useEffect,
    useMemo,
+   useRef,
    useState,
 } from "react"
 import { useStreamingContext } from "./Streaming"
@@ -95,11 +96,17 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       error: fetchMicsError,
    } = useMicrophones(shouldStream)
 
+   const camerasRef = useRef<MediaDeviceInfo[]>(cameras)
+   const microphonesRef = useRef<MediaDeviceInfo[]>(microphones)
+
    const [activeCameraId, setActiveCameraId] = useState<string>("")
    const [activeMicrophoneId, setActiveMicrophoneId] = useState<string>("")
 
    const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false)
    const microphoneTrack = useLocalMicrophoneTrack(shouldStream)
+
+   camerasRef.current = cameras
+   microphonesRef.current = microphones
 
    /**
     * This useEffect hook is used to initialize the selected devices.
@@ -132,7 +139,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          if (cameraTrack.localCameraTrack) {
             const isActive = setActiveDevice(setActiveCameraId, dev)
             if (!isActive) {
-               setFirstAvailableDevice(cameras, setActiveCameraId, dev)
+               setFirstAvailableDevice(
+                  camerasRef.current,
+                  setActiveCameraId,
+                  dev
+               )
             }
          }
       }
@@ -141,7 +152,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          if (microphoneTrack.localMicrophoneTrack) {
             const isActive = setActiveDevice(setActiveMicrophoneId, dev)
             if (!isActive) {
-               setFirstAvailableDevice(microphones, setActiveMicrophoneId, dev)
+               setFirstAvailableDevice(
+                  microphonesRef.current,
+                  setActiveMicrophoneId,
+                  dev
+               )
             }
          }
       }
@@ -150,14 +165,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          AgoraRTC.onCameraChanged = null
          AgoraRTC.onMicrophoneChanged = null
       }
-   }, [
-      cameraTrack,
-      cameras,
-      microphoneTrack.localMicrophoneTrack,
-      microphones,
-      refetchCameras,
-      refetchMicrophones,
-   ])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [cameraTrack, microphoneTrack.localMicrophoneTrack])
 
    /**
     * Uses the `activeCameraId` and `activeMicrophoneId` to set the active local devices

@@ -24,14 +24,6 @@ const UserClientProvider = dynamic(
    { ssr: false }
 )
 
-const ScreenShareClientProvider = dynamic(
-   () =>
-      import("./context/ScreenShareClient").then(
-         (mod) => mod.ScreenShareClientProvider
-      ),
-   { ssr: false }
-)
-
 const Layout = dynamic(
    () => import("./components/Layout").then((mod) => mod.Layout),
    {
@@ -81,6 +73,14 @@ const StreamingProvider = dynamic(
 )
 const LocalTracksProvider = dynamic(
    () => import("./context/LocalTracks").then((mod) => mod.LocalTracksProvider),
+   { ssr: false }
+)
+
+const ScreenShareProvider = dynamic(
+   () =>
+      import("./context/ScreenShareTracks").then(
+         (mod) => mod.ScreenShareProvider
+      ),
    { ssr: false }
 )
 
@@ -148,19 +148,19 @@ const Component = ({ isHost }: Props) => {
 
    return (
       <UserClientProvider>
-         <ScreenShareClientProvider>
-            <StreamingProvider
-               isHost={isHost}
-               agoraUserId={agoraUserId}
-               livestreamId={livestream.id}
-            >
-               <LocalTracksProvider>
+         <StreamingProvider
+            isHost={isHost}
+            agoraUserId={agoraUserId}
+            livestreamId={livestream.id}
+         >
+            <LocalTracksProvider>
+               <ScreenShareProvider>
                   <Layout>{memoizedChildren}</Layout>
                   <ToggleStreamModeButton />
-               </LocalTracksProvider>
-            </StreamingProvider>
-            <AudioLevelsTracker />
-         </ScreenShareClientProvider>
+               </ScreenShareProvider>
+            </LocalTracksProvider>
+         </StreamingProvider>
+         <AudioLevelsTracker />
       </UserClientProvider>
    )
 }
