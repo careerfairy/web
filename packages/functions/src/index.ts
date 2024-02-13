@@ -237,8 +237,8 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v2 = userSparks.getSparksFeed
-exports.markSparkAsSeenByUser_v2 = userSparks.markSparkAsSeenByUser
+exports.getSparksFeed_v3 = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v4 = userSparks.trackSparkEvents
