@@ -148,7 +148,7 @@ export const speakerObj = {
    email: "",
 } as ISpeakerObj
 
-export const getLivestreamInitialValues = (group) => ({
+export const getLivestreamInitialValues = (group: Group) => ({
    // add group logo if it has any and if it's not a university
    companyLogoUrl: group?.universityCode ? "" : group?.logoUrl || "",
    backgroundImageUrl: group?.universityCode ? "" : group?.bannerImageUrl || "",
