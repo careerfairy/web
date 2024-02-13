@@ -1,13 +1,12 @@
-import { useFormikContext } from "formik"
-import { LivestreamFormValues } from "../../types"
 import FormSectionHeader from "../../FormSectionHeader"
 import MultiChipSelect from "./components/MultiChipSelect"
 import { useInterests } from "components/custom-hook/useCollection"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 
 const Categories = () => {
    const {
       values: { general },
-   } = useFormikContext<LivestreamFormValues>()
+   } = useLivestreamFormValues()
    const { data: existingInterests } = useInterests()
 
    return (

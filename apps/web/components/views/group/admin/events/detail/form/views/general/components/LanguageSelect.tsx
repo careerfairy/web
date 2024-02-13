@@ -1,13 +1,12 @@
 import React from "react"
-import { useFormikContext } from "formik"
 import MultiChipSelect from "./MultiChipSelect"
-import { LivestreamFormValues } from "../../../types"
 import { languageCodes } from "components/helperFunctions/streamFormFunctions"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 
 const LanguageSelect = () => {
    const {
       values: { general },
-   } = useFormikContext<LivestreamFormValues>()
+   } = useLivestreamFormValues()
 
    const initialFormValue = languageCodes.find(
       (language) => language.code === general.language
