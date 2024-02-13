@@ -59,19 +59,28 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to turn on the local user's camera. Default false.
     */
    readonly cameraOn?: boolean
-
-   micMuted?: boolean
-   localCameraTrack?: ILocalVideoTrack | undefined
-   isLoading?: boolean
-   localMicrophoneTrack?: ILocalAudioTrack | undefined
+   /**
+    * Whether the local user's microphone is muted. Default is undefined.
+    */
+   readonly micMuted?: boolean
+   /**
+    * The local user's camera track
+    */
+   readonly localCameraTrack?: ILocalVideoTrack | undefined
+   /**
+    * Whether the component is in a loading state. Default is undefined.
+    */
+   readonly isLoading?: boolean
+   /**
+    * The local user's microphone track
+    */
+   readonly localMicrophoneTrack?: ILocalAudioTrack | undefined
 } & BoxProps
 
 /**
  * Play/Stop local user camera and microphone track.
  */
-export const LocalMicrophoneAndCameraUser = (
-   props: LocalMicrophoneAndCameraUserProps
-) => {
+export const LocalUserStream = (props: LocalMicrophoneAndCameraUserProps) => {
    const {
       localCameraTrack,
       localMicrophoneTrack,
@@ -81,7 +90,7 @@ export const LocalMicrophoneAndCameraUser = (
    } = useLocalTracks()
 
    return (
-      <LocalUser
+      <LocalStream
          {...props}
          localCameraTrack={localCameraTrack.localCameraTrack}
          isLoading={localCameraTrack.isLoading}
@@ -92,20 +101,25 @@ export const LocalMicrophoneAndCameraUser = (
       />
    )
 }
-export const LocalUserScreen = (props: LocalMicrophoneAndCameraUserProps) => {
-   const { screenVideoTrack, screenAudioTrack } = useScreenShareTracks()
+
+export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
+   const { screenVideoTrack, screenAudioTrack, isLoadingScreenShare } =
+      useScreenShareTracks()
    return (
-      <LocalUser
+      <LocalStream
          {...props}
          localCameraTrack={screenVideoTrack}
          localMicrophoneTrack={screenAudioTrack}
          cameraOn={Boolean(screenVideoTrack)}
          micOn={Boolean(screenAudioTrack)}
+         isLoading={isLoadingScreenShare}
          containVideo
+         hideDetails
       />
    )
 }
-export const LocalUser = ({
+
+const LocalStream = ({
    micOn,
    micMuted,
    cameraOn,
@@ -118,6 +132,7 @@ export const LocalUser = ({
    localCameraTrack,
    localMicrophoneTrack,
    isLoading,
+   containVideo,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
    const uid = useCurrentUID()
@@ -134,7 +149,7 @@ export const LocalUser = ({
    return (
       <VideoTrackWrapper {...props}>
          <Box
-            sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
+            sx={[styles.videoTrack, containVideo && styles.videoContain]}
             component={LocalVideoTrack}
             disabled={!cameraOn}
             play={playVideo}

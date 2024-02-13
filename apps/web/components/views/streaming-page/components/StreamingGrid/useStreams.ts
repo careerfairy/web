@@ -15,12 +15,12 @@ export const useStreams = (): StreamUser[] => {
    const remoteStreamers = useRemoteUsers()
 
    const { localUser } = useLocalTracks()
-   const { localUserScreen } = useScreenShareTracks()
+   const { localUserScreen, screenShareUID } = useScreenShareTracks()
 
    return useMemo(() => {
       // Start by mapping remoteStreamers to include the 'type' property
       const combinedStreamers: StreamUser[] = remoteStreamers
-         .filter((user) => user.uid !== localUserScreen.user?.uid) // Agora rule: User should never subscribe to their own local screen share
+         .filter((user) => user.uid !== screenShareUID) // Agora rule: User should never subscribe to their own local screen share
          .map<RemoteUser>((user) => ({
             user,
             type: user.uid
@@ -39,5 +39,5 @@ export const useStreams = (): StreamUser[] => {
       }
 
       return combinedStreamers
-   }, [localUser, localUserScreen, remoteStreamers])
+   }, [localUser, localUserScreen, remoteStreamers, screenShareUID])
 }

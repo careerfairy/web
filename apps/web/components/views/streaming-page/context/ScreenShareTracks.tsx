@@ -1,4 +1,5 @@
 import type {
+   AgoraRTCReactError,
    ILocalAudioTrack,
    ILocalTrack,
    ILocalVideoTrack,
@@ -52,6 +53,8 @@ type ScreenShareTracksContextProps = {
     * The local user's screen share stream
     */
    localUserScreen: LocalUserScreen
+   screenShareError: AgoraRTCReactError | null
+   isLoadingScreenShare: boolean
 }
 
 const ScreenShareTracksContext = createContext<
@@ -78,6 +81,9 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       useState<ILocalVideoTrack | null>(null)
    const [screenAudioTrack, setScreenAudioTrack] =
       useState<ILocalAudioTrack | null>(null)
+
+   const [screenShareError, setScreenShareError] =
+      useState<null | AgoraRTCReactError>(null)
 
    const screenShareUID = `${STREAM_IDENTIFIERS.SCREEN_SHARE}-${userUID}`
 
@@ -142,12 +148,27 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       }
    }, [readyToPublish, screenShareUID, setLivestreamMode])
 
+   useEffect(() => {
+      if (localScreenTrack.error) {
+         // True if the user clicked "cancel" in the screen share popup
+         const userCancelledScreenShare =
+            localScreenTrack.error.message ===
+            "AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied"
+
+         // If getting the screen track fails, close screen share
+         setScreenShareError(
+            userCancelledScreenShare ? null : localScreenTrack.error
+         )
+         setScreenShareOn(false)
+      }
+   }, [localScreenTrack.error])
+
    useTrackEvent(screenVideoTrack, "track-ended", handleStopScreenShare)
 
    /**
-    * This useEffect handles the logic for setting the screen video and audio tracks based on the selected screen sharing options.
-    * Due to the different scenarios of selecting a screen with or without audio, the hook `useLocalScreenTrack` can return different types of track configurations.
-    * This logic ensures the correct tracks are set for both video and audio based on the user's selection.
+    * Manages screen video and audio tracks based on user selections:
+    * - If "share audio" is selected, `useLocalScreenTrack` returns an array of video and audio tracks.
+    * - Without "share audio" selected, it returns only a video track (not in an array).
     */
    useEffect(() => {
       if (!localScreenTrack.screenTrack) {
@@ -172,34 +193,24 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    }, [localScreenTrack.screenTrack])
 
    const localUserScreen = useMemo<LocalUserScreen>(
-      () => ({
-         type: "local-user-screen",
-         user: {
-            uid: screenShareUID,
-            videoTrack: screenVideoTrack,
-            audioTrack: screenAudioTrack,
-            hasAudio: Boolean(screenAudioTrack),
-            hasVideo: Boolean(screenVideoTrack),
-         },
-      }),
-      [screenAudioTrack, screenShareUID, screenVideoTrack]
-   )
-
-   const value = useMemo<ScreenShareTracksContextProps>(
       () =>
          readyToPublish
             ? {
-                 screenVideoTrack,
-                 screenAudioTrack,
-                 screenShareOn,
-                 screenShareUID,
-                 handleStopScreenShare,
-                 handleStartScreenShareProcess,
-                 localUserScreen,
+                 type: "local-user-screen",
+                 user: {
+                    uid: screenShareUID,
+                    videoTrack: screenVideoTrack,
+                    audioTrack: screenAudioTrack,
+                    hasAudio: Boolean(screenAudioTrack),
+                    hasVideo: Boolean(screenVideoTrack),
+                 },
               }
             : null,
-      [
-         readyToPublish,
+      [readyToPublish, screenAudioTrack, screenShareUID, screenVideoTrack]
+   )
+
+   const value = useMemo<ScreenShareTracksContextProps>(
+      () => ({
          screenVideoTrack,
          screenAudioTrack,
          screenShareOn,
@@ -207,6 +218,19 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          handleStopScreenShare,
          handleStartScreenShareProcess,
          localUserScreen,
+         screenShareError,
+         isLoadingScreenShare: localScreenTrack.isLoading,
+      }),
+      [
+         screenVideoTrack,
+         screenAudioTrack,
+         screenShareOn,
+         screenShareUID,
+         handleStopScreenShare,
+         handleStartScreenShareProcess,
+         localUserScreen,
+         screenShareError,
+         localScreenTrack.isLoading,
       ]
    )
 
