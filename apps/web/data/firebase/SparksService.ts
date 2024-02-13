@@ -94,7 +94,7 @@ export class SparksService {
          SerializedSpark[]
       >(
          this.functions,
-         "getSparksFeed_v2"
+         "getSparksFeed_v3"
       )(data)
 
       return serializedSparks.map(SparkPresenter.deserialize)
