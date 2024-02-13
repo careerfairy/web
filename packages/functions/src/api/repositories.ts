@@ -31,9 +31,9 @@ import {
    SparkFunctionsRepository,
 } from "../lib/sparks/SparkFunctionsRepository"
 import {
-   INotificationRepository,
-   NotificationFunctionsRepository,
-} from "@careerfairy/shared-lib/notifications/INotificationRepository"
+   IEmailNotificationRepository,
+   EmailNotificationFunctionsRepository,
+} from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
@@ -111,5 +111,5 @@ export const getSparksAnalyticsRepoInstance = (
 export const customJobRepo: ICustomJobFunctionsRepository =
    new CustomJobFunctionsRepository(firestore as any, FieldValue)
 
-export const notificationsRepo: INotificationRepository =
-   new NotificationFunctionsRepository(firestore as any)
+export const notificationsRepo: IEmailNotificationRepository =
+   new EmailNotificationFunctionsRepository(firestore as any)

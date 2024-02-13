@@ -4,11 +4,11 @@ import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { OnboardingNewsletterEmailBuilder } from "../onboarding/OnboardingNewsletterEmailBuilder"
-import { INotificationRepository } from "@careerfairy/shared-lib/notifications/INotificationRepository"
 import {
    EmailNotificationType,
    EmailNotification,
 } from "@careerfairy/shared-lib/notifications/notifications"
+import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { LivestreamRecordingDetails } from "@careerfairy/shared-lib/livestreams"
 import { Timestamp } from "firebase-admin/firestore"
@@ -46,11 +46,16 @@ export class OnboardingNewsletterService {
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly sparksRepo: ISparkFunctionsRepository,
-      private readonly notificationsRepo: INotificationRepository,
+      private readonly notificationsRepo: IEmailNotificationRepository,
       private readonly livestreamsRepo: ILivestreamRepository,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
       private readonly logger: Logger
-   ) {}
+   ) {
+      this.logger.info(
+         `OnboardingNewsletterService starting at ${notificationsRepo.getServerTimestamp()}`
+      )
+      this.logger.info("Email builder " + this.emailBuilder + "")
+   }
 
    private shouldSendCompanyDiscovery = (user: OnboardingUserData): boolean => {
       return (
@@ -94,7 +99,7 @@ export class OnboardingNewsletterService {
       return !user.notifications.feedbackDiscovery.length
    }
 
-   private createNotifications(
+   private buildEmailNotifications(
       type: EmailNotificationType,
       creationDate: Timestamp,
       userEmails
@@ -103,15 +108,7 @@ export class OnboardingNewsletterService {
       console.log(type, creationDate, userEmails)
    }
 
-   async fetchRequiredData() {
-      this.users = await this.userRepo.getSubscribedUsers()
-      const onboardingUserPromises = this.users.map(this.fetchUserData)
-
-      this.onboardingUsers = await Promise.all(onboardingUserPromises)
-      // fetch notifications for the users and filter map to users
-   }
-
-   async fetchUserData(user: UserData): Promise<OnboardingUserData> {
+   private async fetchUserData(user: UserData): Promise<OnboardingUserData> {
       const seenSparksPromise = this.sparksRepo.getUserSparkInteraction(
          user.id,
          "seenSparks"
@@ -120,39 +117,47 @@ export class OnboardingNewsletterService {
          .getCompaniesUserFollowsQuery(user.id, 1)
          .get()
       const userStatsPromise = this.userRepo.getUserStats(user.userEmail)
-      const userNotificationsPromise =
-         this.notificationsRepo.getUserReceivedNotifications(user.userEmail)
 
-      const [seenSparks, companiesUserFollows, userStats, userNotifications] =
-         await Promise.all([
-            seenSparksPromise,
-            companiesUserFollowsPromise,
-            userStatsPromise,
-            userNotificationsPromise,
-         ])
+      const userNotificationsPromises = [
+         this.notificationsRepo.getUserReceivedNotifications(
+            user.userEmail,
+            "companyDiscovery"
+         ),
+         this.notificationsRepo.getUserReceivedNotifications(
+            user.userEmail,
+            "sparksDiscovery"
+         ),
+         this.notificationsRepo.getUserReceivedNotifications(
+            user.userEmail,
+            "livestream1stRegistrationDiscovery"
+         ),
+         this.notificationsRepo.getUserReceivedNotifications(
+            user.userEmail,
+            "recordingDiscovery"
+         ),
+         this.notificationsRepo.getUserReceivedNotifications(
+            user.userEmail,
+            "feedbackDiscovery"
+         ),
+      ]
+      const [seenSparks, companiesUserFollows, userStats] = await Promise.all([
+         seenSparksPromise,
+         companiesUserFollowsPromise,
+         userStatsPromise,
+      ])
 
       const userRecordingStatsPromises = userStats.recordingsBought.map(
          this.livestreamsRepo.getLivestreamRecordingStats
       )
       const recordingStats = await Promise.all(userRecordingStatsPromises)
       // Filtering notifications in memory to limit Database queries
-      const companyDiscoveryNotifications = userNotifications.filter(
-         (notification) => notification.details.type == "companyDiscovery"
-      )
-      const sparksDiscoveryNotifications = userNotifications.filter(
-         (notification) => notification.details.type == "sparksDiscovery"
-      )
-      const livestream1stRegistrationDiscoveryNotifications =
-         userNotifications.filter(
-            (notification) =>
-               notification.details.type == "livestream1stRegistrationDiscovery"
-         )
-      const recordingDiscoveryNotifications = userNotifications.filter(
-         (notification) => notification.details.type == "recordingDiscovery"
-      )
-      const feedbackDiscoveryNotifications = userNotifications.filter(
-         (notification) => notification.details.type == "feedbackDiscovery"
-      )
+      const [
+         companyDiscoveryNotifications,
+         sparksDiscoveryNotifications,
+         livestream1stRegistrationDiscoveryNotifications,
+         recordingDiscoveryNotifications,
+         feedbackDiscoveryNotifications,
+      ] = await Promise.all(userNotificationsPromises)
 
       return {
          user: user,
@@ -170,12 +175,8 @@ export class OnboardingNewsletterService {
          },
       } as OnboardingUserData
    }
-   buildDiscoveryLists() {
-      this.onboardingUsers.forEach(this.handleUserDiscovery)
-      this.createNotifications(null, null, null)
-   }
 
-   handleUserDiscovery(
+   private handleUserDiscovery(
       onboardingUserData: OnboardingUserData,
       daysSinceRegistration?: number
    ) {
@@ -277,7 +278,7 @@ export class OnboardingNewsletterService {
       }
    }
 
-   applyDiscovery(
+   private applyDiscovery(
       onboardingUserData: OnboardingUserData,
       predicate: boolean,
       emails: string[],
@@ -287,5 +288,37 @@ export class OnboardingNewsletterService {
       else if (next) {
          next()
       }
+   }
+
+   async fetchRequiredData() {
+      this.logger.info("OnboardingNewsletterService... fetching required data")
+      this.users = await this.userRepo.getSubscribedUsers()
+      const onboardingUserPromises = this.users.map(this.fetchUserData)
+
+      this.onboardingUsers = await Promise.all(onboardingUserPromises)
+      this.logger.info(
+         `OnboardingNewsletterService... fetched ${this.onboardingUsers.length} subscribed users`
+      )
+      // fetch notifications for the users and filter map to users
+   }
+
+   buildDiscoveryLists() {
+      this.logger.info(
+         "OnboardingNewsletterService... building discovery lists & email notification template data"
+      )
+      this.onboardingUsers.forEach(this.handleUserDiscovery)
+      this.buildEmailNotifications(null, null, null)
+      this.logger.info(
+         "OnboardingNewsletterService... finished building discovery lists & email notification template data"
+      )
+      this.logger.info(
+         "OnboardingNewsletterService... companyDiscoveryUsers: " +
+            this.companyDiscoveryEmails
+      )
+      // TODO: add more logging
+   }
+
+   async sendDiscoveryEmails() {
+      return null
    }
 }
