@@ -71,16 +71,16 @@ const StreamingProvider = dynamic(
    () => import("./context/Streaming").then((mod) => mod.StreamingProvider),
    { ssr: false }
 )
-const LocalTracksProvider = dynamic(
-   () => import("./context/LocalTracks").then((mod) => mod.LocalTracksProvider),
-   { ssr: false }
-)
-
 const ScreenShareProvider = dynamic(
    () =>
       import("./context/ScreenShareTracks").then(
          (mod) => mod.ScreenShareProvider
       ),
+   { ssr: false }
+)
+
+const LocalTracksProvider = dynamic(
+   () => import("./context/LocalTracks").then((mod) => mod.LocalTracksProvider),
    { ssr: false }
 )
 

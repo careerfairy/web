@@ -206,7 +206,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       // If the user is ready to publish, return the local user object
       if (readToPublish) {
          return {
-            type: "local",
+            type: "local-user",
             user: {
                uid: currentUserUID,
                hasAudio: !microphoneMuted,

@@ -13,18 +13,14 @@ import {
    useRTCScreenShareClient,
    useTrackEvent,
 } from "agora-rtc-react"
-import {
-   useAgoraRtcToken,
-   useLivestreamData,
-} from "components/custom-hook/streaming"
+import { useAgoraRtcToken } from "components/custom-hook/streaming"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import {
    ReactNode,
    createContext,
-   memo,
-   // useCallback,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
@@ -32,17 +28,30 @@ import {
 } from "react"
 import { useStreamingContext } from "."
 import { useRouter } from "next/router"
+import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
+import { LocalUserScreen } from "../types"
 
 interface ScreenShareProviderProps {
    children: ReactNode
 }
 
 type ScreenShareTracksContextProps = {
+   /** Wether the user has locally started the screen sharing process */
    screenShareOn: boolean
-   setScreenShareOn: (on: boolean) => void
+   /** Function to stop any screen sharing */
+   handleStopScreenShare: () => void
+   /** Function to start the screen sharing process */
+   handleStartScreenShareProcess: () => void
+   /** Unique identifier for the screen sharing session */
    screenShareUID: string
+   /** The video track of the screen sharing session */
    screenVideoTrack: ILocalVideoTrack | null
+   /** The audio track of the screen sharing session */
    screenAudioTrack: ILocalAudioTrack | null
+   /**
+    * The local user's screen share stream
+    */
+   localUserScreen: LocalUserScreen
 }
 
 const ScreenShareTracksContext = createContext<
@@ -52,17 +61,19 @@ const ScreenShareTracksContext = createContext<
 export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const [screenShareOn, setScreenShareOn] = useState(false)
 
-   const { agoraUserToken, livestreamId, shouldStream } = useStreamingContext()
+   const { livestreamId, shouldStream } = useStreamingContext()
+
+   const client = useRTCScreenShareClient()
 
    const localScreenTrack = useLocalScreenTrack(
       shouldStream ? screenShareOn : false,
       {},
-      "enable"
+      "auto",
+      client
    )
-   const client = useRTCScreenShareClient()
+
    const userUID = useCurrentUID()
 
-   //screen share
    const [screenVideoTrack, setScreenVideoTrack] =
       useState<ILocalVideoTrack | null>(null)
    const [screenAudioTrack, setScreenAudioTrack] =
@@ -73,48 +84,71 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const { query } = useRouter()
 
    const hostAuthToken = query.token?.toString() || ""
-   //join room
 
    const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
 
    const response = useAgoraRtcToken(
-      {
-         channelName: livestreamId,
-         isStreamer: true,
-         sentToken: hostAuthToken,
-         streamDocumentPath: `livestreams/${livestreamId}`,
-         uid: screenShareUID,
-      },
-      true
+      screenShareOn
+         ? {
+              channelName: livestreamId,
+              isStreamer: true,
+              sentToken: hostAuthToken,
+              streamDocumentPath: `livestreams/${livestreamId}`,
+              uid: screenShareUID,
+           }
+         : null
    )
 
-   const { isConnected } = useJoin(
+   const handleStopScreenShare = useCallback(() => {
+      setLivestreamMode({
+         mode: LivestreamModes.DEFAULT,
+      })
+      setScreenShareOn(false)
+   }, [setLivestreamMode, setScreenShareOn])
+
+   const handleStartScreenShareProcess = useCallback(() => {
+      setScreenShareOn(true)
+   }, [setScreenShareOn])
+
+   useJoin(
       {
          appid: agoraCredentials.appID,
          channel: livestreamId,
          token: response.token,
          uid: screenShareUID,
       },
-      screenShareOn,
+      Boolean(screenShareOn && response.token),
       client
    )
-   console.log("🚀 ~ agoraUserToken Token", agoraUserToken)
-   console.log("🚀 ~ screen Token", response.token)
 
-   //publish screen share
-   usePublish([screenVideoTrack, screenAudioTrack], screenShareOn, client)
+   const hasSelectedScreen = Boolean(screenVideoTrack)
+
+   const { currentRole } = useClientConfig(client, {
+      hostCondition: shouldStream && hasSelectedScreen,
+   })
+
+   const readyToPublish = Boolean(
+      screenShareOn && hasSelectedScreen && currentRole === "host"
+   )
+
+   usePublish([screenVideoTrack, screenAudioTrack], readyToPublish, client)
 
    useEffect(() => {
-      if (isConnected) {
-         console.log("🚀 setting livestream mode")
+      if (readyToPublish) {
          setLivestreamMode({
             mode: LivestreamModes.DESKTOP,
             screenSharerAgoraUID: screenShareUID,
          })
       }
-   }, [isConnected, screenShareUID, setLivestreamMode])
+   }, [readyToPublish, screenShareUID, setLivestreamMode])
 
-   //get screen share video track and audio track
+   useTrackEvent(screenVideoTrack, "track-ended", handleStopScreenShare)
+
+   /**
+    * This useEffect handles the logic for setting the screen video and audio tracks based on the selected screen sharing options.
+    * Due to the different scenarios of selecting a screen with or without audio, the hook `useLocalScreenTrack` can return different types of track configurations.
+    * This logic ensures the correct tracks are set for both video and audio based on the user's selection.
+    */
    useEffect(() => {
       if (!localScreenTrack.screenTrack) {
          setScreenAudioTrack(null)
@@ -137,54 +171,51 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       }
    }, [localScreenTrack.screenTrack])
 
-   const value = useMemo<ScreenShareTracksContextProps>(
+   const localUserScreen = useMemo<LocalUserScreen>(
       () => ({
+         type: "local-user-screen",
+         user: {
+            uid: screenShareUID,
+            videoTrack: screenVideoTrack,
+            audioTrack: screenAudioTrack,
+            hasAudio: Boolean(screenAudioTrack),
+            hasVideo: Boolean(screenVideoTrack),
+         },
+      }),
+      [screenAudioTrack, screenShareUID, screenVideoTrack]
+   )
+
+   const value = useMemo<ScreenShareTracksContextProps>(
+      () =>
+         readyToPublish
+            ? {
+                 screenVideoTrack,
+                 screenAudioTrack,
+                 screenShareOn,
+                 screenShareUID,
+                 handleStopScreenShare,
+                 handleStartScreenShareProcess,
+                 localUserScreen,
+              }
+            : null,
+      [
+         readyToPublish,
          screenVideoTrack,
          screenAudioTrack,
          screenShareOn,
-         setScreenShareOn,
          screenShareUID,
-      }),
-      [screenVideoTrack, screenAudioTrack, screenShareOn, screenShareUID]
+         handleStopScreenShare,
+         handleStartScreenShareProcess,
+         localUserScreen,
+      ]
    )
 
    return (
       <ScreenShareTracksContext.Provider value={value}>
          {children}
-         <ScreenShareTracker />
       </ScreenShareTracksContext.Provider>
    )
 }
-
-const ScreenShareTracker = memo(function ScreenShareTracker() {
-   // const { livestreamId } = useStreamingContext()
-   const { screenSharerId } = useLivestreamData()
-   const { screenShareUID, setScreenShareOn, screenVideoTrack } =
-      useScreenShareTracks()
-
-   // const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
-
-   // const handleStopScreenShare = useCallback(() => {
-   //    setLivestreamMode({
-   //       mode: LivestreamModes.DEFAULT,
-   //    })
-   //    setScreenShareOn(false)
-   // }, [setLivestreamMode, setScreenShareOn])
-
-   //screen share closed
-   useTrackEvent(screenVideoTrack, "track-ended", () => {
-      console.log("screen sharing track ended")
-      // handleStopScreenShare()
-   })
-
-   useEffect(() => {
-      if (screenSharerId && screenSharerId !== screenShareUID) {
-         // setScreenShareOn(false)
-      }
-   }, [screenShareUID, screenSharerId, setScreenShareOn])
-
-   return null
-})
 
 export const useScreenShareTracks = () => {
    const context = useContext(ScreenShareTracksContext)

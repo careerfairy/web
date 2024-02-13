@@ -2,6 +2,8 @@ import {
    LocalVideoTrack,
    LocalAudioTrack,
    useCurrentUID,
+   ILocalVideoTrack,
+   ILocalAudioTrack,
 } from "agora-rtc-react"
 import type { ReactNode } from "react"
 
@@ -16,6 +18,7 @@ import { useAppSelector } from "components/custom-hook/store"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { DetailsOverlay } from "./DetailsOverlay"
 import { SpeakingIndicator } from "./SpeakingIndicator"
+import { useScreenShareTracks } from "../../context/ScreenShareTracks"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -47,18 +50,74 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to hide the speaking indicator.
     */
    readonly hideSpeakingIndicator?: boolean
+
+   /**
+    * Whether to turn on the local user's microphone. Default false.
+    */
+   readonly micOn?: boolean
+   /**
+    * Whether to turn on the local user's camera. Default false.
+    */
+   readonly cameraOn?: boolean
+
+   micMuted?: boolean
+   localCameraTrack?: ILocalVideoTrack | undefined
+   isLoading?: boolean
+   localMicrophoneTrack?: ILocalAudioTrack | undefined
 } & BoxProps
 
 /**
  * Play/Stop local user camera and microphone track.
  */
-export const LocalMicrophoneAndCameraUser = ({
+export const LocalMicrophoneAndCameraUser = (
+   props: LocalMicrophoneAndCameraUserProps
+) => {
+   const {
+      localCameraTrack,
+      localMicrophoneTrack,
+      cameraOn,
+      microphoneOn,
+      microphoneMuted,
+   } = useLocalTracks()
+
+   return (
+      <LocalUser
+         {...props}
+         localCameraTrack={localCameraTrack.localCameraTrack}
+         isLoading={localCameraTrack.isLoading}
+         localMicrophoneTrack={localMicrophoneTrack.localMicrophoneTrack}
+         cameraOn={cameraOn}
+         micOn={microphoneOn}
+         micMuted={microphoneMuted}
+      />
+   )
+}
+export const LocalUserScreen = (props: LocalMicrophoneAndCameraUserProps) => {
+   const { screenVideoTrack, screenAudioTrack } = useScreenShareTracks()
+   return (
+      <LocalUser
+         {...props}
+         localCameraTrack={screenVideoTrack}
+         localMicrophoneTrack={screenAudioTrack}
+         cameraOn={Boolean(screenVideoTrack)}
+         micOn={Boolean(screenAudioTrack)}
+         containVideo
+      />
+   )
+}
+export const LocalUser = ({
+   micOn,
+   micMuted,
+   cameraOn,
    playAudio = false,
    playVideo,
    volume,
    hideDetails,
    hideSpeakingIndicator,
    children,
+   localCameraTrack,
+   localMicrophoneTrack,
+   isLoading,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
    const uid = useCurrentUID()
@@ -66,14 +125,6 @@ export const LocalMicrophoneAndCameraUser = ({
    const isSpeaking = useAppSelector(userIsSpeakingSelector(uid))
 
    const { data: streamerDetails } = useStreamerDetails(uid)
-
-   const {
-      localCameraTrack: { localCameraTrack, isLoading },
-      localMicrophoneTrack: { localMicrophoneTrack },
-      cameraOn,
-      microphoneOn: micOn,
-      microphoneMuted: micMuted,
-   } = useLocalTracks()
 
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)

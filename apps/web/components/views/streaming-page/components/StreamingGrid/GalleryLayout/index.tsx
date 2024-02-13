@@ -1,7 +1,10 @@
 import { Box } from "@mui/material"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { LocalMicrophoneAndCameraUser } from "../../streaming/LocalMicrophoneAndCameraUser"
+import {
+   LocalMicrophoneAndCameraUser,
+   LocalUserScreen,
+} from "../../streaming/LocalMicrophoneAndCameraUser"
 import { GridCarousel } from "../GridCarousel"
 import { LayoutGrid } from "../LayoutGrid"
 import { useSortedStreams } from "../useSortedStreams"
@@ -65,8 +68,18 @@ type GridItemContentProps = {
 }
 
 const GridItemContent = ({ user }: GridItemContentProps) => {
-   if (user.type === "local") {
+   if (user.type === "local-user") {
       return <LocalMicrophoneAndCameraUser />
    }
-   return <RemoteStreamer key={user.user.uid} user={user.user} />
+   if (user.type === "local-user-screen") {
+      return <LocalUserScreen />
+   }
+
+   return (
+      <RemoteStreamer
+         containVideo={user.type === "remote-user-screen"}
+         key={user.user.uid}
+         user={user.user}
+      />
+   )
 }
