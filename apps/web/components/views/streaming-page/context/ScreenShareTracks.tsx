@@ -155,10 +155,11 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
             localScreenTrack.error.message ===
             "AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied"
 
-         // If getting the screen track fails, close screen share
          setScreenShareError(
             userCancelledScreenShare ? null : localScreenTrack.error
          )
+
+         // If getting the screen track fails, stop the screen share process
          setScreenShareOn(false)
       }
    }, [localScreenTrack.error])
