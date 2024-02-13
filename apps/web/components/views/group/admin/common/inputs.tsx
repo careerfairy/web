@@ -30,7 +30,7 @@ const styles = sxStyles({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "#F0EDFD",
+      bgcolor: (theme) => theme.palette.secondary.light,
       color: "black",
       display: "flex",
       justifyContent: "center",
