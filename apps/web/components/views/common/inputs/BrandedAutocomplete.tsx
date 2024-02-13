@@ -48,7 +48,7 @@ const StyledBrandedAutocomplete = styled(
          renderOption={(optionProps, option, { selected }) => (
             <MenuItem
                {...optionProps}
-               key={option.id}
+               key={optionProps.id}
                sx={{
                   '&[aria-selected="true"]': {
                      backgroundColor: "#FAFAFA !important",
@@ -56,7 +56,7 @@ const StyledBrandedAutocomplete = styled(
                }}
             >
                <ListItemText
-                  key={`${option.id}-text`}
+                  key={`${optionProps.id}-text`}
                   primary={getOptionLabel(option)}
                   sx={{ padding: "16px" }}
                />
@@ -90,16 +90,21 @@ export const FormBrandedAutocomplete: FC<FormBrandedAutocompleteProps> = ({
    ...props
 }) => {
    const [{ onBlur }, ,] = useField(name)
+
+   const handleChange = async (...args) => {
+      // If we follow TS validations we will be tied to props.onChange signature when we don't have to
+      // @ts-ignore
+      await props.onChange(...args)
+      await onBlur({ target: { name } })
+   }
+
    return (
       <StyledBrandedAutocomplete
          renderInput={(params) => (
             <FormBrandedTextField name={name} {...params} {...textFieldProps} />
          )}
          {...props}
-         onChange={async (...args) => {
-            await props.onChange(...args)
-            await onBlur({ target: { name } })
-         }}
+         onChange={handleChange}
       />
    )
 }
