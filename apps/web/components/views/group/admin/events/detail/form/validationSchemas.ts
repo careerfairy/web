@@ -24,9 +24,11 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
       company: yup.string().notRequired(),
       companyId: yup.string().notRequired(),
       companyLogoUrl: yup.string().notRequired(),
-      backgroundImageUrl: yup.string().required("DA FUQ BRO"),
+      backgroundImageUrl: yup
+         .string()
+         .required("Please provide a banner image"),
       startDate: yup.date().required(),
-      duration: yup.number().required(REQUIRED_FIELD_MESSAGE),
+      duration: yup.number().nullable().required(REQUIRED_FIELD_MESSAGE),
       language: yup.string().required(REQUIRED_FIELD_MESSAGE),
       summary: yup
          .string()
