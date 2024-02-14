@@ -190,7 +190,7 @@ const TextContent = () => {
             <p style={{ marginLeft: "40px", marginBottom: 0 }}>
                CareerFairy AG&nbsp;
                <br />
-               Technoparkstrasse 1&nbsp;
+               Hardturmstrasse 253&nbsp;
                <br />
                8005 Z&uuml;rich&nbsp;
                <br />
