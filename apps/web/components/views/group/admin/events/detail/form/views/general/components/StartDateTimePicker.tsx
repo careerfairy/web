@@ -3,7 +3,7 @@ import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 
 const styles = sxStyles({
    datePickerDesktop: (theme) => {
@@ -80,20 +80,31 @@ const styles = sxStyles({
    },
 })
 
-const CustomInputField = (params) => (
-   <BrandedTextField
-      {...params}
-      placeholder="Insert date"
-      sx={styles.icon}
-      fullWidth
-   />
-)
+const CustomInputField = (params) => {
+   const fieldName = "general.startDate"
+   const [{ onBlur }, ,] = useField(fieldName)
+
+   return (
+      <FormBrandedTextField
+         {...params}
+         name={fieldName}
+         type="text"
+         fullWidth
+         sx={styles.icon}
+         placeholder="Insert date"
+         requiredText="(required)"
+         onBlur={async () => {
+            await onBlur({ target: { name: fieldName } })
+         }}
+      />
+   )
+}
 
 const StartDateTimePicker = () => {
    const fieldName = "general.startDate"
 
    const isMobile = useIsMobile()
-   const [{ onBlur, ...field }, , helpers] = useField(fieldName)
+   const [field, , helpers] = useField(fieldName)
 
    const layoutStyles = isMobile
       ? styles.datePickerMobile
@@ -102,7 +113,7 @@ const StartDateTimePicker = () => {
    return (
       <DateTimePicker
          name={fieldName}
-         label="Live Stream Start Date"
+         label="Start date"
          localeText={
             isMobile ? { toolbarTitle: "Select live stream start date" } : null
          }
@@ -127,7 +138,6 @@ const StartDateTimePicker = () => {
          value={field.value}
          onChange={async (newValue) => {
             await helpers.setValue(newValue)
-            await onBlur({ target: { name: fieldName } })
          }}
       />
    )

@@ -127,9 +127,9 @@ export const FormBrandedTextField: FC<BrandedTextFieldProps> = ({
    return (
       <BrandedTextField
          {...field}
+         {...props}
          error={meta.touched ? Boolean(meta.error) : null}
          helperText={meta.touched ? meta.error : null}
-         {...props}
       />
    )
 }
