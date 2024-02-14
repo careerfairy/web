@@ -19,7 +19,7 @@ import { getDownloadUrl } from "components/helperFunctions/streamFormFunctions"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 
 const PLACEHOLDER_BANNER_URL =
-   "https://storage.cloud.google.com/careerfairy-e1fd9.appspot.com/random-logos/livestream_creation_banner_placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flivestream_creation_banner_placeholder.png?alt=media&token=e12cc34a-44e5-4c00-8ac5-ed6ec232bc69"
 
 const styles = sxStyles({
    root: {
