@@ -35,14 +35,28 @@ export async function run() {
          const group = groups[index]
 
          const toUpdate: Partial<SparkStats> = {
-            category: stat.spark.category,
-            ...(group?.companyIndustries && {
-               companyIndustries: group.companyIndustries,
-            }),
-            ...(group?.companyCountry && {
-               companyCountry: group.companyCountry,
-            }),
-            ...(group?.companySize && { companySize: group.companySize }),
+            spark: {
+               ...stat.spark,
+               group: {
+                  ...stat.spark.group,
+                  ...(group?.companyIndustries && {
+                     companyIndustries: group.companyIndustries,
+                  }),
+                  ...(group?.companyCountry && {
+                     companyCountry: group.companyCountry,
+                  }),
+                  ...(group?.targetedCountries && {
+                     targetedCountries: group.targetedCountries,
+                  }),
+                  ...(group?.targetedUniversities && {
+                     targetedUniversities: group.targetedUniversities,
+                  }),
+                  ...(group?.targetedFieldsOfStudy && {
+                     targetedFieldsOfStudy: group.targetedFieldsOfStudy,
+                  }),
+                  ...(group?.plan && { plan: group.plan }),
+               },
+            },
          }
 
          const sparkStatsRef = firestore.collection("sparkStats").doc(stat.id)

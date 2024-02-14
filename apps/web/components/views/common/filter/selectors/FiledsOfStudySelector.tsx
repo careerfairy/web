@@ -38,7 +38,7 @@ const FieldsOfStudySelector = ({ handleChange }: Props) => {
 
       if (queryFieldOfStudies) {
          selectedFieldOfStudies = formatToOptionArray(
-            queryFieldOfStudies.split(","),
+            queryFieldOfStudies.split(",").map(decodeURIComponent),
             fieldsOfStudy
          )
       }
@@ -61,9 +61,11 @@ const FieldsOfStudySelector = ({ handleChange }: Props) => {
             allValues={relevantFieldsOfStudy}
             setFieldValue={handleChange}
             getValueFn={multiListSelectMapValueFn}
+            useStyledCheckbox
          />
 
          <MultiListSelect
+            useStyledCheckbox
             inputName={"fieldsOfStudy"}
             isCheckbox
             selectedItems={getSelectedFieldOfStudy()}

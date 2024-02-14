@@ -56,6 +56,7 @@ const styles = sxStyles({
          md: `0 0 65%`,
          lg: `0 0 47%`,
       },
+      minWidth: 0,
       position: "relative",
       height: {
          xs: 355,

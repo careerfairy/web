@@ -1,0 +1,74 @@
+{
+   "fields": [
+      {
+         "name": "documentId",
+         "type": "string"
+      },
+      {
+         "name": "jobId",
+         "type": "string"
+      },
+      {
+         "name": "clicks",
+         "type": "number"
+      },
+      {
+         "name": "applicants",
+         "type": "number"
+      },
+      {
+         "name": "job",
+         "type": "map",
+         "fields": [
+            {
+               "name": "groupId",
+               "type": "string"
+            },
+            {
+               "name": "title",
+               "type": "string"
+            },
+            {
+               "name": "description",
+               "type": "string"
+            },
+            {
+               "name": "jobType",
+               "type": "string"
+            },
+            {
+               "name": "deadline",
+               "type": "timestamp"
+            },
+            {
+               "name": "createdAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "updatedAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "salary",
+               "type": "string"
+            },
+            {
+               "name": "livestreams",
+               "type": "stringified_map"
+            },
+            {
+               "name": "deleted",
+               "type": "boolean"
+            }
+         ]
+      },
+      {
+         "name": "deleted",
+         "type": "boolean"
+      },
+      {
+         "name": "deletedAt",
+         "type": "timestamp"
+      }
+   ]
+}

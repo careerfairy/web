@@ -6,6 +6,16 @@ import useSWR, { SWRConfiguration } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   keepPreviousData: true,
+   suspense: true,
+   onError: (error, key) =>
+      errorLogAndNotify(error, {
+         message: `Error fetching livestreams with options: ${key}`,
+      }),
+}
+
 export type UseLivestreamsSWROptions = {
    languageCodes?: string[]
    companyIndustries?: string[]
@@ -36,16 +46,6 @@ const useLivestreamsSWR = (
    )
 
    return useSWR(key, swrFetcher, swrOptions)
-}
-
-const swrOptions: SWRConfiguration = {
-   ...reducedRemoteCallsOptions,
-   keepPreviousData: true,
-   suspense: false,
-   onError: (error, key) =>
-      errorLogAndNotify(error, {
-         message: `Error fetching livestreams with options: ${key}`,
-      }),
 }
 
 export default useLivestreamsSWR

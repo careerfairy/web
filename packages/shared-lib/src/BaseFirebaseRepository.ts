@@ -16,7 +16,7 @@ export default class BaseFirebaseRepository {
    addIdToDocs<T extends Identifiable>(docs: DocumentSnapshot[]): T[] {
       const result = []
 
-      for (let doc of docs) {
+      for (const doc of docs) {
          result.push(this.addIdToDoc(doc))
       }
 
@@ -103,6 +103,41 @@ export function removeDuplicateDocuments<T extends Identifiable>(
    return docs.filter((item, index) => {
       return docs.findIndex((i) => i.id === item.id) === index
    })
+}
+
+type RankedDocument = {
+   id: string
+   points: number
+   model: unknown
+}
+
+export function combineRankedDocuments<T extends RankedDocument>(
+   mapDocs: T[][] | T[]
+): T[] {
+   const resultMap: Record<string, T> = {}
+
+   // Ensure that the received prop is an array of arrays
+   const mapArrays = Array.isArray(mapDocs[0])
+      ? (mapDocs as T[][])
+      : [mapDocs as T[]]
+
+   // Iterate over the nested arrays and combine points for the same ID
+   mapArrays.forEach((innerArray) => {
+      innerArray.forEach((element) => {
+         const { id, points } = element
+
+         if (resultMap[id]) {
+            // If ID already exists in resultMap, update points and model
+            resultMap[id].points += points
+         } else {
+            // If ID doesn't exist in resultMap, add a new entry
+            resultMap[id] = element
+         }
+      })
+   })
+
+   // Convert resultMap values to an array
+   return Object.values(resultMap)
 }
 
 // max of 10 events to allow for firestore query limit

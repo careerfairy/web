@@ -511,7 +511,7 @@ export class LivestreamFunctionsRepository
       })
 
       functions.logger.log(
-         `Notified ${livestream.registeredUsers.length} users of livestream start`
+         `Notified ${livestream.registeredUsers?.length} users of livestream start`
       )
 
       return void bulkWriter.close()

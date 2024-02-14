@@ -79,7 +79,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
    const activeSpark = useSelector(activeSparkSelector)
    const groupPageId = useSelector(groupIdSelector)
    const event = useLivestream(eventNotification?.eventId || "none")
-   const isUserRegisteredToEvent = event?.data?.registeredUsers.includes(
+   const isUserRegisteredToEvent = event?.data?.registeredUsers?.includes(
       authenticatedUser?.email
    )
 

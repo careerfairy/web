@@ -98,7 +98,7 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
          <Box sx={styles.videoWrapper}>
             <ReactPlayer
                id={"company-video-player"}
-               controls={playVideo}
+               controls={isVimeo(video.url) || playVideo}
                playing={playVideo}
                config={editMode ? undefined : config}
                width={"100%"}
@@ -136,6 +136,17 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
    )
 }
 
-const config: Config = { file: { attributes: { controlsList: "nodownload" } } }
+const config: Config = {
+   file: { attributes: { controlsList: "nodownload" } },
+}
+
+/**
+ * Determines if the received video URL belongs to Vimeo player
+ * @param url Video URL as non empty string
+ * @returns true if video contains domain 'vimeo.com', could be enhanced
+ */
+const isVimeo = (url: string): boolean => {
+   return url.includes("vimeo.com")
+}
 
 export default VideoComponent
