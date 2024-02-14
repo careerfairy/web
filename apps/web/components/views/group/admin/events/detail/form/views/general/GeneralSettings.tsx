@@ -25,8 +25,8 @@ const GeneralSettings = () => {
          />
          <FormBrandedTextField
             name="general.title"
-            label="Live Stream Title"
-            placeholder="Insert your Live Stream title"
+            label="Live stream title"
+            placeholder="Insert your live stream title"
             requiredText="(required)"
          />
          <BannerImageSelect />
@@ -43,7 +43,7 @@ const GeneralSettings = () => {
          </Grid>
          <FormBrandedTextField
             name="general.summary"
-            label="What Is The Live Stream About?"
+            label="What is the live stream about?"
             fullWidth
             requiredText="(required)"
             multiline
