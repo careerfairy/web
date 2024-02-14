@@ -25,13 +25,17 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.neutral[100],
+      },
+      zIndex: 1,
    },
    checkedIconSx: {
       width: 20,
       height: 20,
       borderRadius: 1,
       bgcolor: (theme) => theme.palette.secondary.light,
-      color: "black",
+      color: (theme) => theme.palette.neutral[800],
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
