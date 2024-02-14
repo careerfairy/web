@@ -155,7 +155,7 @@ export const getLivestreamInitialValues = (group: Group) => ({
    // add group name if it has any and if it's not a university
    company: group?.universityCode ? "" : group?.universityName || "",
    companyId: "",
-   title: "WOLOLO",
+   title: "",
    interestsIds: [],
    groupIds: [],
    start: new Date(),
