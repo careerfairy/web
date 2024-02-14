@@ -286,6 +286,9 @@ class FirebaseService {
       }
    }
 
+   testOnboardingNewsletter = () => {
+      return this.functions.httpsCallable("testOnboardingNewsletter")()
+   }
    sendLivestreamEmailRegistrationConfirmation = (
       user,
       userData,
