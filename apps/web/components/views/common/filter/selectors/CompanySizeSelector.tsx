@@ -27,7 +27,7 @@ const CompanySizeSelector = ({ handleChange }: Props) => {
 
       if (queryCompanySize) {
          selectedSize = formatToOptionArray(
-            queryCompanySize.split(","),
+            queryCompanySize.split(",").map(decodeURIComponent),
             mappedCompanySizesCodes
          )
       }
@@ -41,6 +41,7 @@ const CompanySizeSelector = ({ handleChange }: Props) => {
          allValues={mappedCompanySizesCodes}
          setFieldValue={handleChange}
          getValueFn={multiListSelectMapValueFn}
+         useStyledCheckbox
       />
    )
 }

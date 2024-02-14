@@ -650,3 +650,11 @@ export type FilterLivestreamsOptions = {
    companyCountries?: string[]
    targetFieldsOfStudy?: FieldOfStudy[]
 }
+
+/**
+ * Options for checkForCategoryData, used for custom hook useLivestreamCategoryDataSWR.
+ */
+export type CategoryDataOption = {
+   livestream: LivestreamEvent
+   userData: UserData
+}

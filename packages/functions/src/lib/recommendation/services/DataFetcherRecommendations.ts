@@ -3,6 +3,13 @@ import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/Lives
 import { UserData } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { BundleLoader } from "../../bundleLoader"
+import {
+   LikedSparks,
+   SeenSparks,
+   SharedSparks,
+   SparkStats,
+} from "@careerfairy/shared-lib/sparks/sparks"
+import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
 
 /**
  * Interface that holds the contract that fetches data for
@@ -83,5 +90,61 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
          orderByDirection: "desc",
          limit: 10,
       })
+   }
+}
+
+export class SparksDataFetcher {
+   private loader: BundleLoader
+   constructor(
+      private readonly userId: string,
+      private readonly livestreamRepo: ILivestreamRepository,
+      private readonly userRepo: IUserRepository,
+      private readonly sparksRepo: ISparkFunctionsRepository
+   ) {
+      this.loader = new BundleLoader()
+   }
+
+   // Get user data by user ID
+   async getUser(): Promise<UserData> {
+      return this.userRepo.getUserDataById(this.userId)
+   }
+
+   // Get the last 5 participated livestreams for this user only
+   getParticipatedLivestreams(): Promise<LivestreamEvent[]> {
+      return this.livestreamRepo.getParticipatedEvents(this.userId, {
+         to: new Date(),
+         orderByDirection: "desc",
+         limit: 5,
+      })
+   }
+
+   // Fetch all spark statistics
+   async getAllSparksStats(): Promise<SparkStats[]> {
+      await this.loader.fetch("allSparksStats")
+      return this.loader.getDocs<SparkStats>("all-sparks-stats")
+   }
+
+   // Get shared sparks for the user
+   getSharedSparks(): Promise<SharedSparks[]> {
+      return this.sparksRepo.getUserSparkInteraction<SharedSparks>(
+         this.userId,
+         "sharedSparks"
+      )
+   }
+
+   // Get liked sparks for the user
+   getLikedSparks(): Promise<LikedSparks[]> {
+      return this.sparksRepo.getUserSparkInteraction<LikedSparks>(
+         this.userId,
+         "likedSparks"
+      )
+   }
+
+   // Get seen sparks for the user
+   getSeenSparks(): Promise<SeenSparks[]> {
+      return this.sparksRepo.getUserSparkInteraction<SeenSparks>(
+         this.userId,
+         "seenSparks"
+      )
    }
 }

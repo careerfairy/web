@@ -94,7 +94,7 @@ export class SparksService {
          SerializedSpark[]
       >(
          this.functions,
-         "getSparksFeed"
+         "getSparksFeed_v2"
       )(data)
 
       return serializedSparks.map(SparkPresenter.deserialize)
@@ -247,7 +247,7 @@ export class SparksService {
       if (!userId) return // Should not be called if not logged in
       return httpsCallable<{ sparkId: string }, void>(
          this.functions,
-         "markSparkAsSeenByUser"
+         "markSparkAsSeenByUser_v2"
       )({ sparkId })
    }
 
@@ -446,6 +446,8 @@ export class SparksService {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sparkService = new SparksService(FunctionsInstance as any)
+export const sparkService = new SparksService(
+   FunctionsInstance as unknown as Functions
+)
 
 export default SparksService

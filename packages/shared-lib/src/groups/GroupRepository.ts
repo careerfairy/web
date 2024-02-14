@@ -34,7 +34,9 @@ import {
    UserGroupData,
 } from "./groups"
 import { Create, ImageType } from "../commonTypes"
+import { containsAny } from "../utils/utils"
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const cloneDeep = require("lodash.clonedeep")
 
 export interface IGroupRepository {
@@ -280,14 +282,14 @@ export class FirebaseGroupRepository
    }
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
-      let userRef = this.firestore.collection("userData").doc(userEmail)
+      const userRef = this.firestore.collection("userData").doc(userEmail)
 
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
       })
    }
 
-   async getGroupsByIds(groupIds: string[]): Promise<any> {
+   async getGroupsByIds(groupIds: string[]): Promise<Group[]> {
       const uniqueGroupIds = Array.from(new Set(groupIds))
       const groupRefs = uniqueGroupIds.map((groupId) =>
          this.firestore.collection("careerCenterData").doc(groupId)
@@ -367,8 +369,10 @@ export class FirebaseGroupRepository
       integrationId: string,
       data: Partial<GroupATSAccountDocument>
    ) {
-      data.updatedAt = this.fieldValue.serverTimestamp() as any
-      data.createdAt = this.fieldValue.serverTimestamp() as any
+      data.updatedAt =
+         this.fieldValue.serverTimestamp() as firebase.firestore.Timestamp
+      data.createdAt =
+         this.fieldValue.serverTimestamp() as firebase.firestore.Timestamp
 
       return this.firestore
          .collection("careerCenterData")
@@ -915,7 +919,8 @@ export class FirebaseGroupRepository
          groupId: group.id,
          group: pickPublicDataFromGroup(group),
          id: group.id,
-         createdAt: this.fieldValue.serverTimestamp() as any,
+         createdAt:
+            this.fieldValue.serverTimestamp() as firebase.firestore.Timestamp,
          user: pickPublicDataFromUser(userData),
          userId: userData.id,
       }
@@ -975,7 +980,9 @@ export class FirebaseGroupRepository
    ): Promise<Creator> {
       const creatorData: Creator = {
          ...creator,
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          createdAt: this.fieldValue.serverTimestamp() as any,
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          updatedAt: this.fieldValue.serverTimestamp() as any,
          id: creator.email, // We use the email as the id and not firestore's auto generated id
          documentType: "groupCreator",
@@ -1004,6 +1011,7 @@ export class FirebaseGroupRepository
       const updateCreatorData: UpdateCreatorData & Pick<Creator, "updatedAt"> =
          {
             ...creator,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             updatedAt: this.fieldValue.serverTimestamp() as any,
          }
 
@@ -1101,6 +1109,44 @@ export class FirebaseGroupRepository
       }
 
       return groupRef.update(toUpdate)
+   }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Mappings and Filters
+|--------------------------------------------------------------------------
+*/
+export class GroupsDataParser {
+   constructor(private groups: Group[]) {}
+
+   filterByCompanyCountry(companyCountriesIds: string[]) {
+      this.groups = this.groups?.filter(({ companyCountry }) =>
+         companyCountriesIds.includes(companyCountry.id)
+      )
+      return this
+   }
+
+   filterByCompanyIndustry(companyIndustryIds: string[]) {
+      this.groups = this.groups?.filter(({ companyIndustries }) =>
+         containsAny(
+            companyIndustries.map((industry) => industry.id),
+            companyIndustryIds
+         )
+      )
+
+      return this
+   }
+
+   filterByCompanySize(companySizes: string[]) {
+      this.groups = this.groups?.filter(({ companySize }) =>
+         companySizes.includes(companySize)
+      )
+      return this
+   }
+
+   get() {
+      return this.groups
    }
 }
 

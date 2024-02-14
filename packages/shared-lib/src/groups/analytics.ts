@@ -59,8 +59,11 @@ const mapUserStats = (
    dataPaths: BreakdownDataPaths
 ) => {
    for (const user of users) {
-      const dataId = getNestedProperty(user, dataPaths.pathToDataId)
-      const dataName = getNestedProperty(user, dataPaths.pathToDataName)
+      const dataId = getNestedProperty(user, dataPaths.pathToDataId) as string
+      const dataName = getNestedProperty(
+         user,
+         dataPaths.pathToDataName
+      ) as string
 
       if (!dataId) continue
       if (!stats.dataDict[dataId]) {

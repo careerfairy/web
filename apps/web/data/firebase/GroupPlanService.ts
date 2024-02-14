@@ -12,11 +12,12 @@ export class GroupPlanService {
    async startPlan(data: StartPlanData) {
       return httpsCallable<StartPlanData, void>(
          this.functions,
-         "startPlan_v2"
+         "startPlan_v3"
       )(data)
    }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const groupPlanService = new GroupPlanService(FunctionsInstance as any)
 
 export default GroupPlanService

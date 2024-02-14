@@ -2,28 +2,114 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
 import { appendCurrentQueryParams } from "components/util/url"
-import { BottomBar, Layout, TopBar } from "./components"
-import { MiddleContent } from "./components/MiddleContent"
-import { ToggleStreamModeButton } from "./components/ToggleStreamModeButton"
-import { StreamProvider } from "./context"
-import { Fragment, ReactNode, useMemo } from "react"
+import { Fragment, useMemo } from "react"
 import { CircularProgress } from "@mui/material"
+import {
+   GetUserStreamIdOptions,
+   getAgoraUserId,
+   withLocalStorage,
+} from "./util"
+
+import { useAuth } from "HOCs/AuthProvider"
+import { useRouter } from "next/router"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import dynamic from "next/dynamic"
+
+const LivestreamValidationWrapper = dynamic(
+   () =>
+      import("./components/LivestreamValidationWrapper").then(
+         (mod) => mod.LivestreamValidationWrapper
+      ),
+   { ssr: false }
+)
+
+const UserClientProvider = dynamic(
+   () => import("./context/UserClient").then((mod) => mod.UserClientProvider),
+   { ssr: false }
+)
+
+const Layout = dynamic(
+   () => import("./components/Layout").then((mod) => mod.Layout),
+   {
+      ssr: false,
+   }
+)
+
+const ToggleStreamModeButton = dynamic(
+   () =>
+      import("./components/ToggleStreamModeButton").then(
+         (mod) => mod.ToggleStreamModeButton
+      ),
+   {
+      ssr: false,
+   }
+)
+const StreamSetupWidget = dynamic(
+   () =>
+      import("./components/StreamSetupWidget").then(
+         (mod) => mod.StreamSetupWidget
+      ),
+   {
+      ssr: false,
+   }
+)
+const TopBar = dynamic(
+   () => import("./components/TopBar").then((mod) => mod.TopBar),
+   {
+      ssr: false,
+   }
+)
+const MiddleContent = dynamic(
+   () => import("./components/MiddleContent").then((mod) => mod.MiddleContent),
+   {
+      ssr: false,
+   }
+)
+const BottomBar = dynamic(
+   () => import("./components/BottomBar").then((mod) => mod.BottomBar),
+   {
+      ssr: false,
+   }
+)
+const StreamingProvider = dynamic(
+   () => import("./context/Streaming").then((mod) => mod.StreamingProvider),
+   { ssr: false }
+)
+const LocalTracksProvider = dynamic(
+   () => import("./context/LocalTracks").then((mod) => mod.LocalTracksProvider),
+   { ssr: false }
+)
+
+const AudioLevelsTracker = dynamic(
+   () =>
+      import("./components/streaming/AudioLevelsTracker").then(
+         (mod) => mod.AudioLevelsTracker
+      ),
+   { ssr: false }
+)
 
 type Props = {
    isHost: boolean
 }
 
 export const StreamingPage = ({ isHost }: Props) => {
+   const { authenticatedUser } = useAuth()
+
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <LivestreamValidationWrapper>
-            <Component isHost={isHost} />
-         </LivestreamValidationWrapper>
+         <ConditionalWrapper condition={authenticatedUser.isLoaded}>
+            <LivestreamValidationWrapper isHost={isHost}>
+               <Component isHost={isHost} />
+            </LivestreamValidationWrapper>
+         </ConditionalWrapper>
       </SuspenseWithBoundary>
    )
 }
-export const Component = ({ isHost }: Props) => {
+
+const Component = ({ isHost }: Props) => {
    const livestream = useLivestreamData()
+   const { authenticatedUser } = useAuth()
+   const { query } = useRouter()
 
    useConditionalRedirect(
       !livestream.useNewUI,
@@ -31,6 +117,17 @@ export const Component = ({ isHost }: Props) => {
          `/streaming/${livestream.id}/${isHost ? "main-streamer" : "viewer"}`
       )
    )
+
+   const options: GetUserStreamIdOptions = {
+      isRecordingWindow: Boolean(query.isRecordingWindow),
+      useRandomId: livestream.openStream || isHost,
+      streamId: livestream.id,
+      userId: authenticatedUser.uid,
+   }
+
+   const agoraUserId = isHost
+      ? withLocalStorage("streamingUuid", () => getAgoraUserId(options))
+      : getAgoraUserId(options)
 
    /**
     * The children are wrapped in useMemo to ensure that they are only re-rendered when necessary.
@@ -42,46 +139,25 @@ export const Component = ({ isHost }: Props) => {
             <TopBar />
             <MiddleContent />
             <BottomBar />
+            <StreamSetupWidget />
          </Fragment>
       ),
       []
    )
 
    return (
-      <StreamProvider isHost={isHost} livestreamId={livestream.id}>
-         <Layout>{memoizedChildren}</Layout>
-         <ToggleStreamModeButton />
-      </StreamProvider>
+      <UserClientProvider>
+         <StreamingProvider
+            isHost={isHost}
+            agoraUserId={agoraUserId}
+            livestreamId={livestream.id}
+         >
+            <LocalTracksProvider>
+               <Layout>{memoizedChildren}</Layout>
+               <ToggleStreamModeButton />
+            </LocalTracksProvider>
+         </StreamingProvider>
+         <AudioLevelsTracker />
+      </UserClientProvider>
    )
-}
-
-type ConditionalRedirectWrapperProps = {
-   children: ReactNode
-}
-
-/**
- * All validation logic for the live stream data is handled here.
- * Ensures all the children have the data needed without having to check for it in each component.
- *
- * TODO:
- * - Validate token if user is host and not test stream
- * - Validate user must be logged-in except for (test/open) streams
- * - Validate if viewer and has registered for event
- * - Validate browser is compatible with Agora
- */
-export const LivestreamValidationWrapper = ({
-   children,
-}: ConditionalRedirectWrapperProps) => {
-   const livestream = useLivestreamData()
-
-   const livestreamExists = Boolean(livestream)
-
-   useConditionalRedirect(!livestreamExists, "/portal")
-
-   if (!livestreamExists) {
-      // Since we're using suspense, if there's no live stream data, it means it doesn't exist
-      return null
-   }
-
-   return <>{children}</>
 }

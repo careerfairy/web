@@ -55,6 +55,7 @@ import groupPlans = require("./groupPlans")
 import search = require("./search")
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
+import companies = require("./companies")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -67,7 +68,7 @@ exports.resendPostmarkEmailVerificationEmailWithPin_eu =
 exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
-exports.fetchAgoraRtcToken_eu = agora.fetchAgoraRtcToken
+exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
 
 // Backup
@@ -236,8 +237,8 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed = userSparks.getSparksFeed
-exports.markSparkAsSeenByUser = userSparks.markSparkAsSeenByUser
+exports.getSparksFeed_v2 = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser_v2 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v4 = userSparks.trackSparkEvents
@@ -252,7 +253,9 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
 
 // Group Subscription Plan Functions
-exports.startPlan_v2 = groupPlans.startPlan
+exports.startPlan_v3 = groupPlans.startPlan
+exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
+   groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
 
 // Search
 exports.fullIndexSync = search.fullIndexSync
@@ -261,3 +264,6 @@ exports.fullIndexSync = search.fullIndexSync
 // npx firelink deploy --only functions:searchIndex-livestreams
 //
 exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
+
+// Company | Group Functions
+exports.fetchCompanies = companies.fetchCompanies

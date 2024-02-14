@@ -97,6 +97,7 @@ const styles = sxStyles({
    eventCardContentInner: {
       height: "100%",
       mt: "unset",
+      justifyContent: "center",
    },
    outerActionsWrapper: {
       position: "absolute",
@@ -260,9 +261,7 @@ const SparksFeedCard: FC<Props> = ({
                <Box
                   sx={[
                      styles.contentInner,
-                     ...(showCardNotification
-                        ? [styles.eventCardContentInner]
-                        : []),
+                     showCardNotification && styles.eventCardContentInner,
                   ]}
                >
                   {showCardNotification ? (
