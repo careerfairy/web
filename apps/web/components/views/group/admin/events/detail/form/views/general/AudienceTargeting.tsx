@@ -93,7 +93,7 @@ const AudienceTargeting = () => {
             disableCloseOnSelect
             textFieldProps={{
                label: "By Country",
-               placeholder: "Select Country",
+               placeholder: "Select country",
             }}
          />
          {general.targetCountries.length === 0 ? (
@@ -116,7 +116,7 @@ const AudienceTargeting = () => {
                disableCloseOnSelect
                textFieldProps={{
                   label: "By University",
-                  placeholder: "Select University",
+                  placeholder: "Select university",
                }}
             />
          )}
@@ -129,7 +129,7 @@ const AudienceTargeting = () => {
             disableCloseOnSelect
             textFieldProps={{
                label: "By Field Of Study",
-               placeholder: "Select Fields of Study",
+               placeholder: "Select fields of study",
                required: true,
             }}
          />
@@ -141,7 +141,7 @@ const AudienceTargeting = () => {
             disableCloseOnSelect
             textFieldProps={{
                label: "By Level Of Study",
-               placeholder: "Select Levels of Study",
+               placeholder: "Select levels of study",
                required: true,
             }}
          />
