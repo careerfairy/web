@@ -50,6 +50,15 @@ export const onboardingNewsletter = functions
       await sendOnboardingNewsletter()
    })
 
+export const testOnboardingNewsletter = functions
+   .region(config.region)
+   .https.onCall(async () => {
+      functions.logger.info(
+         "Starting TEST execution of OnboardingNewsletterService"
+      )
+      await sendOnboardingNewsletter()
+   })
+
 async function sendOnboardingNewsletter() {
    if (newsletterAlreadySent) {
       functions.logger.info(
