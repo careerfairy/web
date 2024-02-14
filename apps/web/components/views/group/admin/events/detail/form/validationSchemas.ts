@@ -27,7 +27,11 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
       backgroundImageUrl: yup
          .string()
          .required("Please provide a banner image"),
-      startDate: yup.date().required(),
+      startDate: yup
+         .date()
+         .nullable()
+         .min(new Date(), "Choose a date in the future")
+         .required(REQUIRED_FIELD_MESSAGE),
       duration: yup.number().nullable().required(REQUIRED_FIELD_MESSAGE),
       language: yup.string().required(REQUIRED_FIELD_MESSAGE),
       summary: yup
