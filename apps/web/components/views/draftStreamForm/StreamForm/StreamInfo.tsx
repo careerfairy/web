@@ -17,7 +17,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import { LanguageSelect } from "../../../helperFunctions/streamFormFunctions/components"
 import Stack from "@mui/material/Stack"
 import FormGroup from "../FormGroup"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
@@ -27,6 +27,7 @@ import DateUtil from "../../../../util/DateUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
 import AspectRatio from "components/views/common/AspectRatio"
 import useUploadLivestreamLogo from "components/custom-hook/live-stream/useUploadLivestreamLogo"
+import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
 
 type Props = {
    isGroupsSelected: boolean
@@ -72,6 +73,7 @@ const StreamInfo = ({
    const [disableStartDatePicker, setDisableStartDatePicker] = useState(false)
    const { setShowPromotionInputs, setIsPromotionInputsDisabled } =
       useStreamCreationProvider()
+   const startDatePickerRef = useRef(null)
 
    const { handleUploadImage } = useUploadLivestreamLogo(values.id, isDraft)
 
@@ -309,7 +311,13 @@ const StreamInfo = ({
                   resolution={"1280 x 960"}
                />
             </Grid>
-            <Grid xs={12} sm={6} md={4} item>
+            <Grid
+               xs={12}
+               sm={6}
+               md={4}
+               item
+               ref={(field) => (startDatePickerRef.current = field)}
+            >
                <DateTimePicker
                   format={"dd/MM/yyyy HH:mm"}
                   disablePast
@@ -327,6 +335,7 @@ const StreamInfo = ({
                         />
                      ),
                   }}
+                  openTo="day"
                   disabled={isSubmitting || disableStartDatePicker}
                   label="Live Stream Start Date"
                   value={values.start}
@@ -336,6 +345,23 @@ const StreamInfo = ({
                   }}
                   open={startDatePickerOpen}
                   onOpen={() => setStartDatePickerOpen(true)}
+                  viewRenderers={{
+                     // @ts-ignore
+                     hours: renderMultiSectionDigitalClockTimeView,
+                     // @ts-ignore
+                     minutes: renderMultiSectionDigitalClockTimeView,
+                  }}
+                  slotProps={{
+                     popper: {
+                        placement: "bottom-start",
+                        anchorEl: startDatePickerRef.current,
+                        sx: {
+                           "& .MuiPaper-root": {
+                              marginLeft: 2,
+                           },
+                        },
+                     },
+                  }}
                />
                <Collapse
                   className={classes.errorMessage}
