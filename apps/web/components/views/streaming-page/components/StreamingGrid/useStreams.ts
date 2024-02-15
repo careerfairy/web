@@ -2,7 +2,7 @@ import { useRemoteUsers } from "agora-rtc-react"
 import { useMemo } from "react"
 import { useLocalTracks } from "../../context"
 import { RemoteUser, UserStream } from "../../types"
-import { useScreenShare } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShare"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 
 /**

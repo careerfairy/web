@@ -13,7 +13,7 @@ import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamData } from "components/custom-hook/streaming"
-import { useScreenShare } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShare"
 
 const styles = sxStyles({
    root: {
