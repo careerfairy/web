@@ -5,7 +5,7 @@ import useMenuState from "components/custom-hook/useMenuState"
 import { ShareMenu } from "../ShareMenu"
 import { Tooltip } from "@mui/material"
 import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
-import { useScreenShare } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShare"
 import { getDeviceButtonColor, getRTCErrorCode } from "../../util"
 import { AgoraRTCReactError } from "agora-rtc-react"
 

@@ -72,10 +72,7 @@ const StreamingProvider = dynamic(
    { ssr: false }
 )
 const ScreenShareProvider = dynamic(
-   () =>
-      import("./context/ScreenShareTracks").then(
-         (mod) => mod.ScreenShareProvider
-      ),
+   () => import("./context/ScreenShare").then((mod) => mod.ScreenShareProvider),
    { ssr: false }
 )
 

@@ -17,7 +17,7 @@ import { useAppSelector } from "components/custom-hook/store"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { DetailsOverlay } from "./DetailsOverlay"
 import { SpeakingIndicator } from "./SpeakingIndicator"
-import { useScreenShare } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShare"
 import { LocalUser, LocalUserScreen } from "../../types"
 import { useUserStream } from "../../context/UserStream"
 
