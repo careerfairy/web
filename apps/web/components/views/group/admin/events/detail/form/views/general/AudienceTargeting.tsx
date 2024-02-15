@@ -92,14 +92,14 @@ const AudienceTargeting = () => {
             multiple
             disableCloseOnSelect
             textFieldProps={{
-               label: "By Country",
+               label: "By country",
                placeholder: "Select country",
             }}
          />
          {general.targetCountries.length === 0 ? (
             <BrandedTextField
                disabled
-               label="By University"
+               label="By university"
                value="Please first select your target countries"
             />
          ) : (
@@ -115,7 +115,7 @@ const AudienceTargeting = () => {
                multiple
                disableCloseOnSelect
                textFieldProps={{
-                  label: "By University",
+                  label: "By university",
                   placeholder: "Select university",
                }}
             />
@@ -128,7 +128,7 @@ const AudienceTargeting = () => {
             multiple
             disableCloseOnSelect
             textFieldProps={{
-               label: "By Field Of Study",
+               label: "By field of study",
                placeholder: "Select fields of study",
                required: true,
             }}
@@ -140,7 +140,7 @@ const AudienceTargeting = () => {
             multiple
             disableCloseOnSelect
             textFieldProps={{
-               label: "By Level Of Study",
+               label: "By level of study",
                placeholder: "Select levels of study",
                required: true,
             }}
