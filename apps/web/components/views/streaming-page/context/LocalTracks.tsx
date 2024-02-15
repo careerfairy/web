@@ -65,7 +65,6 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       error: fetchCamerasError,
       activeDeviceId: activeCameraId,
       setActiveDeviceId: setActiveCameraId,
-      deviceLastChanged: cameraLastChanged,
    } = useDevices({
       deviceType: "camera",
       enable: shouldStream,
@@ -76,7 +75,6 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       error: fetchMicsError,
       activeDeviceId: activeMicrophoneId,
       setActiveDeviceId: setActiveMicrophoneId,
-      deviceLastChanged: microphoneLastChanged,
    } = useDevices({
       deviceType: "microphone",
       enable: shouldStream,
@@ -91,21 +89,33 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     */
    useEffect(() => {
       if (cameraTrack.localCameraTrack && activeCameraId) {
-         cameraTrack.localCameraTrack.setDevice(activeCameraId).catch((error) =>
-            errorLogAndNotify(error, {
-               message: "Failed to set the active camera device",
-               metadata: {
-                  activeCameraId,
-               },
-            })
-         )
+         console.log(`🚀: Start setting camera to ${activeCameraId}`)
+         cameraTrack.localCameraTrack
+            .setDevice(activeCameraId)
+            .then(() =>
+               console.log(`🚀: Camera set successfully to ${activeCameraId}`)
+            )
+            .catch((error) =>
+               errorLogAndNotify(error, {
+                  message: "Failed to set the active camera device",
+                  metadata: {
+                     activeCameraId,
+                  },
+               })
+            )
       }
-   }, [activeCameraId, cameraTrack.localCameraTrack, cameraLastChanged])
+   }, [activeCameraId, cameraTrack.localCameraTrack])
 
    useEffect(() => {
       if (microphoneTrack.localMicrophoneTrack && activeMicrophoneId) {
+         console.log(`🚀: Start setting microphone to ${activeMicrophoneId}`)
          microphoneTrack.localMicrophoneTrack
             .setDevice(activeMicrophoneId)
+            .then(() =>
+               console.log(
+                  `🚀: Microphone set successfully to ${activeMicrophoneId}`
+               )
+            )
             .catch((error) =>
                errorLogAndNotify(error, {
                   message: "Failed to set the active microphone device",
@@ -115,11 +125,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
                })
             )
       }
-   }, [
-      activeMicrophoneId,
-      microphoneTrack.localMicrophoneTrack,
-      microphoneLastChanged,
-   ])
+   }, [activeMicrophoneId, microphoneTrack.localMicrophoneTrack])
 
    /**
     * For an improved user experience, the microphone is only muted/unmuted rather than being turned off/on.
