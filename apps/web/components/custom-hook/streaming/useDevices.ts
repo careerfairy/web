@@ -1,5 +1,5 @@
 import AgoraRTC, { DeviceInfo, type IAgoraRTCError } from "agora-rtc-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 type Options = {
@@ -10,29 +10,8 @@ type Options = {
    deviceType: "camera" | "microphone"
 }
 
-const updateAndSetDevices = (
-   currentDevices: MediaDeviceInfo[],
-   activeDeviceId: string,
-   setActiveDeviceId: (id: string) => void,
-   dev: DeviceInfo
-) => {
-   const isNew = dev.state === "ACTIVE"
-   const newDevices = isNew
-      ? [dev.device, ...currentDevices]
-      : currentDevices.filter(
-           (device) => device.deviceId !== dev.device.deviceId
-        )
-
-   if (isNew) {
-      setActiveDeviceId(dev.device.deviceId)
-   } else {
-      const activeDeviceWasRemoved = activeDeviceId === dev.device.deviceId
-      if (activeDeviceWasRemoved) {
-         setActiveDeviceId(newDevices[0].deviceId || "")
-      }
-   }
-   return newDevices
-}
+const removeDefaultDevices = (devices: MediaDeviceInfo[]) =>
+   devices.filter((device) => device.deviceId !== "default")
 
 /**
  * Custom hook to manage and interact with media devices (camera and microphone).
@@ -47,16 +26,15 @@ export const useDevices = (options: Options) => {
    const [error, setError] = useState<IAgoraRTCError | null>(null)
 
    /**
-    * Default device have the id "default" which is not unique
-    * so we need to use the device change counter to force the
-    * track to re-initialize when the default device changes.
+    * Debug for simone
     */
-   const [deviceLastChanged, setDeviceLastChanged] = useState(0)
-
-   const handleChangeActiveDevice = useCallback((deviceId: string) => {
-      setActiveDeviceId(deviceId)
-      setDeviceLastChanged(Date.now())
-   }, [])
+   if (options.deviceType === "microphone") {
+      console.log("🚀 ~ device state:", {
+         activeDeviceId,
+         devices,
+         error,
+      })
+   }
 
    /**
     * This useEffect hook is used to initialize the selected devices.
@@ -71,6 +49,7 @@ export const useDevices = (options: Options) => {
             : AgoraRTC.getMicrophones
 
       fetchDevices()
+         .then(removeDefaultDevices)
          .then((fetchedDevices) => {
             setActiveDeviceId(fetchedDevices[0]?.deviceId ?? "")
             setDevices(fetchedDevices)
@@ -88,14 +67,32 @@ export const useDevices = (options: Options) => {
    }, [options.deviceType, options.enable])
 
    useEffect(() => {
-      const deviceChangedHandler = (dev: DeviceInfo) => {
-         const updatedDevices = updateAndSetDevices(
-            devices,
-            activeDeviceId,
-            handleChangeActiveDevice,
-            dev
+      const handleAddDevice = (dev: DeviceInfo) => {
+         const newDevices = removeDefaultDevices([dev.device, ...devices])
+         setActiveDeviceId(newDevices[0].deviceId || "")
+         setDevices(newDevices)
+      }
+
+      const handleRemoveDevice = (dev: DeviceInfo) => {
+         const newDevices = devices.filter(
+            (device) => device.deviceId !== dev.device.deviceId
          )
-         setDevices(updatedDevices)
+
+         const activeDeviceWasRemoved = activeDeviceId === dev.device.deviceId
+         if (activeDeviceWasRemoved) {
+            setActiveDeviceId(newDevices[0].deviceId || "")
+         }
+         setDevices(newDevices)
+      }
+
+      const deviceChangedHandler = (dev: DeviceInfo) => {
+         if (dev.state === "ACTIVE") {
+            handleAddDevice(dev)
+         }
+
+         if (dev.state === "INACTIVE") {
+            handleRemoveDevice(dev)
+         }
       }
 
       if (options.deviceType === "camera") {
@@ -110,7 +107,7 @@ export const useDevices = (options: Options) => {
          AgoraRTC.onCameraChanged = null
          AgoraRTC.onMicrophoneChanged = null
       }
-   }, [activeDeviceId, devices, handleChangeActiveDevice, options.deviceType])
+   }, [activeDeviceId, devices, options.deviceType])
 
    return useMemo(
       () => ({
@@ -118,8 +115,7 @@ export const useDevices = (options: Options) => {
          setActiveDeviceId,
          devices,
          error,
-         deviceLastChanged,
       }),
-      [activeDeviceId, deviceLastChanged, devices, error]
+      [activeDeviceId, devices, error]
    )
 }
