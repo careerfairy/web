@@ -1,7 +1,6 @@
 import {
    LocalVideoTrack,
    LocalAudioTrack,
-   useCurrentUID,
    ILocalVideoTrack,
    ILocalAudioTrack,
 } from "agora-rtc-react"
@@ -18,7 +17,9 @@ import { useAppSelector } from "components/custom-hook/store"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { DetailsOverlay } from "./DetailsOverlay"
 import { SpeakingIndicator } from "./SpeakingIndicator"
-import { useScreenShareTracks } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShareTracks"
+import { LocalUser, LocalUserScreen } from "../../types"
+import { useUserStream } from "../../context/UserStream"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -37,10 +38,7 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Children is rendered on top of the video canvas.
     */
    readonly children?: ReactNode
-   /**
-    * Whether to contain the video inside the container or fill it.
-    */
-   readonly containVideo?: boolean
+
    /**
     * Whether to hide the details overlay.
     */
@@ -104,7 +102,7 @@ export const LocalUserStream = (props: LocalMicrophoneAndCameraUserProps) => {
 
 export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
    const { screenVideoTrack, screenAudioTrack, isLoadingScreenShare } =
-      useScreenShareTracks()
+      useScreenShare()
    return (
       <LocalStream
          {...props}
@@ -113,7 +111,6 @@ export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
          cameraOn={Boolean(screenVideoTrack)}
          micOn={Boolean(screenAudioTrack)}
          isLoading={isLoadingScreenShare}
-         containVideo
          hideDetails
       />
    )
@@ -132,14 +129,13 @@ const LocalStream = ({
    localCameraTrack,
    localMicrophoneTrack,
    isLoading,
-   containVideo,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
-   const uid = useCurrentUID()
+   const { user, type } = useUserStream<LocalUser | LocalUserScreen>()
 
-   const isSpeaking = useAppSelector(userIsSpeakingSelector(uid))
+   const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
-   const { data: streamerDetails } = useStreamerDetails(uid)
+   const { data: streamerDetails } = useStreamerDetails(user.uid)
 
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)
@@ -149,7 +145,10 @@ const LocalStream = ({
    return (
       <VideoTrackWrapper {...props}>
          <Box
-            sx={[styles.videoTrack, containVideo && styles.videoContain]}
+            sx={[
+               styles.videoTrack,
+               type === "local-user-screen" && styles.videoContain,
+            ]}
             component={LocalVideoTrack}
             disabled={!cameraOn}
             play={playVideo}

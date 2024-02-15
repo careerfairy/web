@@ -23,6 +23,7 @@ import {
 import { useStreamingContext } from "./Streaming"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { type LocalUser } from "../types"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -45,6 +46,7 @@ type LocalTracksContextProps = {
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
    localUser: LocalUser
+   readyToPublish: boolean
 }
 
 const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
@@ -75,10 +77,11 @@ const setFirstAvailableDevice = (
    }
 }
 
-export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
-   children,
-}) => {
-   const { isReady, shouldStream, currentRole } = useStreamingContext()
+export const LocalTracksProvider: FC<LocalTracksProviderProps> = (props) => {
+   useTraceUpdate(props)
+   const { children } = props
+   const streamingContextProps = useStreamingContext()
+   const { isReady, shouldStream, currentRole } = streamingContextProps
    const currentUserUID = useCurrentUID()
 
    const [cameraOn, setCameraOn] = useState(true)
@@ -200,35 +203,31 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const toggleCamera = useCallback(() => setCameraOn((prev) => !prev), [])
 
-   const readToPublish = shouldStream && isReady && currentRole === "host"
+   const readyToPublish = shouldStream && isReady && currentRole === "host"
 
-   const localUser = useMemo<LocalUser | null>(() => {
-      // If the user is ready to publish, return the local user object
-      if (readToPublish) {
-         return {
-            type: "local-user",
-            user: {
-               uid: currentUserUID,
-               hasAudio: !microphoneMuted,
-               hasVideo: cameraOn,
-               audioTrack: microphoneTrack.localMicrophoneTrack,
-               videoTrack: cameraTrack.localCameraTrack,
-            },
-         }
-      }
-      return null
-   }, [
-      readToPublish,
-      currentUserUID,
-      microphoneMuted,
-      cameraOn,
-      microphoneTrack.localMicrophoneTrack,
-      cameraTrack.localCameraTrack,
-   ])
+   const localUser = useMemo<LocalUser>(
+      () => /* If the user is ready to publish, return the local user object*/ ({
+         type: "local-user",
+         user: {
+            uid: currentUserUID,
+            hasAudio: !microphoneMuted,
+            hasVideo: cameraOn,
+            audioTrack: microphoneTrack.localMicrophoneTrack,
+            videoTrack: cameraTrack.localCameraTrack,
+         },
+      }),
+      [
+         currentUserUID,
+         microphoneMuted,
+         cameraOn,
+         microphoneTrack.localMicrophoneTrack,
+         cameraTrack.localCameraTrack,
+      ]
+   )
 
    usePublish(
       [microphoneTrack.localMicrophoneTrack, cameraTrack.localCameraTrack],
-      readToPublish
+      readyToPublish
    )
 
    const value = useMemo<LocalTracksContextProps>(
@@ -249,6 +248,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameraDevices: cameras,
          microphoneDevices: microphones,
          localUser,
+         readyToPublish,
       }),
       [
          cameraTrack,
@@ -265,6 +265,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameras,
          microphones,
          localUser,
+         readyToPublish,
       ]
    )
 

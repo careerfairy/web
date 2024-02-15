@@ -1,19 +1,19 @@
 import { useAppSelector } from "components/custom-hook/store"
 import { useEffect, useState } from "react"
 import { audioLevelsSelector } from "store/selectors/streamingAppSelectors"
-import { StreamUser } from "../../types"
+import { UserStream } from "../../types"
 import { swapPositions } from "@careerfairy/shared-lib/utils"
 
 /**
  * Sorts the combined streamers based on their audio levels in descending order.
  * This hook utilizes `useStreams` to get the combined streamers and then applies sorting logic.
  *
- * @returns {Array<StreamUser>} An array of sorted streamers, primarily based on their audio levels.
+ * @returns {Array<UserStream>} An array of sorted streamers, primarily based on their audio levels.
  */
 export const useSortedStreams = (
-   streams: StreamUser[],
+   streams: UserStream[],
    pageSize: number
-): StreamUser[] => {
+): UserStream[] => {
    const audioLevels = useAppSelector(audioLevelsSelector)
    const [sortedStreams, setSortedStreams] = useState(streams)
 

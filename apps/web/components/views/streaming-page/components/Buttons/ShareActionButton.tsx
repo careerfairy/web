@@ -5,7 +5,7 @@ import useMenuState from "components/custom-hook/useMenuState"
 import { ShareMenu } from "../ShareMenu"
 import { Tooltip } from "@mui/material"
 import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
-import { useScreenShareTracks } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShareTracks"
 import { getDeviceButtonColor, getRTCErrorCode } from "../../util"
 import { AgoraRTCReactError } from "agora-rtc-react"
 
@@ -14,7 +14,7 @@ export const ShareActionButton = forwardRef<
    ActionButtonProps
 >((props, ref) => {
    const { anchorEl, handleClick, open, handleClose } = useMenuState()
-   const { screenShareError, isLoadingScreenShare } = useScreenShareTracks()
+   const { screenShareError, isLoadingScreenShare } = useScreenShare()
 
    return (
       <span>
