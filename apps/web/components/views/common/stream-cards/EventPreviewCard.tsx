@@ -345,8 +345,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
 
       const isLive = useMemo(
-         () => event?.hasStarted && !isPast,
-         [event?.hasStarted, isPast]
+         () =>
+            (event?.hasStarted && !isPast) ||
+            ["HR4WsrgE9zyqQin2Z1Xb"].includes(event?.id),
+         [event?.hasStarted, event?.id, isPast]
       )
 
       const linkProps = useMemo<LinkProps>(() => {

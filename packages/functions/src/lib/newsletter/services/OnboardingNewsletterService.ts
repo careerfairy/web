@@ -8,7 +8,7 @@ import {
    EmailNotificationType,
    EmailNotification,
 } from "@careerfairy/shared-lib/notifications/notifications"
-import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
+import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { LivestreamRecordingDetails } from "@careerfairy/shared-lib/livestreams"
 import { Timestamp } from "firebase-admin/firestore"
@@ -35,26 +35,23 @@ type OnboardingUserData = {
    notifications: OnboardingUserDataNotifications
 }
 export class OnboardingNewsletterService {
-   private onboardingUsers: OnboardingUserData[]
-   private users: UserData[]
-   private companyDiscoveryEmails: string[]
-   private livestream1stRegistrationDiscoveryEmails: string[]
-   private sparksDiscoveryEmails: string[]
-   private recordingDiscoveryEmails: string[]
-   private feedbackDiscoveryEmails: string[]
+   private onboardingUsers: OnboardingUserData[] = []
+   private users: UserData[] = []
+   private companyDiscoveryEmails: string[] = []
+   private livestream1stRegistrationDiscoveryEmails: string[] = []
+   private sparksDiscoveryEmails: string[] = []
+   private recordingDiscoveryEmails: string[] = []
+   private feedbackDiscoveryEmails: string[] = []
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly sparksRepo: ISparkFunctionsRepository,
-      private readonly notificationsRepo: IEmailNotificationRepository,
+      private readonly notificationsRepo: IEmailFunctionsNotificationRepository,
       private readonly livestreamsRepo: ILivestreamRepository,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
       private readonly logger: Logger
    ) {
-      this.logger.info(
-         `OnboardingNewsletterService starting at ${notificationsRepo.getServerTimestamp()}`
-      )
-      this.logger.info("Email builder " + this.emailBuilder + "")
+      this.logger.info("OnboardingNewsletterService...")
    }
 
    private shouldSendCompanyDiscovery = (user: OnboardingUserData): boolean => {
@@ -108,7 +105,15 @@ export class OnboardingNewsletterService {
       console.log(type, creationDate, userEmails)
    }
 
-   private async fetchUserData(user: UserData): Promise<OnboardingUserData> {
+   async fetchUserData(user: UserData): Promise<OnboardingUserData> {
+      this.logger.info(`OnboardingNewsletterService starting at ${new Date()}`)
+      this.logger.info(
+         "OnboardingNewsletterService...sparksRepo:  " + this.sparksRepo
+      )
+      this.logger.info(
+         "OnboardingNewsletterService fetchUserData: sparksRepo - " +
+            this.sparksRepo
+      )
       const seenSparksPromise = this.sparksRepo.getUserSparkInteraction(
          user.id,
          "seenSparks"
@@ -146,10 +151,12 @@ export class OnboardingNewsletterService {
          userStatsPromise,
       ])
 
-      const userRecordingStatsPromises = userStats.recordingsBought.map(
+      const userRecordingStatsPromises = userStats.recordingsBought?.map(
          this.livestreamsRepo.getLivestreamRecordingStats
       )
-      const recordingStats = await Promise.all(userRecordingStatsPromises)
+      const recordingStats = userRecordingStatsPromises?.length
+         ? await Promise.all(userRecordingStatsPromises)
+         : []
       // Filtering notifications in memory to limit Database queries
       const [
          companyDiscoveryNotifications,
@@ -178,38 +185,62 @@ export class OnboardingNewsletterService {
 
    private handleUserDiscovery(
       onboardingUserData: OnboardingUserData,
-      daysSinceRegistration?: number
+      daysSinceUserRegistration?: number
    ) {
-      const fromSkippedDiscovery = daysSinceRegistration !== undefined
+      const fromSkippedDiscovery = daysSinceUserRegistration !== undefined
 
-      const now = new Date()
-      const diffTime = Math.abs(
-         now.getDate() - onboardingUserData.user.createdAt.toDate().getDate()
-      )
       // Real user days since registration, as this method can be called recursively with overridden days
-      const effectiveUserDaysSinceRegistration = Math.ceil(
-         diffTime / (1000 * 60 * 60 * 24)
+      let effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
+         onboardingUserData.user.createdAt.toDate(),
+         new Date()
       )
 
       if (!fromSkippedDiscovery) {
-         daysSinceRegistration = effectiveUserDaysSinceRegistration
+         console.log(
+            "🚀 ~ OnboardingNewsletterService ~ fromSkippedDiscovery:",
+            fromSkippedDiscovery
+         )
+         effectiveUserDaysSinceRegistration = daysSinceUserRegistration
       }
-
-      switch (daysSinceRegistration) {
+      console.log(
+         `🚀 ~ OnboardingNewsletterService...handleUserDiscovery user{ ${
+            onboardingUserData.user.userEmail
+         } } - createdAt: ${onboardingUserData.user.createdAt.toDate()}`
+      )
+      console.log(
+         `🚀 ~ OnboardingNewsletterService...handleUserDiscovery user{ ${onboardingUserData.user.userEmail} } - effectiveDaysSinceRegistration: ${effectiveUserDaysSinceRegistration}`
+      )
+      switch (effectiveUserDaysSinceRegistration) {
          case COMPANY_DISCOVERY_TRIGGER_DAY: {
-            this.applyDiscovery(
-               onboardingUserData,
-               this.shouldSendCompanyDiscovery(onboardingUserData),
-               this.companyDiscoveryEmails,
-               () =>
-                  this.handleUserDiscovery(
-                     onboardingUserData,
-                     SPARKS_DISCOVERY_TRIGGER_DAY
-                  )
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...applyingDiscovery user{ ${onboardingUserData.user.userEmail} } - DAY: ${COMPANY_DISCOVERY_TRIGGER_DAY}`
             )
+            if (this.shouldSendCompanyDiscovery(onboardingUserData)) {
+               this.companyDiscoveryEmails.push(
+                  onboardingUserData.user.userEmail
+               )
+            } else {
+               this.handleUserDiscovery(
+                  onboardingUserData,
+                  SPARKS_DISCOVERY_TRIGGER_DAY
+               )
+            }
+            // this.applyDiscovery(
+            //    onboardingUserData,
+            //    this.shouldSendCompanyDiscovery(onboardingUserData),
+            //    this.companyDiscoveryEmails,
+            //    () =>
+            //       this.handleUserDiscovery(
+            //          onboardingUserData,
+            //          SPARKS_DISCOVERY_TRIGGER_DAY
+            //       )
+            // )
             break
          }
          case SPARKS_DISCOVERY_TRIGGER_DAY: {
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...applyingDiscovery user{ ${onboardingUserData.user.userEmail} } - DAY: ${SPARKS_DISCOVERY_TRIGGER_DAY}`
+            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendSparksDiscovery(onboardingUserData),
@@ -223,6 +254,9 @@ export class OnboardingNewsletterService {
             break
          }
          case LIVESTREAM_1ST_REGISTRATION_DISCOVERY_TRIGGER_DAY: {
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...applyingDiscovery user{ ${onboardingUserData.user.userEmail} } - DAY: ${LIVESTREAM_1ST_REGISTRATION_DISCOVERY_TRIGGER_DAY}`
+            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendLivestream1stRecommendationDiscovery(
@@ -238,6 +272,9 @@ export class OnboardingNewsletterService {
             break
          }
          case RECORDING_DISCOVERY_TRIGGER_DAY: {
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...applyingDiscovery user{ ${onboardingUserData.user.userEmail} } - DAY: ${RECORDING_DISCOVERY_TRIGGER_DAY}`
+            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendRecordingDiscovery(onboardingUserData),
@@ -251,6 +288,9 @@ export class OnboardingNewsletterService {
             break
          }
          case FEEDBACK_DISCOVERY_TRIGGER_DAY: {
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...applyingDiscovery user{ ${onboardingUserData.user.userEmail} } - DAY: ${FEEDBACK_DISCOVERY_TRIGGER_DAY}`
+            )
             const shouldSendDiscovery =
                this.shouldSendFeedbackDiscovery(onboardingUserData)
 
@@ -273,6 +313,9 @@ export class OnboardingNewsletterService {
             break
          }
          default: {
+            console.log(
+               `🚀 ~ OnboardingNewsletterService...IGNORE-- user{ ${onboardingUserData.user.userEmail} } - user is on day: ${effectiveUserDaysSinceRegistration} --IGNORE`
+            )
             break
          }
       }
@@ -293,12 +336,22 @@ export class OnboardingNewsletterService {
    async fetchRequiredData() {
       this.logger.info("OnboardingNewsletterService... fetching required data")
       this.users = await this.userRepo.getSubscribedUsers()
-      const onboardingUserPromises = this.users.map(this.fetchUserData)
+      const onboardingUserPromises = this.users.map((user) => {
+         this.logger.info(
+            "OnboardingNewsletterService... mapping user - " + user.userEmail
+         )
+         return this.fetchUserData(user)
+      })
 
       this.onboardingUsers = await Promise.all(onboardingUserPromises)
       this.logger.info(
          `OnboardingNewsletterService... fetched ${this.onboardingUsers.length} subscribed users`
       )
+      console.log(
+         "🚀 ~ OnboardingNewsletterService ~ fetchRequiredData ~ this.onboardingUsers:",
+         this.onboardingUsers
+      )
+
       // fetch notifications for the users and filter map to users
    }
 
@@ -306,7 +359,9 @@ export class OnboardingNewsletterService {
       this.logger.info(
          "OnboardingNewsletterService... building discovery lists & email notification template data"
       )
-      this.onboardingUsers.forEach(this.handleUserDiscovery)
+      this.onboardingUsers.forEach((user) => {
+         return this.handleUserDiscovery(user)
+      })
       this.buildEmailNotifications(null, null, null)
       this.logger.info(
          "OnboardingNewsletterService... finished building discovery lists & email notification template data"
@@ -321,4 +376,19 @@ export class OnboardingNewsletterService {
    async sendDiscoveryEmails() {
       return null
    }
+}
+
+// TODO: Check if ignore hour comparison, since the schedule would be everyday at a specific time
+// Use minutes in day difference ? Even though the user is on the correct day, but created an account on a later
+// hour/minute/second than the running function
+const getDateDifferenceInDays = (dateFrom: Date, dateTo: Date): number => {
+   // Calculate the time difference in milliseconds
+   const timeDiff = dateTo.getTime() - dateFrom.getTime()
+
+   // Calculate the number of days
+   const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+   console.log("🚀 ~ getDateDifferenceInDays ~ daysDiff ", daysDiff)
+
+   // Adjust for time component
+   return daysDiff
 }

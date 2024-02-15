@@ -11,8 +11,6 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "./EventsPreviewCarousel"
 import { sxStyles } from "types/commonTypes"
-import { Button } from "@mui/material"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 
 const config = {
    suspense: false,
@@ -182,23 +180,18 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       setLocalEvents(newLocalEvents || [])
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [eventFromQuery, events])
-   const { testOnboardingNewsletter } = useFirebaseService()
+
    // Only render carousel component on client side, it starts to bug out when SSR is being used
    return (
-      <>
-         <Button onClick={testOnboardingNewsletter}>
-            Test Onboarding Newsletter
-         </Button>
-         <EventsPreviewCarousel
-            id={"upcoming-events"}
-            title={COMMING_UP_NEXT_EVENT_TITLE}
-            type={EventsTypes.COMING_UP}
-            events={formatLivestreamsEvents(localEvents)}
-            seeMoreLink={"/next-livestreams"}
-            isRecommended
-            styling={defaultStyling}
-         />
-      </>
+      <EventsPreviewCarousel
+         id={"upcoming-events"}
+         title={COMMING_UP_NEXT_EVENT_TITLE}
+         type={EventsTypes.COMING_UP}
+         events={formatLivestreamsEvents(localEvents)}
+         seeMoreLink={"/next-livestreams"}
+         isRecommended
+         styling={defaultStyling}
+      />
    )
 }
 export const COMMING_UP_NEXT_EVENT_TITLE = "Upcoming live streams"
