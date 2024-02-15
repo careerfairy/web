@@ -298,3 +298,21 @@ export const isWithinNormalizationLimit = (
       limit
    )
 }
+
+/**
+ * Swaps the positions of two elements in an array. This function mutates the original array.
+ * @param {T[]} array - The array containing the elements to swap.
+ * @param {number} indexA - The index of the first element to swap.
+ * @param {number} indexB - The index of the second element to swap.
+ * @returns {T[]} The original array (not copy) with the elements swapped.
+ */
+export const swapPositions = <T>(
+   array: T[],
+   indexA: number,
+   indexB: number
+): T[] => {
+   const temp = array[indexA]
+   array[indexA] = array[indexB]
+   array[indexB] = temp
+   return array
+}

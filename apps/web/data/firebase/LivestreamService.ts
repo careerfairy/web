@@ -5,7 +5,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
-import { FunctionsInstance } from "./FirebaseInstance"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import {
    AgoraTokenRequest,
    AgoraTokenResponse,
@@ -15,6 +15,27 @@ import GroupsUtil from "data/util/GroupsUtil"
 import { groupRepo } from "data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   collection,
+   collectionGroup,
+   documentId,
+   getDocs,
+   limit,
+   query,
+   where,
+} from "firebase/firestore"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+
+type StreamerDetails = {
+   firstName: string
+   lastName: string
+   role: string
+   avatarUrl: string
+   linkedInUrl: string
+}
 
 export class LivestreamService {
    constructor(private readonly functions: Functions) {}
@@ -125,6 +146,73 @@ export class LivestreamService {
       } = await fetchAgoraRtcToken(data)
 
       return token.rtcToken
+   }
+
+   async getStreamerDetails(uid: string): Promise<StreamerDetails> {
+      const [tag, identifier] = uid.split("-") as [StreamIdentifier, string]
+
+      if (tag === STREAM_IDENTIFIERS.RECORDING) {
+         return {
+            firstName: "Recording",
+            lastName: "Bot",
+            role: "Recording",
+            avatarUrl: "",
+            linkedInUrl: "",
+         }
+      }
+
+      if (tag === STREAM_IDENTIFIERS.CREATOR) {
+         const creatorQuery = query(
+            collectionGroup(FirestoreInstance, "creators"),
+            where(documentId(), "==", identifier),
+            limit(1)
+         ).withConverter(createGenericConverter<Creator>())
+
+         const snapshot = await getDocs(creatorQuery)
+
+         if (!snapshot.empty) {
+            const data = snapshot.docs[0].data()
+
+            return {
+               firstName: data.firstName,
+               lastName: data.lastName,
+               role: data.position,
+               avatarUrl: data.avatarUrl,
+               linkedInUrl: data.linkedInUrl,
+            }
+         }
+      }
+
+      if (tag === STREAM_IDENTIFIERS.USER) {
+         const userQuery = query(
+            collection(FirestoreInstance, "userData"),
+            where("authId", "==", identifier),
+            limit(1)
+         ).withConverter(createGenericConverter<UserData>())
+
+         const snapshot = await getDocs(userQuery)
+
+         if (!snapshot.empty) {
+            const data = snapshot.docs[0].data()
+
+            return {
+               firstName: data.firstName,
+               lastName: data.lastName,
+               // Use their position from the B2B Profile if available, otherwise use their field of study
+               role: data.position || data.fieldOfStudy.name || "",
+               avatarUrl: data.avatar,
+               linkedInUrl: data.linkedinUrl,
+            }
+         }
+      }
+
+      return {
+         firstName: "Anonymous",
+         lastName: "User",
+         role: "",
+         avatarUrl: "",
+         linkedInUrl: "",
+      }
    }
 }
 

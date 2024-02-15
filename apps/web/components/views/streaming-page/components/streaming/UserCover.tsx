@@ -2,6 +2,7 @@ import { Avatar, Box, Typography, alpha } from "@mui/material"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 import { FloatingContent } from "./VideoTrackWrapper"
+import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 
 const MOBILE_AVATAR_SIZE = 104
 const DESKTOP_AVATAR_SIZE = 136
@@ -39,19 +40,14 @@ const styles = sxStyles({
    },
 })
 export interface UserCoverProps {
-   avatarUrl?: string
-   firstName: string
-   lastName: string
+   streamerDetails: StreamerDetails
 }
 
 /**
  * User Cover image OR initials
  */
-export const UserCover = ({
-   avatarUrl,
-   firstName,
-   lastName,
-}: UserCoverProps) => {
+export const UserCover = ({ streamerDetails }: UserCoverProps) => {
+   const { avatarUrl, firstName, lastName } = streamerDetails
    return (
       <FloatingContent sx={styles.root}>
          <Box sx={styles.border}>
