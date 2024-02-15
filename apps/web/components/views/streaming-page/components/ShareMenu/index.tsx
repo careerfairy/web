@@ -13,7 +13,7 @@ import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamData } from "components/custom-hook/streaming"
-import { useScreenShareTracks } from "../../context/ScreenShareTracks"
+import { useScreenShare } from "../../context/ScreenShareTracks"
 
 const styles = sxStyles({
    root: {
@@ -65,7 +65,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
    ({ handleClose, ...props }, ref) => {
       const livestream = useLivestreamData()
       const { handleStopScreenShare, handleStartScreenShareProcess } =
-         useScreenShareTracks()
+         useScreenShare()
 
       const screenShareActive = livestream.mode === LivestreamModes.DESKTOP
       const PDFActive = livestream.mode === LivestreamModes.PRESENTATION

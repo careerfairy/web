@@ -2,6 +2,7 @@ import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context"
 import { LocalUserStream } from "../streaming/LocalStream"
 import { CameraDisabledOverlay } from "./CameraDisabledOverlay"
+import { UserStreamProvider } from "../../context/UserStream"
 
 const styles = sxStyles({
    video: {
@@ -12,11 +13,13 @@ const styles = sxStyles({
 })
 
 export const SetupCameraVideo = () => {
-   const { cameraOn } = useLocalTracks()
+   const { cameraOn, localUser } = useLocalTracks()
 
    return (
-      <LocalUserStream hideDetails hideSpeakingIndicator sx={styles.video}>
-         {!cameraOn && <CameraDisabledOverlay />}
-      </LocalUserStream>
+      <UserStreamProvider user={localUser}>
+         <LocalUserStream hideDetails hideSpeakingIndicator sx={styles.video}>
+            {!cameraOn && <CameraDisabledOverlay />}
+         </LocalUserStream>
+      </UserStreamProvider>
    )
 }

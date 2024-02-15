@@ -10,6 +10,7 @@ import { useGalleryLayout } from "./useGalleryLayout"
 import { RemoteStreamer } from "../../streaming"
 import { TrackBoundary } from "agora-rtc-react"
 import { useStreams } from "../useStreams"
+import { UserStreamProvider } from "components/views/streaming-page/context/UserStream"
 
 const styles = sxStyles({
    root: {
@@ -49,7 +50,9 @@ export const GalleryLayout = () => {
                            key={user.user.uid}
                            layoutColumns={layout.columns}
                         >
-                           <GridItemContent user={user} />
+                           <UserStreamProvider user={user}>
+                              <GridItemContent user={user} />
+                           </UserStreamProvider>
                         </LayoutGrid.Item>
                      )}
                   />
@@ -72,11 +75,5 @@ const GridItemContent = ({ user }: GridItemContentProps) => {
       return <LocalScreenStream />
    }
 
-   return (
-      <RemoteStreamer
-         containVideo={user.type === "remote-user-screen"}
-         key={user.user.uid}
-         user={user.user}
-      />
-   )
+   return <RemoteStreamer />
 }

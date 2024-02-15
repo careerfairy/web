@@ -36,7 +36,7 @@ interface ScreenShareProviderProps {
    children: ReactNode
 }
 
-type ScreenShareTracksContextProps = {
+type ScreenShareContextProps = {
    /** Wether the user has locally started the screen sharing process */
    screenShareOn: boolean
    /** Function to stop any screen sharing */
@@ -55,11 +55,12 @@ type ScreenShareTracksContextProps = {
    localUserScreen: LocalUserScreen
    screenShareError: AgoraRTCReactError | null
    isLoadingScreenShare: boolean
+   readyToPublish: boolean
 }
 
-const ScreenShareTracksContext = createContext<
-   ScreenShareTracksContextProps | undefined
->(undefined)
+const ScreenShareContext = createContext<ScreenShareContextProps | undefined>(
+   undefined
+)
 
 export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const [screenShareOn, setScreenShareOn] = useState(false)
@@ -194,23 +195,20 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    }, [localScreenTrack.screenTrack])
 
    const localUserScreen = useMemo<LocalUserScreen>(
-      () =>
-         readyToPublish
-            ? {
-                 type: "local-user-screen",
-                 user: {
-                    uid: screenShareUID,
-                    videoTrack: screenVideoTrack,
-                    audioTrack: screenAudioTrack,
-                    hasAudio: Boolean(screenAudioTrack),
-                    hasVideo: Boolean(screenVideoTrack),
-                 },
-              }
-            : null,
-      [readyToPublish, screenAudioTrack, screenShareUID, screenVideoTrack]
+      () => ({
+         type: "local-user-screen",
+         user: {
+            uid: screenShareUID,
+            videoTrack: screenVideoTrack,
+            audioTrack: screenAudioTrack,
+            hasAudio: Boolean(screenAudioTrack),
+            hasVideo: Boolean(screenVideoTrack),
+         },
+      }),
+      [screenAudioTrack, screenShareUID, screenVideoTrack]
    )
 
-   const value = useMemo<ScreenShareTracksContextProps>(
+   const value = useMemo<ScreenShareContextProps>(
       () => ({
          screenVideoTrack,
          screenAudioTrack,
@@ -221,6 +219,7 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          localUserScreen,
          screenShareError,
          isLoadingScreenShare: localScreenTrack.isLoading,
+         readyToPublish,
       }),
       [
          screenVideoTrack,
@@ -232,19 +231,20 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          localUserScreen,
          screenShareError,
          localScreenTrack.isLoading,
+         readyToPublish,
       ]
    )
 
    return (
-      <ScreenShareTracksContext.Provider value={value}>
+      <ScreenShareContext.Provider value={value}>
          {children}
-      </ScreenShareTracksContext.Provider>
+      </ScreenShareContext.Provider>
    )
 }
 
-export const useScreenShareTracks = () => {
-   const context = useContext(ScreenShareTracksContext)
-   if (!context) {
+export const useScreenShare = () => {
+   const context = useContext(ScreenShareContext)
+   if (context === undefined) {
       throw new Error(
          "useScreenShareTracks must be used within a ScreenShareProvider"
       )

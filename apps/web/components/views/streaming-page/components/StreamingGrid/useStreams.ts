@@ -1,25 +1,31 @@
 import { useRemoteUsers } from "agora-rtc-react"
 import { useMemo } from "react"
 import { useLocalTracks } from "../../context"
-import { RemoteUser, StreamUser } from "../../types"
-import { useScreenShareTracks } from "../../context/ScreenShareTracks"
+import { RemoteUser, UserStream } from "../../types"
+import { useScreenShare } from "../../context/ScreenShareTracks"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 
 /**
  * Combines local and remote streamers into a single array.
  * This hook gathers all streamers without sorting them, preparing the data for further processing or display.
  *
- * @returns {Array<StreamUser>} An array of combined local and remote users.
+ * @returns {Array<UserStream>} An array of combined local and remote users.
  */
-export const useStreams = (): StreamUser[] => {
+export const useStreams = (): UserStream[] => {
    const remoteStreamers = useRemoteUsers()
 
-   const { localUser } = useLocalTracks()
-   const { localUserScreen, screenShareUID } = useScreenShareTracks()
+   const { localUser, readyToPublish: readyToPublishLocalUser } =
+      useLocalTracks()
+
+   const {
+      localUserScreen,
+      screenShareUID,
+      readyToPublish: readyToPublishScreenShare,
+   } = useScreenShare()
 
    return useMemo(() => {
       // Start by mapping remoteStreamers to include the 'type' property
-      const combinedStreamers: StreamUser[] = remoteStreamers
+      const combinedStreamers: UserStream[] = remoteStreamers
          .filter((user) => user.uid !== screenShareUID) // Agora rule: User should never subscribe to their own local screen share
          .map<RemoteUser>((user) => ({
             user,
@@ -30,14 +36,21 @@ export const useStreams = (): StreamUser[] => {
                : "remote-user",
          }))
 
-      if (localUser) {
+      if (readyToPublishLocalUser) {
          combinedStreamers.push(localUser)
       }
 
-      if (localUserScreen) {
+      if (readyToPublishScreenShare) {
          combinedStreamers.push(localUserScreen)
       }
 
       return combinedStreamers
-   }, [localUser, localUserScreen, remoteStreamers, screenShareUID])
+   }, [
+      localUser,
+      localUserScreen,
+      readyToPublishLocalUser,
+      readyToPublishScreenShare,
+      remoteStreamers,
+      screenShareUID,
+   ])
 }

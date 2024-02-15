@@ -173,104 +173,118 @@ export class LivestreamService {
       return token.rtcToken
    }
 
-   async getStreamerDetails(
-      uid: string,
-      depth: number = 0
-   ): Promise<StreamerDetails> {
-      const [tag, identifier] = uid.split("-") as [StreamIdentifier, string]
+   private async getUserDetails(
+      identifier: string
+   ): Promise<StreamerDetails | null> {
+      const userQuery = query(
+         collection(FirestoreInstance, "userData"),
+         where("authId", "==", identifier),
+         limit(1)
+      ).withConverter(createGenericConverter<UserData>())
 
-      const MAX_DEPTH = 1
+      const snapshot = await getDocs(userQuery)
 
-      if (depth > MAX_DEPTH) {
-         // Return a default or indicative StreamerDetails object instead of throwing an error
+      if (!snapshot.empty) {
+         const data = snapshot.docs[0].data()
+
          return {
-            firstName: "",
-            lastName: "",
-            role: "",
+            firstName: data.firstName,
+            lastName: data.lastName,
+            role: data.position || data.fieldOfStudy.name || "",
+            avatarUrl: data.avatar,
+            linkedInUrl: data.linkedinUrl,
+         }
+      }
+
+      return null
+   }
+
+   private async getCreatorDetails(
+      identifier: string
+   ): Promise<StreamerDetails | null> {
+      const creatorQuery = query(
+         collectionGroup(FirestoreInstance, "creators"),
+         where(documentId(), "==", identifier),
+         limit(1)
+      ).withConverter(createGenericConverter<Creator>())
+
+      const snapshot = await getDocs(creatorQuery)
+
+      if (!snapshot.empty) {
+         const data = snapshot.docs[0].data()
+
+         return {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            role: data.position,
+            avatarUrl: data.avatarUrl,
+            linkedInUrl: data.linkedInUrl,
+         }
+      }
+
+      return null
+   }
+
+   private getTagAndIdentifierFromUid(uid: string): [StreamIdentifier, string] {
+      return uid.split("-") as [StreamIdentifier, string]
+   }
+
+   async getStreamerDetails(uid: string): Promise<StreamerDetails> {
+      const [tag, identifier] = this.getTagAndIdentifierFromUid(uid)
+      let details: StreamerDetails | null = null
+
+      switch (tag) {
+         case STREAM_IDENTIFIERS.RECORDING:
+            details = {
+               firstName: "Recording",
+               lastName: "Bot",
+               role: "Recording",
+               avatarUrl: "",
+               linkedInUrl: "",
+            }
+            break
+         case STREAM_IDENTIFIERS.CREATOR:
+            details = await this.getCreatorDetails(identifier)
+            break
+         case STREAM_IDENTIFIERS.USER:
+            details = await this.getUserDetails(identifier)
+            break
+         case STREAM_IDENTIFIERS.SCREEN_SHARE: {
+            /**
+             * Retrieves the screen share details by extracting the user identifier from the UID.
+             * If the tag indicates a screen share or a user, it fetches the user details accordingly.
+             */
+            const userUid = uid.replace(
+               `${STREAM_IDENTIFIERS.SCREEN_SHARE}-`,
+               ""
+            )
+
+            const [userTag, userIdentifier] =
+               this.getTagAndIdentifierFromUid(userUid)
+
+            if (userTag === STREAM_IDENTIFIERS.CREATOR) {
+               details = await this.getCreatorDetails(userIdentifier)
+            }
+            if (userTag === STREAM_IDENTIFIERS.USER) {
+               details = await this.getUserDetails(userIdentifier)
+            }
+            if (details) {
+               details.role = "Screen Share"
+            }
+            break
+         }
+      }
+
+      // Return the details if found, otherwise return a default anonymous user object
+      return (
+         details || {
+            firstName: "Anonymous",
+            lastName: "User",
+            role: tag === STREAM_IDENTIFIERS.SCREEN_SHARE ? "Screen Share" : "",
             avatarUrl: "",
             linkedInUrl: "",
          }
-      }
-
-      if (tag === STREAM_IDENTIFIERS.RECORDING) {
-         return {
-            firstName: "Recording",
-            lastName: "Bot",
-            role: "Recording",
-            avatarUrl: "",
-            linkedInUrl: "",
-         }
-      }
-
-      if (tag === STREAM_IDENTIFIERS.CREATOR) {
-         const creatorQuery = query(
-            collectionGroup(FirestoreInstance, "creators"),
-            where(documentId(), "==", identifier),
-            limit(1)
-         ).withConverter(createGenericConverter<Creator>())
-
-         const snapshot = await getDocs(creatorQuery)
-
-         if (!snapshot.empty) {
-            const data = snapshot.docs[0].data()
-
-            return {
-               firstName: data.firstName,
-               lastName: data.lastName,
-               role: data.position,
-               avatarUrl: data.avatarUrl,
-               linkedInUrl: data.linkedInUrl,
-            }
-         }
-      }
-
-      if (tag === STREAM_IDENTIFIERS.USER) {
-         const userQuery = query(
-            collection(FirestoreInstance, "userData"),
-            where("authId", "==", identifier),
-            limit(1)
-         ).withConverter(createGenericConverter<UserData>())
-
-         const snapshot = await getDocs(userQuery)
-
-         if (!snapshot.empty) {
-            const data = snapshot.docs[0].data()
-
-            return {
-               firstName: data.firstName,
-               lastName: data.lastName,
-               // Use their position from the B2B Profile if available, otherwise use their field of study
-               role: data.position || data.fieldOfStudy.name || "",
-               avatarUrl: data.avatar,
-               linkedInUrl: data.linkedinUrl,
-            }
-         }
-      }
-
-      if (tag === STREAM_IDENTIFIERS.SCREEN_SHARE) {
-         // Get the user id from the uid
-         const userId = uid.replace(`${STREAM_IDENTIFIERS.SCREEN_SHARE}-`, "")
-         /**
-          * Recursively calls this function to retrieve user details for a screen-sharing user.
-          */
-         const details = await this.getStreamerDetails(userId, depth + 1)
-
-         return {
-            firstName: details.firstName,
-            lastName: details.lastName,
-            role: "Screen Share",
-            avatarUrl: details.avatarUrl,
-            linkedInUrl: "",
-         }
-      }
-
-      return {
-         firstName: "Anonymous",
-         lastName: "User",
-         role: "",
-         avatarUrl: "",
-         linkedInUrl: "",
-      }
+      )
    }
 
    private getLivestreamRef(livestreamId: string) {
