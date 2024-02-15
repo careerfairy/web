@@ -1,5 +1,5 @@
 import AgoraRTC, { DeviceInfo, type IAgoraRTCError } from "agora-rtc-react"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 type Options = {
@@ -47,35 +47,38 @@ export const useDevices = (options: Options) => {
    const [error, setError] = useState<IAgoraRTCError | null>(null)
 
    /**
+    * Default device have the id "default" which is not unique
+    * so we need to use the device change counter to force the
+    * track to re-initialize when the default device changes.
+    */
+   const [deviceLastChanged, setDeviceLastChanged] = useState(0)
+
+   const handleChangeActiveDevice = useCallback((deviceId: string) => {
+      setActiveDeviceId(deviceId)
+      setDeviceLastChanged(Date.now())
+   }, [])
+
+   /**
     * This useEffect hook is used to initialize the selected devices.
     * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
     */
    useEffect(() => {
       if (!options.enable) return
 
-      if (options.deviceType === "camera") {
-         AgoraRTC.getCameras()
-            .then((cameras) => {
-               setActiveDeviceId(cameras[0]?.deviceId ?? "")
-               setDevices(cameras)
-            })
-            .catch((error) => {
-               setError(error)
-               errorLogAndNotify(error)
-            })
-      }
+      const fetchDevices =
+         options.deviceType === "camera"
+            ? AgoraRTC.getCameras
+            : AgoraRTC.getMicrophones
 
-      if (options.deviceType === "microphone") {
-         AgoraRTC.getMicrophones()
-            .then((microphones) => {
-               setActiveDeviceId(microphones[0]?.deviceId ?? "")
-               setDevices(microphones)
-            })
-            .catch((error) => {
-               setError(error)
-               errorLogAndNotify(error)
-            })
-      }
+      fetchDevices()
+         .then((fetchedDevices) => {
+            setActiveDeviceId(fetchedDevices[0]?.deviceId ?? "")
+            setDevices(fetchedDevices)
+         })
+         .catch((error) => {
+            setError(error)
+            errorLogAndNotify(error)
+         })
 
       return () => {
          setActiveDeviceId("")
@@ -85,35 +88,29 @@ export const useDevices = (options: Options) => {
    }, [options.deviceType, options.enable])
 
    useEffect(() => {
+      const deviceChangedHandler = (dev: DeviceInfo) => {
+         const updatedDevices = updateAndSetDevices(
+            devices,
+            activeDeviceId,
+            handleChangeActiveDevice,
+            dev
+         )
+         setDevices(updatedDevices)
+      }
+
       if (options.deviceType === "camera") {
-         AgoraRTC.onCameraChanged = (dev) => {
-            const updatedDevices = updateAndSetDevices(
-               devices,
-               activeDeviceId,
-               setActiveDeviceId,
-               dev
-            )
-            setDevices(updatedDevices)
-         }
+         AgoraRTC.onCameraChanged = deviceChangedHandler
       }
 
       if (options.deviceType === "microphone") {
-         AgoraRTC.onMicrophoneChanged = (dev) => {
-            const updatedDevices = updateAndSetDevices(
-               devices,
-               activeDeviceId,
-               setActiveDeviceId,
-               dev
-            )
-            setDevices(updatedDevices)
-         }
+         AgoraRTC.onMicrophoneChanged = deviceChangedHandler
       }
 
       return () => {
          AgoraRTC.onCameraChanged = null
          AgoraRTC.onMicrophoneChanged = null
       }
-   }, [activeDeviceId, devices, options.deviceType])
+   }, [activeDeviceId, devices, handleChangeActiveDevice, options.deviceType])
 
    return useMemo(
       () => ({
@@ -121,7 +118,8 @@ export const useDevices = (options: Options) => {
          setActiveDeviceId,
          devices,
          error,
+         deviceLastChanged,
       }),
-      [activeDeviceId, devices, error]
+      [activeDeviceId, deviceLastChanged, devices, error]
    )
 }

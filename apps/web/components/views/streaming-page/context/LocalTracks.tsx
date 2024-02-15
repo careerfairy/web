@@ -65,6 +65,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       error: fetchCamerasError,
       activeDeviceId: activeCameraId,
       setActiveDeviceId: setActiveCameraId,
+      deviceLastChanged: cameraLastChanged,
    } = useDevices({
       deviceType: "camera",
       enable: shouldStream,
@@ -75,6 +76,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       error: fetchMicsError,
       activeDeviceId: activeMicrophoneId,
       setActiveDeviceId: setActiveMicrophoneId,
+      deviceLastChanged: microphoneLastChanged,
    } = useDevices({
       deviceType: "microphone",
       enable: shouldStream,
@@ -98,7 +100,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
             })
          )
       }
-   }, [activeCameraId, cameraTrack.localCameraTrack])
+   }, [activeCameraId, cameraTrack.localCameraTrack, cameraLastChanged])
 
    useEffect(() => {
       if (microphoneTrack.localMicrophoneTrack && activeMicrophoneId) {
@@ -113,7 +115,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
                })
             )
       }
-   }, [activeMicrophoneId, microphoneTrack.localMicrophoneTrack])
+   }, [
+      activeMicrophoneId,
+      microphoneTrack.localMicrophoneTrack,
+      microphoneLastChanged,
+   ])
 
    /**
     * For an improved user experience, the microphone is only muted/unmuted rather than being turned off/on.
