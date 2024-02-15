@@ -1,6 +1,7 @@
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
+import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import {
    EmailNotificationType,
    EmailNotification,
@@ -18,7 +19,7 @@ export interface IEmailNotificationRepository {
       type?: EmailNotificationType
    ): Promise<EmailNotification[]>
 
-   getServerTimestamp()
+   getServerTimestamp(): Timestamp
 }
 
 export class EmailNotificationFunctionsRepository
@@ -103,6 +104,6 @@ export class EmailNotificationFunctionsRepository
    }
 
    getServerTimestamp = () => {
-      return firebase.firestore.FieldValue.serverTimestamp()
+      return FieldValue.serverTimestamp()
    }
 }
