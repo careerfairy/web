@@ -4,11 +4,7 @@ import { useConditionalRedirect } from "components/custom-hook/useConditionalRed
 import { appendCurrentQueryParams } from "components/util/url"
 import { Fragment, useMemo } from "react"
 import { CircularProgress } from "@mui/material"
-import {
-   GetUserStreamIdOptions,
-   getAgoraUserId,
-   withLocalStorage,
-} from "./util"
+import { getAgoraUserId } from "./util"
 
 import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
@@ -118,16 +114,13 @@ const Component = ({ isHost }: Props) => {
       )
    )
 
-   const options: GetUserStreamIdOptions = {
+   const agoraUserId = getAgoraUserId({
       isRecordingWindow: Boolean(query.isRecordingWindow),
-      useRandomId: livestream.openStream || isHost,
+      useTempId: livestream.openStream && !isHost, // Use a temporary ID for viewers of open streams
       streamId: livestream.id,
       userId: authenticatedUser.uid,
-   }
-
-   const agoraUserId = isHost
-      ? withLocalStorage("streamingUuid", () => getAgoraUserId(options))
-      : getAgoraUserId(options)
+      creatorId: "", // TODO: CreatorID goes here once we introduce the select logic
+   })
 
    /**
     * The children are wrapped in useMemo to ensure that they are only re-rendered when necessary.

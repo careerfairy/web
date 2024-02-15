@@ -1,43 +1,89 @@
-import { useRemoteUsers } from "agora-rtc-react"
 import { useAppSelector } from "components/custom-hook/store"
-import { useMemo } from "react"
+import { useEffect, useState } from "react"
 import { audioLevelsSelector } from "store/selectors/streamingAppSelectors"
-import { useLocalTracks } from "../../context"
-import { LocalUser, RemoteUser } from "../../types"
+import { StreamUser } from "../../types"
+import { swapPositions } from "@careerfairy/shared-lib/utils"
 
 /**
- * Basic implementation of sorting algorithm
- * TODO: Only relocate user when not in the first screen of the grid, eg when the user is in the first screen, don't relocate it.
- *       Screen size can be gotten from layout rows * columns
- * TODO: Don't sort the entire array only SWAP with inactive users on the first screen.
- *       Can be achieved by comparing previous and current state with usePrevious from react use
+ * Sorts the combined streamers based on their audio levels in descending order.
+ * This hook utilizes `useStreams` to get the combined streamers and then applies sorting logic.
  *
+ * @returns {Array<StreamUser>} An array of sorted streamers, primarily based on their audio levels.
  */
-export const useSortedStreams = (): (LocalUser | RemoteUser)[] => {
-   const remoteStreamers = useRemoteUsers()
-
+export const useSortedStreams = (
+   streams: StreamUser[],
+   pageSize: number
+): StreamUser[] => {
    const audioLevels = useAppSelector(audioLevelsSelector)
+   const [sortedStreams, setSortedStreams] = useState(streams)
 
-   const { localUser } = useLocalTracks()
+   useEffect(() => {
+      setSortedStreams((prevSortedStreams) => {
+         // update the streams with the latest stream data
+         let newSortedStreams = prevSortedStreams.map(
+            (s) =>
+               streams.find((stream) => stream.user.uid === s.user.uid) || null
+         )
 
-   return useMemo(() => {
-      // Map remoteStreamers to include the 'type' property
-      const mappedRemoteStreamers = remoteStreamers.map<RemoteUser>((user) => ({
-         user,
-         type: "remote" as const,
-      }))
+         // Remove streams that are no longer present
+         newSortedStreams = newSortedStreams.filter(Boolean)
 
-      const combinedStreamers: (LocalUser | RemoteUser)[] =
-         mappedRemoteStreamers
+         // Ensure all current streams are present, adding new ones to the end.
+         streams.forEach((stream) => {
+            const isStreamPresent = newSortedStreams.some(
+               (s) => s.user.uid === stream.user.uid
+            )
+            if (!isStreamPresent) {
+               newSortedStreams.push(stream)
+            }
+         })
 
-      if (localUser) {
-         combinedStreamers.push(localUser)
-      }
+         if (newSortedStreams.length > pageSize) {
+            // Only sort the streams if the number of streams is greater than the page size.
 
-      return combinedStreamers.sort((a, b) => {
-         const levelA = audioLevels[a.user.uid]?.level || 0
-         const levelB = audioLevels[b.user.uid]?.level || 0
-         return levelB - levelA // Sort in descending order
+            // Find the first currently active speaker outside the first page.
+            const firstActiveSpeakerIndex = newSortedStreams.findIndex(
+               (stream, index) => {
+                  return (
+                     index >= pageSize &&
+                     audioLevels[stream.user.uid]?.level > 60
+                  )
+               }
+            )
+
+            if (firstActiveSpeakerIndex !== -1) {
+               // Find the least recently active speaker in the entire array or default to the first one
+               const leastActiveSpeakerIndex = newSortedStreams.reduce(
+                  (leastActiveIndex, currentStream, currentIndex) => {
+                     if (currentIndex >= pageSize) return leastActiveIndex // Only consider the first page
+
+                     const currentLastSpokeAt =
+                        audioLevels[currentStream.user.uid]?.lastSpokeAt || 0
+                     const leastActiveLastSpokeAt =
+                        audioLevels[newSortedStreams[leastActiveIndex].user.uid]
+                           ?.lastSpokeAt || 0
+
+                     // Update the leastActiveIndex if the current stream's lastSpokeAt is earlier
+                     return currentLastSpokeAt < leastActiveLastSpokeAt ||
+                        leastActiveLastSpokeAt === 0
+                        ? currentIndex
+                        : leastActiveIndex
+                  },
+                  0
+               )
+
+               // Use swapPositions to swap the most currently active speaker from the second page with the least recently active speaker on the first page.
+               newSortedStreams = swapPositions(
+                  newSortedStreams,
+                  leastActiveSpeakerIndex,
+                  firstActiveSpeakerIndex
+               )
+            }
+         }
+
+         return newSortedStreams
       })
-   }, [audioLevels, localUser, remoteStreamers])
+   }, [streams, audioLevels, pageSize])
+
+   return sortedStreams
 }

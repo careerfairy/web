@@ -1,34 +1,42 @@
 import { type IAgoraRTCError, useLocalCameraTrack } from "agora-rtc-react"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { v4 as uuidv4 } from "uuid"
 
 const randomId = uuidv4().replace(/-/g, "")
 
 export type GetUserStreamIdOptions = {
    isRecordingWindow: boolean
-   useRandomId: boolean
+   useTempId: boolean
    streamId: string
    userId?: string
+   creatorId?: string
 }
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
    if (options.isRecordingWindow) {
-      return `recording-${randomId}` as const
+      return `${STREAM_IDENTIFIERS.RECORDING}-${randomId}-${options.streamId}` as const
    }
 
-   if (options.useRandomId || !options.userId) {
-      return `anon-${options.streamId}${randomId}` as const
+   if (options.creatorId) {
+      return `${STREAM_IDENTIFIERS.CREATOR}-${options.creatorId}-${options.streamId}` as const
    }
 
-   return `user-${options.userId}` as const
+   if (options.useTempId || !options.userId) {
+      return getTempId(options.streamId)
+   }
+
+   return `${STREAM_IDENTIFIERS.USER}-${options.userId}-${options.streamId}` as const
 }
 
-export const withLocalStorage = (key: string, generateValue: () => string) => {
-   let value = localStorage.getItem(key)
-   if (!value) {
-      value = generateValue()
-      localStorage.setItem(key, value)
+const getTempId = (streamId: string) => {
+   // first check local storage
+   const key = "tempId"
+   const tempId = localStorage.getItem(key)
+   if (!tempId) {
+      localStorage.setItem("tempId", tempId)
+      return `${STREAM_IDENTIFIERS.ANONYMOUS}-${tempId}-${streamId}` as const
    }
-   return value
+   return `${STREAM_IDENTIFIERS.ANONYMOUS}-${randomId}-${streamId}` as const
 }
 
 export const getDeviceButtonColor = (
@@ -92,4 +100,8 @@ export const getDeviceErrorMessage = (
 // Helper to safely import the AgoraRTCReact module on the client to avoid server-side build errors
 export const getAgoraRTC = async () => {
    return (await import("agora-rtc-react")).default
+}
+
+export const getStreamerDisplayName = (firstName: string, lastName: string) => {
+   return [firstName, lastName].filter(Boolean).join(" ")
 }

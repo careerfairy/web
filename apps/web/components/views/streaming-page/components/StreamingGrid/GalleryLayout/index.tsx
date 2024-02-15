@@ -9,6 +9,7 @@ import { getPaginatedGridLayout } from "../util"
 import { useGalleryLayout } from "./useGalleryLayout"
 import { RemoteStreamer } from "../../streaming"
 import { TrackBoundary } from "agora-rtc-react"
+import { useStreams } from "../useStreams"
 
 const styles = sxStyles({
    root: {
@@ -19,13 +20,16 @@ const styles = sxStyles({
 })
 
 export const GalleryLayout = () => {
-   const streams = useSortedStreams()
-
+   const streams = useStreams()
    const layout = useGalleryLayout(streams.length)
 
+   const pageSize = layout.rows * layout.columns
+
+   const sortedStreams = useSortedStreams(streams, pageSize)
+
    const gridPages = useMemo(
-      () => getPaginatedGridLayout(streams, layout),
-      [streams, layout]
+      () => getPaginatedGridLayout(sortedStreams, layout),
+      [sortedStreams, layout]
    )
 
    return (
