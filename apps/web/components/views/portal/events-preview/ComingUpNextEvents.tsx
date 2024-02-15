@@ -69,14 +69,11 @@ const styles = sxStyles({
          md: `0 0 40%`,
          lg: `0 0 30%`,
       },
-      minWidth: {
-         xs: "310px",
-         md: "360px",
-      },
+      minWidth: 0,
       position: "relative",
       height: {
-         xs: 363,
-         md: 363,
+         xs: 355,
+         md: 355,
       },
       "&:not(:first-of-type)": {
          paddingLeft: `calc(${slideSpacing}px - 5px)`,
