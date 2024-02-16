@@ -16,30 +16,30 @@ import Stack from "@mui/material/Stack"
 import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
-   checkboxIconWrapper: {
+   checkboxIconWrapper: (theme) => ({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: (theme) => theme.palette.neutral[50],
-      color: (theme) => theme.palette.secondary.light,
+      bgcolor: theme.palette.neutral[50],
+      color: theme.palette.secondary.light,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       "&:hover": {
-         backgroundColor: (theme) => theme.palette.neutral[100],
+         backgroundColor: theme.palette.neutral[100],
       },
       zIndex: 1,
-   },
-   checkedIconSx: {
+   }),
+   checkedIconSx: (theme) => ({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: (theme) => theme.palette.secondary.light,
-      color: (theme) => theme.palette.neutral[800],
+      bgcolor: theme.palette.secondary.light,
+      color: theme.palette.neutral[800],
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-   },
+   }),
    stars: {
       color: "secondary.main",
    },
