@@ -1,3 +1,7 @@
+import {
+   LivestreamMode,
+   LivestreamModes,
+} from "@careerfairy/shared-lib/livestreams"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { type UID } from "agora-rtc-react"
 
@@ -31,6 +35,10 @@ export interface StreamingAppState {
          lastSpokeAt: number | null
       }
    }
+   livestreamState: {
+      screenSharerId: string
+      mode: LivestreamMode
+   }
 }
 
 const initialState: StreamingAppState = {
@@ -43,6 +51,10 @@ const initialState: StreamingAppState = {
       viewCount: 0, // hardcoded number for now
    },
    audioLevels: {},
+   livestreamState: {
+      mode: LivestreamModes.DEFAULT,
+      screenSharerId: null,
+   },
 }
 
 const streamingAppSlice = createSlice({
@@ -100,11 +112,19 @@ const streamingAppSlice = createSlice({
             }
          })
       },
+      setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
+         state.livestreamState.mode = action.payload
+      },
+      setScreenSharerId(state, action: PayloadAction<string | null>) {
+         state.livestreamState.screenSharerId = action.payload
+      },
    },
 })
 
 export const {
    actions: {
+      setLivestreamMode,
+      setScreenSharerId,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,

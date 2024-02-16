@@ -10,6 +10,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
+import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 
 const LivestreamValidationWrapper = dynamic(
    () =>
@@ -154,6 +155,7 @@ const Component = ({ isHost }: Props) => {
                </LocalTracksProvider>
             </StreamingProvider>
             <AudioLevelsTracker />
+            <LivestreamStateTrackers />
          </UserClientProvider>
       ),
       [agoraUserId, isHost, livestream.id]

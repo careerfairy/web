@@ -28,19 +28,6 @@ export const useDevices = (options: Options) => {
    const [error, setError] = useState<IAgoraRTCError | null>(null)
 
    /**
-    * Debug for simone
-    */
-   if (options.deviceType === "microphone") {
-      console.group("🚀 ~ device state:")
-      console.log({
-         activeDeviceId,
-         error,
-      })
-      console.table(devices)
-      console.groupEnd()
-   }
-
-   /**
     * This useEffect hook is used to initialize the selected devices.
     * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
     */
