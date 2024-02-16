@@ -72,6 +72,10 @@ export class OnboardingNewsletterService {
          "🚀 ~ OnboardingNewsletterService ~ seenSparksCount:",
          seenSparksCount
       )
+      console.log(
+         "🚀 ~ OnboardingNewsletterService ~ user.notifications.sparksDiscovery.length:",
+         user.notifications.sparksDiscovery.length
+      )
       return !user.notifications.sparksDiscovery.length && seenSparksCount < 5
    }
 
@@ -386,36 +390,27 @@ export class OnboardingNewsletterService {
       this.onboardingUsers.forEach((user) => {
          return this.handleUserDiscovery(user)
       })
+      const userDataMapper = (user: OnboardingUserData) => user.user
 
       this.emailBuilder
          .addRecipients(
-            this.companyDiscoveryUsers.map(
-               (onboardingUser) => onboardingUser.user
-            ),
+            this.companyDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.COMPANY_DISCOVERY
          )
          .addRecipients(
-            this.sparksDiscoveryUsers.map(
-               (onboardingUser) => onboardingUser.user
-            ),
+            this.sparksDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.SPARKS_DISCOVERY
          )
          .addRecipients(
-            this.livestream1stRegistrationDiscoveryUsers.map(
-               (onboardingUser) => onboardingUser.user
-            ),
+            this.livestream1stRegistrationDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
          )
          .addRecipients(
-            this.recordingDiscoveryUsers.map(
-               (onboardingUser) => onboardingUser.user
-            ),
+            this.recordingDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.RECORDING_DISCOVERY
          )
          .addRecipients(
-            this.feedbackDiscoveryUsers.map(
-               (onboardingUser) => onboardingUser.user
-            ),
+            this.feedbackDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.FEEDBACK_DISCOVERY
          )
 
