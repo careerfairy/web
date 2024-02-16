@@ -38,6 +38,9 @@ const styles = sxStyles({
    },
 })
 
+const AboutDialog = dynamic(() => import('./AboutDialog'), { ssr: false, loading: () => <CircularProgress /> });
+
+
 const AboutSection = () => {
    const {
       group,
@@ -49,9 +52,6 @@ const AboutSection = () => {
       useDialogStateHandler()
 
    const { companyCountry, companyIndustries, companySize, extraInfo } = group
-
-   const AboutDialog = dynamic(() => import('./AboutDialog'), { ssr: false, loading: () => <CircularProgress /> });
-
 
    const showIcons = useMemo(
       () => companySize || companyIndustries?.length || companyCountry?.name,
