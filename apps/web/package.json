@@ -30,7 +30,7 @@
       "@mergeapi/react-merge-link": "^2.0.6",
       "@mui/lab": "^5.0.0-alpha.150",
       "@mui/styles": "^5.14.17",
-      "@mui/x-date-pickers": "^5.0.1",
+      "@mui/x-date-pickers": "^6.19.2",
       "@react-pdf/renderer": "^3.1.14",
       "@reduxjs/toolkit": "^1.8.3",
       "@sentry/nextjs": "^6.17.9",

@@ -8,6 +8,7 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
 } from "@careerfairy/shared-lib/livestreams"
+import { GroupOption } from "@careerfairy/shared-lib/groups"
 
 export type LivestreamFormGeneralTabValues = {
    title: string
@@ -18,16 +19,12 @@ export type LivestreamFormGeneralTabValues = {
    backgroundImageUrl: string
    startDate: Date
    duration: number
-   language: {
-      code: string
-      name: string
-      shortName: string
-   }
+   language: string
    summary: string
    reasonsToJoin: string[]
-   categoriesId: string[]
-   targetCountries: string[]
-   targetUniversities: string[]
+   categories: GroupOption[]
+   targetCountries: GroupOption[]
+   targetUniversities: GroupOption[]
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: LevelOfStudy[]
 }
@@ -45,7 +42,9 @@ export type LivestreamFormJobsTabValues = {
    jobs: LivestreamEvent["jobs"]
 }
 
-export type LivestreamFormValues = LivestreamFormGeneralTabValues &
-   LivestreamFormSpeakersTabValues &
-   LivestreamFormQuestionsTabValues &
-   LivestreamFormJobsTabValues
+export type LivestreamFormValues = {
+   general: LivestreamFormGeneralTabValues
+   speakers: LivestreamFormSpeakersTabValues
+   questions: LivestreamFormQuestionsTabValues
+   jobs: LivestreamFormJobsTabValues
+}

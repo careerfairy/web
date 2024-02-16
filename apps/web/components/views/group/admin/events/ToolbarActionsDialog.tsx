@@ -19,14 +19,66 @@ import ShareIcon from "@mui/icons-material/Share"
 import { Film as StreamIcon } from "react-feather"
 import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import HintIcon from "../../../common/HintIcon"
+import { useAuth } from "HOCs/AuthProvider"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
+import { useRouter } from "next/router"
+import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+
+const handleCreateDraftLivestream = async (
+   authenticatedUser,
+   group,
+   firebase,
+   router
+) => {
+   const author = {
+      groupId: group.id,
+      email: authenticatedUser.email,
+   }
+
+   const initialValues = getLivestreamInitialValues(group)
+   const draftLivestream: LivestreamEvent = buildLivestreamObject(
+      initialValues,
+      false,
+      null,
+      firebase
+   )
+
+   const draftLiveStreamId = await firebase.addLivestream(
+      draftLivestream,
+      "draftLivestreams",
+      author,
+      null
+   )
+
+   return router.push({
+      pathname: `/group/${group.id}/admin/events/${draftLiveStreamId}`,
+   })
+}
 
 const ToolbarActionsDialogContent = ({
    handleClose,
    handleOpenNewStreamModal,
    group,
 }) => {
+   const router = useRouter()
+   const firebase = useFirebaseService()
+   const { authenticatedUser } = useAuth()
+   const featureFlags = useFeatureFlags()
    const { enqueueSnackbar } = useSnackbar()
 
+   const handleNewStream_v2 = async () => {
+      await handleCreateDraftLivestream(
+         authenticatedUser,
+         group,
+         firebase,
+         router
+      )
+   }
+
+   // eslint-disable-next-line react/hook-use-state
    const [actions] = useState([
       {
          name: "Create a draft live stream",
@@ -38,6 +90,18 @@ const ToolbarActionsDialogContent = ({
          description:
             "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
       },
+      ...(featureFlags.livestreamCreationFlowV2
+         ? [
+              {
+                 name: "Create a draft live stream V2",
+                 onClick: async () => {
+                    await handleNewStream_v2()
+                 },
+                 icon: <StreamIcon />,
+                 description: "New live stream creation form!",
+              },
+           ]
+         : []),
       {
          name: "Share a link to create a draft live stream",
          onClick: () => {
@@ -84,6 +148,7 @@ const ToolbarActionsDialogContent = ({
       <Paper>
          <List>
             {actions.map((action) => (
+               // eslint-disable-next-line react/jsx-handler-names
                <ListItem key={action.name} onClick={action.onClick} button>
                   <ListItemIcon>{action.icon}</ListItemIcon>
                   <ListItemText>{action.name}</ListItemText>

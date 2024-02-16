@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
    Box,
    Collapse,
@@ -16,7 +17,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import { LanguageSelect } from "../../../helperFunctions/streamFormFunctions/components"
 import Stack from "@mui/material/Stack"
 import FormGroup from "../FormGroup"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
@@ -26,6 +27,7 @@ import DateUtil from "../../../../util/DateUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
 import AspectRatio from "components/views/common/AspectRatio"
 import useUploadLivestreamLogo from "components/custom-hook/live-stream/useUploadLivestreamLogo"
+import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
 
 type Props = {
    isGroupsSelected: boolean
@@ -65,11 +67,13 @@ const StreamInfo = ({
    isDraft,
 }: Props) => {
    const { palette } = useTheme()
+   // eslint-disable-next-line react/hook-use-state, @typescript-eslint/no-unused-vars
    const [showStartTooltip, setShowStartToolTip] = useState(false)
    const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
    const [disableStartDatePicker, setDisableStartDatePicker] = useState(false)
    const { setShowPromotionInputs, setIsPromotionInputsDisabled } =
       useStreamCreationProvider()
+   const startDatePickerRef = useRef(null)
 
    const { handleUploadImage } = useUploadLivestreamLogo(values.id, isDraft)
 
@@ -170,6 +174,7 @@ const StreamInfo = ({
             }
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [setShowPromotionInputs, values.start])
 
    const buildHiddenMessage = () => {
@@ -225,7 +230,7 @@ const StreamInfo = ({
                   </Collapse>
                </FormControl>
             </Grid>
-            {isGroupsSelected && (
+            {Boolean(isGroupsSelected) && (
                <Grid
                   xs={12}
                   md={3}
@@ -299,61 +304,38 @@ const StreamInfo = ({
                   changeImageButtonLabel="Change Background"
                   value={values.backgroundImageUrl}
                   error={
-                     errors.backgroundImageUrl &&
-                     touched.backgroundImageUrl &&
-                     errors.backgroundImageUrl
+                     Boolean(errors.backgroundImageUrl) &&
+                     Boolean(touched.backgroundImageUrl) &&
+                     Boolean(errors.backgroundImageUrl)
                   }
                   resolution={"1280 x 960"}
                />
             </Grid>
-            <Grid xs={12} sm={6} md={4} item>
+            <Grid
+               xs={12}
+               sm={6}
+               md={4}
+               item
+               ref={(field) => (startDatePickerRef.current = field)}
+            >
                <DateTimePicker
-                  inputFormat={"dd/MM/yyyy HH:mm"}
+                  format={"dd/MM/yyyy HH:mm"}
                   disablePast
                   ampm={false}
-                  // renderInput={(params) => (
-                  //    <Tooltip
-                  //       placement="top"
-                  //       arrow
-                  //       open={showStartTooltip && !startDatePickerOpen}
-                  //       title={
-                  //          <Box display="flex">
-                  //             <Typography>
-                  //                Promotion won’t available if the event happens
-                  //                within 30 days
-                  //             </Typography>
-                  //             <IconButton
-                  //                onClick={() => setShowStartToolTip(false)}
-                  //                size="small"
-                  //                color="info"
-                  //             >
-                  //                <CloseIcon />
-                  //             </IconButton>
-                  //          </Box>
-                  //       }
-                  //    >
-                  //       <TextField
-                  //          fullWidth
-                  //          {...params}
-                  //          id="start"
-                  //          onBlur={handleBlur}
-                  //          sx={{ svg: { color: palette.secondary.main } }}
-                  //          error={Boolean(errors.start && touched.start)}
-                  //          disabled={disableStartDatePicker}
-                  //       />
-                  //    </Tooltip>
-                  // )}
-                  renderInput={(params) => (
-                     <TextField
-                        fullWidth
-                        {...params}
-                        id="start"
-                        onBlur={handleBlur}
-                        sx={{ svg: { color: palette.secondary.main } }}
-                        error={Boolean(errors.start && touched.start)}
-                        disabled={disableStartDatePicker}
-                     />
-                  )}
+                  slots={{
+                     textField: (params) => (
+                        <TextField
+                           {...params}
+                           fullWidth
+                           id="start"
+                           onBlur={handleBlur}
+                           sx={{ svg: { color: palette.secondary.main } }}
+                           error={Boolean(errors.start && touched.start)}
+                           disabled={disableStartDatePicker}
+                        />
+                     ),
+                  }}
+                  openTo="day"
                   disabled={isSubmitting || disableStartDatePicker}
                   label="Live Stream Start Date"
                   value={values.start}
@@ -363,6 +345,23 @@ const StreamInfo = ({
                   }}
                   open={startDatePickerOpen}
                   onOpen={() => setStartDatePickerOpen(true)}
+                  viewRenderers={{
+                     // @ts-ignore
+                     hours: renderMultiSectionDigitalClockTimeView,
+                     // @ts-ignore
+                     minutes: renderMultiSectionDigitalClockTimeView,
+                  }}
+                  slotProps={{
+                     popper: {
+                        placement: "bottom-start",
+                        anchorEl: startDatePickerRef.current,
+                        sx: {
+                           "& .MuiPaper-root": {
+                              marginLeft: 2,
+                           },
+                        },
+                     },
+                  }}
                />
                <Collapse
                   className={classes.errorMessage}
@@ -492,7 +491,7 @@ const StreamInfo = ({
                </FormControl>
             </Grid>
 
-            {userData?.isAdmin && (
+            {Boolean(userData?.isAdmin) && (
                <Grid xs={12} item>
                   <Stack direction="row" spacing={2}>
                      <Box pl={2} display="flex" alignItems="center">
