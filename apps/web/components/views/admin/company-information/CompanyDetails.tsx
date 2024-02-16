@@ -14,7 +14,7 @@ import {
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import * as Yup from "yup"
 import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
@@ -30,6 +30,7 @@ const [title, description] = [
 const CompanyDetails = () => {
    const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const quillInputRef = useRef()
 
    const initialValues = useMemo<FormValues>(
       () => ({
@@ -82,7 +83,7 @@ const CompanyDetails = () => {
          <Formik<FormValues>
             initialValues={initialValues}
             enableReinitialize
-            validationSchema={validationSchema}
+            validationSchema={() => validationSchema(quillInputRef)}
             onSubmit={onSubmit}
          >
             {({
@@ -113,6 +114,7 @@ const CompanyDetails = () => {
                         label="Describe your company"
                         placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
                         disabled={isSubmitting}
+                        inputRef={quillInputRef}
                         InputProps={{
                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                            inputComponent: CustomRichTextEditor as any,
@@ -214,7 +216,7 @@ type FormValues = {
    extraInfo: string
 }
 
-const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
+const validationSchema = (quillRef) => (Yup.object().shape({
    universityName: Yup.string().required("Company name is required"),
    companyCountry: Yup.object()
       .shape({
@@ -243,12 +245,12 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
       .nullable()
       .required("Company size is required"),
    extraInfo: Yup.string()
-      .transform(value => value.replace(/<[^>]+>/g, '')) // Strip HTML tags
+      .transform(() => quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")) //ReactQuill appends a new line to text
       .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
          `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`)
       .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
          `Must be at least ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`),
    careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
-})
+}))
 
 export default CompanyDetails

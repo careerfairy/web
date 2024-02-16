@@ -12,6 +12,7 @@ import { UserPlus } from "react-feather"
 import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
 import { FormikValues } from "formik"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import { useRef } from "react"
 
 const styles = sxStyles({
    multiline: {
@@ -77,6 +78,7 @@ const TestimonialForm = ({
    disabledAddMoreTestimonials,
 }: Props) => {
    const isLast = index === Object.keys(values.testimonials).length - 1
+   testimonial.quillInputRef = useRef()
 
    return (
       <>
@@ -113,6 +115,7 @@ const TestimonialForm = ({
                         value={testimonial.testimonial ? testimonial.testimonial : "<p></p>"} //to avoid label getting on top of editor when empty
                         variant="outlined"
                         sx={styles.multiline}
+                        inputRef={testimonial.quillInputRef}
                         InputProps={{
                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                            inputComponent: CustomRichTextEditor as any,

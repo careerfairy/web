@@ -8,7 +8,7 @@ import {
 } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik } from "formik"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useMemo, useRef } from "react"
 import { useCompanyPage } from "../index"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
@@ -25,6 +25,7 @@ const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
+   const quillInputRef = useRef()
 
    const initialValues = useMemo(
       () => ({
@@ -62,7 +63,7 @@ const AboutDialog = ({ handleClose }: Props) => {
       <Box>
          <Formik
             initialValues={initialValues}
-            validationSchema={schema}
+            validationSchema={() => schema(quillInputRef)}
             onSubmit={handleSubmitForm}
          >
             {({
@@ -117,6 +118,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                            value={values.extraInfo ? values.extraInfo : "<p></p>"} //to avoid label getting on top of editor when empty
                            variant="outlined"
                            className="multiLineInput"
+                           inputRef={quillInputRef}
                            InputProps={{
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               inputComponent: CustomRichTextEditor as any,
@@ -151,36 +153,37 @@ const AboutDialog = ({ handleClose }: Props) => {
    )
 }
 
-const schema = yup.object().shape({
-   extraInfo: yup
-      .string()
-      .transform(value => value.replace(/<[^>]+>/g, '')) // Strip HTML tags
-      .required("Please describe your company")
-      .min(
-         GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
-         `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`
-      )
-      .max(
-         GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
-         `Must be less than ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`
-      ),
-   companySize: yup.string().required("Please add the company size"),
-   companyIndustries: yup
-      .array()
-      .of(
-         yup.object().nullable().shape({
-            id: yup.string(),
+const schema = (quillRef) => (
+   yup.object().shape({
+      extraInfo: yup
+         .string()
+         .transform(() => quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")) //ReactQuill appends a new line to text
+         .required("Please describe your company")
+         .min(
+            GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
+            `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`
+         )
+         .max(
+            GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
+            `Must be less than ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`
+         ),
+      companySize: yup.string().required("Please add the company size"),
+      companyIndustries: yup
+         .array()
+         .of(
+            yup.object().nullable().shape({
+               id: yup.string(),
+               name: yup.string(),
+            })
+         )
+         .required("Please add the company industry"),
+      companyCountry: yup
+         .object()
+         .nullable()
+         .shape({
             name: yup.string(),
          })
-      )
-      .required("Please add the company industry"),
-   companyCountry: yup
-      .object()
-      .nullable()
-      .shape({
-         name: yup.string(),
-      })
-      .required("Please add the company location"),
-})
+         .required("Please add the company location"),
+}))
 
 export default AboutDialog
