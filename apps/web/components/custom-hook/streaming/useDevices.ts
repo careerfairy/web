@@ -1,4 +1,5 @@
 import AgoraRTC, { DeviceInfo, type IAgoraRTCError } from "agora-rtc-react"
+import { useSnackbar } from "notistack"
 import { useEffect, useMemo, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 
@@ -21,6 +22,7 @@ const removeDefaultDevices = (devices: MediaDeviceInfo[]) =>
  * @returns {Object} An object containing the active device ID, list of devices, error state, and a function to set the active device ID.
  */
 export const useDevices = (options: Options) => {
+   const { enqueueSnackbar } = useSnackbar()
    const [activeDeviceId, setActiveDeviceId] = useState<string>("")
    const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
    const [error, setError] = useState<IAgoraRTCError | null>(null)
@@ -73,6 +75,10 @@ export const useDevices = (options: Options) => {
          const newDevices = removeDefaultDevices([dev.device, ...devices])
          setActiveDeviceId(newDevices[0].deviceId || "")
          setDevices(newDevices)
+         enqueueSnackbar(
+            `Device added: ${dev.device.label} (ID: ${dev.device.deviceId})`,
+            { variant: "success" }
+         )
       }
 
       const handleRemoveDevice = (dev: DeviceInfo) => {
@@ -81,14 +87,21 @@ export const useDevices = (options: Options) => {
          )
 
          const activeDeviceWasRemoved = activeDeviceId === dev.device.deviceId
+         setDevices(newDevices)
+         enqueueSnackbar(
+            `Device removed: ${dev.device.label} (ID: ${dev.device.deviceId})`,
+            { variant: "info" }
+         )
          if (activeDeviceWasRemoved) {
             setActiveDeviceId(newDevices[0].deviceId || "")
+            enqueueSnackbar(
+               `Setting new active device to: ${newDevices[0].label} (ID: ${newDevices[0].deviceId})`,
+               { variant: "info" }
+            )
          }
-         setDevices(newDevices)
       }
 
       const deviceChangedHandler = (dev: DeviceInfo) => {
-         console.log("🚀 ~ DEVICE CHANGE DETECTED:", dev)
          if (dev.state === "ACTIVE") {
             handleAddDevice(dev)
          }
@@ -105,12 +118,7 @@ export const useDevices = (options: Options) => {
       if (options.deviceType === "microphone") {
          AgoraRTC.onMicrophoneChanged = deviceChangedHandler
       }
-
-      return () => {
-         AgoraRTC.onCameraChanged = null
-         AgoraRTC.onMicrophoneChanged = null
-      }
-   }, [activeDeviceId, devices, options.deviceType])
+   }, [activeDeviceId, devices, enqueueSnackbar, options.deviceType])
 
    return useMemo(
       () => ({
