@@ -80,8 +80,10 @@ async function sendOnboardingNewsletter() {
    )
 
    await onboardingNewsletterService.fetchRequiredData()
+
    onboardingNewsletterService.buildDiscoveryLists()
-   //    await onboardingNewsletterService.sendDiscoveryEmails()
+
+   await onboardingNewsletterService.sendDiscoveryEmails()
 
    functions.logger.info("OnboardingNewsletter(s) sent")
 }

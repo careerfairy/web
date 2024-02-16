@@ -1,13 +1,14 @@
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
-import { FieldValue, Timestamp } from "firebase-admin/firestore"
+import { FieldValue } from "firebase-admin/firestore"
 import {
    EmailNotificationType,
    EmailNotification,
    EmailNotificationDetails,
 } from "./notifications"
 import firebase from "firebase/compat/app"
+import { DocumentData } from "firebase/firestore"
 
 export interface IEmailNotificationRepository {
    /**
@@ -19,7 +20,12 @@ export interface IEmailNotificationRepository {
       type?: EmailNotificationType
    ): Promise<EmailNotification[]>
 
-   getServerTimestamp(): Timestamp
+   getServerTimestamp(): FieldValue
+
+   createDiscoveryNotifications(
+      emails: string[],
+      type?: EmailNotificationType
+   ): Promise<DocumentData[]>
 }
 
 export class EmailNotificationFunctionsRepository
@@ -29,6 +35,7 @@ export class EmailNotificationFunctionsRepository
    constructor(readonly firestore: firebase.firestore.Firestore) {
       super()
    }
+
    async getUserReceivedNotifications(
       email: string,
       type?: EmailNotificationType
@@ -56,7 +63,7 @@ export class EmailNotificationFunctionsRepository
    async createDiscoveryNotifications(
       emails: string[],
       type?: EmailNotificationType
-   ) {
+   ): Promise<DocumentData[]> {
       const userToNotificationDetails = (userEmail: string) => {
          return {
             sentBy: "careerfairy.io",
@@ -65,7 +72,7 @@ export class EmailNotificationFunctionsRepository
          } as EmailNotificationDetails
       }
 
-      await Promise.all(
+      return await Promise.all(
          emails.map(userToNotificationDetails).map(this.createNotification)
       )
    }

@@ -3,15 +3,14 @@ import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository"
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { OnboardingNewsletterEmailBuilder } from "../onboarding/OnboardingNewsletterEmailBuilder"
 import {
-   EmailNotificationType,
-   EmailNotification,
-} from "@careerfairy/shared-lib/notifications/notifications"
+   OnboardingNewsletterEmailBuilder,
+   OnboardingNewsletterEvents,
+} from "../onboarding/OnboardingNewsletterEmailBuilder"
+import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
 import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { LivestreamRecordingDetails } from "@careerfairy/shared-lib/livestreams"
-import { Timestamp } from "firebase-admin/firestore"
 
 const COMPANY_DISCOVERY_TRIGGER_DAY = 4
 const SPARKS_DISCOVERY_TRIGGER_DAY = 9
@@ -37,11 +36,11 @@ type OnboardingUserData = {
 export class OnboardingNewsletterService {
    private onboardingUsers: OnboardingUserData[] = []
    private users: UserData[] = []
-   private companyDiscoveryEmails: string[] = []
-   private livestream1stRegistrationDiscoveryEmails: string[] = []
-   private sparksDiscoveryEmails: string[] = []
-   private recordingDiscoveryEmails: string[] = []
-   private feedbackDiscoveryEmails: string[] = []
+   private companyDiscoveryUsers: OnboardingUserData[] = []
+   private livestream1stRegistrationDiscoveryUsers: OnboardingUserData[] = []
+   private sparksDiscoveryUsers: OnboardingUserData[] = []
+   private recordingDiscoveryUsers: OnboardingUserData[] = []
+   private feedbackDiscoveryUsers: OnboardingUserData[] = []
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
@@ -106,13 +105,43 @@ export class OnboardingNewsletterService {
       return !user.notifications.feedbackDiscovery.length
    }
 
-   private buildEmailNotifications(
-      type: EmailNotificationType,
-      creationDate: Timestamp,
-      userEmails
-   ) {
+   private async createDiscoveryEmailNotifications() {
       // TODO: Create method
-      console.log(type, creationDate, userEmails)
+      const companyDiscoveryNotificationsPromise =
+         this.notificationsRepo.createDiscoveryNotifications(
+            this.companyDiscoveryUsers.map((u) => u.user.userEmail),
+            OnboardingNewsletterEvents.COMPANY_DISCOVERY
+         )
+      const sparksDiscoveryNotificationsPromise =
+         this.notificationsRepo.createDiscoveryNotifications(
+            this.sparksDiscoveryUsers.map((u) => u.user.userEmail),
+            OnboardingNewsletterEvents.SPARKS_DISCOVERY
+         )
+      const livestream1stRegistrationDiscoveryNotificationsPromise =
+         this.notificationsRepo.createDiscoveryNotifications(
+            this.livestream1stRegistrationDiscoveryUsers.map(
+               (u) => u.user.userEmail
+            ),
+            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
+         )
+      const recordingDiscoveryNotificationsPromise =
+         this.notificationsRepo.createDiscoveryNotifications(
+            this.recordingDiscoveryUsers.map((u) => u.user.userEmail),
+            OnboardingNewsletterEvents.RECORDING_DISCOVERY
+         )
+      const feedbackDiscoveryNotificationsPromise =
+         this.notificationsRepo.createDiscoveryNotifications(
+            this.feedbackDiscoveryUsers.map((u) => u.user.userEmail),
+            OnboardingNewsletterEvents.FEEDBACK_DISCOVERY
+         )
+
+      return await Promise.all([
+         companyDiscoveryNotificationsPromise,
+         sparksDiscoveryNotificationsPromise,
+         livestream1stRegistrationDiscoveryNotificationsPromise,
+         recordingDiscoveryNotificationsPromise,
+         feedbackDiscoveryNotificationsPromise,
+      ])
    }
 
    async fetchUserData(user: UserData): Promise<OnboardingUserData> {
@@ -223,7 +252,7 @@ export class OnboardingNewsletterService {
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendCompanyDiscovery(onboardingUserData),
-               this.companyDiscoveryEmails,
+               this.companyDiscoveryUsers,
                () =>
                   this.handleUserDiscovery(
                      onboardingUserData,
@@ -239,7 +268,7 @@ export class OnboardingNewsletterService {
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendSparksDiscovery(onboardingUserData),
-               this.sparksDiscoveryEmails,
+               this.sparksDiscoveryUsers,
                () =>
                   this.handleUserDiscovery(
                      onboardingUserData,
@@ -257,7 +286,7 @@ export class OnboardingNewsletterService {
                this.shouldSendLivestream1stRecommendationDiscovery(
                   onboardingUserData
                ),
-               this.livestream1stRegistrationDiscoveryEmails,
+               this.livestream1stRegistrationDiscoveryUsers,
                () =>
                   this.handleUserDiscovery(
                      onboardingUserData,
@@ -273,7 +302,7 @@ export class OnboardingNewsletterService {
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendRecordingDiscovery(onboardingUserData),
-               this.recordingDiscoveryEmails,
+               this.recordingDiscoveryUsers,
                () =>
                   this.handleUserDiscovery(
                      onboardingUserData,
@@ -296,14 +325,14 @@ export class OnboardingNewsletterService {
                this.applyDiscovery(
                   onboardingUserData,
                   shouldSendDiscovery,
-                  this.feedbackDiscoveryEmails
+                  this.feedbackDiscoveryUsers
                )
 
             if (!fromSkippedDiscovery)
                this.applyDiscovery(
                   onboardingUserData,
                   shouldSendDiscovery,
-                  this.feedbackDiscoveryEmails
+                  this.feedbackDiscoveryUsers
                )
             break
          }
@@ -319,10 +348,10 @@ export class OnboardingNewsletterService {
    private applyDiscovery(
       onboardingUserData: OnboardingUserData,
       predicate: boolean,
-      emails: string[],
+      users: OnboardingUserData[],
       next?: () => void
    ) {
-      if (predicate) emails.push(onboardingUserData.user.userEmail)
+      if (predicate) users.push(onboardingUserData)
       else if (next) {
          next()
       }
@@ -357,19 +386,112 @@ export class OnboardingNewsletterService {
       this.onboardingUsers.forEach((user) => {
          return this.handleUserDiscovery(user)
       })
-      this.buildEmailNotifications(null, null, null)
+
+      this.emailBuilder
+         .addRecipients(
+            this.companyDiscoveryUsers.map(
+               (onboardingUser) => onboardingUser.user
+            ),
+            OnboardingNewsletterEvents.COMPANY_DISCOVERY
+         )
+         .addRecipients(
+            this.sparksDiscoveryUsers.map(
+               (onboardingUser) => onboardingUser.user
+            ),
+            OnboardingNewsletterEvents.SPARKS_DISCOVERY
+         )
+         .addRecipients(
+            this.livestream1stRegistrationDiscoveryUsers.map(
+               (onboardingUser) => onboardingUser.user
+            ),
+            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
+         )
+         .addRecipients(
+            this.recordingDiscoveryUsers.map(
+               (onboardingUser) => onboardingUser.user
+            ),
+            OnboardingNewsletterEvents.RECORDING_DISCOVERY
+         )
+         .addRecipients(
+            this.feedbackDiscoveryUsers.map(
+               (onboardingUser) => onboardingUser.user
+            ),
+            OnboardingNewsletterEvents.FEEDBACK_DISCOVERY
+         )
+
       this.logger.info(
          "OnboardingNewsletterService... finished building discovery lists & email notification template data"
       )
       this.logger.info(
          "OnboardingNewsletterService... companyDiscoveryUsers: " +
-            this.companyDiscoveryEmails
+            this.companyDiscoveryUsers
       )
       // TODO: add more logging
    }
 
    async sendDiscoveryEmails() {
-      return null
+      this.logger.info(
+         "OnboardingNewsletterService.... Sending discovery emails ...."
+      )
+      this.logger.info(
+         "OnboardingNewsletterService......... companyDiscovery ..........."
+      )
+
+      this.logDiscoveryEmails()
+      await this.emailBuilder.sendAll()
+      await this.createDiscoveryEmailNotifications()
+      return
+   }
+   private logDiscoveryEmails() {
+      this.emailBuilder
+         .getTemplate(OnboardingNewsletterEvents.COMPANY_DISCOVERY)
+         .forEach((templateMessage) => {
+            this.logger.info(
+               `...................................... to: ${templateMessage.To} ...........`
+            )
+         })
+      this.logger.info(
+         "OnboardingNewsletterService......... sparksDiscovery ..........."
+      )
+      this.emailBuilder
+         .getTemplate(OnboardingNewsletterEvents.SPARKS_DISCOVERY)
+         .forEach((templateMessage) => {
+            this.logger.info(
+               `...................................... to: ${templateMessage.To} ...........`
+            )
+         })
+      this.logger.info(
+         "OnboardingNewsletterService......... livestream1stRegistrationDiscovery ..........."
+      )
+      this.emailBuilder
+         .getTemplate(
+            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
+         )
+         .forEach((templateMessage) => {
+            this.logger.info(
+               `...................................... to: ${templateMessage.To} ...........`
+            )
+         })
+      this.logger.info(
+         "OnboardingNewsletterService......... recordingDiscovery ..........."
+      )
+      this.emailBuilder
+         .getTemplate(OnboardingNewsletterEvents.RECORDING_DISCOVERY)
+         .forEach((templateMessage) => {
+            this.logger.info(
+               `...................................... to: ${templateMessage.To} ...........`
+            )
+         })
+      this.logger.info(
+         "OnboardingNewsletterService......... feedbackDiscovery ..........."
+      )
+      this.emailBuilder
+         .getTemplate(OnboardingNewsletterEvents.FEEDBACK_DISCOVERY)
+         .forEach((templateMessage) => {
+            this.logger.info(
+               `...................................... to: ${templateMessage.To} ...........`
+            )
+         })
    }
 }
 
