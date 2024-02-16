@@ -67,13 +67,12 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
 
    const { livestreamId, shouldStream } = useStreamingContext()
 
-   const client = useRTCScreenShareClient()
+   const screenShareClient = useRTCScreenShareClient()
 
    const localScreenTrack = useLocalScreenTrack(
       shouldStream ? screenShareOn : false,
       {},
-      "auto",
-      client
+      "auto"
    )
 
    const userUID = useCurrentUID()
@@ -125,12 +124,12 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          uid: screenShareUID,
       },
       Boolean(screenShareOn && response.token),
-      client
+      screenShareClient
    )
 
    const hasSelectedScreen = Boolean(screenVideoTrack)
 
-   const { currentRole } = useClientConfig(client, {
+   const { currentRole } = useClientConfig(screenShareClient, {
       hostCondition: shouldStream && hasSelectedScreen,
    })
 
@@ -138,7 +137,11 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       screenShareOn && hasSelectedScreen && currentRole === "host"
    )
 
-   usePublish([screenVideoTrack, screenAudioTrack], readyToPublish, client)
+   usePublish(
+      [screenVideoTrack, screenAudioTrack],
+      readyToPublish,
+      screenShareClient
+   )
 
    useEffect(() => {
       if (readyToPublish) {
@@ -152,16 +155,18 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    useEffect(() => {
       if (localScreenTrack.error) {
          // True if the user clicked "cancel" in the screen share popup
-         const userCancelledScreenShare =
+         const userCancelledScreenShareChrome =
             localScreenTrack.error.message ===
             "AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied"
 
          setScreenShareError(
-            userCancelledScreenShare ? null : localScreenTrack.error
+            userCancelledScreenShareChrome ? null : localScreenTrack.error
          )
 
          // If getting the screen track fails, stop the screen share process
          setScreenShareOn(false)
+      } else {
+         setScreenShareError(null)
       }
    }, [localScreenTrack.error])
 

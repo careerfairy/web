@@ -29,11 +29,13 @@ export const useDevices = (options: Options) => {
     * Debug for simone
     */
    if (options.deviceType === "microphone") {
-      console.log("🚀 ~ device state:", {
+      console.group("🚀 ~ device state:")
+      console.log({
          activeDeviceId,
-         devices,
          error,
       })
+      console.table(devices)
+      console.groupEnd()
    }
 
    /**
@@ -86,6 +88,7 @@ export const useDevices = (options: Options) => {
       }
 
       const deviceChangedHandler = (dev: DeviceInfo) => {
+         console.log("🚀 ~ DEVICE CHANGE DETECTED:", dev)
          if (dev.state === "ACTIVE") {
             handleAddDevice(dev)
          }
