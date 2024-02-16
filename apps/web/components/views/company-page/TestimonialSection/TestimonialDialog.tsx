@@ -64,11 +64,13 @@ const testimonialObj: Testimonial & { quillInputRef: MutableRefObject<ReactQuill
 
 const TESTIMONIAL_LIMIT = 10
 
+const TestimonialForm = dynamic(() => import('./TestimonialForm'), { ssr: false, loading: () => <CircularProgress /> })
+
+
 const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
-   const TestimonialForm = dynamic(() => import('./TestimonialForm'), { ssr: false, loading: () => <CircularProgress /> })
 
 
    const initialValues = useMemo(

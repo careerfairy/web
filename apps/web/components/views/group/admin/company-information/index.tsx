@@ -28,12 +28,13 @@ const styles = sxStyles({
    },
 })
 
+const CompanyDetails = dynamic(() => import('../../../admin/company-information/CompanyDetails'), { ssr: false })
+
 const CompanyInformationPageContent: FC = () => {
    return <MemoizedPageContent />
 }
 
 const PageContent = () => {
-   const CompanyDetails = dynamic(() => import('../../../admin/company-information/CompanyDetails'), { ssr: false })
 
    return (
       <Box sx={styles.root}>
