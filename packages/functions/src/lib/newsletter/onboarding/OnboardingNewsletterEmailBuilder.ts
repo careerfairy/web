@@ -216,14 +216,23 @@ export class OnboardingNewsletterEmailBuilder {
 
       return (
          messages.length &&
-         this.sender.sendEmailBatchWithTemplates(messages, (err) => {
+         this.sender.sendEmailBatchWithTemplates(messages, (res, err) => {
             // this callback is called for each postmark http response
             if (err) {
+               console.log(
+                  "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
+                  err,
+                  messages
+               )
                console.error("Unable to send via postmark", {
                   error: err,
                })
                return
             }
+            console.log(
+               "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ OK: ",
+               res
+            )
          })
       )
    }

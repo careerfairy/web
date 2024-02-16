@@ -93,6 +93,10 @@ export class EmailNotificationFunctionsRepository
          details: details,
          createdAt: this.getServerTimestamp(),
       } as EmailNotification
+      console.log(
+         "🚀 ~ createNotification= ~ newNotification:",
+         newNotification
+      )
 
       return ref.add(newNotification)
    }
