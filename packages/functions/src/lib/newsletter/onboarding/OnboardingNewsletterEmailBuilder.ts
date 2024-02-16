@@ -2,12 +2,19 @@ import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../../../api/postmark"
 import { UserData } from "@careerfairy/shared-lib/users"
 
-enum OnboardingNewsletterEvents {
-   COMPANY_DISCOVERY,
-   SPARKS_DISCOVERY,
-   LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
-   RECORDING_DISCOVERY,
-   FEEDBACK_DISCOVERY,
+export enum OnboardingNewsletterEvents {
+   COMPANY_DISCOVERY = "companyDiscovery",
+   SPARKS_DISCOVERY = "sparksDiscovery",
+   LIVESTREAM_1ST_REGISTRATION_DISCOVERY = "livestream1stRegistrationDiscovery",
+   RECORDING_DISCOVERY = "recordingDiscovery",
+   FEEDBACK_DISCOVERY = "feedbackDiscovery",
+}
+
+type DiscoveryTemplateData = {
+   TemplateId: number
+   TemplateModel: any
+   MessageStream: string
+   Tag: string
 }
 /**
  * Builds an Onboarding newsletter email (templated) and each batch, according to its type, to the various recipients
@@ -26,10 +33,109 @@ export class OnboardingNewsletterEmailBuilder {
       TemplatedMessage[]
    >()
 
+   private discoveryTemplateModelConvertersMap = new Map<
+      OnboardingNewsletterEvents,
+      (user: UserData) => DiscoveryTemplateData
+   >()
+
    constructor(private readonly sender: PostmarkEmailSender) {
       this.initRecipientsData()
+      this.initConvertersMap()
    }
 
+   private initConvertersMap() {
+      this.discoveryTemplateModelConvertersMap.set(
+         OnboardingNewsletterEvents.COMPANY_DISCOVERY,
+         this.companyDiscoveryTemplateData
+      )
+      this.discoveryTemplateModelConvertersMap.set(
+         OnboardingNewsletterEvents.SPARKS_DISCOVERY,
+         this.sparksDiscoveryTemplateData
+      )
+      this.discoveryTemplateModelConvertersMap.set(
+         OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
+         this.livestream1stRegistrationDiscoveryTemplateData
+      )
+      this.discoveryTemplateModelConvertersMap.set(
+         OnboardingNewsletterEvents.RECORDING_DISCOVERY,
+         this.recordingDiscoveryTemplateData
+      )
+      this.discoveryTemplateModelConvertersMap.set(
+         OnboardingNewsletterEvents.FEEDBACK_DISCOVERY,
+         this.feedbackDiscoveryTemplateData
+      )
+   }
+
+   private companyDiscoveryTemplateData(user: UserData): DiscoveryTemplateData {
+      return {
+         TemplateId: Number(
+            process.env
+               .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_COMPANY_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
+      }
+   }
+   private sparksDiscoveryTemplateData(user: UserData): DiscoveryTemplateData {
+      return {
+         TemplateId: Number(
+            process.env.POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_SPARKS_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
+      }
+   }
+   private livestream1stRegistrationDiscoveryTemplateData(
+      user: UserData
+   ): DiscoveryTemplateData {
+      return {
+         TemplateId: Number(
+            process.env
+               .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_LIVESTREAM_1ST_REGISTRATION_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
+      }
+   }
+   private recordingDiscoveryTemplateData(
+      user: UserData
+   ): DiscoveryTemplateData {
+      return {
+         TemplateId: Number(
+            process.env
+               .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_RECORDING_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
+      }
+   }
+   private feedbackDiscoveryTemplateData(
+      user: UserData
+   ): DiscoveryTemplateData {
+      return {
+         TemplateId: Number(
+            process.env
+               .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_FEEDBACK_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
+      }
+   }
    private initRecipientsData() {
       this.discoveryEmailsTemplatedMessageMap.set(
          OnboardingNewsletterEvents.COMPANY_DISCOVERY,
@@ -57,21 +163,20 @@ export class OnboardingNewsletterEmailBuilder {
       type: OnboardingNewsletterEvents,
       userData: UserData
    ): TemplatedMessage {
-      const template = {
+      const templateData =
+         this.discoveryTemplateModelConvertersMap.get(type)(userData)
+      return {
          From: this.from,
          To: userData.userEmail,
-         TemplateId: Number(process.env.POSTMARK_TEMPLATE_NEWSLETTER),
-         TemplateModel: {
-            name: "templateName",
-            // header1,
-            // header2,
-            // livestreams1,
-            // livestreams2,
-         },
-         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         TemplateId: templateData.TemplateId,
+         TemplateModel: templateData.TemplateModel,
+         MessageStream: templateData.MessageStream,
+         Tag: templateData.Tag,
       }
-      return template
+   }
+
+   getTemplate(discoveryType: OnboardingNewsletterEvents): TemplatedMessage[] {
+      return this.discoveryEmailsTemplatedMessageMap.get(discoveryType)
    }
    /**
     * Adds a recipient to the list of recipients and constructs the template data
@@ -94,9 +199,24 @@ export class OnboardingNewsletterEmailBuilder {
    }
 
    send(discoveryType: OnboardingNewsletterEvents): Promise<void[]> {
-      return this.sender.sendEmailBatchWithTemplates(
-         this.discoveryEmailsTemplatedMessageMap.get(discoveryType),
-         (err) => {
+      console.log(
+         "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ discoveryType:",
+         discoveryType
+      )
+      const messages =
+         this.discoveryEmailsTemplatedMessageMap.get(discoveryType)
+      console.log(
+         "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~messagesTo:",
+         messages.map((t) => t.To)
+      )
+
+      if (!messages.length) {
+         return null
+      }
+
+      return (
+         messages.length &&
+         this.sender.sendEmailBatchWithTemplates(messages, (err) => {
             // this callback is called for each postmark http response
             if (err) {
                console.error("Unable to send via postmark", {
@@ -104,7 +224,7 @@ export class OnboardingNewsletterEmailBuilder {
                })
                return
             }
-         }
+         })
       )
    }
 
