@@ -1,12 +1,7 @@
 import React from "react"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import useMediaQuery from "@mui/material/useMediaQuery"
-
-const useStyles = makeStyles((theme) => ({
-   root: {},
-}))
 
 const durations = [
    { minutes: 15, label: "15m" },
@@ -37,15 +32,9 @@ const StreamDurationSelect = (props) => {
    const { disabled, label, setFieldValue, variant, value, fullWidth } = props
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
-   const classes = useStyles()
 
    return (
-      <FormControl
-         variant={variant}
-         fullWidth={fullWidth}
-         disabled={disabled}
-         className={classes.root}
-      >
+      <FormControl variant={variant} fullWidth={fullWidth} disabled={disabled}>
          <InputLabel id="duration-label">{label}</InputLabel>
          <Select
             labelId="duration-label"
@@ -53,7 +42,7 @@ const StreamDurationSelect = (props) => {
             name="duration"
             label={label}
             native={mobile}
-            onChange={(event, secondArg) => {
+            onChange={(event) => {
                const value = event.target.value
                setFieldValue("duration", Number(value))
             }}

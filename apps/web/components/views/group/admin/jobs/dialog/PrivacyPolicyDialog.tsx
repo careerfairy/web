@@ -10,7 +10,7 @@ import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNoti
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { Form, Formik } from "formik"
-import { BrandedTextFieldField } from "../../../../common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "../../../../common/inputs/BrandedTextField"
 import * as Yup from "yup"
 
 const styles = sxStyles({
@@ -107,19 +107,19 @@ const PrivacyPolicyDialog = () => {
                         <SteppedDialog.Subtitle maxWidth={"unset"}>
                            Unlock access to job applicants! To view applicants
                            for your job openings, you are required to add a link
-                           to your company's privacy policy in your company
+                           to your company&apos;s privacy policy in your company
                            profile.
                         </SteppedDialog.Subtitle>
 
                         <SteppedDialog.Subtitle maxWidth={"unset"}>
                            This not only ensures the privacy and security of our
-                           talent community's data but also builds trust with
-                           potential candidates.
+                           talent community&apos;s data but also builds trust
+                           with potential candidates.
                         </SteppedDialog.Subtitle>
                      </Stack>
 
                      <Form>
-                        <BrandedTextFieldField
+                        <FormBrandedTextField
                            label="Link to privacy policy"
                            name="privacyPolicyUrl"
                            placeholder="Insert privacy policy URL link"

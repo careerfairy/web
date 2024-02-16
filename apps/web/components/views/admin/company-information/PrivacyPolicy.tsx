@@ -2,7 +2,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { LoadingButton } from "@mui/lab"
 import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -68,10 +68,10 @@ const PrivacyPolicy = () => {
             validationSchema={validationSchema}
             enableReinitialize
          >
-            {({ dirty, handleSubmit, isSubmitting, errors }) => (
+            {({ dirty, handleSubmit, isSubmitting }) => (
                <Form>
                   <Stack>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         label="Link to privacy policy"
                         name="privacyPolicyUrl"
                         placeholder="Insert privacy policy URL link"

@@ -9,7 +9,7 @@ const styles = sxStyles({
       width: 24,
       height: 24,
       borderRadius: "4px",
-      bgcolor: "tertiary.main",
+      bgcolor: (theme) => theme.brand.black[400],
       color: "black",
       display: "flex",
       justifyContent: "center",

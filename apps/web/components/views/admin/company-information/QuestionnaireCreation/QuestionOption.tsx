@@ -13,7 +13,7 @@ import ConfirmationDialog, {
 import { useMemo } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { BrandedTextFieldField } from "../../../common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "../../../common/inputs/BrandedTextField"
 import BaseStyles from "../BaseStyles"
 
 const styles = sxStyles({
@@ -107,7 +107,7 @@ const QuestionOption: React.FC<Props> = ({
          ) : null}
          {editing ? (
             <Box px={2} py={0.75}>
-               <BrandedTextFieldField
+               <FormBrandedTextField
                   label={`Question option ${cardinal ?? 1}`}
                   placeholder="Write an answer option"
                   name={name}
