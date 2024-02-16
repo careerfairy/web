@@ -25,12 +25,16 @@ import {
    useContext,
    useEffect,
    useMemo,
+   useRef,
    useState,
 } from "react"
 import { useStreamingContext } from "."
 import { useRouter } from "next/router"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { LocalUserScreen } from "../types"
+import { currentScreenSharerSelector } from "store/selectors/streamingAppSelectors"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
+import { useAppSelector } from "components/custom-hook/store"
 
 interface ScreenShareProviderProps {
    children: ReactNode
@@ -62,12 +66,18 @@ const ScreenShareContext = createContext<ScreenShareContextProps | undefined>(
    undefined
 )
 
+const useCurrentScreenSharer = () => useAppSelector(currentScreenSharerSelector)
+
 export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const [screenShareOn, setScreenShareOn] = useState(false)
 
    const { livestreamId, shouldStream } = useStreamingContext()
 
    const screenShareClient = useRTCScreenShareClient()
+
+   const currentScreenSharer = useCurrentScreenSharer()
+
+   useTraceUpdate(currentScreenSharer)
 
    const localScreenTrack = useLocalScreenTrack(
       shouldStream ? screenShareOn : false,
@@ -143,14 +153,27 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       screenShareClient
    )
 
+   /**
+    * Monitors screen sharing status to enforce single user sharing at a time,
+    * using `screenShareOnRef` for current state accuracy.
+    */
+   const screenShareOnRef = useRef(screenShareOn)
+   screenShareOnRef.current = screenShareOn
+
+   useEffect(() => {
+      if (currentScreenSharer !== userUID && screenShareOnRef.current) {
+         setScreenShareOn(false)
+      }
+   }, [currentScreenSharer, userUID])
+
    useEffect(() => {
       if (readyToPublish) {
          setLivestreamMode({
             mode: LivestreamModes.DESKTOP,
-            screenSharerAgoraUID: screenShareUID,
+            screenSharerAgoraUID: userUID.toString(),
          })
       }
-   }, [readyToPublish, screenShareUID, setLivestreamMode])
+   }, [readyToPublish, setLivestreamMode, userUID])
 
    useEffect(() => {
       if (localScreenTrack.error) {
