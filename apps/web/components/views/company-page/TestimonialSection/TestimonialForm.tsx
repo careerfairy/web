@@ -12,7 +12,8 @@ import { UserPlus } from "react-feather"
 import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
 import { FormikValues } from "formik"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
-import { useRef } from "react"
+import { MutableRefObject, useRef } from "react"
+import ReactQuill from "react-quill"
 
 const styles = sxStyles({
    multiline: {
@@ -41,7 +42,7 @@ type Props = {
    nameError: string
    positionError: string
    avatarError: string
-   testimonial: Testimonial
+   testimonial: Testimonial & { quillInputRef: MutableRefObject<ReactQuill> }
    objectKey: string
    setFieldValue: (field, value) => void
    handleBlur: (event) => void
@@ -112,7 +113,11 @@ const TestimonialForm = ({
                         disabled={isSubmitting}
                         onChange={handleChange}
                         error={Boolean(testimonialError)}
-                        value={testimonial.testimonial ? testimonial.testimonial : "<p></p>"} //to avoid label getting on top of editor when empty
+                        value={
+                           testimonial.testimonial
+                              ? testimonial.testimonial
+                              : "<p></p>"
+                        } //to avoid label getting on top of editor when empty
                         variant="outlined"
                         sx={styles.multiline}
                         inputRef={testimonial.quillInputRef}
