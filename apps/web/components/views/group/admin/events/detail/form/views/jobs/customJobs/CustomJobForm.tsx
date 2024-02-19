@@ -15,6 +15,14 @@ import { jobsDialogOpenSelector } from "store/selectors/adminJobsSelectors"
 import { closeJobsDialog } from "store/reducers/adminJobsReducer"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
+import { sxStyles } from "@careerfairy/shared-ui"
+
+const styles = sxStyles({
+   dialog: {
+      top: { xs: "70px", md: 0 },
+      borderRadius: 5,
+   },
+})
 
 type Props = {
    groupId: string
@@ -104,6 +112,7 @@ const CustomJobForm: FC<Props> = ({ groupId, fieldId }) => {
                open={isJobFormDialogOpen}
                views={views}
                transition={SlideUpTransition}
+               sx={styles.dialog}
             />
          </Stack>
       </Grid>
