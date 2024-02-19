@@ -2,13 +2,12 @@ import React, {
    createContext,
    useContext,
    ReactNode,
-   useState,
    useMemo,
    useCallback,
 } from "react"
 import { useLocalTracks, useStreamingContext } from "../../context"
 import { useLocalCameraTrack, useLocalMicrophoneTrack } from "agora-rtc-react"
-import { useSetDevice } from "components/custom-hook/streaming/useSetDevice"
+import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
 
 type SettingsMenuContextType = {
    tempCameraTrack: ReturnType<typeof useLocalCameraTrack>
@@ -41,20 +40,24 @@ export const SettingsMenuProvider = ({
       setActiveMicrophoneId,
    } = useLocalTracks()
 
-   const [tempMicrophoneId, setTempMicrophoneId] = useState(initialMicrophoneId)
-   const [tempCameraId, setTempCameraId] = useState(initialCameraId)
-
    const { shouldStream } = useStreamingContext()
 
    const tempCameraTrack = useLocalCameraTrack(shouldStream, {
-      cameraId: tempCameraId,
+      cameraId: initialCameraId,
    })
    const tempMicrophoneTrack = useLocalMicrophoneTrack(shouldStream, {
-      microphoneId: tempMicrophoneId,
+      microphoneId: initialMicrophoneId,
    })
 
-   useSetDevice(tempCameraTrack.localCameraTrack, tempCameraId)
-   useSetDevice(tempMicrophoneTrack.localMicrophoneTrack, tempMicrophoneId)
+   const {
+      activeDeviceId: tempMicrophoneId,
+      handleSetActiveDevice: setTempMicrophoneId,
+   } = useTrackHandler("microphone", tempMicrophoneTrack.localMicrophoneTrack)
+
+   const {
+      activeDeviceId: tempCameraId,
+      handleSetActiveDevice: setTempCameraId,
+   } = useTrackHandler("camera", tempCameraTrack.localCameraTrack)
 
    const handleSaveAndClose = useCallback(() => {
       setActiveCameraId(tempCameraId)
@@ -81,11 +84,13 @@ export const SettingsMenuProvider = ({
       }),
       [
          tempCameraTrack,
-         handleSaveAndClose,
          tempMicrophoneTrack,
-         onClose,
          tempCameraId,
          tempMicrophoneId,
+         setTempCameraId,
+         setTempMicrophoneId,
+         handleSaveAndClose,
+         onClose,
       ]
    )
 
