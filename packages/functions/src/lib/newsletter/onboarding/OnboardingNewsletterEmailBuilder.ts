@@ -76,7 +76,7 @@ export class OnboardingNewsletterEmailBuilder {
             user_name: user.firstName,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         Tag: "onboarding-company",
       }
    }
    private sparksDiscoveryTemplateData(user: UserData): DiscoveryTemplateData {
@@ -88,7 +88,7 @@ export class OnboardingNewsletterEmailBuilder {
             user_name: user.firstName,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         Tag: "onboarding-sparks",
       }
    }
    private livestream1stRegistrationDiscoveryTemplateData(
@@ -103,7 +103,7 @@ export class OnboardingNewsletterEmailBuilder {
             user_name: user.firstName,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         Tag: "onboarding-livestream",
       }
    }
    private recordingDiscoveryTemplateData(
@@ -118,7 +118,7 @@ export class OnboardingNewsletterEmailBuilder {
             user_name: user.firstName,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         Tag: "onboarding-recording",
       }
    }
    private feedbackDiscoveryTemplateData(
@@ -133,7 +133,7 @@ export class OnboardingNewsletterEmailBuilder {
             user_name: user.firstName,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "newsletter",
+         Tag: "onboarding-feedback",
       }
    }
    private initRecipientsData() {
@@ -217,14 +217,13 @@ export class OnboardingNewsletterEmailBuilder {
       return (
          messages.length &&
          this.sender.sendEmailBatchWithTemplates(messages, (res, err) => {
-            // this callback is called for each postmark http response
             if (err) {
                console.log(
                   "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
                   err,
                   messages
                )
-               console.error("Unable to send via postmark", {
+               console.error("Unable to send Discovery Email via postmark", {
                   error: err,
                })
                return
