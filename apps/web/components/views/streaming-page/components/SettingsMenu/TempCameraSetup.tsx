@@ -29,7 +29,6 @@ export const TempCameraSetup = () => {
             isLoading={tempCameraTrack.isLoading}
             hideDetails
             hideSpeakingIndicator
-            height={222}
             sx={styles.video}
             cameraOn
             containVideo
