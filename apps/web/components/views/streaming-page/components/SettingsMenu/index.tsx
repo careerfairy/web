@@ -34,17 +34,19 @@ const styles = sxStyles({
       "& .MuiDrawer-paper": {
          borderTopLeftRadius: 12,
          borderTopRightRadius: 12,
+         maxHeight: "calc(100vh - 88px)",
       },
    },
    actions: {
       py: 1.5,
       px: 2,
+      zIndex: 1,
+      borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
    },
    actionsSticky: {
       position: "sticky",
       bottom: 0,
       backgroundColor: (theme) => theme.brand.white[200],
-      borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
    },
    icon: {
       color: "neutral.900",
@@ -52,6 +54,13 @@ const styles = sxStyles({
    title: {
       p: 2,
       pt: 2.375,
+      borderBottom: (theme) => `1px solid ${theme.brand.black[300]}`,
+   },
+   titleSticky: {
+      position: "sticky",
+      top: 0,
+      zIndex: 2,
+      backgroundColor: "white",
    },
    titleText: {
       color: "neutral.800",
@@ -65,6 +74,7 @@ const styles = sxStyles({
    },
    dialogContent: {
       p: 2,
+      border: "none",
    },
    closeBtn: {
       color: "neutral.500",
@@ -118,7 +128,7 @@ type ContentProps = {
 const Content = ({ onClose, isMobile }: ContentProps) => {
    return (
       <SettingsMenuProvider onClose={onClose}>
-         <DialogTitle sx={styles.title}>
+         <DialogTitle sx={[styles.title, isMobile && styles.titleSticky]}>
             <Stack
                alignItems="center"
                direction="row"
