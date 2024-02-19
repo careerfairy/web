@@ -9,7 +9,7 @@ const styles = sxStyles({
       aspectRatio: "16/9",
       width: "100%",
       borderRadius: "8px",
-      border: (theme) => `2px solid ${theme.brand.purple[100]}`,
+      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
       "& .videoTrack": {
          "& > div": {
             backgroundColor: (theme) => theme.brand.white[300] + " !important",

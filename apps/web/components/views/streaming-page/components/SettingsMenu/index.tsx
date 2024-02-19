@@ -147,9 +147,9 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
                <Box>
                   <MenuHeading>Video settings</MenuHeading>
                   <Box pb={2} />
-                  <TempCameraSelect />
-                  <Box pb={1.5} />
                   <TempCameraSetup />
+                  <Box pb={1.5} />
+                  <TempCameraSelect />
                </Box>
             </Stack>
          </DialogContent>
