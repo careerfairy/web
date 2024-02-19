@@ -104,25 +104,33 @@ export class OnboardingNewsletterService {
             user.notifications.livestream1stRegistrationDiscovery,
             user.notifications.recordingDiscovery,
             user.notifications.feedbackDiscovery,
-         ]) && !user.stats.hasRegisteredOnAnyLivestream
+         ]) && !user.stats?.hasRegisteredOnAnyLivestream
       )
    }
 
    private shouldSendRecordingDiscovery = (
       onboardingUser: OnboardingUserData
    ): boolean => {
-      return (
-         !this.hasNotifications([
-            onboardingUser.notifications.recordingDiscovery,
-            onboardingUser.notifications.feedbackDiscovery,
-         ]) &&
-         !onboardingUser.recordingStats.find((stat) =>
+      const hasWatchedRecording = Boolean(
+         onboardingUser.recordingStats.find((stat) =>
             Boolean(
-               stat.viewers.find(
+               stat?.viewers.find(
                   (viewer) => viewer === onboardingUser.user.userEmail
                )
             )
          )
+      )
+
+      console.log(
+         "🚀 ~ OnboardingNewsletterService ~ hasWatchedRecording:",
+         hasWatchedRecording
+      )
+
+      return (
+         !this.hasNotifications([
+            onboardingUser.notifications.recordingDiscovery,
+            onboardingUser.notifications.feedbackDiscovery,
+         ]) && !hasWatchedRecording
       )
    }
    private shouldSendFeedbackDiscovery = (
@@ -227,8 +235,12 @@ export class OnboardingNewsletterService {
          userStatsPromise,
       ])
 
-      const userRecordingStatsPromises = userStats.recordingsBought?.map(
-         this.livestreamsRepo.getLivestreamRecordingStats
+      const userRecordingStatsPromises = userStats?.recordingsBought?.map(
+         (livestreamId) => {
+            return this.livestreamsRepo.getLivestreamRecordingStats(
+               livestreamId
+            )
+         }
       )
       const recordingStats = userRecordingStatsPromises?.length
          ? await Promise.all(userRecordingStatsPromises)
