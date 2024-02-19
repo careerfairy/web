@@ -21,6 +21,7 @@ import { MicVolume } from "./MicVolume"
 import { SettingsMenuProvider, useSettingsMenu } from "./SettingsMenuContext"
 import { TempCameraSetup } from "./TempCameraSetup"
 import { TempCameraSelect, TempMicrophoneSelect } from "./temp-device-select"
+import { VideoEffects } from "./VideoEffects"
 
 const styles = sxStyles({
    dialog: {
@@ -150,6 +151,8 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
                   <TempCameraSetup />
                   <Box pb={1.5} />
                   <TempCameraSelect />
+                  <Box pb={1.5} />
+                  <VideoEffects />
                </Box>
             </Stack>
          </DialogContent>
