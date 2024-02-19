@@ -52,7 +52,7 @@ const LivestreamAdminDetailTopBarNavigation: FC<
          <Tab label="General" value={TAB_VALUES.GENERAL} />
          <Tab label="Speakers" value={TAB_VALUES.SPEAKERS} />
          <Tab label="Questions" value={TAB_VALUES.QUESTIONS} />
-         <Tab label="Jobs" value={TAB_VALUES.JOBS} />
+         <Tab label="Job openings" value={TAB_VALUES.JOBS} />
       </Tabs>
    )
 }

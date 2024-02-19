@@ -109,7 +109,7 @@ const getListLabelFn = (option: PublicCustomJob) => (
    <Typography key={`${option.id}-label`}>{option.title}</Typography>
 )
 
-const getValueFn = (value: any) => {
+const getValueFn = (value: undefined) => {
    return value
 }
 
@@ -120,6 +120,6 @@ const getLabelFn = (value: PublicCustomJob) => {
 const isOptionEqualToValue = (
    option: PublicCustomJob,
    value: PublicCustomJob
-): Boolean => option.id === value.id
+): boolean => option.id === value.id
 
 export default SelectorCustomJobsDropDown
