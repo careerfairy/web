@@ -34,8 +34,10 @@ type OnboardingUserData = {
    notifications: OnboardingUserDataNotifications
 }
 export class OnboardingNewsletterService {
+   // User data with required fields for onboarding logic evaluation
    private onboardingUsers: OnboardingUserData[] = []
-   private users: UserData[] = []
+
+   // Discovery user lists
    private companyDiscoveryUsers: OnboardingUserData[] = []
    private livestream1stRegistrationDiscoveryUsers: OnboardingUserData[] = []
    private sparksDiscoveryUsers: OnboardingUserData[] = []
@@ -105,37 +107,39 @@ export class OnboardingNewsletterService {
    private shouldSendFeedbackDiscovery = (
       user: OnboardingUserData
    ): boolean => {
-      // TODO: Set as user has not received notification yet
       return !user.notifications.feedbackDiscovery.length
    }
 
+   /**
+    * Create entries in collection emailNotifications for the different types for each user, useful
+    * for checking if certain types of email discoveries have already been sent.
+    */
    private async createDiscoveryEmailNotifications() {
-      // TODO: Create method
+      const userEmailMapper = (oUser: OnboardingUserData) =>
+         oUser.user.userEmail
       const companyDiscoveryNotificationsPromise =
-         this.notificationsRepo.createDiscoveryNotifications(
-            this.companyDiscoveryUsers.map((u) => u.user.userEmail),
+         this.notificationsRepo.createNotifications(
+            this.companyDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.COMPANY_DISCOVERY
          )
       const sparksDiscoveryNotificationsPromise =
-         this.notificationsRepo.createDiscoveryNotifications(
-            this.sparksDiscoveryUsers.map((u) => u.user.userEmail),
+         this.notificationsRepo.createNotifications(
+            this.sparksDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.SPARKS_DISCOVERY
          )
       const livestream1stRegistrationDiscoveryNotificationsPromise =
-         this.notificationsRepo.createDiscoveryNotifications(
-            this.livestream1stRegistrationDiscoveryUsers.map(
-               (u) => u.user.userEmail
-            ),
+         this.notificationsRepo.createNotifications(
+            this.livestream1stRegistrationDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
          )
       const recordingDiscoveryNotificationsPromise =
-         this.notificationsRepo.createDiscoveryNotifications(
-            this.recordingDiscoveryUsers.map((u) => u.user.userEmail),
+         this.notificationsRepo.createNotifications(
+            this.recordingDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.RECORDING_DISCOVERY
          )
       const feedbackDiscoveryNotificationsPromise =
-         this.notificationsRepo.createDiscoveryNotifications(
-            this.feedbackDiscoveryUsers.map((u) => u.user.userEmail),
+         this.notificationsRepo.createNotifications(
+            this.feedbackDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.FEEDBACK_DISCOVERY
          )
 
@@ -148,15 +152,18 @@ export class OnboardingNewsletterService {
       ])
    }
 
+   /**
+    * Fetches all necessary user data for evaluating discovery states and decide on the specific logic to
+    * be applied accordingly.
+    * After fetching all needed data, the user is stored as @type OnboardingUserData, with all the needed properties for logic
+    * evaluation.
+    * @param user UserData with basic user fields, used to infer remaining data: notifications, sparksSeen, etc.
+    * @returns Promise fulfilling when all other Promises related to the user data are also fulfilled with the
+    * calculated OnboardingUserData.
+    */
    async fetchUserData(user: UserData): Promise<OnboardingUserData> {
       this.logger.info(`OnboardingNewsletterService starting at ${new Date()}`)
-      this.logger.info(
-         "OnboardingNewsletterService...sparksRepo:  " + this.sparksRepo
-      )
-      this.logger.info(
-         "OnboardingNewsletterService fetchUserData: sparksRepo - " +
-            this.sparksRepo
-      )
+
       const seenSparksPromise = this.sparksRepo.getUserSparkInteraction(
          user.id,
          "seenSparks"
@@ -200,7 +207,7 @@ export class OnboardingNewsletterService {
       const recordingStats = userRecordingStatsPromises?.length
          ? await Promise.all(userRecordingStatsPromises)
          : []
-      // Filtering notifications in memory to limit Database queries
+
       const [
          companyDiscoveryNotifications,
          sparksDiscoveryNotifications,
@@ -226,6 +233,16 @@ export class OnboardingNewsletterService {
       } as OnboardingUserData
    }
 
+   /**
+    * Main onboarding project logic, based on the calculated OnboardingUserData, determines to which batch of email notification
+    * discoveries the user shall be attached to, depending on the days since registration, with some determined days serving as trigger for
+    * the main logic.
+    * Certain scenarios, foresee evaluating the next condition on the same trigger day, thus for certain conditions, if not met, this function can be called recursively, which just means evaluating the next discovery condition on the
+    * present condition trigger day.
+    * @param onboardingUserData User data for main logic (stats, notifications, etc.)
+    * @param daysSinceUserRegistration Optional parameter, when present overrides the days since the user was created with this value instead
+    * of calculating based on creationDate.
+    */
    private handleUserDiscovery(
       onboardingUserData: OnboardingUserData,
       daysSinceUserRegistration?: number
@@ -234,8 +251,16 @@ export class OnboardingNewsletterService {
 
       // Real user days since registration, as this method can be called recursively with overridden days
       let effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
-         onboardingUserData.user.createdAt.toDate(),
+         onboardingUserData.user.createdAt.toDate(), // TODO: check if other property check is needed
          new Date()
+      )
+      console.log(
+         `🚀 ~ OnboardingNewsletterService ~ handleUserDiscovery ~ effectiveUserDaysSinceRegistration - ${
+            onboardingUserData.user.userEmail
+         }: creationDate - ${
+            onboardingUserData.user.createdAt
+         } current - ${new Date()}`,
+         effectiveUserDaysSinceRegistration
       )
 
       if (fromSkippedDiscovery) {
@@ -362,30 +387,22 @@ export class OnboardingNewsletterService {
    }
 
    async fetchRequiredData() {
-      this.logger.info("OnboardingNewsletterService... fetching required data")
-      this.users = await this.userRepo.getSubscribedUsers()
-      const onboardingUserPromises = this.users.map((user) => {
-         this.logger.info(
-            "OnboardingNewsletterService... mapping user - " + user.userEmail
-         )
+      this.logger.info("Fetching required data")
+      const users = await this.userRepo.getSubscribedUsers()
+      const onboardingUserPromises = users.map((user) => {
          return this.fetchUserData(user)
       })
 
       this.onboardingUsers = await Promise.all(onboardingUserPromises)
-      this.logger.info(
-         `OnboardingNewsletterService... fetched ${this.onboardingUsers.length} subscribed users`
-      )
-      console.log(
-         "🚀 ~ OnboardingNewsletterService ~ fetchRequiredData ~ this.onboardingUsers:",
-         this.onboardingUsers
-      )
 
-      // fetch notifications for the users and filter map to users
+      this.logger.info(
+         `Fetched ${this.onboardingUsers.length} subscribed users`
+      )
    }
 
    buildDiscoveryLists() {
       this.logger.info(
-         "OnboardingNewsletterService... building discovery lists & email notification template data"
+         "Building discovery lists & email notification template data"
       )
       this.onboardingUsers.forEach((user) => {
          return this.handleUserDiscovery(user)
@@ -417,76 +434,11 @@ export class OnboardingNewsletterService {
       this.logger.info(
          "OnboardingNewsletterService... finished building discovery lists & email notification template data"
       )
-      this.logger.info(
-         "OnboardingNewsletterService... companyDiscoveryUsers: " +
-            this.companyDiscoveryUsers
-      )
-      // TODO: add more logging
    }
 
    async sendDiscoveryEmails() {
-      this.logger.info(
-         "OnboardingNewsletterService.... Sending discovery emails ...."
-      )
-      this.logger.info(
-         "OnboardingNewsletterService......... companyDiscovery ..........."
-      )
-
-      this.logDiscoveryEmails()
       await this.emailBuilder.sendAll()
       await this.createDiscoveryEmailNotifications()
-      return
-   }
-   private logDiscoveryEmails() {
-      this.emailBuilder
-         .getTemplate(OnboardingNewsletterEvents.COMPANY_DISCOVERY)
-         .forEach((templateMessage) => {
-            this.logger.info(
-               `...................................... to: ${templateMessage.To} ...........`
-            )
-         })
-      this.logger.info(
-         "OnboardingNewsletterService......... sparksDiscovery ..........."
-      )
-      this.emailBuilder
-         .getTemplate(OnboardingNewsletterEvents.SPARKS_DISCOVERY)
-         .forEach((templateMessage) => {
-            this.logger.info(
-               `...................................... to: ${templateMessage.To} ...........`
-            )
-         })
-      this.logger.info(
-         "OnboardingNewsletterService......... livestream1stRegistrationDiscovery ..........."
-      )
-      this.emailBuilder
-         .getTemplate(
-            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
-         )
-         .forEach((templateMessage) => {
-            this.logger.info(
-               `...................................... to: ${templateMessage.To} ...........`
-            )
-         })
-      this.logger.info(
-         "OnboardingNewsletterService......... recordingDiscovery ..........."
-      )
-      this.emailBuilder
-         .getTemplate(OnboardingNewsletterEvents.RECORDING_DISCOVERY)
-         .forEach((templateMessage) => {
-            this.logger.info(
-               `...................................... to: ${templateMessage.To} ...........`
-            )
-         })
-      this.logger.info(
-         "OnboardingNewsletterService......... feedbackDiscovery ..........."
-      )
-      this.emailBuilder
-         .getTemplate(OnboardingNewsletterEvents.FEEDBACK_DISCOVERY)
-         .forEach((templateMessage) => {
-            this.logger.info(
-               `...................................... to: ${templateMessage.To} ...........`
-            )
-         })
    }
 }
 

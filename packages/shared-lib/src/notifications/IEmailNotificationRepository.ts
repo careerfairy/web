@@ -12,7 +12,7 @@ import { DocumentData } from "firebase/firestore"
 
 export interface IEmailNotificationRepository {
    /**
-    * Fetches all Notification related to the user email
+    * Fetches all Notifications related to the user email
     * @returns {Promise<EmailNotification[] | []>} A promise that resolves to an array of Notifications or an empty array
     */
    getUserReceivedNotifications(
@@ -20,12 +20,17 @@ export interface IEmailNotificationRepository {
       type?: EmailNotificationType
    ): Promise<EmailNotification[]>
 
-   getServerTimestamp(): FieldValue
-
-   createDiscoveryNotifications(
+   /**
+    * Creates email notifications for the user emails and the given type. A check is made before creating, for the type and user.
+    * @param emails User emails to create notifications for
+    * @param type Type of email notification
+    */
+   createNotifications(
       emails: string[],
       type?: EmailNotificationType
    ): Promise<DocumentData[]>
+
+   getServerTimestamp(): FieldValue
 }
 
 export class EmailNotificationFunctionsRepository
@@ -54,13 +59,7 @@ export class EmailNotificationFunctionsRepository
       return result.docs.map((doc) => doc.data())
    }
 
-   /**
-    * Adds new entries to the emailNotification collection, for each user email, checking before hand
-    * if there is already an email notification for the user and type
-    * @param emails
-    * @param type
-    */
-   async createDiscoveryNotifications(
+   async createNotifications(
       emails: string[],
       type?: EmailNotificationType
    ): Promise<DocumentData[]> {
@@ -93,10 +92,6 @@ export class EmailNotificationFunctionsRepository
          details: details,
          createdAt: this.getServerTimestamp(),
       } as EmailNotification
-      console.log(
-         "🚀 ~ createNotification= ~ newNotification:",
-         newNotification
-      )
 
       return ref.add(newNotification)
    }
