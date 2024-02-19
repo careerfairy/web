@@ -9,7 +9,8 @@ import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 import { IRecommendationDataFetcher } from "../../recommendation/services/DataFetcherRecommendations"
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
-
+import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
+import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
 /**
  * Data structure used to associate each user with his recommended livestreams
  * and groups he is following
@@ -55,10 +56,33 @@ export class NewsletterService {
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly groupRepo: IGroupFunctionsRepository,
+      private readonly notificationsRepo: IEmailFunctionsNotificationRepository,
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: NewsletterEmailBuilder,
       private readonly logger: Logger
    ) {}
+
+   private async filterUsers(users: UserData[]): Promise<UserData[]> {
+      const promises = users.map(async (user) => {
+         const notifications: EmailNotification[] =
+            await this.notificationsRepo.getUserReceivedNotifications(
+               user.userEmail
+            )
+         return {
+            user: user,
+            notifications: notifications,
+         }
+      })
+
+      return (await Promise.all(promises))
+         .filter(
+            (userData) =>
+               !userData.notifications.filter(
+                  (n) => n.details.type === "livestream1stRegistrationDiscovery"
+               )
+         )
+         .map((userData) => userData.user)
+   }
 
    /**
     * Fetches the required data for generating the newsletter
@@ -74,9 +98,10 @@ export class NewsletterService {
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
 
-      this.subscribedUsers = convertDocArrayToDict(
+      const filteredUsers = await this.filterUsers(
          subscribedUsers as UserData[]
       )
+      this.subscribedUsers = convertDocArrayToDict(filteredUsers)
       this.futureLivestreams = futureLivestreams
       this.pastLivestreams = pastLivestreams
 
