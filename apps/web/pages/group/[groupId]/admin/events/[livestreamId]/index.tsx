@@ -1,7 +1,8 @@
-import { Formik } from "formik"
+import { Form, Formik } from "formik"
 import { useState } from "react"
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useRouter } from "next/router"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { useInterests } from "components/custom-hook/useCollection"
@@ -25,6 +26,12 @@ import LivestreamFormQuestionsStep from "../../../../../../components/views/grou
 import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general/general"
 import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
+
+const styles = sxStyles({
+   root: {
+      padding: "24px",
+   },
+})
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -99,10 +106,15 @@ const convertLivestreamObjectToForm = (
       ? [livestream.reasonsToJoinLivestream, undefined, undefined]
       : livestream.reasonsToJoinLivestream_v2
 
+   const questions: LivestreamFormQuestionsTabValues = {
+      registrationQuestions: livestream.groupQuestionsMap,
+      feedbackQuestions: [],
+   }
+
    return {
       general: general,
       speakers: valuesReducer(formSpeakersTabInitialValues),
-      questions: valuesReducer(formQuestionsTabInitialValues),
+      questions: questions,
       jobs: valuesReducer(formJobsTabInitialValues),
    }
 }
@@ -150,26 +162,26 @@ const LivestreamAdminDetailsPage = () => {
                         onSubmit={undefined}
                         validationSchema={livestreamFormValidationSchema}
                      >
-                        <>
-                           {tabValue == TAB_VALUES.GENERAL && (
-                              <LivestreamFormGeneralStep />
-                           )}
-                           {tabValue == TAB_VALUES.SPEAKERS && (
-                              <LivestreamFormSpeakersStep
-                                 values={formSpeakersTabInitialValues}
-                              />
-                           )}
-                           {tabValue == TAB_VALUES.QUESTIONS && (
-                              <LivestreamFormQuestionsStep
-                                 values={formQuestionsTabInitialValues}
-                              />
-                           )}
-                           {tabValue == TAB_VALUES.JOBS && (
-                              <LivestreamFormJobsStep
-                                 values={formJobsTabInitialValues}
-                              />
-                           )}
-                        </>
+                        <Form>
+                           <Stack sx={styles.root} rowGap={2}>
+                              {tabValue == TAB_VALUES.GENERAL && (
+                                 <LivestreamFormGeneralStep />
+                              )}
+                              {tabValue == TAB_VALUES.SPEAKERS && (
+                                 <LivestreamFormSpeakersStep
+                                    values={formSpeakersTabInitialValues}
+                                 />
+                              )}
+                              {tabValue == TAB_VALUES.QUESTIONS && (
+                                 <LivestreamFormQuestionsStep />
+                              )}
+                              {tabValue == TAB_VALUES.JOBS && (
+                                 <LivestreamFormJobsStep
+                                    values={formJobsTabInitialValues}
+                                 />
+                              )}
+                           </Stack>
+                        </Form>
                      </Formik>
                   </Box>
                )
