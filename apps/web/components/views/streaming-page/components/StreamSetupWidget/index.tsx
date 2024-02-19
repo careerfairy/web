@@ -7,7 +7,7 @@ import {
    Drawer,
    Grid,
 } from "@mui/material"
-import { CameraSelect, MicrophoneSelect } from "./DeviceSelect"
+import { CameraSelect, MicrophoneSelect } from "../streaming/DeviceSelect"
 import {
    MicActionButton,
    ResponsiveStreamButton,
