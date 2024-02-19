@@ -4,7 +4,7 @@ import {
    IMicrophoneAudioTrack,
 } from "agora-rtc-react"
 import { useSnackbar } from "notistack"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import { useAgoraDevices } from "components/views/streaming-page/context/AgoraDevices"
 
@@ -48,10 +48,6 @@ export const useTrackHandler = (
    } = useAgoraDevices()
 
    const devices = deviceType === "camera" ? cameras : microphones
-
-   const devicesRef = useRef<MediaDeviceInfo[]>(devices)
-
-   devicesRef.current = devices
 
    const [activeDeviceId, setActiveDeviceId] = useState<string>()
 

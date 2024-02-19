@@ -64,11 +64,17 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const { cameras, microphones, fetchCamerasError, fetchMicsError } =
       useAgoraDevices()
 
-   const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false, {
-      cameraId: cameras[0]?.deviceId,
-   })
+   const firstCameraAvailable = cameras[0]?.deviceId
+   const firstMicrophoneAvailable = microphones[0]?.deviceId
+
+   const cameraTrack = useLocalCameraTrack(
+      shouldStream ? Boolean(cameraOn) : false,
+      {
+         cameraId: firstCameraAvailable,
+      }
+   )
    const microphoneTrack = useLocalMicrophoneTrack(shouldStream, {
-      microphoneId: microphones[0]?.deviceId,
+      microphoneId: firstMicrophoneAvailable,
    })
 
    const {
