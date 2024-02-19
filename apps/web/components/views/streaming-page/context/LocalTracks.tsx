@@ -12,14 +12,13 @@ import {
    createContext,
    useCallback,
    useContext,
-   useEffect,
    useMemo,
    useState,
 } from "react"
 import { useStreamingContext } from "./Streaming"
 import { type LocalUser } from "../types"
 import { useDevices } from "components/custom-hook/streaming/useDevices"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { useSetDevice } from "components/custom-hook/streaming/useSetDevice"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -37,8 +36,10 @@ type LocalTracksContextProps = {
    activeMicrophoneId: string
    setActiveCameraId: (cameraId: string) => void
    setActiveMicrophoneId: (microphoneId: string) => void
-   microphoneError: IAgoraRTCError | AgoraRTCReactError
-   cameraError: IAgoraRTCError | AgoraRTCReactError
+   microphoneError: AgoraRTCReactError
+   cameraError: AgoraRTCReactError
+   fetchCamerasError: IAgoraRTCError
+   fetchMicsError: IAgoraRTCError
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
    localUser: LocalUser
@@ -87,33 +88,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     * Uses the `activeCameraId` and `activeMicrophoneId` to set the active local devices
     * for the camera and microphone tracks.
     */
-   useEffect(() => {
-      if (cameraTrack.localCameraTrack && activeCameraId) {
-         cameraTrack.localCameraTrack.setDevice(activeCameraId).catch((error) =>
-            errorLogAndNotify(error, {
-               message: "Failed to set the active camera device",
-               metadata: {
-                  activeCameraId,
-               },
-            })
-         )
-      }
-   }, [activeCameraId, cameraTrack.localCameraTrack])
-
-   useEffect(() => {
-      if (microphoneTrack.localMicrophoneTrack && activeMicrophoneId) {
-         microphoneTrack.localMicrophoneTrack
-            .setDevice(activeMicrophoneId)
-            .catch((error) =>
-               errorLogAndNotify(error, {
-                  message: "Failed to set the active microphone device",
-                  metadata: {
-                     activeMicrophoneId,
-                  },
-               })
-            )
-      }
-   }, [activeMicrophoneId, microphoneTrack.localMicrophoneTrack])
+   useSetDevice(cameraTrack.localCameraTrack, activeCameraId)
+   useSetDevice(microphoneTrack.localMicrophoneTrack, activeMicrophoneId)
 
    /**
     * For an improved user experience, the microphone is only muted/unmuted rather than being turned off/on.
@@ -171,8 +147,10 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          activeMicrophoneId,
          setActiveCameraId,
          setActiveMicrophoneId,
-         microphoneError: microphoneTrack.error || fetchMicsError,
-         cameraError: cameraTrack.error || fetchCamerasError,
+         microphoneError: microphoneTrack.error,
+         cameraError: cameraTrack.error,
+         fetchCamerasError,
+         fetchMicsError,
          cameraDevices: cameras,
          microphoneDevices: microphones,
          localUser,

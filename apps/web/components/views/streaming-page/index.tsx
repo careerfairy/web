@@ -50,6 +50,12 @@ const StreamSetupWidget = dynamic(
       ssr: false,
    }
 )
+const SettingsMenu = dynamic(
+   () => import("./components/SettingsMenu").then((mod) => mod.SettingsMenu),
+   {
+      ssr: false,
+   }
+)
 const TopBar = dynamic(
    () => import("./components/TopBar").then((mod) => mod.TopBar),
    {
@@ -148,6 +154,7 @@ const Component = ({ isHost }: Props) => {
                            <MiddleContent />
                            <BottomBar />
                            <StreamSetupWidget />
+                           <SettingsMenu />
                         </Fragment>
                      </Layout>
                      <ToggleStreamModeButton />

@@ -84,6 +84,7 @@ export const RemoteStreamer = ({
             ]}
             play={playVideo}
             track={videoTrack}
+            className="videoTrack"
          />
          <RemoteAudioTrack
             play={playAudio}

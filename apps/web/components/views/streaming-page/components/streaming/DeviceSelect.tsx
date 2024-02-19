@@ -29,7 +29,7 @@ type DeviceSelectProps = SelectProps & {
 const getValue = (value: string, options: MediaDeviceInfo[]) =>
    options.find((op) => op.deviceId === value)?.deviceId ?? ""
 
-const DeviceSelect = ({
+export const DeviceSelect = ({
    label,
    options,
    onDeviceSelect,
@@ -76,8 +76,13 @@ const DeviceSelect = ({
 }
 
 export const CameraSelect = () => {
-   const { setActiveCameraId, activeCameraId, cameraError, cameraDevices } =
-      useLocalTracks()
+   const {
+      setActiveCameraId,
+      activeCameraId,
+      cameraError,
+      fetchCamerasError,
+      cameraDevices,
+   } = useLocalTracks()
 
    return (
       <DeviceSelect
@@ -86,7 +91,10 @@ export const CameraSelect = () => {
          options={cameraDevices}
          onDeviceSelect={setActiveCameraId}
          value={activeCameraId}
-         permissionDenied={getRTCErrorCode(cameraError) === "PERMISSION_DENIED"}
+         permissionDenied={
+            getRTCErrorCode(fetchCamerasError || cameraError) ===
+            "PERMISSION_DENIED"
+         }
       />
    )
 }
@@ -96,6 +104,7 @@ export const MicrophoneSelect = () => {
       setActiveMicrophoneId,
       activeMicrophoneId,
       microphoneError: micError,
+      fetchMicsError,
       microphoneDevices: micDevices,
    } = useLocalTracks()
 
@@ -105,7 +114,9 @@ export const MicrophoneSelect = () => {
          options={micDevices}
          onDeviceSelect={setActiveMicrophoneId}
          value={activeMicrophoneId}
-         permissionDenied={getRTCErrorCode(micError) === "PERMISSION_DENIED"}
+         permissionDenied={
+            getRTCErrorCode(fetchMicsError || micError) === "PERMISSION_DENIED"
+         }
       />
    )
 }
