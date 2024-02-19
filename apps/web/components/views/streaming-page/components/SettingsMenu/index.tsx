@@ -28,6 +28,7 @@ const styles = sxStyles({
       "& .MuiDialog-paper": {
          minWidth: 571,
          maxWidth: 571,
+         maxHeight: 571,
       },
    },
    drawer: {
