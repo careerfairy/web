@@ -36,12 +36,12 @@ type DeviceContextType = {
 
 const DeviceContext = createContext<DeviceContextType | undefined>(undefined)
 
+const removeDefaultDevices = (devices: MediaDeviceInfo[]) =>
+   devices.filter((device) => device.deviceId !== "default")
+
 type DeviceProviderProps = {
    children: ReactNode
 }
-
-const removeDefaultDevices = (devices: MediaDeviceInfo[]) =>
-   devices.filter((device) => device.deviceId !== "default")
 
 export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
    const { shouldStream } = useStreamingContext()
@@ -144,7 +144,6 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          dev: DeviceInfo,
          type: "camera" | "microphone"
       ) => {
-         fetchAndSetDevices()
          if (dev.state === "ACTIVE") {
             handleAddDevice(dev, type)
          }
@@ -155,12 +154,14 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
 
          if (type === "camera") {
             cameraChangedCallback.current.forEach((callback) => callback(dev))
+            setFetchCamerasError(null)
          }
 
          if (type === "microphone") {
             microphoneChangedCallback.current.forEach((callback) =>
                callback(dev)
             )
+            setFetchMicsError(null)
          }
       }
 
