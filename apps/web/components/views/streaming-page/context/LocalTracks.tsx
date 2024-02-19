@@ -17,8 +17,8 @@ import {
 } from "react"
 import { useStreamingContext } from "./Streaming"
 import { type LocalUser } from "../types"
-import { useDevices } from "components/custom-hook/streaming/useDevices"
-import { useSetDevice } from "components/custom-hook/streaming/useSetDevice"
+import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
+import { useAgoraDevices } from "./AgoraDevices"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -61,35 +61,25 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
 
-   const {
-      devices: cameras,
-      error: fetchCamerasError,
-      activeDeviceId: activeCameraId,
-      setActiveDeviceId: setActiveCameraId,
-   } = useDevices({
-      deviceType: "camera",
-      enable: shouldStream,
+   const { cameras, microphones, fetchCamerasError, fetchMicsError } =
+      useAgoraDevices()
+
+   const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false, {
+      cameraId: cameras[0]?.deviceId,
+   })
+   const microphoneTrack = useLocalMicrophoneTrack(shouldStream, {
+      microphoneId: microphones[0]?.deviceId,
    })
 
    const {
-      devices: microphones,
-      error: fetchMicsError,
       activeDeviceId: activeMicrophoneId,
-      setActiveDeviceId: setActiveMicrophoneId,
-   } = useDevices({
-      deviceType: "microphone",
-      enable: shouldStream,
-   })
+      handleSetActiveDevice: setActiveMicrophoneId,
+   } = useTrackHandler("microphone", microphoneTrack.localMicrophoneTrack)
 
-   const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false)
-   const microphoneTrack = useLocalMicrophoneTrack(shouldStream)
-
-   /**
-    * Uses the `activeCameraId` and `activeMicrophoneId` to set the active local devices
-    * for the camera and microphone tracks.
-    */
-   useSetDevice(cameraTrack.localCameraTrack, activeCameraId)
-   useSetDevice(microphoneTrack.localMicrophoneTrack, activeMicrophoneId)
+   const {
+      activeDeviceId: activeCameraId,
+      handleSetActiveDevice: setActiveCameraId,
+   } = useTrackHandler("camera", cameraTrack.localCameraTrack)
 
    /**
     * For an improved user experience, the microphone is only muted/unmuted rather than being turned off/on.

@@ -1,5 +1,4 @@
 import { Box } from "@mui/material"
-import { useLocalTracks } from "../../context"
 import {
    getCameraErrorMessage,
    getMicrophoneErrorMessage,
@@ -9,6 +8,7 @@ import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
 import { DeviceSelect } from "../streaming/DeviceSelect"
 import { useSettingsMenu } from "./SettingsMenuContext"
 import { sxStyles } from "types/commonTypes"
+import { useAgoraDevices } from "../../context/AgoraDevices"
 
 const styles = sxStyles({
    root: {
@@ -21,7 +21,7 @@ const styles = sxStyles({
 })
 
 export const TempCameraSelect = () => {
-   const { fetchCamerasError, cameraDevices } = useLocalTracks()
+   const { fetchCamerasError, cameras } = useAgoraDevices()
    const { setTempCameraId, tempCameraId, tempCameraTrack } = useSettingsMenu()
    return (
       <Box sx={styles.root}>
@@ -32,9 +32,9 @@ export const TempCameraSelect = () => {
          >
             <Box component="span" sx={styles.select}>
                <DeviceSelect
-                  key={cameraDevices.length}
+                  key={cameras.length}
                   label="Select Camera"
-                  options={cameraDevices}
+                  options={cameras}
                   onDeviceSelect={setTempCameraId}
                   value={tempCameraId}
                   permissionDenied={
@@ -50,7 +50,8 @@ export const TempCameraSelect = () => {
 }
 
 export const TempMicrophoneSelect = () => {
-   const { fetchMicsError, microphoneDevices } = useLocalTracks()
+   const { fetchMicsError, microphones } = useAgoraDevices()
+
    const { setTempMicrophoneId, tempMicrophoneId, tempMicrophoneTrack } =
       useSettingsMenu()
 
@@ -63,8 +64,9 @@ export const TempMicrophoneSelect = () => {
          >
             <Box component="span" sx={styles.select}>
                <DeviceSelect
+                  key={microphones.length}
                   label="Select Microphone"
-                  options={microphoneDevices}
+                  options={microphones}
                   onDeviceSelect={setTempMicrophoneId}
                   value={tempMicrophoneId}
                   permissionDenied={
