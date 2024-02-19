@@ -747,7 +747,7 @@ export class FirebaseUserRepository
          .doc("stats")
 
       // const stats = docRef.
-      return docRef.get().then((value) => value.data as unknown as UserStats)
+      return docRef.get().then((value) => value.data() as unknown as UserStats)
    }
 
    getCompaniesUserFollowsQuery(
