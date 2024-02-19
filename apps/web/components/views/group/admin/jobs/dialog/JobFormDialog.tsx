@@ -4,7 +4,7 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
 } from "../../../../stepped-dialog/SteppedDialog"
-import { useCallback } from "react"
+import { FC, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import * as Yup from "yup"
@@ -57,7 +57,15 @@ const styles = sxStyles({
    },
 })
 
-const JobFormDialog = () => {
+type Props = {
+   afterCreateCustomJob?: (job: PublicCustomJob) => void
+   afterUpdateCustomJob?: (job: PublicCustomJob) => void
+}
+
+const JobFormDialog: FC<Props> = ({
+   afterCreateCustomJob,
+   afterUpdateCustomJob,
+}) => {
    const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
    const { group } = useGroupFromState()
    const { handleClose } = useStepper()
@@ -80,9 +88,13 @@ const JobFormDialog = () => {
 
             if (selectedJobId) {
                await customJobRepo.updateCustomJob(formattedJob)
+               afterUpdateCustomJob && afterUpdateCustomJob(formattedJob)
+
                successNotification("Job successfully updated")
             } else {
                await customJobRepo.createCustomJob(formattedJob)
+               afterCreateCustomJob && afterCreateCustomJob(formattedJob)
+
                successNotification("Job successfully created")
             }
          } catch (error) {
@@ -91,7 +103,14 @@ const JobFormDialog = () => {
             handleClose()
          }
       },
-      [selectedJobId, successNotification, errorNotification, handleClose]
+      [
+         selectedJobId,
+         afterUpdateCustomJob,
+         successNotification,
+         afterCreateCustomJob,
+         errorNotification,
+         handleClose,
+      ]
    )
 
    return (
@@ -102,7 +121,6 @@ const JobFormDialog = () => {
                   initialValues={getInitialValues(job, group.groupId)}
                   onSubmit={handleSubmit}
                   validationSchema={validationSchema}
-                  enableReinitialize
                >
                   {({ dirty, handleSubmit, isSubmitting, isValid }) => (
                      <SteppedDialog.Container
@@ -114,7 +132,7 @@ const JobFormDialog = () => {
                            <SteppedDialog.Content sx={styles.container}>
                               <>
                                  <SteppedDialog.Title sx={styles.title}>
-                                    Create a{" "}
+                                    {selectedJobId ? "Editing " : "Create a "}
                                     <Box
                                        component="span"
                                        color="secondary.main"
@@ -151,7 +169,13 @@ const JobFormDialog = () => {
                                  onClick={() => handleSubmit()}
                                  loading={isSubmitting}
                               >
-                                 {selectedJobId ? "Update" : "Create"}
+                                 {selectedJobId
+                                    ? isSubmitting
+                                       ? "Updating"
+                                       : "Update"
+                                    : isSubmitting
+                                    ? "Creating"
+                                    : "Create"}
                               </SteppedDialog.Button>
                            </SteppedDialog.Actions>
                         </>

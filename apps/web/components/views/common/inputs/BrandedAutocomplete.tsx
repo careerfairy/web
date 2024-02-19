@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC } from "react"
+import { FC, ReactElement } from "react"
 import { styled } from "@mui/material/styles"
 import BrandedCheckbox from "./BrandedCheckbox"
 import { ListItemText, MenuItem } from "@mui/material"
@@ -15,6 +15,8 @@ type StyledBrandedAutocompleteProps<
 > = Omit<AutocompleteProps<T, boolean, boolean, boolean>, "renderTags"> & {
    textFieldProps?: BrandedTextFieldProps
    limit?: number
+   initialOptionSection?: ReactElement
+   getOptionElement?: (option: unknown) => ReactElement
 }
 
 export type BrandedAutocompleteProps = Omit<
@@ -29,6 +31,8 @@ const StyledBrandedAutocomplete = styled(
       limit,
       getOptionLabel,
       renderInput,
+      initialOptionSection,
+      getOptionElement,
       ...props
    }: StyledBrandedAutocompleteProps) => (
       <Autocomplete
@@ -45,23 +49,35 @@ const StyledBrandedAutocomplete = styled(
             )
          }}
          {...props}
-         renderOption={(optionProps, option, { selected }) => (
-            <MenuItem
-               {...optionProps}
-               key={optionProps.id}
-               sx={{
-                  '&[aria-selected="true"]': {
-                     backgroundColor: "#FAFAFA !important",
-                  },
-               }}
-            >
-               <ListItemText
-                  key={`${optionProps.id}-text`}
-                  primary={getOptionLabel(option)}
-                  sx={{ padding: "16px" }}
-               />
-               {props.multiple ? <BrandedCheckbox checked={selected} /> : null}
-            </MenuItem>
+         renderOption={(optionProps, option, { selected, index }) => (
+            <>
+               {index === 0 && initialOptionSection
+                  ? initialOptionSection
+                  : null}
+               <MenuItem
+                  {...optionProps}
+                  key={optionProps.id}
+                  sx={{
+                     '&[aria-selected="true"]': {
+                        backgroundColor: "#FAFAFA !important",
+                     },
+                  }}
+               >
+                  {getOptionElement ? (
+                     getOptionElement(option)
+                  ) : (
+                     <ListItemText
+                        key={`${optionProps.id}-text`}
+                        primary={getOptionLabel(option)}
+                        sx={{ padding: "16px" }}
+                     />
+                  )}
+
+                  {props.multiple ? (
+                     <BrandedCheckbox checked={selected} />
+                  ) : null}
+               </MenuItem>
+            </>
          )}
          color="primary"
          getOptionLabel={getOptionLabel}
