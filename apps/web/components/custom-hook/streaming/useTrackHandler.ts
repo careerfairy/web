@@ -49,7 +49,7 @@ export const useTrackHandler = (
 
    const devices = deviceType === "camera" ? cameras : microphones
 
-   const [activeDeviceId, setActiveDeviceId] = useState<string>()
+   const [activeDeviceId, setActiveDeviceId] = useState<string>("default")
 
    const changeAndSetActiveDevice = useCallback(
       async (deviceId: string) => {
@@ -90,6 +90,8 @@ export const useTrackHandler = (
          if (dev.state === "INACTIVE" && dev.device.kind) {
             const activeDeviceWasRemoved =
                activeDeviceId === dev.device.deviceId
+
+            const isCurrentlyDefaultDevice = activeDeviceId === "default"
             if (activeDeviceWasRemoved) {
                // find the first device that is not the active device
                const replacementDevice = devices.find(
@@ -100,6 +102,12 @@ export const useTrackHandler = (
                   enqueueSnackbar(
                      `Successfully set new active device to: ${replacementDevice.label} (ID: ${replacementDevice.deviceId})`
                   )
+               })
+            }
+
+            if (isCurrentlyDefaultDevice) {
+               changeAndSetActiveDevice("default").then(() => {
+                  enqueueSnackbar(`Updated default ${deviceType}`)
                })
             }
          }
