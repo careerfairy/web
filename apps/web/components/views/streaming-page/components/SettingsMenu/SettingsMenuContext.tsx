@@ -46,15 +46,15 @@ export const SettingsMenuProvider = ({
 
    const { shouldStream } = useStreamingContext()
 
-   const cameraTrack = useLocalCameraTrack(shouldStream, {
+   const tempCameraTrack = useLocalCameraTrack(shouldStream, {
       cameraId: tempCameraId,
    })
-   const microphoneTrack = useLocalMicrophoneTrack(shouldStream, {
+   const tempMicrophoneTrack = useLocalMicrophoneTrack(shouldStream, {
       microphoneId: tempMicrophoneId,
    })
 
-   useSetDevice(cameraTrack.localCameraTrack, tempCameraId)
-   useSetDevice(microphoneTrack.localMicrophoneTrack, tempMicrophoneId)
+   useSetDevice(tempCameraTrack.localCameraTrack, tempCameraId)
+   useSetDevice(tempMicrophoneTrack.localMicrophoneTrack, tempMicrophoneId)
 
    const handleSaveAndClose = useCallback(() => {
       setActiveCameraId(tempCameraId)
@@ -70,8 +70,8 @@ export const SettingsMenuProvider = ({
 
    const value = useMemo<SettingsMenuContextType>(
       () => ({
-         tempCameraTrack: cameraTrack,
-         tempMicrophoneTrack: microphoneTrack,
+         tempCameraTrack,
+         tempMicrophoneTrack,
          tempCameraId,
          tempMicrophoneId,
          setTempCameraId,
@@ -80,9 +80,9 @@ export const SettingsMenuProvider = ({
          handleClose: onClose,
       }),
       [
-         cameraTrack,
+         tempCameraTrack,
          handleSaveAndClose,
-         microphoneTrack,
+         tempMicrophoneTrack,
          onClose,
          tempCameraId,
          tempMicrophoneId,
