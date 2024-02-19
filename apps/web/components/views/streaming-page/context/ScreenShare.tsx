@@ -33,7 +33,6 @@ import { useRouter } from "next/router"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { LocalUserScreen } from "../types"
 import { currentScreenSharerSelector } from "store/selectors/streamingAppSelectors"
-import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import { useAppSelector } from "components/custom-hook/store"
 
 interface ScreenShareProviderProps {
@@ -70,15 +69,20 @@ const useCurrentScreenSharer = () => useAppSelector(currentScreenSharerSelector)
 
 export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const [screenShareOn, setScreenShareOn] = useState(false)
+   const [screenVideoTrack, setScreenVideoTrack] =
+      useState<ILocalVideoTrack | null>(null)
+   const [screenAudioTrack, setScreenAudioTrack] =
+      useState<ILocalAudioTrack | null>(null)
+   const [screenShareError, setScreenShareError] =
+      useState<null | AgoraRTCReactError>(null)
 
    const { livestreamId, shouldStream } = useStreamingContext()
 
+   const { query } = useRouter()
+   const hostAuthToken = query.token?.toString() || ""
+
    const screenShareClient = useRTCScreenShareClient()
-
    const currentScreenSharer = useCurrentScreenSharer()
-
-   useTraceUpdate(currentScreenSharer)
-
    const localScreenTrack = useLocalScreenTrack(
       shouldStream ? screenShareOn : false,
       {},
@@ -86,23 +90,7 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    )
 
    const userUID = useCurrentUID()
-
-   const [screenVideoTrack, setScreenVideoTrack] =
-      useState<ILocalVideoTrack | null>(null)
-   const [screenAudioTrack, setScreenAudioTrack] =
-      useState<ILocalAudioTrack | null>(null)
-
-   const [screenShareError, setScreenShareError] =
-      useState<null | AgoraRTCReactError>(null)
-
    const screenShareUID = `${STREAM_IDENTIFIERS.SCREEN_SHARE}-${userUID}`
-
-   const { query } = useRouter()
-
-   const hostAuthToken = query.token?.toString() || ""
-
-   const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
-
    const response = useAgoraRtcToken(
       screenShareOn
          ? {
@@ -113,6 +101,17 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
               uid: screenShareUID,
            }
          : null
+   )
+   const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
+
+   const hasSelectedScreen = Boolean(screenVideoTrack)
+
+   const { currentRole } = useClientConfig(screenShareClient, {
+      hostCondition: shouldStream && hasSelectedScreen,
+   })
+
+   const readyToPublish = Boolean(
+      screenShareOn && hasSelectedScreen && currentRole === "host"
    )
 
    const handleStopScreenShare = useCallback(() => {
@@ -137,21 +136,13 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       screenShareClient
    )
 
-   const hasSelectedScreen = Boolean(screenVideoTrack)
-
-   const { currentRole } = useClientConfig(screenShareClient, {
-      hostCondition: shouldStream && hasSelectedScreen,
-   })
-
-   const readyToPublish = Boolean(
-      screenShareOn && hasSelectedScreen && currentRole === "host"
-   )
-
    usePublish(
       [screenVideoTrack, screenAudioTrack],
       readyToPublish,
       screenShareClient
    )
+
+   useTrackEvent(screenVideoTrack, "track-ended", handleStopScreenShare)
 
    /**
     * Monitors screen sharing status to enforce single user sharing at a time,
@@ -192,8 +183,6 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          setScreenShareError(null)
       }
    }, [localScreenTrack.error])
-
-   useTrackEvent(screenVideoTrack, "track-ended", handleStopScreenShare)
 
    /**
     * Manages screen video and audio tracks based on user selections:
