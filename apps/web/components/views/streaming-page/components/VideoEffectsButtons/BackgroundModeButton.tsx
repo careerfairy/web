@@ -1,4 +1,4 @@
-import { ButtonBase, ButtonBaseProps, Typography, alpha } from "@mui/material"
+import { ButtonBase, ButtonBaseProps, Typography } from "@mui/material"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
 
@@ -20,11 +20,12 @@ const styles = sxStyles({
          width: 24,
          height: 24,
       },
+      transition: (theme) =>
+         theme.transitions.create(["background-color", "color"]),
    },
    active: {
-      color: "primary.main",
-      borderColor: "primary.main",
-      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+      color: "white",
+      bgcolor: "primary.500",
    },
    label: {
       mt: 1.25,
@@ -32,7 +33,7 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[400],
    },
    labelActive: {
-      color: "primary.main",
+      color: "white",
    },
 })
 
