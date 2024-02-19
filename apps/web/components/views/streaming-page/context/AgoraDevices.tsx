@@ -36,9 +36,6 @@ type DeviceContextType = {
 
 const DeviceContext = createContext<DeviceContextType | undefined>(undefined)
 
-const removeDefaultDevices = (devices: MediaDeviceInfo[]) =>
-   devices.filter((device) => device.deviceId !== "default")
-
 type DeviceProviderProps = {
    children: ReactNode
 }
@@ -66,14 +63,10 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
       ])
 
       setCameras(
-         camerasResult.status === "fulfilled"
-            ? removeDefaultDevices(camerasResult.value)
-            : []
+         camerasResult.status === "fulfilled" ? camerasResult.value : []
       )
       setMicrophones(
-         microphonesResult.status === "fulfilled"
-            ? removeDefaultDevices(microphonesResult.value)
-            : []
+         microphonesResult.status === "fulfilled" ? microphonesResult.value : []
       )
 
       if (camerasResult.status === "rejected") {
@@ -115,7 +108,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          const newDevices = [dev.device, ...devices]
 
          const setter = type === "camera" ? setCameras : setMicrophones
-         setter(removeDefaultDevices(newDevices))
+         setter(newDevices)
 
          enqueueSnackbar(
             `Device detected: ${dev.device.label} (ID: ${dev.device.deviceId})`
@@ -133,7 +126,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          )
 
          const setter = type === "camera" ? setCameras : setMicrophones
-         setter(removeDefaultDevices(newDevices))
+         setter(newDevices)
 
          enqueueSnackbar(
             `Device removed: ${dev.device.label} (ID: ${dev.device.deviceId})`
@@ -144,6 +137,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          dev: DeviceInfo,
          type: "camera" | "microphone"
       ) => {
+         fetchAndSetDevices()
          if (dev.state === "ACTIVE") {
             handleAddDevice(dev, type)
          }
