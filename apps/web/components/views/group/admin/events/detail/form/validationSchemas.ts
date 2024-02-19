@@ -16,13 +16,13 @@ const groupOptionShape = yup.object().shape({
 
 const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValues> =
    yup.object().shape({
+      id: yup.string(),
       title: yup
          .string()
          .required(REQUIRED_FIELD_MESSAGE)
          .min(10, getMinCharactersMessage("title", 10)),
       hidden: yup.bool().notRequired(),
       company: yup.string().notRequired(),
-      companyId: yup.string().notRequired(),
       companyLogoUrl: yup.string().notRequired(),
       backgroundImageUrl: yup
          .string()
@@ -64,6 +64,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .of(groupOptionShape)
          .required()
          .min(1, getSelectAtLeastOneMessage("level of study")),
+      groupIds: yup.array().of(yup.string()),
    })
 
 const livestreamFormSpeakersTabSchema = yup.object().shape({
