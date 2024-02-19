@@ -23,7 +23,7 @@ const LivestreamFormJobsStep = () => {
 
    return (
       <Form>
-         <Stack sx={styles.root} rowGap={2}>
+         <Stack sx={styles.root} rowGap={4}>
             <FormSectionHeader
                title={"Job openings"}
                subtitle={

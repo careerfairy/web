@@ -15,7 +15,12 @@ const styles = sxStyles({
    content: {
       alignItems: "center",
       textAlign: "center",
-      maxWidth: "550px",
+      maxWidth: "500px",
+      mx: 2,
+   },
+   title: {
+      fontSize: { xs: "18px", md: "20px" },
+      fontWeight: "bold",
    },
    subtitle: {
       fontSize: "16px",
@@ -30,7 +35,7 @@ const EmptyJobs = () => {
          <Stack spacing={2} sx={styles.content}>
             <Briefcase size={70} color={theme.palette.secondary.main} />
 
-            <Typography variant={"h5"} fontWeight={"bold"}>
+            <Typography sx={styles.title}>
                No jobs linked to your live stream
             </Typography>
 
