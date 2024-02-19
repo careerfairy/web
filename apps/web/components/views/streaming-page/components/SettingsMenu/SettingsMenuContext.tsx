@@ -96,7 +96,6 @@ export const SettingsMenuProvider = ({
    )
 }
 
-// Create a custom hook to use the context
 export const useSettingsMenu = () => {
    const context = useContext(SettingsMenuContext)
    if (context === undefined) {
