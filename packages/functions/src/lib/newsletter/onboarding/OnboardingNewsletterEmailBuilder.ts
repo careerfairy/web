@@ -216,7 +216,7 @@ export class OnboardingNewsletterEmailBuilder {
 
       return (
          messages.length &&
-         this.sender.sendEmailBatchWithTemplates(messages, (res, err) => {
+         this.sender.sendEmailBatchWithTemplates(messages, (err, res) => {
             if (err) {
                console.log(
                   "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
@@ -229,8 +229,8 @@ export class OnboardingNewsletterEmailBuilder {
                return
             }
             console.log(
-               "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ OK: ",
-               res
+               "🚀 ~ OnboardingNewsletterEmailBuilder ~ SEND_OK: ",
+               res.map((res) => res.To)
             )
          })
       )
