@@ -57,7 +57,13 @@ export class OnboardingNewsletterService {
 
    private shouldSendCompanyDiscovery = (user: OnboardingUserData): boolean => {
       return (
-         !user.notifications.companyDiscovery.length && !user.followingCompanies
+         !this.hasNotifications([
+            user.notifications.companyDiscovery,
+            user.notifications.sparksDiscovery,
+            user.notifications.livestream1stRegistrationDiscovery,
+            user.notifications.recordingDiscovery,
+            user.notifications.feedbackDiscovery,
+         ]) && !user.followingCompanies
       )
    }
    private shouldSendSparksDiscovery = (user: OnboardingUserData): boolean => {
@@ -78,15 +84,27 @@ export class OnboardingNewsletterService {
          "🚀 ~ OnboardingNewsletterService ~ user.notifications.sparksDiscovery.length:",
          user.notifications.sparksDiscovery.length
       )
-      return !user.notifications.sparksDiscovery.length && seenSparksCount < 5
+      return (
+         !this.hasNotifications([
+            user.notifications.sparksDiscovery,
+            user.notifications.livestream1stRegistrationDiscovery,
+            user.notifications.recordingDiscovery,
+            user.notifications.feedbackDiscovery,
+         ]) &&
+         !user.notifications.sparksDiscovery.length &&
+         seenSparksCount < 5
+      )
    }
 
    private shouldSendLivestream1stRecommendationDiscovery = (
       user: OnboardingUserData
    ): boolean => {
       return (
-         !user.notifications.livestream1stRegistrationDiscovery.length &&
-         !user.stats.hasRegisteredOnAnyLivestream
+         !this.hasNotifications([
+            user.notifications.livestream1stRegistrationDiscovery,
+            user.notifications.recordingDiscovery,
+            user.notifications.feedbackDiscovery,
+         ]) && !user.stats.hasRegisteredOnAnyLivestream
       )
    }
 
@@ -94,7 +112,10 @@ export class OnboardingNewsletterService {
       onboardingUser: OnboardingUserData
    ): boolean => {
       return (
-         !onboardingUser.notifications.recordingDiscovery.length &&
+         !this.hasNotifications([
+            onboardingUser.notifications.recordingDiscovery,
+            onboardingUser.notifications.feedbackDiscovery,
+         ]) &&
          !onboardingUser.recordingStats.find((stat) =>
             Boolean(
                stat.viewers.find(
@@ -108,6 +129,13 @@ export class OnboardingNewsletterService {
       user: OnboardingUserData
    ): boolean => {
       return !user.notifications.feedbackDiscovery.length
+   }
+
+   private hasNotifications(notifications: EmailNotification[][]) {
+      return (
+         notifications.length &&
+         notifications.find((items) => Boolean(items.length)) !== undefined
+      )
    }
 
    /**
@@ -162,8 +190,6 @@ export class OnboardingNewsletterService {
     * calculated OnboardingUserData.
     */
    async fetchUserData(user: UserData): Promise<OnboardingUserData> {
-      this.logger.info(`OnboardingNewsletterService starting at ${new Date()}`)
-
       const seenSparksPromise = this.sparksRepo.getUserSparkInteraction(
          user.id,
          "seenSparks"
@@ -250,30 +276,32 @@ export class OnboardingNewsletterService {
       const fromSkippedDiscovery = daysSinceUserRegistration !== undefined
 
       // Real user days since registration, as this method can be called recursively with overridden days
-      let effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
+      const effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
          onboardingUserData.user.createdAt.toDate(), // TODO: check if other property check is needed
          new Date()
       )
+
       console.log(
          `🚀 ~ OnboardingNewsletterService ~ handleUserDiscovery ~ effectiveUserDaysSinceRegistration - ${
             onboardingUserData.user.userEmail
-         }: creationDate - ${
-            onboardingUserData.user.createdAt
-         } current - ${new Date()}`,
+         }: creationDate - ${onboardingUserData.user.createdAt
+            .toDate()
+            .toISOString()} current - ${new Date().toISOString()}`,
          effectiveUserDaysSinceRegistration
       )
 
+      let userDaysSinceRegistration = effectiveUserDaysSinceRegistration
       if (fromSkippedDiscovery) {
          console.log(
             "🚀 ~ OnboardingNewsletterService ~ fromSkippedDiscovery:",
             fromSkippedDiscovery
          )
-         effectiveUserDaysSinceRegistration = daysSinceUserRegistration
+         userDaysSinceRegistration = daysSinceUserRegistration
       }
       console.log(
-         `🚀 ~ OnboardingNewsletterService...HANDLE_USER_DISCOVERY: user{ ${onboardingUserData.user.userEmail} } - effectiveDaysSinceRegistration: ${effectiveUserDaysSinceRegistration}`
+         `🚀 ~ OnboardingNewsletterService...HANDLE_USER_DISCOVERY: user{ ${onboardingUserData.user.userEmail} } - effectiveDaysSinceRegistration: ${userDaysSinceRegistration}`
       )
-      switch (effectiveUserDaysSinceRegistration) {
+      switch (userDaysSinceRegistration) {
          case COMPANY_DISCOVERY_TRIGGER_DAY: {
             console.log(
                `🚀 ~ OnboardingNewsletterService.......COMPANY_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${COMPANY_DISCOVERY_TRIGGER_DAY}`
