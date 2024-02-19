@@ -1,5 +1,5 @@
 import { Formik } from "formik"
-import { useState } from "react"
+import { FC, useState } from "react"
 import { Box } from "@mui/material"
 import { useRouter } from "next/router"
 import { Interest } from "@careerfairy/shared-lib/interests"
@@ -25,12 +25,17 @@ import LivestreamFormQuestionsStep from "../../../../../../components/views/grou
 import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general/general"
 import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
+import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import {
+   PublicCustomJob,
+   pickPublicDataFromCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
+   id: "",
    title: "",
    hidden: false,
    company: "",
-   companyId: "",
    companyLogoUrl: "",
    backgroundImageUrl: "",
    startDate: null,
@@ -43,6 +48,7 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    targetUniversities: [],
    targetFieldsOfStudy: [],
    targetLevelsOfStudy: [],
+   groupIds: [],
 }
 
 const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
@@ -56,6 +62,7 @@ const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
 
 const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
    jobs: [],
+   customJobs: [],
 }
 
 const formInitialValues: LivestreamFormValues = {
@@ -65,10 +72,17 @@ const formInitialValues: LivestreamFormValues = {
    jobs: { ...formJobsTabInitialValues },
 }
 
-const convertLivestreamObjectToForm = (
-   livestream: LivestreamEvent,
+type ConvertLivestreamObjectToFormArgs = {
+   livestream: LivestreamEvent
    existingInterests: Interest[]
-): LivestreamFormValues => {
+   customJobs: PublicCustomJob[]
+}
+
+const convertLivestreamObjectToForm = ({
+   livestream,
+   existingInterests,
+   customJobs,
+}: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = (values) =>
       Object.keys(values).reduce(
          (acc, key) =>
@@ -103,7 +117,10 @@ const convertLivestreamObjectToForm = (
       general: general,
       speakers: valuesReducer(formSpeakersTabInitialValues),
       questions: valuesReducer(formQuestionsTabInitialValues),
-      jobs: valuesReducer(formJobsTabInitialValues),
+      jobs: {
+         jobs: livestream.jobs,
+         customJobs: customJobs.map(pickPublicDataFromCustomJob),
+      } as LivestreamFormJobsTabValues,
    }
 }
 
@@ -111,8 +128,9 @@ const LivestreamAdminDetailsPage = () => {
    const {
       query: { groupId, livestreamId },
    } = useRouter()
-   const { data: existingInterests } = useInterests()
+
    const [tabValue, setTabValue] = useState(TAB_VALUES.GENERAL)
+
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
    }
@@ -138,44 +156,61 @@ const LivestreamAdminDetailsPage = () => {
       >
          <DashboardHead title="CareerFairy | Editing Live Stream of " />
          <LivestreamFetchWrapper livestreamId={livestreamId as string}>
-            {(livestream) => {
-               const formValues: LivestreamFormValues = livestream
-                  ? convertLivestreamObjectToForm(livestream, existingInterests)
-                  : formInitialValues
-
-               return (
-                  <Box>
-                     <Formik<LivestreamFormValues>
-                        initialValues={formValues}
-                        onSubmit={undefined}
-                        validationSchema={livestreamFormValidationSchema}
-                     >
-                        <>
-                           {tabValue == TAB_VALUES.GENERAL && (
-                              <LivestreamFormGeneralStep />
-                           )}
-                           {tabValue == TAB_VALUES.SPEAKERS && (
-                              <LivestreamFormSpeakersStep
-                                 values={formSpeakersTabInitialValues}
-                              />
-                           )}
-                           {tabValue == TAB_VALUES.QUESTIONS && (
-                              <LivestreamFormQuestionsStep
-                                 values={formQuestionsTabInitialValues}
-                              />
-                           )}
-                           {tabValue == TAB_VALUES.JOBS && (
-                              <LivestreamFormJobsStep
-                                 values={formJobsTabInitialValues}
-                              />
-                           )}
-                        </>
-                     </Formik>
-                  </Box>
-               )
-            }}
+            {(livestream) => (
+               <FormContent
+                  livestream={livestream}
+                  groupId={groupId as string}
+                  tabValue={tabValue}
+               />
+            )}
          </LivestreamFetchWrapper>
       </GroupDashboardLayout>
+   )
+}
+
+type Props = {
+   livestream: LivestreamEvent
+   groupId: string
+   tabValue: TAB_VALUES
+}
+
+const FormContent: FC<Props> = ({ livestream, groupId, tabValue }) => {
+   const { data: existingInterests } = useInterests()
+   const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
+      livestreamId: livestream.id,
+   })
+
+   const formValues: LivestreamFormValues = livestream
+      ? convertLivestreamObjectToForm({
+           livestream,
+           existingInterests,
+           customJobs: initialSelectedCustomJobs,
+        })
+      : formInitialValues
+
+   return (
+      <Box>
+         <Formik<LivestreamFormValues>
+            initialValues={formValues}
+            onSubmit={undefined}
+            validationSchema={livestreamFormValidationSchema}
+         >
+            <>
+               {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
+               {tabValue == TAB_VALUES.SPEAKERS && (
+                  <LivestreamFormSpeakersStep
+                     values={formSpeakersTabInitialValues}
+                  />
+               )}
+               {tabValue == TAB_VALUES.QUESTIONS && (
+                  <LivestreamFormQuestionsStep
+                     values={formQuestionsTabInitialValues}
+                  />
+               )}
+               {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
+            </>
+         </Formik>
+      </Box>
    )
 }
 
