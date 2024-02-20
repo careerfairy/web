@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import { useAgoraDevices } from "components/views/streaming-page/context/AgoraDevices"
 
-// Decoupled getTrackDeviceId function
 const updateActiveDeviceId = (
    track: ICameraVideoTrack | IMicrophoneAudioTrack,
    setActiveDeviceId: (id: string) => void
@@ -86,29 +85,21 @@ export const useTrackHandler = (
     * ensuring the track is kept up-to-date with a new device selection.
     */
    useEffect(() => {
-      const onDeviceChange = (dev: DeviceInfo) => {
+      const onDeviceChange = async (dev: DeviceInfo) => {
          if (dev.state === "INACTIVE" && dev.device.kind) {
             const activeDeviceWasRemoved =
                activeDeviceId === dev.device.deviceId
 
-            const isCurrentlyDefaultDevice = activeDeviceId === "default"
             if (activeDeviceWasRemoved) {
                // find the first device that is not the active device
                const replacementDevice = devices.find(
                   (d) => d.deviceId !== activeDeviceId
                )
 
-               changeAndSetActiveDevice(replacementDevice.deviceId).then(() => {
-                  enqueueSnackbar(
-                     `Successfully set new active device to: ${replacementDevice.label} (ID: ${replacementDevice.deviceId})`
-                  )
-               })
-            }
-
-            if (isCurrentlyDefaultDevice) {
-               changeAndSetActiveDevice("default").then(() => {
-                  enqueueSnackbar(`Updated default ${deviceType}`)
-               })
+               await changeAndSetActiveDevice(replacementDevice.deviceId)
+               enqueueSnackbar(
+                  `Successfully set new active device to: ${replacementDevice.label} (ID: ${replacementDevice.deviceId})`
+               )
             }
          }
       }
