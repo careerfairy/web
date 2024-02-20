@@ -10,6 +10,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
+import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 
 const LivestreamValidationWrapper = dynamic(
    () =>
@@ -71,6 +72,11 @@ const StreamingProvider = dynamic(
    () => import("./context/Streaming").then((mod) => mod.StreamingProvider),
    { ssr: false }
 )
+const ScreenShareProvider = dynamic(
+   () => import("./context/ScreenShare").then((mod) => mod.ScreenShareProvider),
+   { ssr: false }
+)
+
 const LocalTracksProvider = dynamic(
    () => import("./context/LocalTracks").then((mod) => mod.LocalTracksProvider),
    { ssr: false }
@@ -126,31 +132,32 @@ const Component = ({ isHost }: Props) => {
     * The children are wrapped in useMemo to ensure that they are only re-rendered when necessary.
     * This is because React.memo does not optimize for inline JSX children, hence the need for useMemo.
     */
-   const memoizedChildren = useMemo(
+   return useMemo(
       () => (
-         <Fragment>
-            <TopBar />
-            <MiddleContent />
-            <BottomBar />
-            <StreamSetupWidget />
-         </Fragment>
+         <UserClientProvider>
+            <StreamingProvider
+               isHost={isHost}
+               agoraUserId={agoraUserId}
+               livestreamId={livestream.id}
+            >
+               <LocalTracksProvider>
+                  <ScreenShareProvider>
+                     <Layout>
+                        <Fragment>
+                           <TopBar />
+                           <MiddleContent />
+                           <BottomBar />
+                           <StreamSetupWidget />
+                        </Fragment>
+                     </Layout>
+                     <ToggleStreamModeButton />
+                  </ScreenShareProvider>
+               </LocalTracksProvider>
+            </StreamingProvider>
+            <AudioLevelsTracker />
+            <LivestreamStateTrackers />
+         </UserClientProvider>
       ),
-      []
-   )
-
-   return (
-      <UserClientProvider>
-         <StreamingProvider
-            isHost={isHost}
-            agoraUserId={agoraUserId}
-            livestreamId={livestream.id}
-         >
-            <LocalTracksProvider>
-               <Layout>{memoizedChildren}</Layout>
-               <ToggleStreamModeButton />
-            </LocalTracksProvider>
-         </StreamingProvider>
-         <AudioLevelsTracker />
-      </UserClientProvider>
+      [agoraUserId, isHost, livestream.id]
    )
 }
