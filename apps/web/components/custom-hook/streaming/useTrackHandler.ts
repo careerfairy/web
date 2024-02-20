@@ -95,11 +95,17 @@ export const useTrackHandler = (
                const replacementDevice = devices.find(
                   (d) => d.deviceId !== activeDeviceId
                )
-
-               await changeAndSetActiveDevice(replacementDevice.deviceId)
-               enqueueSnackbar(
-                  `Successfully set new active device to: ${replacementDevice.label} (ID: ${replacementDevice.deviceId})`
-               )
+               if (replacementDevice) {
+                  await changeAndSetActiveDevice(replacementDevice.deviceId)
+                  enqueueSnackbar(
+                     `Successfully set new active device to: ${replacementDevice.label} (ID: ${replacementDevice.deviceId})`
+                  )
+               } else {
+                  console.warn("🚀 ~ No replacement device found", {
+                     activeDeviceId,
+                     devices,
+                  })
+               }
             }
          }
       }
