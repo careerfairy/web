@@ -36,6 +36,9 @@ type DeviceContextType = {
 
 const DeviceContext = createContext<DeviceContextType | undefined>(undefined)
 
+const removeDefaultDevices = (device: MediaDeviceInfo[]) =>
+   device.filter((d) => d.deviceId !== "default")
+
 type DeviceProviderProps = {
    children: ReactNode
 }
@@ -63,10 +66,14 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
       ])
 
       setCameras(
-         camerasResult.status === "fulfilled" ? camerasResult.value : []
+         camerasResult.status === "fulfilled"
+            ? removeDefaultDevices(camerasResult.value)
+            : []
       )
       setMicrophones(
-         microphonesResult.status === "fulfilled" ? microphonesResult.value : []
+         microphonesResult.status === "fulfilled"
+            ? removeDefaultDevices(microphonesResult.value)
+            : []
       )
 
       if (camerasResult.status === "rejected") {
