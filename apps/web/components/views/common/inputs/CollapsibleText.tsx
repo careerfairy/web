@@ -30,7 +30,7 @@ type Props = {
    collapsedSize?: number | string
 }
 
-const CollapsableText = ({
+const CollapsibleText = ({
    text,
    textStyle,
    maxLength,
@@ -86,4 +86,4 @@ const CollapsableText = ({
    )
 }
 
-export default CollapsableText
+export default CollapsibleText

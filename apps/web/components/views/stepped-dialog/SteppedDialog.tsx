@@ -150,8 +150,6 @@ const styles = sxStyles({
 export type View = {
    key: string
    Component: ComponentType
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   props?: any
 }
 
 /**
@@ -330,13 +328,13 @@ const SteppedDialog = <K extends string>({
                axis={theme.direction === "rtl" ? "x-reverse" : "x"}
                index={currentStep}
             >
-               {views.map(({ Component, key, props }, index) => (
+               {views.map(({ Component, key }, index) => (
                   <AnimatedTabPanel
                      key={key}
                      value={index}
                      activeValue={currentStep}
                   >
-                     <Component {...props} />
+                     <Component />
                   </AnimatedTabPanel>
                ))}
             </SwipeableViews>

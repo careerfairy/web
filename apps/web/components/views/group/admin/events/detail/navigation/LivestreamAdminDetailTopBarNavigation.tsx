@@ -1,6 +1,7 @@
 import { FC } from "react"
 import { Tab, Tabs, TabsOwnProps } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    tabs: {
@@ -42,6 +43,8 @@ type LivestreamAdminDetailTopBarNavigationProps = {
 const LivestreamAdminDetailTopBarNavigation: FC<
    LivestreamAdminDetailTopBarNavigationProps
 > = ({ tabValue, tabOnChange }) => {
+   const isMobile = useIsMobile()
+
    return (
       <Tabs
          value={tabValue}
@@ -52,7 +55,10 @@ const LivestreamAdminDetailTopBarNavigation: FC<
          <Tab label="General" value={TAB_VALUES.GENERAL} />
          <Tab label="Speakers" value={TAB_VALUES.SPEAKERS} />
          <Tab label="Questions" value={TAB_VALUES.QUESTIONS} />
-         <Tab label="Job openings" value={TAB_VALUES.JOBS} />
+         <Tab
+            label={isMobile ? "Jobs" : "Job openings"}
+            value={TAB_VALUES.JOBS}
+         />
       </Tabs>
    )
 }
