@@ -5,16 +5,20 @@ import { SelectProps } from "@mui/material/Select"
 import { useLocalTracks } from "../../context"
 import { sxStyles } from "types/commonTypes"
 import { getRTCErrorCode } from "../../util"
+import { useState } from "react"
 
 const styles = sxStyles({
    root: {
       maxWidth: "100%",
-      "& .MuiSelect-select": {},
    },
    icon: {
-      mx: 1.5,
-      mt: "14px",
-      fontSize: 24,
+      pointerEvents: "none",
+      position: "absolute",
+      right: 12,
+      top: 20,
+   },
+   iconOpen: {
+      transform: "rotate(180deg)",
    },
 })
 
@@ -38,6 +42,7 @@ export const DeviceSelect = ({
    ...props
 }: DeviceSelectProps) => {
    const inputId = `select-${label.toLowerCase()}` // Generate a unique ID based on the label, replacing spaces with hyphens
+   const [selectOpen, setSelectOpen] = useState(false) // Add this line to manage the open state
 
    return (
       <BrandedTextField
@@ -51,7 +56,14 @@ export const DeviceSelect = ({
             permissionDenied ? "Permission Denied" : getValue(value, options)
          }
          SelectProps={{
-            IconComponent: () => <ExpandMoreIcon sx={styles.icon} />,
+            IconComponent: () => (
+               <ExpandMoreIcon
+                  sx={[styles.icon, selectOpen && styles.iconOpen]}
+               />
+            ),
+            open: selectOpen,
+            onOpen: () => setSelectOpen(true),
+            onClose: () => setSelectOpen(false),
          }}
          InputLabelProps={{ htmlFor: inputId }}
          inputProps={{ id: inputId }}

@@ -18,6 +18,7 @@ type SettingsMenuContextType = {
    setTempMicrophoneId: (id: string) => void
    handleSaveAndClose: () => void
    handleClose: () => void
+   isMobile: boolean
 }
 
 const SettingsMenuContext = createContext<SettingsMenuContextType | undefined>(
@@ -27,11 +28,13 @@ const SettingsMenuContext = createContext<SettingsMenuContextType | undefined>(
 type SettingsMenuProviderProps = {
    children: ReactNode
    onClose: () => void
+   isMobile: boolean
 }
 
 export const SettingsMenuProvider = ({
    children,
    onClose,
+   isMobile,
 }: SettingsMenuProviderProps) => {
    const {
       activeCameraId: initialCameraId,
@@ -81,6 +84,7 @@ export const SettingsMenuProvider = ({
          setTempMicrophoneId,
          handleSaveAndClose,
          handleClose: onClose,
+         isMobile,
       }),
       [
          tempCameraTrack,
@@ -91,6 +95,7 @@ export const SettingsMenuProvider = ({
          setTempMicrophoneId,
          handleSaveAndClose,
          onClose,
+         isMobile,
       ]
    )
 
