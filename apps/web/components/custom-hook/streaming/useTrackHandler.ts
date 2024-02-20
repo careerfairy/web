@@ -8,15 +8,12 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import { useAgoraDevices } from "components/views/streaming-page/context/AgoraDevices"
 
-const updateActiveDeviceId = (
-   track: ICameraVideoTrack | IMicrophoneAudioTrack,
-   setActiveDeviceId: (id: string) => void
-) => {
-   let newId = ""
+const getTrackDeviceId = (track: ICameraVideoTrack | IMicrophoneAudioTrack) => {
+   let deviceId = ""
    if (track) {
-      newId = track.getMediaStreamTrack().getSettings().deviceId
+      deviceId = track.getMediaStreamTrack().getSettings().deviceId
    }
-   setActiveDeviceId(newId)
+   return deviceId
 }
 
 /**
@@ -48,14 +45,14 @@ export const useTrackHandler = (
 
    const devices = deviceType === "camera" ? cameras : microphones
 
-   const [activeDeviceId, setActiveDeviceId] = useState<string>("default")
+   const [activeDeviceId, setActiveDeviceId] = useState<string>("")
 
    const changeAndSetActiveDevice = useCallback(
       async (deviceId: string) => {
          if (track) {
             try {
                await track.setDevice(deviceId)
-               updateActiveDeviceId(track, setActiveDeviceId)
+               setActiveDeviceId(getTrackDeviceId(track))
             } catch (error) {
                errorNotification(
                   error,
@@ -76,8 +73,8 @@ export const useTrackHandler = (
    )
 
    useEffect(() => {
-      updateActiveDeviceId(track, setActiveDeviceId)
-   }, [track])
+      setActiveDeviceId(getTrackDeviceId(track))
+   }, [track, devices])
 
    /**
     * Monitors device changes and updates the track accordingly.
