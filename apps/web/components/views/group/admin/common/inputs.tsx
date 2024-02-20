@@ -16,11 +16,6 @@ import Stack from "@mui/material/Stack"
 import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
-   checkbox: {
-      "&:hover": {
-         backgroundColor: "transparent !important",
-      },
-   },
    checkboxIconWrapper: (theme) => ({
       width: 20,
       height: 20,
@@ -105,7 +100,7 @@ export const StyledCheckbox = (
       <Checkbox
          {...props}
          icon={<Box sx={styles.checkboxIconWrapper} />}
-         sx={styles.checkbox}
+         disableRipple
          checkedIcon={
             <Box sx={styles.checkedIconSx}>
                <CheckRoundedIcon fontSize={"small"} />
