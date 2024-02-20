@@ -7,6 +7,8 @@ export const STREAM_IDENTIFIERS = {
    USER: "user",
    /** If an agora UID starts with this, it is an anonymous user */
    ANONYMOUS: "anon",
+   /** If an agora UID starts with this, it is a screen share */
+   SCREEN_SHARE: "screen",
 } as const
 
 export type StreamIdentifier =

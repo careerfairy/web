@@ -4,7 +4,6 @@ import {
    RemoteAudioTrack,
    RemoteVideoTrack,
    useRemoteUserTrack,
-   IAgoraRTCRemoteUser,
 } from "agora-rtc-react"
 import { UserCover } from "./UserCover"
 import { FloatingContent, VideoTrackWrapper } from "./VideoTrackWrapper"
@@ -16,13 +15,10 @@ import { userIsSpeakingSelector } from "store/selectors/streamingAppSelectors"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { DetailsOverlay } from "./DetailsOverlay"
 import { SpeakingIndicator } from "./SpeakingIndicator"
+import { useUserStream } from "../../context/UserStream"
+import { RemoteUser } from "../../types"
 
 type Props = {
-   /**
-    * The remote user object.
-    */
-   readonly user: IAgoraRTCRemoteUser
-
    /**
     * `true`: Play the video track of the remote user.`false`: Stop playing the video track of the remote user.
     */
@@ -47,14 +43,9 @@ type Props = {
     * The React nodes to be rendered.
     */
    readonly children?: ReactNode
-   /**
-    * Whether to contain the video inside the container or fill it.
-    */
-   readonly containVideo?: boolean
 } & BoxProps
 
 export const RemoteStreamer = ({
-   user,
    playVideo,
    playAudio,
    playbackDeviceId,
@@ -62,6 +53,9 @@ export const RemoteStreamer = ({
    children,
    ...props
 }: Props) => {
+   const { user, type } = useUserStream<RemoteUser>()
+
+   // console.count(`RemoteStreamer ${user.uid}`)
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
@@ -84,7 +78,10 @@ export const RemoteStreamer = ({
       <VideoTrackWrapper {...props}>
          <Box
             component={RemoteVideoTrack}
-            sx={[styles.videoTrack, props.containVideo && styles.videoContain]}
+            sx={[
+               styles.videoTrack,
+               type === "remote-user-screen" && styles.videoContain,
+            ]}
             play={playVideo}
             track={videoTrack}
          />

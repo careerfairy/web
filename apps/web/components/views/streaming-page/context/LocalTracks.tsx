@@ -1,14 +1,11 @@
-import AgoraRTC, {
+import {
    AgoraRTCReactError,
-   DeviceInfo,
    IAgoraRTCError,
    useCurrentUID,
    useLocalCameraTrack,
    useLocalMicrophoneTrack,
    usePublish,
 } from "agora-rtc-react"
-import { useCameras } from "components/custom-hook/streaming/useCameras"
-import { useMicrophones } from "components/custom-hook/streaming/useMicrophones"
 import {
    FC,
    ReactNode,
@@ -20,8 +17,9 @@ import {
    useState,
 } from "react"
 import { useStreamingContext } from "./Streaming"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { type LocalUser } from "../types"
+import { useDevices } from "components/custom-hook/streaming/useDevices"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -44,40 +42,18 @@ type LocalTracksContextProps = {
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
    localUser: LocalUser
+   readyToPublish: boolean
 }
 
 const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
    undefined
 )
 
-const setActiveDevice = (
-   setActiveDeviceId: (id: string) => void,
-   dev: DeviceInfo
-) => {
-   if (dev.state === "ACTIVE") {
-      setActiveDeviceId(dev.device.deviceId)
-      return true
-   }
-   return false
-}
-
-const setFirstAvailableDevice = (
-   devices: MediaDeviceInfo[],
-   setActiveDeviceId: (id: string) => void,
-   dev: DeviceInfo
-) => {
-   if (devices.length > 0) {
-      setActiveDeviceId(
-         devices.find((device) => device.deviceId !== dev.device.deviceId)
-            ?.deviceId ?? ""
-      )
-   }
-}
-
 export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    children,
 }) => {
-   const { isReady, shouldStream, currentRole } = useStreamingContext()
+   const streamingContextProps = useStreamingContext()
+   const { isReady, shouldStream, currentRole } = streamingContextProps
    const currentUserUID = useCurrentUID()
 
    const [cameraOn, setCameraOn] = useState(true)
@@ -85,79 +61,27 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
 
    const {
-      data: cameras,
-      mutate: refetchCameras,
+      devices: cameras,
       error: fetchCamerasError,
-   } = useCameras(shouldStream)
-   const {
-      data: microphones,
-      mutate: refetchMicrophones,
-      error: fetchMicsError,
-   } = useMicrophones(shouldStream)
+      activeDeviceId: activeCameraId,
+      setActiveDeviceId: setActiveCameraId,
+   } = useDevices({
+      deviceType: "camera",
+      enable: shouldStream,
+   })
 
-   const [activeCameraId, setActiveCameraId] = useState<string>("")
-   const [activeMicrophoneId, setActiveMicrophoneId] = useState<string>("")
+   const {
+      devices: microphones,
+      error: fetchMicsError,
+      activeDeviceId: activeMicrophoneId,
+      setActiveDeviceId: setActiveMicrophoneId,
+   } = useDevices({
+      deviceType: "microphone",
+      enable: shouldStream,
+   })
 
    const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false)
    const microphoneTrack = useLocalMicrophoneTrack(shouldStream)
-
-   /**
-    * This useEffect hook is used to initialize the selected devices.
-    * Optionally, a preferred deviceId can be retrieved from local storage, similar to the previous streaming application.
-    */
-   useEffect(() => {
-      if (!shouldStream) return
-
-      AgoraRTC.getCameras()
-         .then((cameras) => {
-            setActiveCameraId(cameras[0]?.deviceId ?? "")
-         })
-         .catch(errorLogAndNotify)
-
-      AgoraRTC.getMicrophones()
-         .then((microphones) => {
-            setActiveMicrophoneId(microphones[0]?.deviceId ?? "")
-         })
-         .catch(errorLogAndNotify)
-
-      return () => {
-         setActiveCameraId("")
-         setActiveMicrophoneId("")
-      }
-   }, [shouldStream])
-
-   useEffect(() => {
-      AgoraRTC.onCameraChanged = (dev) => {
-         refetchCameras() // Refetch cameras when camera is plugged in or unplugged
-         if (cameraTrack.localCameraTrack) {
-            const isActive = setActiveDevice(setActiveCameraId, dev)
-            if (!isActive) {
-               setFirstAvailableDevice(cameras, setActiveCameraId, dev)
-            }
-         }
-      }
-      AgoraRTC.onMicrophoneChanged = (dev) => {
-         refetchMicrophones() // Refetch microphones when mic is plugged in or unplugged
-         if (microphoneTrack.localMicrophoneTrack) {
-            const isActive = setActiveDevice(setActiveMicrophoneId, dev)
-            if (!isActive) {
-               setFirstAvailableDevice(microphones, setActiveMicrophoneId, dev)
-            }
-         }
-      }
-
-      return () => {
-         AgoraRTC.onCameraChanged = null
-         AgoraRTC.onMicrophoneChanged = null
-      }
-   }, [
-      cameraTrack,
-      cameras,
-      microphoneTrack.localMicrophoneTrack,
-      microphones,
-      refetchCameras,
-      refetchMicrophones,
-   ])
 
    /**
     * Uses the `activeCameraId` and `activeMicrophoneId` to set the active local devices
@@ -165,13 +89,29 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
     */
    useEffect(() => {
       if (cameraTrack.localCameraTrack && activeCameraId) {
-         cameraTrack.localCameraTrack.setDevice(activeCameraId)
+         cameraTrack.localCameraTrack.setDevice(activeCameraId).catch((error) =>
+            errorLogAndNotify(error, {
+               message: "Failed to set the active camera device",
+               metadata: {
+                  activeCameraId,
+               },
+            })
+         )
       }
    }, [activeCameraId, cameraTrack.localCameraTrack])
 
    useEffect(() => {
       if (microphoneTrack.localMicrophoneTrack && activeMicrophoneId) {
-         microphoneTrack.localMicrophoneTrack.setDevice(activeMicrophoneId)
+         microphoneTrack.localMicrophoneTrack
+            .setDevice(activeMicrophoneId)
+            .catch((error) =>
+               errorLogAndNotify(error, {
+                  message: "Failed to set the active microphone device",
+                  metadata: {
+                     activeMicrophoneId,
+                  },
+               })
+            )
       }
    }, [activeMicrophoneId, microphoneTrack.localMicrophoneTrack])
 
@@ -191,35 +131,31 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const toggleCamera = useCallback(() => setCameraOn((prev) => !prev), [])
 
-   const readToPublish = shouldStream && isReady && currentRole === "host"
+   const readyToPublish = shouldStream && isReady && currentRole === "host"
 
-   const localUser = useMemo<LocalUser | null>(() => {
-      // If the user is ready to publish, return the local user object
-      if (readToPublish) {
-         return {
-            type: "local",
-            user: {
-               uid: currentUserUID,
-               hasAudio: !microphoneMuted,
-               hasVideo: cameraOn,
-               audioTrack: microphoneTrack.localMicrophoneTrack,
-               videoTrack: cameraTrack.localCameraTrack,
-            },
-         }
-      }
-      return null
-   }, [
-      readToPublish,
-      currentUserUID,
-      microphoneMuted,
-      cameraOn,
-      microphoneTrack.localMicrophoneTrack,
-      cameraTrack.localCameraTrack,
-   ])
+   const localUser = useMemo<LocalUser>(
+      () => /* If the user is ready to publish, return the local user object*/ ({
+         type: "local-user",
+         user: {
+            uid: currentUserUID,
+            hasAudio: !microphoneMuted,
+            hasVideo: cameraOn,
+            audioTrack: microphoneTrack.localMicrophoneTrack,
+            videoTrack: cameraTrack.localCameraTrack,
+         },
+      }),
+      [
+         currentUserUID,
+         microphoneMuted,
+         cameraOn,
+         microphoneTrack.localMicrophoneTrack,
+         cameraTrack.localCameraTrack,
+      ]
+   )
 
    usePublish(
       [microphoneTrack.localMicrophoneTrack, cameraTrack.localCameraTrack],
-      readToPublish
+      readyToPublish
    )
 
    const value = useMemo<LocalTracksContextProps>(
@@ -240,6 +176,7 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameraDevices: cameras,
          microphoneDevices: microphones,
          localUser,
+         readyToPublish,
       }),
       [
          cameraTrack,
@@ -251,11 +188,14 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          toggleMicMuted,
          activeCameraId,
          activeMicrophoneId,
+         setActiveCameraId,
+         setActiveMicrophoneId,
          fetchMicsError,
          fetchCamerasError,
          cameras,
          microphones,
          localUser,
+         readyToPublish,
       ]
    )
 

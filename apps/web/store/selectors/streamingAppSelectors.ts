@@ -20,3 +20,6 @@ export const audioLevelsSelector = (state: RootState) =>
 
 export const userIsSpeakingSelector = (userId: UID) => (state: RootState) =>
    Boolean(state.streamingApp.audioLevels[userId]?.level > 60)
+
+export const currentScreenSharerSelector = (state: RootState) =>
+   state.streamingApp.livestreamState.screenSharerId

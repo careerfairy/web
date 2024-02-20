@@ -17,6 +17,7 @@ const styles = sxStyles({
    speedDial: (theme) => ({
       position: "absolute",
       bottom: 0,
+      boxShadow: "none",
       "& .MuiButtonBase-root": {
          boxShadow: "none",
          width: 38,
@@ -71,6 +72,7 @@ const styles = sxStyles({
    },
    noShadow: {
       boxShadow: "none !important",
+      filter: "none !important",
    },
 })
 

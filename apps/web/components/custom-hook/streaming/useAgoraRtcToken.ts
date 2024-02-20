@@ -24,15 +24,8 @@ export type UseAgoraRtcToken = {
  */
 export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
    const { authenticatedUser } = useAuth()
-   const key = args
-      ? [
-           args.channelName,
-           args.isStreamer,
-           args.sentToken,
-           args.streamDocumentPath,
-           args.uid,
-        ]
-      : null
+
+   const key = args ? JSON.stringify(args) : null
 
    const options = useMemo<SWRConfiguration>(
       () => ({
@@ -47,13 +40,7 @@ export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
             return errorLogAndNotify(error, {
                message: "Failed to fetch Agora RTC token",
                userUid: authenticatedUser?.uid,
-               args: {
-                  channelName: key[0],
-                  isStreamer: key[1],
-                  sentToken: key[2],
-                  streamDocumentPath: key[3],
-                  agoraUid: key[4],
-               },
+               args: key,
             })
          },
          suspense: false,
