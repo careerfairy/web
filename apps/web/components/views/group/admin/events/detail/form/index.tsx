@@ -73,7 +73,7 @@ const convertLivestreamObjectToForm = ({
    existingInterests,
    customJobs,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
-   const valuesReducer = (values) =>
+   const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
          (acc, key) =>
             key in livestream ? { ...acc, [key]: livestream[key] } : acc,
@@ -127,7 +127,7 @@ const LivestreamCreationForm: FC<Props> = ({
 }) => {
    const { data: existingInterests } = useInterests()
    const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
-      livestreamId: livestream.id,
+      livestreamId: livestream?.id,
    })
 
    const formValues: LivestreamFormValues = livestream
