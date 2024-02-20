@@ -1,27 +1,14 @@
-import {
-   Box,
-   Button,
-   Dialog,
-   DialogActions,
-   DialogContent,
-   DialogTitle,
-   IconButton,
-   Stack,
-   SwipeableDrawer,
-   Typography,
-} from "@mui/material"
+import { Box, Dialog, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import React, { Fragment } from "react"
-import { X as CloseIcon, Settings } from "react-feather"
+import React from "react"
 import { toggleSettingsMenu } from "store/reducers/streamingAppReducer"
 import { useSettingsMenuOpen } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { MicVolume } from "./MicVolume"
-import { SettingsMenuProvider, useSettingsMenu } from "./SettingsMenuContext"
-import { TempCameraSetup } from "./TempCameraSetup"
-import { TempCameraSelect, TempMicrophoneSelect } from "./temp-device-select"
-import { VideoEffects } from "./VideoEffects"
+import { SettingsMenuProvider } from "./SettingsMenuContext"
+import { Title } from "./Title"
+import { Actions } from "./Actions"
+import { Body } from "./Body"
 
 const styles = sxStyles({
    dialog: {
@@ -37,48 +24,6 @@ const styles = sxStyles({
          borderTopRightRadius: 12,
          maxHeight: "calc(100vh - 88px)",
       },
-   },
-   actions: {
-      py: 1.5,
-      px: 2,
-      zIndex: 1,
-      borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
-   },
-   actionsSticky: {
-      position: "sticky",
-      bottom: 0,
-      backgroundColor: (theme) => theme.brand.white[200],
-   },
-   icon: {
-      color: "neutral.900",
-   },
-   title: {
-      p: 2,
-      pt: 2.375,
-      borderBottom: (theme) => `1px solid ${theme.brand.black[300]}`,
-   },
-   titleSticky: {
-      position: "sticky",
-      top: 0,
-      zIndex: 2,
-      backgroundColor: "white",
-   },
-   titleText: {
-      color: "neutral.800",
-   },
-   closeButton: {
-      m: (theme) => `-${theme.spacing(1)} !important`,
-   },
-   heading: {
-      fontWeight: 600,
-      color: "neutral.900",
-   },
-   dialogContent: {
-      p: 2,
-      border: "none",
-   },
-   closeBtn: {
-      color: "neutral.500",
    },
 })
 
@@ -128,80 +73,10 @@ type ContentProps = {
 
 const Content = ({ onClose, isMobile }: ContentProps) => {
    return (
-      <SettingsMenuProvider onClose={onClose}>
-         <DialogTitle sx={[styles.title, isMobile && styles.titleSticky]}>
-            <Stack
-               alignItems="center"
-               direction="row"
-               justifyContent="space-between"
-               spacing={2}
-            >
-               <Stack alignItems="center" spacing={1} direction="row">
-                  <Box sx={styles.icon} component={Settings} />
-                  <Typography sx={styles.titleText} variant="medium">
-                     Settings
-                  </Typography>
-               </Stack>
-               <IconButton sx={styles.closeButton} onClick={onClose}>
-                  <Box sx={styles.icon} component={CloseIcon} />
-               </IconButton>
-            </Stack>
-         </DialogTitle>
-         <DialogContent sx={styles.dialogContent} dividers>
-            <Stack spacing={3}>
-               <Box>
-                  <MenuHeading>Voice settings</MenuHeading>
-                  <Box pb={2} />
-                  <TempMicrophoneSelect />
-                  <Box pb={1.5} />
-                  <MicVolume />
-               </Box>
-               <Box>
-                  <MenuHeading>Video settings</MenuHeading>
-                  <Box pb={2} />
-                  <TempCameraSetup />
-                  <Box pb={1.5} />
-                  <TempCameraSelect />
-                  <Box pb={1.5} />
-                  <VideoEffects />
-               </Box>
-            </Stack>
-         </DialogContent>
-         <DialogActions sx={[styles.actions, isMobile && styles.actionsSticky]}>
-            <Actions />
-         </DialogActions>
+      <SettingsMenuProvider isMobile={isMobile} onClose={onClose}>
+         <Title />
+         <Body />
+         <Actions />
       </SettingsMenuProvider>
-   )
-}
-
-const Actions = () => {
-   const { handleSaveAndClose, handleClose } = useSettingsMenu()
-
-   return (
-      <Fragment>
-         <Button
-            sx={styles.closeBtn}
-            variant="outlined"
-            color="grey"
-            onClick={handleClose}
-         >
-            Close
-         </Button>
-         <Button variant="contained" onClick={handleSaveAndClose}>
-            Save and close
-         </Button>
-      </Fragment>
-   )
-}
-
-type MenuHeadingProps = {
-   children: React.ReactNode
-}
-
-const MenuHeading = ({ children }: MenuHeadingProps) => {
-   return (
-      <Typography variant="brandedH4" sx={styles.heading}>
-         {children}
-      </Typography>
    )
 }
