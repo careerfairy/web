@@ -100,6 +100,11 @@ export const StyledCheckbox = (
       <Checkbox
          {...props}
          icon={<Box sx={styles.checkboxIconWrapper} />}
+         sx={{
+            "&:hover": {
+               backgroundColor: "transparent !important",
+            },
+         }}
          checkedIcon={
             <Box sx={styles.checkedIconSx}>
                <CheckRoundedIcon fontSize={"small"} />
