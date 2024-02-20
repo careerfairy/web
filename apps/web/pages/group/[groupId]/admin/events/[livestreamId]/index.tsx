@@ -1,128 +1,14 @@
-import { Formik } from "formik"
-import { FC, useState } from "react"
-import { Box } from "@mui/material"
+import { useState } from "react"
 import { useRouter } from "next/router"
-import { Interest } from "@careerfairy/shared-lib/interests"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
-import { useInterests } from "components/custom-hook/useCollection"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import {
-   LivestreamFormGeneralTabValues,
-   LivestreamFormJobsTabValues,
-   LivestreamFormValues,
-   LivestreamFormQuestionsTabValues,
-   LivestreamFormSpeakersTabValues,
-} from "../../../../../../components/views/group/admin/events/detail/form/types"
 import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
-import LivestreamFormJobsStep from "../../../../../../components/views/group/admin/events/detail/form/views/jobs"
 import LivestreamAdminDetailTopBarNavigation, {
    TAB_VALUES,
 } from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
 import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
-import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/detail/form/views/speakers"
-import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions"
-import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general/general"
-import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
-import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
-import {
-   PublicCustomJob,
-   pickPublicDataFromCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-
-const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
-   id: "",
-   title: "",
-   hidden: false,
-   company: "",
-   companyLogoUrl: "",
-   backgroundImageUrl: "",
-   startDate: null,
-   duration: null,
-   language: "",
-   summary: "",
-   reasonsToJoin: [],
-   categories: [],
-   targetCountries: [],
-   targetUniversities: [],
-   targetFieldsOfStudy: [],
-   targetLevelsOfStudy: [],
-   groupIds: [],
-}
-
-const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
-   speakers: [],
-}
-
-const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
-   registrationQuestions: {},
-   feedbackQuestions: [],
-}
-
-const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
-   jobs: [],
-   customJobs: [],
-}
-
-const formInitialValues: LivestreamFormValues = {
-   general: { ...formGeneralTabInitialValues },
-   speakers: { ...formSpeakersTabInitialValues },
-   questions: { ...formQuestionsTabInitialValues },
-   jobs: { ...formJobsTabInitialValues },
-}
-
-type ConvertLivestreamObjectToFormArgs = {
-   livestream: LivestreamEvent
-   existingInterests: Interest[]
-   customJobs: PublicCustomJob[]
-}
-
-const convertLivestreamObjectToForm = ({
-   livestream,
-   existingInterests,
-   customJobs,
-}: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
-   const valuesReducer = (values) =>
-      Object.keys(values).reduce(
-         (acc, key) =>
-            key in livestream ? { ...acc, [key]: livestream[key] } : acc,
-         values
-      )
-
-   // Addressing edge cases one by one
-   const general: LivestreamFormGeneralTabValues = valuesReducer(
-      formGeneralTabInitialValues
-   )
-
-   // Simple name remapping s
-   general.categories = existingInterests.filter((interest) =>
-      livestream.interestsIds.includes(interest.id)
-   )
-
-   general.language =
-      livestream.language?.code || formGeneralTabInitialValues.language
-
-   // This field was originally named "start" and it's now "startDate"
-   general.startDate =
-      livestream.start.toDate() || formGeneralTabInitialValues.startDate
-
-   // This is to ensure backwards compatibility
-   // Previously was a single field (i.e. a single string) and now it's an array of strings
-   general.reasonsToJoin = livestream.reasonsToJoinLivestream
-      ? [livestream.reasonsToJoinLivestream, undefined, undefined]
-      : livestream.reasonsToJoinLivestream_v2
-
-   return {
-      general: general,
-      speakers: valuesReducer(formSpeakersTabInitialValues),
-      questions: valuesReducer(formQuestionsTabInitialValues),
-      jobs: {
-         jobs: livestream.jobs,
-         customJobs: customJobs.map(pickPublicDataFromCustomJob),
-      } as LivestreamFormJobsTabValues,
-   }
-}
+import LivestreamCreationForm from "components/views/group/admin/events/detail/form"
 
 const LivestreamAdminDetailsPage = () => {
    const {
@@ -157,7 +43,7 @@ const LivestreamAdminDetailsPage = () => {
          <DashboardHead title="CareerFairy | Editing Live Stream of " />
          <LivestreamFetchWrapper livestreamId={livestreamId as string}>
             {(livestream) => (
-               <FormContent
+               <LivestreamCreationForm
                   livestream={livestream}
                   groupId={groupId as string}
                   tabValue={tabValue}
@@ -165,52 +51,6 @@ const LivestreamAdminDetailsPage = () => {
             )}
          </LivestreamFetchWrapper>
       </GroupDashboardLayout>
-   )
-}
-
-type Props = {
-   livestream: LivestreamEvent
-   groupId: string
-   tabValue: TAB_VALUES
-}
-
-const FormContent: FC<Props> = ({ livestream, groupId, tabValue }) => {
-   const { data: existingInterests } = useInterests()
-   const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
-      livestreamId: livestream.id,
-   })
-
-   const formValues: LivestreamFormValues = livestream
-      ? convertLivestreamObjectToForm({
-           livestream,
-           existingInterests,
-           customJobs: initialSelectedCustomJobs,
-        })
-      : formInitialValues
-
-   return (
-      <Box>
-         <Formik<LivestreamFormValues>
-            initialValues={formValues}
-            onSubmit={undefined}
-            validationSchema={livestreamFormValidationSchema}
-         >
-            <>
-               {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
-               {tabValue == TAB_VALUES.SPEAKERS && (
-                  <LivestreamFormSpeakersStep
-                     values={formSpeakersTabInitialValues}
-                  />
-               )}
-               {tabValue == TAB_VALUES.QUESTIONS && (
-                  <LivestreamFormQuestionsStep
-                     values={formQuestionsTabInitialValues}
-                  />
-               )}
-               {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
-            </>
-         </Formik>
-      </Box>
    )
 }
 
