@@ -12,7 +12,6 @@ import { GroupOption } from "@careerfairy/shared-lib/groups"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export type LivestreamFormGeneralTabValues = {
-   id: string
    title: string
    hidden: boolean
    company?: string

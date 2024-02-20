@@ -23,7 +23,7 @@ const styles = sxStyles({
    wrapper: {
       p: 3,
       mt: 3,
-      border: "1px solid #BCBCBC",
+      border: "1px solid #ECECEC",
       borderRadius: 2,
    },
    titleSection: {
@@ -66,6 +66,10 @@ const styles = sxStyles({
       mt: { xs: 2, md: 1 },
       fontSize: "inherit",
    },
+   description: {
+      fontSize: "16px",
+      color: "var(--Neutral-Neutral---700, #5C5C6A)",
+   },
 })
 
 type Props = {
@@ -94,7 +98,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                {!isAtsJob && (
                   <Box>
                      <IconButton onClick={handleClick} size="small">
-                        <MoreVertIcon color={"secondary"} />
+                        <MoreVertIcon />
                      </IconButton>
                      <BrandedMenu
                         onClose={handleClose}
@@ -174,7 +178,11 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
             )}
 
             <Grid xs={12} item mt={4}>
-               <CollapsableText text={job.description} collapsedSize={80} />
+               <CollapsableText
+                  text={job.description}
+                  textStyle={styles.description}
+                  collapsedSize={80}
+               />
             </Grid>
          </Grid>
       </Box>

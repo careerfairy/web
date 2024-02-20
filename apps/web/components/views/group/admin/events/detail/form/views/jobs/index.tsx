@@ -23,7 +23,7 @@ const LivestreamFormJobsStep = () => {
 
    return (
       <Form>
-         <Stack sx={styles.root} rowGap={4}>
+         <Stack sx={styles.root} rowGap={2}>
             <FormSectionHeader
                title={"Job openings"}
                subtitle={
@@ -34,7 +34,7 @@ const LivestreamFormJobsStep = () => {
                {hasAtsIntegration ? (
                   <AtsJobForm />
                ) : (
-                  <CustomJobForm groupId={group.id} fieldId="jobs.customJobs" />
+                  <CustomJobForm fieldId="jobs.customJobs" />
                )}
             </SuspenseWithBoundary>
          </Stack>
