@@ -22,7 +22,7 @@ import LivestreamAdminDetailTopBarNavigation, {
 } from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
 import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
 import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/detail/form/views/speakers"
-import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions"
+import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions/questions"
 import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general/general"
 import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
