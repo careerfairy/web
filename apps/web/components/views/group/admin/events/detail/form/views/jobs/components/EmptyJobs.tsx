@@ -18,13 +18,6 @@ const styles = sxStyles({
       maxWidth: "500px",
       mx: 2,
    },
-   title: {
-      fontSize: { xs: "18px", md: "20px" },
-      fontWeight: "bold",
-   },
-   subtitle: {
-      fontSize: "16px",
-   },
 })
 
 const EmptyJobs = () => {
@@ -35,11 +28,11 @@ const EmptyJobs = () => {
          <Stack spacing={2} sx={styles.content}>
             <Briefcase size={70} color={theme.palette.secondary.main} />
 
-            <Typography sx={styles.title}>
+            <Typography variant="brandedH4" fontWeight={"bold"}>
                No jobs linked to your live stream
             </Typography>
 
-            <Typography variant={"subtitle1"} sx={styles.subtitle}>
+            <Typography variant={"brandedBody"}>
                Supercharge your recruitment efforts. Link a job opening and
                engage with the next generation of talent effortlessly.
             </Typography>

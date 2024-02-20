@@ -12,7 +12,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { X as DeleteIcon, Edit2 as EditIcon } from "react-feather"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
-import CollapsableText from "components/views/common/inputs/CollapsableText"
+import CollapsibleText from "components/views/common/inputs/CollapsibleText"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import Link from "components/views/common/Link"
@@ -35,7 +35,6 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       color: "#7C7C7C",
-      fontSize: 16,
    },
    icon: {
       display: "flex",
@@ -57,18 +56,14 @@ const styles = sxStyles({
          borderRadius: "6px",
       },
    },
-   jobInfo: {
-      fontSize: { xs: "14px", md: "16px" },
-   },
    postingUrl: {
       overflow: "hidden",
       textOverflow: "ellipsis",
       mt: { xs: 2, md: 1 },
-      fontSize: "inherit",
    },
    description: {
       fontSize: "16px",
-      color: "var(--Neutral-Neutral---700, #5C5C6A)",
+      color: "neutral.600",
    },
 })
 
@@ -91,7 +86,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
       <Box sx={styles.wrapper}>
          <Grid container>
             <Grid xs={12} item sx={styles.titleSection}>
-               <Typography variant="h5" fontWeight="bold">
+               <Typography variant="brandedH4" fontWeight="bold">
                   {isAtsJob ? job.name : job.title}
                </Typography>
 
@@ -114,7 +109,10 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                         }}
                         sx={styles.menu}
                      >
-                        <MenuItem onClick={handleClickEdit}>
+                        <MenuItem
+                           onClick={handleClickEdit}
+                           sx={{ color: "#6B6B7F" }}
+                        >
                            <Box sx={styles.icon}>
                               <EditIcon size="1rem" color="#6B6B7F" />
                            </Box>
@@ -140,19 +138,21 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                   <Stack spacing={2} direction={"row"}>
                      {job.salary ? (
                         <>
-                           <Typography sx={styles.jobInfo}>
+                           <Typography variant="brandedBody">
                               {job.salary}
                            </Typography>
                            <Divider orientation="vertical" />
                         </>
                      ) : null}
 
-                     <Typography sx={styles.jobInfo}>{job.jobType}</Typography>
+                     <Typography variant="brandedBody">
+                        {job.jobType}
+                     </Typography>
 
                      {job.deadline ? (
                         <>
                            <Divider orientation="vertical" />
-                           <Typography sx={styles.jobInfo}>
+                           <Typography variant="brandedBody">
                               {DateUtil.formatDateToString(
                                  job.deadline.toDate()
                               )}
@@ -161,15 +161,13 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                      ) : null}
                   </Stack>
 
-                  <Typography
-                     variant="body1"
-                     sx={[styles.jobInfo, styles.postingUrl]}
-                  >
+                  <Typography sx={styles.postingUrl}>
                      <Link
                         href={job.postingUrl}
                         color={"inherit"}
                         underline={"none"}
                         target={"_blank"}
+                        variant="brandedBody"
                      >
                         {job.postingUrl}
                      </Link>
@@ -178,7 +176,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
             )}
 
             <Grid xs={12} item mt={4}>
-               <CollapsableText
+               <CollapsibleText
                   text={job.description}
                   textStyle={styles.description}
                   collapsedSize={80}

@@ -74,19 +74,21 @@ const CustomJobForm: FC<Props> = ({ fieldId }) => {
       [customJobs, fieldId, setFieldValue]
    )
 
-   const views = useMemo(
-      () => [
+   const views = useMemo(() => {
+      const JobFormDialogComponent = () => (
+         <JobFormDialog
+            afterCreateCustomJob={handleCreateCustomJob}
+            afterUpdateCustomJob={handleUpdateCustomJob}
+         />
+      )
+
+      return [
          {
             key: "livestream-create-form",
-            Component: JobFormDialog,
-            props: {
-               afterCreateCustomJob: handleCreateCustomJob,
-               afterUpdateCustomJob: handleUpdateCustomJob,
-            },
+            Component: JobFormDialogComponent,
          },
-      ],
-      [handleCreateCustomJob, handleUpdateCustomJob]
-   )
+      ]
+   }, [handleCreateCustomJob, handleUpdateCustomJob])
 
    return (
       <Grid xs={12} item>

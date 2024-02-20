@@ -6,7 +6,7 @@ import SanitizedHTML from "../../../../../util/SanitizedHTML"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import Skeleton from "@mui/material/Skeleton"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import CollapsableText from "../../../../common/inputs/CollapsableText"
+import CollapsibleText from "../../../../common/inputs/CollapsibleText"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import Box from "@mui/material/Box"
@@ -76,7 +76,7 @@ const JobDescription: FC<Props> = ({ job }) => {
             {isAtsJob ? (
                <SanitizedHTML sx={styles.html} htmlString={job.description} />
             ) : (
-               <CollapsableText
+               <CollapsibleText
                   text={job.description}
                   collapsedSize={isMobile ? 190 : 180}
                   textStyle={styles.html}
@@ -84,7 +84,7 @@ const JobDescription: FC<Props> = ({ job }) => {
             )}
          </Box>
 
-         {Boolean(jobSalary) ? (
+         {jobSalary ? (
             <Box>
                <Typography variant={"subtitle1"} sx={styles.subTitle}>
                   Salary
@@ -95,7 +95,7 @@ const JobDescription: FC<Props> = ({ job }) => {
             </Box>
          ) : null}
 
-         {Boolean(jobDeadline) ? (
+         {jobDeadline ? (
             <Box>
                <Typography variant={"subtitle1"} sx={styles.subTitle}>
                   Application deadline
