@@ -16,6 +16,7 @@ import { closeJobsDialog } from "store/reducers/adminJobsReducer"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { sxStyles } from "@careerfairy/shared-ui"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    dialog: {
@@ -25,13 +26,13 @@ const styles = sxStyles({
 })
 
 type Props = {
-   groupId: string
    fieldId: string
 }
 
-const CustomJobForm: FC<Props> = ({ groupId, fieldId }) => {
+const CustomJobForm: FC<Props> = ({ fieldId }) => {
    const dispatch = useDispatch()
-   const allCustomJobs = useGroupCustomJobs(groupId)
+   const { group } = useGroup()
+   const allCustomJobs = useGroupCustomJobs(group.id)
    const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
 
    const {
