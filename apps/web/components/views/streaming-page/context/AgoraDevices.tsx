@@ -43,6 +43,11 @@ type DeviceProviderProps = {
    children: ReactNode
 }
 
+/**
+ * AgoraDevicesProvider streamlines device event management (for cameras and microphones) by utilizing AgoraRTC's
+ * `onCameraChanged` and `onMicrophoneChanged` callbacks. These global callbacks, defined once, centralize device
+ * event handling, allowing for modular and reusable component interaction without direct global callback manipulation.
+ */
 export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
    const { shouldStream } = useStreamingContext()
    const { enqueueSnackbar } = useSnackbar()
@@ -236,6 +241,26 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
    )
 }
 
+/**
+ * Hook for accessing and managing camera and microphone devices. It enables components to listen for device changes and access the current device lists.
+ *
+ * @hook
+ * @example
+ * const Component = () => {
+ *   const { cameras, registerCameraChangedCallback, unregisterCameraChangedCallback } = useAgoraDevices();
+ *
+ *   useEffect(() => {
+ *     const handleCameraChange = (deviceInfo) => {
+ *       console.log('Device changed:', deviceInfo);
+ *     };
+ *     registerCameraChangedCallback(handleCameraChange);
+ *     // Cleanup
+ *     return () => unregisterCameraChangedCallback(handleCameraChange);
+ *   }, [registerCameraChangedCallback, unregisterCameraChangedCallback]);
+ *
+ *   return <div>Cameras: {cameras.length}</div>;
+ * }
+ */
 export const useAgoraDevices = () => {
    const context = useContext(DeviceContext)
    if (!context) {
