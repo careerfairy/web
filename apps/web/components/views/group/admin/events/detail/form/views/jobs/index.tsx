@@ -4,7 +4,7 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import FormSectionHeader from "../../FormSectionHeader"
 import { sxStyles } from "types/commonTypes"
-import AtsJobForm from "./atsJobs/AtsJobForm"
+import AtsJobForm from "./atsJobs"
 import CustomJobForm from "./customJobs/CustomJobForm"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
