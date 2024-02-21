@@ -21,7 +21,7 @@ const JobForm = () => {
          <Grid xs={12} item>
             <FormBrandedTextField
                name="title"
-               label="Job title (required)"
+               label="Job Title (required)"
                placeholder="E.g., Mechanical Engineer"
                fullWidth
             />

@@ -55,6 +55,9 @@ const styles = sxStyles({
       maxWidth: "unset",
       fontSize: { xs: "16px", md: "16px" },
    },
+   cancelBtn: {
+      color: "neutral.500",
+   },
 })
 
 type Props = {
@@ -157,6 +160,7 @@ const JobFormDialog: FC<Props> = ({
                                  variant="outlined"
                                  color="grey"
                                  onClick={handleClose}
+                                 sx={styles.cancelBtn}
                               >
                                  Cancel
                               </SteppedDialog.Button>
@@ -171,8 +175,8 @@ const JobFormDialog: FC<Props> = ({
                               >
                                  {selectedJobId
                                     ? isSubmitting
-                                       ? "Updating"
-                                       : "Update"
+                                       ? "Saving"
+                                       : "Save"
                                     : isSubmitting
                                     ? "Creating"
                                     : "Create"}
