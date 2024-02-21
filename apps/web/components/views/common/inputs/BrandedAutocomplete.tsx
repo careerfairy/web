@@ -33,57 +33,67 @@ const StyledBrandedAutocomplete = styled(
       renderInput,
       initialOptionSection,
       getOptionElement,
+      options,
       ...props
-   }: StyledBrandedAutocompleteProps) => (
-      <Autocomplete
-         getOptionDisabled={(optionEl) => {
-            if (!props.multiple || !limit) return false
-            return (
-               props.value.length >= limit &&
-               !props.value.find((item) => {
-                  if (props.isOptionEqualToValue) {
-                     return props.isOptionEqualToValue(item, optionEl)
-                  }
-                  return item === optionEl
-               })
-            )
-         }}
-         {...props}
-         renderOption={(optionProps, option, { selected, index }) => (
-            <>
-               {index === 0 && initialOptionSection
-                  ? initialOptionSection
-                  : null}
-               <MenuItem
-                  {...optionProps}
-                  key={optionProps.id}
-                  sx={{
-                     '&[aria-selected="true"]': {
-                        backgroundColor: "#FAFAFA !important",
-                     },
-                  }}
-               >
-                  {getOptionElement ? (
-                     getOptionElement(option)
-                  ) : (
-                     <ListItemText
-                        key={`${optionProps.id}-text`}
-                        primary={getOptionLabel(option)}
-                        sx={{ padding: "16px" }}
-                     />
-                  )}
+   }: StyledBrandedAutocompleteProps) => {
+      // If an {initialOptionSection} exists, add an extra option at the beginning of the list
+      const newOptions = initialOptionSection
+         ? ["INITIAL_SECTION", ...options]
+         : options
 
-                  {props.multiple ? (
-                     <BrandedCheckbox checked={selected} />
-                  ) : null}
-               </MenuItem>
-            </>
-         )}
-         color="primary"
-         getOptionLabel={getOptionLabel}
-         renderInput={renderInput}
-      />
-   )
+      return (
+         <Autocomplete
+            getOptionDisabled={(optionEl) => {
+               if (!props.multiple || !limit) return false
+               return (
+                  props.value.length >= limit &&
+                  !props.value.find((item) => {
+                     if (props.isOptionEqualToValue) {
+                        return props.isOptionEqualToValue(item, optionEl)
+                     }
+                     return item === optionEl
+                  })
+               )
+            }}
+            options={newOptions}
+            {...props}
+            renderOption={(optionProps, option, { selected, index }) => (
+               <>
+                  {index === 0 && initialOptionSection ? (
+                     initialOptionSection
+                  ) : (
+                     <MenuItem
+                        {...optionProps}
+                        key={optionProps.id}
+                        sx={{
+                           '&[aria-selected="true"]': {
+                              backgroundColor: "#FAFAFA !important",
+                           },
+                        }}
+                     >
+                        {getOptionElement ? (
+                           getOptionElement(option)
+                        ) : (
+                           <ListItemText
+                              key={`${optionProps.id}-text`}
+                              primary={getOptionLabel(option)}
+                              sx={{ padding: "16px" }}
+                           />
+                        )}
+
+                        {props.multiple ? (
+                           <BrandedCheckbox checked={selected} />
+                        ) : null}
+                     </MenuItem>
+                  )}
+               </>
+            )}
+            color="primary"
+            getOptionLabel={getOptionLabel}
+            renderInput={renderInput}
+         />
+      )
+   }
 )({})
 
 const BrandedAutocomplete: FC<BrandedAutocompleteProps> = ({
