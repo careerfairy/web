@@ -102,14 +102,14 @@ const SelectorCustomJobsDropDown = ({
                </ListItemIcon>
                <ListItemText primary={"Create a new job opening"} />
             </MenuItem>
-            <Divider />
+            {options?.length ? <Divider /> : null}
          </>
       ),
-      [dispatch]
+      [dispatch, options?.length]
    )
 
-   const onChangeHandler = async (_, selectedOption: PublicCustomJob[]) => {
-      await setFieldValue(fieldId, selectedOption)
+   const onChangeHandler = async (_, selectedOptions: PublicCustomJob[]) => {
+      await setFieldValue(fieldId, selectedOptions)
    }
 
    const getOptionElement = useCallback(
