@@ -186,6 +186,15 @@ export class OnboardingNewsletterEmailBuilder {
       discoveryType: OnboardingNewsletterEvents
    ): OnboardingNewsletterEmailBuilder {
       const template = this.getTemplateModel(discoveryType, userData)
+      return this.addRecipientTemplated(discoveryType, template)
+   }
+   /**
+    * Adds a recipient to the list of recipients and based on the templated data
+    */
+   addRecipientTemplated(
+      discoveryType: OnboardingNewsletterEvents,
+      template: TemplatedMessage
+   ): OnboardingNewsletterEmailBuilder {
       this.discoveryEmailsTemplatedMessageMap.get(discoveryType).push(template)
       return this
    }
@@ -197,16 +206,26 @@ export class OnboardingNewsletterEmailBuilder {
       usersData.forEach((data) => this.addRecipient(data, discoveryType))
       return this
    }
+   addRecipientsTemplated(
+      usersData: UserData[],
+      discoveryType: OnboardingNewsletterEvents,
+      templateGenerator: (user: UserData) => TemplatedMessage
+   ): OnboardingNewsletterEmailBuilder {
+      usersData.forEach((data) =>
+         this.addRecipientTemplated(discoveryType, templateGenerator(data))
+      )
+      return this
+   }
 
    send(discoveryType: OnboardingNewsletterEvents): Promise<void[]> {
       console.log(
-         "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ discoveryType:",
+         "OnboardingNewsletterEmailBuilder ~ send ~ discoveryType:",
          discoveryType
       )
       const messages =
          this.discoveryEmailsTemplatedMessageMap.get(discoveryType)
       console.log(
-         "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~messagesTo:",
+         "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~messagesTo:",
          messages.map((t) => t.To)
       )
 
@@ -219,7 +238,7 @@ export class OnboardingNewsletterEmailBuilder {
          this.sender.sendEmailBatchWithTemplates(messages, (err, res) => {
             if (err) {
                console.log(
-                  "🚀 ~ OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
+                  "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
                   err,
                   messages
                )
@@ -229,7 +248,7 @@ export class OnboardingNewsletterEmailBuilder {
                return
             }
             console.log(
-               "🚀 ~ OnboardingNewsletterEmailBuilder ~ SEND_OK: ",
+               "OnboardingNewsletterEmailBuilder ~ SEND_OK: ",
                res.map((res) => res.To)
             )
          })

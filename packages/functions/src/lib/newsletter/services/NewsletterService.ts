@@ -2,7 +2,10 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepos
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import {
+   getDateDifferenceInDays,
+   sortLivestreamsDesc,
+} from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
 import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
@@ -10,7 +13,12 @@ import { IRecommendationDataFetcher } from "../../recommendation/services/DataFe
 import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
 import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
-import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
+import {
+   EmailNotification,
+   EmailNotificationType,
+} from "@careerfairy/shared-lib/notifications/notifications"
+
+const TOLERANCE_DAYS = 2
 /**
  * Data structure used to associate each user with his recommended livestreams
  * and groups he is following
@@ -62,9 +70,25 @@ export class NewsletterService {
       private readonly logger: Logger
    ) {}
 
+   private isSent(
+      notifications: EmailNotification[],
+      types: EmailNotificationType[],
+      tolerance: number
+   ) {
+      return (
+         notifications.find(
+            (notification) =>
+               types.includes(notification.details.type) &&
+               getDateDifferenceInDays(
+                  notification.createdAt.toDate(),
+                  new Date()
+               ) > tolerance
+         ) !== undefined
+      )
+   }
    private async filterUsers(users: UserData[]): Promise<UserData[]> {
       const promises = users.map(async (user) => {
-         const notifications: EmailNotification[] =
+         const notifications =
             await this.notificationsRepo.getUserReceivedNotifications(
                user.userEmail
             )
@@ -75,13 +99,16 @@ export class NewsletterService {
       })
 
       return (await Promise.all(promises))
-         .filter(
-            (userData) =>
-               !userData.notifications.filter(
-                  (n) => n.details.type === "livestream1stRegistrationDiscovery"
-               )
+         .filter((userData) =>
+            this.isSent(
+               userData.notifications,
+               ["livestream1stRegistrationDiscovery"],
+               TOLERANCE_DAYS
+            )
          )
-         .map((userData) => userData.user)
+         .map((userData) => {
+            return userData.user
+         })
    }
 
    /**
@@ -102,6 +129,13 @@ export class NewsletterService {
          subscribedUsers as UserData[]
       )
       this.subscribedUsers = convertDocArrayToDict(filteredUsers)
+      this.logger.info(
+         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
+         Object.keys(this.subscribedUsers).map(
+            (k) => this.subscribedUsers[k].userEmail
+         )
+      )
+
       this.futureLivestreams = futureLivestreams
       this.pastLivestreams = pastLivestreams
 

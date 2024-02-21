@@ -73,18 +73,15 @@ export class NewsletterEmailBuilder {
    }
 
    send() {
-      return this.sender.sendEmailBatchWithTemplates(
-         this.recipients,
-         (_, err) => {
-            // this callback is called for each postmark http response
-            if (err) {
-               console.error("Unable to send via postmark", {
-                  error: err,
-               })
-               return
-            }
+      return this.sender.sendEmailBatchWithTemplates(this.recipients, (err) => {
+         // this callback is called for each postmark http response
+         if (err) {
+            console.error("Unable to send via postmark", {
+               error: err,
+            })
+            return
          }
-      )
+      })
    }
 
    private mapLivestreamToTemplate(livestream: LivestreamEvent) {
