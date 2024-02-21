@@ -315,6 +315,7 @@ export const swapPositions = <T>(
    array[indexA] = array[indexB]
    array[indexB] = temp
    return array
+}
 // Calculate difference between two dates in days while taking into consideration the time
 export const getDateDifferenceInDays = (
    dateFrom: Date,
