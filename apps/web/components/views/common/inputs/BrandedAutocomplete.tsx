@@ -117,7 +117,12 @@ export const FormBrandedAutocomplete: FC<FormBrandedAutocompleteProps> = ({
    return (
       <StyledBrandedAutocomplete
          renderInput={(params) => (
-            <FormBrandedTextField name={name} {...params} {...textFieldProps} />
+            <FormBrandedTextField
+               name={name}
+               autocomplete
+               {...params}
+               {...textFieldProps}
+            />
          )}
          {...props}
          onChange={handleChange}
