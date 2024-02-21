@@ -95,8 +95,10 @@ const JobFormDialog: FC<Props> = ({
 
                successNotification("Job successfully updated")
             } else {
-               await customJobRepo.createCustomJob(formattedJob)
-               afterCreateCustomJob && afterCreateCustomJob(formattedJob)
+               const createdJob = await customJobRepo.createCustomJob(
+                  formattedJob
+               )
+               afterCreateCustomJob && afterCreateCustomJob(createdJob)
 
                successNotification("Job successfully created")
             }
