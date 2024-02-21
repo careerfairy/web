@@ -1,6 +1,7 @@
 import { type UID } from "agora-rtc-react"
 import { useAppSelector } from "components/custom-hook/store"
 import { type RootState } from "store"
+import { StreamLayouts } from "store/reducers/streamingAppReducer"
 
 export const activeViewSelector = (state: RootState) =>
    state.streamingApp.sidePanel.activeView
@@ -27,3 +28,8 @@ export const currentScreenSharerSelector = (state: RootState) =>
 
 export const useSettingsMenuOpen = () =>
    useAppSelector((state) => state.streamingApp.settingsMenu.isOpen)
+
+export const useIsSpotlightMode = () =>
+   useAppSelector(
+      (state) => state.streamingApp.streamLayout === StreamLayouts.SPOTLIGHT
+   )
