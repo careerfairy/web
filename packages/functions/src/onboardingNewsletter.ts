@@ -10,6 +10,7 @@ import {
 import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
+import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -38,16 +39,17 @@ const runtimeSettings: RuntimeOptions = {
 }
 
 /**
- * Send a newsletter to all users every other tuesday
+ * Check and send onboarding newsletter everyday at a specific time
  */
 export const onboardingNewsletter = functions
    .region(config.region)
    .runWith(runtimeSettings)
-   .pubsub.schedule("0 7 * * *") // everyday at 7pm
+   .pubsub.schedule("0 17 * * *") // everyday at 9am
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       functions.logger.info("Starting execution of OnboardingNewsletterService")
-      await sendOnboardingNewsletter()
+      // Disable for now - wgoncalves
+      // await sendOnboardingNewsletter()
    })
 
 export const testOnboardingNewsletter = functions
@@ -70,11 +72,13 @@ async function sendOnboardingNewsletter() {
    const emailBuilder = new OnboardingNewsletterEmailBuilder(
       PostmarkEmailSender.create()
    )
+   const dataLoader = await NewsletterDataFetcher.create()
    const onboardingNewsletterService = new OnboardingNewsletterService(
       userRepo,
       sparkRepo,
       notificationsRepo,
       livestreamsRepo,
+      dataLoader,
       emailBuilder,
       functions.logger
    )
