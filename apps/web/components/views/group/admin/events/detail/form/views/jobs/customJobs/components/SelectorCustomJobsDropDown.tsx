@@ -154,6 +154,7 @@ const SelectorCustomJobsDropDown = ({
          initialOptionSection={renderCreateNewJobOption}
          getOptionElement={getOptionElement}
          disabled={isSubmitting}
+         limit={5}
          {...props}
       />
    )
