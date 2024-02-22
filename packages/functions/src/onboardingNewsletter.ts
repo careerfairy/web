@@ -44,7 +44,7 @@ const runtimeSettings: RuntimeOptions = {
 export const onboardingNewsletter = functions
    .region(config.region)
    .runWith(runtimeSettings)
-   .pubsub.schedule("0 17 * * *") // everyday at 9am
+   .pubsub.schedule("0 17 * * *") // everyday at 17pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       functions.logger.info("Starting execution of OnboardingNewsletterService")
