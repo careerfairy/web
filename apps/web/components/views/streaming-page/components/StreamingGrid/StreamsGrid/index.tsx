@@ -1,70 +1,75 @@
 import { Box } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import { LocalUserStream, LocalScreenStream } from "../../streaming/LocalStream"
 import { GridCarousel } from "../GridCarousel"
 import { LayoutGrid } from "../LayoutGrid"
-import { useSortedStreams } from "../useSortedStreams"
-import { RemoteStreamer } from "../../streaming"
-import { TrackBoundary } from "agora-rtc-react"
-import { UserStreamProvider } from "components/views/streaming-page/context/UserStream"
 import { UserStream } from "components/views/streaming-page/types"
 import { Layout } from "../types"
+import { UserStreamComponent } from "./UserStreamComponent"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 
-const styles = sxStyles({
-   root: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "column",
-   },
-})
+const dynamicStyles = (spacing: number, isLandscape: boolean) =>
+   sxStyles({
+      rootSpotlight: (theme) => ({
+         display: "flex",
+         ...(isLandscape
+            ? {
+                 width: `calc(208px - ${theme.spacing(spacing)})`,
+              }
+            : {
+                 height: {
+                    xs: `calc(132px - ${theme.spacing(spacing)})`,
+                    tablet: `calc(195px - ${theme.spacing(spacing)})`,
+                 },
+              }),
+      }),
+      root: {
+         flex: 1,
+         display: "flex",
+         flexDirection: "column",
+      },
+   })
 
 type Props = {
    gridPages: UserStream[][]
    layout: Layout
+   spacing: number
 }
 
-export const StreamsGrid = ({ gridPages, layout }: Props) => {
+export const StreamsGrid = ({ gridPages, layout, spacing }: Props) => {
+   const isSpotlightMode = useIsSpotlightMode()
+   const isLandscape = useStreamIsLandscape()
+
+   const componentStyles = dynamicStyles(spacing, isLandscape)
+
    return (
-      <TrackBoundary>
-         <Box sx={styles.root}>
-            <GridCarousel
-               gridPages={gridPages.map((pageStreamers, pageIndex) => (
-                  <LayoutGrid
-                     key={pageIndex}
-                     elements={pageStreamers}
-                     isLastButNotFirstPage={
-                        pageIndex === gridPages.length - 1 && pageIndex !== 0
-                     }
-                     layout={layout}
-                     renderGridItem={(user) => (
-                        <LayoutGrid.Item
-                           key={user.user.uid}
-                           layoutColumns={layout.columns}
-                        >
-                           <UserStreamProvider user={user}>
-                              <GridItemContent user={user} />
-                           </UserStreamProvider>
-                        </LayoutGrid.Item>
-                     )}
-                  />
-               ))}
-            />
-         </Box>
-      </TrackBoundary>
+      <Box
+         sx={
+            isSpotlightMode
+               ? componentStyles.rootSpotlight
+               : componentStyles.root
+         }
+      >
+         <GridCarousel
+            gridPages={gridPages.map((pageStreamers, pageIndex) => (
+               <LayoutGrid
+                  key={pageIndex}
+                  elements={pageStreamers}
+                  isLastButNotFirstPage={
+                     pageIndex === gridPages.length - 1 && pageIndex !== 0
+                  }
+                  layout={layout}
+                  renderGridItem={(user) => (
+                     <LayoutGrid.Item
+                        key={user.user.uid}
+                        layoutColumns={layout.columns}
+                     >
+                        <UserStreamComponent user={user} />
+                     </LayoutGrid.Item>
+                  )}
+               />
+            ))}
+         />
+      </Box>
    )
-}
-
-type GridItemContentProps = {
-   user: ReturnType<typeof useSortedStreams>[number]
-}
-
-const GridItemContent = ({ user }: GridItemContentProps) => {
-   if (user.type === "local-user") {
-      return <LocalUserStream />
-   }
-   if (user.type === "local-user-screen") {
-      return <LocalScreenStream />
-   }
-
-   return <RemoteStreamer />
 }

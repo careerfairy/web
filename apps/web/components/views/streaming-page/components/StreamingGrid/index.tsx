@@ -1,59 +1,66 @@
 import { sxStyles } from "types/commonTypes"
-import { Box, Stack } from "@mui/material"
+import { Slide, Stack } from "@mui/material"
 import React, { useMemo } from "react"
 import { StreamsGrid } from "./StreamsGrid"
-import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
-import { useStreamIsLandscape } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { useStreams } from "./useStreams"
 import { useGalleryLayout } from "./StreamsGrid/useGalleryLayout"
 import { useSortedStreams } from "./useSortedStreams"
 import { getPaginatedGridLayout } from "./util"
+import { useSpotlightStream } from "./useSpotlightStream"
+import { Spotlight } from "./Spotlight/Spotlight"
+import { TrackBoundary } from "agora-rtc-react"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 
 const styles = sxStyles({
    root: {
       flex: 1,
       display: "flex",
    },
-   spotlight: {
-      height: 0,
-      // width: "100%",
-      border: "1px solid red",
-      transition: (theme) =>
-         theme.transitions.create(["height", "width"], {
-            duration: theme.transitions.duration.complex,
-         }),
-   },
-   spotlightActive: {
-      height: "50%",
-   },
 })
 
 export const StreamingGrid = () => {
-   const isSpotlightMode = useIsSpotlightMode()
    const isLandscape = useStreamIsLandscape()
-   console.log(
-      "🚀 ~ file: index.tsx:16 ~ StreamingGrid ~ isSpotlightMode:",
-      isSpotlightMode
-   )
+   const isMobile = useStreamIsMobile()
+   const isSpotlightMode = useIsSpotlightMode()
 
    const streams = useStreams()
-   const layout = useGalleryLayout(streams.length)
+   const { spotlightStream, otherStreams } = useSpotlightStream(streams)
 
+   const layout = useGalleryLayout(otherStreams.length)
    const pageSize = layout.rows * layout.columns
-
-   const sortedStreams = useSortedStreams(streams, pageSize)
+   const sortedStreams = useSortedStreams(otherStreams, pageSize)
 
    const gridPages = useMemo(
       () => getPaginatedGridLayout(sortedStreams, layout),
       [sortedStreams, layout]
    )
 
+   const spacing = isLandscape ? 0.75 : isMobile ? 1.125 : 1.25
+
    return (
-      <Stack direction={isLandscape ? "row" : "column"} sx={styles.root}>
-         <StreamsGrid gridPages={gridPages} layout={layout} />
-         <Box
-            sx={[styles.spotlight, isSpotlightMode && styles.spotlightActive]}
-         />
-      </Stack>
+      <TrackBoundary>
+         <Stack
+            direction={isLandscape ? "row-reverse" : "column"}
+            sx={styles.root}
+            spacing={spacing}
+         >
+            <StreamsGrid
+               spacing={spacing}
+               gridPages={gridPages}
+               layout={layout}
+            />
+            <Slide
+               in={isSpotlightMode}
+               direction={isLandscape ? "right" : "up"}
+               unmountOnExit
+            >
+               <Spotlight stream={spotlightStream} />
+            </Slide>
+         </Stack>
+      </TrackBoundary>
    )
 }
