@@ -27,7 +27,7 @@ type Props = {
    text: string
    textStyle?: SxProps<Theme>
    maxLength?: number
-   collapsedSize?: number
+   collapsedSize?: number | string
 }
 
 const CollapsableText = ({
@@ -74,7 +74,7 @@ const CollapsableText = ({
                      variant="text"
                      color="secondary"
                      sx={styles.collapseBtn}
-                     startIcon={<ExpandLessIcon />}
+                     endIcon={<ExpandLessIcon />}
                      onClick={handleClick}
                   >
                      View less

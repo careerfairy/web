@@ -5,13 +5,15 @@ type Props = {
    livestreamId: string
    job: PublicCustomJob
    handleClick: () => void
+   isSecondary?: boolean
 }
-const CustomJobCTAButton = ({ livestreamId, job, handleClick }: Props) => {
+const CustomJobCTAButton = ({ livestreamId, job, handleClick, isSecondary }: Props) => {
    return (
       <CustomJobEntryApply
          job={job as PublicCustomJob}
          livestreamId={livestreamId}
          handleApplyClick={handleClick}
+         isSecondary={isSecondary}
       />
    )
 }
