@@ -29,18 +29,22 @@ type CompanyDiscoveryData = DiscoveryTemplateData<
    CompanyDiscoveryTemplateModel,
    "onboarding-company"
 >
+
 type SparksDiscoveryData = DiscoveryTemplateData<
    SparksDiscoveryTemplateModel,
    "onboarding-sparks"
 >
+
 export type LivestreamDiscoveryData = DiscoveryTemplateData<
    LivestreamDiscoveryTemplateModel,
    "onboarding-livestream"
 >
+
 type RecordingDiscoveryData = DiscoveryTemplateData<
    RecordingDiscoveryTemplateModel,
    "onboarding-recording"
 >
+
 type FeedbackDiscoveryData = DiscoveryTemplateData<
    FeedbackDiscoveryTemplateModel,
    "onboarding-feedback"
@@ -219,6 +223,13 @@ export class OnboardingNewsletterEmailBuilder {
       )
    }
 
+   /**
+    * Retrieves the template model for the given user and discovery type by retrieving the mapper function from the converters map, for
+    * the type, and executing it for the given user.
+    * @param type Discovery type
+    * @param userData User related data
+    * @returns TemplatedMessage PostMark template message for sending
+    */
    private getTemplateModel(
       type: OnboardingNewsletterEvents,
       userData: UserData
