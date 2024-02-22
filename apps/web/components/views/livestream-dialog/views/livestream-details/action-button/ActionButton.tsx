@@ -116,22 +116,24 @@ export const LinkText: FC<LinkTextProps> = ({
    )
 }
 
-type FloatingButtonProps = {
+type ActionButtonWrapperProps = {
    isFloating: boolean
    disableMarginTop?: boolean
+   isFixedToBottom?: boolean
    children: React.ReactNode
 }
 
-export const FloatingButtonWrapper: FC<FloatingButtonProps> = ({
+export const ActionButtonWrapper: FC<ActionButtonWrapperProps> = ({
    isFloating,
    disableMarginTop,
+   isFixedToBottom,
    children,
 }) => {
    return (
       <Box
          component="span"
          sx={[
-            styles.btnWrapper,
+            !isFixedToBottom && styles.btnWrapper,
             isFloating && styles.floatingBtnWrapper,
             disableMarginTop && styles.noMarginTop,
          ]}
