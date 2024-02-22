@@ -52,16 +52,44 @@ export const onboardingNewsletter = functions
       // await sendOnboardingNewsletter()
    })
 
-export const testOnboardingNewsletter = functions
+export const manualOnboardingNewsletter = functions
    .region(config.region)
-   .https.onCall(async () => {
+   .https.onRequest(async (req, res) => {
+      if (req.method !== "GET") {
+         res.status(400).send("Only GET requests are allowed")
+         return
+      }
+
       functions.logger.info(
-         "Starting TEST execution of OnboardingNewsletterService"
+         "Starting MANUAL execution of OnboardingNewsletterService"
       )
-      await sendOnboardingNewsletter()
+      const receivedEmails = ((req.query.emails as string) ?? "")
+         .split(",")
+         .map((email) => email?.trim())
+         .filter(Boolean)
+
+      functions.logger.info("Received emails", receivedEmails)
+
+      if (receivedEmails.length === 0) {
+         res.status(400).send("No emails provided")
+         return
+      }
+
+      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+         await sendOnboardingNewsletter()
+         res.status(200).send("Onboarding Newsletter sent to everyone")
+      } else {
+         await sendOnboardingNewsletter(receivedEmails)
+         res.status(200).send(
+            "Onboarding Newsletter sent to " + receivedEmails.join(", ")
+         )
+      }
+      functions.logger.info(
+         "Ended MANUAL execution of OnboardingNewsletterService"
+      )
    })
 
-async function sendOnboardingNewsletter() {
+async function sendOnboardingNewsletter(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
       functions.logger.info(
          "OnboardingNewsletter was already sent in this execution environment, skipping"
@@ -80,6 +108,7 @@ async function sendOnboardingNewsletter() {
       livestreamsRepo,
       dataLoader,
       emailBuilder,
+      overrideUsers,
       functions.logger
    )
 

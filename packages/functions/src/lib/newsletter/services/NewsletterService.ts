@@ -70,22 +70,38 @@ export class NewsletterService {
       private readonly logger: Logger
    ) {}
 
+   /**
+    * Checks whether a given set of notification types @param types has been sent taking into account the
+    * tolerance days.
+    * @param notifications All notifications (per user expected)
+    * @param types Types to check for
+    * @returns true if any notification in @param notifications is sent according to the tolerance days and types, false otherwise
+    */
    private isSent(
       notifications: EmailNotification[],
-      types: EmailNotificationType[],
-      tolerance: number
+      types: EmailNotificationType[]
    ) {
-      return (
-         notifications.find(
-            (notification) =>
-               types.includes(notification.details.type) &&
-               getDateDifferenceInDays(
-                  notification.createdAt.toDate(),
-                  new Date()
-               ) > tolerance
-         ) !== undefined
-      )
+      const notificationByType = (notification: EmailNotification) => {
+         const isWithinToleranceDays =
+            getDateDifferenceInDays(
+               notification.createdAt.toDate(),
+               new Date()
+            ) > TOLERANCE_DAYS
+         return (
+            types.includes(notification.details.type) && isWithinToleranceDays
+         )
+      }
+      return notifications.find(notificationByType) !== undefined
    }
+
+   /**
+    * Filters are the fetched and subscribed users according to the onboarding project. Users now should only
+    * receive the newsletter if the onboarding/guidance step, has reached the livestream step (livestream discovery).
+    * Also it takes into consideration, when livestream discovery notification was sent, introducing a tolerance of 2 days as not
+    * to send close emails to the user.
+    * @param users
+    * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
+    */
    private async filterUsers(users: UserData[]): Promise<UserData[]> {
       const promises = users.map(async (user) => {
          const notifications =
@@ -97,18 +113,13 @@ export class NewsletterService {
             notifications: notifications,
          }
       })
-
-      return (await Promise.all(promises))
-         .filter((userData) =>
-            this.isSent(
-               userData.notifications,
-               ["livestream1stRegistrationDiscovery"],
-               TOLERANCE_DAYS
-            )
-         )
-         .map((userData) => {
-            return userData.user
-         })
+      const usersDataItems = await Promise.all(promises)
+      const filteredData = usersDataItems.filter((userData) =>
+         this.isSent(userData.notifications, [
+            "livestream1stRegistrationDiscovery",
+         ])
+      )
+      return filteredData.map((userData) => userData.user)
    }
 
    /**
