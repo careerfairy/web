@@ -1,19 +1,15 @@
 import { sxStyles } from "types/commonTypes"
-import { Slide, Stack } from "@mui/material"
-import React, { useMemo } from "react"
-import { StreamsGrid } from "./StreamsGrid"
+import { Stack } from "@mui/material"
+import React from "react"
+import { Gallery } from "./gallery/Gallery"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import { useStreams } from "./useStreams"
-import { useGalleryLayout } from "./StreamsGrid/useGalleryLayout"
-import { useSortedStreams } from "./useSortedStreams"
-import { getPaginatedGridLayout } from "./util"
 import { useSpotlightStream } from "./useSpotlightStream"
-import { Spotlight } from "./Spotlight/Spotlight"
+import { Spotlight } from "./spotlight/Spotlight"
 import { TrackBoundary } from "agora-rtc-react"
-import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 
 const styles = sxStyles({
    root: {
@@ -25,19 +21,9 @@ const styles = sxStyles({
 export const StreamingGrid = () => {
    const isLandscape = useStreamIsLandscape()
    const isMobile = useStreamIsMobile()
-   const isSpotlightMode = useIsSpotlightMode()
 
    const streams = useStreams()
    const { spotlightStream, otherStreams } = useSpotlightStream(streams)
-
-   const layout = useGalleryLayout(otherStreams.length)
-   const pageSize = layout.rows * layout.columns
-   const sortedStreams = useSortedStreams(otherStreams, pageSize)
-
-   const gridPages = useMemo(
-      () => getPaginatedGridLayout(sortedStreams, layout),
-      [sortedStreams, layout]
-   )
 
    const spacing = isLandscape ? 0.75 : isMobile ? 1.125 : 1.25
 
@@ -48,18 +34,8 @@ export const StreamingGrid = () => {
             sx={styles.root}
             spacing={spacing}
          >
-            <StreamsGrid
-               spacing={spacing}
-               gridPages={gridPages}
-               layout={layout}
-            />
-            <Slide
-               in={isSpotlightMode}
-               direction={isLandscape ? "right" : "up"}
-               unmountOnExit
-            >
-               <Spotlight stream={spotlightStream} />
-            </Slide>
+            <Gallery spacing={spacing} streams={otherStreams} />
+            <Spotlight stream={spotlightStream} />
          </Stack>
       </TrackBoundary>
    )

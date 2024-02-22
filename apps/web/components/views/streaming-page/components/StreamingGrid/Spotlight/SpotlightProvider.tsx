@@ -26,6 +26,12 @@ export const SpotlightProvider = ({ stream, children }: Props) => {
    )
 }
 
+/**
+ * Provides the shared context for all the content that is displayed in the spotlight.
+ * This context includes the current stream if there is one, the pdf url, and the youtube video url.
+ *
+ * @returns The Spotlight context with the current stream.
+ */
 export const useSpotlight = () => {
    const context = useContext(SpotlightContext)
    if (!context) {
