@@ -530,18 +530,6 @@ export class OnboardingNewsletterService {
             this.livestream1stRegistrationDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
             (userData) => {
-               const livestream1 =
-                  (this.userRecommendedLivestreams[userData.id].length > 0 &&
-                     this.userRecommendedLivestreams[userData.id].at(0)) ||
-                  undefined
-               const livestream2 =
-                  (this.userRecommendedLivestreams[userData.id].length > 1 &&
-                     this.userRecommendedLivestreams[userData.id].at(1)) ||
-                  undefined
-               const livestream3 =
-                  (this.userRecommendedLivestreams[userData.id].length > 2 &&
-                     this.userRecommendedLivestreams[userData.id].at(2)) ||
-                  undefined
                return {
                   From: "CareerFairy <noreply@careerfairy.io>",
                   To: userData.userEmail,
@@ -554,9 +542,6 @@ export class OnboardingNewsletterService {
                      recommendedEvents: this.userRecommendedLivestreams[
                         userData.id
                      ].map((event) => this.mapLivestreamToTemplate(event)),
-                     livestream1: this.mapLivestreamToTemplate(livestream1),
-                     livestream2: this.mapLivestreamToTemplate(livestream2),
-                     livestream3: this.mapLivestreamToTemplate(livestream3),
                   },
                   MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
                   Tag: "onboarding-livestream",
