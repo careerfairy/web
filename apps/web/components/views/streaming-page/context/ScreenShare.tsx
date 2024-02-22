@@ -32,8 +32,7 @@ import { useStreamingContext } from "."
 import { useRouter } from "next/router"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { LocalUserScreen } from "../types"
-import { currentScreenSharerSelector } from "store/selectors/streamingAppSelectors"
-import { useAppSelector } from "components/custom-hook/store"
+import { useCurrentScreenSharer } from "store/selectors/streamingAppSelectors"
 
 interface ScreenShareProviderProps {
    children: ReactNode
@@ -64,8 +63,6 @@ type ScreenShareContextProps = {
 const ScreenShareContext = createContext<ScreenShareContextProps | undefined>(
    undefined
 )
-
-const useCurrentScreenSharer = () => useAppSelector(currentScreenSharerSelector)
 
 export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const [screenShareOn, setScreenShareOn] = useState(false)
