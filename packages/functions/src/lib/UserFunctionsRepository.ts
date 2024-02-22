@@ -24,7 +24,7 @@ export class UserFunctionsRepository
          .where("lastActivityAt", ">=", earlierThan)
 
       if (userEmails?.length) {
-         query = query.where("id", "in", userEmails)
+         query = query.where("userEmail", "in", userEmails)
       }
 
       const data = await query.get()
