@@ -63,12 +63,14 @@ export class EmailNotificationFunctionsRepository
       emails: string[],
       type?: EmailNotificationType
    ): Promise<DocumentData[]> {
-      const userToNotificationDetails = (userEmail: string) => {
+      const userToNotificationDetails = (
+         userEmail: string
+      ): EmailNotificationDetails => {
          return {
             sentBy: "careerfairy.io",
             receiverEmail: userEmail,
             type: type,
-         } as EmailNotificationDetails
+         }
       }
 
       return await Promise.all(

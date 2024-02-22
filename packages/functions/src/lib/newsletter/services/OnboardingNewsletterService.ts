@@ -4,6 +4,7 @@ import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import {
+   LivestreamDiscoveryData,
    OnboardingNewsletterEmailBuilder,
    OnboardingNewsletterEvents,
 } from "../onboarding/OnboardingNewsletterEmailBuilder"
@@ -68,6 +69,7 @@ export class OnboardingNewsletterService {
       private readonly livestreamsRepo: ILivestreamRepository,
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
+      private readonly overrideUsers: string[],
       private readonly logger: Logger
    ) {
       this.logger.info("OnboardingNewsletterService...")
@@ -474,27 +476,29 @@ export class OnboardingNewsletterService {
       } as OnboardingUserData
    }
 
+   /**
+    * Fetches all required data for correctly dispatching users to the most relevant discoveries.
+    */
    async fetchRequiredData() {
       this.logger.info("Fetching required data")
 
       const promises = [
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
-         this.userRepo.getSubscribedUsers(),
-      ]
+         this.userRepo.getSubscribedUsers(this.overrideUsers),
+      ] as const
+
       const [futureLivestreams, pastLivestreams, users] = await Promise.all(
          promises
       )
 
-      this.futureLivestreams = (futureLivestreams as LivestreamEvent[]).filter(
-         (l) => {
-            // filter out livestreams before now, the bundle might have events for the same day
-            // already started/ended, also hide the hidden ones
-            return l.start.toDate().getTime() > Date.now() && !l.hidden
-         }
-      )
+      this.futureLivestreams = futureLivestreams.filter((l) => {
+         // filter out livestreams before now, the bundle might have events for the same day
+         // already started/ended, also hide the hidden ones
+         return l.start.toDate().getTime() > Date.now() && !l.hidden
+      })
 
-      this.pastLivestreams = pastLivestreams as LivestreamEvent[]
+      this.pastLivestreams = pastLivestreams
 
       const onboardingUserPromises = users.map((user) => {
          return this.fetchUserData(user)
@@ -513,6 +517,10 @@ export class OnboardingNewsletterService {
       await this.createDiscoveryEmailNotifications()
    }
 
+   /**
+    * Builds the onboarding discovery lists, mapping each user to the most relevant guidance content. After having the users
+    * split into the separate discoveries, use @class OnboardingNewsletterEmailBuilder for adding recipients to the correct templates.
+    */
    buildDiscoveryLists() {
       this.logger.info(
          "Building discovery lists & email notification template data"
@@ -521,6 +529,13 @@ export class OnboardingNewsletterService {
          return this.handleUserDiscovery(user)
       })
       const userDataMapper = (user: OnboardingUserData) => user.user
+
+      this.emailBuilder.setDiscoveryMapper(
+         OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
+         (userData) => {
+            return this.livestreamDiscoveryMapper(userData)
+         }
+      )
 
       this.emailBuilder
          .addRecipients(
@@ -531,27 +546,9 @@ export class OnboardingNewsletterService {
             this.sparksDiscoveryUsers.map(userDataMapper),
             OnboardingNewsletterEvents.SPARKS_DISCOVERY
          )
-         .addRecipientsTemplated(
+         .addRecipients(
             this.livestream1stRegistrationDiscoveryUsers.map(userDataMapper),
-            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
-            (userData) => {
-               return {
-                  From: "CareerFairy <noreply@careerfairy.io>",
-                  To: userData.userEmail,
-                  TemplateId: Number(
-                     process.env
-                        .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_LIVESTREAM_1ST_REGISTRATION_DISCOVERY
-                  ),
-                  TemplateModel: {
-                     user_name: userData.firstName,
-                     recommendedEvents: this.userRecommendedLivestreams[
-                        userData.id
-                     ].map((event) => this.mapLivestreamToTemplate(event)),
-                  },
-                  MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-                  Tag: "onboarding-livestream",
-               }
-            }
+            OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
          )
          .addRecipients(
             this.recordingDiscoveryUsers.map(userDataMapper),
@@ -565,5 +562,28 @@ export class OnboardingNewsletterService {
       this.logger.info(
          "OnboardingNewsletterService... finished building discovery lists & email notification template data"
       )
+   }
+
+   /**
+    * Maps a user to a livestream discovery template model. This method exists mainly due to the recommended events being specific to each user
+    * and that data is kept in this service.
+    * @param user UserData for fields
+    * @returns LivestreamDiscoveryData Discovery template
+    */
+   private livestreamDiscoveryMapper(user: UserData): LivestreamDiscoveryData {
+      return {
+         TemplateId: Number(
+            process.env
+               .POSTMARK_TEMPLATE_ONBOARDING_NEWSLETTER_LIVESTREAM_1ST_REGISTRATION_DISCOVERY
+         ),
+         TemplateModel: {
+            user_name: user.firstName,
+            recommendedEvents: this.userRecommendedLivestreams[user.id].map(
+               (event) => this.mapLivestreamToTemplate(event)
+            ),
+         },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "onboarding-livestream",
+      }
    }
 }

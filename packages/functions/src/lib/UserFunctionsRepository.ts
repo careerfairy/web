@@ -7,7 +7,7 @@ import {
 import { DateTime } from "luxon"
 
 export interface IUserFunctionsRepository extends IUserRepository {
-   getSubscribedUsers(): Promise<UserData[]>
+   getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
 }
 
@@ -15,14 +15,19 @@ export class UserFunctionsRepository
    extends FirebaseUserRepository
    implements IUserFunctionsRepository
 {
-   async getSubscribedUsers(): Promise<UserData[]> {
+   async getSubscribedUsers(userEmails?: string[]): Promise<UserData[]> {
       const earlierThan = DateTime.now().minus({ months: 18 }).toJSDate()
 
-      const data = await this.firestore
+      let query = this.firestore
          .collection("userData")
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
-         .get()
+
+      if (userEmails?.length) {
+         query = query.where("id", "in", userEmails)
+      }
+
+      const data = await query.get()
 
       return mapFirestoreDocuments(data)
    }

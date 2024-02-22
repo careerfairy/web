@@ -104,7 +104,8 @@ exports.sendReminderForNonAttendeesByStreamId =
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
-exports.testOnboardingNewsletter = onboardingNewsletter.testOnboardingNewsletter
+exports.manualOnboardingNewsletter =
+   onboardingNewsletter.manualOnboardingNewsletter
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
