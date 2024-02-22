@@ -174,9 +174,14 @@ export class OnboardingNewsletterService {
    private mapLivestreamToTemplate(livestream: LivestreamEvent) {
       const date = DateTime.fromJSDate(livestream.start.toDate())
       const link = makeLivestreamEventDetailsUrl(livestream.id)
+      const shortTitle =
+         livestream.title.length > 40
+            ? livestream.title.substring(0, 39)
+            : livestream.title
       return {
          image: livestream.companyLogoUrl,
          title: livestream.title,
+         shortTitle: shortTitle.concat(" .. "),
          date: date.toFormat("dd LLLL yyyy"),
          link: addUtmTagsToLink({
             link,
