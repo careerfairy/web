@@ -1,11 +1,14 @@
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
-import { Box } from "@mui/material"
-import { forwardRef } from "react"
-import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
+import { Box, Slide } from "@mui/material"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
+import {
+   useIsSpotlightMode,
+   useLivestreamMode,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { UserStream } from "../../../types"
-import { UserStreamComponent } from "../StreamsGrid/UserStreamComponent"
-import { SpotlightProvider, useSpotlight } from "./SpotlightProvider"
+import { SpotlightProvider } from "./SpotlightProvider"
+import { SpotlightStream } from "./SpotlightStream"
 
 const styles = sxStyles({
    root: {
@@ -16,47 +19,34 @@ const styles = sxStyles({
    },
 })
 
+const Content = {
+   [LivestreamModes.DESKTOP]: <SpotlightStream />,
+   [LivestreamModes.PRESENTATION]: <Box>Rendering PDF Spotlight Content</Box>,
+   [LivestreamModes.VIDEO]: (
+      <Box>Rendering YouTube Video Spotlight Content</Box>
+   ),
+} as const
+
 type Props = {
    stream: UserStream
 }
 
-export const Spotlight = forwardRef<HTMLDivElement, Props>(
-   ({ stream }, ref) => {
-      return (
-         <SpotlightProvider stream={stream}>
-            <Box ref={ref} sx={styles.root}>
-               <SpotlightContent />
-            </Box>
-         </SpotlightProvider>
-      )
-   }
-)
-
-Spotlight.displayName = "Spotlight"
-
-export const SpotlightContent = () => {
+export const Spotlight = ({ stream }: Props) => {
+   const isLandscape = useStreamIsLandscape()
+   const isSpotlightMode = useIsSpotlightMode()
    const livestreamMode = useLivestreamMode()
 
-   if (livestreamMode === LivestreamModes.DESKTOP) {
-      return <SpotlightStream />
-   }
-
-   if (livestreamMode === LivestreamModes.PRESENTATION) {
-      return <>Rendering PDF</>
-   }
-   if (livestreamMode === LivestreamModes.VIDEO) {
-      return <>Rendering YouTube Video</>
-   }
-
-   return null
-}
-
-const SpotlightStream = () => {
-   const { stream } = useSpotlight()
-
-   if (!stream) {
-      return <Box>Please wait while the host is setting up the stream</Box>
-   }
-
-   return <UserStreamComponent user={stream} />
+   return (
+      <Slide
+         in={isSpotlightMode}
+         direction={isLandscape ? "right" : "up"}
+         unmountOnExit
+      >
+         <Box sx={styles.root}>
+            <SpotlightProvider stream={stream}>
+               {Content[livestreamMode] || null}
+            </SpotlightProvider>
+         </Box>
+      </Slide>
+   )
 }
