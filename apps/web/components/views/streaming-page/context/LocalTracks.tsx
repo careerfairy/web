@@ -12,14 +12,13 @@ import {
    createContext,
    useCallback,
    useContext,
-   useEffect,
    useMemo,
    useState,
 } from "react"
 import { useStreamingContext } from "./Streaming"
 import { type LocalUser } from "../types"
-import { useDevices } from "components/custom-hook/streaming/useDevices"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
+import { useAgoraDevices } from "./AgoraDevices"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -37,8 +36,10 @@ type LocalTracksContextProps = {
    activeMicrophoneId: string
    setActiveCameraId: (cameraId: string) => void
    setActiveMicrophoneId: (microphoneId: string) => void
-   microphoneError: IAgoraRTCError | AgoraRTCReactError
-   cameraError: IAgoraRTCError | AgoraRTCReactError
+   microphoneError: AgoraRTCReactError
+   cameraError: AgoraRTCReactError
+   fetchCamerasError: IAgoraRTCError
+   fetchMicsError: IAgoraRTCError
    cameraDevices: MediaDeviceInfo[]
    microphoneDevices: MediaDeviceInfo[]
    localUser: LocalUser
@@ -60,60 +61,34 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const [microphoneMuted, setMicrophoneMuted] = useState(false)
 
-   const {
-      devices: cameras,
-      error: fetchCamerasError,
-      activeDeviceId: activeCameraId,
-      setActiveDeviceId: setActiveCameraId,
-   } = useDevices({
-      deviceType: "camera",
-      enable: shouldStream,
-   })
+   const { cameras, microphones, fetchCamerasError, fetchMicsError } =
+      useAgoraDevices()
+
+   const firstCameraId = cameras?.[0]?.deviceId
+   const firstMicId = microphones?.[0]?.deviceId
+
+   const cameraTrack = useLocalCameraTrack(
+      shouldStream ? Boolean(cameraOn && firstCameraId) : false,
+      {
+         cameraId: firstCameraId,
+      }
+   )
+   const microphoneTrack = useLocalMicrophoneTrack(
+      shouldStream && Boolean(firstMicId),
+      {
+         microphoneId: firstMicId,
+      }
+   )
 
    const {
-      devices: microphones,
-      error: fetchMicsError,
       activeDeviceId: activeMicrophoneId,
-      setActiveDeviceId: setActiveMicrophoneId,
-   } = useDevices({
-      deviceType: "microphone",
-      enable: shouldStream,
-   })
+      handleSetActiveDevice: setActiveMicrophoneId,
+   } = useTrackHandler("microphone", microphoneTrack.localMicrophoneTrack)
 
-   const cameraTrack = useLocalCameraTrack(shouldStream ? cameraOn : false)
-   const microphoneTrack = useLocalMicrophoneTrack(shouldStream)
-
-   /**
-    * Uses the `activeCameraId` and `activeMicrophoneId` to set the active local devices
-    * for the camera and microphone tracks.
-    */
-   useEffect(() => {
-      if (cameraTrack.localCameraTrack && activeCameraId) {
-         cameraTrack.localCameraTrack.setDevice(activeCameraId).catch((error) =>
-            errorLogAndNotify(error, {
-               message: "Failed to set the active camera device",
-               metadata: {
-                  activeCameraId,
-               },
-            })
-         )
-      }
-   }, [activeCameraId, cameraTrack.localCameraTrack])
-
-   useEffect(() => {
-      if (microphoneTrack.localMicrophoneTrack && activeMicrophoneId) {
-         microphoneTrack.localMicrophoneTrack
-            .setDevice(activeMicrophoneId)
-            .catch((error) =>
-               errorLogAndNotify(error, {
-                  message: "Failed to set the active microphone device",
-                  metadata: {
-                     activeMicrophoneId,
-                  },
-               })
-            )
-      }
-   }, [activeMicrophoneId, microphoneTrack.localMicrophoneTrack])
+   const {
+      activeDeviceId: activeCameraId,
+      handleSetActiveDevice: setActiveCameraId,
+   } = useTrackHandler("camera", cameraTrack.localCameraTrack)
 
    /**
     * For an improved user experience, the microphone is only muted/unmuted rather than being turned off/on.
@@ -171,8 +146,10 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          activeMicrophoneId,
          setActiveCameraId,
          setActiveMicrophoneId,
-         microphoneError: microphoneTrack.error || fetchMicsError,
-         cameraError: cameraTrack.error || fetchCamerasError,
+         microphoneError: microphoneTrack.error,
+         cameraError: cameraTrack.error,
+         fetchCamerasError,
+         fetchMicsError,
          cameraDevices: cameras,
          microphoneDevices: microphones,
          localUser,

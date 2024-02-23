@@ -97,6 +97,28 @@ export const getDeviceErrorMessage = (
    }
 }
 
+export const getCameraErrorMessage = (
+   error: IAgoraRTCError | TAgoraRTCReactError
+) =>
+   getDeviceErrorMessage(error, {
+      permissionDenied:
+         "Camera permission denied. Please enable it in your browser settings.",
+      notReadable: "Camera in use by another app.",
+      unknown:
+         "Please check your camera connection and settings. If the issue persists, try restarting your browser or device.",
+   })
+
+export const getMicrophoneErrorMessage = (
+   error: IAgoraRTCError | TAgoraRTCReactError
+) =>
+   getDeviceErrorMessage(error, {
+      permissionDenied:
+         "Microphone permission denied. Please enable it in your browser settings.",
+      notReadable: "Microphone in use by another app.",
+      unknown:
+         "Please check your microphone connection and settings. If the issue persists, try restarting your browser or device.",
+   })
+
 // Helper to safely import the AgoraRTCReact module on the client to avoid server-side build errors
 export const getAgoraRTC = async () => {
    return (await import("agora-rtc-react")).default

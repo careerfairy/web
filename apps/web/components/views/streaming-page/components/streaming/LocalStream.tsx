@@ -73,6 +73,11 @@ export type LocalMicrophoneAndCameraUserProps = {
     * The local user's microphone track
     */
    readonly localMicrophoneTrack?: ILocalAudioTrack | undefined
+
+   /**
+    * Whether to contain the video within the container. Default false.
+    */
+   readonly containVideo?: boolean
 } & BoxProps
 
 /**
@@ -116,7 +121,7 @@ export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
    )
 }
 
-const LocalStream = ({
+export const LocalStream = ({
    micOn,
    micMuted,
    cameraOn,
@@ -124,6 +129,7 @@ const LocalStream = ({
    playVideo,
    volume,
    hideDetails,
+   containVideo,
    hideSpeakingIndicator,
    children,
    localCameraTrack,
@@ -148,7 +154,9 @@ const LocalStream = ({
             sx={[
                styles.videoTrack,
                type === "local-user-screen" && styles.videoContain,
+               containVideo && styles.videoContain,
             ]}
+            className="videoTrack"
             component={LocalVideoTrack}
             disabled={!cameraOn}
             play={playVideo}

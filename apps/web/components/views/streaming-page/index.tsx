@@ -20,6 +20,11 @@ const LivestreamValidationWrapper = dynamic(
    { ssr: false }
 )
 
+const AgoraDevicesProvider = dynamic(
+   () =>
+      import("./context/AgoraDevices").then((mod) => mod.AgoraDevicesProvider),
+   { ssr: false }
+)
 const UserClientProvider = dynamic(
    () => import("./context/UserClient").then((mod) => mod.UserClientProvider),
    { ssr: false }
@@ -46,6 +51,12 @@ const StreamSetupWidget = dynamic(
       import("./components/StreamSetupWidget").then(
          (mod) => mod.StreamSetupWidget
       ),
+   {
+      ssr: false,
+   }
+)
+const SettingsMenu = dynamic(
+   () => import("./components/SettingsMenu").then((mod) => mod.SettingsMenu),
    {
       ssr: false,
    }
@@ -140,19 +151,22 @@ const Component = ({ isHost }: Props) => {
                agoraUserId={agoraUserId}
                livestreamId={livestream.id}
             >
-               <LocalTracksProvider>
-                  <ScreenShareProvider>
-                     <Layout>
-                        <Fragment>
-                           <TopBar />
-                           <MiddleContent />
-                           <BottomBar />
-                           <StreamSetupWidget />
-                        </Fragment>
-                     </Layout>
-                     <ToggleStreamModeButton />
-                  </ScreenShareProvider>
-               </LocalTracksProvider>
+               <AgoraDevicesProvider>
+                  <LocalTracksProvider>
+                     <ScreenShareProvider>
+                        <Layout>
+                           <Fragment>
+                              <TopBar />
+                              <MiddleContent />
+                              <BottomBar />
+                              <StreamSetupWidget />
+                              <SettingsMenu />
+                           </Fragment>
+                        </Layout>
+                        <ToggleStreamModeButton />
+                     </ScreenShareProvider>
+                  </LocalTracksProvider>
+               </AgoraDevicesProvider>
             </StreamingProvider>
             <AudioLevelsTracker />
             <LivestreamStateTrackers />
