@@ -9,52 +9,6 @@ const styles = sxStyles({
       width: "414px",
       height: "300px",
    },
-   wrapContainer: {
-      height: {
-         xs: "320px",
-         md: "100%",
-      },
-   },
-   container: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "100%",
-      width: "100%",
-      px: 2,
-   },
-   content: {
-      my: 1,
-   },
-   info: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      textAlign: "center",
-   },
-   title: {
-      fontSize: { xs: "18px", md: "20px" },
-   },
-   subtitle: {
-      maxWidth: "unset",
-      fontSize: { xs: "16px", md: "16px" },
-   },
-   actions: {
-      position: "absolute !important",
-      width: "100%",
-      display: "flex",
-      justifyContent: "space-evenly",
-      borderTop: "none !important",
-      backgroundColor: "#FFFFFF !important",
-   },
-   cancelBtn: {
-      color: "grey",
-   },
-   actionBtn: {
-      width: "160px",
-      height: "40px",
-      boxShadow: "none",
-   },
 })
 
 type FeedbackQuestionRemoveDialogProps = {
