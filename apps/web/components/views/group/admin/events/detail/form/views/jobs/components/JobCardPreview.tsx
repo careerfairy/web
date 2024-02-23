@@ -16,8 +16,8 @@ import CollapsibleText from "components/views/common/inputs/CollapsibleText"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import Link from "components/views/common/Link"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import useIsAtsJob from "components/custom-hook/useIsAtsJob"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import useIsAtsLivestreamJobAssociation from "components/custom-hook/useIsAtsLivestreamJobAssociation"
 
 const styles = sxStyles({
    wrapper: {
@@ -68,14 +68,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: PublicCustomJob | Job
+   job: PublicCustomJob | LivestreamJobAssociation
    handleRemoveJob: (jobId: string) => void
    handleEditJob: (job: PublicCustomJob) => void
 }
 
 const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
-   const isAtsJob = useIsAtsJob(job)
+   const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
 
    const handleClickEdit = () => {
       handleEditJob(job as PublicCustomJob)
@@ -87,10 +87,10 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
          <Grid container>
             <Grid xs={12} item sx={styles.titleSection}>
                <Typography variant="brandedH4" fontWeight="bold">
-                  {isAtsJob ? job.name : job.title}
+                  {isAtsLivestreamAssociation ? job.name : job.title}
                </Typography>
 
-               {!isAtsJob && (
+               {!isAtsLivestreamAssociation && (
                   <Box>
                      <IconButton onClick={handleClick} size="small">
                         <MoreVertIcon />
@@ -133,7 +133,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                )}
             </Grid>
 
-            {!isAtsJob && (
+            {!isAtsLivestreamAssociation && (
                <Grid xs={12} item sx={styles.infoSection} mt={2}>
                   <Stack spacing={2} direction={"row"}>
                      {job.salary ? (
@@ -175,7 +175,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                </Grid>
             )}
 
-            <Grid xs={12} item mt={4}>
+            <Grid xs={12} item mt={isAtsLivestreamAssociation ? 2 : 4}>
                <CollapsibleText
                   text={job.description}
                   textStyle={styles.description}
