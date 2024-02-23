@@ -7,14 +7,14 @@ const LivestreamFormJobsStep = () => {
    const {
       values: { questions },
    } = useLivestreamFormValues()
-   console.log(questions)
+   // console.log(questions)
    const options = [
       ...Object.values(
          Object.values(questions.registrationQuestions)[0].questions
       ),
    ]
-   console.log(options)
-   console.log([...Object.values(options)])
+   // console.log(options)
+   // console.log([...Object.values(options)])
    return (
       <>
          <FormSectionHeader
