@@ -1,5 +1,5 @@
 import { sparkService } from "data/firebase/SparksService"
-import { GetServerSideProps } from "next"
+import { GetStaticProps } from "next"
 
 /**
  *  This page is used to redirect to the next spark if a user lands on the /sparks page.
@@ -9,29 +9,23 @@ export default function Sparks() {
    return <div>No sparks available.</div>
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
    })
 
-   if (sparks.length > 0) {
-      const ttl = process.env.NODE_ENV === "development" ? 1 : 60 * 60 * 1 // 1 hour in production, 1 second in development
-
-      context.res.setHeader(
-         "Cache-Control",
-         `public, s-maxage=${ttl}, stale-while-revalidate=${ttl}`
-      )
-
-      return {
-         redirect: {
-            destination: `/sparks/${sparks[0].id}`,
-            permanent: false,
-         },
-      }
+   // If there are no sparks, return empty props or handle accordingly
+   if (sparks.length === 0) {
+      return { props: {}, revalidate: 1 } // Revalidate after 1 second to check for new sparks
    }
 
+   // Redirect to the first spark found
    return {
-      props: {},
+      redirect: {
+         destination: `/sparks/${sparks[0].id}`,
+         permanent: false,
+      },
+      revalidate: 10, // Revalidate page every 10 seconds
    }
 }
