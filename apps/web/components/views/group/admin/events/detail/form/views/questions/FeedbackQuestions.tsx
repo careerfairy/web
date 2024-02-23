@@ -1,9 +1,21 @@
 import { useCallback, useState } from "react"
+import { SwipeableDrawer } from "@mui/material"
+import { sxStyles } from "@careerfairy/shared-ui"
+import RemoveQuestion from "./components/RemoveQuestion"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import FeedbackQuestionMobile from "./components/FeedbackQuestionMobile"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import FeedbackQuestionsDesktop from "./components/FeedbackQuestionsDesktop"
 import AddQuestionButton from "./components/AddQuestionButton"
+import FeedbackQuestionMobile from "./components/FeedbackQuestionMobile"
+import FeedbackQuestionsDesktop from "./components/FeedbackQuestionsDesktop"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+
+const styles = sxStyles({
+   drawer: {
+      ".MuiPaper-root": {
+         borderTopLeftRadius: 12,
+         borderTopRightRadius: 12,
+      },
+   },
+})
 
 const dummyFeedbackQuestions = [
    {
@@ -31,6 +43,7 @@ const FeedbackQuestions = () => {
    )
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [currentQuestion, setCurrentQuestion] = useState(null)
+   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
    const [, handleAddEditOpenDialog] = useDialogStateHandler()
 
@@ -47,9 +60,13 @@ const FeedbackQuestions = () => {
    const handleRemove = useCallback(
       (_, question) => {
          setCurrentQuestion(question)
-         handleRemoveOpenDialog()
+         if (isMobile) {
+            setIsDrawerOpen(true)
+         } else {
+            handleRemoveOpenDialog()
+         }
       },
-      [handleRemoveOpenDialog]
+      [handleRemoveOpenDialog, isMobile]
    )
 
    if (isMobile) {
@@ -71,6 +88,17 @@ const FeedbackQuestions = () => {
                   ])
                }}
             />
+            <SwipeableDrawer
+               anchor="bottom"
+               onClose={() => setIsDrawerOpen(false)}
+               onOpen={() => null}
+               open={isDrawerOpen}
+               sx={styles.drawer}
+            >
+               <RemoveQuestion
+                  handleCancelClick={() => setIsDrawerOpen(false)}
+               />
+            </SwipeableDrawer>
          </>
       )
    }
