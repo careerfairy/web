@@ -8,8 +8,7 @@ import {
    Typography,
 } from "@mui/material"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
-import { X as DeleteIcon, Edit2 as EditIcon } from "react-feather"
+import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
@@ -93,7 +92,7 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                {!isAtsLivestreamAssociation && (
                   <Box>
                      <IconButton onClick={handleClick} size="small">
-                        <MoreVertIcon />
+                        <MoreVertical size={24} />
                      </IconButton>
                      <BrandedMenu
                         onClose={handleClose}

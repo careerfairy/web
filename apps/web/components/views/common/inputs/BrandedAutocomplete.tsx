@@ -38,7 +38,7 @@ const StyledBrandedAutocomplete = styled(
    }: StyledBrandedAutocompleteProps) => {
       // If an {initialOptionSection} exists, add an extra option at the beginning of the list
       const newOptions = initialOptionSection
-         ? ["INITIAL_SECTION", ...options]
+         ? [{ title: "INITIAL_SECTION" }, ...options]
          : options
 
       return (
