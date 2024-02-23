@@ -80,9 +80,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                         answers
                      )
                         .then(() => {
-                           onRegisterSuccess
-                              ? onRegisterSuccess()
-                              : goToView("register-ask-questions")
+                           if (onRegisterSuccess) {
+                              onRegisterSuccess()
+                           }
+                           goToView("register-ask-questions")
                         })
                         .catch((e) => {
                            errorNotification(e)
@@ -91,9 +92,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                      break
                   case "registered":
                      // user is already registered, so we can skip the registration process
-                     onRegisterSuccess
-                        ? onRegisterSuccess()
-                        : goToView("register-ask-questions")
+                     if (onRegisterSuccess) {
+                        onRegisterSuccess()
+                     }
+                     goToView("register-ask-questions")
                      break
 
                   default:
@@ -108,6 +110,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
          .catch((e) => {
             errorNotification(e)
          })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       authenticatedUser,
       authenticatedUser.email,
@@ -126,6 +129,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
    // TODO: replace this with a livestreamRegistrations counter field on the userStats
    useEffect(() => {
       if (userData?.authId && !userStats?.hasRegisteredOnAnyLivestream) {
+         // eslint-disable-next-line no-extra-semi
          ;(async () => {
             try {
                const isUserRegisterOnAnyLivestream =
