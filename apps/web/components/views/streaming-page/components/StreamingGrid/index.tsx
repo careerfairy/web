@@ -8,7 +8,7 @@ import {
 } from "components/custom-hook/streaming"
 import { useStreams } from "./useStreams"
 import { useSpotlightStream } from "./useSpotlightStream"
-import { Spotlight } from "./spotlight/Spotlight"
+import { Spotlight } from "./Spotlight/Spotlight"
 import { TrackBoundary } from "agora-rtc-react"
 
 const styles = sxStyles({
