@@ -9,20 +9,13 @@ export default function Sparks() {
    return <div>No sparks available.</div>
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
    })
 
    if (sparks.length > 0) {
-      const ttl = 1 // 1 second
-
-      context.res.setHeader(
-         "Cache-Control",
-         `public, s-maxage=${ttl}, stale-while-revalidate=${ttl}`
-      )
-
       return {
          redirect: {
             destination: `/sparks/${sparks[0].id}`,
