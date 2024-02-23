@@ -1,6 +1,6 @@
 import { useCompanyPage } from "../index"
-import React, { Fragment, useCallback, useMemo } from "react"
-import { Box, Button, Fab } from "@mui/material"
+import React, { Fragment, MutableRefObject, useCallback, useMemo } from "react"
+import { Box, Button, CircularProgress, Fab } from "@mui/material"
 import { Formik, FormikErrors, FormikValues } from "formik"
 import {
    buildTestimonialsArray,
@@ -13,12 +13,13 @@ import {
    handleDeleteSection,
    handleErrorSection,
 } from "../../../helperFunctions/streamFormFunctions"
-import TestimonialForm from "./TestimonialForm"
 import { v4 as uuidv4 } from "uuid"
 import DeleteIcon from "@mui/icons-material/Delete"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import dynamic from "next/dynamic"
+import ReactQuill from "react-quill"
 
 const styles = sxStyles({
    multiline: {
@@ -51,21 +52,26 @@ type Props = {
    testimonialToEdit?: Testimonial
 }
 
-const testimonialObj: Testimonial = {
+const testimonialObj: Testimonial & { quillInputRef: MutableRefObject<ReactQuill> } = {
    id: "",
    groupId: "",
    name: "",
    position: "",
    testimonial: "",
    avatar: "",
+   quillInputRef: { current: null }
 }
 
 const TESTIMONIAL_LIMIT = 10
+
+const TestimonialForm = dynamic(() => import('./TestimonialForm'), { ssr: false, loading: () => <CircularProgress /> })
+
 
 const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const { group } = useCompanyPage()
    const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
+
 
    const initialValues = useMemo(
       () => ({
@@ -157,6 +163,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                errors,
                touched,
                handleBlur,
+               handleChange,
                handleSubmit,
                isSubmitting,
                setFieldValue,
@@ -214,6 +221,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                            objectKey={key}
                            setFieldValue={setFieldValue}
                            handleBlur={handleBlur}
+                           handleChange={handleChange}
                            isSubmitting={isSubmitting}
                            getDownloadUrl={getDownloadUrl}
                            setValues={setValues}
@@ -258,7 +266,7 @@ const handleValidation = (values: FormikValues) => {
          errors.testimonials[key].testimonial =
             "Please add the testimonial personal story"
       } else if (
-         values.testimonials[key].testimonial.length < minDescCharLength
+         values.testimonials[key].quillInputRef?.current?.unprivilegedEditor.getLength() - 1 < minDescCharLength //ReactQuill appends a new line to text
       ) {
          errors.testimonials[
             key
@@ -282,6 +290,8 @@ const handleValidation = (values: FormikValues) => {
    if (!Object.keys(errors.testimonials).length) {
       delete errors.testimonials
    }
+
+   console.log(errors)
 
    return errors
 }

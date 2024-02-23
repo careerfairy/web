@@ -3,10 +3,10 @@ import { Box, Container, Stack } from "@mui/material"
 
 import { sxStyles } from "types/commonTypes"
 import CompanyIdentity from "components/views/admin/company-information/CompanyIdentity"
-import CompanyDetails from "components/views/admin/company-information/CompanyDetails"
 import TargetTalent from "components/views/admin/company-information/TargetTalent"
 import LiveStreamRegistrationQuestions from "components/views/admin/company-information/LiveStreamRegistrationQuestions"
 import PrivacyPolicy from "components/views/admin/company-information/PrivacyPolicy"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
    container: {
@@ -28,11 +28,14 @@ const styles = sxStyles({
    },
 })
 
+const CompanyDetails = dynamic(() => import('../../../admin/company-information/CompanyDetails'), { ssr: false })
+
 const CompanyInformationPageContent: FC = () => {
    return <MemoizedPageContent />
 }
 
 const PageContent = () => {
+
    return (
       <Box sx={styles.root}>
          <Container sx={styles.container} maxWidth="xl">
