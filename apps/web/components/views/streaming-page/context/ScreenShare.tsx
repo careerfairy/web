@@ -90,7 +90,9 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    )
 
    const userUID = useCurrentUID()
-   const screenShareUID = `${STREAM_IDENTIFIERS.SCREEN_SHARE}-${userUID}`
+
+   const joinUID = `${STREAM_IDENTIFIERS.SCREEN_SHARE}-${userUID}`
+
    const response = useAgoraRtcToken(
       screenShareOn
          ? {
@@ -98,7 +100,7 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
               isStreamer: true,
               sentToken: hostAuthToken,
               streamDocumentPath: `livestreams/${livestreamId}`,
-              uid: screenShareUID,
+              uid: joinUID,
            }
          : null
    )
@@ -125,12 +127,12 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
       setScreenShareOn(true)
    }, [setScreenShareOn])
 
-   useJoin(
+   const { data: screenShareUID } = useJoin(
       {
          appid: agoraCredentials.appID,
          channel: livestreamId,
          token: response.token,
-         uid: screenShareUID,
+         uid: joinUID,
       },
       Boolean(screenShareOn && response.token),
       screenShareClient
@@ -148,23 +150,32 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
     * Monitors screen sharing status to enforce single user sharing at a time,
     * using `screenShareOnRef` for current state accuracy.
     */
-   const screenShareOnRef = useRef(screenShareOn)
-   screenShareOnRef.current = screenShareOn
+   const screenShareRef = useRef({
+      screenShareOn,
+      screenShareUID,
+   })
+   screenShareRef.current = {
+      screenShareOn,
+      screenShareUID,
+   }
 
    useEffect(() => {
-      if (currentScreenSharer !== userUID && screenShareOnRef.current) {
+      if (
+         currentScreenSharer !== screenShareRef.current.screenShareUID &&
+         screenShareRef.current.screenShareOn
+      ) {
          setScreenShareOn(false)
       }
-   }, [currentScreenSharer, userUID])
+   }, [currentScreenSharer])
 
    useEffect(() => {
       if (readyToPublish) {
          setLivestreamMode({
             mode: LivestreamModes.DESKTOP,
-            screenSharerAgoraUID: userUID.toString(),
+            screenSharerAgoraUID: screenShareUID.toString(),
          })
       }
-   }, [readyToPublish, setLivestreamMode, userUID])
+   }, [readyToPublish, setLivestreamMode, screenShareUID])
 
    useEffect(() => {
       if (localScreenTrack.error) {
@@ -230,7 +241,7 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
          screenVideoTrack,
          screenAudioTrack,
          screenShareOn,
-         screenShareUID,
+         screenShareUID: screenShareUID.toString(),
          handleStopScreenShare,
          handleStartScreenShareProcess,
          localUserScreen,

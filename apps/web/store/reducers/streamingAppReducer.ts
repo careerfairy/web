@@ -25,6 +25,9 @@ export interface StreamingAppState {
    topBar: {
       viewCount: number
    }
+   settingsMenu: {
+      isOpen: boolean
+   }
    /**
     * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
     * Audio levels are represented as integers ranging from 0 to 100.
@@ -49,6 +52,9 @@ const initialState: StreamingAppState = {
    isHost: false,
    topBar: {
       viewCount: 0, // hardcoded number for now
+   },
+   settingsMenu: {
+      isOpen: false,
    },
    audioLevels: {},
    livestreamState: {
@@ -118,6 +124,9 @@ const streamingAppSlice = createSlice({
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
       },
+      toggleSettingsMenu(state) {
+         state.settingsMenu.isOpen = !state.settingsMenu.isOpen
+      },
    },
 })
 
@@ -132,6 +141,7 @@ export const {
       incrementViewCount,
       decrementViewCount,
       setAudioLevels,
+      toggleSettingsMenu,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
