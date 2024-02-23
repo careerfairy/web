@@ -4,7 +4,7 @@ import {
    ILocalVideoTrack,
    ILocalAudioTrack,
 } from "agora-rtc-react"
-import type { ReactNode } from "react"
+import { type ReactNode } from "react"
 
 import { Box, BoxProps } from "@mui/material"
 import { useLocalTracks } from "../../context"
@@ -105,12 +105,20 @@ export const LocalUserStream = (props: LocalMicrophoneAndCameraUserProps) => {
    )
 }
 
-export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
-   const { screenVideoTrack, screenAudioTrack, isLoadingScreenShare } =
-      useScreenShare()
+export const LocalScreenStream = () => {
+   const {
+      screenVideoTrack,
+      screenAudioTrack,
+      isLoadingScreenShare,
+      screenShareError,
+   } = useScreenShare()
+
+   console.log(
+      "🚀 ~ file: LocalStream.tsx:110 ~ LocalScreenStream ~ screenShareError:",
+      screenShareError
+   )
    return (
       <LocalStream
-         {...props}
          localCameraTrack={screenVideoTrack}
          localMicrophoneTrack={screenAudioTrack}
          cameraOn={Boolean(screenVideoTrack)}
@@ -142,6 +150,13 @@ export const LocalStream = ({
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
+
+   if (type === "local-user-screen") {
+      console.log(
+         "🚀 ~ file: LocalStream.tsx:140 ~ localCameraTrack:",
+         localCameraTrack
+      )
+   }
 
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)
