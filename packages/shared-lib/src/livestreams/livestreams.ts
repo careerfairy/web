@@ -250,6 +250,7 @@ export interface LivestreamJobAssociation {
    integrationId: string
    jobId: string
    name: string
+   description?: string
 }
 
 export type LivestreamCustomJobAssociationPresenter = Omit<

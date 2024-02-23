@@ -24,6 +24,7 @@ const useGroupATSAccounts = (
 
    // fetch from firestore
    const { data } = useFirestoreCollectionData<GroupATSAccountDocument>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collectionRef as any,
       {
          idField: "id", // this field will be added to the firestore object
@@ -32,7 +33,7 @@ const useGroupATSAccounts = (
 
    return useMemo(() => {
       // map to business model
-      const accounts = data.map((document) =>
+      const accounts: GroupATSAccount[] = data.map((document) =>
          GroupATSAccount.createFromDocument(document)
       )
 
