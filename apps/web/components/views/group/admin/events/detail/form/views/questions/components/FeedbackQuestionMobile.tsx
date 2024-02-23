@@ -108,7 +108,7 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
                         <Button
                            variant="outlined"
                            color="error"
-                           onClick={() => handleOpenCloseDialog()}
+                           onClick={handleRemove}
                            endIcon={<DeleteIcon />}
                         >
                            Remove Question
@@ -122,11 +122,6 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
                         >
                            Save
                         </Button>
-                        <FeedbackQuestionRemoveDialog
-                           question={undefined}
-                           isDialogOpen={isRemoveDialogOpen}
-                           handleCloseDialog={handleRemoveCloseDialog}
-                        />
                      </Stack>
                   </>
                )}
