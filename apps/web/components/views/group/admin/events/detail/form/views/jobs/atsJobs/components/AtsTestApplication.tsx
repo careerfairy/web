@@ -85,19 +85,19 @@ const Content = () => {
 
    const { selectJob } = actions
    const { readyToTest, testedSuccessfully } = state
+   const isTestedCompleted =
+      testedSuccessfully === false || testedSuccessfully === true
 
    useEffect(() => {
-      if (testedSuccessfully === true) {
-         goToStep("application-success")
-      }
-
-      if (testedSuccessfully === false) {
-         goToStep("application-error")
+      if (isTestedCompleted) {
+         goToStep(
+            testedSuccessfully ? "application-success" : "application-error"
+         )
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [testedSuccessfully])
+   }, [isTestedCompleted])
 
-   if (isLoading) {
+   if (isLoading || isTestedCompleted) {
       return <LoadingTest />
    }
 
