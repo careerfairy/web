@@ -1,73 +1,9 @@
-import {
-   Box,
-   Button,
-   Table,
-   TableBody,
-   TableCell,
-   TableContainer,
-   TableHead,
-   TableRow,
-} from "@mui/material"
-import { useState } from "react"
-import { sxStyles } from "types/commonTypes"
-import { MoreVertical, PlusCircle } from "react-feather"
-
-const styles = sxStyles({
-   table: {
-      container: {
-         borderRadius: "12px",
-         border: "1px solid #F3F3F5",
-         tr: {
-            "td, th": {
-               borderBottom: "1px solid #F3F3F5",
-            },
-            "&:last-child td, &:last-child th": {
-               border: 0,
-            },
-         },
-      },
-      head: {
-         background: "#F6F6FA",
-         th: {
-            color: "#5C5C6A",
-            fontSize: "16px",
-            fontWeight: "400",
-            lineHeight: "24px",
-            letterSpacing: "0em",
-            padding: "8px 16px 8px 16px",
-         },
-      },
-      body: {
-         background:
-            "linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
-         "td, th": {
-            fontSize: "16px",
-            fontWeight: 400,
-            lineHeight: "24px",
-            letterSpacing: "0em",
-            color: "#5C5C6A",
-            pading: "16px",
-         },
-      },
-   },
-   addQuestion: {
-      container: {
-         display: "flex",
-         justifyContent: "center",
-         width: "100%",
-         height: "74px",
-         border: "1px solid #F3F3F5",
-         borderRadius: "12px",
-         background:
-            "linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
-      },
-      button: {
-         fontWeight: 600,
-         padding: "28px",
-         borderRadius: "0",
-      },
-   },
-})
+import { useCallback, useState } from "react"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import FeedbackQuestionMobile from "./components/FeedbackQuestionMobile"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import FeedbackQuestionsDesktop from "./components/FeedbackQuestionsDesktop"
+import AddQuestionButton from "./components/AddQuestionButton"
 
 const dummyFeedbackQuestions = [
    {
@@ -89,56 +25,57 @@ const newDummyFeedbackQuestion = {
 }
 
 const FeedbackQuestions = () => {
+   const isMobile = useIsMobile()
    const [feedbackQuestions, setFeedbackQuestions] = useState(
       dummyFeedbackQuestions
    )
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   const [currentQuestion, setCurrentQuestion] = useState(null)
 
-   return (
-      <>
-         <TableContainer sx={styles.table.container}>
-            <Table aria-label="Feedback questions table">
-               <TableHead sx={styles.table.head}>
-                  <TableRow>
-                     <TableCell>Question</TableCell>
-                     <TableCell>Type</TableCell>
-                     <TableCell>Appear after</TableCell>
-                     <TableCell></TableCell>
-                  </TableRow>
-               </TableHead>
-               <TableBody sx={styles.table.body}>
-                  {feedbackQuestions.map((row, index) => (
-                     <TableRow key={index}>
-                        <TableCell component="th" scope="row">
-                           {row.title}
-                        </TableCell>
-                        <TableCell>{row.type}</TableCell>
-                        <TableCell>{`${row.appearAfter} minutes`}</TableCell>
-                        <TableCell>
-                           <MoreVertical />
-                        </TableCell>
-                     </TableRow>
-                  ))}
-               </TableBody>
-            </Table>
-         </TableContainer>
-         <Box sx={styles.addQuestion.container}>
-            <Button
-               sx={styles.addQuestion.button}
-               startIcon={<PlusCircle strokeWidth={2.5} />}
-               color="secondary"
-               fullWidth
-               onClick={() => {
+   const [, handleAddEditOpenDialog] = useDialogStateHandler()
+
+   const handleEdit = useCallback(
+      (_, question) => {
+         setCurrentQuestion(question)
+         handleAddEditOpenDialog()
+      },
+      [handleAddEditOpenDialog]
+   )
+
+   const [, handleRemoveOpenDialog] = useDialogStateHandler()
+
+   const handleRemove = useCallback(
+      (_, question) => {
+         setCurrentQuestion(question)
+         handleRemoveOpenDialog()
+      },
+      [handleRemoveOpenDialog]
+   )
+
+   if (isMobile) {
+      return (
+         <>
+            {feedbackQuestions.map((question, index) => (
+               <FeedbackQuestionMobile
+                  key={index}
+                  question={question}
+                  handleEdit={(event) => handleEdit(event, question)}
+                  handleRemove={(event) => handleRemove(event, question)}
+               />
+            ))}
+            <AddQuestionButton
+               handleClick={() => {
                   setFeedbackQuestions([
                      ...feedbackQuestions,
                      newDummyFeedbackQuestion,
                   ])
                }}
-            >
-               Add question
-            </Button>
-         </Box>
-      </>
-   )
+            />
+         </>
+      )
+   }
+
+   return <FeedbackQuestionsDesktop questions={feedbackQuestions} />
 }
 
 export default FeedbackQuestions
