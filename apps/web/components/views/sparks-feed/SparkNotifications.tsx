@@ -93,7 +93,6 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       dispatch(setEventToRegisterTo(null))
    }, [dispatch])
 
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const handleSuccessfulEventRegistration = () => {
       trackEvent(SparkEventActions.Register_Event)
    }
@@ -111,6 +110,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          serverUserEmail={userEmail}
          mode={"stand-alone"}
          currentSparkId={currentSpark?.id}
+         onRegisterSuccess={handleSuccessfulEventRegistration}
       />
    ) : null
 }
