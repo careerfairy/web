@@ -95,7 +95,7 @@ export class NewsletterService {
    }
 
    /**
-    * Filters are the fetched and subscribed users according to the onboarding project. Users now should only
+    * Filters all the fetched and subscribed users according to the onboarding project. Users now should only
     * receive the newsletter if the onboarding/guidance step, has reached the livestream step (livestream discovery).
     * Also it takes into consideration, when livestream discovery notification was sent, introducing a tolerance of 2 days as not
     * to send close emails to the user.

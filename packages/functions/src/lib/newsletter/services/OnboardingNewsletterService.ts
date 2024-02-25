@@ -107,9 +107,7 @@ export class OnboardingNewsletterService {
             user.notifications.livestream1stRegistrationDiscovery,
             user.notifications.recordingDiscovery,
             user.notifications.feedbackDiscovery,
-         ]) &&
-         !user.notifications.sparksDiscovery.length &&
-         seenSparksCount < MAX_SPARKS_COUNT
+         ]) && seenSparksCount < MAX_SPARKS_COUNT
       )
    }
 
@@ -210,8 +208,11 @@ export class OnboardingNewsletterService {
       const fromSkippedDiscovery = daysSinceUserRegistration !== undefined
 
       // Real user days since registration, as this method can be called recursively with overridden days
+      const userCreationDate = onboardingUserData.user.createdAt
+         ? onboardingUserData.user.createdAt.toDate()
+         : new Date()
       const effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
-         onboardingUserData.user.createdAt.toDate(),
+         userCreationDate,
          new Date()
       )
 
@@ -500,9 +501,12 @@ export class OnboardingNewsletterService {
 
       this.pastLivestreams = pastLivestreams
 
-      const onboardingUserPromises = users.map((user) => {
-         return this.fetchUserData(user)
-      })
+      const onboardingUserPromises =
+         (users &&
+            users.map((user) => {
+               return this.fetchUserData(user)
+            })) ||
+         []
 
       this.onboardingUsers = await Promise.all(onboardingUserPromises)
 
