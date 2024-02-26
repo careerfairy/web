@@ -2,7 +2,7 @@ import { UserStream } from "components/views/streaming-page/types"
 import { ReactNode, createContext, useContext, useMemo } from "react"
 
 type SpotlightContextValue = {
-   stream: UserStream
+   stream: UserStream | null
 }
 
 const SpotlightContext = createContext<SpotlightContextValue | undefined>(null)
