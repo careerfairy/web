@@ -11,6 +11,7 @@ const StreamingPage = dynamic(
 
 const StreamingHost = () => {
    const [loaded, setLoaded] = useState(false)
+
    useEffect(() => {
       setLoaded(true)
    }, [])
@@ -19,10 +20,7 @@ const StreamingHost = () => {
 }
 /**
  * Force the page to be initially rendered on the server
- *
- * This is required to allow the _document.tsx to access the correct request
- * context data (query string params) and disable Usercentrics for certain scenarios
- * like the recording session
+ * Prevents shallow routing bugs
  */
 export const getServerSideProps: GetServerSideProps = async () => {
    return { props: {} }

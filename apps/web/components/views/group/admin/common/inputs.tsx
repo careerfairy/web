@@ -16,26 +16,30 @@ import Stack from "@mui/material/Stack"
 import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
-   checkboxIconWrapper: {
+   checkboxIconWrapper: (theme) => ({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "lightgrey",
-      color: "F0EDFD",
+      bgcolor: theme.palette.neutral[50],
+      color: theme.palette.secondary.light,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-   },
-   checkedIconSx: {
+      "&:hover": {
+         backgroundColor: theme.palette.neutral[100],
+      },
+      zIndex: 1,
+   }),
+   checkedIconSx: (theme) => ({
       width: 20,
       height: 20,
       borderRadius: 1,
-      bgcolor: "#F0EDFD",
-      color: "black",
+      bgcolor: theme.palette.secondary.light,
+      color: theme.palette.neutral[800],
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-   },
+   }),
    stars: {
       color: "secondary.main",
    },
@@ -95,8 +99,8 @@ export const StyledCheckbox = (
    return (
       <Checkbox
          {...props}
-         color={"default"}
          icon={<Box sx={styles.checkboxIconWrapper} />}
+         disableRipple
          checkedIcon={
             <Box sx={styles.checkedIconSx}>
                <CheckRoundedIcon fontSize={"small"} />

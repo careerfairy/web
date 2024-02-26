@@ -208,14 +208,27 @@ export interface LivestreamEvent extends Identifiable {
    useNewUI?: boolean
 }
 
-/**
- * These modes are used to dictate how the livestream is displayed in the UI
- * - presentation: A PDF presentation is currently being shared
- * - video: A YouTube video is currently being shared
- * - desktop: A user's screen is currently being shared
- * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
- */
-export type LivestreamMode = "presentation" | "desktop" | "video" | "default"
+export const LivestreamModes = {
+   /**
+    * A PDF is being shared in the stream
+    */
+   PRESENTATION: "presentation",
+   /**
+    * A user's screen is currently being shared
+    */
+   DESKTOP: "desktop",
+   /**
+    * A YouTube video is currently being shared
+    */
+   VIDEO: "video",
+   /**
+    * The default livestream view
+    */
+   DEFAULT: "default",
+} as const
+
+export type LivestreamMode =
+   (typeof LivestreamModes)[keyof typeof LivestreamModes]
 
 export type LivestreamLanguage = {
    code?: string

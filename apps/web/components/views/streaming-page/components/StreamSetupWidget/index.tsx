@@ -1,4 +1,3 @@
-import { BlurIcon, PlaceholderImageIcon } from "components/views/common/icons"
 import {
    Box,
    Dialog,
@@ -7,20 +6,19 @@ import {
    Drawer,
    Grid,
 } from "@mui/material"
-import { CameraSelect, MicrophoneSelect } from "./DeviceSelect"
+import { CameraSelect, MicrophoneSelect } from "../streaming/DeviceSelect"
 import {
    MicActionButton,
    ResponsiveStreamButton,
    VideoActionButton,
 } from "../Buttons"
 
-import { BackgroundModeButton } from "./BackgroundModeButton"
 import { Fragment } from "react"
 import { SetupCameraVideo } from "./SetupCameraVideo"
-import { Slash } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamingContext } from "../../context"
+import { VideoEffectsButtons } from "../VideoEffectsButtons"
 
 const styles = sxStyles({
    dialog: {
@@ -82,24 +80,7 @@ const Content = () => {
             <Box>
                <SetupCameraVideo />
                <Box pb={1.5} />
-               <Grid container spacing={1.5}>
-                  <Grid item xs={4}>
-                     <BackgroundModeButton label="No Effect" icon={<Slash />} />
-                  </Grid>
-                  <Grid item xs={4}>
-                     <BackgroundModeButton
-                        label="Background Blur"
-                        active
-                        icon={<BlurIcon />}
-                     />
-                  </Grid>
-                  <Grid item xs={4}>
-                     <BackgroundModeButton
-                        label="Custom Image"
-                        icon={<PlaceholderImageIcon />}
-                     />
-                  </Grid>
-               </Grid>
+               <VideoEffectsButtons />
                <Box pb={{ xs: 1.5, sm: 3 }} />
                <Grid container spacing={1}>
                   <Grid item xs={12} sm={6}>
