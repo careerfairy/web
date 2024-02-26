@@ -24,10 +24,6 @@ export const StreamingGrid = () => {
 
    const streams = useStreams()
    const { spotlightStream, otherStreams } = useSpotlightStream(streams)
-   console.log("🚀", {
-      spotlightStream,
-      otherStreams,
-   })
 
    const spacing = isLandscape ? 0.75 : isMobile ? 1.125 : 1.25
 
