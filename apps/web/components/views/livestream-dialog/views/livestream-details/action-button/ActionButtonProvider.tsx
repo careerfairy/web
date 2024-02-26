@@ -6,6 +6,8 @@ export type ActionButtonContextType = {
    livestreamPresenter: LivestreamPresenter
    userEmailFromServer: string
    isFloating?: boolean
+   isFixedToBottom?: boolean
+   setIsDisabled?: (isDisabled: boolean) => void
    heroVisible?: boolean
    canWatchRecording?: boolean
    /*
@@ -16,6 +18,8 @@ export type ActionButtonContextType = {
 
 const ActionButtonContext = createContext<ActionButtonContextType>({
    isFloating: false,
+   isFixedToBottom: false,
+   setIsDisabled: () => {},
    onRegisterClick: () => {},
    livestreamPresenter: null,
    heroVisible: false,

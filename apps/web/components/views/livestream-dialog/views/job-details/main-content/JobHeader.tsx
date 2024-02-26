@@ -3,22 +3,18 @@ import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
-import Image from "next/legacy/image"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { alpha } from "@mui/material/styles"
-import { MapPin as LocationIcon } from "react-feather"
+import { Briefcase, MapPin as LocationIcon } from "react-feather"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
    logoWrapper: {
-      p: 1,
       background: "white",
-      borderRadius: 4,
-      display: "flex",
    },
    companyNameWrapper: {
       display: "flex",
@@ -29,11 +25,9 @@ const styles = sxStyles({
       borderRadius: 4,
    },
    jobTitle: {
-      fontSize: "2.285rem",
       fontWeight: 600,
    },
    jobDepartment: {
-      fontSize: "1.143rem",
       fontWeight: 400,
    },
    jobLocation: {
@@ -48,7 +42,7 @@ const styles = sxStyles({
       },
    },
    lightText: {
-      color: (theme) => `${alpha(theme.palette.text.secondary, 0.4)}`,
+      color: "text.secondary",
    },
 })
 
@@ -72,24 +66,25 @@ const JobHeader: FC<Props> = ({ job, livestreamPresenter }) => {
    }
 
    return (
-      <Stack spacing={1.5} direction="row">
+      <Stack spacing={"18px"} direction="row">
          <Box sx={styles.logoWrapper}>
-            <Image
+            <CircularLogo
                src={getResizedUrl(livestreamPresenter.companyLogoUrl, "lg")}
-               width={50}
-               height={50}
-               objectFit={"contain"}
                alt={livestreamPresenter.company}
+               size={63}
             />
          </Box>
          <Box sx={styles.companyNameWrapper}>
-            <Typography sx={styles.jobTitle} component={"h4"}>
+            <Typography sx={styles.jobTitle} variant="h4">
                {jobName}
             </Typography>
             {jobDepartment ? (
-               <Typography sx={[styles.jobDepartment, styles.lightText]}>
-                  {jobDepartment}
-               </Typography>
+               <Box sx={styles.lightText} display="flex" alignItems="center" gap="6px">
+                  <Briefcase size={12}/>
+                  <Typography sx={styles.jobDepartment}>
+                     {jobDepartment}
+                  </Typography>
+               </Box>
             ) : null}
             {jobLocation ? (
                <Typography sx={[styles.jobLocation, styles.lightText]}>
