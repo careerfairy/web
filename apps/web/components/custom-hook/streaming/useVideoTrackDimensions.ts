@@ -9,7 +9,7 @@ type VideoDimensions = {
 const getTrackDimensions = (
    track: ILocalVideoTrack | IRemoteVideoTrack
 ): VideoDimensions | null => {
-   if (!track) return null
+   if (!track || !track.isPlaying) return null
 
    const trackSettings = track.getMediaStreamTrack().getSettings()
 

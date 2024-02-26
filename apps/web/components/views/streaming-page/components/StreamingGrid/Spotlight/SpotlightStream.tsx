@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { UserStreamComponent } from "../gallery/UserStreamComponent"
 import { useSpotlight } from "./SpotlightProvider"
 import { sxStyles } from "types/commonTypes"
@@ -7,6 +7,7 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
+import { useDelayedValue } from "components/custom-hook/utils/useDelayedValue"
 
 const styles = sxStyles({
    root: {
@@ -21,19 +22,38 @@ const styles = sxStyles({
 export const SpotlightStream = () => {
    const { stream } = useSpotlight()
 
+   const hasStream = Boolean(stream)
+   /**
+    * Delays the rendering of the stream to mitigate issues during the transition
+    * from gallery to spotlight, specifically avoiding race conditions in video
+    * track play/stop actions.
+    */
+   const delayedHasStream = useDelayedValue(hasStream, 1000)
+
+   if (!delayedHasStream) {
+      return hasStream ? (
+         <CircularProgress />
+      ) : (
+         <Box>Please wait while the host is setting up their stream</Box>
+      )
+   }
+
+   return <Content />
+}
+
+const Content = () => {
+   const { stream } = useSpotlight()
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
 
    const isMobilePortrait = streamIsMobile && !streamIsLandscape
 
-   if (!stream) {
-      return <Box>Please wait while the host is setting up the stream</Box>
-   }
+   if (!stream) return <CircularProgress />
 
    return (
       <Box sx={styles.root}>
          <ConditionalStreamAspectRatio
-            useStreamAspectRatio={isMobilePortrait}
+            originalStreamAspectRatio={isMobilePortrait}
             track={stream.user.videoTrack}
          >
             <UserStreamComponent user={stream} />
