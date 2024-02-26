@@ -3,7 +3,7 @@ import Head from "next/head"
 import { Container } from "@mui/material"
 import GeneralLayout from "../layouts/GeneralLayout"
 
-function TermsAndConditions(props) {
+function TermsAndConditions() {
    return (
       <>
          <Head>
@@ -17,11 +17,11 @@ function TermsAndConditions(props) {
                      Welcome to CareerFairy! CareerFairy is an online platform
                      that is designed to build a bridge between the new
                      generation of talents and employees at work. It is owned
-                     and operated by CareerFairy GmbH, a Swiss limited liability
-                     company, based at Zurlindenstrasse 45, Zurich, Switzerland.
-                     In this Privacy Policy, CareerFairy GmbH will be referred
-                     to as “CareerFairy” or “we”, and the user of the website
-                     located at{" "}
+                     and operated by CareerFairy AG, a Swiss corporation, based
+                     at Hardturmstrasse 253, 8005 Zurich, Switzerland. In this
+                     Privacy Policy, CareerFairy AG will be referred to as
+                     “CareerFairy” or “we”, and the user of the website located
+                     at{" "}
                      <a href="https://careerfairy.io">https://careerfairy.io</a>{" "}
                      (CareerFairy Website) will be referred to as “user” or
                      “you”.
