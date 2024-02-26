@@ -12,17 +12,20 @@ const getTrackDimensions = (
    if (!track || !track.isPlaying) return null
 
    const trackSettings = track.getMediaStreamTrack().getSettings()
-
    let { width, height } = trackSettings
 
-   if (isNaN(width) || isNaN(height)) {
-      // Fallback for browsers that don't support getSettings (e.g., Firefox)
-      const trackFrame = track.getCurrentFrameData()
-      width = trackFrame.width
-      height = trackFrame.height
+   // Use fallback if width or height are not valid numbers
+   if (typeof width !== "number" || typeof height !== "number") {
+      const frameData = track.getCurrentFrameData() || {
+         width: null,
+         height: null,
+      }
+
+      width = typeof frameData.width === "number" ? frameData.width : null
+      height = typeof frameData.height === "number" ? frameData.height : null
    }
 
-   return { width: width || 0, height: height || 0 }
+   return width && height ? { width, height } : null
 }
 
 /**
@@ -51,7 +54,6 @@ export const useVideoTrackDimensions = (
       }
 
       return () => {
-         setDimensions(null)
          clearInterval(interval)
       }
    }, [track])
