@@ -20,8 +20,8 @@ export const AgoraTrackers = () => {
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
-         console.warn("Autoplay failed")
-         alert("Autoplay failed")
+         // TODO: Handle autoplay failure
+         // ticket: https://linear.app/careerfairy/issue/CF-816/handle-videoaudio-track-autoplay-faliure
       }
    }, [client])
 
