@@ -319,7 +319,7 @@ const EventsTable = ({
             },
          ]
 
-         if (featureFlags.sparksB2BOnboardingFlag)
+         if (featureFlags.livestreamCreationFlowV2)
             return [editLivestreamInV2FlowOption, ...result]
 
          return result
@@ -333,7 +333,7 @@ const EventsTable = ({
          group.groupId,
          userData?.isAdmin,
          publishingDraft,
-         featureFlags.sparksB2BOnboardingFlag,
+         featureFlags.livestreamCreationFlowV2,
          handleEditStreamV2,
          handleEditStream,
          handleOpenStreamerLinksModal,

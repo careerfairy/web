@@ -1,6 +1,7 @@
-import { useJoin, useRTCClient } from "agora-rtc-react"
+import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
+import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { useRouter } from "next/router"
 import {
@@ -30,6 +31,7 @@ type StreamContextProps = {
    isReady: boolean
    setIsReady: (isReady: boolean) => void
    isJoining: boolean
+   currentRole: ClientRole
 }
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
@@ -77,20 +79,21 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
-   const { isLoading, isConnected } = useJoin({
-      appid: agoraCredentials.appID,
-      channel: livestreamId,
-      token: response.token,
-      uid: agoraUserId,
-   })
+   const { isLoading } = useJoin(
+      {
+         appid: agoraCredentials.appID,
+         channel: livestreamId,
+         token: response.token,
+         uid: agoraUserId,
+      },
+      Boolean(!response.isLoading && response.token) // Allow to join/re-join when the token is changed
+   )
 
    const client = useRTCClient()
 
-   useEffect(() => {
-      if (isConnected) {
-         client.setClientRole(shouldStream ? "host" : "audience")
-      }
-   }, [client, isConnected, shouldStream])
+   const config = useClientConfig(client, {
+      hostCondition: shouldStream && isReady,
+   })
 
    const value = useMemo<StreamContextProps>(
       () => ({
@@ -103,6 +106,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          isReady,
          setIsReady,
          isJoining: isLoading,
+         currentRole: config.currentRole,
       }),
       [
          livestreamId,
@@ -113,6 +117,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          response.token,
          isReady,
          isLoading,
+         config.currentRole,
       ]
    )
 

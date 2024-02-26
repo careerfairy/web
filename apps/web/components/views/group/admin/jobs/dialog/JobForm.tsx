@@ -3,7 +3,7 @@ import { JobFormValues } from "./JobFormDialog"
 import { Box, Grid } from "@mui/material"
 import DatePicker from "react-datepicker"
 import BrandedTextField, {
-   BrandedTextFieldField,
+   FormBrandedTextField,
 } from "../../../../common/inputs/BrandedTextField"
 import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { getTextFieldProps } from "../../../../../helperFunctions/streamFormFunctions"
@@ -19,7 +19,7 @@ const JobForm = () => {
    return (
       <Grid container spacing={2}>
          <Grid xs={12} item>
-            <BrandedTextFieldField
+            <FormBrandedTextField
                name="title"
                label="Job title (required)"
                placeholder="E.g., Mechanical Engineer"
@@ -28,7 +28,7 @@ const JobForm = () => {
          </Grid>
 
          <Grid xs={12} md={6} item>
-            <BrandedTextFieldField
+            <FormBrandedTextField
                name="salary"
                label="Salary Range"
                placeholder="E.g., 85’000-95’000 CHF"
@@ -59,7 +59,7 @@ const JobForm = () => {
          </Grid>
 
          <Grid xs={12} item>
-            <BrandedTextFieldField
+            <FormBrandedTextField
                name="description"
                label="Job Description (Required)"
                placeholder="Tell your viewers more on what to expect about this job"
@@ -103,7 +103,7 @@ const JobForm = () => {
             </Box>
          </Grid>
          <Grid xs={12} md={6} item>
-            <BrandedTextFieldField
+            <FormBrandedTextField
                name="postingUrl"
                label="Job posting URL (required)"
                placeholder="E.g., www.careerpage.com/role"

@@ -5,7 +5,7 @@ import SparkFetchWrapper from "HOCs/spark/SparkFetchWrapper"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useFirebaseDelete from "components/custom-hook/utils/useFirebaseDelete"
 import ExitIcon from "components/views/common/icons/ExitIcon"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { Form, Formik, useFormikContext } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import ConfirmationDialog, {
@@ -262,7 +262,7 @@ const FormComponent: FC = () => {
                         <SparkCategorySelect name="categoryId" />
                      </Grid>
                      <Grid item xs={12}>
-                        <BrandedTextFieldField
+                        <FormBrandedTextField
                            name="question"
                            label="Question"
                            placeholder="Insert Spark question"

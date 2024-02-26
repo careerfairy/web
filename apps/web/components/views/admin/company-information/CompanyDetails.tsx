@@ -5,7 +5,7 @@ import { Box, Stack } from "@mui/material"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
 import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import { BrandedTextFieldField } from "components/views/common/inputs/BrandedTextField"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import {
    CompanyCountryValues,
    CompanyIndustryValues,
@@ -14,10 +14,11 @@ import {
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import * as Yup from "yup"
 import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
+import CustomRichTextEditor from "../../../util/CustomRichTextEditor"
 
 const [title, description] = [
    "Details",
@@ -29,6 +30,7 @@ const [title, description] = [
 const CompanyDetails = () => {
    const { group } = useGroup()
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const quillInputRef = useRef()
 
    const initialValues = useMemo<FormValues>(
       () => ({
@@ -81,7 +83,7 @@ const CompanyDetails = () => {
          <Formik<FormValues>
             initialValues={initialValues}
             enableReinitialize
-            validationSchema={validationSchema}
+            validationSchema={() => validationSchema(quillInputRef)}
             onSubmit={onSubmit}
          >
             {({
@@ -96,22 +98,28 @@ const CompanyDetails = () => {
             }) => (
                <Form>
                   <Stack spacing={1.5}>
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="universityName"
                         label="Company name"
                         placeholder="E.g., CareerFairy"
                      />
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="careerPageUrl"
                         label="Career page URL"
                         placeholder="E.g., company.io/careers"
                      />
-                     <BrandedTextFieldField
+                     <FormBrandedTextField
                         name="extraInfo"
                         multiline
-                        rows={4}
                         label="Describe your company"
                         placeholder="E.g., Briefly describe your company's mission, products/services, and target audience"
+                        disabled={isSubmitting}
+                        inputRef={quillInputRef}
+                        InputProps={{
+                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           inputComponent: CustomRichTextEditor as any,
+                           
+                        }}
                      />
                      <BrandedAutocomplete
                         id={"companyCountry"}
@@ -208,7 +216,7 @@ type FormValues = {
    extraInfo: string
 }
 
-const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
+const validationSchema = (quillRef) => (Yup.object().shape({
    universityName: Yup.string().required("Company name is required"),
    companyCountry: Yup.object()
       .shape({
@@ -237,9 +245,12 @@ const validationSchema: Yup.SchemaOf<FormValues> = Yup.object().shape({
       .nullable()
       .required("Company size is required"),
    extraInfo: Yup.string()
-      .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH)
-      .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH),
+      .transform(() => quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")) //ReactQuill appends a new line to text
+      .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
+         `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`)
+      .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
+         `Must be at least ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`),
    careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
-})
+}))
 
 export default CompanyDetails

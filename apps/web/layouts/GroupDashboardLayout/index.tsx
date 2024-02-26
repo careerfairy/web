@@ -72,9 +72,10 @@ type GroupDashboardLayoutProps = {
    topBarCta?: React.ReactNode
    topBarNavigation?: React.ReactNode
    bottomBarNavigation?: React.ReactNode
+   backgroundColor?: string
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
-   const { children, groupId, titleComponent } = props
+   const { children, groupId, titleComponent, backgroundColor } = props
    const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
    const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false)
@@ -226,6 +227,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
                topBarNavigation={props.topBarNavigation}
                bottomBarNavigation={props.bottomBarNavigation}
                titleComponent={titleComponent}
+               backgroundColor={backgroundColor}
             >
                {children}
                {livestreamDialog.StreamCreationDialog}

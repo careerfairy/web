@@ -1,4 +1,9 @@
+import {
+   LivestreamMode,
+   LivestreamModes,
+} from "@careerfairy/shared-lib/livestreams"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { type UID } from "agora-rtc-react"
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -20,6 +25,23 @@ export interface StreamingAppState {
    topBar: {
       viewCount: number
    }
+   settingsMenu: {
+      isOpen: boolean
+   }
+   /**
+    * A mapping from user IDs to objects containing their current audio levels and the timestamp when their audio level was last above 60.
+    * Audio levels are represented as integers ranging from 0 to 100.
+    */
+   audioLevels: {
+      [key in UID]: {
+         level: number
+         lastSpokeAt: number | null
+      }
+   }
+   livestreamState: {
+      screenSharerId: string
+      mode: LivestreamMode
+   }
 }
 
 const initialState: StreamingAppState = {
@@ -30,6 +52,14 @@ const initialState: StreamingAppState = {
    isHost: false,
    topBar: {
       viewCount: 0, // hardcoded number for now
+   },
+   settingsMenu: {
+      isOpen: false,
+   },
+   audioLevels: {},
+   livestreamState: {
+      mode: LivestreamModes.DEFAULT,
+      screenSharerId: null,
    },
 }
 
@@ -64,18 +94,54 @@ const streamingAppSlice = createSlice({
       decrementViewCount(state) {
          state.topBar.viewCount -= 1
       },
-      // Add other necessary actions here
+      /**
+       * Updates the audio levels of users.
+       *
+       * This reducer takes an array of objects, each containing a user ID (`uid`) and their corresponding audio level,
+       * and updates the `audioLevels` state with these values. The audio levels are stored in a Map where the key is the user ID
+       * and the value is the audio level.
+       *
+       * @param state The current state of the streaming app.
+       * @param action The action payload containing an array of user audio levels.
+       */
+      setAudioLevels(
+         state,
+         action: PayloadAction<{ uid: UID; level: number }[]>
+      ) {
+         action.payload.forEach(({ uid, level }) => {
+            state.audioLevels[uid] = {
+               level,
+               lastSpokeAt:
+                  level > 60
+                     ? Date.now()
+                     : state.audioLevels[uid]?.lastSpokeAt || null,
+            }
+         })
+      },
+      setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
+         state.livestreamState.mode = action.payload
+      },
+      setScreenSharerId(state, action: PayloadAction<string | null>) {
+         state.livestreamState.screenSharerId = action.payload
+      },
+      toggleSettingsMenu(state) {
+         state.settingsMenu.isOpen = !state.settingsMenu.isOpen
+      },
    },
 })
 
 export const {
    actions: {
+      setLivestreamMode,
+      setScreenSharerId,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,
       setHostStatus,
       incrementViewCount,
       decrementViewCount,
+      setAudioLevels,
+      toggleSettingsMenu,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

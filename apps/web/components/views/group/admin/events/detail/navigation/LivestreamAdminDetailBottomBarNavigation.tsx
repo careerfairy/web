@@ -7,6 +7,10 @@ import { TAB_VALUES } from "./LivestreamAdminDetailTopBarNavigation"
 
 const styles = sxStyles({
    root: {
+      position: "sticky",
+      bottom: 0,
+      right: 0,
+      zIndex: 1,
       display: "flex",
       justifyContent: {
          xs: "left",
