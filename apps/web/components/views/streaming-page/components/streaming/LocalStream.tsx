@@ -106,17 +106,9 @@ export const LocalUserStream = (props: LocalMicrophoneAndCameraUserProps) => {
 }
 
 export const LocalScreenStream = () => {
-   const {
-      screenVideoTrack,
-      screenAudioTrack,
-      isLoadingScreenShare,
-      screenShareError,
-   } = useScreenShare()
+   const { screenVideoTrack, screenAudioTrack, isLoadingScreenShare } =
+      useScreenShare()
 
-   console.log(
-      "🚀 ~ file: LocalStream.tsx:110 ~ LocalScreenStream ~ screenShareError:",
-      screenShareError
-   )
    return (
       <LocalStream
          localCameraTrack={screenVideoTrack}
@@ -150,13 +142,6 @@ export const LocalStream = ({
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
-
-   if (type === "local-user-screen") {
-      console.log(
-         "🚀 ~ file: LocalStream.tsx:140 ~ localCameraTrack:",
-         localCameraTrack
-      )
-   }
 
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)

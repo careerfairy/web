@@ -15,20 +15,20 @@ const styles = sxStyles({
 
 type Props = {
    children: ReactNode
-   useStreamAspectRatio: boolean
+   originalStreamAspectRatio: boolean
    track: ILocalVideoTrack | IRemoteVideoTrack
 }
 
 export const ConditionalStreamAspectRatio = ({
    children,
-   useStreamAspectRatio,
+   originalStreamAspectRatio,
    track,
 }: Props) => {
    const dimensions = useVideoTrackDimensions(
-      useStreamAspectRatio ? track : null
+      originalStreamAspectRatio ? track : null
    )
 
-   if (!useStreamAspectRatio) {
+   if (!originalStreamAspectRatio || !dimensions) {
       return <>{children}</>
    }
 
