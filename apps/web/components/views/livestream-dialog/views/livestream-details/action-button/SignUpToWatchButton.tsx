@@ -35,7 +35,7 @@ const SignUpToWatchButton: FC = () => {
             data-testid="livestream-signup-watch-button"
             size={isFixedToBottom? "medium" : "large"}
          >
-            Sign Up to Watch
+            Sign up to watch
          </Button>
          {isFloating || isFixedToBottom ? null : (
             <Typography sx={{ textAlign: "center", marginTop: 2 }}>
