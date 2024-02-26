@@ -291,7 +291,6 @@ const handleValidation = (values: FormikValues) => {
       delete errors.testimonials
    }
 
-   console.log(errors)
 
    return errors
 }

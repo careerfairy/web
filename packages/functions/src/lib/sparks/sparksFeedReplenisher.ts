@@ -16,7 +16,7 @@ import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 export class SparksFeedReplenisher {
    private firestore: Firestore
    // Target spark count in a user's feed
-   private TARGET_SPARK_COUNT = 20
+   private TARGET_SPARK_COUNT = 30
    // Buffer percentage to decide if replenishment is necessary
    private BUFFER_PERCENT = 0.8
 
@@ -114,7 +114,9 @@ export class SparksFeedReplenisher {
          )
 
          const recommendedSparkIds =
-            await recommendationService.getRecommendations(30)
+            await recommendationService.getRecommendations(
+               this.TARGET_SPARK_COUNT
+            )
 
          const recommendedSparks = await sparkRepo.getSparksByIds(
             recommendedSparkIds
