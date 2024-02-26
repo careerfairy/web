@@ -327,4 +327,16 @@ export default class DateUtil {
    static formatDateToDayMonthYear(JSDate: Date) {
       return dayjs(JSDate).format("DD MMM YYYY") // 12 Oct 2020
    }
+
+   /**
+    * Determines if the current date has surpassed a given deadline.
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be compared.
+    * @return {boolean} - True if the current date exceeds the deadline.
+    */
+   static isDeadlineExpired(JSDate: Date) {
+      JSDate.setUTCHours(23, 59, 59, 999) // Get end of day
+      const now = new Date();
+      return now >= JSDate
+   }
 }
