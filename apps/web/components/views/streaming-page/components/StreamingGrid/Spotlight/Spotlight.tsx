@@ -16,6 +16,8 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       borderRadius: "10px",
+      justifyContent: "center",
+      alignItems: "center",
    },
 })
 
