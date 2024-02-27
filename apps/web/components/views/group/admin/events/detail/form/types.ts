@@ -6,7 +6,7 @@ import {
 import {
    EventRating,
    LivestreamEvent,
-   LivestreamGroupQuestionsMap,
+   LivestreamGroupQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { GroupOption } from "@careerfairy/shared-lib/groups"
 
@@ -34,7 +34,7 @@ export type LivestreamFormSpeakersTabValues = {
 }
 
 export type LivestreamFormQuestionsTabValues = {
-   registrationQuestions: LivestreamGroupQuestionsMap
+   registrationQuestions: LivestreamGroupQuestion[]
    feedbackQuestions: EventRating[]
 }
 
