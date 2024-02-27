@@ -13,6 +13,7 @@ import {
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../../common/company/company-tags"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 type Props = {
    companyGroupData: Group
@@ -79,13 +80,10 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                ) : null}
             </Stack>
 
-            <Typography
-               style={{ whiteSpace: "pre-line" }}
+            <SanitizedHTML
+               htmlString={companyGroupData.extraInfo}
                color="textSecondary"
-               variant="h6"
-            >
-               {companyGroupData.extraInfo}
-            </Typography>
+            />
             {showCompanyPageCta ? (
                <Box
                   display="flex"
