@@ -1,6 +1,7 @@
 import React, { useState } from "react"
-import { Box, Button, Collapse, Typography } from "@mui/material"
+import { Box, Button, Collapse } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const styles = {
    groupBioWrapper: {
@@ -55,7 +56,7 @@ const GroupBio = ({ groupBio }) => {
             {showMore ? "Hide Info" : "More Info"}
          </Button>
          <Collapse in={showMore}>
-            <Typography sx={styles.groupBioText}>{groupBio}</Typography>
+            <SanitizedHTML sx={styles.groupBioText} htmlString={groupBio} />
          </Collapse>
       </Box>
    )
