@@ -26,6 +26,7 @@ import { InViewRef } from "../MainContentNavigation"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import PublicSparksBadge from "../../../../common/icons/PublicSparksBadge"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const styles = sxStyles({
    root: {
@@ -207,7 +208,7 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                   ) : null}
                </Stack>
                <Typography sx={styles.companyDescription}>
-                  {company.extraInfo}
+                  <SanitizedHTML htmlString={company.extraInfo} />
                </Typography>
                {showCompanyPageCta ? (
                   <Box
