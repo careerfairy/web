@@ -68,57 +68,54 @@ const FeedbackQuestionEditDialog: FC<FeedbackQuestionEditDialogProps> = ({
          validationSchema={feedbackQuestionValidationSchema}
          enableReinitialize
       >
-         {({ dirty, handleSubmit, isSubmitting, isValid, values }) => {
-            console.log(values)
-            return (
-               <SteppedDialog.Container
-                  containerSx={styles.content}
-                  sx={styles.wrapContainer}
-                  withActions
-                  handleCloseIconClick={handleClose}
-               >
-                  <>
-                     <SteppedDialog.Content sx={styles.container}>
-                        <>
-                           <SteppedDialog.Title sx={styles.title}>
-                              <DialogTitle isEdit={isEdit} />
-                           </SteppedDialog.Title>
+         {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+            <SteppedDialog.Container
+               containerSx={styles.content}
+               sx={styles.wrapContainer}
+               withActions
+               handleCloseIconClick={handleClose}
+            >
+               <>
+                  <SteppedDialog.Content sx={styles.container}>
+                     <>
+                        <SteppedDialog.Title sx={styles.title}>
+                           <DialogTitle isEdit={isEdit} />
+                        </SteppedDialog.Title>
 
-                           <SteppedDialog.Subtitle sx={styles.subtitle}>
-                              Automatically ask your audience feedback questions
-                              during the live stream
-                           </SteppedDialog.Subtitle>
+                        <SteppedDialog.Subtitle sx={styles.subtitle}>
+                           Automatically ask your audience feedback questions
+                           during the live stream
+                        </SteppedDialog.Subtitle>
 
-                           <Box sx={styles.form}>
-                              <FeedbackQuestionForm />
-                           </Box>
-                        </>
-                     </SteppedDialog.Content>
+                        <Box sx={styles.form}>
+                           <FeedbackQuestionForm />
+                        </Box>
+                     </>
+                  </SteppedDialog.Content>
 
-                     <SteppedDialog.Actions sx={styles.actions}>
-                        <SteppedDialog.Button
-                           variant="outlined"
-                           color="grey"
-                           onClick={handleClose}
-                        >
-                           Cancel
-                        </SteppedDialog.Button>
+                  <SteppedDialog.Actions sx={styles.actions}>
+                     <SteppedDialog.Button
+                        variant="outlined"
+                        color="grey"
+                        onClick={handleClose}
+                     >
+                        Cancel
+                     </SteppedDialog.Button>
 
-                        <SteppedDialog.Button
-                           variant="contained"
-                           color={"secondary"}
-                           disabled={isSubmitting || !isValid || !dirty}
-                           type="submit"
-                           onClick={() => handleSubmit()}
-                           loading={isSubmitting}
-                        >
-                           {isEdit ? "Save" : "Create"}
-                        </SteppedDialog.Button>
-                     </SteppedDialog.Actions>
-                  </>
-               </SteppedDialog.Container>
-            )
-         }}
+                     <SteppedDialog.Button
+                        variant="contained"
+                        color={"secondary"}
+                        disabled={isSubmitting || !isValid || !dirty}
+                        type="submit"
+                        onClick={() => handleSubmit()}
+                        loading={isSubmitting}
+                     >
+                        {isEdit ? "Save" : "Create"}
+                     </SteppedDialog.Button>
+                  </SteppedDialog.Actions>
+               </>
+            </SteppedDialog.Container>
+         )}
       </Formik>
    )
 }
