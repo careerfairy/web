@@ -8,6 +8,7 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import { useDelayedValue } from "components/custom-hook/utils/useDelayedValue"
+import { useRemoteUserTrack } from "agora-rtc-react"
 
 const styles = sxStyles({
    root: {
@@ -46,6 +47,16 @@ const Content = () => {
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
 
+   const isRemoteStream =
+      stream.type === "remote-user" || stream.type === "remote-user-screen"
+
+   // the only way to detect changes in a remote video/audio track is to use this hook
+   // if not the component will not re-render when the track changes
+   const { track: remoteVideoTrack } = useRemoteUserTrack(
+      isRemoteStream ? stream.user : null,
+      "video"
+   )
+
    const isMobilePortrait = streamIsMobile && !streamIsLandscape
 
    if (!stream) return <CircularProgress />
@@ -54,7 +65,7 @@ const Content = () => {
       <Box sx={styles.root}>
          <ConditionalStreamAspectRatio
             originalStreamAspectRatio={isMobilePortrait}
-            track={stream.user.videoTrack}
+            track={isRemoteStream ? remoteVideoTrack : stream.user.videoTrack}
          >
             <UserStreamComponent user={stream} />
          </ConditionalStreamAspectRatio>
