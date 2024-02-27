@@ -4,7 +4,7 @@ import { Formik } from "formik"
 import { FC, useState } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography } from "@mui/material"
-import FeedbackQuestionForm from "./add-edit-dialog/FeedbackQuestionForm"
+import FeedbackQuestionForm from "./FeedbackQuestionForm"
 import {
    FeedbackQuestionFormValues,
    feedbackQuestionFormInitialValues,

@@ -10,7 +10,7 @@ import { sxStyles } from "types/commonTypes"
 import { FeedbackQuestionFormValues } from "../commons"
 import MoreMenuWithEditAndRemoveOptions from "./MoreMenu"
 import { FC, useCallback, useState } from "react"
-import FeedbackQuestionAddEditDialog from "./add-edit-dialog/FeedbackQuestionAddEditDialog"
+import FeedbackQuestionAddEditDialog from "./FeedbackQuestionAddEditDialog"
 import FeedbackQuestionRemoveDialog from "./FeedbackQuestionRemoveDialog"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import AddQuestionButton from "./AddQuestionButton"
@@ -70,7 +70,6 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsDesktopProps> = ({
       handleAddEditCloseDialog,
    ] = useDialogStateHandler()
 
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const handleAddQuestionClick = useCallback(() => {
       setCurrentQuestion(null)
       handleAddEditOpenDialog()
@@ -130,7 +129,7 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsDesktopProps> = ({
                </TableBody>
             </Table>
          </TableContainer>
-         <AddQuestionButton handleClick={handleAddEditCloseDialog} />
+         <AddQuestionButton handleClick={handleAddQuestionClick} />
          <FeedbackQuestionAddEditDialog
             question={currentQuestion}
             isDialogOpen={isAddEditDialogOpen}
