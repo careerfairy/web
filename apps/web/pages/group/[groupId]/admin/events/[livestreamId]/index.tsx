@@ -6,7 +6,10 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { useInterests } from "components/custom-hook/useCollection"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestion,
+} from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import {
    LivestreamFormGeneralTabValues,
@@ -22,9 +25,9 @@ import LivestreamAdminDetailTopBarNavigation, {
 } from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
 import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
 import LivestreamFormSpeakersStep from "../../../../../../components/views/group/admin/events/detail/form/views/speakers"
-import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions/questions"
 import LivestreamFormGeneralStep from "../../../../../../components/views/group/admin/events/detail/form/views/general/general"
 import { livestreamFormValidationSchema } from "../../../../../../components/views/group/admin/events/detail/form/validationSchemas"
+import LivestreamFormQuestionsStep from "../../../../../../components/views/group/admin/events/detail/form/views/questions/questions"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
 
 const styles = sxStyles({
@@ -57,7 +60,7 @@ const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
-   registrationQuestions: {},
+   registrationQuestions: [],
    feedbackQuestions: [],
 }
 
@@ -107,7 +110,7 @@ const convertLivestreamObjectToForm = (
       : livestream.reasonsToJoinLivestream_v2
 
    const questions: LivestreamFormQuestionsTabValues = {
-      registrationQuestions: livestream.groupQuestionsMap,
+      registrationQuestions: [],
       feedbackQuestions: [],
    }
 
@@ -117,6 +120,14 @@ const convertLivestreamObjectToForm = (
       questions: questions,
       jobs: valuesReducer(formJobsTabInitialValues),
    }
+}
+
+const getRegistrationQuestionsOptions = (
+   livestream: LivestreamEvent
+): LivestreamGroupQuestion[] => {
+   return Object.values(
+      Object.values(livestream.groupQuestionsMap)[0].questions
+   )
 }
 
 const LivestreamAdminDetailsPage = () => {
@@ -155,6 +166,9 @@ const LivestreamAdminDetailsPage = () => {
                   ? convertLivestreamObjectToForm(livestream, existingInterests)
                   : formInitialValues
 
+               const registrationQuestionsOptions =
+                  getRegistrationQuestionsOptions(livestream)
+
                return (
                   <Box>
                      <Formik<LivestreamFormValues>
@@ -173,7 +187,11 @@ const LivestreamAdminDetailsPage = () => {
                                  />
                               )}
                               {tabValue == TAB_VALUES.QUESTIONS && (
-                                 <LivestreamFormQuestionsStep />
+                                 <LivestreamFormQuestionsStep
+                                    registrationQuestionsOptions={
+                                       registrationQuestionsOptions
+                                    }
+                                 />
                               )}
                               {tabValue == TAB_VALUES.JOBS && (
                                  <LivestreamFormJobsStep
