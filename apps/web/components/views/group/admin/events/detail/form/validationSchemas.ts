@@ -71,7 +71,8 @@ const livestreamFormSpeakersTabSchema = yup.object().shape({
 })
 
 const livestreamFormQuestionsTabSchema = yup.object().shape({
-   dummyFieldQuestions: yup.string().required("Required"),
+   registrationQuestions: yup.mixed(),
+   feedbackQuestions: yup.mixed(),
 })
 
 const livestreamFormJobsTabSchema = yup.object().shape({
