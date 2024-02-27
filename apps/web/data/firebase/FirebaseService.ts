@@ -785,10 +785,10 @@ class FirebaseService {
 
    //TEST_LIVESTREAMS
 
-   createTestLivestream = () => {
+   createTestLivestream = async () => {
       const livestreamDocRef = this.firestore.collection("livestreams").doc()
 
-      return livestreamDocRef.set({
+      await livestreamDocRef.set({
          companyId: "CareerFairy",
          test: true,
          id: livestreamDocRef.id,
@@ -798,6 +798,8 @@ class FirebaseService {
             new Date("March 17, 2020 03:24:00")
          ),
       })
+
+      return livestreamDocRef
    }
 
    setupTestLivestream = (
