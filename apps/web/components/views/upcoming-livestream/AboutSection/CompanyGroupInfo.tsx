@@ -80,13 +80,10 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                ) : null}
             </Stack>
 
-            <Typography
-               style={{ whiteSpace: "pre-line" }}
+            <SanitizedHTML
+               htmlString={companyGroupData.extraInfo}
                color="textSecondary"
-               variant="h6"
-            >
-               <SanitizedHTML htmlString={companyGroupData.extraInfo} />
-            </Typography>
+            />
             {showCompanyPageCta ? (
                <Box
                   display="flex"

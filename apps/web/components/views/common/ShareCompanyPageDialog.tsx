@@ -135,13 +135,11 @@ const ShareCompanyPageDialog: FC<Props> = ({
                         <Typography fontWeight={800}>
                            {group.universityName}
                         </Typography>
-                        <Typography
+                        <SanitizedHTML
+                           htmlString={group.extraInfo}
                            sx={styles.companyDescription}
-                           variant="body2"
                            color={"text.secondary"}
-                        >
-                           <SanitizedHTML htmlString={group.extraInfo} />
-                        </Typography>
+                        />
                      </Box>
                   </Stack>
                </Box>

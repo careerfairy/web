@@ -207,9 +207,7 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                      />
                   ) : null}
                </Stack>
-               <Typography sx={styles.companyDescription}>
-                  <SanitizedHTML htmlString={company.extraInfo} />
-               </Typography>
+               <SanitizedHTML htmlString={company.extraInfo} />
                {showCompanyPageCta ? (
                   <Box
                      display="flex"
