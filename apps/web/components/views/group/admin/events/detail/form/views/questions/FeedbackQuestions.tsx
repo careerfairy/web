@@ -1,21 +1,7 @@
-import { useCallback, useState } from "react"
-import { SwipeableDrawer } from "@mui/material"
-import { sxStyles } from "@careerfairy/shared-ui"
-import RemoveQuestion from "./components/RemoveQuestion"
+import { useState } from "react"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import AddQuestionButton from "./components/AddQuestionButton"
-import FeedbackQuestionMobile from "./components/FeedbackQuestionMobile"
+import FeedbackQuestionsMobile from "./components/FeedbackQuestionsMobile"
 import FeedbackQuestionsDesktop from "./components/FeedbackQuestionsDesktop"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-
-const styles = sxStyles({
-   drawer: {
-      ".MuiPaper-root": {
-         borderTopLeftRadius: 12,
-         borderTopRightRadius: 12,
-      },
-   },
-})
 
 const dummyFeedbackQuestions = [
    {
@@ -41,65 +27,19 @@ const FeedbackQuestions = () => {
    const [feedbackQuestions, setFeedbackQuestions] = useState(
       dummyFeedbackQuestions
    )
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const [currentQuestion, setCurrentQuestion] = useState(null)
-   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-   const [, handleAddEditOpenDialog] = useDialogStateHandler()
-
-   const handleEdit = useCallback(
-      (_, question) => {
-         setCurrentQuestion(question)
-         handleAddEditOpenDialog()
-      },
-      [handleAddEditOpenDialog]
-   )
-
-   const [, handleRemoveOpenDialog] = useDialogStateHandler()
-
-   const handleRemove = useCallback(
-      (_, question) => {
-         setCurrentQuestion(question)
-         if (isMobile) {
-            setIsDrawerOpen(true)
-         } else {
-            handleRemoveOpenDialog()
-         }
-      },
-      [handleRemoveOpenDialog, isMobile]
-   )
 
    if (isMobile) {
       return (
-         <>
-            {feedbackQuestions.map((question, index) => (
-               <FeedbackQuestionMobile
-                  key={index}
-                  question={question}
-                  handleEdit={(event) => handleEdit(event, question)}
-                  handleRemove={(event) => handleRemove(event, question)}
-               />
-            ))}
-            <AddQuestionButton
-               handleClick={() => {
-                  setFeedbackQuestions([
-                     ...feedbackQuestions,
-                     newDummyFeedbackQuestion,
-                  ])
-               }}
-            />
-            <SwipeableDrawer
-               anchor="bottom"
-               onClose={() => setIsDrawerOpen(false)}
-               onOpen={() => null}
-               open={isDrawerOpen}
-               sx={styles.drawer}
-            >
-               <RemoveQuestion
-                  handleCancelClick={() => setIsDrawerOpen(false)}
-               />
-            </SwipeableDrawer>
-         </>
+         <FeedbackQuestionsMobile
+            questions={feedbackQuestions}
+            handleAddQuestionClick={() => {
+               // this is for testing purposes only
+               setFeedbackQuestions([
+                  ...feedbackQuestions,
+                  newDummyFeedbackQuestion,
+               ])
+            }}
+         />
       )
    }
 

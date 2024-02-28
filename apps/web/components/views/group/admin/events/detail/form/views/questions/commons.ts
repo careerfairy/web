@@ -30,6 +30,10 @@ export type FeedbackQuestionFormValues = {
    appearAfter: number
 }
 
+export type FeedbackQuestionsProp = {
+   questions: FeedbackQuestionFormValues[]
+}
+
 export const feedbackQuestionFormInitialValues: FeedbackQuestionFormValues = {
    title: "",
    type: "",
