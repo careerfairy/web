@@ -25,7 +25,7 @@ export interface IEmailNotificationRepository {
     * @param emails User emails to create notifications for
     * @param type Type of email notification
     */
-   createNotifications(
+   createNotificationDocs(
       emails: string[],
       type?: EmailNotificationType
    ): Promise<DocumentData[]>
@@ -59,7 +59,7 @@ export class EmailNotificationFunctionsRepository
       return result.docs.map((doc) => doc.data())
    }
 
-   async createNotifications(
+   async createNotificationDocs(
       emails: string[],
       type?: EmailNotificationType
    ): Promise<DocumentData[]> {
@@ -74,11 +74,11 @@ export class EmailNotificationFunctionsRepository
       }
 
       return await Promise.all(
-         emails.map(userToNotificationDetails).map(this.createNotification)
+         emails.map(userToNotificationDetails).map(this.createNotificationDoc)
       )
    }
 
-   createNotification = async (details: EmailNotificationDetails) => {
+   createNotificationDoc = async (details: EmailNotificationDetails) => {
       const prevNotification = await this.checkForNotificationByType(
          details.receiverEmail,
          details.type

@@ -111,5 +111,5 @@ export const getSparksAnalyticsRepoInstance = (
 export const customJobRepo: ICustomJobFunctionsRepository =
    new CustomJobFunctionsRepository(firestore as any, FieldValue)
 
-export const notificationsRepo: IEmailNotificationRepository =
+export const emailNotificationsRepo: IEmailNotificationRepository =
    new EmailNotificationFunctionsRepository(firestore as any)

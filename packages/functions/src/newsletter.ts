@@ -6,7 +6,7 @@ import {
    groupRepo,
    userRepo,
    livestreamsRepo,
-   notificationsRepo,
+   emailNotificationsRepo,
 } from "./api/repositories"
 import config from "./config"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
@@ -103,7 +103,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
    const newsletterService = new NewsletterService(
       userRepo,
       groupRepo,
-      notificationsRepo,
+      emailNotificationsRepo,
       dataLoader,
       emailBuilder,
       functions.logger

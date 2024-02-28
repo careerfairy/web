@@ -91,7 +91,7 @@ export class NewsletterService {
             types.includes(notification.details.type) && isWithinToleranceDays
          )
       }
-      return notifications.find(notificationByType) !== undefined
+      return Boolean(notifications.find(notificationByType))
    }
 
    /**

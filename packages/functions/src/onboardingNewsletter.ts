@@ -5,28 +5,12 @@ import {
    userRepo,
    livestreamsRepo,
    sparkRepo,
-   notificationsRepo,
+   emailNotificationsRepo,
 } from "./api/repositories"
 import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-
-/**
- * To be sure we only send 1 newsletter when manually triggered
- *
- * It's easy to make multiple browser requests and thus send multiple newsletters
- * which is bad, the user will probably unsubscribe after receiving 2 or more
- * newsletters in a short time
- *
- *
- * This variable works as a safeguard to make we only send one newsletter
- * This should be clear when Google Cloud removes the function execution environment
- * after a while
- *
- * https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
- */
-const newsletterAlreadySent = false
 
 /**
  * OnboardingNewsletter functions runtime settings
@@ -90,21 +74,15 @@ export const manualOnboardingNewsletter = functions
    })
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
-   if (newsletterAlreadySent) {
-      functions.logger.info(
-         "OnboardingNewsletter was already sent in this execution environment, skipping"
-      )
-      return
-   }
-
    const emailBuilder = new OnboardingNewsletterEmailBuilder(
-      PostmarkEmailSender.create()
+      PostmarkEmailSender.create(),
+      functions.logger
    )
    const dataLoader = await NewsletterDataFetcher.create()
    const onboardingNewsletterService = new OnboardingNewsletterService(
       userRepo,
       sparkRepo,
-      notificationsRepo,
+      emailNotificationsRepo,
       livestreamsRepo,
       dataLoader,
       emailBuilder,

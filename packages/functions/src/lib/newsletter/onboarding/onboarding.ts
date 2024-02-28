@@ -1,3 +1,6 @@
+type DiscoveryTemplateWithUserName = {
+   user_name: string
+}
 export type DiscoveryTag =
    | "onboarding-company"
    | "onboarding-sparks"
@@ -6,16 +9,11 @@ export type DiscoveryTag =
    | "onboarding-feedback"
    | "onboarding-all"
 
-export type CompanyDiscoveryTemplateModel = {
-   user_name: string
-}
+export type CompanyDiscoveryTemplateModel = DiscoveryTemplateWithUserName
 
-export type SparksDiscoveryTemplateModel = {
-   user_name: string
-}
+export type SparksDiscoveryTemplateModel = DiscoveryTemplateWithUserName
 
-export type LivestreamDiscoveryTemplateModel = {
-   user_name: string
+export type LivestreamDiscoveryTemplateModel = DiscoveryTemplateWithUserName & {
    recommendedEvents?: LivestreamDiscoveryEvents[]
 }
 
@@ -27,10 +25,6 @@ export type LivestreamDiscoveryEvents = {
    link: string
 }
 
-export type RecordingDiscoveryTemplateModel = {
-   user_name: string
-}
+export type RecordingDiscoveryTemplateModel = DiscoveryTemplateWithUserName
 
-export type FeedbackDiscoveryTemplateModel = {
-   user_name: string
-}
+export type FeedbackDiscoveryTemplateModel = DiscoveryTemplateWithUserName

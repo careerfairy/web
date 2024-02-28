@@ -6,6 +6,8 @@ import {
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
 
+const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
+
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
@@ -16,7 +18,9 @@ export class UserFunctionsRepository
    implements IUserFunctionsRepository
 {
    async getSubscribedUsers(userEmails?: string[]): Promise<UserData[]> {
-      const earlierThan = DateTime.now().minus({ months: 18 }).toJSDate()
+      const earlierThan = DateTime.now()
+         .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
+         .toJSDate()
 
       let query = this.firestore
          .collection("userData")

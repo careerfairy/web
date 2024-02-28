@@ -9,6 +9,7 @@ import {
    RecordingDiscoveryTemplateModel,
    SparksDiscoveryTemplateModel,
 } from "./onboarding"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 export enum OnboardingNewsletterEvents {
    COMPANY_DISCOVERY = "companyDiscovery",
@@ -81,7 +82,10 @@ export class OnboardingNewsletterEmailBuilder {
       DiscoveryMapper
    >()
 
-   constructor(private readonly sender: PostmarkEmailSender) {
+   constructor(
+      private readonly sender: PostmarkEmailSender,
+      private readonly logger: Logger
+   ) {
       this.initRecipientsData()
       this.initConvertersMap()
    }
@@ -106,6 +110,29 @@ export class OnboardingNewsletterEmailBuilder {
       this.discoveryTemplateModelConvertersMap.set(
          OnboardingNewsletterEvents.FEEDBACK_DISCOVERY,
          this.feedbackDiscoveryTemplateData
+      )
+   }
+
+   private initRecipientsData() {
+      this.discoveryEmailsTemplatedMessageMap.set(
+         OnboardingNewsletterEvents.COMPANY_DISCOVERY,
+         this.companyDiscoveryRecipients
+      )
+      this.discoveryEmailsTemplatedMessageMap.set(
+         OnboardingNewsletterEvents.SPARKS_DISCOVERY,
+         this.sparksDiscoveryRecipients
+      )
+      this.discoveryEmailsTemplatedMessageMap.set(
+         OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
+         this.livestream1stRegistrationDiscoveryRecipients
+      )
+      this.discoveryEmailsTemplatedMessageMap.set(
+         OnboardingNewsletterEvents.RECORDING_DISCOVERY,
+         this.recordingDiscoveryRecipients
+      )
+      this.discoveryEmailsTemplatedMessageMap.set(
+         OnboardingNewsletterEvents.FEEDBACK_DISCOVERY,
+         this.feedbackDiscoveryRecipients
       )
    }
 
@@ -200,29 +227,6 @@ export class OnboardingNewsletterEmailBuilder {
       }
    }
 
-   private initRecipientsData() {
-      this.discoveryEmailsTemplatedMessageMap.set(
-         OnboardingNewsletterEvents.COMPANY_DISCOVERY,
-         this.companyDiscoveryRecipients
-      )
-      this.discoveryEmailsTemplatedMessageMap.set(
-         OnboardingNewsletterEvents.SPARKS_DISCOVERY,
-         this.sparksDiscoveryRecipients
-      )
-      this.discoveryEmailsTemplatedMessageMap.set(
-         OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY,
-         this.livestream1stRegistrationDiscoveryRecipients
-      )
-      this.discoveryEmailsTemplatedMessageMap.set(
-         OnboardingNewsletterEvents.RECORDING_DISCOVERY,
-         this.recordingDiscoveryRecipients
-      )
-      this.discoveryEmailsTemplatedMessageMap.set(
-         OnboardingNewsletterEvents.FEEDBACK_DISCOVERY,
-         this.feedbackDiscoveryRecipients
-      )
-   }
-
    /**
     * Retrieves the template model for the given user and discovery type by retrieving the mapper function from the converters map, for
     * the type, and executing it for the given user.
@@ -301,19 +305,19 @@ export class OnboardingNewsletterEmailBuilder {
     * @param discoveryType Type of discovery to send emails
     */
    send(discoveryType: OnboardingNewsletterEvents): Promise<void[]> {
-      console.log(
+      this.logger.info(
          "OnboardingNewsletterEmailBuilder ~ send ~ discoveryType:",
          discoveryType
       )
       const messages =
          this.discoveryEmailsTemplatedMessageMap.get(discoveryType)
-      console.log(
+      this.logger.info(
          "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~messagesTo:",
          messages.map((t) => t.To)
       )
 
       if (!messages.length) {
-         console.log(
+         this.logger.info(
             "OnboardingNewsletterEmailBuilder ~ send ~ ~empty messages - IGNORE:",
             messages.map((t) => t.To)
          )
@@ -322,17 +326,17 @@ export class OnboardingNewsletterEmailBuilder {
 
       return this.sender.sendEmailBatchWithTemplates(messages, (err, res) => {
          if (err) {
-            console.log(
+            this.logger.info(
                "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
                err,
                messages
             )
-            console.error("Unable to send Discovery Email via postmark", {
+            this.logger.error("Unable to send Discovery Email via postmark", {
                error: err,
             })
             return
          }
-         console.log(
+         this.logger.info(
             "OnboardingNewsletterEmailBuilder ~ SEND_OK: ",
             res.map((res) => res.To)
          )

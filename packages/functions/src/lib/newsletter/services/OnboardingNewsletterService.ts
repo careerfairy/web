@@ -24,6 +24,7 @@ import {
 } from "@careerfairy/shared-lib/utils"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
+const FEEDBACK_DISCOVERY_TRIGGER_DAY_FROM_SKIPPED = 25
 const MAX_SPARKS_COUNT = 5
 
 const COMPANY_DISCOVERY_TRIGGER_DAY = 4
@@ -86,6 +87,7 @@ export class OnboardingNewsletterService {
          ]) && !user.followingCompanies
       )
    }
+
    private shouldSendSparksDiscovery = (user: OnboardingUserData): boolean => {
       const seenSparksCount =
          (user.seenSparks.length &&
@@ -146,6 +148,7 @@ export class OnboardingNewsletterService {
          ]) && !hasWatchedRecording
       )
    }
+
    private shouldSendFeedbackDiscovery = (
       user: OnboardingUserData
    ): boolean => {
@@ -155,7 +158,7 @@ export class OnboardingNewsletterService {
    private hasNotifications(notifications: EmailNotification[][]) {
       return (
          notifications.length &&
-         notifications.find((items) => Boolean(items.length)) !== undefined
+         Boolean(notifications.find((items) => Boolean(items.length)))
       )
    }
 
@@ -174,14 +177,22 @@ export class OnboardingNewsletterService {
    private mapLivestreamToTemplate(livestream: LivestreamEvent) {
       const date = DateTime.fromJSDate(livestream.start.toDate())
       const link = makeLivestreamEventDetailsUrl(livestream.id)
-      const shortTitle =
-         livestream.title.length > 40
-            ? livestream.title.substring(0, 39)
-            : livestream.title
+      let shortTitle = livestream.title
+
+      if (shortTitle.length > 60) {
+         if (shortTitle.charAt(59) == " ")
+            shortTitle = shortTitle.substring(0, 59).trim().concat("...")
+         else {
+            const parts = shortTitle.substring(0, 59).split(" ")
+            parts[parts.length - 1] = ""
+            shortTitle = parts.join(" ").concat("...")
+         }
+      }
+
       return {
          image: livestream.companyLogoUrl,
          title: livestream.title,
-         shortTitle: shortTitle.concat(" .. "),
+         shortTitle: shortTitle,
          date: date.toFormat("dd LLLL yyyy"),
          link: addUtmTagsToLink({
             link,
@@ -303,7 +314,8 @@ export class OnboardingNewsletterService {
 
             if (
                fromSkippedDiscovery &&
-               effectiveUserDaysSinceRegistration >= 25
+               effectiveUserDaysSinceRegistration >=
+                  FEEDBACK_DISCOVERY_TRIGGER_DAY_FROM_SKIPPED
             )
                this.applyDiscovery(
                   onboardingUserData,
@@ -333,30 +345,30 @@ export class OnboardingNewsletterService {
     * for checking if certain types of email discoveries have already been sent.
     */
    private async createDiscoveryEmailNotifications() {
-      const userEmailMapper = (oUser: OnboardingUserData) =>
-         oUser.user.userEmail
+      const userEmailMapper = (onboardingUserData: OnboardingUserData) =>
+         onboardingUserData.user.userEmail
       const companyDiscoveryNotificationsPromise =
-         this.notificationsRepo.createNotifications(
+         this.notificationsRepo.createNotificationDocs(
             this.companyDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.COMPANY_DISCOVERY
          )
       const sparksDiscoveryNotificationsPromise =
-         this.notificationsRepo.createNotifications(
+         this.notificationsRepo.createNotificationDocs(
             this.sparksDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.SPARKS_DISCOVERY
          )
       const livestream1stRegistrationDiscoveryNotificationsPromise =
-         this.notificationsRepo.createNotifications(
+         this.notificationsRepo.createNotificationDocs(
             this.livestream1stRegistrationDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.LIVESTREAM_1ST_REGISTRATION_DISCOVERY
          )
       const recordingDiscoveryNotificationsPromise =
-         this.notificationsRepo.createNotifications(
+         this.notificationsRepo.createNotificationDocs(
             this.recordingDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.RECORDING_DISCOVERY
          )
       const feedbackDiscoveryNotificationsPromise =
-         this.notificationsRepo.createNotifications(
+         this.notificationsRepo.createNotificationDocs(
             this.feedbackDiscoveryUsers.map(userEmailMapper),
             OnboardingNewsletterEvents.FEEDBACK_DISCOVERY
          )
