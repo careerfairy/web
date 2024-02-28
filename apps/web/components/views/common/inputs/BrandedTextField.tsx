@@ -5,13 +5,15 @@ import {
    SelectProps,
    Typography,
    lighten,
+   useForkRef,
 } from "@mui/material"
 import TextField, { FilledTextFieldProps } from "@mui/material/TextField"
 import { styled } from "@mui/material/styles"
 import { useField } from "formik"
-import { FC, ReactElement } from "react"
+import { FC, ReactElement, forwardRef } from "react"
 import BrandedTooltip from "../tooltips/BrandedTooltip"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
+import { Control, FieldPath, FieldValues, useController } from "react-hook-form"
 
 export interface CustomBrandedTextFieldProps {
    /**
@@ -138,5 +140,47 @@ export const FormBrandedTextField: FC<BrandedTextFieldProps> = ({
       />
    )
 }
+
+type BrandedTextFieldControllerProps<
+   TFieldValues extends FieldValues = FieldValues,
+   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> = {
+   name: TName
+   control?: Control<TFieldValues>
+} & BrandedTextFieldProps
+
+export const BrandedTextFieldController = forwardRef<
+   HTMLDivElement,
+   BrandedTextFieldControllerProps
+>(({ name, control, inputRef, required, ...textFieldprops }, ref) => {
+   const {
+      field: { name: fieldName, onBlur, onChange, ref: fieldRef, value },
+      fieldState: { error, isTouched },
+   } = useController({
+      name,
+      control,
+   })
+
+   const handleInputRef = useForkRef(fieldRef, inputRef)
+
+   return (
+      <BrandedTextField
+         {...textFieldprops}
+         name={fieldName}
+         value={value}
+         onChange={onChange}
+         onBlur={onBlur}
+         required={required}
+         error={Boolean(error)}
+         helperText={
+            error ? isTouched && error.message : textFieldprops.helperText
+         }
+         ref={ref}
+         inputRef={handleInputRef}
+      />
+   )
+})
+
+BrandedTextFieldController.displayName = "BrandedTextFieldController"
 
 export default BrandedTextField
