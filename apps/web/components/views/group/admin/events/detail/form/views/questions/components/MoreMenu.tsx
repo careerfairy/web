@@ -157,20 +157,22 @@ const MoreMenu: FC<MoreMenuProps> = ({ options }) => {
 type MoreMenuWithEditAndRemoveProps = {
    handleEdit: (args: unknown) => void
    handleRemove: (args: unknown) => void
+   labels?: string[]
 }
 
 const MoreMenuWithEditAndRemoveOptions: FC<MoreMenuWithEditAndRemoveProps> = ({
    handleEdit,
    handleRemove,
+   labels,
 }) => {
    const options: MoreMenuProps["options"] = [
       {
-         label: "Edit details",
+         label: labels[0] || "Edit details",
          icon: <EditIcon color="#6B6B7F" />,
          handleClick: handleEdit,
       },
       {
-         label: "Unlink job opening",
+         label: labels[1] || "Remove item",
          icon: <DeleteIcon />,
          handleClick: handleRemove,
          menuItemSxProps: styles.deleteMenuItem,
