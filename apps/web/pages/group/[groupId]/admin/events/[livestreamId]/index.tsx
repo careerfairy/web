@@ -125,9 +125,11 @@ const convertLivestreamObjectToForm = (
 const getRegistrationQuestionsOptions = (
    livestream: LivestreamEvent
 ): LivestreamGroupQuestion[] => {
-   return Object.values(
-      Object.values(livestream.groupQuestionsMap)[0].questions
-   )
+   const firstGroupQuestions =
+      livestream.groupQuestionsMap[Object.keys(livestream.groupQuestionsMap)[0]]
+   return firstGroupQuestions
+      ? Object.values(firstGroupQuestions.questions)
+      : []
 }
 
 const LivestreamAdminDetailsPage = () => {
