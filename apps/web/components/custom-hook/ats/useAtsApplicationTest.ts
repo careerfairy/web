@@ -65,7 +65,12 @@ export const stateMachine = createSlice({
 
 const { submit, successResult, errorResult } = stateMachine.actions
 
-const useAtsApplicationTest = () => {
+type Props = {
+   onSuccess?: () => void
+   onError?: () => void
+}
+
+const useAtsApplicationTest = ({ onSuccess, onError }: Props = {}) => {
    const { atsAccount } = useATSAccount()
    const specifics = getIntegrationSpecifics(atsAccount)
 
@@ -117,12 +122,21 @@ const useAtsApplicationTest = () => {
          })
          .then(() => {
             dispatch(successResult())
+            onSuccess?.()
          })
          .catch((e) => {
             errorLogAndNotify(e)
             dispatch(errorResult())
+            onError?.()
          })
-   }, [atsAccount.groupId, atsAccount.id, state.data, state.job?.id])
+   }, [
+      atsAccount.groupId,
+      atsAccount.id,
+      onError,
+      onSuccess,
+      state.data,
+      state.job?.id,
+   ])
 
    const isLoading = state.testedSuccessfully === null
 

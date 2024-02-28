@@ -5,11 +5,6 @@ import SteppedDialog, {
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   wrapContainer: {
-      height: {
-         md: "100%",
-      },
-   },
    container: {
       display: "flex",
       flexDirection: "column",
@@ -17,18 +12,6 @@ const styles = sxStyles({
       height: "100%",
       width: "100%",
       px: 2,
-   },
-   content: {
-      mt: 1,
-      maxWidth: "550px !important",
-   },
-   info: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   form: {
-      my: "40px",
    },
    title: {
       fontSize: { xs: "28px", md: "32px" },
@@ -98,7 +81,7 @@ const AtsTestApplicationFallback = () => {
             <SteppedDialog.Button
                variant="contained"
                color={"secondary"}
-               disabled={true}
+               disabled
             >
                Test
             </SteppedDialog.Button>
