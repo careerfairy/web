@@ -4,7 +4,7 @@ import {
    getSubstringWithEllipsis,
 } from "@careerfairy/shared-lib/utils"
 import { TemplatedMessage } from "postmark"
-import { PostmarkEmailSender } from "../api/postmark"
+import { PostmarkEmailSender } from "../../api/postmark"
 import { DateTime } from "luxon"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
