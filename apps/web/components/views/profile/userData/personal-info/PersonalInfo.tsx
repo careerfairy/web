@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { Formik } from "formik"
 
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import {
    Typography,
    TextField,
@@ -16,7 +15,7 @@ import {
 } from "@mui/material"
 import UniversityCountrySelector from "components/views/universitySelect/UniversityCountrySelector"
 import UniversitySelector from "components/views/universitySelect/UniversitySelector"
-import { GENERAL_ERROR, URL_REGEX } from "components/util/constants"
+import { GENERAL_ERROR } from "components/util/constants"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
@@ -28,6 +27,15 @@ import { useRouter } from "next/router"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { FieldOfStudySelector } from "../../../signup/userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../../../signup/userInformation/LevelOfStudySelector"
+import { useYupForm } from "components/custom-hook/form/useYupForm"
+import { PersonalInfo, personalInfoSchema } from "./schema"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { FormProvider, useFormContext } from "react-hook-form"
+import { BrandedTextFieldController } from "components/views/common/inputs/BrandedTextField"
+import { BrandedCheckBoxController } from "components/views/common/inputs/BrandedCheckbox"
+// import { LogoDev } from "@mui/icons-material"
+import { LoadingButton } from "@mui/lab"
+import UniversityCountrySelectorV2 from "components/views/universitySelect/UniversityCountrySelectorV2"
 
 const styles: StylesProps = {
    avatar: {
@@ -51,7 +59,11 @@ const styles: StylesProps = {
    },
 }
 
-const PersonalInfo = ({ userData }) => {
+type Props = {
+   userData: UserData
+}
+
+const PersonalInfo = ({ userData }: Props) => {
    const { userPresenter } = useAuth()
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
@@ -59,6 +71,22 @@ const PersonalInfo = ({ userData }) => {
    const dispatch = useDispatch()
    // @ts-ignore
    const { loading, error } = useSelector((state) => state.auth.profileEdit)
+
+   const methods = useYupForm({
+      schema: personalInfoSchema,
+      defaultValues: {
+         firstName: userData?.firstName || "",
+         lastName: userData?.lastName || "",
+         linkedinUrl: userData?.linkedinUrl || "",
+         university: userData?.university,
+         universityCountryCode: userData?.universityCountryCode || "",
+         unsubscribed: userData?.unsubscribed || false,
+         fieldOfStudy: userData?.fieldOfStudy,
+         levelOfStudy: userData?.levelOfStudy,
+         email: userData?.id,
+      },
+      mode: "onChange", // Important for the form to be validated on change, depending on your use case
+   })
 
    useEffect(() => {
       if (loading === false && error === false) {
@@ -76,7 +104,7 @@ const PersonalInfo = ({ userData }) => {
       return () => {
          dispatch(actions.clean())
       }
-   }, [loading, error])
+   }, [loading, error, enqueueSnackbar, dispatch])
 
    const handleClose = () => {
       setOpen(false)
@@ -99,6 +127,150 @@ const PersonalInfo = ({ userData }) => {
    }, [router])
 
    return (
+      <FormProvider {...methods}>
+         <Grid container spacing={2}>
+            <Grid item xs={8}>
+               <ContentCardTitle sx={styles.title}>
+                  Personal Info
+               </ContentCardTitle>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: "right" }}>
+               <BadgeSimpleButton
+                  badge={NetworkerBadge}
+                  isActive={Boolean(userPresenter?.badges?.networkerBadge())}
+                  onClick={navigateToReferrals}
+               />
+            </Grid>
+         </Grid>
+         <Grid container spacing={2}>
+            <Grid item xs={12}>
+               <BrandedTextFieldController
+                  name="email"
+                  disabled
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               <BrandedTextFieldController
+                  name="firstName"
+                  label="First Name"
+                  fullWidth
+                  requiredText="(required)"
+                  disabled={methods.formState.isSubmitting}
+               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               <BrandedTextFieldController
+                  name="lastName"
+                  label="Last Name"
+                  fullWidth
+                  requiredText="(required)"
+                  disabled={methods.formState.isSubmitting}
+               />
+            </Grid>
+            <Grid item xs={12}>
+               <Typography sx={styles.subtitle} variant="h5">
+                  University
+               </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               {/* <UniversityCountrySelector
+                  value={values.universityCountryCode}
+                  handleClose={handleClose}
+                  submitting={isSubmitting}
+                  setFieldValue={setFieldValue}
+                  error={
+                     errors.universityCountryCode &&
+                     touched.universityCountryCode &&
+                     errors.universityCountryCode.toString()
+                  }
+                  handleOpen={handleOpen}
+                  open={open}
+               /> */}
+               <UniversityCountrySelectorV2
+                  name="universityCountryCode"
+                  disabled={methods.formState.isSubmitting}
+               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               {/* <UniversitySelector
+                  error={
+                     errors.university &&
+                     touched.university &&
+                     errors.university
+                  }
+                  universityCountryCode={values.universityCountryCode}
+                  values={values}
+                  submitting={isSubmitting}
+                  setFieldValue={setFieldValue}
+               /> */}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               {/* <FieldOfStudySelector
+                  setFieldValue={setFieldValue}
+                  value={values.fieldOfStudy}
+                  disabled={isSubmitting}
+                  error={
+                     errors.fieldOfStudy &&
+                     touched.fieldOfStudy &&
+                     errors.fieldOfStudy
+                  }
+               /> */}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+               {/* <LevelOfStudySelector
+                  setFieldValue={setFieldValue}
+                  value={values.levelOfStudy}
+                  disabled={isSubmitting}
+                  error={
+                     errors.levelOfStudy &&
+                     touched.levelOfStudy &&
+                     errors.levelOfStudy
+                  }
+               /> */}
+            </Grid>
+            <Grid item xs={12}>
+               <Typography sx={styles.subtitle} variant="h5">
+                  Social
+               </Typography>
+            </Grid>
+            <Grid item xs={12}>
+               <BrandedTextFieldController
+                  id="linkedinUrl"
+                  name="linkedinUrl"
+                  label="LinkedIn (optional)"
+                  placeholder="https://www.linkedin.com/in/username/"
+                  disabled={methods.formState.isSubmitting}
+                  autoComplete="lname"
+                  fullWidth
+               />
+            </Grid>
+            <Grid item xs={12}>
+               <Typography sx={styles.subtitle} variant="h5">
+                  Newsletter
+               </Typography>
+            </Grid>
+            <Grid item xs={12}>
+               <BrandedCheckBoxController
+                  name="unsubscribed"
+                  label={
+                     <Typography>
+                        I want to join <b>60’000+ students</b> who receive
+                        personalised invitations to career events and job
+                        openings 👍
+                     </Typography>
+                  }
+               />
+            </Grid>
+         </Grid>
+
+         <SubmitButton />
+      </FormProvider>
+   )
+
+   return (
       <Formik
          initialValues={{
             firstName: userData?.firstName || "",
@@ -112,39 +284,6 @@ const PersonalInfo = ({ userData }) => {
             levelOfStudy: userData?.levelOfStudy || null,
          }}
          enableReinitialize
-         validate={(values) => {
-            let errors: any = {}
-            if (!values.firstName) {
-               errors.firstName = "Required"
-            } else if (!/^\D+$/i.test(values.firstName)) {
-               errors.firstName = "Please enter a valid first name"
-            } else if (values.firstName.length > 50) {
-               errors.firstName = "Cannot be longer than 50 characters"
-            }
-            if (!values.lastName) {
-               errors.lastName = "Required"
-            } else if (!/^\D+$/i.test(values.lastName)) {
-               errors.lastName = "Please enter a valid last name"
-            } else if (values.lastName.length > 50) {
-               errors.lastName = "Cannot be longer than 50 characters"
-            }
-            if (
-               values.linkedinUrl.length > 0 &&
-               !values.linkedinUrl.match(URL_REGEX)
-            ) {
-               errors.linkedinUrl = "Please enter a valid URL"
-            }
-            if (!values.universityCountryCode) {
-               errors.universityCountryCode = "Please chose a country code"
-            }
-            if (!values.fieldOfStudy?.name || !values.fieldOfStudy?.id) {
-               errors.fieldOfStudy = "Please select a field of study"
-            }
-            if (!values.levelOfStudy?.name || !values.levelOfStudy?.id) {
-               errors.levelOfStudy = "Please select a level of study"
-            }
-            return errors
-         }}
          onSubmit={handleUpdate}
       >
          {({
@@ -271,8 +410,9 @@ const PersonalInfo = ({ userData }) => {
                               setFieldValue={setFieldValue}
                               error={
                                  errors.universityCountryCode &&
-                                 touched.universityCountryCode &&
-                                 errors.universityCountryCode
+                                 touched.universityCountryCode
+                                    ? errors.universityCountryCode
+                                    : null
                               }
                               handleOpen={handleOpen}
                               open={open}
@@ -281,9 +421,9 @@ const PersonalInfo = ({ userData }) => {
                         <Grid item xs={12} sm={6}>
                            <UniversitySelector
                               error={
-                                 errors.university &&
-                                 touched.university &&
-                                 errors.university
+                                 errors.university && touched.university
+                                    ? errors.university
+                                    : null
                               }
                               universityCountryCode={
                                  values.universityCountryCode
@@ -299,9 +439,9 @@ const PersonalInfo = ({ userData }) => {
                               value={values.fieldOfStudy}
                               disabled={isSubmitting}
                               error={
-                                 errors.fieldOfStudy &&
-                                 touched.fieldOfStudy &&
-                                 errors.fieldOfStudy
+                                 errors.fieldOfStudy && touched.fieldOfStudy
+                                    ? errors.fieldOfStudy
+                                    : null
                               }
                            />
                         </Grid>
@@ -311,9 +451,9 @@ const PersonalInfo = ({ userData }) => {
                               value={values.levelOfStudy}
                               disabled={isSubmitting}
                               error={
-                                 errors.levelOfStudy &&
-                                 touched.levelOfStudy &&
-                                 errors.levelOfStudy
+                                 errors.levelOfStudy && touched.levelOfStudy
+                                    ? errors.levelOfStudy
+                                    : null
                               }
                            />
                         </Grid>
@@ -395,7 +535,7 @@ const PersonalInfo = ({ userData }) => {
                         color="primary"
                         disabled={isSubmitting || !dirty}
                         startIcon={
-                           isSubmitting && (
+                           Boolean(isSubmitting) && (
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
@@ -411,4 +551,27 @@ const PersonalInfo = ({ userData }) => {
    )
 }
 
-export default withFirebase(PersonalInfo)
+const SubmitButton = () => {
+   const { handleSubmit, formState } = useFormContext<PersonalInfo>()
+   const dispatch = useDispatch()
+
+   const onSubmit = (data: PersonalInfo) => {
+      console.log("🚀 ~ file: PersonalInfo.tsx:583 ~ onSubmit ~ data:", data)
+      dispatch(actions.editUserProfile(data))
+   }
+
+   return (
+      <LoadingButton
+         loading={formState.isSubmitting}
+         onClick={() => handleSubmit(onSubmit)()}
+         variant="contained"
+         color="primary"
+         fullWidth
+         sx={styles.submit}
+      >
+         {formState.isSubmitting ? "Updating" : "Update"}
+      </LoadingButton>
+   )
+}
+
+export default PersonalInfo

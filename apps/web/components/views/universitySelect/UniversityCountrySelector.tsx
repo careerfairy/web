@@ -7,6 +7,17 @@ import parse from "autosuggest-highlight/parse"
 
 const otherObj = { code: "OTHER", name: "Other" }
 
+type Props = {
+   handleClose: () => void
+   handleOpen: () => void
+   open: boolean
+   value: string
+   setFieldValue: (field: string, value: string) => void
+   submitting: boolean
+   error: string
+   className?: string
+}
+
 const UniversityCountrySelector = ({
    handleClose,
    handleOpen,
@@ -16,7 +27,7 @@ const UniversityCountrySelector = ({
    submitting,
    error,
    className = "",
-}) => {
+}: Props) => {
    const getSelectedItem = () => {
       // Autocomplete will always complain because of async filtering... :( So ignore the warning
       const item = universityCountries.find((country) => country.code === value)
@@ -26,7 +37,6 @@ const UniversityCountrySelector = ({
    return (
       <Autocomplete
          id="universityCountryCode"
-         name="universityCountryCode"
          fullWidth
          data-testid={"university-country-selector"}
          disabled={submitting}
@@ -68,9 +78,6 @@ const UniversityCountrySelector = ({
                            </React.Fragment>
                         ),
                         autoComplete: "new-password",
-                        form: {
-                           autoComplete: "new-password",
-                        },
                      }}
                   />
                   <Collapse in={Boolean(error)}>
