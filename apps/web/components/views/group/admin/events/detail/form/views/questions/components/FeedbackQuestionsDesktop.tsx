@@ -7,7 +7,7 @@ import {
    TableRow,
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import { FeedbackQuestionFormValues } from "../commons"
+import { FeedbackQuestionsProp } from "../commons"
 import MoreMenuWithEditAndRemoveOptions from "./MoreMenu"
 import { FC, useCallback, useState } from "react"
 import FeedbackQuestionAddEditDialog from "./FeedbackQuestionAddEditDialog"
@@ -55,13 +55,7 @@ const styles = sxStyles({
    },
 })
 
-type FeedbackQuestionsDesktopProps = {
-   questions: FeedbackQuestionFormValues[]
-}
-
-const FeedbackQuestionsDesktop: FC<FeedbackQuestionsDesktopProps> = ({
-   questions,
-}) => {
+const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
    const [currentQuestion, setCurrentQuestion] = useState(null)
 
    const [
