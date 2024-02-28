@@ -43,8 +43,14 @@ const AtsJobSelector: FC<Props> = ({ fieldId }) => {
             label: "Job related to this live stream",
             placeholder: "Select a job",
          }}
+         isOptionEqualToValue={isOptionEqualToValue}
       />
    )
 }
+
+const isOptionEqualToValue = (
+   option: LivestreamJobAssociation,
+   value: LivestreamJobAssociation
+): boolean => option.jobId === value.jobId
 
 export default AtsJobSelector

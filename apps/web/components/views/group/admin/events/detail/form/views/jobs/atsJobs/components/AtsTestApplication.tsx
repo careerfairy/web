@@ -8,7 +8,7 @@ import { sxStyles } from "types/commonTypes"
 import AtsTestApplicationFallback from "./AtsTestApplicationFallback"
 import CircularLoader from "components/views/loader/CircularLoader"
 import JobList from "components/views/group/admin/ats-integration/application-test/JobList"
-import { useEffect } from "react"
+import { useCallback } from "react"
 import Image from "next/legacy/image"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
@@ -31,14 +31,6 @@ const styles = sxStyles({
    content: {
       mt: 1,
       maxWidth: "550px !important",
-   },
-   info: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   form: {
-      my: "40px",
    },
    title: {
       fontSize: { xs: "28px", md: "32px" },
@@ -79,23 +71,20 @@ const AtsTestApplication = () => {
 
 const Content = () => {
    const { handleClose, goToStep } = useStepper()
-   const { isLoading, onSubmit, state, dispatch, actions } =
-      useAtsApplicationTest()
    const isMobile = useIsMobile()
+   const { isLoading, onSubmit, state, dispatch, actions } =
+      useAtsApplicationTest({
+         onSuccess: useCallback(
+            () => goToStep("application-success"),
+            [goToStep]
+         ),
+         onError: useCallback(() => goToStep("application-error"), [goToStep]),
+      })
 
    const { selectJob } = actions
    const { readyToTest, testedSuccessfully } = state
    const isTestedCompleted =
       testedSuccessfully === false || testedSuccessfully === true
-
-   useEffect(() => {
-      if (isTestedCompleted) {
-         goToStep(
-            testedSuccessfully ? "application-success" : "application-error"
-         )
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [isTestedCompleted])
 
    if (isLoading || isTestedCompleted) {
       return <LoadingTest />
