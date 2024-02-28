@@ -3,20 +3,17 @@ export function top10Countries(timePeriod: string) {
     WITH filtered_events AS (
       SELECT 
         ifNull(universityCountry, countryCode) as label,
-        COUNT(distinct(userId)) AS counting,
+        COUNT(distinct(ifNull(userId, visitorId))) AS counting,
       FROM careerfairy-e1fd9.SparkAnalytics.SparkEvents
       WHERE groupId = @groupId
         AND timestamp >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL ${timePeriod}))
         AND ifNull(universityCountry, countryCode) IS NOT NULL
         AND LOWER(ifNull(universityCountry, countryCode)) != LOWER("OTHER")
-        AND userId IS NOT NULL
       GROUP BY label
-      HAVING COUNT(distinct(userId)) != 0
+      HAVING counting != 0
     ), total AS (
-      SELECT SUM(counting) AS total_count FROM (
-        SELECT counting
-        FROM filtered_events
-      )
+      SELECT SUM(counting) AS total_count 
+      FROM filtered_events
     )
     
     SELECT
