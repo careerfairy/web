@@ -6,10 +6,7 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import { useInterests } from "components/custom-hook/useCollection"
-import {
-   LivestreamEvent,
-   LivestreamGroupQuestion,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import {
    LivestreamFormGeneralTabValues,
@@ -122,16 +119,6 @@ const convertLivestreamObjectToForm = (
    }
 }
 
-const getRegistrationQuestionsOptions = (
-   livestream: LivestreamEvent
-): LivestreamGroupQuestion[] => {
-   const firstGroupQuestions =
-      livestream.groupQuestionsMap[Object.keys(livestream.groupQuestionsMap)[0]]
-   return firstGroupQuestions
-      ? Object.values(firstGroupQuestions.questions)
-      : []
-}
-
 const LivestreamAdminDetailsPage = () => {
    const {
       query: { groupId, livestreamId },
@@ -168,9 +155,6 @@ const LivestreamAdminDetailsPage = () => {
                   ? convertLivestreamObjectToForm(livestream, existingInterests)
                   : formInitialValues
 
-               const registrationQuestionsOptions =
-                  getRegistrationQuestionsOptions(livestream)
-
                return (
                   <Box>
                      <Formik<LivestreamFormValues>
@@ -189,11 +173,7 @@ const LivestreamAdminDetailsPage = () => {
                                  />
                               )}
                               {tabValue == TAB_VALUES.QUESTIONS && (
-                                 <LivestreamFormQuestionsStep
-                                    registrationQuestionsOptions={
-                                       registrationQuestionsOptions
-                                    }
-                                 />
+                                 <LivestreamFormQuestionsStep />
                               )}
                               {tabValue == TAB_VALUES.JOBS && (
                                  <LivestreamFormJobsStep
