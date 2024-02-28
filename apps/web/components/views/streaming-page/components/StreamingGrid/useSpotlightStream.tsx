@@ -8,7 +8,7 @@ import {
 type UseSpotlightStream = {
    /** The user stream that should be currently in the spotlight. */
    spotlightStream: UserStream | null
-   /** All other users that are not in the spotlight. */
+   /** All other streams that are not in the spotlight. */
    otherStreams: UserStream[]
 }
 
@@ -31,12 +31,12 @@ export const useSpotlightStream = (
          )
       }
 
-      // Find all other streams that are not in the spotlight
-      const otherStreams = spotlightStream
-         ? combinedStreamers.filter(
-              (stream) => stream.user.uid !== spotlightStream?.user.uid
-           )
-         : combinedStreamers
+      const otherStreams = combinedStreamers.filter(
+         (stream) =>
+            stream.type !== "local-user-screen" && // filter out local user screen share
+            stream.type !== "remote-user-screen" && // filter out remote user screen share
+            stream.user?.uid !== spotlightStream?.user?.uid // filter out the spotlight stream
+      )
 
       return { spotlightStream, otherStreams }
    }, [isScreenShareMode, combinedStreamers, currentScreenSharer])
