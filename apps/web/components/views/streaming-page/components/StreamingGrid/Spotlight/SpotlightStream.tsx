@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { UserStreamComponent } from "../gallery/UserStreamComponent"
 import { useSpotlight } from "./SpotlightProvider"
 import { sxStyles } from "types/commonTypes"
@@ -22,9 +22,7 @@ const styles = sxStyles({
 export const SpotlightStream = () => {
    const { stream } = useSpotlight()
 
-   const hasStream = Boolean(stream)
-
-   if (!hasStream) {
+   if (!stream) {
       return <Box>Please wait while the host is setting up their stream</Box>
    }
 
@@ -37,7 +35,7 @@ const Content = () => {
    const streamIsLandscape = useStreamIsLandscape()
 
    const isRemoteStream =
-      stream?.type === "remote-user" || stream?.type === "remote-user-screen"
+      stream.type === "remote-user" || stream.type === "remote-user-screen"
 
    // the only way to detect changes in a remote video/audio track is to use this hook
    // if not the component will not re-render when the track changes
@@ -47,9 +45,7 @@ const Content = () => {
    )
 
    const isMobilePortrait = streamIsMobile && !streamIsLandscape
-   const track = isRemoteStream ? remoteVideoTrack : stream?.user?.videoTrack
-
-   if (!stream) return <CircularProgress />
+   const track = isRemoteStream ? remoteVideoTrack : stream.user?.videoTrack
 
    return (
       <Box sx={styles.root}>
