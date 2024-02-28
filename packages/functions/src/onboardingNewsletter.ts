@@ -32,8 +32,8 @@ export const onboardingNewsletter = functions
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       functions.logger.info("Starting execution of OnboardingNewsletterService")
-      // Disable for now - wgoncalves
-      // await sendOnboardingNewsletter()
+
+      await sendOnboardingNewsletter()
    })
 
 export const manualOnboardingNewsletter = functions
