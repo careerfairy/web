@@ -316,3 +316,12 @@ export const swapPositions = <T>(
    array[indexB] = temp
    return array
 }
+// Calculate difference between two dates in days while taking into consideration the time
+export const getDateDifferenceInDays = (
+   dateFrom: Date,
+   dateTo: Date
+): number => {
+   const diff = Math.abs(dateFrom.getTime() - dateTo.getTime())
+   const diffDays = Math.ceil(diff / (1000 * 3600 * 24))
+   return diffDays
+}
