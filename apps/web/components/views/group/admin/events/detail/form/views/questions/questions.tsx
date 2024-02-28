@@ -1,20 +1,15 @@
-import { FC } from "react"
 import FeedbackQuestions from "./FeedbackQuestions"
 import FormSectionHeader from "../../FormSectionHeader"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import MultiChipSelect from "../general/components/MultiChipSelect"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
-import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
 
-type LivestreamFormJobsStepProps = {
-   registrationQuestionsOptions: LivestreamGroupQuestion[]
-}
-
-const LivestreamFormJobsStep: FC<LivestreamFormJobsStepProps> = ({
-   registrationQuestionsOptions,
-}) => {
+const LivestreamFormJobsStep = () => {
    const {
       values: { questions },
    } = useLivestreamFormValues()
+
+   const { groupQuestions } = useGroup()
 
    return (
       <>
@@ -24,7 +19,7 @@ const LivestreamFormJobsStep: FC<LivestreamFormJobsStepProps> = ({
          />
          <MultiChipSelect
             id="questions.registrationQuestions"
-            options={registrationQuestionsOptions}
+            options={groupQuestions}
             value={questions.registrationQuestions ?? []}
             multiple
             disableCloseOnSelect
