@@ -143,6 +143,8 @@ export const LocalStream = ({
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
 
+   const isScreenShare = type === "local-user-screen"
+
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)
 
@@ -153,7 +155,7 @@ export const LocalStream = ({
          <Box
             sx={[
                styles.videoTrack,
-               type === "local-user-screen" && styles.videoContain,
+               isScreenShare && styles.videoContain,
                containVideo && styles.videoContain,
             ]}
             className="videoTrack"
@@ -176,10 +178,11 @@ export const LocalStream = ({
          )}
 
          <FloatingContent>{children}</FloatingContent>
-         {hideDetails ? null : (
+         {hideDetails || isScreenShare ? null : (
             <DetailsOverlay
                micActive={micActive}
                streamerDetails={streamerDetails}
+               showIcons={!isScreenShare}
             />
          )}
       </VideoTrackWrapper>
