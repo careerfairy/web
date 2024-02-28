@@ -122,6 +122,7 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsDesktopProps> = ({
                               handleRemove={(event) =>
                                  handleRemove(event, question)
                               }
+                              labels={["Edit question", "Remove question"]}
                            />
                         </TableCell>
                      </TableRow>
