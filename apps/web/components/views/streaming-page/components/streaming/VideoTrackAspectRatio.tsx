@@ -15,28 +15,23 @@ const styles = sxStyles({
 
 type Props = {
    children: ReactNode
-   originalStreamAspectRatio: boolean
-   track: ILocalVideoTrack | IRemoteVideoTrack
+   /**
+    * The video track to infer the aspect ratio from,
+    * if not provided, no aspect ratio will be applied
+    */
+   track?: ILocalVideoTrack | IRemoteVideoTrack
 }
 
-export const ConditionalStreamAspectRatio = ({
-   children,
-   originalStreamAspectRatio,
-   track,
-}: Props) => {
-   const dimensions = useVideoTrackDimensions(
-      originalStreamAspectRatio ? track : null
-   )
+export const VideoTrackAspectRatio = ({ children, track }: Props) => {
+   const dimensions = useVideoTrackDimensions(track)
 
-   if (!originalStreamAspectRatio || !dimensions) {
+   if (!track || !dimensions) {
       return <>{children}</>
    }
 
    return (
       <AspectRatio
-         aspectRatio={
-            dimensions ? `${dimensions?.width}:${dimensions?.height}` : "16:9"
-         }
+         aspectRatio={`${dimensions?.width}:${dimensions?.height}`}
          childProps={{
             sx: styles.childStyles,
          }}
