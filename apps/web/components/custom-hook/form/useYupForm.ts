@@ -3,17 +3,14 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 
 /**
- * Custom hook for form handling with Yup schema validation.
+ * A custom hook that integrates Yup schema validation with react-hook-form.
+ * It returns useForm properties and methods, enhanced for schema validation.
  *
- * This hook simplifies integrating Yup schema validation with react-hook-form by automatically
- * resolving the schema provided. It returns all the necessary properties and methods from useForm
- * to manage form state, handle submissions, and validate user input according to the Yup schema.
+ * @param {Object} props - Configuration properties.
+ * @param {yup.AnyObjectSchema} props.schema - Yup validation schema.
+ * Additional UseFormProps can be included for react-hook-form customization.
  *
- * @param {Object} props - The properties to configure the hook.
- * @param {yup.AnyObjectSchema} props.schema - The Yup schema object for validation.
- * Other properties from UseFormProps can be passed to customize the react-hook-form behavior.
- *
- * @returns The useForm hook properties and methods, enhanced with Yup schema validation.
+ * @returns Enhanced useForm hook properties and methods for schema validation.
  *
  * @example
  * const schema = yup.object({
@@ -22,21 +19,12 @@ import * as yup from "yup"
  *    gender: yup.string().oneOf(['male', 'female']).required(),
  * });
  *
-   const {
-      register,
-      handleSubmit,
-      formState: { errors },
-   } = useYupForm({
-      schema,
-      defaultValues: {
-         name: "",
-         age: 0,
-         gender: "male",
-      },
-   })
+ * const { register, handleSubmit, formState: { errors } } = useYupForm({
+ *    schema,
+ *    defaultValues: { name: "", age: 0, gender: "male" },
+ * });
  *
- * Note: Use `yup.object({})` instead of `yup.object().shape({})` for schema definition due to type inference limitations,
- * though both validate identically.
+ * Note: Prefer `yup.object({})` over `yup.object().shape({})` for schema definition to avoid type inference issues.
  */
 export const useYupForm = <TSchema extends yup.AnyObjectSchema>(
    props: Omit<UseFormProps<yup.InferType<TSchema>>, "resolver"> & {
