@@ -13,8 +13,7 @@ type Props = {
 const AtsJobSelector: FC<Props> = ({ fieldId }) => {
    const { group } = useGroup()
    const { atsAccount } = useATSAccount()
-   const accounts = useMemo(() => [atsAccount], [atsAccount])
-   const allJobs = useGroupATSJobsAllIntegrations(accounts)
+   const allJobs = useGroupATSJobsAllIntegrations([atsAccount])
    const {
       values: {
          jobs: { jobs },

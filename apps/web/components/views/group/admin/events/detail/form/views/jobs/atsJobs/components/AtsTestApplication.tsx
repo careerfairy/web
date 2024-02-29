@@ -8,7 +8,6 @@ import { sxStyles } from "types/commonTypes"
 import AtsTestApplicationFallback from "./AtsTestApplicationFallback"
 import CircularLoader from "components/views/loader/CircularLoader"
 import JobList from "components/views/group/admin/ats-integration/application-test/JobList"
-import { useCallback } from "react"
 import Image from "next/legacy/image"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
@@ -74,11 +73,8 @@ const Content = () => {
    const isMobile = useIsMobile()
    const { isLoading, onSubmit, state, dispatch, actions } =
       useAtsApplicationTest({
-         onSuccess: useCallback(
-            () => goToStep("application-success"),
-            [goToStep]
-         ),
-         onError: useCallback(() => goToStep("application-error"), [goToStep]),
+         onSuccess: () => goToStep("application-success"),
+         onError: () => goToStep("application-error"),
       })
 
    const { selectJob } = actions

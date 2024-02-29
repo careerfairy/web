@@ -5,17 +5,13 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import CircularLoader from "components/views/loader/CircularLoader"
 import Typography from "@mui/material/Typography"
 import useAtsApplicationTest from "components/custom-hook/ats/useAtsApplicationTest"
-import { useCallback } from "react"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 export const ApplicationTest = () => {
    const { successNotification } = useSnackbarNotifications()
    const { isLoading, components, onSubmit, state, dispatch, actions } =
       useAtsApplicationTest({
-         onSuccess: useCallback(
-            () => successNotification(successMessage),
-            [successNotification]
-         ),
+         onSuccess: () => successNotification(successMessage),
       })
    const { selectJob, setData } = actions
    const { readyToTest, testedSuccessfully } = state
