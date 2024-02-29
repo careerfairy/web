@@ -89,7 +89,6 @@ const customJobShape = yup.object().shape({
    description: yup.string().required(),
    jobType: yup.string().required(),
    postingUrl: yup.string().required(),
-   salary: yup.number(),
    deleted: yup.bool(),
 })
 
