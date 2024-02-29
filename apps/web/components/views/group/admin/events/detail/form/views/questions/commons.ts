@@ -44,5 +44,5 @@ export const feedbackQuestionValidationSchema = () =>
    yup.object().shape({
       title: yup.string().required("Required"),
       type: yup.string().required("Required"),
-      appearAfter: yup.string().required("Required"),
+      appearAfter: yup.number().required("Required"),
    })
