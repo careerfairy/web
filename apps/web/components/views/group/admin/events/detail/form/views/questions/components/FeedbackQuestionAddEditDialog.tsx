@@ -5,7 +5,7 @@ import { FeedbackQuestionFormValues } from "../commons"
 
 type FeedbackQuestionAddEditDialogProps = {
    question?: FeedbackQuestionFormValues
-} & Omit<BrandedDialogProps, "children">
+} & Omit<BrandedDialogProps, "key" | "children">
 
 const FeedbackQuestionAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
    question,
@@ -13,6 +13,7 @@ const FeedbackQuestionAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
    handleCloseDialog,
 }) => (
    <BrandedDialog
+      key="add-edit-feedback-question-dialog"
       isDialogOpen={isDialogOpen}
       handleCloseDialog={handleCloseDialog}
    >

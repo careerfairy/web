@@ -125,13 +125,11 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
          </TableContainer>
          <AddQuestionButton handleClick={handleAddQuestionClick} />
          <FeedbackQuestionAddEditDialog
-            key="add-edit-feedback-question-dialog"
             question={currentQuestion}
             isDialogOpen={isAddEditDialogOpen}
             handleCloseDialog={handleAddEditCloseDialog}
          />
          <FeedbackQuestionRemoveDialog
-            key="remove-feedback-question-dialog"
             question={currentQuestion}
             isDialogOpen={isRemoveDialogOpen}
             handleCloseDialog={handleRemoveCloseDialog}

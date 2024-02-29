@@ -13,7 +13,7 @@ const styles = sxStyles({
 
 type FeedbackQuestionRemoveDialogProps = {
    question: object
-} & Omit<BrandedDialogProps, "children">
+} & Omit<BrandedDialogProps, "key" | "children">
 
 const FeedbackQuestionRemoveDialog: FC<FeedbackQuestionRemoveDialogProps> = ({
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,6 +25,7 @@ const FeedbackQuestionRemoveDialog: FC<FeedbackQuestionRemoveDialogProps> = ({
 
    return (
       <BrandedDialog
+         key="remove-feedback-question-dialog"
          isDialogOpen={isDialogOpen}
          handleCloseDialog={handleCloseDialog}
          paperSx={Boolean(!isMobile) && styles.paper}
