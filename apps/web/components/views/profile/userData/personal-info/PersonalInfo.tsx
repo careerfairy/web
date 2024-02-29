@@ -1,47 +1,26 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { Formik } from "formik"
-
-import {
-   Typography,
-   TextField,
-   Button,
-   Grid,
-   CircularProgress,
-   Collapse,
-   FormHelperText,
-   FormControl,
-   Checkbox,
-   FormControlLabel,
-} from "@mui/material"
-import UniversityCountrySelector from "components/views/universitySelect/UniversityCountrySelector"
-import UniversitySelector from "components/views/universitySelect/UniversitySelector"
-import { GENERAL_ERROR } from "components/util/constants"
-import { useDispatch, useSelector } from "react-redux"
-import * as actions from "store/actions"
-import { useSnackbar } from "notistack"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
-import BadgeSimpleButton from "../../BadgeSimpleButton"
-import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
-import { StylesProps } from "../../../../../types/commonTypes"
-import { useRouter } from "next/router"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { FieldOfStudySelector } from "../../../signup/userInformation/FieldOfStudySelector"
-import { LevelOfStudySelector } from "../../../signup/userInformation/LevelOfStudySelector"
-import { useYupForm } from "components/custom-hook/form/useYupForm"
-import { PersonalInfo, personalInfoSchema } from "./schema"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { FormProvider, useFormContext } from "react-hook-form"
-import { BrandedTextFieldController } from "components/views/common/inputs/BrandedTextField"
-import { BrandedCheckBoxController } from "components/views/common/inputs/BrandedCheckbox"
-// import { LogoDev } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
-import UniversityCountrySelectorV2 from "components/views/universitySelect/UniversityCountrySelectorV2"
+import { Grid, Typography } from "@mui/material"
+import { useYupForm } from "components/custom-hook/form/useYupForm"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { userRepo } from "data/RepositoryInstances"
+import { useRouter } from "next/router"
+import { useCallback } from "react"
+import { FormProvider, useFormContext } from "react-hook-form"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
+import { sxStyles } from "../../../../../types/commonTypes"
+import BadgeSimpleButton from "../../BadgeSimpleButton"
+import { StudyDomainSelector } from "./StudyDomainSelector"
+import { UniversityCountrySelector } from "./UniversityCountrySelector"
+import { UniversitySelector } from "./UniversitySelector"
+import { PersonalInfoFormValues, personalInfoSchema } from "./schema"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
+import { ControlledBrandedCheckBox } from "components/views/common/inputs/ControlledBrandedCheckbox"
+import { UserData } from "@careerfairy/shared-lib/users"
 
-const styles: StylesProps = {
-   avatar: {
-      margin: 1,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-   },
+const styles = sxStyles({
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
       marginBottom: 0,
@@ -57,7 +36,7 @@ const styles: StylesProps = {
       fontWeight: "bold",
       marginBottom: 1,
    },
-}
+})
 
 type Props = {
    userData: UserData
@@ -65,12 +44,7 @@ type Props = {
 
 const PersonalInfo = ({ userData }: Props) => {
    const { userPresenter } = useAuth()
-   const [open, setOpen] = useState(false)
-   const { enqueueSnackbar } = useSnackbar()
    const router = useRouter()
-   const dispatch = useDispatch()
-   // @ts-ignore
-   const { loading, error } = useSelector((state) => state.auth.profileEdit)
 
    const methods = useYupForm({
       schema: personalInfoSchema,
@@ -78,45 +52,23 @@ const PersonalInfo = ({ userData }: Props) => {
          firstName: userData?.firstName || "",
          lastName: userData?.lastName || "",
          linkedinUrl: userData?.linkedinUrl || "",
-         university: userData?.university,
+         university: {
+            id: userData?.university?.code || "",
+            value: userData?.university?.name || "",
+         },
          universityCountryCode: userData?.universityCountryCode || "",
          unsubscribed: userData?.unsubscribed || false,
-         fieldOfStudy: userData?.fieldOfStudy,
-         levelOfStudy: userData?.levelOfStudy,
-         email: userData?.id,
+         fieldOfStudy: {
+            id: userData?.fieldOfStudy?.id || "",
+            value: userData?.fieldOfStudy?.name || "",
+         },
+         levelOfStudy: {
+            id: userData?.levelOfStudy?.id || "",
+            value: userData?.levelOfStudy?.name || "",
+         },
       },
       mode: "onChange", // Important for the form to be validated on change, depending on your use case
    })
-
-   useEffect(() => {
-      if (loading === false && error === false) {
-         enqueueSnackbar("Your profile has been updated!", {
-            variant: "success",
-            preventDuplicate: true,
-         })
-      } else if (error) {
-         enqueueSnackbar(GENERAL_ERROR, {
-            variant: "error",
-            preventDuplicate: true,
-         })
-      }
-
-      return () => {
-         dispatch(actions.clean())
-      }
-   }, [loading, error, enqueueSnackbar, dispatch])
-
-   const handleClose = () => {
-      setOpen(false)
-   }
-
-   const handleOpen = () => {
-      setOpen(true)
-   }
-
-   const handleUpdate = async (values) => {
-      await dispatch(actions.editUserProfile(values))
-   }
 
    const navigateToReferrals = useCallback(() => {
       void router.push({
@@ -125,6 +77,8 @@ const PersonalInfo = ({ userData }: Props) => {
 
       return {} // match event handler signature
    }, [router])
+
+   const isSubmitting = methods.formState.isSubmitting
 
    return (
       <FormProvider {...methods}>
@@ -144,30 +98,31 @@ const PersonalInfo = ({ userData }: Props) => {
          </Grid>
          <Grid container spacing={2}>
             <Grid item xs={12}>
-               <BrandedTextFieldController
+               <BrandedTextField
                   name="email"
-                  disabled
                   fullWidth
                   id="email"
                   label="Email Address"
+                  value={userData.userEmail}
+                  disabled
                />
             </Grid>
             <Grid item xs={12} sm={6}>
-               <BrandedTextFieldController
+               <ControlledBrandedTextField
                   name="firstName"
                   label="First Name"
                   fullWidth
                   requiredText="(required)"
-                  disabled={methods.formState.isSubmitting}
+                  disabled={isSubmitting}
                />
             </Grid>
             <Grid item xs={12} sm={6}>
-               <BrandedTextFieldController
+               <ControlledBrandedTextField
                   name="lastName"
                   label="Last Name"
                   fullWidth
                   requiredText="(required)"
-                  disabled={methods.formState.isSubmitting}
+                  disabled={isSubmitting}
                />
             </Grid>
             <Grid item xs={12}>
@@ -176,60 +131,28 @@ const PersonalInfo = ({ userData }: Props) => {
                </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-               {/* <UniversityCountrySelector
-                  value={values.universityCountryCode}
-                  handleClose={handleClose}
-                  submitting={isSubmitting}
-                  setFieldValue={setFieldValue}
-                  error={
-                     errors.universityCountryCode &&
-                     touched.universityCountryCode &&
-                     errors.universityCountryCode.toString()
-                  }
-                  handleOpen={handleOpen}
-                  open={open}
-               /> */}
-               <UniversityCountrySelectorV2
+               <UniversityCountrySelector
                   name="universityCountryCode"
-                  disabled={methods.formState.isSubmitting}
+                  universityFieldName="university"
                />
             </Grid>
             <Grid item xs={12} sm={6}>
-               {/* <UniversitySelector
-                  error={
-                     errors.university &&
-                     touched.university &&
-                     errors.university
-                  }
-                  universityCountryCode={values.universityCountryCode}
-                  values={values}
-                  submitting={isSubmitting}
-                  setFieldValue={setFieldValue}
-               /> */}
+               <UniversitySelector
+                  name="university"
+                  countryCodesName="universityCountryCode"
+               />
             </Grid>
             <Grid item xs={12} sm={6}>
-               {/* <FieldOfStudySelector
-                  setFieldValue={setFieldValue}
-                  value={values.fieldOfStudy}
-                  disabled={isSubmitting}
-                  error={
-                     errors.fieldOfStudy &&
-                     touched.fieldOfStudy &&
-                     errors.fieldOfStudy
-                  }
-               /> */}
+               <StudyDomainSelector
+                  collection="fieldsOfStudy"
+                  name="fieldOfStudy"
+               />
             </Grid>
             <Grid item xs={12} sm={6}>
-               {/* <LevelOfStudySelector
-                  setFieldValue={setFieldValue}
-                  value={values.levelOfStudy}
-                  disabled={isSubmitting}
-                  error={
-                     errors.levelOfStudy &&
-                     touched.levelOfStudy &&
-                     errors.levelOfStudy
-                  }
-               /> */}
+               <StudyDomainSelector
+                  collection="levelsOfStudy"
+                  name="levelOfStudy"
+               />
             </Grid>
             <Grid item xs={12}>
                <Typography sx={styles.subtitle} variant="h5">
@@ -237,12 +160,12 @@ const PersonalInfo = ({ userData }: Props) => {
                </Typography>
             </Grid>
             <Grid item xs={12}>
-               <BrandedTextFieldController
+               <ControlledBrandedTextField
                   id="linkedinUrl"
                   name="linkedinUrl"
                   label="LinkedIn (optional)"
                   placeholder="https://www.linkedin.com/in/username/"
-                  disabled={methods.formState.isSubmitting}
+                  disabled={isSubmitting}
                   autoComplete="lname"
                   fullWidth
                />
@@ -253,7 +176,7 @@ const PersonalInfo = ({ userData }: Props) => {
                </Typography>
             </Grid>
             <Grid item xs={12}>
-               <BrandedCheckBoxController
+               <ControlledBrandedCheckBox
                   name="unsubscribed"
                   label={
                      <Typography>
@@ -269,295 +192,43 @@ const PersonalInfo = ({ userData }: Props) => {
          <SubmitButton />
       </FormProvider>
    )
-
-   return (
-      <Formik
-         initialValues={{
-            firstName: userData?.firstName || "",
-            lastName: userData?.lastName || "",
-            linkedinUrl:
-               userData?.linkedinUrl || "" ? userData.linkedinUrl : "",
-            university: userData?.university,
-            universityCountryCode: userData?.universityCountryCode || "",
-            unsubscribed: userData?.unsubscribed || false,
-            fieldOfStudy: userData?.fieldOfStudy || null,
-            levelOfStudy: userData?.levelOfStudy || null,
-         }}
-         enableReinitialize
-         onSubmit={handleUpdate}
-      >
-         {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            dirty,
-            setFieldValue,
-            isSubmitting,
-            /* and other goodies */
-         }) =>
-            userData ? (
-               <form onSubmit={handleSubmit}>
-                  <>
-                     <Grid container spacing={2}>
-                        <Grid item xs={8}>
-                           <ContentCardTitle sx={styles.title}>
-                              Personal Info
-                           </ContentCardTitle>
-                        </Grid>
-                        <Grid item xs={4} sx={{ textAlign: "right" }}>
-                           <BadgeSimpleButton
-                              badge={NetworkerBadge}
-                              isActive={Boolean(
-                                 userPresenter?.badges?.networkerBadge()
-                              )}
-                              onClick={navigateToReferrals}
-                           />
-                        </Grid>
-                     </Grid>
-                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                           <TextField
-                              variant="outlined"
-                              disabled
-                              value={userData.id}
-                              fullWidth
-                              id="email"
-                              label="Email Address"
-                              name="email"
-                           />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <FormControl fullWidth>
-                              <TextField
-                                 autoComplete="fname"
-                                 name="firstName"
-                                 variant="outlined"
-                                 required
-                                 fullWidth
-                                 id="firstName"
-                                 label="First Name"
-                                 disabled={isSubmitting}
-                                 onBlur={handleBlur}
-                                 value={values.firstName}
-                                 error={Boolean(
-                                    errors.firstName &&
-                                       touched.firstName &&
-                                       errors.firstName
-                                 )}
-                                 onChange={handleChange}
-                              />
-                              <Collapse
-                                 in={Boolean(
-                                    errors.firstName &&
-                                       touched.firstName &&
-                                       errors.firstName
-                                 )}
-                              >
-                                 <FormHelperText error>
-                                    {/* @ts-ignore */}
-                                    {errors.firstName}
-                                 </FormHelperText>
-                              </Collapse>
-                           </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <FormControl fullWidth>
-                              <TextField
-                                 variant="outlined"
-                                 required
-                                 fullWidth
-                                 id="lastName"
-                                 label="Last Name"
-                                 name="lastName"
-                                 autoComplete="lname"
-                                 disabled={isSubmitting}
-                                 onBlur={handleBlur}
-                                 value={values.lastName}
-                                 error={Boolean(
-                                    errors.lastName &&
-                                       touched.lastName &&
-                                       errors.lastName
-                                 )}
-                                 onChange={handleChange}
-                              />
-                              <Collapse
-                                 in={Boolean(
-                                    errors.lastName &&
-                                       touched.lastName &&
-                                       errors.lastName
-                                 )}
-                              >
-                                 <FormHelperText error>
-                                    {/* @ts-ignore */}
-                                    {errors.lastName}
-                                 </FormHelperText>
-                              </Collapse>
-                           </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                           <Typography sx={styles.subtitle} variant="h5">
-                              University
-                           </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <UniversityCountrySelector
-                              value={values.universityCountryCode}
-                              handleClose={handleClose}
-                              submitting={isSubmitting}
-                              setFieldValue={setFieldValue}
-                              error={
-                                 errors.universityCountryCode &&
-                                 touched.universityCountryCode
-                                    ? errors.universityCountryCode
-                                    : null
-                              }
-                              handleOpen={handleOpen}
-                              open={open}
-                           />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <UniversitySelector
-                              error={
-                                 errors.university && touched.university
-                                    ? errors.university
-                                    : null
-                              }
-                              universityCountryCode={
-                                 values.universityCountryCode
-                              }
-                              values={values}
-                              submitting={isSubmitting}
-                              setFieldValue={setFieldValue}
-                           />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <FieldOfStudySelector
-                              setFieldValue={setFieldValue}
-                              value={values.fieldOfStudy}
-                              disabled={isSubmitting}
-                              error={
-                                 errors.fieldOfStudy && touched.fieldOfStudy
-                                    ? errors.fieldOfStudy
-                                    : null
-                              }
-                           />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                           <LevelOfStudySelector
-                              setFieldValue={setFieldValue}
-                              value={values.levelOfStudy}
-                              disabled={isSubmitting}
-                              error={
-                                 errors.levelOfStudy && touched.levelOfStudy
-                                    ? errors.levelOfStudy
-                                    : null
-                              }
-                           />
-                        </Grid>
-                        <Grid item xs={12}>
-                           <Typography sx={styles.subtitle} variant="h5">
-                              Social
-                           </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                           <FormControl fullWidth>
-                              <TextField
-                                 variant="outlined"
-                                 fullWidth
-                                 id="linkedinUrl"
-                                 label="LinkedIn (optional)"
-                                 name="linkedinUrl"
-                                 autoComplete="lname"
-                                 placeholder="https://www.linkedin.com/in/username/"
-                                 disabled={isSubmitting}
-                                 onBlur={handleBlur}
-                                 value={values.linkedinUrl}
-                                 error={Boolean(
-                                    errors.linkedinUrl &&
-                                       touched.linkedinUrl &&
-                                       errors.linkedinUrl
-                                 )}
-                                 onChange={handleChange}
-                              />
-                              <Collapse
-                                 in={Boolean(
-                                    errors.linkedinUrl &&
-                                       touched.linkedinUrl &&
-                                       errors.linkedinUrl
-                                 )}
-                              >
-                                 <FormHelperText error>
-                                    {/* @ts-ignore */}
-                                    {errors.linkedinUrl}
-                                 </FormHelperText>
-                              </Collapse>
-                           </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                           <Typography sx={styles.subtitle} variant="h5">
-                              Newsletter
-                           </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                           <FormControl fullWidth>
-                              <FormControlLabel
-                                 control={
-                                    <Checkbox
-                                       checked={!values.unsubscribed}
-                                       onBlur={handleBlur}
-                                       onChange={(event) => {
-                                          setFieldValue(
-                                             "unsubscribed",
-                                             !event.target.checked
-                                          )
-                                       }}
-                                       name="unsubscribed"
-                                    />
-                                 }
-                                 label={
-                                    <Typography>
-                                       I want to join <b>60’000+ students</b>{" "}
-                                       who receive personalised invitations to
-                                       career events and job openings 👍
-                                    </Typography>
-                                 }
-                              />
-                           </FormControl>
-                        </Grid>
-                     </Grid>
-                     <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        disabled={isSubmitting || !dirty}
-                        startIcon={
-                           Boolean(isSubmitting) && (
-                              <CircularProgress size={20} color="inherit" />
-                           )
-                        }
-                        sx={styles.submit}
-                     >
-                        {isSubmitting ? "Updating" : "Update"}
-                     </Button>
-                  </>
-               </form>
-            ) : null
-         }
-      </Formik>
-   )
 }
 
 const SubmitButton = () => {
-   const { handleSubmit, formState } = useFormContext<PersonalInfo>()
-   const dispatch = useDispatch()
+   const { handleSubmit, formState, reset } =
+      useFormContext<PersonalInfoFormValues>()
+   const { userData } = useAuth()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
 
-   const onSubmit = (data: PersonalInfo) => {
-      console.log("🚀 ~ file: PersonalInfo.tsx:583 ~ onSubmit ~ data:", data)
-      dispatch(actions.editUserProfile(data))
+   const onSubmit = async (data: PersonalInfoFormValues) => {
+      try {
+         await userRepo.updateUserData(userData.id, {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            linkedinUrl: data.linkedinUrl,
+            fieldOfStudy: {
+               id: data.fieldOfStudy.id,
+               name: data.fieldOfStudy.value,
+            },
+            levelOfStudy: {
+               id: data.levelOfStudy.id,
+               name: data.levelOfStudy.value,
+            },
+            university: {
+               code: data.university.id,
+               name: data.university.value,
+            },
+            universityCountryCode: data.universityCountryCode,
+            unsubscribed: data.unsubscribed,
+         })
+         reset(data)
+         successNotification("Your profile has been updated!")
+      } catch (error) {
+         errorNotification(
+            error,
+            "We encountered a problem while updating your profile. Rest assured, we're on it!"
+         )
+      }
    }
 
    return (
@@ -567,6 +238,7 @@ const SubmitButton = () => {
          variant="contained"
          color="primary"
          fullWidth
+         disabled={!formState.isDirty}
          sx={styles.submit}
       >
          {formState.isSubmitting ? "Updating" : "Update"}
