@@ -25,13 +25,13 @@ export const UniversitySelector = ({ name, countryCodesName }: Props) => {
    const universities = useUniversitiesByCountryCodes(countryCodes)
 
    const options = useMemo(() => {
-      const unies =
+      const newOptions =
          universities?.map((university) => ({
             id: university.id,
             value: university.name,
          })) || []
 
-      return [OTHER_UNIVERSITY_OPTION, ...unies]
+      return [OTHER_UNIVERSITY_OPTION, ...newOptions]
    }, [universities])
 
    return (
@@ -43,6 +43,7 @@ export const UniversitySelector = ({ name, countryCodesName }: Props) => {
             id: "universityCountryCode",
             disabled: isSubmitting,
             autoHighlight: true,
+            disableClearable: true,
             // @ts-ignore
             ["data-testid"]: "university-country-selector",
             filterOptions: filterWithOther,
