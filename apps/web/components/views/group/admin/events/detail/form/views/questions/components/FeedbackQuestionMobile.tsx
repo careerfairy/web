@@ -11,7 +11,6 @@ import {
    feedbackQuestionValidationSchema,
 } from "../commons"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import FeedbackQuestionRemoveDialog from "./FeedbackQuestionRemoveDialog"
 
 const styles = sxStyles({
    container: {
@@ -68,6 +67,12 @@ const styles = sxStyles({
          padding: "5px 15px",
       },
    },
+   buttonExtraSmall: {
+      fontSize: {
+         xs: "1rem",
+         sm: "initial",
+      },
+   },
 })
 
 type FeedbackQuestionMobileProps = {
@@ -110,8 +115,9 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
                            color="error"
                            onClick={handleRemove}
                            endIcon={<DeleteIcon />}
+                           sx={styles.buttonExtraSmall}
                         >
-                           Remove Question
+                           Remove question
                         </Button>
                         <Button
                            variant="contained"
@@ -119,6 +125,7 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
                            disabled={!isValid}
                            onClick={() => setIsEditing(false)}
                            endIcon={<Save />}
+                           sx={styles.buttonExtraSmall}
                         >
                            Save
                         </Button>
