@@ -5,16 +5,15 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
-   container: {
+   container: (theme) => ({
       display: "flex",
       justifyContent: "center",
       width: "100%",
       height: "74px",
-      border: "1px solid #F3F3F5",
+      border: `1px solid ${theme.brand.white[500]}`,
       borderRadius: "12px",
-      background:
-         "linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
-   },
+      background: `linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, ${theme.brand.white[500]}, ${theme.brand.white[500]})`,
+   }),
    button: {
       fontWeight: 600,
       padding: "28px",
