@@ -36,7 +36,7 @@ export const UniversitySelector = ({ name, countryCodesName }: Props) => {
 
    return (
       <ControlledBrandedAutoComplete
-         label="Select University"
+         label="University"
          name={name}
          options={options}
          autocompleteProps={{
