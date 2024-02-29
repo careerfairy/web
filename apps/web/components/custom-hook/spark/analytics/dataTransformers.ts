@@ -123,7 +123,7 @@ export const convertToClientModel = (
    data: SparksAnalyticsDTO,
    fieldsOfStudyLookup,
    levelsOfStudyLookup
-): SparkAnalyticsClientWithPastData | {} => {
+): SparkAnalyticsClientWithPastData | object => {
    const {
       reach,
       engagement,
@@ -157,7 +157,7 @@ export const convertToClientModel = (
       },
    ]
 
-   const analytics: SparkAnalyticsClientWithPastData | {} =
+   const analytics: SparkAnalyticsClientWithPastData | object =
       timeFramesFilters.reduce(
          (acc, { timeFrame, value, timeFrameFilterCallback }) => {
             acc[timeFrame] = {

@@ -24,7 +24,7 @@ const useSparksAnalytics = (groupId: string) => {
    const fetcher = useFunctionsSWR()
 
    const { data } = useSWR<SparksAnalyticsDTO>(
-      ["getSparksAnalytics", { groupId }],
+      ["getSparksAnalytics_v2", { groupId }],
       fetcher,
       reducedRemoteCallsOptions
    )
