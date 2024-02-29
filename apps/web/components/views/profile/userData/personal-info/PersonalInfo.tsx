@@ -218,9 +218,9 @@ const SubmitButton = () => {
                code: data.university.id,
                name: data.university.value,
                // If the user selects the same university, we want to keep the questions
-               ...(data.university.id === userData.university.code
+               ...(data.university.id === userData.university?.code
                   ? {
-                       questions: userData.university.questions,
+                       questions: userData.university?.questions || null,
                     }
                   : {}),
             },
