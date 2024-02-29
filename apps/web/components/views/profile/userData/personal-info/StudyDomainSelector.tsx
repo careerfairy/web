@@ -28,7 +28,9 @@ export const StudyDomainSelector = ({ name, collection }: Props) => {
 
    return (
       <ControlledBrandedAutoComplete
-         label="Select Field of Study"
+         label={`Select your ${
+            collection === "fieldsOfStudy" ? "field" : "level"
+         } of Study`}
          name={name}
          options={options}
          autocompleteProps={{

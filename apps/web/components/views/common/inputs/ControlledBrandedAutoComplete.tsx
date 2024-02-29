@@ -9,13 +9,14 @@ import {
 import {
    Autocomplete,
    AutocompleteProps,
-   Checkbox,
+   styled,
    TextFieldProps,
    useForkRef,
 } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { forwardRef, ReactNode, Ref, RefAttributes } from "react"
 import BrandedTextField from "./BrandedTextField"
+import BrandedCheckbox from "./BrandedCheckbox"
 
 export type Option = {
    id: string | number
@@ -64,6 +65,12 @@ type AutocompleteElementComponent = <
    > &
       RefAttributes<HTMLDivElement>
 ) => JSX.Element
+
+const StyledMenuItem = styled("li")({
+   '&[aria-selected="true"]': {
+      backgroundColor: "#FAFAFA !important",
+   },
+})
 
 export const ControlledBrandedAutoComplete = forwardRef(
    function AutocompleteElement<
@@ -172,22 +179,22 @@ export const ControlledBrandedAutoComplete = forwardRef(
                autocompleteProps?.renderOption ??
                (showCheckbox
                   ? (props, option, { selected }) => (
-                       <li {...props}>
-                          <Checkbox
+                       <StyledMenuItem {...props}>
+                          <BrandedCheckbox
                              sx={{ marginRight: 1 }}
                              checked={selected}
                           />
                           {autocompleteProps?.getOptionLabel?.(option) ||
                              option.value ||
                              option}
-                       </li>
+                       </StyledMenuItem>
                     )
                   : (props, option) => (
-                       <li {...props} key={option?.id || option}>
+                       <StyledMenuItem {...props} key={option?.id || option}>
                           {autocompleteProps?.getOptionLabel?.(option) ||
                              option.value ||
                              option}
-                       </li>
+                       </StyledMenuItem>
                     ))
             }
             onBlur={(event) => {
