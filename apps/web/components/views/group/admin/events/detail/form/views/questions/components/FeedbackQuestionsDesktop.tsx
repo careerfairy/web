@@ -17,18 +17,18 @@ import AddQuestionButton from "./AddQuestionButton"
 
 const styles = sxStyles({
    table: {
-      container: {
+      container: (theme) => ({
          borderRadius: "12px",
-         border: "1px solid #F3F3F5",
+         border: `1px solid ${theme.brand.white[500]}`,
          tr: {
             "td, th": {
-               borderBottom: "1px solid #F3F3F5",
+               borderBottom: `1px solid ${theme.brand.white[500]}`,
             },
             "&:last-child td, &:last-child th": {
                border: 0,
             },
          },
-      },
+      }),
       head: {
          background: "#F6F6FA",
          th: {
@@ -40,18 +40,17 @@ const styles = sxStyles({
             padding: "8px 16px 8px 16px",
          },
       },
-      body: {
-         background:
-            "linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, #F3F3F5, #F3F3F5)",
+      body: (theme) => ({
+         background: `linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(0deg, ${theme.brand.white[500]}, ${theme.brand.white[500]})`,
          "td, th": {
             fontSize: "16px",
             fontWeight: 400,
             lineHeight: "24px",
             letterSpacing: "0em",
-            color: "#5C5C6A",
+            color: "neutral.600",
             pading: "16px",
          },
-      },
+      }),
    },
 })
 
@@ -97,7 +96,7 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
                      <TableCell>Question</TableCell>
                      <TableCell>Type</TableCell>
                      <TableCell>Appear after</TableCell>
-                     <TableCell></TableCell>
+                     <TableCell />
                   </TableRow>
                </TableHead>
                <TableBody sx={styles.table.body}>
@@ -126,11 +125,13 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
          </TableContainer>
          <AddQuestionButton handleClick={handleAddQuestionClick} />
          <FeedbackQuestionAddEditDialog
+            key="add-edit-feedback-question-dialog"
             question={currentQuestion}
             isDialogOpen={isAddEditDialogOpen}
             handleCloseDialog={handleAddEditCloseDialog}
          />
          <FeedbackQuestionRemoveDialog
+            key="remove-feedback-question-dialog"
             question={currentQuestion}
             isDialogOpen={isRemoveDialogOpen}
             handleCloseDialog={handleRemoveCloseDialog}
