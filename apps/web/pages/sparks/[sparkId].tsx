@@ -64,16 +64,12 @@ const SparksPage: NextPage<
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
-      if (!groupId) {
-         dispatch(removeGroupId())
-      }
       dispatch(fetchInitialSparksFeed())
 
       return () => {
          dispatch(resetSparksFeed())
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [groupId])
+   }, [dispatch])
 
    useEffect(() => {
       if (
