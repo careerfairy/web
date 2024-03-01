@@ -128,7 +128,7 @@ export type Index<DataType = any, DataTypeTransformed = DataType> = {
     * Fields to index. be sure to avoid indexing fields that are too large since Algolia has a limit of 10kb per record.
     * @example ["id", "title", "summary"]
     */
-   fields: ReadonlyArray<keyof DataTypeTransformed & string>
+   fields: Array<keyof DataTypeTransformed & string>
    /**
     * Name of the index in Algolia
     */
@@ -138,11 +138,11 @@ export type Index<DataType = any, DataTypeTransformed = DataType> = {
       /**
        * Attributes for text search; listing more enhances speed and reduces index size.
        */
-      searchableAttributes: ReadonlyArray<keyof DataTypeTransformed & string>
+      searchableAttributes: Array<keyof DataTypeTransformed & string>
       /**
        * Attributes to use for filtering like tags, company, isPublic, etc.
        */
-      attributesForFaceting: ReadonlyArray<keyof DataTypeTransformed & string>
+      attributesForFaceting: Array<keyof DataTypeTransformed & string>
    }
    /**
     * Function that determines whether or not to index a document. If not provided, all documents will be indexed.

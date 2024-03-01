@@ -72,7 +72,7 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "fieldOfStudyIdTags",
    "fieldOfStudyNameTags",
    "levelOfStudyNameTags",
-] as const satisfies (keyof TransformedLivestreamEvent)[]
+] satisfies (keyof TransformedLivestreamEvent)[]
 
 type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
 
@@ -89,7 +89,7 @@ export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
    "company",
    "fieldOfStudyNameTags",
    "companyIndustries",
-] as const satisfies FieldToIndexType[]
+] satisfies FieldToIndexType[]
 
 /**
  * The fields listed below are intended for filtering purposes.
@@ -109,4 +109,4 @@ export const LIVESTREAM_FILTERING_FIELDS = [
    "companyCountries",
    "companyIndustries",
    "hasJobs",
-] as const satisfies FieldToIndexType[]
+] satisfies FieldToIndexType[]
