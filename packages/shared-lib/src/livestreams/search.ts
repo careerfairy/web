@@ -77,7 +77,7 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "startTimeMs",
 ] satisfies (keyof TransformedLivestreamEvent)[]
 
-type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
+export type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
 
 /**
  * Searchable attributes for livestream events to enhance search functionality:
