@@ -225,7 +225,7 @@ export const arrayContainsAny = <Type>(
  * Remove duplicates values
  * @param arr
  */
-export const removeDuplicates = (arr: string[]) => {
+export const removeDuplicates = <T>(arr: T[]): T[] => {
    return Array.from(new Set(arr))
 }
 

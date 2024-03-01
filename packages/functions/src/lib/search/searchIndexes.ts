@@ -1,73 +1,37 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LIVESTREAM_FIELDS_TO_INDEX,
+   LIVESTREAM_FILTERING_FIELDS,
+   LIVESTREAM_SEARCHABLE_ATTRIBUTES,
+   TransformedLivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams/search"
 import { Index } from "./searchIndexGenerator"
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 
 const livestreamIndex = {
    collectionPath: "livestreams",
    indexName: "livestreams" as const, // To allow inferring the type of the index name
-   fields: [
-      "id",
-      "summary",
-      "reasonsToJoinLivestream",
-      "reasonsToJoinLivestream_v2",
-      "backgroundImageUrl",
-      "company",
-      "companyId",
-      "maxRegistrants",
-      "companyLogoUrl",
-      "created",
-      "withResume",
-      "duration",
-      "groupIds",
-      "interestsIds",
-      "levelOfStudyIds",
-      "fieldOfStudyIds",
-      "isRecording",
-      "language",
-      "hidden",
-      "hasNoTalentPool",
-      "test",
-      "title",
-      "type",
-      "start",
-      "status",
-      "hasStarted",
-      "hasEnded",
-      "targetCategories",
-      "mode",
-      "maxHandRaisers",
-      "hasNoRatings",
-      "recommendedEventIds",
-      "activeCallToActionIds",
-      "openStream",
-      "impressions",
-      "recommendedImpressions",
-      "speakerSwitchMode",
-      "targetCountries",
-      "targetUniversities",
-      "targetFieldsOfStudy",
-      "targetLevelsOfStudy",
-      "lastUpdated",
-      "universities",
-      "questionsDisabled",
-      "denyRecordingAccess",
-      "jobs",
-      "hasJobs",
-      "isHybrid",
-      "address",
-      "externalEventLink",
-      "timezone",
-      "isFaceToFace",
-      "popularity",
-      "companySizes",
-      "companyIndustries",
-      "companyCountries",
-      "isDraft",
-      "speakers",
-   ],
+   fields: removeDuplicates(LIVESTREAM_FIELDS_TO_INDEX),
    shouldIndex: (doc) => !doc.test, // Don't index test livestreams
    fullIndexSyncQueryConstraints: (collectionRef) =>
       collectionRef.where("test", "==", false),
-} satisfies Index<LivestreamEvent>
+   transformData: (data) => ({
+      ...data,
+      languageCode: data.language?.code ?? null,
+      fieldOfStudyNameTags:
+         data.targetFieldsOfStudy?.map((field) => field.name) ?? [],
+      levelOfStudyNameTags:
+         data.targetLevelsOfStudy?.map((level) => level.name) ?? [],
+      fieldOfStudyIdTags:
+         data.targetFieldsOfStudy?.map((field) => field.id) ?? [],
+      levelOfStudyIdTags:
+         data.targetLevelsOfStudy?.map((level) => level.id) ?? [],
+   }),
+   settings: {
+      attributesForFaceting: LIVESTREAM_FILTERING_FIELDS,
+      searchableAttributes: LIVESTREAM_SEARCHABLE_ATTRIBUTES,
+   },
+} satisfies Index<LivestreamEvent, TransformedLivestreamEvent>
 
 export const knownIndexes = {
    [livestreamIndex.indexName]: livestreamIndex,
