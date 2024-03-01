@@ -137,6 +137,7 @@ export type Index<DataType = any, DataTypeTransformed = DataType> = {
    settings?: {
       /**
        * Attributes for text search; listing more enhances speed and reduces index size.
+       * The position of attributes in the list determines their priority in the search.
        */
       searchableAttributes: Array<keyof DataTypeTransformed & string>
       /**
