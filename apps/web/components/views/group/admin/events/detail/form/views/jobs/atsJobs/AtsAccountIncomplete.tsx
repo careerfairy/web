@@ -51,7 +51,7 @@ const AtsAccountIncomplete: FC<Props> = ({ onDialogOpen }) => {
 
                <Typography variant={"brandedBody"}>
                   Before you can associate jobs to your live stream you need to
-                  complete the Application Test for {atsAccount.name}
+                  complete the Application Test for {atsAccount.name}.
                </Typography>
 
                <Typography variant={"brandedBody"}>

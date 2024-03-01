@@ -105,7 +105,7 @@ const Content = () => {
                      </Box>
 
                      <Box>
-                        To finalize the ATS integration, create a mock
+                        To finalise the ATS integration, create a mock
                         application through the CareerFairy platform within your
                         ATS system. Once complete, you may discard the sample
                         Candidate from your ATS system.

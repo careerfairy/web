@@ -39,7 +39,7 @@ const AtsNotLinked = () => {
             </Typography>
 
             <Typography variant={"brandedBody"}>
-               You can do that in the ATS section of your CareerFairy
+               You can do that in the ATS section of your CareerFairy dashboard.
             </Typography>
          </Stack>
       </Box>
