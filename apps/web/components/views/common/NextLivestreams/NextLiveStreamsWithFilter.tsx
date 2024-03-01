@@ -1,9 +1,6 @@
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
-import useLivestreamsSWR, {
-   UseLivestreamsSWROptions,
-} from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { useRouter } from "next/router"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import Link from "../../../../components/views/common/Link"
@@ -19,6 +16,10 @@ import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 import { ParsedUrlQuery } from "querystring"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -53,6 +54,11 @@ const getQueryVariables = (query: ParsedUrlQuery) => {
       fieldsOfStudy: queryParamToArr(query.fieldsOfStudy),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
       companyId: companyId || null,
+      denyRecordingAccess: recordedOnly
+         ? recordedOnly === "true"
+            ? false
+            : true
+         : undefined,
    }
 }
 
@@ -66,16 +72,17 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
 
-   const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
-      useFieldsOfStudy()
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
+
+   const [inputValue, setInputValue] = useState("")
 
    const {
       languages,
       companyCountries,
       companyIndustries,
-      recordedOnly,
       fieldsOfStudy,
       companyId,
+      denyRecordingAccess,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
@@ -95,37 +102,38 @@ const NextLiveStreamsWithFilter = ({
       [companyId, hasPastEvents]
    )
 
-   const mapFieldsOfStudy = useMemo(
-      () =>
-         allFieldsOfStudy?.filter((item) => fieldsOfStudy?.includes(item.id)),
-      [allFieldsOfStudy, fieldsOfStudy]
-   )
-
-   const swrQuery = useMemo<UseLivestreamsSWROptions>(
+   const filterOptions = useMemo<FilterOptions>(
       () => ({
-         languageCodes: languages,
-         companyCountries: companyCountries,
-         companyIndustries: companyIndustries,
-         targetFieldsOfStudy: mapFieldsOfStudy,
-         withRecordings: recordedOnly,
-         targetGroupId: companyId,
-         withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-         type: initialTabValue,
-         disabled: isLoadingFieldsOfStudy,
+         arrayFilters: {
+            companyCountries,
+            companyIndustries,
+            fieldOfStudyIdTags: fieldsOfStudy.filter(
+               (id) => allFieldsOfStudy?.some((item) => item.id === id) || false
+            ),
+            groupIds: [companyId],
+            languageCode: languages,
+         },
+         booleanFilters: {
+            denyRecordingAccess,
+            hidden: Boolean(companyId),
+            test: false,
+         },
       }),
       [
-         languages,
          companyCountries,
          companyIndustries,
-         mapFieldsOfStudy,
-         recordedOnly,
+         allFieldsOfStudy,
          companyId,
-         initialTabValue,
-         isLoadingFieldsOfStudy,
+         languages,
+         denyRecordingAccess,
+         fieldsOfStudy,
       ]
    )
 
-   const { data: livestreams } = useLivestreamsSWR(swrQuery)
+   const { data: livestreamsData } = useLivestreamSearchAlgolia(
+      inputValue,
+      filterOptions
+   )
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -198,12 +206,15 @@ const NextLiveStreamsWithFilter = ({
                      value={null}
                      endIcon={<FindIcon color={"black"} />}
                      hasPastEvents={hasPastEvents}
+                     filterOptions={filterOptions}
+                     setInputValue={setInputValue}
+                     inputValue={inputValue}
                   />
                </Card>
                <Box sx={styles.filter}>
                   <Filter
                      filtersToShow={filtersToShow}
-                     numberOfResults={livestreams?.length}
+                     numberOfResults={livestreamsData?.nbHits}
                   />
                </Box>
             </Box>
@@ -211,9 +222,9 @@ const NextLiveStreamsWithFilter = ({
 
          <StreamsSection
             value={initialTabValue}
-            upcomingLivestreams={livestreams}
+            upcomingLivestreams={livestreamsData?.deserializedHits}
             listenToUpcoming
-            pastLivestreams={livestreams}
+            pastLivestreams={livestreamsData?.deserializedHits}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
