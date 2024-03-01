@@ -204,7 +204,7 @@ export class GroupPresenter {
          {
             label: "Upload a video",
             checkIsComplete: () => this.videos.length > 0,
-            isInitial: true,
+            isInitial: false,
             section: "videos",
          },
          {
