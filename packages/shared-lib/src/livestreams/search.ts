@@ -78,17 +78,14 @@ type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
 
 /**
  * Searchable attributes for livestream events to enhance search functionality:
- * - `title`: Livestream event title.
- * - `company`: Hosting company.
- * - `levelOfStudyNameTags`: Education level tags for event filtering.
- * - `fieldOfStudyNameTags`: Area of interest tags for event filtering.
- * - `companyIndustries`: Hosting company's industries for industry-based filtering.
+ * The position of attributes in the list determines their priority in the search.
+ * They must be a subset of the fields defined in LIVESTREAM_FIELDS_TO_INDEX.
  */
 export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
    "title",
    "company",
-   "fieldOfStudyNameTags",
    "companyIndustries",
+   "fieldOfStudyNameTags",
 ] satisfies FieldToIndexType[]
 
 /**
