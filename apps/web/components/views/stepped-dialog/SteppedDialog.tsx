@@ -412,7 +412,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    )
 }
 
-type ContentProps = BoxProps<"span"> & {}
+type ContentProps = BoxProps<"span">
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
    return (
