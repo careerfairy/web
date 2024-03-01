@@ -24,6 +24,10 @@ export interface CustomBrandedTextFieldProps {
     * Text for the additional tooltip, empty if not provided
     */
    tooltipText?: string
+   /**
+    * Indicates whether the input should support autocomplete feature
+    */
+   autocomplete?: boolean
 }
 
 export type BrandedTextFieldProps = Omit<
@@ -120,13 +124,14 @@ const selectProps: Partial<SelectProps> = {
 
 export const FormBrandedTextField: FC<BrandedTextFieldProps> = ({
    name,
+   autocomplete,
    ...props
 }) => {
    const [field, meta] = useField(name)
 
    return (
       <BrandedTextField
-         {...field}
+         {...(autocomplete ? null : field)}
          {...props}
          error={meta.touched ? Boolean(meta.error) : null}
          helperText={meta.touched ? meta.error : null}

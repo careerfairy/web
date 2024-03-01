@@ -2,10 +2,15 @@ import { RuntimeOptions } from "firebase-functions"
 import functions = require("firebase-functions")
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
-import { groupRepo, userRepo, livestreamsRepo } from "./api/repositories"
+import {
+   groupRepo,
+   userRepo,
+   livestreamsRepo,
+   emailNotificationsRepo,
+} from "./api/repositories"
 import config from "./config"
-import { NewsletterEmailBuilder } from "./lib/NewsletterEmailBuilder"
-import { NewsletterService } from "./lib/NewsletterService"
+import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
+import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
 
 /**
@@ -98,6 +103,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
    const newsletterService = new NewsletterService(
       userRepo,
       groupRepo,
+      emailNotificationsRepo,
       dataLoader,
       emailBuilder,
       functions.logger

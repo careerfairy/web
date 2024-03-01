@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Fragment, useEffect, useState } from "react"
 import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Paper from "@mui/material/Paper"
@@ -105,7 +106,7 @@ const WishCard = ({ wish }: WishCardProps) => {
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
    )
-   const { query, push, asPath } = useRouter()
+   const { push, asPath } = useRouter()
    // @ts-ignore
    const [date] = useState<Date>(new Date(wish.createdAt))
    const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
@@ -117,12 +118,12 @@ const WishCard = ({ wish }: WishCardProps) => {
       setDescription(
          wish._highlightResult?.description?.value || wish.description
       )
-   }, [wish?._highlightResult?.description?.value])
+   }, [wish._highlightResult?.description?.value, wish.description])
 
    useEffect(() => {
       ;(async function getUpvotersData() {
          if (wish.uidsOfRecentUpvoters.length) {
-            const upvotersData = await userRepo.getUsersDataByUids(
+            const upvotersData = await userRepo.getUsersDataByUuids(
                wish.uidsOfRecentUpvoters
             )
             setUpvoters(upvotersData)

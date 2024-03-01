@@ -8,11 +8,12 @@ import styles from "./Styles"
 import CareerCoinIcon from "../../../../common/CareerCoinIcon"
 import { getBuyCostForAction } from "@careerfairy/shared-lib/rewards"
 import { Typography } from "@mui/material"
-import { FloatingButtonWrapper } from "./ActionButton"
+import { ActionButtonWrapper } from "./ActionButton"
+import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 
 const BuyRecordingButton: FC = () => {
-   const { isFloating, livestreamPresenter } = useActionButtonContext()
-
+   const { isFloating, livestreamPresenter, isFixedToBottom } = useActionButtonContext()
+   const { goToView } = useLiveStreamDialog()
    const { userData } = useAuth()
    const [isLoading, setIsLoading] = useState(false)
    const { errorNotification } = useSnackbarNotifications()
@@ -25,28 +26,34 @@ const BuyRecordingButton: FC = () => {
          .finally(() => setIsLoading(false))
    }
 
+   const handleClickFixedBottom = () => {
+      goToView("livestream-details")
+   }
+
    return (
-      <FloatingButtonWrapper isFloating={isFloating}>
+      <ActionButtonWrapper isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
          <LoadingButton
             id="register-button"
             color="primary"
             sx={[styles.whiteText, styles.btn]}
             variant={"contained"}
             fullWidth
-            onClick={handleClick}
+            onClick={isFixedToBottom ? handleClickFixedBottom : handleClick}
             disableElevation
             loading={isLoading}
             data-testid="livestream-unlock-recording-button"
-            size="large"
+            size={isFixedToBottom ? "medium" : "large"}
             endIcon={isLoading ? undefined : <CareerCoinIcon />}
          >
             Unlock recording with &nbsp;{" "}
             {getBuyCostForAction("LIVESTREAM_RECORDING_BOUGHT")}
          </LoadingButton>
-         <Typography sx={[styles.subButtonText, isFloating && styles.darkText]}>
-            You currently have {userData.credits} <CareerCoinIcon /> left
-         </Typography>
-      </FloatingButtonWrapper>
+         {!isFixedToBottom && 
+            (<Typography sx={[styles.subButtonText, isFloating && styles.darkText]}>
+               You currently have {userData.credits} <CareerCoinIcon /> left
+            </Typography>)
+         }
+      </ActionButtonWrapper>
    )
 }
 

@@ -1,12 +1,12 @@
-import React, { FC } from "react"
+import React, { FC, useEffect } from "react"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { useCreditsDialog } from "../../../../../../layouts/CreditsDialogLayout"
 import { Button } from "@mui/material"
 import styles from "./Styles"
-import { FloatingButtonWrapper, LinkText } from "./ActionButton"
+import { ActionButtonWrapper, LinkText } from "./ActionButton"
 
 const NotEnoughCreditsButton: FC = () => {
-   const { isFloating } = useActionButtonContext()
+   const { isFloating, isFixedToBottom, setIsDisabled } = useActionButtonContext()
 
    const { handleOpenCreditsDialog } = useCreditsDialog()
    const handleClick = (e: React.SyntheticEvent) => {
@@ -15,25 +15,35 @@ const NotEnoughCreditsButton: FC = () => {
       handleOpenCreditsDialog()
    }
 
+   useEffect(()=>{
+      if (setIsDisabled){
+         setIsDisabled(true)
+      }
+   }, [setIsDisabled])
+   
+
    return (
-      <FloatingButtonWrapper isFloating={isFloating}>
+      <ActionButtonWrapper isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
          <Button
             id="register-button"
             variant={"contained"}
             fullWidth
-            color="navyBlue"
-            sx={styles.btn}
+            color={isFixedToBottom ? "secondary" : "navyBlue"}
+            sx={isFixedToBottom ? null : styles.btn}
             onClick={handleClick}
             disableElevation
             data-testid="livestream-not-enough-credits-button"
-            size="large"
+            size={isFixedToBottom? "medium" : "large"}
+            disabled={isFixedToBottom}
          >
             Not enough CareerCoins to unlock
          </Button>
-         <LinkText isFloating={isFloating} onClick={handleClick}>
-            Get more CareerCoins to access this recording
-         </LinkText>
-      </FloatingButtonWrapper>
+         {!isFixedToBottom && 
+            (<LinkText isFloating={isFloating} onClick={handleClick}>
+               Get more CareerCoins to access this recording
+            </LinkText>)
+         }
+      </ActionButtonWrapper>
    )
 }
 

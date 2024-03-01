@@ -1,10 +1,10 @@
-import React, { FC, useCallback } from "react"
+import React, { FC } from "react"
 import { useRouter } from "next/router"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { Button, Typography } from "@mui/material"
 import styles from "./Styles"
 import Link from "../../../../common/Link"
-import { FloatingButtonWrapper } from "./ActionButton"
+import { ActionButtonWrapper } from "./ActionButton"
 
 const SignUpToWatchButton: FC = () => {
    const { asPath, pathname } = useRouter()
@@ -19,10 +19,10 @@ const SignUpToWatchButton: FC = () => {
       return ""
    }
 
-   const { isFloating } = useActionButtonContext()
+   const { isFloating, isFixedToBottom } = useActionButtonContext()
 
    return (
-      <FloatingButtonWrapper isFloating={isFloating}>
+      <ActionButtonWrapper isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
          <Button
             id="register-button"
             color="primary"
@@ -33,11 +33,11 @@ const SignUpToWatchButton: FC = () => {
             component={Link}
             disableElevation
             data-testid="livestream-signup-watch-button"
-            size="large"
+            size={isFixedToBottom? "medium" : "large"}
          >
-            Sign Up to Watch
+            Sign up to watch
          </Button>
-         {isFloating ? null : (
+         {isFloating || isFixedToBottom ? null : (
             <Typography sx={{ textAlign: "center", marginTop: 2 }}>
                Already have an account?{" "}
                <Link
@@ -48,7 +48,7 @@ const SignUpToWatchButton: FC = () => {
                </Link>
             </Typography>
          )}
-      </FloatingButtonWrapper>
+      </ActionButtonWrapper>
    )
 }
 

@@ -27,10 +27,10 @@ type Props = {
    text: string
    textStyle?: SxProps<Theme>
    maxLength?: number
-   collapsedSize?: number
+   collapsedSize?: number | string
 }
 
-const CollapsableText = ({
+const CollapsibleText = ({
    text,
    textStyle,
    maxLength,
@@ -51,7 +51,7 @@ const CollapsableText = ({
       <Box>
          <Collapse in={!isTextCollapsed} collapsedSize={collapsedSize || 75}>
             <SanitizedHTML
-               sx={Boolean(textStyle) ? textStyle : styles.text}
+               sx={textStyle ? textStyle : styles.text}
                htmlString={text}
             />
          </Collapse>
@@ -74,7 +74,7 @@ const CollapsableText = ({
                      variant="text"
                      color="secondary"
                      sx={styles.collapseBtn}
-                     startIcon={<ExpandLessIcon />}
+                     endIcon={<ExpandLessIcon />}
                      onClick={handleClick}
                   >
                      View less
@@ -86,4 +86,4 @@ const CollapsableText = ({
    )
 }
 
-export default CollapsableText
+export default CollapsibleText

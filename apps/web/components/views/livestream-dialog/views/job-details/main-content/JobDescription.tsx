@@ -6,8 +6,7 @@ import SanitizedHTML from "../../../../../util/SanitizedHTML"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import Skeleton from "@mui/material/Skeleton"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import CollapsableText from "../../../../common/inputs/CollapsableText"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import CollapsibleText from "../../../../common/inputs/CollapsibleText"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import Box from "@mui/material/Box"
 import DateUtil from "../../../../../../util/DateUtil"
@@ -15,11 +14,11 @@ import DateUtil from "../../../../../../util/DateUtil"
 const styles = sxStyles({
    root: {},
    jobTitle: {
-      fontSize: "1.428rem",
-      fontWeight: 500,
+      fontWeight: 600,
    },
    html: {
-      fontSize: "1.1428rem",
+      fontSize: "1.1rem",
+      lineHeight: "1.7rem",
       width: "100%",
       overflowWrap: "break-word",
       wordWrap: "break-word",
@@ -31,11 +30,15 @@ const styles = sxStyles({
       },
    },
    subTitle: {
-      fontSize: "20px",
-      fontWeight: "bold",
+      fontWeight: 600,
    },
    jobValues: {
-      fontSize: "16px",
+      fontSize: "1.1rem",
+   },
+   wrapper: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "16px"
    },
    confirmationWrapper: {
       display: "flex",
@@ -55,7 +58,6 @@ type Props = {
 }
 
 const JobDescription: FC<Props> = ({ job }) => {
-   const isMobile = useIsMobile()
    const isAtsJob = useIsAtsJob(job)
 
    let jobSalary: string, jobDeadline: string
@@ -68,25 +70,25 @@ const JobDescription: FC<Props> = ({ job }) => {
    }
 
    return (
-      <Stack spacing={2}>
-         <Box>
-            <Typography component="h4" sx={styles.jobTitle}>
+      <Stack spacing={"24px"}>
+         <Box sx={styles.wrapper}>
+            <Typography sx={styles.jobTitle} variant="h6">
                Job Description
             </Typography>
             {isAtsJob ? (
                <SanitizedHTML sx={styles.html} htmlString={job.description} />
             ) : (
-               <CollapsableText
+               <CollapsibleText
                   text={job.description}
-                  collapsedSize={isMobile ? 190 : 180}
+                  collapsedSize={"5em"}
                   textStyle={styles.html}
                />
             )}
          </Box>
 
-         {Boolean(jobSalary) ? (
-            <Box>
-               <Typography variant={"subtitle1"} sx={styles.subTitle}>
+         {jobSalary ? (
+            <Box sx={styles.wrapper}>
+               <Typography variant={"h6"} sx={styles.subTitle}>
                   Salary
                </Typography>
                <Typography variant={"body1"} sx={styles.jobValues}>
@@ -95,9 +97,9 @@ const JobDescription: FC<Props> = ({ job }) => {
             </Box>
          ) : null}
 
-         {Boolean(jobDeadline) ? (
-            <Box>
-               <Typography variant={"subtitle1"} sx={styles.subTitle}>
+         {jobDeadline ? (
+            <Box sx={styles.wrapper}>
+               <Typography variant={"h6"} sx={styles.subTitle}>
                   Application deadline
                </Typography>
                <Typography variant={"body1"} sx={styles.jobValues}>

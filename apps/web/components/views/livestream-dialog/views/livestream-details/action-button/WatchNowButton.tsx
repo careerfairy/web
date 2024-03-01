@@ -3,7 +3,8 @@ import { useActionButtonContext } from "./ActionButtonProvider"
 import { Button } from "@mui/material"
 import styles from "./Styles"
 import PlayIcon from "@mui/icons-material/PlayCircleOutlineRounded"
-import { FloatingButtonWrapper } from "./ActionButton"
+import { ActionButtonWrapper } from "./ActionButton"
+import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 
 const scrollToHero = () => {
    const element = document.getElementById("live-stream-dialog-hero")
@@ -17,25 +18,30 @@ const scrollToHero = () => {
 }
 
 const WatchNowButton: FC = () => {
-   const { isFloating, heroVisible } = useActionButtonContext()
+   const { isFloating, heroVisible, isFixedToBottom } = useActionButtonContext()
+   const { goToView } = useLiveStreamDialog()
+
+   const handleWatchRecording = () => {
+      goToView("livestream-details")
+   }
 
    return (
-      <FloatingButtonWrapper disableMarginTop isFloating={isFloating}>
+      <ActionButtonWrapper disableMarginTop isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
          <Button
             id="watch-now-button"
             color="primary"
             sx={[styles.btn, heroVisible && styles.hiddenButton]}
             variant={"contained"}
             fullWidth
-            onClick={scrollToHero}
+            onClick={isFixedToBottom ? handleWatchRecording : scrollToHero}
             disableElevation
-            endIcon={<PlayIcon />}
+            endIcon={isFixedToBottom ? null : <PlayIcon />}
             data-testid="livestream-watch-now-button"
-            size="large"
+            size={isFixedToBottom ? "medium" : "large"}
          >
-            Watch now
+            {isFixedToBottom ? "Watch recording" : "Watch now"}
          </Button>
-      </FloatingButtonWrapper>
+      </ActionButtonWrapper>
    )
 }
 
