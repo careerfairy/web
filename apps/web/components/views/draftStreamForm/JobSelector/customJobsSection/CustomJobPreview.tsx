@@ -18,7 +18,7 @@ import BrandedMenu from "../../../common/inputs/BrandedMenu"
 import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import EditIcon from "@mui/icons-material/Edit"
 import { Trash2 as DeleteIcon } from "react-feather"
-import CollapsableText from "../../../common/inputs/CollapsableText"
+import CollapsibleText from "../../../common/inputs/CollapsibleText"
 
 const styles = sxStyles({
    wrapper: {
@@ -176,7 +176,7 @@ const CustomJobPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
             </Grid>
 
             <Grid xs={12} item mt={4}>
-               <CollapsableText text={job.description} collapsedSize={80} />
+               <CollapsibleText text={job.description} collapsedSize={80} />
             </Grid>
          </Grid>
       </Box>
