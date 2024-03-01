@@ -12,6 +12,7 @@ import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Search as FindIcon } from "react-feather"
 import { where } from "firebase/firestore"
+import { LivestreamSearchResult } from "types/algolia"
 
 const spacing = 3
 
@@ -63,7 +64,10 @@ const LivestreamSearchNav = () => {
             <Card sx={styles.searchCard}>
                <LivestreamSearch
                   handleChange={handleChange}
-                  value={currentStreamStats?.livestream ?? null}
+                  value={
+                     (currentStreamStats?.livestream as LivestreamSearchResult) ??
+                     null
+                  }
                   startIcon={<FindIcon color={"black"} />}
                   additionalConstraints={additionalConstraints}
                   includeHiddenEvents
