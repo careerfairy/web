@@ -161,8 +161,7 @@ const useAtsApplicationTest = ({ onSuccess, onError }: Props = {}) => {
  * @returns true if all values are truthy, false otherwise
  */
 const allValuesTruthy = (obj: unknown) => {
-   const values = Object.values(obj)
-   return values.length > 0 ? values.every((value) => value) : false
+   return Object.values(obj).every((value) => value)
 }
 
 /**
