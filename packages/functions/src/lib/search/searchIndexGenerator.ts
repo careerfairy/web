@@ -13,14 +13,24 @@ import { SearchIndex } from "algoliasearch"
 import config from "../../config"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
 
-export const getData = (snapshot: DocumentSnapshot, fields: string[]) => {
+type TransformData = (doc: Record<string, any>) => Record<string, any> | null
+
+export const getData = (
+   snapshot: DocumentSnapshot,
+   fields: string[],
+   transformData: TransformData
+) => {
    const payload: {
       [key: string]: boolean | string | number
    } = {
       objectID: snapshot.id,
    }
 
-   const data = snapshot.data()
+   let data = snapshot.data()
+
+   if (transformData) {
+      data = transformData(data)
+   }
 
    return fields.reduce((acc, field) => {
       if (field in data && data[field] !== undefined && data[field] !== null) {
@@ -33,10 +43,11 @@ export const getData = (snapshot: DocumentSnapshot, fields: string[]) => {
 const handleCreateDocument = async (
    snapshot: DocumentSnapshot,
    fields: string[],
-   index: SearchIndex
+   index: SearchIndex,
+   transformData: TransformData
 ) => {
    try {
-      const data = getData(snapshot, fields)
+      const data = getData(snapshot, fields, transformData)
 
       functions.logger.debug({
          ...data,
@@ -53,7 +64,8 @@ const handleUpdateDocument = async (
    before: DocumentSnapshot,
    after: DocumentSnapshot,
    fields: string[],
-   index: SearchIndex
+   index: SearchIndex,
+   transformData: TransformData
 ) => {
    try {
       functions.logger.debug("Detected a change, execute indexing")
@@ -65,7 +77,7 @@ const handleUpdateDocument = async (
       )
       functions.logger.debug("undefinedAttrs", undefinedAttrs)
 
-      const data = getData(after, fields)
+      const data = getData(after, fields, transformData)
       // if no attributes were removed, then use partial update of the record.
       if (undefinedAttrs.length === 0) {
          logUpdateIndex(after.id, data)
@@ -101,7 +113,13 @@ const handleDeleteDocument = async (
    }
 }
 
-export type Index<T = any> = {
+/**
+ * Defines the structure for an index configuration.
+ *
+ * @template DataType The type of the data before any transformation. Defaults to any.
+ * @template DataTypeTransformed The type of the data after transformation. Defaults to the same as DataType.
+ */
+export type Index<DataType = any, DataTypeTransformed = DataType> = {
    /**
     * Path to the collection to index (e.g. "livestreams" or "livestreams/{docId}/questions")
     */
@@ -110,17 +128,28 @@ export type Index<T = any> = {
     * Fields to index. be sure to avoid indexing fields that are too large since Algolia has a limit of 10kb per record.
     * @example ["id", "title", "summary"]
     */
-   fields: (keyof T & string)[]
+   fields: ReadonlyArray<keyof DataTypeTransformed & string>
    /**
     * Name of the index in Algolia
     */
    indexName: string
+   transformData?: (doc: DataType) => DataTypeTransformed
+   settings?: {
+      /**
+       * Attributes for text search; listing more enhances speed and reduces index size.
+       */
+      searchableAttributes: ReadonlyArray<keyof DataTypeTransformed & string>
+      /**
+       * Attributes to use for filtering like tags, company, isPublic, etc.
+       */
+      attributesForFaceting: ReadonlyArray<keyof DataTypeTransformed & string>
+   }
    /**
     * Function that determines whether or not to index a document. If not provided, all documents will be indexed.
     * @param doc The document to index
     * @returns  Whether or not to index the document
     */
-   shouldIndex?: (doc: Partial<T>) => boolean
+   shouldIndex?: (doc: Partial<DataType>) => boolean
    /**
     * Function that returns a query to use to filter the documents to index.
     * @param collectionQuery The collection query to filter
@@ -136,7 +165,8 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
    const exports = {}
 
    for (const indexName in indexes) {
-      const { collectionPath, fields, shouldIndex } = indexes[indexName]
+      const { collectionPath, fields, shouldIndex, settings, transformData } =
+         indexes[indexName]
 
       const indexClient = initAlgoliaIndex(indexName)
 
@@ -147,6 +177,10 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
          .region(config.region)
          .firestore.document(documentPath)
          .onWrite(async (change) => {
+            if (settings) {
+               await indexClient.setSettings(settings)
+            }
+
             const changeType = getChangeTypeEnum(change)
             // Get the document data
             const docData = change.after.exists
@@ -165,14 +199,20 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
 
             switch (changeType) {
                case ChangeType.CREATE:
-                  await handleCreateDocument(change.after, fields, indexClient)
+                  await handleCreateDocument(
+                     change.after,
+                     fields,
+                     indexClient,
+                     transformData
+                  )
                   break
                case ChangeType.UPDATE:
                   await handleUpdateDocument(
                      change.before,
                      change.after,
                      fields,
-                     indexClient
+                     indexClient,
+                     transformData
                   )
                   break
                case ChangeType.DELETE:
