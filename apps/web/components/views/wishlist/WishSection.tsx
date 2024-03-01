@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import WishCard from "./WishCard"
 import { StylesProps } from "../../../types/commonTypes"
-import { SearchResponse } from "../../../types/algolia"
+import { SearchResponse } from "@algolia/client-search"
 
 interface WishSectionProps {
    wishes: SearchResponse<Wish>["hits"]
@@ -85,7 +85,7 @@ const WishSection = ({
                <WishCard key={wish.id} wish={wish} />
             ))}
          </Stack>
-         {loadingMore && (
+         {Boolean(loadingMore) && (
             <Box>
                <CircularProgress />
             </Box>
