@@ -1,4 +1,4 @@
-import { Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { Wish } from "@careerfairy/shared-lib/wishes"
 import Container from "@mui/material/Container"
 import { Grid, Pagination, PaginationItem } from "@mui/material"
 import CreateAndFilter from "../../components/views/wishlist/CreateAndFilter"
@@ -7,7 +7,6 @@ import GeneralLayout from "../../layouts/GeneralLayout"
 import { useRouter } from "next/router"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
 import { useState } from "react"
-import { SearchResponse } from "../../types/algolia"
 import algoliaRepo from "../../data/algolia/AlgoliaRepository"
 import WishSection from "../../components/views/wishlist/WishSection"
 import Link from "../../components/views/common/Link"
@@ -16,6 +15,7 @@ import { GetServerSideProps } from "next"
 import { useUpdateEffect } from "react-use"
 import SEO from "../../components/util/SEO"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
+import { SearchResponse } from "@algolia/client-search"
 
 const pageSize = 10
 
@@ -43,6 +43,7 @@ const Wishlist = ({ serverSearchResponse }: Props) => {
       getQueryVariables(query)
 
    useUpdateEffect(() => {
+      // eslint-disable-next-line no-extra-semi
       ;(async function search() {
          try {
             setLoading(true)
@@ -174,7 +175,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             page: queryVars.currentPage,
          }
       )
-   } catch (e) {}
+   } catch (e) {
+      console.error(e)
+   }
    return {
       props: {
          serverSearchResponse: newSearchResponse,

@@ -39,6 +39,7 @@ type AutocompleteSearchProps<TOption = unknown> = {
    noOptionsText?: string
    placeholderText?: string
    minCharacters?: number
+   disableFiltering?: boolean
 }
 
 const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
@@ -57,6 +58,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    inputStartIcon,
    inputEndIcon,
    loading,
+   disableFiltering,
 }) => {
    const inputTooSmall = minCharacters && inputValue.length < minCharacters
 
@@ -68,14 +70,14 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    }, [inputTooSmall, options])
 
    const onChange = useCallback(
-      (event: any, newValue: T | null) => {
+      (event, newValue: T | null) => {
          return handleChange(newValue)
       },
       [handleChange]
    )
 
    const onInputChange = useCallback(
-      (event: any, newInputValue: string, reason) => {
+      (event, newInputValue: string, reason) => {
          if (reason === "reset") {
             setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
             return
@@ -133,6 +135,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
             />
          )}
          renderOption={renderOption}
+         filterOptions={disableFiltering ? (x) => x : undefined}
       />
    )
 }
