@@ -7,6 +7,10 @@ import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 type Status = "idle" | "loading" | "failed"
 
+export enum AutomaticActions {
+   APPLY = "apply"
+}
+
 // Initial state
 interface SparksState {
    originalSparkId: string | null
@@ -29,6 +33,8 @@ interface SparksState {
    videosMuted: boolean
    playing: boolean
    eventToRegisterTo: string | null
+   jobToOpen: string | null
+   autoAction: AutomaticActions
 }
 
 const initialState: SparksState = {
@@ -52,6 +58,8 @@ const initialState: SparksState = {
    videosMuted: true,
    playing: true,
    eventToRegisterTo: null,
+   jobToOpen: null,
+   autoAction: null
 }
 
 // Async thunk to fetch the next sparks
@@ -168,6 +176,12 @@ const sparksFeedSlice = createSlice({
       setEventToRegisterTo: (state, action: PayloadAction<string>) => {
          state.eventToRegisterTo = action.payload
       },
+      setJobToOpen: (state, action: PayloadAction<string>) => {
+         state.jobToOpen = action.payload
+      },
+      setAutoAction: (state, action: PayloadAction<AutomaticActions>) => {
+         state.autoAction = action.payload
+      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -282,6 +296,8 @@ export const {
    setCardNotification,
    setCameFromCompanyPageLink,
    setEventToRegisterTo,
+   setJobToOpen,
+   setAutoAction,
    setVideosMuted,
    setVideoPlaying,
    togglePlaying,
