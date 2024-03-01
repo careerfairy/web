@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Edit2 as EditIcon, Save, Trash2 as DeleteIcon } from "react-feather"
 import { Formik } from "formik"
-import { FC, useState } from "react"
+import { FC, useMemo, useState } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography } from "@mui/material"
 import FeedbackQuestionForm from "./FeedbackQuestionForm"
 import {
+   ESTIMATED_DURATIONS,
    FeedbackQuestionFormValues,
    feedbackQuestionFormInitialValues,
    feedbackQuestionValidationSchema,
@@ -97,6 +98,14 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
       (question as FeedbackQuestionFormValues) ||
       feedbackQuestionFormInitialValues
 
+   const appearAfterLabel = useMemo(
+      () =>
+         ESTIMATED_DURATIONS.find(
+            (duration) => duration.minutes === question.appearAfter
+         ).name,
+      [question.appearAfter]
+   )
+
    return (
       <Stack key={key} sx={styles.container}>
          {isEditing ? (
@@ -137,7 +146,7 @@ const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
             <>
                <Typography>{question.title}</Typography>
                <Typography>{question.type}</Typography>
-               <Typography>{question.appearAfter}</Typography>
+               <Typography>{appearAfterLabel}</Typography>
                <Button
                   sx={styles.editButton}
                   endIcon={<EditIcon />}
