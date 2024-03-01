@@ -4,7 +4,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import MultiChipSelect from "../general/components/MultiChipSelect"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 
-const LivestreamFormJobsStep = () => {
+const LivestreamFormQuestionsStep = () => {
    const {
       values: { questions },
    } = useLivestreamFormValues()
@@ -39,4 +39,4 @@ const LivestreamFormJobsStep = () => {
    )
 }
 
-export default LivestreamFormJobsStep
+export default LivestreamFormQuestionsStep
