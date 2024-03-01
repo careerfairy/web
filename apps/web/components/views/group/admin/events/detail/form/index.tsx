@@ -6,7 +6,7 @@ import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
-import { Formik } from "formik"
+import { Form, Formik } from "formik"
 import { FC } from "react"
 import { TAB_VALUES } from "../navigation/LivestreamAdminDetailTopBarNavigation"
 import {
@@ -17,10 +17,18 @@ import {
    LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import LivestreamFormGeneralStep from "./views/general/general"
-import LivestreamFormJobsStep from "./views/jobs"
-import LivestreamFormQuestionsStep from "./views/questions"
+import LivestreamFormGeneralStep from "./views/general"
 import LivestreamFormSpeakersStep from "./views/speakers"
+import LivestreamFormQuestionsStep from "./views/questions"
+import LivestreamFormJobsStep from "./views/jobs"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { Stack } from "@mui/material"
+
+const styles = sxStyles({
+   root: {
+      padding: "24px",
+   },
+})
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -46,7 +54,7 @@ const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
-   registrationQuestions: {},
+   registrationQuestions: [],
    feedbackQuestions: [],
 }
 
@@ -144,20 +152,20 @@ const LivestreamCreationForm: FC<Props> = ({
          onSubmit={undefined}
          validationSchema={livestreamFormValidationSchema}
       >
-         <>
-            {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
-            {tabValue == TAB_VALUES.SPEAKERS && (
-               <LivestreamFormSpeakersStep
-                  values={formSpeakersTabInitialValues}
-               />
-            )}
-            {tabValue == TAB_VALUES.QUESTIONS && (
-               <LivestreamFormQuestionsStep
-                  values={formQuestionsTabInitialValues}
-               />
-            )}
-            {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
-         </>
+         <Form>
+            <Stack sx={styles.root} rowGap={2}>
+               {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
+               {tabValue == TAB_VALUES.SPEAKERS && (
+                  <LivestreamFormSpeakersStep
+                     values={formSpeakersTabInitialValues}
+                  />
+               )}
+               {tabValue == TAB_VALUES.QUESTIONS && (
+                  <LivestreamFormQuestionsStep />
+               )}
+               {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
+            </Stack>
+         </Form>
       </Formik>
    )
 }
