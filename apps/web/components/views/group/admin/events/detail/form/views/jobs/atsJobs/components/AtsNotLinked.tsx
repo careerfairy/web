@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material"
 import React from "react"
-import { AlertCircle } from "react-feather"
+import { AlertCircle as AlertIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -27,7 +27,7 @@ const AtsNotLinked = () => {
    return (
       <Box sx={styles.wrap}>
          <Stack spacing={3} sx={styles.content}>
-            <AlertCircle size={70} color={theme.palette.secondary.main} />
+            <AlertIcon size={70} color={theme.palette.secondary.main} />
 
             <Typography variant="brandedH4" fontWeight={"bold"}>
                No ATS system linked yet!

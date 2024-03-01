@@ -3,7 +3,7 @@ import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import { sxStyles } from "types/commonTypes"
-import { XCircle } from "react-feather"
+import { XCircle as ErrorIcon } from "react-feather"
 import useAtsApplicationTest from "components/custom-hook/ats/useAtsApplicationTest"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
@@ -91,7 +91,7 @@ const ApplicationTestError = () => {
                            onClick={handleClose}
                            sx={[styles.cancelBtn, styles.mobileBtn]}
                         >
-                           close
+                           Close
                         </SteppedDialog.Button>
                      </Box>
                   </>
@@ -131,7 +131,7 @@ const Content = () => {
 
    return (
       <Stack spacing={3}>
-         <XCircle color={theme.palette.error.main} />
+         <ErrorIcon color={theme.palette.error.main} />
 
          <SteppedDialog.Title sx={styles.title}>
             Application test got an{" "}

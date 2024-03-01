@@ -1,7 +1,7 @@
 import AtsNotLinked from "./components/AtsNotLinked"
 import { sxStyles } from "types/commonTypes"
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material"
-import { AlertCircle } from "react-feather"
+import { AlertCircle as AlertIcon } from "react-feather"
 import { useATSAccount } from "components/views/group/admin/ats-integration/ATSAccountContextProvider"
 import { FC } from "react"
 
@@ -43,7 +43,7 @@ const AtsAccountIncomplete: FC<Props> = ({ onDialogOpen }) => {
       <>
          <Box sx={styles.wrap}>
             <Stack spacing={3} sx={styles.content}>
-               <AlertCircle size={70} color={theme.palette.secondary.main} />
+               <AlertIcon size={70} color={theme.palette.secondary.main} />
 
                <Typography variant="brandedH4" fontWeight={"bold"}>
                   One more step!

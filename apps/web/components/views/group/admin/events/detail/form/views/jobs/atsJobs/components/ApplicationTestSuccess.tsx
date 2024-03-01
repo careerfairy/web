@@ -3,7 +3,7 @@ import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import { sxStyles } from "types/commonTypes"
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
+import { CheckCircleRounded as SuccessIcon } from "@mui/icons-material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
@@ -104,7 +104,7 @@ const ApplicationTestGenerated = () => {
 
 const Content = () => (
    <Stack spacing={3}>
-      <CheckCircleRoundedIcon color="success" />
+      <SuccessIcon color="success" />
 
       <SteppedDialog.Title sx={styles.title}>
          Application test was{" "}
