@@ -1,16 +1,16 @@
-import React, { FC, useCallback, useMemo, useState } from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import { Box, Grid, Typography } from "@mui/material"
-import { where } from "firebase/firestore"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
-import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { QueryConstraint } from "@firebase/firestore"
-import { useLivestreamSearchAlgolia } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { LivestreamSearchResult } from "types/algolia"
 import SanitizedHTML from "components/util/SanitizedHTML"
 
@@ -52,6 +52,9 @@ type Props = {
    additionalConstraints?: QueryConstraint[]
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
+   filterOptions: FilterOptions
+   inputValue: string
+   setInputValue: (value: string) => void
 }
 const LivestreamSearch: FC<Props> = ({
    value,
@@ -60,37 +63,28 @@ const LivestreamSearch: FC<Props> = ({
    startIcon,
    endIcon,
    placeholderText,
-   additionalConstraints = [] as QueryConstraint[],
    // hasPastEvents, TODO: Add this to Algolia filtering
-   includeHiddenEvents,
+   filterOptions,
+   inputValue,
+   setInputValue,
 }) => {
-   const [inputValue, setInputValue] = useState("")
+   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions)
 
-   // When using trigrams in a search, it's necessary to obtain more results because the filtering can only be performed on the client-side.
-   // This ensures that we have some results to display to the user.
-   //
-   // When using trigrams in a search, we require a minimum number of characters in the search input
-   // to ensure that no emptyOrderBy option will be added
-   // TODO: convert this to algolia filtering
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const options = useMemo<UseSearchOptions<LivestreamEvent>>(
-      () => ({
-         maxResults: 7,
-         debounceMs: null,
-         additionalConstraints: [
-            ...additionalConstraints,
-            where("test", "==", false),
-            ...(includeHiddenEvents ? [] : [where("hidden", "==", false)]),
-         ],
-         emptyOrderBy: {
-            field: "start",
-            direction: orderByDirection || "desc",
-         },
-      }),
-      [additionalConstraints, includeHiddenEvents, orderByDirection]
-   )
-
-   const { data } = useLivestreamSearchAlgolia(inputValue)
+   // console.table(
+   //    data?.deserializedHits.map((hit) => ({
+   //       id: hit.objectID,
+   //       denyRecordingAccess: hit.denyRecordingAccess,
+   //       fieldOfStudyIdTags: hit.fieldOfStudyIdTags,
+   //       companyIndustries: hit.companyIndustries,
+   //       companySizes: hit.companySizes,
+   //       companyCountries: hit.companyCountries,
+   //       hidden: hit.hidden,
+   //       test: hit.test,
+   //       hasJobs: hit.hasJobs,
+   //       languageCode: hit.languageCode,
+   //       groupIds: hit.groupIds,
+   //    }))
+   // )
 
    const renderOption = useCallback(
       (
@@ -106,7 +100,7 @@ const LivestreamSearch: FC<Props> = ({
                {...props}
                component="li"
                sx={[state.selected && styles.listItemSelected]}
-               key={option.id}
+               key={option.objectID}
             >
                <Grid container alignItems="center">
                   <Grid item width="calc(100% - 44px)" sx={styles.listItemGrid}>
