@@ -9,9 +9,11 @@ import {
 } from "@mui/material"
 import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
 import { UserPlus } from "react-feather"
-import React from "react"
 import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
 import { FormikValues } from "formik"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import { MutableRefObject, useRef } from "react"
+import ReactQuill from "react-quill"
 
 const styles = sxStyles({
    multiline: {
@@ -40,10 +42,11 @@ type Props = {
    nameError: string
    positionError: string
    avatarError: string
-   testimonial: Testimonial
+   testimonial: Testimonial & { quillInputRef: MutableRefObject<ReactQuill> }
    objectKey: string
    setFieldValue: (field, value) => void
    handleBlur: (event) => void
+   handleChange: (event) => void
    isSubmitting: boolean
    getDownloadUrl: (fileName) => string
    setValues: (values) => void
@@ -64,6 +67,7 @@ const TestimonialForm = ({
    objectKey,
    setFieldValue,
    handleBlur,
+   handleChange,
    isSubmitting,
    getDownloadUrl,
    setValues,
@@ -75,6 +79,7 @@ const TestimonialForm = ({
    disabledAddMoreTestimonials,
 }: Props) => {
    const isLast = index === Object.keys(values.testimonials).length - 1
+   testimonial.quillInputRef = useRef()
 
    return (
       <>
@@ -106,16 +111,20 @@ const TestimonialForm = ({
                         id={`testimonials.${objectKey}.testimonial`}
                         placeholder="Say something about their story"
                         disabled={isSubmitting}
-                        onChange={({ currentTarget: { value } }) =>
-                           setFieldValue(
-                              `testimonials.${objectKey}.testimonial`,
-                              value
-                           )
-                        }
+                        onChange={handleChange}
                         error={Boolean(testimonialError)}
-                        value={testimonial.testimonial}
+                        value={
+                           testimonial.testimonial
+                              ? testimonial.testimonial
+                              : "<p></p>"
+                        } //to avoid label getting on top of editor when empty
                         variant="outlined"
                         sx={styles.multiline}
+                        inputRef={testimonial.quillInputRef}
+                        InputProps={{
+                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           inputComponent: CustomRichTextEditor as any,
+                        }}
                      />
                      <Collapse
                         in={Boolean(testimonialError)}

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Typography } from "@mui/material"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
@@ -11,8 +11,9 @@ import {
    Users as UsersIcon,
 } from "react-feather"
 import EditDialog from "../EditDialog"
-import AboutDialog from "./AboutDialog"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
    wrapper: {
@@ -36,6 +37,9 @@ const styles = sxStyles({
       my: 1,
    },
 })
+
+const AboutDialog = dynamic(() => import('./AboutDialog'), { ssr: false, loading: () => <CircularProgress /> });
+
 
 const AboutSection = () => {
    const {
@@ -111,7 +115,7 @@ const AboutSection = () => {
             {showIcons ? renderIcons() : null}
             <Box mt={2}>
                <Typography variant="h6" fontWeight={"400"} color="black">
-                  {extraInfo}
+                  <SanitizedHTML htmlString={extraInfo} />
                </Typography>
             </Box>
          </Box>

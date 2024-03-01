@@ -292,7 +292,7 @@ export class SparkFunctionsRepository
       super()
    }
 
-   private readonly TARGET_SPARK_COUNT = 20 // The number of sparks a user's feed should have
+   private readonly TARGET_SPARK_COUNT = 30 // The number of sparks a user's feed should have
 
    async get(id: string): Promise<Spark | null> {
       const doc = await this.firestore

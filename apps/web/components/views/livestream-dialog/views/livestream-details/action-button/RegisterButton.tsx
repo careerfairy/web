@@ -1,10 +1,10 @@
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import { Button } from "@mui/material"
 import styles from "./Styles"
 import CheckIcon from "@mui/icons-material/Check"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { FloatingButtonWrapper, LinkText } from "./ActionButton"
+import { ActionButtonWrapper, LinkText } from "./ActionButton"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
@@ -15,7 +15,7 @@ type RegisterButtonProps = {
 }
 const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
    const { authenticatedUser, isLoadingUserData, isLoadingAuth } = useAuth()
-   const { onRegisterClick, livestreamPresenter, isFloating } =
+   const { onRegisterClick, livestreamPresenter, isFloating, isFixedToBottom, setIsDisabled } =
       useActionButtonContext()
 
    // Must use controlled open state for Tooltip to work with disabled button
@@ -53,8 +53,14 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
       onRegisterClick(isFloating)
    }, [isLoadingUserData, isLoadingAuth, onRegisterClick, isFloating])
 
+   useEffect(() => {
+      if (buttonDisabled && setIsDisabled){
+         setIsDisabled(true);
+      }
+   }, [buttonDisabled, setIsDisabled])
+
    return (
-      <FloatingButtonWrapper isFloating={isFloating}>
+      <ActionButtonWrapper isFloating={isFloating} isFixedToBottom={isFixedToBottom}>
          <Box
             onMouseEnter={() => buttonDisabled && handleOpen()}
             onMouseLeave={() => buttonDisabled && handleClose()}
@@ -66,7 +72,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                id="register-button"
                color={"secondary"}
                variant={"contained"}
-               sx={[styles.btn, registered && styles.successButton]}
+               sx={[!isFixedToBottom && styles.btn, registered && !isFixedToBottom && styles.successButton]}
                fullWidth
                startIcon={registered ? <CheckIcon /> : null}
                endIcon={
@@ -88,17 +94,17 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                onClick={handleClick}
                disableElevation
                data-testid="livestream-registration-button"
-               size="large"
+               size={isFixedToBottom? "medium" : "large"}
             >
                {label}
             </Button>
          </Box>
-         {registered && !isPast ? (
+         {!isFixedToBottom && registered && !isPast ? (
             <LinkText isFloating={isFloating} onClick={handleClick}>
                Cancel registration
             </LinkText>
          ) : null}
-      </FloatingButtonWrapper>
+      </ActionButtonWrapper>
    )
 }
 

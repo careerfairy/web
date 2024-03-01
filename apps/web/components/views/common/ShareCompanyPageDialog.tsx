@@ -25,6 +25,7 @@ import Image from "next/legacy/image"
 import ReferralWidget from "./ReferralWidget"
 import useSocials, { SocialPlatformObject } from "../../custom-hook/useSocials"
 import { sxStyles } from "../../../types/commonTypes"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const styles = sxStyles({
    title: {
@@ -134,13 +135,11 @@ const ShareCompanyPageDialog: FC<Props> = ({
                         <Typography fontWeight={800}>
                            {group.universityName}
                         </Typography>
-                        <Typography
+                        <SanitizedHTML
+                           htmlString={group.extraInfo}
                            sx={styles.companyDescription}
-                           variant="body2"
                            color={"text.secondary"}
-                        >
-                           {group.extraInfo}
-                        </Typography>
+                        />
                      </Box>
                   </Stack>
                </Box>

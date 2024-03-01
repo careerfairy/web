@@ -56,6 +56,7 @@ import search = require("./search")
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
+import onboardingNewsletter = require("./onboardingNewsletter")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -102,6 +103,9 @@ exports.sendReminderForNonAttendeesByStreamId =
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
+exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
+exports.manualOnboardingNewsletter =
+   onboardingNewsletter.manualOnboardingNewsletter
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
@@ -237,13 +241,13 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v2 = userSparks.getSparksFeed
-exports.markSparkAsSeenByUser_v2 = userSparks.markSparkAsSeenByUser
+exports.getSparksFeed_v3 = userSparks.getSparksFeed
+exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v4 = userSparks.trackSparkEvents
 exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
-exports.getSparksAnalytics = sparksAnalytics.getSparksAnalytics
+exports.getSparksAnalytics_v2 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
 exports.userApplyToCustomJob_v2 = customJobs.userApplyToCustomJob

@@ -1,4 +1,4 @@
-import * as DOMPurify from "dompurify"
+import DOMPurify from "isomorphic-dompurify"
 import { FC, useMemo } from "react"
 import Box, { BoxProps } from "@mui/material/Box"
 

@@ -22,7 +22,7 @@ import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DateUtil from "../../../../../../util/DateUtil"
 import CvUploadSection from "./CvUploadSection"
-import CollapsableText from "../../../../common/inputs/CollapsableText"
+import CollapsibleText from "../../../../common/inputs/CollapsibleText"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import CustomJobEntryApply from "./CustomJobEntryApply"
 import CustomJobApplyConfirmationDialog from "./CustomJobApplyConfirmationDialog"
@@ -98,7 +98,7 @@ const styles = sxStyles({
 
 type Props = {
    job: Job | PublicCustomJob
-   handleClose: () => any
+   handleClose: () => unknown
    livestream: LivestreamEvent
    open: boolean
 }
@@ -165,7 +165,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
          )
       }
 
-      if (!Boolean(userData)) {
+      if (!userData) {
          return renderNeedsLogin
       }
 
@@ -219,7 +219,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                   <Typography variant={"h4"} sx={styles.jobName}>
                      {jobName}
                   </Typography>
-                  {Boolean(jobType) ? (
+                  {jobType ? (
                      <Typography variant={"subtitle1"} sx={styles.jobType}>
                         {jobType}
                      </Typography>
@@ -239,7 +239,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
 
          <DialogContent sx={styles.content}>
             <Stack spacing={2} sx={{ height: "100%" }}>
-               {Boolean(hiringManager) ? (
+               {hiringManager ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Hiring Manager
@@ -254,13 +254,13 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                   <Typography variant={"subtitle1"} sx={styles.subTitle}>
                      Job description
                   </Typography>
-                  <CollapsableText
+                  <CollapsibleText
                      text={job.description}
                      collapsedSize={isMobile ? 190 : 80}
                   />
                </Box>
 
-               {Boolean(jobSalary) ? (
+               {jobSalary ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Salary
@@ -271,7 +271,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                   </Box>
                ) : null}
 
-               {Boolean(jobDeadline) ? (
+               {jobDeadline ? (
                   <Box>
                      <Typography variant={"subtitle1"} sx={styles.subTitle}>
                         Application deadline
@@ -285,7 +285,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                {isAtsJob ? (
                   <Box sx={styles.bottomSection}>
                      <Box mt={2}>
-                        {Boolean(userData) ? (
+                        {userData ? (
                            <CvUploadSection alreadyApplied={alreadyApplied} />
                         ) : (
                            renderNeedsLogin

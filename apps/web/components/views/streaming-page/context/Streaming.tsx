@@ -1,6 +1,7 @@
 import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
+import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { useRouter } from "next/router"
 import {
@@ -14,7 +15,6 @@ import {
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
-import { errorLogAndNotify } from "util/CommonUtil"
 
 type StreamContextProps = {
    livestreamId: string
@@ -52,9 +52,6 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const { query } = useRouter()
    const [isReady, setIsReady] = useState(false)
 
-   // Default role is always audience according to SDK
-   const [currentRole, setCurrentRole] = useState<ClientRole>("audience")
-
    const hostAuthToken = query.token?.toString() || ""
 
    const { activeView } = useAppSelector(sidePanelSelector)
@@ -82,7 +79,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
-   const { isLoading, isConnected } = useJoin(
+   const { isLoading } = useJoin(
       {
          appid: agoraCredentials.appID,
          channel: livestreamId,
@@ -94,25 +91,9 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const client = useRTCClient()
 
-   useEffect(() => {
-      client.enableDualStream().catch(errorLogAndNotify)
-   }, [client, shouldStream])
-
-   useEffect(() => {
-      if (isConnected) {
-         const newRole = shouldStream && isReady ? "host" : "audience"
-         client
-            .setClientRole(newRole)
-            .then(() => setCurrentRole(newRole))
-            .catch(errorLogAndNotify)
-      }
-   }, [client, isConnected, isReady, shouldStream])
-
-   useEffect(() => {
-      if (isConnected) {
-         client.enableAudioVolumeIndicator()
-      }
-   }, [client, isConnected])
+   const config = useClientConfig(client, {
+      hostCondition: shouldStream && isReady,
+   })
 
    const value = useMemo<StreamContextProps>(
       () => ({
@@ -125,7 +106,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          isReady,
          setIsReady,
          isJoining: isLoading,
-         currentRole,
+         currentRole: config.currentRole,
       }),
       [
          livestreamId,
@@ -136,7 +117,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          response.token,
          isReady,
          isLoading,
-         currentRole,
+         config.currentRole,
       ]
    )
 

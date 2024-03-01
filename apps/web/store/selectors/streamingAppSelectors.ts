@@ -1,4 +1,5 @@
 import { type UID } from "agora-rtc-react"
+import { useAppSelector } from "components/custom-hook/store"
 import { type RootState } from "store"
 
 export const activeViewSelector = (state: RootState) =>
@@ -20,3 +21,9 @@ export const audioLevelsSelector = (state: RootState) =>
 
 export const userIsSpeakingSelector = (userId: UID) => (state: RootState) =>
    Boolean(state.streamingApp.audioLevels[userId]?.level > 60)
+
+export const currentScreenSharerSelector = (state: RootState) =>
+   state.streamingApp.livestreamState.screenSharerId
+
+export const useSettingsMenuOpen = () =>
+   useAppSelector((state) => state.streamingApp.settingsMenu.isOpen)

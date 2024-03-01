@@ -38,11 +38,12 @@ const styles = sxStyles({
 type Props = {
    job: Job
    livestreamPresenter: LivestreamPresenter
+   isSecondary: boolean
 }
 
-const JobCTAButton: FC<Props> = ({ job, livestreamPresenter }) => {
+const JobCTAButton: FC<Props> = ({ job, livestreamPresenter, isSecondary }) => {
    const { userPresenter, isLoggedOut, authenticatedUser } = useAuth()
-
+   
    if (job.isClosed()) {
       return <ClosedJobButton />
    }
@@ -51,17 +52,19 @@ const JobCTAButton: FC<Props> = ({ job, livestreamPresenter }) => {
       return <ButtonSkeleton />
    }
 
-   if (isLoggedOut) return <SignUpButton />
+   if (isLoggedOut) { 
+      return <SignUpButton />
+   }
 
    if (userPresenter.hasResume()) {
       return (
          <SuspenseWithBoundary>
-            <ApplyButton job={job} livestreamId={livestreamPresenter.id} />
+            <ApplyButton job={job} livestreamId={livestreamPresenter.id} isSecondary={isSecondary} />
          </SuspenseWithBoundary>
       )
    }
 
-   return <UploadCVButton />
+   return <UploadCVButton isSecondary={isSecondary} />
 }
 
 const SignUpButton: FC = () => {
@@ -81,7 +84,7 @@ const SignUpButton: FC = () => {
    )
 }
 
-const UploadCVButton: FC = () => {
+const UploadCVButton: FC<{ isSecondary: boolean }> = ({isSecondary}) => {
    const { fileUploaderProps, dragActive, isLoading } = useUploadCV()
 
    return (
@@ -90,11 +93,12 @@ const UploadCVButton: FC = () => {
          sx={[dragActive && styles.dragActive]}
       >
          <LoadingButton
-            color="primary"
             sx={styles.btn}
             disabled={isLoading}
             startIcon={<UploadIcon />}
             {...baseButtonProps}
+            color={isSecondary ? "grey" : "primary"}
+            variant={isSecondary ? "text" : "contained"}
          >
             Upload CV
          </LoadingButton>
@@ -105,9 +109,10 @@ const UploadCVButton: FC = () => {
 type ApplyButtonProps = {
    job: Job
    livestreamId: string
+   isSecondary: boolean
 }
 
-const ApplyButton: FC<ApplyButtonProps> = ({ job, livestreamId }) => {
+const ApplyButton: FC<ApplyButtonProps> = ({ job, livestreamId, isSecondary }) => {
    const [alreadyApplied, setAlreadyApplied] = useState(false)
 
    const { userData } = useAuth()
@@ -122,9 +127,10 @@ const ApplyButton: FC<ApplyButtonProps> = ({ job, livestreamId }) => {
 
    return (
       <LoadingButton
-         color="primary"
          sx={styles.btn}
          {...baseButtonProps}
+         color={isSecondary ? "grey" : "primary"}
+         variant={isSecondary ? "text" : "contained"}
          loading={isLoading}
          disabled={alreadyApplied}
          onClick={applyJob}
