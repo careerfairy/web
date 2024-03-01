@@ -107,3 +107,21 @@ export const LIVESTREAM_FILTERING_FIELDS = [
    "companyIndustries",
    "hasJobs",
 ] satisfies FieldToIndexType[]
+
+type FilterFieldType = (typeof LIVESTREAM_FILTERING_FIELDS)[number]
+
+export type ArrayFilterFieldType = Extract<
+   FilterFieldType,
+   | "fieldOfStudyIdTags"
+   | "levelOfStudyIdTags"
+   | "groupIds"
+   | "companyIndustries"
+   | "companySizes"
+   | "companyCountries"
+   | "languageCode"
+>
+
+export type BooleanFilterFieldType = Extract<
+   FilterFieldType,
+   "denyRecordingAccess" | "hasJobs" | "hidden" | "test" | "hasEnded"
+>
