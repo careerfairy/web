@@ -2,7 +2,7 @@ import algoliaRepo from "data/algolia/AlgoliaRepository"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import {
-   AlgoliaSerializedLivestream,
+   AlgoliaLivestreamResponse,
    LivestreamSearchResult,
 } from "types/algolia"
 import { SearchResponse } from "@algolia/client-search"
@@ -10,7 +10,7 @@ import { useState } from "react"
 import { useDebounce } from "react-use"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 
-type Data = SearchResponse<AlgoliaSerializedLivestream> & {
+type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
 }
 

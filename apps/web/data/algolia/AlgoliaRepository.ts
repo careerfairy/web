@@ -4,7 +4,7 @@ import { SearchResponse } from "@algolia/client-search"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { initAlgoliaIndex } from "./util"
-import { AlgoliaSerializedLivestream } from "types/algolia"
+import { AlgoliaLivestreamResponse } from "types/algolia"
 
 export interface IAlgoliaRepository {
    searchWishes(
@@ -13,7 +13,7 @@ export interface IAlgoliaRepository {
    ): Promise<SearchResponse<Wish>>
    searchLivestreams(
       query: string
-   ): Promise<SearchResponse<AlgoliaSerializedLivestream>>
+   ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
 }
 interface SearchWishesOptions {
    sortType?: SortType
@@ -62,7 +62,7 @@ class AlgoliaRepository implements IAlgoliaRepository {
 
    async searchLivestreams(query: string) {
       const index = initAlgoliaIndex("livestreams")
-      return index.search<AlgoliaSerializedLivestream>(query)
+      return index.search<AlgoliaLivestreamResponse>(query)
    }
 }
 

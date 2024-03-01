@@ -1,9 +1,9 @@
 import { Hit } from "@algolia/client-search"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { LIVESTREAM_FIELDS_TO_INDEX } from "@careerfairy/shared-lib/livestreams/search"
+import {
+   FieldToIndexType,
+   TransformedLivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams/search"
 import firebase from "firebase/compat/app"
-
-type LiveStreamIndexKeysType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
 
 /**
  * Transforms `firebase.firestore.Timestamp` properties in type `T` to a format
@@ -30,10 +30,13 @@ export type DeserializeTimestamps<T> = {
       : T[P]
 }
 
-export type AlgoliaSerializedLivestream = SerializeTimestamps<
-   Pick<LivestreamEvent, LiveStreamIndexKeysType>
+// The livestream data type stored in the Algolia index.
+export type AlgoliaLivestreamResponse = SerializeTimestamps<
+   Pick<TransformedLivestreamEvent, FieldToIndexType>
 >
 
-export type LivestreamAlgoliaHit = Hit<AlgoliaSerializedLivestream>
+// The data type with additional Algolia metadata like `objectID`, '_highlightResult', '_rankingInfo' etc.
+export type LivestreamAlgoliaHit = Hit<AlgoliaLivestreamResponse>
 
+// The search result type with deserialized timestamps.
 export type LivestreamSearchResult = DeserializeTimestamps<LivestreamAlgoliaHit>
