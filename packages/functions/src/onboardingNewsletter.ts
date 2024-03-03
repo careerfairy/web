@@ -84,16 +84,16 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
    const dataLoader = await NewsletterDataFetcher.create()
    const subscribedUsersCount = await userRepo.getSubscribedUsersCount()
    functions.logger.info(
-      "🚀 ~ sendOnboardingNewsletter ~ subscribedUsersCount:",
+      "sendOnboardingNewsletter ~ subscribedUsersCount:",
       subscribedUsersCount
    )
    const batches = subscribedUsersCount / ITEMS_PER_BATCH
 
-   functions.logger.info("🚀 ~ sendOnboardingNewsletter ~ batches:", batches)
+   functions.logger.info("sendOnboardingNewsletter ~ batches:", batches)
    let lastUser: UserData
    for (let i = 0; i < batches; i++) {
       functions.logger.info(
-         "🚀 ~ sendOnboardingNewsletter ~ PROCESSING_BATCH,TOTAL_USERS,SKIP:",
+         "sendOnboardingNewsletter ~ PROCESSING_BATCH,TOTAL_USERS,SKIP:",
          i,
          subscribedUsersCount,
          ITEMS_PER_BATCH
