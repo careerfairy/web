@@ -11,6 +11,7 @@ import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 /**
  * OnboardingNewsletter functions runtime settings
@@ -22,6 +23,7 @@ const runtimeSettings: RuntimeOptions = {
    memory: "2GB",
 }
 
+const ITEMS_PER_BATCH = 300
 /**
  * Check and send onboarding newsletter everyday at a specific time
  */
@@ -38,6 +40,7 @@ export const onboardingNewsletter = functions
 
 export const manualOnboardingNewsletter = functions
    .region(config.region)
+   .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -79,22 +82,44 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
       functions.logger
    )
    const dataLoader = await NewsletterDataFetcher.create()
-   const onboardingNewsletterService = new OnboardingNewsletterService(
-      userRepo,
-      sparkRepo,
-      emailNotificationsRepo,
-      livestreamsRepo,
-      dataLoader,
-      emailBuilder,
-      overrideUsers,
-      functions.logger
+   const subscribedUsersCount = await userRepo.getSubscribedUsersCount()
+   functions.logger.info(
+      "🚀 ~ sendOnboardingNewsletter ~ subscribedUsersCount:",
+      subscribedUsersCount
    )
+   const batches = subscribedUsersCount / ITEMS_PER_BATCH
 
-   await onboardingNewsletterService.fetchRequiredData()
+   functions.logger.info("🚀 ~ sendOnboardingNewsletter ~ batches:", batches)
+   let lastUser: UserData
+   for (let i = 0; i < batches; i++) {
+      functions.logger.info(
+         "🚀 ~ sendOnboardingNewsletter ~ PROCESSING_BATCH,TOTAL_USERS,SKIP:",
+         i,
+         subscribedUsersCount,
+         ITEMS_PER_BATCH
+      )
 
-   onboardingNewsletterService.buildDiscoveryLists()
+      const onboardingNewsletterService = new OnboardingNewsletterService(
+         userRepo,
+         sparkRepo,
+         emailNotificationsRepo,
+         livestreamsRepo,
+         dataLoader,
+         emailBuilder,
+         overrideUsers,
+         ITEMS_PER_BATCH,
+         lastUser && lastUser.id,
+         functions.logger
+      )
 
-   await onboardingNewsletterService.sendDiscoveryEmails()
+      await onboardingNewsletterService.fetchRequiredData()
 
-   functions.logger.info("OnboardingNewsletter(s) sent")
+      onboardingNewsletterService.buildDiscoveryLists()
+
+      await onboardingNewsletterService.sendDiscoveryEmails()
+
+      const users = onboardingNewsletterService.getUsers()
+      lastUser = onboardingNewsletterService.getUsers().at(users.length - 1)
+      functions.logger.info("OnboardingNewsletter(s) sent batch: ", i)
+   }
 }
