@@ -120,6 +120,7 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
 
       const users = onboardingNewsletterService.getUsers()
       lastUser = onboardingNewsletterService.getUsers().at(users.length - 1)
+
       functions.logger.info("OnboardingNewsletter(s) sent batch: ", i)
    }
 }
