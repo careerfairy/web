@@ -44,6 +44,7 @@ export class UserFunctionsRepository
             .where("id", "==", afterId)
 
          const previousResult = await previousDocQuery.get()
+
          if (previousResult.docs.length) {
             query = query.startAfter(previousResult.docs.at(0))
          }
