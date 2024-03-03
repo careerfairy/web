@@ -71,11 +71,16 @@ export class OnboardingNewsletterService {
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
       private readonly overrideUsers: string[],
+      private readonly itemPerBatch: number,
+      private readonly lastUserId: string,
       private readonly logger: Logger
    ) {
       this.logger.info("OnboardingNewsletterService...")
    }
 
+   getUsers(): UserData[] {
+      return this.onboardingUsers.map((onboardingUser) => onboardingUser.user)
+   }
    private shouldSendCompanyDiscovery = (user: OnboardingUserData): boolean => {
       return (
          !this.hasNotifications([
@@ -98,10 +103,6 @@ export class OnboardingNewsletterService {
                )
                .reduce((prev, current) => prev + current)) ||
          0
-      this.logger.info(
-         `OnboardingNewsletterService ~ ${user.user.userEmail} seenSparksCount:`,
-         seenSparksCount
-      )
 
       return (
          !this.hasNotifications([
@@ -135,10 +136,6 @@ export class OnboardingNewsletterService {
                )
             )
          )
-      )
-      this.logger.info(
-         `OnboardingNewsletterService ~ ${onboardingUser.user.userEmail} hasWatchedRecording:`,
-         hasWatchedRecording
       )
 
       return (
@@ -219,9 +216,20 @@ export class OnboardingNewsletterService {
       const fromSkippedDiscovery = daysSinceUserRegistration !== undefined
 
       // Real user days since registration, as this method can be called recursively with overridden days
-      const userCreationDate = onboardingUserData.user.createdAt
-         ? onboardingUserData.user.createdAt.toDate()
-         : new Date()
+      let userCreationDate
+
+      try {
+         userCreationDate = onboardingUserData.user.createdAt
+            ? onboardingUserData.user.createdAt.toDate()
+            : new Date()
+      } catch (ex) {
+         this.logger.info(
+            `OnboardingNewsletterService ~ handleUserDiscovery ${onboardingUserData.user.userEmail} error parsing created at: ${onboardingUserData.user.createdAt}`,
+            fromSkippedDiscovery
+         )
+         userCreationDate = new Date()
+      }
+
       const effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
          userCreationDate,
          new Date()
@@ -229,20 +237,10 @@ export class OnboardingNewsletterService {
 
       let userDaysSinceRegistration = effectiveUserDaysSinceRegistration
       if (fromSkippedDiscovery) {
-         this.logger.info(
-            `OnboardingNewsletterService ~ ${onboardingUserData.user.userEmail} fromSkippedDiscovery:`,
-            fromSkippedDiscovery
-         )
          userDaysSinceRegistration = daysSinceUserRegistration
       }
-      this.logger.info(
-         `OnboardingNewsletterService...HANDLE_USER_DISCOVERY: user{ ${onboardingUserData.user.userEmail} } - effectiveDaysSinceRegistration: ${userDaysSinceRegistration}`
-      )
       switch (userDaysSinceRegistration) {
          case COMPANY_DISCOVERY_TRIGGER_DAY: {
-            this.logger.info(
-               `OnboardingNewsletterService.......COMPANY_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${COMPANY_DISCOVERY_TRIGGER_DAY}`
-            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendCompanyDiscovery(onboardingUserData),
@@ -256,9 +254,6 @@ export class OnboardingNewsletterService {
             break
          }
          case SPARKS_DISCOVERY_TRIGGER_DAY: {
-            this.logger.info(
-               `OnboardingNewsletterService.......SPARKS_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${SPARKS_DISCOVERY_TRIGGER_DAY}`
-            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendSparksDiscovery(onboardingUserData),
@@ -272,9 +267,6 @@ export class OnboardingNewsletterService {
             break
          }
          case LIVESTREAM_1ST_REGISTRATION_DISCOVERY_TRIGGER_DAY: {
-            this.logger.info(
-               `OnboardingNewsletterService.......LIVESTREAM_1ST_REGISTRATION_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${LIVESTREAM_1ST_REGISTRATION_DISCOVERY_TRIGGER_DAY}`
-            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendLivestream1stRecommendationDiscovery(
@@ -290,9 +282,6 @@ export class OnboardingNewsletterService {
             break
          }
          case RECORDING_DISCOVERY_TRIGGER_DAY: {
-            this.logger.info(
-               `OnboardingNewsletterService.......RECORDING_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${RECORDING_DISCOVERY_TRIGGER_DAY}`
-            )
             this.applyDiscovery(
                onboardingUserData,
                this.shouldSendRecordingDiscovery(onboardingUserData),
@@ -306,9 +295,6 @@ export class OnboardingNewsletterService {
             break
          }
          case FEEDBACK_DISCOVERY_TRIGGER_DAY: {
-            this.logger.info(
-               `OnboardingNewsletterService.......FEEDBACK_DISCOVERY user{ ${onboardingUserData.user.userEmail} } - DAY: ${FEEDBACK_DISCOVERY_TRIGGER_DAY}`
-            )
             const shouldSendDiscovery =
                this.shouldSendFeedbackDiscovery(onboardingUserData)
 
@@ -332,9 +318,6 @@ export class OnboardingNewsletterService {
             break
          }
          default: {
-            this.logger.info(
-               `OnboardingNewsletterService.......IGNORE-- user{ ${onboardingUserData.user.userEmail} } - user is on day: ${effectiveUserDaysSinceRegistration} --IGNORE`
-            )
             break
          }
       }
@@ -423,7 +406,8 @@ export class OnboardingNewsletterService {
       const companiesUserFollowsPromise = this.userRepo
          .getCompaniesUserFollowsQuery(user.id, 1)
          .get()
-      const userStatsPromise = this.userRepo.getUserStats(user.userEmail)
+
+      const userStats = await this.userRepo.getUserStats(user.userEmail)
 
       const userNotificationsPromises = [
          this.notificationsRepo.getUserReceivedNotifications(
@@ -447,22 +431,23 @@ export class OnboardingNewsletterService {
             "feedbackDiscovery"
          ),
       ]
-      const [seenSparks, companiesUserFollows, userStats] = await Promise.all([
+
+      const userRecordingStatsPromises =
+         (Boolean(userStats) &&
+            Boolean(userStats?.recordingsBought?.length) &&
+            userStats?.recordingsBought?.map((livestreamId) => {
+               return this.livestreamsRepo.getLivestreamRecordingStats(
+                  livestreamId
+               )
+            })) ||
+         []
+
+      const recordingStats = await Promise.all(userRecordingStatsPromises)
+
+      const [seenSparks, companiesUserFollows] = await Promise.all([
          seenSparksPromise,
          companiesUserFollowsPromise,
-         userStatsPromise,
       ])
-
-      const userRecordingStatsPromises = userStats?.recordingsBought?.map(
-         (livestreamId) => {
-            return this.livestreamsRepo.getLivestreamRecordingStats(
-               livestreamId
-            )
-         }
-      )
-      const recordingStats = userRecordingStatsPromises?.length
-         ? await Promise.all(userRecordingStatsPromises)
-         : []
 
       const [
          companyDiscoveryNotifications,
@@ -498,7 +483,11 @@ export class OnboardingNewsletterService {
       const promises = [
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
-         this.userRepo.getSubscribedUsers(this.overrideUsers),
+         this.userRepo.getSubscribedUsers(
+            this.overrideUsers || [],
+            this.itemPerBatch,
+            this.lastUserId
+         ),
       ] as const
 
       const [futureLivestreams, pastLivestreams, users] = await Promise.all(
@@ -514,7 +503,7 @@ export class OnboardingNewsletterService {
       this.pastLivestreams = pastLivestreams
 
       const onboardingUserPromises =
-         (users &&
+         (Boolean(users.length) &&
             users.map((user) => {
                return this.fetchUserData(user)
             })) ||
@@ -529,7 +518,7 @@ export class OnboardingNewsletterService {
    }
 
    async sendDiscoveryEmails() {
-      await this.emailBuilder.sendAll()
+      // await this.emailBuilder.sendAll()
       await this.createDiscoveryEmailNotifications()
    }
 
