@@ -47,11 +47,11 @@ const generateDateFilterString = (
 
    switch (dateFilter) {
       case "future":
-         filterString = generateDateFilter("start._seconds", new Date(), null)
+         filterString = generateDateFilter("startTimeMs", new Date(), null)
          break
       case "past":
          filterString = generateDateFilter(
-            "start._seconds",
+            "startTimeMs",
             new Date(0),
             new Date()
          )

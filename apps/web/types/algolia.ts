@@ -43,7 +43,7 @@ export type LivestreamSearchResult = DeserializeTimestamps<LivestreamAlgoliaHit>
 
 // Filters
 export type DateFilterFieldType<T> = {
-   attribute: keyof T | string
+   attribute: keyof T & (string | number)
    startDate: Date
    endDate: Date
 }
