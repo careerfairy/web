@@ -769,6 +769,7 @@ export class FirebaseLivestreamRepository
          companyLogoUrl: event.companyLogoUrl || null,
          backgroundImageUrl: event.backgroundImageUrl || null,
          speakers: event.speakers || [],
+         creatorsIds: event.creatorsIds || [],
          summary: event.summary || null,
          createdDateString: event.created?.toDate?.().toString() || null,
          lastUpdatedDateString:

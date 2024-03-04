@@ -166,6 +166,7 @@ export const getLivestreamInitialValues = (group: Group) => ({
    reasonsToJoinLivestream: "",
    reasonsToJoinLivestream_v2: [],
    speakers: { [uuidv4()]: speakerObj },
+   creatorsIds: [],
    status: {},
    language: languageCodes[0],
    targetFieldsOfStudy: [],
@@ -231,6 +232,7 @@ export interface DraftFormValues {
    reasonsToJoinLivestream: string
    reasonsToJoinLivestream_v2: string[]
    speakers: Record<string, Partial<Speaker>>
+   creatorsIds: LivestreamEvent["creatorsIds"]
    status: object
    language: {
       code: string
@@ -447,6 +449,7 @@ const DraftStreamForm = ({
                      livestream,
                      speakerQuery
                   ),
+                  creatorsIds: [],
                   status: livestream.status || {},
                   // @ts-ignore
                   language: livestream.language || languageCodes[0],
