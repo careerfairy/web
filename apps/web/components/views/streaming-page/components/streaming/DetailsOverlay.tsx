@@ -31,9 +31,14 @@ const styles = sxStyles({
 type Props = {
    micActive: boolean
    streamerDetails: StreamerDetails
+   showIcons: boolean
 }
 
-export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
+export const DetailsOverlay = ({
+   micActive,
+   streamerDetails,
+   showIcons,
+}: Props) => {
    const displayName = getStreamerDisplayName(
       streamerDetails.firstName,
       streamerDetails.lastName
@@ -61,12 +66,14 @@ export const DetailsOverlay = ({ micActive, streamerDetails }: Props) => {
                   </Typography>
                )}
             </Stack>
-            <Stack direction="row" spacing={1.5}>
-               <Grow in={!micActive} unmountOnExit>
-                  <Box sx={styles.micOff} component={MicOff} />
-               </Grow>
-               <Info />
-            </Stack>
+            {Boolean(showIcons) && (
+               <Stack direction="row" spacing={1.5}>
+                  <Grow in={!micActive} unmountOnExit>
+                     <Box sx={styles.micOff} component={MicOff} />
+                  </Grow>
+                  <Info />
+               </Stack>
+            )}
          </Stack>
       </FloatingContent>
    )
