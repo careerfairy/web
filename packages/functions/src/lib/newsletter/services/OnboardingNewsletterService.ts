@@ -518,7 +518,7 @@ export class OnboardingNewsletterService {
    }
 
    async sendDiscoveryEmails() {
-      // await this.emailBuilder.sendAll()
+      await this.emailBuilder.sendAll()
       await this.createDiscoveryEmailNotifications()
    }
 
