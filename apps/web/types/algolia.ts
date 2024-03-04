@@ -40,3 +40,10 @@ export type LivestreamAlgoliaHit = Hit<AlgoliaLivestreamResponse>
 
 // The search result type with deserialized timestamps.
 export type LivestreamSearchResult = DeserializeTimestamps<LivestreamAlgoliaHit>
+
+// Filters
+export type DateFilterFieldType<T> = {
+   attribute: keyof T | string
+   startDate: Date
+   endDate: Date
+}

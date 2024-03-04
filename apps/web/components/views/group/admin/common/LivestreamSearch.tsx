@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback, useMemo, useState } from "react"
 import { Box, Grid, Typography } from "@mui/material"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -6,7 +6,6 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
-import { QueryConstraint } from "@firebase/firestore"
 import {
    FilterOptions,
    useLivestreamSearchAlgolia,
@@ -40,22 +39,18 @@ const styles = sxStyles({
    },
 })
 
-export type LivestreamHit = LivestreamSearchResult
-
 type Props = {
-   value: LivestreamHit
-   handleChange: (value: LivestreamHit | null) => void
+   value: LivestreamSearchResult
+   handleChange: (value: LivestreamSearchResult | null) => void
    orderByDirection?: "asc" | "desc"
    startIcon?: JSX.Element
    endIcon?: JSX.Element
    placeholderText?: string
-   additionalConstraints?: QueryConstraint[]
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
    filterOptions: FilterOptions
-   inputValue: string
-   setInputValue: (value: string) => void
 }
+
 const LivestreamSearch: FC<Props> = ({
    value,
    handleChange,
@@ -63,33 +58,18 @@ const LivestreamSearch: FC<Props> = ({
    startIcon,
    endIcon,
    placeholderText,
-   // hasPastEvents, TODO: Add this to Algolia filtering
    filterOptions,
-   inputValue,
-   setInputValue,
 }) => {
-   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions)
+   const [inputValue, setInputValue] = useState("")
 
-   // console.table(
-   //    data?.deserializedHits.map((hit) => ({
-   //       id: hit.objectID,
-   //       denyRecordingAccess: hit.denyRecordingAccess,
-   //       fieldOfStudyIdTags: hit.fieldOfStudyIdTags,
-   //       companyIndustries: hit.companyIndustries,
-   //       companySizes: hit.companySizes,
-   //       companyCountries: hit.companyCountries,
-   //       hidden: hit.hidden,
-   //       test: hit.test,
-   //       hasJobs: hit.hasJobs,
-   //       languageCode: hit.languageCode,
-   //       groupIds: hit.groupIds,
-   //    }))
-   // )
+   const [open, setOpen] = useState(false)
+
+   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions, !open)
 
    const renderOption = useCallback(
       (
          props: React.HTMLAttributes<HTMLLIElement>,
-         option: LivestreamHit,
+         option: LivestreamSearchResult,
          state: AutocompleteRenderOptionState
       ) => {
          const highlightTitle = option._highlightResult?.title
@@ -157,13 +137,17 @@ const LivestreamSearch: FC<Props> = ({
          setInputValue={setInputValue}
          placeholderText={placeholderText}
          inputEndIcon={endIcon}
+         open={open}
+         setOpen={setOpen}
          disableFiltering // Filtering is now done by Algolia, not by the component
       />
    )
 }
 
-const isOptionEqualToValue = (option: LivestreamHit, value: LivestreamHit) =>
-   option.id === value.id
+const isOptionEqualToValue = (
+   option: LivestreamSearchResult,
+   value: LivestreamSearchResult
+) => option.id === value.id
 
-const getOptionLabel = (option: LivestreamHit) => option.title
+const getOptionLabel = (option: LivestreamSearchResult) => option.title
 export default LivestreamSearch

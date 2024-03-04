@@ -40,6 +40,8 @@ type AutocompleteSearchProps<TOption = unknown> = {
    placeholderText?: string
    minCharacters?: number
    disableFiltering?: boolean
+   open?: boolean
+   setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
@@ -59,6 +61,8 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    inputEndIcon,
    loading,
    disableFiltering,
+   open,
+   setOpen,
 }) => {
    const inputTooSmall = minCharacters && inputValue.length < minCharacters
 
@@ -77,7 +81,11 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    )
 
    const onInputChange = useCallback(
-      (event, newInputValue: string) => {
+      (event, newInputValue: string, reason) => {
+         if (reason === "reset") {
+            setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
+            return
+         }
          setInputValue(newInputValue)
       },
       [setInputValue]
@@ -87,16 +95,18 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
       <Autocomplete
          id={id}
          fullWidth
+         open={open}
+         onOpen={setOpen ? () => setOpen(true) : undefined}
+         onClose={setOpen ? () => setOpen(false) : undefined}
          loading={loading}
          getOptionLabel={getOptionLabel}
          options={searchOptions}
          autoComplete
-         freeSolo
          disableClearable
          forcePopupIcon={inputTooSmall ? false : undefined}
          blurOnSelect
          includeInputInList
-         // clearOnBlur
+         clearOnBlur
          ListboxProps={listBoxProps}
          value={value}
          isOptionEqualToValue={isOptionEqualToValue}
@@ -112,7 +122,6 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                {...params}
                InputProps={{
                   ...params.InputProps,
-                  type: "search",
                   ...(inputStartIcon && {
                      startAdornment: (
                         <InputAdornment position="start">

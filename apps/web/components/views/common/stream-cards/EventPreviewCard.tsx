@@ -239,7 +239,6 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }: EventPreviewCardProps,
       ref
    ) => {
-      console.log("🚀 ~ file: EventPreviewCard.tsx:243 ~ event:", event)
       const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
       const trackImpressionsRef = useTrackLivestreamImpressions({
