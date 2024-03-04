@@ -76,8 +76,26 @@ const livestreamFormQuestionsTabSchema = yup.object().shape({
    feedbackQuestions: yup.mixed(),
 })
 
+const atsJobShape = yup.object().shape({
+   groupId: yup.string().required(),
+   integrationId: yup.string().required(),
+   jobId: yup.string().required(),
+   name: yup.string().required(),
+})
+
+const customJobShape = yup.object().shape({
+   id: yup.string().required(),
+   groupId: yup.string().required(),
+   title: yup.string().required(),
+   description: yup.string().required(),
+   jobType: yup.string().required(),
+   postingUrl: yup.string().required(),
+   deleted: yup.bool(),
+})
+
 const livestreamFormJobsTabSchema = yup.object().shape({
-   dummyFieldJobs: yup.string().required("Required"),
+   jobs: yup.array().of(atsJobShape),
+   customJobs: yup.array().of(customJobShape),
 })
 
 const livestreamFormValidationSchema = yup.object().shape({

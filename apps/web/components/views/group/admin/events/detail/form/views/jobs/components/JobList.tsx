@@ -2,26 +2,34 @@ import { FC, useCallback, useMemo } from "react"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import JobCardPreview from "./JobCardPreview"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "store/reducers/adminJobsReducer"
+import EmptyJobs from "./EmptyJobs"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 type Props = {
-   atsJobs?: Job[]
    fieldId: string
 }
-const JobList: FC<Props> = ({ atsJobs, fieldId }) => {
+const JobList: FC<Props> = ({ fieldId }) => {
    const dispatch = useDispatch()
+   const featureFlags = useFeatureFlags()
+   const { group } = useGroup()
+
+   const hasAtsIntegration =
+      featureFlags.atsAdminPageFlag || group.atsAdminPageFlag
+
    const {
       values: {
-         jobs: { customJobs },
+         jobs: { customJobs, jobs: atsJobs },
       },
       setFieldValue,
    } = useLivestreamFormValues()
 
    const selectedJobs = useMemo(
-      () => (customJobs?.length > 0 ? customJobs : atsJobs),
-      [atsJobs, customJobs]
+      () => (hasAtsIntegration ? atsJobs : customJobs),
+      [atsJobs, customJobs, hasAtsIntegration]
    )
 
    const handleRemoveJob = useCallback(
@@ -39,14 +47,20 @@ const JobList: FC<Props> = ({ atsJobs, fieldId }) => {
       [dispatch]
    )
 
-   return selectedJobs.map((job: PublicCustomJob | Job) => (
-      <JobCardPreview
-         key={job.id}
-         job={job}
-         handleRemoveJob={handleRemoveJob}
-         handleEditJob={handleEditJob}
-      />
-   ))
+   if (selectedJobs.length === 0) {
+      return <EmptyJobs />
+   }
+
+   return selectedJobs.map(
+      (job: PublicCustomJob | LivestreamJobAssociation, index: number) => (
+         <JobCardPreview
+            key={index}
+            job={job}
+            handleRemoveJob={handleRemoveJob}
+            handleEditJob={handleEditJob}
+         />
+      )
+   )
 }
 
 export default JobList

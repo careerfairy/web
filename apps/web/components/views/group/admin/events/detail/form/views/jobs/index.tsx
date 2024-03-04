@@ -27,15 +27,13 @@ const LivestreamFormJobsStep = () => {
             <FormSectionHeader
                title={"Job openings"}
                subtitle={
-                  "Create or select up to 5 job openings that you want to share with the talent community!"
+                  hasAtsIntegration
+                     ? "Create and insert all job openings that you want to share with the talent community!"
+                     : "Create or select up to 5 job openings that you want to share with the talent community!"
                }
             />
             <SuspenseWithBoundary fallback={<CircularProgress />}>
-               {hasAtsIntegration ? (
-                  <AtsJobForm />
-               ) : (
-                  <CustomJobForm fieldId="jobs.customJobs" />
-               )}
+               {hasAtsIntegration ? <AtsJobForm /> : <CustomJobForm />}
             </SuspenseWithBoundary>
          </Stack>
       </Form>
