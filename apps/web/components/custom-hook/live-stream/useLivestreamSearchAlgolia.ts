@@ -34,6 +34,41 @@ export type FilterOptions = {
 }
 
 /**
+ * Generates a date filter string for Algolia search based on the provided date filter options.
+ * @param {FilterOptions['dateFilter']} dateFilter - The date filter option.
+ * @returns {string} The generated date filter string.
+ */
+const generateDateFilterString = (
+   dateFilter: FilterOptions["dateFilter"]
+): string => {
+   let filterString = ""
+
+   if (!dateFilter) return filterString
+
+   switch (dateFilter) {
+      case "future":
+         filterString = generateDateFilter("start._seconds", new Date(), null)
+         break
+      case "past":
+         filterString = generateDateFilter(
+            "start._seconds",
+            new Date(0),
+            new Date()
+         )
+         break
+      default:
+         filterString = generateDateFilter(
+            dateFilter.attribute,
+            dateFilter.startDate,
+            dateFilter.endDate
+         )
+         break
+   }
+
+   return filterString
+}
+
+/**
  * Builds an Algolia filter string based on the provided options.
  * @param {Object} options - The filters to apply.
  * @returns {string} The constructed filter string.
@@ -49,32 +84,7 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
    // Handle booleanFilters
    filters.push(generateBooleanFilterStrings(booleanFilters))
 
-   console.log(
-      "🚀 ~ file: useLivestreamSearchAlgolia.ts:53 ~ buildAlgoliaFilterString ~ dateFilter:",
-      dateFilter
-   )
-   switch (dateFilter) {
-      case "future":
-         filters.push(generateDateFilter("start._seconds", new Date(), null))
-         break
-      case "past":
-         filters.push(
-            generateDateFilter("start._seconds", new Date(0), new Date())
-         )
-         break
-
-      default:
-         if (dateFilter) {
-            filters.push(
-               generateDateFilter(
-                  dateFilter.attribute,
-                  dateFilter.startDate,
-                  dateFilter.endDate
-               )
-            )
-         }
-         break
-   }
+   filters.push(generateDateFilterString(dateFilter))
 
    return filters.filter(Boolean).join(" AND ")
 }
