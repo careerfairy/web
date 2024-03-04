@@ -94,6 +94,16 @@ export const datePickerDefaultStyles = sxStyles({
       "& .react-datepicker-wrapper": {
          width: "100%",
       },
+      "& .react-datepicker-popper": {
+         zIndex: 99,
+      },
+      "& .react-datepicker__triangle": {
+         transform: "translate(200px, 0px) !important",
+      },
+      "& .react-datepicker-popper[data-placement^=bottom] .react-datepicker__triangle::after":
+         {
+            borderBottomColor: "white",
+         },
       "& .react-datepicker__header": {
          backgroundColor: "white",
          borderBlockColor: "transparent",

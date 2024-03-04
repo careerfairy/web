@@ -1,13 +1,12 @@
 import { Grid, Stack } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
-import { FC, useCallback, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import {
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import SelectorCustomJobsDropDown from "./components/SelectorCustomJobsDropDown"
-import EmptyJobs from "../components/EmptyJobs"
 import JobList from "../components/JobList"
 import JobFormDialog from "components/views/group/admin/jobs/dialog/JobFormDialog"
 import { useDispatch, useSelector } from "react-redux"
@@ -25,11 +24,9 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   fieldId: string
-}
+const FIELD_ID = "jobs.customJobs"
 
-const CustomJobForm: FC<Props> = ({ fieldId }) => {
+const CustomJobForm = () => {
    const dispatch = useDispatch()
    const { group } = useGroup()
    const allCustomJobs = useGroupCustomJobs(group.id)
@@ -53,9 +50,9 @@ const CustomJobForm: FC<Props> = ({ fieldId }) => {
 
    const handleCreateCustomJob = useCallback(
       (createdJob: PublicCustomJob) => {
-         setFieldValue(fieldId, [...customJobs, createdJob])
+         setFieldValue(FIELD_ID, [...customJobs, createdJob])
       },
-      [customJobs, fieldId, setFieldValue]
+      [customJobs, setFieldValue]
    )
 
    const handleUpdateCustomJob = useCallback(
@@ -69,9 +66,9 @@ const CustomJobForm: FC<Props> = ({ fieldId }) => {
             ...customJobs.slice(indexToUpdate + 1),
          ]
 
-         setFieldValue(fieldId, newValues)
+         setFieldValue(FIELD_ID, newValues)
       },
-      [customJobs, fieldId, setFieldValue]
+      [customJobs, setFieldValue]
    )
 
    const views = useMemo(() => {
@@ -94,18 +91,14 @@ const CustomJobForm: FC<Props> = ({ fieldId }) => {
       <Grid xs={12} item>
          <Stack spacing={2}>
             <SelectorCustomJobsDropDown
-               fieldId={fieldId}
+               fieldId={FIELD_ID}
                label="Job related to this event"
                placeholder="Select jobs you want to attach"
                values={customJobs}
                options={allCustomJobsPresenter}
             />
 
-            {customJobs?.length > 0 ? (
-               <JobList fieldId={fieldId} />
-            ) : (
-               <EmptyJobs />
-            )}
+            <JobList fieldId={FIELD_ID} />
 
             {/* Using a SteppedDialog to be prepared for the future jobFormDialog */}
             <SteppedDialog
