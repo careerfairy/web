@@ -13,12 +13,14 @@ import { SearchIndex } from "algoliasearch"
 import config from "../../config"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
 
-type TransformData = (doc: Record<string, any>) => Record<string, any> | null
+type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
+   doc: DataType
+) => DataTypeTransformed
 
 export const getData = (
    snapshot: DocumentSnapshot,
    fields: string[],
-   transformData: TransformData
+   transformData?: DocumentTransformer
 ) => {
    const payload: {
       [key: string]: boolean | string | number
@@ -44,7 +46,7 @@ const handleCreateDocument = async (
    snapshot: DocumentSnapshot,
    fields: string[],
    index: SearchIndex,
-   transformData: TransformData
+   transformData?: DocumentTransformer
 ) => {
    try {
       const data = getData(snapshot, fields, transformData)
@@ -65,7 +67,7 @@ const handleUpdateDocument = async (
    after: DocumentSnapshot,
    fields: string[],
    index: SearchIndex,
-   transformData: TransformData
+   transformData?: DocumentTransformer
 ) => {
    try {
       functions.logger.debug("Detected a change, execute indexing")
@@ -133,7 +135,10 @@ export type Index<DataType = any, DataTypeTransformed = DataType> = {
     * Name of the index in Algolia
     */
    indexName: string
-   transformData?: (doc: DataType) => DataTypeTransformed
+   /**
+    * Function to transform the data before indexing.
+    */
+   transformData?: DocumentTransformer<DataType, DataTypeTransformed>
    settings?: {
       /**
        * Attributes for text search; listing more enhances speed and reduces index size.

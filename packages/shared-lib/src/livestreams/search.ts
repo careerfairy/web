@@ -85,7 +85,6 @@ export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
    "title",
    "company",
    "companyIndustries",
-   "fieldOfStudyNameTags",
 ] satisfies FieldToIndexType[]
 
 /**
