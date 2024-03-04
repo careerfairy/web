@@ -30,6 +30,10 @@ const styles = sxStyles({
    listItemGrid: {
       width: "calc(100% - 44px)",
       wordWrap: "break-word",
+      "& em": {
+         fontStyle: "normal",
+         fontWeight: 600,
+      },
    },
    listItemSelected: {
       backgroundColor: "white !important",
