@@ -6,6 +6,7 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useMemo } from "react"
 import { Layout } from "../types"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 
 /**
  * A custom hook that calculates the layout for a gallery based on various conditions.
@@ -17,6 +18,7 @@ import { Layout } from "../types"
  */
 export const useGalleryLayout = (numberOfElements: number): Layout => {
    const { isOpen: isSideDrawerOpen } = useSideDrawer()
+   const isSpotlightMode = useIsSpotlightMode()
 
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
@@ -30,8 +32,23 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
 
       // Landscape mode: prioritize a single row, adjusting columns based on count, maxing out at 3.
       if (streamIsLandscape) {
+         if (isSpotlightMode) {
+            return {
+               columns: numberOfElements > 2 ? 2 : 1,
+               rows: 2,
+            }
+         }
          return {
             columns: numberOfElements < 4 ? numberOfElements : 3,
+            rows: 1,
+         }
+      }
+
+      if (isSpotlightMode) {
+         return {
+            // Max 3 streamers on a single row on mobile
+            // Max 4 streamers on a single row on desktop
+            columns: Math.min(streamIsMobile ? 3 : 4, numberOfElements),
             rows: 1,
          }
       }
@@ -50,5 +67,11 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
 
       // Default scenario for larger collections: Opt for a 3x2 grid to balance between rows and columns.
       return { columns: 3, rows: 2 }
-   }, [galleryIsSquished, numberOfElements, streamIsLandscape, streamIsMobile])
+   }, [
+      galleryIsSquished,
+      isSpotlightMode,
+      numberOfElements,
+      streamIsLandscape,
+      streamIsMobile,
+   ])
 }

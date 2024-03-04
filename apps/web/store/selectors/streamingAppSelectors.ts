@@ -1,6 +1,8 @@
+import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { type UID } from "agora-rtc-react"
 import { useAppSelector } from "components/custom-hook/store"
 import { type RootState } from "store"
+import { StreamLayouts } from "store/reducers/streamingAppReducer"
 
 export const activeViewSelector = (state: RootState) =>
    state.streamingApp.sidePanel.activeView
@@ -27,3 +29,20 @@ export const currentScreenSharerSelector = (state: RootState) =>
 
 export const useSettingsMenuOpen = () =>
    useAppSelector((state) => state.streamingApp.settingsMenu.isOpen)
+
+export const useIsSpotlightMode = () =>
+   useAppSelector(
+      (state) => state.streamingApp.streamLayout === StreamLayouts.SPOTLIGHT
+   )
+
+export const useIsScreenShareMode = (): boolean =>
+   useAppSelector(
+      (state) =>
+         state.streamingApp.livestreamState.mode === LivestreamModes.DESKTOP
+   )
+
+export const useLivestreamMode = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.mode)
+
+export const useCurrentScreenSharer = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.screenSharerId)
