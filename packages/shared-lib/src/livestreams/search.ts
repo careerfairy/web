@@ -6,6 +6,8 @@ export type TransformedLivestreamEvent = LivestreamEvent & {
    levelOfStudyIdTags: string[]
    fieldOfStudyIdTags: string[]
    languageCode: string
+   /* The start time of the event in milliseconds */
+   startTimeMs: number
 }
 
 export const LIVESTREAM_FIELDS_TO_INDEX = [
@@ -72,6 +74,7 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "fieldOfStudyIdTags",
    "fieldOfStudyNameTags",
    "levelOfStudyNameTags",
+   "startTimeMs",
 ] satisfies (keyof TransformedLivestreamEvent)[]
 
 type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
@@ -95,7 +98,6 @@ export const LIVESTREAM_FILTERING_FIELDS = [
    "fieldOfStudyIdTags",
    "levelOfStudyIdTags",
    "denyRecordingAccess",
-   "start",
    "groupIds",
    "hasEnded",
    "test",
@@ -105,4 +107,5 @@ export const LIVESTREAM_FILTERING_FIELDS = [
    "companyCountries",
    "companyIndustries",
    "hasJobs",
+   "startTimeMs",
 ] satisfies FieldToIndexType[]
