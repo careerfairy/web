@@ -26,6 +26,7 @@ const livestreamIndex = {
          data.targetFieldsOfStudy?.map((field) => field.id) ?? [],
       levelOfStudyIdTags:
          data.targetLevelsOfStudy?.map((level) => level.id) ?? [],
+      startTimeMs: data.start?.toDate?.().getTime() ?? null,
    }),
    settings: {
       attributesForFaceting: LIVESTREAM_FILTERING_FIELDS,
