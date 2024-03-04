@@ -98,8 +98,8 @@ const LivestreamSearch: FC<Props> = ({
          option: LivestreamHit,
          state: AutocompleteRenderOptionState
       ) => {
-         const highlightTitle = option._highlightResult.title
-         const highlightCompany = option._highlightResult.company
+         const highlightTitle = option._highlightResult?.title
+         const highlightCompany = option._highlightResult?.company
 
          return (
             <Box
