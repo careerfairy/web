@@ -55,7 +55,6 @@ export const RemoteStreamer = ({
 }: Props) => {
    const { user, type } = useUserStream<RemoteUser>()
 
-   // console.count(`RemoteStreamer ${user.uid}`)
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
