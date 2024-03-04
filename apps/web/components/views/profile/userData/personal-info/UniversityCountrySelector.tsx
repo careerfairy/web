@@ -33,8 +33,6 @@ export const UniversityCountrySelector = ({
             onChange: () => {
                setValue(universityFieldName, null)
             },
-            // @ts-ignore
-            ["data-testid"]: "university-country-selector",
          }}
       />
    )

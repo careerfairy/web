@@ -2,7 +2,7 @@ import { useFormContext, useWatch } from "react-hook-form"
 import { useMemo } from "react"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
-import { OTHER_UNIVERSITY_OPTION, filterWithOther } from "./util"
+import { OTHER_OPTION, filterWithOther } from "util/form"
 
 type Props = {
    name: string
@@ -31,7 +31,7 @@ export const UniversitySelector = ({ name, countryCodesName }: Props) => {
             value: university.name,
          })) || []
 
-      return [OTHER_UNIVERSITY_OPTION, ...newOptions]
+      return [OTHER_OPTION, ...newOptions]
    }, [universities])
 
    return (
@@ -44,8 +44,6 @@ export const UniversitySelector = ({ name, countryCodesName }: Props) => {
             disabled: isSubmitting,
             autoHighlight: true,
             disableClearable: true,
-            // @ts-ignore
-            ["data-testid"]: "university-country-selector",
             filterOptions: filterWithOther,
          }}
       />
