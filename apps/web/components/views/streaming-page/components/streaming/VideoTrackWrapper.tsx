@@ -24,7 +24,13 @@ const styles = sxStyles({
 })
 
 export const VideoTrackWrapper = ({ ...props }: BoxProps) => {
-   return <Box {...props} sx={combineStyles(styles.root, props.sx)} />
+   return (
+      <Box
+         {...props}
+         sx={combineStyles(styles.root, props.sx)}
+         className="videoTrackWrapper"
+      />
+   )
 }
 
 export const FloatingContent = (props: BoxProps) => {

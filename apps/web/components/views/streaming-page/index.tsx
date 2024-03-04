@@ -93,10 +93,10 @@ const LocalTracksProvider = dynamic(
    { ssr: false }
 )
 
-const AudioLevelsTracker = dynamic(
+const AgoraTrackers = dynamic(
    () =>
-      import("./components/streaming/AudioLevelsTracker").then(
-         (mod) => mod.AudioLevelsTracker
+      import("./components/streaming/AgoraTrackers").then(
+         (mod) => mod.AgoraTrackers
       ),
    { ssr: false }
 )
@@ -168,7 +168,7 @@ const Component = ({ isHost }: Props) => {
                   </LocalTracksProvider>
                </AgoraDevicesProvider>
             </StreamingProvider>
-            <AudioLevelsTracker />
+            <AgoraTrackers />
             <LivestreamStateTrackers />
          </UserClientProvider>
       ),
