@@ -46,6 +46,9 @@ const styles = sxStyles({
       "@media (max-height: 700px)": {
          height: { md: "unset" },
       },
+      "@media (max-height: 550px)": {
+         height: "unset",
+      },
    },
    icon: {
       mr: 1,
@@ -54,14 +57,19 @@ const styles = sxStyles({
          color: (theme) => theme.palette.primary.main,
 
          "@media (max-height: 700px)": {
-            height: { md: "20px" },
-            width: { md: "20px" },
+            height: { md: "24px" },
+            width: { md: "24px" },
+         },
+
+         "@media (max-height: 550px)": {
+            height: "24px",
+            width: "24px",
          },
       },
    },
    infoText: {
       "@media (max-height: 700px)": {
-         fontSize: "12px !important",
+         fontSize: "14px !important",
       },
    },
    actions: {
@@ -74,9 +82,12 @@ const styles = sxStyles({
       alignItems: "center",
 
       "@media (max-height: 600px)": {
-         bottom: 2,
-         position: "unset",
+         position: { md: "unset" },
          mt: 6,
+      },
+
+      "@media (max-height: 450px)": {
+         position: "unset",
       },
    },
 })
