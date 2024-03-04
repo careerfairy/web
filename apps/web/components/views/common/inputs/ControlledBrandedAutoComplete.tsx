@@ -121,15 +121,19 @@ export const ControlledBrandedAutoComplete = forwardRef(
       let currentValue = multiple ? field.value || [] : field.value ?? null
 
       if (matchId) {
+         // This block ensures that the current value matches an option's id or the option itself,
+         // facilitating the use of objects with an 'id' property or direct values as options.
          // @ts-ignore
          currentValue = multiple
-            ? (field.value || []).map(
-                 (i) =>
-                    options.find((j) => {
-                       // @ts-ignore
-                       return (j.id ?? j) === i
-                    }) ?? {}
-              )
+            ? (field.value || [])
+                 .map(
+                    (i) =>
+                       options.find((j) => {
+                          // @ts-ignore
+                          return (j.id ?? j) === i
+                       }) ?? null
+                 )
+                 .filter(Boolean)
             : options.find((i) => {
                  // @ts-ignore
                  return (i.id ?? i) === field.value
@@ -235,6 +239,7 @@ export const ControlledBrandedAutoComplete = forwardRef(
                   inputRef={handleInputRef}
                />
             )}
+            data-testid={name + "-autocomplete"}
          />
       )
    }

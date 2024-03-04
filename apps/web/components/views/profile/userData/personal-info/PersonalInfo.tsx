@@ -46,7 +46,7 @@ const PersonalInfo = ({ userData }: Props) => {
    const { userPresenter } = useAuth()
    const router = useRouter()
 
-   const methods = useYupForm({
+   const formMethods = useYupForm({
       schema: personalInfoSchema,
       defaultValues: {
          firstName: userData?.firstName || "",
@@ -78,10 +78,10 @@ const PersonalInfo = ({ userData }: Props) => {
       return {} // match event handler signature
    }, [router])
 
-   const isSubmitting = methods.formState.isSubmitting
+   const isSubmitting = formMethods.formState.isSubmitting
 
    return (
-      <FormProvider {...methods}>
+      <FormProvider {...formMethods}>
          <Grid container spacing={2}>
             <Grid item xs={8}>
                <ContentCardTitle sx={styles.title}>
@@ -166,7 +166,6 @@ const PersonalInfo = ({ userData }: Props) => {
                   label="LinkedIn (optional)"
                   placeholder="https://www.linkedin.com/in/username/"
                   disabled={isSubmitting}
-                  autoComplete="lname"
                   fullWidth
                />
             </Grid>

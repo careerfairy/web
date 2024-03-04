@@ -1,40 +1,37 @@
 import { URL_REGEX } from "components/util/constants"
+import { ERROR_MESSAGES, maxLength, minLength } from "util/form"
 import * as Yup from "yup"
 
 export const personalInfoSchema = Yup.object({
    firstName: Yup.string()
       .trim()
-      .min(2, "Cannot be shorter than 2 characters")
-      .max(50, "Cannot be longer than 50 characters")
-      .required("Required"),
+      .min(...minLength(2))
+      .max(...maxLength(50))
+      .required(ERROR_MESSAGES.REQUIRED),
    lastName: Yup.string()
       .trim()
-      .min(2, "Cannot be shorter than 2 characters")
-      .max(50, "Cannot be longer than 50 characters")
-      .required("Required"),
-   linkedinUrl: Yup.string()
-      .trim()
-      .nullable()
-      .test(
-         "is-valid-url",
-         "Please enter a valid URL",
-         (value) => !value || URL_REGEX.test(value) // Only test the URL_REGEX if value is not empty
-      ),
+      .min(...minLength(2))
+      .max(...maxLength(50))
+      .required(ERROR_MESSAGES.REQUIRED),
+   linkedinUrl: Yup.string().matches(URL_REGEX, {
+      excludeEmptyString: true,
+      message: ERROR_MESSAGES.VALID_URL,
+   }),
    fieldOfStudy: Yup.object({
-      value: Yup.string().required("Please select a field of study"),
-      id: Yup.string().required("Please select a field of study"),
-   }).required("Please select a field of study"),
+      value: Yup.string().required(ERROR_MESSAGES.SELECT_FIELD),
+      id: Yup.string().required(ERROR_MESSAGES.SELECT_FIELD),
+   }).required(ERROR_MESSAGES.SELECT_FIELD),
    levelOfStudy: Yup.object({
-      value: Yup.string().required("Please select a level of study"),
-      id: Yup.string().required("Please select a level of study"),
-   }).required("Please select a level of study"),
-   universityCountryCode: Yup.string().required("Please chose a country code"),
+      value: Yup.string().required(),
+      id: Yup.string().required(),
+   }).required(ERROR_MESSAGES.SELECT_LEVEL),
+   universityCountryCode: Yup.string().required(ERROR_MESSAGES.CHOOSE_COUNTRY),
    university: Yup.object({
-      id: Yup.string().required("Please enter the university code"),
-      value: Yup.string().required("Please enter the university name"),
+      id: Yup.string().required(),
+      value: Yup.string().required(),
    })
-      .typeError("Please select a university")
-      .required("Please select a university"),
+      .typeError(ERROR_MESSAGES.SELECT_UNIVERSITY)
+      .required(ERROR_MESSAGES.SELECT_UNIVERSITY),
    unsubscribed: Yup.boolean().required(),
 })
 
