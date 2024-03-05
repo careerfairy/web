@@ -25,7 +25,9 @@ const styles = sxStyles({
 })
 
 type GradientContextType = {
+   /** For the carousel next button. */
    showRightLinearGradient: boolean
+   /** For the carousel previous button. */
    showLeftLinearGradient: boolean
 }
 
@@ -34,9 +36,7 @@ const GradientContext = createContext<GradientContextType>({
    showLeftLinearGradient: false,
 })
 
-type GradientProviderProps = {
-   showRightLinearGradient: boolean
-   showLeftLinearGradient: boolean
+type GradientProviderProps = GradientContextType & {
    children: ReactNode
 }
 
@@ -86,6 +86,12 @@ type GradientControlResult = {
    showLeftLinearGradient: boolean
 }
 
+/**
+ * Determines gradient visibility on stream items for carousel button visibility.
+ *
+ * @param {GradientControlParams} params - Calculation parameters.
+ * @returns {GradientControlResult} Visibility flags for left and right gradients.
+ */
 export const calculateGradientControl = ({
    pageIndex,
    pagesLength,
