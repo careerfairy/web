@@ -9,11 +9,7 @@ import { DateTime } from "luxon"
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 2
 
 export interface IUserFunctionsRepository extends IUserRepository {
-   getSubscribedUsers(
-      userEmails?: string[],
-      limit?: number,
-      afterId?: string
-   ): Promise<UserData[]>
+   getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
    getGroupFollowers(groupId: string): Promise<CompanyFollowed[]>
    getSubscribedUsersCount(userEmails?: string[]): Promise<number>
 }
@@ -22,11 +18,7 @@ export class UserFunctionsRepository
    extends FirebaseUserRepository
    implements IUserFunctionsRepository
 {
-   async getSubscribedUsers(
-      userEmails?: string[],
-      limit?: number,
-      afterId?: string
-   ): Promise<UserData[]> {
+   async getSubscribedUsers(userEmails?: string[]): Promise<UserData[]> {
       const earlierThan = DateTime.now()
          .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
          .toJSDate()
@@ -35,20 +27,6 @@ export class UserFunctionsRepository
          .collection("userData")
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
-
-      query = (limit && query.limit(limit)) || query
-
-      if (afterId) {
-         const previousDocQuery = this.firestore
-            .collection("userData")
-            .where("id", "==", afterId)
-
-         const previousResult = await previousDocQuery.get()
-
-         if (previousResult.docs.length) {
-            query = query.startAfter(previousResult.docs.at(0))
-         }
-      }
 
       if (userEmails?.length) {
          query = query.where("userEmail", "in", userEmails)
