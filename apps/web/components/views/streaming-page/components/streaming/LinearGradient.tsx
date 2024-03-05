@@ -6,7 +6,7 @@ const styles = sxStyles({
    root: {
       transition: (theme) => theme.transitions.create("background"),
       background:
-         "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 66.5%, rgba(0, 0, 0, 0.12) 75.5%, rgba(0, 0, 0, 0.48) 100%) transparent 50% / cover no-repeat",
+         "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 66.5%, rgba(0, 0, 0, 0.12) 75.5%, rgba(0, 0, 0, 0.48) 100%), transparent 50% / cover no-repeat",
    },
    showRight: {
       background: {
