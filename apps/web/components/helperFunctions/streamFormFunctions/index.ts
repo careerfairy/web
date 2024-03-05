@@ -98,6 +98,7 @@ export const buildLivestreamObject = (
       reasonsToJoinLivestream: values.reasonsToJoinLivestream,
       reasonsToJoinLivestream_v2: values.reasonsToJoinLivestream_v2,
       speakers: buildSpeakersArray(values),
+      creatorsIds: values.creatorsIds,
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
       hasEnded: false,
