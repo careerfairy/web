@@ -10,6 +10,10 @@ import { useGalleryLayout } from "./useGalleryLayout"
 import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
 import { getPaginatedGridLayout } from "../util"
+import {
+   GradientProvider,
+   calculateGradientControl,
+} from "../../streaming/LinearGradient"
 
 const dynamicStyles = (spacing: number) =>
    sxStyles({
@@ -73,14 +77,31 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      pageIndex === gridPages.length - 1 && pageIndex !== 0
                   }
                   layout={layout}
-                  renderGridItem={(user) => (
-                     <LayoutGrid.Item
-                        key={user.user.uid}
-                        layoutColumns={layout.columns}
-                     >
-                        <UserStreamComponent user={user} />
-                     </LayoutGrid.Item>
-                  )}
+                  renderGridItem={(stream, index, streams) => {
+                     const { showLeftLinearGradient, showRightLinearGradient } =
+                        calculateGradientControl({
+                           index,
+                           layoutRows: layout.rows,
+                           pageIndex,
+                           pageSize,
+                           pagesLength: gridPages.length,
+                           streamsLength: streams.length,
+                        })
+
+                     return (
+                        <GradientProvider
+                           showLeftLinearGradient={showLeftLinearGradient}
+                           showRightLinearGradient={showRightLinearGradient}
+                        >
+                           <LayoutGrid.Item
+                              key={stream.user.uid}
+                              layoutColumns={layout.columns}
+                           >
+                              <UserStreamComponent user={stream} />
+                           </LayoutGrid.Item>
+                        </GradientProvider>
+                     )
+                  }}
                />
             ))}
          />
