@@ -70,10 +70,7 @@ export class OnboardingNewsletterService {
       private readonly livestreamsRepo: ILivestreamRepository,
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
-      private readonly itemPerBatch: number,
       private readonly allUsers: UserData[],
-      private readonly batchIndex: number,
-
       private readonly logger: Logger
    ) {
       this.logger.info("OnboardingNewsletterService...")
@@ -477,29 +474,14 @@ export class OnboardingNewsletterService {
          },
       } as OnboardingUserData
    }
-
-   private paginate(array, pageSize, pageNumber) {
-      return array.slice(
-         pageNumber * pageSize,
-         pageNumber * pageSize + pageSize
-      )
-   }
    /**
     * Fetches all required data for correctly dispatching users to the most relevant discoveries.
     */
    async fetchRequiredData() {
       this.logger.info("Fetching required data")
 
-      const users = this.paginate(
-         this.allUsers,
-         this.itemPerBatch,
-         this.batchIndex
-      )
+      const users = this.allUsers
 
-      this.logger.info(
-         `fetchRequiredData - Users ${users.map((u) => u.userEmail)} Length: `,
-         users.length
-      )
       const onboardingUserPromises =
          (Boolean(users.length) &&
             users.map((user) => {

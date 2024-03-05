@@ -76,29 +76,26 @@ export const manualOnboardingNewsletter = functions
    })
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
-   const emailBuilder = new OnboardingNewsletterEmailBuilder(
-      PostmarkEmailSender.create(),
-      functions.logger
-   )
-   if (overrideUsers) console.log("override users todo")
    const dataLoader = await NewsletterDataFetcher.create()
-   const allSubscribedUsers = await userRepo.getSubscribedUsers()
-   const subscribedUsersCount = await userRepo.getSubscribedUsersCount()
-   functions.logger.info(
-      "sendOnboardingNewsletter ~ subscribedUsersCount / all:",
-      subscribedUsersCount,
-      allSubscribedUsers.length
-   )
-   const batches = subscribedUsersCount / ITEMS_PER_BATCH
+   const allSubscribedUsers = await userRepo.getSubscribedUsers(overrideUsers)
 
-   functions.logger.info("sendOnboardingNewsletter ~ batches:", batches)
+   const batches = allSubscribedUsers.length / ITEMS_PER_BATCH
+
+   functions.logger.info(
+      "sendOnboardingNewsletter ~ TOTAL_SUBSCRIBED_USERS,ITEMS_PER_BATCH,TOTAL_BATCHES:",
+      allSubscribedUsers.length,
+      ITEMS_PER_BATCH,
+      batches
+   )
 
    for (let i = 0; i < batches; i++) {
-      functions.logger.info(
-         "sendOnboardingNewsletter ~ PROCESSING_BATCH,TOTAL_USERS,SKIP:",
-         i,
-         subscribedUsersCount,
-         ITEMS_PER_BATCH
+      const batchUsers = paginate(allSubscribedUsers, ITEMS_PER_BATCH, i)
+
+      functions.logger.info("sendOnboardingNewsletter ~ PROCESSING_BATCH:", i)
+
+      const emailBuilder = new OnboardingNewsletterEmailBuilder(
+         PostmarkEmailSender.create(),
+         functions.logger
       )
 
       const onboardingNewsletterService = new OnboardingNewsletterService(
@@ -108,9 +105,7 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
          livestreamsRepo,
          dataLoader,
          emailBuilder,
-         ITEMS_PER_BATCH,
-         allSubscribedUsers,
-         i,
+         batchUsers,
          functions.logger
       )
 
@@ -122,4 +117,8 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
 
       functions.logger.info("OnboardingNewsletter(s) sent batch: ", i)
    }
+}
+
+function paginate(array, pageSize, pageNumber) {
+   return array.slice(pageNumber * pageSize, pageNumber * pageSize + pageSize)
 }
