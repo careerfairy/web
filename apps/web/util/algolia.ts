@@ -102,10 +102,8 @@ export const generateDateFilter = (
    startDate: Date | null,
    endDate: Date | null
 ): string => {
-   const startTimestamp = startDate
-      ? Math.floor(startDate.getTime() / 1000)
-      : null
-   const endTimestamp = endDate ? Math.floor(endDate.getTime() / 1000) : null
+   const startTimestamp = startDate ? startDate.getTime() : null
+   const endTimestamp = endDate ? endDate.getTime() : null
 
    let filter = ""
 
