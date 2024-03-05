@@ -63,6 +63,8 @@ export const Gallery = ({ streams, spacing }: Props) => {
    return (
       <Box sx={[styles.root, getConditionalStyles()]}>
          <GridCarousel
+            floatingDots={Boolean(isLandscape && isSpotlightMode)}
+            navigationMode={isSpotlightMode && !isLandscape ? "arrows" : "dots"}
             gridPages={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
