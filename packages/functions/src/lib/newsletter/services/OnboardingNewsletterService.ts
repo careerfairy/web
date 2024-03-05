@@ -70,9 +70,10 @@ export class OnboardingNewsletterService {
       private readonly livestreamsRepo: ILivestreamRepository,
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: OnboardingNewsletterEmailBuilder,
-      private readonly overrideUsers: string[],
       private readonly itemPerBatch: number,
-      private readonly lastUserId: string,
+      private readonly allUsers: UserData[],
+      private readonly batchIndex: number,
+
       private readonly logger: Logger
    ) {
       this.logger.info("OnboardingNewsletterService...")
@@ -442,20 +443,23 @@ export class OnboardingNewsletterService {
             })) ||
          []
 
-      const recordingStats = await Promise.all(userRecordingStatsPromises)
-
-      const [seenSparks, companiesUserFollows] = await Promise.all([
+      const [
+         recordingStats,
+         seenSparks,
+         companiesUserFollows,
+         [
+            companyDiscoveryNotifications,
+            sparksDiscoveryNotifications,
+            livestream1stRegistrationDiscoveryNotifications,
+            recordingDiscoveryNotifications,
+            feedbackDiscoveryNotifications,
+         ],
+      ] = await Promise.all([
+         Promise.all(userRecordingStatsPromises),
          seenSparksPromise,
          companiesUserFollowsPromise,
+         Promise.all(userNotificationsPromises),
       ])
-
-      const [
-         companyDiscoveryNotifications,
-         sparksDiscoveryNotifications,
-         livestream1stRegistrationDiscoveryNotifications,
-         recordingDiscoveryNotifications,
-         feedbackDiscoveryNotifications,
-      ] = await Promise.all(userNotificationsPromises)
 
       return {
          user: user,
@@ -474,25 +478,40 @@ export class OnboardingNewsletterService {
       } as OnboardingUserData
    }
 
+   private paginate(array, pageSize, pageNumber) {
+      return array.slice(
+         pageNumber * pageSize,
+         pageNumber * pageSize + pageSize
+      )
+   }
    /**
     * Fetches all required data for correctly dispatching users to the most relevant discoveries.
     */
    async fetchRequiredData() {
       this.logger.info("Fetching required data")
 
+      const users = this.paginate(
+         this.allUsers,
+         this.itemPerBatch,
+         this.batchIndex
+      )
+
+      this.logger.info(
+         `fetchRequiredData - Users ${users.map((u) => u.userEmail)} Length: `,
+         users.length
+      )
+      const onboardingUserPromises =
+         (Boolean(users.length) &&
+            users.map((user) => {
+               return this.fetchUserData(user)
+            })) ||
+         []
       const promises = [
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
-         this.userRepo.getSubscribedUsers(
-            this.overrideUsers || [],
-            this.itemPerBatch,
-            this.lastUserId
-         ),
       ] as const
 
-      const [futureLivestreams, pastLivestreams, users] = await Promise.all(
-         promises
-      )
+      const [futureLivestreams, pastLivestreams] = await Promise.all(promises)
 
       this.futureLivestreams = futureLivestreams.filter((l) => {
          // filter out livestreams before now, the bundle might have events for the same day
@@ -501,13 +520,6 @@ export class OnboardingNewsletterService {
       })
 
       this.pastLivestreams = pastLivestreams
-
-      const onboardingUserPromises =
-         (Boolean(users.length) &&
-            users.map((user) => {
-               return this.fetchUserData(user)
-            })) ||
-         []
 
       this.onboardingUsers = await Promise.all(onboardingUserPromises)
 
