@@ -11,7 +11,6 @@ import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import { UserData } from "@careerfairy/shared-lib/users"
 
 /**
  * OnboardingNewsletter functions runtime settings
@@ -20,10 +19,10 @@ const runtimeSettings: RuntimeOptions = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "2GB",
+   memory: "4GB",
 }
 
-const ITEMS_PER_BATCH = 300
+const ITEMS_PER_BATCH = 450
 /**
  * Check and send onboarding newsletter everyday at a specific time
  */
@@ -81,16 +80,19 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
       PostmarkEmailSender.create(),
       functions.logger
    )
+   if (overrideUsers) console.log("override users todo")
    const dataLoader = await NewsletterDataFetcher.create()
+   const allSubscribedUsers = await userRepo.getSubscribedUsers()
    const subscribedUsersCount = await userRepo.getSubscribedUsersCount()
    functions.logger.info(
-      "sendOnboardingNewsletter ~ subscribedUsersCount:",
-      subscribedUsersCount
+      "sendOnboardingNewsletter ~ subscribedUsersCount / all:",
+      subscribedUsersCount,
+      allSubscribedUsers.length
    )
    const batches = subscribedUsersCount / ITEMS_PER_BATCH
 
    functions.logger.info("sendOnboardingNewsletter ~ batches:", batches)
-   let lastUser: UserData
+
    for (let i = 0; i < batches; i++) {
       functions.logger.info(
          "sendOnboardingNewsletter ~ PROCESSING_BATCH,TOTAL_USERS,SKIP:",
@@ -106,9 +108,9 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
          livestreamsRepo,
          dataLoader,
          emailBuilder,
-         overrideUsers,
          ITEMS_PER_BATCH,
-         lastUser && lastUser.id,
+         allSubscribedUsers,
+         i,
          functions.logger
       )
 
@@ -117,9 +119,6 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
       onboardingNewsletterService.buildDiscoveryLists()
 
       await onboardingNewsletterService.sendDiscoveryEmails()
-
-      const users = onboardingNewsletterService.getUsers()
-      lastUser = onboardingNewsletterService.getUsers().at(users.length - 1)
 
       functions.logger.info("OnboardingNewsletter(s) sent batch: ", i)
    }
