@@ -4,7 +4,7 @@ import { useFormik } from "formik"
 import {
    maxQuestionLength,
    minQuestionLength,
-} from "../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { Box, Button, CircularProgress, TextField } from "@mui/material"
@@ -88,7 +88,7 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
          }
       },
       validate: (values) => {
-         let errors: { questionTitle?: string } = {}
+         const errors: { questionTitle?: string } = {}
          if (!values.questionTitle) {
             errors.questionTitle = "Please enter a title"
          }

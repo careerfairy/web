@@ -32,6 +32,10 @@ export const getData = (
 
    if (transformData) {
       data = transformData(data)
+      console.log(
+         "🚀 ~ file: transformData ~ data:",
+         data.companyIndustryNameTags
+      )
    }
 
    return fields.reduce((acc, field) => {
@@ -80,6 +84,7 @@ const handleUpdateDocument = async (
       functions.logger.debug("undefinedAttrs", undefinedAttrs)
 
       const data = getData(after, fields, transformData)
+
       // if no attributes were removed, then use partial update of the record.
       if (undefinedAttrs.length === 0) {
          logUpdateIndex(after.id, data)

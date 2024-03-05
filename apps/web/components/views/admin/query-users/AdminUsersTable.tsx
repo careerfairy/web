@@ -22,7 +22,7 @@ import GenericFilterSelector from "./GenericFilterSelector"
 import {
    countriesOptionCodes,
    maxCountriesOfInterestToShow,
-} from "../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { UserRecord } from "./useUserRecords"
 
 interface UserTableProps {
@@ -36,6 +36,7 @@ interface UserTableProps {
 }
 
 const AdminUsersTable = ({
+   // eslint-disable-next-line react/no-object-type-as-default-prop
    users = [],
    pageSize,
    loading,

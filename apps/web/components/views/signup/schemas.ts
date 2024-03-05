@@ -1,6 +1,6 @@
 import { URL_REGEX } from "components/util/constants"
 import * as yup from "yup"
-import { possibleGenders } from "../../../constants/forms"
+import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
 
 export const signupSchema = {
    email: yup
