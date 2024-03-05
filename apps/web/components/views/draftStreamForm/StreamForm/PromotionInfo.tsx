@@ -22,7 +22,7 @@ type Props = {
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
    setFieldValue: (field, value) => void
-   classes: string
+   classes: Record<string, string>
    sectionRef: MutableRefObject<HTMLDivElement>
    isPastStream?: boolean
 }
