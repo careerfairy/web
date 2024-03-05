@@ -119,7 +119,7 @@ export function useLivestreamSearchAlgolia(
          })
       },
       500,
-      [inputValue]
+      [inputValue, options]
    )
 
    return useSWR<Data>(
