@@ -18,6 +18,12 @@ const styles = sxStyles({
          },
       },
    },
+   input: {
+      fontSize: "1.1428571429rem",
+      "& .MuiInputBase-input::placeholder": {
+         color: "black",
+      },
+   },
 })
 
 type AutocompleteSearchProps<TOption = unknown> = {
@@ -150,6 +156,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                         </InputAdornment>
                      ),
                   }),
+                  sx: styles.input,
                }}
                placeholder={placeholderText}
                fullWidth
