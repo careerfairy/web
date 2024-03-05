@@ -16,7 +16,11 @@ type Props<ElementType> = {
    elements: ElementType[]
    isLastButNotFirstPage: boolean
    layout: { columns: number; rows: number }
-   renderGridItem: (element: ElementType) => ReactNode
+   renderGridItem: (
+      element: ElementType,
+      index: number,
+      array: ElementType[]
+   ) => ReactNode
 }
 
 /**
