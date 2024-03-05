@@ -10,10 +10,12 @@ import {
    ButtonBaseProps,
    Collapse,
    Fade,
+   IconButton,
    Stack,
 } from "@mui/material"
 
 import { ChevronLeft, ChevronRight } from "react-feather"
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 const SLIDE_SIZE = "100%"
 
@@ -61,7 +63,6 @@ const styles = sxStyles({
       position: "absolute", // To ensure the dots don't change component height
       bottom: 0,
       width: "100%",
-      // transform: "translateY(100%)", // Move the container down by its own height
    },
    dot: {
       width: 10,
@@ -77,9 +78,8 @@ const styles = sxStyles({
       position: "absolute",
       top: "50%",
       transform: "translateY(-50%)",
-      width: 60,
-      height: "100%",
-      color: "neutral.700",
+      color: (theme) => theme.brand.white[50],
+      p: 0,
       "& svg": {
          width: {
             xs: 24,
@@ -96,20 +96,11 @@ const styles = sxStyles({
       },
    },
    prevButton: {
-      left: 0,
-      backgroundImage: {
-         xs: "linear-gradient(270deg, rgba(247, 248, 252, 0.00) 38.02%, rgba(247, 248, 252, 0.80) 92.71%)",
-         tablet:
-            "linear-gradient(270deg, rgba(247, 248, 252, 0.00) 15.5%, #F7F7F7 100%)",
-      },
+      left: -4,
    },
    nextButton: {
-      right: 0,
-      backgroundImage: {
-         xs: "linear-gradient(90deg, rgba(247, 248, 252, 0.00) 38.02%, rgba(247, 248, 252, 0.80) 92.71%)",
-         tablet:
-            "linear-gradient(90deg, rgba(247, 248, 252, 0.00) 15.5%, #F7F7F7 100%)",
-      },
+      borderRadius: "50% 0 0 50%",
+      right: -4,
    },
 })
 
@@ -132,7 +123,9 @@ export const GridCarousel = ({
       }),
       [showNav]
    )
-   const [emblaRef, emblaApi] = useEmblaCarousel(options)
+   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
+      WheelGesturesPlugin(),
+   ])
    const [selectedIndex, setSelectedIndex] = useState(0)
    const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
 
@@ -193,31 +186,30 @@ export const GridCarousel = ({
             </>
          )}
 
-         {Boolean(isDots) && (
-            <Collapse
-               id="dots"
-               sx={styles.collapseContainer}
-               in={gridPages.length > 1}
+         <Collapse
+            id="dots"
+            sx={styles.collapseContainer}
+            in={gridPages.length > 1 && isDots}
+            unmountOnExit
+         >
+            <Stack
+               direction="row"
+               justifyContent="center"
+               pt={{
+                  xs: 1.25,
+                  tablet: 1.5,
+               }}
+               spacing={0.875}
             >
-               <Stack
-                  direction="row"
-                  justifyContent="center"
-                  pt={{
-                     xs: 1.25,
-                     tablet: 1.5,
-                  }}
-                  spacing={0.875}
-               >
-                  {scrollSnaps.map((_, index) => (
-                     <DotButton
-                        key={index}
-                        onClick={() => scrollTo(index)}
-                        sx={index === selectedIndex && styles.dotSelected}
-                     />
-                  ))}
-               </Stack>
-            </Collapse>
-         )}
+               {scrollSnaps.map((_, index) => (
+                  <DotButton
+                     key={index}
+                     onClick={() => scrollTo(index)}
+                     sx={index === selectedIndex && styles.dotSelected}
+                  />
+               ))}
+            </Stack>
+         </Collapse>
       </Box>
    )
 }
@@ -230,13 +222,13 @@ type ArrowButtonProps = {
 const PrevButton = ({ enabled, onClick }: ArrowButtonProps) => {
    return (
       <Fade in={enabled} unmountOnExit>
-         <ButtonBase
+         <IconButton
             onClick={onClick}
             disabled={!enabled}
             sx={[styles.arrowButton, styles.prevButton]}
          >
             <ChevronLeft />
-         </ButtonBase>
+         </IconButton>
       </Fade>
    )
 }
@@ -244,13 +236,13 @@ const PrevButton = ({ enabled, onClick }: ArrowButtonProps) => {
 const NextButton = ({ enabled, onClick }: ArrowButtonProps) => {
    return (
       <Fade in={enabled} unmountOnExit>
-         <ButtonBase
+         <IconButton
             onClick={onClick}
             disabled={!enabled}
             sx={[styles.arrowButton, styles.nextButton]}
          >
             <ChevronRight />
-         </ButtonBase>
+         </IconButton>
       </Fade>
    )
 }

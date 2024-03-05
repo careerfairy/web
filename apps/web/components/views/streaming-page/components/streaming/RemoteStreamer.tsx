@@ -18,6 +18,7 @@ import { SpeakingIndicator } from "./SpeakingIndicator"
 import { useUserStream } from "../../context/UserStream"
 import { RemoteUser } from "../../types"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { LinearGradient } from "./LinearGradient"
 
 type Props = {
    /**
@@ -93,6 +94,7 @@ export const RemoteStreamer = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
+         <LinearGradient />
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          <SpeakingIndicator isSpeaking={isSpeaking} />
          <FloatingContent>{children}</FloatingContent>
