@@ -7,6 +7,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams/search"
 import { Index } from "./searchIndexGenerator"
 import { removeDuplicates } from "@careerfairy/shared-lib/utils"
+import { CompanyIndustryValuesLookup } from "@careerfairy/shared-lib/constants/forms"
 
 const livestreamIndex = {
    collectionPath: "livestreams",
@@ -27,6 +28,10 @@ const livestreamIndex = {
       levelOfStudyIdTags:
          data.targetLevelsOfStudy?.map((level) => level.id) ?? [],
       startTimeMs: data.start?.toDate?.().getTime() ?? null,
+      companyIndustryNameTags:
+         data.companyIndustries?.map(
+            (industry) => CompanyIndustryValuesLookup[industry] ?? industry
+         ) ?? [],
    }),
    settings: {
       attributesForFaceting: LIVESTREAM_FILTERING_FIELDS,

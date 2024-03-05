@@ -1,7 +1,7 @@
 import {
    CompanyCountryValues,
    RelevantCompanyCountryValues,
-} from "../../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,
