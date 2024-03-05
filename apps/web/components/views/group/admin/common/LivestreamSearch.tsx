@@ -54,7 +54,6 @@ type Props = {
    orderByDirection?: "asc" | "desc"
    startIcon?: JSX.Element
    endIcon?: JSX.Element
-   placeholderText?: string
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
    filterOptions: FilterOptions
@@ -66,7 +65,6 @@ const LivestreamSearch: FC<Props> = ({
    orderByDirection,
    startIcon,
    endIcon,
-   placeholderText,
    filterOptions,
 }) => {
    const [inputValue, setInputValue] = useState("")
@@ -102,7 +100,7 @@ const LivestreamSearch: FC<Props> = ({
          getOptionLabel={getOptionLabel}
          inputStartIcon={startIcon}
          setInputValue={setInputValue}
-         placeholderText={placeholderText}
+         placeholderText={"Search by title, company or industry"}
          inputEndIcon={endIcon}
          open={open}
          setOpen={setOpen}
