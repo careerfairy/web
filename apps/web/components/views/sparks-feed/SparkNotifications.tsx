@@ -13,8 +13,8 @@ import {
 import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
 import { FC, useCallback, useEffect } from "react"
 import {
-   setCardNotification,
-   setCurrentEventNotification,
+   setCardEventNotification,
+   setEventNotification,
    setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../store/reducers/sparksFeedReducer"
@@ -67,7 +67,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       if (eventNotifications?.length && !groupId) {
          timeout = setTimeout(() => {
             dispatch(
-               setCurrentEventNotification(
+               setEventNotification(
                   eventNotifications[0] as UserSparksNotification
                )
             )
@@ -85,7 +85,9 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
    useEffect(() => {
       if (groupId && eventNotifications?.length) {
          dispatch(
-            setCardNotification(eventNotifications[0] as UserSparksNotification)
+            setCardEventNotification(
+               eventNotifications[0] as UserSparksNotification
+            )
          )
       }
    }, [groupId, eventNotifications, dispatch])

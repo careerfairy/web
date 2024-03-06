@@ -46,7 +46,7 @@ export const fetchNextErrorSelector = (state: RootState) =>
 export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
 
 export const currentSparkEventNotificationSelector = (state: RootState) =>
-   state.sparksFeed.currentEventNotification
+   state.sparksFeed.eventNotification
 
 export const cardNotificationSelector = (state: RootState) =>
    state.sparksFeed.cardNotification
@@ -91,3 +91,6 @@ export const jobToOpen = (state: RootState) =>
 
 export const autoAction = (state: RootState) =>
    state.sparksFeed.autoAction
+
+export const conversionCardIntervalSelector = (state: RootState) =>
+   state.sparksFeed.conversionCardInterval
