@@ -35,7 +35,7 @@ export const onboardingNewsletter = functions
    .onRun(async () => {
       functions.logger.info("Starting execution of OnboardingNewsletterService")
 
-      // await sendOnboardingNewsletter()
+      await sendOnboardingNewsletter()
    })
 
 export const manualOnboardingNewsletter = functions
