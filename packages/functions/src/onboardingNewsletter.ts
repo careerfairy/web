@@ -34,7 +34,7 @@ export const onboardingNewsletter = functions
    .onRun(async () => {
       functions.logger.info("Starting execution of OnboardingNewsletterService")
 
-      await sendOnboardingNewsletter()
+      // await sendOnboardingNewsletter()
    })
 
 export const manualOnboardingNewsletter = functions
@@ -77,7 +77,10 @@ export const manualOnboardingNewsletter = functions
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
    const dataLoader = await NewsletterDataFetcher.create()
-   const allSubscribedUsers = await userRepo.getSubscribedUsers(overrideUsers)
+   const allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
+      overrideUsers,
+      46
+   )
 
    const batches = Math.ceil(allSubscribedUsers.length / ITEMS_PER_BATCH)
 
@@ -93,6 +96,7 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
 
       functions.logger.info("sendOnboardingNewsletter ~ PROCESSING_BATCH:", i)
 
+      // warning: using this outside the loop will cause email duplication
       const emailBuilder = new OnboardingNewsletterEmailBuilder(
          PostmarkEmailSender.create(),
          functions.logger
