@@ -61,6 +61,7 @@ const LivestreamSearchNav = () => {
                      null
                   }
                   startIcon={<FindIcon color={"black"} />}
+                  placeholderText="Search by title"
                   includeHiddenEvents
                   filterOptions={{
                      arrayFilters: {
