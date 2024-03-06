@@ -88,7 +88,7 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
 
       if (!withinLimit) {
          allSubscribedUsers = allSubscribedUsers.filter((user) =>
-            overrideUsers.includes(user.userEmail)
+            overrideUsers.includes(user.id)
          )
       }
    }
