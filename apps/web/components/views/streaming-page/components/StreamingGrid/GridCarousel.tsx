@@ -99,7 +99,6 @@ const styles = sxStyles({
       left: -4,
    },
    nextButton: {
-      borderRadius: "50% 0 0 50%",
       right: -4,
    },
 })
