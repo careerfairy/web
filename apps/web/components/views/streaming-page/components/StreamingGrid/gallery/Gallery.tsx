@@ -81,6 +81,7 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      <LayoutGrid.Item
                         key={stream.user.uid}
                         layoutColumns={layout.columns}
+                        maxWidth={"100px !important"}
                      >
                         <GradientProvider
                            {...calculateGradientControl({
@@ -102,3 +103,12 @@ export const Gallery = ({ streams, spacing }: Props) => {
       </Box>
    )
 }
+
+// const calculateGridItemMaxWidth: CalculateGridItemMaxWidth = (
+//    maxPageColumns: number,
+//    maxPageRows: number,
+//    numberOfStreamsInPage: number
+// ) => {
+//    const isSingleRowMode = maxPageRows === 1
+//
+// }
