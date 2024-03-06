@@ -129,9 +129,7 @@ export class OnboardingNewsletterService {
       const hasWatchedRecording = Boolean(
          onboardingUser.recordingStats.find((stat) =>
             Boolean(
-               stat?.viewers.find(
-                  (viewer) => viewer === onboardingUser.user.userEmail
-               )
+               stat?.viewers.find((viewer) => viewer === onboardingUser.user.id)
             )
          )
       )
@@ -316,7 +314,7 @@ export class OnboardingNewsletterService {
     */
    private async createDiscoveryEmailNotifications() {
       const userEmailMapper = (onboardingUserData: OnboardingUserData) =>
-         onboardingUserData.user.userEmail
+         onboardingUserData.user.id
       const companyDiscoveryNotificationsPromise =
          this.notificationsRepo.createNotificationDocs(
             this.companyDiscoveryUsers.map(userEmailMapper),
@@ -394,27 +392,27 @@ export class OnboardingNewsletterService {
          .getCompaniesUserFollowsQuery(user.id, 1)
          .get()
 
-      const userStats = await this.userRepo.getUserStats(user.userEmail)
+      const userStats = await this.userRepo.getUserStats(user.id)
 
       const userNotificationsPromises = [
          this.notificationsRepo.getUserReceivedNotifications(
-            user.userEmail,
+            user.id,
             "companyDiscovery"
          ),
          this.notificationsRepo.getUserReceivedNotifications(
-            user.userEmail,
+            user.id,
             "sparksDiscovery"
          ),
          this.notificationsRepo.getUserReceivedNotifications(
-            user.userEmail,
+            user.id,
             "livestream1stRegistrationDiscovery"
          ),
          this.notificationsRepo.getUserReceivedNotifications(
-            user.userEmail,
+            user.id,
             "recordingDiscovery"
          ),
          this.notificationsRepo.getUserReceivedNotifications(
-            user.userEmail,
+            user.id,
             "feedbackDiscovery"
          ),
       ]
@@ -472,11 +470,10 @@ export class OnboardingNewsletterService {
       const users = this.allUsers
 
       const onboardingUserPromises =
-         (Boolean(users.length) &&
-            users.map((user) => {
-               return this.fetchUserData(user)
-            })) ||
-         []
+         users?.map((user) => {
+            return this.fetchUserData(user)
+         }) || []
+
       const promises = [
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
