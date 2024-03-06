@@ -9,6 +9,7 @@ import { swipeToSparkByIndex } from "store/reducers/sparksFeedReducer"
 import { useRouter } from "next/router"
 import { useDispatch, useSelector } from "react-redux"
 import { currentSparkIndexSelector } from "store/selectors/sparksFeedSelectors"
+import Link from "next/link"
 
 const styles = sxStyles({
    header: {
@@ -94,12 +95,8 @@ const styles = sxStyles({
 
 const SparkConversionFullCardNotification = () => {
    const dispatch = useDispatch()
-   const { push } = useRouter()
    const currentSparkIndex = useSelector(currentSparkIndexSelector)
-
-   const handleSignUp = () => {
-      void push("/signup")
-   }
+   const { asPath } = useRouter()
 
    const handleSwipeToNext = () => {
       dispatch(swipeToSparkByIndex(currentSparkIndex + 1))
@@ -161,7 +158,12 @@ const SparkConversionFullCardNotification = () => {
          </Stack>
 
          <Box sx={styles.actions}>
-            <Button color="primary" variant="contained" onClick={handleSignUp}>
+            <Button
+               color="primary"
+               variant="contained"
+               component={Link}
+               href={`/login?absolutePath=${asPath}`}
+            >
                Sign up now
             </Button>
 

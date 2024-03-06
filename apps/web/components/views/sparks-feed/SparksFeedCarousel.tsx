@@ -16,7 +16,9 @@ import {
 } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   removeCurrentEventNotifications,
+   AddCardNotificationPayload,
+   addCardNotificationToSparksList,
+   removeEventNotifications,
    setVideoPlaying,
    setVideosMuted,
    swipeToSparkByIndex,
@@ -29,10 +31,10 @@ import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carou
 import {
    activeSparkSelector,
    cameFromCompanyPageLinkSelector,
+   conversionCardIntervalSelector,
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
-   isFetchingSparksSelector,
    isOnEdgeSelector,
    isPlayingSelector,
    sparksSelector,
@@ -46,6 +48,7 @@ import EmptyFilterView from "./EmptyFilterView"
 import FeedCardSlide from "./FeedCardSlide"
 import SparkNotifications from "./SparkNotifications"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
+import { SparkCardNotificationTypes } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -139,13 +142,13 @@ const SparksFeedCarousel: FC = () => {
    const emptyFilter = useSelector(emptyFilterSelector)
    const sparks = useSelector(sparksSelector)
    const activeSpark = useSelector(activeSparkSelector)
-   const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const isPlaying = useSelector(isPlayingSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
    )
    const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
+   const conversionCardInterval = useSelector(conversionCardIntervalSelector)
 
    const noSparks = sparks.length === 0
 
@@ -218,6 +221,32 @@ const SparksFeedCarousel: FC = () => {
    }, [emblaApi, currentPlayingIndex])
 
    /**
+    * Handle the addition of the conversion card notification
+    */
+   useEffect(() => {
+      // No need to validate if there is no {currentPlayingIndex} nor {conversionCardInterval}
+      if (currentPlayingIndex > 0 && conversionCardInterval > 0) {
+         // after adding the first cardNotification we need to increment the interval to count with the index of the card notification
+         const cardNotificationIncrement =
+            currentPlayingIndex > conversionCardInterval + 1 ? 1 : 0
+
+         if (
+            (currentPlayingIndex + 1 + cardNotificationIncrement) %
+               (conversionCardInterval + cardNotificationIncrement) ===
+            0
+         ) {
+            const payload: AddCardNotificationPayload = {
+               type: SparkCardNotificationTypes.CONVERSION,
+               position: currentPlayingIndex + 1,
+            }
+            dispatch(addCardNotificationToSparksList(payload))
+         }
+      }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [conversionCardInterval, currentPlayingIndex, dispatch])
+
+   /**
     * When the user swipes to a new slide,
     * update the current playing spark in redux
     */
@@ -242,7 +271,7 @@ const SparksFeedCarousel: FC = () => {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeToSparkByIndex(index))
-            dispatch(removeCurrentEventNotifications())
+            dispatch(removeEventNotifications())
             if (!isPlaying) dispatch(setVideoPlaying(true))
          }
 
@@ -408,7 +437,7 @@ type ViewportBoxProps = BoxProps & {
 const ViewportBox = forwardRef(
    (
       { outterContent, children, sx, ...props }: ViewportBoxProps,
-      ref: Ref<any>
+      ref: Ref<unknown>
    ) => {
       const isFullScreen = useSparksFeedIsFullScreen()
       return (

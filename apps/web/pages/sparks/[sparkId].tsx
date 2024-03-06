@@ -1,5 +1,6 @@
 import {
    SerializedSpark,
+   SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
@@ -13,7 +14,6 @@ import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSpa
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   addCarNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
    removeGroupId,
@@ -22,6 +22,9 @@ import {
    setOriginalSparkId,
    setSparks,
    setUserEmail,
+   setConversionCardInterval,
+   AddCardNotificationPayload,
+   addCardNotificationToSparksList,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -38,7 +41,7 @@ import { useMountedState } from "react-use"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedSpark, groupId, userEmail }) => {
+> = ({ serializedSpark, groupId, userEmail, conversionInterval }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
 
@@ -62,6 +65,18 @@ const SparksPage: NextPage<
       dispatch(setSparks([originalSpark]))
       dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
+
+   useEffect(() => {
+      const validConversionInterval =
+         conversionInterval > 0 && conversionInterval < 10
+            ? conversionInterval
+            : 5
+      dispatch(
+         setConversionCardInterval(
+            userEmail || fromGroupPage ? 0 : validConversionInterval
+         )
+      )
+   }, [conversionInterval, dispatch, fromGroupPage, userEmail])
 
    useEffect(() => {
       if (!groupId) {
@@ -111,8 +126,11 @@ const SparksPage: NextPage<
             dispatch(removeGroupId())
             dispatch(fetchInitialSparksFeed())
          } else {
+            const payload: AddCardNotificationPayload = {
+               type: SparkCardNotificationTypes.GROUP,
+            }
             // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-            dispatch(addCarNotificationToSparksList())
+            dispatch(addCardNotificationToSparksList(payload))
          }
       }
    }, [
@@ -191,6 +209,7 @@ type SparksPageProps = {
    serializedSpark: SerializedSpark
    groupId: string | null
    userEmail: string | null
+   conversionInterval: number
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -202,6 +221,10 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
    const groupId = context.query.groupId
       ? context.query.groupId.toString()
+      : null
+
+   const conversionInterval = context.query.conversionInterval
+      ? context.query.conversionInterval.toString()
       : null
 
    const token = getUserTokenFromCookie(context)
@@ -224,6 +247,7 @@ export const getServerSideProps: GetServerSideProps<
          serializedSpark: SparkPresenter.serialize(sparkFromService),
          groupId,
          userEmail: token?.email ?? null,
+         conversionInterval: conversionInterval ? +conversionInterval : 0,
       },
    }
 }

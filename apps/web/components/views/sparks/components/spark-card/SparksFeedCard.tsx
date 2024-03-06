@@ -28,12 +28,11 @@ import {
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import SparkEventFullCardNotification from "./Notifications/SparkEventFullCardNotification"
-import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNotification"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { sparkService } from "data/firebase/SparksService"
 import { useAuth } from "HOCs/AuthProvider"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
+import FullCardNotification from "./Notifications/FullCardNotification"
 
 const styles = sxStyles({
    root: {
@@ -265,17 +264,7 @@ const SparksFeedCard: FC<Props> = ({
                   ]}
                >
                   {showCardNotification ? (
-                     <>
-                        {cardNotification ? (
-                           <SparkEventFullCardNotification
-                              eventId={cardNotification.eventId}
-                           />
-                        ) : (
-                           <SparkGroupFullCardNotification
-                              group={spark.group}
-                           />
-                        )}
-                     </>
+                     <FullCardNotification spark={spark} />
                   ) : isOverlayedOntop ? (
                      <Stack justifyContent="flex-end">
                         <SparkDetails
