@@ -94,7 +94,7 @@ export const RemoteStreamer = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
-         <LinearGradient />
+         {isScreenShare ? null : <LinearGradient />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          <SpeakingIndicator isSpeaking={isSpeaking} />
          <FloatingContent>{children}</FloatingContent>
