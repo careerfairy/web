@@ -6,7 +6,7 @@ import {
 } from "@careerfairy/shared-lib/users/UserRepository"
 import { DateTime } from "luxon"
 
-const SUBSCRIBED_BEFORE_MONTHS_COUNT = 2
+const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(
