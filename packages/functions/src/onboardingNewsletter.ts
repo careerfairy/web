@@ -11,6 +11,7 @@ import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
 
 /**
  * OnboardingNewsletter functions runtime settings
@@ -77,10 +78,20 @@ export const manualOnboardingNewsletter = functions
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
    const dataLoader = await NewsletterDataFetcher.create()
-   const allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
+   let allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
       overrideUsers,
       46
    )
+
+   if (overrideUsers?.length) {
+      const withinLimit = isWithinNormalizationLimit(30, overrideUsers)
+
+      if (!withinLimit) {
+         allSubscribedUsers = allSubscribedUsers.filter((user) =>
+            overrideUsers.includes(user.userEmail)
+         )
+      }
+   }
 
    const batches = Math.ceil(allSubscribedUsers.length / ITEMS_PER_BATCH)
 
@@ -123,6 +134,6 @@ async function sendOnboardingNewsletter(overrideUsers?: string[]) {
    }
 }
 
-function paginate(array, pageSize, pageNumber) {
+function paginate(array: any[], pageSize: number, pageNumber: number) {
    return array.slice(pageNumber * pageSize, pageNumber * pageSize + pageSize)
 }

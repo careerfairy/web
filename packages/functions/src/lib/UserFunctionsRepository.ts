@@ -4,15 +4,13 @@ import {
    FirebaseUserRepository,
    IUserRepository,
 } from "@careerfairy/shared-lib/users/UserRepository"
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
 
 const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
 export interface IUserFunctionsRepository extends IUserRepository {
-   getSubscribedUsers(
-      userEmails?: string[],
-      earlierThanDays?: number
-   ): Promise<UserData[]>
+   getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
 
    /**
     * Retrieves the subscribed users, which were created earlier than a given number of days.
@@ -43,7 +41,10 @@ export class UserFunctionsRepository
          .where("lastActivityAt", ">=", earlierThan)
 
       if (userEmails?.length) {
-         query = query.where("userEmail", "in", userEmails)
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
       }
 
       const data = await query.get()
@@ -64,7 +65,10 @@ export class UserFunctionsRepository
          .where("createdAt", ">=", earlierThan)
 
       if (userEmails?.length) {
-         query = query.where("userEmail", "in", userEmails)
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
       }
 
       const data = await query.get()
