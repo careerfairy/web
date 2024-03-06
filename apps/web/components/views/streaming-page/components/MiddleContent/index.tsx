@@ -32,7 +32,7 @@ export const MiddleContent = () => {
    const { isOpen } = useSideDrawer()
 
    return (
-      <Container sx={[styles.root, styles.fullHeight]} maxWidth={false}>
+      <Container sx={[styles.root, styles.fullHeight]} maxWidth="xl">
          <Stack
             sx={[styles.stack, styles.fullHeight]}
             direction="row"
