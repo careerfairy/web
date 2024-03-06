@@ -173,7 +173,7 @@ export const LocalStream = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
-         <LinearGradient />
+         {isScreenShare ? null : <LinearGradient />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          {hideSpeakingIndicator ? null : (
             <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />
