@@ -5,15 +5,15 @@ import { LayoutGrid } from "../LayoutGrid"
 import { UserStream } from "components/views/streaming-page/types"
 import { UserStreamComponent } from "./UserStreamComponent"
 import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
-import { useStreamIsLandscape } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { useGalleryLayout } from "./useGalleryLayout"
 import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
 import { getPaginatedGridLayout } from "../util"
-import {
-   GradientProvider,
-   calculateGradientControl,
-} from "../../streaming/LinearGradient"
+import { RowCarousel } from "../RowCarousel"
 
 const dynamicStyles = (spacing: number) =>
    sxStyles({
@@ -44,6 +44,7 @@ type Props = {
 export const Gallery = ({ streams, spacing }: Props) => {
    const isSpotlightMode = useIsSpotlightMode()
    const isLandscape = useStreamIsLandscape()
+   const isMobile = useStreamIsMobile()
 
    const layout = useGalleryLayout(streams.length)
    const pageSize = layout.rows * layout.columns
@@ -64,47 +65,42 @@ export const Gallery = ({ streams, spacing }: Props) => {
          : styles.spotlightActivePortrait
    }
 
+   const isSingleRowMode = isSpotlightMode && !isLandscape
+
    return (
       <Box sx={[styles.root, getConditionalStyles()]}>
-         <GridCarousel
-            floatingDots={Boolean(isLandscape && isSpotlightMode)}
-            navigationMode={isSpotlightMode && !isLandscape ? "arrows" : "dots"}
-            gridPages={gridPages.map((pageStreamers, pageIndex) => (
-               <LayoutGrid
-                  key={pageIndex}
-                  elements={pageStreamers}
-                  isLastButNotFirstPage={
-                     pageIndex === gridPages.length - 1 && pageIndex !== 0
-                  }
-                  layout={layout}
-                  renderGridItem={(stream, index, streams) => {
-                     const { showLeftLinearGradient, showRightLinearGradient } =
-                        calculateGradientControl({
-                           index,
-                           layoutRows: layout.rows,
-                           pageIndex,
-                           pageSize,
-                           pagesLength: gridPages.length,
-                           streamsLength: streams.length,
-                        })
-
-                     return (
-                        <GradientProvider
-                           showLeftLinearGradient={showLeftLinearGradient}
-                           showRightLinearGradient={showRightLinearGradient}
-                        >
+         {isSingleRowMode ? (
+            <RowCarousel
+               streams={sortedStreams}
+               maxItemsToShowAtOnce={pageSize}
+            />
+         ) : (
+            <GridCarousel
+               floatingDots={Boolean(
+                  (isLandscape && isSpotlightMode) || !isMobile
+               )}
+               gridPages={gridPages.map((pageStreamers, pageIndex) => (
+                  <LayoutGrid
+                     key={pageIndex}
+                     elements={pageStreamers}
+                     isLastButNotFirstPage={
+                        pageIndex === gridPages.length - 1 && pageIndex !== 0
+                     }
+                     layout={layout}
+                     renderGridItem={(stream) => {
+                        return (
                            <LayoutGrid.Item
                               key={stream.user.uid}
                               layoutColumns={layout.columns}
                            >
                               <UserStreamComponent user={stream} />
                            </LayoutGrid.Item>
-                        </GradientProvider>
-                     )
-                  }}
-               />
-            ))}
-         />
+                        )
+                     }}
+                  />
+               ))}
+            />
+         )}
       </Box>
    )
 }

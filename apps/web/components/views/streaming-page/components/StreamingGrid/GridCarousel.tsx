@@ -9,12 +9,9 @@ import {
    ButtonBase,
    ButtonBaseProps,
    Collapse,
-   Fade,
-   IconButton,
    Stack,
 } from "@mui/material"
 
-import { ChevronLeft, ChevronRight } from "react-feather"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 
 const SLIDE_SIZE = "100%"
@@ -74,46 +71,14 @@ const styles = sxStyles({
    dotSelected: {
       backgroundColor: "#808080",
    },
-   arrowButton: {
-      position: "absolute",
-      top: "50%",
-      transform: "translateY(-50%)",
-      color: (theme) => theme.brand.white[50],
-      p: 0,
-      "& svg": {
-         width: {
-            xs: 24,
-            tablet: 32,
-         },
-         height: {
-            xs: 24,
-            tablet: 32,
-         },
-      },
-      transition: (theme) => theme.transitions.create(["background-color"]),
-      "&:hover,&:focus": {
-         backgroundColor: (theme) => theme.palette.action.hover,
-      },
-   },
-   prevButton: {
-      left: -4,
-   },
-   nextButton: {
-      right: -4,
-   },
 })
 
 type Props = {
    gridPages: ReactNode[]
-   navigationMode: "arrows" | "dots"
    floatingDots?: boolean
 }
 
-export const GridCarousel = ({
-   gridPages,
-   navigationMode,
-   floatingDots,
-}: Props) => {
+export const GridCarousel = ({ gridPages, floatingDots }: Props) => {
    const showNav = gridPages.length > 1
 
    const options = useMemo<EmblaOptionsType>(
@@ -151,16 +116,13 @@ export const GridCarousel = ({
       emblaApi.on("select", onSelect)
    }, [emblaApi, onInit, onSelect])
 
-   const isArrows = navigationMode === "arrows"
-   const isDots = navigationMode === "dots"
-
    return (
       <Box
          id="grid-carousel"
          sx={[
             styles.root,
-            showNav && isDots && styles.rootWithDots,
-            showNav && floatingDots && isDots && styles.rootWithFloatingDots,
+            showNav && styles.rootWithDots,
+            showNav && floatingDots && styles.rootWithFloatingDots,
          ]}
       >
          <Box sx={styles.viewport} ref={emblaRef}>
@@ -172,23 +134,11 @@ export const GridCarousel = ({
                ))}
             </Box>
          </Box>
-         {Boolean(isArrows) && (
-            <>
-               <PrevButton
-                  enabled={selectedIndex > 0}
-                  onClick={() => scrollTo(selectedIndex - 1)}
-               />
-               <NextButton
-                  enabled={selectedIndex < gridPages.length - 1}
-                  onClick={() => scrollTo(selectedIndex + 1)}
-               />
-            </>
-         )}
 
          <Collapse
             id="dots"
             sx={styles.collapseContainer}
-            in={gridPages.length > 1 && isDots}
+            in={gridPages.length > 1}
             unmountOnExit
          >
             <Stack
@@ -210,39 +160,6 @@ export const GridCarousel = ({
             </Stack>
          </Collapse>
       </Box>
-   )
-}
-
-type ArrowButtonProps = {
-   onClick: () => void
-   enabled: boolean
-}
-
-const PrevButton = ({ enabled, onClick }: ArrowButtonProps) => {
-   return (
-      <Fade in={enabled} unmountOnExit>
-         <IconButton
-            onClick={onClick}
-            disabled={!enabled}
-            sx={[styles.arrowButton, styles.prevButton]}
-         >
-            <ChevronLeft />
-         </IconButton>
-      </Fade>
-   )
-}
-
-const NextButton = ({ enabled, onClick }: ArrowButtonProps) => {
-   return (
-      <Fade in={enabled} unmountOnExit>
-         <IconButton
-            onClick={onClick}
-            disabled={!enabled}
-            sx={[styles.arrowButton, styles.nextButton]}
-         >
-            <ChevronRight />
-         </IconButton>
-      </Fade>
    )
 }
 
