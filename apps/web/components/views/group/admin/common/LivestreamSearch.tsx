@@ -57,6 +57,7 @@ type Props = {
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
    filterOptions: FilterOptions
+   placeholderText?: string
 }
 
 const LivestreamSearch: FC<Props> = ({
@@ -66,6 +67,7 @@ const LivestreamSearch: FC<Props> = ({
    startIcon,
    endIcon,
    filterOptions,
+   placeholderText = "Search by title, company or industry",
 }) => {
    const [inputValue, setInputValue] = useState("")
 
@@ -100,7 +102,7 @@ const LivestreamSearch: FC<Props> = ({
          getOptionLabel={getOptionLabel}
          inputStartIcon={startIcon}
          setInputValue={setInputValue}
-         placeholderText={"Search by title, company or industry"}
+         placeholderText={placeholderText}
          inputEndIcon={endIcon}
          open={open}
          setOpen={setOpen}
