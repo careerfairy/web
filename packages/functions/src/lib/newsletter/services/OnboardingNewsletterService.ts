@@ -214,19 +214,8 @@ export class OnboardingNewsletterService {
       const fromSkippedDiscovery = daysSinceUserRegistration !== undefined
 
       // Real user days since registration, as this method can be called recursively with overridden days
-      let userCreationDate
-
-      try {
-         userCreationDate = onboardingUserData.user.createdAt
-            ? onboardingUserData.user.createdAt.toDate()
-            : new Date()
-      } catch (ex) {
-         this.logger.info(
-            `OnboardingNewsletterService ~ handleUserDiscovery ${onboardingUserData.user.userEmail} error parsing created at: ${onboardingUserData.user.createdAt}`,
-            fromSkippedDiscovery
-         )
-         userCreationDate = new Date()
-      }
+      const userCreationDate =
+         onboardingUserData.user.createdAt?.toDate?.() ?? new Date()
 
       const effectiveUserDaysSinceRegistration = getDateDifferenceInDays(
          userCreationDate,
