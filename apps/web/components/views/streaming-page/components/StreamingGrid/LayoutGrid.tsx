@@ -82,7 +82,13 @@ type GalleryGridItemProps = {
 
 const LayoutGridItem = memo(
    ({ children, layoutColumns }: GalleryGridItemProps) => (
-      <Grid item xs={12 / layoutColumns}>
+      <Grid
+         sx={{
+            maxWidth: "300px !important",
+         }}
+         item
+         xs={12 / layoutColumns}
+      >
          <Box sx={styles.item}>{children}</Box>
       </Grid>
    )
