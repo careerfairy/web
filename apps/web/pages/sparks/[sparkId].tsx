@@ -176,8 +176,8 @@ const SparksPage: NextPage<
                topBarTransparent
                hideFooter
                headerWidth="auto"
-               hideBottomNav={isFullScreen}
                hideHeader={isFullScreen}
+               isBottomNavDark={isFullScreen}
             >
                <SparksFeedCarousel />
             </GenericDashboardLayout>
