@@ -44,6 +44,10 @@ const styles = sxStyles({
          xs: MOBILE_SPACING,
          tablet: DESKTOP_SPACING,
       },
+      maxWidth: {
+         // xs: "180px",
+         // tablet: "350px",
+      },
    },
    btnWrapper: {
       position: "absolute",
@@ -84,15 +88,18 @@ const styles = sxStyles({
 
 type Props = {
    streams: UserStream[]
-   maxItemsToShowAtOnce: number
+   maxNumberOfItemsToShowAtOnce: number
 }
 
-export const RowCarousel = ({ streams, maxItemsToShowAtOnce }: Props) => {
-   const active = streams.length > maxItemsToShowAtOnce
+export const RowCarousel = ({
+   streams,
+   maxNumberOfItemsToShowAtOnce,
+}: Props) => {
+   const active = streams.length > maxNumberOfItemsToShowAtOnce
 
    const options = useMemo<EmblaOptionsType>(
       () => ({
-         active: active,
+         active,
       }),
       [active]
    )
@@ -106,17 +113,29 @@ export const RowCarousel = ({ streams, maxItemsToShowAtOnce }: Props) => {
       onPrevButtonClick,
       prevBtnDisabled,
    } = usePrevNextButtons(emblaApi)
+   console.log(
+      "🚀 ~ file: RowCarousel.tsx:107 ~ RowCarousel ~ prevBtnDisabled:",
+      prevBtnDisabled
+   )
+   console.log(
+      "🚀 ~ file: RowCarousel.tsx:107 ~ RowCarousel ~ nextBtnDisabled:",
+      nextBtnDisabled
+   )
 
    return (
       <Box id="grid-carousel" sx={styles.root}>
          <Box sx={styles.viewport} ref={emblaRef}>
-            <Box sx={styles.container}>
+            <Box
+               justifyContent={active ? "flex-start" : "center"}
+               sx={styles.container}
+            >
                {streams.map((stream) => (
                   <Box
+                     id="slide"
                      sx={[
                         styles.slide,
                         {
-                           flex: `0 0 ${100 / maxItemsToShowAtOnce}%`,
+                           flex: `0 0 ${100 / maxNumberOfItemsToShowAtOnce}%`,
                         },
                      ]}
                      key={stream.user.uid}

@@ -72,7 +72,7 @@ export const Gallery = ({ streams, spacing }: Props) => {
          {isSingleRowMode ? (
             <RowCarousel
                streams={sortedStreams}
-               maxItemsToShowAtOnce={pageSize}
+               maxNumberOfItemsToShowAtOnce={pageSize}
             />
          ) : (
             <GridCarousel
