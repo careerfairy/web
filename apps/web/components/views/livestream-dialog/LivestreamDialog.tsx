@@ -96,6 +96,12 @@ type Props = {
    mode?: DialogContextType["mode"]
    onRegisterSuccess?: () => void
    currentSparkId?: string
+   /**
+    * The ID of a job associated with the livestream.
+    *
+    * Note: This property is only available in the "stand-alone" mode.
+    */
+   jobId?: string
 }
 
 export type ViewKey =
@@ -212,6 +218,7 @@ const Content: FC<ContentProps> = ({
    livestreamId,
    mode = "page",
    currentSparkId,
+   jobId,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -225,7 +232,7 @@ const Content: FC<ContentProps> = ({
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
-   const [jobId, setJobId] = useState<string | null>(null)
+   const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -297,7 +304,7 @@ const Content: FC<ContentProps> = ({
                routerOptions
             )
          } else {
-            setJobId(jobId)
+            setCurrentJobId(jobId)
             setValue(views.findIndex((v) => v.key === "job-details"))
          }
       },
@@ -351,7 +358,7 @@ const Content: FC<ContentProps> = ({
          isRecommended,
          registrationState,
          registrationDispatch,
-         jobId,
+         jobId: currentJobId,
          goToJobDetails,
          mode,
          onRegisterSuccess,
@@ -368,7 +375,7 @@ const Content: FC<ContentProps> = ({
          serverUserEmail,
          isRecommended,
          registrationState,
-         jobId,
+         currentJobId,
          goToJobDetails,
          mode,
          onRegisterSuccess,

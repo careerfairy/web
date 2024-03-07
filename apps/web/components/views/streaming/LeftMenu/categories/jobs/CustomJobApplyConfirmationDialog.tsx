@@ -44,6 +44,7 @@ const styles = sxStyles({
       fontWeight: 600,
       fontSize: "24px !important",
       textAlign: "center",
+      mb: 1,
    },
    btn: {
       mx: 2,
@@ -120,6 +121,11 @@ const CustomJobApplyConfirmationDialog = ({
                <Box sx={styles.message}>
                   <Typography variant={"h5"} sx={styles.messageText}>
                      {`Did you apply to ${job.title}?`}
+                  </Typography>
+                  <Typography variant={"body2"}>
+                     {
+                        "You'll soon be able to manage your jobs directly in your profile."
+                     }
                   </Typography>
                </Box>
 
