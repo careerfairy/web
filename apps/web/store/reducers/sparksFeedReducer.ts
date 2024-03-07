@@ -44,7 +44,6 @@ interface SparksState {
    jobToOpen: string | null
    autoAction: AutomaticActions
    conversionCardInterval: number
-   conversionCounter: number
 }
 
 const initialState: SparksState = {
@@ -71,7 +70,6 @@ const initialState: SparksState = {
    jobToOpen: null,
    autoAction: null,
    conversionCardInterval: 0,
-   conversionCounter: 0,
 }
 
 // Async thunk to fetch the next sparks
@@ -222,11 +220,19 @@ const sparksFeedSlice = createSlice({
       setConversionCardInterval: (state, action: PayloadAction<number>) => {
          state.conversionCardInterval = action.payload
       },
-      incrementConversionCounter: (state) => {
-         state.conversionCounter++
-      },
-      resetConversionCounter: (state) => {
-         state.conversionCounter = 0
+      removeNotificationsByType: (
+         state,
+         action: PayloadAction<SparkCardNotificationTypes>
+      ) => {
+         const notificationType = action.payload
+
+         const filteredSparks = state.sparks.filter(
+            (spark) => spark.cardNotificationType !== notificationType
+         )
+
+         if (filteredSparks.length !== state.sparks.length) {
+            state.sparks = filteredSparks
+         }
       },
       resetSparksFeed: (state) => {
          state.sparks = []
@@ -246,7 +252,6 @@ const sparksFeedSlice = createSlice({
          state.videosMuted = false
          state.playing = true
          state.conversionCardInterval = 0
-         state.conversionCounter = 0
       },
    },
    extraReducers: (builder) => {
@@ -262,7 +267,10 @@ const sparksFeedSlice = createSlice({
                state.fetchNextSparksStatus = "idle"
 
                // We don't mind duplicates since the feed is endless
-               state.sparks = [...sparks, ...action.payload]
+               state.sparks = insertNotificationIfNeeded(state, [
+                  ...sparks,
+                  ...action.payload,
+               ])
 
                if (action.payload.length === 0) {
                   state.hasMoreSparks = false
@@ -284,7 +292,12 @@ const sparksFeedSlice = createSlice({
                state.initialFetchStatus = "idle"
                state.initialSparksFetched = true
 
-               state.sparks = mergeSparks(sparks, action.payload)
+               const newSparks = insertNotificationIfNeeded(
+                  state,
+                  mergeSparks(sparks, action.payload)
+               )
+
+               state.sparks = newSparks
 
                if (action.payload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
@@ -328,6 +341,60 @@ const getSparkOptions = (state: RootState) => {
    }
 }
 
+/**
+ * Inserts card notifications into the array of sparks if needed, based on the conversion card interval.
+ *
+ * @param state - The current state.
+ * @param sparks - The array of sparks to be processed.
+ * @returns The array of sparks with card notifications inserted.
+ */
+const insertNotificationIfNeeded = (
+   state: SparksState,
+   sparks: SparkPresenter[]
+): SparkPresenter[] => {
+   const conversionCardInterval = state.conversionCardInterval
+
+   // Copy the array of sparks to avoid mutating the original array
+   const results = sparks.slice()
+
+   // If the conversion card interval is 0, no need to insert notifications
+   if (conversionCardInterval === 0) {
+      return results
+   }
+
+   const lastCardNotificationIndex = results.findLastIndex(
+      (spark) => spark.isCardNotification
+   )
+
+   // Set the initial index to insert notifications after the last one if it exists, otherwise, start from the beginning
+   const initialIndex =
+      lastCardNotificationIndex > 0 ? lastCardNotificationIndex + 1 : 0
+
+   let alreadyHaveNotifications = false
+
+   // Iterate through the sparks array to insert card notifications based on the conversion card interval
+   for (
+      let index = initialIndex;
+      index < results.length;
+      index += conversionCardInterval + (alreadyHaveNotifications ? 1 : 0)
+   ) {
+      if (index !== initialIndex) {
+         alreadyHaveNotifications = true
+
+         const sparkNotificationToAdd = {
+            ...results[index],
+            isCardNotification: true,
+            cardNotificationType: SparkCardNotificationTypes.CONVERSION,
+         } as SparkPresenter
+
+         // Insert the spark notification at the calculated index based on the conversion card interval
+         results.splice(index, 0, sparkNotificationToAdd)
+      }
+   }
+
+   return results
+}
+
 export const {
    setOriginalSparkId,
    setSparks,
@@ -350,8 +417,7 @@ export const {
    setVideoPlaying,
    togglePlaying,
    setConversionCardInterval,
-   resetConversionCounter,
-   incrementConversionCounter,
+   removeNotificationsByType,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

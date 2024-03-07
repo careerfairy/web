@@ -16,11 +16,7 @@ import {
 } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   AddCardNotificationPayload,
-   addCardNotificationToSparksList,
-   incrementConversionCounter,
    removeEventNotifications,
-   resetConversionCounter,
    setVideoPlaying,
    setVideosMuted,
    swipeToSparkByIndex,
@@ -33,8 +29,6 @@ import useVerticalMouseScrollNavigation from "components/custom-hook/embla-carou
 import {
    activeSparkSelector,
    cameFromCompanyPageLinkSelector,
-   conversionCardIntervalSelector,
-   conversionCounterSelector,
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
@@ -51,7 +45,6 @@ import EmptyFilterView from "./EmptyFilterView"
 import FeedCardSlide from "./FeedCardSlide"
 import SparkNotifications from "./SparkNotifications"
 import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
-import { SparkCardNotificationTypes } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 
 const slideSpacing = 32 // in pixels
 const slideHeight = "90%"
@@ -151,8 +144,6 @@ const SparksFeedCarousel: FC = () => {
    )
    const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
-   const conversionCardInterval = useSelector(conversionCardIntervalSelector)
-   const conversionCounter = useSelector(conversionCounterSelector)
 
    const noSparks = sparks.length === 0
 
@@ -221,38 +212,8 @@ const SparksFeedCarousel: FC = () => {
    useEffect(() => {
       if (emblaApi) {
          emblaApi.scrollTo(currentPlayingIndex)
-
-         if (
-            conversionCardInterval > 0 &&
-            !sparks[currentPlayingIndex].isCardNotification
-         ) {
-            dispatch(incrementConversionCounter())
-         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [emblaApi, currentPlayingIndex, conversionCardInterval, dispatch])
-
-   /**
-    * Handle the addition of the conversion card notification
-    */
-   useEffect(() => {
-      if (
-         conversionCardInterval > 0 &&
-         conversionCounter === conversionCardInterval
-      ) {
-         const payload: AddCardNotificationPayload = {
-            type: SparkCardNotificationTypes.CONVERSION,
-            position: currentPlayingIndex + 1,
-         }
-         dispatch(addCardNotificationToSparksList(payload))
-         dispatch(resetConversionCounter())
-      }
-   }, [
-      conversionCardInterval,
-      conversionCounter,
-      currentPlayingIndex,
-      dispatch,
-   ])
+   }, [currentPlayingIndex, emblaApi])
 
    /**
     * When the user swipes to a new slide,

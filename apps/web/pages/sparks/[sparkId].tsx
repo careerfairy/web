@@ -25,6 +25,7 @@ import {
    setConversionCardInterval,
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
+   removeNotificationsByType,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -79,6 +80,12 @@ const SparksPage: NextPage<
             userData || fromGroupPage ? 0 : validConversionInterval
          )
       )
+
+      if (userData) {
+         dispatch(
+            removeNotificationsByType(SparkCardNotificationTypes.CONVERSION)
+         )
+      }
    }, [conversionInterval, dispatch, fromGroupPage, userData])
 
    useEffect(() => {
