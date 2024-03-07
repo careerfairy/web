@@ -78,28 +78,24 @@ export const Gallery = ({ streams, spacing }: Props) => {
                   }
                   layout={layout}
                   renderGridItem={(stream, index, streams) => {
-                     const { showLeftLinearGradient, showRightLinearGradient } =
-                        calculateGradientControl({
-                           index,
-                           layoutRows: layout.rows,
-                           pageIndex,
-                           pageSize,
-                           pagesLength: gridPages.length,
-                           streamsLength: streams.length,
-                        })
-
                      return (
-                        <GradientProvider
-                           showLeftLinearGradient={showLeftLinearGradient}
-                           showRightLinearGradient={showRightLinearGradient}
+                        <LayoutGrid.Item
+                           key={stream.user.uid}
+                           layoutColumns={layout.columns}
                         >
-                           <LayoutGrid.Item
-                              key={stream.user.uid}
-                              layoutColumns={layout.columns}
+                           <GradientProvider
+                              {...calculateGradientControl({
+                                 index,
+                                 layoutRows: layout.rows,
+                                 pageIndex,
+                                 pageSize,
+                                 pagesLength: gridPages.length,
+                                 streamsLength: streams.length,
+                              })}
                            >
                               <UserStreamComponent user={stream} />
-                           </LayoutGrid.Item>
-                        </GradientProvider>
+                           </GradientProvider>
+                        </LayoutGrid.Item>
                      )
                   }}
                />
