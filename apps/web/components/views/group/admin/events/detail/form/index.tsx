@@ -22,7 +22,8 @@ import LivestreamFormSpeakersStep from "./views/speakers"
 import LivestreamFormQuestionsStep from "./views/questions"
 import LivestreamFormJobsStep from "./views/jobs"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
+import { CircularProgress, Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 const styles = sxStyles({
    root: {
@@ -156,9 +157,9 @@ const LivestreamCreationForm: FC<Props> = ({
             <Stack sx={styles.root} rowGap={2}>
                {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
                {tabValue == TAB_VALUES.SPEAKERS && (
-                  <LivestreamFormSpeakersStep
-                     values={formSpeakersTabInitialValues}
-                  />
+                  <SuspenseWithBoundary fallback={<CircularProgress />}>
+                     <LivestreamFormSpeakersStep />
+                  </SuspenseWithBoundary>
                )}
                {tabValue == TAB_VALUES.QUESTIONS && (
                   <LivestreamFormQuestionsStep />
