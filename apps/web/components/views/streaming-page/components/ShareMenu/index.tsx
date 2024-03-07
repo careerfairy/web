@@ -12,8 +12,8 @@ import {
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useLivestreamData } from "components/custom-hook/streaming"
 import { useScreenShare } from "../../context/ScreenShare"
+import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
 
 const styles = sxStyles({
    root: {
@@ -63,13 +63,14 @@ type Props = MenuProps & {
 
 export const ShareMenu = forwardRef<HTMLDivElement, Props>(
    ({ handleClose, ...props }, ref) => {
-      const livestream = useLivestreamData()
       const { handleStopScreenShare, handleStartScreenShareProcess } =
          useScreenShare()
 
-      const screenShareActive = livestream.mode === LivestreamModes.DESKTOP
-      const PDFActive = livestream.mode === LivestreamModes.PRESENTATION
-      const videoActive = livestream.mode === LivestreamModes.VIDEO
+      const mode = useLivestreamMode()
+
+      const screenShareActive = mode === LivestreamModes.DESKTOP
+      const PDFActive = mode === LivestreamModes.PRESENTATION
+      const videoActive = mode === LivestreamModes.VIDEO
 
       const handleToggleMode = (newMode: LivestreamMode, active: boolean) => {
          switch (newMode) {
