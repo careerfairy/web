@@ -94,3 +94,6 @@ export const autoAction = (state: RootState) =>
 
 export const conversionCardIntervalSelector = (state: RootState) =>
    state.sparksFeed.conversionCardInterval
+
+export const conversionCounterSelector = (state: RootState) =>
+   state.sparksFeed.conversionCounter

@@ -18,7 +18,9 @@ import { useDispatch, useSelector } from "react-redux"
 import {
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
+   incrementConversionCounter,
    removeEventNotifications,
+   resetConversionCounter,
    setVideoPlaying,
    setVideosMuted,
    swipeToSparkByIndex,
@@ -32,6 +34,7 @@ import {
    activeSparkSelector,
    cameFromCompanyPageLinkSelector,
    conversionCardIntervalSelector,
+   conversionCounterSelector,
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
@@ -149,6 +152,7 @@ const SparksFeedCarousel: FC = () => {
    const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
    const conversionCardInterval = useSelector(conversionCardIntervalSelector)
+   const conversionCounter = useSelector(conversionCounterSelector)
 
    const noSparks = sparks.length === 0
 
@@ -217,34 +221,38 @@ const SparksFeedCarousel: FC = () => {
    useEffect(() => {
       if (emblaApi) {
          emblaApi.scrollTo(currentPlayingIndex)
+
+         if (
+            conversionCardInterval > 0 &&
+            !sparks[currentPlayingIndex].isCardNotification
+         ) {
+            dispatch(incrementConversionCounter())
+         }
       }
-   }, [emblaApi, currentPlayingIndex])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [emblaApi, currentPlayingIndex, conversionCardInterval, dispatch])
 
    /**
     * Handle the addition of the conversion card notification
     */
    useEffect(() => {
-      // No need to validate if there is no {currentPlayingIndex} nor {conversionCardInterval}
-      if (currentPlayingIndex > 0 && conversionCardInterval > 0) {
-         // after adding the first cardNotification we need to increment the interval to count with the index of the card notification
-         const cardNotificationIncrement =
-            currentPlayingIndex > conversionCardInterval + 1 ? 1 : 0
-
-         if (
-            (currentPlayingIndex + 1 + cardNotificationIncrement) %
-               (conversionCardInterval + cardNotificationIncrement) ===
-            0
-         ) {
-            const payload: AddCardNotificationPayload = {
-               type: SparkCardNotificationTypes.CONVERSION,
-               position: currentPlayingIndex + 1,
-            }
-            dispatch(addCardNotificationToSparksList(payload))
+      if (
+         conversionCardInterval > 0 &&
+         conversionCounter === conversionCardInterval
+      ) {
+         const payload: AddCardNotificationPayload = {
+            type: SparkCardNotificationTypes.CONVERSION,
+            position: currentPlayingIndex + 1,
          }
+         dispatch(addCardNotificationToSparksList(payload))
+         dispatch(resetConversionCounter())
       }
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [conversionCardInterval, currentPlayingIndex, dispatch])
+   }, [
+      conversionCardInterval,
+      conversionCounter,
+      currentPlayingIndex,
+      dispatch,
+   ])
 
    /**
     * When the user swipes to a new slide,
