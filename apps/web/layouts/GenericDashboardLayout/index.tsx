@@ -89,6 +89,10 @@ type Props = {
     */
    hideBottomNav?: boolean
    /**
+    * If true, the bottom nav will be dark
+    */
+   isBottomNavDark?: boolean
+   /**
     * If true, the header will be hidden
     */
    hideHeader?: boolean
@@ -106,6 +110,7 @@ const GenericDashboardLayout = ({
    hideDrawer,
    headerWidth = "100%",
    hideBottomNav,
+   isBottomNavDark = false,
    hideHeader,
 }: Props) => {
    const isMobile = useIsMobile()
@@ -195,7 +200,7 @@ const GenericDashboardLayout = ({
                }
                drawerContent={<NavBar />}
                hideDrawer={hideDrawer}
-               bottomNavContent={hideBottomNav ? null : <GenericNavList />}
+               bottomNavContent={hideBottomNav ? null : <GenericNavList isDark={isBottomNavDark} />}
                drawerOpen={!isMobile}
                dropdownNav={isMobile ? <DropdownNavigator /> : null}
                topBarTransparent={topBarTransparent}

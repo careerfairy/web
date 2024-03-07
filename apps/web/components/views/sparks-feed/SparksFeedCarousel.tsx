@@ -75,7 +75,7 @@ const styles = sxStyles({
       backgroundColor: "transparent",
    },
    fullScreenViewport: {
-      height: "100dvh",
+      height: "calc(100dvh - 67px)",
       position: "fixed",
       width: "100%",
       zIndex: (theme) => theme.zIndex.drawer + 1,
