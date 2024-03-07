@@ -250,7 +250,7 @@ export const getServerSideProps: GetServerSideProps<
          serializedSpark: SparkPresenter.serialize(sparkFromService),
          groupId,
          userEmail: token?.email ?? null,
-         conversionInterval: conversionInterval ? +conversionInterval : 0,
+         conversionInterval: +conversionInterval,
       },
    }
 }
