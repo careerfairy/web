@@ -18,15 +18,16 @@ const styles = sxStyles({
       textAlign: "center",
 
       "@media (max-height: 850px)": {
-         mt: 3,
+         mt: 6,
       },
    },
    title: {
       fontSize: "64px !important",
       fontWeight: "bold",
       lineHeight: "66px",
+      cursor: "default",
 
-      "@media (max-height: 850px)": {
+      "@media (max-height: 840px)": {
          fontSize: "32px !important",
          lineHeight: "34px",
       },
@@ -35,7 +36,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       mx: 5,
-      mt: "31px",
+      mt: { xs: "100px", md: "42px" },
+
+      "@media (max-height: 840px)": {
+         mt: { xs: "62px", md: "62px" },
+      },
    },
    infoCard: {
       display: "flex",
@@ -48,7 +53,7 @@ const styles = sxStyles({
       "@media (max-height: 700px)": {
          height: { md: "unset" },
       },
-      "@media (max-height: 560px)": {
+      "@media (max-height: 600px)": {
          height: "unset",
       },
    },
@@ -59,19 +64,21 @@ const styles = sxStyles({
          color: (theme) => theme.palette.primary.main,
 
          "@media (max-height: 700px)": {
-            height: { md: "24px" },
-            width: { md: "24px" },
+            height: { md: "32px" },
+            width: { md: "32px" },
          },
 
-         "@media (max-height: 560px)": {
-            height: "24px",
-            width: "24px",
+         "@media (max-height: 600px)": {
+            height: "32px",
+            width: "32px",
          },
       },
    },
    infoText: {
+      cursor: "default",
+
       "@media (max-height: 700px)": {
-         fontSize: "14px !important",
+         fontSize: "16px !important",
       },
    },
    actions: {
@@ -83,12 +90,12 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
 
-      "@media (max-height: 600px)": {
+      "@media (max-height: 710px)": {
          position: { md: "unset" },
          mt: 6,
       },
 
-      "@media (max-height: 450px)": {
+      "@media (max-height: 520px)": {
          position: "unset",
       },
    },
@@ -109,6 +116,9 @@ const styles = sxStyles({
          width: "unset !important",
          maxWidth: "80%",
       },
+   },
+   secondaryBtn: {
+      mt: 2,
    },
 })
 
@@ -152,7 +162,7 @@ const SparkConversionFullCardNotification = () => {
                      color="text.primary"
                      sx={styles.infoText}
                   >
-                     Get personalized career recommendations
+                     Get personalised career recommendations
                   </Typography>
                </Box>
 
@@ -195,7 +205,12 @@ const SparkConversionFullCardNotification = () => {
                   Sign up now
                </Button>
 
-               <Button color="info" variant="text" onClick={handleSwipeToNext}>
+               <Button
+                  color="info"
+                  variant="text"
+                  onClick={handleSwipeToNext}
+                  sx={styles.secondaryBtn}
+               >
                   Watch more Sparks
                </Button>
 
