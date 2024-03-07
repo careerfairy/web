@@ -37,9 +37,9 @@ export const MiddleContent = () => {
             sx={[styles.stack, styles.fullHeight]}
             direction="row"
             spacing={isMobile || !isOpen ? 0 : 2.5}
-            pt={isLandscape ? 1.5 : isMobile ? 3 : 3.875}
+            pt={isLandscape ? 1.5 : isMobile ? 3 : isSpotlightMode ? 2 : 3.875}
             pb={
-               isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 7 : 5.875
+               isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 2 : 5.875
             }
          >
             <StreamingGrid />

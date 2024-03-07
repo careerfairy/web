@@ -30,7 +30,7 @@ const dynamicStyles = (spacing: number) =>
          // Shrink the height of the gallery to make space for the spotlight
          height: {
             xs: `calc(132px - ${theme.spacing(spacing)})`,
-            tablet: `calc(195px - ${theme.spacing(spacing)})`,
+            tablet: `calc(160px - ${theme.spacing(spacing)})`,
          },
       }),
       spotlightActiveLandscape: (theme) => ({
@@ -44,7 +44,7 @@ const calculateGridItemMaxWidth = (
    isMobile: boolean
 ) => {
    if (isSingleRowMode) {
-      return isMobile ? "180px !important" : "330px !important"
+      return isMobile ? "180px !important" : "285px !important"
    }
    return undefined
 }

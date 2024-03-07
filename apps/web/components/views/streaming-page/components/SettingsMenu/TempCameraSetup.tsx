@@ -32,6 +32,7 @@ export const TempCameraSetup = () => {
             sx={styles.video}
             cameraOn
             containVideo
+            hideGradient
          />
       </UserStreamProvider>
    )
