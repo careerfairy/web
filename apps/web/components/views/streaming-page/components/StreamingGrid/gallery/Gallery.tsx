@@ -5,7 +5,10 @@ import { LayoutGrid } from "../LayoutGrid"
 import { UserStream } from "components/views/streaming-page/types"
 import { UserStreamComponent } from "./UserStreamComponent"
 import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
-import { useStreamIsLandscape } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { useGalleryLayout } from "./useGalleryLayout"
 import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
@@ -44,6 +47,7 @@ type Props = {
 export const Gallery = ({ streams, spacing }: Props) => {
    const isSpotlightMode = useIsSpotlightMode()
    const isLandscape = useStreamIsLandscape()
+   const isMobile = useStreamIsMobile()
 
    const layout = useGalleryLayout(streams.length)
    const pageSize = layout.rows * layout.columns
@@ -64,11 +68,13 @@ export const Gallery = ({ streams, spacing }: Props) => {
          : styles.spotlightActivePortrait
    }
 
+   const isSingleRowMode = isSpotlightMode && !isLandscape
+
    return (
       <Box sx={[styles.root, getConditionalStyles()]}>
          <GridCarousel
             floatingDots={Boolean(isLandscape && isSpotlightMode)}
-            navigationMode={isSpotlightMode && !isLandscape ? "arrows" : "dots"}
+            navigationMode={isSingleRowMode ? "arrows" : "dots"}
             gridPages={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
@@ -81,7 +87,10 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      <LayoutGrid.Item
                         key={stream.user.uid}
                         layoutColumns={layout.columns}
-                        maxWidth={"100px !important"}
+                        maxWidth={calculateGridItemMaxWidth(
+                           isSingleRowMode,
+                           isMobile
+                        )}
                      >
                         <GradientProvider
                            {...calculateGradientControl({
@@ -104,11 +113,12 @@ export const Gallery = ({ streams, spacing }: Props) => {
    )
 }
 
-// const calculateGridItemMaxWidth: CalculateGridItemMaxWidth = (
-//    maxPageColumns: number,
-//    maxPageRows: number,
-//    numberOfStreamsInPage: number
-// ) => {
-//    const isSingleRowMode = maxPageRows === 1
-//
-// }
+const calculateGridItemMaxWidth = (
+   isSingleRowMode: boolean,
+   isMobile: boolean
+) => {
+   if (isSingleRowMode) {
+      return isMobile ? "180px !important" : "330px !important"
+   }
+   return undefined
+}
