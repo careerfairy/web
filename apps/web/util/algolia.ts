@@ -65,7 +65,7 @@ export const generateArrayFilterString = (
             .map((filterValue) => `${filterName}:${filterValue}`)
             .join(" OR ") // Link options with "OR".
          if (filterValueString) {
-            filters.push(`(${filterValueString})`) // Enclose in parentheses to ensure proper grouping
+            filters.push(`(${filterValueString})`) // Enclose in parenthesis to ensure proper grouping
          }
       }
    })
