@@ -44,6 +44,7 @@ interface SparksState {
    jobToOpen: string | null
    autoAction: AutomaticActions
    conversionCardInterval: number
+   conversionCounter: number
 }
 
 const initialState: SparksState = {
@@ -70,6 +71,7 @@ const initialState: SparksState = {
    jobToOpen: null,
    autoAction: null
    conversionCardInterval: 0,
+   conversionCounter: 0,
 }
 
 // Async thunk to fetch the next sparks
@@ -220,6 +222,12 @@ const sparksFeedSlice = createSlice({
       setConversionCardInterval: (state, action: PayloadAction<number>) => {
          state.conversionCardInterval = action.payload
       },
+      incrementConversionCounter: (state) => {
+         state.conversionCounter++
+      },
+      resetConversionCounter: (state) => {
+         state.conversionCounter = 0
+      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -237,6 +245,7 @@ const sparksFeedSlice = createSlice({
          state.cardNotification = null
          state.videosMuted = false
          state.playing = true
+         state.conversionCounter = 0
       },
    },
    extraReducers: (builder) => {
@@ -340,6 +349,8 @@ export const {
    setVideoPlaying,
    togglePlaying,
    setConversionCardInterval,
+   resetConversionCounter,
+   incrementConversionCounter,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

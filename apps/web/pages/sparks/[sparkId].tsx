@@ -68,7 +68,7 @@ const SparksPage: NextPage<
 
    useEffect(() => {
       const validConversionInterval =
-         conversionInterval > 0 && conversionInterval < 10
+         conversionInterval >= 2 && conversionInterval < 10
             ? conversionInterval
             : 5
       dispatch(
