@@ -11,6 +11,7 @@ import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
 
 /**
  * OnboardingNewsletter functions runtime settings
@@ -19,9 +20,10 @@ const runtimeSettings: RuntimeOptions = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "2GB",
+   memory: "4GB",
 }
 
+const ITEMS_PER_BATCH = 450
 /**
  * Check and send onboarding newsletter everyday at a specific time
  */
@@ -38,6 +40,7 @@ export const onboardingNewsletter = functions
 
 export const manualOnboardingNewsletter = functions
    .region(config.region)
+   .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -74,27 +77,64 @@ export const manualOnboardingNewsletter = functions
    })
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
-   const emailBuilder = new OnboardingNewsletterEmailBuilder(
-      PostmarkEmailSender.create(),
-      functions.logger
-   )
+   functions.logger.info("sendOnboardingNewsletter ~ V2 ")
    const dataLoader = await NewsletterDataFetcher.create()
-   const onboardingNewsletterService = new OnboardingNewsletterService(
-      userRepo,
-      sparkRepo,
-      emailNotificationsRepo,
-      livestreamsRepo,
-      dataLoader,
-      emailBuilder,
+   let allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
       overrideUsers,
-      functions.logger
+      46
    )
 
-   await onboardingNewsletterService.fetchRequiredData()
+   if (overrideUsers?.length) {
+      const withinLimit = isWithinNormalizationLimit(30, overrideUsers)
 
-   onboardingNewsletterService.buildDiscoveryLists()
+      if (!withinLimit) {
+         allSubscribedUsers = allSubscribedUsers.filter((user) =>
+            overrideUsers.includes(user.id)
+         )
+      }
+   }
 
-   await onboardingNewsletterService.sendDiscoveryEmails()
+   const batches = Math.ceil(allSubscribedUsers.length / ITEMS_PER_BATCH)
 
-   functions.logger.info("OnboardingNewsletter(s) sent")
+   functions.logger.info(
+      "sendOnboardingNewsletter ~ TOTAL_SUBSCRIBED_USERS,ITEMS_PER_BATCH,TOTAL_BATCHES:",
+      allSubscribedUsers.length,
+      ITEMS_PER_BATCH,
+      batches
+   )
+
+   for (let i = 0; i < batches; i++) {
+      const batchUsers = paginate(allSubscribedUsers, ITEMS_PER_BATCH, i)
+
+      functions.logger.info("sendOnboardingNewsletter ~ PROCESSING_BATCH:", i)
+
+      // warning: using this outside the loop will cause email duplication
+      const emailBuilder = new OnboardingNewsletterEmailBuilder(
+         PostmarkEmailSender.create(),
+         functions.logger
+      )
+
+      const onboardingNewsletterService = new OnboardingNewsletterService(
+         userRepo,
+         sparkRepo,
+         emailNotificationsRepo,
+         livestreamsRepo,
+         dataLoader,
+         emailBuilder,
+         batchUsers,
+         functions.logger
+      )
+
+      await onboardingNewsletterService.fetchRequiredData()
+
+      onboardingNewsletterService.buildDiscoveryLists()
+
+      await onboardingNewsletterService.sendDiscoveryEmails()
+
+      functions.logger.info("OnboardingNewsletter(s) sent batch: ", i)
+   }
+}
+
+function paginate(array: any[], pageSize: number, pageNumber: number) {
+   return array.slice(pageNumber * pageSize, pageNumber * pageSize + pageSize)
 }
