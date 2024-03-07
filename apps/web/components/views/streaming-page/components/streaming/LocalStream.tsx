@@ -79,6 +79,8 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to contain the video within the container. Default false.
     */
    readonly containVideo?: boolean
+
+   readonly hideGradient?: boolean
 } & BoxProps
 
 /**
@@ -136,6 +138,7 @@ export const LocalStream = ({
    localCameraTrack,
    localMicrophoneTrack,
    isLoading,
+   hideGradient,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
    const { user, type } = useUserStream<LocalUser | LocalUserScreen>()
@@ -173,7 +176,7 @@ export const LocalStream = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
-         {isScreenShare ? null : <LinearGradient />}
+         {isScreenShare || hideGradient ? null : <LinearGradient />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          {hideSpeakingIndicator ? null : (
             <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />
