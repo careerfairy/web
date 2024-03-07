@@ -8,6 +8,7 @@ import {
    groupIdSelector,
    sparksSelector,
    eventToRegisterTo,
+   jobToOpen,
 } from "../../../store/selectors/sparksFeedSelectors"
 import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
 import { FC, useCallback, useEffect } from "react"
@@ -42,6 +43,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
    const cardNotification = useSelector(cardNotificationSelector)
    const groupId = useSelector(groupIdSelector)
    const eventToRegisterToId = useSelector(eventToRegisterTo)
+   const jobToOpenId = useSelector(jobToOpen)
    const { data: eventNotifications } = useUserSparksNotifications(
       userEmail,
       currentSpark?.group.id
@@ -106,11 +108,12 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          }
          handleClose={handleCloseDialog}
          open={eventDetailsDialogVisibility}
-         page={"details"}
+         page={jobToOpenId ? "job-details" : "details"}
          serverUserEmail={userEmail}
          mode={"stand-alone"}
          currentSparkId={currentSpark?.id}
          onRegisterSuccess={handleSuccessfulEventRegistration}
+         jobId={jobToOpenId}
       />
    ) : null
 }
