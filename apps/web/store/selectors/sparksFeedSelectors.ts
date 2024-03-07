@@ -86,14 +86,6 @@ export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing
 export const eventToRegisterTo = (state: RootState) =>
    state.sparksFeed.eventToRegisterTo
 
-export const jobToOpen = (state: RootState) =>
-   state.sparksFeed.jobToOpen
+export const jobToOpen = (state: RootState) => state.sparksFeed.jobToOpen
 
-export const autoAction = (state: RootState) =>
-   state.sparksFeed.autoAction
-
-export const conversionCardIntervalSelector = (state: RootState) =>
-   state.sparksFeed.conversionCardInterval
-
-export const conversionCounterSelector = (state: RootState) =>
-   state.sparksFeed.conversionCounter
+export const autoAction = (state: RootState) => state.sparksFeed.autoAction
