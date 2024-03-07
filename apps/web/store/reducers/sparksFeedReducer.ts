@@ -245,6 +245,7 @@ const sparksFeedSlice = createSlice({
          state.cardNotification = null
          state.videosMuted = false
          state.playing = true
+         state.conversionCardInterval = 0
          state.conversionCounter = 0
       },
    },
