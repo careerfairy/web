@@ -38,6 +38,7 @@ import {
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { useMountedState } from "react-use"
+import { useAuth } from "HOCs/AuthProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -56,6 +57,7 @@ const SparksPage: NextPage<
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
    const fromGroupPage = useSelector(groupIdSelector)
+   const { userData } = useAuth()
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -71,12 +73,13 @@ const SparksPage: NextPage<
          conversionInterval >= 2 && conversionInterval < 10
             ? conversionInterval
             : 5
+
       dispatch(
          setConversionCardInterval(
-            userEmail || fromGroupPage ? 0 : validConversionInterval
+            userData || fromGroupPage ? 0 : validConversionInterval
          )
       )
-   }, [conversionInterval, dispatch, fromGroupPage, userEmail])
+   }, [conversionInterval, dispatch, fromGroupPage, userData])
 
    useEffect(() => {
       if (!groupId) {
