@@ -79,16 +79,6 @@ export class EmailNotificationFunctionsRepository
    }
 
    createNotificationDoc = async (details: EmailNotificationDetails) => {
-      const prevNotification = await this.checkForNotificationByType(
-         details.receiverEmail,
-         details.type
-      )
-      if (!prevNotification.empty) {
-         throw `Notification Already Exists as document ${
-            prevNotification.docs.at(0).id
-         }`
-      }
-
       const ref = this.firestore.collection("emailNotifications")
       const newNotification = {
          details: details,
