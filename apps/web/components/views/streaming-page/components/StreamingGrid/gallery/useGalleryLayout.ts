@@ -48,7 +48,8 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
       if (isSpotlightMode) {
          return {
             // Max 3 streamers on a single row on mobile
-            // Max 4 streamers on a single row on desktop
+            // Max 4 streamers on a single row on macbook screens
+            // Max 6 streamers on a single row on larger than macbook screens
             columns: Math.min(
                streamIsMobile ? 3 : desktopScreen ? 4 : 6,
                numberOfElements
