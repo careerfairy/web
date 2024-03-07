@@ -39,6 +39,16 @@ const dynamicStyles = (spacing: number) =>
       }),
    })
 
+const calculateGridItemMaxWidth = (
+   isSingleRowMode: boolean,
+   isMobile: boolean
+) => {
+   if (isSingleRowMode) {
+      return isMobile ? "180px !important" : "330px !important"
+   }
+   return undefined
+}
+
 type Props = {
    streams: UserStream[]
    spacing: number
@@ -113,14 +123,4 @@ export const Gallery = ({ streams, spacing }: Props) => {
          />
       </Box>
    )
-}
-
-const calculateGridItemMaxWidth = (
-   isSingleRowMode: boolean,
-   isMobile: boolean
-) => {
-   if (isSingleRowMode) {
-      return isMobile ? "180px !important" : "330px !important"
-   }
-   return undefined
 }
