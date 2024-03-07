@@ -11,7 +11,7 @@ import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 type Status = "idle" | "loading" | "failed"
 
 export enum AutomaticActions {
-   APPLY = "apply"
+   APPLY = "apply",
 }
 
 export type AddCardNotificationPayload = {
@@ -69,7 +69,7 @@ const initialState: SparksState = {
    playing: true,
    eventToRegisterTo: null,
    jobToOpen: null,
-   autoAction: null
+   autoAction: null,
    conversionCardInterval: 0,
    conversionCounter: 0,
 }
