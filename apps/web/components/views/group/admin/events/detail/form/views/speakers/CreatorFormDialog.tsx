@@ -3,8 +3,8 @@ import { Formik } from "formik"
 import { Box } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { LivestreamCreator } from "../questions/commons"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import CreateOrEditCreatorForm from "components/views/sparks/forms/CreateOrEditCreatorForm"
 import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
@@ -46,7 +46,7 @@ const styles = sxStyles({
 })
 
 type CreatorFormDialogProps = {
-   creator: Creator
+   creator: LivestreamCreator
    handleClose: () => void
 }
 
@@ -133,7 +133,7 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
    )
 }
 
-const getInitialValues = (creator?: Creator): CreatorFormValues => ({
+const getInitialValues = (creator?: LivestreamCreator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
    firstName: creator?.firstName || "",
@@ -142,7 +142,7 @@ const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    linkedInUrl: creator?.linkedInUrl || "",
    story: creator?.story || "",
    email: creator?.email || "",
-   id: creator?.id || "",
+   id: creator?.originalId || "",
 })
 
 export default CreatorFormDialog
