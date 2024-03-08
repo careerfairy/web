@@ -179,13 +179,13 @@ export class LivestreamService {
     * @param data The data required to fetch the RTC token
     * @returns A promise containing the Agora RTC token
     */
-   async fetchAgoraRtmToken(data: AgoraRTMTokenRequest) {
+   async fetchAgoraRtmToken(uid: string) {
       const {
          data: { token },
       } = await httpsCallable<AgoraRTMTokenRequest, AgoraRTMTokenResponse>(
          this.functions,
          "fetchAgoraRtmToken_v2"
-      )(data)
+      )({ uid })
 
       return token.rtmToken
    }

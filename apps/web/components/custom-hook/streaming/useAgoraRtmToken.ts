@@ -1,4 +1,3 @@
-import { AgoraRTMTokenRequest } from "@careerfairy/shared-lib/agora/token"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -17,13 +16,10 @@ export type UseAgoraRtmToken = {
 
 /**
  * Custom hook to manage the Agora RTM token.
- * @param {object} args - The data required to fetch the RTM token.
  * @returns {UseAgoraRtmToken} The Agora RTM token and a function to fetch it.
  */
-export const useAgoraRtmToken = (
-   args: AgoraRTMTokenRequest
-): UseAgoraRtmToken => {
-   const key = args ? JSON.stringify(args) : null
+export const useAgoraRtmToken = (agoraUid: string): UseAgoraRtmToken => {
+   const key = agoraUid || null
 
    const {
       data: token,
@@ -31,15 +27,13 @@ export const useAgoraRtmToken = (
       error: tokenError,
       mutate,
       isLoading,
-   } = useSWR(key, () => livestreamService.fetchAgoraRtmToken(args), {
+   } = useSWR(key, () => livestreamService.fetchAgoraRtmToken(agoraUid), {
       /**
        * Token is only re-fetched when the args change
        * Not on focus, blur, or other events
        */
       ...reducedRemoteCallsOptions,
       onError: (error, key) => {
-         console.log("error", error)
-         console.log("key", key)
          return errorLogAndNotify(error, {
             message: "Failed to fetch Agora RTM token",
             args: key,

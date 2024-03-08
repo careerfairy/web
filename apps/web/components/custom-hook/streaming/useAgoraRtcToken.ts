@@ -37,8 +37,6 @@ export const useAgoraRtcToken = (
           */
          ...reducedRemoteCallsOptions,
          onError: (error, key) => {
-            console.log("error", error)
-            console.log("key", key)
             return errorLogAndNotify(error, {
                message: "Failed to fetch Agora RTC token",
                userUid: authenticatedUser?.uid,
