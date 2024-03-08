@@ -10,11 +10,11 @@ import {
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
-import { UpdateCreatorData } from "@careerfairy/shared-lib/groups/creators"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
-import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 
 const styles = sxStyles({
    menuItem: {
@@ -66,9 +66,9 @@ type Props = {
    fieldId: string
    label: string
    placeholder: string
-   options: Partial<UpdateCreatorData>[]
    handleCreateNew: () => void
-   values?: Partial<UpdateCreatorData>[]
+   options: Creator[]
+   values?: Creator[]
 }
 
 const SelectSpeakersDropDown = ({
@@ -98,21 +98,18 @@ const SelectSpeakersDropDown = ({
       [handleCreateNew, options?.length]
    )
 
-   const onChangeHandler = async (
-      _,
-      selectedOptions: Partial<UpdateCreatorData>[]
-   ) => {
+   const onChangeHandler = async (_, selectedOptions: Creator[]) => {
       await setFieldValue(fieldId, selectedOptions)
    }
 
    const getOptionElement = useCallback(
-      (speaker: Partial<UpdateCreatorData>) => (
+      (speaker: Creator) => (
          <Stack direction="row" padding="16px" gap="8px" width="100%">
             <CreatorAvatar
                creator={{
                   firstName: speaker.firstName,
                   lastName: speaker.lastName,
-                  avatarUrl: speaker.avatar,
+                  avatarUrl: speaker.avatarUrl,
                }}
                size={48}
             />
@@ -180,13 +177,11 @@ const SelectSpeakersDropDown = ({
    )
 }
 
-const getLabelFn = (value: Partial<UpdateCreatorData>) => {
+const getLabelFn = (value: Creator) => {
    return `${value.firstName} ${value.lastName}`
 }
 
-const isOptionEqualToValue = (
-   option: Partial<UpdateCreatorData>,
-   value: Partial<UpdateCreatorData>
-): boolean => option.id === value.id
+const isOptionEqualToValue = (option: Creator, value: Creator): boolean =>
+   option.id === value.id
 
 export default SelectSpeakersDropDown

@@ -1,12 +1,14 @@
-import { Box } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import CreateOrEditCreatorForm from "components/views/sparks/forms/CreateOrEditCreatorForm"
 import { FC } from "react"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { sxStyles } from "@careerfairy/shared-ui"
 import { Formik } from "formik"
+import { Box } from "@mui/material"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import CreateOrEditCreatorForm from "components/views/sparks/forms/CreateOrEditCreatorForm"
 import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
+import { CreatorFormValues } from "components/views/sparks/forms/hooks/useCreatorFormSubmit"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -44,7 +46,7 @@ const styles = sxStyles({
 })
 
 type CreatorFormDialogProps = {
-   creator: object
+   creator: Creator
    handleClose: () => void
 }
 
@@ -131,7 +133,7 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
    )
 }
 
-const getInitialValues = (creator?) => ({
+const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
    firstName: creator?.firstName || "",
