@@ -1,4 +1,7 @@
-import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import {
+   SparkCardNotificationTypes,
+   SparkPresenter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import Box from "@mui/material/Box"
 import { Button, Fade, Grow, Stack } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
@@ -21,19 +24,17 @@ import VideoPreview from "./VideoPreview"
 import SparksEventNotification from "./Notifications/SparksEventNotification"
 import { useSelector } from "react-redux"
 import {
-   cardNotificationSelector,
    eventDetailsDialogVisibilitySelector,
    videosMuttedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import SparkEventFullCardNotification from "./Notifications/SparkEventFullCardNotification"
-import SparkGroupFullCardNotification from "./Notifications/SparkGroupFullCardNotification"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { sparkService } from "data/firebase/SparksService"
 import { useAuth } from "HOCs/AuthProvider"
 import UnmuteIcon from "@mui/icons-material/VolumeOff"
+import FullCardNotification from "./Notifications/FullCardNotification"
 
 const styles = sxStyles({
    root: {
@@ -92,6 +93,12 @@ const styles = sxStyles({
       "&::after": {
          background:
             "linear-gradient(6deg,rgb(255 255 255 / 0%) 88%, rgb(255 255 255 / 13%) 8%),linear-gradient(185deg,rgb(255 255 255 / 0%) 88%, rgb(255 255 255 / 13%) 8%), linear-gradient(0deg, rgba(247, 248, 252, 0.20) 0%, rgba(247, 248, 252, 0.20) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.00) 42.19%, rgba(0, 0, 0, 0.06) 88.02%), linear-gradient(180deg, rgba(103, 73, 234, 0.30) 0%, rgba(80, 56, 185, 0.30) 100%), radial-gradient(180.08% 206.61% at 95.7% 3.63%, rgba(103, 73, 234, 0.90) 0%, rgba(0, 210, 170, 0.90) 100%), #2ABAA6",
+      },
+   },
+   conversionCardContent: {
+      "&::after": {
+         background:
+            "linear-gradient(357deg, #476E69 31%, #476E69 20%, rgba(311, 380, 0, 0.00) 31.1%), radial-gradient(101.03% 109.86% at 4.52% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.00) 100%), #0F423B",
       },
    },
    eventCardContentInner: {
@@ -167,7 +174,6 @@ const SparksFeedCard: FC<Props> = ({
       eventDetailsDialogVisibilitySelector
    )
    const videosMuted = useSelector(videosMuttedSelector)
-   const cardNotification = useSelector(cardNotificationSelector)
 
    const { trackEvent, trackSecondsWatched } = useSparksFeedTracker()
 
@@ -217,6 +223,19 @@ const SparksFeedCard: FC<Props> = ({
 
    if (!visitorId) return null
 
+   const cardNotificationStyle = () => {
+      switch (spark.cardNotificationType) {
+         case SparkCardNotificationTypes.EVENT:
+            return [styles.eventCardContent]
+
+         case SparkCardNotificationTypes.GROUP:
+            return [styles.defaultCardContent]
+
+         case SparkCardNotificationTypes.CONVERSION:
+            return [styles.conversionCardContent]
+      }
+   }
+
    return (
       <>
          <Box
@@ -230,14 +249,12 @@ const SparksFeedCard: FC<Props> = ({
             <Box
                sx={[
                   styles.cardContent,
-                  ...(showCardNotification
-                     ? cardNotification
-                        ? [styles.eventCardContent]
-                        : [styles.defaultCardContent]
-                     : []),
+                  ...(showCardNotification ? cardNotificationStyle() : []),
                ]}
             >
-               {videosMuted && isOverlayedOntop ? (
+               {videosMuted &&
+               isOverlayedOntop &&
+               !spark?.isCardNotification ? (
                   <ClickToUnmuteOverlay />
                ) : null}
                {showCardNotification || hideVideo ? null : (
@@ -265,17 +282,7 @@ const SparksFeedCard: FC<Props> = ({
                   ]}
                >
                   {showCardNotification ? (
-                     <>
-                        {cardNotification ? (
-                           <SparkEventFullCardNotification
-                              eventId={cardNotification.eventId}
-                           />
-                        ) : (
-                           <SparkGroupFullCardNotification
-                              group={spark.group}
-                           />
-                        )}
-                     </>
+                     <FullCardNotification spark={spark} />
                   ) : isOverlayedOntop ? (
                      <Stack justifyContent="flex-end">
                         <SparkDetails
