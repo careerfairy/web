@@ -1,4 +1,7 @@
-import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import {
+   SparkCardNotificationTypes,
+   SparkPresenter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
@@ -8,7 +11,12 @@ import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 type Status = "idle" | "loading" | "failed"
 
 export enum AutomaticActions {
-   APPLY = "apply"
+   APPLY = "apply",
+}
+
+export type AddCardNotificationPayload = {
+   position?: number
+   type: SparkCardNotificationTypes
 }
 
 // Initial state
@@ -25,7 +33,7 @@ interface SparksState {
    initialSparksFetched: boolean
    fetchNextError: string | null
    initialFetchError: string | null
-   currentEventNotification: UserSparksNotification | null
+   eventNotification: UserSparksNotification | null
    sparkCategoryIds: SparkCategory["id"][]
    showEventDetailsDialog: boolean
    cardNotification: UserSparksNotification | null
@@ -35,6 +43,7 @@ interface SparksState {
    eventToRegisterTo: string | null
    jobToOpen: string | null
    autoAction: AutomaticActions
+   conversionCardInterval: number
 }
 
 const initialState: SparksState = {
@@ -51,7 +60,7 @@ const initialState: SparksState = {
    fetchNextError: null,
    initialFetchError: null,
    sparkCategoryIds: [],
-   currentEventNotification: null,
+   eventNotification: null,
    showEventDetailsDialog: false,
    cardNotification: null,
    cameFromCompanyPageLink: null,
@@ -59,7 +68,8 @@ const initialState: SparksState = {
    playing: true,
    eventToRegisterTo: null,
    jobToOpen: null,
-   autoAction: null
+   autoAction: null,
+   conversionCardInterval: 0,
 }
 
 // Async thunk to fetch the next sparks
@@ -133,37 +143,64 @@ const sparksFeedSlice = createSlice({
             state.currentPlayingIndex = newIndex
          }
       },
-      setCurrentEventNotification: (
+      setEventNotification: (
          state,
          action: PayloadAction<UserSparksNotification>
       ) => {
-         state.currentEventNotification = action.payload
+         state.eventNotification = action.payload
       },
-      removeCurrentEventNotifications: (state) => {
-         state.currentEventNotification = null
+      removeEventNotifications: (state) => {
+         state.eventNotification = null
       },
-      setCardNotification: (
+      setCardEventNotification: (
          state,
          action: PayloadAction<UserSparksNotification>
       ) => {
-         state.cardNotification = action.payload
+         const endContentGroupNotificationIndex = state.sparks.findIndex(
+            (spark) =>
+               spark?.cardNotificationType === SparkCardNotificationTypes.GROUP
+         )
+
+         if (endContentGroupNotificationIndex > 0) {
+            state.cardNotification = action.payload
+
+            state.sparks = [
+               ...state.sparks.slice(0, endContentGroupNotificationIndex),
+               {
+                  ...state.sparks[endContentGroupNotificationIndex],
+                  cardNotificationType: SparkCardNotificationTypes.EVENT,
+               },
+               ...state.sparks.slice(endContentGroupNotificationIndex + 1),
+            ]
+         }
       },
       showEventDetailsDialog: (state, action: PayloadAction<boolean>) => {
          // when closing event dialog we want to remove the notification
          if (action.payload === false) {
-            state.currentEventNotification = null
+            state.eventNotification = null
          }
          state.showEventDetailsDialog = action.payload
       },
-      addCarNotificationToSparksList: (state) => {
-         // duplicate the last spark and add the isCardNotification field to it
+      addCardNotificationToSparksList: (
+         state,
+         action: PayloadAction<AddCardNotificationPayload>
+      ) => {
+         const lastPosition = state.sparks.length
+
+         const { position = lastPosition, type } = action.payload
+
+         const filteredSparks = state.sparks.filter(
+            (spark) => spark?.cardNotificationType !== type
+         )
+
          state.sparks = [
-            ...state.sparks,
+            ...filteredSparks.slice(0, position),
             {
-               ...state.sparks[state.sparks.length - 1],
+               ...filteredSparks[0],
                isCardNotification: true,
-               id: state.groupId,
+               cardNotificationType: type,
             },
+            ...filteredSparks.slice(position),
          ]
       },
       removeGroupId: (state) => {
@@ -182,6 +219,23 @@ const sparksFeedSlice = createSlice({
       setAutoAction: (state, action: PayloadAction<AutomaticActions>) => {
          state.autoAction = action.payload
       },
+      setConversionCardInterval: (state, action: PayloadAction<number>) => {
+         state.conversionCardInterval = action.payload
+      },
+      removeNotificationsByType: (
+         state,
+         action: PayloadAction<SparkCardNotificationTypes>
+      ) => {
+         const notificationType = action.payload
+
+         const filteredSparks = state.sparks.filter(
+            (spark) => spark.cardNotificationType !== notificationType
+         )
+
+         if (filteredSparks.length !== state.sparks.length) {
+            state.sparks = filteredSparks
+         }
+      },
       resetSparksFeed: (state) => {
          state.sparks = []
          state.currentPlayingIndex = 0
@@ -191,7 +245,7 @@ const sparksFeedSlice = createSlice({
          state.fetchNextSparksStatus = "idle"
          state.fetchNextError = null
          state.initialFetchError = null
-         state.currentEventNotification = null
+         state.eventNotification = null
          state.sparkCategoryIds = []
          state.showEventDetailsDialog = false
          state.originalSparkId = null
@@ -199,6 +253,7 @@ const sparksFeedSlice = createSlice({
          state.cardNotification = null
          state.videosMuted = false
          state.playing = true
+         state.conversionCardInterval = 0
       },
    },
    extraReducers: (builder) => {
@@ -209,12 +264,15 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               const { sparks, numberOfSparksToFetch } = state
+               const { sparks } = state
 
                state.fetchNextSparksStatus = "idle"
 
                // We don't mind duplicates since the feed is endless
-               state.sparks = [...sparks, ...action.payload]
+               state.sparks = insertNotificationIfNeeded(state, [
+                  ...sparks,
+                  ...action.payload,
+               ])
 
                if (action.payload.length === 0) {
                   state.hasMoreSparks = false
@@ -236,7 +294,12 @@ const sparksFeedSlice = createSlice({
                state.initialFetchStatus = "idle"
                state.initialSparksFetched = true
 
-               state.sparks = mergeSparks(sparks, action.payload)
+               const newSparks = insertNotificationIfNeeded(
+                  state,
+                  mergeSparks(sparks, action.payload)
+               )
+
+               state.sparks = newSparks
 
                if (action.payload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
@@ -280,6 +343,60 @@ const getSparkOptions = (state: RootState) => {
    }
 }
 
+/**
+ * Inserts card notifications into the array of sparks if needed, based on the conversion card interval.
+ *
+ * @param state - The current state.
+ * @param sparks - The array of sparks to be processed.
+ * @returns The array of sparks with card notifications inserted.
+ */
+const insertNotificationIfNeeded = (
+   state: SparksState,
+   sparks: SparkPresenter[]
+): SparkPresenter[] => {
+   const conversionCardInterval = state.conversionCardInterval
+
+   // Copy the array of sparks to avoid mutating the original array
+   const results = sparks.slice()
+
+   // If the conversion card interval is 0, no need to insert notifications
+   if (conversionCardInterval === 0) {
+      return results
+   }
+
+   const lastCardNotificationIndex = results.findLastIndex(
+      (spark) => spark.isCardNotification
+   )
+
+   // Set the initial index to insert notifications after the last one if it exists, otherwise, start from the beginning
+   const initialIndex =
+      lastCardNotificationIndex > 0 ? lastCardNotificationIndex + 1 : 0
+
+   let alreadyHaveNotifications = false
+
+   // Iterate through the sparks array to insert card notifications based on the conversion card interval
+   for (
+      let index = initialIndex;
+      index < results.length;
+      index += conversionCardInterval + (alreadyHaveNotifications ? 1 : 0)
+   ) {
+      if (index !== initialIndex) {
+         alreadyHaveNotifications = true
+
+         const sparkNotificationToAdd = {
+            ...results[index],
+            isCardNotification: true,
+            cardNotificationType: SparkCardNotificationTypes.CONVERSION,
+         } as SparkPresenter
+
+         // Insert the spark notification at the calculated index based on the conversion card interval
+         results.splice(index, 0, sparkNotificationToAdd)
+      }
+   }
+
+   return results
+}
+
 export const {
    setOriginalSparkId,
    setSparks,
@@ -288,12 +405,12 @@ export const {
    setSparkCategories,
    resetSparksFeed,
    swipeToSparkByIndex,
-   setCurrentEventNotification,
-   removeCurrentEventNotifications,
+   setEventNotification,
+   removeEventNotifications,
    showEventDetailsDialog,
-   addCarNotificationToSparksList,
+   addCardNotificationToSparksList,
    removeGroupId,
-   setCardNotification,
+   setCardEventNotification,
    setCameFromCompanyPageLink,
    setEventToRegisterTo,
    setJobToOpen,
@@ -301,6 +418,8 @@ export const {
    setVideosMuted,
    setVideoPlaying,
    togglePlaying,
+   setConversionCardInterval,
+   removeNotificationsByType,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
