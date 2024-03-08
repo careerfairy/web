@@ -32,9 +32,10 @@ export const RTMSignalingProvider = ({
    children,
 }: RTMSignalingProviderProps) => {
    const { livestreamId } = useStreamingContext()
-   const [loggedIn, setLoggedIn] = useState(false)
-   const uid = useCurrentUID()
    const rtcIsConnected = useIsConnected()
+   const uid = useCurrentUID()
+
+   const [loggedIn, setLoggedIn] = useState(false)
 
    const client = useClient(agoraCredentials.appID, {
       enableCloudProxy: false,
@@ -43,19 +44,7 @@ export const RTMSignalingProvider = ({
 
    const channel = useChannel(client, livestreamId)
 
-   const { token } = useAgoraRtmToken(
-      rtcIsConnected
-         ? {
-              uid: uid.toString(),
-           }
-         : null
-   )
-
-   console.log("🚀 RTM - :", {
-      loggedIn,
-      rtcIsConnected,
-      token,
-   })
+   const { token } = useAgoraRtmToken(rtcIsConnected ? uid.toString() : null)
 
    const login = useCallback(async () => {
       try {
@@ -83,13 +72,9 @@ export const RTMSignalingProvider = ({
       } catch (e) {
          errorLogAndNotify(e, {
             message: "Failed to logout from Agora RTM",
-            metadata: {
-               uid: uid,
-               token,
-            },
          })
       }
-   }, [channel, client, uid, token])
+   }, [channel, client])
 
    useEffect(() => {
       if (token) {
