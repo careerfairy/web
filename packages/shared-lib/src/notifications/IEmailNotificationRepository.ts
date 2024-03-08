@@ -30,6 +30,19 @@ export interface IEmailNotificationRepository {
       type?: EmailNotificationType
    ): Promise<DocumentData[]>
 
+   /**
+    * Creates email notifications for the received details.
+    * @param details EmailNotificationDetails ready to stored
+    */
+   createNotificationDocuments(
+      details: EmailNotificationDetails[]
+   ): Promise<DocumentData[]>
+
+   /**
+    * Retrieves all emailNotifications for the given @param type
+    * @param type Type of emailNotification to retrieved, matched against /emailNotification/details.type
+    */
+   getNotifications(type: EmailNotificationType): Promise<EmailNotification[]>
    getServerTimestamp(): FieldValue
 }
 
@@ -59,6 +72,17 @@ export class EmailNotificationFunctionsRepository
       return result.docs.map((doc) => doc.data())
    }
 
+   async getNotifications(type: EmailNotificationType) {
+      const query = this.firestore
+         .collection("emailNotifications")
+         .where("details.type", "==", type)
+      const result = await query
+         .withConverter(createCompatGenericConverter<EmailNotification>())
+         .get()
+
+      return result.docs.map((doc) => doc.data())
+   }
+
    async createNotificationDocs(
       emails: string[],
       type?: EmailNotificationType
@@ -76,6 +100,13 @@ export class EmailNotificationFunctionsRepository
       return await Promise.all(
          emails.map(userToNotificationDetails).map(this.createNotificationDoc)
       )
+   }
+
+   // TODO: Check if rollback could be needed
+   async createNotificationDocuments(
+      details: EmailNotificationDetails[]
+   ): Promise<DocumentData[]> {
+      return await Promise.all(details.map(this.createNotificationDoc))
    }
 
    createNotificationDoc = async (details: EmailNotificationDetails) => {
