@@ -133,7 +133,7 @@ const renderOption = (
          key={option.objectID}
       >
          <Grid container alignItems="center">
-            <Grid item width="calc(100% - 44px)" sx={styles.listItemGrid}>
+            <Grid item sx={styles.listItemGrid}>
                <Typography
                   component={SanitizedHTML}
                   htmlString={highlightTitle?.value || option.title}
