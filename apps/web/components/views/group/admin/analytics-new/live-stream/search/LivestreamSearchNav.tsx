@@ -1,9 +1,7 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback } from "react"
 import { Box, Card } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import LivestreamSearch, {
-   LivestreamHit,
-} from "../../../common/LivestreamSearch"
+import LivestreamSearch from "../../../common/LivestreamSearch"
 import Stack from "@mui/material/Stack"
 import UserTypeTabs from "./UserTypeTabs"
 import ExportPdfButton from "../../../common/ExportPDFButton"
@@ -11,7 +9,6 @@ import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPagePr
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Search as FindIcon } from "react-feather"
-import { where } from "firebase/firestore"
 import { LivestreamSearchResult } from "types/algolia"
 
 const spacing = 3
@@ -36,7 +33,7 @@ const LivestreamSearchNav = () => {
    const { group } = useGroup()
 
    const handleChange = useCallback(
-      (newValue: LivestreamHit | null) => {
+      (newValue: LivestreamSearchResult | null) => {
          void push(
             `/group/${group.id}/admin/analytics/live-stream/${
                newValue?.id ?? ""
@@ -46,11 +43,6 @@ const LivestreamSearchNav = () => {
          )
       },
       [group.id, push]
-   )
-
-   const additionalConstraints = useMemo(
-      () => (group?.id ? [where("groupIds", "array-contains", group.id)] : []),
-      [group?.id]
    )
 
    return (
@@ -69,8 +61,12 @@ const LivestreamSearchNav = () => {
                      null
                   }
                   startIcon={<FindIcon color={"black"} />}
-                  additionalConstraints={additionalConstraints}
                   includeHiddenEvents
+                  filterOptions={{
+                     arrayFilters: {
+                        groupIds: [group.id],
+                     },
+                  }}
                />
             </Card>
          </Box>

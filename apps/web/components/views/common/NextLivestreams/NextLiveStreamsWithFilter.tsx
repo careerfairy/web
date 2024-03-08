@@ -1,7 +1,4 @@
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
-import useLivestreamsSWR, {
-   UseLivestreamsSWROptions,
-} from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { useRouter } from "next/router"
 import { useCallback, useMemo } from "react"
 import { Search as FindIcon } from "react-feather"
@@ -10,15 +7,18 @@ import Link from "../../../../components/views/common/Link"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
-import LivestreamSearch, {
-   LivestreamHit,
-} from "../../group/admin/common/LivestreamSearch"
+import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 import { ParsedUrlQuery } from "querystring"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
+import { FilterOptions } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import useLivestreamsSWR, {
+   UseLivestreamsSWROptions,
+} from "components/custom-hook/live-stream/useLivestreamsSWR"
+import { LivestreamSearchResult } from "types/algolia"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -53,6 +53,7 @@ const getQueryVariables = (query: ParsedUrlQuery) => {
       fieldsOfStudy: queryParamToArr(query.fieldsOfStudy),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
       companyId: companyId || null,
+      denyRecordingAccess: recordedOnly === "true" ? false : undefined,
    }
 }
 
@@ -76,7 +77,9 @@ const NextLiveStreamsWithFilter = ({
       recordedOnly,
       fieldsOfStudy,
       companyId,
+      denyRecordingAccess,
    } = useMemo(() => getQueryVariables(query), [query])
+
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
       () => initialTabValue === "pastEvents",
@@ -125,6 +128,34 @@ const NextLiveStreamsWithFilter = ({
       ]
    )
 
+   const filterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {
+            companyCountries,
+            companyIndustries,
+            fieldOfStudyIdTags: fieldsOfStudy.filter(
+               (id) => allFieldsOfStudy?.some((item) => item.id === id) || false
+            ),
+            languageCode: languages,
+         },
+         booleanFilters: {
+            denyRecordingAccess,
+            hidden: false,
+            test: false,
+         },
+         dateFilter: hasPastEvents ? "past" : "future",
+      }),
+      [
+         companyCountries,
+         companyIndustries,
+         fieldsOfStudy,
+         languages,
+         denyRecordingAccess,
+         hasPastEvents,
+         allFieldsOfStudy,
+      ]
+   )
+
    const { data: livestreams } = useLivestreamsSWR(swrQuery)
 
    const noResultsMessage = useMemo<JSX.Element>(
@@ -167,7 +198,7 @@ const NextLiveStreamsWithFilter = ({
 
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
-      (hit: LivestreamHit | null) => {
+      (hit: LivestreamSearchResult | null) => {
          if (!hit) return
          void push(
             buildDialogLink({
@@ -198,6 +229,7 @@ const NextLiveStreamsWithFilter = ({
                      value={null}
                      endIcon={<FindIcon color={"black"} />}
                      hasPastEvents={hasPastEvents}
+                     filterOptions={filterOptions}
                   />
                </Card>
                <Box sx={styles.filter}>
