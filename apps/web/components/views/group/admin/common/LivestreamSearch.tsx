@@ -1,22 +1,18 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { Box, Grid, Typography } from "@mui/material"
 import { where } from "firebase/firestore"
-import {
-   LivestreamEvent,
-   LivestreamEventPublicData,
-} from "@careerfairy/shared-lib/livestreams"
-import { useLivestreamSearch } from "../../../../custom-hook/live-stream/useLivestreamSearch"
-import { getParts } from "../../../../util/search"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import RenderParts from "../../../common/search/RenderParts"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { QueryConstraint } from "@firebase/firestore"
-import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants"
+import { useLivestreamSearchAlgolia } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { LivestreamSearchResult } from "types/algolia"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const styles = sxStyles({
    root: {
@@ -44,7 +40,7 @@ const styles = sxStyles({
    },
 })
 
-export type LivestreamHit = LivestreamEvent | LivestreamEventPublicData
+export type LivestreamHit = LivestreamSearchResult
 
 type Props = {
    value: LivestreamHit
@@ -54,7 +50,6 @@ type Props = {
    endIcon?: JSX.Element
    placeholderText?: string
    additionalConstraints?: QueryConstraint[]
-   searchWithTrigram?: boolean
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
 }
@@ -65,9 +60,8 @@ const LivestreamSearch: FC<Props> = ({
    startIcon,
    endIcon,
    placeholderText,
-   searchWithTrigram,
    additionalConstraints = [] as QueryConstraint[],
-   hasPastEvents,
+   // hasPastEvents, TODO: Add this to Algolia filtering
    includeHiddenEvents,
 }) => {
    const [inputValue, setInputValue] = useState("")
@@ -77,33 +71,26 @@ const LivestreamSearch: FC<Props> = ({
    //
    // When using trigrams in a search, we require a minimum number of characters in the search input
    // to ensure that no emptyOrderBy option will be added
+   // TODO: convert this to algolia filtering
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const options = useMemo<UseSearchOptions<LivestreamEvent>>(
       () => ({
-         maxResults: searchWithTrigram ? 20 : 7,
-         debounceMs: searchWithTrigram ? 1000 : null,
+         maxResults: 7,
+         debounceMs: null,
          additionalConstraints: [
             ...additionalConstraints,
             where("test", "==", false),
             ...(includeHiddenEvents ? [] : [where("hidden", "==", false)]),
          ],
-         ...(searchWithTrigram
-            ? null
-            : {
-                 emptyOrderBy: {
-                    field: "start",
-                    direction: orderByDirection || "desc",
-                 },
-              }),
+         emptyOrderBy: {
+            field: "start",
+            direction: orderByDirection || "desc",
+         },
       }),
-      [
-         additionalConstraints,
-         includeHiddenEvents,
-         orderByDirection,
-         searchWithTrigram,
-      ]
+      [additionalConstraints, includeHiddenEvents, orderByDirection]
    )
 
-   const { data: livestreamHits } = useLivestreamSearch(inputValue, options)
+   const { data } = useLivestreamSearchAlgolia(inputValue)
 
    const renderOption = useCallback(
       (
@@ -111,8 +98,8 @@ const LivestreamSearch: FC<Props> = ({
          option: LivestreamHit,
          state: AutocompleteRenderOptionState
       ) => {
-         const titleParts = getParts(option.title, inputValue)
-         const companyParts = getParts(option.company, inputValue)
+         const highlightTitle = option._highlightResult?.title
+         const highlightCompany = option._highlightResult?.company
 
          return (
             <Box
@@ -123,9 +110,13 @@ const LivestreamSearch: FC<Props> = ({
             >
                <Grid container alignItems="center">
                   <Grid item width="calc(100% - 44px)" sx={styles.listItemGrid}>
-                     <RenderParts parts={titleParts} />
+                     <SanitizedHTML
+                        htmlString={highlightCompany?.value || option.company}
+                     />
                      <Typography variant="body2" color="text.secondary">
-                        <RenderParts parts={companyParts} />
+                        <SanitizedHTML
+                           htmlString={highlightTitle?.value || option.title}
+                        />
                      </Typography>
                      <Typography variant="body2" color="text.secondary">
                         {prettyDate(option.start)}
@@ -140,46 +131,23 @@ const LivestreamSearch: FC<Props> = ({
             </Box>
          )
       },
-      [inputValue]
+      []
    )
 
    const sortedLivestreamHits = useMemo(() => {
-      const sortedHits: LivestreamHit[] = livestreamHits || []
+      const sortedHits: LivestreamSearchResult[] = data?.deserializedHits || []
 
-      if (value && !livestreamHits?.find((hit) => hit.id === value?.id)) {
+      if (value && !sortedHits?.find((hit) => hit.id === value?.id)) {
          // add current value to sortedHits array if it's not already in there
          sortedHits.push(value)
       }
 
       sortedHits.sort((a, b) =>
-         sortLivestreamsDesc(
-            a as LivestreamEvent,
-            b as LivestreamEvent,
-            orderByDirection === "asc"
-         )
+         sortLivestreamsDesc(a, b, orderByDirection === "asc")
       )
 
-      if (searchWithTrigram) {
-         // When using trigrams in a search, is required to do the filtering on client side.
-         // In this case filter by start date
-         const currentTime = new Date(
-            Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS
-         )
-
-         return sortedHits.filter((hit) =>
-            hasPastEvents
-               ? hit.start?.toDate() < currentTime
-               : hit.start?.toDate() >= currentTime
-         )
-      }
       return sortedHits
-   }, [
-      livestreamHits,
-      orderByDirection,
-      hasPastEvents,
-      searchWithTrigram,
-      value,
-   ])
+   }, [data, orderByDirection, value])
 
    return (
       <AutocompleteSearch
@@ -195,7 +163,7 @@ const LivestreamSearch: FC<Props> = ({
          setInputValue={setInputValue}
          placeholderText={placeholderText}
          inputEndIcon={endIcon}
-         minCharacters={searchWithTrigram ? 3 : null}
+         disableFiltering // Filtering is now done by Algolia, not by the component
       />
    )
 }

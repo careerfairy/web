@@ -217,3 +217,37 @@ We use ImageKit for real-time video optimization and transformation. Each develo
 8. Enable the **Optimize video quality before delivery** option, choose `40%` for the quality
 9. You can leave the other options as default and click "Save" at the top right corner.
 10.   Now your ImageKit account is ready to use 🚀
+
+# Setting Up Algolia
+
+## Algolia Setup for Web App
+
+1. **Environment Variables:** Ensure you have the Algolia environment variables set up in your `.env.local` file for the web app. You need to specify the Algolia App ID and the Algolia Search API Key, they can be obtained by logging into the [shared](https://www.notion.so/Algolia-Search-b05602e4ff25447d8e1c0e865f627cb1) Algolia account. Refer to the example in `apps/web/.env.local.example`:
+
+```sell
+NEXT_PUBLIC_ALGOLIA_APP_ID=ask-your-team
+NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=ask-your-team
+NEXT_PUBLIC_DEV_NAME=dev_firstName
+```
+
+## Full Index Sync with Algolia
+
+To synchronize a Firestore collection with Algolia, you can trigger a full index sync. This process is defined in `packages/functions/src/search.ts`.
+
+1. **Triggering the Sync:** Use the curl command to start the sync. Replace `indexName` with one of the available index names at `packages/functions/src/lib/search/searchIndexes.ts` and `secretKey` with the `ALGOLIA_FULL_SYNC_SECRET_KEY` found in `packages/functions/.env`.
+
+Development:
+
+```shell
+curl "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/fullIndexSync?indexName=livestreams&secretKey=yourSecretKey"
+```
+
+Production:
+
+```shell
+curl "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/fullIndexSync?indexName=livestreams&secretKey=yourSecretKey"
+```
+
+2. **Monitoring the Sync:** The function logs the progress of the sync operation. Check the Firebase Functions logs at http://localhost:4000/logs (dev) or https://console.cloud.google.com/functions/list?project=careerfairy-e1fd9 for information about the number of documents synced.
+
+By following these steps, you'll have Algolia set up for the web app and know how to perform a full index sync to keep your search indices up to date.

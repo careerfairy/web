@@ -19,11 +19,11 @@ import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import FlagDialog from "./FlagDialog"
-import { FlagReason, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { FlagReason, Wish } from "@careerfairy/shared-lib/wishes"
 import CreateOrEditWishDialog from "./CreateOrEditWishDialog"
-import { Hit } from "../../../types/algolia"
-import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import { Interest } from "@careerfairy/shared-lib/interests"
 import { wishlistRepo } from "../../../data/RepositoryInstances"
+import { Hit } from "@algolia/client-search"
 
 const styles: StylesProps = {
    divider: {
@@ -110,6 +110,7 @@ const WishCardMenuButton = ({
       }
 
       return options
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       wish.id,
       wish.authorUid,
@@ -169,6 +170,7 @@ const WishCardMenuButton = ({
             {options.map((option) => (
                <MenuItem
                   key={option.label}
+                  // eslint-disable-next-line react/jsx-handler-names
                   onClick={option.onClick}
                   sx={styles.menuItem}
                >
@@ -180,7 +182,7 @@ const WishCardMenuButton = ({
                </MenuItem>
             ))}
          </Menu>
-         {confirmDeleteModalOpen && (
+         {Boolean(confirmDeleteModalOpen) && (
             <AreYouSureModal
                handleClose={handleClose}
                handleConfirm={handleDeleteWish}
@@ -190,14 +192,14 @@ const WishCardMenuButton = ({
                confirmButtonText={"Delete this wish"}
             />
          )}
-         {flagModalOpen && (
+         {Boolean(flagModalOpen) && (
             <FlagDialog
                handleFlag={handleFlagWish}
                onClose={handleClose}
                open={flagModalOpen}
             />
          )}
-         {editWishModalOpen && (
+         {Boolean(editWishModalOpen) && (
             <CreateOrEditWishDialog
                open={editWishModalOpen}
                onUpdateWish={onUpdateWish}
