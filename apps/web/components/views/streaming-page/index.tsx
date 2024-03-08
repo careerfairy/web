@@ -29,6 +29,13 @@ const UserClientProvider = dynamic(
    () => import("./context/UserClient").then((mod) => mod.UserClientProvider),
    { ssr: false }
 )
+const RTMSignalingProvider = dynamic(
+   () =>
+      import("./context/RTMSignaling").then((mod) => mod.RTMSignalingProvider),
+   {
+      ssr: false,
+   }
+)
 
 const Layout = dynamic(
    () => import("./components/Layout").then((mod) => mod.Layout),
@@ -151,22 +158,24 @@ const Component = ({ isHost }: Props) => {
                agoraUserId={agoraUserId}
                livestreamId={livestream.id}
             >
-               <AgoraDevicesProvider>
-                  <LocalTracksProvider>
-                     <ScreenShareProvider>
-                        <Layout>
-                           <Fragment>
-                              <TopBar />
-                              <MiddleContent />
-                              <BottomBar />
-                              <StreamSetupWidget />
-                              <SettingsMenu />
-                           </Fragment>
-                        </Layout>
-                        <ToggleStreamModeButton />
-                     </ScreenShareProvider>
-                  </LocalTracksProvider>
-               </AgoraDevicesProvider>
+               <RTMSignalingProvider>
+                  <AgoraDevicesProvider>
+                     <LocalTracksProvider>
+                        <ScreenShareProvider>
+                           <Layout>
+                              <Fragment>
+                                 <TopBar />
+                                 <MiddleContent />
+                                 <BottomBar />
+                                 <StreamSetupWidget />
+                                 <SettingsMenu />
+                              </Fragment>
+                           </Layout>
+                           <ToggleStreamModeButton />
+                        </ScreenShareProvider>
+                     </LocalTracksProvider>
+                  </AgoraDevicesProvider>
+               </RTMSignalingProvider>
             </StreamingProvider>
             <AgoraTrackers />
             <LivestreamStateTrackers />

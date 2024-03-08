@@ -1,4 +1,4 @@
-import { AgoraTokenRequest } from "@careerfairy/shared-lib/agora/token"
+import { AgoraRTCTokenRequest } from "@careerfairy/shared-lib/agora/token"
 import { livestreamService } from "data/firebase/LivestreamService"
 import useSWR, { SWRConfiguration } from "swr"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
@@ -22,7 +22,9 @@ export type UseAgoraRtcToken = {
  * @param {object} args - The data required to fetch the RTC token.
  * @returns {UseAgoraRtcToken} The Agora RTC token and a function to fetch it.
  */
-export const useAgoraRtcToken = (args: AgoraTokenRequest): UseAgoraRtcToken => {
+export const useAgoraRtcToken = (
+   args: AgoraRTCTokenRequest
+): UseAgoraRtcToken => {
    const { authenticatedUser } = useAuth()
 
    const key = args ? JSON.stringify(args) : null

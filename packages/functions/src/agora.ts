@@ -3,11 +3,14 @@ import functions = require("firebase-functions")
 import { agoraCredentials } from "./api/agora"
 import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
-import { AgoraTokenRequest } from "@careerfairy/shared-lib/agora/token"
+import {
+   AgoraRTCTokenRequest,
+   AgoraRTMTokenRequest,
+} from "@careerfairy/shared-lib/agora/token"
 
 export const fetchAgoraRtcToken = functions
    .region(config.region)
-   .https.onCall(async (data: AgoraTokenRequest) => {
+   .https.onCall(async (data: AgoraRTCTokenRequest) => {
       const { isStreamer, uid, sentToken, channelName, streamDocumentPath } =
          data
       const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER
@@ -66,7 +69,7 @@ export const fetchAgoraRtcToken = functions
 
 export const fetchAgoraRtmToken = functions
    .region(config.region)
-   .https.onCall(async (data) => {
+   .https.onCall(async (data: AgoraRTMTokenRequest) => {
       const { uid } = data
       const expirationTimeInSeconds = 21600
       const currentTimestamp = Math.floor(Date.now() / 1000)
