@@ -64,6 +64,7 @@ export const generateArrayFilterString = (
             .filter(Boolean) // Use only valid options.
             .map((filterValue) => `${filterName}:${filterValue}`)
             .join(" OR ") // Link options with "OR".
+
          if (filterValueString) {
             filters.push(`(${filterValueString})`) // Enclose in parenthesis to ensure proper grouping
          }
@@ -83,6 +84,7 @@ export const generateBooleanFilterStrings = (
    booleanFilters: Partial<Record<string, boolean | undefined>>
 ): string => {
    if (!booleanFilters) return ""
+
    return Object.entries(booleanFilters)
       .filter(([, value]) => value !== undefined) // Filter out undefined values
       .map(([filterName, value]) => `${filterName}:${value}`)
@@ -105,18 +107,16 @@ export const generateDateFilter = (
    const startTimestamp = startDate ? startDate.getTime() : null
    const endTimestamp = endDate ? endDate.getTime() : null
 
-   let filter = ""
-
    if (startTimestamp && endTimestamp) {
       // Filter between start and end dates
-      filter = `${attributeName} >= ${startTimestamp} AND ${attributeName} <= ${endTimestamp}`
+      return `${attributeName} >= ${startTimestamp} AND ${attributeName} <= ${endTimestamp}`
    } else if (startTimestamp) {
       // Filter from start date onwards
-      filter = `${attributeName} >= ${startTimestamp}`
+      return `${attributeName} >= ${startTimestamp}`
    } else if (endTimestamp) {
       // Filter up to end date
-      filter = `${attributeName} <= ${endTimestamp}`
+      return `${attributeName} <= ${endTimestamp}`
    }
 
-   return filter
+   return ""
 }

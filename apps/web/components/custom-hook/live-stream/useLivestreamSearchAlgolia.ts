@@ -41,31 +41,20 @@ export type FilterOptions = {
 const generateDateFilterString = (
    dateFilter: FilterOptions["dateFilter"]
 ): string => {
-   let filterString = ""
-
-   if (!dateFilter) return filterString
+   if (!dateFilter) return ""
 
    switch (dateFilter) {
       case "future":
-         filterString = generateDateFilter("startTimeMs", new Date(), null)
-         break
+         return generateDateFilter("startTimeMs", new Date(), null)
       case "past":
-         filterString = generateDateFilter(
-            "startTimeMs",
-            new Date(0),
-            new Date()
-         )
-         break
+         return generateDateFilter("startTimeMs", new Date(0), new Date())
       default:
-         filterString = generateDateFilter(
+         return generateDateFilter(
             dateFilter.attribute,
             dateFilter.startDate,
             dateFilter.endDate
          )
-         break
    }
-
-   return filterString
 }
 
 /**
