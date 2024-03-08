@@ -44,7 +44,7 @@ const calculateGridItemMaxWidth = (
    isMobile: boolean
 ) => {
    if (isSingleRowMode) {
-      return isMobile ? "180px !important" : "285px !important"
+      return isMobile ? "180px !important" : "320px !important"
    }
    return undefined
 }

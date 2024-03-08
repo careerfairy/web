@@ -51,7 +51,7 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
             // Max 4 streamers on a single row on macbook screens
             // Max 6 streamers on a single row on larger than macbook screens
             columns: Math.min(
-               streamIsMobile ? 3 : desktopScreen ? 4 : 6,
+               streamIsMobile ? 3 : desktopScreen ? 4 : 7,
                numberOfElements
             ),
             rows: 1,
