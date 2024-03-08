@@ -8,7 +8,7 @@ import {
    LivestreamGroupQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { GroupOption } from "@careerfairy/shared-lib/groups"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamCreator } from "./views/questions/commons"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export type LivestreamFormGeneralTabValues = {
@@ -31,8 +31,8 @@ export type LivestreamFormGeneralTabValues = {
 }
 
 export type LivestreamFormSpeakersTabValues = {
-   values: Creator[]
-   options: Creator[]
+   values: LivestreamCreator[]
+   options: LivestreamCreator[]
 }
 
 export type LivestreamFormQuestionsTabValues = {
