@@ -1,5 +1,6 @@
+/* eslint-disable */
 import React, { Fragment, useEffect, useState } from "react"
-import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { Rating, Wish } from "@careerfairy/shared-lib/wishes"
 import Paper from "@mui/material/Paper"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
@@ -9,11 +10,11 @@ import {
    CircularProgress,
    Typography,
 } from "@mui/material"
-import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import { Interest } from "@careerfairy/shared-lib/interests"
 import Stack from "@mui/material/Stack"
 import { wishListBorderRadius } from "../../../constants/pages"
 import UserAvatar from "../common/UserAvatar"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 import UpvoteIcon from "@mui/icons-material/ArrowUpward"
 import DownvoteIcon from "@mui/icons-material/ArrowDownward"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -21,10 +22,10 @@ import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import DateUtil from "../../../util/DateUtil"
 import { useRouter } from "next/router"
-import { Hit } from "../../../types/algolia"
 import WishCardMenuButton from "./WishCardMenuButton"
 import WishSEOSchemaScriptTag from "../common/WishSEOSchemaScriptTag"
 import { userRepo, wishlistRepo } from "../../../data/RepositoryInstances"
+import { Hit } from "@algolia/client-search"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -105,7 +106,7 @@ const WishCard = ({ wish }: WishCardProps) => {
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
    )
-   const { query, push, asPath } = useRouter()
+   const { push, asPath } = useRouter()
    // @ts-ignore
    const [date] = useState<Date>(new Date(wish.createdAt))
    const [numberOfUpvotes, setNumberOfUpvotes] = useState(wish.numberOfUpvotes)
@@ -117,12 +118,12 @@ const WishCard = ({ wish }: WishCardProps) => {
       setDescription(
          wish._highlightResult?.description?.value || wish.description
       )
-   }, [wish?._highlightResult?.description?.value])
+   }, [wish._highlightResult?.description?.value, wish.description])
 
    useEffect(() => {
       ;(async function getUpvotersData() {
          if (wish.uidsOfRecentUpvoters.length) {
-            const upvotersData = await userRepo.getUsersDataByUids(
+            const upvotersData = await userRepo.getUsersDataByUuids(
                wish.uidsOfRecentUpvoters
             )
             setUpvoters(upvotersData)

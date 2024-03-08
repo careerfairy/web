@@ -17,9 +17,17 @@ import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
 const DOCS_PER_INDEXING = 250
 
 /**
+ * How it works:
  * 1. Fetches an entire firestore collection from Firestore in batches of 250 documents.
  * 2. Indexes the documents in Algolia.
  * 3. Repeats until all document batches have been indexed.
+ *
+ * How to Trigger:
+ * Development: curl "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/fullIndexSync?indexName=livestreams&secretKey=123"
+ * Production: curl "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/fullIndexSync?indexName=livestreams&secretKey=123"
+ *
+ * Where to get the secret key:
+ * 1. ALGOLIA_FULL_SYNC_SECRET_KEY in the .env file in functions package
  */
 export const fullIndexSync = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -59,7 +67,13 @@ export const fullIndexSync = functions
          fields,
          shouldIndex,
          fullIndexSyncQueryConstraints,
+         transformData,
+         settings,
       } = knownIndexes[indexName]
+
+      if (settings) {
+         await index.setSettings(settings)
+      }
 
       // Reference to the Firestore collection
       let collectionRef: Query = firestore.collection(collectionPath)
@@ -99,7 +113,7 @@ export const fullIndexSync = functions
 
          // Create a batch of documents to index
          const batch = index.saveObjects(
-            docsToIndex.map((doc) => getData(doc, fields))
+            docsToIndex.map((doc) => getData(doc, fields, transformData))
          )
 
          // Wait for the batch to be indexed

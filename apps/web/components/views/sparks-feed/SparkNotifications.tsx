@@ -8,12 +8,13 @@ import {
    groupIdSelector,
    sparksSelector,
    eventToRegisterTo,
+   jobToOpen,
 } from "../../../store/selectors/sparksFeedSelectors"
 import useUserSparksNotifications from "../../custom-hook/spark/useUserSparksNotifications"
 import { FC, useCallback, useEffect } from "react"
 import {
-   setCardNotification,
-   setCurrentEventNotification,
+   setCardEventNotification,
+   setEventNotification,
    setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../store/reducers/sparksFeedReducer"
@@ -42,6 +43,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
    const cardNotification = useSelector(cardNotificationSelector)
    const groupId = useSelector(groupIdSelector)
    const eventToRegisterToId = useSelector(eventToRegisterTo)
+   const jobToOpenId = useSelector(jobToOpen)
    const { data: eventNotifications } = useUserSparksNotifications(
       userEmail,
       currentSpark?.group.id
@@ -65,7 +67,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
       if (eventNotifications?.length && !groupId) {
          timeout = setTimeout(() => {
             dispatch(
-               setCurrentEventNotification(
+               setEventNotification(
                   eventNotifications[0] as UserSparksNotification
                )
             )
@@ -83,7 +85,9 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
    useEffect(() => {
       if (groupId && eventNotifications?.length) {
          dispatch(
-            setCardNotification(eventNotifications[0] as UserSparksNotification)
+            setCardEventNotification(
+               eventNotifications[0] as UserSparksNotification
+            )
          )
       }
    }, [groupId, eventNotifications, dispatch])
@@ -106,11 +110,12 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          }
          handleClose={handleCloseDialog}
          open={eventDetailsDialogVisibility}
-         page={"details"}
+         page={jobToOpenId ? "job-details" : "details"}
          serverUserEmail={userEmail}
          mode={"stand-alone"}
          currentSparkId={currentSpark?.id}
          onRegisterSuccess={handleSuccessfulEventRegistration}
+         jobId={jobToOpenId}
       />
    ) : null
 }

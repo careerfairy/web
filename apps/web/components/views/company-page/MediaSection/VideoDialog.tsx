@@ -22,7 +22,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import ReactPlayer from "react-player"
-import { videoUrlRegex } from "../../../../constants/forms"
+import { videoUrlRegex } from "@careerfairy/shared-lib/constants/forms"
 import { GroupVideo } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({

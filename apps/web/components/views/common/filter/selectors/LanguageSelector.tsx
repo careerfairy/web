@@ -1,5 +1,5 @@
 import MultiCheckboxSelect from "../MultiCheckboxSelect"
-import { languageOptionCodes } from "../../../../../constants/forms"
+import { languageOptionCodes } from "@careerfairy/shared-lib/constants/forms"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,

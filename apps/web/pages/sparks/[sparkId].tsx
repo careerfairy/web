@@ -1,5 +1,6 @@
 import {
    SerializedSpark,
+   SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Button } from "@mui/material"
@@ -13,7 +14,6 @@ import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSpa
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   addCarNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchNextSparks,
    removeGroupId,
@@ -22,6 +22,10 @@ import {
    setOriginalSparkId,
    setSparks,
    setUserEmail,
+   setConversionCardInterval,
+   AddCardNotificationPayload,
+   addCardNotificationToSparksList,
+   removeNotificationsByType,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -35,10 +39,11 @@ import {
 import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { useMountedState } from "react-use"
+import { useAuth } from "HOCs/AuthProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedSpark, groupId, userEmail }) => {
+> = ({ serializedSpark, groupId, userEmail, conversionInterval }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
 
@@ -53,6 +58,7 @@ const SparksPage: NextPage<
    const activeSpark = useSelector(activeSparkSelector)
    const fetchNextError = useSelector(fetchNextErrorSelector)
    const fromGroupPage = useSelector(groupIdSelector)
+   const { userData } = useAuth()
 
    useEffect(() => {
       dispatch(setGroupId(groupId))
@@ -64,12 +70,36 @@ const SparksPage: NextPage<
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
+      const validConversionInterval =
+         conversionInterval >= 2 && conversionInterval <= 10
+            ? conversionInterval
+            : 5
+
+      dispatch(
+         setConversionCardInterval(
+            userData || fromGroupPage ? 0 : validConversionInterval
+         )
+      )
+
+      if (userData) {
+         dispatch(
+            removeNotificationsByType(SparkCardNotificationTypes.CONVERSION)
+         )
+      }
+   }, [conversionInterval, dispatch, fromGroupPage, userData])
+
+   useEffect(() => {
+      if (!groupId) {
+         dispatch(removeGroupId())
+      }
+
       dispatch(fetchInitialSparksFeed())
 
       return () => {
          dispatch(resetSparksFeed())
       }
-   }, [dispatch])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [groupId])
 
    useEffect(() => {
       if (
@@ -107,8 +137,11 @@ const SparksPage: NextPage<
             dispatch(removeGroupId())
             dispatch(fetchInitialSparksFeed())
          } else {
+            const payload: AddCardNotificationPayload = {
+               type: SparkCardNotificationTypes.GROUP,
+            }
             // Add a card notification to the Sparks array when a user reaches the end of the Company Sparks list
-            dispatch(addCarNotificationToSparksList())
+            dispatch(addCardNotificationToSparksList(payload))
          }
       }
    }, [
@@ -172,8 +205,8 @@ const SparksPage: NextPage<
                topBarTransparent
                hideFooter
                headerWidth="auto"
-               hideBottomNav={isFullScreen}
                hideHeader={isFullScreen}
+               isBottomNavDark={isFullScreen}
             >
                <SparksFeedCarousel />
             </GenericDashboardLayout>
@@ -187,6 +220,7 @@ type SparksPageProps = {
    serializedSpark: SerializedSpark
    groupId: string | null
    userEmail: string | null
+   conversionInterval: number
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -198,6 +232,10 @@ export const getServerSideProps: GetServerSideProps<
 > = async (context) => {
    const groupId = context.query.groupId
       ? context.query.groupId.toString()
+      : null
+
+   const conversionInterval = context.query.conversionInterval
+      ? context.query.conversionInterval.toString()
       : null
 
    const token = getUserTokenFromCookie(context)
@@ -220,6 +258,7 @@ export const getServerSideProps: GetServerSideProps<
          serializedSpark: SparkPresenter.serialize(sparkFromService),
          groupId,
          userEmail: token?.email ?? null,
+         conversionInterval: +conversionInterval,
       },
    }
 }

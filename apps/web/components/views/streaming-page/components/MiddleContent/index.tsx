@@ -7,6 +7,7 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 
 const styles = sxStyles({
    root: {
@@ -26,6 +27,8 @@ const styles = sxStyles({
 export const MiddleContent = () => {
    const isLandscape = useStreamIsLandscape()
    const isMobile = useStreamIsMobile()
+   const isSpotlightMode = useIsSpotlightMode()
+
    const { isOpen } = useSideDrawer()
 
    return (
@@ -35,7 +38,9 @@ export const MiddleContent = () => {
             direction="row"
             spacing={isMobile || !isOpen ? 0 : 2.5}
             pt={isLandscape ? 1.5 : isMobile ? 3 : 3.875}
-            pb={isLandscape ? 3.125 : isMobile ? 6.125 : 7}
+            pb={
+               isLandscape ? 3.125 : isMobile ? 2 : isSpotlightMode ? 7 : 5.875
+            }
          >
             <StreamingGrid />
             <SidePanel />

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC } from "react"
+import { FC, ReactElement } from "react"
 import { styled } from "@mui/material/styles"
 import BrandedCheckbox from "./BrandedCheckbox"
 import { ListItemText, MenuItem } from "@mui/material"
@@ -15,6 +15,8 @@ type StyledBrandedAutocompleteProps<
 > = Omit<AutocompleteProps<T, boolean, boolean, boolean>, "renderTags"> & {
    textFieldProps?: BrandedTextFieldProps
    limit?: number
+   initialOptionSection?: ReactElement
+   getOptionElement?: (option: unknown) => ReactElement
 }
 
 export type BrandedAutocompleteProps = Omit<
@@ -29,45 +31,69 @@ const StyledBrandedAutocomplete = styled(
       limit,
       getOptionLabel,
       renderInput,
+      initialOptionSection,
+      getOptionElement,
+      options,
       ...props
-   }: StyledBrandedAutocompleteProps) => (
-      <Autocomplete
-         getOptionDisabled={(optionEl) => {
-            if (!props.multiple || !limit) return false
-            return (
-               props.value.length >= limit &&
-               !props.value.find((item) => {
-                  if (props.isOptionEqualToValue) {
-                     return props.isOptionEqualToValue(item, optionEl)
-                  }
-                  return item === optionEl
-               })
-            )
-         }}
-         {...props}
-         renderOption={(optionProps, option, { selected }) => (
-            <MenuItem
-               {...optionProps}
-               key={optionProps.id}
-               sx={{
-                  '&[aria-selected="true"]': {
-                     backgroundColor: "#FAFAFA !important",
-                  },
-               }}
-            >
-               <ListItemText
-                  key={`${optionProps.id}-text`}
-                  primary={getOptionLabel(option)}
-                  sx={{ padding: "16px" }}
-               />
-               {props.multiple ? <BrandedCheckbox checked={selected} /> : null}
-            </MenuItem>
-         )}
-         color="primary"
-         getOptionLabel={getOptionLabel}
-         renderInput={renderInput}
-      />
-   )
+   }: StyledBrandedAutocompleteProps) => {
+      // If an {initialOptionSection} exists, add an extra option at the beginning of the list
+      const newOptions = initialOptionSection
+         ? [{ title: "INITIAL_SECTION" }, ...options]
+         : options
+
+      return (
+         <Autocomplete
+            getOptionDisabled={(optionEl) => {
+               if (!props.multiple || !limit) return false
+               return (
+                  props.value.length >= limit &&
+                  !props.value.find((item) => {
+                     if (props.isOptionEqualToValue) {
+                        return props.isOptionEqualToValue(item, optionEl)
+                     }
+                     return item === optionEl
+                  })
+               )
+            }}
+            options={newOptions}
+            {...props}
+            renderOption={(optionProps, option, { selected, index }) => (
+               <>
+                  {index === 0 && initialOptionSection ? (
+                     initialOptionSection
+                  ) : (
+                     <MenuItem
+                        {...optionProps}
+                        key={optionProps.id}
+                        sx={{
+                           '&[aria-selected="true"]': {
+                              backgroundColor: "#FAFAFA !important",
+                           },
+                        }}
+                     >
+                        {getOptionElement ? (
+                           getOptionElement(option)
+                        ) : (
+                           <ListItemText
+                              key={`${optionProps.id}-text`}
+                              primary={getOptionLabel(option)}
+                              sx={{ padding: "16px" }}
+                           />
+                        )}
+
+                        {props.multiple ? (
+                           <BrandedCheckbox checked={selected} />
+                        ) : null}
+                     </MenuItem>
+                  )}
+               </>
+            )}
+            color="primary"
+            getOptionLabel={getOptionLabel}
+            renderInput={renderInput}
+         />
+      )
+   }
 )({})
 
 const BrandedAutocomplete: FC<BrandedAutocompleteProps> = ({
@@ -101,7 +127,12 @@ export const FormBrandedAutocomplete: FC<FormBrandedAutocompleteProps> = ({
    return (
       <StyledBrandedAutocomplete
          renderInput={(params) => (
-            <FormBrandedTextField name={name} {...params} {...textFieldProps} />
+            <FormBrandedTextField
+               name={name}
+               autocomplete
+               {...params}
+               {...textFieldProps}
+            />
          )}
          {...props}
          onChange={handleChange}

@@ -19,7 +19,7 @@ import { questionIcon } from "../../../../../constants/svgs"
 import {
    maxQuestionLength,
    minQuestionLength,
-} from "../../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { rewardService } from "data/firebase/RewardService"
@@ -97,7 +97,7 @@ const QuestionCreateForm = () => {
 
             rewardService
                .userAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
-               .then((_) => console.log("Rewarded Question Asked"))
+               .then(() => console.log("Rewarded Question Asked"))
                .catch(console.error)
 
             recommendationServiceInstance.createdQuestion(livestream, userData)
@@ -108,10 +108,12 @@ const QuestionCreateForm = () => {
                "event_registration_question_submit",
                livestream
             )
-         } catch (e) {}
+         } catch (e) {
+            console.error(e)
+         }
       },
       validate: (values) => {
-         let errors: { questionTitle?: string } = {}
+         const errors: { questionTitle?: string } = {}
          if (!values.questionTitle) {
             errors.questionTitle = "Please enter a title"
          }
@@ -205,6 +207,7 @@ const QuestionCreateForm = () => {
             <Grid className={classes.imgGrid} item sm={4}>
                <Slide timeout={700} direction="up" in>
                   <div className={classes.imgWrapper}>
+                     {/* eslint-disable-next-line @next/next/no-img-element */}
                      <img
                         src={questionIcon}
                         alt="question prompt illustration"

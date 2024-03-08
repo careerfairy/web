@@ -30,7 +30,7 @@ type Props = {
    collapsedSize?: number | string
 }
 
-const CollapsableText = ({
+const CollapsibleText = ({
    text,
    textStyle,
    maxLength,
@@ -51,7 +51,7 @@ const CollapsableText = ({
       <Box>
          <Collapse in={!isTextCollapsed} collapsedSize={collapsedSize || 75}>
             <SanitizedHTML
-               sx={Boolean(textStyle) ? textStyle : styles.text}
+               sx={textStyle ? textStyle : styles.text}
                htmlString={text}
             />
          </Collapse>
@@ -86,4 +86,4 @@ const CollapsableText = ({
    )
 }
 
-export default CollapsableText
+export default CollapsibleText

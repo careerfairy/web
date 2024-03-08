@@ -104,6 +104,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly targetLevelsOfStudy: LevelOfStudy[],
 
       public readonly speakers: Speaker[],
+      public readonly creatorsIds: LivestreamEvent["creatorsIds"],
       public readonly liveSpeakers: LiveSpeaker[],
       public readonly triGrams: LivestreamEvent["triGrams"],
 
@@ -312,6 +313,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.targetFieldsOfStudy ?? [],
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
+         livestream.creatorsIds ?? [],
          livestream.liveSpeakers ?? [],
          livestream.triGrams ?? {},
          livestream.reminderEmailsSent ?? null,
@@ -377,6 +379,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
          livestream.speakers,
+         livestream.creatorsIds,
          livestream.liveSpeakers,
          livestream.triGrams,
          livestream.reminderEmailsSent,
@@ -461,6 +464,7 @@ export class LivestreamPresenter extends BaseModel {
          targetFieldsOfStudy: this.targetFieldsOfStudy,
          targetLevelsOfStudy: this.targetLevelsOfStudy,
          speakers: this.speakers,
+         creatorsIds: this.creatorsIds,
          liveSpeakers: this.liveSpeakers,
          reminderEmailsSent: this.reminderEmailsSent,
          language: this.language,

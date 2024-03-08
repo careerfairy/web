@@ -9,7 +9,7 @@ import {
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import {
-   removeCurrentEventNotifications,
+   removeEventNotifications,
    setEventToRegisterTo,
    showEventDetailsDialog,
 } from "../../../../../../store/reducers/sparksFeedReducer"
@@ -106,7 +106,7 @@ const SparksEventNotification: FC<Props> = ({ spark }) => {
 
    const cancelHandleClick = useCallback(
       (ev) => {
-         dispatch(removeCurrentEventNotifications())
+         dispatch(removeEventNotifications())
          ev.preventDefault()
          ev.stopPropagation()
       },

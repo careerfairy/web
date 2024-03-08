@@ -16,7 +16,7 @@ import {
 } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
-   removeCurrentEventNotifications,
+   removeEventNotifications,
    setVideoPlaying,
    setVideosMuted,
    swipeToSparkByIndex,
@@ -32,7 +32,6 @@ import {
    currentSparkIndexSelector,
    emptyFilterSelector,
    eventDetailsDialogVisibilitySelector,
-   isFetchingSparksSelector,
    isOnEdgeSelector,
    isPlayingSelector,
    sparksSelector,
@@ -75,7 +74,7 @@ const styles = sxStyles({
       backgroundColor: "transparent",
    },
    fullScreenViewport: {
-      height: "100dvh",
+      height: "calc(100dvh - 67px)",
       position: "fixed",
       width: "100%",
       zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -139,7 +138,6 @@ const SparksFeedCarousel: FC = () => {
    const emptyFilter = useSelector(emptyFilterSelector)
    const sparks = useSelector(sparksSelector)
    const activeSpark = useSelector(activeSparkSelector)
-   const isFetchingSparks = useSelector(isFetchingSparksSelector)
    const isPlaying = useSelector(isPlayingSelector)
    const eventDetailsDialogVisibility = useSelector(
       eventDetailsDialogVisibilitySelector
@@ -215,7 +213,7 @@ const SparksFeedCarousel: FC = () => {
       if (emblaApi) {
          emblaApi.scrollTo(currentPlayingIndex)
       }
-   }, [emblaApi, currentPlayingIndex])
+   }, [currentPlayingIndex, emblaApi])
 
    /**
     * When the user swipes to a new slide,
@@ -242,7 +240,7 @@ const SparksFeedCarousel: FC = () => {
          const onSelect = () => {
             const index = emblaApi.selectedScrollSnap()
             dispatch(swipeToSparkByIndex(index))
-            dispatch(removeCurrentEventNotifications())
+            dispatch(removeEventNotifications())
             if (!isPlaying) dispatch(setVideoPlaying(true))
          }
 
@@ -408,7 +406,7 @@ type ViewportBoxProps = BoxProps & {
 const ViewportBox = forwardRef(
    (
       { outterContent, children, sx, ...props }: ViewportBoxProps,
-      ref: Ref<any>
+      ref: Ref<unknown>
    ) => {
       const isFullScreen = useSparksFeedIsFullScreen()
       return (

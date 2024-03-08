@@ -4,7 +4,7 @@ import {
    useFieldsOfStudy,
    useLevelsOfStudy,
 } from "components/custom-hook/useCollection"
-import { CompanyCountryValues } from "constants/forms"
+import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
 import FormSectionHeader from "../../FormSectionHeader"
 import MultiChipSelect from "./components/MultiChipSelect"
 import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"

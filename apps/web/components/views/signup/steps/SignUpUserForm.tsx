@@ -21,7 +21,7 @@ import {
 } from "../../common/MultiStepWrapper"
 import { sxStyles } from "../../../../types/commonTypes"
 import GenericDropdown from "../../common/GenericDropdown"
-import { possibleGenders } from "../../../../constants/forms"
+import { possibleGenders } from "@careerfairy/shared-lib/constants/forms"
 import {
    UserReminderType,
    UserData,
@@ -284,8 +284,9 @@ function SignUpUserForm() {
                            setFieldValue={setFieldValue}
                            error={
                               errors.universityCountryCode &&
-                              touched.universityCountryCode &&
-                              errors.universityCountryCode
+                              touched.universityCountryCode
+                                 ? errors.universityCountryCode
+                                 : null
                            }
                            handleOpen={handleOpen}
                            open={open}
@@ -295,9 +296,9 @@ function SignUpUserForm() {
                         <UniversitySelector
                            className="registrationInput"
                            error={
-                              errors.university &&
-                              touched.university &&
-                              errors.university
+                              errors.university && touched.university
+                                 ? errors.university
+                                 : null
                            }
                            universityCountryCode={values.universityCountryCode}
                            values={values}
@@ -312,9 +313,9 @@ function SignUpUserForm() {
                            className="registrationInput"
                            disabled={submitting(isSubmitting)}
                            error={
-                              errors.fieldOfStudy &&
-                              touched.fieldOfStudy &&
-                              errors.fieldOfStudy
+                              errors.fieldOfStudy && touched.fieldOfStudy
+                                 ? errors.fieldOfStudy
+                                 : null
                            }
                         />
                      </Grid>
@@ -325,9 +326,9 @@ function SignUpUserForm() {
                            className="registrationInput"
                            disabled={submitting(isSubmitting)}
                            error={
-                              errors.levelOfStudy &&
-                              touched.levelOfStudy &&
-                              errors.levelOfStudy
+                              errors.levelOfStudy && touched.levelOfStudy
+                                 ? errors.levelOfStudy
+                                 : null
                            }
                         />
                      </Grid>
@@ -375,9 +376,9 @@ function SignUpUserForm() {
                      color="primary"
                      disabled={isSubmitting || emailSent}
                      endIcon={
-                        (isSubmitting || generalLoading) && (
+                        isSubmitting || generalLoading ? (
                            <CircularProgress size={20} color="inherit" />
-                        )
+                        ) : null
                      }
                      sx={styles.submit}
                   >

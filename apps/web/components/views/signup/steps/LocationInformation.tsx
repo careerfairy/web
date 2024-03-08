@@ -8,7 +8,7 @@ import {
    countryGroupId,
    languageOptionCodes,
    regionGroupId,
-} from "../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    formatToOptionArray,
    mapOptions,

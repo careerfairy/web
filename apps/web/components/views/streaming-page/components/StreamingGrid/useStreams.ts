@@ -4,6 +4,7 @@ import { useLocalTracks } from "../../context"
 import { RemoteUser, UserStream } from "../../types"
 import { useScreenShare } from "../../context/ScreenShare"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
+import { useIsScreenShareMode } from "store/selectors/streamingAppSelectors"
 
 /**
  * Combines local and remote streamers into a single array.
@@ -13,6 +14,7 @@ import { STREAM_IDENTIFIERS } from "constants/streaming"
  */
 export const useStreams = (): UserStream[] => {
    const remoteStreamers = useRemoteUsers()
+   const isScreenShareMode = useIsScreenShareMode()
 
    const { localUser, readyToPublish: readyToPublishLocalUser } =
       useLocalTracks()
@@ -40,12 +42,13 @@ export const useStreams = (): UserStream[] => {
          combinedStreamers.push(localUser)
       }
 
-      if (readyToPublishScreenShare) {
+      if (readyToPublishScreenShare && isScreenShareMode) {
          combinedStreamers.push(localUserScreen)
       }
 
       return combinedStreamers
    }, [
+      isScreenShareMode,
       localUser,
       localUserScreen,
       readyToPublishLocalUser,
