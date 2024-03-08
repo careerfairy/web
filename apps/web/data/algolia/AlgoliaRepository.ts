@@ -12,7 +12,8 @@ export interface IAlgoliaRepository {
       options: SearchWishesOptions
    ): Promise<SearchResponse<Wish>>
    searchLivestreams(
-      query: string
+      query: string,
+      filters: string
    ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
 }
 interface SearchWishesOptions {
@@ -60,9 +61,11 @@ class AlgoliaRepository implements IAlgoliaRepository {
       })
    }
 
-   async searchLivestreams(query: string) {
+   async searchLivestreams(query: string, filters: string) {
       const index = initAlgoliaIndex("livestreams")
-      return index.search<AlgoliaLivestreamResponse>(query)
+      return index.search<AlgoliaLivestreamResponse>(query, {
+         filters,
+      })
    }
 }
 

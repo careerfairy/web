@@ -1,16 +1,15 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { Box, Grid, Typography } from "@mui/material"
-import { where } from "firebase/firestore"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
-import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
-import { QueryConstraint } from "@firebase/firestore"
-import { useLivestreamSearchAlgolia } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { LivestreamSearchResult } from "types/algolia"
 import SanitizedHTML from "components/util/SanitizedHTML"
 
@@ -31,6 +30,10 @@ const styles = sxStyles({
    listItemGrid: {
       width: "calc(100% - 44px)",
       wordWrap: "break-word",
+      "& em": {
+         fontStyle: "normal",
+         fontWeight: 600,
+      },
    },
    listItemSelected: {
       backgroundColor: "white !important",
@@ -40,19 +43,18 @@ const styles = sxStyles({
    },
 })
 
-export type LivestreamHit = LivestreamSearchResult
-
 type Props = {
-   value: LivestreamHit
-   handleChange: (value: LivestreamHit | null) => void
+   value: LivestreamSearchResult
+   handleChange: (value: LivestreamSearchResult | null) => void
    orderByDirection?: "asc" | "desc"
    startIcon?: JSX.Element
    endIcon?: JSX.Element
    placeholderText?: string
-   additionalConstraints?: QueryConstraint[]
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
+   filterOptions: FilterOptions
 }
+
 const LivestreamSearch: FC<Props> = ({
    value,
    handleChange,
@@ -60,42 +62,18 @@ const LivestreamSearch: FC<Props> = ({
    startIcon,
    endIcon,
    placeholderText,
-   additionalConstraints = [] as QueryConstraint[],
-   // hasPastEvents, TODO: Add this to Algolia filtering
-   includeHiddenEvents,
+   filterOptions,
 }) => {
    const [inputValue, setInputValue] = useState("")
 
-   // When using trigrams in a search, it's necessary to obtain more results because the filtering can only be performed on the client-side.
-   // This ensures that we have some results to display to the user.
-   //
-   // When using trigrams in a search, we require a minimum number of characters in the search input
-   // to ensure that no emptyOrderBy option will be added
-   // TODO: convert this to algolia filtering
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const options = useMemo<UseSearchOptions<LivestreamEvent>>(
-      () => ({
-         maxResults: 7,
-         debounceMs: null,
-         additionalConstraints: [
-            ...additionalConstraints,
-            where("test", "==", false),
-            ...(includeHiddenEvents ? [] : [where("hidden", "==", false)]),
-         ],
-         emptyOrderBy: {
-            field: "start",
-            direction: orderByDirection || "desc",
-         },
-      }),
-      [additionalConstraints, includeHiddenEvents, orderByDirection]
-   )
+   const [open, setOpen] = useState(false)
 
-   const { data } = useLivestreamSearchAlgolia(inputValue)
+   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions, !open)
 
    const renderOption = useCallback(
       (
          props: React.HTMLAttributes<HTMLLIElement>,
-         option: LivestreamHit,
+         option: LivestreamSearchResult,
          state: AutocompleteRenderOptionState
       ) => {
          const highlightTitle = option._highlightResult?.title
@@ -106,7 +84,7 @@ const LivestreamSearch: FC<Props> = ({
                {...props}
                component="li"
                sx={[state.selected && styles.listItemSelected]}
-               key={option.id}
+               key={option.objectID}
             >
                <Grid container alignItems="center">
                   <Grid item width="calc(100% - 44px)" sx={styles.listItemGrid}>
@@ -163,13 +141,17 @@ const LivestreamSearch: FC<Props> = ({
          setInputValue={setInputValue}
          placeholderText={placeholderText}
          inputEndIcon={endIcon}
+         open={open}
+         setOpen={setOpen}
          disableFiltering // Filtering is now done by Algolia, not by the component
       />
    )
 }
 
-const isOptionEqualToValue = (option: LivestreamHit, value: LivestreamHit) =>
-   option.id === value.id
+const isOptionEqualToValue = (
+   option: LivestreamSearchResult,
+   value: LivestreamSearchResult
+) => option.id === value.id
 
-const getOptionLabel = (option: LivestreamHit) => option.title
+const getOptionLabel = (option: LivestreamSearchResult) => option.title
 export default LivestreamSearch

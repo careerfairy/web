@@ -40,6 +40,8 @@ type AutocompleteSearchProps<TOption = unknown> = {
    placeholderText?: string
    minCharacters?: number
    disableFiltering?: boolean
+   open?: boolean
+   setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
@@ -59,6 +61,8 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    inputEndIcon,
    loading,
    disableFiltering,
+   open,
+   setOpen,
 }) => {
    const inputTooSmall = minCharacters && inputValue.length < minCharacters
 
@@ -91,6 +95,9 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
       <Autocomplete
          id={id}
          fullWidth
+         open={open}
+         onOpen={setOpen ? () => setOpen(true) : undefined}
+         onClose={setOpen ? () => setOpen(false) : undefined}
          loading={loading}
          getOptionLabel={getOptionLabel}
          options={searchOptions}
