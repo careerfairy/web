@@ -10,32 +10,6 @@ const LivestreamFormSpeakersStep = () => {
    const {
       values: { speakers },
    } = useLivestreamFormValues()
-   /*
-   const mapCreatorsToSpeakersModel = creators.map((creator, index) => {
-      const matchingSpeaker = speakers.find((speaker) => {
-         const speakerFullName =
-            `${speaker.firstName} ${speaker.lastName}`.replaceAll(" ", "")
-         const creatorFullName =
-            `${creator.firstName} ${creator.lastName}`.replaceAll(" ", "")
-         return speakerFullName === creatorFullName
-      })
-
-      return {
-         id: matchingSpeaker?.id || creator.id,
-         avatar: creator.avatarUrl,
-         background: creator.story,
-         email: creator.email,
-         firstName: creator.firstName,
-         lastName: creator.lastName,
-         position: creator.position,
-         rank: index,
-      }
-   })
-   const options = useMemo(
-      () => [...speakers, ...mapCreatorsToSpeakersModel],
-      []
-      )
-   */
 
    const [currentCreator, setCurrentCreator] = useState(null)
 
@@ -52,7 +26,7 @@ const LivestreamFormSpeakersStep = () => {
             subtitle={"Details about the speakers of the live stream"}
          />
          <SelectSpeakersDropDown
-            fieldId={"speakers"}
+            fieldId={"speakers.values"}
             label={"Speakers of this event"}
             placeholder={"Search, select and create your speakers"}
             values={speakers.values}

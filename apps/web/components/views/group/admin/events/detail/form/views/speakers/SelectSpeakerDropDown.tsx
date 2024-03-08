@@ -9,8 +9,8 @@ import {
    Typography,
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import { LivestreamCreator } from "../questions/commons"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
@@ -67,8 +67,8 @@ type Props = {
    label: string
    placeholder: string
    handleCreateNew: () => void
-   options: Creator[]
-   values?: Creator[]
+   options: LivestreamCreator[]
+   values?: LivestreamCreator[]
 }
 
 const SelectSpeakersDropDown = ({
@@ -98,12 +98,12 @@ const SelectSpeakersDropDown = ({
       [handleCreateNew, options?.length]
    )
 
-   const onChangeHandler = async (_, selectedOptions: Creator[]) => {
+   const onChangeHandler = async (_, selectedOptions: LivestreamCreator[]) => {
       await setFieldValue(fieldId, selectedOptions)
    }
 
    const getOptionElement = useCallback(
-      (speaker: Creator) => (
+      (speaker: LivestreamCreator) => (
          <Stack direction="row" padding="16px" gap="8px" width="100%">
             <CreatorAvatar
                creator={{
@@ -177,11 +177,13 @@ const SelectSpeakersDropDown = ({
    )
 }
 
-const getLabelFn = (value: Creator) => {
+const getLabelFn = (value: LivestreamCreator) => {
    return `${value.firstName} ${value.lastName}`
 }
 
-const isOptionEqualToValue = (option: Creator, value: Creator): boolean =>
-   option.id === value.id
+const isOptionEqualToValue = (
+   option: LivestreamCreator,
+   value: LivestreamCreator
+): boolean => option.id === value.id
 
 export default SelectSpeakersDropDown
