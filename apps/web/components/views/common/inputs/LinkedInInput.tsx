@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material"
 import React, { useCallback } from "react"
 import { useDebounce } from "react-use"
-import { linkedInRegex } from "../../../../constants/forms"
+import { linkedInRegex } from "@careerfairy/shared-lib/constants/forms"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 
@@ -13,7 +13,7 @@ const LinkedInInput = ({
 }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
 
-   const [] = useDebounce(() => handleLinkedInDebounced(linkedInValue), 1000, [
+   useDebounce(() => handleLinkedInDebounced(linkedInValue), 1000, [
       linkedInValue,
    ])
 

@@ -2,14 +2,23 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepos
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import {
+   getDateDifferenceInDays,
+   sortLivestreamsDesc,
+} from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { IGroupFunctionsRepository } from "./GroupFunctionsRepository"
-import { NewsletterEmailBuilder } from "./NewsletterEmailBuilder"
-import { IRecommendationDataFetcher } from "./recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "./recommendation/UserEventRecommendationService"
-import { IUserFunctionsRepository } from "./UserFunctionsRepository"
+import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
+import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
+import { IRecommendationDataFetcher } from "../../recommendation/services/DataFetcherRecommendations"
+import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
+import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
+import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
+import {
+   EmailNotification,
+   EmailNotificationType,
+} from "@careerfairy/shared-lib/notifications/notifications"
 
+const TOLERANCE_DAYS = 2
 /**
  * Data structure used to associate each user with his recommended livestreams
  * and groups he is following
@@ -55,10 +64,63 @@ export class NewsletterService {
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly groupRepo: IGroupFunctionsRepository,
+      private readonly notificationsRepo: IEmailFunctionsNotificationRepository,
       private readonly dataLoader: IRecommendationDataFetcher,
       private readonly emailBuilder: NewsletterEmailBuilder,
       private readonly logger: Logger
    ) {}
+
+   /**
+    * Checks whether a given set of notification types @param types has been sent taking into account the
+    * tolerance days.
+    * @param notifications All notifications (per user expected)
+    * @param types Types to check for
+    * @returns true if any notification in @param notifications is sent according to the tolerance days and types, false otherwise
+    */
+   private isSent(
+      notifications: EmailNotification[],
+      types: EmailNotificationType[]
+   ) {
+      const notificationByType = (notification: EmailNotification) => {
+         const isWithinToleranceDays =
+            getDateDifferenceInDays(
+               notification.createdAt.toDate(),
+               new Date()
+            ) > TOLERANCE_DAYS
+         return (
+            types.includes(notification.details.type) && isWithinToleranceDays
+         )
+      }
+      return Boolean(notifications.find(notificationByType))
+   }
+
+   /**
+    * Filters all the fetched and subscribed users according to the onboarding project. Users now should only
+    * receive the newsletter if the onboarding/guidance step, has reached the livestream step (livestream discovery).
+    * Also it takes into consideration, when livestream discovery notification was sent, introducing a tolerance of 2 days as not
+    * to send close emails to the user.
+    * @param users
+    * @returns UserData[] - Filtered users according to onboarding step and tolerance for the last notification
+    */
+   private async filterUsers(users: UserData[]): Promise<UserData[]> {
+      const promises = users.map(async (user) => {
+         const notifications =
+            await this.notificationsRepo.getUserReceivedNotifications(
+               user.userEmail
+            )
+         return {
+            user: user,
+            notifications: notifications,
+         }
+      })
+      const usersDataItems = await Promise.all(promises)
+      const filteredData = usersDataItems.filter((userData) =>
+         this.isSent(userData.notifications, [
+            "livestream1stRegistrationDiscovery",
+         ])
+      )
+      return filteredData.map((userData) => userData.user)
+   }
 
    /**
     * Fetches the required data for generating the newsletter
@@ -74,9 +136,17 @@ export class NewsletterService {
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
 
-      this.subscribedUsers = convertDocArrayToDict(
+      const filteredUsers = await this.filterUsers(
          subscribedUsers as UserData[]
       )
+      this.subscribedUsers = convertDocArrayToDict(filteredUsers)
+      this.logger.info(
+         "NewsletterService ~ fetchRequiredData ~ subscribedUsers:",
+         Object.keys(this.subscribedUsers).map(
+            (k) => this.subscribedUsers[k].userEmail
+         )
+      )
+
       this.futureLivestreams = futureLivestreams
       this.pastLivestreams = pastLivestreams
 

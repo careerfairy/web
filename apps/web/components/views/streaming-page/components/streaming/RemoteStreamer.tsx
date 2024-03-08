@@ -17,6 +17,7 @@ import { DetailsOverlay } from "./DetailsOverlay"
 import { SpeakingIndicator } from "./SpeakingIndicator"
 import { useUserStream } from "../../context/UserStream"
 import { RemoteUser } from "../../types"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 
 type Props = {
    /**
@@ -55,8 +56,8 @@ export const RemoteStreamer = ({
 }: Props) => {
    const { user, type } = useUserStream<RemoteUser>()
 
-   // console.count(`RemoteStreamer ${user.uid}`)
    const isSpeaking = useAppSelector(userIsSpeakingSelector(user.uid))
+   const streamIsMobile = useStreamIsMobile()
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
 
@@ -69,6 +70,8 @@ export const RemoteStreamer = ({
       "audio"
    )
 
+   const isScreenShare = type === "remote-user-screen"
+
    const isLoading = videoIsLoading || audioIsLoading
 
    playVideo = playVideo ?? user?.hasVideo
@@ -78,10 +81,7 @@ export const RemoteStreamer = ({
       <VideoTrackWrapper {...props}>
          <Box
             component={RemoteVideoTrack}
-            sx={[
-               styles.videoTrack,
-               type === "remote-user-screen" && styles.videoContain,
-            ]}
+            sx={[styles.videoTrack, isScreenShare && styles.videoContain]}
             play={playVideo}
             track={videoTrack}
             className="videoTrack"
@@ -96,10 +96,13 @@ export const RemoteStreamer = ({
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          <SpeakingIndicator isSpeaking={isSpeaking} />
          <FloatingContent>{children}</FloatingContent>
-         <DetailsOverlay
-            micActive={user.hasAudio}
-            streamerDetails={streamerDetails}
-         />
+         {streamIsMobile ? null : (
+            <DetailsOverlay
+               micActive={user.hasAudio}
+               streamerDetails={streamerDetails}
+               showIcons={!isScreenShare}
+            />
+         )}
       </VideoTrackWrapper>
    )
 }

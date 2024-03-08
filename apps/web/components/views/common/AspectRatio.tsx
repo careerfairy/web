@@ -1,7 +1,7 @@
-import Box from "@mui/material/Box"
+import Box, { BoxProps } from "@mui/material/Box"
 import { FC, ReactNode, memo } from "react"
 import { useMeasure } from "react-use"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
@@ -19,6 +19,7 @@ const styles = sxStyles({
 
 type Props = {
    aspectRatio?: `${number}:${number}`
+   childProps?: BoxProps
    children: ReactNode
 }
 
@@ -35,7 +36,7 @@ type Props = {
  *
  * @returns {JSX.Element} A styled Box element containing the children, constrained by the aspect ratio.
  */
-const AspectRatio: FC<Props> = memo(({ aspectRatio, children }) => {
+const AspectRatio: FC<Props> = memo(({ aspectRatio, children, childProps }) => {
    const [ref, { width, height }] = useMeasure()
 
    let adjustedWidth = width
@@ -58,13 +59,15 @@ const AspectRatio: FC<Props> = memo(({ aspectRatio, children }) => {
    return (
       <Box ref={ref} sx={styles.root}>
          <Box
-            sx={[
+            {...childProps}
+            sx={combineStyles([
                styles.child,
                {
                   width: `${adjustedWidth}px`,
                   height: `${adjustedHeight}px`,
                },
-            ]}
+               childProps?.sx,
+            ])}
          >
             {children}
          </Box>

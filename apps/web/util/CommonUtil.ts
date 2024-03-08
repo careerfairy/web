@@ -240,6 +240,16 @@ export const shouldUseEmulators = () => {
    return false
 }
 
+export const getEnvPrefix = () => {
+   if (!shouldUseEmulators()) {
+      return "" // no prefix for production
+   }
+
+   const prefix = process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
+
+   return `_${prefix}`
+}
+
 export const getDictValues = <K extends keyof any, T>(
    valueKeys: K[],
    dict: Record<K, T>

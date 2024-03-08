@@ -42,7 +42,7 @@ const styles = sxStyles({
       },
    },
    lightText: {
-      color: "text.secondary",
+      color: "neutral.500",
    },
 })
 
@@ -79,8 +79,13 @@ const JobHeader: FC<Props> = ({ job, livestreamPresenter }) => {
                {jobName}
             </Typography>
             {jobDepartment ? (
-               <Box sx={styles.lightText} display="flex" alignItems="center" gap="6px">
-                  <Briefcase size={12}/>
+               <Box
+                  sx={styles.lightText}
+                  display="flex"
+                  alignItems="center"
+                  gap="6px"
+               >
+                  <Briefcase size={12} />
                   <Typography sx={styles.jobDepartment}>
                      {jobDepartment}
                   </Typography>

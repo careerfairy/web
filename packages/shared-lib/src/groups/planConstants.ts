@@ -20,8 +20,9 @@ interface SparksPlanConstants {
    TRIAL_CREATION_PERIOD_MILLISECONDS?: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface JobsPlanConstants {
-   // Empty for now
+   // Empty for now - wgoncalves - disabled eslint for now
 }
 
 export type PlanConstants = {
@@ -45,7 +46,7 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    },
    tier1: {
       sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 3,
+         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 15,
          MAX_SPARK_CREATOR_COUNT: 200, // No limit

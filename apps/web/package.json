@@ -19,6 +19,7 @@
       "build-storybook": "storybook build"
    },
    "dependencies": {
+      "@algolia/client-search": "^4.22.1",
       "@careerfairy/config-mui": "*",
       "@careerfairy/shared-lib": "*",
       "@careerfairy/shared-ui": "*",
@@ -39,7 +40,7 @@
       "agora-rtc-react": "^2.1.0",
       "agora-rtc-sdk-ng": "^4.18.0",
       "agora-rtm-sdk": "^1.6.0-205",
-      "algoliasearch": "^4.13.0",
+      "algoliasearch": "^4.22.1",
       "apexcharts": "^3.41.0",
       "autosuggest-highlight": "^3.1.1",
       "axios": "^0.27.2",

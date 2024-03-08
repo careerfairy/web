@@ -1,7 +1,15 @@
 import { sxStyles } from "types/commonTypes"
-import { Box } from "@mui/material"
+import { Stack } from "@mui/material"
 import React from "react"
-import { GalleryLayout } from "./GalleryLayout"
+import { Gallery } from "./gallery/Gallery"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
+import { useStreams } from "./useStreams"
+import { useSpotlightStream } from "./useSpotlightStream"
+import { Spotlight } from "./Spotlight/Spotlight"
+import { TrackBoundary } from "agora-rtc-react"
 
 const styles = sxStyles({
    root: {
@@ -11,9 +19,24 @@ const styles = sxStyles({
 })
 
 export const StreamingGrid = () => {
+   const isLandscape = useStreamIsLandscape()
+   const isMobile = useStreamIsMobile()
+
+   const streams = useStreams()
+   const { spotlightStream, otherStreams } = useSpotlightStream(streams)
+
+   const spacing = isLandscape ? 0.75 : isMobile ? 1.125 : 1.25
+
    return (
-      <Box sx={styles.root}>
-         <GalleryLayout />
-      </Box>
+      <TrackBoundary>
+         <Stack
+            direction={isLandscape ? "row-reverse" : "column"}
+            sx={styles.root}
+            spacing={spacing}
+         >
+            <Gallery spacing={spacing} streams={otherStreams} />
+            <Spotlight stream={spotlightStream} />
+         </Stack>
+      </TrackBoundary>
    )
 }

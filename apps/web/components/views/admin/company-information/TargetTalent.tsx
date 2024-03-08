@@ -18,7 +18,7 @@ import {
 } from "components/custom-hook/useCollection"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
-import { CompanyCountryValues } from "constants/forms"
+import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"

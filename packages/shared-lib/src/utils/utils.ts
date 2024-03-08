@@ -77,8 +77,8 @@ export const shuffle = <T>(array: T[]) => {
  * @param reverse ascending ordering
  */
 export const sortLivestreamsDesc = (
-   a: LivestreamEvent,
-   b: LivestreamEvent,
+   a: Pick<LivestreamEvent, "start">,
+   b: Pick<LivestreamEvent, "start">,
    reverse = false
 ): number => {
    const aa = reverse ? b : a
@@ -225,7 +225,7 @@ export const arrayContainsAny = <Type>(
  * Remove duplicates values
  * @param arr
  */
-export const removeDuplicates = (arr: string[]) => {
+export const removeDuplicates = <T>(arr: T[]): T[] => {
    return Array.from(new Set(arr))
 }
 
@@ -315,4 +315,13 @@ export const swapPositions = <T>(
    array[indexA] = array[indexB]
    array[indexB] = temp
    return array
+}
+// Calculate difference between two dates in days while taking into consideration the time
+export const getDateDifferenceInDays = (
+   dateFrom: Date,
+   dateTo: Date
+): number => {
+   const diff = Math.abs(dateFrom.getTime() - dateTo.getTime())
+   const diffDays = Math.ceil(diff / (1000 * 3600 * 24))
+   return diffDays
 }

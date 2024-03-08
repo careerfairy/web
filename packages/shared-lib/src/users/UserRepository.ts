@@ -46,7 +46,7 @@ export interface IUserRepository {
 
    getUserDataById(id: string): Promise<UserData>
 
-   getUsersDataByUids(uids: string[]): Promise<UserData[]>
+   getUsersDataByUuids(uuids: string[]): Promise<UserData[]>
 
    getUsersByEmail(
       arrayOfEmails: string[],
@@ -127,6 +127,7 @@ export interface IUserRepository {
       hasRegistered: boolean
    ): Promise<void>
 
+   getUserStats(userEmail: string): Promise<UserStats>
    getCompaniesUserFollowsQuery(
       userEmail: string,
       limit: number
@@ -201,7 +202,7 @@ export class FirebaseUserRepository
    }
 
    async getStats(userEmail: string): Promise<UserStats | null> {
-      let snap = await this.firestore
+      const snap = await this.firestore
          .collection("userData")
          .doc(userEmail)
          .collection("stats")
@@ -215,11 +216,7 @@ export class FirebaseUserRepository
       return snap.data() as UserStats
    }
 
-   async incrementStat(
-      userDataId: string,
-      field: keyof UserStats,
-      amount: number = 1
-   ) {
+   async incrementStat(userDataId: string, field: keyof UserStats, amount = 1) {
       const docRef = this.firestore
          .collection("userData")
          .doc(userDataId)
@@ -256,7 +253,7 @@ export class FirebaseUserRepository
    }
 
    async getByReferralCode(referralCode: string): Promise<UserData | null> {
-      let snap = await this.firestore
+      const snap = await this.firestore
          .collection("userData")
          .where("referralCode", "==", referralCode)
          .limit(1)
@@ -279,6 +276,7 @@ export class FirebaseUserRepository
          collection: "userActivity",
          userId: user.id,
          type,
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          date: this.fieldValue.serverTimestamp() as any,
          user,
       }
@@ -302,6 +300,7 @@ export class FirebaseUserRepository
 
    updateLastActivity(userId: string): Promise<void> {
       const toUpdate: Pick<UserData, "lastActivityAt"> = {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          lastActivityAt: this.fieldValue.serverTimestamp() as any,
       }
 
@@ -312,7 +311,7 @@ export class FirebaseUserRepository
    }
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
-      let userRef = this.firestore.collection("userData").doc(userEmail)
+      const userRef = this.firestore.collection("userData").doc(userEmail)
 
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
@@ -417,9 +416,9 @@ export class FirebaseUserRepository
       return this.addIdToDoc<UserData>(snap)
    }
 
-   async getUsersDataByUids(uids: string[]): Promise<UserData[]> {
+   async getUsersDataByUuids(uuids: string[]): Promise<UserData[]> {
       const users = await Promise.all(
-         uids.map((uid) => this.getUserDataByUid(uid))
+         uuids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
    }
@@ -429,10 +428,8 @@ export class FirebaseUserRepository
       options = { withEmpty: false }
    ): Promise<UserData[]> {
       let totalUsers = []
-      let i,
-         j,
-         tempArray,
-         chunk = 800
+      let i, j, tempArray
+      const chunk = 800
       for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
          tempArray = arrayOfEmails.slice(i, i + chunk)
          const userSnaps = await Promise.all(
@@ -741,6 +738,15 @@ export class FirebaseUserRepository
          },
          { merge: true }
       )
+   }
+   getUserStats(userEmail: string): Promise<UserStats> {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("stats")
+         .doc("stats")
+
+      return docRef.get().then((value) => value.data() as unknown as UserStats)
    }
 
    getCompaniesUserFollowsQuery(

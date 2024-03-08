@@ -128,10 +128,19 @@ export interface LivestreamEvent extends Identifiable {
    targetLevelsOfStudy?: LevelOfStudy[]
 
    lastUpdated?: firebase.firestore.Timestamp
+
    /**
     * The speakers that are displayed on the upcoming-livestream landing page of the event
     */
    speakers?: Speaker[]
+
+   /**
+    * The creators' identifiers of the speakers.
+    * This is used for data relationship and syncing purposes.
+    * Relates with creators in careerCenterData/creator sub collection.
+    */
+   creatorsIds?: Speaker["id"][]
+
    /**
     * The actual details of the speakers in the livestream
     */
@@ -250,6 +259,7 @@ export interface LivestreamJobAssociation {
    integrationId: string
    jobId: string
    name: string
+   description?: string
 }
 
 export type LivestreamCustomJobAssociationPresenter = Omit<

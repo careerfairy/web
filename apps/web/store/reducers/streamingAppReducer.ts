@@ -14,6 +14,21 @@ export const ActiveViews = {
    HAND_RAISE: "handRaise",
 } as const
 
+export const StreamLayouts = {
+   /**
+    * Represents a layout where the focus is on a specific content or person, such as when a desktop is being shared,
+    * a video is played, or a presentation is being shown.
+    */
+   SPOTLIGHT: "spotlight",
+   /**
+    * Represents a layout where multiple participants' streams are displayed equally, typically in a grid format.
+    * This is the default view when no specific content is being highlighted.
+    */
+   GALLERY: "gallery",
+} as const
+
+export type StreamLayout = (typeof StreamLayouts)[keyof typeof StreamLayouts]
+
 export type ActiveView = (typeof ActiveViews)[keyof typeof ActiveViews]
 
 export interface StreamingAppState {
@@ -22,6 +37,7 @@ export interface StreamingAppState {
       activeView: ActiveView
    }
    isHost: boolean
+   streamLayout: StreamLayout
    topBar: {
       viewCount: number
    }
@@ -50,6 +66,7 @@ const initialState: StreamingAppState = {
       activeView: ActiveViews.CHAT, // 'chat', 'polls', 'questions', etc.
    },
    isHost: false,
+   streamLayout: StreamLayouts.GALLERY,
    topBar: {
       viewCount: 0, // hardcoded number for now
    },
@@ -120,6 +137,18 @@ const streamingAppSlice = createSlice({
       },
       setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
          state.livestreamState.mode = action.payload
+
+         const shouldBeSpotlight = [
+            LivestreamModes.DESKTOP,
+            LivestreamModes.VIDEO,
+            LivestreamModes.PRESENTATION,
+         ].some((mode) => mode === action.payload)
+
+         if (shouldBeSpotlight) {
+            state.streamLayout = StreamLayouts.SPOTLIGHT
+         } else {
+            state.streamLayout = StreamLayouts.GALLERY
+         }
       },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload

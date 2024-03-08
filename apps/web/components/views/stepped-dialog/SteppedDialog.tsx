@@ -370,6 +370,7 @@ type SteppedDialogContainerProps = BoxProps & {
    hideCloseButton?: boolean
    withActions?: boolean
    containerSx?: SxProps<Theme>
+   handleCloseIconClick?: () => void
 }
 
 const Container: FC<SteppedDialogContainerProps> = ({
@@ -379,8 +380,11 @@ const Container: FC<SteppedDialogContainerProps> = ({
    children,
    containerSx,
    withActions,
+   handleCloseIconClick,
 }) => {
    const stepper = useStepper()
+
+   const handleClose = handleCloseIconClick || stepper.handleClose
 
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
@@ -401,7 +405,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
             {children}
             {hideCloseButton ? null : (
                <Box sx={styles.closeBtn}>
-                  <IconButton onClick={stepper.handleClose}>
+                  <IconButton onClick={handleClose}>
                      <CloseIcon />
                   </IconButton>
                </Box>
@@ -412,7 +416,7 @@ const Container: FC<SteppedDialogContainerProps> = ({
    )
 }
 
-type ContentProps = BoxProps<"span"> & {}
+type ContentProps = BoxProps<"span"> & object
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
    return (

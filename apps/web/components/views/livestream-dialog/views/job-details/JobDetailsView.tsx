@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
@@ -30,37 +30,39 @@ import useRecordingAccess from "components/views/upcoming-livestream/HeroSection
 import { sxStyles } from "types/commonTypes"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import DateUtil from "util/DateUtil"
+import { useSelector } from "react-redux"
+import { AutomaticActions } from "store/reducers/sparksFeedReducer"
+import { autoAction } from "store/selectors/sparksFeedSelectors"
 
 const styles = sxStyles({
    btnGrid: {
-      justifyContent: {xs: "center", sm: "flex-end"},
+      justifyContent: { xs: "center", sm: "flex-end" },
       gap: "10px",
-      flexDirection: {xs: "column", sm: "row"},
+      flexDirection: { xs: "column", sm: "row" },
       alignItems: "center",
    },
    btnGridPrimary: {
-      order: { xs: 1, sm: 2 }
+      order: { xs: 1, sm: 2 },
    },
    btnGridSecondary: {
-      order: { xs: 2, sm: 1 }
+      order: { xs: 2, sm: 1 },
    },
    livestreamCopy: {
       fontWeight: 700,
    },
    livestreamDateCopy: {
-      fontWeight: 500
+      fontWeight: 500,
    },
    copyStackContainer: {
-      gap: "12px"
+      gap: "12px",
    },
    copyContainer: {
       display: "flex",
       alignItems: "center",
    },
    heroContent: {
-      padding: "10%"
-   } 
-
+      padding: "10%",
+   },
 })
 
 type Props = {
@@ -88,12 +90,13 @@ const JobDetailsView: FC = (props) => {
 }
 
 const JobDetails: FC<Props> = ({ jobId }) => {
-   const { userData } = useAuth()
-
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
    const customJob = useCustomJob(jobId)
-   const [isLiveStreamButtonDisabled, setIsLiveStreamButtonDisabled] = useState(false);
+   const [isLiveStreamButtonDisabled, setIsLiveStreamButtonDisabled] =
+      useState(false)
+   const autoActionType = useSelector(autoAction)
+   const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    let job: Job | PublicCustomJob
 
@@ -106,6 +109,12 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    }
 
    const isAtsJob = useIsAtsJob(job)
+
+   useEffect(() => {
+      if (job && isAutoApply){
+         handleOpen()
+      }
+   }, [isAutoApply, handleOpen, job])
 
    if (!job) {
       return (
@@ -129,29 +138,30 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                noMinHeight
                sx={styles.heroContent}
             >
-               <Box sx={styles.copyContainer} >
+               <Box sx={styles.copyContainer}>
                   <Stack sx={styles.copyStackContainer}>
                      <Typography
                         align="center"
                         variant={"h4"}
                         sx={styles.livestreamCopy}
                      >
-                        {livestreamPresenter.isPast() ? 
-                           "Ace your application: watch the stream recording and gain exclusive insights" :
-                           "Ace your application: discover exclusive insights in the live stream"
-                        }
+                        {livestreamPresenter.isPast()
+                           ? "Ace your application: watch the stream recording and gain exclusive insights"
+                           : "Ace your application: discover exclusive insights in the live stream"}
                      </Typography>
                      <Typography
                         align="center"
                         variant={"body1"}
                         sx={styles.livestreamDateCopy}
                      >
-                        {livestreamPresenter.isPast() ?
-                           `Live streamed on: ${DateUtil.getJobApplicationDate(livestreamPresenter.start)}` :
-                           `${DateUtil.formatLiveDate(livestreamPresenter.start)}`
-                        }
+                        {livestreamPresenter.isPast()
+                           ? `Live streamed on: ${DateUtil.getJobApplicationDate(
+                                livestreamPresenter.start
+                             )}`
+                           : `${DateUtil.formatLiveDate(
+                                livestreamPresenter.start
+                             )}`}
                      </Typography>
-
                   </Stack>
                </Box>
             </HeroContent>
@@ -166,31 +176,46 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
                   <JobDescription job={job} />
 
-                  {isOpen && !isAtsJob && userData?.id ? (
+                  {isOpen && !isAtsJob ? (
                      <CustomJobApplyConfirmation
                         handleClose={handleClose}
                         job={job as PublicCustomJob}
                         livestreamId={livestream.id}
+                        autoApply={isAutoApply}
                      />
                   ) : null}
                </Stack>
             </MainContent>
          }
          fixedBottomContent={
-            <Grid container sx={styles.btnGrid} >
-                  <Grid item sx={isLiveStreamButtonDisabled ? styles.btnGridSecondary : styles.btnGridPrimary}>
-                     <LiveStreamButton
-                        setIsDisabled={setIsLiveStreamButtonDisabled}
-                     />
-                  </Grid>
-                  <Grid item sx={isLiveStreamButtonDisabled ? styles.btnGridPrimary : styles.btnGridSecondary}>
-                     <JobButton
-                        job={job as Job}
-                        livestreamPresenter={livestreamPresenter}
-                        isSecondary={!isLiveStreamButtonDisabled}
-                        handleOpen={handleOpen}
-                     />
-                  </Grid>
+            <Grid container sx={styles.btnGrid}>
+               <Grid
+                  item
+                  sx={
+                     isLiveStreamButtonDisabled
+                        ? styles.btnGridSecondary
+                        : styles.btnGridPrimary
+                  }
+               >
+                  <LiveStreamButton
+                     setIsDisabled={setIsLiveStreamButtonDisabled}
+                  />
+               </Grid>
+               <Grid
+                  item
+                  sx={
+                     isLiveStreamButtonDisabled
+                        ? styles.btnGridPrimary
+                        : styles.btnGridSecondary
+                  }
+               >
+                  <JobButton
+                     job={job as Job}
+                     livestreamPresenter={livestreamPresenter}
+                     isSecondary={!isLiveStreamButtonDisabled}
+                     handleOpen={handleOpen}
+                  />
+               </Grid>
             </Grid>
          }
       />
@@ -204,20 +229,26 @@ type JobButtonProps = {
    handleOpen: () => void
 }
 
-const JobButton: FC<JobButtonProps> = ({ job, livestreamPresenter, isSecondary, handleOpen }) => {
+const JobButton: FC<JobButtonProps> = ({
+   job,
+   livestreamPresenter,
+   isSecondary,
+   handleOpen,
+}) => {
    const isAtsJob = useIsAtsJob(job)
    const { isLoggedOut } = useAuth()
 
    return (
       <>
-         {isAtsJob ? 
-             !isLoggedOut && (
+         {isAtsJob ? (
+            !isLoggedOut && (
                <JobCTAButton
                   livestreamPresenter={livestreamPresenter}
                   job={job as Job}
                   isSecondary={isSecondary}
                />
-            ) : (
+            )
+         ) : (
             <CustomJobCTAButton
                livestreamId={livestreamPresenter.id}
                job={job as PublicCustomJob}
@@ -236,7 +267,8 @@ type LiveStreamButtonProps = {
 const LiveStreamButton: FC<LiveStreamButtonProps> = ({ setIsDisabled }) => {
    const { authenticatedUser } = useAuth()
    const { handleRegisterClick } = useRegistrationHandler()
-   const { livestreamPresenter , serverUserEmail, updatedStats } = useLiveStreamDialog()
+   const { livestreamPresenter, serverUserEmail, updatedStats } =
+      useLiveStreamDialog()
    const { showRecording } = useRecordingAccess(
       authenticatedUser.email || serverUserEmail,
       livestreamPresenter,

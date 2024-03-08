@@ -35,6 +35,21 @@ export interface SerializedSpark
    group: SerializedPublicGroup
 }
 
+export enum SparkCardNotificationTypes {
+   /**
+    * Notification to convert logged out users
+    */
+   CONVERSION = "conversion",
+   /**
+    * Default notification to be displayed at the end of group content
+    */
+   GROUP = "group",
+   /**
+    * Notification to be displayed at the end of group content if the company does have any upcoming live stream
+    */
+   EVENT = "event",
+}
+
 /**
  * `SparkPresenter` bridges Firestore's `Spark` document and client-side needs.
  * It handles data conversions, offers utility methods for specific Spark operations,
@@ -62,7 +77,8 @@ export class SparkPresenter implements SparkPresenterInterface {
    video: SparkVideo
 
    // Additional properties can be added here as the Spark structure evolves
-   isCardNotification: boolean
+   isCardNotification?: boolean
+   cardNotificationType?: SparkCardNotificationTypes
 
    // The SparkPresenter constructor
    constructor(data: Partial<SparkPresenter>) {

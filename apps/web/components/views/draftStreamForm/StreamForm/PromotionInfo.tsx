@@ -5,7 +5,7 @@ import MultiListSelect from "../../common/MultiListSelect"
 import {
    channelOptionCodes,
    countriesOptionCodes,
-} from "../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    multiListSelectMapIdValueFn,
    multiListSelectMapValueFn,
@@ -22,8 +22,8 @@ type Props = {
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
    setFieldValue: (field, value) => void
-   classes: any
-   sectionRef: MutableRefObject<any>
+   classes: Record<string, string>
+   sectionRef: MutableRefObject<HTMLDivElement>
    isPastStream?: boolean
 }
 

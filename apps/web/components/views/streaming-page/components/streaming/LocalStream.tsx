@@ -4,7 +4,7 @@ import {
    ILocalVideoTrack,
    ILocalAudioTrack,
 } from "agora-rtc-react"
-import type { ReactNode } from "react"
+import { type ReactNode } from "react"
 
 import { Box, BoxProps } from "@mui/material"
 import { useLocalTracks } from "../../context"
@@ -105,12 +105,12 @@ export const LocalUserStream = (props: LocalMicrophoneAndCameraUserProps) => {
    )
 }
 
-export const LocalScreenStream = (props: LocalMicrophoneAndCameraUserProps) => {
+export const LocalScreenStream = () => {
    const { screenVideoTrack, screenAudioTrack, isLoadingScreenShare } =
       useScreenShare()
+
    return (
       <LocalStream
-         {...props}
          localCameraTrack={screenVideoTrack}
          localMicrophoneTrack={screenAudioTrack}
          cameraOn={Boolean(screenVideoTrack)}
@@ -143,6 +143,8 @@ export const LocalStream = ({
 
    const { data: streamerDetails } = useStreamerDetails(user.uid)
 
+   const isScreenShare = type === "local-user-screen"
+
    playVideo = playVideo ?? Boolean(cameraOn)
    playAudio = playAudio ?? Boolean(micOn)
 
@@ -153,7 +155,7 @@ export const LocalStream = ({
          <Box
             sx={[
                styles.videoTrack,
-               type === "local-user-screen" && styles.videoContain,
+               isScreenShare && styles.videoContain,
                containVideo && styles.videoContain,
             ]}
             className="videoTrack"
@@ -176,10 +178,11 @@ export const LocalStream = ({
          )}
 
          <FloatingContent>{children}</FloatingContent>
-         {hideDetails ? null : (
+         {hideDetails || isScreenShare ? null : (
             <DetailsOverlay
                micActive={micActive}
                streamerDetails={streamerDetails}
+               showIcons={!isScreenShare}
             />
          )}
       </VideoTrackWrapper>
