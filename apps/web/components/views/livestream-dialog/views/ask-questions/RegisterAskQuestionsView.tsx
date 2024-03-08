@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -15,7 +15,7 @@ import * as Yup from "yup"
 import {
    maxQuestionLength,
    minQuestionLength,
-} from "../../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { QuestionsComponent } from "../livestream-details/main-content/Questions"
 import Button from "@mui/material/Button"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
@@ -81,9 +81,7 @@ const styles = sxStyles({
    },
 })
 
-type Props = {}
-
-const RegisterAskQuestionsView: FC<Props> = (props) => {
+const RegisterAskQuestionsView = () => {
    const { livestream, goToView } = useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
    const { createLivestreamQuestion } = useFirebaseService()
@@ -180,12 +178,12 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                               rows={2}
                               multiline
                               placeholder="Write your question"
-                              error={errors.question && touched.question}
+                              error={errors.question ? touched.question : null}
                            />
                            <Typography sx={styles.errorText}>
-                              {errors.question &&
-                                 touched.question &&
-                                 errors.question}
+                              {errors.question && touched.question
+                                 ? errors.question
+                                 : null}
                            </Typography>
                            <LoadingButton
                               sx={styles.btn}

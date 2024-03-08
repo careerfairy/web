@@ -46,8 +46,10 @@ const PaginatedFeedbacks: FC = () => {
 
    return (
       <Stack spacing={3} justifyContent="space-between" sx={styles.root}>
-         <Grid container spacing={3}>
-            <Feedbacks loading={results.loading} stats={results.data} />
+         <Grid container>
+            <Grid container spacing={3}>
+               <Feedbacks loading={results.loading} stats={results.data} />
+            </Grid>
          </Grid>
          <StyledPagination
             count={results.nextDisabled ? results.page : results.page + 1}

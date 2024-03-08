@@ -2,10 +2,11 @@ import React, { FC, useCallback, useMemo } from "react"
 import Autocomplete, {
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete"
-import { InputAdornment } from "@mui/material"
+import { InputAdornment, styled } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import { StyledTextField } from "../group/admin/common/inputs"
 import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
+import { Paper } from "@mui/material"
 
 const styles = sxStyles({
    listBox: {
@@ -15,6 +16,12 @@ const styles = sxStyles({
             backgroundColor: (theme) =>
                theme.palette.action.hover + " !important",
          },
+      },
+   },
+   input: {
+      fontSize: "1.1428571429rem",
+      "& .MuiInputBase-input::placeholder": {
+         color: "black",
       },
    },
 })
@@ -43,6 +50,17 @@ type AutocompleteSearchProps<TOption = unknown> = {
    open?: boolean
    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
+
+const StyledPaper = styled(Paper)({
+   borderRadius: "8px",
+   boxShadow: "0px 0px 12px 0px rgba(20, 20, 20, 0.08)",
+})
+
+const StyledListbox = styled("ul")(({ theme }) => ({
+   "& > li:not(:last-child)": {
+      borderBottom: `1px solid ${theme.brand.black[300]}`,
+   },
+}))
 
 const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    id,
@@ -107,6 +125,8 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          blurOnSelect
          includeInputInList
          clearOnBlur
+         PaperComponent={StyledPaper}
+         ListboxComponent={StyledListbox}
          ListboxProps={listBoxProps}
          value={value}
          isOptionEqualToValue={isOptionEqualToValue}
@@ -136,6 +156,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                         </InputAdornment>
                      ),
                   }),
+                  sx: styles.input,
                }}
                placeholder={placeholderText}
                fullWidth

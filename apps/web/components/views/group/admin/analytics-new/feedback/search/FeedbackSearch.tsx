@@ -81,6 +81,7 @@ const FeedbackSearch: FC = () => {
                orderByDirection={SORT_DIRECTIONS[sortDirection]}
                handleChange={handleChange}
                value={null}
+               placeholderText="Search by title"
                startIcon={<FindIcon color={"black"} />}
                filterOptions={{
                   arrayFilters: {
