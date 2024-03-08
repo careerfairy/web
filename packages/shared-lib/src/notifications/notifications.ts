@@ -7,11 +7,13 @@ export type EmailNotificationType =
    | "livestream1stRegistrationDiscovery"
    | "recordingDiscovery"
    | "feedbackDiscovery"
+   | "endOfSparksTrial"
 
 export type EmailNotificationDetails = {
    receiverEmail: string
    sentBy: string
    type: EmailNotificationType
+   groupId?: string
 }
 
 export type EmailNotification = {
