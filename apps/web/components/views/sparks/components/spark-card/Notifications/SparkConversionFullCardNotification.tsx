@@ -14,11 +14,11 @@ import Image from "next/image"
 
 const styles = sxStyles({
    header: {
-      mt: 9,
+      mt: { xs: "8%", lg: "13%" },
       textAlign: "center",
 
-      "@media (max-height: 860px)": {
-         mt: 6,
+      "@media (max-height: 840px)": {
+         mt: { xs: "10%", lg: "8%" },
       },
    },
    title: {
@@ -28,18 +28,18 @@ const styles = sxStyles({
       cursor: "default",
 
       "@media (max-height: 840px)": {
-         fontSize: "32px !important",
-         lineHeight: "34px",
+         fontSize: { xs: "42px !important", lg: "48px !important" },
+         lineHeight: { xs: "44px", lg: "50px !important" },
       },
    },
    content: {
       display: "flex",
       flexDirection: "column",
       mx: 5,
-      mt: { xs: "100px", md: "42px" },
+      mt: { xs: "10%", md: "42px" },
 
       "@media (max-height: 840px)": {
-         mt: { xs: "62px", md: "62px" },
+         mt: { xs: "8%", md: "8%" },
       },
    },
    infoCard: {
@@ -50,10 +50,7 @@ const styles = sxStyles({
       alignItems: "center",
       px: 2,
 
-      "@media (max-height: 700px)": {
-         height: { md: "unset" },
-      },
-      "@media (max-height: 630px)": {
+      "@media (max-height: 720px)": {
          height: "unset",
       },
    },
@@ -63,7 +60,7 @@ const styles = sxStyles({
       "& svg": {
          color: (theme) => theme.palette.primary.main,
 
-         "@media (max-height: 700px)": {
+         "@media (max-height: 720px)": {
             height: { md: "32px" },
             width: { md: "32px" },
          },
@@ -77,7 +74,7 @@ const styles = sxStyles({
    infoText: {
       cursor: "default",
 
-      "@media (max-height: 700px)": {
+      "@media (max-height: 720px)": {
          fontSize: "16px !important",
       },
    },
@@ -90,13 +87,14 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
 
-      "@media (max-height: 750px)": {
+      "@media (max-height: 840px)": {
          position: { md: "unset" },
-         mt: 6,
+         mt: { md: "10%" },
       },
 
-      "@media (max-height: 580px)": {
+      "@media (max-height: 650px)": {
          position: "unset",
+         mt: "10%",
       },
    },
    shadow: {
