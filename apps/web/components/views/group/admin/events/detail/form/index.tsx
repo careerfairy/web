@@ -3,7 +3,7 @@ import {
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Interest } from "@careerfairy/shared-lib/interests"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
 import { Form, Formik } from "formik"
@@ -24,6 +24,8 @@ import LivestreamFormJobsStep from "./views/jobs"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { CircularProgress, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    root: {
@@ -51,7 +53,8 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
 }
 
 const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
-   speakers: [],
+   values: [],
+   options: [],
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
@@ -75,12 +78,50 @@ type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
    existingInterests: Interest[]
    customJobs: PublicCustomJob[]
+   creators: Creator[]
+}
+
+function mapSpeakerToCreator(speaker: Speaker): Creator {
+   return {
+      id: null,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName,
+      lastName: speaker.lastName,
+      position: speaker.position,
+      email: speaker.email,
+      avatarUrl: speaker.avatar,
+      createdAt: null, // Assuming current date or derive from context
+      updatedAt: null, // Assuming current date or derive from context
+      linkedInUrl: null,
+      story: speaker.background,
+      roles: ["Speaker"], // Assuming role based on conversion
+   }
+}
+
+function unionCreatorsAndSpeakers(
+   creators: Creator[],
+   speakers: Speaker[]
+): Creator[] {
+   const mergedArray = [...creators, ...speakers.map(mapSpeakerToCreator)]
+
+   const uniqueMap = new Map<string, Creator>()
+
+   mergedArray.forEach((item) => {
+      const key = item.id || item.email // Use id as key if available, otherwise email
+      if (!uniqueMap.has(key)) {
+         uniqueMap.set(key, item)
+      }
+   })
+
+   return Array.from(uniqueMap.values())
 }
 
 const convertLivestreamObjectToForm = ({
    livestream,
    existingInterests,
    customJobs,
+   creators,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
@@ -112,9 +153,14 @@ const convertLivestreamObjectToForm = ({
       ? [livestream.reasonsToJoinLivestream, undefined, undefined]
       : livestream.reasonsToJoinLivestream_v2
 
+   const speakers = {
+      values: livestream.speakers.map(mapSpeakerToCreator),
+      options: unionCreatorsAndSpeakers(creators, livestream.speakers),
+   }
+
    return {
       general: general,
-      speakers: valuesReducer(formSpeakersTabInitialValues),
+      speakers: speakers,
       questions: valuesReducer(formQuestionsTabInitialValues),
       jobs: {
          jobs: livestream.jobs,
@@ -138,12 +184,14 @@ const LivestreamCreationForm: FC<Props> = ({
    const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
       livestreamId: livestream?.id,
    })
+   const { data: creators } = useGroupCreators(groupId)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
            existingInterests,
            customJobs: initialSelectedCustomJobs,
+           creators,
         })
       : formInitialValues
 
