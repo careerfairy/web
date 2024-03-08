@@ -12,7 +12,15 @@ const styles = sxStyles({
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: "770px !important",
-      overflowY: "auto",
+      overflowY: "hidden",
+      top: {
+         xs: "70px",
+         md: 0,
+      },
+      borderRadius: {
+         xs: "20px",
+         md: "20px",
+      },
    },
 })
 
