@@ -1,11 +1,16 @@
 import { LivestreamEvent } from "./livestreams"
 
+/**
+ * When adding new fields to this type, make sure to add them to the
+ * LIVESTREAM_FIELDS_TO_INDEX array.
+ */
 export type TransformedLivestreamEvent = LivestreamEvent & {
    levelOfStudyNameTags: string[]
    fieldOfStudyNameTags: string[]
    levelOfStudyIdTags: string[]
    fieldOfStudyIdTags: string[]
    languageCode: string
+   companyIndustryNameTags: string[]
    /* The start time of the event in milliseconds */
    startTimeMs: number
 }
@@ -75,6 +80,7 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "fieldOfStudyNameTags",
    "levelOfStudyNameTags",
    "startTimeMs",
+   "companyIndustryNameTags",
 ] satisfies (keyof TransformedLivestreamEvent)[]
 
 export type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
@@ -87,7 +93,7 @@ export type FieldToIndexType = (typeof LIVESTREAM_FIELDS_TO_INDEX)[number]
 export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
    "title",
    "company",
-   "companyIndustries",
+   "companyIndustryNameTags",
 ] satisfies FieldToIndexType[]
 
 /**

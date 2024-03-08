@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useMemo, useState } from "react"
-import { Box, Grid, Typography } from "@mui/material"
+import React, { FC, useMemo, useState } from "react"
+import { Box, Grid, Stack, Typography } from "@mui/material"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
@@ -12,6 +12,7 @@ import {
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { LivestreamSearchResult } from "types/algolia"
 import SanitizedHTML from "components/util/SanitizedHTML"
+import { Tag } from "react-feather"
 
 const styles = sxStyles({
    root: {
@@ -30,10 +31,14 @@ const styles = sxStyles({
    listItemGrid: {
       width: "calc(100% - 44px)",
       wordWrap: "break-word",
+      color: "neutral.700",
       "& em": {
          fontStyle: "normal",
          fontWeight: 600,
       },
+   },
+   listItem: {
+      padding: "12px !important",
    },
    listItemSelected: {
       backgroundColor: "white !important",
@@ -49,10 +54,10 @@ type Props = {
    orderByDirection?: "asc" | "desc"
    startIcon?: JSX.Element
    endIcon?: JSX.Element
-   placeholderText?: string
    hasPastEvents?: boolean
    includeHiddenEvents?: boolean
    filterOptions: FilterOptions
+   placeholderText?: string
 }
 
 const LivestreamSearch: FC<Props> = ({
@@ -61,56 +66,14 @@ const LivestreamSearch: FC<Props> = ({
    orderByDirection,
    startIcon,
    endIcon,
-   placeholderText,
    filterOptions,
+   placeholderText = "Search by title, company or industry",
 }) => {
    const [inputValue, setInputValue] = useState("")
 
    const [open, setOpen] = useState(false)
 
    const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions, !open)
-
-   const renderOption = useCallback(
-      (
-         props: React.HTMLAttributes<HTMLLIElement>,
-         option: LivestreamSearchResult,
-         state: AutocompleteRenderOptionState
-      ) => {
-         const highlightTitle = option._highlightResult?.title
-         const highlightCompany = option._highlightResult?.company
-
-         return (
-            <Box
-               {...props}
-               component="li"
-               sx={[state.selected && styles.listItemSelected]}
-               key={option.objectID}
-            >
-               <Grid container alignItems="center">
-                  <Grid item width="calc(100% - 44px)" sx={styles.listItemGrid}>
-                     <SanitizedHTML
-                        htmlString={highlightCompany?.value || option.company}
-                     />
-                     <Typography variant="body2" color="text.secondary">
-                        <SanitizedHTML
-                           htmlString={highlightTitle?.value || option.title}
-                        />
-                     </Typography>
-                     <Typography variant="body2" color="text.secondary">
-                        {prettyDate(option.start)}
-                     </Typography>
-                  </Grid>
-                  <Grid item>
-                     {state.selected ? (
-                        <CheckRoundedIcon fontSize="small" />
-                     ) : null}
-                  </Grid>
-               </Grid>
-            </Box>
-         )
-      },
-      []
-   )
 
    const sortedLivestreamHits = useMemo(() => {
       const sortedHits: LivestreamSearchResult[] = data?.deserializedHits || []
@@ -145,6 +108,67 @@ const LivestreamSearch: FC<Props> = ({
          setOpen={setOpen}
          disableFiltering // Filtering is now done by Algolia, not by the component
       />
+   )
+}
+
+const renderOption = (
+   props: React.HTMLAttributes<HTMLLIElement>,
+   option: LivestreamSearchResult,
+   state: AutocompleteRenderOptionState
+) => {
+   const highlightTitle = option._highlightResult?.title
+   const highlightCompany = option._highlightResult?.company
+   const companyIndustryNameTags =
+      option._highlightResult?.companyIndustryNameTags
+
+   const companyIndustriesText =
+      companyIndustryNameTags?.map((industry) => industry.value).join(", ") ||
+      option.companyIndustries?.join(", ")
+
+   return (
+      <Box
+         {...props}
+         component="li"
+         sx={[styles.listItem, state.selected && styles.listItemSelected]}
+         key={option.objectID}
+      >
+         <Grid container alignItems="center">
+            <Grid item sx={styles.listItemGrid}>
+               <Typography
+                  component={SanitizedHTML}
+                  htmlString={highlightTitle?.value || option.title}
+                  variant="small"
+                  mb={1}
+               />
+               <Typography
+                  component={SanitizedHTML}
+                  htmlString={highlightCompany?.value || option.company}
+                  variant="xsmall"
+               />
+               {Boolean(companyIndustriesText) && (
+                  <Stack
+                     direction="row"
+                     alignItems="center"
+                     spacing={0.5}
+                     mt={0.5}
+                  >
+                     <Tag size={12} />
+                     <Typography
+                        component={SanitizedHTML}
+                        variant="xsmall"
+                        htmlString={companyIndustriesText}
+                     />
+                  </Stack>
+               )}
+               <Typography mt={1} variant="xsmall" color="neutral.500">
+                  {prettyDate(option.start)}
+               </Typography>
+            </Grid>
+            <Grid item>
+               {state.selected ? <CheckRoundedIcon fontSize="small" /> : null}
+            </Grid>
+         </Grid>
+      </Box>
    )
 }
 

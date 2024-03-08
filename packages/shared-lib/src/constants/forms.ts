@@ -1,5 +1,10 @@
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { DropdownItem } from "../components/views/common/GenericDropdown"
+import { OptionGroup } from "../commonTypes"
+
+type DropdownItem = {
+   id: string
+   value: string
+   label: string
+}
 
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
@@ -1532,6 +1537,10 @@ export const CompanyIndustryValues: OptionGroup[] = [
       name: "Venture Capital & Private Equity",
    },
 ]
+
+export const CompanyIndustryValuesLookup = Object.fromEntries(
+   CompanyIndustryValues.map((industry) => [industry.id, industry.name])
+)
 
 export const RelevantCompanyIndustryValues: OptionGroup[] = [
    {

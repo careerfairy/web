@@ -6,7 +6,7 @@ import {
    CompanyCountryValues,
    CompanyIndustryValues,
    CompanySizesCodes,
-} from "../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { Autocomplete, Box, Collapse, TextField } from "@mui/material"
 import MultiListSelect from "../../common/MultiListSelect"
 import { multiListSelectMapValueFn } from "../../signup/utils"
