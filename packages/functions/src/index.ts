@@ -65,6 +65,7 @@ import {
    updatePoll,
    markPollAsCurrent,
 } from "./lib/streaming"
+import endOfSparksTrials = require("./sparksTrials")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -118,7 +119,9 @@ exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
-
+exports.manualEndOfSparksTrialEmails =
+   endOfSparksTrials.manualEndOfSparksTrialEmails
+exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
