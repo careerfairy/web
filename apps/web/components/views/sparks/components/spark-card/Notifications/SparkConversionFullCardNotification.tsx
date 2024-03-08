@@ -17,7 +17,7 @@ const styles = sxStyles({
       mt: 9,
       textAlign: "center",
 
-      "@media (max-height: 850px)": {
+      "@media (max-height: 860px)": {
          mt: 6,
       },
    },
@@ -53,7 +53,7 @@ const styles = sxStyles({
       "@media (max-height: 700px)": {
          height: { md: "unset" },
       },
-      "@media (max-height: 600px)": {
+      "@media (max-height: 630px)": {
          height: "unset",
       },
    },
@@ -68,7 +68,7 @@ const styles = sxStyles({
             width: { md: "32px" },
          },
 
-         "@media (max-height: 600px)": {
+         "@media (max-height: 630px)": {
             height: "32px",
             width: "32px",
          },
@@ -90,12 +90,12 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
 
-      "@media (max-height: 710px)": {
+      "@media (max-height: 750px)": {
          position: { md: "unset" },
          mt: 6,
       },
 
-      "@media (max-height: 520px)": {
+      "@media (max-height: 580px)": {
          position: "unset",
       },
    },
