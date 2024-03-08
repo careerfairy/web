@@ -1,3 +1,5 @@
+import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import * as yup from "yup"
 
 export const ESTIMATED_DURATIONS = [
@@ -61,3 +63,5 @@ export const feedbackQuestionValidationSchema = () =>
       type: yup.string().required("Required"),
       appearAfter: yup.number().required("Required"),
    })
+
+export type LivestreamCreator = Creator & { originalId: Identifiable["id"] }
