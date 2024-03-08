@@ -92,6 +92,7 @@ const SparksPage: NextPage<
       if (!groupId) {
          dispatch(removeGroupId())
       }
+
       dispatch(fetchInitialSparksFeed())
 
       return () => {
