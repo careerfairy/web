@@ -252,7 +252,9 @@ const SparksFeedCard: FC<Props> = ({
                   ...(showCardNotification ? cardNotificationStyle() : []),
                ]}
             >
-               {videosMuted && isOverlayedOntop ? (
+               {videosMuted &&
+               isOverlayedOntop &&
+               !spark?.isCardNotification ? (
                   <ClickToUnmuteOverlay />
                ) : null}
                {showCardNotification || hideVideo ? null : (

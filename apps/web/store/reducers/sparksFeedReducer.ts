@@ -156,21 +156,23 @@ const sparksFeedSlice = createSlice({
          state,
          action: PayloadAction<UserSparksNotification>
       ) => {
-         state.cardNotification = action.payload
-
          const endContentGroupNotificationIndex = state.sparks.findIndex(
             (spark) =>
                spark?.cardNotificationType === SparkCardNotificationTypes.GROUP
          )
 
-         state.sparks = [
-            ...state.sparks.slice(0, endContentGroupNotificationIndex),
-            {
-               ...state.sparks[endContentGroupNotificationIndex],
-               cardNotificationType: SparkCardNotificationTypes.EVENT,
-            },
-            ...state.sparks.slice(endContentGroupNotificationIndex + 1),
-         ]
+         if (endContentGroupNotificationIndex > 0) {
+            state.cardNotification = action.payload
+
+            state.sparks = [
+               ...state.sparks.slice(0, endContentGroupNotificationIndex),
+               {
+                  ...state.sparks[endContentGroupNotificationIndex],
+                  cardNotificationType: SparkCardNotificationTypes.EVENT,
+               },
+               ...state.sparks.slice(endContentGroupNotificationIndex + 1),
+            ]
+         }
       },
       showEventDetailsDialog: (state, action: PayloadAction<boolean>) => {
          // when closing event dialog we want to remove the notification
