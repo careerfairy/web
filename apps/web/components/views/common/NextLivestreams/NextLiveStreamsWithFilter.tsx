@@ -53,11 +53,7 @@ const getQueryVariables = (query: ParsedUrlQuery) => {
       fieldsOfStudy: queryParamToArr(query.fieldsOfStudy),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
       companyId: companyId || null,
-      denyRecordingAccess: recordedOnly
-         ? recordedOnly === "true"
-            ? false
-            : true
-         : undefined,
+      denyRecordingAccess: recordedOnly === "true" ? false : undefined,
    }
 }
 
@@ -83,6 +79,7 @@ const NextLiveStreamsWithFilter = ({
       companyId,
       denyRecordingAccess,
    } = useMemo(() => getQueryVariables(query), [query])
+
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
       () => initialTabValue === "pastEvents",
