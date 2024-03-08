@@ -197,7 +197,6 @@ const NextLiveStreamsWithFilter = ({
                      handleChange={handleSearch}
                      value={null}
                      endIcon={<FindIcon color={"black"} />}
-                     searchWithTrigram
                      hasPastEvents={hasPastEvents}
                   />
                </Card>
