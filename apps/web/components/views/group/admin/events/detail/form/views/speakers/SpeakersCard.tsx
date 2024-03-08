@@ -1,12 +1,12 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
+import { LinkedIn } from "@mui/icons-material"
 import { sxStyles } from "@careerfairy/shared-ui"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material"
 import { UpdateCreatorData } from "@careerfairy/shared-lib/groups/creators"
-import { Box, Divider, Link, Stack, Typography } from "@mui/material"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
 import MoreMenuWithEditAndRemoveOptions from "../questions/components/MoreMenu"
-import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
-import { LinkedIn } from "@mui/icons-material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    wrapper: {
@@ -19,6 +19,10 @@ const styles = sxStyles({
    description: {
       fontSize: "16px",
       color: "neutral.600",
+   },
+   descriptionPlaceholder: {
+      color: "neutral.500",
+      fontStyle: "italic",
    },
    moreMenu: {
       position: "absolute",
@@ -43,6 +47,11 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
 }) => {
    const isMobile = useIsMobile()
 
+   const speakerHasStory = useMemo(
+      () => speaker.story && speaker.story !== "",
+      [speaker.story]
+   )
+
    return (
       <Box sx={styles.wrapper}>
          <Box sx={styles.moreMenu}>
@@ -62,7 +71,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   creator={{
                      firstName: speaker.firstName,
                      lastName: speaker.lastName,
-                     avatarUrl: speaker.avatar,
+                     avatarUrl: speaker.avatarUrl,
                   }}
                   size={104}
                />
@@ -115,14 +124,40 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   </Stack>
                </Stack>
             </Stack>
-            <CollapsibleText
-               text={
-                  speaker.story ||
-                  `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi nec odio ante. Ut eu tellus a massa bibendum finibus eget at sapien. Vestibulum fringilla a magna vel facilisis. Ut vehicula, lectus non interdum condimentum, nulla sem egestas nisl, a aliquet sapien magna id metus. Donec justo mauris, ullamcorper vel porta ac, fringilla a libero. Maecenas mauris massa, varius vitae rhoncus id, iaculis vel mauris. Duis faucibus sapien a ornare sodales. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vivamus non felis venenatis, pretium lorem finibus, laoreet turpis. Nulla facilisi. Duis eu eros vel odio cursus facilisis. Mauris et turpis nibh. Ut eget nisi eu leo porttitor venenatis. Vestibulum tempus, mi a dapibus egestas, lorem risus lacinia risus, nec pharetra augue enim vel eros. Vestibulum ac velit est. Mauris eget maximus velit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In iaculis vehicula ipsum vel auctor. Quisque tellus eros, dictum vitae rutrum a, consequat ut leo. Pellentesque lobortis fringilla metus, sed placerat quam rutrum eu. Cras quis viverra tellus, ac lobortis sapien. Praesent faucibus, augue sit amet blandit gravida, ipsum turpis malesuada felis, at porttitor leo sapien vitae enim. Sed vitae tincidunt dolor. Aenean et egestas arcu, vel commodo elit. Nullam vel ex facilisis, consectetur mauris imperdiet, molestie erat.`
-               }
-               textStyle={styles.description}
-               collapsedSize={80}
-            />
+            {speakerHasStory ? (
+               <CollapsibleText
+                  text={speaker.story}
+                  textStyle={styles.description}
+                  collapsedSize={80}
+               />
+            ) : (
+               <Stack
+                  sx={styles.descriptionPlaceholder}
+                  direction={isMobile ? "column" : "row"}
+                  alignItems="center"
+                  alignContent="center"
+                  textAlign={isMobile ? "center" : null}
+                  justifyContent="space-between"
+                  gap={isMobile ? 3 : null}
+               >
+                  <Stack>
+                     <Typography>
+                        This is your spotlight for our talent community.
+                     </Typography>
+                     <Typography>
+                        Share your experiences and connect with your audience by
+                        adding your personal story.
+                     </Typography>
+                  </Stack>
+                  <Button
+                     variant="outlined"
+                     color="secondary"
+                     onClick={handleEdit}
+                  >
+                     Add personal story
+                  </Button>
+               </Stack>
+            )}
          </Stack>
       </Box>
    )
