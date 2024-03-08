@@ -1,4 +1,3 @@
-import { UpdateCreatorData } from "@careerfairy/shared-lib/groups/creators"
 import {
    FieldOfStudy,
    LevelOfStudy,
@@ -9,6 +8,7 @@ import {
    LivestreamGroupQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { GroupOption } from "@careerfairy/shared-lib/groups"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export type LivestreamFormGeneralTabValues = {
@@ -31,7 +31,8 @@ export type LivestreamFormGeneralTabValues = {
 }
 
 export type LivestreamFormSpeakersTabValues = {
-   speakers: Partial<UpdateCreatorData>[]
+   values: Creator[]
+   options: Creator[]
 }
 
 export type LivestreamFormQuestionsTabValues = {

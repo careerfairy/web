@@ -3,9 +3,10 @@ import CreatorFormDialog from "./CreatorFormDialog"
 import BrandedDialog, {
    BrandedDialogProps,
 } from "../questions/components/BrandedDialog"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 type FeedbackQuestionAddEditDialogProps = {
-   creator?: object
+   creator?: Creator
 } & Omit<BrandedDialogProps, "key" | "children">
 
 const CreatorAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
