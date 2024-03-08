@@ -101,7 +101,7 @@ class FirebaseService {
 
    fetchAgoraRtmToken = async (data) => {
       const fetchAgoraRtmToken = this.functions.httpsCallable(
-         "fetchAgoraRtmToken_eu"
+         "fetchAgoraRtmToken_v2"
       )
       return await fetchAgoraRtmToken(data)
    }

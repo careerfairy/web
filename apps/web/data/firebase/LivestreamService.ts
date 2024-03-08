@@ -10,8 +10,10 @@ import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import {
-   AgoraTokenRequest,
-   AgoraTokenResponse,
+   AgoraRTCTokenRequest,
+   AgoraRTMTokenRequest,
+   AgoraRTCTokenResponse,
+   AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
 import FirebaseService from "./FirebaseService"
 import GroupsUtil from "data/util/GroupsUtil"
@@ -155,22 +157,37 @@ export class LivestreamService {
          return false
       }
    }
+
    /**
     * Fetches an Agora RTC token with the given data
     * @param data The data required to fetch the RTC token
     * @returns A promise containing the Agora RTC token
     */
-   async fetchAgoraRtcToken(data: AgoraTokenRequest) {
-      const fetchAgoraRtcToken = httpsCallable<
-         AgoraTokenRequest,
-         AgoraTokenResponse
-      >(this.functions, "fetchAgoraRtcToken_v2")
-
+   async fetchAgoraRtcToken(data: AgoraRTCTokenRequest) {
       const {
          data: { token },
-      } = await fetchAgoraRtcToken(data)
+      } = await httpsCallable<AgoraRTCTokenRequest, AgoraRTCTokenResponse>(
+         this.functions,
+         "fetchAgoraRtcToken_v2"
+      )(data)
 
       return token.rtcToken
+   }
+
+   /**
+    * Fetches an Agora RTC token with the given data
+    * @param data The data required to fetch the RTC token
+    * @returns A promise containing the Agora RTC token
+    */
+   async fetchAgoraRtmToken(data: AgoraRTMTokenRequest) {
+      const {
+         data: { token },
+      } = await httpsCallable<AgoraRTMTokenRequest, AgoraRTMTokenResponse>(
+         this.functions,
+         "fetchAgoraRtmToken_v2"
+      )(data)
+
+      return token.rtmToken
    }
 
    private async getUserDetails(
