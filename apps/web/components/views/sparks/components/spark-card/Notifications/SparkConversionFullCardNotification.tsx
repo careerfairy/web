@@ -19,6 +19,7 @@ const styles = sxStyles({
 
       "@media (max-height: 840px)": {
          mt: { xs: "10%", lg: "8%" },
+         mx: { xs: 2 },
       },
    },
    title: {
@@ -31,6 +32,11 @@ const styles = sxStyles({
          fontSize: { xs: "42px !important", lg: "48px !important" },
          lineHeight: { xs: "44px", lg: "50px !important" },
       },
+
+      "@media (max-height: 580px)": {
+         fontSize: { xs: "22px !important", lg: "48px !important" },
+         lineHeight: { xs: "24px", lg: "50px !important" },
+      },
    },
    content: {
       display: "flex",
@@ -40,6 +46,11 @@ const styles = sxStyles({
 
       "@media (max-height: 840px)": {
          mt: { xs: "8%", md: "8%" },
+         mx: { xs: "6%" },
+      },
+
+      "@media (max-height: 580px)": {
+         mx: 0,
       },
    },
    infoCard: {
@@ -52,6 +63,7 @@ const styles = sxStyles({
 
       "@media (max-height: 720px)": {
          height: "unset",
+         py: 1,
       },
    },
    icon: {
@@ -69,6 +81,11 @@ const styles = sxStyles({
             height: "32px",
             width: "32px",
          },
+
+         "@media (max-height: 580px)": {
+            height: "22px",
+            width: "22px",
+         },
       },
    },
    infoText: {
@@ -76,6 +93,10 @@ const styles = sxStyles({
 
       "@media (max-height: 720px)": {
          fontSize: "16px !important",
+      },
+
+      "@media (max-height: 580px)": {
+         fontSize: "12px !important",
       },
    },
    actions: {
@@ -95,6 +116,16 @@ const styles = sxStyles({
       "@media (max-height: 650px)": {
          position: "unset",
          mt: "10%",
+      },
+
+      "@media (max-height: 580px)": {
+         "& a": {
+            fontSize: "12px !important",
+         },
+
+         "& button": {
+            fontSize: "12px !important",
+         },
       },
    },
    shadow: {
@@ -117,6 +148,10 @@ const styles = sxStyles({
    },
    secondaryBtn: {
       mt: 2,
+
+      "@media (max-height: 580px)": {
+         mt: 1,
+      },
    },
 })
 
