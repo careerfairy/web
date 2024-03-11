@@ -1,4 +1,11 @@
-import React, {
+import { Box, Button, ButtonGroup } from "@mui/material"
+import { useCurrentUID, useIsConnected } from "agora-rtc-react"
+import AgoraRTM from "agora-rtm-sdk"
+import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
+import { EmoteType } from "context/agora/RTMContext"
+import { agoraCredentials } from "data/agora/AgoraInstance"
+import { useSnackbar } from "notistack"
+import {
    ReactNode,
    createContext,
    useCallback,
@@ -6,14 +13,14 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { useCurrentUID, useIsConnected } from "agora-rtc-react"
-import { useStreamingContext } from "./Streaming"
-import { createLazyChannel, createLazyClient } from "./rtm/util"
-import { agoraCredentials } from "data/agora/AgoraInstance"
-import AgoraRTM from "agora-rtm-sdk"
-import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
+import { useStreamingContext } from "./Streaming"
+import {
+   AgoraRTMChannelProvider,
+   AgoraRTMClientProvider,
+   useRTMChannelEvent,
+} from "./rtm"
+import { createLazyChannel, createLazyClient } from "./rtm/util"
 
 const useClient = createLazyClient()
 const useChannel = createLazyChannel()
@@ -32,6 +39,7 @@ export const RTMSignalingProvider = ({
    children,
 }: RTMSignalingProviderProps) => {
    const { livestreamId } = useStreamingContext()
+   const { enqueueSnackbar } = useSnackbar()
    const rtcIsConnected = useIsConnected()
    const uid = useCurrentUID()
 
@@ -86,11 +94,28 @@ export const RTMSignalingProvider = ({
       }
    }, [login, logout, token])
 
-   // Todo: Dispatch emote locally
-   // const sendEmote = async (text: string) => {
-   //   const message = client.createMessage({ text, messageType: "TEXT" })
-   //   await channel.sendMessage(message)
-   // }
+   /**
+    * Todos:
+    * 1. Optimistically dispatch emote locally to the UI
+    * 2. On successful send, save emote to the database
+    */
+   const sendEmote = async (emoteType: EmoteType) => {
+      const message = client.createMessage({
+         text: emoteType,
+         messageType: "TEXT",
+      })
+      await channel.sendMessage(message)
+   }
+
+   useRTMChannelEvent(channel, "ChannelMessage", (message, memberId) => {
+      enqueueSnackbar(`Emote sent by ${memberId}: ${message.text}`, {
+         variant: "success",
+      })
+   })
+
+   useRTMChannelEvent(channel, "MemberCountUpdated", (newCount) => {
+      console.log("MemberCountUpdated 🚀", newCount)
+   })
 
    const value = useMemo<RTMSignalingContextType>(
       () => ({
@@ -104,6 +129,22 @@ export const RTMSignalingProvider = ({
          <AgoraRTMClientProvider client={client}>
             <AgoraRTMChannelProvider channel={channel}>
                {children}
+               <Box position="absolute" p={2} top={0} right={0}>
+                  <ButtonGroup>
+                     <Button
+                        variant="contained"
+                        onClick={() => sendEmote("clapping")}
+                     >
+                        Clap
+                     </Button>
+                     <Button
+                        variant="contained"
+                        onClick={() => sendEmote("heart")}
+                     >
+                        Heart
+                     </Button>
+                  </ButtonGroup>
+               </Box>
             </AgoraRTMChannelProvider>
          </AgoraRTMClientProvider>
       </RTMContext.Provider>
