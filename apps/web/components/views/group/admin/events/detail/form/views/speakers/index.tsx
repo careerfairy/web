@@ -5,10 +5,12 @@ import FormSectionHeader from "../../FormSectionHeader"
 import SelectSpeakersDropDown from "./SelectSpeakerDropDown"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { LivestreamCreator } from "../questions/commons"
 
 const LivestreamFormSpeakersStep = () => {
    const {
       values: { speakers },
+      setFieldValue,
    } = useLivestreamFormValues()
 
    const [currentCreator, setCurrentCreator] = useState(null)
@@ -18,6 +20,13 @@ const LivestreamFormSpeakersStep = () => {
       handleAddEditOpenDialog,
       handleAddEditCloseDialog,
    ] = useDialogStateHandler()
+
+   const handleSpeakerRemove = (speakerId: LivestreamCreator["id"]) => {
+      const newSpeakersState = speakers.values.filter(
+         (speaker) => speaker.id !== speakerId
+      )
+      setFieldValue("speakers.values", newSpeakersState, true)
+   }
 
    return (
       <>
@@ -45,7 +54,7 @@ const LivestreamFormSpeakersStep = () => {
                   handleAddEditOpenDialog()
                }}
                handleRemove={() => {
-                  alert(`Will remove ${JSON.stringify(speaker, null, 2)}`)
+                  handleSpeakerRemove(speaker.id)
                }}
             />
          ))}
