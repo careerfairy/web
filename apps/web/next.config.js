@@ -69,6 +69,7 @@ const csp = {
       "https://d3e54v103j8qbb.cloudfront.net",
       "https://assets-global.website-files.com",
       "https://player.vimeo.com",
+      "https://js.stripe.com",
    ],
    "style-src": [
       "'self'",
@@ -113,6 +114,7 @@ const csp = {
       "https://cdn.dreamdata.cloud",
       "https://px.ads.linkedin.com",
       "https://vimeo.com",
+      "https://api.stripe.com",
    ],
    "img-src": [
       "'self'",
@@ -136,6 +138,8 @@ const csp = {
       "https://www.careerfairy.io",
       "https://library.careerfairy.io",
       "https://cdn.embedly.com",
+      "https://js.stripe.com",
+      "https://hooks.stripe.com",
    ],
    "font-src": [
       "'self'",

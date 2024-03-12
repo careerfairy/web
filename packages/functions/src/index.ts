@@ -58,6 +58,7 @@ import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
+import stripe = require("./stripe")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -112,6 +113,8 @@ exports.manualEndOfSparksTrialEmails =
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
 
+// Stripe
+exports.stripeWebHook = stripe.stripeWebHook
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
