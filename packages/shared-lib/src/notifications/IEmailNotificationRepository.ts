@@ -9,6 +9,7 @@ import {
 } from "./notifications"
 import firebase from "firebase/compat/app"
 import { DocumentData } from "firebase/firestore"
+import { chunkArray } from "../utils"
 
 export interface IEmailNotificationRepository {
    /**
@@ -37,6 +38,10 @@ export interface IEmailNotificationRepository {
    createNotificationDocuments(
       details: EmailNotificationDetails[]
    ): Promise<DocumentData[]>
+
+   createNotificationsBatched(
+      details: EmailNotificationDetails[]
+   ): Promise<EmailNotification[]>
 
    /**
     * Retrieves all emailNotifications for the given @param type
@@ -102,11 +107,39 @@ export class EmailNotificationFunctionsRepository
       )
    }
 
-   // TODO: Check if rollback could be needed
    async createNotificationDocuments(
       details: EmailNotificationDetails[]
    ): Promise<DocumentData[]> {
       return await Promise.all(details.map(this.createNotificationDoc))
+   }
+
+   async createNotificationsBatched(
+      details: EmailNotificationDetails[]
+   ): Promise<EmailNotification[]> {
+      const createdNotifications = []
+
+      const chunks = 499
+
+      const splitChunks = chunkArray(details, chunks)
+
+      const batchPromises = splitChunks.map((detailsChunk) => {
+         const batch = this.firestore.batch()
+
+         detailsChunk.forEach((detail) => {
+            const ref = this.firestore.collection("emailNotifications").doc()
+            const newNotification: EmailNotification = {
+               details: detail,
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
+               createdAt: this.getServerTimestamp() as unknown as any,
+               id: ref.id,
+            }
+            createdNotifications.push(newNotification)
+            batch.set(ref, newNotification)
+         })
+         return batch.commit()
+      })
+      await Promise.all(batchPromises)
+      return createdNotifications
    }
 
    createNotificationDoc = async (details: EmailNotificationDetails) => {
