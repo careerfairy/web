@@ -77,6 +77,7 @@ export default function MyDocument(props: DocumentProps) {
                   }}
                ></script>
             ) : null}
+            <script async src="https://js.stripe.com/v3/buy-button.js"></script>
             <link
                rel="preload"
                href="/fonts/subset-Poppins-Regular.woff2"
