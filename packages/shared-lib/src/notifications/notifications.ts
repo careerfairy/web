@@ -19,5 +19,4 @@ export type EmailNotificationDetails = {
 export type EmailNotification = {
    createdAt: Timestamp
    details: EmailNotificationDetails
-   templateId: string
 } & Identifiable

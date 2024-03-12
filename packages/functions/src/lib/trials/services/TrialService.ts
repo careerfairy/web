@@ -39,7 +39,7 @@ export class TrialService {
       const sentTrialNotifications =
          await this.notificationsRepo.getNotifications("endOfSparksTrial")
 
-      // TODO: Check, do not care if not all from group have received, as long as at least one
+      // Checking if at least one group HR has received the notification and if so, ignore those groups
       const alreadyNotifiedGroups = sentTrialNotifications
          .filter((notification) => Boolean(notification.details.groupId))
          .map((notification) => notification.details.groupId)
@@ -54,8 +54,6 @@ export class TrialService {
          this.logger,
          ignoreGroups
       )
-
-      // this.logger.info(` - groups[${this.groups.length}] with plan expiring: `, this.groups.map( g => `${g.universityName} { plan {from: ${g.plan.startedAt?.toDate().toISOString()},to: ${g.plan.expiresAt?.toDate().toISOString()}} }` ))
    }
 
    /**
@@ -66,7 +64,6 @@ export class TrialService {
    async buildNotifications(): Promise<void> {
       this.logger.info(" - Building notifications")
 
-      // TODO: Check all user admins are correctly found
       const groupAdminsPromises = this.groups.map((group) =>
          this.groupRepo.getGroupAdmins(group.groupId)
       )
@@ -76,8 +73,6 @@ export class TrialService {
       const allGroupAdmins = groupAdminsCollections
          .flat()
          .filter((groupAdmin) => Boolean(groupAdmin?.groupId))
-
-      // this.logger.info("allGroupAdmins: ", allGroupAdmins)
 
       const uniqueAdminGroups = [
          ...new Set(allGroupAdmins.map((admin) => admin.groupId)),
@@ -125,7 +120,6 @@ export class TrialService {
     */
    async createNotifications(): Promise<void> {
       this.logger.info(" - Storing notifications on database")
-      this.logger.info(" -  notificationDetails:", this.notificationDetails)
       const createdNotifications =
          await this.notificationsRepo.createNotificationDocuments(
             this.notificationDetails
