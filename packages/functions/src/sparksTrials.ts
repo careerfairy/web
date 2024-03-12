@@ -27,7 +27,7 @@ export const endOfSparksTrialEmails = functions
    .onRun(async () => {
       functions.logger.info("Starting execution of endOfSparksTrialEmails v2")
 
-      // await sendEndOfSparksTrialEmails()
+      await sendEndOfSparksTrialEmails()
    })
 
 export const manualEndOfSparksTrialEmails = functions
@@ -67,5 +67,5 @@ async function sendEndOfSparksTrialEmails() {
    await trialService.createNotifications()
 
    // disable for now
-   // await emailBuilder.send()
+   await emailBuilder.send()
 }
