@@ -679,8 +679,7 @@ export class GroupFunctionsRepository
          .withConverter(createCompatGenericConverter<Group>())
          .get()
 
-      const results = mapFirestoreDocuments<Group>(snaps)
-      return (results?.length && results.filter(afterFetchFilter)) || []
+      return mapFirestoreDocuments<Group>(snaps)?.filter(afterFetchFilter)
    }
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
