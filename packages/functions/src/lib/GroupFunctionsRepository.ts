@@ -672,6 +672,7 @@ export class GroupFunctionsRepository
          (group) => !ignoreGroupIds.includes(group.groupId)
       )
    }
+
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
       client: ServerClient
