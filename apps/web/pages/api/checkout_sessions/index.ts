@@ -4,17 +4,16 @@ import { Stripe } from "stripe"
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 //
-// const PRICE = process.env.SPARKS_ONE_YEAR_PRICE_ID!
-type ResponseData = {
+export type StripeCustomerSessionResponseData = {
    session?: Stripe.Checkout.Session
    customerSessionSecret?: string
    message?: string
 }
 
-// TODO: check if user is admin
+// TODO: check if user is admin, schema validation
 export default async function handler(
    req: NextApiRequest,
-   res: NextApiResponse<ResponseData>
+   res: NextApiResponse<StripeCustomerSessionResponseData>
 ) {
    // TODO: Validate body
    console.log("🚀 ~ req.body:", req.body)
