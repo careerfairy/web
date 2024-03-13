@@ -1,6 +1,5 @@
 import { Box, Button, ButtonGroup } from "@mui/material"
 import { useCurrentUID, useIsConnected } from "agora-rtc-react"
-import AgoraRTM from "agora-rtm-sdk"
 import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
 import { EmoteType } from "context/agora/RTMContext"
 import { agoraCredentials } from "data/agora/AgoraInstance"
@@ -20,10 +19,10 @@ import {
    AgoraRTMClientProvider,
    useRTMChannelEvent,
 } from "./rtm"
-import { createLazyChannel, createLazyClient } from "./rtm/util"
+import { createRTMClient, createLazyRTMChannel } from "./rtm/util"
 
-const useClient = createLazyClient()
-const useChannel = createLazyChannel()
+const useClient = createRTMClient(agoraCredentials.appID)
+const useChannel = createLazyRTMChannel()
 
 type RTMSignalingContextType = {
    isLoggedIn: boolean
@@ -45,10 +44,7 @@ export const RTMSignalingProvider = ({
 
    const [loggedIn, setLoggedIn] = useState(false)
 
-   const client = useClient(agoraCredentials.appID, {
-      enableCloudProxy: false,
-      logFilter: AgoraRTM.LOG_FILTER_INFO,
-   })
+   const client = useClient()
 
    const channel = useChannel(client, livestreamId)
 
