@@ -7,10 +7,19 @@ export type Listenable = {
 export type Disposer = () => void
 
 export const listen = (
-   channel: Listenable,
+   /**
+    * Rtm channel or client to listen to. eg channel.on('ChannelMessage', listener)
+    */
+   target: Listenable,
+   /**
+    * The name of the event to listen for.
+    */
    event: string,
+   /**
+    * The callback function to execute when the event occurs.
+    */
    listener: Fn
 ): Disposer => {
-   channel.on(event, listener)
-   return () => channel.off(event, listener)
+   target.on(event, listener)
+   return () => target.off(event, listener)
 }

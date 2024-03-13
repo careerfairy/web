@@ -35,7 +35,7 @@ export function useRTMClientEvent(
 ): void
 
 export function useRTMClientEvent(
-   channel: Nullable<RtmClient>,
+   client: Nullable<RtmClient>,
    event: RTMClientEventName,
    listener: Nullable<Fn>
 ) {
@@ -46,11 +46,11 @@ export function useRTMClientEvent(
    }, [listener])
 
    useEffect(() => {
-      if (channel) {
-         const disposer = listen(channel, event, (...args: unknown[]) => {
+      if (client) {
+         const disposer = listen(client, event, (...args: unknown[]) => {
             listenerRef.current?.(...args)
          })
          return disposer
       }
-   }, [event, channel])
+   }, [event, client])
 }
