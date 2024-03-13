@@ -175,10 +175,10 @@ const Component = ({ isHost }: Props) => {
                         </ScreenShareProvider>
                      </LocalTracksProvider>
                   </AgoraDevicesProvider>
+                  <AgoraTrackers />
+                  <LivestreamStateTrackers />
                </RTMSignalingProvider>
             </StreamingProvider>
-            <AgoraTrackers />
-            <LivestreamStateTrackers />
          </UserClientProvider>
       ),
       [agoraUserId, isHost, livestream.id]
