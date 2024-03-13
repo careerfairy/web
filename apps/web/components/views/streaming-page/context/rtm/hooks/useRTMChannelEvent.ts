@@ -1,7 +1,6 @@
-import { RtmChannel, RtmMessage, RtmEvents } from "agora-rtm-sdk"
-import { Fn, Nullable, listen } from "./util"
-import { useEffect, useRef } from "react"
-import { useIsomorphicLayoutEffect } from "react-use"
+import { RtmChannel, RtmEvents, RtmMessage } from "agora-rtm-sdk"
+import useRTMEvent from "./useRTMEvent"
+import { Fn, Nullable } from "./util"
 
 export type RTMChannelEventName = keyof RtmEvents.RtmChannelEvents & string
 
@@ -39,18 +38,5 @@ export function useRTMChannelEvent(
    event: RTMChannelEventName,
    listener: Nullable<Fn>
 ) {
-   const listenerRef = useRef<Nullable<Fn>>(listener)
-
-   useIsomorphicLayoutEffect(() => {
-      listenerRef.current = listener
-   }, [listener])
-
-   useEffect(() => {
-      if (channel) {
-         const disposer = listen(channel, event, (...args: unknown[]) => {
-            listenerRef.current?.(...args)
-         })
-         return disposer
-      }
-   }, [event, channel])
+   useRTMEvent(channel, event, listener)
 }

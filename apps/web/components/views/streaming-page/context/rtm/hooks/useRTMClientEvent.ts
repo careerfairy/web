@@ -1,7 +1,6 @@
-import { RtmClient, RtmStatusCode, RtmEvents } from "agora-rtm-sdk"
-import { Fn, Nullable, listen } from "./util"
-import { useEffect, useRef } from "react"
-import { useIsomorphicLayoutEffect } from "react-use"
+import { RtmClient, RtmEvents, RtmStatusCode } from "agora-rtm-sdk"
+import useRTMEvent from "./useRTMEvent"
+import { Fn, Nullable } from "./util"
 
 export type RTMClientEventName = keyof RtmEvents.RtmClientEvents & string
 
@@ -39,18 +38,5 @@ export function useRTMClientEvent(
    event: RTMClientEventName,
    listener: Nullable<Fn>
 ) {
-   const listenerRef = useRef<Nullable<Fn>>(listener)
-
-   useIsomorphicLayoutEffect(() => {
-      listenerRef.current = listener
-   }, [listener])
-
-   useEffect(() => {
-      if (client) {
-         const disposer = listen(client, event, (...args: unknown[]) => {
-            listenerRef.current?.(...args)
-         })
-         return disposer
-      }
-   }, [event, client])
+   useRTMEvent(client, event, listener)
 }
