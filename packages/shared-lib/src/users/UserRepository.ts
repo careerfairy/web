@@ -24,6 +24,7 @@ import { Create } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
+   updateUserData(userId: string, data: Partial<UserData>): Promise<void>
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
    updateFieldOfStudy(
       userEmail: string,
@@ -191,6 +192,15 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async updateUserData(
+      userId: string,
+      data: Partial<UserData>
+   ): Promise<void> {
+      const userRef = this.firestore.collection("userData").doc(userId)
+
+      return userRef.update(data)
    }
 
    async welcomeDialogComplete(userEmail: string) {
