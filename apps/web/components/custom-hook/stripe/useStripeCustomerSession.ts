@@ -1,6 +1,6 @@
 import axios from "axios"
 import { StripeCustomerSessionResponseData } from "pages/api/checkout_sessions"
-import { useMemo, useState } from "react"
+import { useCallback, useState } from "react"
 
 type Props = {
    groupId: string
@@ -20,7 +20,7 @@ const useStripeCustomerSession = ({
    const [isLoading, setIsLoading] = useState(false)
    const [data, setData] = useState<StripeCustomerSessionResponseData>()
 
-   useMemo(() => {
+   useCallback(() => {
       setIsLoading(true)
       axios
          .post<StripeCustomerSessionResponseData>("/api/checkout_sessions", {
