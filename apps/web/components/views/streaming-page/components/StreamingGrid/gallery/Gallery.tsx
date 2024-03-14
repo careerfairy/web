@@ -10,6 +10,10 @@ import { useGalleryLayout } from "./useGalleryLayout"
 import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
 import { getPaginatedGridLayout } from "../util"
+import {
+   GradientProvider,
+   calculateGradientControl,
+} from "../../streaming/LinearGradient"
 
 const dynamicStyles = (spacing: number) =>
    sxStyles({
@@ -63,6 +67,8 @@ export const Gallery = ({ streams, spacing }: Props) => {
    return (
       <Box sx={[styles.root, getConditionalStyles()]}>
          <GridCarousel
+            floatingDots={Boolean(isLandscape && isSpotlightMode)}
+            navigationMode={isSpotlightMode && !isLandscape ? "arrows" : "dots"}
             gridPages={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
@@ -71,12 +77,23 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      pageIndex === gridPages.length - 1 && pageIndex !== 0
                   }
                   layout={layout}
-                  renderGridItem={(user) => (
+                  renderGridItem={(stream, index, streams) => (
                      <LayoutGrid.Item
-                        key={user.user.uid}
+                        key={stream.user.uid}
                         layoutColumns={layout.columns}
                      >
-                        <UserStreamComponent user={user} />
+                        <GradientProvider
+                           {...calculateGradientControl({
+                              index,
+                              layoutRows: layout.rows,
+                              pageIndex,
+                              pageSize,
+                              pagesLength: gridPages.length,
+                              streamsLength: streams.length,
+                           })}
+                        >
+                           <UserStreamComponent user={stream} />
+                        </GradientProvider>
                      </LayoutGrid.Item>
                   )}
                />
