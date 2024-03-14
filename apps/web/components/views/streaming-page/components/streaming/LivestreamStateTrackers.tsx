@@ -4,6 +4,7 @@ import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
    setLivestreamMode,
+   setNumberOfParticipants,
    setScreenSharerId,
 } from "store/reducers/streamingAppReducer"
 
@@ -22,19 +23,26 @@ export const LivestreamStateTrackers = (): null => {
 
    useEffect(() => {
       dispatch(setLivestreamMode(livestream.mode ?? LivestreamModes.DEFAULT))
-
-      return () => {
-         dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
-      }
    }, [dispatch, livestream.mode])
 
    useEffect(() => {
       dispatch(setScreenSharerId(livestream.screenSharerId ?? null))
-
-      return () => {
-         dispatch(setScreenSharerId(null))
-      }
    }, [dispatch, livestream.screenSharerId])
+
+   useEffect(() => {
+      dispatch(
+         setNumberOfParticipants(livestream.participatingStudents?.length ?? 0)
+      )
+   }, [dispatch, livestream.participatingStudents?.length])
+
+   // Clean up the state on unmount
+   useEffect(() => {
+      return () => {
+         dispatch(setNumberOfParticipants(0))
+         dispatch(setScreenSharerId(null))
+         dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
+      }
+   }, [dispatch])
 
    return null
 }
