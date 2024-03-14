@@ -7,6 +7,8 @@ import axios from "axios"
 
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import BuyButtonComponent from "./BuyButtonComponent"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { StripeButtonProductConfig } from "data/stripe/stripe"
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -14,25 +16,34 @@ import BuyButtonComponent from "./BuyButtonComponent"
 // const stripePromise = getStripe()
 
 const styles = sxStyles({
-   embeddedCheckoutWrapper: {
-      "&:first-of-type": {
-         m: 100,
-      },
-      p: 10,
-      position: "absolute",
-      width: "100%",
-      left: 0,
-      right: 0,
-      margin: "auto",
-      overflow: "scroll",
-      zIndex: 10,
-      borderRadius: "15px",
-      //    border: "solid 3px darkgrey"
+   embeddedCheckoutWrapper: {},
+   banner: {
+      mx: 5,
+      my: 1,
+      display: "flex",
+      width: "1100px%",
+      padding: "24px",
+      justifyContent: "space-between",
+      alignItems: "center",
+      minHeight: "150px",
+      backgroundColor: "red",
+      borderRadius: "12px",
+      border: "1px solid var(--Attention-Attention---600---Default, #FF1616)",
+      background:
+         "linear-gradient(94deg, rgba(255, 0, 0, 0.10) 1.13%, rgba(255, 0, 0, 0.00) 58.83%), rgba(255, 22, 22, 0.60)",
    },
 })
 
+type Props = {
+   productConfig: StripeButtonProductConfig
+}
 //TODO: check unmounting
-const CheckoutForm = () => {
+/**
+ * This
+ * @returns
+ */
+const UpgradePlanBanner = ({ productConfig }: Props) => {
+   const group = useGroup()
    const [clientSecret, setClientSecret] = useState("")
    console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
 
@@ -41,7 +52,7 @@ const CheckoutForm = () => {
       // Create a Checkout Session.
       const checkoutSession = await axios.post(
          "/api/checkout_sessions",
-         { amount: "some amount", groupId: "yrUCEdMPNc6vz2mMXkx1" } // BMW
+         { amount: "some amount", groupId: group.group.groupId } // BMW
       )
 
       if (checkoutSession.status != 200) {
@@ -74,31 +85,37 @@ const CheckoutForm = () => {
             <Box></Box>
             <Box sx={styles.embeddedCheckoutWrapper}>
                <BuyButtonComponent
-                  buttonId={
-                     process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID
-                  }
-                  publishableKey={
-                     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-                  }
+                  buttonId={productConfig.buttonId}
+                  publishableKey={productConfig.publishableKey}
                   clientSecret={clientSecret}
                />
-               {/* <EmbeddedCheckoutProvider stripe={stripePromise}  options={{clientSecret}} >
-                    <EmbeddedCheckout className="stripeCheckout"/>
-                </EmbeddedCheckoutProvider> */}
             </Box>
          </ConditionalWrapper>
-         <ConditionalWrapper condition={!clientSecret}>
-            <Button
-               onClick={redirectToCheckout}
-               color="secondary"
-               sx={{ mt: 1 }}
-               startIcon={<StarBorderIcon />}
-            >
-               Upgrade Now
-            </Button>
-         </ConditionalWrapper>
+         <Box sx={styles.banner}>
+            <Box>
+               <p>
+                  Your Sparks trial has ended, and theyre no longer visible to
+                  the CareerFairy talent community. But the magic doesnt have to
+                  stop! Upgrade now and reignite the spark to continue engaging
+                  all year round with your target audience, access in-depth
+                  analytics and showcase your job opportunities in an innovative
+                  way. Dont let the momentum you built fade, upgrade now and
+                  reignite the spark!
+               </p>
+            </Box>
+            <Box>
+               <Button
+                  onClick={redirectToCheckout}
+                  color="secondary"
+                  sx={{ mt: 1 }}
+                  startIcon={<StarBorderIcon />}
+               >
+                  Upgrade Now
+               </Button>
+            </Box>
+         </Box>
       </Box>
    )
 }
 
-export default CheckoutForm
+export default UpgradePlanBanner

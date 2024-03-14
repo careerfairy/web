@@ -7,7 +7,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import TrialStatusMobileDrawer from "./TrialStatusMobileDrawer"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import CheckoutForm from "components/views/pay-wall/forms/CheckoutForm"
+import CheckoutForm from "components/views/checkout/forms/CheckoutForm"
 
 const styles = sxStyles({
    root: {

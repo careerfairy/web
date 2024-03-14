@@ -7,6 +7,7 @@ import axios from "axios"
 
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import BuyButtonComponent from "./BuyButtonComponent"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -31,12 +32,9 @@ const styles = sxStyles({
    },
 })
 
-// type Props = {
-//     children?: React.ReactElement,
-//     customerClientSecret?: string
-// }
 //TODO: check unmounting
-const CheckoutButton = () => {
+const CheckoutForm = () => {
+   const group = useGroup()
    const [clientSecret, setClientSecret] = useState("")
    console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
 
@@ -45,7 +43,7 @@ const CheckoutButton = () => {
       // Create a Checkout Session.
       const checkoutSession = await axios.post(
          "/api/checkout_sessions",
-         { amount: "some amount", groupId: "yrUCEdMPNc6vz2mMXkx1" } // BMW
+         { amount: "some amount", groupId: group.group.groupId } // BMW
       )
 
       if (checkoutSession.status != 200) {
@@ -91,18 +89,16 @@ const CheckoutButton = () => {
                 </EmbeddedCheckoutProvider> */}
             </Box>
          </ConditionalWrapper>
-         <ConditionalWrapper condition={!clientSecret}>
-            <Button
-               onClick={redirectToCheckout}
-               color="secondary"
-               sx={{ mt: 1 }}
-               startIcon={<StarBorderIcon />}
-            >
-               Upgrade Now
-            </Button>
-         </ConditionalWrapper>
+         <Button
+            onClick={redirectToCheckout}
+            color="secondary"
+            sx={{ mt: 1 }}
+            startIcon={<StarBorderIcon />}
+         >
+            Upgrade Now
+         </Button>
       </Box>
    )
 }
 
-export default CheckoutButton
+export default CheckoutForm
