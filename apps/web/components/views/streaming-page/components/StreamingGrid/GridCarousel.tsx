@@ -151,16 +151,16 @@ export const GridCarousel = ({
       emblaApi.on("select", onSelect)
    }, [emblaApi, onInit, onSelect])
 
-   const isArrows = navigationMode === "arrows"
-   const isDots = navigationMode === "dots"
+   const showArrows = navigationMode === "arrows"
+   const showDots = navigationMode === "dots"
 
    return (
       <Box
          id="grid-carousel"
          sx={[
             styles.root,
-            showNav && isDots && styles.rootWithDots,
-            showNav && floatingDots && isDots && styles.rootWithFloatingDots,
+            showNav && showDots && styles.rootWithDots,
+            showNav && floatingDots && showDots && styles.rootWithFloatingDots,
          ]}
       >
          <Box sx={styles.viewport} ref={emblaRef}>
@@ -172,7 +172,7 @@ export const GridCarousel = ({
                ))}
             </Box>
          </Box>
-         {Boolean(isArrows) && (
+         {Boolean(showArrows) && (
             <>
                <PrevButton
                   enabled={selectedIndex > 0}
@@ -188,7 +188,7 @@ export const GridCarousel = ({
          <Collapse
             id="dots"
             sx={styles.collapseContainer}
-            in={gridPages.length > 1 && isDots}
+            in={gridPages.length > 1 && showDots}
             unmountOnExit
          >
             <Stack
