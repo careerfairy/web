@@ -4,7 +4,6 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { type UID } from "agora-rtc-react"
-import { RtmStatusCode } from "agora-rtm-sdk"
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -39,6 +38,9 @@ export interface StreamingAppState {
    }
    isHost: boolean
    streamLayout: StreamLayout
+   topBar: {
+      viewCount: number
+   }
    settingsMenu: {
       isOpen: boolean
    }
@@ -55,15 +57,6 @@ export interface StreamingAppState {
    livestreamState: {
       screenSharerId: string
       mode: LivestreamMode
-      numberOfParticipants: number
-   }
-   rtmSignalingState: {
-      failedToConnect: boolean
-      viewCount: number
-      connectionState: {
-         state: RtmStatusCode.ConnectionState
-         reason: RtmStatusCode.ConnectionChangeReason
-      }
    }
 }
 
@@ -74,6 +67,9 @@ const initialState: StreamingAppState = {
    },
    isHost: false,
    streamLayout: StreamLayouts.GALLERY,
+   topBar: {
+      viewCount: 0, // hardcoded number for now
+   },
    settingsMenu: {
       isOpen: false,
    },
@@ -81,12 +77,6 @@ const initialState: StreamingAppState = {
    livestreamState: {
       mode: LivestreamModes.DEFAULT,
       screenSharerId: null,
-      numberOfParticipants: 0,
-   },
-   rtmSignalingState: {
-      failedToConnect: false,
-      viewCount: 0,
-      connectionState: null,
    },
 }
 
@@ -114,6 +104,12 @@ const streamingAppSlice = createSlice({
       },
       setHostStatus(state, action: PayloadAction<boolean>) {
          state.isHost = action.payload
+      },
+      incrementViewCount(state) {
+         state.topBar.viewCount += 1
+      },
+      decrementViewCount(state) {
+         state.topBar.viewCount -= 1
       },
       /**
        * Updates the audio levels of users.
@@ -154,32 +150,11 @@ const streamingAppSlice = createSlice({
             state.streamLayout = StreamLayouts.GALLERY
          }
       },
-      setNumberOfParticipants(state, action: PayloadAction<number>) {
-         state.livestreamState.numberOfParticipants = action.payload
-      },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
       },
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
-      },
-
-      /* ==========================
-         ||   Signaling State   ||
-         ========================== */
-      setRTMFailedToConnect(state, action: PayloadAction<boolean>) {
-         state.rtmSignalingState.failedToConnect = action.payload
-      },
-      setViewCount(state, action: PayloadAction<number>) {
-         state.rtmSignalingState.viewCount = action.payload
-      },
-      setRTMConnectionState(
-         state,
-         action: PayloadAction<
-            StreamingAppState["rtmSignalingState"]["connectionState"]
-         >
-      ) {
-         state.rtmSignalingState.connectionState = action.payload
       },
    },
 })
@@ -188,16 +163,14 @@ export const {
    actions: {
       setLivestreamMode,
       setScreenSharerId,
-      setNumberOfParticipants,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,
       setHostStatus,
-      setViewCount,
+      incrementViewCount,
+      decrementViewCount,
       setAudioLevels,
       toggleSettingsMenu,
-      setRTMFailedToConnect,
-      setRTMConnectionState,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

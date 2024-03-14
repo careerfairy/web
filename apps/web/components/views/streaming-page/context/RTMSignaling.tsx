@@ -1,12 +1,10 @@
 import { Box, Button, ButtonGroup } from "@mui/material"
 import { useCurrentUID, useIsConnected } from "agora-rtc-react"
-import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
 import { EmoteType } from "context/agora/RTMContext"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { useSnackbar } from "notistack"
 import { ReactNode, useCallback, useEffect } from "react"
-import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
 import {
@@ -14,6 +12,7 @@ import {
    AgoraRTMClientProvider,
    createLazyRTMChannel,
    createRTMClient,
+   useRTMChannelEvent,
 } from "./rtm"
 
 const useChannel = createLazyRTMChannel()
@@ -30,7 +29,6 @@ export const RTMSignalingProvider = ({
    const { enqueueSnackbar } = useSnackbar()
    const rtcIsConnected = useIsConnected()
    const uid = useCurrentUID()
-   const dispatch = useAppDispatch()
 
    const client = useClient()
    const channel = useChannel(client, livestreamId)
@@ -41,9 +39,7 @@ export const RTMSignalingProvider = ({
       try {
          await client.login({ uid: uid.toString(), token })
          await channel.join()
-         dispatch(setRTMFailedToConnect(false))
       } catch (e) {
-         dispatch(setRTMFailedToConnect(true))
          errorLogAndNotify(e, {
             message: "Failed to login to Agora RTM",
             metadata: {
@@ -52,14 +48,7 @@ export const RTMSignalingProvider = ({
             },
          })
       }
-   }, [channel, client, dispatch, token, uid])
-
-   // Reset the failed to connect state when the component unmounts
-   useEffect(() => {
-      return () => {
-         dispatch(setRTMFailedToConnect(false))
-      }
-   }, [dispatch])
+   }, [channel, client, token, uid])
 
    const logout = useCallback(async () => {
       try {
@@ -95,12 +84,31 @@ export const RTMSignalingProvider = ({
       // 1. Optimistically dispatch emote locally to the UI
       enqueueSnackbar(emoteType, {
          variant: "success",
+         anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+         },
+         autoHideDuration: 2000,
       })
       // 2. Emit the emote event into the signaling API
       await channel.sendMessage(message)
 
       // 3. Save the emote document in firestore
    }
+
+   /**
+    * For demo purposes
+    */
+   useRTMChannelEvent(channel, "ChannelMessage", (message, memberId) => {
+      enqueueSnackbar(`${message.text} - ${memberId}`, {
+         variant: "success",
+         anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+         },
+         autoHideDuration: 2000,
+      })
+   })
 
    return (
       <AgoraRTMClientProvider client={client}>
