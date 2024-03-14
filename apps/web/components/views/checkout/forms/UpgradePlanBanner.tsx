@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { Box, Button } from "@mui/material"
+import { Box, Button, SxProps, Theme } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import StarBorderIcon from "@mui/icons-material/StarBorder"
 
@@ -9,6 +9,7 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import BuyButtonComponent from "./BuyButtonComponent"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { StripeButtonProductConfig } from "data/stripe/stripe"
+import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -21,9 +22,9 @@ const styles = sxStyles({
       mx: 5,
       my: 1,
       display: "flex",
-      width: "1100px%",
-      padding: "24px",
-      justifyContent: "space-between",
+      pl: "24px",
+      alignContent: "space-between",
+      justifyContent: "center",
       alignItems: "center",
       minHeight: "150px",
       backgroundColor: "red",
@@ -36,16 +37,32 @@ const styles = sxStyles({
 
 type Props = {
    productConfig: StripeButtonProductConfig
+   title: string
+   description: string
+   bannerSx?: SxProps<Theme>
 }
 //TODO: check unmounting
 /**
  * This
  * @returns
  */
-const UpgradePlanBanner = ({ productConfig }: Props) => {
+const UpgradePlanBanner = ({
+   productConfig,
+   title,
+   description,
+   bannerSx,
+}: Props) => {
    const group = useGroup()
+   const planStatus = useGroupPlanIsValid(group.group.groupId, [
+      "trial",
+      "tier1",
+   ])
    const [clientSecret, setClientSecret] = useState("")
-   console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
+   console.log(
+      "🚀 ~ CheckoutForm ~ clientSecret,bannerSx:",
+      clientSecret,
+      bannerSx
+   )
 
    const redirectToCheckout = async (e: FormEvent) => {
       e.preventDefault()
@@ -80,41 +97,36 @@ const UpgradePlanBanner = ({ productConfig }: Props) => {
    }
 
    return (
-      <Box>
-         <ConditionalWrapper condition={Boolean(clientSecret)}>
-            <Box></Box>
-            <Box sx={styles.embeddedCheckoutWrapper}>
-               <BuyButtonComponent
-                  buttonId={productConfig.buttonId}
-                  publishableKey={productConfig.publishableKey}
-                  clientSecret={clientSecret}
-               />
-            </Box>
-         </ConditionalWrapper>
-         <Box sx={styles.banner}>
-            <Box>
-               <p>
-                  Your Sparks trial has ended, and theyre no longer visible to
-                  the CareerFairy talent community. But the magic doesnt have to
-                  stop! Upgrade now and reignite the spark to continue engaging
-                  all year round with your target audience, access in-depth
-                  analytics and showcase your job opportunities in an innovative
-                  way. Dont let the momentum you built fade, upgrade now and
-                  reignite the spark!
-               </p>
-            </Box>
-            <Box>
-               <Button
-                  onClick={redirectToCheckout}
-                  color="secondary"
-                  sx={{ mt: 1 }}
-                  startIcon={<StarBorderIcon />}
-               >
-                  Upgrade Now
-               </Button>
+      <ConditionalWrapper condition={planStatus ? !planStatus.valid : null}>
+         <Box>
+            <ConditionalWrapper condition={Boolean(clientSecret)}>
+               <Box></Box>
+               <Box sx={styles.embeddedCheckoutWrapper}>
+                  <BuyButtonComponent
+                     buttonId={productConfig.buttonId}
+                     publishableKey={productConfig.publishableKey}
+                     clientSecret={clientSecret}
+                  />
+               </Box>
+            </ConditionalWrapper>
+            <Box sx={styles.banner}>
+               <Box>
+                  <h5>{title}</h5>
+                  <p>{description}</p>
+               </Box>
+               <Box sx={{ minWidth: "250px" }}>
+                  <Button
+                     onClick={redirectToCheckout}
+                     color="secondary"
+                     sx={{ mt: 1 }}
+                     startIcon={<StarBorderIcon />}
+                  >
+                     Upgrade Now
+                  </Button>
+               </Box>
             </Box>
          </Box>
-      </Box>
+      </ConditionalWrapper>
    )
 }
 

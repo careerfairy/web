@@ -32,10 +32,16 @@ const styles = sxStyles({
    },
 })
 
+type Props = {
+   text: string
+   icon: React.ReactNode
+}
 //TODO: check unmounting
-const CheckoutForm = () => {
+const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
    const group = useGroup()
    const [clientSecret, setClientSecret] = useState("")
+
+   const buttonText = text ? text : "Upgrade Now"
    console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
 
    const redirectToCheckout = async (e: FormEvent) => {
@@ -93,12 +99,12 @@ const CheckoutForm = () => {
             onClick={redirectToCheckout}
             color="secondary"
             sx={{ mt: 1 }}
-            startIcon={<StarBorderIcon />}
+            startIcon={icon || <StarBorderIcon />}
          >
-            Upgrade Now
+            {buttonText}
          </Button>
       </Box>
    )
 }
 
-export default CheckoutForm
+export default UpgradeSparksPlanButton

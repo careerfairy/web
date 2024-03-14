@@ -42,41 +42,40 @@ export default async function handler(
    // console.log("🚀 ~ checkoutSession:", checkoutSession)
    // res.status(200).json({ session: checkoutSession, message: JSON.stringify(session) })
 
-   // const query = `metadata['groupId']:'${req.body.groupId}'`
-
-   //   console.log("🚀 ~ query:", query)
-   //   const customers = await stripe.customers.search({
-   //     query: query,
-   //   });
-   let groupCustomer
+   const query = `metadata['groupId']:'${req.body.groupId}'`
+   let customer
    let createCustomer = false
-   try {
-      groupCustomer = await stripe.customers.retrieve(req.body.groupId)
+   console.log("🚀 ~ query:", query)
+   const customers = await stripe.customers.search({
+      query: query,
+   })
+   console.log("🚀 ~ customers via query:", customers)
 
-      // What if customer is deleted ?
-      if (!groupCustomer || groupCustomer.deleted) {
-         createCustomer = true
-      }
-   } catch (e) {
-      console.log("🚀 ~ error retrieving customer:", e)
+   if (customers && customers.data.length) {
+      if (customers.data.length > 1)
+         throw new Error(
+            "Too many customers found with the same 'metadata.groupId'",
+            customers
+         )
 
+      customer = customers.data.at(0)
+   } else {
       createCustomer = true
    }
 
    if (createCustomer) {
-      groupCustomer = await stripe.customers.create({
-         id: req.body.groupId,
+      customer = await stripe.customers.create({
          metadata: {
             // Does not seem to work
             groupId: req.body.groupId,
          },
       })
-      console.log("🚀 ~ created customer:", groupCustomer)
+      console.log("🚀 ~ created customer:", customer)
    }
-   console.log("🚀 ~ customer:", groupCustomer)
+   console.log("🚀 ~ customer:", customer)
 
    const customerSession = await stripe.customerSessions.create({
-      customer: groupCustomer.id,
+      customer: customer.id,
       components: {
          buy_button: {
             enabled: true,

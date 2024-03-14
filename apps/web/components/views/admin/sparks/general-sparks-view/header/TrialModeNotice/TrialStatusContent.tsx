@@ -4,6 +4,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import Message from "./Message"
 import Progress from "./Progress"
+import UpgradeSparksPlanButton from "components/views/checkout/forms/UpgradePlanButton"
 
 const styles = sxStyles({
    progressSection: {
@@ -106,6 +107,9 @@ const TrialStatusContent = () => {
             trialAboutToExpire={trialAboutToExpire}
             metPublishingCriteria={groupPresenter.publicSparks}
          />
+         <Box>
+            <UpgradeSparksPlanButton></UpgradeSparksPlanButton>
+         </Box>
       </Fragment>
    )
 }
