@@ -1,8 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import UpgradeSparksPlanButton from "components/views/checkout/forms/UpgradePlanButton"
 import LockedIcon from "components/views/common/icons/LockedIcon"
 import Image from "next/image"
 import React from "react"
+import { Unlock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -119,7 +121,7 @@ const Info = () => {
             ))}
          </Box>
          <Box sx={styles.text}>
-            Talk to your Success Manager to unlock the full power of Sparks.
+            <UpgradeSparksPlanButton text="Unlock it now" icon={<Unlock />} />
          </Box>
       </Stack>
    )

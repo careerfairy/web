@@ -2,10 +2,11 @@ import { RuntimeOptions } from "firebase-functions"
 import functions = require("firebase-functions")
 import config from "./config"
 import { Stripe } from "stripe"
-// import { stripe} from "stripe"
 import { setCORSHeaders } from "./util"
 import { groupRepo } from "./api/repositories"
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 /**
  * Functions runtime settings
  */
@@ -41,8 +42,9 @@ export const stripeWebHook = functions
             event = Stripe.webhooks.constructEvent(buf, sig, webhookSecret)
 
             await handleStripeEvent(event)
-            console.log("🚀 ~ .onRequest ~ handled:", event)
+            // console.log("🚀 ~ .onRequest ~ handled:", event)
          } catch (err) {
+            console.log("🚀 ~ .https.onRequest ~ err:", err)
             // On error, log and return the error message
             // console.log(`❌ Error message: ${err.message}`)
             response.status(400).send(`Webhook Error: ${err}`)
@@ -89,18 +91,28 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
          const paymentSucceedEvent =
             event as Stripe.CheckoutSessionCompletedEvent
          // console.log("🚀 ~ handleStripeEvent ~ paymentSucceedEvent:", paymentSucceedEvent)
-         const groupId = paymentSucceedEvent.data.object.customer as string
-         console.log("🚀 ~ handleStripeEvent ~ groupId:", groupId)
+         const customerId = paymentSucceedEvent.data.object.customer as string
+         console.log("🚀 ~ handleStripeEvent ~ customerId:", customerId)
+         const customer = await stripe.customers.retrieve(customerId)
+         console.log("🚀 ~ handleStripeEvent ~ customer:", customer)
+         if (customer && customer.metadata?.groupId) {
+            console.log("🚀 ~ handleStripeEvent ~ customer:", customer)
 
-         await groupRepo.startPlan(groupId, "tier1")
+            await groupRepo.startPlan(customer.metadata.groupId, "tier1")
 
-         console.log("🚀 ~ handleStripeEvent ~ groupId:", groupId)
-         console.log("✅ Successfully processed event:", event)
+            console.log("🚀 ~ handleStripeEvent ~ groupId:", customerId)
+            console.log(
+               "✅ Successfully processed event - Stripe Customer: " +
+                  customerId +
+                  ", Group ID: ",
+               customer.metadata.groupId
+            )
+         }
          break
       }
 
       default: {
-         console.log("IGNORE event:", event.type)
+         // console.log("IGNORE event:", event.type)
          break
       }
    }
