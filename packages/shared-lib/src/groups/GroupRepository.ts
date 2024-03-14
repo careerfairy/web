@@ -106,7 +106,7 @@ export interface IGroupRepository {
       questionType: Exclude<GroupQuestion["questionType"], "custom">
    ): Promise<GroupQuestion>
 
-   getAllGroups(): Promise<Group[]>
+   getAllPublicProfileGroups(): Promise<Group[]>
 
    getGroupCustomQuestionsQuery(
       groupId: string
@@ -535,9 +535,10 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<GroupQuestion>(groupFieldsOfStudySnaps)?.[0]
    }
 
-   async getAllGroups(): Promise<Group[]> {
+   async getAllPublicProfileGroups(): Promise<Group[]> {
       const groupSnapshots = await this.firestore
          .collection("careerCenterData")
+         .where("publicProfile", "==", true)
          .get()
       return mapFirestoreDocuments<Group>(groupSnapshots)
    }
