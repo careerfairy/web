@@ -5,7 +5,10 @@ import { LayoutGrid } from "../LayoutGrid"
 import { UserStream } from "components/views/streaming-page/types"
 import { UserStreamComponent } from "./UserStreamComponent"
 import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
-import { useStreamIsLandscape } from "components/custom-hook/streaming"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { useGalleryLayout } from "./useGalleryLayout"
 import { useSortedStreams } from "../useSortedStreams"
 import { useMemo } from "react"
@@ -27,7 +30,7 @@ const dynamicStyles = (spacing: number) =>
          // Shrink the height of the gallery to make space for the spotlight
          height: {
             xs: `calc(132px - ${theme.spacing(spacing)})`,
-            tablet: `calc(195px - ${theme.spacing(spacing)})`,
+            tablet: `calc(160px - ${theme.spacing(spacing)})`,
          },
       }),
       spotlightActiveLandscape: (theme) => ({
@@ -35,6 +38,16 @@ const dynamicStyles = (spacing: number) =>
          width: `calc(208px - ${theme.spacing(spacing)})`,
       }),
    })
+
+const calculateGridItemMaxWidth = (
+   isSingleRowMode: boolean,
+   isMobile: boolean
+) => {
+   if (isSingleRowMode) {
+      return isMobile ? "180px !important" : "320px !important"
+   }
+   return undefined
+}
 
 type Props = {
    streams: UserStream[]
@@ -44,6 +57,7 @@ type Props = {
 export const Gallery = ({ streams, spacing }: Props) => {
    const isSpotlightMode = useIsSpotlightMode()
    const isLandscape = useStreamIsLandscape()
+   const isMobile = useStreamIsMobile()
 
    const layout = useGalleryLayout(streams.length)
    const pageSize = layout.rows * layout.columns
@@ -64,11 +78,13 @@ export const Gallery = ({ streams, spacing }: Props) => {
          : styles.spotlightActivePortrait
    }
 
+   const isSingleRowMode = isSpotlightMode && !isLandscape
+
    return (
       <Box sx={[styles.root, getConditionalStyles()]}>
          <GridCarousel
             floatingDots={Boolean(isLandscape && isSpotlightMode)}
-            navigationMode={isSpotlightMode && !isLandscape ? "arrows" : "dots"}
+            navigationMode={isSingleRowMode ? "arrows" : "dots"}
             gridPages={gridPages.map((pageStreamers, pageIndex) => (
                <LayoutGrid
                   key={pageIndex}
@@ -81,6 +97,10 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      <LayoutGrid.Item
                         key={stream.user.uid}
                         layoutColumns={layout.columns}
+                        maxWidth={calculateGridItemMaxWidth(
+                           isSingleRowMode,
+                           isMobile
+                        )}
                      >
                         <GradientProvider
                            {...calculateGradientControl({
