@@ -77,27 +77,25 @@ export const Gallery = ({ streams, spacing }: Props) => {
                      pageIndex === gridPages.length - 1 && pageIndex !== 0
                   }
                   layout={layout}
-                  renderGridItem={(stream, index, streams) => {
-                     return (
-                        <LayoutGrid.Item
-                           key={stream.user.uid}
-                           layoutColumns={layout.columns}
+                  renderGridItem={(stream, index, streams) => (
+                     <LayoutGrid.Item
+                        key={stream.user.uid}
+                        layoutColumns={layout.columns}
+                     >
+                        <GradientProvider
+                           {...calculateGradientControl({
+                              index,
+                              layoutRows: layout.rows,
+                              pageIndex,
+                              pageSize,
+                              pagesLength: gridPages.length,
+                              streamsLength: streams.length,
+                           })}
                         >
-                           <GradientProvider
-                              {...calculateGradientControl({
-                                 index,
-                                 layoutRows: layout.rows,
-                                 pageIndex,
-                                 pageSize,
-                                 pagesLength: gridPages.length,
-                                 streamsLength: streams.length,
-                              })}
-                           >
-                              <UserStreamComponent user={stream} />
-                           </GradientProvider>
-                        </LayoutGrid.Item>
-                     )
-                  }}
+                           <UserStreamComponent user={stream} />
+                        </GradientProvider>
+                     </LayoutGrid.Item>
+                  )}
                />
             ))}
          />
