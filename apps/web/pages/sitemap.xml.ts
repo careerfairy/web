@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
              xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
        <sitemap>
             <loc>${getBaseUrl()}/portal/sitemap.xml</loc>
-            <changeFrequency>daily</changeFrequency>
+            <changefreq>daily</changefreq>
        </sitemap>
     
        <sitemap>
@@ -22,18 +22,17 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     
        <sitemap>
             <loc>${getBaseUrl()}/next-livestreams/sitemap.xml</loc>
-            <changeFrequency>daily</changeFrequency>
+            <changefreq>daily</changefreq>
        </sitemap>
        
        <sitemap>
             <loc>${getBaseUrl()}/past-livestreams/sitemap.xml</loc>
-            <changeFrequency>daily</changeFrequency>
+            <changefreq>daily</changefreq>
        </sitemap>
        
        <sitemap>
             <loc>${getBaseUrl()}/landing_sitemap.xml</loc>
-       </sitemap>
-    
+       </sitemap>    
     </sitemapindex>`
 
    res.setHeader("Content-Type", "text/xml")
