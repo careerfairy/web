@@ -19,7 +19,7 @@ export const mapLiveStreamsToSiteMap = (
             `<url>
             <loc>${`${getBaseUrl()}${path}/${event.id}`}</loc>
             <lastmod>${event.lastUpdated?.toDate?.().toString()}</lastmod>
-            <changeFrequency>daily</changeFrequency>
+            <changefreq>daily</changefreq>
         </url>`
       )
       .join("")}`
