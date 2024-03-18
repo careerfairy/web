@@ -15,3 +15,12 @@ export const appendCurrentQueryParams = (url: string) => {
 
    return fullUrl.toString()
 }
+
+export const getServerSideBaseUrl = (req) => {
+   // Check for the X-Forwarded-Proto header to determine the protocol
+   const protocol = req.headers["x-forwarded-proto"] || "https"
+   // Use the Host header to get the host and possibly the port
+   const host = req.headers.host
+
+   return `${protocol}://${host}`
+}

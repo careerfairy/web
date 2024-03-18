@@ -1,7 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 
 /**
  * Maps live streams to sitemap URLs
@@ -17,7 +16,7 @@ export const mapLiveStreamsToSiteMap = (
       .map(
          (event) =>
             `<url>
-            <loc>${`${getBaseUrl()}${path}/${event.id}`}</loc>
+            <loc>${`${path}/${event.id}`}</loc>
             <lastmod>${event.lastUpdated?.toDate?.().toString()}</lastmod>
             <changefreq>daily</changefreq>
         </url>`
@@ -36,9 +35,7 @@ export const mapGroupsToSiteMap = (path: string, groups: Group[]): string => {
       .map(
          (group) =>
             `<url>
-            <loc>${`${getBaseUrl()}${path}/${companyNameSlugify(
-               group.universityName
-            )}`}</loc>
+            <loc>${`${path}/${companyNameSlugify(group.universityName)}`}</loc>
         </url>`
       )
       .join("")}`
@@ -54,7 +51,7 @@ export const mapWebFlowToSiteMap = (paths: string[]): string => {
       .map(
          (path) =>
             `<url>
-            <loc>${`${getBaseUrl()}/${path}`}</loc>
+            <loc>${path}</loc>
         </url>`
       )
       .join("")}`
