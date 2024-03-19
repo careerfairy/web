@@ -32,7 +32,9 @@ export const RTMSignalingProvider = ({
       channel: null,
    })
 
-   const { token } = useAgoraRtmToken(rtcIsConnected ? uid.toString() : null)
+   const { token } = useAgoraRtmToken(
+      rtcIsConnected && uid ? uid.toString() : null
+   )
 
    const login = useCallback(async () => {
       try {
