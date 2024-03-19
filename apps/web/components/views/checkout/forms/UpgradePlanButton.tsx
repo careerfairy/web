@@ -56,7 +56,7 @@ const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
    console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
 
    const handleOpen = useCallback(() => {
-      dispatch(openGroupPlansDialog({ selectedPlan: "tier1" }))
+      dispatch(openGroupPlansDialog())
    }, [dispatch])
 
    const redirectToCheckout = async (e: FormEvent) => {
@@ -71,10 +71,7 @@ const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
          console.error(checkoutSession.statusText)
          return
       }
-      console.log(
-         "🚀 ~ redirectToCheckout ~ customerSessionSecret:",
-         checkoutSession.data.customerSessionSecret
-      )
+
       setClientSecret(checkoutSession.data.customerSessionSecret)
 
       // // Redirect to Checkout.
