@@ -7,7 +7,6 @@ type Props = {
 }
 
 function BuyButtonComponent({ clientSecret, buttonId, publishableKey }: Props) {
-   // Paste the stripe-buy-button snippet in your React component
    return (
       <stripe-buy-button
          buy-button-id={buttonId}

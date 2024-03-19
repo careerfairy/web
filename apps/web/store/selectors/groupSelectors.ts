@@ -7,3 +7,9 @@ export const groupATSAccountsSelector = (state: RootState) =>
 
 export const notificationsSelector = (state: RootState) =>
    state.firestore.ordered.notifications || []
+
+export const groupPlansDialogInitialStepSelector = (state: RootState) =>
+   state.groupPlan.groupPlansForm.initialStep
+
+export const plansDialogOpenSelector = (state: RootState) =>
+   state.groupPlan.plansDialogOpen

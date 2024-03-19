@@ -2,6 +2,9 @@ import { GroupPlanType } from "."
 
 export type PlanFeature = "sparks" | "jobs"
 
+interface AnalyticsPlanConstants {
+   MINIMUM_DUMMY: number
+}
 interface SparksPlanConstants {
    /** The minimum number of creators required to publish sparks. */
    MINIMUM_CREATORS_TO_PUBLISH_SPARKS: number
@@ -28,6 +31,8 @@ interface JobsPlanConstants {
 export type PlanConstants = {
    sparks: SparksPlanConstants
    jobs: JobsPlanConstants
+   analytics?: AnalyticsPlanConstants
+   stripePriceId?: string
 }
 
 export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
@@ -45,12 +50,30 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
    },
    tier1: {
+      // Stripe price ID - Uniquely identifies a subscription
+      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      stripePriceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 15,
          MAX_SPARK_CREATOR_COUNT: 200, // No limit
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+      },
+      jobs: {
+         // Empty for now
+      },
+   },
+   essential: {
+      sparks: {
+         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
+         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
+         MAX_PUBLIC_SPARKS: 6,
+         MAX_SPARK_CREATOR_COUNT: 4,
+         PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+      },
+      analytics: {
+         MINIMUM_DUMMY: 1,
       },
       jobs: {
          // Empty for now

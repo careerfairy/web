@@ -1,13 +1,15 @@
-import { FormEvent, useState } from "react"
+import { FormEvent, useCallback, useState } from "react"
 import { Box, Button } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import StarBorderIcon from "@mui/icons-material/StarBorder"
 
 import axios from "axios"
 
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import BuyButtonComponent from "./BuyButtonComponent"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { Star } from "react-feather"
+import { useDispatch } from "react-redux"
+import { openGroupPlansDialog } from "store/reducers/groupPlanReducer"
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -30,6 +32,14 @@ const styles = sxStyles({
       borderRadius: "15px",
       //    border: "solid 3px darkgrey"
    },
+   checkoutButton: {
+      mt: 2,
+      backgroundColor: (theme) => theme.palette.secondary.main,
+      color: "white",
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.secondary.dark,
+      },
+   },
 })
 
 type Props = {
@@ -38,11 +48,16 @@ type Props = {
 }
 //TODO: check unmounting
 const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
+   const dispatch = useDispatch()
    const group = useGroup()
    const [clientSecret, setClientSecret] = useState("")
 
    const buttonText = text ? text : "Upgrade Now"
    console.log("🚀 ~ CheckoutForm ~ clientSecret:", clientSecret)
+
+   const handleOpen = useCallback(() => {
+      dispatch(openGroupPlansDialog({ selectedPlan: "tier1" }))
+   }, [dispatch])
 
    const redirectToCheckout = async (e: FormEvent) => {
       e.preventDefault()
@@ -75,7 +90,10 @@ const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
       // // using `error.message`.
       // console.warn(error.message);
    }
-
+   console.log(
+      "🚀 ~ redirectToCheckout ~ redirectToCheckout:",
+      redirectToCheckout
+   )
    return (
       <Box>
          <ConditionalWrapper condition={Boolean(clientSecret)}>
@@ -96,10 +114,10 @@ const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
             </Box>
          </ConditionalWrapper>
          <Button
-            onClick={redirectToCheckout}
-            color="secondary"
-            sx={{ mt: 1 }}
-            startIcon={icon || <StarBorderIcon />}
+            // onClick={redirectToCheckout}
+            onClick={handleOpen}
+            sx={styles.checkoutButton}
+            startIcon={icon || <Star strokeWidth={3} />}
          >
             {buttonText}
          </Button>

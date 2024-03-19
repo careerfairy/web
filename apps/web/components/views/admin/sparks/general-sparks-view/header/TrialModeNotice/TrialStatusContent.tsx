@@ -5,6 +5,7 @@ import { sxStyles } from "types/commonTypes"
 import Message from "./Message"
 import Progress from "./Progress"
 import UpgradeSparksPlanButton from "components/views/checkout/forms/UpgradePlanButton"
+import { Star } from "react-feather"
 
 const styles = sxStyles({
    progressSection: {
@@ -108,7 +109,10 @@ const TrialStatusContent = () => {
             metPublishingCriteria={groupPresenter.publicSparks}
          />
          <Box>
-            <UpgradeSparksPlanButton></UpgradeSparksPlanButton>
+            <UpgradeSparksPlanButton
+               text="Upgrade now"
+               icon={<Star strokeWidth={3} />}
+            ></UpgradeSparksPlanButton>
          </Box>
       </Fragment>
    )
