@@ -32,35 +32,36 @@ type Data = {
    background: string
 }
 
-export const useMemberData = (
-   memberData: UserLivestreamData | string
-): Data => {
-   const isString = typeof memberData === "string"
-   const isUser = !isString
+/**
+ * Transforms member data or streamer ID into a standardized format.
+ */
+const useMemberData = (memberData: UserLivestreamData | string): Data => {
+   const shouldFetchStreamerDetails = typeof memberData === "string"
 
    const { data: streamerDetails } = useStreamerDetails(
-      isString ? memberData : null
+      shouldFetchStreamerDetails ? memberData : null
    )
 
-   const user = isUser ? new UserPresenter(memberData.user) : null
+   if (shouldFetchStreamerDetails) {
+      return {
+         firstName: streamerDetails.firstName,
+         lastName: streamerDetails.lastName,
+         displayName: getStreamerDisplayName(
+            streamerDetails.firstName,
+            streamerDetails.lastName
+         ),
+         avatar: streamerDetails.avatarUrl,
+         background: streamerDetails.role,
+      }
+   }
 
-   const avatar = isString ? streamerDetails.avatarUrl : user.model.avatar
-   const firstName = isString ? streamerDetails.firstName : user.model.firstName
-   const lastName = isString ? streamerDetails.lastName : user.model.lastName
-   const displayName = isString
-      ? getStreamerDisplayName(
-           streamerDetails?.firstName,
-           streamerDetails?.lastName
-        )
-      : user.getDisplayName()
-   const background = isString ? streamerDetails.role : user.getBackground()
-
+   const user = new UserPresenter(memberData.user)
    return {
-      firstName,
-      lastName,
-      displayName,
-      avatar,
-      background,
+      firstName: user.model.firstName,
+      lastName: user.model.lastName,
+      displayName: user.getDisplayName(),
+      avatar: user.model.avatar,
+      background: user.getBackground(),
    }
 }
 

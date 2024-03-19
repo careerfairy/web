@@ -18,6 +18,7 @@ import { GenericListRenderer } from "./GenericListRenderer"
 const styles = sxStyles({
    contentWrapper: {
       p: 0,
+      overflowX: "hidden",
    },
    viewer: {
       py: 1,
