@@ -23,6 +23,12 @@ const styles = sxStyles({
       py: 1,
       px: 2,
    },
+   loader: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100%",
+   },
 })
 
 export const ViewersPanel = () => {
@@ -42,12 +48,18 @@ export const ViewersPanel = () => {
          icon={<Eye />}
          contentWrapperStyles={styles.contentWrapper}
       >
-         <SuspenseWithBoundary fallback={<CircularProgress />}>
+         <SuspenseWithBoundary fallback={<Loader />}>
             <Content />
          </SuspenseWithBoundary>
       </SidePanelView>
    )
 }
+
+const Loader = () => (
+   <Box sx={styles.loader}>
+      <CircularProgress />
+   </Box>
+)
 
 const Content = () => {
    const { livestreamId } = useStreamingContext()
