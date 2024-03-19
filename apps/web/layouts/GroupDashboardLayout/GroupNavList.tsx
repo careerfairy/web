@@ -25,16 +25,22 @@ import ATSStatus from "./ATSStatus"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 import NewFeatureHint from "../../components/util/NewFeatureHint"
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { Box } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
 
+const SPARKS_NAV_TITLE_WARNING_PLAN_DAYS = 7
 // Declare pathnames here if you are using them in multiple places
 const companyPagePathName = `/${baseHrefPath}/${baseParam}/admin/page/[[...livestreamDialog]]`
 
 const GroupNavList = () => {
    const { group, groupPresenter, shrunkLeftMenuIsActive } = useGroup()
 
+   const showSparksUpgradeWarning =
+      groupPresenter.isTrialPlan() &&
+      groupPresenter.getPlanDaysLeft() <= SPARKS_NAV_TITLE_WARNING_PLAN_DAYS
    const { push, pathname } = useRouter()
 
    const { layout } = useGroupDashboard()
@@ -78,7 +84,36 @@ const GroupNavList = () => {
                           href: `/${baseHrefPath}/${group.id}/admin/sparks`,
                           pathname: `/${baseHrefPath}/${baseParam}/admin/sparks`,
                           title: "Videos",
+                          rightElement: (
+                             <ConditionalWrapper
+                                condition={showSparksUpgradeWarning}
+                             >
+                                <Box alignItems={"center"}>
+                                   <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      style={{ marginTop: 5, marginRight: 70 }}
+                                      width="18"
+                                      height="18"
+                                      fill="none"
+                                   >
+                                      <circle
+                                         cx="9"
+                                         cy="9"
+                                         r="4"
+                                         fill="#FE9B0E"
+                                      />
+                                      <circle
+                                         cx="9"
+                                         cy="9"
+                                         r="7.5"
+                                         stroke="#FE9B0E"
+                                      />
+                                   </svg>
+                                </Box>
+                             </ConditionalWrapper>
+                          ),
                        },
+
                        {
                           id: "analytics",
                           href: `/${baseHrefPath}/${group.id}/admin/sparks/analytics`,
@@ -219,6 +254,7 @@ const GroupNavList = () => {
       group.id,
       group.universityCode,
       hasAccessToSparks,
+      showSparksUpgradeWarning,
       hasAtsIntegration,
       showCompanyPageCTA,
       push,
