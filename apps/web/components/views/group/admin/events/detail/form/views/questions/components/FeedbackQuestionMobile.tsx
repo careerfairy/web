@@ -6,12 +6,12 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography } from "@mui/material"
 import FeedbackQuestionForm from "./FeedbackQuestionForm"
 import {
-   ESTIMATED_DURATIONS,
    FeedbackQuestionFormValues,
    feedbackQuestionFormInitialValues,
    feedbackQuestionValidationSchema,
 } from "../commons"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { ESTIMATED_DURATIONS } from "../../../commons"
 
 const styles = sxStyles({
    container: {
