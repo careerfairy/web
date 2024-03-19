@@ -16,10 +16,11 @@ export interface UserAvatarProps {
 const small = 30
 const medium = 50
 const large = 80
-const fontMultiplier = 0.5
+const fontMultiplier = 0.45
 const styles: StylesProps = {
    root: {
       textDecoration: "none",
+      fontWeight: 500,
    },
    small: {
       width: small,

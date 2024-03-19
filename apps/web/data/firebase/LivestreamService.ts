@@ -5,6 +5,7 @@ import {
    LivestreamMode,
    LivestreamEvent,
    LivestreamModes,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -22,19 +23,23 @@ import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/vi
 import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
+   Timestamp,
    UpdateData,
+   arrayUnion,
    collection,
    collectionGroup,
    doc,
    documentId,
+   getDoc,
    getDocs,
    limit,
    query,
    updateDoc,
    where,
+   writeBatch,
 } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 
 type StreamerDetails = {
@@ -310,6 +315,16 @@ export class LivestreamService {
       )
    }
 
+   private getUserLivestreamDataRef(livestreamId: string, userEmail: string) {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "userLivestreamData",
+         userEmail
+      ).withConverter(createGenericConverter<UserLivestreamData>())
+   }
+
    private updateLivestream(
       livestreamId: string,
       data: UpdateData<LivestreamEvent>
@@ -374,6 +389,56 @@ export class LivestreamService {
          default:
             throw new Error("Invalid mode provided")
       }
+   }
+
+   async setUserIsParticipating(
+      livestreamId: string,
+      userEmail: UserData,
+      userStats: UserStats
+   ) {
+      const batch = writeBatch(FirestoreInstance)
+
+      const userLivestreamDataRef = this.getUserLivestreamDataRef(
+         livestreamId,
+         userEmail.userEmail
+      )
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+
+      const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
+
+      const isFirstTimeParticipating = !userLivestreamDataSnapshot.exists()
+
+      // Set the user Participating data in the userLivestreamData collection
+      batch.set(
+         userLivestreamDataRef,
+         {
+            user: userEmail,
+            userId: userEmail?.authId,
+            participated: {
+               date: Timestamp.now(),
+               // If this is the first time the user is participating, we store the user stats
+               ...(isFirstTimeParticipating
+                  ? {
+                       initialSnapshot: {
+                          userData: userEmail || null,
+                          userStats: userStats || null,
+                          date: Timestamp.now(),
+                       },
+                    }
+                  : {}),
+            },
+         },
+         {
+            merge: true,
+         }
+      )
+
+      // Set the user's email in the participants array of the livestream document
+      batch.update(livestreamRef, {
+         participatingStudents: arrayUnion(userEmail.userEmail),
+      })
+
+      return batch.commit()
    }
 }
 
