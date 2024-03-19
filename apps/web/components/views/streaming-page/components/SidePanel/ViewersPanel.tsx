@@ -1,19 +1,19 @@
-import React, { Fragment, memo } from "react"
+import { Fragment } from "react"
 import { SidePanelView } from "./SidePanelView"
 
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
-import { Box, CircularProgress, Stack, Typography } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useParticipatingUsers } from "components/custom-hook/streaming/useParticipatingUsers"
 import { Eye } from "react-feather"
-import AutoSizer from "react-virtualized-auto-sizer"
-import { FixedSizeList } from "react-window"
-import { useCurrentViewCount } from "store/selectors/streamingAppSelectors"
+import {
+   useCurrentViewCount,
+   useFailedToConnectToRTM,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
-import UserAvatar from "components/views/common/UserAvatar"
-import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { useRTMChannel } from "../../context/rtm"
+import { useChannelMembers } from "../../context/rtm/hooks/useChannelMembers"
+import { GenericListRenderer } from "./GenericListRenderer"
 
 const styles = sxStyles({
    contentWrapper: {
@@ -33,6 +33,7 @@ const styles = sxStyles({
 
 export const ViewersPanel = () => {
    const viewCount = useCurrentViewCount()
+   const failedToConnectToRTM = useFailedToConnectToRTM()
 
    return (
       <SidePanelView
@@ -49,7 +50,11 @@ export const ViewersPanel = () => {
          contentWrapperStyles={styles.contentWrapper}
       >
          <SuspenseWithBoundary fallback={<Loader />}>
-            <Content />
+            {failedToConnectToRTM ? (
+               <AllAttendees />
+            ) : (
+               <CurrentRTMChanneLMembers />
+            )}
          </SuspenseWithBoundary>
       </SidePanelView>
    )
@@ -61,63 +66,18 @@ const Loader = () => (
    </Box>
 )
 
-const Content = () => {
+const AllAttendees = () => {
    const { livestreamId } = useStreamingContext()
    const { data: users } = useParticipatingUsers(livestreamId)
 
-   const userCount = users?.length || 0
-
    return (
-      <AutoSizer>
-         {({ height, width }) => (
-            <FixedSizeList
-               itemSize={66}
-               itemCount={userCount}
-               height={height}
-               width={width}
-            >
-               {({ style, index }) => (
-                  <Viewer
-                     key={users[index].id}
-                     memberData={users[index]}
-                     style={style}
-                  />
-               )}
-            </FixedSizeList>
-         )}
-      </AutoSizer>
+      <GenericListRenderer items={users || []} itemKey={(item) => item.id} />
    )
 }
 
-type ViewerProps = {
-   memberData: UserLivestreamData
-   style: React.CSSProperties
+const CurrentRTMChanneLMembers = () => {
+   const rtmChannel = useRTMChannel()
+   const { members } = useChannelMembers(rtmChannel)
+
+   return <GenericListRenderer items={members || []} itemKey={(item) => item} />
 }
-
-const Viewer = memo(({ memberData, style }: ViewerProps) => {
-   const user = new UserPresenter(memberData.user)
-   return (
-      <Stack direction="row" spacing={0.75} style={style} sx={styles.viewer}>
-         <UserAvatar size={44} data={memberData.user} />
-         <Stack>
-            <Typography
-               sx={getMaxLineStyles(1)}
-               variant="medium"
-               color="neutral.800"
-               fontWeight={600}
-            >
-               {user.getDisplayName()}
-            </Typography>
-            <Typography
-               sx={getMaxLineStyles(1)}
-               variant="small"
-               color="neutral.400"
-            >
-               {user.getBackground()}
-            </Typography>
-         </Stack>
-      </Stack>
-   )
-})
-
-Viewer.displayName = "Viewer"
