@@ -2,8 +2,10 @@ import useSWR from "swr"
 import { RtmChannel } from "agora-rtm-sdk"
 import { useRTMChannelEvent } from "./useRTMChannelEvent"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { STREAM_IDENTIFIERS } from "constants/streaming"
+import { useMemo } from "react"
 
-// Define a fetcher function that calls the `getMembers` method on the channel
+// fetcher function that calls the `getMembers` method on the channel
 const fetchChannelMembers = async (channel: RtmChannel) => {
    if (!channel) return []
 
@@ -11,17 +13,35 @@ const fetchChannelMembers = async (channel: RtmChannel) => {
 }
 
 /**
- * Sorts channel members based on their roles and names.
+ * Sorts channel members based on their roles and names in a more streamlined manner.
  * The order of precedence is as follows:
  * 1. Creators are listed first.
- * 2. Users are listed next.
- * 3. Within each role, members are sorted alphabetically.
+ * 2. Screen shares are listed next.
+ * 3. Users are listed after screen shares.
+ * 4. Unknown roles are listed last.
+ * 5. Within each role, members are sorted alphabetically.
  */
 const sortMembers = (a: string, b: string) => {
-   if (a.startsWith("creator") && !b.startsWith("creator")) return -1
-   if (!a.startsWith("creator") && b.startsWith("creator")) return 1
-   if (a.startsWith("user") && !b.startsWith("user")) return -1
-   if (!a.startsWith("user") && b.startsWith("user")) return 1
+   const precedence = [
+      STREAM_IDENTIFIERS.CREATOR,
+      STREAM_IDENTIFIERS.SCREEN_SHARE,
+      STREAM_IDENTIFIERS.USER,
+      STREAM_IDENTIFIERS.ANONYMOUS,
+      STREAM_IDENTIFIERS.RECORDING,
+   ]
+
+   const getPrecedenceIndex = (identifier: string) => {
+      const index = precedence.findIndex((role) => identifier.startsWith(role))
+      return index === -1 ? precedence.length : index // Place unknown roles at the end
+   }
+
+   const aPrecedence = getPrecedenceIndex(a)
+   const bPrecedence = getPrecedenceIndex(b)
+
+   if (aPrecedence !== bPrecedence) {
+      return aPrecedence - bPrecedence
+   }
+
    return a.localeCompare(b)
 }
 
@@ -36,7 +56,7 @@ export const useChannelMembers = (channel: RtmChannel) => {
    const channelId = channel?.channelId
 
    const { data, error, mutate, isLoading } = useSWR<string[]>(
-      channel ? ["channelMembers", channelId] : null,
+      channelId ? ["channelMembers", channelId] : null,
       () => fetchChannelMembers(channel),
       {
          revalidateOnFocus: false,
@@ -85,8 +105,10 @@ export const useChannelMembers = (channel: RtmChannel) => {
       )
    })
 
+   const sortedMembers = useMemo(() => data?.sort(sortMembers), [data])
+
    return {
-      members: data?.sort(sortMembers),
+      members: sortedMembers,
       isLoading,
       error,
    }
