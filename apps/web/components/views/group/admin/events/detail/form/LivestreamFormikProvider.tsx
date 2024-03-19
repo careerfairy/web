@@ -2,37 +2,23 @@ import {
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
-import { Form, Formik } from "formik"
-import { FC } from "react"
-import { TAB_VALUES } from "../navigation/LivestreamAdminDetailTopBarNavigation"
+import { Formik } from "formik"
+import { FC, ReactNode } from "react"
 import {
    LivestreamFormGeneralTabValues,
-   LivestreamFormSpeakersTabValues,
-   LivestreamFormQuestionsTabValues,
    LivestreamFormJobsTabValues,
+   LivestreamFormQuestionsTabValues,
+   LivestreamFormSpeakersTabValues,
    LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import LivestreamFormGeneralStep from "./views/general"
-import LivestreamFormSpeakersStep from "./views/speakers"
-import LivestreamFormQuestionsStep from "./views/questions"
-import LivestreamFormJobsStep from "./views/jobs"
-import { sxStyles } from "@careerfairy/shared-ui"
-import { CircularProgress, Stack } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamCreator } from "./views/questions/commons"
-
-const styles = sxStyles({
-   root: {
-      padding: "24px",
-   },
-})
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -115,7 +101,7 @@ function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
       avatarUrl: speaker.avatar,
       createdAt: null,
       updatedAt: null,
-      linkedInUrl: null,
+      linkedInUrl: "",
       story: speaker.background,
       roles: ["Speaker"],
    }
@@ -195,13 +181,13 @@ const convertLivestreamObjectToForm = ({
 type Props = {
    livestream: LivestreamEvent
    groupId: string
-   tabValue: TAB_VALUES
+   children: ReactNode
 }
 
-const LivestreamCreationForm: FC<Props> = ({
+const LivestreamFormikProvider: FC<Props> = ({
    livestream,
    groupId,
-   tabValue,
+   children,
 }) => {
    const { data: existingInterests } = useInterests()
    const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
@@ -224,22 +210,9 @@ const LivestreamCreationForm: FC<Props> = ({
          onSubmit={undefined}
          validationSchema={livestreamFormValidationSchema}
       >
-         <Form>
-            <Stack sx={styles.root} rowGap={2}>
-               {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
-               {tabValue == TAB_VALUES.SPEAKERS && (
-                  <SuspenseWithBoundary fallback={<CircularProgress />}>
-                     <LivestreamFormSpeakersStep />
-                  </SuspenseWithBoundary>
-               )}
-               {tabValue == TAB_VALUES.QUESTIONS && (
-                  <LivestreamFormQuestionsStep />
-               )}
-               {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
-            </Stack>
-         </Form>
+         {children}
       </Formik>
    )
 }
 
-export default LivestreamCreationForm
+export default LivestreamFormikProvider
