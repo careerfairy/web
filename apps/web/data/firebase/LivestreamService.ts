@@ -391,11 +391,19 @@ export class LivestreamService {
       }
    }
 
+   /**
+    * Updates Firestore to mark a user as participating in a livestream. This involves updating the user's status in `userLivestreamData` and adding their email to `participatingStudents`.
+    *
+    * @param {string} livestreamId - Livestream ID.
+    * @param {UserData} userData - User data.
+    * @param {UserStats} userStats - User statistics.
+    * @returns {Promise<void>} Resolves upon successful Firestore batch commit.
+    */
    async setUserIsParticipating(
       livestreamId: string,
       userData: UserData,
       userStats: UserStats
-   ) {
+   ): Promise<void> {
       const batch = writeBatch(FirestoreInstance)
 
       const userLivestreamDataRef = this.getUserLivestreamDataRef(
