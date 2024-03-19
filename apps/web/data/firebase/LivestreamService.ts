@@ -457,6 +457,26 @@ export class LivestreamService {
 
       return batch.commit()
    }
+
+   /**
+    * Sets the status of a livestream to either started or not started.
+    * Updates the livestream document with the `hasStarted`, `hasEnded`, and optionally `startedAt` fields.
+    *
+    * @param {string} livestreamId - The ID of the livestream to update.
+    * @param {boolean} hasStarted - A boolean indicating if the livestream has started.
+    * @returns A promise resolved with the result of the update operation.
+    */
+   async setLivestreamHasStarted(livestreamId: string, hasStarted: boolean) {
+      return this.updateLivestream(livestreamId, {
+         hasStarted,
+         hasEnded: !hasStarted,
+         ...(hasStarted
+            ? {
+                 startedAt: Timestamp.now(),
+              }
+            : {}),
+      })
+   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

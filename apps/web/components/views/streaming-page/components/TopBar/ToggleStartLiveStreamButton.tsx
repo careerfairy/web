@@ -2,25 +2,32 @@ import { ResponsiveStreamButton } from "../Buttons"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useState } from "react"
 
+// type ConfirmationDialogAction = "start" | "stop" | null
+
 export const ToggleStartLiveStreamButton = () => {
    const [hasStartedLivestream, setHasStartedLivestream] =
       useState<boolean>(false)
 
+   // const [confirmationDialogAction, setConfirmationDialogAction] =
+   //    useState<ConfirmationDialogAction>(null)
+
    const isMobile = useStreamIsMobile(390)
 
    return (
-      <ResponsiveStreamButton
-         onClick={() => setHasStartedLivestream(!hasStartedLivestream)}
-         color={hasStartedLivestream ? "error" : "primary"}
-         variant="contained"
-      >
-         {hasStartedLivestream
-            ? isMobile
-               ? "Stop"
-               : "End live stream"
-            : isMobile
-            ? "Start"
-            : "Start live stream"}
-      </ResponsiveStreamButton>
+      <>
+         <ResponsiveStreamButton
+            onClick={() => setHasStartedLivestream(!hasStartedLivestream)}
+            color={hasStartedLivestream ? "error" : "primary"}
+            variant="contained"
+         >
+            {hasStartedLivestream
+               ? isMobile
+                  ? "Stop"
+                  : "End live stream"
+               : isMobile
+               ? "Start"
+               : "Start live stream"}
+         </ResponsiveStreamButton>
+      </>
    )
 }
