@@ -53,6 +53,7 @@ export interface LivestreamEvent extends Identifiable {
    registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
+   startedAt?: firebase.firestore.Timestamp
    hasEnded?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
