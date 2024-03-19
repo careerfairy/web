@@ -11,7 +11,9 @@ type stringSizes = "small" | "medium" | "large"
 export interface UserAvatarProps {
    sx?: SxProps<DefaultTheme>
    size?: stringSizes | number | string
-   data?: UserData
+   data?: Partial<
+      Pick<UserData, "authId" | "firstName" | "lastName" | "avatar">
+   >
 }
 const small = 30
 const medium = 50
@@ -66,7 +68,7 @@ const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
          firstName={data?.firstName}
          lastName={data?.lastName}
          // @ts-ignore
-         imageUrl={userData?.avatarUrl}
+         imageUrl={data?.avatar}
          onClick={(e) => e.stopPropagation()}
          // @ts-ignore
          component={isLoggedInUser ? Link : undefined}

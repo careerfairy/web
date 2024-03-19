@@ -301,8 +301,11 @@ export class LivestreamService {
       return (
          details || {
             firstName: "Anonymous",
-            lastName: "User",
-            role: tag === STREAM_IDENTIFIERS.SCREEN_SHARE ? "Screen Share" : "",
+            lastName: "",
+            role:
+               tag === STREAM_IDENTIFIERS.SCREEN_SHARE
+                  ? "Screen Share"
+                  : "User",
             avatarUrl: "",
             linkedInUrl: "",
          }
