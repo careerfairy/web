@@ -1,8 +1,8 @@
-import { FC, ReactNode } from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import FirestoreConditionalDocumentFetcher, {
    WrapperProps,
 } from "HOCs/FirestoreConditionalDocumentFetcher"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { FC, ReactNode } from "react"
 
 type LivestreamFetchWrapperProps = {
    livestreamId: string
