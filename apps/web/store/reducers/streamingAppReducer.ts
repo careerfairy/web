@@ -13,6 +13,7 @@ export const ActiveViews = {
    JOBS: "jobs",
    CTA: "cta",
    HAND_RAISE: "handRaise",
+   VIEWERS: "viewers",
 } as const
 
 export const StreamLayouts = {
