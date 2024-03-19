@@ -1,56 +1,48 @@
-import { useState } from "react"
-import { useRouter } from "next/router"
+import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
+import { LivestreamCreationContextProvider } from "components/views/group/admin/events/detail/LivestreamCreationContext"
+import LivestreamForm from "components/views/group/admin/events/detail/form/LivestreamForm"
+import LivestreamFormikProvider from "components/views/group/admin/events/detail/form/LivestreamFormikProvider"
+import LivestreamAdminDetailTopBarNavigation from "components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
-import LivestreamAdminDetailTopBarNavigation, {
-   TAB_VALUES,
-} from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
+import { useRouter } from "next/router"
 import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
 import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
-import LivestreamCreationForm from "components/views/group/admin/events/detail/form"
 
 const LivestreamAdminDetailsPage = () => {
    const {
       query: { groupId, livestreamId },
    } = useRouter()
 
-   const [tabValue, setTabValue] = useState(TAB_VALUES.GENERAL)
-
-   const handleTabChange = (_, newValue) => {
-      setTabValue(newValue)
-   }
+   if (!groupId) return null
 
    return (
-      <GroupDashboardLayout
-         titleComponent={"Live stream Details"}
-         groupId={groupId as string}
-         topBarCta={<LivestreamButtonActions />} // TODO to be implemented properly in CF-527
-         topBarNavigation={
-            <LivestreamAdminDetailTopBarNavigation
-               tabValue={tabValue}
-               tabOnChange={handleTabChange}
-            />
-         }
-         bottomBarNavigation={
-            <LivestreamAdminDetailBottomBarNavigation
-               currentTab={tabValue}
-               changeTab={setTabValue}
-            />
-         }
-         backgroundColor="#FDFDFD"
-      >
-         <DashboardHead title="CareerFairy | Editing Live Stream of " />
-         <LivestreamFetchWrapper livestreamId={livestreamId as string}>
-            {(livestream) => (
-               <LivestreamCreationForm
-                  livestream={livestream}
-                  groupId={groupId as string}
-                  tabValue={tabValue}
-               />
-            )}
-         </LivestreamFetchWrapper>
-      </GroupDashboardLayout>
+      <LivestreamFetchWrapper livestreamId={livestreamId as string}>
+         {(livestream) => (
+            <LivestreamFormikProvider
+               livestream={livestream}
+               groupId={groupId as string}
+            >
+               <LivestreamCreationContextProvider>
+                  <GroupDashboardLayout
+                     titleComponent={"Live stream Details"}
+                     groupId={groupId as string}
+                     topBarCta={<LivestreamButtonActions />}
+                     topBarNavigation={
+                        <LivestreamAdminDetailTopBarNavigation />
+                     }
+                     bottomBarNavigation={
+                        <LivestreamAdminDetailBottomBarNavigation />
+                     }
+                     backgroundColor="#FDFDFD"
+                  >
+                     <DashboardHead title="CareerFairy | Editing Live Stream of " />
+                     <LivestreamForm />
+                  </GroupDashboardLayout>
+               </LivestreamCreationContextProvider>
+            </LivestreamFormikProvider>
+         )}
+      </LivestreamFetchWrapper>
    )
 }
 
