@@ -1,15 +1,14 @@
-import { Box, Button, CircularProgress, Stack } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import GroupPlansDialog, { useSparksPlansForm } from "../GroupPlansDialog"
+import GroupPlansDialog from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { isMobile } from "react-device-detect"
-import GroupSparksPlanDesktopSelector from "./components/GroupSparksPlanDesktopSelector"
 import { useSelector } from "react-redux"
-import { selectedPlanSelector } from "store/selectors/groupSelectors"
-import { FormEvent } from "react"
-import axios from "axios"
+import {
+   clientSecret,
+   selectedPlanSelector,
+} from "store/selectors/groupSelectors"
+import BuyButtonComponent from "../forms/BuyButtonComponent"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 
 const styles = sxStyles({
    content: {
@@ -18,6 +17,7 @@ const styles = sxStyles({
       justifyContent: "center",
       height: "100%",
       width: "100%",
+      backgroundColor: "#F6F6FA",
    },
    checkoutButton: {
       mt: 2,
@@ -48,9 +48,15 @@ const styles = sxStyles({
       fontWeight: "400",
       lineHeight: "20px",
    },
+   stripeButtonWrapper: {
+      display: "flex",
+      justifyItems: "center",
+      alignContent: "center",
+      justifyContent: "center",
+   },
 })
 
-const SelectSparksPlanView = () => {
+const GroupPlanCheckoutView = () => {
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
          <View />
@@ -59,40 +65,9 @@ const SelectSparksPlanView = () => {
 }
 
 const View = () => {
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
    const selectedPlan = useSelector(selectedPlanSelector)
-   const { group } = useGroup()
-
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-      // Create a Checkout Session.
-      const checkoutSession = await axios.post(
-         "/api/checkout_sessions",
-         { amount: "some amount", groupId: group.groupId } // BMW
-      )
-
-      if (checkoutSession.status != 200) {
-         console.error(checkoutSession.statusText)
-         return
-      }
-
-      setClientSecret(checkoutSession.data.customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-
-      // // Redirect to Checkout.
-      // const stripe = await loadStripe()
-      // const { error } = await stripe!.redirectToCheckout({
-      //    // Make the id field from the Checkout Session creation API response
-      //    // available to this file, so you can provide it as parameter here
-      //    // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-      //    sessionId: checkoutSession.data.id,
-      // });
-      // // If `redirectToCheckout` fails due to a browser or network
-      // // error, display the localized error message to your customer
-      // // using `error.message`.
-      // console.warn(error.message);
-   }
+   const generatedClientSecret = useSelector(clientSecret)
+   console.log("🚀 ~ View ~ selectedPlan:", selectedPlan)
 
    return (
       <GroupPlansDialog.Container>
@@ -113,36 +88,37 @@ const View = () => {
                   md: 0,
                }}
             />
-
-            <ConditionalWrapper
-               condition={isMobile}
-               fallback={<GroupSparksPlanDesktopSelector />}
-            >
-               {/* <GroupSparksPlanMobileSelector /> */}
-            </ConditionalWrapper>
-
+            {selectedPlan} / {generatedClientSecret}
+            <Box sx={styles.stripeButtonWrapper}>
+               <BuyButtonComponent
+                  buttonId={PLAN_CONSTANTS[selectedPlan].stripe?.buttonId}
+                  clientSecret={generatedClientSecret}
+                  publishableKey={
+                     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                  }
+               />
+            </Box>
             <Box
                mb={{
                   xs: "auto",
                   md: 0,
                }}
             />
-            <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
-               <Box>
+            {/* <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
+               <Box >
                   <Button
-                     disabled={!selectedPlan}
-                     color={"secondary"}
-                     onClick={redirectToCheckout}
-                     // onClick={handleOpen}
-                     sx={styles.checkoutButton}
-                  >
-                     Select plan
-                  </Button>
+               color={"secondary"}
+               // onClick={redirectToCheckout}
+               // onClick={handleOpen}
+               sx={styles.checkoutButton} 
+            >
+               Select plan
+            </Button>
                </Box>
                <Box sx={styles.checkoutDescription}>
-                  Content available for 1 year
+               Content available for 1 year
                </Box>
-            </Stack>
+            </Stack> */}
          </GroupPlansDialog.Content>
          {/* <GroupPlansDialog.Actions>
             <GroupPlansDialog.Button
@@ -164,4 +140,4 @@ const View = () => {
    )
 }
 
-export default SelectSparksPlanView
+export default GroupPlanCheckoutView

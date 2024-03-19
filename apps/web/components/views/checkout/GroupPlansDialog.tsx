@@ -5,11 +5,9 @@ import {
    BoxProps,
    CircularProgress,
    IconButton,
-   Container as MuiContainer,
-   Stack,
    Typography,
    TypographyProps,
-   StackProps,
+   Dialog,
 } from "@mui/material"
 import SteppedDialog, {
    useStepper,
@@ -19,7 +17,11 @@ import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { GroupPlanType } from "@careerfairy/shared-lib/groups"
-import { closeGroupPlansDialog } from "store/reducers/groupPlanReducer"
+import {
+   closeGroupPlansDialog,
+   setPlan as setPlanAction,
+   setSecret as setClientSecretAction,
+} from "store/reducers/groupPlanReducer"
 import {
    groupPlansDialogInitialStepSelector,
    plansDialogOpenSelector,
@@ -32,42 +34,42 @@ const mobileBreakpoint = "md"
 const styles = sxStyles({
    root: {},
    title: {
+      color: "var(--neutral-neutral---800, #3D3D47)",
+      textAlign: "center",
+
+      /* Desktop/Heading 2/H2 - Bold - Desktop */
+      fontFamily: "Poppins",
+      fontSize: "32px",
+      fontStyle: "normal",
+      fontWeight: "700",
+      lineHeight: "48px" /* 150% */,
       letterSpacing: {
          xs: "-0.04343rem",
          [mobileBreakpoint]: "-0.04886rem",
       },
-      fontSize: {
-         xs: "2.28571rem", // 32px
-         [mobileBreakpoint]: "2.57143rem", // 36px
-      },
-      fontWeight: 600,
-      lineHeight: "150%",
-      textAlign: {
-         [mobileBreakpoint]: "center",
-      },
    },
    subtitle: {
-      color: "text.secondary",
-      fontSize: "1.14286rem",
-      fontStyle: "normal",
-      fontWeight: 400,
-      lineHeight: "150%",
       letterSpacing: "-0.02171rem",
       mx: {
          [mobileBreakpoint]: "auto",
       },
-      textAlign: {
-         mobile: "center",
-      },
+      color: "var(--Neutral-Neutral---800, #3D3D47)",
+      textAlign: "center",
+      fontFamily: "Poppins",
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "24px",
    },
    containerWrapper: {
       flexDirection: "column",
       py: `${mobileTopPadding}px`,
       position: "relative",
-      height: {
-         xs: "100dvh",
-         [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 855px)",
-      },
+      // height: {
+      //    xs: "100dvh",
+      //    [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 855px)",
+      // },
+      height: "100%",
       justifyContent: {
          xs: "flex-start",
          [mobileBreakpoint]: "center",
@@ -80,12 +82,14 @@ const styles = sxStyles({
    container: {
       width: "100%",
       height: "100%",
-      display: "grid",
+      display: "flex",
       flexDirection: "column",
    },
    content: {
       display: "flex",
       flexDirection: "column",
+      px: 10,
+      py: 3,
    },
    fixedBottomContent: {
       position: "fixed",
@@ -146,9 +150,9 @@ const views = [
       ),
    },
    {
-      key: "select-or-change-plan",
+      key: "checkout",
       Component: dynamic(
-         () => import("components/views/checkout/views/SelectGroupPlanView"),
+         () => import("components/views/checkout/views/GroupPlanCheckoutView"),
          { loading: () => <CircularProgress /> }
       ),
    },
@@ -162,7 +166,14 @@ export const useSparksPlansForm = () => {
 
    const setPlan = useCallback(
       (plan: GroupPlanType) => {
-         dispatch(setPlan(plan))
+         dispatch(setPlanAction(plan))
+      },
+      [dispatch]
+   )
+
+   const setClientSecret = useCallback(
+      (secret: string) => {
+         dispatch(setClientSecretAction(secret))
       },
       [dispatch]
    )
@@ -171,17 +182,28 @@ export const useSparksPlansForm = () => {
       dispatch(closeGroupPlansDialog())
    }, [dispatch])
 
-   const goToSelectPlanView = useCallback(() => {
-      setStateAndNavigate(setPlan, stepper.goToStep, null, "select-plan")
-   }, [setPlan, stepper])
+   const goToSelectedPlanCheckoutView = useCallback(
+      (plan: GroupPlanType) => {
+         setStateAndNavigate(setPlan, stepper.goToStep, plan, "checkout")
+      },
+      [setPlan, stepper]
+   )
 
    return useMemo(() => {
       return {
          stepper,
          handleClose,
-         goToSelectPlanView,
+         goToCheckoutView: goToSelectedPlanCheckoutView,
+         setPlan: setPlan,
+         setClientSecret: setClientSecret,
       }
-   }, [handleClose, goToSelectPlanView, stepper])
+   }, [
+      handleClose,
+      goToSelectedPlanCheckoutView,
+      stepper,
+      setPlan,
+      setClientSecret,
+   ])
 }
 
 const GroupPlansDialog = () => {
@@ -257,20 +279,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    console.log("🚀 ~ open:", open, width)
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
-         <MuiContainer
-            sx={[
-               styles.container,
-               // width
-               //    ? {
-               //         width: {
-               //            [mobileBreakpoint]: width,
-               //         },
-               //      }
-               //    : null,
-            ]}
-            disableGutters
-            maxWidth={"lg"}
-         >
+         <Dialog sx={styles.container} open={open} maxWidth={false}>
             {children}
             {hideCloseButton ? null : (
                <Box sx={styles.closeBtn}>
@@ -279,7 +288,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
                   </IconButton>
                </Box>
             )}
-         </MuiContainer>
+         </Dialog>
       </Box>
    )
 }
@@ -289,29 +298,6 @@ type ContentProps = BoxProps<"span"> & {}
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
    return <Box sx={combineStyles(sx, styles.content)} {...props} />
-}
-
-const Actions: FC<StackProps> = ({ children, sx, ...props }) => {
-   const {
-      stepper: { currentStep },
-   } = useSparksPlansForm()
-
-   console.log("🚀 ~ currentStep:", currentStep)
-   return (
-      <Stack
-         justifyContent={"center"}
-         alignContent={"center"}
-         direction="row"
-         // left={`${currentStep * 100}%`}
-         alignItems="center"
-         spacing={2}
-         zIndex={1}
-         sx={combineStyles(sx, styles.fixedBottomContent)}
-         {...props}
-      >
-         {children}
-      </Stack>
-   )
 }
 
 const ActionsOffset: FC<BoxProps> = ({ height = actionsHeight }) => {
@@ -361,7 +347,6 @@ function setStateAndNavigate(
 GroupPlansDialog.Title = Title
 GroupPlansDialog.Subtitle = Subtitle
 GroupPlansDialog.Container = Container
-GroupPlansDialog.Actions = Actions
 GroupPlansDialog.Button = CustomButton
 GroupPlansDialog.ActionsOffset = ActionsOffset
 GroupPlansDialog.Content = Content
