@@ -414,7 +414,13 @@ export class LivestreamService {
 
       const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
 
-      const isFirstTimeParticipating = !userLivestreamDataSnapshot.exists()
+      const shouldParticipate = userLivestreamDataSnapshot.exists()
+
+      // User live stream data does not exist, which means they haven't registered yet, so abort
+      if (!shouldParticipate) return
+
+      const isFirstTimeParticipating =
+         !userLivestreamDataSnapshot.data()?.participated?.date
 
       // Set the user Participating data in the userLivestreamData collection
       batch.set(
