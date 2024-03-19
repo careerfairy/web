@@ -3,9 +3,11 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
+   setHasStarted,
    setLivestreamMode,
    setNumberOfParticipants,
    setScreenSharerId,
+   setStartedAt,
 } from "store/reducers/streamingAppReducer"
 
 /**
@@ -35,12 +37,22 @@ export const LivestreamStateTrackers = (): null => {
       )
    }, [dispatch, livestream.participatingStudents?.length])
 
+   useEffect(() => {
+      dispatch(setStartedAt(livestream.startedAt?.toMillis() ?? null))
+   }, [dispatch, livestream.startedAt])
+
+   useEffect(() => {
+      dispatch(setHasStarted(Boolean(livestream.hasStarted)))
+   }, [dispatch, livestream.hasStarted])
+
    // Clean up the state on unmount
    useEffect(() => {
       return () => {
          dispatch(setNumberOfParticipants(0))
          dispatch(setScreenSharerId(null))
          dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
+         dispatch(setStartedAt(null))
+         dispatch(setHasStarted(false))
       }
    }, [dispatch])
 
