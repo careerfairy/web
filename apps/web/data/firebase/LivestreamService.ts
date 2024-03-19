@@ -393,14 +393,14 @@ export class LivestreamService {
 
    async setUserIsParticipating(
       livestreamId: string,
-      userEmail: UserData,
+      userData: UserData,
       userStats: UserStats
    ) {
       const batch = writeBatch(FirestoreInstance)
 
       const userLivestreamDataRef = this.getUserLivestreamDataRef(
          livestreamId,
-         userEmail.userEmail
+         userData.userEmail
       )
       const livestreamRef = this.getLivestreamRef(livestreamId)
 
@@ -412,15 +412,15 @@ export class LivestreamService {
       batch.set(
          userLivestreamDataRef,
          {
-            user: userEmail,
-            userId: userEmail?.authId,
+            user: userData,
+            userId: userData?.authId,
             participated: {
                date: Timestamp.now(),
                // If this is the first time the user is participating, we store the user stats
                ...(isFirstTimeParticipating
                   ? {
                        initialSnapshot: {
-                          userData: userEmail || null,
+                          userData: userData || null,
                           userStats: userStats || null,
                           date: Timestamp.now(),
                        },
@@ -435,7 +435,7 @@ export class LivestreamService {
 
       // Set the user's email in the participants array of the livestream document
       batch.update(livestreamRef, {
-         participatingStudents: arrayUnion(userEmail.userEmail),
+         participatingStudents: arrayUnion(userData.userEmail),
       })
 
       return batch.commit()

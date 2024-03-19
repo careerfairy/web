@@ -3,6 +3,7 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useEffect } from "react"
 import {
    setAudioLevels,
+   setRTCConnectionState,
    setRTMConnectionState,
    setViewCount,
 } from "store/reducers/streamingAppReducer"
@@ -33,6 +34,20 @@ export const AgoraTrackers = () => {
    useClientEvent(rtcClient, "volume-indicator", (users) => {
       dispatch(setAudioLevels(users))
    })
+
+   useClientEvent(
+      rtcClient,
+      "connection-state-change",
+      (currentState, prevState, reason) => {
+         dispatch(
+            setRTCConnectionState({
+               currentState,
+               prevState,
+               reason,
+            })
+         )
+      }
+   )
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
