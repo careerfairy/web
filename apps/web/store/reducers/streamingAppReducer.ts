@@ -3,7 +3,11 @@ import {
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { type UID } from "agora-rtc-react"
+import {
+   ConnectionDisconnectedReason,
+   ConnectionState,
+   type UID,
+} from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
 
 export const ActiveViews = {
@@ -66,6 +70,14 @@ export interface StreamingAppState {
          reason: RtmStatusCode.ConnectionChangeReason
       }
    }
+   rtcState: {
+      connectionState?: {
+         currentState: ConnectionState
+         prevState: ConnectionState
+         reason: ConnectionDisconnectedReason
+      }
+   }
+   isLoggedInOnDifferentBrowser: boolean
 }
 
 const initialState: StreamingAppState = {
@@ -89,6 +101,10 @@ const initialState: StreamingAppState = {
       viewCount: 0,
       connectionState: null,
    },
+   rtcState: {
+      connectionState: null,
+   },
+   isLoggedInOnDifferentBrowser: false,
 }
 
 const streamingAppSlice = createSlice({
@@ -181,6 +197,26 @@ const streamingAppSlice = createSlice({
          >
       ) {
          state.rtmSignalingState.connectionState = action.payload
+         const { reason, state: rtmState } = action.payload
+
+         if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+            state.isLoggedInOnDifferentBrowser = true
+         }
+      },
+
+      /* ==========================
+         ||   RTC State   ||
+         ========================== */
+      setRTCConnectionState(
+         state,
+         action: PayloadAction<StreamingAppState["rtcState"]["connectionState"]>
+      ) {
+         state.rtcState.connectionState = action.payload
+         const { reason } = action.payload
+
+         if (reason === "UID_BANNED") {
+            state.isLoggedInOnDifferentBrowser = true
+         }
       },
    },
 })
@@ -199,6 +235,7 @@ export const {
       toggleSettingsMenu,
       setRTMFailedToConnect,
       setRTMConnectionState,
+      setRTCConnectionState,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
