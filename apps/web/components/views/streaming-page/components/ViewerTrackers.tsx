@@ -3,6 +3,13 @@ import { useSetUserIsParticipating } from "components/custom-hook/streaming/useS
 import { useEffect } from "react"
 import { useStreamingContext } from "../context"
 
+/**
+ * Component responsible for tracking viewer-related behaviors within the streaming application.
+ * - Sets the user as participating in the current livestream on mount.
+ * - TODO:
+ * - Refactor useCountLivestreamAttendanceMinutes to work here
+ * - Refactor useRewardLivestreamAttendance to work here
+ */
 export const ViewerTrackers = () => {
    const { userData, userStats } = useAuth()
    const { livestreamId } = useStreamingContext()
@@ -14,7 +21,7 @@ export const ViewerTrackers = () => {
    )
 
    /**
-    * Set the user as participating on mount
+    * Store the user as participating data in the database on mount
     */
    useEffect(() => {
       setViewerIsParticipating()

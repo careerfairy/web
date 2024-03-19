@@ -21,6 +21,16 @@ const getKey = (
       userStats,
    })}`
 
+/**
+ * A custom hook that utilizes the `setUserIsParticipating` method from `@LivestreamService.ts`.
+ * This method updates Firestore to reflect a user's participation status in a livestream.
+ * It sets user data and stats in the `userLivestreamData` collection and adds the user's email to the `participatingStudents` array of the livestream document.
+ *
+ * @param {string} livestreamId - The ID of the livestream.
+ * @param {UserData} userData - The user's data.
+ * @param {UserStats} userStats - The user's statistics.
+ * @returns An object containing a function to trigger the participation status update and the mutation key.
+ */
 export const useSetUserIsParticipating = (
    livestreamId: string,
    userData: UserData,

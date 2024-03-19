@@ -23,9 +23,6 @@ const styles = sxStyles({
       py: 1,
       px: 2,
    },
-   maxOneLine: {
-      ...getMaxLineStyles(1),
-   },
 })
 
 export const ViewersPanel = () => {
@@ -72,7 +69,6 @@ const Content = () => {
                      key={users[index].id}
                      memberData={users[index]}
                      style={style}
-                     isLast={index === userCount - 1}
                   />
                )}
             </FixedSizeList>
@@ -84,7 +80,6 @@ const Content = () => {
 type ViewerProps = {
    memberData: UserLivestreamData
    style: React.CSSProperties
-   isLast: boolean
 }
 
 const Viewer = memo(({ memberData, style }: ViewerProps) => {
@@ -94,7 +89,7 @@ const Viewer = memo(({ memberData, style }: ViewerProps) => {
          <UserAvatar size={44} data={memberData.user} />
          <Stack>
             <Typography
-               sx={styles.maxOneLine}
+               sx={getMaxLineStyles(1)}
                variant="medium"
                color="neutral.800"
                fontWeight={600}
@@ -102,7 +97,7 @@ const Viewer = memo(({ memberData, style }: ViewerProps) => {
                {user.getDisplayName()}
             </Typography>
             <Typography
-               sx={styles.maxOneLine}
+               sx={getMaxLineStyles(1)}
                variant="small"
                color="neutral.400"
             >
