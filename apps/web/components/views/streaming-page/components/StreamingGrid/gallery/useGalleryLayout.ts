@@ -29,7 +29,7 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
 
    return useMemo<Layout>(() => {
       // Single element scenario: straightforward one column, one row.
-      if (numberOfElements === 1) return { columns: 1, rows: 1 }
+      if (numberOfElements <= 1) return { columns: 1, rows: 1 }
 
       // Landscape mode: prioritize a single row, adjusting columns based on count, maxing out at 3.
       if (streamIsLandscape) {
