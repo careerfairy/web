@@ -1,4 +1,4 @@
-import { GroupPlanType } from "@careerfairy/shared-lib/groups"
+import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { GroupPlansDialogStep } from "components/views/checkout/GroupPlansDialog"
 
@@ -7,6 +7,7 @@ interface IGroupPlanState {
    confirmCloseSparksDialogOpen: boolean
    groupPlansForm: {
       selectedPlan: GroupPlanType | null
+      clientSecret: string | null
       initialStep: GroupPlansDialogStep
    }
 }
@@ -23,7 +24,8 @@ const initialState: IGroupPlanState = {
    plansDialogOpen: false,
    confirmCloseSparksDialogOpen: false,
    groupPlansForm: {
-      selectedPlan: null,
+      selectedPlan: GroupPlanTypes.Advanced,
+      clientSecret: null,
       initialStep: "select-plan",
    },
 }
@@ -42,7 +44,7 @@ export const groupPlansSlice = createSlice({
             if ("selectedPlan" in action.payload) {
                state.groupPlansForm.selectedPlan = action.payload.selectedPlan
 
-               state.groupPlansForm.initialStep = "select-or-change-plan"
+               state.groupPlansForm.initialStep = "checkout"
             }
          }
       },
@@ -54,18 +56,23 @@ export const groupPlansSlice = createSlice({
          action: PayloadAction<CloseDialogPayload>
       ) => {
          const shouldForceClose = action.payload?.forceClose
-         console.log("🚀 ~ shoudlForceClose:", shouldForceClose)
+         console.log("🚀 ~ shouldForceClose:", shouldForceClose)
 
          state.plansDialogOpen = false
          state.groupPlansForm.selectedPlan = null
          state.confirmCloseSparksDialogOpen = false
-         state.groupPlansForm.initialStep =
-            initialState.groupPlansForm.initialStep // Reset the initial step
+         state.groupPlansForm = initialState.groupPlansForm // Reset the initial state completely
       },
       // Actions for setting values on the form
       setPlan: (state, action: PayloadAction<GroupPlanType>) => {
          state.groupPlansForm.selectedPlan =
             action.payload || initialState.groupPlansForm.selectedPlan
+      },
+      // Actions for setting values on the form
+      setSecret: (state, action: PayloadAction<string>) => {
+         console.log("🚀 ~ setting client secret:", action)
+         state.groupPlansForm.clientSecret =
+            action.payload || initialState.groupPlansForm.clientSecret
       },
    },
 })
@@ -73,6 +80,7 @@ export const groupPlansSlice = createSlice({
 // Export actions
 export const {
    setPlan,
+   setSecret,
    closeGroupPlansDialog,
    closeConfirmCloseGroupPlansDialog,
    openGroupPlansDialog,

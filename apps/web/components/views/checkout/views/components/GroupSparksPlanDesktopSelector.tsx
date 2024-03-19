@@ -1,11 +1,20 @@
-import { GroupPlanType } from "@careerfairy/shared-lib/groups"
+import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { Stack, Box } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import React from "react"
 import { Check, CheckCircle, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useSparksPlansForm } from "../../GroupPlansDialog"
+import { useSelector } from "react-redux"
+import { selectedPlanSelector } from "store/selectors/groupSelectors"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 
 const styles = sxStyles({
+   plansStack: {},
+   planFeatures: {
+      pt: 1,
+      borderRadius: "12px",
+   },
    planTitle: {
       // color: "var(--white-white---100, #FFF)",
 
@@ -33,7 +42,8 @@ const styles = sxStyles({
       lineHeight: "24px" /* 150% */,
    },
    planWrapper: {
-      width: "220px",
+      minWidth: "280px",
+      maxWidth: "280px",
       display: "flex",
       padding: "20px",
       flexDirection: "column",
@@ -42,7 +52,7 @@ const styles = sxStyles({
       gap: "8px",
       alignSelf: "stretch",
       borderRadius: "12px 12px 8px 8px",
-      background: "var(--purple-purple---600---Default, #6749EA)",
+      // background: "var(--purple-purple---600---Default, #6749EA)",
    },
    contentWrapper: {
       // width: "220px",
@@ -55,7 +65,10 @@ const styles = sxStyles({
       // alignSelf: "stretch",
       borderRadius: "14px",
       border: "1.5px solid var(--Purple-Purple---600---Default, #6749EA)",
-      background: "var(--Purple-Purple---50, #F0EDFD)",
+      // background: "var(--Purple-Purple---50, #F0EDFD)",
+      "&:hover": {
+         cursor: "pointer",
+      },
    },
    planSeparator: {
       // borderColor: "red",
@@ -66,77 +79,43 @@ const styles = sxStyles({
    selectedIcon: {
       position: "absolute",
       left: 210,
-      // backgroundColor: "black",
-      // borderRadius: "50%"
+      backgroundColor: "black",
+      borderRadius: "50%",
+   },
+   selectedWrapper: {
+      mt: "15px",
+      ml: "240px",
+      position: "absolute",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "27px",
+      height: "27px",
+
+      borderRadius: "50%",
    },
 })
 
-const ESSENTIAL_FEATURES: GroupSparksPlanFeatureProps[] = [
-   {
-      enabled: true,
-      name: "6 Sparks slots",
-   },
-   {
-      enabled: true,
-      name: "General analytics",
-   },
-   {
-      enabled: true,
-      name: "Up to 4 featured employees",
-   },
-   {
-      enabled: false,
-      name: "Reach and audience analytics",
-   },
-   {
-      enabled: false,
-      name: "Competitor analytics",
-   },
-   {
-      enabled: false,
-      name: "Dedicated KAM",
-   },
-   {
-      enabled: false,
-      name: "4'000 - 5’000 Exposure range",
-   },
-]
 const GroupSparksPlanDesktopSelector = () => {
-   const [checked, setChecked] = React.useState([1])
-
-   const handleToggle = (value: number) => () => {
-      const currentIndex = checked.indexOf(value)
-      const newChecked = [...checked]
-
-      if (currentIndex === -1) {
-         newChecked.push(value)
-      } else {
-         newChecked.splice(currentIndex, 1)
-      }
-
-      setChecked(newChecked)
-   }
-   console.log("🚀 ~ handleToggle ~ handleToggle:", handleToggle)
    return (
-      <Stack spacing={4} direction={"row"}>
+      <Stack spacing={4} direction={"row"} sx={styles.plansStack}>
          <GroupSparksPlanComponent
             title="Essential"
             description="Jumpstart your employer branding"
             pricing="8.700 CHF/ year"
-            features={ESSENTIAL_FEATURES}
-            selected
+            plan={GroupPlanTypes.Tier1}
          />
          <GroupSparksPlanComponent
-            title="Essential"
+            title="Advanced"
             description="Scale up your employer brand narrative"
-            features={[]}
             pricing="8.700 CHF/ year"
+            plan={GroupPlanTypes.Advanced}
          />
          <GroupSparksPlanComponent
-            title="Essential"
-            features={[]}
+            title="Premium"
             description="Gain unparalleled insights into your employer brand perception"
             pricing="8.700 CHF/ year"
+            plan={GroupPlanTypes.Premium}
          />
       </Stack>
    )
@@ -155,11 +134,11 @@ const GroupSparksPlanFeature = (props: GroupSparksPlanFeatureProps) => {
       <Stack direction={"row"} spacing={1}>
          <ConditionalWrapper
             condition={props.enabled}
-            fallback={<XCircle color={color} size={"21px"} />}
+            fallback={<XCircle color={color} size={"16px"} opacity={0.2} />}
          >
             <CheckCircle color={color} size={"16px"} />
          </ConditionalWrapper>
-         <Box>{props.name}</Box>
+         <Box sx={{ opacity: props.enabled ? 1 : 0.2 }}>{props.name}</Box>
       </Stack>
    )
 }
@@ -167,22 +146,53 @@ type GroupSparksPlanProps = {
    title: string
    description: string
    pricing: string
-   features: GroupSparksPlanFeatureProps[]
-   key?: GroupPlanType
-   selected?: boolean
+   plan: GroupPlanType
 }
 const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
-   const color = props.selected ? "var(--white-white---100, #FFF)" : "black"
+   const { setPlan } = useSparksPlansForm()
+   const selectedPlan = useSelector(selectedPlanSelector)
+   const selected = selectedPlan === props.plan
+   const color = selected ? "var(--white-white---100, #FFF)" : "black"
+
+   const selectedColor = "var(--Purple-Purple---600---Default, #6749EA)"
+   const unselectedColor = "var(--neutral-neutral---50, #EBEBEF)"
+   const featuresBackgroundColor = selected
+      ? "var(--purple-purple---50, #F0EDFD)"
+      : "var(--white-white---400, #F6F6FA)"
+   const headerBorderColor = selected ? selectedColor : unselectedColor
+   const headerBgColor = selected ? selectedColor : unselectedColor
+   const checkBackgroundColor = selected
+      ? "var(--purple-purple---800, #523ABB)"
+      : "#D9D9D9"
+
+   const features = PLAN_CONSTANTS[props.plan]?.features || []
+
+   // const checkout = useCallback( () => {
+   //     goToCheckoutView(props.key)
+   // }, [goToCheckoutView, props.key])
    return (
-      <Box sx={styles.contentWrapper}>
-         <Stack direction={"column"} sx={styles.planWrapper}>
-            <ConditionalWrapper condition={props.selected}>
-               <Box display={"flex"} justifyContent={"flex-end"}>
-                  <Box sx={styles.selectedIcon}>
-                     <Check />
-                  </Box>
-               </Box>
+      <Box
+         onClick={() => setPlan(props.plan)}
+         sx={[
+            styles.contentWrapper,
+            {
+               borderColor: headerBorderColor,
+               background: featuresBackgroundColor,
+            },
+         ]}
+         key={props.plan}
+      >
+         <Box
+            sx={[styles.selectedWrapper, { background: checkBackgroundColor }]}
+         >
+            <ConditionalWrapper condition={selected}>
+               <Check size={18} color="white" />
             </ConditionalWrapper>
+         </Box>
+         <Stack
+            direction={"column"}
+            sx={[styles.planWrapper, { backgroundColor: headerBgColor }]}
+         >
             <Box component="span" color={color} sx={styles.planTitle}>
                {props.title}
             </Box>
@@ -195,10 +205,14 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
                {props.pricing}
             </Box>
          </Stack>
-         <Stack direction={"column"} spacing={1} sx={{ mt: 2 }}>
-            {props.features.map((feature) => {
+         <Stack
+            direction={"column"}
+            spacing={1}
+            sx={[styles.planFeatures, { background: featuresBackgroundColor }]}
+         >
+            {features.map((feature, idx, items) => {
                return (
-                  <>
+                  <Box key={feature.name}>
                      <Box pl={2}>
                         <GroupSparksPlanFeature
                            key={feature.name}
@@ -206,10 +220,13 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
                            name={feature.name}
                         />
                      </Box>
-                     <Box>
+                     <ConditionalWrapper
+                        condition={idx != items.length - 1}
+                        fallback={<Box mt={"10px"} />}
+                     >
                         <hr style={styles.planSeparator} color="#E1E1E1" />
-                     </Box>
-                  </>
+                     </ConditionalWrapper>
+                  </Box>
                )
             })}
          </Stack>

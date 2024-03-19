@@ -1,7 +1,112 @@
 import { GroupPlanType } from "."
 
+const PREMIUM_FEATURES: PlanFeatureItem[] = [
+   {
+      enabled: true,
+      name: "Unlimited Sparks slots",
+   },
+   {
+      enabled: true,
+      name: "Unlimited featured employees",
+   },
+   {
+      enabled: true,
+      name: "General analytics",
+   },
+   {
+      enabled: true,
+      name: "Reach and audience analytics",
+   },
+   {
+      enabled: true,
+      name: "Competitor analytics",
+   },
+   {
+      enabled: true,
+      name: "Dedicated KAM",
+   },
+   {
+      enabled: true,
+      name: "11'000 - 13’000 Exposure range",
+   },
+]
+const ADVANCED_FEATURES: PlanFeatureItem[] = [
+   {
+      enabled: true,
+      name: "10 Sparks slots",
+   },
+   {
+      enabled: true,
+      name: "Up to 7 featured employees",
+   },
+   {
+      enabled: true,
+      name: "General analytics",
+   },
+   {
+      enabled: true,
+      name: "Reach and audience analytics",
+   },
+   {
+      enabled: false,
+      name: "Competitor analytics",
+   },
+   {
+      enabled: true,
+      name: "Dedicated KAM",
+   },
+   {
+      enabled: true,
+      name: "7'000 - 8’000 Exposure range",
+   },
+]
+const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
+   {
+      enabled: true,
+      name: "6 Sparks slots",
+   },
+   {
+      enabled: true,
+      name: "General analytics",
+   },
+   {
+      enabled: true,
+      name: "Up to 4 featured employees",
+   },
+   {
+      enabled: false,
+      name: "Reach and audience analytics",
+   },
+   {
+      enabled: false,
+      name: "Competitor analytics",
+   },
+   {
+      enabled: false,
+      name: "Dedicated KAM",
+   },
+   {
+      enabled: true,
+      name: "4'000 - 5’000 Exposure range",
+   },
+]
 export type PlanFeature = "sparks" | "jobs"
 
+/**
+ * Configurations related to Stripe payments, the important ones are:
+ *  - priceId: Unique ID of the Stripe price, defines a unique campaign e.g: Sparks 1 Year subscription / 5.000 CHF
+ *       Not used for now, but can be if manual checkout is implemented.
+ *  - buttonId: Stripe button ID, used for embedded checkout process.
+ */
+type StripeConfig = {
+   priceId: string
+   buttonId: string
+}
+
+export type PlanFeatureItem = {
+   enabled: boolean
+   name: string
+}
 interface AnalyticsPlanConstants {
    MINIMUM_DUMMY: number
 }
@@ -32,11 +137,19 @@ export type PlanConstants = {
    sparks: SparksPlanConstants
    jobs: JobsPlanConstants
    analytics?: AnalyticsPlanConstants
-   stripePriceId?: string
+   stripe?: StripeConfig
+   features?: PlanFeatureItem[]
 }
 
 export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    trial: {
+      // Stripe price ID - Uniquely identifies a subscription
+      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      stripe: {
+         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
+         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+      },
+      features: ESSENTIAL_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
@@ -52,7 +165,11 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    tier1: {
       // Stripe price ID - Uniquely identifies a subscription
       // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
-      stripePriceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
+      stripe: {
+         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
+         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+      },
+      features: ESSENTIAL_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
@@ -64,7 +181,36 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
          // Empty for now
       },
    },
-   essential: {
+   advanced: {
+      // Stripe price ID - Uniquely identifies a subscription
+      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      stripe: {
+         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
+         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+      },
+      features: ADVANCED_FEATURES,
+      sparks: {
+         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
+         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
+         MAX_PUBLIC_SPARKS: 6,
+         MAX_SPARK_CREATOR_COUNT: 4,
+         PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+      },
+      analytics: {
+         MINIMUM_DUMMY: 1,
+      },
+      jobs: {
+         // Empty for now
+      },
+   },
+   premium: {
+      // Stripe price ID - Uniquely identifies a subscription
+      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      stripe: {
+         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
+         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+      },
+      features: PREMIUM_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
