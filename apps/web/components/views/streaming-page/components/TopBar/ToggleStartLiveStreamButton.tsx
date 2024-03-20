@@ -7,7 +7,7 @@ import {
    useHasStarted,
    useStartsAt,
 } from "store/selectors/streamingAppSelectors"
-import { useToggleStartLivestream } from "components/custom-hook/streaming/useToggleStartLivestream"
+import { useUpdateLivestreamStartEndState } from "components/custom-hook/streaming/useToggleStartLivestream"
 import { useStreamingContext } from "../../context"
 import useIsStreamStartingSoon from "./useIsStreamStartingSoon"
 import { Tooltip } from "@mui/material"
@@ -22,8 +22,8 @@ export const ToggleStartLiveStreamButton = () => {
    const startsAt = useStartsAt()
    const { livestreamId } = useStreamingContext()
 
-   const { trigger: toggleStartLivestream, isMutating } =
-      useToggleStartLivestream(livestreamId)
+   const { trigger: updateLivestreamStartEndState, isMutating } =
+      useUpdateLivestreamStartEndState(livestreamId)
 
    const isMobile = useStreamIsMobile(390)
 
@@ -94,7 +94,7 @@ export const ToggleStartLiveStreamButton = () => {
                text: shouldStop ? "End live stream" : "Start live stream",
                color: shouldStop ? "error" : "primary",
                callback: async () => {
-                  await toggleStartLivestream(!shouldStop)
+                  await updateLivestreamStartEndState(!shouldStop)
                   handleCloseDialog()
                },
                variant: "contained",
