@@ -53,8 +53,12 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
    const isMobile = useIsMobile()
 
    const { errors } = useLivestreamFormValues()
-   const { shouldShowAlertIndicator, tabValue, setTabValue, tabNavigation } =
-      useLivestreamCreationContext()
+   const {
+      shouldShowAlertIndicator,
+      tabValue,
+      setTabValue,
+      navigateWithValidationCheck,
+   } = useLivestreamCreationContext()
 
    const showAlertIndicatorStyles =
       shouldShowAlertIndicator &&
@@ -66,7 +70,7 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
       <Tabs
          value={tabValue}
          onChange={(_, newValue) => {
-            tabNavigation(() => setTabValue(newValue))
+            navigateWithValidationCheck(() => setTabValue(newValue))
          }}
          aria-label="Livestream Creation Form Tabs"
          sx={styles.tabs}

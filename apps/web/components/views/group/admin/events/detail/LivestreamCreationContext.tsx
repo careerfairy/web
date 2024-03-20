@@ -18,7 +18,7 @@ type LivestreamCreationContextType = {
    setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
    navPreviousTab: () => void
    navNextTab: () => void
-   tabNavigation: (callback: () => void) => void
+   navigateWithValidationCheck: (callback: () => void) => void
    alertState: boolean
    setAlertState: Dispatch<SetStateAction<boolean>>
    isValidationDialogOpen: boolean
@@ -58,7 +58,7 @@ export const LivestreamCreationContextProvider: FC<
       (alertState === true || alertState == undefined) &&
       formHasCriticalValidationErrors
 
-   const tabNavigation = useCallback(
+   const navigateWithValidationCheck = useCallback(
       (navigationCallback: () => void) => {
          if (shouldShowAlertDialog) {
             setAlertState(true)
@@ -71,20 +71,20 @@ export const LivestreamCreationContextProvider: FC<
    )
 
    const navPreviousTab = useCallback(() => {
-      tabNavigation(() => {
+      navigateWithValidationCheck(() => {
          if (tabValue !== TAB_VALUES.GENERAL) {
             setTabValue(tabValue - 1)
          }
       })
-   }, [tabNavigation, tabValue])
+   }, [navigateWithValidationCheck, tabValue])
 
    const navNextTab = useCallback(() => {
-      tabNavigation(() => {
+      navigateWithValidationCheck(() => {
          if (tabValue !== TAB_VALUES.JOBS) {
             setTabValue(tabValue + 1)
          }
       })
-   }, [tabNavigation, tabValue])
+   }, [navigateWithValidationCheck, tabValue])
 
    const value = useMemo(
       () => ({
@@ -92,7 +92,7 @@ export const LivestreamCreationContextProvider: FC<
          setTabValue,
          navPreviousTab,
          navNextTab,
-         tabNavigation,
+         navigateWithValidationCheck,
          alertState,
          setAlertState,
          isValidationDialogOpen,
@@ -107,7 +107,7 @@ export const LivestreamCreationContextProvider: FC<
          handleValidationCloseDialog,
          handleValidationOpenDialog,
          isValidationDialogOpen,
-         tabNavigation,
+         navigateWithValidationCheck,
          navNextTab,
          navPreviousTab,
          alertState,
