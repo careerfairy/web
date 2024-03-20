@@ -11,24 +11,25 @@ import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCre
 import { CreatorFormValues } from "components/views/sparks/forms/hooks/useCreatorFormSubmit"
 
 const styles = sxStyles({
-   wrapContainer: {
-      height: {
-         md: "100%",
-      },
-   },
-   container: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "100%",
-      width: "100%",
-      px: 2,
-   },
    content: {
       mt: 1,
    },
+   wrapContainer: {
+      height: "100%",
+      overflowY: "scroll",
+   },
+   container: {
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      width: "100%",
+      px: 2,
+   },
    form: {
-      my: "40px",
+      marginTop: "40px",
+      marginBottom: "40px",
+      paddingBottom: "48px",
    },
    title: {
       fontSize: { xs: "28px", md: "32px" },
@@ -38,10 +39,14 @@ const styles = sxStyles({
       fontSize: { xs: "16px", md: "16px" },
    },
    actions: {
+      display: "flex",
       position: "absolute !important",
       backgroundColor: "#FFFFFF !important",
-      width: "96% !important",
-      marginLeft: "2%",
+      height: "90px",
+      marginBottom: {
+         xs: "70px",
+         md: "0",
+      },
    },
 })
 
@@ -66,42 +71,42 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
          onSubmit={undefined}
       >
          {({ dirty, handleSubmit, isSubmitting, isValid }) => (
-            <SteppedDialog.Container
-               containerSx={styles.content}
-               sx={styles.wrapContainer}
-               withActions
-               handleCloseIconClick={handleClose}
-            >
-               <SteppedDialog.Content sx={styles.container}>
-                  {creator ? (
-                     <SteppedDialog.Title sx={styles.title}>
-                        <Box component="span" color="secondary.main">
-                           Editing
-                        </Box>{" "}
-                        creator
-                     </SteppedDialog.Title>
-                  ) : (
-                     <SteppedDialog.Title sx={styles.title}>
-                        Create {isMobile ? "" : "a"} new{" "}
-                        <Box component="span" color="secondary.main">
-                           profile
-                        </Box>
-                     </SteppedDialog.Title>
-                  )}
-                  <SteppedDialog.Subtitle sx={styles.subtitle}>
-                     {creator
-                        ? "Please check if that’s the correct creator"
-                        : "Insert your new creator details!"}
-                  </SteppedDialog.Subtitle>
-                  <Box sx={styles.form}>
-                     <CreateOrEditCreatorForm
-                        groupId={group.id}
-                        creator={creator}
-                        onSuccessfulSubmit={undefined}
-                     />
-                  </Box>
-               </SteppedDialog.Content>
-
+            <>
+               <SteppedDialog.Container
+                  containerSx={styles.content}
+                  sx={styles.wrapContainer}
+                  handleCloseIconClick={handleClose}
+               >
+                  <SteppedDialog.Content sx={styles.container}>
+                     {creator ? (
+                        <SteppedDialog.Title sx={styles.title}>
+                           <Box component="span" color="secondary.main">
+                              Editing
+                           </Box>{" "}
+                           creator
+                        </SteppedDialog.Title>
+                     ) : (
+                        <SteppedDialog.Title sx={styles.title}>
+                           Create {isMobile ? "" : "a"} new{" "}
+                           <Box component="span" color="secondary.main">
+                              profile
+                           </Box>
+                        </SteppedDialog.Title>
+                     )}
+                     <SteppedDialog.Subtitle sx={styles.subtitle}>
+                        {creator
+                           ? "Please check if that’s the correct creator"
+                           : "Insert your new creator details!"}
+                     </SteppedDialog.Subtitle>
+                     <Box sx={styles.form}>
+                        <CreateOrEditCreatorForm
+                           groupId={group.id}
+                           creator={creator}
+                           onSuccessfulSubmit={undefined}
+                        />
+                     </Box>
+                  </SteppedDialog.Content>
+               </SteppedDialog.Container>
                <SteppedDialog.Actions sx={styles.actions}>
                   <SteppedDialog.Button
                      variant="outlined"
@@ -122,7 +127,7 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
                      {isEdit ? "Save" : "Create"}
                   </SteppedDialog.Button>
                </SteppedDialog.Actions>
-            </SteppedDialog.Container>
+            </>
          )}
       </Formik>
    )
