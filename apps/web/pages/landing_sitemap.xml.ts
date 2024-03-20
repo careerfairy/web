@@ -27,7 +27,7 @@ const generateSiteMap = async (basePath: string): Promise<string> => {
       // Generate the sitemap XML content based on the final paths
       return siteMapXmlWrapper(mapWebFlowToSiteMap(finalPaths))
    } catch (error) {
-      console.log
+      console.log(error)
    }
 }
 
