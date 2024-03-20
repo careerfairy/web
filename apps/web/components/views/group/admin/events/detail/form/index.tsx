@@ -25,7 +25,7 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { CircularProgress, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamCreator } from "./views/questions/commons"
 
 const styles = sxStyles({
@@ -117,7 +117,7 @@ function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
       updatedAt: null,
       linkedInUrl: null,
       story: speaker.background,
-      roles: ["Speaker"],
+      roles: [CreatorRoles.Speaker],
    }
 }
 
