@@ -101,7 +101,8 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   <Typography
                      fontSize="24px"
                      fontWeight="600"
-                     lineHeight="20px"
+                     lineHeight="26px"
+                     textAlign="center"
                   >
                      {`${speaker.firstName} ${speaker.lastName}`}
                   </Typography>
