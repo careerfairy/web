@@ -66,6 +66,13 @@ const styles = sxStyles({
    skipButton: {
       color: "white",
    },
+   mobileDrawer: {
+      ".MuiPaper-root": {
+         borderTopLeftRadius: 12,
+         borderTopRightRadius: 12,
+         paddingBottom: 3,
+      },
+   },
 })
 
 const InvalidAlertContent = () => {
@@ -145,13 +152,7 @@ const InvalidAlertDialog = () => {
             onClose={() => handleValidationCloseDialog()}
             onOpen={() => null}
             open={isValidationDialogOpen}
-            sx={{
-               ".MuiPaper-root": {
-                  borderTopLeftRadius: 12,
-                  borderTopRightRadius: 12,
-                  paddingBottom: 3,
-               },
-            }}
+            sx={styles.mobileDrawer}
          >
             <InvalidAlertContent />
          </SwipeableDrawer>
