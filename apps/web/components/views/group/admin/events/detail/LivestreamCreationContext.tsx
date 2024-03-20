@@ -1,5 +1,8 @@
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { TAB_VALUES } from "components/views/group/admin/events/detail/form/commons"
+import {
+   MAX_TAB_VALUE,
+   TAB_VALUES,
+} from "components/views/group/admin/events/detail/form/commons"
 import {
    Dispatch,
    FC,
@@ -80,7 +83,7 @@ export const LivestreamCreationContextProvider: FC<
 
    const navNextTab = useCallback(() => {
       navigateWithValidationCheck(() => {
-         if (tabValue !== TAB_VALUES.JOBS) {
+         if (tabValue !== MAX_TAB_VALUE) {
             setTabValue(tabValue + 1)
          }
       })

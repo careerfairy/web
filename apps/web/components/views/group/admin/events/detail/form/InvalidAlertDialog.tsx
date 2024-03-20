@@ -4,7 +4,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { Info } from "react-feather"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
-import { TAB_VALUES } from "./commons"
+import { MAX_TAB_VALUE } from "./commons"
 import BrandedDialog from "./views/questions/components/BrandedDialog"
 
 const styles = sxStyles({
@@ -87,7 +87,7 @@ const InvalidAlertContent = () => {
    const handleSkipForNow = () => {
       setAlertState(false)
       handleValidationCloseDialog()
-      if (tabValue !== TAB_VALUES.JOBS) {
+      if (tabValue !== MAX_TAB_VALUE) {
          setTabValue(tabValue + 1)
       }
    }
