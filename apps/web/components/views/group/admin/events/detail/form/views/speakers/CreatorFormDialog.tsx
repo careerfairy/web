@@ -58,14 +58,12 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
    const { group } = useGroup()
    const isMobile = useIsMobile()
 
-   const handleSubmit = undefined
-
    return (
       <Formik
          initialValues={getInitialValues(creator)}
          validationSchema={CreateCreatorSchema}
          enableReinitialize
-         onSubmit={handleSubmit}
+         onSubmit={undefined}
       >
          {({ dirty, handleSubmit, isSubmitting, isValid }) => (
             <SteppedDialog.Container
@@ -95,8 +93,6 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
                         ? "Please check if that’s the correct creator"
                         : "Insert your new creator details!"}
                   </SteppedDialog.Subtitle>
-                  <Box mt={4} />
-                  <Box mt={"auto"} />
                   <Box sx={styles.form}>
                      <CreateOrEditCreatorForm
                         groupId={group.id}
