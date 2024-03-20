@@ -64,7 +64,6 @@ const styles = sxStyles({
       boxShadow: "none",
    },
    skipButton: {
-      //backgroundColor: "#FE9B0E",
       color: "white",
    },
 })
