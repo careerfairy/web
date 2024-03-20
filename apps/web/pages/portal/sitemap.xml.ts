@@ -1,12 +1,14 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    mapLiveStreamsToSiteMap,
+   mapSparksToSiteMap,
    siteMapXmlWrapper,
 } from "components/util/Sitemap"
 import { getServerSideBaseUrl } from "components/util/url"
-import { livestreamRepo } from "data/RepositoryInstances"
+import { livestreamRepo, sparkRepo } from "data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "data/constants/streamContants"
 import { GetServerSideProps } from "next"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
 const PortalSitemap = () => {
    return null
@@ -19,18 +21,28 @@ const generateSiteMap = async (basePath: string) => {
       livestreamRepo.getPastEventsFrom({
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
          limit: 6,
-      })
+      }),
+      sparkRepo.getPublicSparksFeed(8)
    )
 
-   const results = await Promise.allSettled(promises)
+   const [upcomingEvents, pastEvents, sparks] = await Promise.allSettled(
+      promises
+   )
 
-   const fulfilledResults = results
+   const fulfilledEvents = [upcomingEvents, pastEvents]
       .filter((result) => result.status === "fulfilled")
       .map((result: PromiseFulfilledResult<LivestreamEvent>) => result.value)
       .flat()
 
+   const fulfilledSparks: Spark[] =
+      sparks.status === "fulfilled" ? sparks.value : []
+
    return siteMapXmlWrapper(
-      mapLiveStreamsToSiteMap(`${basePath}/portal/livestream`, fulfilledResults)
+      mapSparksToSiteMap(`${basePath}/sparks`, fulfilledSparks) +
+         mapLiveStreamsToSiteMap(
+            `${basePath}/portal/livestream`,
+            fulfilledEvents
+         )
    )
 }
 
