@@ -45,9 +45,9 @@ const LivestreamFormSpeakersStep = () => {
                handleAddEditOpenDialog()
             }}
          />
-         {speakers.values.map((speaker, index) => (
+         {speakers.values.map((speaker) => (
             <SpeakersCard
-               key={`speaker-card-${index}`}
+               key={`speaker-card-${speaker.originalId}`}
                speaker={speaker}
                handleEdit={() => {
                   setCurrentCreator(speaker)
