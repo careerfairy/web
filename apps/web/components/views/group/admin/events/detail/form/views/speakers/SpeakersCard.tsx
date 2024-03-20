@@ -1,11 +1,11 @@
-import { FC, useMemo } from "react"
-import { LinkedIn } from "@mui/icons-material"
-import { sxStyles } from "@careerfairy/shared-ui"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material"
 import { UpdateCreatorData } from "@careerfairy/shared-lib/groups/creators"
-import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
+import { sxStyles } from "@careerfairy/shared-ui"
+import { LinkedIn } from "@mui/icons-material"
+import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
+import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
+import { FC } from "react"
 import MoreMenuWithEditAndRemoveOptions from "../questions/components/MoreMenu"
 
 const styles = sxStyles({
@@ -47,10 +47,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
 }) => {
    const isMobile = useIsMobile()
 
-   const speakerHasStory = useMemo(
-      () => speaker.story && speaker.story !== "",
-      [speaker.story]
-   )
+   const speakerHasStory = Boolean(speaker.story)
 
    return (
       <Box sx={styles.wrapper}>
