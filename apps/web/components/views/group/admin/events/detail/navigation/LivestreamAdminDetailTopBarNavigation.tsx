@@ -7,6 +7,15 @@ import { useLivestreamCreationContext } from "../LivestreamCreationContext"
 import { TAB_VALUES } from "../form/commons"
 import { useLivestreamFormValues } from "../form/useLivestreamFormValues"
 
+const styles = sxStyles({
+   alertIconWrapper: {
+      width: "16px",
+      height: "16px",
+      marginRight: "6px",
+      alignContent: "center",
+   },
+})
+
 const getStyles = (hasError: boolean) => {
    const conditionalErrorColor = hasError ? "#FE9B0E" : "#6749EA"
 
@@ -15,13 +24,13 @@ const getStyles = (hasError: boolean) => {
          width: "100%",
          "*": {
             textTransform: "none !important",
-            fontWeight: 400,
+            fontWeight: "400 !important",
             fontSize: {
                md: "16px !important",
             },
          },
          ".Mui-selected": {
-            fontWeight: 600,
+            fontWeight: "600 !important",
             color: `${conditionalErrorColor} !important`,
          },
          ".MuiTabs-indicator": {
@@ -39,13 +48,8 @@ const getStyles = (hasError: boolean) => {
 }
 
 const TabAlertIcon = () => (
-   <Box alignContent="center">
-      <Info
-         size={16}
-         style={{ marginRight: "6px" }}
-         color="#FE9B0E"
-         strokeWidth={3}
-      />
+   <Box sx={styles.alertIconWrapper}>
+      <Info size={16} color="#FE9B0E" strokeWidth={3} />
    </Box>
 )
 
