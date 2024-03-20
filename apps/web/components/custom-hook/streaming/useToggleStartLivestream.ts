@@ -1,21 +1,26 @@
 import { livestreamService } from "data/firebase/LivestreamService"
-import useSWRMutation from "swr/mutation"
+import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
+
+type FetcherType = MutationFetcher<
+   void, // return type
+   unknown, // error type
+   boolean // Should start the livestream
+>
 
 /**
  * Custom hook to toggle the start status of a livestream.
  * Utilizes SWR mutation for data fetching and state management.
  *
  * @param {string} livestreamId - The ID of the livestream to toggle.
- * @param {boolean} started - The new start status of the livestream.
  * @returns An object containing the SWR mutation trigger function and error handling.
  */
-export const useToggleStartLivestream = (
-   livestreamId: string,
-   started: boolean
-) => {
-   const fetcher = async () => {
-      return livestreamService.setLivestreamHasStarted(livestreamId, started)
+export const useToggleStartLivestream = (livestreamId: string) => {
+   const fetcher: FetcherType = async (_, options) => {
+      return livestreamService.setLivestreamHasStarted(
+         livestreamId,
+         options.arg
+      )
    }
 
    return useSWRMutation(`start-livestream-${livestreamId}`, fetcher, {
