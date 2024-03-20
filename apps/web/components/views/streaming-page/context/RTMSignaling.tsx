@@ -7,11 +7,7 @@ import { ReactNode, useCallback, useEffect, useState } from "react"
 import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
-import {
-   AgoraRTMChannelProvider,
-   AgoraRTMClientProvider,
-   useRTMChannelEvent,
-} from "./rtm"
+import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
 import AgoraRTM, { RtmChannel, RtmClient } from "agora-rtm-sdk"
 
 type RTMSignalingProviderProps = {
@@ -19,8 +15,8 @@ type RTMSignalingProviderProps = {
 }
 
 type RTMState = {
-   channel: RtmChannel
-   client: RtmClient
+   client: RtmClient | null
+   channel: RtmChannel | null
 }
 
 export const RTMSignalingProvider = ({
@@ -31,7 +27,10 @@ export const RTMSignalingProvider = ({
    const uid = useCurrentUID()
    const dispatch = useAppDispatch()
 
-   const [rtmState, setRtmState] = useState<RTMState | null>(null)
+   const [rtmState, setRtmState] = useState<RTMState>({
+      client: null,
+      channel: null,
+   })
 
    const { token } = useAgoraRtmToken(rtcIsConnected ? uid.toString() : null)
 
@@ -58,11 +57,11 @@ export const RTMSignalingProvider = ({
    const logout = useCallback(async () => {
       try {
          setRtmState((prev) => {
-            prev?.channel.leave()
-            prev?.channel.removeAllListeners()
-            prev?.client.logout()
-            prev?.client.removeAllListeners()
-            return null
+            prev.channel?.leave()
+            prev.channel?.removeAllListeners()
+            prev.client?.logout()
+            prev.client?.removeAllListeners()
+            return { channel: null, client: null }
          })
       } catch (e) {
          errorLogAndNotify(e, {
@@ -99,8 +98,8 @@ export const RTMSignalingProvider = ({
    }
 
    return (
-      <AgoraRTMClientProvider client={rtmState?.client}>
-         <AgoraRTMChannelProvider channel={rtmState?.channel}>
+      <AgoraRTMClientProvider client={rtmState.client}>
+         <AgoraRTMChannelProvider channel={rtmState.channel}>
             {children}
          </AgoraRTMChannelProvider>
       </AgoraRTMClientProvider>

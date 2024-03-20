@@ -12,9 +12,9 @@ type AgoraRTMChannelProviderProps = {
    children: ReactNode
 }
 
-const AgoraRTMClientContext = createContext<RtmClient | null>(null)
+const AgoraRTMClientContext = createContext<RtmClient | undefined>(undefined)
 
-const AgoraRTMChannelContext = createContext<RtmChannel | null>(null)
+const AgoraRTMChannelContext = createContext<RtmChannel | undefined>(undefined)
 
 export const AgoraRTMClientProvider = ({
    client,
@@ -56,7 +56,7 @@ export const AgoraRTMChannelProvider = ({
 export const useRTMClient = (client?: RtmClient | null): RtmClient => {
    const resolvedClient = useOptionalContext(AgoraRTMClientContext, client)
 
-   if (!resolvedClient) {
+   if (resolvedClient === undefined) {
       throw new Error(
          "Agora RTM client not found. Should be wrapped in <AgoraRTMClientProvider value={client} />"
       )
@@ -79,7 +79,7 @@ export const useRTMClient = (client?: RtmClient | null): RtmClient => {
 export const useRTMChannel = (channel?: RtmChannel | null): RtmChannel => {
    const resolvedChannel = useOptionalContext(AgoraRTMChannelContext, channel)
 
-   if (!resolvedChannel) {
+   if (resolvedChannel === undefined) {
       throw new Error(
          "Agora RTM channel not found. Should be wrapped in <AgoraRTMChannelProvider value={channel} />"
       )
