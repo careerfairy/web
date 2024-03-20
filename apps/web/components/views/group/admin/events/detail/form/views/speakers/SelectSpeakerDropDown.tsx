@@ -60,6 +60,11 @@ const styles = sxStyles({
       overflow: "hidden",
       textOverflow: "ellipsis",
    },
+   speakerInfo: {
+      fontWeight: 300,
+      fontSize: "14px",
+      lineHeight: "24px",
+   },
 })
 
 type Props = {
@@ -145,11 +150,7 @@ const getOptionElement = (speaker: LivestreamCreator) => (
          {Boolean(speaker.position || speaker.email) && (
             <Stack spacing={2} direction={"row"}>
                {Boolean(speaker.position) && (
-                  <Typography
-                     fontSize="14px"
-                     fontWeight={300}
-                     lineHeight="24px"
-                  >
+                  <Typography sx={styles.speakerInfo}>
                      {speaker.position}
                   </Typography>
                )}
@@ -160,10 +161,11 @@ const getOptionElement = (speaker: LivestreamCreator) => (
 
                {Boolean(speaker.email) && (
                   <Typography
-                     fontSize="14px"
-                     fontWeight={300}
-                     lineHeight="24px"
-                     sx={[styles.optionInfo, styles.ellipsis]}
+                     sx={[
+                        styles.optionInfo,
+                        styles.ellipsis,
+                        styles.speakerInfo,
+                     ]}
                   >
                      {speaker.email}
                   </Typography>
