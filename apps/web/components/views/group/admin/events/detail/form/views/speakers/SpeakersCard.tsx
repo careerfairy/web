@@ -23,6 +23,21 @@ const styles = sxStyles({
    descriptionPlaceholder: {
       color: "neutral.500",
       fontStyle: "italic",
+      alignItems: "center",
+      alignContent: "center",
+      justifyContent: "space-between",
+      textAlign: {
+         xs: "center",
+         md: "initial",
+      },
+      flexDirection: {
+         xs: "column",
+         md: "row",
+      },
+      gap: {
+         xs: 3,
+         md: "initial",
+      },
    },
    moreMenu: {
       position: "absolute",
@@ -31,6 +46,11 @@ const styles = sxStyles({
       right: 0,
       marginTop: 3,
       marginRight: 3,
+   },
+   speakerInfo: {
+      color: "neutral.400",
+      fontSize: "16px",
+      lineHeight: "27px",
    },
 })
 
@@ -92,11 +112,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                         alignItems="center"
                         justifyContent={isMobile ? "center" : null}
                      >
-                        <Typography
-                           fontSize="16px"
-                           color="neutral.400"
-                           lineHeight="27px"
-                        >
+                        <Typography sx={styles.speakerInfo}>
                            {speaker.position}
                         </Typography>
                         <Divider
@@ -111,11 +127,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                            <LinkedIn htmlColor="#e5e5e5" />
                         )}
                      </Stack>
-                     <Typography
-                        fontSize="16px"
-                        color="neutral.400"
-                        lineHeight="27px"
-                     >
+                     <Typography sx={styles.speakerInfo}>
                         {speaker.email}
                      </Typography>
                   </Stack>
@@ -128,15 +140,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   collapsedSize={80}
                />
             ) : (
-               <Stack
-                  sx={styles.descriptionPlaceholder}
-                  direction={isMobile ? "column" : "row"}
-                  alignItems="center"
-                  alignContent="center"
-                  textAlign={isMobile ? "center" : null}
-                  justifyContent="space-between"
-                  gap={isMobile ? 3 : null}
-               >
+               <Stack sx={styles.descriptionPlaceholder}>
                   <Stack>
                      <Typography>
                         This is your spotlight for our talent community.

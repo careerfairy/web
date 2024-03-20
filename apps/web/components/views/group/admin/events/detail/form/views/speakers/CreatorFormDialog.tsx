@@ -100,7 +100,6 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
                         onSuccessfulSubmit={undefined}
                      />
                   </Box>
-                  <Box mb={"auto"} />
                </SteppedDialog.Content>
 
                <SteppedDialog.Actions sx={styles.actions}>
