@@ -53,7 +53,6 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
    const isMobile = useIsMobile()
 
    const { errors } = useLivestreamFormValues()
-   console.log("🚀 ~ errors:", errors)
    const { shouldShowAlertIndicator, tabValue, setTabValue, tabNavigation } =
       useLivestreamCreationContext()
 
