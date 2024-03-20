@@ -17,6 +17,11 @@ export const getServerSideProps: GetServerSideProps = async ({ res, req }) => {
             <loc>${basePath}/portal/sitemap.xml</loc>
             <changefreq>daily</changefreq>
        </sitemap>
+       
+       <sitemap>
+            <loc>${basePath}/sparks/sitemap.xml</loc>
+            <changefreq>weekly</changefreq>
+       </sitemap>
     
        <sitemap>
             <loc>${basePath}/companies/sitemap.xml</loc>

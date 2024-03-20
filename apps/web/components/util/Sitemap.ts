@@ -1,5 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 
 /**
@@ -21,6 +22,21 @@ export const mapLiveStreamsToSiteMap = (
             <changefreq>${event.hasEnded ? "never" : "daily"}</changefreq>
         </url>`
       )
+      .join("")}`
+}
+
+export const mapSparksToSiteMap = (path: string, sparks: Spark[]): string => {
+   return `${sparks
+      .map((spark) => {
+         const lastModified = spark.updatedAt
+            ? spark.updatedAt?.toDate?.().toString()
+            : spark.createdAt.toDate?.().toString()
+
+         return `<url>
+                    <loc>${`${path}/${spark.id}`}</loc>
+                    <lastmod>${lastModified}</lastmod>
+                </url>`
+      })
       .join("")}`
 }
 
