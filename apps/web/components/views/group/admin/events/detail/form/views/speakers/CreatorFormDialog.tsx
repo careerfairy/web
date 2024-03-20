@@ -17,6 +17,7 @@ const styles = sxStyles({
    wrapContainer: {
       height: "100%",
       overflowY: "scroll",
+      overflowX: "hidden",
    },
    container: {
       position: "relative",
