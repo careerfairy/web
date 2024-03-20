@@ -10,7 +10,12 @@ const CompaniesSitemap = () => {
 const generateSiteMap = async (basePath: string) => {
    const results: Group[] = await groupRepo.getAllPublicProfileGroups()
 
-   return siteMapXmlWrapper(mapGroupsToSiteMap(`${basePath}/company`, results))
+   const companiesPageXmlLocation = `<url> <loc>${basePath}/companies</loc> </url>`
+
+   return siteMapXmlWrapper(
+      companiesPageXmlLocation +
+         mapGroupsToSiteMap(`${basePath}/company`, results)
+   )
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res, req }) => {
