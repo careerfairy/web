@@ -38,7 +38,7 @@ const getStyles = (hasError: boolean) => {
             backgroundColor: `${conditionalErrorColor} !important`,
          },
          ".MuiTouchRipple-child": {
-            backgroundColor: "#EBEBEF",
+            backgroundColor: "#EBEBEF !important",
          },
          ".MuiTab-root": {
             minHeight: "48px !important",
