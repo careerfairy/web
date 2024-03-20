@@ -128,7 +128,6 @@ const SelectSpeakersDropDown = ({
          initialOptionSection={renderCreateNewCreatorOption}
          getOptionElement={getOptionElement}
          disabled={isSubmitting}
-         limit={5}
       />
    )
 }
