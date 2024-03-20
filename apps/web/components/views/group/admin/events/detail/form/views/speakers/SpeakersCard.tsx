@@ -102,7 +102,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                      fontSize="24px"
                      fontWeight="600"
                      lineHeight="26px"
-                     textAlign="center"
+                     textAlign={isMobile ? "center" : null}
                   >
                      {`${speaker.firstName} ${speaker.lastName}`}
                   </Typography>
