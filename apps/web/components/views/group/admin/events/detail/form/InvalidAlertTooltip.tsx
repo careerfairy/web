@@ -13,6 +13,13 @@ import { FC, useMemo } from "react"
 import { Info } from "react-feather"
 import { LivestreamFormValues } from "./types"
 import { useLivestreamFormValues } from "./useLivestreamFormValues"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   okButton: {
+      color: "grey",
+   },
+})
 
 const tabLabelsMap: Record<keyof LivestreamFormValues, string> = {
    general: "General",
@@ -61,6 +68,7 @@ export const InvalidAlertTooltipContent: FC<
                variant="outlined"
                color="grey"
                onClick={handleOkClick}
+               sx={styles.okButton}
             >
                Ok
             </Button>
