@@ -25,7 +25,6 @@ const styles = sxStyles({
 })
 
 export type BrandedDialogProps = {
-   key: string
    isDialogOpen: boolean
    handleCloseDialog: () => void
    children: ReactNode
@@ -33,7 +32,6 @@ export type BrandedDialogProps = {
 }
 
 const BrandedDialog: FC<BrandedDialogProps> = ({
-   key,
    isDialogOpen,
    handleCloseDialog,
    children,
@@ -43,7 +41,6 @@ const BrandedDialog: FC<BrandedDialogProps> = ({
 
    return (
       <Dialog
-         key={key}
          open={isDialogOpen}
          onClose={handleCloseDialog}
          maxWidth="md"
