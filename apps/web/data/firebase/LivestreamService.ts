@@ -34,6 +34,7 @@ import {
    getDocs,
    limit,
    query,
+   runTransaction,
    updateDoc,
    where,
    writeBatch,
@@ -457,25 +458,43 @@ export class LivestreamService {
 
       return batch.commit()
    }
-
    /**
     * Sets the status of a livestream to either started or not started.
-    * Updates the livestream document with the `hasStarted`, `hasEnded`, and optionally `startedAt` fields.
+    * If `hasStarted` is true, performs a transaction to ensure the stream isn't restarted if already started.
+    * Otherwise, performs a normal update operation to mark the stream as not started.
     *
     * @param {string} livestreamId - The ID of the livestream to update.
-    * @param {boolean} hasStarted - A boolean indicating if the livestream has started.
+    * @param {boolean} shouldStart - A boolean indicating if the livestream has started.
     * @returns A promise resolved with the result of the update operation.
     */
-   async setLivestreamHasStarted(livestreamId: string, hasStarted: boolean) {
-      return this.updateLivestream(livestreamId, {
-         hasStarted,
-         hasEnded: !hasStarted,
-         ...(hasStarted
-            ? {
-                 startedAt: Timestamp.now(),
-              }
-            : {}),
-      })
+   async updateLivestreamStartEndState(
+      livestreamId: string,
+      shouldStart: boolean
+   ) {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      if (shouldStart) {
+         return runTransaction(FirestoreInstance, async (transaction) => {
+            const livestreamDoc = await transaction.get(livestreamRef)
+            if (!livestreamDoc.exists()) {
+               throw "Document does not exist!"
+            }
+            const data = livestreamDoc.data()
+            if (data.hasStarted) {
+               // If the stream has already started, we don't want to restart it and reset the start time
+               return
+            }
+            transaction.update(livestreamRef, {
+               hasStarted: true,
+               hasEnded: false,
+               startedAt: Timestamp.now(),
+            })
+         })
+      } else {
+         return this.updateLivestream(livestreamId, {
+            hasStarted: false,
+            hasEnded: true,
+         })
+      }
    }
 }
 

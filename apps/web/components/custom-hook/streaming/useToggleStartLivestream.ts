@@ -15,9 +15,9 @@ type FetcherType = MutationFetcher<
  * @param {string} livestreamId - The ID of the livestream to toggle.
  * @returns An object containing the SWR mutation trigger function and error handling.
  */
-export const useToggleStartLivestream = (livestreamId: string) => {
+export const useUpdateLivestreamStartEndState = (livestreamId: string) => {
    const fetcher: FetcherType = async (_, options) => {
-      return livestreamService.setLivestreamHasStarted(
+      return livestreamService.updateLivestreamStartEndState(
          livestreamId,
          options.arg
       )
