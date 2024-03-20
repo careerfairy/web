@@ -2,45 +2,80 @@ import { StartStreamIcon, StopStreamIcon } from "components/views/common/icons"
 import { ResponsiveStreamButton } from "../Buttons"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
-import { useState } from "react"
-import { useHasStarted } from "store/selectors/streamingAppSelectors"
+import { useCallback, useState } from "react"
+import {
+   useHasStarted,
+   useStartsAt,
+} from "store/selectors/streamingAppSelectors"
 import { useToggleStartLivestream } from "components/custom-hook/streaming/useToggleStartLivestream"
 import { useStreamingContext } from "../../context"
+import useIsStreamStartingSoon from "./useIsStreamStartingSoon"
+import { Tooltip } from "@mui/material"
 
-type StreamerIntent = "start-streaming" | "stop-streaming" | null
+type ConfirmDialogState = {
+   isDialogOpen: boolean
+   intent: "start-streaming" | "stop-streaming"
+}
 
 export const ToggleStartLiveStreamButton = () => {
    const hasStarted = useHasStarted()
+   const startsAt = useStartsAt()
    const { livestreamId } = useStreamingContext()
 
-   const [intent, setIntent] = useState<StreamerIntent>(null)
+   const { trigger: toggleStartLivestream, isMutating } =
+      useToggleStartLivestream(livestreamId)
 
    const isMobile = useStreamIsMobile(390)
 
-   const shouldStop = intent === "stop-streaming"
+   const isStreamStartingSoon = useIsStreamStartingSoon(startsAt)
 
-   const { trigger: toggleStartLivestream, isMutating } =
-      useToggleStartLivestream(livestreamId, !shouldStop)
+   const [dialogState, setDialogState] = useState<ConfirmDialogState>({
+      isDialogOpen: false,
+      intent: "start-streaming",
+   })
+
+   const shouldStop = dialogState.intent === "stop-streaming"
+
+   const handleCloseDialog = useCallback(() => {
+      setDialogState((prev) => ({ ...prev, isDialogOpen: false }))
+   }, [])
 
    return (
       <>
-         <ResponsiveStreamButton
-            onClick={() =>
-               setIntent(hasStarted ? "stop-streaming" : "start-streaming")
+         <Tooltip
+            placement="top"
+            title={
+               isStreamStartingSoon
+                  ? ""
+                  : "The Start Streaming button will become active 2 minutes before the stream's official start time."
             }
-            color={hasStarted ? "error" : "primary"}
-            variant="contained"
          >
-            {hasStarted
-               ? isMobile
-                  ? "Stop"
-                  : "End live stream"
-               : isMobile
-               ? "Start"
-               : "Start live stream"}
-         </ResponsiveStreamButton>
+            <span>
+               <ResponsiveStreamButton
+                  disabled={!isStreamStartingSoon}
+                  onClick={() =>
+                     setDialogState({
+                        isDialogOpen: true,
+                        intent: hasStarted
+                           ? "stop-streaming"
+                           : "start-streaming",
+                     })
+                  }
+                  color={hasStarted ? "error" : "primary"}
+                  variant="contained"
+               >
+                  {hasStarted
+                     ? isMobile
+                        ? "Stop"
+                        : "End live stream"
+                     : isMobile
+                     ? "Start"
+                     : "Start live stream"}
+               </ResponsiveStreamButton>
+            </span>
+         </Tooltip>
          <ConfirmationDialog
-            open={Boolean(intent)}
+            open={Boolean(dialogState.isDialogOpen)}
             title={shouldStop ? "End live stream" : "Start live stream"}
             description={
                shouldStop
@@ -51,19 +86,19 @@ export const ToggleStartLiveStreamButton = () => {
             secondaryAction={{
                text: "Cancel",
                color: "grey",
-               callback: () => setIntent(null),
+               callback: () => handleCloseDialog(),
                variant: "outlined",
-               loading: isMutating || !intent,
+               loading: isMutating,
             }}
             primaryAction={{
                text: shouldStop ? "End live stream" : "Start live stream",
                color: shouldStop ? "error" : "primary",
                callback: async () => {
-                  await toggleStartLivestream()
-                  setIntent(null)
+                  await toggleStartLivestream(!shouldStop)
+                  handleCloseDialog()
                },
                variant: "contained",
-               loading: isMutating || !intent,
+               loading: isMutating,
             }}
          />
       </>

@@ -1,6 +1,11 @@
 import CloseIcon from "@mui/icons-material/Close"
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
-import { Stack, SwipeableDrawer, Typography } from "@mui/material"
+import {
+   DialogContentText,
+   Stack,
+   SwipeableDrawer,
+   Typography,
+} from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -49,12 +54,6 @@ const styles = sxStyles({
       px: 4,
       pb: 0,
    },
-   title: {
-      fontWeight: 700,
-   },
-   mobileTitle: {
-      fontWeight: 600,
-   },
    description: {
       textAlign: "center",
       color: {
@@ -99,6 +98,8 @@ export type ConfirmationDialogAction = {
    callback: () => void
    variant?: LoadingButtonProps["variant"]
    loading?: LoadingButtonProps["loading"]
+   autoFocus?: boolean
+   fullWidth?: boolean
 }
 
 type Props = {
@@ -118,20 +119,8 @@ const ConfirmationDialog: FC<Props> = (props) => {
       title,
       description,
       icon,
-      primaryAction: {
-         text: primaryActionText,
-         color: primaryActionColor,
-         callback: primaryActionCallback,
-         variant: primaryActionVariant,
-         loading: primaryActionLoading,
-      },
-      secondaryAction: {
-         text: secondaryActionText,
-         color: secondaryActionColor,
-         callback: secondaryActionCallback,
-         variant: secondaryActionVariant,
-         loading: secondaryActionLoading,
-      },
+      primaryAction,
+      secondaryAction,
    } = props
 
    const isMobile = useIsMobile()
@@ -165,7 +154,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
             >
                {icon}
                <Typography
-                  sx={styles.title}
+                  fontWeight={700}
                   variant="desktopBrandedH4"
                   component="h4"
                >
@@ -173,46 +162,23 @@ const ConfirmationDialog: FC<Props> = (props) => {
                </Typography>
             </Stack>
             {Boolean(handleClose) && (
-               <Box sx={styles.closeIcon}>
-                  <IconButton
-                     color="inherit"
-                     onClick={handleClose}
-                     aria-label="close"
-                  >
-                     <CloseIcon />
-                  </IconButton>
-               </Box>
+               <CloseIconButton handleClose={handleClose} />
             )}
          </DialogTitle>
          <DialogContent sx={styles.content}>
             <Typography
                id="confirmation-dialog-description"
                sx={styles.description}
+               variant="medium"
+               component={DialogContentText}
             >
                {description}
             </Typography>
          </DialogContent>
          <DialogActions sx={styles.actions}>
             <Stack direction="row" spacing={1.5} width="100%">
-               <LoadingButton
-                  onClick={() => secondaryActionCallback()}
-                  color={secondaryActionColor}
-                  variant={secondaryActionVariant}
-                  loading={secondaryActionLoading}
-                  fullWidth
-               >
-                  {secondaryActionText}
-               </LoadingButton>
-               <LoadingButton
-                  onClick={() => primaryActionCallback()}
-                  color={primaryActionColor}
-                  variant={primaryActionVariant}
-                  loading={primaryActionLoading}
-                  autoFocus
-                  fullWidth
-               >
-                  {primaryActionText}
-               </LoadingButton>
+               <ActionButton fullWidth {...secondaryAction} />
+               <ActionButton fullWidth autoFocus {...primaryAction} />
             </Stack>
          </DialogActions>
       </Dialog>
@@ -247,26 +213,15 @@ const MobileDrawer = ({
             sx={styles.iconWrapper}
          >
             {icon}
-            <Typography sx={styles.mobileTitle} variant="desktopBrandedH4">
+            <Typography fontWeight={600} variant="desktopBrandedH4">
                {title}
             </Typography>
          </Stack>
-         {Boolean(handleClose) && (
-            <Box sx={styles.closeIcon}>
-               <IconButton
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-               >
-                  <CloseIcon />
-               </IconButton>
-            </Box>
-         )}
+         {Boolean(handleClose) && <CloseIconButton handleClose={handleClose} />}
          <Typography
             id="confirmation-dialog-description"
             sx={styles.description}
             variant="medium"
-            color="neutral.700"
          >
             {description}
          </Typography>
@@ -278,25 +233,34 @@ const MobileDrawer = ({
             spacing={1.5}
             justifyContent="center"
          >
-            <LoadingButton
-               onClick={() => secondaryAction.callback()}
-               color={secondaryAction.color}
-               variant={secondaryAction.variant}
-               loading={secondaryAction.loading}
-            >
-               {secondaryAction.text}
-            </LoadingButton>
-            <LoadingButton
-               onClick={() => primaryAction.callback()}
-               color={primaryAction.color}
-               variant={primaryAction.variant}
-               loading={primaryAction.loading}
-               autoFocus
-            >
-               {primaryAction.text}
-            </LoadingButton>
+            <ActionButton {...secondaryAction} />
+            <ActionButton autoFocus {...primaryAction} />
          </Stack>
       </SwipeableDrawer>
+   )
+}
+
+type CloseIconButtonProps = {
+   handleClose: () => void
+}
+
+const CloseIconButton = ({ handleClose }: CloseIconButtonProps) => (
+   <Box sx={styles.closeIcon}>
+      <IconButton color="inherit" onClick={handleClose} aria-label="close">
+         <CloseIcon />
+      </IconButton>
+   </Box>
+)
+
+const ActionButton = ({
+   text,
+   callback,
+   ...props
+}: ConfirmationDialogAction) => {
+   return (
+      <LoadingButton {...props} onClick={callback}>
+         {text}
+      </LoadingButton>
    )
 }
 

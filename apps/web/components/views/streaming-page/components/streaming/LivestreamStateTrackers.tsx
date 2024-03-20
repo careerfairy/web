@@ -8,6 +8,7 @@ import {
    setNumberOfParticipants,
    setScreenSharerId,
    setStartedAt,
+   setStartsAt,
 } from "store/reducers/streamingAppReducer"
 
 /**
@@ -37,9 +38,17 @@ export const LivestreamStateTrackers = (): null => {
       )
    }, [dispatch, livestream.participatingStudents?.length])
 
+   // convert to primitive for comparison
+   const startsAtMillis = livestream.start?.toMillis() ?? null
    useEffect(() => {
-      dispatch(setStartedAt(livestream.startedAt?.toMillis() ?? null))
-   }, [dispatch, livestream.startedAt])
+      dispatch(setStartsAt(startsAtMillis))
+   }, [dispatch, startsAtMillis])
+
+   // Convert to primitive for comparison
+   const startedAtMillis = livestream.startedAt?.toMillis() ?? null
+   useEffect(() => {
+      dispatch(setStartedAt(startedAtMillis))
+   }, [dispatch, startedAtMillis])
 
    useEffect(() => {
       dispatch(setHasStarted(Boolean(livestream.hasStarted)))
@@ -51,6 +60,7 @@ export const LivestreamStateTrackers = (): null => {
          dispatch(setNumberOfParticipants(0))
          dispatch(setScreenSharerId(null))
          dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
+         dispatch(setStartsAt(null))
          dispatch(setStartedAt(null))
          dispatch(setHasStarted(false))
       }
