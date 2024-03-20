@@ -5,6 +5,8 @@ export enum TAB_VALUES {
    JOBS,
 }
 
+export const MAX_TAB_VALUE = TAB_VALUES.JOBS
+
 export const ESTIMATED_DURATIONS = [
    { minutes: 5, name: "5 minutes" },
    { minutes: 10, name: "10 minutes" },
