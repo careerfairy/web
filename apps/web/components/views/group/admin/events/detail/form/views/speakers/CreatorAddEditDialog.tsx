@@ -7,7 +7,7 @@ import { LivestreamCreator } from "../questions/commons"
 
 type FeedbackQuestionAddEditDialogProps = {
    creator?: LivestreamCreator
-} & Omit<BrandedDialogProps, "key" | "children">
+} & Omit<BrandedDialogProps, "children">
 
 const CreatorAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
    creator,
@@ -15,7 +15,6 @@ const CreatorAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
    handleCloseDialog,
 }) => (
    <BrandedDialog
-      key="add-edit-creator-dialog"
       isDialogOpen={isDialogOpen}
       handleCloseDialog={handleCloseDialog}
    >
