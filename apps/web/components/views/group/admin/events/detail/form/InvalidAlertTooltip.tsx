@@ -57,7 +57,6 @@ export const InvalidAlertTooltipContent: FC<
          </Typography>
          {Boolean(isMobile) && (
             <Button
-               key="wololowtfbro"
                fullWidth
                variant="outlined"
                color="grey"
