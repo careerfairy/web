@@ -15,6 +15,7 @@ import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import { LivestreamCreator } from "../questions/commons"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    menuItem: {
@@ -84,6 +85,7 @@ const SelectSpeakersDropDown = ({
    handleCreateNew,
    values,
 }: Props) => {
+   const isMobile = useIsMobile()
    const { setFieldValue, isSubmitting } = useLivestreamFormValues()
 
    const renderCreateNewCreatorOption = useMemo(
@@ -126,13 +128,15 @@ const SelectSpeakersDropDown = ({
          multiple
          disableCloseOnSelect
          initialOptionSection={renderCreateNewCreatorOption}
-         getOptionElement={getOptionElement}
+         getOptionElement={(speaker) =>
+            getOptionElement(speaker as LivestreamCreator, isMobile)
+         }
          disabled={isSubmitting}
       />
    )
 }
 
-const getOptionElement = (speaker: LivestreamCreator) => (
+const getOptionElement = (speaker: LivestreamCreator, isMobile: boolean) => (
    <Stack direction="row" padding="16px" gap="8px" width="100%">
       <CreatorAvatar
          creator={{
@@ -142,19 +146,19 @@ const getOptionElement = (speaker: LivestreamCreator) => (
          }}
          size={48}
       />
-      <Stack direction="column" alignContent="center">
-         <Typography fontSize="16px" lineHeight="24px">
+      <Stack direction="column" alignContent="center" width="40dvw">
+         <Typography fontSize="16px" lineHeight="24px" sx={styles.ellipsis}>
             {`${speaker.firstName} ${speaker.lastName}`}
          </Typography>
          {Boolean(speaker.position || speaker.email) && (
             <Stack spacing={2} direction={"row"}>
-               {Boolean(speaker.position) && (
+               {Boolean(speaker.position && !isMobile) && (
                   <Typography sx={styles.speakerInfo}>
                      {speaker.position}
                   </Typography>
                )}
 
-               {Boolean(speaker.position && speaker.email) && (
+               {Boolean(speaker.position && speaker.email && !isMobile) && (
                   <Divider orientation="vertical" flexItem />
                )}
 
