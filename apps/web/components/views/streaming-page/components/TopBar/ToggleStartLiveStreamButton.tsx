@@ -7,7 +7,7 @@ import {
    useHasStarted,
    useStartsAt,
 } from "store/selectors/streamingAppSelectors"
-import { useUpdateLivestreamStartEndState } from "components/custom-hook/streaming/useToggleStartLivestream"
+import { useUpdateLivestreamStartEndState } from "components/custom-hook/streaming/useUpdateLivestreamStartEndState"
 import { useStreamingContext } from "../../context"
 import useIsStreamStartingSoon from "./useIsStreamStartingSoon"
 import { Tooltip } from "@mui/material"
