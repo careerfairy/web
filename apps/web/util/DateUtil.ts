@@ -18,13 +18,13 @@ export default class DateUtil {
       return dayjs(JSDate).format("DD MMM YYYY")
    }
    static getTodaysISODate() {
-      let today = new Date()
-      let todaysYear = today.getFullYear()
-      let todaysMonth =
+      const today = new Date()
+      const todaysYear = today.getFullYear()
+      const todaysMonth =
          today.getMonth() + 1 > 9
             ? today.getMonth() + 1
             : "0" + (today.getMonth() + 1)
-      let todaysDate =
+      const todaysDate =
          today.getDate() > 9 ? today.getDate() : "0" + today.getDate()
       return todaysYear + "-" + todaysMonth + "-" + todaysDate
    }
@@ -95,19 +95,20 @@ export default class DateUtil {
    }
 
    static getISODateTime(JSDate: Date) {
-      let year = JSDate.getFullYear()
-      let month =
+      const year = JSDate.getFullYear()
+      const month =
          JSDate.getMonth() + 1 > 9
             ? JSDate.getMonth() + 1
             : "0" + (JSDate.getMonth() + 1)
-      let day = JSDate.getDate() > 9 ? JSDate.getDate() : "0" + JSDate.getDate()
-      let hours =
+      const day =
+         JSDate.getDate() > 9 ? JSDate.getDate() : "0" + JSDate.getDate()
+      const hours =
          JSDate.getHours() > 9 ? JSDate.getHours() : "0" + JSDate.getHours()
-      let minutes =
+      const minutes =
          JSDate.getMinutes() > 9
             ? JSDate.getMinutes()
             : "0" + JSDate.getMinutes()
-      let seconds =
+      const seconds =
          JSDate.getSeconds() > 9
             ? JSDate.getSeconds()
             : "0" + JSDate.getSeconds()
@@ -127,19 +128,20 @@ export default class DateUtil {
    }
 
    static getAddEventDateTime(JSDate: Date) {
-      let year = JSDate.getFullYear()
-      let month =
+      const year = JSDate.getFullYear()
+      const month =
          JSDate.getMonth() + 1 > 9
             ? JSDate.getMonth() + 1
             : "0" + (JSDate.getMonth() + 1)
-      let day = JSDate.getDate() > 9 ? JSDate.getDate() : "0" + JSDate.getDate()
-      let hours =
+      const day =
+         JSDate.getDate() > 9 ? JSDate.getDate() : "0" + JSDate.getDate()
+      const hours =
          JSDate.getHours() > 9 ? JSDate.getHours() : "0" + JSDate.getHours()
-      let minutes =
+      const minutes =
          JSDate.getMinutes() > 9
             ? JSDate.getMinutes()
             : "0" + JSDate.getMinutes()
-      let seconds =
+      const seconds =
          JSDate.getSeconds() > 9
             ? JSDate.getSeconds()
             : "0" + JSDate.getSeconds()
@@ -336,7 +338,22 @@ export default class DateUtil {
     */
    static isDeadlineExpired(JSDate: Date) {
       JSDate.setUTCHours(23, 59, 59, 999) // Get end of day
-      const now = new Date();
+      const now = new Date()
       return now >= JSDate
+   }
+
+   static formatElapsedTime(startedAt: number | Date) {
+      const now = dayjs()
+      const start = dayjs(startedAt)
+      const difference = now.diff(start)
+
+      // Calculate total minutes and remaining seconds
+      const totalMinutes = Math.floor(difference / (1000 * 60))
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+      // Format seconds to always be two digits
+      const formattedSeconds = seconds.toString().padStart(2, "0")
+
+      return `${totalMinutes}:${formattedSeconds}`
    }
 }
