@@ -10,12 +10,11 @@ import {
 import { Fragment } from "react"
 import DateUtil from "util/DateUtil"
 import * as PropTypes from "prop-types"
-import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
 import {
    PdfCategoryChartData,
    PdfCategoryChartOption,
    PdfReportData,
-} from "@careerfairy/shared-lib/dist/groups/pdf-report"
+} from "@careerfairy/shared-lib/groups/pdf-report"
 
 Font.register({
    family: "Poppins",
@@ -235,16 +234,20 @@ const CFPage = (props) => <Page {...props} style={styles.cfPage} />
 
 const TopView = (props) => <View {...props} style={styles.topView} />
 
-const CFLogo = (props) => <Image {...props} style={styles.cfLogo} />
+const CFLogo = (props) => (
+   <Image {...props} style={styles.cfLogo} alt="CareerFairy Logo" />
+)
 
-const CompanyLogo = (props) => <Image {...props} style={styles.companyLogo} />
+const CompanyLogo = (props) => (
+   <Image {...props} style={styles.companyLogo} alt="Company Logo" />
+)
 
 const CompanyLogoView = (props) => (
    <View {...props} style={styles.companyLogoContainer} />
 )
 
 const GroupLogoImage = (props) => (
-   <Image {...props} style={styles.groupLogoImage} />
+   <Image {...props} style={styles.groupLogoImage} alt="Group Logo" />
 )
 
 const GroupLogoView = (props) => (
@@ -252,7 +255,7 @@ const GroupLogoView = (props) => (
 )
 
 const SpeakerAvatar = (props) => (
-   <Image {...props} style={styles.speakerAvatar} />
+   <Image {...props} style={styles.speakerAvatar} alt="Speaker Avatar" />
 )
 
 const Label = (props) => <Text {...props} style={styles.label} />
@@ -288,7 +291,9 @@ const PartnerBreakdownItem = (props) => (
       style={{ ...styles.partnerItem, ...styles.partnerItemBreakdown }}
    />
 )
-const PartnerLogo = (props) => <Image {...props} style={styles.partnerLogo} />
+const PartnerLogo = (props) => (
+   <Image {...props} style={styles.partnerLogo} alt="Partner Logo" />
+)
 
 const EngagementChild = (props) => (
    <View {...props} style={styles.engagementChild} />
@@ -327,10 +332,7 @@ const GroupSubTitle = (props) => (
    />
 )
 
-const AnswerText = (props) => <Text {...props} style={styles.answerText} />
 const ColorText = (props) => <View {...props} style={styles.colorText} />
-
-const Poll = (props) => <View {...props} style={styles.poll} />
 
 const QuestionVotes = (props) => (
    <Text {...props} style={styles.questionVotes} />
@@ -410,7 +412,7 @@ const RatingView = ({ rating }) => {
 // }
 
 const SpeakerView = ({ speaker }) => {
-   let avatarUrl =
+   const avatarUrl =
       speaker.avatar ||
       "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mentors-pictures%2Fplaceholder.png?alt=media"
    return (
@@ -438,14 +440,10 @@ const SpeakerView = ({ speaker }) => {
 }
 
 const SpeakersViewElement = ({ speakers }) => {
-   let speakerElements = speakers.map((speaker) => {
+   const speakerElements = speakers.map((speaker) => {
       return <SpeakerView key={speaker.id} speaker={speaker} />
    })
    return <SpeakersView>{speakerElements}</SpeakersView>
-}
-
-const getPercentage = (num1, num2) => {
-   return `${((num1 / num2) * 100).toFixed(0)}%`
 }
 
 interface ReportPageProps {
@@ -462,7 +460,7 @@ const ReportPage = ({
 }: ReportPageProps) => {
    return (
       <Fragment>
-         {groupLogo && (
+         {Boolean(groupLogo) && (
             <GroupLogoView break>
                <GroupLogoImage src={groupLogo} />
             </GroupLogoView>
@@ -543,9 +541,6 @@ const EventPdfReport = (props: PdfReportData) => {
       (question) => (numberOfVotes += question.votes)
    )
 
-   const isForUniversity = Boolean(
-      props.summary?.requestingGroup?.universityCode
-   )
    return (
       <Document
          title={`General Report ${props.summary.livestream.company} ${props.summary.livestream.id}.pdf`}
@@ -568,17 +563,6 @@ const EventPdfReport = (props: PdfReportData) => {
                </View>
             </TopView>
             <View style={styles.topMargin}>
-               {props.summary.requestingGroup.universityCode ? (
-                  <TopView>
-                     <CompanyLogoView>
-                        <CompanyLogo
-                           src={resolveImage(
-                              props.summary.livestream.companyLogoUrl
-                           )}
-                        />
-                     </CompanyLogoView>
-                  </TopView>
-               ) : null}
                <View>
                   <Label>Live Stream Report </Label>
                   <Title>{props.summary.livestream.title}</Title>
@@ -627,42 +611,18 @@ const EventPdfReport = (props: PdfReportData) => {
                         </ColorText>
                      </View>
                   </View>
-                  {isForUniversity ? (
-                     <View wrap={false}>
-                        <SubTitle>Where They Came From</SubTitle>
-                        <PartnersWrapper>
-                           {[...props.hostsData]
-                              .sort(dynamicSort("totalParticipantsFromGroup"))
-                              .filter(
-                                 (host) =>
-                                    host.numberOfStudentsFromUniversity > 0 &&
-                                    host.isUniversity
-                              )
-                              .map((host) => (
-                                 <PartnerBreakdown
-                                    key={host.id}
-                                    name={host.hostName}
-                                    numberOfStudents={
-                                       host.numberOfStudentsFromUniversity
-                                    }
-                                 />
-                              ))}
-                        </PartnersWrapper>
-                     </View>
-                  ) : (
-                     <View wrap={false}>
-                        <SubTitle>Most Popular Schools</SubTitle>
-                        <PartnersWrapper>
-                           {props.summary.mostCommonUniversities.map((uni) => (
-                              <PartnerBreakdown
-                                 key={uni.code}
-                                 name={uni.name}
-                                 numberOfStudents={uni.count}
-                              />
-                           ))}
-                        </PartnersWrapper>
-                     </View>
-                  )}
+                  <View wrap={false}>
+                     <SubTitle>Most Popular Schools</SubTitle>
+                     <PartnersWrapper>
+                        {props.summary.mostCommonUniversities.map((uni) => (
+                           <PartnerBreakdown
+                              key={uni.code}
+                              name={uni.name}
+                              numberOfStudents={uni.count}
+                           />
+                        ))}
+                     </PartnersWrapper>
+                  </View>
                   <View wrap={false}>
                      <SubTitle>Viewer Ratings</SubTitle>
                      <FlexParent>{ratingsElements}</FlexParent>
@@ -700,30 +660,11 @@ const EventPdfReport = (props: PdfReportData) => {
                      <SubTitle>Most upvoted questions</SubTitle>
                      {questionElements}
                   </View>
-                  {props.universityChartData && (
+                  {Boolean(props.nonUniversityChartData) && (
                      <View break>
                         <ReportPage
-                           groupLogo={props.summary.requestingGroup.logoUrl}
-                           title={`Your Audience from ${props.summary.requestingGroup.universityName}`}
-                           subtitle={`Number Of Participating Students from
-                        ${props.summary.requestingGroup.universityName}: ${props.universityChartData.totalWithStats}`}
-                           chartData={props.universityChartData}
-                        />
-                     </View>
-                  )}
-                  {props.nonUniversityChartData && (
-                     <View break>
-                        <ReportPage
-                           title={
-                              isForUniversity
-                                 ? "Participants from other universities"
-                                 : "Your participants breakdown"
-                           }
-                           subtitle={`${
-                              isForUniversity
-                                 ? "Number Of Participants from other universities"
-                                 : "Number Of Participants from your most popular schools"
-                           }: ${props.nonUniversityChartData.totalWithStats}`}
+                           title={"Your participants breakdown"}
+                           subtitle={`Number Of Participants from your most popular schools: ${props.nonUniversityChartData.totalWithStats}`}
                            chartData={props.nonUniversityChartData}
                         />
                      </View>
@@ -751,7 +692,7 @@ const EventPdfReport = (props: PdfReportData) => {
  * @param url
  * @returns {Promise<unknown>|*}
  */
-const resolveImage = (url) => {
+const resolveImage = (url: string) => {
    if (url.toLowerCase().indexOf(".png") !== -1) {
       // react-pdf accepts a Promise
       return convertImgToBase64URL(url)
@@ -761,7 +702,7 @@ const resolveImage = (url) => {
 }
 
 //https://github.com/diegomura/react-pdf/issues/676#issuecomment-821109460
-const convertImgToBase64URL = (url, outputFormat?: any) =>
+const convertImgToBase64URL = (url: string) =>
    new Promise((resolve, reject) => {
       const img = document.createElement("img")
       img.crossOrigin = "Anonymous"
@@ -771,11 +712,11 @@ const convertImgToBase64URL = (url, outputFormat?: any) =>
       img.onload = function () {
          let canvas: HTMLCanvasElement = document.createElement("canvas")
          const ctx = canvas.getContext("2d")
-         let dataURL
+         let dataURL = ""
          canvas.height = img.height
          canvas.width = img.width
          ctx.drawImage(img, 0, 0, img.width, img.height)
-         dataURL = canvas.toDataURL(outputFormat)
+         dataURL = canvas.toDataURL()
          canvas = null
          resolve(dataURL)
       }

@@ -3,14 +3,14 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import { v4 as uuidv4 } from "uuid"
 import { Container, Step, StepLabel, Stepper } from "@mui/material"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import {
    Group,
    GroupQuestion,
    sortGroupQuestionOptionsByName,
-} from "@careerfairy/shared-lib/dist/groups"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+} from "@careerfairy/shared-lib/groups"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import Header from "../../components/views/header/Header"
@@ -61,7 +61,7 @@ const CreateGroup = () => {
       if (user === null) {
          router.replace("/login")
       }
-   }, [user])
+   }, [user, router])
 
    useEffect(() => {
       if (baseGroupInfo.university?.id) {
@@ -71,6 +71,7 @@ const CreateGroup = () => {
       } else {
          clearFieldAndLevelOfStudyQuestions()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(baseGroupInfo.university?.id)])
 
    const steps = getSteps()
@@ -170,8 +171,8 @@ const CreateGroup = () => {
    const uploadLogo = async (fileObject) => {
       try {
          const storageRef = firebase.getStorageRef()
-         let fullPath = "group-logos" + "/" + fileObject.name
-         let companyLogoRef = storageRef.child(fullPath)
+         const fullPath = "group-logos" + "/" + fileObject.name
+         const companyLogoRef = storageRef.child(fullPath)
          const uploadTask = companyLogoRef.put(fileObject)
          await uploadTask.then()
          return uploadTask.snapshot.ref.getDownloadURL()
@@ -191,9 +192,7 @@ const CreateGroup = () => {
             logoUrl: downloadURL,
             description: baseGroupInfo.description?.trim(),
             test: false,
-            ...(baseGroupInfo.university?.id && {
-               universityCode: baseGroupInfo.university.id,
-            }),
+            universityCode: baseGroupInfo.university?.id || "",
             atsAdminPageFlag: baseGroupInfo.isATSEnabled,
             companyCountry: baseGroupInfo.companyCountry,
             companyIndustries: baseGroupInfo.companyIndustries,
