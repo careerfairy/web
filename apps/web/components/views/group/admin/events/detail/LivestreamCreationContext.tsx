@@ -22,6 +22,7 @@ type LivestreamCreationContextType = {
    navPreviousTab: () => void
    navNextTab: () => void
    navigateWithValidationCheck: (callback: () => void) => void
+   isNavigatingForward: boolean
    alertState: boolean
    setAlertState: Dispatch<SetStateAction<boolean>>
    isValidationDialogOpen: boolean
@@ -49,6 +50,7 @@ export const LivestreamCreationContextProvider: FC<
    const { errors } = useLivestreamFormValues()
    const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
    const [alertState, setAlertState] = useState(undefined)
+   const [isNavigatingForward, setIsNavigatingForward] = useState(true)
    const [
       isValidationDialogOpen,
       handleValidationOpenDialog,
@@ -91,6 +93,7 @@ export const LivestreamCreationContextProvider: FC<
       navigateWithValidationCheck(() => {
          if (tabValue !== TAB_VALUES.GENERAL) {
             setTabValue(tabValue - 1)
+            setIsNavigatingForward(false)
          }
       })
    }, [navigateWithValidationCheck, tabValue])
@@ -99,6 +102,7 @@ export const LivestreamCreationContextProvider: FC<
       navigateWithValidationCheck(() => {
          if (tabValue !== MAX_TAB_VALUE) {
             setTabValue(tabValue + 1)
+            setIsNavigatingForward(true)
          }
       })
    }, [navigateWithValidationCheck, tabValue])
@@ -110,6 +114,7 @@ export const LivestreamCreationContextProvider: FC<
          navPreviousTab,
          navNextTab,
          navigateWithValidationCheck,
+         isNavigatingForward,
          alertState,
          setAlertState,
          isValidationDialogOpen,
@@ -129,6 +134,7 @@ export const LivestreamCreationContextProvider: FC<
          navigateWithValidationCheck,
          navNextTab,
          navPreviousTab,
+         isNavigatingForward,
          alertState,
          tabValue,
       ]
