@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
 import { sxStyles } from "types/commonTypes"
@@ -7,6 +7,7 @@ import SparkCategoryChip from "./SparkCategoryChip"
 import SparkQuestion from "./SparkQuestion"
 import { Stack } from "@mui/material"
 import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
+import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 
 const cardPadding = 2
 
@@ -25,13 +26,19 @@ type Props = {
 }
 
 const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
+   const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
+   const [isHovered, setIsHovered] = useState(false)
+
    return (
       <SparkCarouselCardContainer
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
-            url: spark.video.url,
-            preview,
+            url: sparkPresenter.getTransformedVideoUrl(),
+            preview: preview,
          }}
+         onMouseEnter={() => setIsHovered(true)}
+         onMouseLeave={() => setIsHovered(false)}
+         isHovered={isHovered}
       >
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />

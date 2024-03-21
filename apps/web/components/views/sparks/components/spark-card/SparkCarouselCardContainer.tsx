@@ -42,22 +42,36 @@ type Props = {
    componentHeader?: React.ReactNode
    children?: React.ReactNode
    video: { thumbnailUrl: string; url: string; preview: boolean }
+   onMouseEnter?: () => void
+   onMouseLeave?: () => void
+   isHovered?: boolean
 }
 
 const SparkCarouselCardContainer: FC<Props> = ({
    componentHeader,
    children,
    video,
+   onMouseEnter,
+   onMouseLeave,
+   isHovered,
 }) => {
+   const hoverEnabled = isHovered !== undefined
+
    return (
-      <Box sx={styles.root}>
+      <Box
+         sx={styles.root}
+         onMouseEnter={onMouseEnter}
+         onMouseLeave={onMouseLeave}
+      >
          {componentHeader ? componentHeader : null}
          <Box sx={styles.cardContent}>{children}</Box>
          <VideoPreview
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
             playing={video.preview}
-            light={!video.preview}
+            light={hoverEnabled ? false : !video.preview}
+            isHovered={isHovered}
+            muted={hoverEnabled ? true : undefined}
          />
       </Box>
    )
