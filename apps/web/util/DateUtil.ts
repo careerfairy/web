@@ -342,18 +342,33 @@ export default class DateUtil {
       return now >= JSDate
    }
 
-   static formatElapsedTime(startedAt: number | Date) {
+   /**
+    * Formats the elapsed time since a given start point to a string.
+    * If more than an hour has passed, it formats the time as "HH:MM:SS".
+    * If less than an hour has passed, it formats the time as "MM:SS".
+    *
+    * @param {number | Date} startedAt - The start time as a timestamp or Date object.
+    * @return {string} - The formatted elapsed time.
+    */
+   static formatElapsedTime(startedAt: number | Date): string {
       const now = dayjs()
       const start = dayjs(startedAt)
       const difference = now.diff(start)
 
       // Calculate total minutes and remaining seconds
-      const totalMinutes = Math.floor(difference / (1000 * 60))
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+      const totalHours = Math.floor(difference / (1000 * 60 * 60))
+      const totalMinutes = Math.floor((difference / (1000 * 60)) % 60)
+      const seconds = Math.floor((difference / 1000) % 60)
 
-      // Format seconds to always be two digits
+      // Format hours, minutes and seconds
+      const formattedHours = totalHours.toString().padStart(2, "0")
+      const formattedMinutes = totalMinutes.toString().padStart(2, "0")
       const formattedSeconds = seconds.toString().padStart(2, "0")
 
-      return `${totalMinutes}:${formattedSeconds}`
+      if (totalHours > 0) {
+         return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+      }
+
+      return `${formattedMinutes}:${formattedSeconds}`
    }
 }
