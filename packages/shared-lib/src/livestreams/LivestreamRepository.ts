@@ -775,6 +775,7 @@ export class FirebaseLivestreamRepository
          lastUpdatedDateString:
             event.lastUpdated?.toDate?.().toString() || null,
          startDateString: event.start?.toDate?.().toString() || null,
+         startedAtDateString: event.startedAt?.toDate?.().toString() || null,
          groupQuestionsMap: event.groupQuestionsMap || null,
          duration: event.duration || null,
          hasEnded: event.hasEnded || false,
@@ -802,6 +803,9 @@ export class FirebaseLivestreamRepository
          ...serializedEvent,
          startDate: serializedEvent.startDateString
             ? new Date(serializedEvent.startDateString)
+            : null,
+         startedAt: serializedEvent.startedAtDateString
+            ? new Date(serializedEvent.startedAtDateString)
             : null,
          createdDate: serializedEvent.createdDateString
             ? new Date(serializedEvent.createdDateString)
