@@ -1,13 +1,17 @@
-import { useState } from "react"
-import SpeakersCard from "./SpeakersCard"
-import CreatorDialog from "./CreatorAddEditDialog"
-import FormSectionHeader from "../../FormSectionHeader"
-import SelectSpeakersDropDown from "./SelectSpeakerDropDown"
-import { useLivestreamFormValues } from "../../useLivestreamFormValues"
+import { useTheme } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { useState } from "react"
+import { User } from "react-feather"
+import EmptyFormSection from "../../EmptyFormSection"
+import FormSectionHeader from "../../FormSectionHeader"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import { LivestreamCreator } from "../questions/commons"
+import CreatorDialog from "./CreatorAddEditDialog"
+import SelectSpeakersDropDown from "./SelectSpeakerDropDown"
+import SpeakersCard from "./SpeakersCard"
 
 const LivestreamFormSpeakersStep = () => {
+   const theme = useTheme()
    const {
       values: { speakers },
       setFieldValue,
@@ -45,19 +49,31 @@ const LivestreamFormSpeakersStep = () => {
                handleAddEditOpenDialog()
             }}
          />
-         {speakers.values.map((speaker) => (
-            <SpeakersCard
-               key={`speaker-card-${speaker.originalId}`}
-               speaker={speaker}
-               handleEdit={() => {
-                  setCurrentCreator(speaker)
-                  handleAddEditOpenDialog()
-               }}
-               handleRemove={() => {
-                  handleSpeakerRemove(speaker.id)
-               }}
+         {speakers.values.length > 0 ? (
+            <>
+               {speakers.values.map((speaker) => (
+                  <SpeakersCard
+                     key={`speaker-card-${speaker.originalId}`}
+                     speaker={speaker}
+                     handleEdit={() => {
+                        setCurrentCreator(speaker)
+                        handleAddEditOpenDialog()
+                     }}
+                     handleRemove={() => {
+                        handleSpeakerRemove(speaker.id)
+                     }}
+                  />
+               ))}
+            </>
+         ) : (
+            <EmptyFormSection
+               icon={<User size={70} color={theme.palette.secondary.main} />}
+               title={"Select a speaker!"}
+               caption={
+                  "Selecting at least one speaker is required in order to publish your live stream."
+               }
             />
-         ))}
+         )}
          <CreatorDialog
             creator={currentCreator}
             isDialogOpen={isAddEditDialogOpen}
