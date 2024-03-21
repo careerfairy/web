@@ -1,5 +1,5 @@
 import { useAuth } from "HOCs/AuthProvider"
-import { useSetUserIsParticipating } from "components/custom-hook/streaming/useSetUserIsParticipating"
+import { useTrackUserParticipation } from "components/custom-hook/streaming/useTrackUserParticipation"
 import { useStreamingContext } from "../context"
 
 /**
@@ -13,7 +13,7 @@ export const ViewerTrackers = () => {
    const { userData, userStats } = useAuth()
    const { livestreamId } = useStreamingContext()
 
-   useSetUserIsParticipating(livestreamId, userData, userStats)
+   useTrackUserParticipation(livestreamId, userData, userStats)
 
    return null
 }

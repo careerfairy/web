@@ -13,7 +13,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
  * @param {UserStats} userStats - The user's statistics.
  * @returns An object containing a function to trigger the participation status update and the mutation key.
  */
-export const useSetUserIsParticipating = (
+export const useTrackUserParticipation = (
    livestreamId: string,
    userData: UserData,
    userStats: UserStats
