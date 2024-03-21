@@ -91,7 +91,7 @@ function mapCreatorToLivestreamCreator(creator: Creator): LivestreamCreator {
 function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
    return {
       originalId: speaker.id,
-      id: speaker.email,
+      id: speaker.id,
       groupId: null,
       documentType: "groupCreator",
       firstName: speaker.firstName,
