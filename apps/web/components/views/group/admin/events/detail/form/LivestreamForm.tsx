@@ -1,6 +1,5 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { CircularProgress, Stack } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { Stack } from "@mui/material"
 import { Form } from "formik"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
 import { TAB_VALUES } from "./commons"
@@ -22,11 +21,7 @@ const LivestreamForm = () => {
       <Form>
          <Stack sx={styles.root} rowGap={2}>
             {tabValue === TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
-            {tabValue == TAB_VALUES.SPEAKERS && (
-               <SuspenseWithBoundary fallback={<CircularProgress />}>
-                  <LivestreamFormSpeakersStep />
-               </SuspenseWithBoundary>
-            )}
+            {tabValue == TAB_VALUES.SPEAKERS && <LivestreamFormSpeakersStep />}
             {tabValue === TAB_VALUES.QUESTIONS && (
                <LivestreamFormQuestionsStep />
             )}
