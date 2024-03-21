@@ -6,7 +6,7 @@ import {
    SwipeableDrawer,
    Typography,
 } from "@mui/material"
-import Dialog from "@mui/material/Dialog"
+import Dialog, { DialogProps } from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
@@ -109,7 +109,8 @@ type Props = {
    description: string | ReactNode
    icon: ReactNode
    primaryAction: ConfirmationDialogAction
-   secondaryAction: ConfirmationDialogAction
+   secondaryAction?: ConfirmationDialogAction
+   sx?: DialogProps["sx"]
 }
 
 const ConfirmationDialog: FC<Props> = (props) => {
@@ -121,6 +122,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
       icon,
       primaryAction,
       secondaryAction,
+      sx,
    } = props
 
    const isMobile = useIsMobile()
@@ -140,6 +142,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
          PaperProps={{
             sx: styles.dialogPaper,
          }}
+         sx={sx}
       >
          <DialogTitle
             sx={[styles.titleWrapper, styles.iconWrapper]}
@@ -177,7 +180,9 @@ const ConfirmationDialog: FC<Props> = (props) => {
          </DialogContent>
          <DialogActions sx={styles.actions}>
             <Stack direction="row" spacing={1.5} width="100%">
-               <ActionButton fullWidth {...secondaryAction} />
+               {Boolean(secondaryAction) && (
+                  <ActionButton fullWidth {...secondaryAction} />
+               )}
                <ActionButton fullWidth autoFocus {...primaryAction} />
             </Stack>
          </DialogActions>
@@ -233,7 +238,9 @@ const MobileDrawer = ({
             spacing={1.5}
             justifyContent="center"
          >
-            <ActionButton {...secondaryAction} />
+            {Boolean(secondaryAction) && (
+               <ActionButton fullWidth {...secondaryAction} />
+            )}
             <ActionButton autoFocus {...primaryAction} />
          </Stack>
       </SwipeableDrawer>
