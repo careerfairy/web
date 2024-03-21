@@ -1,14 +1,14 @@
-import { FC } from "react"
-import { Formik } from "formik"
-import { Box } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { LivestreamCreator } from "../questions/commons"
+import { Box } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import CreateOrEditCreatorForm from "components/views/sparks/forms/CreateOrEditCreatorForm"
-import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
 import { CreatorFormValues } from "components/views/sparks/forms/hooks/useCreatorFormSubmit"
+import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
+import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import { Formik } from "formik"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC } from "react"
+import { LivestreamCreator } from "../questions/commons"
 
 const styles = sxStyles({
    content: {
