@@ -20,10 +20,6 @@ const styles = sxStyles({
       p: 0,
       overflowX: "hidden",
    },
-   viewer: {
-      py: 1,
-      px: 2,
-   },
    loader: {
       display: "flex",
       justifyContent: "center",
@@ -33,20 +29,12 @@ const styles = sxStyles({
 })
 
 export const ViewersPanel = () => {
-   const viewCount = useCurrentViewCount()
    const failedToConnectToRTM = useFailedToConnectToRTM()
 
    return (
       <SidePanelView
          id="viewer-panel"
-         title={
-            <Fragment>
-               Viewers:{" "}
-               <Box component="span" fontWeight={600}>
-                  {viewCount}
-               </Box>
-            </Fragment>
-         }
+         title={<ViewersTitle />}
          icon={<Eye />}
          contentWrapperStyles={styles.contentWrapper}
       >
@@ -54,10 +42,24 @@ export const ViewersPanel = () => {
             {failedToConnectToRTM ? (
                <AllAttendees />
             ) : (
-               <CurrentRTMChanneLMembers />
+               <CurrentRTMChannelMembers />
             )}
          </SuspenseWithBoundary>
       </SidePanelView>
+   )
+}
+
+export const ViewersTitle = () => {
+   const viewCount = useCurrentViewCount()
+   const failedToConnectToRTM = useFailedToConnectToRTM()
+
+   return (
+      <Fragment>
+         {failedToConnectToRTM ? "Attendees:" : "Viewers:"}{" "}
+         <Box component="span" fontWeight={600}>
+            {viewCount}
+         </Box>
+      </Fragment>
    )
 }
 
@@ -76,7 +78,7 @@ const AllAttendees = () => {
    )
 }
 
-const CurrentRTMChanneLMembers = () => {
+const CurrentRTMChannelMembers = () => {
    const rtmChannel = useRTMChannel()
    const { members } = useChannelMembers(rtmChannel)
 

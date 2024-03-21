@@ -11,7 +11,9 @@ export const GenericListRenderer = <T extends UserLivestreamData | string>({
    items: Array<T>
    itemKey: (item: T) => React.Key
 }) => {
-   const userCount = items.length
+   const safeItems = items || []
+
+   const userCount = safeItems.length
 
    return (
       <AutoSizer>
@@ -24,8 +26,8 @@ export const GenericListRenderer = <T extends UserLivestreamData | string>({
             >
                {({ style, index }) => (
                   <Viewer
-                     key={itemKey(items[index])}
-                     memberData={items[index]}
+                     key={itemKey(safeItems[index])}
+                     memberData={safeItems[index]}
                      style={style}
                   />
                )}

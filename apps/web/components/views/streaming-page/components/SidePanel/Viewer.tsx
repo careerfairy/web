@@ -24,7 +24,7 @@ export const styles = sxStyles({
    },
 })
 
-type Data = {
+type ViewerData = {
    firstName: string
    lastName: string
    displayName: string
@@ -35,7 +35,7 @@ type Data = {
 /**
  * Transforms member data or streamer ID into a standardized format.
  */
-const useMemberData = (memberData: UserLivestreamData | string): Data => {
+const useMemberData = (memberData: UserLivestreamData | string): ViewerData => {
    const shouldFetchStreamerDetails = typeof memberData === "string"
 
    const { data: streamerDetails } = useStreamerDetails(
