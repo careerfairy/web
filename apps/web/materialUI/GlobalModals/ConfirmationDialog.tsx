@@ -241,9 +241,7 @@ const MobileDrawer = ({
             spacing={1.5}
             justifyContent="center"
          >
-            {Boolean(secondaryAction) && (
-               <ActionButton fullWidth {...secondaryAction} />
-            )}
+            {Boolean(secondaryAction) && <ActionButton {...secondaryAction} />}
             <ActionButton autoFocus {...primaryAction} />
          </Stack>
       </DrawerComponent>
