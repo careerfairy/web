@@ -148,8 +148,8 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                            lineHeight="27px"
                            fontWeight={500}
                         >
-                           Missing email address. Please edit this speaker’s
-                           details to add it.
+                           Missing email address. Please edit this speaker to
+                           add it.
                         </Typography>
                      )}
                   </Stack>
