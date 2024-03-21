@@ -573,16 +573,19 @@ export interface LivestreamEventSerialized
       | "created"
       | "start"
       | "startDate"
+      | "startedAt"
       | "lastUpdated"
       | "lastUpdatedAuthorInfo"
    > {
    createdDateString: string
    startDateString: string
+   startedAtDateString: string
    lastUpdatedDateString: string
 }
 
 export interface LivestreamEventParsed extends LivestreamEventSerialized {
    startDate: Date
+   startedAt: Date
    createdDate: Date
    lastUpdatedDate: Date
 }
