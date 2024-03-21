@@ -17,11 +17,12 @@ import {
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
 
 type LivestreamCreationContextType = {
+   tabToNavigateTo: TAB_VALUES
    tabValue: TAB_VALUES
    setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
    navPreviousTab: () => void
    navNextTab: () => void
-   navigateWithValidationCheck: (callback: () => void) => void
+   navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
    isNavigatingForward: boolean
    alertState: boolean
    setAlertState: Dispatch<SetStateAction<boolean>>
@@ -51,6 +52,7 @@ export const LivestreamCreationContextProvider: FC<
    const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
    const [alertState, setAlertState] = useState(undefined)
    const [isNavigatingForward, setIsNavigatingForward] = useState(true)
+   const [tabToNavigateTo, setTabToNavigateTo] = useState<TAB_VALUES>(undefined)
    const [
       isValidationDialogOpen,
       handleValidationOpenDialog,
@@ -78,37 +80,35 @@ export const LivestreamCreationContextProvider: FC<
       formHasCriticalValidationErrors
 
    const navigateWithValidationCheck = useCallback(
-      (navigationCallback: () => void) => {
+      (newTabValue) => {
          if (shouldShowAlertDialog) {
             setAlertState(true)
             handleValidationOpenDialog()
-            return
+            setTabToNavigateTo(newTabValue)
+         } else {
+            setTabValue(newTabValue)
          }
-         navigationCallback()
       },
       [handleValidationOpenDialog, shouldShowAlertDialog]
    )
 
    const navPreviousTab = useCallback(() => {
-      navigateWithValidationCheck(() => {
-         if (tabValue !== TAB_VALUES.GENERAL) {
-            setTabValue(tabValue - 1)
-            setIsNavigatingForward(false)
-         }
-      })
+      if (tabValue !== TAB_VALUES.GENERAL) {
+         setIsNavigatingForward(false)
+         navigateWithValidationCheck(tabValue - 1)
+      }
    }, [navigateWithValidationCheck, tabValue])
 
    const navNextTab = useCallback(() => {
-      navigateWithValidationCheck(() => {
-         if (tabValue !== MAX_TAB_VALUE) {
-            setTabValue(tabValue + 1)
-            setIsNavigatingForward(true)
-         }
-      })
+      if (tabValue !== MAX_TAB_VALUE) {
+         setIsNavigatingForward(true)
+         navigateWithValidationCheck(tabValue + 1)
+      }
    }, [navigateWithValidationCheck, tabValue])
 
    const value = useMemo(
       () => ({
+         tabToNavigateTo,
          tabValue,
          setTabValue,
          navPreviousTab,
@@ -137,6 +137,7 @@ export const LivestreamCreationContextProvider: FC<
          isNavigatingForward,
          alertState,
          tabValue,
+         tabToNavigateTo,
       ]
    )
 
@@ -151,7 +152,7 @@ export const useLivestreamCreationContext = () => {
    const context = useContext(LivestreamCreationContext)
    if (context === undefined) {
       throw new Error(
-         "useLivestreamTab must be used within a LivestreamTabProvider"
+         "useLivestreamCreationContext must be used within a LivestreamCreationContextProvider"
       )
    }
    return context

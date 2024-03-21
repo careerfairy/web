@@ -4,7 +4,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { Info } from "react-feather"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
-import { MAX_TAB_VALUE } from "./commons"
 import BrandedDialog from "./views/questions/components/BrandedDialog"
 
 const styles = sxStyles({
@@ -79,9 +78,8 @@ const InvalidAlertContent = () => {
    const {
       setAlertState,
       handleValidationCloseDialog,
-      tabValue,
+      tabToNavigateTo,
       setTabValue,
-      isNavigatingForward,
    } = useLivestreamCreationContext()
 
    const handleGoBack = () => {
@@ -92,10 +90,7 @@ const InvalidAlertContent = () => {
    const handleSkipForNow = () => {
       setAlertState(false)
       handleValidationCloseDialog()
-      if (tabValue !== MAX_TAB_VALUE) {
-         const step = isNavigatingForward ? 1 : -1
-         setTabValue(tabValue + step)
-      }
+      setTabValue(tabToNavigateTo)
    }
 
    return (
