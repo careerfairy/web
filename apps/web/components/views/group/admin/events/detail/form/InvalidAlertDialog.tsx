@@ -76,8 +76,13 @@ const styles = sxStyles({
 })
 
 const InvalidAlertContent = () => {
-   const { setAlertState, handleValidationCloseDialog, tabValue, setTabValue } =
-      useLivestreamCreationContext()
+   const {
+      setAlertState,
+      handleValidationCloseDialog,
+      tabValue,
+      setTabValue,
+      isNavigatingForward,
+   } = useLivestreamCreationContext()
 
    const handleGoBack = () => {
       setAlertState(false)
@@ -88,7 +93,8 @@ const InvalidAlertContent = () => {
       setAlertState(false)
       handleValidationCloseDialog()
       if (tabValue !== MAX_TAB_VALUE) {
-         setTabValue(tabValue + 1)
+         const step = isNavigatingForward ? 1 : -1
+         setTabValue(tabValue + step)
       }
    }
 
