@@ -106,14 +106,16 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   >
                      {`${speaker.firstName} ${speaker.lastName}`}
                   </Typography>
-                  <Stack direction="column">
-                     <Stack
-                        direction="row"
-                        gap="16px"
-                        alignItems="center"
-                        justifyContent={isMobile ? "center" : null}
-                     >
-                        <Typography sx={styles.speakerInfo}>
+                  <Stack
+                     direction="column"
+                     textAlign={isMobile ? "center" : null}
+                  >
+                     <Stack direction="row" gap="16px" alignItems="center">
+                        <Typography
+                           fontSize="16px"
+                           color="neutral.400"
+                           lineHeight="27px"
+                        >
                            {speaker.position}
                         </Typography>
                         <Divider
@@ -128,9 +130,25 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                            <LinkedIn htmlColor="#e5e5e5" />
                         )}
                      </Stack>
-                     <Typography sx={styles.speakerInfo}>
-                        {speaker.email}
-                     </Typography>
+                     {speaker.email ? (
+                        <Typography
+                           fontSize="16px"
+                           color="neutral.400"
+                           lineHeight="27px"
+                        >
+                           {speaker.email}
+                        </Typography>
+                     ) : (
+                        <Typography
+                           fontSize="16px"
+                           color="#FE9B0E"
+                           lineHeight="27px"
+                           fontWeight={500}
+                        >
+                           Missing email address. Please edit this speaker to
+                           add it.
+                        </Typography>
+                     )}
                   </Stack>
                </Stack>
             </Stack>
