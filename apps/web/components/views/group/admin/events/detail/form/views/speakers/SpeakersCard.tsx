@@ -9,6 +9,9 @@ import { FC } from "react"
 import MoreMenuWithEditAndRemoveOptions from "../questions/components/MoreMenu"
 
 const styles = sxStyles({
+   alertBorder: {
+      borderColor: "#FE9B0E",
+   },
    wrapper: {
       p: 3,
       mt: 3,
@@ -70,7 +73,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
    const speakerHasStory = Boolean(speaker.story)
 
    return (
-      <Box sx={styles.wrapper}>
+      <Box sx={[styles.wrapper, !speaker.email && styles.alertBorder]}>
          <Box sx={styles.moreMenu}>
             <MoreMenuWithEditAndRemoveOptions
                labels={["Edit speaker's details", "Remove speaker"]}
