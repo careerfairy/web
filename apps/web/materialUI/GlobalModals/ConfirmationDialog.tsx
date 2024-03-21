@@ -2,6 +2,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
 import {
    DialogContentText,
+   Drawer,
    Stack,
    SwipeableDrawer,
    Typography,
@@ -199,8 +200,10 @@ const MobileDrawer = ({
    primaryAction,
    secondaryAction,
 }: Props) => {
+   const DrawerComponent = handleClose ? SwipeableDrawer : Drawer
+
    return (
-      <SwipeableDrawer
+      <DrawerComponent
          onOpen={() => {}}
          onClose={handleClose}
          open={open}
@@ -243,7 +246,7 @@ const MobileDrawer = ({
             )}
             <ActionButton autoFocus {...primaryAction} />
          </Stack>
-      </SwipeableDrawer>
+      </DrawerComponent>
    )
 }
 
