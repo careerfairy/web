@@ -355,7 +355,7 @@ export default class DateUtil {
       const start = dayjs(startedAt)
       const difference = now.diff(start)
 
-      // Calculate total minutes and remaining seconds
+      // Calculate total hours, minutes and remaining seconds
       const totalHours = Math.floor(difference / (1000 * 60 * 60))
       const totalMinutes = Math.floor((difference / (1000 * 60)) % 60)
       const seconds = Math.floor((difference / 1000) % 60)
