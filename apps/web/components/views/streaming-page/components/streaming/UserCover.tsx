@@ -4,16 +4,14 @@ import { sxStyles } from "types/commonTypes"
 import { FloatingContent } from "./VideoTrackWrapper"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 
-const MOBILE_AVATAR_SIZE = 104
-const DESKTOP_AVATAR_SIZE = 136
+const MOBILE_AVATAR_SIZE = 65
+const DESKTOP_AVATAR_SIZE = 100
 
 const styles = sxStyles({
    root: {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background:
-         "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 79.5%, rgba(0, 0, 0, 0.12) 86.5%, rgba(0, 0, 0, 0.48) 100%), #EBEBEF",
    },
    image: {
       width: {
@@ -26,15 +24,18 @@ const styles = sxStyles({
       },
    },
    border: {
-      border: "21px solid transparent",
+      border: {
+         xs: "10px solid transparent",
+         tablet: "21px solid transparent",
+      },
       borderRadius: "50%",
       padding: "5px",
       background: (theme) => alpha(theme.palette.neutral[100], 0.2),
    },
    initials: {
       fontSize: {
-         xs: 48,
-         tablet: 64,
+         xs: 30,
+         tablet: 55,
       },
       fontWeight: 500,
    },

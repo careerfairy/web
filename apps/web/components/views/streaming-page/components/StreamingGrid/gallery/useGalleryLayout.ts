@@ -23,6 +23,7 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
    const narrowIshScreen = useIsMobile(1280)
+   const desktopScreen = useIsMobile(1290)
 
    const galleryIsSquished = narrowIshScreen && isSideDrawerOpen
 
@@ -47,8 +48,12 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
       if (isSpotlightMode) {
          return {
             // Max 3 streamers on a single row on mobile
-            // Max 4 streamers on a single row on desktop
-            columns: Math.min(streamIsMobile ? 3 : 4, numberOfElements),
+            // Max 4 streamers on a single row on macbook screens
+            // Max 6 streamers on a single row on larger than macbook screens
+            columns: Math.min(
+               streamIsMobile ? 3 : desktopScreen ? 4 : 7,
+               numberOfElements
+            ),
             rows: 1,
          }
       }
@@ -68,6 +73,7 @@ export const useGalleryLayout = (numberOfElements: number): Layout => {
       // Default scenario for larger collections: Opt for a 3x2 grid to balance between rows and columns.
       return { columns: 3, rows: 2 }
    }, [
+      desktopScreen,
       galleryIsSquished,
       isSpotlightMode,
       numberOfElements,
