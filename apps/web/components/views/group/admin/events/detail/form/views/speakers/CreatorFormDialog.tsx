@@ -28,7 +28,7 @@ const styles = sxStyles({
       px: 2,
    },
    form: {
-      marginTop: "40px",
+      marginTop: "25px",
       marginBottom: "40px",
       paddingBottom: "48px",
    },
