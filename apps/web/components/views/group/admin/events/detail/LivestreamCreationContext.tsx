@@ -27,6 +27,10 @@ type LivestreamCreationContextType = {
    isValidationDialogOpen: boolean
    handleValidationOpenDialog: () => void
    handleValidationCloseDialog: () => void
+   shouldShowAlertIndicatorOnTab: Record<
+      TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
+      boolean
+   >
    shouldShowAlertDialog: boolean
    shouldShowAlertIndicator: boolean
 }
@@ -50,6 +54,16 @@ export const LivestreamCreationContextProvider: FC<
       handleValidationOpenDialog,
       handleValidationCloseDialog,
    ] = useDialogStateHandler()
+
+   const shouldShowAlertIndicatorOnTab = useMemo(
+      () => ({
+         [TAB_VALUES.GENERAL]:
+            alertState !== undefined && Boolean(errors.general),
+         [TAB_VALUES.SPEAKERS]:
+            alertState !== undefined && Boolean(errors.speakers),
+      }),
+      [alertState, errors.general, errors.speakers]
+   )
 
    const formHasCriticalValidationErrors = Boolean(
       errors.general || errors.speakers
@@ -101,12 +115,14 @@ export const LivestreamCreationContextProvider: FC<
          isValidationDialogOpen,
          handleValidationOpenDialog,
          handleValidationCloseDialog,
+         shouldShowAlertIndicatorOnTab,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
       }),
       [
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
+         shouldShowAlertIndicatorOnTab,
          handleValidationCloseDialog,
          handleValidationOpenDialog,
          isValidationDialogOpen,

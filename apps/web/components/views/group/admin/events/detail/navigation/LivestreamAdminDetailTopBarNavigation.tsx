@@ -62,13 +62,10 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
       tabValue,
       setTabValue,
       navigateWithValidationCheck,
+      shouldShowAlertIndicatorOnTab,
    } = useLivestreamCreationContext()
 
-   const showAlertIndicatorStyles =
-      shouldShowAlertIndicator &&
-      (tabValue === TAB_VALUES.GENERAL || tabValue === TAB_VALUES.SPEAKERS) // is the user in a critical tab?
-
-   const styles = getStyles(showAlertIndicatorStyles)
+   const styles = getStyles(shouldShowAlertIndicatorOnTab[tabValue])
 
    return (
       <Tabs
