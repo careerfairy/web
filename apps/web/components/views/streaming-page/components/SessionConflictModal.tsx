@@ -25,7 +25,7 @@ const Content = () => {
       <>
          <DialogTitle>Session Conflict Detected</DialogTitle>
          <DialogContent>
-            It looks like you&apos;re logged in from another browser or device.
+            {`It looks like you're logged in from another browser or device.`}
          </DialogContent>
          <DialogActions>
             <Button onClick={handleReload} variant="contained" color="primary">
