@@ -259,7 +259,7 @@ class FirebaseService {
       data
    ): Promise<firebase.functions.HttpsCallableResult> => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_eu"
+         "getLivestreamReportData_v2"
       )
       return handleGetLivestreamReportData(data)
    }
