@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
-import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -110,8 +110,8 @@ const SelectSpeakersDropDown = ({
    }
 
    return (
-      <FormBrandedAutocomplete
-         name={fieldId}
+      <BrandedAutocomplete
+         key={fieldId}
          value={values}
          options={options}
          isOptionEqualToValue={isOptionEqualToValue}
