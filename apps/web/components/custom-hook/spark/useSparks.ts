@@ -8,7 +8,7 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 /**
  * Fetches the stats for a given spark if it belongs to the given group.
  **/
-const useSparks = (totalItems?: number, groupId?: String) => {
+const useSparks = (totalItems?: number, groupId?: string) => {
    const sparksQuery = useMemo(() => {
       return query(
          collection(FirestoreInstance, "sparks"),
