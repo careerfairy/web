@@ -67,7 +67,7 @@ const MenuBurger: FC<Props> = ({ id }) => {
                         fullWidth
                         variant="outlined"
                         color="grey"
-                        href={`/login`}
+                        href={"/login"}
                         component={Link}
                      >
                         Log in
@@ -76,7 +76,7 @@ const MenuBurger: FC<Props> = ({ id }) => {
                      <Button
                         fullWidth
                         variant="contained"
-                        href={`/signup`}
+                        href={"/signup"}
                         color="primary"
                         component={Link}
                      >
