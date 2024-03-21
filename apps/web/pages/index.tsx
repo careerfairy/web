@@ -8,6 +8,7 @@ import parseHtml, {
 } from "html-react-parser"
 import get from "lodash/get"
 import React, { ReactElement } from "react"
+import MenuBurger from "components/webflow/MenuBurger"
 
 // Determines if URL is internal or external
 function isUrlInternal(link: string): boolean {
@@ -27,9 +28,15 @@ function isUrlInternal(link: string): boolean {
 function replace(node: Element): ReactElement | false {
    const attribs = node.attribs || {}
 
+   // Replace nav element with MenuBurger component if the id includes "burger-menu"
+   if (node.name === "nav" && attribs.id?.includes("burger-menu")) {
+      return <MenuBurger id={attribs.id} />
+   }
+
    // Replace links with Next links
    if (node.name === `a` && isUrlInternal(attribs.href)) {
-      let { href, style, ...props } = attribs
+      let { href } = attribs
+      const { style, ...props } = attribs
       href = `${href}`
       if (props.class) {
          props.className = props.class
@@ -45,7 +52,7 @@ function replace(node: Element): ReactElement | false {
          )
       }
 
-      let styleObj = {}
+      const styleObj = {}
       if (style) {
          const [property, value] = style.split(":")
          styleObj[property.trim()] = value.trim()
