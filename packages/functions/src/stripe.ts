@@ -123,6 +123,7 @@ export const fetchStripeCustomerSession = functions
                   ],
                   ui_mode: "embedded",
                   mode: "payment",
+                  billing_address_collection: "required",
                   metadata: {
                      groupId: data.groupId,
                      plan: data.plan,
