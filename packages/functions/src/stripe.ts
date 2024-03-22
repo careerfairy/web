@@ -128,6 +128,7 @@ export const fetchStripeCustomerSession = functions
                      groupId: data.groupId,
                      plan: data.plan,
                   },
+                  customer_email: data.customerEmail,
                })
                // console.log("🚀 ~ customerSession:", customerSession)
 
