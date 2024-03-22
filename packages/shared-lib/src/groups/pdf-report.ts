@@ -27,14 +27,6 @@ export interface PdfCategoryChartData {
    mainCategoryOptions: PdfCategoryChartOption[]
 }
 
-const uniFilterFn = (
-   user: UserData,
-   category: GroupQuestion,
-   option: GroupQuestionOption
-) => {
-   return user.university?.questions?.[category.id]?.answerId === option.id
-}
-
 const generalFilterFn = (
    user: UserData,
    userInfo: GroupQuestion,
@@ -46,17 +38,14 @@ const generalFilterFn = (
 export const getPdfCategoryChartData = (
    mainQuestion: GroupQuestion,
    subQuestion: GroupQuestion,
-   users: UserData[],
-   forUniversity: boolean
+   users: UserData[]
 ): PdfCategoryChartData => {
    const subCategorySortingOrder = "asc"
    const mainQuestionOptions: PdfCategoryChartOption[] =
       convertGroupQuestionOptionsToSortedArray(mainQuestion?.options)
          .map((mainQuestionOption) => {
             const mainQuestionOptionUsers = users.filter((user) =>
-               forUniversity
-                  ? uniFilterFn(user, mainQuestion, mainQuestionOption)
-                  : generalFilterFn(user, mainQuestion, mainQuestionOption)
+               generalFilterFn(user, mainQuestion, mainQuestionOption)
             )
             return {
                id: mainQuestionOption?.id,
@@ -65,13 +54,7 @@ export const getPdfCategoryChartData = (
                )
                   .map((subCategoryOption) => {
                      const count = mainQuestionOptionUsers.filter((user) =>
-                        forUniversity
-                           ? uniFilterFn(user, subQuestion, subCategoryOption)
-                           : generalFilterFn(
-                                user,
-                                subQuestion,
-                                subCategoryOption
-                             )
+                        generalFilterFn(user, subQuestion, subCategoryOption)
                      ).length
                      return {
                         id: subCategoryOption?.id,
@@ -105,8 +88,6 @@ export const getPdfCategoryChartData = (
    }
 }
 
-export const getUniPdfCategoryChartData = () => {}
-
 export interface PdfCategoryChartOption extends GroupQuestionOption {
    count: number
    subCategoryOptions: PdfCategoryChartSubOption[]
@@ -124,7 +105,6 @@ export interface PdfReportData {
       id: string
       isUniversity: boolean
    }[]
-   universityChartData: PdfCategoryChartData
    nonUniversityChartData: PdfCategoryChartData
    summary: {
       totalParticipating: number
@@ -133,6 +113,7 @@ export interface PdfReportData {
       requestingGroup: Group
       speakers: Speaker[]
       totalStudentsInTalentPool: number
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ratings: any[]
       livestream: LivestreamEvent
       questions: LivestreamQuestion[]
