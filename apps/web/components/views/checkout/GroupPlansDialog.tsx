@@ -276,7 +276,6 @@ type GroupPlansDialogContainerProps = BoxProps & {
 }
 
 const Container: FC<GroupPlansDialogContainerProps> = ({
-   width,
    sx,
    hideCloseButton,
    children,
@@ -284,7 +283,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    const { handleClose } = useSparksPlansForm()
    const isMobile = useIsMobile("md")
    const open = useSelector(plansDialogOpenSelector)
-   console.log("🚀 ~ open:", open, width)
+
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
          <Dialog

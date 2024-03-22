@@ -29,6 +29,8 @@ type FetchStripeCustomerSession = {
    customerEmail: string
    groupId: string
    plan: GroupPlanType
+   priceId: string
+   successUrl: string
 }
 /**
  * Functions runtime settings
@@ -49,6 +51,8 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
       customerEmail: string().required(),
       groupId: string().required(),
       customerId: string().required(),
+      priceId: string().required(),
+      successUrl: string().required(),
    })
 /**
  * Sync Status for the multiple entities
@@ -63,6 +67,9 @@ export const fetchStripeCustomerSession = functions
          async (data: FetchStripeCustomerSession, context) => {
             functions.logger.info("fetchStripeCustomerSession - data: ", data)
 
+            const returnUrl =
+               context.rawRequest.headers.origin + data.successUrl
+            console.log("🚀 ~ returnUrl:", returnUrl)
             try {
                // Query Stripe customer database via metadata
                const query = `metadata['groupId']:'${data.customerId}'`
@@ -106,17 +113,26 @@ export const fetchStripeCustomerSession = functions
                   })
                }
 
-               const customerSession = await stripe.customerSessions.create({
-                  customer: customer.id,
-                  components: {
-                     buy_button: {
-                        enabled: true,
+               const customerSession = await stripe.checkout.sessions.create({
+                  return_url: returnUrl,
+                  line_items: [
+                     {
+                        price: data.priceId,
+                        quantity: 1,
                      },
+                  ],
+                  ui_mode: "embedded",
+                  mode: "payment",
+                  metadata: {
+                     groupId: data.groupId,
+                     plan: data.plan,
                   },
                })
+               // console.log("🚀 ~ customerSession:", customerSession)
 
                return { customerSessionSecret: customerSession.client_secret }
             } catch (error) {
+               console.log(error)
                logAndThrow("Error while creating Stripe Customer Session", {
                   data,
                   error,
@@ -190,29 +206,22 @@ export const stripeWebHook = functions
 
 async function handleStripeEvent(event: Stripe.Event): Promise<void> {
    try {
+      console.log("🚀 ~ handleStripeEvent ~ event:", event)
       switch (event.type) {
          case "checkout.session.completed": {
             const paymentSucceedEvent =
                event as Stripe.CheckoutSessionCompletedEvent
 
-            const customerId = paymentSucceedEvent.data.object
-               .customer as string
-            const customer: Stripe.Customer = await stripe.customers.retrieve(
-               customerId
-            )
-            if (
-               customer &&
-               customer.metadata.groupId &&
-               customer.metadata.plan
-            ) {
-               const plan = customer.metadata.plan as GroupPlanType
-               await groupRepo.startPlan(customer.metadata.groupId, plan)
+            const metadata = paymentSucceedEvent.data.object.metadata
+            if (metadata && metadata.groupId && metadata.plan) {
+               const plan = metadata.plan as GroupPlanType
+               await groupRepo.startPlan(metadata.groupId, plan)
 
                functions.logger.info(
                   "✅ Successfully processed event - Stripe Customer: " +
-                     customer +
+                     metadata +
                      ", Group ID: ",
-                  customer.metadata.groupId
+                  metadata.groupId
                )
             }
             break

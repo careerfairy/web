@@ -12,14 +12,12 @@ export type PlanFeature = "sparks" | "jobs"
  * Configurations related to Stripe payments, the important ones are:
  *  - priceId: Unique ID of the Stripe price, defines a unique campaign e.g: Sparks 1 Year subscription / 5.000 CHF
  *       Not used for now, but can be if manual checkout is implemented.
- *  - buttonId: Stripe button ID, used for embedded checkout process.
  *
  * These are defined as functions as the Price IDs to be used change depending on group companyCountry.id
  * Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
  */
 type StripeConfig = {
    priceId: (countryCode: string) => string
-   buttonId: (countryCode: string) => string
 }
 
 interface AnalyticsPlanConstants {
@@ -73,8 +71,6 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       description: "Trial plan",
       stripe: {
          priceId: () => resolveByCountry("", "CH", "", ""), // Not to be used
-         buttonId: () =>
-            process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
@@ -100,13 +96,6 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
                process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID_CH,
                process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
             ),
-         buttonId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_BUY_BUTTON_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_BUY_BUTTON_ID
-            ),
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
@@ -130,13 +119,6 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
                "CH",
                process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID_CH,
                process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
-            ),
-         buttonId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_BUY_BUTTON_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_BUY_BUTTON_ID
             ),
       },
       features: ADVANCED_FEATURES,
@@ -165,13 +147,6 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
                "CH",
                process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID_CH,
                process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
-            ),
-         buttonId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_BUY_BUTTON_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_BUY_BUTTON_ID
             ),
       },
       features: PREMIUM_FEATURES,
