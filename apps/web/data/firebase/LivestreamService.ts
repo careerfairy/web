@@ -460,8 +460,8 @@ export class LivestreamService {
    }
    /**
     * Sets the status of a livestream to either started or not started.
-    * If `hasStarted` is true, performs a transaction to ensure the stream isn't restarted if already started.
-    * Otherwise, performs a normal update operation to mark the stream as not started.
+    * If `shouldStart` is true, performs a transaction to ensure the stream isn't restarted if already started.
+    * Otherwise, performs a normal update operation to mark the stream as ended.
     *
     * @param {string} livestreamId - The ID of the livestream to update.
     * @param {boolean} shouldStart - A boolean indicating if the livestream has started.
@@ -491,7 +491,6 @@ export class LivestreamService {
          })
       } else {
          return this.updateLivestream(livestreamId, {
-            hasStarted: false,
             hasEnded: true,
          })
       }

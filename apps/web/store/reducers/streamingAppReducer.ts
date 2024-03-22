@@ -64,6 +64,7 @@ export interface StreamingAppState {
       startsAt: number | null
       startedAt: number | null
       hasStarted: boolean
+      hasEnded: boolean
    }
    rtmSignalingState: {
       failedToConnect: boolean
@@ -101,6 +102,7 @@ const initialState: StreamingAppState = {
       startsAt: null,
       startedAt: null,
       hasStarted: false,
+      hasEnded: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -180,11 +182,6 @@ const streamingAppSlice = createSlice({
       setNumberOfParticipants(state, action: PayloadAction<number>) {
          state.livestreamState.numberOfParticipants = action.payload
       },
-      setStartedAt(state, action: PayloadAction<number | null>) {
-         if (state.livestreamState.startedAt !== action.payload) {
-            state.livestreamState.startedAt = action.payload
-         }
-      },
       setHasStarted(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.hasStarted !== action.payload) {
             state.livestreamState.hasStarted = action.payload
@@ -193,6 +190,16 @@ const streamingAppSlice = createSlice({
       setStartsAt(state, action: PayloadAction<number | null>) {
          if (state.livestreamState.startsAt !== action.payload) {
             state.livestreamState.startsAt = action.payload
+         }
+      },
+      setStartedAt(state, action: PayloadAction<number | null>) {
+         if (state.livestreamState.startedAt !== action.payload) {
+            state.livestreamState.startedAt = action.payload
+         }
+      },
+      setHasEnded(state, action: PayloadAction<boolean>) {
+         if (state.livestreamState.hasEnded !== action.payload) {
+            state.livestreamState.hasEnded = action.payload
          }
       },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
@@ -247,9 +254,10 @@ export const {
       setLivestreamMode,
       setScreenSharerId,
       setNumberOfParticipants,
+      setHasStarted,
       setStartsAt,
       setStartedAt,
-      setHasStarted,
+      setHasEnded,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,

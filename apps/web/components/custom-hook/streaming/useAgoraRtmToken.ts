@@ -1,7 +1,6 @@
 import { livestreamService } from "data/firebase/LivestreamService"
-import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 import { errorLogAndNotify } from "util/CommonUtil"
-import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 
 export type UseAgoraRtmToken = {
    /** The Agora RTM token */
@@ -19,7 +18,7 @@ export type UseAgoraRtmToken = {
  * @returns {UseAgoraRtmToken} The Agora RTM token and a function to fetch it.
  */
 export const useAgoraRtmToken = (agoraUid: string): UseAgoraRtmToken => {
-   const key = agoraUid || null
+   const key = agoraUid ? `get-agora-rtm-token-${agoraUid}` : null
 
    const {
       data: token,
@@ -27,20 +26,18 @@ export const useAgoraRtmToken = (agoraUid: string): UseAgoraRtmToken => {
       error: tokenError,
       mutate,
       isLoading,
-   } = useSWR(key, () => livestreamService.fetchAgoraRtmToken(agoraUid), {
-      /**
-       * Token is only re-fetched when the args change
-       * Not on focus, blur, or other events
-       */
-      ...reducedRemoteCallsOptions,
-      onError: (error, key) => {
-         return errorLogAndNotify(error, {
-            message: "Failed to fetch Agora RTM token",
-            args: key,
-         })
-      },
-      suspense: false,
-   })
+   } = useSWRImmutable(
+      key,
+      () => livestreamService.fetchAgoraRtmToken(agoraUid),
+      {
+         onError: (error, key) => {
+            return errorLogAndNotify(error, {
+               message: "Failed to fetch Agora RTM token",
+               args: key,
+            })
+         },
+      }
+   )
 
    return {
       token,
