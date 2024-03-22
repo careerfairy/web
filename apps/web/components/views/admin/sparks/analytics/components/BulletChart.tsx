@@ -1,9 +1,9 @@
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
-import { Box, LinearProgress, Typography } from "@mui/material"
 import { LinearBarDataPoint } from "@careerfairy/shared-lib/sparks/analytics"
+import { Box, LinearProgress, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const getStyles = (gridColumnLength) =>
    sxStyles({
@@ -70,9 +70,14 @@ const calculateMedian = (data) => {
 type BulletChartProps = {
    data: LinearBarDataPoint[]
    valueIndexer?: string
+   showPercentageOnly?: boolean
 }
 
-const BulletChart: FC<BulletChartProps> = ({ data, valueIndexer }) => {
+const BulletChart: FC<BulletChartProps> = ({
+   data,
+   valueIndexer,
+   showPercentageOnly,
+}) => {
    const isMobile = useIsMobile()
 
    const labelLengths = data.map((item) => item.label.length)
@@ -85,7 +90,10 @@ const BulletChart: FC<BulletChartProps> = ({ data, valueIndexer }) => {
    return (
       <Box sx={styles.root}>
          {data.map((item, index) => {
-            const value = `${item.value} (${Math.round(item.percentage)}%)`
+            const value = showPercentageOnly
+               ? `${Math.round(item.percentage)}%`
+               : `${item.value} (${Math.round(item.percentage)}%)`
+
             return (
                <>
                   <Box
