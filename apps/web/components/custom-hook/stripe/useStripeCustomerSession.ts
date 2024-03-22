@@ -1,47 +1,66 @@
-import axios from "axios"
-import { StripeCustomerSessionResponseData } from "pages/api/checkout_sessions"
-import { useCallback, useState } from "react"
+import useSWR, { SWRConfiguration } from "swr"
 
-type Props = {
-   groupId: string
-}
-type StripeCustomerSession = {
-   isLoading: boolean
-   data: StripeCustomerSessionResponseData
+import { useMemo } from "react"
+import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
+import useFunctionsSWR, {
+   reducedRemoteCallsOptions,
+} from "../utils/useFunctionsSWRFetcher"
+import { errorLogAndNotify } from "util/CommonUtil"
+
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   keepPreviousData: true,
+   suspense: true,
+   onError: (error, key) =>
+      errorLogAndNotify(error, {
+         message: `Error fetching Stripe Customer Session with options: ${key}`,
+      }),
 }
 
 /**
- * Hook that provides functionality to upload a user's CV to Firebase storage.
- * @returns An object containing upload related state and methods.
+ * Stripe Session secret, a key that's unique to the individual PaymentIntent.
+ * On the client side, Stripe.js uses the client secret as a parameter when invoking functions (such as stripe.confirmCardPayment
+ *  or stripe.handleCardAction) to complete the payment.
  */
-const useStripeCustomerSession = ({
-   groupId,
-}: Props): StripeCustomerSession => {
-   const [isLoading, setIsLoading] = useState(false)
-   const [data, setData] = useState<StripeCustomerSessionResponseData>()
+type Result = {
+   customerSessionSecret: string
+}
 
-   useCallback(() => {
-      setIsLoading(true)
-      axios
-         .post<StripeCustomerSessionResponseData>("/api/checkout_sessions", {
-            groupId: groupId,
-         })
-         .then((res) => {
-            if (res.status == 200) {
-               console.log(
-                  "🚀 ~ fetchData ~ apiData: fetched customer session",
-                  groupId
-               )
-               setData(res.data)
-            }
-         })
-         .catch((err) => {
-            console.error("Error creating API customer session: ", err)
-            setIsLoading(false)
-         })
-   }, [groupId])
+/**
+ * Creates a session based on the given details, creates or updates an existing Stripe customer
+ * with the additional details.
+ * @param group Group object, the groupId is used as customerId
+ * @param plan  The plan for the group to subscribe to
+ * @param userEmail Current HR rep email
+ * @returns customerSessionSecret Stripe customer session to be used in the checkout process
+ */
+const useStripeCustomerSession = (
+   group: Group,
+   plan: GroupPlanType,
+   userEmail: string
+) => {
+   const fetcher = useFunctionsSWR<Result[]>()
 
-   return { data: data, isLoading: isLoading }
+   const options = useMemo(() => {
+      return {
+         customerId: group.groupId,
+         plan: plan,
+         customerEmail: userEmail,
+         groupId: group.groupId,
+         customerName: group.universityName,
+      }
+   }, [group.groupId, group.universityName, plan, userEmail])
+   const { data } = useSWR(
+      ["fetchStripeCustomerSession", options],
+      fetcher,
+      swrOptions
+   )
+
+   return useMemo(() => {
+      return {
+         customerSessionSecret: data.customerSessionSecret,
+      }
+   }, [data])
 }
 
 export default useStripeCustomerSession

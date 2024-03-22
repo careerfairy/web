@@ -1,21 +1,159 @@
 import { RuntimeOptions } from "firebase-functions"
 import functions = require("firebase-functions")
 import config from "./config"
-import { Stripe } from "stripe"
 import { setCORSHeaders } from "./util"
 import { groupRepo } from "./api/repositories"
-
+import { Stripe } from "stripe"
+import { middlewares } from "./middlewares/middlewares"
+import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
+import { SchemaOf, mixed, object, string } from "yup"
+import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { logAndThrow } from "./lib/validations"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
+
+/**
+ * Payload for retrieving Stripe Price information
+ */
+type FetchStripePrice = {
+   priceId: string
+}
+/**
+ * Payload for creating a Stripe customer session, returning the client secret.
+ * For retrieving the secret it is necessary to provide a customer ID, so a customer will be created
+ * if not existing and updating if already present.
+ */
+type FetchStripeCustomerSession = {
+   customerName: string
+   customerId: string
+   customerEmail: string
+   groupId: string
+   plan: GroupPlanType
+}
 /**
  * Functions runtime settings
  */
 const runtimeSettings: RuntimeOptions = {
-   // may take a while
-   timeoutSeconds: 60,
-   // we may load lots of data into memory
+   timeoutSeconds: 20,
    memory: "128MB",
 }
+
+const fetchStripePriceSchema: SchemaOf<FetchStripePrice> = object().shape({
+   priceId: string().required(),
+})
+
+const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
+   object().shape({
+      plan: mixed().oneOf(Object.values(GroupPlanTypes)).required(),
+      customerName: string().required(),
+      customerEmail: string().required(),
+      groupId: string().required(),
+      customerId: string().required(),
+   })
+/**
+ * Sync Status for the multiple entities
+ */
+export const fetchStripeCustomerSession = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onCall(
+      middlewares(
+         dataValidation(fetchStripeCustomerSessionSchema),
+         userShouldBeCFAdmin(),
+         async (data: FetchStripeCustomerSession, context) => {
+            functions.logger.info("fetchStripeCustomerSession - data: ", data)
+
+            try {
+               // Query Stripe customer database via metadata
+               const query = `metadata['groupId']:'${data.customerId}'`
+               let customer
+               let createCustomer = false
+
+               const customers = await stripe.customers.search({
+                  query: query,
+               })
+               functions.logger.info(
+                  "fetchStripeCustomerSession - customers via query: ",
+                  customers
+               )
+
+               if (customers && customers.data.length) {
+                  customer = customers.data.at(0)
+               } else {
+                  createCustomer = true
+               }
+
+               if (createCustomer) {
+                  customer = await stripe.customers.create({
+                     name: data.customerName,
+                     email: data.customerEmail,
+                     metadata: {
+                        groupId: data.groupId,
+                        plan: data.plan,
+                     },
+                  })
+                  functions.logger.info(
+                     "fetchStripeCustomerSession - created customer function:",
+                     customer
+                  )
+               } else {
+                  customer = await stripe.customers.update(customer.id, {
+                     metadata: {
+                        // Passing groupId in metadata to allow a Customer (Group) to be always identifiable without override Stripe own ID
+                        groupId: data.groupId,
+                        plan: data.plan,
+                     },
+                  })
+               }
+
+               const customerSession = await stripe.customerSessions.create({
+                  customer: customer.id,
+                  components: {
+                     buy_button: {
+                        enabled: true,
+                     },
+                  },
+               })
+
+               return { customerSessionSecret: customerSession.client_secret }
+            } catch (error) {
+               logAndThrow("Error while creating Stripe Customer Session", {
+                  data,
+                  error,
+                  context,
+               })
+            }
+         }
+      )
+   )
+
+/**
+ * Fetch Stripe Price via ID using the Stripe API. Receives requests with data of @type FetchStripePrice.
+ */
+export const fetchStripePrice = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onCall(
+      middlewares(
+         dataValidation(fetchStripePriceSchema),
+         userShouldBeCFAdmin(),
+         async (data: FetchStripePrice, context) => {
+            functions.logger.info("fetchStripePrice - priceId: ", data.priceId)
+
+            try {
+               const price = await stripe.prices.retrieve(data.priceId)
+
+               return price
+            } catch (error) {
+               logAndThrow("Error while retrieving Stripe price by ID", {
+                  data,
+                  error,
+                  context,
+               })
+            }
+         }
+      )
+   )
 
 export const stripeWebHook = functions
    .region(config.region)
@@ -26,15 +164,13 @@ export const stripeWebHook = functions
          response.status(400).send("Only POST requests are allowed")
          return
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
-      // functions.logger.info(
-      //    "Starting Stripe WebHook"
-      // )
+
+      const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET
+
       if (request.method === "POST") {
          const buf = request.rawBody
-         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-         const sig = request.headers["stripe-signature"]!
+
+         const sig = request.headers["stripe-signature"]
 
          let event: Stripe.Event = null
 
@@ -42,79 +178,51 @@ export const stripeWebHook = functions
             event = Stripe.webhooks.constructEvent(buf, sig, webhookSecret)
 
             await handleStripeEvent(event)
-            // console.log("🚀 ~ .onRequest ~ handled:", event)
          } catch (err) {
-            console.log("🚀 ~ .https.onRequest ~ err:", err)
-            // On error, log and return the error message
-            // console.log(`❌ Error message: ${err.message}`)
+            functions.logger.info("Error handling Stripe Event :", err)
             response.status(400).send(`Webhook Error: ${err}`)
             return
          }
       }
 
-      //       const event = request.body;
-
-      //   // Handle the event
-      //   let paymentIntent
-      //   let paymentMethod
-      //   switch (event.type) {
-      //     case "checkout.session.completed":
-      //         console.log("🚀 ~ .https.onRequest ~ metadata", event.data.metadata)
-      //         if(event.data.metadata)
-      //         console.log("✅ Success:", event.id)
-      //         // paymentIntent = event.data.object;
-      //         // console.log("🚀 ~ .https.onRequest ~ paymentIntent:", paymentIntent)
-      //       // Then define and call a method to handle the successful payment intent.
-      //       // handlePaymentIntentSucceeded(paymentIntent);
-      //       break;
-      //     case "invoice.payment_succeeded":
-      //       console.log("🚀 ~ .https.onRequest ~ metadata", event.data.metadata)
-      //       // Then define and call a method to handle the successful attachment of a PaymentMethod.
-      //       // handlePaymentMethodAttached(paymentMethod);
-      //       // Successfully constructed event
-      //         if(event.data.metadata)
-      //         console.log("✅ Success:", event.id)
-      //       break;
-      //     // ... handle other event types
-      //     default:
-      //       console.log(`Unhandled event type ${event.type}`);
-      //   }
-
-      // Return a response to acknowledge receipt of the event
-
       response.json({ received: true })
    })
 
 async function handleStripeEvent(event: Stripe.Event): Promise<void> {
-   switch (event.type) {
-      case "checkout.session.completed": {
-         const paymentSucceedEvent =
-            event as Stripe.CheckoutSessionCompletedEvent
-         // console.log("🚀 ~ handleStripeEvent ~ paymentSucceedEvent:", paymentSucceedEvent)
-         const customerId = paymentSucceedEvent.data.object.customer as string
-         console.log("🚀 ~ handleStripeEvent ~ customerId:", customerId)
-         const customer = await stripe.customers.retrieve(customerId)
-         console.log("🚀 ~ handleStripeEvent ~ customer:", customer)
-         if (customer && customer.metadata?.groupId) {
-            console.log("🚀 ~ handleStripeEvent ~ customer:", customer)
+   try {
+      switch (event.type) {
+         case "checkout.session.completed": {
+            const paymentSucceedEvent =
+               event as Stripe.CheckoutSessionCompletedEvent
 
-            await groupRepo.startPlan(customer.metadata.groupId, "tier1")
-
-            console.log("🚀 ~ handleStripeEvent ~ groupId:", customerId)
-            console.log(
-               "✅ Successfully processed event - Stripe Customer: " +
-                  customerId +
-                  ", Group ID: ",
-               customer.metadata.groupId
+            const customerId = paymentSucceedEvent.data.object
+               .customer as string
+            const customer: Stripe.Customer = await stripe.customers.retrieve(
+               customerId
             )
-         }
-         break
-      }
+            if (
+               customer &&
+               customer.metadata.groupId &&
+               customer.metadata.plan
+            ) {
+               const plan = customer.metadata.plan as GroupPlanType
+               await groupRepo.startPlan(customer.metadata.groupId, plan)
 
-      default: {
-         // console.log("IGNORE event:", event.type)
-         break
+               functions.logger.info(
+                  "✅ Successfully processed event - Stripe Customer: " +
+                     customer +
+                     ", Group ID: ",
+                  customer.metadata.groupId
+               )
+            }
+            break
+         }
+
+         default: {
+            break
+         }
       }
+   } catch (error) {
+      functions.logger.info("Error processing Stripe event: ", error)
    }
-   return
 }

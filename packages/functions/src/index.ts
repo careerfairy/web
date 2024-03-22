@@ -115,6 +115,9 @@ exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook
+exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
+exports.fetchStripePrice = stripe.fetchStripePrice
+
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
@@ -268,7 +271,8 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
 exports.startPlan_v3 = groupPlans.startPlan
 exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
-
+exports.checkExpiredPlans = groupPlans.checkExpiredPlans
+exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
 // Search
 exports.fullIndexSync = search.fullIndexSync
 

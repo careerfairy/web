@@ -1,95 +1,11 @@
 import { GroupPlanType } from "."
+import {
+   ADVANCED_FEATURES,
+   ESSENTIAL_FEATURES,
+   PREMIUM_FEATURES,
+   PlanFeatureItem,
+} from "./planFeatures"
 
-const PREMIUM_FEATURES: PlanFeatureItem[] = [
-   {
-      enabled: true,
-      name: "Unlimited Sparks slots",
-   },
-   {
-      enabled: true,
-      name: "Unlimited featured employees",
-   },
-   {
-      enabled: true,
-      name: "General analytics",
-   },
-   {
-      enabled: true,
-      name: "Reach and audience analytics",
-   },
-   {
-      enabled: true,
-      name: "Competitor analytics",
-   },
-   {
-      enabled: true,
-      name: "Dedicated KAM",
-   },
-   {
-      enabled: true,
-      name: "11'000 - 13’000 Exposure range",
-   },
-]
-const ADVANCED_FEATURES: PlanFeatureItem[] = [
-   {
-      enabled: true,
-      name: "10 Sparks slots",
-   },
-   {
-      enabled: true,
-      name: "Up to 7 featured employees",
-   },
-   {
-      enabled: true,
-      name: "General analytics",
-   },
-   {
-      enabled: true,
-      name: "Reach and audience analytics",
-   },
-   {
-      enabled: false,
-      name: "Competitor analytics",
-   },
-   {
-      enabled: true,
-      name: "Dedicated KAM",
-   },
-   {
-      enabled: true,
-      name: "7'000 - 8’000 Exposure range",
-   },
-]
-const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
-   {
-      enabled: true,
-      name: "6 Sparks slots",
-   },
-   {
-      enabled: true,
-      name: "General analytics",
-   },
-   {
-      enabled: true,
-      name: "Up to 4 featured employees",
-   },
-   {
-      enabled: false,
-      name: "Reach and audience analytics",
-   },
-   {
-      enabled: false,
-      name: "Competitor analytics",
-   },
-   {
-      enabled: false,
-      name: "Dedicated KAM",
-   },
-   {
-      enabled: true,
-      name: "4'000 - 5’000 Exposure range",
-   },
-]
 export type PlanFeature = "sparks" | "jobs"
 
 /**
@@ -97,16 +13,15 @@ export type PlanFeature = "sparks" | "jobs"
  *  - priceId: Unique ID of the Stripe price, defines a unique campaign e.g: Sparks 1 Year subscription / 5.000 CHF
  *       Not used for now, but can be if manual checkout is implemented.
  *  - buttonId: Stripe button ID, used for embedded checkout process.
+ *
+ * These are defined as functions as the Price IDs to be used change depending on group companyCountry.id
+ * Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
  */
 type StripeConfig = {
-   priceId: string
-   buttonId: string
+   priceId: (countryCode: string) => string
+   buttonId: (countryCode: string) => string
 }
 
-export type PlanFeatureItem = {
-   enabled: boolean
-   name: string
-}
 interface AnalyticsPlanConstants {
    MINIMUM_DUMMY: number
 }
@@ -133,21 +48,33 @@ interface JobsPlanConstants {
    // Empty for now - wgoncalves - disabled eslint for now
 }
 
+const resolveByCountry = (
+   code: string,
+   countryCode: string,
+   value: string,
+   fallback: string
+) => {
+   return code == countryCode ? value : fallback
+}
+
 export type PlanConstants = {
+   name: string // Name of the plan, UI plan name
+   description: string // Description of the plan, UI description
    sparks: SparksPlanConstants
    jobs: JobsPlanConstants
    analytics?: AnalyticsPlanConstants
-   stripe?: StripeConfig
-   features?: PlanFeatureItem[]
+   stripe: StripeConfig
+   features: PlanFeatureItem[] // List of plan features, shown in UI for checkout
 }
 
 export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    trial: {
-      // Stripe price ID - Uniquely identifies a subscription
-      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      name: "Trial",
+      description: "Trial plan",
       stripe: {
-         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
-         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+         priceId: () => resolveByCountry("", "CH", "", ""), // Not to be used
+         buttonId: () =>
+            process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
@@ -163,18 +90,30 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
    },
    tier1: {
-      // Stripe price ID - Uniquely identifies a subscription
-      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      name: "Essential",
+      description: "Jumpstart your employer branding",
       stripe: {
-         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
-         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+         priceId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
+            ),
+         buttonId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_BUY_BUTTON_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_BUY_BUTTON_ID
+            ),
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 15,
-         MAX_SPARK_CREATOR_COUNT: 200, // No limit
+         MAX_PUBLIC_SPARKS: 6,
+         MAX_SPARK_CREATOR_COUNT: 4, // No limit
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
       },
       jobs: {
@@ -182,18 +121,30 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
    },
    advanced: {
-      // Stripe price ID - Uniquely identifies a subscription
-      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      name: "Advanced",
+      description: "Scale up your employer brand narrative",
       stripe: {
-         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
-         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+         priceId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
+            ),
+         buttonId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_BUY_BUTTON_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_BUY_BUTTON_ID
+            ),
       },
       features: ADVANCED_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 6,
-         MAX_SPARK_CREATOR_COUNT: 4,
+         MAX_PUBLIC_SPARKS: 10,
+         MAX_SPARK_CREATOR_COUNT: 7,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
       },
       analytics: {
@@ -204,18 +155,31 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
    },
    premium: {
-      // Stripe price ID - Uniquely identifies a subscription
-      // Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
+      name: "Premium",
+      description:
+         "Gain unparalleled insights into your employer brand perception",
       stripe: {
-         priceId: process.env.SPARKS_TRIAL_STRIPE_PRICE_ID,
-         buttonId: process.env.NEXT_PUBLIC_SPARKS_STRIPE_1_YEAR_BUY_BUTTON_ID,
+         priceId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
+            ),
+         buttonId: (countryCode) =>
+            resolveByCountry(
+               countryCode,
+               "CH",
+               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_BUY_BUTTON_ID_CH,
+               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_BUY_BUTTON_ID
+            ),
       },
       features: PREMIUM_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 6,
-         MAX_SPARK_CREATOR_COUNT: 4,
+         MAX_PUBLIC_SPARKS: 200, // Unlimited
+         MAX_SPARK_CREATOR_COUNT: 200, // Unlimited
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
       },
       analytics: {
