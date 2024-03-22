@@ -50,8 +50,7 @@ const useStripeCustomerSession = (
          groupId: group.groupId,
          customerName: group.universityName,
          priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry.id),
-         successUrl:
-            "/group/yrUCEdMPNc6vz2mMXkx1/admin/sparks?session_id={CHECKOUT_SESSION_ID}",
+         successUrl: `/group/${group.groupId}/admin/sparks?session_id={CHECKOUT_SESSION_ID}`,
       }
    }, [
       group.companyCountry.id,
