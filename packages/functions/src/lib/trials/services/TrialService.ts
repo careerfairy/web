@@ -49,7 +49,7 @@ export class TrialService {
       this.logger.info(" - ignore groups: ", ignoreGroups)
 
       this.groups = await this.groupRepo.getAllGroupsWithAPlanExpiring(
-         "trial",
+         ["trial"],
          SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS,
          this.logger,
          ignoreGroups

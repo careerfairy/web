@@ -1,6 +1,6 @@
-import { Box, Stack, Typography } from "@mui/material"
-import { FC } from "react"
-import { sxStyles } from "types/commonTypes"
+import { Box, Stack, SxProps, Typography } from "@mui/material"
+import { FC, useState } from "react"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import SparksContainer from "../components/SparksContainer"
 import CreatorSparksCollection from "./CreatorSparksCollection"
 import HeaderActions from "./header/HeaderActions"
@@ -8,9 +8,12 @@ import SparksProgressIndicator from "./header/SparksProgressIndicator"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import UpgradePlanBanner from "components/views/checkout/forms/UpgradePlanBanner"
 import { DateTime } from "luxon"
+import { ChevronDown, ChevronUp } from "react-feather"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const BANNER_TITLE = "Reignite your Sparks and keep the momentum going!"
-const BANNER_DESCRIPTION =
+const BANNER_DESCRIPTION_FULL =
    "Your Sparks trial has ended, and they're no longer visible to the CareerFairy talent community. But the magic doesn't have to stop! Upgrade now and reignite the spark to continue engaging all year round with your target audience, access in-depth analytics and showcase your job opportunities in an innovative way. Don't let the momentum you built fade, upgrade now and reignite the spark!"
 
 const BANNER_DESCRIPTION_DAY_7 =
@@ -25,47 +28,98 @@ const styles = sxStyles({
       fontWeight: 600,
       lineHeight: "30px",
    },
+   bannerTitle: {
+      color: (theme) => theme.brand.white[100],
+      textAlign: "left",
+      fontFamily: "Poppins",
+      fontSize: "20px",
+      fontStyle: "normal",
+      fontWeight: "600",
+      lineHeight: "30px",
+      mb: 1,
+   },
    alerted: {
       color: (theme) => theme.palette.secondary.main,
    },
    banner: {
-      // mx: 5,
-      // my: 1,
-      // m: 2,
       display: "flex",
-      // p: "24px",
-      gap: "54px",
-      // alignContent: "space-between",
-      justifyContent: "center",
+      gap: "5px",
+      px: "24px",
+      py: "5px",
+      justifyContent: "space-between",
       alignItems: "center",
-      // minHeight: "150px",
-      // backgroundColor: "red",
       borderRadius: "12px",
-      border: "1px solid var(--purple-purple---400, #9580F0)",
+      border: "1px solid",
+      borderColor: (theme) => theme.brand.purple[400],
       background: "rgba(225, 219, 251, 0.20)",
+   },
+   bannerDescription: {
+      py: 2,
+      color: (theme) => theme.palette.neutral[900],
+      fontFamily: "Poppins",
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "24px",
+   },
+   bannerDescriptionWarning: {
+      py: 2,
+      color: (theme) => theme.brand.white[100],
+      fontFamily: "Poppins",
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: "400",
+      lineHeight: "24px",
+   },
+   statusTitle: {
+      pt: 2,
+   },
+   showMoreWrapper: {
+      pt: 2,
+   },
+   showMore: {
+      color: (theme) => theme.palette.neutral[700],
+   },
+   showMoreWarning: {
+      color: (theme) => theme.brand.white[300],
    },
 })
 
 const GeneralSparksView: FC = () => {
    const { group, groupPresenter } = useGroup()
-   const planDays =
-      groupPresenter.isTrialPlan() && groupPresenter.getPlanDaysLeft()
+
+   const isTrial = groupPresenter.isTrialPlan()
+   const planDays = groupPresenter.getPlanDaysLeft()
 
    return (
       <Stack pb={4} alignItems="center" spacing={4.125}>
          <SparksContainer>
             <UpgradePlanBanner
-               title={BANNER_TITLE}
-               description={BANNER_DESCRIPTION}
-               show={planDays < 1}
+               title={
+                  <Typography sx={styles.bannerTitle}>
+                     {BANNER_TITLE}{" "}
+                  </Typography>
+               }
+               description={
+                  <StatusDescription
+                     showSx={styles.showMoreWarning}
+                     sx={styles.bannerDescriptionWarning}
+                     description={BANNER_DESCRIPTION_FULL}
+                  />
+               }
+               show={isTrial ? planDays < 1 : null}
             />
             <UpgradePlanBanner
                bannerSx={styles.banner}
                title={<TrialEndUpgradeTitle days={planDays} />}
                description={
-                  <StatusDescription description={BANNER_DESCRIPTION_DAY_7} />
+                  <StatusDescription
+                     showSx={styles.showMore}
+                     sx={styles.bannerDescription}
+                     description={BANNER_DESCRIPTION_DAY_7}
+                  />
                }
-               show={planDays > 0 && planDays <= 7}
+               show={isTrial ? planDays > 0 && planDays <= 7 : null}
             />
          </SparksContainer>
          {group.publicSparks ? null : (
@@ -88,7 +142,9 @@ type TrialEndProps = {
 }
 const TrialEndUpgradeTitle = ({ days }: TrialEndProps) => {
    const endDate = DateTime.now().plus({ days: days })
-   const endsOn = `ends on ${endDate.day} ${endDate.monthShort} ${endDate.year}`
+   const month = endDate.monthShort.replace(".", "")
+   const monthShort = month.at(0).toUpperCase() + month.substring(1)
+   const endsOn = `ends on ${endDate.day} ${monthShort} ${endDate.year}`
    return (
       <>
          <StatusTitle
@@ -109,7 +165,7 @@ type StatusTitleProps = {
 }
 const StatusTitle = (props: StatusTitleProps) => {
    return (
-      <Box sx={{ pl: 2 }}>
+      <Box sx={styles.statusTitle}>
          <Typography sx={styles.title}>
             {props.preTitle}
             <Typography component="span" sx={[styles.title, styles.alerted]}>
@@ -122,10 +178,65 @@ const StatusTitle = (props: StatusTitleProps) => {
 }
 
 type StatusDescriptionProps = {
-   description
+   description: string
+   sx: SxProps
+   showSx?: SxProps
 }
-const StatusDescription = ({ description }: StatusDescriptionProps) => {
-   return <Box sx={{ pl: 2, pt: 1 }}>{description}</Box>
+const StatusDescription = ({
+   description,
+   sx,
+   showSx,
+}: StatusDescriptionProps) => {
+   const isMobile = useIsMobile("md")
+   // TODO: more concise substring
+   const shortDescription = description.substring(0, 100)
+   return (
+      <Box sx={sx}>
+         <ConditionalWrapper condition={isMobile} fallback={description}>
+            <ShowMoreComponent
+               showSx={showSx}
+               full={description}
+               short={shortDescription}
+            />
+         </ConditionalWrapper>
+      </Box>
+   )
 }
 
+type ShowMoreComponentProps = {
+   full: string
+   short: string
+   showSx?: SxProps
+}
+const ShowMoreComponent = (props: ShowMoreComponentProps) => {
+   const [showingMore, setShowingMore] = useState(true)
+   const text = showingMore ? props.full : props.short
+   return (
+      <Stack>
+         <Box>
+            {text}
+            {!showingMore ? "..." : ""}
+         </Box>
+         <Box
+            onClick={() => setShowingMore(!showingMore)}
+            display={"flex"}
+            sx={combineStyles(styles.showMoreWrapper, props.showSx)}
+         >
+            <Box>
+               <ConditionalWrapper fallback="Show More" condition={showingMore}>
+                  Show Less
+               </ConditionalWrapper>
+            </Box>
+            <Box>
+               <ConditionalWrapper
+                  condition={showingMore}
+                  fallback={<ChevronDown />}
+               >
+                  <ChevronUp />
+               </ConditionalWrapper>
+            </Box>
+         </Box>
+      </Stack>
+   )
+}
 export default GeneralSparksView

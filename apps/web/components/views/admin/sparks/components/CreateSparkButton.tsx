@@ -5,6 +5,7 @@ import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    root: {
@@ -16,8 +17,10 @@ const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
    const dispatch = useDispatch()
    const group = useGroup()
    const planStatus = useGroupPlanIsValid(group.group.groupId, [
-      "trial",
-      "tier1",
+      GroupPlanTypes.Trial,
+      GroupPlanTypes.Tier1,
+      GroupPlanTypes.Advanced,
+      GroupPlanTypes.Premium,
    ])
 
    const handleOpen = useCallback(() => {

@@ -9,6 +9,7 @@ import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    root: {
@@ -72,7 +73,11 @@ type TimeFilter = {
 const GroupSparkAnalytics = () => {
    const { group } = useGroup()
    const { userData } = useAuth()
-   const planStatus = useGroupPlanIsValid(group.groupId, ["tier1"])
+   const planStatus = useGroupPlanIsValid(group.groupId, [
+      GroupPlanTypes.Tier1,
+      GroupPlanTypes.Advanced,
+      GroupPlanTypes.Premium,
+   ])
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimeFilter["value"]>("30days")
@@ -83,7 +88,6 @@ const GroupSparkAnalytics = () => {
 
    // CF Admins can see analytics in trial mode
    const shoulLockAnalytics = !planStatus.valid || !userData.isAdmin
-   console.log("🚀 ~ GroupSparkAnalytics ~ planStatus:", planStatus)
 
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },

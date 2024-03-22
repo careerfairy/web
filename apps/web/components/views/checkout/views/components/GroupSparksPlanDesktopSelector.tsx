@@ -1,5 +1,5 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
-import { Stack, Box } from "@mui/material"
+import { Stack, Box, useTheme } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import React from "react"
 import { Check, CheckCircle, XCircle } from "react-feather"
@@ -7,7 +7,14 @@ import { sxStyles } from "types/commonTypes"
 import { useSparksPlansForm } from "../../GroupPlansDialog"
 import { useSelector } from "react-redux"
 import { selectedPlanSelector } from "store/selectors/groupSelectors"
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import {
+   PLAN_CONSTANTS,
+   getPlanConstants,
+} from "@careerfairy/shared-lib/groups/planConstants"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import useStripePrice from "components/custom-hook/stripe/useStripePrice"
+import Stripe from "stripe"
+import { commafy } from "./GroupSparksPlanMobileSelector"
 
 const styles = sxStyles({
    plansStack: {},
@@ -16,30 +23,25 @@ const styles = sxStyles({
       borderRadius: "12px",
    },
    planTitle: {
-      // color: "var(--white-white---100, #FFF)",
-
-      /* Desktop/Heading 2/H2 - Bold - Desktop */
       fontFamily: "Poppins",
       fontSize: "32px",
       fontStyle: "normal",
       fontWeight: 700,
-      lineHeight: "48px" /* 150% */,
+      lineHeight: "48px",
    },
    planDescription: {
-      /* Desktop/Text S/Text S - Regular - Desktop */
       fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",
-      lineHeight: "20px" /* 142.857% */,
+      lineHeight: "20px",
    },
    planPricing: {
-      /* Desktop/Body text/Body - SemiBold - Desktop */
       fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "24px" /* 150% */,
+      lineHeight: "24px",
    },
    planWrapper: {
       minWidth: "280px",
@@ -52,26 +54,16 @@ const styles = sxStyles({
       gap: "8px",
       alignSelf: "stretch",
       borderRadius: "12px 12px 8px 8px",
-      // background: "var(--purple-purple---600---Default, #6749EA)",
    },
    contentWrapper: {
-      // width: "220px",
-      // display: "flex",
-      // padding: "20px",
-      // flexDirection: "column",
-      // justifyContent: "center",
-      // alignItems: "flex-start",
-      // gap: "8px",
-      // alignSelf: "stretch",
       borderRadius: "14px",
-      border: "1.5px solid var(--Purple-Purple---600---Default, #6749EA)",
-      // background: "var(--Purple-Purple---50, #F0EDFD)",
+      border: "1.5px solid",
+      borderColor: (theme) => theme.brand.purple[600],
       "&:hover": {
          cursor: "pointer",
       },
    },
    planSeparator: {
-      // borderColor: "red",
       opacity: "0.3",
       background: "#E1E1E1",
       height: "1px",
@@ -91,7 +83,6 @@ const styles = sxStyles({
       alignItems: "center",
       width: "27px",
       height: "27px",
-
       borderRadius: "50%",
    },
 })
@@ -100,21 +91,18 @@ const GroupSparksPlanDesktopSelector = () => {
    return (
       <Stack spacing={4} direction={"row"} sx={styles.plansStack}>
          <GroupSparksPlanComponent
-            title="Essential"
-            description="Jumpstart your employer branding"
-            pricing="8.700 CHF/ year"
+            title={PLAN_CONSTANTS[GroupPlanTypes.Tier1].name}
+            description={PLAN_CONSTANTS[GroupPlanTypes.Tier1].description}
             plan={GroupPlanTypes.Tier1}
          />
          <GroupSparksPlanComponent
-            title="Advanced"
-            description="Scale up your employer brand narrative"
-            pricing="8.700 CHF/ year"
+            title={PLAN_CONSTANTS[GroupPlanTypes.Advanced].name}
+            description={PLAN_CONSTANTS[GroupPlanTypes.Advanced].description}
             plan={GroupPlanTypes.Advanced}
          />
          <GroupSparksPlanComponent
-            title="Premium"
-            description="Gain unparalleled insights into your employer brand perception"
-            pricing="8.700 CHF/ year"
+            title={PLAN_CONSTANTS[GroupPlanTypes.Premium].name}
+            description={PLAN_CONSTANTS[GroupPlanTypes.Premium].description}
             plan={GroupPlanTypes.Premium}
          />
       </Stack>
@@ -126,9 +114,8 @@ type GroupSparksPlanFeatureProps = {
    enabled: boolean
 }
 const GroupSparksPlanFeature = (props: GroupSparksPlanFeatureProps) => {
-   const color = props.enabled
-      ? "#6749EA"
-      : "var(--neutral-neutral---800, #3D3D47)"
+   const theme = useTheme()
+   const color = props.enabled ? "#6749EA" : theme.palette.neutral[800]
 
    return (
       <Stack direction={"row"} spacing={1}>
@@ -145,31 +132,36 @@ const GroupSparksPlanFeature = (props: GroupSparksPlanFeatureProps) => {
 type GroupSparksPlanProps = {
    title: string
    description: string
-   pricing: string
    plan: GroupPlanType
 }
 const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
    const { setPlan } = useSparksPlansForm()
+   const { group } = useGroup()
+   const theme = useTheme()
    const selectedPlan = useSelector(selectedPlanSelector)
    const selected = selectedPlan === props.plan
-   const color = selected ? "var(--white-white---100, #FFF)" : "black"
+   const color = selected ? theme.brand.white[100] : "black"
 
-   const selectedColor = "var(--Purple-Purple---600---Default, #6749EA)"
-   const unselectedColor = "var(--neutral-neutral---50, #EBEBEF)"
+   const selectedColor = theme.brand.purple[600]
+   const unselectedColor = theme.palette.neutral[50]
    const featuresBackgroundColor = selected
-      ? "var(--purple-purple---50, #F0EDFD)"
-      : "var(--white-white---400, #F6F6FA)"
+      ? theme.brand.purple[50]
+      : theme.brand.white[400]
    const headerBorderColor = selected ? selectedColor : unselectedColor
    const headerBgColor = selected ? selectedColor : unselectedColor
-   const checkBackgroundColor = selected
-      ? "var(--purple-purple---800, #523ABB)"
-      : "#D9D9D9"
+   const checkBackgroundColor = selected ? theme.brand.purple[800] : "#D9D9D9"
 
    const features = PLAN_CONSTANTS[props.plan]?.features || []
 
-   // const checkout = useCallback( () => {
-   //     goToCheckoutView(props.key)
-   // }, [goToCheckoutView, props.key])
+   const planPriceId = getPlanConstants(props.plan).stripe.priceId(
+      group.companyCountry.id
+   )
+
+   const { data: priceData } = useStripePrice(planPriceId)
+   const stripePrice: Stripe.Price = priceData
+      ? (priceData as Stripe.Price)
+      : null
+
    return (
       <Box
          onClick={() => setPlan(props.plan)}
@@ -202,7 +194,11 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
                <Box sx={{ mt: 1 }} />
             </Box>
             <Box component="span" color={color} sx={styles.planPricing}>
-               {props.pricing}
+               <ConditionalWrapper condition={Boolean(stripePrice)}>
+                  {commafy((stripePrice.unit_amount / 100).toFixed(2)) +
+                     stripePrice.currency.toUpperCase() +
+                     "/ year"}
+               </ConditionalWrapper>
             </Box>
          </Stack>
          <Stack
