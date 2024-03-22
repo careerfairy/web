@@ -79,6 +79,7 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
                   <BulletChart
                      data={updatedTopUniversities}
                      valueIndexer="relativePercentage"
+                     showPercentageOnly
                   />
                </EmptyDataCheckerForBulletChart>
             </GroupSparkAnalyticsCardContainer>
