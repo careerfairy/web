@@ -26,6 +26,7 @@ import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
 import { scrollTop } from "../../../../util/CommonUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
+import { v4 as uuidv4 } from "uuid"
 
 const useStyles = makeStyles(() => ({
    root: {
@@ -224,6 +225,7 @@ const CreateBaseGroup = ({
                                  setFieldValue("logoUrl", newLogoUrl, true)
                                  setFieldValue("logoFileObj", fileObject, true)
                               }}
+                              fileName={uuidv4()}
                            />
                         </Box>
                         <FormHelperText>
