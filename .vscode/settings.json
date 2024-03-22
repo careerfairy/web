@@ -1,3 +1,10 @@
 {
-   "cSpell.words": ["careerfairy", "livestream"]
+   "cSpell.words": ["careerfairy", "livestream"],
+   "editor.tabSize": 2,
+   "editor.insertSpaces": true,
+   "editor.detectIndentation": false,
+   "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+   },
+   "editor.formatOnSave": true
 }
