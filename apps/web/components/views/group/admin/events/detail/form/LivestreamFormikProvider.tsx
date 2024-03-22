@@ -2,6 +2,7 @@ import {
   PublicCustomJob,
   pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
@@ -63,6 +64,7 @@ const formInitialValues: LivestreamFormValues = {
 
 type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
+   group: Group
    existingInterests: Interest[]
    customJobs: PublicCustomJob[]
    creators: Creator[]
@@ -127,6 +129,7 @@ function unionCreatorsAndSpeakers(
 
 const convertLivestreamObjectToForm = ({
    livestream,
+   group,
    existingInterests,
    customJobs,
    creators,
@@ -142,6 +145,19 @@ const convertLivestreamObjectToForm = ({
    const general: LivestreamFormGeneralTabValues = valuesReducer(
       formGeneralTabInitialValues
    )
+
+   // Handle univesrity edge case
+   general.company = group?.universityCode
+      ? formGeneralTabInitialValues.company
+      : group?.universityName || formGeneralTabInitialValues.company
+
+   general.companyLogoUrl = group?.universityCode
+      ? formGeneralTabInitialValues.companyLogoUrl
+      : group?.logoUrl || formGeneralTabInitialValues.companyLogoUrl
+
+   general.backgroundImageUrl = group?.universityCode
+      ? formGeneralTabInitialValues.backgroundImageUrl
+      : group?.bannerImageUrl || formGeneralTabInitialValues.backgroundImageUrl
 
    // Simple name remapping s
    general.categories = existingInterests.filter((interest) =>
@@ -180,24 +196,25 @@ const convertLivestreamObjectToForm = ({
 
 type Props = {
    livestream: LivestreamEvent
-   groupId: string
+   group: Group
    children: ReactNode
 }
 
 const LivestreamFormikProvider: FC<Props> = ({
    livestream,
-   groupId,
+   group,
    children,
 }) => {
    const { data: existingInterests } = useInterests()
-   const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
+   const initialSelectedCustomJobs = useGroupCustomJobs(group?.id, {
       livestreamId: livestream?.id,
    })
-   const { data: creators } = useGroupCreators(groupId)
+   const { data: creators } = useGroupCreators(group?.id)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
+           group,
            existingInterests,
            customJobs: initialSelectedCustomJobs,
            creators,
