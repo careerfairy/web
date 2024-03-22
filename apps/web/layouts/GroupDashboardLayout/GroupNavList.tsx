@@ -44,7 +44,6 @@ const GroupNavList = () => {
    const showCompanyPageCTA = Boolean(
       !groupPresenter.companyPageIsReady() && // their company page is not ready yet
          companyPagePathName !== pathname && // they are not on the company page
-         !group.universityCode && // they are not a university
          !layout.leftDrawerOpen // they are not on mobile
    )
 
@@ -129,7 +128,7 @@ const GroupNavList = () => {
                   localStorageKey={"has-seen-company-page-cta"}
                   tooltipTitle="🚀 New feature: Company page!"
                   placement="right"
-                  hide={showCompanyPageCTA}
+                  hide={Boolean(showCompanyPageCTA || group.universityCode)} // Don't show the hint for university Groups
                   tooltipText="We added company pages to CareerFairy. You can now create a dedicated page for your company and share it with your network of talent."
                   buttonText={"Manage company page"}
                >
