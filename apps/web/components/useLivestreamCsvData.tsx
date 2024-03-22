@@ -7,9 +7,9 @@ import { useTheme } from "@mui/material/styles"
 import {
    LivestreamEvent,
    LivestreamUserAction,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { livestreamRepo } from "../data/RepositoryInstances"
-import { CSVDownloadUserData } from "@careerfairy/shared-lib/dist/users"
+import { CSVDownloadUserData } from "@careerfairy/shared-lib/users"
 import { useGroup } from "../layouts/GroupDashboardLayout"
 import { CSVDialogDownload } from "./custom-hook/useMetaDataActions"
 import { errorLogAndNotify } from "../util/CommonUtil"
@@ -45,7 +45,7 @@ export function useLivestreamCsvData({
 
    useEffect(() => {
       if (targetStream) {
-         ;(async function fetchUsers() {
+         const fetchUsers = async () => {
             setLoadingData((prevState) => ({
                ...prevState,
                [targetStream.id]: true,
@@ -53,21 +53,11 @@ export function useLivestreamCsvData({
             const targetUsers = userDataDictionary[targetStream.id]
             try {
                if (!targetUsers) {
-                  let users = await livestreamRepo.getLivestreamUsers(
+                  const users = await livestreamRepo.getLivestreamUsers(
                      targetStream.id,
                      userType
                   )
-                  // We only filter out the users if the group is a university group and the usertype is not talent pool
-                  // This is because we want to show all the users in the talent pool no matter what kind of group they are (request from sales)
-                  if (
-                     group.universityCode &&
-                     userType !== "talentPool" &&
-                     users
-                  ) {
-                     users = users.filter((data) =>
-                        groupPresenter.isUniversityStudent(data.user)
-                     )
-                  }
+
                   const csvData = StatsUtil.getCsvData(
                      group,
                      targetStream,
@@ -91,7 +81,8 @@ export function useLivestreamCsvData({
                ...prevState,
                [targetStream.id]: false,
             }))
-         })()
+         }
+         fetchUsers()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [targetStream, groupQuestions, userType, group, groupPresenter])
