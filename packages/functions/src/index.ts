@@ -84,7 +84,7 @@ exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail_v2 =
    groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
+exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData
 exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
 exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
 exports.createGroup_eu = groupAdmin.createGroup

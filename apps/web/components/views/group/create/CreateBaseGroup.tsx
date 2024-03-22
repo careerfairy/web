@@ -16,9 +16,9 @@ import * as yup from "yup"
 import {
    University,
    universityCountryMap,
-} from "@careerfairy/shared-lib/dist/universities"
+} from "@careerfairy/shared-lib/universities"
 import { universityRepo } from "../../../../data/RepositoryInstances"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
 import Stack from "@mui/material/Stack"
 import { BaseGroupInfo } from "../../../../pages/group/create"
@@ -26,6 +26,7 @@ import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
 import { scrollTop } from "../../../../util/CommonUtil"
 import LogoUploaderWithCropping from "components/views/common/logos/LogoUploaderWithCropping"
+import { v4 as uuidv4 } from "uuid"
 
 const useStyles = makeStyles(() => ({
    root: {
@@ -72,6 +73,7 @@ const schema = yup.object().shape({
 
 export interface GroupedUniversity extends University {
    countryName: string
+   id: string
 }
 
 interface CreateGroupProps {
@@ -93,7 +95,7 @@ const CreateBaseGroup = ({
    >([])
 
    useEffect(() => {
-      ;(async function () {
+      const getAndSetGroupedUniversities = async () => {
          const allUniversitiesByCountries =
             await universityRepo.getAllUniversitiesByCountries()
          setGroupedUniversities(
@@ -113,7 +115,9 @@ const CreateBaseGroup = ({
                }, [])
                .sort(dynamicSort("countryName"))
          )
-      })()
+      }
+
+      getAndSetGroupedUniversities()
    }, [])
 
    const initialValues = useMemo(
@@ -145,7 +149,7 @@ const CreateBaseGroup = ({
 
    const handleSubmit = useCallback(
       (values, { setSubmitting }) => {
-         let careerCenter: BaseGroupInfo = {
+         const careerCenter: BaseGroupInfo = {
             logoUrl: values.logoUrl,
             logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
             description: values.description,
@@ -221,6 +225,7 @@ const CreateBaseGroup = ({
                                  setFieldValue("logoUrl", newLogoUrl, true)
                                  setFieldValue("logoFileObj", fileObject, true)
                               }}
+                              fileName={uuidv4()}
                            />
                         </Box>
                         <FormHelperText>
