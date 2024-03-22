@@ -45,6 +45,7 @@ type Props = {
    onMouseEnter?: () => void
    onMouseLeave?: () => void
    isHovered?: boolean
+   containerRef?: React.RefObject<HTMLDivElement>
 }
 
 const SparkCarouselCardContainer: FC<Props> = ({
@@ -54,11 +55,13 @@ const SparkCarouselCardContainer: FC<Props> = ({
    onMouseEnter,
    onMouseLeave,
    isHovered,
+   containerRef,
 }) => {
    const hoverEnabled = isHovered !== undefined
 
    return (
       <Box
+         ref={containerRef}
          sx={styles.root}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
