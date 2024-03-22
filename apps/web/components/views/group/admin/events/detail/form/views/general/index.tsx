@@ -1,7 +1,7 @@
-import Categories from "./Categories"
-import ReasonsToJoin from "./ReasonsToJoin"
-import GeneralSettings from "./GeneralSettings"
 import AudienceTargeting from "./AudienceTargeting"
+import Categories from "./Categories"
+import GeneralSettings from "./GeneralSettings"
+import ReasonsToJoin from "./ReasonsToJoin"
 
 const LivestreamFormGeneralStep = () => {
    return (
