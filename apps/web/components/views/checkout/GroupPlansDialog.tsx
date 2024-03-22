@@ -26,6 +26,7 @@ import {
    groupPlansDialogInitialStepSelector,
    plansDialogOpenSelector,
 } from "store/selectors/groupSelectors"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -33,16 +34,25 @@ const mobileBreakpoint = "md"
 
 const styles = sxStyles({
    root: {},
+   dialogPaperMobile: { minWidth: "100%", minHeight: "100%" },
+   steppedDialog: {
+      minWidth: {
+         xs: "100%",
+         md: "auto",
+      },
+      minHeight: {
+         xs: "100%",
+         md: "auto",
+      },
+   },
    title: {
-      color: "var(--neutral-neutral---800, #3D3D47)",
+      color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
-
-      /* Desktop/Heading 2/H2 - Bold - Desktop */
       fontFamily: "Poppins",
       fontSize: "32px",
       fontStyle: "normal",
       fontWeight: "700",
-      lineHeight: "48px" /* 150% */,
+      lineHeight: "48px",
       letterSpacing: {
          xs: "-0.04343rem",
          [mobileBreakpoint]: "-0.04886rem",
@@ -53,7 +63,7 @@ const styles = sxStyles({
       mx: {
          [mobileBreakpoint]: "auto",
       },
-      color: "var(--Neutral-Neutral---800, #3D3D47)",
+      color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
       fontFamily: "Poppins",
       fontSize: "16px",
@@ -65,10 +75,6 @@ const styles = sxStyles({
       flexDirection: "column",
       py: `${mobileTopPadding}px`,
       position: "relative",
-      // height: {
-      //    xs: "100dvh",
-      //    [mobileBreakpoint]: "clamp(0px, calc(100dvh - 50px), 855px)",
-      // },
       height: "100%",
       justifyContent: {
          xs: "flex-start",
@@ -88,7 +94,7 @@ const styles = sxStyles({
    content: {
       display: "flex",
       flexDirection: "column",
-      px: 10,
+      px: 4,
       py: 3,
    },
    fixedBottomContent: {
@@ -237,6 +243,7 @@ const GroupPlansDialog = () => {
    return (
       <>
          <SteppedDialog
+            sx={styles.steppedDialog}
             key={open ? "open" : "closed"}
             bgcolor="#FCFCFC"
             handleClose={() => handleCloseGroupPlansDialog()}
@@ -275,11 +282,17 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    children,
 }) => {
    const { handleClose } = useSparksPlansForm()
+   const isMobile = useIsMobile("md")
    const open = useSelector(plansDialogOpenSelector)
    console.log("🚀 ~ open:", open, width)
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
-         <Dialog sx={styles.container} open={open} maxWidth={false}>
+         <Dialog
+            sx={styles.container}
+            open={open}
+            maxWidth={false}
+            PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+         >
             {children}
             {hideCloseButton ? null : (
                <Box sx={styles.closeBtn}>

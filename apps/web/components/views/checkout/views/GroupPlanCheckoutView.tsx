@@ -9,6 +9,7 @@ import {
 } from "store/selectors/groupSelectors"
 import BuyButtonComponent from "../forms/BuyButtonComponent"
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    content: {
@@ -27,7 +28,7 @@ const styles = sxStyles({
       },
       width: "276px",
 
-      color: "var(--White-White---100, #FFF)",
+      color: (theme) => theme.brand.white[100],
       textAlign: "center",
       fontFamily: "Poppins",
       fontSize: "16px",
@@ -40,7 +41,7 @@ const styles = sxStyles({
       alignItems: "center",
    },
    checkoutDescription: {
-      color: "var(--Neutral-Neutral---600, #6B6B7F)",
+      color: (theme) => theme.palette.neutral[600],
       textAlign: "center",
       fontFamily: "Poppins",
       fontSize: "14px",
@@ -67,7 +68,10 @@ const GroupPlanCheckoutView = () => {
 const View = () => {
    const selectedPlan = useSelector(selectedPlanSelector)
    const generatedClientSecret = useSelector(clientSecret)
-   console.log("🚀 ~ View ~ selectedPlan:", selectedPlan)
+   const { group } = useGroup()
+   const buttonId = PLAN_CONSTANTS[selectedPlan].stripe?.buttonId(
+      group.companyCountry.id
+   )
 
    return (
       <GroupPlansDialog.Container>
@@ -88,10 +92,9 @@ const View = () => {
                   md: 0,
                }}
             />
-            {selectedPlan} / {generatedClientSecret}
             <Box sx={styles.stripeButtonWrapper}>
                <BuyButtonComponent
-                  buttonId={PLAN_CONSTANTS[selectedPlan].stripe?.buttonId}
+                  buttonId={buttonId}
                   clientSecret={generatedClientSecret}
                   publishableKey={
                      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -104,38 +107,7 @@ const View = () => {
                   md: 0,
                }}
             />
-            {/* <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
-               <Box >
-                  <Button
-               color={"secondary"}
-               // onClick={redirectToCheckout}
-               // onClick={handleOpen}
-               sx={styles.checkoutButton} 
-            >
-               Select plan
-            </Button>
-               </Box>
-               <Box sx={styles.checkoutDescription}>
-               Content available for 1 year
-               </Box>
-            </Stack> */}
          </GroupPlansDialog.Content>
-         {/* <GroupPlansDialog.Actions>
-            <GroupPlansDialog.Button
-               color="grey"
-               variant="outlined"
-               onClick={() => {
-                  // resetForm()
-                  // if (isEditing) {
-                  //    goToCreatorSelectedView(pickPublicDataFromCreator(creator))
-                  // } else {
-                  //    handleBack() // go back to select another creator view
-                  // }
-               }}
-            >
-               {"Back"}
-            </GroupPlansDialog.Button>
-         </GroupPlansDialog.Actions> */}
       </GroupPlansDialog.Container>
    )
 }
