@@ -1,10 +1,10 @@
 import { AgoraRTCTokenRequest } from "@careerfairy/shared-lib/agora/token"
 import { livestreamService } from "data/firebase/LivestreamService"
-import useSWR, { SWRConfiguration } from "swr"
-import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
+import { SWRConfiguration } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
+import useSWRImmutable from "swr/immutable"
 
 export type UseAgoraRtcToken = {
    /** The Agora RTC token */
@@ -27,15 +27,10 @@ export const useAgoraRtcToken = (
 ): UseAgoraRtcToken => {
    const { authenticatedUser } = useAuth()
 
-   const key = args ? JSON.stringify(args) : null
+   const key = args ? `get-agora-rtc-token-${JSON.stringify(args)}` : null
 
    const options = useMemo<SWRConfiguration>(
       () => ({
-         /**
-          * Token is only re-fetched when the args change
-          * Not on focus, blur, or other events
-          */
-         ...reducedRemoteCallsOptions,
          onError: (error, key) => {
             return errorLogAndNotify(error, {
                message: "Failed to fetch Agora RTC token",
@@ -43,7 +38,6 @@ export const useAgoraRtcToken = (
                args: key,
             })
          },
-         suspense: false,
       }),
       [authenticatedUser?.uid]
    )
@@ -54,7 +48,11 @@ export const useAgoraRtcToken = (
       error: tokenError,
       mutate,
       isLoading,
-   } = useSWR(key, () => livestreamService.fetchAgoraRtcToken(args), options)
+   } = useSWRImmutable(
+      key,
+      () => livestreamService.fetchAgoraRtcToken(args),
+      options
+   )
 
    return {
       token,
