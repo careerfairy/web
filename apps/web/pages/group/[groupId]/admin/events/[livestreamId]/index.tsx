@@ -1,3 +1,4 @@
+import useAdminGroup from "components/custom-hook/useAdminGroup"
 import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
 import { LivestreamCreationContextProvider } from "components/views/group/admin/events/detail/LivestreamCreationContext"
 import LivestreamForm from "components/views/group/admin/events/detail/form/LivestreamForm"
@@ -14,16 +15,18 @@ const LivestreamAdminDetailsPage = () => {
       query: { groupId, livestreamId },
    } = useRouter()
 
-   if (!groupId) return null
+   const { group } = useAdminGroup(groupId as string)
+
+   if (!groupId || !group) return null
 
    return (
       <LivestreamFetchWrapper livestreamId={livestreamId as string}>
          {(livestream) => (
-            <LivestreamFormikProvider
-               livestream={livestream}
-               groupId={groupId as string}
-            >
-               <LivestreamCreationContextProvider>
+            <LivestreamFormikProvider livestream={livestream} group={group}>
+               <LivestreamCreationContextProvider
+                  livestream={livestream}
+                  group={group}
+               >
                   <GroupDashboardLayout
                      titleComponent={"Live stream Details"}
                      groupId={groupId as string}
