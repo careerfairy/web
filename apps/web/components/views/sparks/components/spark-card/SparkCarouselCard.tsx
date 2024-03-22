@@ -30,7 +30,6 @@ type Props = {
 const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [isHovered, setIsHovered] = useState(false)
-   // console.log("🚀 ~ isHovered:", isHovered)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
 
@@ -40,12 +39,9 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
       const observable = (entries) => {
          const entry = entries[0]
 
-         // if (entry.isIntersecting && entry.intersectionRatio === 1) {
          if (entry && entry.intersectionRatio > 0.9) {
-            // console.log("START -> ", entry)
             setIsHovered(true)
          } else {
-            // console.log("STOP -> ", entry)
             setIsHovered(false)
          }
       }
