@@ -3,13 +3,8 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import GroupPlansDialog from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import { useSelector } from "react-redux"
-import {
-   clientSecret,
-   selectedPlanSelector,
-} from "store/selectors/groupSelectors"
-import BuyButtonComponent from "../forms/BuyButtonComponent"
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
-import { useGroup } from "layouts/GroupDashboardLayout"
+import { clientSecret } from "store/selectors/groupSelectors"
+import StripeCheckoutComponent from "../forms/StripeCheckoutComponent"
 
 const styles = sxStyles({
    content: {
@@ -66,25 +61,18 @@ const GroupPlanCheckoutView = () => {
 }
 
 const View = () => {
-   const selectedPlan = useSelector(selectedPlanSelector)
    const generatedClientSecret = useSelector(clientSecret)
-   const { group } = useGroup()
-   const buttonId = PLAN_CONSTANTS[selectedPlan].stripe?.buttonId(
-      group.companyCountry.id
-   )
 
    return (
       <GroupPlansDialog.Container>
          <GroupPlansDialog.Content sx={styles.content}>
             <GroupPlansDialog.Title>
-               Select your{" "}
                <Box component="span" color="secondary.main">
-                  Sparks
+                  Checkout
                </Box>{" "}
-               plan
             </GroupPlansDialog.Title>
             <GroupPlansDialog.Subtitle>
-               Tailored offers that best suit YOUR needs.
+               The page will be automatically refreshed upon completion.
             </GroupPlansDialog.Subtitle>
             <Box mt={5} />
             <Box
@@ -93,13 +81,7 @@ const View = () => {
                }}
             />
             <Box sx={styles.stripeButtonWrapper}>
-               <BuyButtonComponent
-                  buttonId={buttonId}
-                  clientSecret={generatedClientSecret}
-                  publishableKey={
-                     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-                  }
-               />
+               <StripeCheckoutComponent clientSecret={generatedClientSecret} />
             </Box>
             <Box
                mb={{

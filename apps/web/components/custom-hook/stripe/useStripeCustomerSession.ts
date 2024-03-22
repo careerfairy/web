@@ -6,6 +6,7 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -48,8 +49,17 @@ const useStripeCustomerSession = (
          customerEmail: userEmail,
          groupId: group.groupId,
          customerName: group.universityName,
+         priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry.id),
+         successUrl:
+            "/group/yrUCEdMPNc6vz2mMXkx1/admin/sparks?session_id={CHECKOUT_SESSION_ID}",
       }
-   }, [group.groupId, group.universityName, plan, userEmail])
+   }, [
+      group.companyCountry.id,
+      group.groupId,
+      group.universityName,
+      plan,
+      userEmail,
+   ])
    const { data } = useSWR(
       ["fetchStripeCustomerSession", options],
       fetcher,
