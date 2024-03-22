@@ -142,9 +142,12 @@ const VideoPreview: FC<Props> = ({
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
          setProgress(progress.played * 100)
-         onProgress(progress)
+
+         if (!isHovered) {
+            onProgress(progress)
+         }
       },
-      [onProgress]
+      [isHovered, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
