@@ -97,7 +97,7 @@ const Logo: FC<LogoProps> = ({ dragActive, url }) => {
 type UploaderProps = {
    logoUrl?: string
    handleSubmit: (file: File) => Promise<void>
-   fileName: string
+   fileName?: string
 }
 
 const LogoUploaderWithCropping: FC<UploaderProps> = (props) => {
