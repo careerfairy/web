@@ -40,7 +40,8 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
       const observable = (entries) => {
          const entry = entries[0]
 
-         if (entry.isIntersecting && entry.intersectionRatio === 1) {
+         // if (entry.isIntersecting && entry.intersectionRatio === 1) {
+         if (entry && entry.intersectionRatio > 0.9) {
             // console.log("START -> ", entry)
             setIsHovered(true)
          } else {
@@ -51,19 +52,17 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
 
       const debouncedObservable = debounce(observable, 300)
 
-      if (isMobile) {
-         const observer = new IntersectionObserver(debouncedObservable, {
-            threshold: 1.0,
-         })
+      const observer = new IntersectionObserver(debouncedObservable, {
+         threshold: 0.9,
+      })
 
+      if (isMobile && containerRef.current) {
+         observer.observe(containerRef.current)
+      }
+
+      return () => {
          if (currentContainerRef) {
-            observer.observe(currentContainerRef)
-         }
-
-         return () => {
-            if (currentContainerRef) {
-               observer.unobserve(currentContainerRef)
-            }
+            observer.unobserve(currentContainerRef)
          }
       }
    }, [isMobile])
