@@ -69,51 +69,10 @@ export const fetchStripeCustomerSession = functions
 
             const returnUrl =
                context.rawRequest.headers.origin + data.successUrl
-            console.log("🚀 ~ returnUrl:", returnUrl)
+
             try {
-               // Query Stripe customer database via metadata
-               const query = `metadata['groupId']:'${data.customerId}'`
-               let customer
-               let createCustomer = false
-
-               const customers = await stripe.customers.search({
-                  query: query,
-               })
-               functions.logger.info(
-                  "fetchStripeCustomerSession - customers via query: ",
-                  customers
-               )
-
-               if (customers && customers.data.length) {
-                  customer = customers.data.at(0)
-               } else {
-                  createCustomer = true
-               }
-
-               if (createCustomer) {
-                  customer = await stripe.customers.create({
-                     name: data.customerName,
-                     email: data.customerEmail,
-                     metadata: {
-                        groupId: data.groupId,
-                        plan: data.plan,
-                     },
-                  })
-                  functions.logger.info(
-                     "fetchStripeCustomerSession - created customer function:",
-                     customer
-                  )
-               } else {
-                  customer = await stripe.customers.update(customer.id, {
-                     metadata: {
-                        // Passing groupId in metadata to allow a Customer (Group) to be always identifiable without override Stripe own ID
-                        groupId: data.groupId,
-                        plan: data.plan,
-                     },
-                  })
-               }
-
                const customerSession = await stripe.checkout.sessions.create({
+                  // customer: customer.id,
                   return_url: returnUrl,
                   line_items: [
                      {
