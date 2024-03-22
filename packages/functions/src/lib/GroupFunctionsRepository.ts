@@ -603,13 +603,17 @@ export class GroupFunctionsRepository
             getPlanConstants(planType).sparks.PLAN_DURATION_MILLISECONDS
       )
 
-      const toUpdate: Pick<Group, "plan" | "sparksAdminPageFlag"> = {
+      const toUpdate: Pick<
+         Group,
+         "plan" | "sparksAdminPageFlag" | "publicSparks"
+      > = {
          plan: {
             type: planType,
             startedAt: now,
             expiresAt,
          },
          sparksAdminPageFlag: true,
+         publicSparks: true,
       }
 
       return groupRef.update(toUpdate)
