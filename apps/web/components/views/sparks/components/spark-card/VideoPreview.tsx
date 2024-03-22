@@ -40,10 +40,7 @@ const styles = sxStyles({
          left: 0,
          "& video": {
             background: "black",
-            objectFit: {
-               xs: "cover !important",
-               sm: "contain !important",
-            },
+            objectFit: "cover !important",
          },
       },
       "& .react-player__preview": {
@@ -229,16 +226,6 @@ const VideoPreview: FC<Props> = ({
                   onPlay={onPlay}
                   onError={handleError}
                   progressInterval={250}
-                  light={
-                     light ? (
-                        <ThumbnailOverlay
-                           src={thumbnailUrl}
-                           containPreviewOnTablet={containPreviewOnTablet}
-                        />
-                     ) : (
-                        false
-                     )
-                  }
                   url={videoUrl}
                   playIcon={<Fragment />}
                   muted={muted}
