@@ -12,6 +12,7 @@ import { groupRepo } from "./api/repositories"
 import { client } from "./api/postmark"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { RuntimeOptions } from "firebase-functions"
+import { validateGroupSparks } from "./util/sparks"
 
 /**
  * functions runtime settings
@@ -100,19 +101,16 @@ async function updateExpiredGroupPlans() {
          functions.logger
       )
       const groups = expiringGroups.filter((group) =>
+         // Only want those whose have publicSparks = true or undefined values, those with false are already correct
          group.publicSparks
             ? group.publicSparks
             : group.publicSparks === undefined
       )
 
-      const updatePromises = groups.map((group) => {
-         return groupRepo.updatePublicSparks(group.groupId, false)
-      })
+      const updatePromises = groups.map(validateGroupSparks)
 
       await Promise.all(updatePromises)
 
-      // TODO set Sparks published flag to false
-      // return groupRepo.updatePublicSparks(groupId, false)
       functions.logger.info(
          "Updated publicSparks to false for ",
          groups.map((g) => g.groupId)

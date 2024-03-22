@@ -53,11 +53,9 @@ export const groupPlansSlice = createSlice({
       },
       closeGroupPlansDialog: (
          state,
+         // eslint-disable-next-line @typescript-eslint/no-unused-vars
          action: PayloadAction<CloseDialogPayload>
       ) => {
-         const shouldForceClose = action.payload?.forceClose
-         console.log("🚀 ~ shouldForceClose:", shouldForceClose)
-
          state.plansDialogOpen = false
          state.groupPlansForm.selectedPlan = null
          state.confirmCloseSparksDialogOpen = false
