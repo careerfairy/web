@@ -146,8 +146,18 @@ export const stripeWebHook = functions
 
       if (request.method === "POST") {
          const buf = request.rawBody
+         console.log(
+            "🚀 ~ .https.onRequest ~ Stripe request buffer from rawBody:",
+            buf
+         )
 
          const sig = request.headers["stripe-signature"]
+         console.log("🚀 ~ Stripe request signature from headers:", sig)
+         console.log("🚀 ~ Placeholder")
+         console.log(
+            "🚀 ~ Stripe request signature from rawHeaders:",
+            request.headers["stripe-signature"]
+         )
 
          let event: Stripe.Event = null
 
