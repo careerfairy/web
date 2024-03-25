@@ -127,7 +127,7 @@ export default class LivestreamDialogPage extends CommonPage {
 
    async completeRegistrationSuccessView() {
       await expect(
-         this.page.getByRole("heading", { name: "Registration Successful" })
+         this.page.getByRole("heading", { name: "Successfully Registered" })
       ).toBeVisible()
    }
 

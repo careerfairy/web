@@ -2,35 +2,55 @@ import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
+import BaseDialogView, {
+   HeroContent,
+   HeroTitle,
+   MainContent,
+} from "../../BaseDialogView"
 import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
-import {
-   HostImage,
-   PrimarySecondaryButtons,
-} from "../data-consent/RegisterDataConsentView"
+import { PrimarySecondaryButtons } from "../data-consent/RegisterDataConsentView"
 import { useCallback, useState } from "react"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
-   title: {
-      textAlign: "center",
-      fontWeight: 500,
-      lineHeight: 1.3,
-      fontSize: {
-         xs: "1.9rem",
-         sm: "2.571rem",
-      },
-      maxWidth: 655,
-   },
    contentOffset: {
-      mt: -13,
+      mt: { xs: -10.3, md: -14 },
+      px: { xs: "auto", md: 5 },
    },
    joinText: {
       fontSize: 17,
       textAlign: "center",
+   },
+   avatar: {
+      borderRadius: { xs: "70px", md: "91px" },
+      border: "1.5px solid",
+      borderColor: (theme) => theme.brand.white[400],
+   },
+   heroContent: {
+      height: { xs: "229px", md: "366px" },
+   },
+   actionButtons: {
+      width: {
+         xs: "100%",
+         md: "auto",
+      },
+      mb: {
+         xs: "auto",
+         md: "40px !important",
+      },
+   },
+   logoTextContainer: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: { xs: "30px", md: "60px" },
+   },
+   minHeight: {
+      minHeight: { xs: "300px", md: "400px" },
    },
 })
 
@@ -87,6 +107,7 @@ const RegisterJoinTalentPoolView = () => {
                onBackPosition={"top-left"}
                onBackClick={goToPrevious}
                noMinHeight
+               sx={styles.heroContent}
             >
                <Stack
                   alignItems="center"
@@ -99,46 +120,69 @@ const RegisterJoinTalentPoolView = () => {
             </HeroContent>
          }
          mainContent={
-            <MainContent>
-               <Stack
-                  alignItems="center"
-                  spacing={5}
-                  sx={styles.contentOffset}
-                  px={isMobile ? 1 : 5}
-               >
-                  <HostImage
-                     imageUrl={livestream.companyLogoUrl}
-                     alt={livestream.company}
-                  />
+            <MainContent sx={styles.minHeight}>
+               <Stack alignItems="center" spacing={7} sx={styles.contentOffset}>
+                  <Box sx={styles.logoTextContainer}>
+                     <CircularLogo
+                        src={getResizedUrl(livestream.companyLogoUrl, "lg")}
+                        alt={livestream.company}
+                        size={isMobile ? 80 : 136}
+                        sx={styles.avatar}
+                     />
 
-                  <JoinText companyName={livestream.company} />
+                     <JoinText companyName={livestream.company} />
+                  </Box>
 
-                  <PrimarySecondaryButtons
-                     loading={isJoiningTalentPool}
-                     secondaryText="Maybe later"
-                     onClickPrimary={handleJoinTalentPool}
-                     onClickSecondary={handleCancel}
-                     primaryText="Join talent pool"
-                  />
+                  {isMobile ? null : (
+                     <ActionButtons
+                        isJoiningTalentPool={isJoiningTalentPool}
+                        handleJoinTalentPool={handleJoinTalentPool}
+                        handleCancel={handleCancel}
+                     />
+                  )}
                </Stack>
             </MainContent>
+         }
+         hideBottomDivider
+         fixedBottomContent={
+            isMobile ? (
+               <ActionButtons
+                  isJoiningTalentPool={isJoiningTalentPool}
+                  handleJoinTalentPool={handleJoinTalentPool}
+                  handleCancel={handleCancel}
+               />
+            ) : null
          }
       />
    )
 }
 
+const ActionButtons = ({
+   isJoiningTalentPool,
+   handleJoinTalentPool,
+   handleCancel,
+}) => {
+   return (
+      <Box sx={styles.actionButtons}>
+         <PrimarySecondaryButtons
+            loading={isJoiningTalentPool}
+            secondaryText="Maybe later"
+            onClickPrimary={handleJoinTalentPool}
+            onClickSecondary={handleCancel}
+            primaryText="Join talent pool"
+         />
+      </Box>
+   )
+}
+
 const Title = ({ companyName }: { companyName: string }) => {
    return (
-      <Typography
-         align="center"
-         variant={"h3"}
-         component="h1"
-         sx={styles.title}
-      >
+      <HeroTitle>
          Join {companyName}
+         {"'"}s
          <br />
-         Talent Pool
-      </Typography>
+         talent pool
+      </HeroTitle>
    )
 }
 
@@ -146,11 +190,11 @@ const JoinText = ({ companyName }: { companyName: string }) => {
    return (
       <Box>
          <Typography sx={styles.joinText}>
-            Join {companyName} Talent Pool and be contacted directly in case any
-            relevant opportunity arises for you at {companyName} in the future.
-            By joining the Talent Pool, you agree that your profile data will be
-            shared with {companyName}. Don{"'"}t worry, you can leave their
-            Talent Pool at any time.
+            {`Join ${companyName}'s talent pool and be contacted directly in case any
+            relevant opportunity arises for you at ${companyName} in the future.
+            By joining the talent pool, you agree that your profile data will be
+            shared with ${companyName}. Don't worry, you can leave their
+            talent pool at any time.`}
          </Typography>
       </Box>
    )
