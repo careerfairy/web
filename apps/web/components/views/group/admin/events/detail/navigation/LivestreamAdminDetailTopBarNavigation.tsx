@@ -12,6 +12,7 @@ const styles = sxStyles({
       height: "16px",
       marginRight: "6px",
       alignContent: "center",
+      marginBottom: "-4px",
    },
 })
 
