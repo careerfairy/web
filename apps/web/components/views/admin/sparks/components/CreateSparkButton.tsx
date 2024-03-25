@@ -28,8 +28,8 @@ const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
    const planStatus = useGroupPlanIsValid(group.groupId, [
       GroupPlanTypes.Trial,
       GroupPlanTypes.Tier1,
-      GroupPlanTypes.Advanced,
-      GroupPlanTypes.Premium,
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3,
    ])
 
    const maxSparksReached = group?.plan

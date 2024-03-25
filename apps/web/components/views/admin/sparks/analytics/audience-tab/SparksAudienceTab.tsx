@@ -29,8 +29,8 @@ type SparksAudienceTabProps = {
 const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
    const { group } = useGroup()
    const planStatus = useGroupPlanIsValid(group.groupId, [
-      GroupPlanTypes.Advanced,
-      GroupPlanTypes.Premium,
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3,
    ])
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]

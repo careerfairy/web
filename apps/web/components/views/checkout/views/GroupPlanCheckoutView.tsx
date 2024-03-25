@@ -50,9 +50,8 @@ const styles = sxStyles({
       alignContent: "center",
       justifyContent: "center",
       pb: {
-         // "650px"
          xs: 90,
-         md: 85,
+         md: 65,
       },
    },
 })

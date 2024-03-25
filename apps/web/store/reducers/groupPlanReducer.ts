@@ -24,7 +24,7 @@ const initialState: IGroupPlanState = {
    plansDialogOpen: false,
    confirmCloseSparksDialogOpen: false,
    groupPlansForm: {
-      selectedPlan: GroupPlanTypes.Advanced,
+      selectedPlan: GroupPlanTypes.Tier2,
       clientSecret: null,
       initialStep: "select-plan",
    },
