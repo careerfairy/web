@@ -33,9 +33,6 @@ type FetchStripeCustomerSession = {
    successUrl: string
 }
 
-type FetchStripeCustomer = {
-   customerId: string
-}
 const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
 const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
 /**
@@ -60,11 +57,7 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
       priceId: string().required(),
       successUrl: string().required(),
    })
-const fetchStripeCustomerSchema: SchemaOf<FetchStripeCustomer> = object().shape(
-   {
-      customerId: string().required(),
-   }
-)
+
 /**
  * Sync Status for the multiple entities
  */
@@ -182,39 +175,7 @@ export const fetchStripeCustomerSession = functions
          }
       )
    )
-/**
- * Sync Status for the multiple entities
- */
-export const fetchStripeCustomer = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onCall(
-      middlewares(
-         dataValidation(fetchStripeCustomerSchema),
-         userShouldBeCFAdmin(),
-         async (data: FetchStripeCustomer, context) => {
-            functions.logger.info("fetchStripeCustomer - data: ", data)
 
-            try {
-               const query = `metadata['groupId']:'${data.customerId}'`
-               console.log("🚀 ~ query:", query)
-               const customer = await stripe.customers.search({
-                  metadata: query,
-               })
-               console.log("🚀 ~ customerSession:", customer)
-
-               return { customerSessionSecret: customer }
-            } catch (error) {
-               console.log(error)
-               logAndThrow("Error while retrieving Stripe customer", {
-                  data,
-                  error,
-                  context,
-               })
-            }
-         }
-      )
-   )
 /**
  * Fetch Stripe Price via ID using the Stripe API. Receives requests with data of @type FetchStripePrice.
  */
