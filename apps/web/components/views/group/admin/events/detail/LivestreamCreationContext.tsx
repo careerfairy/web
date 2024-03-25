@@ -39,6 +39,8 @@ type LivestreamCreationContextType = {
    >
    shouldShowAlertDialog: boolean
    shouldShowAlertIndicator: boolean
+   isGenralTabInvalid: boolean
+   isSpeakerTabInvalid: boolean
 }
 
 const LivestreamCreationContext = createContext<
@@ -54,7 +56,6 @@ export const LivestreamCreationContextProvider: FC<
 > = ({ children }) => {
    const {
       values: { general, speakers },
-      errors,
    } = useLivestreamFormValues()
    const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
    const [alertState, setAlertState] = useState(undefined)
@@ -66,36 +67,28 @@ export const LivestreamCreationContextProvider: FC<
       handleValidationCloseDialog,
    ] = useDialogStateHandler()
 
+   const isGenralTabInvalid =
+      !livestreamFormGeneralTabSchema.isValidSync(general)
+   const isSpeakerTabInvalid = !livestreamFormSpeakersTabSchema.isValidSync(
+      speakers.values
+   )
+   const formHasCriticalValidationErrors =
+      isGenralTabInvalid || isSpeakerTabInvalid
+
    const shouldShowAlertIndicatorOnTab = useMemo(
       () => ({
-         [TAB_VALUES.GENERAL]:
-            alertState !== undefined && Boolean(errors.general),
-         [TAB_VALUES.SPEAKERS]:
-            alertState !== undefined && Boolean(errors.speakers),
+         [TAB_VALUES.GENERAL]: alertState !== undefined && isGenralTabInvalid,
+         [TAB_VALUES.SPEAKERS]: alertState !== undefined && isSpeakerTabInvalid,
       }),
-      [alertState, errors.general, errors.speakers]
+      [alertState, isGenralTabInvalid, isSpeakerTabInvalid]
    )
 
-   const formHasCriticalValidationErrors = useMemo(() => {
-      const isGenralTabValid =
-         livestreamFormGeneralTabSchema.validateSync(general)
-      const isSpeakerTabValid = livestreamFormSpeakersTabSchema.validateSync(
-         speakers.values
-      )
-      return !isGenralTabValid || !isSpeakerTabValid
-   }, [general, speakers])
+   const shouldShowAlertIndicator =
+      alertState !== undefined && formHasCriticalValidationErrors
 
-   const shouldShowAlertIndicator = useMemo(
-      () => alertState !== undefined && formHasCriticalValidationErrors,
-      [alertState, formHasCriticalValidationErrors]
-   )
-
-   const shouldShowAlertDialog = useMemo(
-      () =>
-         (alertState === true || alertState == undefined) &&
-         formHasCriticalValidationErrors,
-      [alertState, formHasCriticalValidationErrors]
-   )
+   const shouldShowAlertDialog =
+      (alertState === true || alertState == undefined) &&
+      formHasCriticalValidationErrors
 
    const navigateWithValidationCheck = useCallback(
       (newTabValue) => {
@@ -141,6 +134,8 @@ export const LivestreamCreationContextProvider: FC<
          shouldShowAlertIndicatorOnTab,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
+         isGenralTabInvalid,
+         isSpeakerTabInvalid,
       }),
       [
          shouldShowAlertDialog,
@@ -156,6 +151,8 @@ export const LivestreamCreationContextProvider: FC<
          alertState,
          tabValue,
          tabToNavigateTo,
+         isGenralTabInvalid,
+         isSpeakerTabInvalid,
       ]
    )
 
