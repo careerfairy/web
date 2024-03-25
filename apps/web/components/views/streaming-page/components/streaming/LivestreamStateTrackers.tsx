@@ -51,7 +51,7 @@ export const LivestreamStateTrackers = (): null => {
     * Dispatch both `hasStarted` and `startedAt` as the same time to avoid race conditions.
     */
    useEffect(() => {
-      dispatch(setHasStarted(Boolean(livestream.hasStarted)))
+      dispatch(setHasStarted(livestream.hasStarted))
       dispatch(setStartedAt(startedAtMillis))
    }, [dispatch, livestream.hasStarted, startedAtMillis])
 
