@@ -5,7 +5,6 @@ import { FC } from "react"
 import { Info } from "react-feather"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
 import { TAB_VALUES } from "../form/commons"
-import { useLivestreamFormValues } from "../form/useLivestreamFormValues"
 
 const styles = sxStyles({
    alertIconWrapper: {
@@ -56,12 +55,13 @@ const TabAlertIcon = () => (
 const LivestreamAdminDetailTopBarNavigation: FC = () => {
    const isMobile = useIsMobile()
 
-   const { errors } = useLivestreamFormValues()
    const {
       shouldShowAlertIndicator,
       tabValue,
       navigateWithValidationCheck,
       shouldShowAlertIndicatorOnTab,
+      isGenralTabInvalid,
+      isSpeakerTabInvalid,
    } = useLivestreamCreationContext()
 
    const styles = getStyles(shouldShowAlertIndicatorOnTab[tabValue])
@@ -79,7 +79,7 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
             label="General"
             value={TAB_VALUES.GENERAL}
             icon={
-               errors.general && shouldShowAlertIndicator ? (
+               isGenralTabInvalid && shouldShowAlertIndicator ? (
                   <TabAlertIcon />
                ) : undefined
             }
@@ -89,7 +89,7 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
             label="Speakers"
             value={TAB_VALUES.SPEAKERS}
             icon={
-               errors.speakers && shouldShowAlertIndicator ? (
+               isSpeakerTabInvalid && shouldShowAlertIndicator ? (
                   <TabAlertIcon />
                ) : undefined
             }
