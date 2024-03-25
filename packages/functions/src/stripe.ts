@@ -25,7 +25,7 @@ type FetchStripePrice = {
  */
 type FetchStripeCustomerSession = {
    customerName: string
-   customerId: string
+   // customerId: string
    customerEmail: string
    groupId: string
    plan: GroupPlanType
@@ -82,30 +82,41 @@ export const fetchStripeCustomerSession = functions
                context.rawRequest.headers.origin + data.successUrl
 
             try {
-               let groupCustomer
-               let createCustomer = false
-               try {
-                  groupCustomer = await stripe.customers.retrieve(
-                     data.customerId
-                  )
-               } catch (ex) {
-                  functions.logger.error(
-                     "fetchStripeCustomerSession - search customer error: ",
-                     ex
-                  )
-               }
+               const query = `metadata['groupId']:'${data.groupId}'`
+
+               console.log("🚀 ~ query:", query)
+               const customers = await stripe.customers.search({
+                  query: query,
+               })
+               console.log("🚀 ~ customers:", customers)
+
+               const notDeleted = customers?.data?.filter((c) => !c.deleted)
+               console.log("🚀 ~ search customers:", notDeleted)
+               let groupCustomer = notDeleted?.length
+                  ? notDeleted.at(0)
+                  : undefined
+               let createCustomer = groupCustomer === undefined
+               // try {
+               //    groupCustomer = await stripe.customers.retrieve(
+               //       data.customerId
+               //    )
+               // } catch (ex) {
+               //    functions.logger.error(
+               //       "fetchStripeCustomerSession - search customer error: ",
+               //       ex
+               //    )
+               // }
                console.log("🚀 ~ searched customer:", groupCustomer)
 
                // What if customer is deleted ?
                if (!groupCustomer) {
                   createCustomer = true
                }
-               if (groupCustomer && groupCustomer.deleted) {
+               if (groupCustomer) {
                   console.log("🚀 ~ updating customer:", groupCustomer)
                   groupCustomer = await stripe.customers.update(
-                     data.customerId,
+                     groupCustomer.id,
                      {
-                        // deleted: false,
                         metadata: {
                            groupId: data.groupId,
                            plan: data.plan,
@@ -119,7 +130,7 @@ export const fetchStripeCustomerSession = functions
 
                if (createCustomer) {
                   groupCustomer = await stripe.customers.create({
-                     id: data.customerId,
+                     // id: data.customerId,
                      name: data.customerName,
                      email: data.customerEmail,
                      metadata: {
