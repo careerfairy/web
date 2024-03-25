@@ -44,7 +44,7 @@ type Props = {
    video: { thumbnailUrl: string; url: string; preview: boolean }
    onMouseEnter?: () => void
    onMouseLeave?: () => void
-   isHovered?: boolean
+   autoPlaying?: boolean
    containerRef?: React.RefObject<HTMLDivElement>
 }
 
@@ -54,10 +54,10 @@ const SparkCarouselCardContainer: FC<Props> = ({
    video,
    onMouseEnter,
    onMouseLeave,
-   isHovered,
+   autoPlaying,
    containerRef,
 }) => {
-   const hoverEnabled = isHovered !== undefined
+   const hoverEnabled = autoPlaying !== undefined
 
    return (
       <Box
@@ -73,7 +73,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
             videoUrl={video.url}
             playing={video.preview}
             light={hoverEnabled ? false : !video.preview}
-            isHovered={isHovered}
+            autoPlaying={autoPlaying}
             muted={hoverEnabled ? true : undefined}
          />
       </Box>
