@@ -12,6 +12,14 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 
+const SessionConflictModal = dynamic(
+   () =>
+      import("./components/SessionConflictModal").then(
+         (mod) => mod.SessionConflictModal
+      ),
+   { ssr: false }
+)
+
 const LivestreamValidationWrapper = dynamic(
    () =>
       import("./components/LivestreamValidationWrapper").then(
@@ -108,6 +116,12 @@ const AgoraTrackers = dynamic(
    { ssr: false }
 )
 
+const ViewerTrackers = dynamic(
+   () =>
+      import("./components/ViewerTrackers").then((mod) => mod.ViewerTrackers),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -177,6 +191,8 @@ const Component = ({ isHost }: Props) => {
                   </AgoraDevicesProvider>
                   <AgoraTrackers />
                   <LivestreamStateTrackers />
+                  {isHost ? null : <ViewerTrackers />}
+                  <SessionConflictModal />
                </RTMSignalingProvider>
             </StreamingProvider>
          </UserClientProvider>

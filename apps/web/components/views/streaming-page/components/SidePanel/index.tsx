@@ -11,6 +11,7 @@ import { QAndAPanel } from "./QAndAPanel"
 import { HandRaisePanel } from "./HandRaisePanel"
 import { ReactNode } from "react"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { ViewersPanel } from "./ViewersPanel"
 
 const drawerWidth = 328
 
@@ -35,6 +36,9 @@ const styles = sxStyles({
          sm: `calc(100vh - 32px)`,
       },
    },
+   paperMaxHeight: {
+      height: "100%",
+   },
 })
 
 const viewComponents = {
@@ -44,6 +48,7 @@ const viewComponents = {
    questions: <QAndAPanel />,
    cta: <CTAPanel />,
    handRaise: <HandRaisePanel />,
+   viewers: <ViewersPanel />,
    default: null,
 } satisfies Record<ActiveView | "default", ReactNode>
 
@@ -59,6 +64,8 @@ export const SidePanel = () => {
 
    const content = viewComponents[activeView] ?? viewComponents.default
 
+   const isMaxHeight = activeView === "viewers"
+
    if (isMobile) {
       return (
          <SwipeableDrawer
@@ -67,7 +74,7 @@ export const SidePanel = () => {
             open={isOpen}
             anchor="bottom"
             PaperProps={{
-               sx: styles.paper,
+               sx: [styles.paper, isMaxHeight && styles.paperMaxHeight],
             }}
          >
             {content}

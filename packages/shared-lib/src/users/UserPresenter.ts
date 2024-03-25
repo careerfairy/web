@@ -70,6 +70,12 @@ export default class UserPresenter extends BasePresenter<UserData> {
          .join(" ")
    }
 
+   getBackground(): string {
+      return [this.model.fieldOfStudy?.name, this.model.university?.name]
+         .filter(Boolean)
+         .join(" - ")
+   }
+
    getFieldOfStudyDisplayName(): string {
       const filedOfStudy = this.model?.fieldOfStudy?.name
       return filedOfStudy ? `${filedOfStudy} Student` : null
