@@ -23,28 +23,29 @@ import {
 } from "./form/validationSchemas"
 
 type LivestreamCreationContextType = {
-  livestream: LivestreamEvent
-  tabToNavigateTo: TAB_VALUES
-  tabValue: TAB_VALUES
-  setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
-  navPreviousTab: () => void
-  navNextTab: () => void
-  navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
-  isNavigatingForward: boolean
-  alertState: boolean
-  setAlertState: Dispatch<SetStateAction<boolean>>
-  isValidationDialogOpen: boolean
-  handleValidationOpenDialog: () => void
-  handleValidationCloseDialog: () => void
-  shouldShowAlertIndicatorOnTab: Record<
-    TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
-    boolean
-  >
-  shouldShowAlertDialog: boolean
-  shouldShowAlertIndicator: boolean
-  isGenralTabInvalid: boolean
-  isSpeakerTabInvalid: boolean
-  isUniversityEvent: boolean // edge case where university cohost events with companies
+   livestream: LivestreamEvent
+   tabToNavigateTo: TAB_VALUES
+   tabValue: TAB_VALUES
+   setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
+   navPreviousTab: () => void
+   navNextTab: () => void
+   navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
+   isNavigatingForward: boolean
+   alertState: boolean
+   setAlertState: Dispatch<SetStateAction<boolean>>
+   isValidationDialogOpen: boolean
+   handleValidationOpenDialog: () => void
+   handleValidationCloseDialog: () => void
+   shouldShowAlertIndicatorOnTab: Record<
+      TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
+      boolean
+   >
+   shouldShowAlertDialog: boolean
+   shouldShowAlertIndicator: boolean
+   isGenralTabInvalid: boolean
+   isSpeakerTabInvalid: boolean
+   isUniversityEvent: boolean // edge case where university cohost events with companies
+   isCohostedEvent: boolean
 }
 
 const LivestreamCreationContext = createContext<
@@ -91,6 +92,7 @@ export const LivestreamCreationContextProvider: FC<
     isGenralTabInvalid || isSpeakerTabInvalid
 
   const isUniversityEvent = Boolean(group?.universityCode)
+  const isCohostedEvent = Boolean(livestream.groupIds.length > 1)
 
   const shouldShowAlertIndicatorOnTab = useMemo(
     () => ({
@@ -159,8 +161,10 @@ export const LivestreamCreationContextProvider: FC<
       isGenralTabInvalid,
       isSpeakerTabInvalid,
       isUniversityEvent,
+      isCohostedEvent,
     }),
     [
+      isCohostedEvent,
       isUniversityEvent,
       shouldShowAlertDialog,
       shouldShowAlertIndicator,
