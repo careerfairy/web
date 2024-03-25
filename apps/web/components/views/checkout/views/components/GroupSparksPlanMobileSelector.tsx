@@ -270,16 +270,11 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
    )
 }
 export function commafy(num) {
-   const numStr = num + ""
-
-   if (numStr.includes(".")) {
-      return numStr
-   }
-
-   return numberWith(numStr, "’")
+   return numberWith(num, "’")
 }
 
-function numberWith(x, separator) {
-   return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, separator)
+function numberWith(x: number, separator) {
+   return x.toLocaleString("en-US").replace(",", separator)
+   // return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, separator)
 }
 export default GroupSparksPlanMobileSelector
