@@ -58,7 +58,7 @@ const styles = sxStyles({
    },
    mobileWrapper: {
       px: "15px",
-      // pb: "390px"
+      mb: "10px",
    },
    title: {
       color: (theme) => theme.palette.neutral[800],
@@ -182,15 +182,15 @@ const styles = sxStyles({
       // height: "100%",
       // width: "100%",
       // zIndex: 1,
-      pt: {
-         xs: 2.5,
-         [mobileBreakpoint]: 2.125,
-      },
+      // pt: {
+      //    xs: 2.5,
+      //    [mobileBreakpoint]: 2.125,
+      // },
       pr: {
          xs: 2,
          [mobileBreakpoint]: 2.5,
       },
-      // mb: 5,
+      mb: 2,
       color: "text.primary",
       "& svg": {
          width: 32,
@@ -348,7 +348,7 @@ const GroupPlansDialog = () => {
                <Box sx={styles.footer} alignContent={"end"}>
                   <Stack
                      direction={"column"}
-                     spacing={2}
+                     spacing={1}
                      alignContent={"center"}
                      justifyItems={"center"}
                      alignItems={"center"}
