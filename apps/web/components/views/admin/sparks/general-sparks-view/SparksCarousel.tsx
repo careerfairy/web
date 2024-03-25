@@ -83,6 +83,10 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
                              <SparkCarouselCard
                                 onClick={() => onSparkClick(spark)}
                                 spark={spark}
+                                onGoNext={() => emblaApi.scrollNext()}
+                                isLastPosition={
+                                   spark.id === sparks[sparks.length - 1].id
+                                }
                              />
                           )}
                        </Box>

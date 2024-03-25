@@ -25,24 +25,36 @@ type Props = {
    spark: Spark
    preview?: boolean
    onClick?: () => void
+   onGoNext?: () => void
+   isLastPosition?: boolean
 }
 
-const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
+const SparkCarouselCard: FC<Props> = ({
+   spark,
+   onClick,
+   preview = false,
+   onGoNext,
+   isLastPosition,
+}) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
-   const [isHovered, setIsHovered] = useState(false)
+   const [autoPlaying, setAutoPlaying] = useState(false)
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
 
    useEffect(() => {
       const currentContainerRef = containerRef.current
+      let timeout
 
       const observable = (entries) => {
          const entry = entries[0]
 
          if (entry && entry.intersectionRatio > 0.9) {
-            setIsHovered(true)
+            timeout = setTimeout(() => {
+               setAutoPlaying(true)
+            }, 1000)
          } else {
-            setIsHovered(false)
+            setAutoPlaying(false)
+            clearTimeout(timeout)
          }
       }
 
@@ -60,8 +72,27 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
          if (currentContainerRef) {
             observer.unobserve(currentContainerRef)
          }
+         clearTimeout(timeout)
       }
    }, [isMobile])
+
+   useEffect(() => {
+      let timeout
+
+      if (autoPlaying) {
+         timeout = setTimeout(() => {
+            if (isLastPosition) {
+               setAutoPlaying(false)
+            } else {
+               onGoNext && onGoNext()
+            }
+         }, 5000)
+      }
+
+      return () => {
+         clearTimeout(timeout)
+      }
+   }, [autoPlaying, isLastPosition, onGoNext])
 
    return (
       <SparkCarouselCardContainer
@@ -70,9 +101,9 @@ const SparkCarouselCard: FC<Props> = ({ spark, onClick, preview = false }) => {
             url: sparkPresenter.getTransformedVideoUrl(),
             preview: preview,
          }}
-         onMouseEnter={isMobile ? null : () => setIsHovered(true)}
-         onMouseLeave={isMobile ? null : () => setIsHovered(false)}
-         isHovered={isHovered}
+         onMouseEnter={() => setAutoPlaying(true)}
+         onMouseLeave={() => setAutoPlaying(false)}
+         autoPlaying={autoPlaying}
          containerRef={containerRef}
       >
          <Box px={cardPadding} pt={cardPadding}>

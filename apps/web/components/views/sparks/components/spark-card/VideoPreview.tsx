@@ -101,7 +101,7 @@ type Props = {
    light?: boolean
    containPreviewOnTablet?: boolean
    identifier?: string
-   isHovered?: boolean
+   autoPlaying?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
@@ -116,7 +116,7 @@ const VideoPreview: FC<Props> = ({
    light,
    containPreviewOnTablet,
    identifier,
-   isHovered,
+   autoPlaying,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
@@ -143,11 +143,11 @@ const VideoPreview: FC<Props> = ({
       (progress: OnProgressProps) => {
          setProgress(progress.played * 100)
 
-         if (!isHovered) {
+         if (!autoPlaying) {
             onProgress(progress)
          }
       },
-      [isHovered, onProgress]
+      [autoPlaying, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
@@ -165,17 +165,17 @@ const VideoPreview: FC<Props> = ({
    }, [identifier, prevIdentifier])
 
    useEffect(() => {
-      if (isHovered === false) {
+      if (autoPlaying === false) {
          reset()
       }
-   }, [isHovered])
+   }, [autoPlaying])
 
    // Set up an interval to reset the video if hovered for more than 5 seconds
    useEffect(() => {
       let interval: NodeJS.Timeout | null = null
 
       const handleHoveredReset = () => {
-         if (isHovered) {
+         if (autoPlaying) {
             interval = setInterval(() => {
                reset()
             }, 5000)
@@ -191,7 +191,7 @@ const VideoPreview: FC<Props> = ({
       return () => {
          clearInterval(interval)
       }
-   }, [isHovered])
+   }, [autoPlaying])
 
    const onPlay = useCallback(() => {
       setVideoPlayedForSession(true)
@@ -200,7 +200,7 @@ const VideoPreview: FC<Props> = ({
       }
    }, [onVideoPlay, videoPlayedForSession])
 
-   const playingVideo = Boolean(playing && !shouldPause) || isHovered
+   const playingVideo = Boolean(playing && !shouldPause) || autoPlaying
 
    return (
       <Box sx={styles.root}>
