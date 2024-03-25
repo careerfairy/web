@@ -112,7 +112,6 @@ export const fetchStripeCustomerSession = functions
                      {
                         metadata: {
                            groupId: data.groupId,
-                           plan: data.plan,
                            version: STRIPE_CUSTOMER_METADATA_VERSION,
                         },
                      }
@@ -128,7 +127,6 @@ export const fetchStripeCustomerSession = functions
                      email: data.customerEmail,
                      metadata: {
                         groupId: data.groupId,
-                        plan: data.plan,
                         version: STRIPE_CUSTOMER_METADATA_VERSION,
                      },
                   })

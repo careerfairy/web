@@ -12,6 +12,7 @@ import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSel
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
+import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipableDrawer"
 
 const styles = sxStyles({
    content: {
@@ -24,14 +25,14 @@ const styles = sxStyles({
    contentMobile: {
       display: "flex",
       flexDirection: "column",
-      height: "100%",
-      width: "100%",
+      // height: "100%",
+      // width: "100%",
    },
    contentMobileWrapper: {
       display: "flex",
       flexDirection: "column",
-      height: "100%",
-      width: "100%",
+      // height: "100%",
+      // width: "100%",
    },
    checkoutButton: {
       mt: 2,
@@ -167,75 +168,73 @@ const GroupPlansMobile = (props: GroupPlansProps) => {
    const { handleClose } = useSparksPlansForm()
 
    return (
-      <GroupPlansDialog.Container sx={{}}>
-         <GroupPlansDialog.Content sx={styles.contentMobile}>
-            <GroupPlansDialog.Title>
-               Select your{" "}
-               <Box component="span" color="secondary.main">
-                  Sparks
-               </Box>{" "}
-               plan
-            </GroupPlansDialog.Title>
-            <Box mt={5} />
+      <BrandedSwipableDrawer
+         onClose={() => handleClose()}
+         onOpen={() => {}}
+         open={true}
+      >
+         <GroupPlansDialog.Title>
+            Select your{" "}
+            <Box component="span" color="secondary.main">
+               Sparks
+            </Box>{" "}
+            plan
+         </GroupPlansDialog.Title>
+         <Box mt={5} />
+         <Box
+            mt={{
+               md: 0,
+            }}
+         />
+
+         <Box sx={styles.contentMobileWrapper}>
+            <GroupSparksPlanMobileSelector />
+
             <Box
-               mt={{
+               mb={{
+                  xs: "auto",
                   md: 0,
                }}
             />
-
-            <Box sx={styles.contentMobileWrapper}>
-               <GroupSparksPlanMobileSelector />
-
+            <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
                <Box
-                  mb={{
-                     xs: "auto",
-                     md: 0,
-                  }}
-               />
-               <Stack
-                  direction={"column"}
-                  spacing={2}
-                  sx={styles.checkoutWrapper}
+                  sx={styles.checkoutDescription}
+                  display={"flex"}
+                  width={"100%"}
+                  alignContent={"start"}
                >
-                  <Box
-                     sx={styles.checkoutDescription}
-                     display={"flex"}
-                     width={"100%"}
-                     alignContent={"start"}
-                  >
-                     Content available for 1 year
-                  </Box>
-               </Stack>
-            </Box>
-            <Box mt={15} />
-            <Stack
-               direction={"column"}
-               spacing={2}
-               alignItems={"center"}
-               width={"100%"}
-            >
-               <Box>
-                  <Button
-                     disabled={props.disabled}
-                     color={"secondary"}
-                     onClick={props.handleSelect}
-                     sx={styles.checkoutButton}
-                  >
-                     Select plan
-                  </Button>
-               </Box>
-               <Box>
-                  <Button
-                     color={"grey"}
-                     onClick={() => handleClose()}
-                     sx={styles.cancelButton}
-                  >
-                     Cancel
-                  </Button>
+                  Content available for 1 year
                </Box>
             </Stack>
-         </GroupPlansDialog.Content>
-      </GroupPlansDialog.Container>
+         </Box>
+         <Box mt={15} />
+         <Stack
+            direction={"column"}
+            spacing={2}
+            alignItems={"center"}
+            width={"100%"}
+         >
+            <Box>
+               <Button
+                  disabled={props.disabled}
+                  color={"secondary"}
+                  onClick={props.handleSelect}
+                  sx={styles.checkoutButton}
+               >
+                  Select plan
+               </Button>
+            </Box>
+            <Box>
+               <Button
+                  color={"grey"}
+                  onClick={() => handleClose()}
+                  sx={styles.cancelButton}
+               >
+                  Cancel
+               </Button>
+            </Box>
+         </Stack>
+      </BrandedSwipableDrawer>
    )
 }
 
