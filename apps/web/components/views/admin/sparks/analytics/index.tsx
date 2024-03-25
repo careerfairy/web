@@ -75,8 +75,8 @@ const GroupSparkAnalytics = () => {
    const { userData } = useAuth()
    const planStatus = useGroupPlanIsValid(group.groupId, [
       GroupPlanTypes.Tier1,
-      GroupPlanTypes.Advanced,
-      GroupPlanTypes.Premium,
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3,
    ])
    const [tabValue, setTabValue] = useState("overview")
    const [selectTimeFilter, setSelectTimeFilter] =

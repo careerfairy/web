@@ -148,18 +148,14 @@ const GroupSparksPlanMobileSelector = () => {
                   plan={GroupPlanTypes.Tier1}
                />
                <GroupSparksPlanComponent
-                  title={PLAN_CONSTANTS[GroupPlanTypes.Advanced].name}
-                  description={
-                     PLAN_CONSTANTS[GroupPlanTypes.Advanced].description
-                  }
-                  plan={GroupPlanTypes.Advanced}
+                  title={PLAN_CONSTANTS[GroupPlanTypes.Tier2].name}
+                  description={PLAN_CONSTANTS[GroupPlanTypes.Tier2].description}
+                  plan={GroupPlanTypes.Tier2}
                />
                <GroupSparksPlanComponent
-                  title={PLAN_CONSTANTS[GroupPlanTypes.Premium].name}
-                  description={
-                     PLAN_CONSTANTS[GroupPlanTypes.Premium].description
-                  }
-                  plan={GroupPlanTypes.Premium}
+                  title={PLAN_CONSTANTS[GroupPlanTypes.Tier3].name}
+                  description={PLAN_CONSTANTS[GroupPlanTypes.Tier3].description}
+                  plan={GroupPlanTypes.Tier3}
                />
             </Stack>
 
@@ -273,13 +269,16 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
    )
 }
 export function commafy(num) {
-   const str = num.toString().split(".")
-   if (str[0].length >= 5) {
-      str[0] = str[0].replace(/(\d)(?=(\d{3})+$)/g, "$1,")
+   const numStr = num + ""
+
+   if (numStr.includes(".")) {
+      return numStr
    }
-   if (str[1] && str[1].length >= 5) {
-      str[1] = str[1].replace(/(\d{3})/g, "$1 ")
-   }
-   return str.join(".")
+
+   return numberWith(numStr, "’")
+}
+
+function numberWith(x, separator) {
+   return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, separator)
 }
 export default GroupSparksPlanMobileSelector

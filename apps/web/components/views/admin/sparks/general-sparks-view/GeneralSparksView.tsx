@@ -144,7 +144,7 @@ const TrialEndUpgradeTitle = ({ days }: TrialEndProps) => {
    const endDate = DateTime.now().plus({ days: days })
    const month = endDate.monthShort.replace(".", "")
    const monthShort = month.at(0).toUpperCase() + month.substring(1)
-   const endsOn = `ends on ${endDate.day} ${monthShort} ${endDate.year}`
+   const endsOn = `on ${endDate.day} ${monthShort} ${endDate.year}`
    return (
       <>
          <StatusTitle
@@ -169,7 +169,7 @@ const StatusTitle = (props: StatusTitleProps) => {
          <Typography sx={styles.title}>
             {props.preTitle}
             <Typography component="span" sx={[styles.title, styles.alerted]}>
-               {props.daysLeft} days left{" "}
+               ends in {props.daysLeft} days{" "}
             </Typography>
             {props.afterTitle}
          </Typography>

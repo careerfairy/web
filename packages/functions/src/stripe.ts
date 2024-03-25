@@ -32,6 +32,12 @@ type FetchStripeCustomerSession = {
    priceId: string
    successUrl: string
 }
+
+type FetchStripeCustomer = {
+   customerId: string
+}
+const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
+const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
 /**
  * Functions runtime settings
  */
@@ -54,6 +60,11 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
       priceId: string().required(),
       successUrl: string().required(),
    })
+const fetchStripeCustomerSchema: SchemaOf<FetchStripeCustomer> = object().shape(
+   {
+      customerId: string().required(),
+   }
+)
 /**
  * Sync Status for the multiple entities
  */
@@ -71,8 +82,58 @@ export const fetchStripeCustomerSession = functions
                context.rawRequest.headers.origin + data.successUrl
 
             try {
+               let groupCustomer
+               let createCustomer = false
+               try {
+                  groupCustomer = await stripe.customers.retrieve(
+                     data.customerId
+                  )
+               } catch (ex) {
+                  functions.logger.error(
+                     "fetchStripeCustomerSession - search customer error: ",
+                     ex
+                  )
+               }
+               console.log("🚀 ~ searched customer:", groupCustomer)
+
+               // What if customer is deleted ?
+               if (!groupCustomer) {
+                  createCustomer = true
+               }
+               if (groupCustomer && groupCustomer.deleted) {
+                  console.log("🚀 ~ updating customer:", groupCustomer)
+                  groupCustomer = await stripe.customers.update(
+                     data.customerId,
+                     {
+                        // deleted: false,
+                        metadata: {
+                           groupId: data.groupId,
+                           plan: data.plan,
+                           version: STRIPE_CUSTOMER_METADATA_VERSION,
+                        },
+                     }
+                  )
+
+                  console.log("🚀 ~ updated customer:", groupCustomer)
+               }
+
+               if (createCustomer) {
+                  groupCustomer = await stripe.customers.create({
+                     id: data.customerId,
+                     name: data.customerName,
+                     email: data.customerEmail,
+                     metadata: {
+                        groupId: data.groupId,
+                        plan: data.plan,
+                        version: STRIPE_CUSTOMER_METADATA_VERSION,
+                     },
+                  })
+                  console.log("🚀 ~ created customer:", groupCustomer)
+               }
+               console.log("🚀 ~ creating session for customer:", groupCustomer)
+
                const customerSession = await stripe.checkout.sessions.create({
-                  // customer: customer.id,
+                  customer: groupCustomer.id,
                   return_url: returnUrl,
                   line_items: [
                      {
@@ -85,10 +146,17 @@ export const fetchStripeCustomerSession = functions
                   billing_address_collection: "required",
                   metadata: {
                      groupId: data.groupId,
+                     userEmail: data.customerEmail,
                      plan: data.plan,
+                     version: STRIPE_CUSTOMER_SESSION_METADATA_VERSION,
                   },
-                  customer_email: data.customerEmail,
+                  invoice_creation: {
+                     enabled: true,
+                  },
+                  // customer_creation: "never",
+                  // customer_email: data.customerEmail
                })
+               console.log("🚀 ~ customerSession:", customerSession)
                // console.log("🚀 ~ customerSession:", customerSession)
 
                return { customerSessionSecret: customerSession.client_secret }
@@ -103,7 +171,39 @@ export const fetchStripeCustomerSession = functions
          }
       )
    )
+/**
+ * Sync Status for the multiple entities
+ */
+export const fetchStripeCustomer = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onCall(
+      middlewares(
+         dataValidation(fetchStripeCustomerSchema),
+         userShouldBeCFAdmin(),
+         async (data: FetchStripeCustomer, context) => {
+            functions.logger.info("fetchStripeCustomer - data: ", data)
 
+            try {
+               const query = `metadata['groupId']:'${data.customerId}'`
+               console.log("🚀 ~ query:", query)
+               const customer = await stripe.customers.search({
+                  metadata: query,
+               })
+               console.log("🚀 ~ customerSession:", customer)
+
+               return { customerSessionSecret: customer }
+            } catch (error) {
+               console.log(error)
+               logAndThrow("Error while retrieving Stripe customer", {
+                  data,
+                  error,
+                  context,
+               })
+            }
+         }
+      )
+   )
 /**
  * Fetch Stripe Price via ID using the Stripe API. Receives requests with data of @type FetchStripePrice.
  */

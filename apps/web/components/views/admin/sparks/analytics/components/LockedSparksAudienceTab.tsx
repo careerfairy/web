@@ -84,7 +84,7 @@ const lockedSparkAnalyticsDesktopImage =
 const lockedSparkAnalyticsMobileImage =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background-mobile.png?alt=media&token=22923a7d-9b9c-4eeb-90df-43e5624bac0e"
 
-const metrics = ["Reach", "Engagement", "Audience"]
+const metrics = ["Top countries", "Top universities", "Top field of studies"]
 
 export const LockedSparksAudienceTab = () => {
    const isMobile = useIsMobile()
@@ -107,10 +107,10 @@ const Info = () => {
          <Stack spacing={1} sx={styles.heading}>
             <LockedIcon sx={styles.lockedIcon} />
             <Typography component="h3" sx={styles.title}>
-               Unlock audiences
+               Unlock audience
             </Typography>
             <Typography sx={styles.text}>
-               Unlock in-depth audience data analysis
+               Unlock in-depth audience insights
             </Typography>
          </Stack>
          <Box component="ul" sx={styles.metrics}>

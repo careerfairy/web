@@ -1,12 +1,12 @@
 import useSWR, { SWRConfiguration } from "swr"
 
 import { useMemo } from "react"
-import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/groups"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import Stripe from "stripe"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -24,9 +24,9 @@ const swrOptions: SWRConfiguration = {
  *  or stripe.handleCardAction) to complete the payment.
  */
 type Result = {
-   customerSessionSecret: string
+   customer: Stripe.Customer
 }
-const CUSTOMER_ID_PREFIX = "CF_Group_"
+
 /**
  * Creates a session based on the given details, creates or updates an existing Stripe customer
  * with the additional details.
@@ -35,41 +35,25 @@ const CUSTOMER_ID_PREFIX = "CF_Group_"
  * @param userEmail Current HR rep email
  * @returns customerSessionSecret Stripe customer session to be used in the checkout process
  */
-const useStripeCustomerSession = (
-   group: Group,
-   plan: GroupPlanType,
-   userEmail: string
-) => {
+const useStripeCustomer = (group: Group) => {
    const fetcher = useFunctionsSWR<Result[]>()
 
    const options = useMemo(() => {
       return {
-         customerId: CUSTOMER_ID_PREFIX.concat(group.groupId),
-         plan: plan,
-         customerEmail: userEmail,
-         groupId: group.groupId,
-         customerName: group.universityName,
-         priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry.id),
-         successUrl: `/group/${group.groupId}/admin/sparks?session_id={CHECKOUT_SESSION_ID}`,
+         customerId: group.groupId,
       }
-   }, [
-      group.companyCountry.id,
-      group.groupId,
-      group.universityName,
-      plan,
-      userEmail,
-   ])
+   }, [group.groupId])
    const { data } = useSWR(
-      ["fetchStripeCustomerSession", options],
+      ["fetchStripeCustomer", options],
       fetcher,
       swrOptions
    )
 
    return useMemo(() => {
       return {
-         customerSessionSecret: data.customerSessionSecret,
+         customer: data.customer,
       }
    }, [data])
 }
 
-export default useStripeCustomerSession
+export default useStripeCustomer

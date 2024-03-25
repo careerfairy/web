@@ -96,14 +96,14 @@ const GroupSparksPlanDesktopSelector = () => {
             plan={GroupPlanTypes.Tier1}
          />
          <GroupSparksPlanComponent
-            title={PLAN_CONSTANTS[GroupPlanTypes.Advanced].name}
-            description={PLAN_CONSTANTS[GroupPlanTypes.Advanced].description}
-            plan={GroupPlanTypes.Advanced}
+            title={PLAN_CONSTANTS[GroupPlanTypes.Tier2].name}
+            description={PLAN_CONSTANTS[GroupPlanTypes.Tier2].description}
+            plan={GroupPlanTypes.Tier2}
          />
          <GroupSparksPlanComponent
-            title={PLAN_CONSTANTS[GroupPlanTypes.Premium].name}
-            description={PLAN_CONSTANTS[GroupPlanTypes.Premium].description}
-            plan={GroupPlanTypes.Premium}
+            title={PLAN_CONSTANTS[GroupPlanTypes.Tier3].name}
+            description={PLAN_CONSTANTS[GroupPlanTypes.Tier3].description}
+            plan={GroupPlanTypes.Tier3}
          />
       </Stack>
    )
@@ -195,9 +195,10 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
             </Box>
             <Box component="span" color={color} sx={styles.planPricing}>
                <ConditionalWrapper condition={Boolean(stripePrice)}>
-                  {commafy((stripePrice.unit_amount / 100).toFixed(2)) +
+                  {commafy(stripePrice.unit_amount / 100) +
+                     " " +
                      stripePrice.currency.toUpperCase() +
-                     "/ year"}
+                     "/year"}
                </ConditionalWrapper>
             </Box>
          </Stack>

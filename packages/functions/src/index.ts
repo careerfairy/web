@@ -126,6 +126,7 @@ exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.stripeWebHook = stripe.stripeWebHook
 exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
 exports.fetchStripePrice = stripe.fetchStripePrice
+exports.fetchStripeCustomer = stripe.fetchStripeCustomer
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =

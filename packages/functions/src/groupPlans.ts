@@ -90,8 +90,8 @@ async function updateExpiredGroupPlans() {
    const types = [
       GroupPlanTypes.Trial,
       GroupPlanTypes.Tier1,
-      GroupPlanTypes.Advanced,
-      GroupPlanTypes.Premium,
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3,
    ]
 
    try {
