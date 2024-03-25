@@ -13,6 +13,7 @@ import { sxStyles } from "types/commonTypes"
 import { usePrevious } from "react-use"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import { AUTO_PLAY_TIME } from "./SparkCarouselCard"
 
 const styles = sxStyles({
    root: {
@@ -143,6 +144,7 @@ const VideoPreview: FC<Props> = ({
       (progress: OnProgressProps) => {
          setProgress(progress.played * 100)
 
+         // only track the progress if it's not auto-played
          if (!autoPlaying) {
             onProgress(progress)
          }
@@ -170,15 +172,15 @@ const VideoPreview: FC<Props> = ({
       }
    }, [autoPlaying])
 
-   // Set up an interval to reset the video if hovered for more than 5 seconds
+   // Set up an interval to reset the video if auto-played for more than {AUTO_PLAY_TIME} seconds
    useEffect(() => {
       let interval: NodeJS.Timeout | null = null
 
-      const handleHoveredReset = () => {
+      const handleAutoPlayReset = () => {
          if (autoPlaying) {
             interval = setInterval(() => {
                reset()
-            }, 5000)
+            }, AUTO_PLAY_TIME)
          } else {
             if (interval) {
                clearInterval(interval)
@@ -186,7 +188,7 @@ const VideoPreview: FC<Props> = ({
          }
       }
 
-      handleHoveredReset()
+      handleAutoPlayReset()
 
       return () => {
          clearInterval(interval)
