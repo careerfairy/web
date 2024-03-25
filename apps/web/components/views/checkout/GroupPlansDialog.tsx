@@ -27,6 +27,8 @@ import {
    plansDialogOpenSelector,
 } from "store/selectors/groupSelectors"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import BrandedSwipableDrawer from "../common/inputs/BrandedSwipableDrawer"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -155,6 +157,13 @@ const views = [
          { loading: () => <CircularProgress /> }
       ),
    },
+   // {
+   //    key: "select-plan-mobile",
+   //    Component: dynamic(
+   //       () => import("components/views/checkout/views/SelectGroupPlanMobileView"),
+   //       { loading: () => <CircularProgress /> }
+   //    ),
+   // },
    {
       key: "checkout",
       Component: dynamic(
@@ -284,24 +293,35 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    const isMobile = useIsMobile("md")
    const open = useSelector(plansDialogOpenSelector)
 
+   const mobileDrawer = (
+      <BrandedSwipableDrawer
+         onClose={handleClose}
+         onOpen={() => {}}
+         open={open}
+      >
+         {children}
+      </BrandedSwipableDrawer>
+   )
    return (
-      <Box sx={combineStyles(styles.containerWrapper, sx)}>
-         <Dialog
-            sx={styles.container}
-            open={open}
-            maxWidth={false}
-            PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
-         >
-            {children}
-            {hideCloseButton ? null : (
-               <Box sx={styles.closeBtn}>
-                  <IconButton onClick={handleClose}>
-                     <CloseIcon />
-                  </IconButton>
-               </Box>
-            )}
-         </Dialog>
-      </Box>
+      <ConditionalWrapper condition={!isMobile} fallback={mobileDrawer}>
+         <Box sx={combineStyles(styles.containerWrapper, sx)}>
+            <Dialog
+               sx={styles.container}
+               open={open}
+               maxWidth={false}
+               PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+            >
+               {children}
+               {hideCloseButton ? null : (
+                  <Box sx={styles.closeBtn}>
+                     <IconButton onClick={handleClose}>
+                        <CloseIcon />
+                     </IconButton>
+                  </Box>
+               )}
+            </Dialog>
+         </Box>
+      </ConditionalWrapper>
    )
 }
 
