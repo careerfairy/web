@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack } from "@mui/material"
+import { Box, IconButton, Stack, SxProps, Theme } from "@mui/material"
 import { FC, ReactNode, useEffect, useRef, useState } from "react"
 import SparksCarousel, {
    ChildRefType,
@@ -8,7 +8,7 @@ import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
 import { ArrowLeft, ArrowRight } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { EmblaOptionsType } from "embla-carousel-react"
 
 const styles = sxStyles({
@@ -24,19 +24,19 @@ const styles = sxStyles({
       ml: 2,
    },
    sparksContentPaddingLeft: 2,
+   defaultSparks: {
+      pl: 2,
+   },
 })
-const defaultSparksCustomStyling: SparksStyling = {
-   sparksContentPaddingLeft: 2,
-}
+
 type Props = {
    header: ReactNode
    groupId?: string
    handleSparksClicked: (spark: Spark) => void
-   styling?: SparksStyling
+   sx?: SxProps<Theme>
 }
 type FallbackComponentProps = {
    header: ReactNode
-   styling?: SparksStyling
 }
 
 const sparksCarouselEmblaOptions: EmblaOptionsType = {
@@ -47,7 +47,7 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
    groupId,
    handleSparksClicked,
-   styling = defaultSparksCustomStyling,
+   sx,
 }) => {
    const [isClient, setIsClient] = useState(false)
    useEffect(() => {
@@ -56,14 +56,12 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    }, [])
 
    return isClient ? (
-      <SuspenseWithBoundary
-         fallback={<FallbackComponent header={header} styling={styling} />}
-      >
+      <SuspenseWithBoundary fallback={<FallbackComponent header={header} />}>
          <Component
             header={header}
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
-            styling={styling}
+            sx={sx}
          />
       </SuspenseWithBoundary>
    ) : (
@@ -71,12 +69,9 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    )
 }
 
-const FallbackComponent: FC<FallbackComponentProps> = ({
-   header,
-   styling = defaultSparksCustomStyling,
-}) => {
+const FallbackComponent: FC<FallbackComponentProps> = ({ header }) => {
    return (
-      <Box sx={{ pl: styling.sparksContentPaddingLeft }}>
+      <Box>
          <Stack direction={"column"} sx={{ gap: "10px" }}>
             {header}
             <SparksCarouselSkeleton numSlides={8} />
@@ -85,17 +80,12 @@ const FallbackComponent: FC<FallbackComponentProps> = ({
    )
 }
 
-const Component: FC<Props> = ({
-   header,
-   groupId,
-   handleSparksClicked,
-   styling = defaultSparksCustomStyling,
-}) => {
+const Component: FC<Props> = ({ header, groupId, handleSparksClicked, sx }) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
    const withControls = Boolean(groupId)
    return sparksContent.length ? (
-      <Box sx={{ pl: styling.sparksContentPaddingLeft }}>
+      <Box sx={combineStyles(styles.defaultSparks, sx)} id="test">
          <Stack spacing={1.25}>
             <Box sx={styles.stack}>
                {header}
@@ -133,7 +123,5 @@ const Component: FC<Props> = ({
       </Box>
    ) : null
 }
-export type SparksStyling = {
-   sparksContentPaddingLeft?: number
-}
+
 export default SparksCarouselWithSuspenseComponent

@@ -10,49 +10,54 @@ const styles = sxStyles({
       height: "100%",
    },
    mainContent: {
+      height: "100%",
+   },
+   mainContentWrapper: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      py: {
-         xs: 0,
-         md: 5,
-      },
-      lineHeight: "150%",
-      justifyContent: {
-         xs: "space-between",
-         md: "center",
-      },
-      minHeight: {
-         xs: 650,
-      },
    },
-   confettiGraphic: {
-      mx: "auto",
-      borderRadius: 8,
-   },
-   title: {
-      my: "auto",
+   contentWrapper: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
+      height: "100%",
       alignItems: "center",
+      width: "100%",
+   },
+   header: {
+      display: "flex",
+      flexDirection: "column",
+      textAlign: "center",
+      width: "100%",
+      alignItems: "center",
+   },
+   confettiGraphic: {
+      width: "100%",
+      textAlign: "center",
+      mb: 2,
+   },
+   title: {
+      textAlign: "center",
+      pt: { xs: 1, md: 0 },
+      mb: 3,
    },
    description: {
       textAlign: "center",
       fontSize: "1.142rem",
-      my: "auto",
       width: "100%",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
       maxWidth: 680,
+      gap: 1,
    },
    btn: {
       borderRadius: 8,
    },
    buttons: {
-      maxWidth: 400,
+      maxWidth: 300,
       width: "100%",
    },
 })
@@ -64,25 +69,29 @@ const RegisterSuccessViewSkeleton: FC = () => {
       <BaseDialogView
          sx={styles.fullHeight}
          mainContent={
-            <MainContent sx={styles.fullHeight} onBackPosition="top-right">
-               <Box sx={styles.mainContent}>
-                  <Skeleton
-                     sx={styles.confettiGraphic}
-                     variant="rectangular"
-                     width={100}
-                     height={100}
-                  />
-                  <Typography sx={styles.title} variant={"h2"}>
-                     <Skeleton width={300} />
-                     {isMobile ? <Skeleton width={300} /> : null}
-                  </Typography>
+            <MainContent
+               sx={[styles.fullHeight, styles.mainContentWrapper]}
+               onBackPosition="top-right"
+            >
+               <Box sx={styles.contentWrapper}>
+                  <Box id="header" sx={styles.header}>
+                     <Skeleton
+                        sx={styles.confettiGraphic}
+                        variant="rectangular"
+                        width={isMobile ? 144 : 192}
+                        height={isMobile ? 144 : 192}
+                     />
+                     <Typography sx={styles.title} variant={"h2"}>
+                        <Skeleton width={isMobile ? 300 : 600} />
+                     </Typography>
+                  </Box>
+
                   <Box component={Typography} sx={styles.description}>
-                     {Array.from({ length: isMobile ? 6 : 4 }).map(
+                     {Array.from({ length: isMobile ? 5 : 3 }).map(
                         (_, index) => (
                            <Skeleton width="100%" key={index} />
                         )
                      )}
-                     <Skeleton width="40%" />
                   </Box>
                   <Stack spacing={1} mt={4} sx={styles.buttons}>
                      <Skeleton

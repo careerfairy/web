@@ -8,7 +8,7 @@ import {
 import Stack from "@mui/material/Stack"
 import useInfiniteLivestreamQuestions from "../../../../../custom-hook/live-stream/useInfiniteLivestreamQuestions"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { Grid, Typography } from "@mui/material"
+import { CircularProgress, Grid, Typography } from "@mui/material"
 import ThumbUpIcon from "@mui/icons-material/ThumbUpOffAlt"
 import useLivestreamQuestionHandlers from "../../../../../custom-hook/live-stream/useLivestreamQuestionHandlers"
 import LoadingButton from "@mui/lab/LoadingButton"
@@ -18,6 +18,7 @@ import { alpha } from "@mui/material/styles"
 import Skeleton from "@mui/material/Skeleton"
 import CustomInfiniteScroll from "../../../../common/CustomInfiniteScroll"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import QuestionIcon from "components/views/common/icons/QuestionIcon"
 
 const styles = sxStyles({
    greyBorder: {
@@ -28,17 +29,11 @@ const styles = sxStyles({
       border: "1px solid",
       p: [1.5, 1.625],
       bgcolor: "background.paper",
+      height: "100%",
+      justifyContent: "space-between",
    },
    loader: {
       m: "auto",
-   },
-   questionsWrapper: {},
-   scrollWrapper: {
-      maxHeight: 400,
-      overflowY: "auto",
-   },
-   btn: {
-      textTransform: "none",
    },
    loadMoreButton: {
       fontSize: "1.071rem",
@@ -48,18 +43,72 @@ const styles = sxStyles({
    },
    upvoteButton: {
       textTransform: "none",
-      p: (theme) => `${theme.spacing(0.5)} ${theme.spacing(1)} !important`,
+      p: 0,
+      "&:hover": {
+         background: "transparent",
+      },
+      "& svg": {
+         width: "18px",
+         height: "18px",
+      },
+      "& span": {
+         mr: 0.8,
+      },
    },
    upvotedButton: {
       color: "primary.main",
    },
    nonUpvotedButton: {
-      color: "action.disabled",
+      color: "neutral.400",
    },
    date: {
       fontSize: "0.857rem",
       color: (theme) => `${alpha(theme.palette.text.secondary, 0.4)}`,
       fontWeight: 400,
+   },
+   buttonsWrapper: {
+      alignItems: "center",
+      justifyContent: "space-between",
+      display: "flex",
+   },
+   questionListTitle: {
+      fontWeight: 600,
+   },
+   noQuestionsContainer: {
+      backgroundColor: (theme) => theme.brand.white[200],
+      borderRadius: "8px",
+      border: "1px solid",
+      borderColor: (theme) => theme.brand.white[500],
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "16px",
+      textAlign: "center",
+      padding: "20px 12px",
+      flex: "1 1",
+      minHeight: { xs: "300px", md: "330px" },
+   },
+   questionIcon: {
+      width: "44px",
+      height: "44px",
+   },
+   askQuestionCopy: {
+      fontWeight: 600,
+      color: "neutral.800",
+   },
+   askQuestionCopy2: {
+      fontWeight: 400,
+      color: "neutral.700",
+   },
+   noQuestionsCopyContainer: {
+      maxWidth: "490px",
+      display: "flex",
+      flexDirection: "column",
+   },
+   questionsContainer: {
+      display: "flex",
+      flexDirection: "column",
    },
 })
 
@@ -115,73 +164,101 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
 
    const Content = useMemo(
       () => (
-         <Box>
-            <Grid sx={styles.questionsWrapper} container spacing={1.25}>
-               {userAddedQuestions?.length ? (
-                  <>
-                     {userAddedQuestions.map((question) => (
-                        <Grid key={question.id} item {...gridItemProps}>
-                           <Question
-                              livestream={livestream}
-                              question={question}
-                              handleClientToggleUpvoteQuestion={
-                                 handleClientToggleUpvoteQuestion
-                              }
-                           />
-                        </Grid>
-                     ))}
-                  </>
-               ) : null}
-               {questions
-                  .filter(
-                     (q) =>
-                        !userAddedQuestions?.some(
-                           (userQuestion) => userQuestion.id === q.id
+         <>
+            {questions?.length || userAddedQuestions?.length ? (
+               <Box sx={styles.questionsContainer} gap={1.5}>
+                  <Typography variant="brandedH5" sx={styles.questionListTitle}>
+                     {"Other users' questions"}
+                  </Typography>
+                  <Grid container rowSpacing={1.25} columnSpacing={3}>
+                     {userAddedQuestions?.length ? (
+                        <>
+                           {userAddedQuestions.map((question) => (
+                              <Grid key={question.id} item {...gridItemProps}>
+                                 <Question
+                                    livestream={livestream}
+                                    question={question}
+                                    handleClientToggleUpvoteQuestion={
+                                       handleClientToggleUpvoteQuestion
+                                    }
+                                 />
+                              </Grid>
+                           ))}
+                        </>
+                     ) : null}
+                     {questions
+                        .filter(
+                           (q) =>
+                              !userAddedQuestions?.some(
+                                 (userQuestion) => userQuestion.id === q.id
+                              )
                         )
-                  )
-                  .map((question) => (
-                     <Grid key={question.id} item {...gridItemProps}>
-                        <Question
-                           livestream={livestream}
-                           question={question}
-                           handleClientToggleUpvoteQuestion={
-                              handleClientToggleUpvoteQuestion
-                           }
-                        />
-                     </Grid>
-                  ))}
+                        .map((question) => (
+                           <Grid key={question.id} item {...gridItemProps}>
+                              <Question
+                                 livestream={livestream}
+                                 question={question}
+                                 handleClientToggleUpvoteQuestion={
+                                    handleClientToggleUpvoteQuestion
+                                 }
+                              />
+                           </Grid>
+                        ))}
 
-               {loading ? (
-                  <>
-                     <Grid item {...gridItemProps}>
-                        <QuestionSkeleton />
-                     </Grid>
-                     <Grid item {...gridItemProps}>
-                        <QuestionSkeleton />
-                     </Grid>
-                  </>
-               ) : null}
-               {!infiniteScroll && hasMore ? (
-                  <Grid item xs={12}>
-                     <LoadingButton
-                        sx={[
-                           styles.loadMoreButton,
-                           styles.btn,
-                           styles.greyBorder,
-                        ]}
-                        disabled={loading}
-                        onClick={getAll}
-                        fullWidth
-                        variant="outlined"
-                        color="grey"
-                        size="small"
-                     >
-                        Load all {count ?? ""} questions
-                     </LoadingButton>
+                     {loading ? (
+                        <>
+                           <Grid item {...gridItemProps}>
+                              <QuestionSkeleton />
+                           </Grid>
+                           <Grid item {...gridItemProps}>
+                              <QuestionSkeleton />
+                           </Grid>
+                        </>
+                     ) : null}
+                     {!infiniteScroll && hasMore ? (
+                        <Grid item xs={12}>
+                           <LoadingButton
+                              sx={[styles.loadMoreButton, styles.greyBorder]}
+                              disabled={loading}
+                              onClick={getAll}
+                              fullWidth
+                              variant="outlined"
+                              color="grey"
+                              size="small"
+                           >
+                              Load all {count ?? ""} questions
+                           </LoadingButton>
+                        </Grid>
+                     ) : null}
                   </Grid>
-               ) : null}
-            </Grid>
-         </Box>
+               </Box>
+            ) : loading ? (
+               <Box textAlign="center">
+                  <CircularProgress />
+               </Box>
+            ) : (
+               <Box sx={styles.noQuestionsContainer}>
+                  <QuestionIcon sx={styles.questionIcon} />
+                  <Box gap="8px" sx={styles.noQuestionsCopyContainer}>
+                     <Typography
+                        variant="brandedH5"
+                        sx={styles.askQuestionCopy}
+                     >
+                        Be the first one to ask {livestream.company} a question
+                     </Typography>
+                     <Typography
+                        variant="brandedBody"
+                        sx={styles.askQuestionCopy2}
+                     >
+                        Got a question? Get answers directly from{" "}
+                        {livestream.company}
+                        {"'s"} employees. The community can upvote the most
+                        valuable questions.
+                     </Typography>
+                  </Box>
+               </Box>
+            )}
+         </>
       ),
       [
          count,
@@ -238,26 +315,21 @@ const Question: FC<QuestionProps> = ({
    const hasUpvoted = hasUpvotedQuestion(question)
 
    return (
-      <Stack sx={[styles.questionItem, styles.greyBorder]} spacing={1}>
+      <Stack sx={[styles.questionItem, styles.greyBorder]} spacing={2.7}>
          <Typography>{question.title}</Typography>
-         <Stack
-            direction="row"
-            alignItems="end"
-            justifyContent="space-between"
-            spacing={1}
-         >
+         <Box sx={styles.buttonsWrapper}>
             <LoadingButton
                loading={isUpvoting}
                onClick={handleClickUpvote}
                disabled={question?.author === authenticatedUser?.email}
                size="small"
                startIcon={<ThumbUpIcon />}
+               disableRipple
                variant="text"
                color={hasUpvoted ? "primary" : "grey"}
                sx={[
                   hasUpvoted ? styles.upvotedButton : styles.nonUpvotedButton,
                   styles.upvoteButton,
-                  styles.btn,
                ]}
             >
                {`${question.votes || 0} likes`}
@@ -265,7 +337,7 @@ const Question: FC<QuestionProps> = ({
             <Typography sx={styles.date}>
                {DateUtil.getTimeAgo(question.timestamp?.toDate() ?? new Date())}
             </Typography>
-         </Stack>
+         </Box>
       </Stack>
    )
 }
@@ -287,7 +359,7 @@ const QuestionSkeleton: FC = () => {
                size="small"
                startIcon={<ThumbUpIcon />}
                variant="text"
-               sx={[styles.upvoteButton, styles.btn]}
+               sx={styles.upvoteButton}
             >
                <Skeleton width={40} />
             </LoadingButton>
@@ -305,7 +377,7 @@ export const QuestionsSkeleton: FC = () => {
          <SectionTitle>
             <Skeleton width={120} />
          </SectionTitle>
-         <Stack sx={styles.questionsWrapper} spacing={1.25}>
+         <Stack spacing={1.25}>
             <QuestionSkeleton />
             <QuestionSkeleton />
             <QuestionSkeleton />
