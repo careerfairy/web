@@ -57,7 +57,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
    autoPlaying,
    containerRef,
 }) => {
-   const hoverEnabled = autoPlaying !== undefined
+   // const autoPlayEnabled = autoPlaying !== undefined
 
    return (
       <Box
@@ -72,9 +72,9 @@ const SparkCarouselCardContainer: FC<Props> = ({
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
             playing={video.preview}
-            light={hoverEnabled ? false : !video.preview}
+            // light={autoPlayEnabled ? false : !video.preview}
             autoPlaying={autoPlaying}
-            muted={hoverEnabled ? true : undefined}
+            // muted={autoPlayEnabled ? true : undefined}
          />
       </Box>
    )
