@@ -51,3 +51,11 @@ export const useCurrentViewCount = () =>
       }
       return state.streamingApp.rtmSignalingState.viewCount
    })
+
+export const useIsConnectedOnDifferentBrowser = () =>
+   useAppSelector((state) => state.streamingApp.isLoggedInOnDifferentBrowser)
+
+export const useFailedToConnectToRTM = () =>
+   useAppSelector(
+      (state) => state.streamingApp.rtmSignalingState.failedToConnect
+   )

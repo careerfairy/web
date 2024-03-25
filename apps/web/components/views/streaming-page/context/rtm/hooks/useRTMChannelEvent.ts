@@ -22,6 +22,28 @@ export function useRTMChannelEvent(
 ): void
 
 /**
+ * Occurs when a user joins the channel.
+ * @event
+ * @param memberId The uid of the user joining the channel.
+ */
+export function useRTMChannelEvent(
+   track: Nullable<RtmChannel>,
+   event: "MemberJoined",
+   listener: Nullable<(memberId: string) => void>
+): void
+
+/**
+ * Occurs when a user leaves the channel.
+ * @event
+ * @param memberId The uid of the user leaving the channel.
+ */
+export function useRTMChannelEvent(
+   track: Nullable<RtmChannel>,
+   event: "MemberLeft",
+   listener: Nullable<(memberId: string) => void>
+): void
+
+/**
  * Occurs when the local user receives a channel message.
  * @event
  * @param message The received channel message object.
