@@ -12,6 +12,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { debounce } from "lodash"
 
 const cardPadding = 2
+export const AUTO_PLAY_TIME = 5000
 
 const styles = sxStyles({
    cardDetails: {
@@ -41,6 +42,7 @@ const SparkCarouselCard: FC<Props> = ({
    const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
 
+   // Set up intersection observer to handle auto-playing
    useEffect(() => {
       const currentContainerRef = containerRef.current
       let timeout
@@ -76,23 +78,26 @@ const SparkCarouselCard: FC<Props> = ({
       }
    }, [isMobile])
 
+   // Set up auto-playing timeout for mobile experience
    useEffect(() => {
       let timeout
 
-      if (autoPlaying) {
+      if (autoPlaying && isMobile) {
          timeout = setTimeout(() => {
             if (isLastPosition) {
+               // if it's the last spark on the carousel and already auto-played we should set the autoPlaying to false and do nothing
                setAutoPlaying(false)
             } else {
+               // After auto-play we should transition to the next spark
                onGoNext && onGoNext()
             }
-         }, 5000)
+         }, AUTO_PLAY_TIME)
       }
 
       return () => {
          clearTimeout(timeout)
       }
-   }, [autoPlaying, isLastPosition, onGoNext])
+   }, [autoPlaying, isLastPosition, isMobile, onGoNext])
 
    return (
       <SparkCarouselCardContainer
@@ -101,8 +106,8 @@ const SparkCarouselCard: FC<Props> = ({
             url: sparkPresenter.getTransformedVideoUrl(),
             preview: preview,
          }}
-         onMouseEnter={() => setAutoPlaying(true)}
-         onMouseLeave={() => setAutoPlaying(false)}
+         onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
+         onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
          autoPlaying={autoPlaying}
          containerRef={containerRef}
       >
