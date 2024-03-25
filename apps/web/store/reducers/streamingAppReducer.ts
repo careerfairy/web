@@ -188,20 +188,22 @@ const streamingAppSlice = createSlice({
       setNumberOfParticipants(state, action: PayloadAction<number>) {
          state.livestreamState.numberOfParticipants = action.payload
       },
-      setHasStarted(state, action: PayloadAction<boolean>) {
-         if (state.livestreamState.hasStarted !== action.payload) {
-            state.livestreamState.hasStarted = action.payload
-         }
-      },
       setStartsAt(state, action: PayloadAction<number | null>) {
          if (state.livestreamState.startsAt !== action.payload) {
             state.livestreamState.startsAt = action.payload
          }
       },
-      setStartedAt(state, action: PayloadAction<number | null>) {
-         if (state.livestreamState.startedAt !== action.payload) {
-            state.livestreamState.startedAt = action.payload
-         }
+      setStarted(
+         state,
+         action: PayloadAction<
+            Pick<
+               StreamingAppState["livestreamState"],
+               "startedAt" | "hasStarted"
+            >
+         >
+      ) {
+         state.livestreamState.startedAt = action.payload.startedAt
+         state.livestreamState.hasStarted = action.payload.hasStarted
       },
       setHasEnded(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.hasEnded !== action.payload) {
@@ -264,9 +266,8 @@ export const {
       setLivestreamMode,
       setScreenSharerId,
       setNumberOfParticipants,
-      setHasStarted,
+      setStarted,
       setStartsAt,
-      setStartedAt,
       setHasEnded,
       toggleSidePanel,
       closeSidePanel,
