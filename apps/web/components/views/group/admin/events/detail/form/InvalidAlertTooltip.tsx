@@ -9,11 +9,11 @@ import {
    tooltipClasses,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { FC, useMemo } from "react"
+import { FC } from "react"
 import { Info } from "react-feather"
-import { LivestreamFormValues } from "./types"
-import { useLivestreamFormValues } from "./useLivestreamFormValues"
 import { sxStyles } from "types/commonTypes"
+import { useLivestreamCreationContext } from "../LivestreamCreationContext"
+import { LivestreamFormValues } from "./types"
 
 const styles = sxStyles({
    okButton: {
@@ -36,12 +36,13 @@ export const InvalidAlertTooltipContent: FC<
    InvalidAlertTooltipContentProps
 > = ({ handleOkClick }) => {
    const isMobile = useIsMobile()
-   const { errors } = useLivestreamFormValues()
+   const { isGenralTabInvalid, isSpeakerTabInvalid } =
+      useLivestreamCreationContext()
 
-   const tabsWithErros = useMemo(
-      () => Object.keys(errors).map((key) => tabLabelsMap[key]),
-      [errors]
-   )
+   const tabsWithErros = [
+      isGenralTabInvalid && tabLabelsMap.general,
+      isSpeakerTabInvalid && tabLabelsMap.speakers,
+   ]
 
    return (
       <Stack padding="20px" spacing={2} width="100%">
