@@ -1,17 +1,13 @@
-import { Box, Button, ButtonGroup } from "@mui/material"
 import { useCurrentUID, useIsConnected } from "agora-rtc-react"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
 import { EmoteType } from "context/agora/RTMContext"
 import { agoraCredentials } from "data/agora/AgoraInstance"
-import { useSnackbar } from "notistack"
 import { ReactNode, useCallback, useEffect, useState } from "react"
+import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
-import {
-   AgoraRTMChannelProvider,
-   AgoraRTMClientProvider,
-   useRTMChannelEvent,
-} from "./rtm"
+import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
 import AgoraRTM, { RtmChannel, RtmClient } from "agora-rtm-sdk"
 
 type RTMSignalingProviderProps = {
@@ -19,19 +15,22 @@ type RTMSignalingProviderProps = {
 }
 
 type RTMState = {
-   channel: RtmChannel
-   client: RtmClient
+   client: RtmClient | null
+   channel: RtmChannel | null
 }
 
 export const RTMSignalingProvider = ({
    children,
 }: RTMSignalingProviderProps) => {
    const { livestreamId } = useStreamingContext()
-   const { enqueueSnackbar } = useSnackbar()
    const rtcIsConnected = useIsConnected()
    const uid = useCurrentUID()
+   const dispatch = useAppDispatch()
 
-   const [rtmState, setRtmState] = useState<RTMState | null>(null)
+   const [rtmState, setRtmState] = useState<RTMState>({
+      client: null,
+      channel: null,
+   })
 
    const { token } = useAgoraRtmToken(rtcIsConnected ? uid.toString() : null)
 
@@ -42,7 +41,9 @@ export const RTMSignalingProvider = ({
          const newChannel = newClient.createChannel(livestreamId)
          await newChannel.join()
          setRtmState({ channel: newChannel, client: newClient })
+         dispatch(setRTMFailedToConnect(false))
       } catch (e) {
+         dispatch(setRTMFailedToConnect(true))
          errorLogAndNotify(e, {
             message: "Failed to login to Agora RTM",
             metadata: {
@@ -51,16 +52,16 @@ export const RTMSignalingProvider = ({
             },
          })
       }
-   }, [livestreamId, token, uid])
+   }, [dispatch, livestreamId, token, uid])
 
    const logout = useCallback(async () => {
       try {
          setRtmState((prev) => {
-            prev?.channel.leave()
-            prev?.channel.removeAllListeners()
-            prev?.client.logout()
-            prev?.client.removeAllListeners()
-            return null
+            prev.channel?.leave()
+            prev.channel?.removeAllListeners()
+            prev.client?.logout()
+            prev.client?.removeAllListeners()
+            return { channel: null, client: null }
          })
       } catch (e) {
          errorLogAndNotify(e, {
@@ -80,66 +81,26 @@ export const RTMSignalingProvider = ({
    }, [login, logout, token])
 
    /**
-    * For demo purposes
+    * For demo purposes, will be moved to the emotes button
     */
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const sendEmote = async (emoteType: EmoteType) => {
       const message = rtmState?.client.createMessage({
          text: emoteType,
          messageType: "TEXT",
       })
       // 1. Optimistically dispatch emote locally to the UI
-      enqueueSnackbar(emoteType, {
-         variant: "success",
-         anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "right",
-         },
-         autoHideDuration: 2000,
-      })
+
       // 2. Emit the emote event into the signaling API
       await rtmState?.channel.sendMessage(message)
 
       // 3. Save the emote document in firestore
    }
 
-   /**
-    * For demo purposes
-    */
-   useRTMChannelEvent(
-      rtmState?.channel,
-      "ChannelMessage",
-      (message, memberId) => {
-         enqueueSnackbar(`${message.text} - ${memberId}`, {
-            variant: "success",
-            anchorOrigin: {
-               vertical: "bottom",
-               horizontal: "right",
-            },
-            autoHideDuration: 2000,
-         })
-      }
-   )
-
    return (
-      <AgoraRTMClientProvider client={rtmState?.client}>
-         <AgoraRTMChannelProvider channel={rtmState?.channel}>
+      <AgoraRTMClientProvider client={rtmState.client}>
+         <AgoraRTMChannelProvider channel={rtmState.channel}>
             {children}
-            <Box position="absolute" p={2} bottom={0} left={0}>
-               <ButtonGroup>
-                  <Button
-                     variant="contained"
-                     onClick={() => sendEmote("clapping")}
-                  >
-                     Clap
-                  </Button>
-                  <Button
-                     variant="contained"
-                     onClick={() => sendEmote("heart")}
-                  >
-                     Heart
-                  </Button>
-               </ButtonGroup>
-            </Box>
          </AgoraRTMChannelProvider>
       </AgoraRTMClientProvider>
    )

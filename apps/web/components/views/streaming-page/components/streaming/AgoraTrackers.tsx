@@ -1,11 +1,27 @@
 import AgoraRTC, { useClientEvent, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useEffect } from "react"
-import { setAudioLevels } from "store/reducers/streamingAppReducer"
+import {
+   setAudioLevels,
+   setRTMConnectionState,
+   setViewCount,
+} from "store/reducers/streamingAppReducer"
+import {
+   useRTMChannel,
+   useRTMChannelEvent,
+   useRTMClient,
+   useRTMClientEvent,
+} from "../../context/rtm"
+import { useSnackbar } from "notistack"
 
 export const AgoraTrackers = () => {
-   const client = useRTCClient()
+   const rtcClient = useRTCClient()
+
+   const rtmChannel = useRTMChannel()
+   const rtmClient = useRTMClient()
+
    const dispatch = useAppDispatch()
+   const { enqueueSnackbar } = useSnackbar()
 
    /**
     * A hook that tracks and dispatches the audio levels of users in a streaming session.
@@ -14,7 +30,7 @@ export const AgoraTrackers = () => {
     * which provides the audio levels of users. These levels are then dispatched to the Redux store
     * using the `setAudioLevels` action.
     */
-   useClientEvent(client, "volume-indicator", (users) => {
+   useClientEvent(rtcClient, "volume-indicator", (users) => {
       dispatch(setAudioLevels(users))
    })
 
@@ -23,7 +39,25 @@ export const AgoraTrackers = () => {
          // TODO: Handle autoplay failure
          // ticket: https://linear.app/careerfairy/issue/CF-816/handle-videoaudio-track-autoplay-faliure
       }
-   }, [client])
+   }, [rtcClient])
+
+   useRTMChannelEvent(rtmChannel, "ChannelMessage", (message, memberId) => {
+      enqueueSnackbar(`Emote sent by ${memberId}: ${message.text}`, {
+         variant: "success",
+      })
+   })
+
+   useRTMChannelEvent(rtmChannel, "MemberCountUpdated", (newCount) => {
+      dispatch(setViewCount(newCount))
+   })
+
+   useRTMClientEvent(
+      rtmClient,
+      "ConnectionStateChanged",
+      (newState, reason) => {
+         dispatch(setRTMConnectionState({ state: newState, reason }))
+      }
+   )
 
    return null
 }
