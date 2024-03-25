@@ -32,10 +32,11 @@ const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
       GroupPlanTypes.Premium,
    ])
 
-   const disableUploadSparks =
-      !planStatus.valid ||
-      publicSparks.length >=
-         PLAN_CONSTANTS[group.plan.type].sparks.MAX_PUBLIC_SPARKS
+   const maxSparksReached = group?.plan
+      ? publicSparks.length >=
+        PLAN_CONSTANTS[group.plan.type].sparks.MAX_PUBLIC_SPARKS
+      : false
+   const disableUploadSparks = !planStatus.valid || maxSparksReached
    const handleOpen = useCallback(() => {
       dispatch(openSparkDialog(null))
    }, [dispatch])
