@@ -69,9 +69,8 @@ export const LivestreamCreationContextProvider: FC<
 
    const isGenralTabInvalid =
       !livestreamFormGeneralTabSchema.isValidSync(general)
-   const isSpeakerTabInvalid = !livestreamFormSpeakersTabSchema.isValidSync(
-      speakers.values
-   )
+   const isSpeakerTabInvalid =
+      !livestreamFormSpeakersTabSchema.isValidSync(speakers)
    const formHasCriticalValidationErrors =
       isGenralTabInvalid || isSpeakerTabInvalid
 
