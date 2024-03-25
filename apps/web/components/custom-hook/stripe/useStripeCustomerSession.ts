@@ -26,7 +26,7 @@ const swrOptions: SWRConfiguration = {
 type Result = {
    customerSessionSecret: string
 }
-const CUSTOMER_ID_PREFIX = "CF_Group_"
+const CUSTOMER_ID_PREFIX = "Group_"
 /**
  * Creates a session based on the given details, creates or updates an existing Stripe customer
  * with the additional details.
