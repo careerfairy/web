@@ -15,6 +15,10 @@ import {
    useState,
 } from "react"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
+import {
+   livestreamFormGeneralTabSchema,
+   livestreamFormSpeakersTabSchema,
+} from "./form/validationSchemas"
 
 type LivestreamCreationContextType = {
    tabToNavigateTo: TAB_VALUES
@@ -48,7 +52,10 @@ type LivestreamCreationContextProviderType = {
 export const LivestreamCreationContextProvider: FC<
    LivestreamCreationContextProviderType
 > = ({ children }) => {
-   const { errors } = useLivestreamFormValues()
+   const {
+      values: { general, speakers },
+      errors,
+   } = useLivestreamFormValues()
    const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
    const [alertState, setAlertState] = useState(undefined)
    const [isNavigatingForward, setIsNavigatingForward] = useState(true)
@@ -69,15 +76,26 @@ export const LivestreamCreationContextProvider: FC<
       [alertState, errors.general, errors.speakers]
    )
 
-   const formHasCriticalValidationErrors = Boolean(
-      errors.general || errors.speakers
+   const formHasCriticalValidationErrors = useMemo(() => {
+      const isGenralTabValid =
+         livestreamFormGeneralTabSchema.validateSync(general)
+      const isSpeakerTabValid = livestreamFormSpeakersTabSchema.validateSync(
+         speakers.values
+      )
+      return !isGenralTabValid || !isSpeakerTabValid
+   }, [general, speakers])
+
+   const shouldShowAlertIndicator = useMemo(
+      () => alertState !== undefined && formHasCriticalValidationErrors,
+      [alertState, formHasCriticalValidationErrors]
    )
 
-   const shouldShowAlertIndicator =
-      alertState !== undefined && formHasCriticalValidationErrors
-   const shouldShowAlertDialog =
-      (alertState === true || alertState == undefined) &&
-      formHasCriticalValidationErrors
+   const shouldShowAlertDialog = useMemo(
+      () =>
+         (alertState === true || alertState == undefined) &&
+         formHasCriticalValidationErrors,
+      [alertState, formHasCriticalValidationErrors]
+   )
 
    const navigateWithValidationCheck = useCallback(
       (newTabValue) => {
