@@ -70,11 +70,11 @@ export const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: true,
-      name: "General analytics",
+      name: "Up to 4 featured employees",
    },
    {
       enabled: true,
-      name: "Up to 4 featured employees",
+      name: "General analytics",
    },
    {
       enabled: false,

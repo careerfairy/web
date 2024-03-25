@@ -109,7 +109,7 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
          // Empty for now
       },
    },
-   advanced: {
+   tier2: {
       name: "Advanced",
       description: "Scale up your employer brand narrative",
       stripe: {
@@ -136,7 +136,7 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
          // Empty for now
       },
    },
-   premium: {
+   tier3: {
       name: "Premium",
       description:
          "Gain unparalleled insights into your employer brand perception",
