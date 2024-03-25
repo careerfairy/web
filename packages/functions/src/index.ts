@@ -70,7 +70,7 @@ exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
 exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
-exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
+exports.fetchAgoraRtmToken_v2 = agora.fetchAgoraRtmToken
 
 // Backup
 exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
