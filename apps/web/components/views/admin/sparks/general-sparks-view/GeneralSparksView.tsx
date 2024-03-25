@@ -103,19 +103,23 @@ const GeneralSparksView: FC = () => {
                   </Typography>
                }
                description={
-                  <Stack direction={"column"} spacing={1}>
-                     <StatusDescription
-                        showSx={styles.showMoreWarning}
-                        sx={styles.bannerDescriptionWarning}
-                        description={BANNER_DESCRIPTION_PART_1}
-                     />
+                  <StatusDescriptionFull
+                     showSx={styles.showMoreWarning}
+                     sx={styles.bannerDescriptionWarning}
+                  />
+                  // <Stack direction={"column"} spacing={1}>
+                  //    <StatusDescription
+                  //       showSx={styles.showMoreWarning}
+                  //       sx={styles.bannerDescriptionWarning}
+                  //       description={BANNER_DESCRIPTION_PART_1}
+                  //    />
 
-                     <StatusDescription
-                        showSx={styles.showMoreWarning}
-                        sx={styles.bannerDescriptionWarning}
-                        description={BANNER_DESCRIPTION_PART_2}
-                     />
-                  </Stack>
+                  //    <StatusDescription
+                  //       showSx={styles.showMoreWarning}
+                  //       sx={styles.bannerDescriptionWarning}
+                  //       description={BANNER_DESCRIPTION_PART_2}
+                  //    />
+                  // </Stack>
                }
                show={isTrial ? planDays < 1 : null}
             />
@@ -209,6 +213,55 @@ const StatusDescription = ({
                short={shortDescription}
             />
          </ConditionalWrapper>
+      </Box>
+   )
+}
+
+type StatusDescriptionFullProps = {
+   sx: SxProps
+   showSx?: SxProps
+}
+const StatusDescriptionFull = ({ sx, showSx }: StatusDescriptionFullProps) => {
+   const [showingMore, setShowingMore] = useState(true)
+   const isMobile = useIsMobile()
+   return (
+      <Box sx={sx}>
+         <Stack>
+            <Box>
+               {BANNER_DESCRIPTION_PART_1}
+               {!showingMore ? "..." : ""}
+               <ConditionalWrapper condition={showingMore || !isMobile}>
+                  <Box mt={4} />
+                  {BANNER_DESCRIPTION_PART_2}
+               </ConditionalWrapper>
+            </Box>
+            <Box
+               onClick={() => setShowingMore(!showingMore)}
+               display={"flex"}
+               sx={combineStyles(styles.showMoreWrapper, showSx)}
+            >
+               <Box>
+                  <ConditionalWrapper condition={isMobile}>
+                     <ConditionalWrapper
+                        fallback="Show More"
+                        condition={showingMore}
+                     >
+                        Show Less
+                     </ConditionalWrapper>
+                  </ConditionalWrapper>
+               </Box>
+               <Box>
+                  <ConditionalWrapper condition={isMobile}>
+                     <ConditionalWrapper
+                        condition={showingMore}
+                        fallback={<ChevronDown />}
+                     >
+                        <ChevronUp />
+                     </ConditionalWrapper>
+                  </ConditionalWrapper>
+               </Box>
+            </Box>
+         </Stack>
       </Box>
    )
 }
