@@ -16,6 +16,8 @@ import {
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import {
    sidePanelSelector,
+   useHasEnded,
+   useHasStarted,
    useIsConnectedOnDifferentBrowser,
 } from "store/selectors/streamingAppSelectors"
 
@@ -54,6 +56,8 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 }) => {
    const { query } = useRouter()
    const [isReady, setIsReady] = useState(false)
+   const hasStarted = useHasStarted()
+   const hasEnded = useHasEnded()
 
    const hostAuthToken = query.token?.toString() || ""
 
@@ -83,6 +87,8 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
+   const viewerCanJoin = !isHost && !hasEnded && hasStarted
+
    const { isLoading } = useJoin(
       {
          appid: agoraCredentials.appID,
@@ -90,8 +96,9 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          token: response.token,
          uid: agoraUserId,
       },
-      // Join channel if not logged in on another browser and token is available
-      !isLoggedInOnDifferentBrowser &&
+      (isHost || viewerCanJoin) &&
+         // Join channel if not logged in on another browser and token is available
+         !isLoggedInOnDifferentBrowser &&
          !response.isLoading &&
          Boolean(response.token)
    )

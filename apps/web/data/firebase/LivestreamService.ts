@@ -472,28 +472,37 @@ export class LivestreamService {
       shouldStart: boolean
    ) {
       const livestreamRef = this.getLivestreamRef(livestreamId)
-      if (shouldStart) {
-         return runTransaction(FirestoreInstance, async (transaction) => {
-            const livestreamDoc = await transaction.get(livestreamRef)
-            if (!livestreamDoc.exists()) {
-               throw "Document does not exist!"
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const livestreamDoc = await transaction.get(livestreamRef)
+         if (!livestreamDoc.exists()) {
+            throw "Document does not exist!"
+         }
+         const data = livestreamDoc.data()
+         if (shouldStart) {
+            const updateData: UpdateData<LivestreamEvent> = {
+               hasStarted: true,
+               hasEnded: false,
             }
-            const data = livestreamDoc.data()
-            if (data.hasStarted) {
-               // If the stream has already started, we don't want to restart it and reset the start time
-               return
+
+            if (!data.hasStarted) {
+               // Only update the startedAt field if the stream wasn't started before
+               updateData.startedAt = Timestamp.now()
             }
+
             transaction.update(livestreamRef, {
                hasStarted: true,
                hasEnded: false,
                startedAt: Timestamp.now(),
             })
-         })
-      } else {
-         return this.updateLivestream(livestreamId, {
-            hasEnded: true,
-         })
-      }
+         } else {
+            // should end
+
+            transaction.update(livestreamRef, {
+               hasEnded: true,
+               hasStarted: false,
+            })
+         }
+      })
    }
 }
 

@@ -63,7 +63,13 @@ export interface StreamingAppState {
       numberOfParticipants: number
       startsAt: number | null
       startedAt: number | null
-      hasStarted: boolean
+      /**
+       * Indicates the streaming state:
+       * - `undefined`: The stream has never been started.
+       * - `false`: The stream has ended.
+       * - `true`: The stream was restarted.
+       */
+      hasStarted: boolean | undefined
       hasEnded: boolean
    }
    rtmSignalingState: {
@@ -72,14 +78,14 @@ export interface StreamingAppState {
       connectionState: {
          state: RtmStatusCode.ConnectionState
          reason: RtmStatusCode.ConnectionChangeReason
-      }
+      } | null
    }
    rtcState: {
-      connectionState?: {
+      connectionState: {
          currentState: ConnectionState
          prevState: ConnectionState
          reason: ConnectionDisconnectedReason
-      }
+      } | null
    }
    isLoggedInOnDifferentBrowser: boolean
 }
@@ -225,10 +231,12 @@ const streamingAppSlice = createSlice({
          >
       ) {
          state.rtmSignalingState.connectionState = action.payload
-         const { reason, state: rtmState } = action.payload
+         if (action.payload) {
+            const { reason, state: rtmState } = action.payload
 
-         if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
 
@@ -240,10 +248,12 @@ const streamingAppSlice = createSlice({
          action: PayloadAction<StreamingAppState["rtcState"]["connectionState"]>
       ) {
          state.rtcState.connectionState = action.payload
-         const { reason } = action.payload
+         if (action.payload) {
+            const { reason } = action.payload
 
-         if (reason === "UID_BANNED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "UID_BANNED") {
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
    },
