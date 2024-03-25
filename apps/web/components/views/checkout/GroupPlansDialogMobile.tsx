@@ -7,15 +7,10 @@ import {
    IconButton,
    Typography,
    TypographyProps,
-   Dialog,
-   Button,
-   Stack,
 } from "@mui/material"
-import SteppedDialog, {
-   useStepper,
-} from "components/views/stepped-dialog/SteppedDialog"
+import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
 import dynamic from "next/dynamic"
-import { FC, FormEvent, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { GroupPlanType } from "@careerfairy/shared-lib/groups"
@@ -24,20 +19,9 @@ import {
    setPlan as setPlanAction,
    setSecret as setClientSecretAction,
 } from "store/reducers/groupPlanReducer"
-import {
-   clientSecret,
-   groupPlansDialogInitialStepSelector,
-   plansDialogOpenSelector,
-   selectedPlanSelector,
-} from "store/selectors/groupSelectors"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { plansDialogOpenSelector } from "store/selectors/groupSelectors"
 import BrandedSwipableDrawer from "../common/inputs/BrandedSwipableDrawer"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import SelectGroupPlanMobileView from "./views/SelectGroupPlanMobileView"
-import GroupPlanCheckoutMobileView from "./views/GroupPlanCheckoutMobileView"
-import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useAuth } from "HOCs/AuthProvider"
+import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -55,10 +39,6 @@ const styles = sxStyles({
          xs: "100%",
          md: "auto",
       },
-   },
-   mobileWrapper: {
-      px: "15px",
-      // pb: "390px"
    },
    title: {
       color: (theme) => theme.palette.neutral[800],
@@ -112,26 +92,6 @@ const styles = sxStyles({
       px: 4,
       py: 3,
    },
-   checkoutButton: {
-      zIndex: 10,
-      mt: 2,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.secondary.dark,
-      },
-      width: "276px",
-      color: (theme) => theme.brand.white[100],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "24px",
-   },
-   cancelButton: {
-      color: (theme) => theme.palette.black[700],
-      zIndex: 10,
-   },
    fixedBottomContent: {
       position: "fixed",
       bottom: 0,
@@ -161,7 +121,7 @@ const styles = sxStyles({
       position: "absolute",
       top: 0,
       right: 0,
-      zIndex: 2,
+      zIndex: 1,
       pt: {
          xs: 2.5,
          [mobileBreakpoint]: 2.125,
@@ -170,27 +130,6 @@ const styles = sxStyles({
          xs: 2,
          [mobileBreakpoint]: 2.5,
       },
-      color: "text.primary",
-      "& svg": {
-         width: 32,
-         height: 32,
-         color: "text.primary",
-      },
-   },
-   footer: {
-      // position: "absolute",
-      // height: "100%",
-      // width: "100%",
-      // zIndex: 1,
-      pt: {
-         xs: 2.5,
-         [mobileBreakpoint]: 2.125,
-      },
-      pr: {
-         xs: 2,
-         [mobileBreakpoint]: 2.5,
-      },
-      // mb: 5,
       color: "text.primary",
       "& svg": {
          width: 32,
@@ -275,17 +214,8 @@ export const useSparksPlansForm = () => {
    ])
 }
 
-const GroupPlansDialog = () => {
-   const initialStepKey = useSelector(groupPlansDialogInitialStepSelector)
-   const generatedClientSecret = useSelector(clientSecret)
+const GroupPlansDialogMobile = () => {
    const open = useSelector(plansDialogOpenSelector)
-   const isMobile = useIsMobile()
-   const selectedPlan = useSelector(selectedPlanSelector)
-   const { group } = useGroup()
-   const { authenticatedUser } = useAuth()
-
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
 
    const dispatch = useDispatch()
 
@@ -300,98 +230,16 @@ const GroupPlansDialog = () => {
       [dispatch]
    )
 
-   const { customerSessionSecret: customerSessionSecret } =
-      useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
-
-   const disabled = !selectedPlan
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-      setClientSecret(customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-   }
-
-   const initialStep = useMemo(() => {
-      if (initialStepKey) {
-         const index = views.findIndex((view) => view.key === initialStepKey)
-         if (index !== -1) {
-            return index
-         }
-      }
-      return 0
-   }, [initialStepKey])
-
-   const mobileView = (
-      <BrandedSwipableDrawer
-         sx={{ maxHeight: "90%" }}
-         open={open}
-         onOpen={() => {}}
-         onClose={() => handleCloseGroupPlansDialog()}
-      >
-         <Box sx={styles.closeBtn}>
-            <IconButton onClick={() => handleCloseGroupPlansDialog()}>
-               <CloseIcon />
-            </IconButton>
-         </Box>
-         <Stack
-            direction={"column"}
-            justifyContent={"space-around"}
-            sx={styles.mobileWrapper}
-         >
-            <ConditionalWrapper
-               condition={Boolean(generatedClientSecret)}
-               fallback={<SelectGroupPlanMobileView />}
-            >
-               <GroupPlanCheckoutMobileView />
-            </ConditionalWrapper>
-
-            <ConditionalWrapper condition={Boolean(!generatedClientSecret)}>
-               <Box sx={styles.footer} alignContent={"end"}>
-                  <Stack
-                     direction={"column"}
-                     spacing={2}
-                     alignContent={"center"}
-                     justifyItems={"center"}
-                     alignItems={"center"}
-                     width={"100%"}
-                  >
-                     <Box>
-                        <Button
-                           disabled={disabled}
-                           color={"secondary"}
-                           onClick={redirectToCheckout}
-                           sx={styles.checkoutButton}
-                        >
-                           Select plan
-                        </Button>
-                     </Box>
-                     <Box>
-                        <Button
-                           color={"grey"}
-                           onClick={() => handleCloseGroupPlansDialog()}
-                           sx={styles.cancelButton}
-                        >
-                           Cancel
-                        </Button>
-                     </Box>
-                  </Stack>
-               </Box>
-            </ConditionalWrapper>
-         </Stack>
-      </BrandedSwipableDrawer>
-   )
    return (
       <>
-         <ConditionalWrapper condition={!isMobile} fallback={mobileView}>
-            <SteppedDialog
-               sx={styles.steppedDialog}
-               key={open ? "open" : "closed"}
-               bgcolor="#FCFCFC"
-               handleClose={() => handleCloseGroupPlansDialog()}
-               open={open}
-               views={views}
-               initialStep={initialStep}
-            />
-         </ConditionalWrapper>
+         <BrandedSwipableDrawer
+            open={open}
+            onOpen={() => {}}
+            onClose={() => handleCloseGroupPlansDialog()}
+         >
+            <h1>Test</h1>
+            <SelectGroupPlanView />
+         </BrandedSwipableDrawer>
       </>
    )
 }
@@ -422,16 +270,15 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    children,
 }) => {
    const { handleClose } = useSparksPlansForm()
-   const isMobile = useIsMobile("md")
+
    const open = useSelector(plansDialogOpenSelector)
 
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
-         <Dialog
-            sx={styles.container}
+         <BrandedSwipableDrawer
             open={open}
-            maxWidth={false}
-            PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+            onOpen={() => {}}
+            onClose={() => handleClose()}
          >
             {children}
             {hideCloseButton ? null : (
@@ -441,7 +288,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
                   </IconButton>
                </Box>
             )}
-         </Dialog>
+         </BrandedSwipableDrawer>
       </Box>
    )
 }
@@ -497,11 +344,11 @@ function setStateAndNavigate(
    }, 0)
 }
 
-GroupPlansDialog.Title = Title
-GroupPlansDialog.Subtitle = Subtitle
-GroupPlansDialog.Container = Container
-GroupPlansDialog.Button = CustomButton
-GroupPlansDialog.ActionsOffset = ActionsOffset
-GroupPlansDialog.Content = Content
+GroupPlansDialogMobile.Title = Title
+GroupPlansDialogMobile.Subtitle = Subtitle
+GroupPlansDialogMobile.Container = Container
+GroupPlansDialogMobile.Button = CustomButton
+GroupPlansDialogMobile.ActionsOffset = ActionsOffset
+GroupPlansDialogMobile.Content = Content
 
-export default GroupPlansDialog
+export default GroupPlansDialogMobile
