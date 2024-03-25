@@ -48,18 +48,21 @@ export const Timer = () => {
             setElapsedTime(DateUtil.formatElapsedTime(startedAt))
          }, 1000)
 
-         return () => clearInterval(interval)
+         return () => {
+            setElapsedTime(null)
+            return clearInterval(interval)
+         }
       }
    }, [startedAt, hasStarted])
 
-   const timeHasHours = elapsedTime.match(/:/g)?.length === 2
+   const timeHasHours = elapsedTime?.match(/:/g)?.length === 2
 
    if (!hasStarted) return null
 
    return (
       <Stack direction="row" spacing={0.375} sx={styles.root}>
          <Box sx={styles.whiteCircle} />
-         {startedAt ? (
+         {startedAt && elapsedTime ? (
             <Typography
                sx={timeHasHours ? styles.timeTextWide : styles.timeText}
                variant="xsmall"
