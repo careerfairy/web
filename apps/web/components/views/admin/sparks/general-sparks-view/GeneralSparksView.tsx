@@ -13,8 +13,10 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
 const BANNER_TITLE = "Reignite your Sparks and keep the momentum going!"
-const BANNER_DESCRIPTION_FULL =
-   "Your Sparks trial has ended, and they're no longer visible to the CareerFairy talent community. But the magic doesn't have to stop! Upgrade now and reignite the spark to continue engaging all year round with your target audience, access in-depth analytics and showcase your job opportunities in an innovative way. Don't let the momentum you built fade, upgrade now and reignite the spark!"
+const BANNER_DESCRIPTION_PART_1 =
+   "Your Sparks trial has ended, and your Sparks are no longer visible on CareerFairy."
+const BANNER_DESCRIPTION_PART_2 =
+   "But the magic doesn't have to stop! Upgrade now and reignite the spark to continue engaging all year round with your target audience, access in-depth analytics and showcase your job opportunities in an innovative way. Don't let the momentum you built fade, upgrade now and reignite the spark!"
 
 const BANNER_DESCRIPTION_DAY_7 =
    "Enhance the positive momentum your Sparks trial has generated. Continue with Sparks to engage your target audience all year around, access in-depth analytics and promote your job opportunities in a new innovative format."
@@ -101,11 +103,19 @@ const GeneralSparksView: FC = () => {
                   </Typography>
                }
                description={
-                  <StatusDescription
-                     showSx={styles.showMoreWarning}
-                     sx={styles.bannerDescriptionWarning}
-                     description={BANNER_DESCRIPTION_FULL}
-                  />
+                  <Stack direction={"column"} spacing={1}>
+                     <StatusDescription
+                        showSx={styles.showMoreWarning}
+                        sx={styles.bannerDescriptionWarning}
+                        description={BANNER_DESCRIPTION_PART_1}
+                     />
+
+                     <StatusDescription
+                        showSx={styles.showMoreWarning}
+                        sx={styles.bannerDescriptionWarning}
+                        description={BANNER_DESCRIPTION_PART_2}
+                     />
+                  </Stack>
                }
                show={isTrial ? planDays < 1 : null}
             />

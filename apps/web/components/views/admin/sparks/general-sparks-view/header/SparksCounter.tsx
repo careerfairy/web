@@ -10,6 +10,8 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    tooltip: {
@@ -55,12 +57,19 @@ const SparksCounter: FC<Props> = ({
       isCriticalState,
       maxPublicSparks
    )
+   const unlimited =
+      maxPublicSparks ==
+      PLAN_CONSTANTS[GroupPlanTypes.Tier3].sparks.MAX_PUBLIC_SPARKS
+   const maxSparks = unlimited ? 100 : maxPublicSparks
+   const slots = unlimited
+      ? "Unlimited "
+      : `${publicSparks.length}/${maxPublicSparks}`
 
    return (
       <BrandedTooltip title={tooltipMessage} sx={styles.tooltip}>
          <Box alignSelf={"center"}>
             <Typography variant={"body1"} sx={styles.progressCount}>
-               {publicSparks.length}/{maxPublicSparks} Spark slots
+               {slots} Spark slots
             </Typography>
 
             <LinearProgress
@@ -69,7 +78,7 @@ const SparksCounter: FC<Props> = ({
                variant="determinate"
                value={
                   publicSparks.length
-                     ? (publicSparks.length / maxPublicSparks) * 100
+                     ? (publicSparks.length / maxSparks) * 100
                      : 0
                }
             />
