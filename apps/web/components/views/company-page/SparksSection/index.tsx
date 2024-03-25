@@ -53,9 +53,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
             }
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
-            styling={{
-               sparksContentPaddingLeft: 0,
-            }}
+            sx={{ pl: 0 }}
          />
       </Box>
    ) : null

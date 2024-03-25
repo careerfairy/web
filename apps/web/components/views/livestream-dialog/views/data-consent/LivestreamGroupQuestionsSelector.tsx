@@ -1,13 +1,5 @@
-import React, { Fragment, useCallback, useMemo } from "react"
-import {
-   FormControl,
-   FormHelperText,
-   InputLabel,
-   MenuItem,
-   Select,
-   SelectChangeEvent,
-   styled,
-} from "@mui/material"
+import React, { Fragment, useCallback, useMemo, useState } from "react"
+import { FormControl, FormHelperText } from "@mui/material"
 import {
    LivestreamGroupQuestion,
    LivestreamGroupQuestions,
@@ -21,9 +13,9 @@ import {
    FormikHelpers,
    FormikTouched,
 } from "formik"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../types/commonTypes"
-import ExpandMore from "@mui/icons-material/ExpandMore"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import BaseStyles from "components/views/admin/company-information/BaseStyles"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions
@@ -45,7 +37,7 @@ const LivestreamGroupQuestionsSelector = ({
 
    return (
       <Fragment>
-         {questions.map((question) => {
+         {questions.map((question: LivestreamGroupQuestion) => {
             const errorText =
                errors[groupQuestions.groupId]?.questions?.[question.id]
                   ?.selectedOptionId
@@ -99,6 +91,9 @@ const styles = sxStyles({
       ["& legend"]: {
          marginLeft: "15px",
       },
+      ["& .Mui-error"]: {
+         pl: 0,
+      },
    },
    menuItem: {
       paddingLeft: "40px",
@@ -111,71 +106,51 @@ const styles = sxStyles({
    errorText: {
       paddingLeft: "30px",
    },
-})
-
-const StyledSelect = styled(Select)(() => ({
-   fontSize: "16px !important",
-   "& .MuiSelect-select": {
-      paddingLeft: "40px",
-      boxShadow: "none",
+   question: {
+      ["label"]: {
+         left: "0 !important",
+         paddingLeft: "0 !important",
+      },
    },
-})) as unknown as typeof Select
+})
 
 const QuestionSelect = ({
    inputName,
    question,
    setFieldValue,
-   handleBlur,
    errorText,
 }: QuestionSelectProps) => {
-   const isMobile = useIsMobile()
+   const [selected, setSelected] = useState(null)
 
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
 
-   const handleChange = useCallback(
-      (event: SelectChangeEvent) => {
-         setFieldValue(inputName, event.target.value)
+   const handleQuestionChange = useCallback(
+      (_, value) => {
+         setFieldValue(inputName, value?.id)
+         setSelected(value)
       },
       [inputName, setFieldValue]
    )
-
    return (
       <FormControl fullWidth error={!!errorText} sx={styles.formControl}>
-         <InputLabel sx={styles.label} id={`${inputName}-label`}>
-            {question.name}
-         </InputLabel>
-
-         <StyledSelect
-            sx={styles.select}
-            id={`${inputName}`}
-            name={inputName}
-            label={question.name}
-            onBlur={handleBlur}
-            value={question.selectedOptionId || ""}
-            onChange={handleChange}
-            native={isMobile}
-            variant="outlined"
-            IconComponent={ExpandMore}
-         >
-            {isMobile ? <option value="" disabled></option> : null}
-            {options.map((option) =>
-               isMobile ? (
-                  <option key={option.id} value={option.id}>
-                     {option.name}
-                  </option>
-               ) : (
-                  <MenuItem
-                     sx={styles.menuItem}
-                     key={option.id}
-                     value={option.id}
-                  >
-                     {option.name}
-                  </MenuItem>
-               )
-            )}
-         </StyledSelect>
+         <BrandedAutocomplete
+            key={inputName}
+            id={inputName}
+            options={options}
+            value={selected}
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            textFieldProps={{
+               name: inputName,
+               label: question.name,
+               fullWidth: true,
+               placeholder: "Select an option",
+            }}
+            getOptionLabel={(option) => option.name}
+            onChange={handleQuestionChange}
+            sx={[BaseStyles.chipInput, styles.question]}
+         />
          <FormHelperText sx={styles.errorText}>{errorText}</FormHelperText>
       </FormControl>
    )

@@ -1,7 +1,7 @@
 import { FC, forwardRef, ReactNode } from "react"
 import Stack from "@mui/material/Stack"
 import { combineStyles, sxStyles } from "../../../types/commonTypes"
-import { Box, Container, IconButton } from "@mui/material"
+import { Box, Container, IconButton, Typography } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import Image from "next/legacy/image"
@@ -32,6 +32,7 @@ const styles = sxStyles({
    },
    closeIcon: {
       fontSize: "24px",
+      color: "rgba(0, 0, 0, 1)",
    },
    heroContent: {
       color: "white",
@@ -89,6 +90,14 @@ const styles = sxStyles({
       bgcolor: "background.paper",
       display: "flex",
    },
+   noDivider: {
+      borderTop: "none",
+   },
+   heroTitle: {
+      textAlign: "center",
+      fontWeight: 600,
+      maxWidth: 655,
+   },
 })
 
 type Props = FC<{
@@ -101,6 +110,7 @@ type Props = FC<{
    handleClose?: () => void
    handleBack?: () => void
    sx?: SxProps<DefaultTheme>
+   hideBottomDivider?: boolean
 }>
 
 const BaseDialogView: Props = ({
@@ -110,6 +120,7 @@ const BaseDialogView: Props = ({
    handleClose,
    handleBack,
    sx,
+   hideBottomDivider,
 }) => {
    const [ref, { height }] = useMeasure()
 
@@ -135,7 +146,10 @@ const BaseDialogView: Props = ({
          </Stack>
          {fixedBottomContent ? (
             <>
-               <FixedBottomContent ref={ref}>
+               <FixedBottomContent
+                  ref={ref}
+                  hideBottomDivider={hideBottomDivider}
+               >
                   {fixedBottomContent}
                </FixedBottomContent>
                <Box height={`calc(${height}px + 40px)`} />
@@ -233,13 +247,17 @@ export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
 
 type FixedBottomContentProps = {
    children: ReactNode
+   hideBottomDivider: boolean
 }
 export const FixedBottomContent = forwardRef<
    HTMLDivElement,
    FixedBottomContentProps
->(function FixedBottomContent({ children }, ref) {
+>(function FixedBottomContent({ children, hideBottomDivider }, ref) {
    return (
-      <Box ref={ref} sx={styles.fixedBottomContent}>
+      <Box
+         ref={ref}
+         sx={[styles.fixedBottomContent, hideBottomDivider && styles.noDivider]}
+      >
          {children}
       </Box>
    )
@@ -265,6 +283,14 @@ export const MainContent: FC<MainContentProps> = ({
             color={"black"}
          />
       </Box>
+   )
+}
+
+export const HeroTitle = ({ children }) => {
+   return (
+      <Typography variant={"brandedH2"} sx={styles.heroTitle}>
+         {children}
+      </Typography>
    )
 }
 
