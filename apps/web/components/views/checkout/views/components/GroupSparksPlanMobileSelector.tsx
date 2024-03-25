@@ -168,9 +168,10 @@ const GroupSparksPlanMobileSelector = () => {
                </Box>
                <Box component="span" sx={styles.selectedPlanPrice}>
                   <ConditionalWrapper condition={Boolean(stripePrice)}>
-                     {commafy((stripePrice.unit_amount / 100).toFixed(2)) +
-                        stripePrice?.currency.toUpperCase() +
-                        "/ year"}
+                     {commafy(stripePrice.unit_amount / 100) +
+                        " " +
+                        stripePrice.currency.toUpperCase() +
+                        "/year"}
                   </ConditionalWrapper>
                </Box>
             </Stack>

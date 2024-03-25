@@ -12,7 +12,6 @@ import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSel
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
-import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipableDrawer"
 
 const styles = sxStyles({
    content: {
@@ -168,73 +167,75 @@ const GroupPlansMobile = (props: GroupPlansProps) => {
    const { handleClose } = useSparksPlansForm()
 
    return (
-      <BrandedSwipableDrawer
-         onClose={() => handleClose()}
-         onOpen={() => {}}
-         open={true}
-      >
-         <GroupPlansDialog.Title>
-            Select your{" "}
-            <Box component="span" color="secondary.main">
-               Sparks
-            </Box>{" "}
-            plan
-         </GroupPlansDialog.Title>
-         <Box mt={5} />
-         <Box
-            mt={{
-               md: 0,
-            }}
-         />
-
-         <Box sx={styles.contentMobileWrapper}>
-            <GroupSparksPlanMobileSelector />
-
+      <GroupPlansDialog.Container sx={{}}>
+         <GroupPlansDialog.Content sx={styles.contentMobile}>
+            <GroupPlansDialog.Title>
+               Select your{" "}
+               <Box component="span" color="secondary.main">
+                  Sparks
+               </Box>{" "}
+               plan
+            </GroupPlansDialog.Title>
+            <Box mt={5} />
             <Box
-               mb={{
-                  xs: "auto",
+               mt={{
                   md: 0,
                }}
             />
-            <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
+
+            <Box sx={styles.contentMobileWrapper}>
+               <GroupSparksPlanMobileSelector />
+
                <Box
-                  sx={styles.checkoutDescription}
-                  display={"flex"}
-                  width={"100%"}
-                  alignContent={"start"}
+                  mb={{
+                     xs: "auto",
+                     md: 0,
+                  }}
+               />
+               <Stack
+                  direction={"column"}
+                  spacing={2}
+                  sx={styles.checkoutWrapper}
                >
-                  Content available for 1 year
+                  <Box
+                     sx={styles.checkoutDescription}
+                     display={"flex"}
+                     width={"100%"}
+                     alignContent={"start"}
+                  >
+                     Content available for 1 year
+                  </Box>
+               </Stack>
+            </Box>
+            <Box mt={15} />
+            <Stack
+               direction={"column"}
+               spacing={2}
+               alignItems={"center"}
+               width={"100%"}
+            >
+               <Box>
+                  <Button
+                     disabled={props.disabled}
+                     color={"secondary"}
+                     onClick={props.handleSelect}
+                     sx={styles.checkoutButton}
+                  >
+                     Select plan
+                  </Button>
+               </Box>
+               <Box>
+                  <Button
+                     color={"grey"}
+                     onClick={() => handleClose()}
+                     sx={styles.cancelButton}
+                  >
+                     Cancel
+                  </Button>
                </Box>
             </Stack>
-         </Box>
-         <Box mt={15} />
-         <Stack
-            direction={"column"}
-            spacing={2}
-            alignItems={"center"}
-            width={"100%"}
-         >
-            <Box>
-               <Button
-                  disabled={props.disabled}
-                  color={"secondary"}
-                  onClick={props.handleSelect}
-                  sx={styles.checkoutButton}
-               >
-                  Select plan
-               </Button>
-            </Box>
-            <Box>
-               <Button
-                  color={"grey"}
-                  onClick={() => handleClose()}
-                  sx={styles.cancelButton}
-               >
-                  Cancel
-               </Button>
-            </Box>
-         </Stack>
-      </BrandedSwipableDrawer>
+         </GroupPlansDialog.Content>
+      </GroupPlansDialog.Container>
    )
 }
 
