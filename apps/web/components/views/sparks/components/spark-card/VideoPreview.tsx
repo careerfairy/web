@@ -41,7 +41,10 @@ const styles = sxStyles({
          left: 0,
          "& video": {
             background: "black",
-            objectFit: "cover !important",
+            objectFit: {
+               xs: "cover !important",
+               sm: "contain !important",
+            },
          },
       },
       "& .react-player__preview": {
@@ -212,30 +215,32 @@ const VideoPreview: FC<Props> = ({
                light && !containPreviewOnTablet && styles.previewVideo,
             ]}
          >
-            {videoPlayedForSession || !light ? null : (
-               <ThumbnailOverlay
-                  src={thumbnailUrl}
-                  containPreviewOnTablet={containPreviewOnTablet}
-               />
-            )}
-            {light ? null : (
-               <ReactPlayer
-                  ref={playerRef}
-                  playing={playingVideo}
-                  playsinline
-                  loop={playing}
-                  width="100%"
-                  height="100%"
-                  className="player"
-                  onProgress={handleProgress}
-                  onPlay={onPlay}
-                  onError={handleError}
-                  progressInterval={250}
-                  url={videoUrl}
-                  playIcon={<Fragment />}
-                  muted={muted}
-               />
-            )}
+            <ReactPlayer
+               ref={playerRef}
+               playing={playingVideo}
+               playsinline
+               loop={playing}
+               width="100%"
+               height="100%"
+               className="player"
+               onProgress={handleProgress}
+               onPlay={onPlay}
+               onError={handleError}
+               progressInterval={250}
+               url={videoUrl}
+               light={
+                  videoPlayedForSession || !light ? (
+                     false
+                  ) : (
+                     <ThumbnailOverlay
+                        src={thumbnailUrl}
+                        containPreviewOnTablet={containPreviewOnTablet}
+                     />
+                  )
+               }
+               playIcon={<Fragment />}
+               muted={muted}
+            />
          </Box>
          <LinearProgress
             sx={styles.progress}
