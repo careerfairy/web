@@ -26,11 +26,11 @@ export const PREMIUM_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: true,
-      name: "Dedicated KAM",
+      name: "Dedicated account manager",
    },
    {
       enabled: true,
-      name: "11'000 - 13’000 Exposure range",
+      name: "11'000 - 13’000 expected target reach",
    },
 ]
 export const ADVANCED_FEATURES: PlanFeatureItem[] = [
@@ -56,11 +56,11 @@ export const ADVANCED_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: true,
-      name: "Dedicated KAM",
+      name: "Dedicated account manager",
    },
    {
       enabled: true,
-      name: "7'000 - 8’000 Exposure range",
+      name: "7'000 - 8’000 expected target reach",
    },
 ]
 export const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
@@ -86,10 +86,10 @@ export const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: false,
-      name: "Dedicated KAM",
+      name: "Dedicated account manager",
    },
    {
       enabled: true,
-      name: "4'000 - 5’000 Exposure range",
+      name: "4'000 - 5’000 expected target reach",
    },
 ]

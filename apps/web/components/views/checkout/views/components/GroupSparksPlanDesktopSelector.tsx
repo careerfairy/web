@@ -44,8 +44,10 @@ const styles = sxStyles({
       lineHeight: "24px",
    },
    planWrapper: {
-      minWidth: "280px",
-      maxWidth: "280px",
+      minWidth: "320px",
+      maxWidth: "320px",
+      minHeight: "160px",
+      maxHeight: "160px",
       display: "flex",
       padding: "20px",
       flexDirection: "column",
@@ -76,7 +78,7 @@ const styles = sxStyles({
    },
    selectedWrapper: {
       mt: "15px",
-      ml: "240px",
+      ml: "280px",
       position: "absolute",
       display: "flex",
       justifyContent: "center",

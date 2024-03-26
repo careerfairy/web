@@ -73,7 +73,8 @@ const View = () => {
                </Box>{" "}
             </GroupPlansDialog.Title>
             <GroupPlansDialog.Subtitle>
-               The page will be automatically refreshed upon completion.
+               The page will be automatically refreshed upon completion and the
+               corresponding invoice sent to the specified email address.
             </GroupPlansDialog.Subtitle>
             <Box mt={5} />
             <Box
