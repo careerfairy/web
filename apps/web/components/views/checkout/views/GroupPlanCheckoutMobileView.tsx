@@ -70,7 +70,10 @@ const View = () => {
                Checkout
             </Box>{" "}
          </Box>
-         <Box>The page will be automatically refreshed upon completion.</Box>
+         <Box mr={3}>
+            The page will be automatically refreshed upon completion and the
+            corresponding invoice sent to the specified email address.
+         </Box>
          <Box mt={5} />
          <Box
             mt={{

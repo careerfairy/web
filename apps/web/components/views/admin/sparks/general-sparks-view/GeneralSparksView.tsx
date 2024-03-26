@@ -89,53 +89,15 @@ const styles = sxStyles({
 
 const GeneralSparksView: FC = () => {
    const { group, groupPresenter } = useGroup()
-
-   const isTrial = groupPresenter.isTrialPlan()
    const planDays = groupPresenter.getPlanDaysLeft()
 
    return (
       <Stack pb={4} alignItems="center" spacing={4.125}>
-         <SparksContainer>
-            <UpgradePlanBanner
-               title={
-                  <Typography sx={styles.bannerTitle}>
-                     {BANNER_TITLE}{" "}
-                  </Typography>
-               }
-               description={
-                  <StatusDescriptionFull
-                     showSx={styles.showMoreWarning}
-                     sx={styles.bannerDescriptionWarning}
-                  />
-                  // <Stack direction={"column"} spacing={1}>
-                  //    <StatusDescription
-                  //       showSx={styles.showMoreWarning}
-                  //       sx={styles.bannerDescriptionWarning}
-                  //       description={BANNER_DESCRIPTION_PART_1}
-                  //    />
-
-                  //    <StatusDescription
-                  //       showSx={styles.showMoreWarning}
-                  //       sx={styles.bannerDescriptionWarning}
-                  //       description={BANNER_DESCRIPTION_PART_2}
-                  //    />
-                  // </Stack>
-               }
-               show={isTrial ? planDays < 1 : null}
-            />
-            <UpgradePlanBanner
-               bannerSx={styles.banner}
-               title={<TrialEndUpgradeTitle days={planDays} />}
-               description={
-                  <StatusDescription
-                     showSx={styles.showMore}
-                     sx={styles.bannerDescription}
-                     description={BANNER_DESCRIPTION_DAY_7}
-                  />
-               }
-               show={isTrial ? planDays > 0 && planDays <= 7 : null}
-            />
-         </SparksContainer>
+         <SparksPlanBanner
+            planDays={planDays}
+            showDayOne={planDays < 1}
+            showDaySeven={planDays > 0 && planDays <= 7}
+         />
          {group.publicSparks ? null : (
             <SparksContainer>
                <SparksProgressIndicator />
@@ -150,7 +112,49 @@ const GeneralSparksView: FC = () => {
       </Stack>
    )
 }
-
+type SparksPlanBannerProps = {
+   planDays: number
+   showDaySeven?: boolean
+   showDayOne?: boolean
+}
+const SparksPlanBanner = ({
+   showDaySeven,
+   showDayOne,
+   planDays,
+}: SparksPlanBannerProps) => {
+   return (
+      <ConditionalWrapper condition={showDaySeven || showDayOne}>
+         <SparksContainer>
+            <UpgradePlanBanner
+               title={
+                  <Typography sx={styles.bannerTitle}>
+                     {BANNER_TITLE}{" "}
+                  </Typography>
+               }
+               description={
+                  <StatusDescriptionFull
+                     showSx={styles.showMoreWarning}
+                     sx={styles.bannerDescriptionWarning}
+                  />
+               }
+               show={showDayOne}
+            />
+            <UpgradePlanBanner
+               bannerSx={styles.banner}
+               title={<TrialEndUpgradeTitle days={planDays} />}
+               description={
+                  <StatusDescription
+                     showSx={styles.showMore}
+                     sx={styles.bannerDescription}
+                     description={BANNER_DESCRIPTION_DAY_7}
+                  />
+               }
+               show={showDaySeven}
+            />
+         </SparksContainer>
+      </ConditionalWrapper>
+   )
+}
 type TrialEndProps = {
    days: number
 }
