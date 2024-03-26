@@ -218,6 +218,47 @@ We use ImageKit for real-time video optimization and transformation. Each develo
 9. You can leave the other options as default and click "Save" at the top right corner.
 10.   Now your ImageKit account is ready to use 🚀
 
+
+### Configure Local Development
+
+1. Navigate to [ImageKit.io Registration](https://imagekit.io/registration/) and sign up for a new account.
+2. During setup, select Frankfurt (Europe) as the region.
+3. Once registered, go to the [Dashboard](https://imagekit.io/dashboard/external-storage) and click **+Add New** as shown in the image below:
+   ![Dashboard Screenshot](https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2FScreenshot%20from%202023-08-31%2011-39-47.png?alt=media&token=a45777ec-ad2f-4cc4-83ba-f1404f71f038)
+4. Complete the following fields:
+   1. **Origin name\***: Enter `Firebase Storage`.
+   2. **Origin type\***: Select `Web Folder - HTTP(S) server and Magento, Shopify, Wordpress, etc.`.
+   3. **Base URL\***: Enter `https://firebasestorage.googleapis.com`.
+5. Skip the Advanced section and click "Save".
+6. Next we need to enable automatic video optimizations in the [Video Settings](https://imagekit.io/dashboard/settings/videos). Click on the **Video Optimization** section.
+7. Enable the **Use best format for video delivery** option.
+8. Enable the **Optimize video quality before delivery** option, choose `40%` for the quality
+9. You can leave the other options as default and click "Save" at the top right corner.
+10.   Now your ImageKit account is ready to use 🚀
+
+# Stripe Setup
+
+We use [Stripe](https://docs.stripe.com/cli) for processing payments and easily integrate Stripe forms into our application.
+
+**For access you will need to request your team for additional support**
+
+### Configure Local Development
+1. Navigate to [Stripe dashboard in Dev Mode](https://dashboard.stripe.com/test/dashboard) and sign up for a new account. Request access if needed.
+2. On [API Keys](https://dashboard.stripe.com/test/apikeys) copy the publishable and secret keys
+   1. NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY={copied_value}
+   2. STRIPE_SECRET_KEY={copied_value}
+3. WebHooks Local Testing - Via the CLI its possible to forward webhooks to the local development environment, more [here](https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local)
+4. Setup Price IDs - While testing the following environment variables regarding Stripe prices need to be set
+   The API IDs can be found on Stripe for each product, as [Sparks Advanced CH](https://dashboard.stripe.com/test/products/prod_PlbjRlHrGoiWwW)
+   1. Swiss Prices
+      1. NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID_CH
+      2. NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID_CH
+      3. NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID_CH
+   2. Non Swiss Prices
+      1. NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
+      2. NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
+      3. NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
+
 # Setting Up Algolia
 
 ## Algolia Setup for Web App

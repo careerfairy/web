@@ -10,9 +10,15 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      // height: "100%",
-      // width: "100%",
       backgroundColor: "#F6F6FA",
+   },
+   title: {
+      color: (theme) => theme.brand.purple[600],
+      fontFamily: "Poppins",
+      fontSize: "28px",
+      fontStyle: "normal",
+      fontWeight: 700,
+      lineHeight: "42px",
    },
    checkoutButton: {
       mt: 2,
@@ -66,11 +72,11 @@ const View = () => {
    return (
       <Box>
          <Box>
-            <Box component="span" color="secondary.main">
+            <Box component="span" color="secondary.main" sx={styles.title}>
                Checkout
             </Box>{" "}
          </Box>
-         <Box mr={3}>
+         <Box mr={5}>
             The page will be automatically refreshed upon completion and the
             corresponding invoice sent to the specified email address.
          </Box>

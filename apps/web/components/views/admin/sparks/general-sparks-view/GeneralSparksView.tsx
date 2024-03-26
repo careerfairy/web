@@ -226,7 +226,7 @@ type StatusDescriptionFullProps = {
    showSx?: SxProps
 }
 const StatusDescriptionFull = ({ sx, showSx }: StatusDescriptionFullProps) => {
-   const [showingMore, setShowingMore] = useState(true)
+   const [showingMore, setShowingMore] = useState(false)
    const isMobile = useIsMobile()
    return (
       <Box sx={sx}>
@@ -276,7 +276,7 @@ type ShowMoreComponentProps = {
    showSx?: SxProps
 }
 const ShowMoreComponent = (props: ShowMoreComponentProps) => {
-   const [showingMore, setShowingMore] = useState(true)
+   const [showingMore, setShowingMore] = useState(false)
    const text = showingMore ? props.full : props.short
    return (
       <Stack>
