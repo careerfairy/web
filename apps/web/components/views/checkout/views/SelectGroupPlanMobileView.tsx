@@ -1,14 +1,7 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useSparksPlansForm } from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
-import { useSelector } from "react-redux"
-import { selectedPlanSelector } from "store/selectors/groupSelectors"
-import { FormEvent } from "react"
 import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSelector"
-import { useAuth } from "HOCs/AuthProvider"
-import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
 
 const mobileBreakpoint = "md"
 
@@ -37,14 +30,10 @@ const styles = sxStyles({
    contentMobile: {
       display: "flex",
       flexDirection: "column",
-      // height: "100%",
-      // width: "100%",
    },
    contentMobileWrapper: {
       display: "flex",
       flexDirection: "column",
-      // height: "100%",
-      // width: "100%",
    },
    checkoutButton: {
       mt: 2,
@@ -88,38 +77,6 @@ const SelectSparksPlanView = () => {
 }
 
 const View = () => {
-   const { authenticatedUser } = useAuth()
-   const { group } = useGroup()
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
-
-   const selectedPlan = useSelector(selectedPlanSelector)
-
-   const { customerSessionSecret: customerSessionSecret } =
-      useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
-
-   const disabled = !selectedPlan || !customerSessionSecret
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-
-      setClientSecret(customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-   }
-
-   return (
-      <GroupPlansMobile disabled={disabled} handleSelect={redirectToCheckout} />
-   )
-}
-
-type GroupPlansProps = {
-   disabled: boolean
-   handleSelect: (e: FormEvent) => void
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GroupPlansMobile = (props: GroupPlansProps) => {
-   // const { handleClose } = useSparksPlansForm()
-
    return (
       <Box>
          <Typography component="h1" sx={styles.title}>

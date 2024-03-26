@@ -24,14 +24,10 @@ const styles = sxStyles({
    contentMobile: {
       display: "flex",
       flexDirection: "column",
-      // height: "100%",
-      // width: "100%",
    },
    contentMobileWrapper: {
       display: "flex",
       flexDirection: "column",
-      // height: "100%",
-      // width: "100%",
    },
    checkoutButton: {
       mt: 2,
