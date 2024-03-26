@@ -1,5 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import {
   MAX_TAB_VALUE,
@@ -23,29 +24,29 @@ import {
 } from "./form/validationSchemas"
 
 type LivestreamCreationContextType = {
-   livestream: LivestreamEvent
-   tabToNavigateTo: TAB_VALUES
-   tabValue: TAB_VALUES
-   setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
-   navPreviousTab: () => void
-   navNextTab: () => void
-   navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
-   isNavigatingForward: boolean
-   alertState: boolean
-   setAlertState: Dispatch<SetStateAction<boolean>>
-   isValidationDialogOpen: boolean
-   handleValidationOpenDialog: () => void
-   handleValidationCloseDialog: () => void
-   shouldShowAlertIndicatorOnTab: Record<
-      TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
-      boolean
-   >
-   shouldShowAlertDialog: boolean
-   shouldShowAlertIndicator: boolean
-   isGenralTabInvalid: boolean
-   isSpeakerTabInvalid: boolean
-   isUniversityEvent: boolean // edge case where university cohost events with companies
-   isCohostedEvent: boolean
+  livestream: LivestreamEvent
+  tabToNavigateTo: TAB_VALUES
+  tabValue: TAB_VALUES
+  setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
+  navPreviousTab: () => void
+  navNextTab: () => void
+  navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
+  isNavigatingForward: boolean
+  alertState: boolean
+  setAlertState: Dispatch<SetStateAction<boolean>>
+  isValidationDialogOpen: boolean
+  handleValidationOpenDialog: () => void
+  handleValidationCloseDialog: () => void
+  shouldShowAlertIndicatorOnTab: Record<
+    TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
+    boolean
+  >
+  shouldShowAlertDialog: boolean
+  shouldShowAlertIndicator: boolean
+  isGenralTabInvalid: boolean
+  isSpeakerTabInvalid: boolean
+  isUniversityEvent: boolean // edge case where university cohost events with companies
+  isCFAdmin: boolean
 }
 
 const LivestreamCreationContext = createContext<
@@ -61,6 +62,7 @@ type LivestreamCreationContextProviderType = {
 export const LivestreamCreationContextProvider: FC<
   LivestreamCreationContextProviderType
 > = ({ livestream, group, children }) => {
+  const { userData } = useAuth()
   const {
     values: { general, speakers },
   } = useLivestreamFormValues()
@@ -93,6 +95,8 @@ export const LivestreamCreationContextProvider: FC<
 
   const isUniversityEvent = Boolean(group?.universityCode)
   const isCohostedEvent = Boolean(livestream.groupIds.length > 1)
+
+  const isCFAdmin = userData?.isAdmin
 
   const shouldShowAlertIndicatorOnTab = useMemo(
     () => ({
@@ -162,8 +166,10 @@ export const LivestreamCreationContextProvider: FC<
       isSpeakerTabInvalid,
       isUniversityEvent,
       isCohostedEvent,
+      isCFAdmin,
     }),
     [
+      isCFAdmin,
       isCohostedEvent,
       isUniversityEvent,
       shouldShowAlertDialog,
