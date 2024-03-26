@@ -95,14 +95,14 @@ const renderCriticalMessage = () => (
       </Typography>
    </Box>
 )
-const renderDefaultMessage = (maxPublicSparks: number) => (
+const renderDefaultMessage = () => (
    <Box>
       <Typography variant={"h6"} sx={styles.headerMessage}>
          Your company Sparks are visible!
       </Typography>
       <Typography variant={"body1"} fontSize={16}>
          {`Congrats! Your Sparks are now live on CareerFairy. Currently you can
-            publish a maximum of ${maxPublicSparks} Sparks.`}
+            publish unlimited Sparks.`}
       </Typography>
    </Box>
 )
@@ -128,7 +128,7 @@ const getTooltipMessage = (
       return renderCriticalMessage()
    }
 
-   return renderDefaultMessage(maxPublicSparks)
+   return renderDefaultMessage()
 }
 
 export default SparksCounter
