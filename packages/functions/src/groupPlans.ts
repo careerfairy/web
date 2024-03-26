@@ -63,7 +63,7 @@ export const startPlan = functions.region(config.region).https.onCall(
 export const checkExpiredPlans = functions
    .region(config.region)
    .runWith(runtimeSettings)
-   .pubsub.schedule("0 17 * * *") // everyday at 17pm
+   .pubsub.schedule("0 6 * * *") // everyday at 06:00 am
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       functions.logger.info("Starting execution of checkExpiredPlans")
@@ -112,13 +112,16 @@ async function updateExpiredGroupPlans() {
       await Promise.all(updatePromises)
 
       functions.logger.info(
-         "Updated publicSparks to false for ",
+         "Executed validateGroupSparks for the following groups:  ",
          groups.map((g) => g.groupId)
       )
    } catch (error) {
-      logAndThrow("Error while updating expired group plans", {
-         error,
-      })
+      logAndThrow(
+         "Error while executing validateGroupSparks for groups with expiring plans",
+         {
+            error,
+         }
+      )
    }
 }
 /**
