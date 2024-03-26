@@ -325,6 +325,9 @@ const GroupPlansDialog = () => {
          sx={{ maxHeight: "90%" }}
          open={open}
          onOpen={() => {}}
+         PaperProps={{
+            sx: { maxHeight: "95%" },
+         }}
          onClose={() => handleCloseGroupPlansDialog()}
       >
          <Box sx={styles.closeBtn}>
