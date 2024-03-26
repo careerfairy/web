@@ -27,7 +27,7 @@ export const SessionConflictModal = () => {
          icon={<Box component={AlertTriangle} color="warning.main" />}
          primaryAction={{
             callback: handleReload,
-            text: "CLICK HERE TO FORCE CONNECTION",
+            text: "Click here to force connection",
             color: "primary",
             variant: "contained",
          }}

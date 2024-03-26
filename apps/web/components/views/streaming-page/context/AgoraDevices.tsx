@@ -11,7 +11,6 @@ import React, {
 import AgoraRTC, { DeviceInfo, IAgoraRTCError } from "agora-rtc-react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
-import { useSnackbar } from "notistack"
 
 type CallbackType = (dev: DeviceInfo) => void
 
@@ -50,7 +49,6 @@ type DeviceProviderProps = {
  */
 export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
    const { shouldStream } = useStreamingContext()
-   const { enqueueSnackbar } = useSnackbar()
 
    const [microphones, setMicrophones] = useState<MediaDeviceInfo[]>([])
    const [cameras, setCameras] = useState<MediaDeviceInfo[]>([])
@@ -122,7 +120,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          const setter = type === "camera" ? setCameras : setMicrophones
          setter(newDevices)
 
-         enqueueSnackbar(
+         console.info(
             `Device detected: ${dev.device.label} (ID: ${dev.device.deviceId})`
          )
       }
@@ -140,7 +138,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          const setter = type === "camera" ? setCameras : setMicrophones
          setter(newDevices)
 
-         enqueueSnackbar(
+         console.info(
             `Device removed: ${dev.device.label} (ID: ${dev.device.deviceId})`
          )
       }
@@ -180,7 +178,7 @@ export const AgoraDevicesProvider = ({ children }: DeviceProviderProps) => {
          AgoraRTC.onCameraChanged = null
          AgoraRTC.onMicrophoneChanged = null
       }
-   }, [cameras, enqueueSnackbar, fetchAndSetDevices, microphones])
+   }, [cameras, fetchAndSetDevices, microphones])
 
    const registerCameraChangedCallback = useCallback(
       (callback: CallbackType) => {
