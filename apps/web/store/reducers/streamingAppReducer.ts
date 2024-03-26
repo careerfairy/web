@@ -9,6 +9,7 @@ import {
    type UID,
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -246,6 +247,10 @@ const streamingAppSlice = createSlice({
             const { reason, state: rtmState } = action.payload
 
             if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+               errorLogAndNotify(
+                  new Error("RTM - User is logged in on a different browser"),
+                  { reason, rtmState }
+               )
                state.isLoggedInOnDifferentBrowser = true
             }
          }
@@ -260,9 +265,14 @@ const streamingAppSlice = createSlice({
       ) {
          state.rtcState.connectionState = action.payload
          if (action.payload) {
-            const { reason } = action.payload
+            const { reason, currentState, prevState } = action.payload
 
             if (reason === "UID_BANNED") {
+               errorLogAndNotify(new Error("RTC - User is banned"), {
+                  reason,
+                  currentState,
+                  prevState,
+               })
                state.isLoggedInOnDifferentBrowser = true
             }
          }
