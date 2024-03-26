@@ -1,3 +1,4 @@
+import { useGroups } from "components/custom-hook/useCollection"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
@@ -7,11 +8,16 @@ const RegistrationQuestions = () => {
    const {
       values: { questions },
    } = useLivestreamFormValues()
-   const { isCohostedEvent } = useLivestreamCreationContext()
+   const { isCFAdmin } = useLivestreamCreationContext()
 
    const { groupQuestions } = useGroup()
+   const { data: allGroups } = useGroups()
+   console.log(
+      "🚀 ~ useGetRegistrationQuestionsForCFAdmin ~ allGroups:",
+      allGroups
+   )
 
-   if (!isCohostedEvent) {
+   if (!isCFAdmin) {
       return (
          <MultiChipSelect
             id="questions.registrationQuestions"
