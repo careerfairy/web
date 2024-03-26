@@ -58,9 +58,17 @@ export const LivestreamCreationContextProvider: FC<
       values: { general, speakers },
    } = useLivestreamFormValues()
    const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
-   const [alertState, setAlertState] = useState(undefined)
    const [isNavigatingForward, setIsNavigatingForward] = useState(true)
    const [tabToNavigateTo, setTabToNavigateTo] = useState<TAB_VALUES>(undefined)
+   const [tabsVisited, setTabsVisited] = useState<Record<TAB_VALUES, boolean>>({
+      [TAB_VALUES.GENERAL]: true,
+      [TAB_VALUES.SPEAKERS]: false,
+      [TAB_VALUES.QUESTIONS]: false,
+      [TAB_VALUES.JOBS]: false,
+   })
+
+   const [alertState, setAlertState] = useState(undefined)
+
    const [
       isValidationDialogOpen,
       handleValidationOpenDialog,
@@ -68,9 +76,11 @@ export const LivestreamCreationContextProvider: FC<
    ] = useDialogStateHandler()
 
    const isGenralTabInvalid =
-      !livestreamFormGeneralTabSchema.isValidSync(general)
+      !livestreamFormGeneralTabSchema.isValidSync(general) &&
+      tabsVisited[TAB_VALUES.GENERAL]
    const isSpeakerTabInvalid =
-      !livestreamFormSpeakersTabSchema.isValidSync(speakers)
+      !livestreamFormSpeakersTabSchema.isValidSync(speakers) &&
+      tabsVisited[TAB_VALUES.SPEAKERS]
    const formHasCriticalValidationErrors =
       isGenralTabInvalid || isSpeakerTabInvalid
 
@@ -98,8 +108,12 @@ export const LivestreamCreationContextProvider: FC<
          } else {
             setTabValue(newTabValue)
          }
+
+         if (!tabsVisited[tabValue]) {
+            setTabsVisited((prev) => ({ ...prev, [tabValue]: true }))
+         }
       },
-      [handleValidationOpenDialog, shouldShowAlertDialog]
+      [handleValidationOpenDialog, shouldShowAlertDialog, tabValue, tabsVisited]
    )
 
    const navPreviousTab = useCallback(() => {
