@@ -102,7 +102,7 @@ const HeaderActions = () => {
                      <InfoTooltip />
                   </Stack>
                </Stack>
-               {group.publicSparks || isTrialPlan ? (
+               {group.plan ? (
                   <Stack
                      spacing={2}
                      direction="row"
@@ -129,7 +129,7 @@ const HeaderActions = () => {
 
    return (
       <Stack spacing={2} direction="row" justifyContent="space-between">
-         {group.publicSparks || isTrialPlan ? (
+         {group.plan ? (
             <Stack spacing={2} direction="row" alignItems="center">
                <SparksCounter
                   isCriticalState={isCriticalState}
