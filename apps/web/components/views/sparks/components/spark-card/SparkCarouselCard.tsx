@@ -71,9 +71,9 @@ const SparkCarouselCard: FC<Props> = ({
       }
 
       return () => {
-         if (currentContainerRef) {
-            observer.unobserve(currentContainerRef)
-         }
+         // if (currentContainerRef) {
+         observer.unobserve(currentContainerRef)
+         // }
          clearTimeout(timeout)
       }
    }, [isMobile])
