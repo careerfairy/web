@@ -504,10 +504,13 @@ export interface LivestreamChatEntry extends Identifiable {
    message: string
    timestamp: firebase.firestore.Timestamp
 
+   agoraUserId?: string
+
    type?: // used to identify a chat entry that was sent by a host to all breakout rooms (only used in the UI)
    | "broadcast"
       // used to identify a chat entry that was sent by a host (only used in the UI)
       | "streamer"
+      | "viewer"
 
    /*
     * Array of userIds who reacted with 😮

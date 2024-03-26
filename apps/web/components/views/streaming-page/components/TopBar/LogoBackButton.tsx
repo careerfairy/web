@@ -16,7 +16,7 @@ export const LogoBackButton = () => {
       <Stack
          component={Link}
          noLinkStyle
-         href={"https://careerfairy.io"}
+         href={"/"}
          direction="row"
          alignItems="center"
       >
