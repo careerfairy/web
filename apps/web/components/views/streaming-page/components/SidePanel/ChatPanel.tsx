@@ -6,12 +6,14 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import { sxStyles } from "types/commonTypes"
-import { ChatWidget } from "../chat/ChatWidget"
+import { ChatInput } from "../chat/ChatInput"
+import { ChatList } from "../chat/ChatList"
 
 const styles = sxStyles({
    root: {
       p: 0,
       display: "flex",
+      overflow: "hidden",
    },
    portraitChat: {
       minHeight: 372,
@@ -35,8 +37,9 @@ export const ChatPanel = () => {
          title="Chat"
          icon={<MessageCircle />}
          contentWrapperStyles={[styles.root, isMobile && chatPanelStyles]}
+         bottomContent={<ChatInput />}
       >
-         <ChatWidget />
+         <ChatList />
       </SidePanelView>
    )
 }

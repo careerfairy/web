@@ -20,7 +20,6 @@ const styles = sxStyles({
       borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
       display: "flex",
       alignItems: "center",
-      position: "relative",
    },
    input: {
       flex: 1,
@@ -95,6 +94,11 @@ export const ChatInput = () => {
 
    const onSubmit = async (data: FormValues) => {
       try {
+         // Reset form fields after submission
+         reset({
+            message: "",
+         })
+
          await livestreamService.addChatEntry({
             livestreamId,
             message: data.message,
@@ -106,16 +110,15 @@ export const ChatInput = () => {
             authorEmail: getAuthorEmail(),
             agoraUserId,
          })
-
-         // Reset form fields after submission
-         reset({
-            message: "",
-         })
       } catch (error) {
          errorNotification(
             error,
             "An error occurred while sending your message. Please try again in a few moments."
          )
+         // Fall back to the original message if the new message fails to send
+         reset({
+            message: data.message,
+         })
       }
    }
 

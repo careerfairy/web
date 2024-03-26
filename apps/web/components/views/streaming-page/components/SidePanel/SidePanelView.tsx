@@ -28,6 +28,11 @@ const styles = sxStyles({
       top: 0,
       zIndex: 1,
    },
+   footer: {
+      position: "sticky",
+      bottom: 0,
+      zIndex: 1,
+   },
    closeIcon: {
       ml: "auto",
       color: "text.primary",
@@ -51,6 +56,7 @@ type Props = {
    children: ReactNode
    id: string
    contentWrapperStyles?: BoxProps["sx"]
+   bottomContent?: ReactNode
 }
 
 export const SidePanelView = ({
@@ -59,6 +65,7 @@ export const SidePanelView = ({
    children,
    id,
    contentWrapperStyles,
+   bottomContent,
 }: Props) => {
    const dispatch = useAppDispatch()
    const handleToggle = () => {
@@ -85,6 +92,9 @@ export const SidePanelView = ({
          <Box sx={combineStyles(styles.content, contentWrapperStyles)}>
             {children}
          </Box>
+         {Boolean(bottomContent) && (
+            <Box sx={styles.footer}>{bottomContent}</Box>
+         )}
       </Box>
    )
 }
