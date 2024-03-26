@@ -71,6 +71,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
 const livestreamFormSpeakersTabValuesSchema = yup
    .array()
    .of(CreateCreatorSchema)
+   .min(1)
 
 const livestreamFormSpeakersTabSchema = yup.object().shape({
    values: livestreamFormSpeakersTabValuesSchema,
