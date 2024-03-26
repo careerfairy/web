@@ -3,9 +3,11 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
+   resetLivestreamState,
    setHasEnded,
    setLivestreamMode,
    setNumberOfParticipants,
+   setOpenStream,
    setScreenSharerId,
    setStarted,
    setStartsAt,
@@ -62,15 +64,14 @@ export const LivestreamStateTrackers = (): null => {
       dispatch(setHasEnded(Boolean(livestream.hasEnded)))
    }, [dispatch, livestream.hasEnded])
 
+   useEffect(() => {
+      dispatch(setOpenStream(Boolean(livestream.openStream)))
+   }, [dispatch, livestream.openStream])
+
    // Clean up the state on unmount
    useEffect(() => {
       return () => {
-         dispatch(setNumberOfParticipants(0))
-         dispatch(setScreenSharerId(null))
-         dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
-         dispatch(setStartsAt(null))
-         dispatch(setHasEnded(false))
-         dispatch(setStarted({ hasStarted: false, startedAt: null }))
+         dispatch(resetLivestreamState())
       }
    }, [dispatch])
 

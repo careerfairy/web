@@ -71,7 +71,8 @@ export interface StreamingAppState {
        */
       hasStarted: boolean | undefined
       hasEnded: boolean
-   }
+      openStream: boolean
+   } | null
    rtmSignalingState: {
       failedToConnect: boolean
       viewCount: number
@@ -109,6 +110,7 @@ const initialState: StreamingAppState = {
       startedAt: null,
       hasStarted: false,
       hasEnded: false,
+      openStream: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -170,6 +172,7 @@ const streamingAppSlice = createSlice({
             }
          })
       },
+
       setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
          state.livestreamState.mode = action.payload
 
@@ -212,6 +215,12 @@ const streamingAppSlice = createSlice({
       },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
+      },
+      setOpenStream(state, action: PayloadAction<boolean>) {
+         state.livestreamState.openStream = action.payload
+      },
+      resetLivestreamState(state) {
+         state.livestreamState = initialState.livestreamState
       },
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
@@ -269,6 +278,8 @@ export const {
       setStarted,
       setStartsAt,
       setHasEnded,
+      setOpenStream,
+      resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,
