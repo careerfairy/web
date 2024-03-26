@@ -178,14 +178,6 @@ const styles = sxStyles({
       },
    },
    footer: {
-      // position: "absolute",
-      // height: "100%",
-      // width: "100%",
-      // zIndex: 1,
-      // pt: {
-      //    xs: 2.5,
-      //    [mobileBreakpoint]: 2.125,
-      // },
       pr: {
          xs: 2,
          [mobileBreakpoint]: 2.5,
@@ -211,13 +203,6 @@ const views = [
          { loading: () => <CircularProgress /> }
       ),
    },
-   // {
-   //    key: "select-plan-mobile",
-   //    Component: dynamic(
-   //       () => import("components/views/checkout/views/SelectGroupPlanMobileView"),
-   //       { loading: () => <CircularProgress /> }
-   //    ),
-   // },
    {
       key: "checkout",
       Component: dynamic(

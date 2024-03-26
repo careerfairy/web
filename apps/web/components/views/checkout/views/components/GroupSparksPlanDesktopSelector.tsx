@@ -35,6 +35,8 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: "400",
       lineHeight: "20px",
+
+      minHeight: "40px",
    },
    planPricing: {
       fontFamily: "Poppins",
@@ -186,6 +188,7 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
          <Stack
             direction={"column"}
             sx={[styles.planWrapper, { backgroundColor: headerBgColor }]}
+            justifyContent={"space-around"}
          >
             <Box component="span" color={color} sx={styles.planTitle}>
                {props.title}

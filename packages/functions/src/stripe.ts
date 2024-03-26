@@ -18,6 +18,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 type FetchStripePrice = {
    priceId: string
 }
+
 /**
  * Payload for creating a Stripe customer session, returning the client secret.
  * For retrieving the secret it is necessary to provide a customer ID, so a customer will be created
@@ -25,7 +26,6 @@ type FetchStripePrice = {
  */
 type FetchStripeCustomerSession = {
    customerName: string
-   // customerId: string
    customerEmail: string
    groupId: string
    plan: GroupPlanType
@@ -35,6 +35,7 @@ type FetchStripeCustomerSession = {
 
 const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
 const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
+
 /**
  * Functions runtime settings
  */
@@ -59,7 +60,8 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
    })
 
 /**
- * Sync Status for the multiple entities
+ * Fetches a Stripe Customer Session, if the customer does not exist, a new one will be created.
+ * Customers are identified by their metadata.groupId
  */
 export const fetchStripeCustomerSession = functions
    .region(config.region)
@@ -77,36 +79,21 @@ export const fetchStripeCustomerSession = functions
             try {
                const query = `metadata['groupId']:'${data.groupId}'`
 
-               console.log("🚀 ~ query:", query)
                const customers = await stripe.customers.search({
                   query: query,
                })
-               console.log("🚀 ~ customers:", customers)
 
                const notDeleted = customers?.data?.filter((c) => !c.deleted)
-               console.log("🚀 ~ search customers:", notDeleted)
+
                let groupCustomer = notDeleted?.length
                   ? notDeleted.at(0)
                   : undefined
                let createCustomer = groupCustomer === undefined
-               // try {
-               //    groupCustomer = await stripe.customers.retrieve(
-               //       data.customerId
-               //    )
-               // } catch (ex) {
-               //    functions.logger.error(
-               //       "fetchStripeCustomerSession - search customer error: ",
-               //       ex
-               //    )
-               // }
-               console.log("🚀 ~ searched customer:", groupCustomer)
 
-               // What if customer is deleted ?
                if (!groupCustomer) {
                   createCustomer = true
                }
                if (groupCustomer) {
-                  console.log("🚀 ~ updating customer:", groupCustomer)
                   groupCustomer = await stripe.customers.update(
                      groupCustomer.id,
                      {
@@ -116,13 +103,10 @@ export const fetchStripeCustomerSession = functions
                         },
                      }
                   )
-
-                  console.log("🚀 ~ updated customer:", groupCustomer)
                }
 
                if (createCustomer) {
                   groupCustomer = await stripe.customers.create({
-                     // id: data.customerId,
                      name: data.customerName,
                      email: data.customerEmail,
                      metadata: {
@@ -130,9 +114,8 @@ export const fetchStripeCustomerSession = functions
                         version: STRIPE_CUSTOMER_METADATA_VERSION,
                      },
                   })
-                  console.log("🚀 ~ created customer:", groupCustomer)
+                  functions.logger.info("Created customer:", groupCustomer)
                }
-               console.log("🚀 ~ creating session for customer:", groupCustomer)
 
                const customerSession = await stripe.checkout.sessions.create({
                   customer: groupCustomer.id,
@@ -155,11 +138,7 @@ export const fetchStripeCustomerSession = functions
                   invoice_creation: {
                      enabled: true,
                   },
-                  // customer_creation: "never",
-                  // customer_email: data.customerEmail
                })
-               console.log("🚀 ~ customerSession:", customerSession)
-               // console.log("🚀 ~ customerSession:", customerSession)
 
                return { customerSessionSecret: customerSession.client_secret }
             } catch (error) {
