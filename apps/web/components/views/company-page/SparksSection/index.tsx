@@ -7,6 +7,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Typography } from "@mui/material"
 import { useDispatch } from "react-redux"
 import { setCameFromCompanyPageLink } from "store/reducers/sparksFeedReducer"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 type Props = {
    groupId: string
@@ -14,6 +15,7 @@ type Props = {
 
 const SparksSection: FC<Props> = ({ groupId }) => {
    const dispatch = useDispatch()
+   const isMobile = useIsMobile()
 
    const {
       group,
@@ -53,6 +55,7 @@ const SparksSection: FC<Props> = ({ groupId }) => {
             }
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
+            showArrows={!isMobile}
             sx={{ pl: 0 }}
          />
       </Box>

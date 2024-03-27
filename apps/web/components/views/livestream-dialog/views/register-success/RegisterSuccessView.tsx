@@ -26,7 +26,9 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import SparksCarouselWithSuspenseComponent, {
+   MobileSparksArrows,
+} from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
 
 const styles = sxStyles({
    fullHeight: {
@@ -94,6 +96,9 @@ const styles = sxStyles({
    },
    mobileSparksCarousel: {
       py: "16px",
+      ".header": {
+         pr: 1.5,
+      },
    },
    transition: {
       transition: "all 0.5s",
@@ -413,6 +418,8 @@ const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
             }
             groupId={livestream.groupIds[0]}
             sx={styles.mobileSparksCarousel}
+            showArrows
+            arrows={MobileSparksArrows}
          />
       </Box>
    )

@@ -38,6 +38,16 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   sparksCarousel: {
+      ".header": {
+         pr: 1.5,
+      },
+   },
+})
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -48,6 +58,7 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
+   const isMobile = useIsMobile()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -105,6 +116,8 @@ const PortalPage = ({
                            <SparksCarouselWithSuspenseComponent
                               header={<Heading>SPARKS</Heading>}
                               handleSparksClicked={handleSparksClicked}
+                              showArrows={!isMobile}
+                              sx={styles.sparksCarousel}
                            />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
