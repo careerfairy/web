@@ -90,6 +90,7 @@ const styles = sxStyles({
 const GeneralSparksView: FC = () => {
    const { group, groupPresenter } = useGroup()
    const planDays = groupPresenter.getPlanDaysLeft()
+   const planExpired = groupPresenter.hasPlanExpired()
 
    return (
       <Stack pb={4} alignItems="center" spacing={4.125}>
@@ -98,11 +99,11 @@ const GeneralSparksView: FC = () => {
             showDayOne={planDays < 1}
             showDaySeven={planDays > 0 && planDays <= 7}
          />
-         {group.publicSparks ? null : (
+         <ConditionalWrapper condition={!planExpired && !group.publicSparks}>
             <SparksContainer>
                <SparksProgressIndicator />
             </SparksContainer>
-         )}
+         </ConditionalWrapper>
          <SparksContainer>
             <HeaderActions />
          </SparksContainer>

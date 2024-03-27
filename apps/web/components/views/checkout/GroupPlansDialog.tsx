@@ -38,6 +38,8 @@ import GroupPlanCheckoutMobileView from "./views/GroupPlanCheckoutMobileView"
 import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useAuth } from "HOCs/AuthProvider"
+import React from "react"
+import { SlideUpTransition } from "../common/transitions"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -119,7 +121,7 @@ const styles = sxStyles({
       "&:hover": {
          backgroundColor: (theme) => theme.palette.secondary.dark,
       },
-      width: "276px",
+      width: "100%",
       color: (theme) => theme.brand.white[100],
       textAlign: "center",
       fontFamily: "Poppins",
@@ -178,7 +180,7 @@ const styles = sxStyles({
       },
    },
    footer: {
-      pr: {
+      px: {
          xs: 2,
          [mobileBreakpoint]: 2.5,
       },
@@ -333,7 +335,7 @@ const GroupPlansDialog = () => {
             </ConditionalWrapper>
 
             <ConditionalWrapper condition={Boolean(!generatedClientSecret)}>
-               <Box sx={styles.footer} alignContent={"end"}>
+               <Box sx={styles.footer}>
                   <Stack
                      direction={"column"}
                      spacing={1}
@@ -342,16 +344,14 @@ const GroupPlansDialog = () => {
                      alignItems={"center"}
                      width={"100%"}
                   >
-                     <Box>
-                        <Button
-                           disabled={disabled}
-                           color={"secondary"}
-                           onClick={redirectToCheckout}
-                           sx={styles.checkoutButton}
-                        >
-                           Select plan
-                        </Button>
-                     </Box>
+                     <Button
+                        disabled={disabled}
+                        color={"secondary"}
+                        onClick={redirectToCheckout}
+                        sx={styles.checkoutButton}
+                     >
+                        Select plan
+                     </Button>
                      <Box>
                         <Button
                            color={"grey"}
@@ -378,6 +378,7 @@ const GroupPlansDialog = () => {
                open={open}
                views={views}
                initialStep={initialStep}
+               // transition={SlideUpDownTransition}
             />
          </ConditionalWrapper>
       </>
@@ -420,6 +421,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
             open={open}
             maxWidth={false}
             PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+            TransitionComponent={SlideUpTransition}
          >
             {children}
             {hideCloseButton ? null : (
