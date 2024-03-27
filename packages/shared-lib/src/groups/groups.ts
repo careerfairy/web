@@ -70,6 +70,11 @@ export interface Group extends Identifiable {
    plan?: GroupPlan
 
    /**
+    * Collection with history data relating to group changes
+    */
+   actionHistory?: GroupActionHistory
+
+   /**
     * Deprecated
     * */
    categories?: GroupCategory[] // deprecated
@@ -77,6 +82,16 @@ export interface Group extends Identifiable {
    adminEmail?: string // deprecated
 }
 
+export enum GroupPublicSparksActionTypes {
+   SPARK_TRIAL_EXPIRATION = "SPARK_TRIAL_EXPIRATION",
+}
+
+/**
+ * Contains Group fields properties, which have their history traceable
+ */
+export type GroupActionHistory = {
+   publicSparks?: GroupPublicSparksActionTypes
+}
 /**
  * This interface is essential for server-side timestamp serialization.
  * It helps in avoiding errors when passing these timestamps to the client.
