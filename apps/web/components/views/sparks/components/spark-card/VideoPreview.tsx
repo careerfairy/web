@@ -142,10 +142,9 @@ const VideoPreview: FC<Props> = ({
 
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
-         setProgress(progress.played * 100)
-
-         // only track the progress if it's not auto-played
+         // only track and show the progress if it's not auto-played
          if (!autoPlaying) {
+            setProgress(progress.played * 100)
             onProgress(progress)
          }
       },
