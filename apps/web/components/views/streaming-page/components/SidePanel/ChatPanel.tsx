@@ -15,14 +15,13 @@ const styles = sxStyles({
       p: 0,
       display: "flex",
       flexDirection: "column",
-      overflowX: "hidden",
       position: "relative",
    },
    portraitChat: {
-      minHeight: 372,
+      height: 372,
    },
    landscapeChat: {
-      minHeight: 294,
+      height: 294,
    },
 })
 
@@ -41,7 +40,7 @@ export const ChatPanel = () => {
          title="Chat"
          icon={<MessageCircle />}
          contentWrapperStyles={[styles.root, isMobile && chatPanelStyles]}
-         bottomContent={<ChatInput />}
+         bottomContent={<ChatInput scrollToBottom={scrollToBottom} />}
          contentRef={ref}
       >
          <ChatList scrollToBottom={scrollToBottom} />

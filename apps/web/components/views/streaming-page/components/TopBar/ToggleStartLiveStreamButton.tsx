@@ -28,6 +28,7 @@ export const ToggleStartLiveStreamButton = () => {
    const isMobile = useStreamIsMobile(390)
 
    const isStreamStartingSoon = useIsStreamStartingSoon(startsAt)
+   const streamHasNoStartTime = !startsAt // Test streams currently have no start time
 
    const [dialogState, setDialogState] = useState<ConfirmDialogState>({
       isDialogOpen: false,
@@ -45,14 +46,14 @@ export const ToggleStartLiveStreamButton = () => {
          <Tooltip
             placement="top"
             title={
-               isStreamStartingSoon
+               isStreamStartingSoon || streamHasNoStartTime
                   ? ""
                   : "The Start Streaming button will become active 2 minutes before the stream's official start time."
             }
          >
             <span>
                <ResponsiveStreamButton
-                  disabled={!isStreamStartingSoon}
+                  disabled={!(isStreamStartingSoon || streamHasNoStartTime)}
                   onClick={() =>
                      setDialogState({
                         isDialogOpen: true,
