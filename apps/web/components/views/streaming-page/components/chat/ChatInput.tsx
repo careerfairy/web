@@ -57,15 +57,17 @@ const styles = sxStyles({
    },
 })
 
+const MAX_MESSAGE_LENGTH = 1000
+
 const schema = Yup.object({
-   message: Yup.string().trim().required("Message is required"),
+   message: Yup.string().trim().required().max(MAX_MESSAGE_LENGTH),
 }).required()
 
 export type FormValues = Yup.InferType<typeof schema>
 
 export const ChatInput = () => {
    const { livestreamId, isHost, agoraUserId } = useStreamingContext()
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
 
    const isOpenStream = useOpenStream()
@@ -99,14 +101,18 @@ export const ChatInput = () => {
             message: "",
          })
 
+         const displayName = userData?.isAdmin
+            ? "CareerFairy"
+            : getStreamerDisplayName(
+                 streamerDetails?.firstName,
+                 streamerDetails?.lastName
+              )
+
          await livestreamService.addChatEntry({
             livestreamId,
             message: data.message,
             type: isHost ? "streamer" : "viewer",
-            shortenedName: getStreamerDisplayName(
-               streamerDetails?.firstName,
-               streamerDetails?.lastName
-            ),
+            displayName: displayName,
             authorEmail: getAuthorEmail(),
             agoraUserId,
          })
@@ -130,6 +136,9 @@ export const ChatInput = () => {
             render={({ field }) => (
                <OutlinedInput
                   {...field}
+                  onChange={(e) => {
+                     field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH)) // Update the value using React Hook Form's onChange
+                  }}
                   sx={styles.input}
                   placeholder="Write your message"
                   readOnly={formState.isSubmitting}
