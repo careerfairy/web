@@ -42,7 +42,7 @@ export const InvalidAlertTooltipContent: FC<
    const tabsWithErros = [
       isGenralTabInvalid && tabLabelsMap.general,
       isSpeakerTabInvalid && tabLabelsMap.speakers,
-   ]
+   ].filter(Boolean)
 
    return (
       <Stack padding="20px" spacing={2} width="100%">
