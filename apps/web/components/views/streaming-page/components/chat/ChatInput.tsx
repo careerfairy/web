@@ -85,6 +85,8 @@ export const ChatInput = () => {
     * @returns The author's email or a placeholder string.
     */
    const getAuthorEmail = () => {
+      if (userData?.isAdmin) return authenticatedUser.email
+
       if (isHost) return "Streamer"
 
       if (isOpenStream || !authenticatedUser.email) {
