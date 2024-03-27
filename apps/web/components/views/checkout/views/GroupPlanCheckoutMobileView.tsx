@@ -77,8 +77,9 @@ const View = () => {
             </Box>{" "}
          </Box>
          <Box mr={5}>
-            The page will be automatically refreshed upon completion and the
-            corresponding invoice sent to the specified email address.
+            Once you confirm the payment, your plan will be updated
+            automatically and you{"'"}ll receive a invoice straight to your
+            email.
          </Box>
          <Box mt={5} />
          <Box

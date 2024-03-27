@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Stack } from "@mui/material"
+import { Box, Button, Skeleton, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import GroupPlansDialog, { useSparksPlansForm } from "../GroupPlansDialog"
@@ -60,11 +60,29 @@ const styles = sxStyles({
       fontWeight: "400",
       lineHeight: "20px",
    },
+   sparkStaticCard: {
+      width: {
+         xs: "100%",
+         md: 281,
+      },
+      height: {
+         xs: "154vw",
+         md: "523px",
+      },
+   },
 })
-
+const SkeletonSelectSparksPlan = () => {
+   return (
+      <Skeleton
+         variant="rounded"
+         animation="wave"
+         sx={styles.sparkStaticCard}
+      />
+   )
+}
 const SelectSparksPlanView = () => {
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
+      <SuspenseWithBoundary fallback={<SkeletonSelectSparksPlan />}>
          <View />
       </SuspenseWithBoundary>
    )

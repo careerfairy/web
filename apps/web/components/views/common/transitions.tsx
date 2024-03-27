@@ -4,6 +4,7 @@ import { Slide } from "@mui/material"
 
 export const SlideUpTransition = React.forwardRef(function SlideUpTransition(
    props: TransitionProps & {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       children: React.ReactElement<any, any>
    },
    ref: React.Ref<unknown>
@@ -15,9 +16,33 @@ export const SlideUpTransition = React.forwardRef(function SlideUpTransition(
    )
 })
 
+export const SlideUpDownTransition = React.forwardRef(
+   function SlideUpDownTransition(
+      props: TransitionProps & {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         children: React.ReactElement<any, any>
+      },
+      ref: React.Ref<unknown>
+   ) {
+      const [direction, setDirection] = React.useState("up")
+
+      const slideDirection = direction as "left" | "right" | "up" | "down"
+      return (
+         <Slide
+            {...props}
+            ref={ref}
+            direction={slideDirection}
+            onEntered={() => setDirection("up")}
+            onExited={() => setDirection("down")}
+         />
+      )
+   }
+)
+
 export const SlideLeftTransition = React.forwardRef(
    function SlideLeftTransition(
       props: TransitionProps & {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          children: React.ReactElement<any, any>
       },
       ref: React.Ref<unknown>
