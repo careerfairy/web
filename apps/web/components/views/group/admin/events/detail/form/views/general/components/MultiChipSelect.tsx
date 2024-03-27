@@ -1,12 +1,13 @@
-import { FC } from "react"
-import { useFormikContext } from "formik"
-import { sxStyles } from "types/commonTypes"
+import { AutocompleteProps } from "@mui/material"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
-import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
 import {
    BrandedAutocompleteProps,
    FormBrandedAutocomplete,
 } from "components/views/common/inputs/BrandedAutocomplete"
+import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
+import { useFormikContext } from "formik"
+import { FC } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    input: {
@@ -22,7 +23,8 @@ const styles = sxStyles({
 type MultiChipSelectProps = {
    keyOptionIndexer?: string
    textFieldProps?: BrandedTextFieldProps
-} & BrandedAutocompleteProps
+} & BrandedAutocompleteProps &
+   Pick<AutocompleteProps<unknown, boolean, boolean, boolean>, "renderTags">
 
 const MultiChipSelect: FC<MultiChipSelectProps> = ({
    keyOptionIndexer,
