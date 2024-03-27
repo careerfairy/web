@@ -5,6 +5,7 @@ import { groupRepo, sparkRepo } from "../api/repositories"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import functions = require("firebase-functions")
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { DateTime } from "luxon"
 
 /**
  * Adds the current timestamp to the "addedToFeedAt" field of a spark.
@@ -34,6 +35,15 @@ export const validateGroupSparks = async (group: Group) => {
          groupPresenter.getMinimumCreatorsToPublishSparks()
       const minSparksPerCreatorToPublishSparks =
          groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
+
+      // If the groups current plan has expired no need for the other validations and set publicSparks = false
+      if (hasGroupPlanExpired(group)) {
+         // only update if needed
+         if (publicSparks) {
+            return groupRepo.updatePublicSparks(groupId, false)
+         }
+         return
+      }
 
       // If the group is not yet a public group there's no need to do all the other validations
       if (!publicProfile) {
@@ -122,4 +132,14 @@ export const validateGroupSparks = async (group: Group) => {
    } catch (error) {
       return functions.logger.error("Error during Spark validation", { error })
    }
+}
+
+function hasGroupPlanExpired(group: Group): boolean {
+   if (group.plan) {
+      const now = DateTime.now().toJSDate()
+      if (group.plan.expiresAt.toDate() < now) {
+         return true
+      }
+   }
+   return false
 }

@@ -11,7 +11,9 @@ import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
 import { groupRepo } from "./api/repositories"
 import { client } from "./api/postmark"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { validateGroupSparks } from "./util/sparks"
 import { RuntimeOptions } from "firebase-functions"
+
 
 /**
  * functions runtime settings
@@ -23,14 +25,16 @@ const runtimeSettings: RuntimeOptions = {
    memory: "4GB",
 }
 
-const setgroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
+
+
+const setGroupPlanSchema: SchemaOf<StartPlanData> = object().shape({
    planType: mixed().oneOf(Object.values(GroupPlanTypes)).required(),
    groupId: string().required(),
 })
 
 export const startPlan = functions.region(config.region).https.onCall(
    middlewares(
-      dataValidation(setgroupPlanSchema),
+      dataValidation(setGroupPlanSchema),
       userShouldBeCFAdmin(),
       async (data: StartPlanData, context) => {
          try {
@@ -62,7 +66,7 @@ export const startPlan = functions.region(config.region).https.onCall(
 export const checkExpiredPlans = functions
    .region(config.region)
    .runWith(runtimeSettings)
-   .pubsub.schedule("0 17 * * *") // everyday at 17pm
+   .pubsub.schedule("0 6 * * *") // everyday at 06:00 am
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       functions.logger.info("Starting execution of checkExpiredPlans")
@@ -88,9 +92,9 @@ export const manualCheckExpiredPlans = functions
 async function updateExpiredGroupPlans() {
    const types = [
       GroupPlanTypes.Trial,
-      GroupPlanTypes.Tier1,
-      GroupPlanTypes.Advanced,
-      GroupPlanTypes.Premium,
+      GroupPlanTypes.Tier1, 
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3
    ]
 
    try {
@@ -99,28 +103,31 @@ async function updateExpiredGroupPlans() {
          0,
          functions.logger
       )
-      const groups = expiringGroups.filter((group) =>
-         group.publicSparks
-            ? group.publicSparks
-            : group.publicSparks === undefined
-      )
 
-      const updatePromises = groups.map((group) => {
-         return groupRepo.updatePublicSparks(group.groupId, false)
-      })
+      const groups = expiringGroups.filter(
+         (group) =>
+            // Only want those whose have publicSparks = true or undefined values, those with false are already correct
+            group.publicProfile &&
+            (group.publicSparks
+               ? group.publicSparks
+               : group.publicSparks === undefined)
+      )
+      // validateGroupSparks does the actual check and update if plan is already expired
+      const updatePromises = groups.map(validateGroupSparks)
 
       await Promise.all(updatePromises)
 
-      // TODO set Sparks published flag to false
-      // return groupRepo.updatePublicSparks(groupId, false)
       functions.logger.info(
-         "Updated publicSparks to false for ",
+         "Executed validateGroupSparks for the following groups:  ",
          groups.map((g) => g.groupId)
       )
    } catch (error) {
-      logAndThrow("Error while updating expired group plans", {
-         error,
-      })
+      logAndThrow(
+         "Error while executing validateGroupSparks for groups with expiring plans",
+         {
+            error,
+         }
+      )
    }
 }
 /**
