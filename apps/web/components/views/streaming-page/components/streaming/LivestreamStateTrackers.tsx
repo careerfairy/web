@@ -12,6 +12,7 @@ import {
    setStarted,
    setStartsAt,
 } from "store/reducers/streamingAppReducer"
+import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
 /**
  * Component to track and update the livestream state in the Redux store.
@@ -67,6 +68,10 @@ export const LivestreamStateTrackers = (): null => {
    useEffect(() => {
       dispatch(setOpenStream(Boolean(livestream.openStream)))
    }, [dispatch, livestream.openStream])
+
+   useEffect(() => {
+      dispatch(setCompanyLogoUrl(livestream.companyLogoUrl))
+   }, [dispatch, livestream.companyLogoUrl])
 
    // Clean up the state on unmount
    useEffect(() => {

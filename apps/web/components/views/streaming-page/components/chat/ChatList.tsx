@@ -1,89 +1,112 @@
-import { useStreamingContext } from "../../context"
-import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
-import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
-import { EmptyChatView } from "./EmptyChatView"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { Box, CircularProgress, Slide } from "@mui/material"
-import { useEffect, useMemo, useRef } from "react"
+import { CircularProgress, IconButton, Slide } from "@mui/material"
+import { Fragment, useEffect, useMemo } from "react"
+import { ChevronDown } from "react-feather"
 import { ChatEntry } from "./ChatEntry"
-import AutoSizer from "react-virtualized-auto-sizer"
-
-import ScrollToBottom, {
-   useScrollToBottom,
-   useSticky,
-} from "react-scroll-to-bottom"
+import { EmptyChatView } from "./EmptyChatView"
+import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
+import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { TransitionGroup } from "react-transition-group"
-import { useAuth } from "HOCs/AuthProvider"
 import { isMe } from "./util"
+import { useAuth } from "HOCs/AuthProvider"
+import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
+import { useInView } from "react-intersection-observer"
+import { useStreamingContext } from "../../context"
+import { sxStyles } from "types/commonTypes"
+import { Box } from "@mui/material"
+import { Grow } from "@mui/material"
 
-export const ChatList = () => {
+const ARROW_HEIGHT = 40
+
+const styles = sxStyles({
+   button: {
+      ml: "auto",
+      position: "sticky",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      bottom: 15,
+      right: 15,
+      "& svg": {
+         color: (theme) => theme.palette.grey[500],
+         height: 15,
+         width: 15,
+      },
+   },
+   list: {
+      mb: `-${ARROW_HEIGHT}px`,
+      bgcolor: (theme) => theme.brand.white[100],
+   },
+})
+
+type Props = {
+   scrollToBottom: ScrollToBottom["scrollToBottom"]
+}
+
+export const ChatList = (props: Props) => {
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
-         <AutoSizer>
-            {({ height, width }) => {
-               return (
-                  <Box
-                     component={ScrollToBottom}
-                     scrollViewClassName="chat-list"
-                     initialScrollBehavior="auto"
-                     width={width}
-                     sx={{
-                        "& .chat-list": {
-                           overflowX: "hidden",
-                        },
-                     }}
-                     height={height}
-                  >
-                     <Content />
-                  </Box>
-               )
-            }}
-         </AutoSizer>
+         <Content {...props} />
       </SuspenseWithBoundary>
    )
 }
 
-export const Content = () => {
+export const Content = ({ scrollToBottom }: Props) => {
    const { authenticatedUser } = useAuth()
+
+   const [ref, isBottom] = useInView()
+
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
       limit: MAX_STREAM_CHAT_ENTRIES,
    })
 
-   const scrollToBottom = useScrollToBottom()
-   const [sticky] = useSticky() //  In order for use sticky hook to work,
-   const stickyRef = useRef<boolean>(sticky)
-   const containerRef = useRef<HTMLElement>(null)
-
-   stickyRef.current = sticky
    useEffect(() => {
-      //  the component must be the child of a scroll to bottom
-      if (stickyRef.current) {
-         scrollToBottom({ behavior: "auto" })
+      // Scroll to bottom on first load
+      scrollToBottom("instant")
+   }, [scrollToBottom])
+
+   useEffect(() => {
+      if (isBottom) {
+         scrollToBottom("smooth")
       }
-   }, [chatEntries, scrollToBottom])
+   }, [chatEntries, isBottom, scrollToBottom])
 
    const sortedChatEntries = useMemo(() => chatEntries.reverse(), [chatEntries])
 
    if (!chatEntries.length) return <EmptyChatView />
 
    return (
-      <Box width="100%" height="100%" ref={containerRef}>
-         <TransitionGroup>
-            {sortedChatEntries.map((entry) => (
-               <Slide
-                  direction={
-                     isMe(entry, agoraUserId, authenticatedUser.email)
-                        ? "left"
-                        : "right"
-                  }
-                  key={entry.id}
-                  container={containerRef.current}
+      <Fragment>
+         <Box sx={styles.list}>
+            <TransitionGroup>
+               {sortedChatEntries.map((entry, index) => (
+                  <Slide
+                     key={entry.id}
+                     direction={
+                        isMe(entry, agoraUserId, authenticatedUser.email)
+                           ? "left"
+                           : "right"
+                     }
+                     exit={false} // Don't slide out when removed
+                     ref={index === sortedChatEntries.length - 1 ? ref : null}
+                  >
+                     <ChatEntry entry={entry} />
+                  </Slide>
+               ))}
+            </TransitionGroup>
+         </Box>
+         <Grow in={!isBottom}>
+            <Box component="span" sx={styles.button}>
+               <IconButton
+                  size="small"
+                  aria-label="Scroll to bottom"
+                  onClick={() => scrollToBottom()}
                >
-                  <ChatEntry entry={entry} />
-               </Slide>
-            ))}
-         </TransitionGroup>
-      </Box>
+                  <ChevronDown />
+               </IconButton>
+            </Box>
+         </Grow>
+      </Fragment>
    )
 }
