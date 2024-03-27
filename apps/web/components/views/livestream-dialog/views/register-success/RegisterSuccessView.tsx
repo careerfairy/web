@@ -129,7 +129,7 @@ const RegisterSuccessView: FC = () => {
    const [isSparksOpen, setIsSparksOpen] = useState(false)
 
    const handleDiscoverSparks = () => {
-      setIsSparksOpen(!isSparksOpen)
+      setIsSparksOpen(true)
    }
 
    useEffect(() => {
@@ -226,11 +226,18 @@ const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
                   {"'"}t miss it.
                </Typography>
             )}
-
-            <ActionButtons
-               handleDiscoverSparks={handleDiscoverSparks}
-               isSparksOpen={isSparksOpen}
-            />
+            <SuspenseWithBoundary
+               fallback={
+                  <Box>
+                     <CircularProgress />
+                  </Box>
+               }
+            >
+               <ActionButtons
+                  handleDiscoverSparks={handleDiscoverSparks}
+                  isSparksOpen={isSparksOpen}
+               />
+            </SuspenseWithBoundary>
          </Box>
          <Slide direction="up" in={isSparksOpen} unmountOnExit>
             <Box>
@@ -303,45 +310,6 @@ const Header = ({ isSparksOpen }) => {
 }
 
 const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
-   const { livestream } = useLiveStreamDialog()
-
-   return (
-      <Box sx={styles.buttonsWrapper}>
-         <Stack spacing={1.2} sx={styles.buttons}>
-            <AddToCalendar
-               event={livestream}
-               filename={`${livestream.company}-event`}
-            >
-               {(handleClick) => (
-                  <Button
-                     fullWidth
-                     variant={"contained"}
-                     color={"primary"}
-                     onClick={handleClick}
-                     size="large"
-                     startIcon={<CalendarIcon />}
-                  >
-                     Add to calendar
-                  </Button>
-               )}
-            </AddToCalendar>
-            {!isSparksOpen && (
-               <SuspenseWithBoundary
-                  fallback={
-                     <Box>
-                        <CircularProgress />
-                     </Box>
-                  }
-               >
-                  <DiscoverButton handleDiscoverSparks={handleDiscoverSparks} />
-               </SuspenseWithBoundary>
-            )}
-         </Stack>
-      </Box>
-   )
-}
-
-const DiscoverButton = ({ handleDiscoverSparks }) => {
    const route = useRouter()
    const { closeDialog, livestream } = useLiveStreamDialog()
    const groupHasSparks = useGroupHasSparks(livestream.groupIds[0])
@@ -358,18 +326,45 @@ const DiscoverButton = ({ handleDiscoverSparks }) => {
    }, [closeDialog, eventDetailsDialogVisibility, route])
 
    return (
-      <Button
-         variant={groupHasSparks ? "outlined" : "text"}
-         color={groupHasSparks ? "primary" : "grey"}
-         onClick={groupHasSparks ? handleDiscoverSparks : handleBackClick}
-         size="large"
-      >
-         {groupHasSparks
-            ? "Discover company Sparks"
-            : eventDetailsDialogVisibility
-            ? "Back to Sparks"
-            : "Discover more live streams"}
-      </Button>
+      <Box sx={styles.buttonsWrapper}>
+         <Stack spacing={1.2} sx={styles.buttons}>
+            <AddToCalendar
+               event={livestream}
+               filename={`${livestream.company}-event`}
+               onCalendarClick={() => groupHasSparks && handleDiscoverSparks()}
+            >
+               {(handleClick) => (
+                  <Button
+                     fullWidth
+                     variant={"contained"}
+                     color={"primary"}
+                     onClick={handleClick}
+                     size="large"
+                     startIcon={<CalendarIcon />}
+                  >
+                     Add to calendar
+                  </Button>
+               )}
+            </AddToCalendar>
+
+            {!isSparksOpen && (
+               <Button
+                  variant={groupHasSparks ? "outlined" : "text"}
+                  color={groupHasSparks ? "primary" : "grey"}
+                  onClick={
+                     groupHasSparks ? handleDiscoverSparks : handleBackClick
+                  }
+                  size="large"
+               >
+                  {groupHasSparks
+                     ? "Discover company Sparks"
+                     : eventDetailsDialogVisibility
+                     ? "Back to Sparks"
+                     : "Discover more live streams"}
+               </Button>
+            )}
+         </Stack>
+      </Box>
    )
 }
 
