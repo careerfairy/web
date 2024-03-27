@@ -1,5 +1,5 @@
-import { CircularProgress, IconButton, Slide } from "@mui/material"
-import { Fragment, useEffect, useMemo } from "react"
+import { CircularProgress, IconButton } from "@mui/material"
+import { Fragment, useEffect, useMemo, useRef } from "react"
 import { ChevronDown } from "react-feather"
 import { ChatEntry } from "./ChatEntry"
 import { EmptyChatView } from "./EmptyChatView"
@@ -7,8 +7,6 @@ import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
 import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { TransitionGroup } from "react-transition-group"
-import { isMe } from "./util"
-import { useAuth } from "HOCs/AuthProvider"
 import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
 import { useInView } from "react-intersection-observer"
 import { useStreamingContext } from "../../context"
@@ -52,11 +50,10 @@ export const ChatList = (props: Props) => {
 }
 
 export const Content = ({ scrollToBottom }: Props) => {
-   const { authenticatedUser } = useAuth()
-
    const [ref, isBottom] = useInView()
+   const containerRef = useRef<HTMLDivElement>(null)
 
-   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { livestreamId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
       limit: MAX_STREAM_CHAT_ENTRIES,
    })
@@ -78,21 +75,14 @@ export const Content = ({ scrollToBottom }: Props) => {
 
    return (
       <Fragment>
-         <Box sx={styles.list}>
+         <Box ref={containerRef} sx={styles.list}>
             <TransitionGroup>
                {sortedChatEntries.map((entry, index) => (
-                  <Slide
+                  <ChatEntry
                      key={entry.id}
-                     direction={
-                        isMe(entry, agoraUserId, authenticatedUser.email)
-                           ? "left"
-                           : "right"
-                     }
-                     exit={false} // Don't slide out when removed
+                     entry={entry}
                      ref={index === sortedChatEntries.length - 1 ? ref : null}
-                  >
-                     <ChatEntry entry={entry} />
-                  </Slide>
+                  />
                ))}
             </TransitionGroup>
          </Box>

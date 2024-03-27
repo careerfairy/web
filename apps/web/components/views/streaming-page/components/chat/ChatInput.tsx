@@ -11,6 +11,7 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getStreamerDisplayName } from "../../util"
+import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
 
 const styles = sxStyles({
    root: {
@@ -65,7 +66,10 @@ const schema = Yup.object({
 
 export type FormValues = Yup.InferType<typeof schema>
 
-export const ChatInput = () => {
+type Props = {
+   scrollToBottom: ScrollToBottom["scrollToBottom"]
+}
+export const ChatInput = ({ scrollToBottom }: Props) => {
    const { livestreamId, isHost, agoraUserId } = useStreamingContext()
    const { authenticatedUser, userData } = useAuth()
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
@@ -110,6 +114,7 @@ export const ChatInput = () => {
                  streamerDetails?.lastName
               )
 
+         scrollToBottom("smooth")
          await livestreamService.addChatEntry({
             livestreamId,
             message: data.message,

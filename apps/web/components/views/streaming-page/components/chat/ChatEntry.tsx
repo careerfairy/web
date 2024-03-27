@@ -7,6 +7,7 @@ import { useCompanyLogoUrl } from "store/selectors/streamingAppSelectors"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import DateUtil from "util/DateUtil"
+import LinkifyText from "components/util/LinkifyText"
 
 const AVATAR_SIZE = 29
 
@@ -53,7 +54,9 @@ const styles = sxStyles({
          bgcolor: "none",
       },
    },
-   text: {},
+   text: {
+      wordBreak: "break-word",
+   },
 })
 
 type Props = {
@@ -97,8 +100,13 @@ export const ChatEntry = memo(
                   )}
                </Typography>
             </Stack>
-            <Typography color="neutral.800" variant="small">
-               {entry.message}
+            <Typography
+               color="neutral.800"
+               variant="small"
+               component="p"
+               sx={styles.text}
+            >
+               <LinkifyText>{entry.message}</LinkifyText>
             </Typography>
             <Typography color="neutral.200" variant="xsmall">
                {timeSinceEntry}
