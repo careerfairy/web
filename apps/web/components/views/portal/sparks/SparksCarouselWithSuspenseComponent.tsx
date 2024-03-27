@@ -1,5 +1,12 @@
 import { Box, IconButton, Stack, SxProps, Theme } from "@mui/material"
-import { FC, ReactNode, useEffect, useRef, useState } from "react"
+import {
+   ComponentType,
+   FC,
+   ReactNode,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import SparksCarousel, {
    ChildRefType,
 } from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
@@ -7,7 +14,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import SparksCarouselSkeleton from "components/views/admin/sparks/general-sparks-view/SparksCarouselSkeleton"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useSparks from "components/custom-hook/spark/useSparks"
-import { ArrowLeft, ArrowRight } from "react-feather"
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { EmblaOptionsType } from "embla-carousel-react"
 
@@ -16,6 +23,8 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
+      alignItems: "center",
+      alignSelf: "stretch",
    },
    arrowIcon: {
       padding: 0,
@@ -27,6 +36,12 @@ const styles = sxStyles({
    defaultSparks: {
       pl: 2,
    },
+   buttonsWrapper: {
+      display: "flex",
+   },
+   noPadding: {
+      p: 0,
+   },
 })
 
 type Props = {
@@ -34,6 +49,11 @@ type Props = {
    groupId?: string
    handleSparksClicked: (spark: Spark) => void
    sx?: SxProps<Theme>
+   showArrows?: boolean
+   /**
+    * The sliding arrows component to show if showArrows is true.
+    */
+   arrows?: ComponentType<ArrowsProps>
 }
 type FallbackComponentProps = {
    header: ReactNode
@@ -47,6 +67,8 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    header,
    groupId,
    handleSparksClicked,
+   showArrows = false,
+   arrows,
    sx,
 }) => {
    const [isClient, setIsClient] = useState(false)
@@ -61,6 +83,8 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
             header={header}
             groupId={groupId}
             handleSparksClicked={handleSparksClicked}
+            showArrows={showArrows}
+            arrows={arrows}
             sx={sx}
          />
       </SuspenseWithBoundary>
@@ -80,36 +104,40 @@ const FallbackComponent: FC<FallbackComponentProps> = ({ header }) => {
    )
 }
 
-const Component: FC<Props> = ({ header, groupId, handleSparksClicked, sx }) => {
+const Component: FC<Props> = ({
+   header,
+   groupId,
+   handleSparksClicked,
+   showArrows,
+   arrows: Arrows,
+   sx,
+}) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
-   const withControls = Boolean(groupId)
+   const onClickPrev = () => {
+      childRef?.current?.goPrev()
+   }
+   const onClickNext = () => {
+      childRef?.current?.goNext()
+   }
    return sparksContent.length ? (
-      <Box sx={combineStyles(styles.defaultSparks, sx)} id="test">
+      <Box sx={combineStyles(styles.defaultSparks, sx)}>
          <Stack spacing={1.25}>
-            <Box sx={styles.stack}>
+            {/* className is here for styling purposes on the parent components */}
+            <Box className="header" sx={styles.stack}>
                {header}
-               {withControls ? (
-                  <Box>
-                     <IconButton
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           childRef?.current?.goPrev()
-                        }}
-                     >
-                        <ArrowLeft fontSize={"large"} />
-                     </IconButton>
-                     <IconButton
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           childRef?.current?.goNext()
-                        }}
-                     >
-                        <ArrowRight fontSize={"large"} />
-                     </IconButton>
-                  </Box>
+               {showArrows ? (
+                  Arrows ? (
+                     <Arrows
+                        onClickPrev={onClickPrev}
+                        onClickNext={onClickNext}
+                     />
+                  ) : (
+                     <DefaultArrows
+                        onClickPrev={onClickPrev}
+                        onClickNext={onClickNext}
+                     />
+                  )
                ) : null}
             </Box>
             <SparksCarousel
@@ -122,6 +150,56 @@ const Component: FC<Props> = ({ header, groupId, handleSparksClicked, sx }) => {
          </Stack>
       </Box>
    ) : null
+}
+
+type ArrowsProps = {
+   onClickPrev: () => void
+   onClickNext: () => void
+}
+
+const DefaultArrows: FC<ArrowsProps> = ({ onClickPrev, onClickNext }) => {
+   return (
+      <Box>
+         <IconButton
+            color="inherit"
+            sx={styles.arrowIcon}
+            onClick={onClickPrev}
+         >
+            <ArrowLeft fontSize={"large"} />
+         </IconButton>
+         <IconButton
+            color="inherit"
+            sx={styles.arrowIcon}
+            onClick={onClickNext}
+         >
+            <ArrowRight fontSize={"large"} />
+         </IconButton>
+      </Box>
+   )
+}
+
+export const MobileSparksArrows: FC<ArrowsProps> = ({
+   onClickPrev,
+   onClickNext,
+}) => {
+   return (
+      <Box sx={styles.buttonsWrapper} gap={1.2}>
+         <IconButton
+            sx={styles.noPadding}
+            color="inherit"
+            onClick={onClickPrev}
+         >
+            <ChevronLeft fontSize={"large"} />
+         </IconButton>
+         <IconButton
+            sx={styles.noPadding}
+            color="inherit"
+            onClick={onClickNext}
+         >
+            <ChevronRight fontSize={"large"} />
+         </IconButton>
+      </Box>
+   )
 }
 
 export default SparksCarouselWithSuspenseComponent
