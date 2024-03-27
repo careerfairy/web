@@ -121,7 +121,7 @@ const EntryAvatar = ({ entry, authorType }: EntryAvatarProps) => {
 
    if (
       authorType === ChatAuthor.Viewer ||
-      (authorType === ChatAuthor.Streamer && !companyLogoUrl) // Edge-case: When livestream is missing company logo
+      (authorType === ChatAuthor.Streamer && !companyLogoUrl) // Edge-case: When livestream is missing company logo, we use initials
    ) {
       return (
          <ColorizedAvatar
