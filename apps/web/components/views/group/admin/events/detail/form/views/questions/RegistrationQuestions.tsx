@@ -1,8 +1,8 @@
-import { useGroups } from "components/custom-hook/useCollection"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import MultiChipSelect from "../general/components/MultiChipSelect"
+import RegistrationQuestionsListForCFAdmin from "./RegistrationQuestionsListCFAdmin"
 
 const RegistrationQuestions = () => {
    const {
@@ -11,11 +11,6 @@ const RegistrationQuestions = () => {
    const { isCFAdmin } = useLivestreamCreationContext()
 
    const { groupQuestions } = useGroup()
-   const { data: allGroups } = useGroups()
-   console.log(
-      "🚀 ~ useGetRegistrationQuestionsForCFAdmin ~ allGroups:",
-      allGroups
-   )
 
    if (!isCFAdmin) {
       return (
@@ -34,33 +29,7 @@ const RegistrationQuestions = () => {
       )
    }
 
-   return (
-      <>
-         <MultiChipSelect
-            id="questions.registrationQuestions"
-            options={groupQuestions}
-            value={questions.registrationQuestions ?? []}
-            multiple
-            disableCloseOnSelect
-            textFieldProps={{
-               label: "Live Stream Hosts",
-               placeholder: "Add some hosts to your live stream",
-            }}
-         />
-         <MultiChipSelect
-            id="questions.registrationQuestions"
-            options={groupQuestions}
-            value={questions.registrationQuestions ?? []}
-            multiple
-            disableCloseOnSelect
-            textFieldProps={{
-               label: "Questions for live stream registration",
-               placeholder:
-                  "Add some questions you'd like to ask on live stream registration",
-            }}
-         />
-      </>
-   )
+   return <RegistrationQuestionsListForCFAdmin />
 }
 
 export default RegistrationQuestions
