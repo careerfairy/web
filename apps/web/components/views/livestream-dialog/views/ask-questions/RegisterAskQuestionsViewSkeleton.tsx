@@ -12,10 +12,37 @@ import { sxStyles } from "@careerfairy/shared-ui"
 const styles = sxStyles({
    contentOffset: {
       mt: { xs: -7.8, md: -15 },
+      spacing: 2,
+      width: "100%",
    },
    hero: {
       pb: { xs: 2, md: 9 },
       pt: { xs: 0, md: 1 },
+      alignItems: "center",
+      spacing: 1.75,
+   },
+   heroText: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      maxWidth: 655,
+      width: "100%",
+   },
+   inputBox: {
+      width: "90%",
+      borderRadius: 2,
+      height: 120,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "end",
+      boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.04)",
+      border: "1px solid #DCDCDC",
+   },
+   inputWrapper: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
       alignItems: "center",
    },
 })
@@ -30,23 +57,14 @@ const RegisterAskQuestionsViewSkeleton: FC = () => {
                onBackClick={() => {}}
                noMinHeight
             >
-               <Stack spacing={1.75} sx={styles.hero}>
+               <Stack sx={styles.hero}>
                   <Box
                      component={Skeleton}
                      variant={"circular"}
                      width={isMobile ? 80 : 104}
                      height={isMobile ? 80 : 104}
                   />
-                  <Box
-                     component={Typography}
-                     display="flex"
-                     flexDirection="column"
-                     justifyContent="center"
-                     alignItems="center"
-                     variant="h2"
-                     maxWidth={655}
-                     width="100%"
-                  >
+                  <Box component={Typography} sx={styles.heroText} variant="h2">
                      <Skeleton width="60%" />
                      <Box component={Skeleton} mx="auto" width="50%" />
                   </Box>
@@ -55,24 +73,9 @@ const RegisterAskQuestionsViewSkeleton: FC = () => {
          }
          mainContent={
             <MainContent>
-               <Stack sx={styles.contentOffset} spacing={2} width="100%">
-                  <Box
-                     width="100%"
-                     display="flex"
-                     justifyContent="center"
-                     alignItems="center"
-                  >
-                     <Box
-                        width="90%"
-                        borderRadius={2}
-                        component={Paper}
-                        height={120}
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="end"
-                        boxShadow="0px 6px 20px rgba(0, 0, 0, 0.04)"
-                        border="1px solid #DCDCDC"
-                     />
+               <Stack sx={styles.contentOffset}>
+                  <Box sx={styles.inputWrapper}>
+                     <Box sx={styles.inputBox} component={Paper} />
                   </Box>
                   <QuestionsSkeleton />
                </Stack>
