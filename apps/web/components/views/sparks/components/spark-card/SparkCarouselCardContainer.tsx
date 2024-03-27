@@ -75,13 +75,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
             videoUrl={video.url}
             pausing={autoPlayEnabled ? !autoPlaying : undefined}
             playing={autoPlayEnabled ? autoPlaying : video.preview}
-            light={
-               autoPlayEnabled
-                  ? isMobile
-                     ? !autoPlaying
-                     : false
-                  : !video.preview
-            }
+            light={isMobile ? !autoPlaying : false}
             autoPlaying={autoPlaying}
             containPreviewOnTablet
             muted={autoPlayEnabled ? true : undefined}

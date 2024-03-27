@@ -71,9 +71,7 @@ const SparkCarouselCard: FC<Props> = ({
       }
 
       return () => {
-         // if (currentContainerRef) {
          observer.unobserve(currentContainerRef)
-         // }
          clearTimeout(timeout)
       }
    }, [isMobile])
@@ -104,7 +102,7 @@ const SparkCarouselCard: FC<Props> = ({
          video={{
             thumbnailUrl: spark.video.thumbnailUrl,
             url: sparkPresenter.getTransformedVideoUrl(),
-            preview: preview,
+            preview,
          }}
          onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
          onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
