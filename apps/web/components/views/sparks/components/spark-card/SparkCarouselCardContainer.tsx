@@ -2,6 +2,7 @@ import Box from "@mui/material/Box"
 import React, { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import VideoPreview from "./VideoPreview"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {
@@ -58,6 +59,7 @@ const SparkCarouselCardContainer: FC<Props> = ({
    containerRef,
 }) => {
    const autoPlayEnabled = autoPlaying !== undefined
+   const isMobile = useIsMobile()
 
    return (
       <Box
@@ -71,10 +73,19 @@ const SparkCarouselCardContainer: FC<Props> = ({
          <VideoPreview
             thumbnailUrl={video.thumbnailUrl}
             videoUrl={video.url}
-            playing={video.preview}
-            light={autoPlayEnabled ? false : !video.preview}
+            pausing={autoPlayEnabled ? !autoPlaying : undefined}
+            playing={autoPlayEnabled ? autoPlaying : video.preview}
+            light={
+               autoPlayEnabled
+                  ? isMobile
+                     ? !autoPlaying
+                     : false
+                  : !video.preview
+            }
             autoPlaying={autoPlaying}
+            containPreviewOnTablet
             muted={autoPlayEnabled ? true : undefined}
+            identifier={video.url}
          />
       </Box>
    )
