@@ -271,8 +271,7 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
 exports.startPlan_v3 = groupPlans.startPlan
 exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
-exports.checkExpiredPlans = groupPlans.checkExpiredPlans
-exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
+
 // Search
 exports.fullIndexSync = search.fullIndexSync
 
