@@ -9,6 +9,7 @@ import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
 import { SchemaOf, mixed, object, string } from "yup"
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { logAndThrow } from "./lib/validations"
+import { validateGroupSparks } from "./util/sparks"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
@@ -230,7 +231,10 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
             const metadata = paymentSucceedEvent.data.object.metadata
             if (metadata && metadata.groupId && metadata.plan) {
                const plan = metadata.plan as GroupPlanType
+
                await groupRepo.startPlan(metadata.groupId, plan)
+               const group = await groupRepo.getGroupById(metadata.groupId)
+               await validateGroupSparks(group)
 
                functions.logger.info(
                   "✅ Successfully processed event - Stripe Customer: " +
