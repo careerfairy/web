@@ -43,13 +43,14 @@ const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
    </MenuItem>
 )
 
-const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
+const Dropdown = ({ filename, handleClose, anchorEl, urls, onClick }) => {
    return (
       <Menu
          id="add to calendar menu"
          anchorEl={anchorEl}
          open={Boolean(anchorEl)}
          onClose={handleClose}
+         onClick={onClick}
       >
          <LinkMenuItem
             onClick={handleClose}
@@ -105,6 +106,11 @@ type Props = {
    children: (handler: (event: any) => void) => void
    event: LivestreamEvent
    filename: string
+   /**
+    *
+    * Action to take when clicking on the menu of the calendar dropdown.
+    */
+   onCalendarClick?: () => void
 }
 
 export const createCalendarEvent = (
@@ -134,6 +140,7 @@ export const AddToCalendar = memo(function AddToCalendar({
    children,
    event,
    filename = "download",
+   onCalendarClick,
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
@@ -156,6 +163,7 @@ export const AddToCalendar = memo(function AddToCalendar({
             anchorEl={anchorEl}
             handleClose={handleClose}
             urls={urls}
+            onClick={onCalendarClick}
          />
       </>
    )
