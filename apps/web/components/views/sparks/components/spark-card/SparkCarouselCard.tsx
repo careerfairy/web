@@ -27,7 +27,6 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
-   isLastPosition?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -35,7 +34,6 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
-   isLastPosition,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
@@ -81,21 +79,17 @@ const SparkCarouselCard: FC<Props> = ({
       let timeout
 
       if (autoPlaying && isMobile) {
+         // After auto-play we should transition to the next spark
          timeout = setTimeout(() => {
-            if (isLastPosition) {
-               // if it's the last spark on the carousel and already auto-played we should set the autoPlaying to false and do nothing
-               setAutoPlaying(false)
-            } else {
-               // After auto-play we should transition to the next spark
-               onGoNext && onGoNext()
-            }
+            setAutoPlaying(false)
+            onGoNext && onGoNext()
          }, AUTO_PLAY_TIME)
       }
 
       return () => {
          clearTimeout(timeout)
       }
-   }, [autoPlaying, isLastPosition, isMobile, onGoNext])
+   }, [autoPlaying, isMobile, onGoNext])
 
    return (
       <SparkCarouselCardContainer
