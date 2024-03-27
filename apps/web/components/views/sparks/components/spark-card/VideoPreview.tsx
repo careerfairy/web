@@ -205,7 +205,7 @@ const VideoPreview: FC<Props> = ({
    const playingVideo = Boolean(playing && !shouldPause)
 
    return (
-      <Box sx={[styles.root, autoPlaying ? { border: "5px solid red" } : null]}>
+      <Box sx={styles.root}>
          <Box
             sx={[
                styles.playerWrapper,
@@ -260,7 +260,7 @@ export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay, { border: "5px solid green" }]}>
+      <Box sx={styles.thumbnailOverlay}>
          <Image
             src={src}
             layout="fill"
