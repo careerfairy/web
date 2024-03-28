@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
 import { sxStyles } from "types/commonTypes"
@@ -9,7 +9,7 @@ import { Stack } from "@mui/material"
 import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { debounce } from "lodash"
+import { useInView } from "react-intersection-observer"
 
 const cardPadding = 2
 export const AUTO_PLAY_TIME = 5000
@@ -27,6 +27,7 @@ type Props = {
    preview?: boolean
    onClick?: () => void
    onGoNext?: () => void
+   mobileActiveSpark?: boolean
 }
 
 const SparkCarouselCard: FC<Props> = ({
@@ -34,45 +35,29 @@ const SparkCarouselCard: FC<Props> = ({
    onClick,
    preview = false,
    onGoNext,
+   mobileActiveSpark,
 }) => {
    const sparkPresenter = SparkPresenter.createFromFirebaseObject(spark)
    const [autoPlaying, setAutoPlaying] = useState(false)
-   const containerRef = useRef<HTMLDivElement>(null)
    const isMobile = useIsMobile()
+   const [inViewRef, inView] = useInView({ threshold: 1 })
 
-   // Set up intersection observer to handle auto-playing
+   // Set up intersection observer to handle auto-playing only when the card is visible
    useEffect(() => {
-      const currentContainerRef = containerRef.current
       let timeout
-
-      const observable = (entries) => {
-         const entry = entries[0]
-
-         if (entry && entry.intersectionRatio > 0.9) {
-            timeout = setTimeout(() => {
-               setAutoPlaying(true)
-            }, 1000)
-         } else {
-            setAutoPlaying(false)
-            clearTimeout(timeout)
-         }
-      }
-
-      const debouncedObservable = debounce(observable, 300)
-
-      const observer = new IntersectionObserver(debouncedObservable, {
-         threshold: 0.9,
-      })
-
-      if (isMobile && containerRef.current) {
-         observer.observe(containerRef.current)
+      if (inView && mobileActiveSpark) {
+         timeout = setTimeout(() => {
+            setAutoPlaying(true)
+         }, 1000)
+      } else {
+         setAutoPlaying(false)
+         clearTimeout(timeout)
       }
 
       return () => {
-         observer.unobserve(currentContainerRef)
          clearTimeout(timeout)
       }
-   }, [isMobile])
+   }, [inView, mobileActiveSpark])
 
    // Set up auto-playing timeout for mobile experience
    useEffect(() => {
@@ -101,7 +86,7 @@ const SparkCarouselCard: FC<Props> = ({
          onMouseEnter={isMobile ? null : () => setAutoPlaying(true)}
          onMouseLeave={isMobile ? null : () => setAutoPlaying(false)}
          autoPlaying={autoPlaying}
-         containerRef={containerRef}
+         containerRef={inViewRef}
       >
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={false} spark={spark} />
