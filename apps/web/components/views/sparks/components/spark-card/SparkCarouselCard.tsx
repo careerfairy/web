@@ -10,9 +10,9 @@ import SparkCarouselCardContainer from "./SparkCarouselCardContainer"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useInView } from "react-intersection-observer"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const cardPadding = 2
-export const AUTO_PLAY_TIME = 5000
 
 const styles = sxStyles({
    cardDetails: {
@@ -68,7 +68,7 @@ const SparkCarouselCard: FC<Props> = ({
          timeout = setTimeout(() => {
             setAutoPlaying(false)
             onGoNext && onGoNext()
-         }, AUTO_PLAY_TIME)
+         }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
       }
 
       return () => {

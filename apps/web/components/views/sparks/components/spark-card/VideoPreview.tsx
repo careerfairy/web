@@ -13,7 +13,7 @@ import { sxStyles } from "types/commonTypes"
 import { usePrevious } from "react-use"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { AUTO_PLAY_TIME } from "./SparkCarouselCard"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const styles = sxStyles({
    root: {
@@ -171,7 +171,7 @@ const VideoPreview: FC<Props> = ({
       }
    }, [autoPlaying])
 
-   // Set up an interval to reset the video if auto-played for more than {AUTO_PLAY_TIME} seconds
+   // Set up an interval to reset the video if auto-played for more than {SECONDS_TO_AUTO_PLAY} seconds
    useEffect(() => {
       let interval: NodeJS.Timeout | null = null
 
@@ -179,7 +179,7 @@ const VideoPreview: FC<Props> = ({
          if (autoPlaying) {
             interval = setInterval(() => {
                reset()
-            }, AUTO_PLAY_TIME)
+            }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
          } else {
             if (interval) {
                clearInterval(interval)
