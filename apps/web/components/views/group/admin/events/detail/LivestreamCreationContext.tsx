@@ -43,7 +43,7 @@ type LivestreamCreationContextType = {
    >
    shouldShowAlertDialog: boolean
    shouldShowAlertIndicator: boolean
-   isGenralTabInvalid: boolean
+   isGeneralTabInvalid: boolean
    isSpeakerTabInvalid: boolean
    isUniversityEvent: boolean // edge case where university cohost events with companies
    isCohostedEvent: boolean
@@ -85,14 +85,14 @@ export const LivestreamCreationContextProvider: FC<
       handleValidationCloseDialog,
    ] = useDialogStateHandler()
 
-   const isGenralTabInvalid =
+   const isGeneralTabInvalid =
       !livestreamFormGeneralTabSchema.isValidSync(general) &&
       tabsVisited[TAB_VALUES.GENERAL]
    const isSpeakerTabInvalid =
       !livestreamFormSpeakersTabSchema.isValidSync(speakers) &&
       tabsVisited[TAB_VALUES.SPEAKERS]
    const formHasCriticalValidationErrors =
-      isGenralTabInvalid || isSpeakerTabInvalid
+      isGeneralTabInvalid || isSpeakerTabInvalid
 
    const isUniversityEvent = Boolean(group?.universityCode)
    const isCohostedEvent = Boolean(livestream.groupIds.length > 1)
@@ -101,10 +101,10 @@ export const LivestreamCreationContextProvider: FC<
 
    const shouldShowAlertIndicatorOnTab = useMemo(
       () => ({
-         [TAB_VALUES.GENERAL]: alertState !== undefined && isGenralTabInvalid,
+         [TAB_VALUES.GENERAL]: alertState !== undefined && isGeneralTabInvalid,
          [TAB_VALUES.SPEAKERS]: alertState !== undefined && isSpeakerTabInvalid,
       }),
-      [alertState, isGenralTabInvalid, isSpeakerTabInvalid]
+      [alertState, isGeneralTabInvalid, isSpeakerTabInvalid]
    )
 
    const shouldShowAlertIndicator =
@@ -163,7 +163,7 @@ export const LivestreamCreationContextProvider: FC<
          shouldShowAlertIndicatorOnTab,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
-         isGenralTabInvalid,
+         isGeneralTabInvalid,
          isSpeakerTabInvalid,
          isUniversityEvent,
          isCohostedEvent,
@@ -186,7 +186,7 @@ export const LivestreamCreationContextProvider: FC<
          alertState,
          tabValue,
          tabToNavigateTo,
-         isGenralTabInvalid,
+         isGeneralTabInvalid,
          isSpeakerTabInvalid,
          livestream,
       ]
