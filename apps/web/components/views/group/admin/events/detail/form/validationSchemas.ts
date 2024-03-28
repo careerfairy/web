@@ -1,3 +1,4 @@
+import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
 import * as yup from "yup"
 import { LivestreamFormGeneralTabValues } from "./types"
 
@@ -67,8 +68,14 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
       groupIds: yup.array().of(yup.string()),
    })
 
+const livestreamFormSpeakersTabValuesSchema = yup
+   .array()
+   .of(CreateCreatorSchema)
+   .min(1)
+
 const livestreamFormSpeakersTabSchema = yup.object().shape({
-   dummyFieldSpeakers: yup.string().required("Required"),
+   values: livestreamFormSpeakersTabValuesSchema,
+   options: yup.object().nullable(),
 })
 
 const livestreamFormQuestionsTabSchema = yup.object().shape({
@@ -107,8 +114,8 @@ const livestreamFormValidationSchema = yup.object().shape({
 
 export {
    livestreamFormGeneralTabSchema,
-   livestreamFormSpeakersTabSchema,
-   livestreamFormQuestionsTabSchema,
    livestreamFormJobsTabSchema,
+   livestreamFormQuestionsTabSchema,
+   livestreamFormSpeakersTabSchema,
    livestreamFormValidationSchema,
 }

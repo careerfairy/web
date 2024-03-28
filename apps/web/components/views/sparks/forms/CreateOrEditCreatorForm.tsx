@@ -1,20 +1,21 @@
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { Grid } from "@mui/material"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
+import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 import { Form, Formik } from "formik"
-import React, { FC, ReactNode } from "react"
+import { FC, ReactNode } from "react"
+import { sxStyles } from "types/commonTypes"
 import useCreatorFormSubmit, {
    CreatorFormValues,
 } from "./hooks/useCreatorFormSubmit"
-import { Box, Grid } from "@mui/material"
-import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
-import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
-import { sxStyles } from "types/commonTypes"
 import AvatarUpload from "./inputs/AvatarUpload"
-import { EMAIL_TOOLTIP_INFO } from "constants/pages"
+import CreateCreatorSchema from "./schemas/CreateCreatorSchema"
 
 const styles = sxStyles({
    avaGrid: {
       display: "flex",
       justifyContent: "center",
+      marginBottom: 1,
    },
 })
 
@@ -31,7 +32,7 @@ type Props = {
    /**
     * The actions to be displayed at the bottom of the form
     */
-   actions: ReactNode
+   actions?: ReactNode
    /**
     * The callback to be invoked when the form is successfully submitted
     */
@@ -62,7 +63,6 @@ const CreateOrEditCreatorForm: FC<Props> = ({
                         groupId={groupId}
                         remoteUrl={creator?.avatarUrl}
                      />
-                     <Box mt={2} />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                      <FormBrandedTextField

@@ -81,6 +81,7 @@ const ImageCropperDialog = ({
    handleClose,
    onSubmit,
    aspectRatio = 1,
+   fileName = "croppedImage",
 }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
    const fullScreen = useIsMobile()
@@ -95,7 +96,7 @@ const ImageCropperDialog = ({
          const croppedImageUrl = cropper.getCroppedCanvas().toDataURL()
          const croppedImageFile = dataURLtoFile(
             croppedImageUrl,
-            "croppedImage.png"
+            `${fileName}.png`
          )
 
          await onSubmit(croppedImageFile)
@@ -103,7 +104,7 @@ const ImageCropperDialog = ({
       } catch (e) {
          errorNotification(e, e)
       }
-   }, [errorNotification, handleClose, onSubmit])
+   }, [errorNotification, fileName, handleClose, onSubmit])
 
    const { trigger: mutateImage, isMutating } = useSWRMutation(
       `update-group-${title}-logo`,
@@ -145,7 +146,7 @@ const ImageCropperDialog = ({
             <Box sx={{ display: "flex", alignItems: "center" }}>
                <ImageIcon />
                <Typography sx={styles.dialogTitle}>
-                  {Boolean(title) ? title : "Edit picture"}
+                  {title || "Edit picture"}
                </Typography>
             </Box>
             <span>

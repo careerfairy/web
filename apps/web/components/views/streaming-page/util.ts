@@ -30,13 +30,13 @@ export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
 
 const getTempId = (streamId: string) => {
    // first check local storage
-   const key = "tempId"
+   const key = "temp-agora-Id"
    const tempId = localStorage.getItem(key)
    if (!tempId) {
-      localStorage.setItem("tempId", tempId)
-      return `${STREAM_IDENTIFIERS.ANONYMOUS}-${tempId}-${streamId}` as const
+      localStorage.setItem(key, randomId)
+      return `${STREAM_IDENTIFIERS.ANONYMOUS}-${randomId}-${streamId}` as const
    }
-   return `${STREAM_IDENTIFIERS.ANONYMOUS}-${randomId}-${streamId}` as const
+   return `${STREAM_IDENTIFIERS.ANONYMOUS}-${tempId}-${streamId}` as const
 }
 
 export const getDeviceButtonColor = (

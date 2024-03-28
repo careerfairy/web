@@ -2,7 +2,7 @@ import { Grid } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import MultiChipSelect from "../../general/components/MultiChipSelect"
-import { ESTIMATED_DURATIONS } from "../commons"
+import { ESTIMATED_DURATIONS } from "../../../commons"
 
 const styles = sxStyles({
    mobileHelper: {

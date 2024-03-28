@@ -5,13 +5,16 @@ import {
    LivestreamMode,
    LivestreamEvent,
    LivestreamModes,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import {
-   AgoraTokenRequest,
-   AgoraTokenResponse,
+   AgoraRTCTokenRequest,
+   AgoraRTMTokenRequest,
+   AgoraRTCTokenResponse,
+   AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
 import FirebaseService from "./FirebaseService"
 import GroupsUtil from "data/util/GroupsUtil"
@@ -20,19 +23,23 @@ import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/vi
 import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
+   Timestamp,
    UpdateData,
+   arrayUnion,
    collection,
    collectionGroup,
    doc,
    documentId,
+   getDoc,
    getDocs,
    limit,
    query,
    updateDoc,
    where,
+   writeBatch,
 } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 
 type StreamerDetails = {
@@ -155,22 +162,37 @@ export class LivestreamService {
          return false
       }
    }
+
    /**
     * Fetches an Agora RTC token with the given data
     * @param data The data required to fetch the RTC token
     * @returns A promise containing the Agora RTC token
     */
-   async fetchAgoraRtcToken(data: AgoraTokenRequest) {
-      const fetchAgoraRtcToken = httpsCallable<
-         AgoraTokenRequest,
-         AgoraTokenResponse
-      >(this.functions, "fetchAgoraRtcToken_v2")
-
+   async fetchAgoraRtcToken(data: AgoraRTCTokenRequest) {
       const {
          data: { token },
-      } = await fetchAgoraRtcToken(data)
+      } = await httpsCallable<AgoraRTCTokenRequest, AgoraRTCTokenResponse>(
+         this.functions,
+         "fetchAgoraRtcToken_v2"
+      )(data)
 
       return token.rtcToken
+   }
+
+   /**
+    * Fetches an Agora RTC token with the given data
+    * @param data The data required to fetch the RTC token
+    * @returns A promise containing the Agora RTC token
+    */
+   async fetchAgoraRtmToken(uid: string) {
+      const {
+         data: { token },
+      } = await httpsCallable<AgoraRTMTokenRequest, AgoraRTMTokenResponse>(
+         this.functions,
+         "fetchAgoraRtmToken_v2"
+      )({ uid })
+
+      return token.rtmToken
    }
 
    private async getUserDetails(
@@ -279,8 +301,11 @@ export class LivestreamService {
       return (
          details || {
             firstName: "Anonymous",
-            lastName: "User",
-            role: tag === STREAM_IDENTIFIERS.SCREEN_SHARE ? "Screen Share" : "",
+            lastName: "",
+            role:
+               tag === STREAM_IDENTIFIERS.SCREEN_SHARE
+                  ? "Screen Share"
+                  : "User",
             avatarUrl: "",
             linkedInUrl: "",
          }
@@ -291,6 +316,16 @@ export class LivestreamService {
       return doc(FirestoreInstance, "livestreams", livestreamId).withConverter(
          createGenericConverter<LivestreamEvent>()
       )
+   }
+
+   private getUserLivestreamDataRef(livestreamId: string, userEmail: string) {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "userLivestreamData",
+         userEmail
+      ).withConverter(createGenericConverter<UserLivestreamData>())
    }
 
    private updateLivestream(
@@ -357,6 +392,70 @@ export class LivestreamService {
          default:
             throw new Error("Invalid mode provided")
       }
+   }
+
+   /**
+    * Updates Firestore to mark a user as participating in a livestream. This involves updating the user's status in `userLivestreamData` and adding their email to `participatingStudents`.
+    *
+    * @param {string} livestreamId - Livestream ID.
+    * @param {UserData} userData - User data.
+    * @param {UserStats} userStats - User statistics.
+    * @returns {Promise<void>} Resolves upon successful Firestore batch commit.
+    */
+   async setUserIsParticipating(
+      livestreamId: string,
+      userData: UserData,
+      userStats: UserStats
+   ): Promise<void> {
+      const batch = writeBatch(FirestoreInstance)
+
+      const userLivestreamDataRef = this.getUserLivestreamDataRef(
+         livestreamId,
+         userData.userEmail
+      )
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+
+      const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
+
+      const shouldParticipate = userLivestreamDataSnapshot.exists()
+
+      // User live stream data does not exist, which means they haven't registered yet, so abort
+      if (!shouldParticipate) return
+
+      const isFirstTimeParticipating =
+         !userLivestreamDataSnapshot.data()?.participated?.date
+
+      // Set the user Participating data in the userLivestreamData collection
+      batch.set(
+         userLivestreamDataRef,
+         {
+            user: userData,
+            userId: userData?.authId,
+            participated: {
+               date: Timestamp.now(),
+               // If this is the first time the user is participating, we store the user stats
+               ...(isFirstTimeParticipating
+                  ? {
+                       initialSnapshot: {
+                          userData: userData || null,
+                          userStats: userStats || null,
+                          date: Timestamp.now(),
+                       },
+                    }
+                  : {}),
+            },
+         },
+         {
+            merge: true,
+         }
+      )
+
+      // Set the user's email in the participants array of the livestream document
+      batch.update(livestreamRef, {
+         participatingStudents: arrayUnion(userData.userEmail),
+      })
+
+      return batch.commit()
    }
 }
 

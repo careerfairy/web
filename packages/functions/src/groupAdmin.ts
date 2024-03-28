@@ -181,7 +181,6 @@ export const getLivestreamReportData = functions
    .https.onCall(async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data
       const hostsData: PdfReportData["hostsData"] = []
-      let universityChartData: PdfCategoryChartData = null
       let nonUniversityChartData: PdfCategoryChartData = null
 
       const authEmail = context.auth.token.email || null
@@ -359,9 +358,6 @@ export const getLivestreamReportData = functions
                )
             )?.map((data) => data.user) || []
 
-         const groupPresenter =
-            GroupPresenter.createFromDocument(requestingGroupData)
-
          const rootLevelOfStudyCategory =
             await fieldOfStudyRepo.getFieldsOfStudyAsGroupQuestion(
                "levelOfStudy"
@@ -371,44 +367,12 @@ export const getLivestreamReportData = functions
                "fieldOfStudy"
             )
 
-         const {
-            matches: uniStudents,
-            noMatches: nonUniStudents,
-         }: {
-            matches: UserData[]
-            noMatches: UserData[]
-         } = partition(participatingStudents, (student) =>
-            groupPresenter.isUniversityStudent(student)
-         )
-
-         const isUniversity = groupPresenter.isUniversity()
-
          nonUniversityChartData = getPdfCategoryChartData(
             rootFieldOfStudyCategory,
             rootLevelOfStudyCategory,
-            isUniversity ? nonUniStudents : participatingStudents,
-            false
+            participatingStudents
          )
 
-         if (groupPresenter.isUniversity()) {
-            const groupFieldOfStudyQuestion =
-               await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
-                  requestingGroupData.id,
-                  "fieldOfStudy"
-               )
-
-            const groupLevelOfStudyQuestion =
-               await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
-                  requestingGroupData.id,
-                  "levelOfStudy"
-               )
-            universityChartData = getPdfCategoryChartData(
-               groupFieldOfStudyQuestion,
-               groupLevelOfStudyQuestion,
-               uniStudents,
-               true
-            )
-         }
          const speakers = livestreamData.speakers || []
 
          const questions = questionsSnap.docs.map((doc) => ({
@@ -443,14 +407,11 @@ export const getLivestreamReportData = functions
 
             hostsData.push(hostData)
          }
-         const totalParticipatingWithoutData = universityChartData
-            ? (universityChartData?.totalWithoutStats || 0) +
-              (nonUniversityChartData?.totalWithoutStats || 0)
-            : nonUniversityChartData?.totalWithoutStats || 0
+         const totalParticipatingWithoutData =
+            nonUniversityChartData?.totalWithoutStats || 0
 
          return {
             hostsData,
-            universityChartData,
             nonUniversityChartData,
             summary: {
                totalParticipatingWithoutData: totalParticipatingWithoutData,

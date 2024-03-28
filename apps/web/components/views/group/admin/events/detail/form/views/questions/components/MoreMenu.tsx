@@ -103,7 +103,7 @@ const MoreMenu: FC<MoreMenuProps> = ({ options }) => {
    if (isMobile) {
       return (
          <>
-            <IconButton onClick={handleClick} size="small">
+            <IconButton onClick={() => setIsDrawerOpen(true)} size="small">
                <MoreVertical />
             </IconButton>
             <MobileDrawer
@@ -160,19 +160,21 @@ type MoreMenuWithEditAndRemoveProps = {
    labels?: string[]
 }
 
+const defaultLabels = ["Edit details", "Remove item"] as const
+
 const MoreMenuWithEditAndRemoveOptions: FC<MoreMenuWithEditAndRemoveProps> = ({
    handleEdit,
    handleRemove,
-   labels,
+   labels = defaultLabels,
 }) => {
    const options: MoreMenuProps["options"] = [
       {
-         label: labels[0] || "Edit details",
+         label: labels[0],
          icon: <EditIcon color="#6B6B7F" />,
          handleClick: handleEdit,
       },
       {
-         label: labels[1] || "Remove item",
+         label: labels[1],
          icon: <DeleteIcon />,
          handleClick: handleRemove,
          menuItemSxProps: styles.deleteMenuItem,
