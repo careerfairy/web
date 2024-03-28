@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from "react"
+import React, { Fragment, useCallback, useMemo } from "react"
 import { FormControl, FormHelperText } from "@mui/material"
 import {
    LivestreamGroupQuestion,
@@ -120,8 +120,6 @@ const QuestionSelect = ({
    setFieldValue,
    errorText,
 }: QuestionSelectProps) => {
-   const [selected, setSelected] = useState(null)
-
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
@@ -129,25 +127,30 @@ const QuestionSelect = ({
    const handleQuestionChange = useCallback(
       (_, value) => {
          setFieldValue(inputName, value?.id)
-         setSelected(value)
       },
       [inputName, setFieldValue]
    )
+   const selectedOption =
+      options.find((option) => option.id === question.selectedOptionId) || null
+
+   const isOptionEqualToValue = (option, value) => option.id == value?.id
+   const getOptionLabel = (option) => option.name || ""
+
    return (
       <FormControl fullWidth error={!!errorText} sx={styles.formControl}>
          <BrandedAutocomplete
             key={inputName}
             id={inputName}
             options={options}
-            value={selected}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            value={selectedOption}
+            isOptionEqualToValue={isOptionEqualToValue}
             textFieldProps={{
                name: inputName,
                label: question.name,
                fullWidth: true,
                placeholder: "Select an option",
             }}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={getOptionLabel}
             onChange={handleQuestionChange}
             sx={[BaseStyles.chipInput, styles.question]}
          />
