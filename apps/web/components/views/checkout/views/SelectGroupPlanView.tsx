@@ -65,7 +65,6 @@ const styles = sxStyles({
 
 const SelectSparksPlanView = () => {
    return (
-      // <SkeletonSelectSparksPlan />
       <SuspenseWithBoundary fallback={<SkeletonSelectSparksPlan />}>
          <View />
       </SuspenseWithBoundary>
@@ -218,6 +217,7 @@ const GroupPlansMobile = (props: GroupPlansProps) => {
                      color={"secondary"}
                      onClick={props.handleSelect}
                      sx={styles.checkoutButton}
+                     size="large"
                   >
                      Select plan
                   </Button>
