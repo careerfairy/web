@@ -20,19 +20,18 @@ const buildGroupNameMap = (groups: Group[]) => {
 }
 
 type GroupedRegistrationQuestionsProps = {
-   selectedGroups: Group[]
    allGroups: Group[]
 }
 
 const GroupedRegistrationQuestions: FC<GroupedRegistrationQuestionsProps> = ({
-   selectedGroups,
    allGroups,
 }) => {
    const {
       values: { questions },
    } = useLivestreamFormValues()
-   const { groupsQuestions, isLoading, error } =
-      useGroupsQuestions(selectedGroups)
+   const { groupsQuestions, isLoading, error } = useGroupsQuestions(
+      questions.hosts
+   )
 
    const groupNameMap = useMemo(() => buildGroupNameMap(allGroups), [allGroups])
 

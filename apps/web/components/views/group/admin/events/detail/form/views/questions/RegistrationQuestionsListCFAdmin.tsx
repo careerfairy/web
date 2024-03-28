@@ -2,7 +2,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { Chip, Stack } from "@mui/material"
 import { useGroups } from "components/custom-hook/useCollection"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import { hashToColor } from "../../commons"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
@@ -19,16 +19,21 @@ const RegistrationQuestionsListForCFAdmin = () => {
       values: { questions },
       setFieldValue,
    } = useLivestreamFormValues()
-   const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
 
    useEffect(() => {
-      if (!groupsLoading) {
+      if (!groupsLoading && !questions.hosts.length) {
          const initialValue = allGroups.filter((group) =>
             livestream.groupIds.includes(group.id)
          )
-         setSelectedGroups(initialValue)
+         setFieldValue("questions.hosts", initialValue)
       }
-   }, [groupsLoading, allGroups, livestream.groupIds])
+   }, [
+      groupsLoading,
+      allGroups,
+      livestream.groupIds,
+      setFieldValue,
+      questions.hosts,
+   ])
 
    if (error) {
       return <LoadErrorMessage label="groups" />
@@ -46,9 +51,9 @@ const RegistrationQuestionsListForCFAdmin = () => {
    return (
       <>
          <MultiChipSelect
-            id="registration-questions-list"
+            id="questions.hosts"
             options={allGroups}
-            value={selectedGroups}
+            value={questions.hosts}
             multiple
             disableCloseOnSelect
             textFieldProps={{
@@ -56,16 +61,18 @@ const RegistrationQuestionsListForCFAdmin = () => {
                placeholder: "Add some hosts to your live stream",
             }}
             getOptionLabel={(group: Group) => group.universityName}
-            onChange={(_, value) => {
+            onChange={async (_, value) => {
                const registrationQuestionsFiltered =
                   questions.registrationQuestions.filter((question) =>
                      value.some((group) => group.id === question.groupId)
                   )
-               setFieldValue(
-                  "questions.registrationQuestions",
-                  registrationQuestionsFiltered
-               )
-               setSelectedGroups(value)
+               await Promise.all([
+                  setFieldValue(
+                     "questions.registrationQuestions",
+                     registrationQuestionsFiltered
+                  ),
+                  setFieldValue("questions.hosts", value),
+               ])
             }}
             getOptionDisabled={(group) => group.id === currentGroup.groupId}
             renderTags={(value: Group[], getTagProps) => {
@@ -96,10 +103,7 @@ const RegistrationQuestionsListForCFAdmin = () => {
                })
             }}
          />
-         <GroupedRegistrationQuestions
-            selectedGroups={selectedGroups}
-            allGroups={allGroups}
-         />
+         <GroupedRegistrationQuestions allGroups={allGroups} />
       </>
    )
 }
