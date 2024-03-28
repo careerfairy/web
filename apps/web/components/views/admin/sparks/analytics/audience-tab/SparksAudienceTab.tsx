@@ -13,6 +13,7 @@ import {
 } from "./EmptyDataCheckers"
 import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
 import { LockedSparksAudienceTab } from "../components/LockedSparksAudienceTab"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const updateRelativePercentage = (data, maxValue) => {
    return data.map((item) => ({
@@ -27,7 +28,11 @@ type SparksAudienceTabProps = {
 
 const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
    const { group } = useGroup()
-   const planStatus = useGroupPlanIsValid(group.groupId)
+   const planStatus = useGroupPlanIsValid(group.groupId, [
+      GroupPlanTypes.Tier2,
+      GroupPlanTypes.Tier3,
+   ])
+
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]
 
