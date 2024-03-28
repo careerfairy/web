@@ -1,4 +1,4 @@
-import { Box, Button, Skeleton, Stack } from "@mui/material"
+import { Box, Button, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import GroupPlansDialog, { useSparksPlansForm } from "../GroupPlansDialog"
@@ -12,6 +12,7 @@ import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSel
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
+import SkeletonSelectSparksPlan from "./GroupPlanSkeletonView"
 
 const styles = sxStyles({
    content: {
@@ -60,28 +61,11 @@ const styles = sxStyles({
       fontWeight: "400",
       lineHeight: "20px",
    },
-   sparkStaticCard: {
-      width: {
-         xs: "100%",
-         md: 281,
-      },
-      height: {
-         xs: "154vw",
-         md: "523px",
-      },
-   },
 })
-const SkeletonSelectSparksPlan = () => {
-   return (
-      <Skeleton
-         variant="rounded"
-         animation="wave"
-         sx={styles.sparkStaticCard}
-      />
-   )
-}
+
 const SelectSparksPlanView = () => {
    return (
+      // <SkeletonSelectSparksPlan />
       <SuspenseWithBoundary fallback={<SkeletonSelectSparksPlan />}>
          <View />
       </SuspenseWithBoundary>
