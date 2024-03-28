@@ -11,9 +11,8 @@ import { SparkTrialEndEmailBuilder } from "./lib/trials/sparks/SparksTrialEndEma
  */
 const runtimeSettings: RuntimeOptions = {
    // may take a while
-   timeoutSeconds: 60,
-   // we may load lots of data into memory
-   memory: "128MB",
+   timeoutSeconds: 60 * 2,
+   memory: "256MB",
 }
 
 /**

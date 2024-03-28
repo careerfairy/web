@@ -53,14 +53,10 @@ export class SparkTrialEndEmailBuilder {
     * Adds a recipient to the list of messages
     */
    addRecipient(data: SparksEndOfTrialData): SparkTrialEndEmailBuilder {
+      const duplicateMessage = (m: SparksEnfOfTrialTemplateData) =>
+         m.To == data.userEmail && m.TemplateModel.groupId == data.groupId
       // double check for not sending duplicates even though should not be needed here
-      if (
-         this.messages.find(
-            (m: SparksEnfOfTrialTemplateData) =>
-               m.To == data.userEmail && m.TemplateModel.groupId == data.groupId
-         )
-      )
-         return this
+      if (this.messages.find(duplicateMessage)) return this
       this.logger.info("SparkTrialEndEmailBuilder ~ adding:", data)
       this.messages.push(this.getEndOfTrialTemplate(data))
       return this
