@@ -21,6 +21,7 @@ const styles = sxStyles({
       justifyContent: "center",
       height: "100%",
       width: "100%",
+      backgroundColor: "#F6F6FA",
    },
    contentMobile: {
       display: "flex",
