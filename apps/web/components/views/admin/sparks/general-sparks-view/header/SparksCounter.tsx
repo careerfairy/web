@@ -10,7 +10,6 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    tooltip: {
@@ -48,7 +47,7 @@ const SparksCounter: FC<Props> = ({
    publicSparks,
    maxPublicSparks,
 }) => {
-   const { groupPresenter, group } = useGroup()
+   const { groupPresenter } = useGroup()
    const isTrialPlan = groupPresenter.isTrialPlan()
 
    const tooltipMessage = getTooltipMessage(
@@ -56,7 +55,7 @@ const SparksCounter: FC<Props> = ({
       isCriticalState,
       maxPublicSparks
    )
-   const unlimited = group.plan?.type == GroupPlanTypes.Tier3
+   const unlimited = groupPresenter.hasUnlimitedSparks()
    const maxSparks = unlimited ? 100 : maxPublicSparks
    const slots = unlimited
       ? "Unlimited "

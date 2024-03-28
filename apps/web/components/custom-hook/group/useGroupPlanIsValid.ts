@@ -1,34 +1,16 @@
-import useSWR from "swr"
-import { useCallback } from "react"
-import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
-import { groupRepo } from "data/RepositoryInstances"
-
+import useGroupsByIds from "../useGroupsByIds"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 type Result = {
    valid: boolean
 }
 
-const useGroupPlanIsValid = (
-   groupId: string,
-   types: GroupPlanType[]
-): Result => {
-   const groupFetcher = useCallback(
-      (groupId) => groupRepo.getGroupById(groupId),
-      []
-   )
+const useGroupPlanIsValid = (groupId: string): Result => {
+   const { data: group } = useGroupsByIds([groupId])
 
-   const { data: group } = useSWR<Group>(groupId, groupFetcher, {
-      suspense: true,
-   })
-
-   const now = new Date()
-   let valid = false
-
-   if (
-      types.includes(group?.plan?.type) &&
-      group?.plan?.expiresAt?.toDate() > now
-   )
-      valid = true
-
+   let valid
+   if (!group.length) valid = false
+   const groupPresenter = GroupPresenter.createFromDocument(group.at(0))
+   valid = !groupPresenter.hasPlanExpired()
    return { valid }
 }
 

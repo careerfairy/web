@@ -6,12 +6,6 @@ import { clientSecret } from "store/selectors/groupSelectors"
 import StripeCheckoutComponent from "../forms/StripeCheckoutComponent"
 
 const styles = sxStyles({
-   content: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      backgroundColor: "#F6F6FA",
-   },
    title: {
       color: (theme) => theme.brand.purple[600],
       fontFamily: "Poppins",
@@ -19,35 +13,6 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: 700,
       lineHeight: "42px",
-   },
-   checkoutButton: {
-      mt: 2,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.secondary.dark,
-      },
-      width: "276px",
-
-      color: (theme) => theme.brand.white[100],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "24px",
-   },
-   checkoutWrapper: {
-      mt: 2,
-      alignItems: "center",
-   },
-   checkoutDescription: {
-      color: (theme) => theme.palette.neutral[600],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "14px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "20px",
    },
    stripeButtonWrapper: {
       display: "flex",

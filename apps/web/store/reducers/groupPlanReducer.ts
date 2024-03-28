@@ -1,6 +1,5 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
-import { GroupPlansDialogStep } from "components/views/checkout/GroupPlansDialog"
 
 interface IGroupPlanState {
    plansDialogOpen: boolean
@@ -8,7 +7,6 @@ interface IGroupPlanState {
    groupPlansForm: {
       selectedPlan: GroupPlanType | null
       clientSecret: string | null
-      initialStep: GroupPlansDialogStep
    }
 }
 
@@ -26,7 +24,6 @@ const initialState: IGroupPlanState = {
    groupPlansForm: {
       selectedPlan: GroupPlanTypes.Tier2,
       clientSecret: null,
-      initialStep: "select-plan",
    },
 }
 
@@ -43,8 +40,6 @@ export const groupPlansSlice = createSlice({
          if (action.payload) {
             if ("selectedPlan" in action.payload) {
                state.groupPlansForm.selectedPlan = action.payload.selectedPlan
-
-               state.groupPlansForm.initialStep = "checkout"
             }
          }
       },
@@ -68,7 +63,6 @@ export const groupPlansSlice = createSlice({
       },
       // Actions for setting values on the form
       setSecret: (state, action: PayloadAction<string>) => {
-         console.log("🚀 ~ setting client secret:", action)
          state.groupPlansForm.clientSecret =
             action.payload || initialState.groupPlansForm.clientSecret
       },

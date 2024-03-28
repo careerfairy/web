@@ -3,16 +3,16 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import GroupPlansDialog, { useSparksPlansForm } from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import GroupSparksPlanDesktopSelector from "./components/GroupSparksPlanDesktopSelector"
 import { useSelector } from "react-redux"
-import { selectedPlanSelector } from "store/selectors/groupSelectors"
+import {
+   plansDialogOpenSelector,
+   selectedPlanSelector,
+} from "store/selectors/groupSelectors"
 import { FormEvent } from "react"
-import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSelector"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { useAuth } from "HOCs/AuthProvider"
 import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
-import SkeletonSelectSparksPlan from "./GroupPlanSkeletonView"
+import SkeletonSelectSparksPlan from "./skeletons/GroupPlanSkeletonView"
 
 const styles = sxStyles({
    content: {
@@ -22,14 +22,6 @@ const styles = sxStyles({
       height: "100%",
       width: "100%",
       backgroundColor: "#F6F6FA",
-   },
-   contentMobile: {
-      display: "flex",
-      flexDirection: "column",
-   },
-   contentMobileWrapper: {
-      display: "flex",
-      flexDirection: "column",
    },
    checkoutButton: {
       mt: 2,
@@ -50,9 +42,6 @@ const styles = sxStyles({
       mt: 2,
       alignItems: "center",
    },
-   cancelButton: {
-      color: (theme) => theme.palette.black[700],
-   },
    checkoutDescription: {
       color: (theme) => theme.palette.neutral[600],
       textAlign: "center",
@@ -65,15 +54,15 @@ const styles = sxStyles({
 })
 
 const SelectSparksPlanView = () => {
+   const open = useSelector(plansDialogOpenSelector)
    return (
-      <SuspenseWithBoundary fallback={<SkeletonSelectSparksPlan />}>
+      <SuspenseWithBoundary fallback={<SkeletonSelectSparksPlan open={open} />}>
          <View />
       </SuspenseWithBoundary>
    )
 }
 
 const View = () => {
-   const isMobile = useIsMobile("md")
    const { authenticatedUser } = useAuth()
    const { group } = useGroup()
    const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
@@ -92,19 +81,7 @@ const View = () => {
       goToSelectPlanView(selectedPlan)
    }
 
-   return (
-      <ConditionalWrapper
-         condition={isMobile}
-         fallback={
-            <GroupPlans disabled={disabled} handleSelect={redirectToCheckout} />
-         }
-      >
-         <GroupPlansMobile
-            disabled={disabled}
-            handleSelect={redirectToCheckout}
-         />
-      </ConditionalWrapper>
-   )
+   return <GroupPlans disabled={disabled} handleSelect={redirectToCheckout} />
 }
 
 type GroupPlansProps = {
@@ -154,83 +131,6 @@ const GroupPlans = (props: GroupPlansProps) => {
                </Box>
                <Box sx={styles.checkoutDescription}>
                   Content available for 1 year
-               </Box>
-            </Stack>
-         </GroupPlansDialog.Content>
-      </GroupPlansDialog.Container>
-   )
-}
-
-const GroupPlansMobile = (props: GroupPlansProps) => {
-   const { handleClose } = useSparksPlansForm()
-
-   return (
-      <GroupPlansDialog.Container sx={{}}>
-         <GroupPlansDialog.Content sx={styles.contentMobile}>
-            <GroupPlansDialog.Title>
-               Select your{" "}
-               <Box component="span" color="secondary.main">
-                  Sparks
-               </Box>{" "}
-               plan
-            </GroupPlansDialog.Title>
-            <Box mt={5} />
-            <Box
-               mt={{
-                  md: 0,
-               }}
-            />
-
-            <Box sx={styles.contentMobileWrapper}>
-               <GroupSparksPlanMobileSelector />
-
-               <Box
-                  mb={{
-                     xs: "auto",
-                     md: 0,
-                  }}
-               />
-               <Stack
-                  direction={"column"}
-                  spacing={2}
-                  sx={styles.checkoutWrapper}
-               >
-                  <Box
-                     sx={styles.checkoutDescription}
-                     display={"flex"}
-                     width={"100%"}
-                     alignContent={"start"}
-                  >
-                     Content available for 1 year
-                  </Box>
-               </Stack>
-            </Box>
-            <Box mt={15} />
-            <Stack
-               direction={"column"}
-               spacing={2}
-               alignItems={"center"}
-               width={"100%"}
-            >
-               <Box>
-                  <Button
-                     disabled={props.disabled}
-                     color={"secondary"}
-                     onClick={props.handleSelect}
-                     sx={styles.checkoutButton}
-                     size="large"
-                  >
-                     Select plan
-                  </Button>
-               </Box>
-               <Box>
-                  <Button
-                     color={"grey"}
-                     onClick={() => handleClose()}
-                     sx={styles.cancelButton}
-                  >
-                     Cancel
-                  </Button>
                </Box>
             </Stack>
          </GroupPlansDialog.Content>

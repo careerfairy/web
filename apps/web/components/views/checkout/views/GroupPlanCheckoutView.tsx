@@ -15,35 +15,6 @@ const styles = sxStyles({
       width: "100%",
       backgroundColor: "#F6F6FA",
    },
-   checkoutButton: {
-      mt: 2,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.secondary.dark,
-      },
-      width: "276px",
-
-      color: (theme) => theme.brand.white[100],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "24px",
-   },
-   checkoutWrapper: {
-      mt: 2,
-      alignItems: "center",
-   },
-   checkoutDescription: {
-      color: (theme) => theme.palette.neutral[600],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "14px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "20px",
-   },
    stripeButtonWrapper: {
       display: "flex",
       justifyItems: "center",

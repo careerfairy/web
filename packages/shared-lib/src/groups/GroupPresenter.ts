@@ -286,6 +286,23 @@ export class GroupPresenter {
    }
 
    /**
+    * Determines if the group has reached the maximum number of public sparks based on the current
+    * group plan.
+    * @param publicSparksCount Current public sparks count
+    * @returns boolean indicating whether the maximum number of publishable sparks has been reached
+    */
+   hasReachedMaxSparks(publicSparksCount: number) {
+      return publicSparksCount >= this.getMaxPublicSparks()
+   }
+
+   /**
+    * Determines if the current group's plan encompasses unlimited sparks
+    * @returns boolean indicating whether the group has unlimited sparks or not
+    */
+   hasUnlimitedSparks() {
+      return this.plan?.type == GroupPlanTypes.Tier3
+   }
+   /**
     * To get the minimum number of creators required to publish sparks for this specific group
     * This amount may be different depending on the group agreements
     */
