@@ -228,7 +228,7 @@ const RegisterAskQuestionsView = () => {
 
 const questionSchema = Yup.object().shape({
    question: Yup.string()
-      .required("This field is required")
+      .required("")
       .min(
          minQuestionLength,
          `Question must be at least ${minQuestionLength} characters long`
