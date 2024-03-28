@@ -23,7 +23,19 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required(REQUIRED_FIELD_MESSAGE)
          .min(10, getMinCharactersMessage("title", 10)),
       hidden: yup.bool().notRequired(),
-      company: yup.string().notRequired(),
+      company: yup
+         .string()
+         .test(
+            "is-undefined-or-empty",
+            REQUIRED_FIELD_MESSAGE,
+            (value) => value !== undefined && value !== ""
+         )
+         .test(
+            "min-length-requirement",
+            "Company name must have at least 3 characters",
+            (value) => value === null || value?.length > 2
+         )
+         .notRequired(),
       companyLogoUrl: yup.string().notRequired(),
       backgroundImageUrl: yup
          .string()
