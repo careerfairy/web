@@ -62,7 +62,7 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
       const isMobile = useIsMobile()
       const [activeSparkIndex, setActiveSparkIndex] = useState(0)
       const [emblaRef, emblaApi] = useEmblaCarousel(
-         { ...options, ...{ inViewThreshold: 0.9 } },
+         { ...options, inViewThreshold: 0.9 },
          [WheelGesturesPlugin()]
       )
 
