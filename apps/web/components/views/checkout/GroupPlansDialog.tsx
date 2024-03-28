@@ -3,17 +3,12 @@ import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    Box,
    BoxProps,
-   CircularProgress,
    IconButton,
    Typography,
    TypographyProps,
    Dialog,
-   Button,
-   Stack,
 } from "@mui/material"
-import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
-import dynamic from "next/dynamic"
-import { FC, FormEvent, useCallback, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { GroupPlanType } from "@careerfairy/shared-lib/groups"
@@ -25,43 +20,21 @@ import {
 import {
    clientSecret,
    plansDialogOpenSelector,
-   selectedPlanSelector,
 } from "store/selectors/groupSelectors"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import BrandedSwipableDrawer from "../common/inputs/BrandedSwipableDrawer"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import SelectGroupPlanMobileView from "./views/SelectGroupPlanMobileView"
-import GroupPlanCheckoutMobileView from "./views/GroupPlanCheckoutMobileView"
-import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useAuth } from "HOCs/AuthProvider"
 import React from "react"
 import { SlideUpTransition } from "../common/transitions"
 import GroupPlanCheckoutView from "components/views/checkout/views/GroupPlanCheckoutView"
 import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
+import GroupPlansMobileView from "./views/GroupPlansMobileView"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
 const mobileBreakpoint = "md"
 
 const styles = sxStyles({
-   mobilePaperRoot: { maxHeight: "95%", backgroundColor: "#F6F6FA" },
    dialogPaperMobile: { minWidth: "100%", minHeight: "100%" },
-   steppedDialog: {
-      minWidth: {
-         xs: "100%",
-         md: "auto",
-      },
-      minHeight: {
-         xs: "100%",
-         md: "auto",
-      },
-   },
-   mobileWrapper: {
-      px: "15px",
-      mb: "10px",
-      backgroundColor: "#F6F6FA",
-   },
    title: {
       color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
@@ -114,50 +87,12 @@ const styles = sxStyles({
       px: 4,
       py: 3,
    },
-   checkoutButton: {
-      zIndex: 10,
-      mt: 2,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.secondary.dark,
-      },
-      width: "100%",
-      color: (theme) => theme.brand.white[100],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "24px",
-   },
-   cancelButton: {
-      color: (theme) => theme.palette.black[700],
-      zIndex: 10,
-   },
-   fixedBottomContent: {
-      position: "fixed",
-      bottom: 0,
-      width: "100%",
-      p: 2.5,
-      borderTop: "1px solid #F0F0F0",
-      height: actionsHeight,
-      bgcolor: "#FCFCFC",
-   },
    button: {
       textTransform: "none",
       "&:disabled": {
          bgcolor: "#EDEDED",
          color: "#BBBBBB",
       },
-   },
-   mobileBackBtn: {
-      position: "absolute",
-      top: `${mobileTopPadding * 1.25}px`,
-      left: 0,
-      zIndex: 1,
-      p: 1,
-      color: "text.primary",
-      fontSize: "2rem",
    },
    closeBtn: {
       position: "absolute",
@@ -179,45 +114,9 @@ const styles = sxStyles({
          color: "text.primary",
       },
    },
-   footer: {
-      px: {
-         xs: 2,
-         [mobileBreakpoint]: 2.5,
-      },
-      mb: 2,
-      color: "text.primary",
-      "& svg": {
-         width: 32,
-         height: 32,
-         color: "text.primary",
-      },
-   },
-   warningIcon: {
-      fontSize: 62,
-   },
 })
 
-const views = [
-   {
-      key: "select-plan",
-      Component: dynamic(
-         () => import("components/views/checkout/views/SelectGroupPlanView"),
-         { loading: () => <CircularProgress /> }
-      ),
-   },
-   {
-      key: "checkout",
-      Component: dynamic(
-         () => import("components/views/checkout/views/GroupPlanCheckoutView"),
-         { loading: () => <CircularProgress /> }
-      ),
-   },
-] as const
-
-export type GroupPlansDialogStep = (typeof views)[number]["key"]
-
 export const useSparksPlansForm = () => {
-   const stepper = useStepper<GroupPlansDialogStep>()
    const dispatch = useDispatch()
 
    const setPlan = useCallback(
@@ -240,128 +139,31 @@ export const useSparksPlansForm = () => {
 
    const goToSelectedPlanCheckoutView = useCallback(
       (plan: GroupPlanType) => {
-         setStateAndNavigate(setPlan, stepper.goToStep, plan, "checkout")
+         setState(setPlan, plan)
       },
-      [setPlan, stepper]
+      [setPlan]
    )
 
    return useMemo(() => {
       return {
-         stepper,
          handleClose,
          goToCheckoutView: goToSelectedPlanCheckoutView,
          setPlan: setPlan,
          setClientSecret: setClientSecret,
       }
-   }, [
-      handleClose,
-      goToSelectedPlanCheckoutView,
-      stepper,
-      setPlan,
-      setClientSecret,
-   ])
+   }, [handleClose, goToSelectedPlanCheckoutView, setPlan, setClientSecret])
 }
 
 const GroupPlansDialog = () => {
    const generatedClientSecret = useSelector(clientSecret)
-   const open = useSelector(plansDialogOpenSelector)
    const isMobile = useIsMobile()
-   const selectedPlan = useSelector(selectedPlanSelector)
-   const { group } = useGroup()
-   const { authenticatedUser } = useAuth()
 
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
-
-   const dispatch = useDispatch()
-
-   const handleCloseGroupPlansDialog = useCallback(
-      (forceClose: boolean = false) => {
-         dispatch(
-            closeGroupPlansDialog({
-               forceClose,
-            })
-         )
-      },
-      [dispatch]
-   )
-
-   const { customerSessionSecret: customerSessionSecret } =
-      useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
-
-   const disabled = !selectedPlan
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-      setClientSecret(customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-   }
-
-   const mobileView = (
-      <BrandedSwipableDrawer
-         sx={{ maxHeight: "90%" }}
-         open={open}
-         onOpen={() => {}}
-         PaperProps={{
-            sx: styles.mobilePaperRoot,
-         }}
-         transitionDuration={600}
-         onClose={() => handleCloseGroupPlansDialog()}
-      >
-         <Box sx={styles.closeBtn}>
-            <IconButton onClick={() => handleCloseGroupPlansDialog()}>
-               <CloseIcon />
-            </IconButton>
-         </Box>
-         <Stack
-            direction={"column"}
-            justifyContent={"space-around"}
-            sx={styles.mobileWrapper}
-         >
-            <ConditionalWrapper
-               condition={Boolean(generatedClientSecret)}
-               fallback={<SelectGroupPlanMobileView />}
-            >
-               <GroupPlanCheckoutMobileView />
-            </ConditionalWrapper>
-
-            <ConditionalWrapper condition={Boolean(!generatedClientSecret)}>
-               <Box sx={styles.footer}>
-                  <Stack
-                     direction={"column"}
-                     spacing={1}
-                     alignContent={"center"}
-                     justifyItems={"center"}
-                     alignItems={"center"}
-                     width={"100%"}
-                  >
-                     <Button
-                        disabled={disabled}
-                        color={"secondary"}
-                        onClick={redirectToCheckout}
-                        sx={styles.checkoutButton}
-                        size="large"
-                     >
-                        Select plan
-                     </Button>
-                     <Box>
-                        <Button
-                           color={"grey"}
-                           onClick={() => handleCloseGroupPlansDialog()}
-                           sx={styles.cancelButton}
-                           size="large"
-                        >
-                           Cancel
-                        </Button>
-                     </Box>
-                  </Stack>
-               </Box>
-            </ConditionalWrapper>
-         </Stack>
-      </BrandedSwipableDrawer>
-   )
    return (
       <>
-         <ConditionalWrapper condition={!isMobile} fallback={mobileView}>
+         <ConditionalWrapper
+            condition={!isMobile}
+            fallback={<GroupPlansMobileView />}
+         >
             <ConditionalWrapper
                condition={Boolean(generatedClientSecret)}
                fallback={<SelectGroupPlanView />}
@@ -425,8 +227,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    )
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type ContentProps = BoxProps<"span"> & {}
+type ContentProps = BoxProps<"span">
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
    return <Box sx={combineStyles(sx, styles.content)} {...props} />
@@ -461,19 +262,13 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
  * @param {any} stateValue - The new state value.
  * @param {string} step - The step to navigate to.
  */
-function setStateAndNavigate(
+function setState(
    // eslint-disable-next-line @typescript-eslint/ban-types
    setState: Function,
-   // eslint-disable-next-line @typescript-eslint/ban-types
-   goToStep: Function,
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   stateValue: any,
-   step: GroupPlansDialogStep
+   stateValue: any
 ) {
    setState(stateValue)
-   setTimeout(() => {
-      goToStep(step)
-   }, 0)
 }
 
 GroupPlansDialog.Title = Title

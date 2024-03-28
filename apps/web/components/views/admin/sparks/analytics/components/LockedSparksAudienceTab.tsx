@@ -78,7 +78,6 @@ const styles = sxStyles({
       },
    },
 })
-//: TODO: Company name, transaction user
 const lockedSparkAnalyticsDesktopImage =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background.png?alt=media&token=f724cb9e-1a8d-4891-a56c-432039935835"
 const lockedSparkAnalyticsMobileImage =

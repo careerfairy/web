@@ -6,20 +6,6 @@ import { useDispatch } from "react-redux"
 import { openGroupPlansDialog } from "store/reducers/groupPlanReducer"
 
 const styles = sxStyles({
-   embeddedCheckoutWrapper: {
-      "&:first-of-type": {
-         m: 100,
-      },
-      p: 10,
-      position: "absolute",
-      width: "100%",
-      left: 0,
-      right: 0,
-      margin: "auto",
-      overflow: "scroll",
-      zIndex: 10,
-      borderRadius: "15px",
-   },
    checkoutButton: {
       mt: 2,
       backgroundColor: (theme) => theme.palette.secondary.main,

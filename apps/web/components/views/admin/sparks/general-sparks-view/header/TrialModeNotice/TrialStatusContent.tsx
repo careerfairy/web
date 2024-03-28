@@ -69,15 +69,6 @@ const TrialStatusContent = () => {
       failedToMakeEnoughInContentCreationPeriod ||
       planExpired
 
-   // if (groupPresenter.hasPlanExpired()) {
-   //    return (
-   //       <Typography sx={styles.title}>
-   //          Your trial has expired. Please contact your key success manager to
-   //          unlock the full power of Sparks.
-   //       </Typography>
-   //    )
-   // }
-
    return (
       <Fragment>
          <ConditionalWrapper

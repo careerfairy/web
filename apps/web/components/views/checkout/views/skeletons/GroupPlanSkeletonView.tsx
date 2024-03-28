@@ -1,5 +1,5 @@
 import { Box, Dialog, IconButton, Skeleton, Stack } from "@mui/material"
-import GroupPlansDialog from "../GroupPlansDialog"
+import GroupPlansDialog from "../../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "components/views/common/transitions"
 import CloseIcon from "@mui/icons-material/CloseRounded"
@@ -7,13 +7,6 @@ import CloseIcon from "@mui/icons-material/CloseRounded"
 const mobileBreakpoint = "md"
 
 const styles = sxStyles({
-   content: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "100%",
-      width: "100%",
-   },
    closeBtn: {
       position: "absolute",
       top: 0,
@@ -33,45 +26,6 @@ const styles = sxStyles({
          height: 32,
          color: "text.primary",
       },
-   },
-   contentMobile: {
-      display: "flex",
-      flexDirection: "column",
-   },
-   contentMobileWrapper: {
-      display: "flex",
-      flexDirection: "column",
-   },
-   checkoutButton: {
-      mt: 2,
-      backgroundColor: (theme) => theme.palette.secondary.main,
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.secondary.dark,
-      },
-      width: "276px",
-      color: (theme) => theme.brand.white[100],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "24px",
-   },
-   checkoutWrapper: {
-      mt: 2,
-      alignItems: "center",
-   },
-   cancelButton: {
-      color: (theme) => theme.palette.black[700],
-   },
-   checkoutDescription: {
-      color: (theme) => theme.palette.neutral[600],
-      textAlign: "center",
-      fontFamily: "Poppins",
-      fontSize: "14px",
-      fontStyle: "normal",
-      fontWeight: "400",
-      lineHeight: "20px",
    },
    skeletonWrapper: {
       p: "20px",
@@ -110,11 +64,14 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.black,
    },
 })
-const SkeletonSelectSparksPlan = () => {
+type SkeletonSelectSparksPlanProps = {
+   open: boolean
+}
+const SkeletonSelectSparksPlan = ({ open }: SkeletonSelectSparksPlanProps) => {
    return (
       <Dialog
          scroll="paper"
-         open={true}
+         open={open}
          maxWidth={false}
          TransitionComponent={SlideUpTransition}
       >
