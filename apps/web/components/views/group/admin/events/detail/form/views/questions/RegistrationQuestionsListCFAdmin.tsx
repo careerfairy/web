@@ -5,6 +5,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useEffect, useState } from "react"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import { hashToColor } from "../../commons"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import MultiChipSelect from "../general/components/MultiChipSelect"
 import GroupedRegistrationQuestions from "./GroupedRegistrationQuestions"
 import InputSkeleton from "./InputSkeleton"
@@ -14,6 +15,10 @@ const RegistrationQuestionsListForCFAdmin = () => {
    const { group: currentGroup } = useGroup()
    const { data: allGroups, isLoading: groupsLoading, error } = useGroups()
    const { livestream } = useLivestreamCreationContext()
+   const {
+      values: { questions },
+      setFieldValue,
+   } = useLivestreamFormValues()
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
 
    useEffect(() => {
@@ -52,11 +57,22 @@ const RegistrationQuestionsListForCFAdmin = () => {
             }}
             getOptionLabel={(group: Group) => group.universityName}
             onChange={(_, value) => {
+               const registrationQuestionsFiltered =
+                  questions.registrationQuestions.filter((question) =>
+                     value.some((group) => group.id === question.groupId)
+                  )
+               setFieldValue(
+                  "questions.registrationQuestions",
+                  registrationQuestionsFiltered
+               )
                setSelectedGroups(value)
             }}
             getOptionDisabled={(group) => group.id === currentGroup.groupId}
             renderTags={(value: Group[], getTagProps) => {
-               return value.map((option, index) => {
+               const sortedValues = value.sort((a, b) =>
+                  a.universityName.localeCompare(b.universityName)
+               )
+               return sortedValues.map((option, index) => {
                   const isDisabled: boolean =
                      option.groupId === currentGroup.groupId
                   return (
