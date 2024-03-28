@@ -11,9 +11,7 @@ import {
    Button,
    Stack,
 } from "@mui/material"
-import SteppedDialog, {
-   useStepper,
-} from "components/views/stepped-dialog/SteppedDialog"
+import { useStepper } from "components/views/stepped-dialog/SteppedDialog"
 import dynamic from "next/dynamic"
 import { FC, FormEvent, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -26,7 +24,6 @@ import {
 } from "store/reducers/groupPlanReducer"
 import {
    clientSecret,
-   groupPlansDialogInitialStepSelector,
    plansDialogOpenSelector,
    selectedPlanSelector,
 } from "store/selectors/groupSelectors"
@@ -40,6 +37,8 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useAuth } from "HOCs/AuthProvider"
 import React from "react"
 import { SlideUpTransition } from "../common/transitions"
+import GroupPlanCheckoutView from "components/views/checkout/views/GroupPlanCheckoutView"
+import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -263,7 +262,6 @@ export const useSparksPlansForm = () => {
 }
 
 const GroupPlansDialog = () => {
-   const initialStepKey = useSelector(groupPlansDialogInitialStepSelector)
    const generatedClientSecret = useSelector(clientSecret)
    const open = useSelector(plansDialogOpenSelector)
    const isMobile = useIsMobile()
@@ -296,16 +294,6 @@ const GroupPlansDialog = () => {
       setClientSecret(customerSessionSecret)
       goToSelectPlanView(selectedPlan)
    }
-
-   const initialStep = useMemo(() => {
-      if (initialStepKey) {
-         const index = views.findIndex((view) => view.key === initialStepKey)
-         if (index !== -1) {
-            return index
-         }
-      }
-      return 0
-   }, [initialStepKey])
 
    const mobileView = (
       <BrandedSwipableDrawer
@@ -370,16 +358,12 @@ const GroupPlansDialog = () => {
    return (
       <>
          <ConditionalWrapper condition={!isMobile} fallback={mobileView}>
-            <SteppedDialog
-               sx={styles.steppedDialog}
-               key={open ? "open" : "closed"}
-               bgcolor="#FCFCFC"
-               handleClose={() => handleCloseGroupPlansDialog()}
-               open={open}
-               views={views}
-               initialStep={initialStep}
-               // transition={SlideUpDownTransition}
-            />
+            <ConditionalWrapper
+               condition={Boolean(generatedClientSecret)}
+               fallback={<SelectGroupPlanView />}
+            >
+               <GroupPlanCheckoutView />
+            </ConditionalWrapper>
          </ConditionalWrapper>
       </>
    )
@@ -411,13 +395,14 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    children,
 }) => {
    const { handleClose } = useSparksPlansForm()
-   const isMobile = useIsMobile("md")
+   const isMobile = useIsMobile()
    const open = useSelector(plansDialogOpenSelector)
 
    return (
       <Box sx={combineStyles(styles.containerWrapper, sx)}>
          <Dialog
             sx={styles.container}
+            scroll="paper"
             open={open}
             maxWidth={false}
             PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
