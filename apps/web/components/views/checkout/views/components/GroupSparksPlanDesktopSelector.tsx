@@ -61,7 +61,6 @@ const styles = sxStyles({
    },
    contentWrapper: {
       borderRadius: "14px",
-      border: "1.5px solid",
       borderColor: (theme) => theme.brand.purple[600],
       "&:hover": {
          cursor: "pointer",
@@ -148,9 +147,7 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
 
    const selectedColor = theme.brand.purple[600]
    const unselectedColor = theme.palette.neutral[50]
-   const featuresBackgroundColor = selected
-      ? theme.brand.purple[50]
-      : theme.brand.white[400]
+   const featuresBackgroundColor = selected ? theme.brand.purple[50] : "#fff"
    const headerBorderColor = selected ? selectedColor : unselectedColor
    const headerBgColor = selected ? selectedColor : unselectedColor
    const checkBackgroundColor = selected ? theme.brand.purple[800] : "#D9D9D9"
@@ -172,6 +169,7 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
          sx={[
             styles.contentWrapper,
             {
+               border: selected ? "1.5px solid" : "1px solid",
                borderColor: headerBorderColor,
                background: featuresBackgroundColor,
             },

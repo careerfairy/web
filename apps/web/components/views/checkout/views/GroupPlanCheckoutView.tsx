@@ -49,7 +49,7 @@ const styles = sxStyles({
       justifyItems: "center",
       alignContent: "center",
       justifyContent: "center",
-      mb: "450px",
+      mb: "560px",
    },
 })
 
