@@ -3,7 +3,7 @@ import {
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Interest } from "@careerfairy/shared-lib/interests"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
 import { Form, Formik } from "formik"
@@ -22,7 +22,11 @@ import LivestreamFormSpeakersStep from "./views/speakers"
 import LivestreamFormQuestionsStep from "./views/questions"
 import LivestreamFormJobsStep from "./views/jobs"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
+import { CircularProgress, Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamCreator } from "./views/questions/commons"
 
 const styles = sxStyles({
    root: {
@@ -50,7 +54,8 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
 }
 
 const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
-   speakers: [],
+   values: [],
+   options: [],
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
@@ -74,12 +79,71 @@ type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
    existingInterests: Interest[]
    customJobs: PublicCustomJob[]
+   creators: Creator[]
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapCreatorToLivestreamCreator(creator: Creator): LivestreamCreator {
+   return {
+      ...creator,
+      originalId: creator.id,
+      id: creator.email,
+   }
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
+   return {
+      originalId: speaker.id,
+      id: speaker.email,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName,
+      lastName: speaker.lastName,
+      position: speaker.position,
+      email: speaker.email,
+      avatarUrl: speaker.avatar,
+      createdAt: null,
+      updatedAt: null,
+      linkedInUrl: null,
+      story: speaker.background,
+      roles: [CreatorRoles.Speaker],
+   }
+}
+
+function unionCreatorsAndSpeakers(
+   creators: LivestreamCreator[],
+   speakers: Speaker[]
+): LivestreamCreator[] {
+   const mergedArray = [...creators, ...speakers.map(mapSpeakerToCreator)]
+
+   const uniqueMap = new Map<string, LivestreamCreator>()
+
+   mergedArray.forEach((item) => {
+      const key = item.id || item.email
+      if (!uniqueMap.has(key)) {
+         uniqueMap.set(key, item)
+      }
+   })
+
+   return Array.from(uniqueMap.values())
 }
 
 const convertLivestreamObjectToForm = ({
    livestream,
    existingInterests,
    customJobs,
+   creators,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
@@ -113,7 +177,13 @@ const convertLivestreamObjectToForm = ({
 
    return {
       general: general,
-      speakers: valuesReducer(formSpeakersTabInitialValues),
+      speakers: {
+         values: livestream.speakers.map(mapSpeakerToCreator),
+         options: unionCreatorsAndSpeakers(
+            creators.map(mapCreatorToLivestreamCreator),
+            livestream.speakers
+         ),
+      },
       questions: valuesReducer(formQuestionsTabInitialValues),
       jobs: {
          jobs: livestream.jobs,
@@ -137,12 +207,14 @@ const LivestreamCreationForm: FC<Props> = ({
    const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
       livestreamId: livestream?.id,
    })
+   const { data: creators } = useGroupCreators(groupId)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
            existingInterests,
            customJobs: initialSelectedCustomJobs,
+           creators,
         })
       : formInitialValues
 
@@ -156,9 +228,9 @@ const LivestreamCreationForm: FC<Props> = ({
             <Stack sx={styles.root} rowGap={2}>
                {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
                {tabValue == TAB_VALUES.SPEAKERS && (
-                  <LivestreamFormSpeakersStep
-                     values={formSpeakersTabInitialValues}
-                  />
+                  <SuspenseWithBoundary fallback={<CircularProgress />}>
+                     <LivestreamFormSpeakersStep />
+                  </SuspenseWithBoundary>
                )}
                {tabValue == TAB_VALUES.QUESTIONS && (
                   <LivestreamFormQuestionsStep />

@@ -12,12 +12,19 @@ const styles = sxStyles({
       flexDirection: "column",
       maxHeight: "none",
       maxWidth: "770px !important",
-      overflowY: "auto",
+      overflowY: "hidden",
+      top: {
+         xs: "70px",
+         md: 0,
+      },
+      borderRadius: {
+         xs: "20px",
+         md: "20px",
+      },
    },
 })
 
 export type BrandedDialogProps = {
-   key: string
    isDialogOpen: boolean
    handleCloseDialog: () => void
    children: ReactNode
@@ -25,7 +32,6 @@ export type BrandedDialogProps = {
 }
 
 const BrandedDialog: FC<BrandedDialogProps> = ({
-   key,
    isDialogOpen,
    handleCloseDialog,
    children,
@@ -35,7 +41,6 @@ const BrandedDialog: FC<BrandedDialogProps> = ({
 
    return (
       <Dialog
-         key={key}
          open={isDialogOpen}
          onClose={handleCloseDialog}
          maxWidth="md"

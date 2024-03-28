@@ -31,7 +31,7 @@ type Props = {
    /**
     * The actions to be displayed at the bottom of the form
     */
-   actions: ReactNode
+   actions?: ReactNode
    /**
     * The callback to be invoked when the form is successfully submitted
     */
