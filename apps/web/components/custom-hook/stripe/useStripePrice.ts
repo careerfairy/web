@@ -35,13 +35,7 @@ const useStripePrice = (priceId: string) => {
          priceId: priceId,
       }
    }, [priceId])
-   const { data } = useSWR(["fetchStripePrice", options], fetcher, swrOptions)
-
-   return useMemo(() => {
-      return {
-         data,
-      }
-   }, [data])
+   return useSWR(["fetchStripePrice", options], fetcher, swrOptions)
 }
 
 export default useStripePrice

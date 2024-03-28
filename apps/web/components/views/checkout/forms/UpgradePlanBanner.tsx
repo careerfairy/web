@@ -23,7 +23,7 @@ const styles = sxStyles({
       backgroundColor: "red",
       borderRadius: "12px",
       border: "1px solid",
-      borderColor: (theme) => theme.brand.warning[600], // TODO: Confirm warning is -> var(--Attention-Attention---600---Default, #FF1616)
+      borderColor: (theme) => theme.brand.warning[600],
       background:
          "linear-gradient(94deg, rgba(255, 0, 0, 0.10) 1.13%, rgba(255, 0, 0, 0.00) 58.83%), rgba(255, 22, 22, 0.60)",
       backgroundImage: "url('/star-full.png')",
