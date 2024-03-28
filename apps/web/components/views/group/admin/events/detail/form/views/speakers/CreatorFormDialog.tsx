@@ -81,23 +81,23 @@ const CreatorFormDialog: FC<CreatorFormDialogProps> = ({
                   <SteppedDialog.Content sx={styles.container}>
                      {creator ? (
                         <SteppedDialog.Title sx={styles.title}>
+                           Edit your{" "}
                            <Box component="span" color="secondary.main">
-                              Editing
-                           </Box>{" "}
-                           creator
+                              contributor
+                           </Box>
                         </SteppedDialog.Title>
                      ) : (
                         <SteppedDialog.Title sx={styles.title}>
                            Create {isMobile ? "" : "a"} new{" "}
                            <Box component="span" color="secondary.main">
-                              profile
+                              contributor
                            </Box>
                         </SteppedDialog.Title>
                      )}
                      <SteppedDialog.Subtitle sx={styles.subtitle}>
                         {creator
-                           ? "Please check if that’s the correct creator"
-                           : "Insert your new creator details!"}
+                           ? "Check and change your contributor details"
+                           : "Insert your new contributor details!"}
                      </SteppedDialog.Subtitle>
                      <Box sx={styles.form}>
                         <CreateOrEditCreatorForm

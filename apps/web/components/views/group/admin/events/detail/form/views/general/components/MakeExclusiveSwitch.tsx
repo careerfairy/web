@@ -37,6 +37,10 @@ const MakeExclusiveSwitchLabel = () => {
             title={
                "By enabling this you are making this stream only visible to hosts"
             }
+            onClick={(event) => {
+               event.preventDefault()
+               event.stopPropagation()
+            }}
          >
             <InfoIcon color="secondary" />
          </BrandedTooltip>

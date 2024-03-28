@@ -9,6 +9,9 @@ import { FC } from "react"
 import MoreMenuWithEditAndRemoveOptions from "../questions/components/MoreMenu"
 
 const styles = sxStyles({
+   alertBorder: {
+      borderColor: "#FE9B0E",
+   },
    wrapper: {
       p: 3,
       mt: 3,
@@ -70,7 +73,7 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
    const speakerHasStory = Boolean(speaker.story)
 
    return (
-      <Box sx={styles.wrapper}>
+      <Box sx={[styles.wrapper, !speaker.email && styles.alertBorder]}>
          <Box sx={styles.moreMenu}>
             <MoreMenuWithEditAndRemoveOptions
                labels={["Edit speaker's details", "Remove speaker"]}
@@ -106,14 +109,16 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                   >
                      {`${speaker.firstName} ${speaker.lastName}`}
                   </Typography>
-                  <Stack direction="column">
-                     <Stack
-                        direction="row"
-                        gap="16px"
-                        alignItems="center"
-                        justifyContent={isMobile ? "center" : null}
-                     >
-                        <Typography sx={styles.speakerInfo}>
+                  <Stack
+                     direction="column"
+                     textAlign={isMobile ? "center" : null}
+                  >
+                     <Stack direction="row" gap="16px" alignItems="center">
+                        <Typography
+                           fontSize="16px"
+                           color="neutral.400"
+                           lineHeight="27px"
+                        >
                            {speaker.position}
                         </Typography>
                         <Divider
@@ -128,9 +133,25 @@ const SpeakersCard: FC<SpeakersCardProps> = ({
                            <LinkedIn htmlColor="#e5e5e5" />
                         )}
                      </Stack>
-                     <Typography sx={styles.speakerInfo}>
-                        {speaker.email}
-                     </Typography>
+                     {speaker.email ? (
+                        <Typography
+                           fontSize="16px"
+                           color="neutral.400"
+                           lineHeight="27px"
+                        >
+                           {speaker.email}
+                        </Typography>
+                     ) : (
+                        <Typography
+                           fontSize="16px"
+                           color="#FE9B0E"
+                           lineHeight="27px"
+                           fontWeight={500}
+                        >
+                           Missing email address. Please edit this speaker’s
+                           details to add it.
+                        </Typography>
+                     )}
                   </Stack>
                </Stack>
             </Stack>
