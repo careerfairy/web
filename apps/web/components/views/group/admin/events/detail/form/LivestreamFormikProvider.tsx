@@ -1,34 +1,24 @@
 import {
-   PublicCustomJob,
-   pickPublicDataFromCustomJob,
+  PublicCustomJob,
+  pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { Interest } from "@careerfairy/shared-lib/interests"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
+import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
-import { Form, Formik } from "formik"
-import { FC } from "react"
-import { TAB_VALUES } from "../navigation/LivestreamAdminDetailTopBarNavigation"
+import { Formik } from "formik"
+import { FC, ReactNode } from "react"
 import {
-   LivestreamFormGeneralTabValues,
-   LivestreamFormSpeakersTabValues,
-   LivestreamFormQuestionsTabValues,
-   LivestreamFormJobsTabValues,
-   LivestreamFormValues,
+  LivestreamFormGeneralTabValues,
+  LivestreamFormJobsTabValues,
+  LivestreamFormQuestionsTabValues,
+  LivestreamFormSpeakersTabValues,
+  LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import LivestreamFormGeneralStep from "./views/general"
-import LivestreamFormSpeakersStep from "./views/speakers"
-import LivestreamFormQuestionsStep from "./views/questions"
-import LivestreamFormJobsStep from "./views/jobs"
-import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
-
-const styles = sxStyles({
-   root: {
-      padding: "24px",
-   },
-})
+import { LivestreamCreator } from "./views/questions/commons"
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -50,7 +40,8 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
 }
 
 const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
-   speakers: [],
+   values: [],
+   options: [],
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
@@ -74,12 +65,71 @@ type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
    existingInterests: Interest[]
    customJobs: PublicCustomJob[]
+   creators: Creator[]
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapCreatorToLivestreamCreator(creator: Creator): LivestreamCreator {
+   return {
+      ...creator,
+      originalId: creator.id,
+      id: creator.email,
+   }
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
+   return {
+      originalId: speaker.id,
+      id: speaker.id,
+      groupId: null,
+      documentType: "groupCreator",
+      firstName: speaker.firstName,
+      lastName: speaker.lastName,
+      position: speaker.position,
+      email: speaker.email,
+      avatarUrl: speaker.avatar,
+      createdAt: null,
+      updatedAt: null,
+      linkedInUrl: "",
+      story: speaker.background,
+      roles: [CreatorRoles.Speaker],
+   }
+}
+
+function unionCreatorsAndSpeakers(
+   creators: LivestreamCreator[],
+   speakers: Speaker[]
+): LivestreamCreator[] {
+   const mergedArray = [...creators, ...speakers.map(mapSpeakerToCreator)]
+
+   const uniqueMap = new Map<string, LivestreamCreator>()
+
+   mergedArray.forEach((item) => {
+      const key = item.id || item.email
+      if (!uniqueMap.has(key)) {
+         uniqueMap.set(key, item)
+      }
+   })
+
+   return Array.from(uniqueMap.values())
 }
 
 const convertLivestreamObjectToForm = ({
    livestream,
    existingInterests,
    customJobs,
+   creators,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
@@ -113,7 +163,13 @@ const convertLivestreamObjectToForm = ({
 
    return {
       general: general,
-      speakers: valuesReducer(formSpeakersTabInitialValues),
+      speakers: {
+         values: livestream.speakers.map(mapSpeakerToCreator),
+         options: unionCreatorsAndSpeakers(
+            creators.map(mapCreatorToLivestreamCreator),
+            livestream.speakers
+         ),
+      },
       questions: valuesReducer(formQuestionsTabInitialValues),
       jobs: {
          jobs: livestream.jobs,
@@ -125,24 +181,26 @@ const convertLivestreamObjectToForm = ({
 type Props = {
    livestream: LivestreamEvent
    groupId: string
-   tabValue: TAB_VALUES
+   children: ReactNode
 }
 
-const LivestreamCreationForm: FC<Props> = ({
+const LivestreamFormikProvider: FC<Props> = ({
    livestream,
    groupId,
-   tabValue,
+   children,
 }) => {
    const { data: existingInterests } = useInterests()
    const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
       livestreamId: livestream?.id,
    })
+   const { data: creators } = useGroupCreators(groupId)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
            existingInterests,
            customJobs: initialSelectedCustomJobs,
+           creators,
         })
       : formInitialValues
 
@@ -152,22 +210,9 @@ const LivestreamCreationForm: FC<Props> = ({
          onSubmit={undefined}
          validationSchema={livestreamFormValidationSchema}
       >
-         <Form>
-            <Stack sx={styles.root} rowGap={2}>
-               {tabValue == TAB_VALUES.GENERAL && <LivestreamFormGeneralStep />}
-               {tabValue == TAB_VALUES.SPEAKERS && (
-                  <LivestreamFormSpeakersStep
-                     values={formSpeakersTabInitialValues}
-                  />
-               )}
-               {tabValue == TAB_VALUES.QUESTIONS && (
-                  <LivestreamFormQuestionsStep />
-               )}
-               {tabValue == TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
-            </Stack>
-         </Form>
+         {children}
       </Formik>
    )
 }
 
-export default LivestreamCreationForm
+export default LivestreamFormikProvider

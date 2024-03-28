@@ -1,18 +1,21 @@
-import { FC, useCallback, useMemo } from "react"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import JobCardPreview from "./JobCardPreview"
-import { useDispatch } from "react-redux"
-import { openJobsDialog } from "store/reducers/adminJobsReducer"
-import EmptyJobs from "./EmptyJobs"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import { useTheme } from "@mui/material"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC, useCallback, useMemo } from "react"
+import { useDispatch } from "react-redux"
+import { openJobsDialog } from "store/reducers/adminJobsReducer"
+import EmptyFormSection from "../../../EmptyFormSection"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import JobCardPreview from "./JobCardPreview"
+import { Briefcase } from "react-feather"
 
 type Props = {
    fieldId: string
 }
 const JobList: FC<Props> = ({ fieldId }) => {
+   const theme = useTheme()
    const dispatch = useDispatch()
    const featureFlags = useFeatureFlags()
    const { group } = useGroup()
@@ -48,7 +51,15 @@ const JobList: FC<Props> = ({ fieldId }) => {
    )
 
    if (selectedJobs.length === 0) {
-      return <EmptyJobs />
+      return (
+         <EmptyFormSection
+            icon={<Briefcase size={70} color={theme.palette.secondary.main} />}
+            title={"No jobs linked to your live stream"}
+            caption={
+               "Supercharge your recruitment efforts. Link a job opening and engage with the next generation of talent effortlessly."
+            }
+         />
+      )
    }
 
    return selectedJobs.map(

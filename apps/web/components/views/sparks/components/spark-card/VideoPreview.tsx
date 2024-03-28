@@ -13,6 +13,7 @@ import { sxStyles } from "types/commonTypes"
 import { usePrevious } from "react-use"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const styles = sxStyles({
    root: {
@@ -40,10 +41,7 @@ const styles = sxStyles({
          left: 0,
          "& video": {
             background: "black",
-            objectFit: {
-               xs: "cover !important",
-               sm: "contain !important",
-            },
+            objectFit: "cover !important",
          },
       },
       "& .react-player__preview": {
@@ -104,6 +102,7 @@ type Props = {
    light?: boolean
    containPreviewOnTablet?: boolean
    identifier?: string
+   autoPlaying?: boolean
 }
 
 const VideoPreview: FC<Props> = ({
@@ -118,6 +117,7 @@ const VideoPreview: FC<Props> = ({
    light,
    containPreviewOnTablet,
    identifier,
+   autoPlaying,
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [videoPlayedForSession, setVideoPlayedForSession] = useState(false)
@@ -142,10 +142,13 @@ const VideoPreview: FC<Props> = ({
 
    const handleProgress = useCallback(
       (progress: OnProgressProps) => {
-         setProgress(progress.played * 100)
-         onProgress(progress)
+         // only track and show the progress if it's not auto-played
+         if (!autoPlaying) {
+            setProgress(progress.played * 100)
+            onProgress(progress)
+         }
       },
-      [onProgress]
+      [autoPlaying, onProgress]
    )
 
    const prevIdentifier = usePrevious(identifier)
@@ -161,6 +164,35 @@ const VideoPreview: FC<Props> = ({
          reset()
       }
    }, [identifier, prevIdentifier])
+
+   useEffect(() => {
+      if (autoPlaying === false) {
+         reset()
+      }
+   }, [autoPlaying])
+
+   // Set up an interval to reset the video if auto-played for more than {SECONDS_TO_AUTO_PLAY} seconds
+   useEffect(() => {
+      let interval: NodeJS.Timeout | null = null
+
+      const handleAutoPlayReset = () => {
+         if (autoPlaying) {
+            interval = setInterval(() => {
+               reset()
+            }, SPARK_CONSTANTS.SECONDS_TO_AUTO_PLAY)
+         } else {
+            if (interval) {
+               clearInterval(interval)
+            }
+         }
+      }
+
+      handleAutoPlayReset()
+
+      return () => {
+         clearInterval(interval)
+      }
+   }, [autoPlaying])
 
    const onPlay = useCallback(() => {
       setVideoPlayedForSession(true)
@@ -199,16 +231,6 @@ const VideoPreview: FC<Props> = ({
                   onPlay={onPlay}
                   onError={handleError}
                   progressInterval={250}
-                  light={
-                     light ? (
-                        <ThumbnailOverlay
-                           src={thumbnailUrl}
-                           containPreviewOnTablet={containPreviewOnTablet}
-                        />
-                     ) : (
-                        false
-                     )
-                  }
                   url={videoUrl}
                   playIcon={<Fragment />}
                   muted={muted}
@@ -237,7 +259,7 @@ export const ThumbnailOverlay: FC<ThumbnailOverlayProps> = ({
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
 
    return (
-      <Box sx={[styles.thumbnailOverlay]}>
+      <Box sx={styles.thumbnailOverlay}>
          <Image
             src={src}
             layout="fill"

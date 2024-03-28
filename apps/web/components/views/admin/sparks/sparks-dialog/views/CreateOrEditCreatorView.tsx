@@ -35,10 +35,10 @@ const CreateOrEditCreatorView = () => {
                <SparksDialog.Content>
                   {creator ? (
                      <SparksDialog.Title>
+                        Editing{" "}
                         <Box component="span" color="secondary.main">
-                           Editing
-                        </Box>{" "}
-                        creator
+                           creator
+                        </Box>
                      </SparksDialog.Title>
                   ) : (
                      <SparksDialog.Title>

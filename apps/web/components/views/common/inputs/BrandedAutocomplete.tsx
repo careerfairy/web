@@ -40,14 +40,13 @@ const StyledBrandedAutocomplete = styled(
       const newOptions = initialOptionSection
          ? [{ title: "INITIAL_SECTION" }, ...options]
          : options
-
       return (
          <Autocomplete
             getOptionDisabled={(optionEl) => {
                if (!props.multiple || !limit) return false
                return (
-                  props.value.length >= limit &&
-                  !props.value.find((item) => {
+                  props.value?.length >= limit &&
+                  !props.value?.find((item) => {
                      if (props.isOptionEqualToValue) {
                         return props.isOptionEqualToValue(item, optionEl)
                      }

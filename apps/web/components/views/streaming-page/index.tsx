@@ -12,6 +12,14 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 
+const SessionConflictModal = dynamic(
+   () =>
+      import("./components/SessionConflictModal").then(
+         (mod) => mod.SessionConflictModal
+      ),
+   { ssr: false }
+)
+
 const LivestreamValidationWrapper = dynamic(
    () =>
       import("./components/LivestreamValidationWrapper").then(
@@ -28,6 +36,13 @@ const AgoraDevicesProvider = dynamic(
 const UserClientProvider = dynamic(
    () => import("./context/UserClient").then((mod) => mod.UserClientProvider),
    { ssr: false }
+)
+const RTMSignalingProvider = dynamic(
+   () =>
+      import("./context/RTMSignaling").then((mod) => mod.RTMSignalingProvider),
+   {
+      ssr: false,
+   }
 )
 
 const Layout = dynamic(
@@ -101,6 +116,12 @@ const AgoraTrackers = dynamic(
    { ssr: false }
 )
 
+const ViewerTrackers = dynamic(
+   () =>
+      import("./components/ViewerTrackers").then((mod) => mod.ViewerTrackers),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -151,25 +172,29 @@ const Component = ({ isHost }: Props) => {
                agoraUserId={agoraUserId}
                livestreamId={livestream.id}
             >
-               <AgoraDevicesProvider>
-                  <LocalTracksProvider>
-                     <ScreenShareProvider>
-                        <Layout>
-                           <Fragment>
-                              <TopBar />
-                              <MiddleContent />
-                              <BottomBar />
-                              <StreamSetupWidget />
-                              <SettingsMenu />
-                           </Fragment>
-                        </Layout>
-                        <ToggleStreamModeButton />
-                     </ScreenShareProvider>
-                  </LocalTracksProvider>
-               </AgoraDevicesProvider>
+               <RTMSignalingProvider>
+                  <AgoraDevicesProvider>
+                     <LocalTracksProvider>
+                        <ScreenShareProvider>
+                           <Layout>
+                              <Fragment>
+                                 <TopBar />
+                                 <MiddleContent />
+                                 <BottomBar />
+                                 <StreamSetupWidget />
+                                 <SettingsMenu />
+                              </Fragment>
+                           </Layout>
+                           <ToggleStreamModeButton />
+                        </ScreenShareProvider>
+                     </LocalTracksProvider>
+                  </AgoraDevicesProvider>
+                  <AgoraTrackers />
+                  <LivestreamStateTrackers />
+                  {isHost ? null : <ViewerTrackers />}
+                  <SessionConflictModal />
+               </RTMSignalingProvider>
             </StreamingProvider>
-            <AgoraTrackers />
-            <LivestreamStateTrackers />
          </UserClientProvider>
       ),
       [agoraUserId, isHost, livestream.id]
