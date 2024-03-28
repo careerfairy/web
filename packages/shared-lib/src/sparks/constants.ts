@@ -43,4 +43,9 @@ export const SPARK_CONSTANTS = {
     * The year we started tracking likes
     */
    LIKES_TRACKING_START_YEAR: 2023,
+
+   /**
+    * The number of seconds to auto-playing a spark video
+    */
+   SECONDS_TO_AUTO_PLAY: 5000,
 }
