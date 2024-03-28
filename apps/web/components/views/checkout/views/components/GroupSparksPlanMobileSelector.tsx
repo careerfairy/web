@@ -162,10 +162,11 @@ const GroupSparksPlanMobileSelector = () => {
             <Stack spacing={1}>
                <Box component="span" sx={styles.selectedPlanTitle}>
                   {PLAN_CONSTANTS[selectedPlan].name}
+                  <Box component="div" sx={styles.selectedPlanDescription}>
+                     {PLAN_CONSTANTS[selectedPlan].description}
+                  </Box>
                </Box>
-               <Box component="span" sx={styles.selectedPlanDescription}>
-                  {PLAN_CONSTANTS[selectedPlan].description}
-               </Box>
+
                <Box component="span" sx={styles.selectedPlanPrice}>
                   <ConditionalWrapper condition={Boolean(stripePrice)}>
                      {commafy(stripePrice.unit_amount / 100) +

@@ -45,7 +45,7 @@ const mobileTopPadding = 20
 const mobileBreakpoint = "md"
 
 const styles = sxStyles({
-   root: {},
+   mobilePaperRoot: { maxHeight: "95%", backgroundColor: "#F6F6FA" },
    dialogPaperMobile: { minWidth: "100%", minHeight: "100%" },
    steppedDialog: {
       minWidth: {
@@ -60,6 +60,7 @@ const styles = sxStyles({
    mobileWrapper: {
       px: "15px",
       mb: "10px",
+      backgroundColor: "#F6F6FA",
    },
    title: {
       color: (theme) => theme.palette.neutral[800],
@@ -301,8 +302,9 @@ const GroupPlansDialog = () => {
          open={open}
          onOpen={() => {}}
          PaperProps={{
-            sx: { maxHeight: "95%" },
+            sx: styles.mobilePaperRoot,
          }}
+         transitionDuration={600}
          onClose={() => handleCloseGroupPlansDialog()}
       >
          <Box sx={styles.closeBtn}>
