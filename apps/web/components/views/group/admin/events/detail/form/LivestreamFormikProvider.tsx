@@ -1,6 +1,6 @@
 import {
-  PublicCustomJob,
-  pickPublicDataFromCustomJob,
+   PublicCustomJob,
+   pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
@@ -14,11 +14,11 @@ import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { FC, ReactNode } from "react"
 import {
-  LivestreamFormGeneralTabValues,
-  LivestreamFormJobsTabValues,
-  LivestreamFormQuestionsTabValues,
-  LivestreamFormSpeakersTabValues,
-  LivestreamFormValues,
+   LivestreamFormGeneralTabValues,
+   LivestreamFormJobsTabValues,
+   LivestreamFormQuestionsTabValues,
+   LivestreamFormSpeakersTabValues,
+   LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
 import { LivestreamCreator } from "./views/questions/commons"
@@ -50,6 +50,7 @@ const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
    registrationQuestions: [],
    feedbackQuestions: [],
+   hosts: [],
 }
 
 const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
@@ -224,6 +225,7 @@ const convertLivestreamObjectToForm = ({
             group
          ),
          feedbackQuestions: formQuestionsTabInitialValues.feedbackQuestions,
+         hosts: formQuestionsTabInitialValues.hosts,
       },
       jobs: {
          jobs: livestream.jobs,
