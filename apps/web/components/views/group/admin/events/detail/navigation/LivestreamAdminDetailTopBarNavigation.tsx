@@ -61,7 +61,7 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
       tabValue,
       navigateWithValidationCheck,
       shouldShowAlertIndicatorOnTab,
-      isGenralTabInvalid,
+      isGeneralTabInvalid,
       isSpeakerTabInvalid,
    } = useLivestreamCreationContext()
 
@@ -80,7 +80,7 @@ const LivestreamAdminDetailTopBarNavigation: FC = () => {
             label="General"
             value={TAB_VALUES.GENERAL}
             icon={
-               isGenralTabInvalid && shouldShowAlertIndicator ? (
+               isGeneralTabInvalid && shouldShowAlertIndicator ? (
                   <TabAlertIcon />
                ) : undefined
             }
