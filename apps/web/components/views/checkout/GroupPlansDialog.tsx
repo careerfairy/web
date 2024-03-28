@@ -337,6 +337,7 @@ const GroupPlansDialog = () => {
                         color={"secondary"}
                         onClick={redirectToCheckout}
                         sx={styles.checkoutButton}
+                        size="large"
                      >
                         Select plan
                      </Button>
@@ -345,6 +346,7 @@ const GroupPlansDialog = () => {
                            color={"grey"}
                            onClick={() => handleCloseGroupPlansDialog()}
                            sx={styles.cancelButton}
+                           size="large"
                         >
                            Cancel
                         </Button>
