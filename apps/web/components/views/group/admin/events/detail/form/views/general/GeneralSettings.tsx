@@ -26,7 +26,7 @@ const SUMMARY_PLACEHOLDER = `Describe your live stream
 
 const GeneralSettings = () => {
    const isMobile = useIsMobile()
-   const { isUniversityEvent } = useLivestreamCreationContext()
+   const { isCohostedEvent } = useLivestreamCreationContext()
 
    return (
       <>
@@ -41,7 +41,7 @@ const GeneralSettings = () => {
             placeholder="Insert your live stream title"
             requiredText="(required)"
          />
-         {isUniversityEvent ? (
+         {isCohostedEvent ? (
             <Stack sx={styles.logoAndBannerWrapper}>
                <LogoUploader />
                <BannerImageSelect />
@@ -60,6 +60,16 @@ const GeneralSettings = () => {
                <LanguageSelect />
             </Grid>
          </Grid>
+         {Boolean(isCohostedEvent) && (
+            <FormBrandedTextField
+               name="general.company"
+               label="Company name"
+               placeholder="Company name"
+               requiredText="(required)"
+               inputProps={{ maxLength: 70 }}
+               helperText="This will be shown on the livestream page"
+            />
+         )}
          <FormBrandedTextField
             name="general.summary"
             label="What is the live stream about?"
