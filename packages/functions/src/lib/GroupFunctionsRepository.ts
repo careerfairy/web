@@ -653,7 +653,7 @@ export class GroupFunctionsRepository
       type: GroupPlanType,
       days: number,
       logger: Logger,
-      ignoreGroupIds?: string[]
+      ignoreGroupIds: string[] = []
    ): Promise<Group[]> {
       const preExpirationDate = DateTime.now().plus({ days: days }).toJSDate()
       logger.info(
@@ -664,22 +664,13 @@ export class GroupFunctionsRepository
          .collection("careerCenterData")
          .where("plan.type", "==", type)
          .where("plan.expiresAt", "<=", preExpirationDate)
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      let afterFetchFilter = (_) => true
-
-      if (ignoreGroupIds?.length) {
-         // Not using query due to firestore: Cannot have inequality filters on multiple properties
-         afterFetchFilter = (group: Group) =>
-            !ignoreGroupIds.includes(group.groupId)
-      }
-
       const snaps = await query
          .orderBy("plan.expiresAt")
          .withConverter(createCompatGenericConverter<Group>())
          .get()
-
-      return mapFirestoreDocuments<Group>(snaps)?.filter(afterFetchFilter)
+      return mapFirestoreDocuments<Group>(snaps)?.filter(
+         (group) => !ignoreGroupIds.includes(group.groupId)
+      )
    }
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
