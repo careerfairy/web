@@ -1,24 +1,24 @@
-import { useCallback } from "react"
-import {
-   useUniversityCountries,
-   useFieldsOfStudy,
-   useLevelsOfStudy,
-} from "components/custom-hook/useCollection"
-import { CompanyCountryValues } from "constants/forms"
-import FormSectionHeader from "../../FormSectionHeader"
-import MultiChipSelect from "./components/MultiChipSelect"
-import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import {
    GroupOption,
    GroupTargetUniversity,
 } from "@careerfairy/shared-lib/groups"
+import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import {
    University,
    UniversityCountry,
    universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
+import {
+   useFieldsOfStudy,
+   useLevelsOfStudy,
+   useUniversityCountries,
+} from "components/custom-hook/useCollection"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { CompanyCountryValues } from "constants/forms"
+import { useCallback } from "react"
+import FormSectionHeader from "../../FormSectionHeader"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
+import MultiChipSelect from "./components/MultiChipSelect"
 
 type UniversityOption = University & {
    country: string
@@ -104,7 +104,7 @@ const AudienceTargeting = () => {
             />
          ) : (
             <MultiChipSelect
-               id="targetUniversities"
+               id="general.targetUniversities"
                options={filterUniversitiesBySelectedContries(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   general.targetCountries as any
