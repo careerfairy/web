@@ -12,14 +12,19 @@ import { INavLink } from "../types"
 const styles = sxStyles({
    wrapper: {
       position: "fixed",
+      height: "67px",
       bottom: 0,
       width: "100%",
       left: 0,
-      zIndex: 999,
+      zIndex: (theme) => theme.zIndex.modal,
       background: "white",
       borderTop: "1px solid #F3F3F3",
+      justifyContent: "center",
+      alignItems: "center",
       [`& .${tabsClasses.flexContainer}`]: {
          justifyContent: "space-evenly",
+         alignItems: "center",
+         width: "100%",
       },
       [`& .${tabsClasses.indicator}`]: {
          display: "none",
@@ -28,16 +33,29 @@ const styles = sxStyles({
          color: (theme) => `${theme.palette.text.primary} !important`,
       },
    },
+   wrapperDark: {
+      backgroundColor: "neutral.800",
+      borderTop: "1px solid #313131",
+      [`& .${tabClasses.root}`]: {
+         color: (theme) => `${theme.brand.white[50]} !important`,
+         opacity: 0.4
+      },
+      [`& .${tabClasses.selected}`]: {
+         opacity: 1
+      },
+      [`& a:hover`]: {
+         opacity: 1
+      },
+   },
    navLink: {
       display: "flex",
       flexDirection: "column",
-      justifyContent: "flex-start",
+      justifyContent: "center",
       minWidth: 0,
       maxWidth: "20%",
       backgroundColor: "transparent !important",
       color: (theme) => alpha(theme.palette.text.secondary, 0.3),
-      px: "0px",
-      py: "12px",
+      p: 0,
       "&:hover , &:focus": {
          color: "text.primary",
       },
@@ -57,10 +75,11 @@ const styles = sxStyles({
 })
 
 type Props = {
-   links: INavLink[]
+   links: INavLink[],
+   isDark?: boolean 
 }
 
-const BottomNavBar = ({ links }: Props) => {
+const BottomNavBar = ({ links, isDark = false }: Props) => {
    const { pathname: routerPathname } = useRouter()
    const isMobile = useIsMobile()
 
@@ -76,7 +95,7 @@ const BottomNavBar = ({ links }: Props) => {
    }, [links, routerPathname])
 
    return (
-      <Tabs sx={styles.wrapper} value={activeTab}>
+      <Tabs sx={[styles.wrapper, isDark && styles.wrapperDark]} value={activeTab}>
          {links.map(({ id, href, Icon, title, mobileTitle }, index) => (
             <Tab
                key={id}

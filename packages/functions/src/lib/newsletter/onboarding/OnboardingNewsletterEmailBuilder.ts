@@ -305,26 +305,19 @@ export class OnboardingNewsletterEmailBuilder {
     * @param discoveryType Type of discovery to send emails
     */
    send(discoveryType: OnboardingNewsletterEvents): Promise<void[]> {
-      this.logger.info(
-         "OnboardingNewsletterEmailBuilder ~ send ~ discoveryType:",
-         discoveryType
-      )
       const messages =
          this.discoveryEmailsTemplatedMessageMap.get(discoveryType)
       this.logger.info(
          "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~messagesTo:",
+         discoveryType,
          messages.map((t) => t.To)
       )
 
       if (!messages.length) {
-         this.logger.info(
-            "OnboardingNewsletterEmailBuilder ~ send ~ ~empty messages - IGNORE:",
-            messages.map((t) => t.To)
-         )
          return null
       }
 
-      return this.sender.sendEmailBatchWithTemplates(messages, (err, res) => {
+      return this.sender.sendEmailBatchWithTemplates(messages, (err) => {
          if (err) {
             this.logger.info(
                "OnboardingNewsletterEmailBuilder ~ send ~ ~ ~ ~ error:",
@@ -336,10 +329,6 @@ export class OnboardingNewsletterEmailBuilder {
             })
             return
          }
-         this.logger.info(
-            "OnboardingNewsletterEmailBuilder ~ SEND_OK: ",
-            res.map((res) => res.To)
-         )
       })
    }
 

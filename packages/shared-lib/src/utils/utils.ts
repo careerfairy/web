@@ -77,8 +77,8 @@ export const shuffle = <T>(array: T[]) => {
  * @param reverse ascending ordering
  */
 export const sortLivestreamsDesc = (
-   a: LivestreamEvent,
-   b: LivestreamEvent,
+   a: Pick<LivestreamEvent, "start">,
+   b: Pick<LivestreamEvent, "start">,
    reverse = false
 ): number => {
    const aa = reverse ? b : a
@@ -225,7 +225,7 @@ export const arrayContainsAny = <Type>(
  * Remove duplicates values
  * @param arr
  */
-export const removeDuplicates = (arr: string[]) => {
+export const removeDuplicates = <T>(arr: T[]): T[] => {
    return Array.from(new Set(arr))
 }
 

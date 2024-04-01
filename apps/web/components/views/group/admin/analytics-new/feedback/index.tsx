@@ -16,7 +16,7 @@ const AnalyticsFeedbackPageContent = () => {
 const PageContent = () => {
    return (
       <Box py={2}>
-         <Container maxWidth={false}>
+         <Container maxWidth="xl">
             <Grid container spacing={spacing}>
                <Grid xs={12} item>
                   <FeedbackSearch />

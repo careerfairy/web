@@ -1,9 +1,7 @@
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback } from "react"
 import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import LivestreamSearch, {
-   LivestreamHit,
-} from "../../../common/LivestreamSearch"
+import LivestreamSearch from "../../../common/LivestreamSearch"
 import Stack from "@mui/material/Stack"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import {
@@ -14,7 +12,7 @@ import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Search as FindIcon } from "react-feather"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { where } from "firebase/firestore"
+import { LivestreamSearchResult } from "types/algolia"
 
 const styles = sxStyles({
    root: {
@@ -46,7 +44,7 @@ const FeedbackSearch: FC = () => {
       useFeedbackPageContext()
 
    const handleChange = useCallback(
-      (hit: LivestreamHit | null) => {
+      (hit: LivestreamSearchResult | null) => {
          if (hit) {
             handleOpenFeedbackDialog(hit.id)
          }
@@ -63,11 +61,6 @@ const FeedbackSearch: FC = () => {
          setSortDirection(event.target.value as typeof sortDirection)
       },
       [setSortDirection]
-   )
-
-   const additionalConstraints = useMemo(
-      () => (group?.id ? [where("groupIds", "array-contains", group.id)] : []),
-      [group?.id]
    )
 
    return (
@@ -88,8 +81,13 @@ const FeedbackSearch: FC = () => {
                orderByDirection={SORT_DIRECTIONS[sortDirection]}
                handleChange={handleChange}
                value={null}
+               placeholderText="Search by title"
                startIcon={<FindIcon color={"black"} />}
-               additionalConstraints={additionalConstraints}
+               filterOptions={{
+                  arrayFilters: {
+                     groupIds: [group.id],
+                  },
+               }}
             />
             <StyledTextField
                sx={[styles.timeFrameSelect, isMobile && styles.noMarginTop]}

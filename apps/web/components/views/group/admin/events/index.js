@@ -5,7 +5,6 @@ import React, { Fragment, useEffect, useState } from "react"
 import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { AppBar, Box, CircularProgress, Tabs } from "@mui/material"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import Tab from "@mui/material/Tab"
@@ -36,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 const EventsOverview = () => {
    const { group, livestreamDialog } = useGroup()
    const classes = useStyles()
-   const { userData } = useAuth()
    const {
       listenToDraftLiveStreamsByGroupId,
       listenToUpcomingLiveStreamsByGroupId,
@@ -171,12 +169,6 @@ const EventsOverview = () => {
                   group={group}
                   eventId={eventId}
                   setGroupsDictionary={setGroupsDictionary}
-                  hasAccessToRegisteredStudents={
-                     Boolean(userData?.isAdmin) &&
-                     Boolean(
-                        group?.universityCode || group?.privacyPolicyActive
-                     )
-                  }
                   handlePublishStream={livestreamDialog.handlePublishStream}
                   publishingDraft={livestreamDialog.isPublishing}
                   disabled={fetchingQueryEvent || fetching}

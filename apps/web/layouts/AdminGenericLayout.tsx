@@ -16,6 +16,7 @@ import {
 import { sxStyles } from "../types/commonTypes"
 import { useGenericDashboard } from "./GenericDashboardLayout"
 import { useGroup } from "./GroupDashboardLayout"
+import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 
 const baseStyles = (drawerWidth: number) => {
    return sxStyles({
@@ -133,6 +134,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
    const isMobile = useIsMobile()
+   const isFullScreen = useSparksFeedIsFullScreen()
    const styles = useStyles()
 
    useEffect(() => {
@@ -180,15 +182,12 @@ const AdminGenericLayout: React.FC<Props> = ({
             {/* main content */}
             <Box
                component={"main"}
-               sx={[
-                  styles.main,
-                  { mb: isMobile && bottomNavContent ? "50px" : "" },
-               ]}
+               sx={styles.main}
             >
                {children}
             </Box>
             {/* Bottom navigation bar */}
-            {(isMobile || showBottomNavContent) && bottomNavContent
+            {(isMobile || isFullScreen || showBottomNavContent) && bottomNavContent
                ? bottomNavContent
                : null}
          </Box>

@@ -1,14 +1,20 @@
-import algoliaIndexes from "./AlgoliaInstance"
+import algoliaSearchClient from "./AlgoliaInstance"
 import { SearchClient } from "algoliasearch"
+import { SearchResponse } from "@algolia/client-search"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
-import { Wish } from "@careerfairy/shared-lib/dist/wishes"
-import { SearchResponse } from "../../types/algolia"
+import { Wish } from "@careerfairy/shared-lib/wishes"
+import { initAlgoliaIndex } from "./util"
+import { AlgoliaLivestreamResponse } from "types/algolia"
 
 export interface IAlgoliaRepository {
    searchWishes(
       query: string,
       options: SearchWishesOptions
    ): Promise<SearchResponse<Wish>>
+   searchLivestreams(
+      query: string,
+      filters: string
+   ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
 }
 interface SearchWishesOptions {
    sortType?: SortType
@@ -54,9 +60,18 @@ class AlgoliaRepository implements IAlgoliaRepository {
          ...(options?.page && { page: options.page }),
       })
    }
+
+   async searchLivestreams(query: string, filters: string) {
+      const index = initAlgoliaIndex("livestreams")
+      return index.search<AlgoliaLivestreamResponse>(query, {
+         filters,
+      })
+   }
 }
 
 // Singleton
-const algoliaRepo: IAlgoliaRepository = new AlgoliaRepository(algoliaIndexes)
+const algoliaRepo: IAlgoliaRepository = new AlgoliaRepository(
+   algoliaSearchClient
+)
 
 export default algoliaRepo

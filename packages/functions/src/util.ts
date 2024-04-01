@@ -18,8 +18,6 @@ import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
 import type { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import DocumentSnapshot = firestore.DocumentSnapshot
-import { Group } from "@careerfairy/shared-lib/groups"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 export const setCORSHeaders = (req: Request, res: Response): void => {
@@ -295,23 +293,6 @@ export const makeRequestingGroupIdFirst = (
    return newArray
 }
 
-export const studentBelongsToGroup = (student: UserData, group: Group) => {
-   // return (
-   //    student && student.groupIds && student.groupIds.includes(group.groupId)
-   // );
-   if (group.universityCode) {
-      return (
-         student &&
-         student.university &&
-         student.university.code === group.universityCode
-      )
-   } else {
-      return (
-         student && student.groupIds && student.groupIds.includes(group.groupId)
-      )
-   }
-}
-
 export const convertPollOptionsObjectToArray = (pollOptionsObject) => {
    return Object.keys(pollOptionsObject).map((key) => ({
       ...pollOptionsObject[key],
@@ -339,18 +320,6 @@ export const getDateString = (streamData: LivestreamEvent) => {
       streamData.start.toDate &&
       streamData.start.toDate().toString()
    return dateString || ""
-}
-
-export const markStudentStatsInUse = (totalParticipants, groupData) => {
-   return totalParticipants.map((student) => {
-      // Only modify that stats in use prop when it hasn't been assigned yet
-      if (!student.statsInUse) {
-         return {
-            ...student,
-            statsInUse: studentBelongsToGroup(student, groupData),
-         }
-      } else return student
-   })
 }
 
 export const createNestedArrayOfTemplates = (

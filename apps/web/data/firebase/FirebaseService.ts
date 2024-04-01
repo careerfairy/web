@@ -101,7 +101,7 @@ class FirebaseService {
 
    fetchAgoraRtmToken = async (data) => {
       const fetchAgoraRtmToken = this.functions.httpsCallable(
-         "fetchAgoraRtmToken_eu"
+         "fetchAgoraRtmToken_v2"
       )
       return await fetchAgoraRtmToken(data)
    }
@@ -259,7 +259,7 @@ class FirebaseService {
       data
    ): Promise<firebase.functions.HttpsCallableResult> => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_eu"
+         "getLivestreamReportData_v2"
       )
       return handleGetLivestreamReportData(data)
    }

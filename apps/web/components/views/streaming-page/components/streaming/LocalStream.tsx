@@ -20,6 +20,7 @@ import { SpeakingIndicator } from "./SpeakingIndicator"
 import { useScreenShare } from "../../context/ScreenShare"
 import { LocalUser, LocalUserScreen } from "../../types"
 import { useUserStream } from "../../context/UserStream"
+import { LinearGradient } from "./LinearGradient"
 
 export type LocalMicrophoneAndCameraUserProps = {
    /**
@@ -78,6 +79,8 @@ export type LocalMicrophoneAndCameraUserProps = {
     * Whether to contain the video within the container. Default false.
     */
    readonly containVideo?: boolean
+
+   readonly hideGradient?: boolean
 } & BoxProps
 
 /**
@@ -135,6 +138,7 @@ export const LocalStream = ({
    localCameraTrack,
    localMicrophoneTrack,
    isLoading,
+   hideGradient,
    ...props
 }: LocalMicrophoneAndCameraUserProps) => {
    const { user, type } = useUserStream<LocalUser | LocalUserScreen>()
@@ -172,6 +176,7 @@ export const LocalStream = ({
             volume={volume}
          />
          {Boolean(isLoading) && <Loader />}
+         {isScreenShare || hideGradient ? null : <LinearGradient />}
          {!playVideo ? <UserCover streamerDetails={streamerDetails} /> : null}
          {hideSpeakingIndicator ? null : (
             <SpeakingIndicator isSpeaking={Boolean(isSpeaking && micActive)} />

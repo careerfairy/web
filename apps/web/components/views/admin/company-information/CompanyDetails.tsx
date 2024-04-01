@@ -10,7 +10,7 @@ import {
    CompanyCountryValues,
    CompanyIndustryValues,
    CompanySizesCodes,
-} from "constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -118,7 +118,6 @@ const CompanyDetails = () => {
                         InputProps={{
                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                            inputComponent: CustomRichTextEditor as any,
-                           
                         }}
                      />
                      <BrandedAutocomplete
@@ -216,41 +215,48 @@ type FormValues = {
    extraInfo: string
 }
 
-const validationSchema = (quillRef) => (Yup.object().shape({
-   universityName: Yup.string().required("Company name is required"),
-   companyCountry: Yup.object()
-      .shape({
-         id: Yup.string().required(),
-         name: Yup.string().required(),
-      })
-      .required("Company country is required"),
-   companyIndustries: Yup.array()
-      .of(
-         Yup.object().shape({
+const validationSchema = (quillRef) =>
+   Yup.object().shape({
+      universityName: Yup.string().required("Company name is required"),
+      companyCountry: Yup.object()
+         .shape({
             id: Yup.string().required(),
             name: Yup.string().required(),
          })
-      )
-      .nullable()
-      .max(
-         GROUP_CONSTANTS.MAX_INDUSTRY_COUNT,
-         `Maximum of ${GROUP_CONSTANTS.MAX_INDUSTRY_COUNT} industries`
-      )
-      .required("At least one industry is required"),
-   companySize: Yup.object()
-      .shape({
-         id: Yup.string().required(),
-         label: Yup.string().required(),
-      })
-      .nullable()
-      .required("Company size is required"),
-   extraInfo: Yup.string()
-      .transform(() => quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")) //ReactQuill appends a new line to text
-      .min(GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
-         `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`)
-      .max(GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
-         `Must be at least ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`),
-   careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
-}))
+         .required("Company country is required"),
+      companyIndustries: Yup.array()
+         .of(
+            Yup.object().shape({
+               id: Yup.string().required(),
+               name: Yup.string().required(),
+            })
+         )
+         .nullable()
+         .max(
+            GROUP_CONSTANTS.MAX_INDUSTRY_COUNT,
+            `Maximum of ${GROUP_CONSTANTS.MAX_INDUSTRY_COUNT} industries`
+         )
+         .required("At least one industry is required"),
+      companySize: Yup.object()
+         .shape({
+            id: Yup.string().required(),
+            label: Yup.string().required(),
+         })
+         .nullable()
+         .required("Company size is required"),
+      extraInfo: Yup.string()
+         .transform(() =>
+            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+         ) //ReactQuill appends a new line to text
+         .min(
+            GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
+            `Must be at least ${GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH} characters`
+         )
+         .max(
+            GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH,
+            `Must be at least ${GROUP_CONSTANTS.MAX_EXTRA_INFO_LENGTH} characters`
+         ),
+      careerPageUrl: Yup.string().url("Invalid career page URL").nullable(),
+   })
 
 export default CompanyDetails

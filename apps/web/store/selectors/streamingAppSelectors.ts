@@ -9,9 +9,6 @@ export const activeViewSelector = (state: RootState) =>
 
 export const isHostSelector = (state: RootState) => state.streamingApp.isHost
 
-export const viewCountSelector = (state: RootState) =>
-   state.streamingApp.topBar.viewCount
-
 export const isSideDrawerOpenSelector = (state: RootState) =>
    state.streamingApp.sidePanel.isOpen
 
@@ -46,3 +43,19 @@ export const useLivestreamMode = () =>
 
 export const useCurrentScreenSharer = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.screenSharerId)
+
+export const useCurrentViewCount = () =>
+   useAppSelector((state) => {
+      if (state.streamingApp.rtmSignalingState.failedToConnect) {
+         return state.streamingApp.livestreamState.numberOfParticipants
+      }
+      return state.streamingApp.rtmSignalingState.viewCount
+   })
+
+export const useIsConnectedOnDifferentBrowser = () =>
+   useAppSelector((state) => state.streamingApp.isLoggedInOnDifferentBrowser)
+
+export const useFailedToConnectToRTM = () =>
+   useAppSelector(
+      (state) => state.streamingApp.rtmSignalingState.failedToConnect
+   )
