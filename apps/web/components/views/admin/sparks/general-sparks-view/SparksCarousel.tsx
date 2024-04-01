@@ -1,11 +1,15 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode, useCallback, useEffect, useState } from "react"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import Box from "@mui/material/Box"
 import SparkCarouselCardForAdmin from "components/views/sparks/components/spark-card/SparkCarouselCardForAdmin"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
+import useEmblaCarousel, {
+   EmblaCarouselType,
+   EmblaOptionsType,
+} from "embla-carousel-react"
 import { sxStyles } from "types/commonTypes"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const slideSpacing = 21
 const desktopSlideWidth = 306 + slideSpacing
@@ -55,9 +59,12 @@ type PropType = {
 const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
    (props, ref) => {
       const { options, sparks, onSparkClick, children, isAdmin } = props
-      const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-         WheelGesturesPlugin(),
-      ])
+      const isMobile = useIsMobile()
+      const [activeSparkIndex, setActiveSparkIndex] = useState(0)
+      const [emblaRef, emblaApi] = useEmblaCarousel(
+         { ...options, inViewThreshold: 0.9 },
+         [WheelGesturesPlugin()]
+      )
 
       React.useImperativeHandle(ref, () => ({
          goNext() {
@@ -68,11 +75,47 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
          },
       }))
 
+      // Function to handle auto-playing on mobile
+      const handleMobileActiveSpark = useCallback(
+         (emblaApi: EmblaCarouselType) => {
+            if (sparks?.length) {
+               const inViewIndexes = emblaApi.slidesInView()
+
+               let activeIndex: number
+               const lastPosition = sparks.length - 1
+
+               if (
+                  inViewIndexes.length > 1 &&
+                  inViewIndexes.includes(lastPosition)
+               ) {
+                  activeIndex = lastPosition // Set the active index to the last position if the last card is in view
+               } else {
+                  activeIndex = inViewIndexes[0] // Set the active index to the first slide if not at the last position
+               }
+
+               setActiveSparkIndex(activeIndex)
+            }
+         },
+         [sparks?.length]
+      )
+
+      // Add event listener for 'slidesInView' to handle mobile auto-play
+      useEffect(() => {
+         if (emblaApi && isMobile) {
+            emblaApi.on("slidesInView", handleMobileActiveSpark)
+
+            return () => {
+               // Clean up event listener for 'slidesInView'
+               emblaApi.off("slidesInView", handleMobileActiveSpark)
+            }
+         }
+      }, [emblaApi, handleMobileActiveSpark, isMobile])
+
       return (
          <Box sx={styles.viewport} ref={emblaRef}>
             <Box sx={styles.container}>
                {sparks?.length
-                  ? sparks.map((spark) => (
+                  ? sparks.map((spark, index) => (
                        <Box key={spark.id} sx={styles.slide}>
                           {isAdmin ? (
                              <SparkCarouselCardForAdmin
@@ -83,6 +126,10 @@ const SparksCarousel = React.forwardRef<ChildRefType, PropType>(
                              <SparkCarouselCard
                                 onClick={() => onSparkClick(spark)}
                                 spark={spark}
+                                onGoNext={() => emblaApi.scrollNext()}
+                                mobileActiveSpark={
+                                   isMobile ? index === activeSparkIndex : false
+                                }
                              />
                           )}
                        </Box>

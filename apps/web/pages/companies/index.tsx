@@ -6,7 +6,7 @@ import CompaniesPageOverview from "../../components/views/companies/CompaniesPag
 import { InferGetServerSidePropsType, NextPage } from "next"
 import { FilterCompanyOptions } from "@careerfairy/shared-lib/groups"
 import { companyService } from "data/firebase/CompanyService"
-import { CompanyIndustryValues } from "constants/forms"
+import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    queryParamToArr,
    queryParamToBool,

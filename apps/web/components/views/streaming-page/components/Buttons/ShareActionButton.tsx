@@ -8,6 +8,8 @@ import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useScreenShare } from "../../context/ScreenShare"
 import { getDeviceButtonColor, getRTCErrorCode } from "../../util"
 import { AgoraRTCReactError } from "agora-rtc-react"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
+import { StopSharingButton } from "./StopSharingButton"
 
 export const ShareActionButton = forwardRef<
    HTMLButtonElement,
@@ -15,6 +17,12 @@ export const ShareActionButton = forwardRef<
 >((props, ref) => {
    const { anchorEl, handleClick, open, handleClose } = useMenuState()
    const { screenShareError, isLoadingScreenShare } = useScreenShare()
+
+   const isSpotlightMode = useIsSpotlightMode()
+
+   if (isSpotlightMode) {
+      return <StopSharingButton />
+   }
 
    return (
       <span>

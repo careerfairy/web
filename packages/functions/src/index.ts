@@ -70,7 +70,7 @@ exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
 exports.fetchAgoraRtcToken_v2 = agora.fetchAgoraRtcToken
-exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
+exports.fetchAgoraRtmToken_v2 = agora.fetchAgoraRtmToken
 
 // Backup
 exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
@@ -84,7 +84,7 @@ exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail_v2 =
    groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
+exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData
 exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
 exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
 exports.createGroup_eu = groupAdmin.createGroup

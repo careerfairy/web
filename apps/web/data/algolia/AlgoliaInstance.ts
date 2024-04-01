@@ -14,6 +14,6 @@ export const createAlgoliaInstance = (): SearchClient => {
    return algoliasearch(config.appId, config.apiKey)
 }
 
-const algoliaIndexes = createAlgoliaInstance()
+const algoliaSearchClient = createAlgoliaInstance()
 
-export default algoliaIndexes
+export default algoliaSearchClient

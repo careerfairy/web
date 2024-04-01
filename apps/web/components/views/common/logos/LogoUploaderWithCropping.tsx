@@ -98,10 +98,11 @@ const Logo: FC<LogoProps> = ({ dragActive, url }) => {
 type UploaderProps = {
    logoUrl?: string
    handleSubmit: (file: File) => Promise<void>
+   fileName?: string
 }
 
 const LogoUploaderWithCropping: FC<UploaderProps> = (props) => {
-   const { logoUrl, handleSubmit } = props
+   const { logoUrl, handleSubmit, fileName } = props
 
    const [logoObjectUrl, setLogoObjectUrl] = useState<string | null>(null)
    const [logoUrlInternal, setLogoUrlInternal] = useState<string | null>(
@@ -136,7 +137,7 @@ const LogoUploaderWithCropping: FC<UploaderProps> = (props) => {
          {logoObjectUrl ? (
             <ImageCropperDialog
                title={"Edit company picture"}
-               fileName={"company-logo"}
+               fileName={fileName}
                imageSrc={logoObjectUrl}
                open={Boolean(logoObjectUrl)}
                handleClose={handleCloseCropImageDialog}

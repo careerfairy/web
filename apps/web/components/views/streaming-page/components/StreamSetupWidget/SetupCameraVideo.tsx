@@ -17,7 +17,12 @@ export const SetupCameraVideo = () => {
 
    return (
       <UserStreamProvider user={localUser}>
-         <LocalUserStream hideDetails hideSpeakingIndicator sx={styles.video}>
+         <LocalUserStream
+            hideDetails
+            hideGradient
+            hideSpeakingIndicator
+            sx={styles.video}
+         >
             {!cameraOn && <CameraDisabledOverlay />}
          </LocalUserStream>
       </UserStreamProvider>

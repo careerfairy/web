@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, GridProps } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { ReactNode, memo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -16,7 +16,11 @@ type Props<ElementType> = {
    elements: ElementType[]
    isLastButNotFirstPage: boolean
    layout: { columns: number; rows: number }
-   renderGridItem: (element: ElementType) => ReactNode
+   renderGridItem: (
+      element: ElementType,
+      index: number,
+      array: ElementType[]
+   ) => ReactNode
 }
 
 /**
@@ -70,6 +74,7 @@ export const LayoutGrid = <ElementType,>({
 type GalleryGridItemProps = {
    children: ReactNode
    layoutColumns: number
+   maxWidth: GridProps["maxWidth"]
    /**
     * Key is mandatory as it is being rendered in a list
     */
@@ -77,8 +82,8 @@ type GalleryGridItemProps = {
 }
 
 const LayoutGridItem = memo(
-   ({ children, layoutColumns }: GalleryGridItemProps) => (
-      <Grid item xs={12 / layoutColumns}>
+   ({ children, layoutColumns, maxWidth }: GalleryGridItemProps) => (
+      <Grid xs={12 / layoutColumns} item maxWidth={maxWidth}>
          <Box sx={styles.item}>{children}</Box>
       </Grid>
    )

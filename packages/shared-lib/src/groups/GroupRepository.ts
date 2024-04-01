@@ -106,7 +106,7 @@ export interface IGroupRepository {
       questionType: Exclude<GroupQuestion["questionType"], "custom">
    ): Promise<GroupQuestion>
 
-   getAllGroups(): Promise<Group[]>
+   getAllPublicProfileGroups(): Promise<Group[]>
 
    getGroupCustomQuestionsQuery(
       groupId: string
@@ -535,68 +535,12 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments<GroupQuestion>(groupFieldsOfStudySnaps)?.[0]
    }
 
-   async getAllGroups(): Promise<Group[]> {
+   async getAllPublicProfileGroups(): Promise<Group[]> {
       const groupSnapshots = await this.firestore
          .collection("careerCenterData")
+         .where("publicProfile", "==", true)
          .get()
       return mapFirestoreDocuments<Group>(groupSnapshots)
-   }
-
-   /*
-    * Goes and fetches a user's university group level and field of study questions
-    * and add them to the event group questions
-    * */
-   private async addUniversityLevelAndFieldOfStudyQuestionsToEventQuestions(
-      userUniversityGroupId: string,
-      eventGroupQuestions: LivestreamGroupQuestionsMap
-   ): Promise<LivestreamGroupQuestionsMap> {
-      let eventQuestions = { ...eventGroupQuestions }
-      // fetch the group's field and level of study questions and add them
-      const [fieldOfStudyQuestion, levelOfStudyQuestion] = await Promise.all([
-         this.getFieldOrLevelOfStudyGroupQuestion(
-            userUniversityGroupId,
-            "fieldOfStudy"
-         ),
-         this.getFieldOrLevelOfStudyGroupQuestion(
-            userUniversityGroupId,
-            "levelOfStudy"
-         ),
-      ])
-
-      if (fieldOfStudyQuestion) {
-         eventQuestions = FirebaseGroupRepository.addQuestionToMap(
-            eventGroupQuestions,
-            userUniversityGroupId,
-            fieldOfStudyQuestion
-         )
-      }
-      if (levelOfStudyQuestion) {
-         eventQuestions = FirebaseGroupRepository.addQuestionToMap(
-            eventGroupQuestions,
-            userUniversityGroupId,
-            levelOfStudyQuestion
-         )
-      }
-
-      return eventQuestions
-   }
-
-   private static addQuestionToMap(
-      groupQuestionsMap: LivestreamGroupQuestionsMap,
-      groupId: string,
-      question: GroupQuestion
-   ): LivestreamGroupQuestionsMap {
-      return {
-         ...groupQuestionsMap,
-         [groupId]: {
-            groupId: groupId,
-            ...groupQuestionsMap[groupId],
-            questions: {
-               ...groupQuestionsMap[groupId]?.questions,
-               [question.id]: question,
-            },
-         },
-      }
    }
 
    /*
@@ -607,23 +551,8 @@ export class FirebaseGroupRepository
       userData: UserData,
       livestream: LivestreamEvent
    ): Promise<LivestreamGroupQuestionsMap> {
-      let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap =
+      const livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap =
          cloneDeep(livestream.groupQuestionsMap) || {}
-
-      const userUniversityCode = userData.university?.code
-      const usersUniversityGroup = Object.values(
-         livestreamGroupQuestionsMap
-      )?.find(
-         (data) =>
-            data.universityCode && data.universityCode === userUniversityCode
-      )
-      if (usersUniversityGroup) {
-         livestreamGroupQuestionsMap =
-            await this.addUniversityLevelAndFieldOfStudyQuestionsToEventQuestions(
-               usersUniversityGroup.groupId,
-               livestreamGroupQuestionsMap
-            )
-      }
 
       if (!Object.keys(livestreamGroupQuestionsMap).length) {
          return livestreamGroupQuestionsMap
@@ -655,6 +584,7 @@ export class FirebaseGroupRepository
             }
          )
       }
+
       return livestreamGroupQuestionsMap
    }
 

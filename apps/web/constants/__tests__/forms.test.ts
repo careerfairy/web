@@ -1,4 +1,4 @@
-import { videoUrlRegex } from "../forms"
+import { videoUrlRegex } from "@careerfairy/shared-lib/constants/forms"
 
 const isVideoUrlValid = (url: string): boolean => {
    return videoUrlRegex.test(url)

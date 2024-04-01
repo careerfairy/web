@@ -46,7 +46,7 @@ export const fetchNextErrorSelector = (state: RootState) =>
 export const sparksSelector = (state: RootState) => state.sparksFeed.sparks
 
 export const currentSparkEventNotificationSelector = (state: RootState) =>
-   state.sparksFeed.currentEventNotification
+   state.sparksFeed.eventNotification
 
 export const cardNotificationSelector = (state: RootState) =>
    state.sparksFeed.cardNotification
@@ -85,3 +85,7 @@ export const isPlayingSelector = (state: RootState) => state.sparksFeed.playing
 
 export const eventToRegisterTo = (state: RootState) =>
    state.sparksFeed.eventToRegisterTo
+
+export const jobToOpen = (state: RootState) => state.sparksFeed.jobToOpen
+
+export const autoAction = (state: RootState) => state.sparksFeed.autoAction

@@ -7,7 +7,7 @@ import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useMountedState } from "react-use"
 import useCompaniesSWR from "components/custom-hook/group/useCompaniesSWR"
-import { CompanyIndustryValues } from "constants/forms"
+import { CompanyIndustryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    queryParamToArr,
    queryParamToBool,

@@ -2,7 +2,7 @@ import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import {
    CompanyIndustryValues,
    RelevantCompanyIndustryValues,
-} from "../../../../../constants/forms"
+} from "@careerfairy/shared-lib/constants/forms"
 import {
    formatToOptionArray,
    multiListSelectMapIdValueFn,
