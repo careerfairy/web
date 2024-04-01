@@ -1,6 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Chip, Stack } from "@mui/material"
-import { useGroups } from "components/custom-hook/useCollection"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useEffect } from "react"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
@@ -10,10 +9,16 @@ import MultiChipSelect from "../general/components/MultiChipSelect"
 import GroupedRegistrationQuestions from "./GroupedRegistrationQuestions"
 import InputSkeleton from "./InputSkeleton"
 import LoadErrorMessage from "./LoadErrorMessage"
+import { useGroupsSWR } from "./useGroupsSWR"
 
 const RegistrationQuestionsListForCFAdmin = () => {
    const { group: currentGroup } = useGroup()
-   const { data: allGroups, isLoading: groupsLoading, error } = useGroups()
+   const {
+      data: allGroups,
+      isLoading: groupsLoading,
+      isValidating: groupsValidating,
+      error,
+   } = useGroupsSWR()
    const { livestream } = useLivestreamCreationContext()
    const {
       values: { questions },
@@ -21,25 +26,26 @@ const RegistrationQuestionsListForCFAdmin = () => {
    } = useLivestreamFormValues()
 
    useEffect(() => {
-      if (!groupsLoading && !questions.hosts.length) {
+      if (!groupsLoading && !groupsValidating && !questions.hosts.length) {
          const initialValue = allGroups.filter((group) =>
-            livestream.groupIds.includes(group.id)
+            livestream.groupIds.includes(group.groupId)
          )
-         setFieldValue("questions.hosts", initialValue)
+         setFieldValue("questions.hosts", initialValue, false)
       }
    }, [
-      groupsLoading,
       allGroups,
+      groupsLoading,
+      groupsValidating,
       livestream.groupIds,
+      questions.hosts.length,
       setFieldValue,
-      questions.hosts,
    ])
 
    if (error) {
       return <LoadErrorMessage label="groups" />
    }
 
-   if (groupsLoading) {
+   if (groupsLoading || groupsValidating || !questions.hosts.length) {
       return (
          <Stack spacing={2}>
             <InputSkeleton />

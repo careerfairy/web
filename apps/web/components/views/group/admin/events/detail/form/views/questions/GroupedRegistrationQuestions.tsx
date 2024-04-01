@@ -29,9 +29,8 @@ const GroupedRegistrationQuestions: FC<GroupedRegistrationQuestionsProps> = ({
    const {
       values: { questions },
    } = useLivestreamFormValues()
-   const { groupsQuestions, isLoading, error } = useGroupsQuestions(
-      questions.hosts
-   )
+   const { groupsQuestions, isLoading, isValidating, error } =
+      useGroupsQuestions(questions.hosts)
 
    const groupNameMap = useMemo(() => buildGroupNameMap(allGroups), [allGroups])
 
@@ -39,7 +38,7 @@ const GroupedRegistrationQuestions: FC<GroupedRegistrationQuestionsProps> = ({
       return <LoadErrorMessage label="questions" />
    }
 
-   if (isLoading) {
+   if (isLoading || isValidating) {
       return <InputSkeleton />
    }
 
