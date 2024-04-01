@@ -20,7 +20,7 @@ const styles = sxStyles({
       columnGap: "16px",
    },
    logoAndBannerWrapperMobile: {
-      gridTemplateRows: "225px 1fr",
+      gridTemplateRows: "156px 1fr",
       rowGap: "16px",
    },
 })
