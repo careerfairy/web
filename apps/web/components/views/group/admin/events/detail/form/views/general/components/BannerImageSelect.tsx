@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
-import React, { useCallback, useEffect, useState } from "react"
 import {
    Box,
    Button,
@@ -9,21 +8,24 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { UploadIcon } from "./UploadIcon"
-import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import FilePickerContainer from "components/ssr/FilePickerContainer"
-import { uploadLogo } from "components/helperFunctions/HelperFunctions"
-import { useField } from "formik"
-import { getDownloadUrl } from "components/helperFunctions/streamFormFunctions"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useField } from "formik"
+import { useCallback, useEffect, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import { UploadIcon } from "./UploadIcon"
 
 const PLACEHOLDER_BANNER_URL =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flivestream_creation_banner_placeholder.png?alt=media&token=e12cc34a-44e5-4c00-8ac5-ed6ec232bc69"
 
 const styles = sxStyles({
    root: {
-      height: "429px",
+      position: "relative",
+      height: {
+         xs: "275px",
+         md: "429px",
+      },
       alignItems: "center",
       justifyContent: "center",
       border: "1px solid #EBEBEF",
