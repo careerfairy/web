@@ -14,8 +14,14 @@ import StartDateTimePicker from "./components/StartDateTimePicker"
 const styles = sxStyles({
    logoAndBannerWrapper: {
       display: "grid",
+   },
+   logoAndBannerWrapperDesktop: {
       gridTemplateColumns: "0.19fr 1fr",
       columnGap: "16px",
+   },
+   logoAndBannerWrapperMobile: {
+      gridTemplateRows: "225px 1fr",
+      rowGap: "16px",
    },
 })
 
@@ -42,7 +48,14 @@ const GeneralSettings = () => {
             requiredText="(required)"
          />
          {isCohostedEvent ? (
-            <Stack sx={styles.logoAndBannerWrapper}>
+            <Stack
+               sx={[
+                  styles.logoAndBannerWrapper,
+                  isMobile
+                     ? styles.logoAndBannerWrapperMobile
+                     : styles.logoAndBannerWrapperDesktop,
+               ]}
+            >
                <LogoUploader />
                <BannerImageSelect />
             </Stack>
