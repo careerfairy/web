@@ -49,11 +49,15 @@ const SparksCounter: FC<Props> = ({
 }) => {
    const { groupPresenter } = useGroup()
    const isTrialPlan = groupPresenter.isTrialPlan()
+   const planLimitReached = groupPresenter.hasReachedMaxSparks(
+      publicSparks.length
+   )
 
    const tooltipMessage = getTooltipMessage(
       isTrialPlan,
       isCriticalState,
-      maxPublicSparks
+      maxPublicSparks,
+      planLimitReached
    )
    const unlimited = groupPresenter.hasUnlimitedSparks()
    const maxSparks = unlimited ? 100 : maxPublicSparks
@@ -61,6 +65,8 @@ const SparksCounter: FC<Props> = ({
       ? "Unlimited "
       : `${publicSparks.length}/${maxPublicSparks}`
 
+   const progressColor =
+      isCriticalState || planLimitReached ? "error" : "secondary"
    return (
       <BrandedTooltip title={tooltipMessage} sx={styles.tooltip}>
          <Box alignSelf={"center"}>
@@ -70,7 +76,7 @@ const SparksCounter: FC<Props> = ({
 
             <LinearProgress
                sx={styles.progressBar}
-               color={isCriticalState ? "error" : "secondary"}
+               color={progressColor}
                variant="determinate"
                value={
                   publicSparks.length
@@ -82,6 +88,18 @@ const SparksCounter: FC<Props> = ({
       </BrandedTooltip>
    )
 }
+const renderLimitReachedMessage = () => (
+   <Box>
+      <Typography variant={"h6"} sx={styles.headerMessage}>
+         All Sparks used!
+      </Typography>
+      <Typography variant={"body1"} fontSize={16}>
+         Your company{"'"}s been using Sparks like a champ! To keep the
+         recognition flowing and continue engaging your awesome talent, consider
+         adding more Sparks to your plan.
+      </Typography>
+   </Box>
+)
 
 const renderCriticalMessage = () => (
    <Box>
@@ -117,7 +135,8 @@ const renderTrialMessage = (maxPublicSparks: number) => (
 const getTooltipMessage = (
    isTrialPlan: boolean,
    isCriticalState: boolean,
-   maxPublicSparks: number
+   maxPublicSparks: number,
+   planLimitReached: boolean
 ) => {
    if (isTrialPlan) {
       return renderTrialMessage(maxPublicSparks)
@@ -125,6 +144,10 @@ const getTooltipMessage = (
 
    if (isCriticalState) {
       return renderCriticalMessage()
+   }
+
+   if (planLimitReached) {
+      return renderLimitReachedMessage()
    }
 
    return renderDefaultMessage()
