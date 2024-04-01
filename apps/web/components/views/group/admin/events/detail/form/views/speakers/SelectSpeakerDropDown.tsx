@@ -8,14 +8,14 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
-import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import { LivestreamCreator } from "../questions/commons"
-import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    menuItem: {
@@ -110,8 +110,8 @@ const SelectSpeakersDropDown = ({
    }
 
    return (
-      <BrandedAutocomplete
-         key={fieldId}
+      <FormBrandedAutocomplete
+         name={fieldId}
          value={values}
          options={options}
          isOptionEqualToValue={isOptionEqualToValue}
