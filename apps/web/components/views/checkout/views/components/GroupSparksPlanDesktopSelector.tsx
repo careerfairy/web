@@ -17,7 +17,6 @@ import Stripe from "stripe"
 import { commafy } from "./GroupSparksPlanMobileSelector"
 
 const styles = sxStyles({
-   plansStack: {},
    planFeatures: {
       pt: 1,
       borderRadius: "12px",
@@ -71,12 +70,6 @@ const styles = sxStyles({
       background: "#E1E1E1",
       height: "1px",
    },
-   selectedIcon: {
-      position: "absolute",
-      left: 210,
-      backgroundColor: "black",
-      borderRadius: "50%",
-   },
    selectedWrapper: {
       mt: "15px",
       ml: "280px",
@@ -92,7 +85,7 @@ const styles = sxStyles({
 
 const GroupSparksPlanDesktopSelector = () => {
    return (
-      <Stack spacing={4} direction={"row"} sx={styles.plansStack}>
+      <Stack spacing={4} direction={"row"}>
          <GroupSparksPlanComponent
             title={PLAN_CONSTANTS[GroupPlanTypes.Tier1].name}
             description={PLAN_CONSTANTS[GroupPlanTypes.Tier1].description}

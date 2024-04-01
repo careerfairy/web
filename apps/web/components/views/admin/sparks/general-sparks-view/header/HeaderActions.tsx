@@ -68,6 +68,7 @@ const HeaderActions = () => {
    const { group, groupPresenter } = useGroup()
 
    const maxPublicSparks = groupPresenter.getMaxPublicSparks()
+
    const isTrialPlan = groupPresenter.isTrialPlan()
 
    const { data: publicSparks } = useGroupSparks(group.groupId, {
@@ -75,7 +76,12 @@ const HeaderActions = () => {
       limit: maxPublicSparks,
    })
 
-   const isCriticalState = publicSparks.length >= maxPublicSparks - 2
+   const hasReachedMaxSparks = groupPresenter.hasReachedMaxSparks(
+      publicSparks.length
+   )
+
+   const isCriticalState =
+      publicSparks.length >= maxPublicSparks - 2 && !hasReachedMaxSparks
 
    if (isMobile) {
       return (

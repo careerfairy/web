@@ -16,7 +16,6 @@ import useStripePrice from "components/custom-hook/stripe/useStripePrice"
 import Stripe from "stripe"
 
 const styles = sxStyles({
-   plansStack: {},
    planFeatures: {
       pt: 1,
       borderRadius: "12px",
@@ -52,13 +51,6 @@ const styles = sxStyles({
       lineHeight: "normal",
       opacity: 0.8,
    },
-   planPricing: {
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
-      fontWeight: "600",
-      lineHeight: "24px",
-   },
    selectedPlanPrice: {
       color: (theme) => theme.palette.neutral[800],
       fontFamily: "Poppins",
@@ -91,28 +83,6 @@ const styles = sxStyles({
          cursor: "pointer",
       },
    },
-   planSeparator: {
-      opacity: "0.3",
-      background: "#E1E1E1",
-      height: "1px",
-   },
-   selectedIcon: {
-      position: "absolute",
-      left: 210,
-      backgroundColor: "black",
-      borderRadius: "50%",
-   },
-   selectedWrapper: {
-      mt: "15px",
-      ml: "240px",
-      position: "absolute",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "27px",
-      height: "27px",
-      borderRadius: "50%",
-   },
 })
 
 const GroupSparksPlanMobileSelector = () => {
@@ -131,12 +101,7 @@ const GroupSparksPlanMobileSelector = () => {
 
    return (
       <Stack>
-         <Stack
-            spacing={1}
-            direction={"column"}
-            sx={styles.plansStack}
-            justifyContent={"center"}
-         >
+         <Stack spacing={1} direction={"column"} justifyContent={"center"}>
             <Stack
                spacing={1}
                direction={"row"}
@@ -276,6 +241,5 @@ export function commafy(num) {
 
 function numberWith(x: number, separator) {
    return x.toLocaleString("en-US").replace(",", separator)
-   // return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, separator)
 }
 export default GroupSparksPlanMobileSelector

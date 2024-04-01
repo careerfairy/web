@@ -8,6 +8,53 @@ const styles = sxStyles({
    skeletonWrapper: {
       p: "20px",
    },
+   plansSkeletonWrapper: {
+      pt: "15px",
+      pb: "10px",
+   },
+   planSkeleton: {
+      width: "109px",
+      height: "109px",
+      backgroundColor: "lightgray",
+   },
+   planSkeletonTitle: {
+      height: "48px",
+      width: "148px",
+      backgroundColor: "lightgray",
+   },
+   planSkeletonDescription: {
+      height: "20px",
+      width: "246px",
+      backgroundColor: "lightgray",
+   },
+   planSkeletonPrice: {
+      height: "24px",
+      width: "127px",
+      backgroundColor: "lightgray",
+   },
+   planSkeletonFeatures: {
+      height: "20px",
+      width: "343px",
+   },
+   plansFeaturesSkeletonWrapper: {
+      my: "25px",
+   },
+   planSkeletonDisclaimer: {
+      height: "20px",
+      width: "204px",
+      backgroundColor: "lightgrey",
+   },
+   planSkeletonConfirmButton: {
+      height: "48px",
+      width: "343px",
+      borderRadius: "28px",
+      backgroundColor: "lightgrey",
+   },
+   planSkeletonCancelButton: {
+      height: "20px",
+      width: "83px",
+      px: "10px",
+   },
 })
 
 type GroupPlanSkeletonMobileProps = {
@@ -26,7 +73,7 @@ const GroupPlanSkeletonMobile = ({ open }: GroupPlanSkeletonMobileProps) => {
          transitionDuration={400}
          onClose={() => {}}
       >
-         <Stack alignItems={"center"} sx={styles.skeletonWrapper}>
+         <Stack sx={styles.skeletonWrapper}>
             <Stack alignItems={"center"}>
                <GroupPlansDialog.Title>
                   Select your{" "}
@@ -39,14 +86,108 @@ const GroupPlanSkeletonMobile = ({ open }: GroupPlanSkeletonMobileProps) => {
                   Tailored offers that best suit YOUR needs.
                </GroupPlansDialog.Subtitle>
             </Stack>
-            <Stack direction={"row"} spacing={1} p={2}>
-               <Skeleton variant="rounded" animation="wave" />
-               <Skeleton variant="rounded" animation="wave" />
-               <Skeleton variant="rounded" animation="wave" />
+            <Stack
+               direction={"row"}
+               spacing={1}
+               alignItems={"start"}
+               sx={styles.plansSkeletonWrapper}
+            >
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeleton}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeleton}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeleton}
+               />
             </Stack>
-            <Stack spacing={2} alignItems={"center"}>
-               <Skeleton variant="rounded" animation="wave" />
-               <Skeleton variant="rounded" animation="wave" />
+            <Stack direction={"column"} spacing={1} alignItems={"start"}>
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonTitle}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonDescription}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonPrice}
+               />
+            </Stack>
+            <Stack
+               direction={"column"}
+               spacing={1}
+               alignItems={"start"}
+               sx={styles.plansFeaturesSkeletonWrapper}
+            >
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonFeatures}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonDisclaimer}
+               />
+            </Stack>
+            <Stack direction={"column"} spacing={2} alignItems={"center"}>
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonConfirmButton}
+               />
+               <Skeleton
+                  variant="rounded"
+                  animation="wave"
+                  sx={styles.planSkeletonCancelButton}
+               />
             </Stack>
          </Stack>
       </BrandedSwipableDrawer>
