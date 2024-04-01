@@ -1,4 +1,8 @@
-import { Group, GroupAdmin } from "@careerfairy/shared-lib/groups"
+import {
+   Group,
+   GroupAdmin,
+   GroupPlanTypes,
+} from "@careerfairy/shared-lib/groups"
 import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IGroupFunctionsRepository } from "src/lib/GroupFunctionsRepository"
@@ -49,7 +53,7 @@ export class TrialService {
       this.logger.info(" - ignore groups: ", ignoreGroups)
 
       this.groups = await this.groupRepo.getAllGroupsWithAPlanExpiring(
-         ["trial"],
+         [GroupPlanTypes.Trial],
          SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS,
          this.logger,
          ignoreGroups
