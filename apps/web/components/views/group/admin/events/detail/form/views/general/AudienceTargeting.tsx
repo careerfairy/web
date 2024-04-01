@@ -1,3 +1,4 @@
+import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    GroupOption,
    GroupTargetUniversity,
@@ -14,7 +15,6 @@ import {
    useUniversityCountries,
 } from "components/custom-hook/useCollection"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { CompanyCountryValues } from "constants/forms"
 import { useCallback } from "react"
 import FormSectionHeader from "../../FormSectionHeader"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
