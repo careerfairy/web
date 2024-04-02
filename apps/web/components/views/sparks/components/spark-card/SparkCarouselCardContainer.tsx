@@ -45,7 +45,7 @@ type Props = {
    onMouseEnter?: () => void
    onMouseLeave?: () => void
    autoPlaying?: boolean
-   containerRef?: (node?: Element) => void
+   containerRef?: React.RefObject<HTMLDivElement>
 }
 
 const SparkCarouselCardContainer: FC<Props> = ({
