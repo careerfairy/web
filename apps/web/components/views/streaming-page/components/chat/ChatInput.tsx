@@ -11,7 +11,6 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getStreamerDisplayName } from "../../util"
-import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
 
 const styles = sxStyles({
    root: {
@@ -20,13 +19,15 @@ const styles = sxStyles({
       bgcolor: (theme) => theme.brand.white[200],
       borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
       display: "flex",
-      alignItems: "center",
+      alignItems: "flex-end",
    },
    input: {
+      px: 1.5,
+      py: 0.75,
       flex: 1,
       width: "100%",
-      borderRadius: "37px",
-      height: 40,
+      borderRadius: "24px",
+      minHeight: 40,
       border: (theme) => `1px solid ${theme.palette.neutral[100]}`,
       "& .MuiOutlinedInput-notchedOutline": {
          m: "-4px",
@@ -34,9 +35,6 @@ const styles = sxStyles({
       },
       "&.Mui-disabled .MuiOutlinedInput-notchedOutline": {
          borderColor: "transparent !important",
-      },
-      "&:hover .MuiOutlinedInput-notchedOutline": {
-         borderColor: (theme) => theme.brand.info[600],
       },
       "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
          borderColor: (theme) => theme.brand.info[600],
@@ -53,12 +51,14 @@ const styles = sxStyles({
       "& svg": {
          width: 20,
          height: 21,
+         marginLeft: "-2px",
+         marginTop: "1px",
       },
       ml: 0.625,
    },
 })
 
-const MAX_MESSAGE_LENGTH = 1000
+const MAX_MESSAGE_LENGTH = 340
 
 const schema = Yup.object({
    message: Yup.string().trim().required().max(MAX_MESSAGE_LENGTH),
@@ -67,9 +67,10 @@ const schema = Yup.object({
 export type FormValues = Yup.InferType<typeof schema>
 
 type Props = {
-   scrollToBottom: ScrollToBottom["scrollToBottom"]
+   onMessageSend?: () => void
 }
-export const ChatInput = ({ scrollToBottom }: Props) => {
+
+export const ChatInput = ({ onMessageSend }: Props) => {
    const { livestreamId, isHost, agoraUserId } = useStreamingContext()
    const { authenticatedUser, userData } = useAuth()
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
@@ -114,7 +115,7 @@ export const ChatInput = ({ scrollToBottom }: Props) => {
                  streamerDetails?.lastName
               )
 
-         scrollToBottom("smooth")
+         onMessageSend?.()
          await livestreamService.addChatEntry({
             livestreamId,
             message: data.message,
@@ -143,10 +144,18 @@ export const ChatInput = ({ scrollToBottom }: Props) => {
             render={({ field }) => (
                <OutlinedInput
                   {...field}
+                  onKeyDown={(event) => {
+                     if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault() // Prevent the default action to avoid newline in input
+                        handleSubmit(onSubmit)() // Programmatically submit the form
+                     }
+                  }}
                   onChange={(e) => {
-                     field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH)) // Update the value using React Hook Form's onChange
+                     field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))
                   }}
                   sx={styles.input}
+                  multiline
+                  maxRows={4}
                   placeholder="Write your message"
                   readOnly={formState.isSubmitting}
                />

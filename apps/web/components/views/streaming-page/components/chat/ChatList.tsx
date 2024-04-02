@@ -6,7 +6,6 @@ import { EmptyChatView } from "./EmptyChatView"
 import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
 import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { TransitionGroup } from "react-transition-group"
 import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
 import { useInView } from "react-intersection-observer"
 import { useStreamingContext } from "../../context"
@@ -29,6 +28,7 @@ const styles = sxStyles({
          color: (theme) => theme.palette.grey[500],
          height: 15,
          width: 15,
+         strokeWidth: 4,
       },
    },
    list: {
@@ -51,7 +51,8 @@ export const ChatList = (props: Props) => {
 
 export const Content = ({ scrollToBottom }: Props) => {
    const [ref, isBottom] = useInView()
-   const containerRef = useRef<HTMLDivElement>(null)
+   const isBottomRef = useRef<boolean>(isBottom)
+   isBottomRef.current = isBottom
 
    const { livestreamId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
@@ -64,10 +65,10 @@ export const Content = ({ scrollToBottom }: Props) => {
    }, [scrollToBottom])
 
    useEffect(() => {
-      if (isBottom) {
+      if (isBottomRef.current) {
          scrollToBottom("smooth")
       }
-   }, [chatEntries, isBottom, scrollToBottom])
+   }, [chatEntries, scrollToBottom])
 
    const sortedChatEntries = useMemo(() => chatEntries.reverse(), [chatEntries])
 
@@ -75,16 +76,14 @@ export const Content = ({ scrollToBottom }: Props) => {
 
    return (
       <Fragment>
-         <Box ref={containerRef} sx={styles.list}>
-            <TransitionGroup>
-               {sortedChatEntries.map((entry, index) => (
-                  <ChatEntry
-                     key={entry.id}
-                     entry={entry}
-                     ref={index === sortedChatEntries.length - 1 ? ref : null}
-                  />
-               ))}
-            </TransitionGroup>
+         <Box sx={styles.list}>
+            {sortedChatEntries.map((entry, index) => (
+               <ChatEntry
+                  key={entry.id}
+                  entry={entry}
+                  ref={index === sortedChatEntries.length - 1 ? ref : null}
+               />
+            ))}
          </Box>
          <Grow in={!isBottom}>
             <Box component="span" sx={styles.button}>

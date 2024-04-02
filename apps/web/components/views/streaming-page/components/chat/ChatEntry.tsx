@@ -56,6 +56,8 @@ const styles = sxStyles({
    },
    text: {
       wordBreak: "break-word",
+      whiteSpace: "pre-line",
+      lineHeight: "142.857%",
    },
 })
 

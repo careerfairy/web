@@ -40,7 +40,7 @@ export const ChatPanel = () => {
          title="Chat"
          icon={<MessageCircle />}
          contentWrapperStyles={[styles.root, isMobile && chatPanelStyles]}
-         bottomContent={<ChatInput scrollToBottom={scrollToBottom} />}
+         bottomContent={<ChatInput onMessageSend={scrollToBottom} />}
          contentRef={ref}
       >
          <ChatList scrollToBottom={scrollToBottom} />
