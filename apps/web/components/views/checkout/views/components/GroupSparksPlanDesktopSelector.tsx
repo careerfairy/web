@@ -1,5 +1,5 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
-import { Stack, Box, useTheme } from "@mui/material"
+import { Stack, Box, useTheme, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import React from "react"
 import { Check, CheckCircle, XCircle } from "react-feather"
@@ -22,11 +22,7 @@ const styles = sxStyles({
       borderRadius: "12px",
    },
    planTitle: {
-      fontFamily: "Poppins",
-      fontSize: "32px",
-      fontStyle: "normal",
       fontWeight: 700,
-      lineHeight: "48px",
    },
    planDescription: {
       fontFamily: "Poppins",
@@ -34,7 +30,6 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: "400",
       lineHeight: "20px",
-
       minHeight: "40px",
    },
    planPricing: {
@@ -181,9 +176,12 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
             sx={[styles.planWrapper, { backgroundColor: headerBgColor }]}
             justifyContent={"space-around"}
          >
-            <Box component="span" color={color} sx={styles.planTitle}>
+            <Typography variant="brandedH1" color={color} sx={styles.planTitle}>
                {props.title}
-            </Box>
+            </Typography>
+            {/* <Box component="span" color={color} sx={styles.planTitle}>
+               {props.title}
+            </Box> */}
 
             <Box component="span" color={color} sx={styles.planDescription}>
                {props.description}
