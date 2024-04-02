@@ -49,6 +49,7 @@ type Props = {
    groupId?: string
    handleSparksClicked: (spark: Spark) => void
    sx?: SxProps<Theme>
+   headerSx?: SxProps<Theme>
    showArrows?: boolean
    /**
     * The sliding arrows component to show if showArrows is true.
@@ -70,6 +71,7 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
    showArrows = false,
    arrows,
    sx,
+   headerSx,
 }) => {
    const [isClient, setIsClient] = useState(false)
    useEffect(() => {
@@ -86,6 +88,7 @@ const SparksCarouselWithSuspenseComponent: FC<Props> = ({
             showArrows={showArrows}
             arrows={arrows}
             sx={sx}
+            headerSx={headerSx}
          />
       </SuspenseWithBoundary>
    ) : (
@@ -111,6 +114,7 @@ const Component: FC<Props> = ({
    showArrows,
    arrows: Arrows,
    sx,
+   headerSx,
 }) => {
    const { data: sparksContent } = useSparks(8, groupId)
    const childRef = useRef<ChildRefType | null>(null)
@@ -123,8 +127,7 @@ const Component: FC<Props> = ({
    return sparksContent.length ? (
       <Box sx={combineStyles(styles.defaultSparks, sx)}>
          <Stack spacing={1.25}>
-            {/* className is here for styling purposes on the parent components */}
-            <Box className="header" sx={styles.stack}>
+            <Box sx={combineStyles(styles.stack, headerSx)}>
                {header}
                {showArrows ? (
                   Arrows ? (
