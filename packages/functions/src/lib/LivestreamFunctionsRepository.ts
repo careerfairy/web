@@ -6,6 +6,7 @@ import {
    EventRating,
    EventRatingAnswer,
    getEarliestEventBufferTime,
+   LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
    pickPublicDataFromLivestream,
@@ -42,8 +43,39 @@ import {
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
+import { chunkArray } from "@careerfairy/shared-lib/utils"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
+   /**
+    * Retrieves a single chat entry from a specific livestream.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param entryId - The ID of the chat entry to retrieve.
+    * @returns A promise that resolves to the requested LivestreamChatEntry.
+    */
+   getLivestreamChatEntry(
+      livestreamId: string,
+      entryId: string
+   ): Promise<LivestreamChatEntry>
+
+   /**
+    * Deletes all chat entries from a specific livestream.
+    *
+    * @param livestreamId - The ID of the livestream from which the chat entries will be deleted.
+    * @returns A promise that resolves when all chat entries have been successfully deleted.
+    */
+   deleteAllLivestreamChatEntries(livestreamId: string): Promise<void>
+   /**
+    * Deletes a chat entry from a specific livestream.
+    *
+    * @param livestreamId - The ID of the livestream from which the chat entry will be deleted.
+    * @param entryId - The ID of the chat entry to be deleted.
+    * @returns A promise that resolves when the chat entry has been successfully deleted.
+    */
+   deleteLivestreamChatEntry(
+      livestreamId: string,
+      entryId: string
+   ): Promise<void>
    /**
     * Get all registered users for the given livestream ids
     * @param livestreamIds
@@ -515,5 +547,62 @@ export class LivestreamFunctionsRepository
       )
 
       return void bulkWriter.close()
+   }
+
+   async deleteLivestreamChatEntry(
+      livestreamId: string,
+      entryId: string
+   ): Promise<void> {
+      const chatEntryRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chatEntries")
+         .doc(entryId)
+
+      return chatEntryRef.delete()
+   }
+
+   async deleteAllLivestreamChatEntries(livestreamId: string): Promise<void> {
+      const chatEntriesRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chatEntries")
+         .withConverter(createCompatGenericConverter<LivestreamChatEntry>())
+
+      const snapshot = await chatEntriesRef.get()
+
+      const chunks = chunkArray(snapshot.docs, 450)
+
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+
+         chunk.forEach((doc) => {
+            batch.delete(doc.ref)
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
+   }
+
+   async getLivestreamChatEntry(
+      livestreamId: string,
+      entryId: string
+   ): Promise<LivestreamChatEntry | null> {
+      const chatEntryRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chatEntries")
+         .doc(entryId)
+         .withConverter(createCompatGenericConverter<LivestreamChatEntry>())
+
+      const snap = await chatEntryRef.get()
+
+      if (!snap.exists) {
+         return null
+      }
+
+      return snap.data()
    }
 }
