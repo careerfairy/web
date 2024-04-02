@@ -1,13 +1,17 @@
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
+   LivestreamSecureToken,
 } from "@careerfairy/shared-lib/livestreams"
 import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { firestore } from "../api/firestoreAdmin"
 import { WriteBatch } from "firebase-admin/firestore"
 
-export const livestreamGetSecureToken = async (id, breakoutRoomId?) => {
+export const livestreamGetSecureToken = async (
+   id: string,
+   breakoutRoomId?: string
+): Promise<LivestreamSecureToken | null> => {
    let documentSnap: any = firestore.collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
@@ -29,8 +33,8 @@ export const livestreamGetSecureToken = async (id, breakoutRoomId?) => {
 }
 
 export const livestreamGetRecordingToken = async (
-   id,
-   breakoutRoomId = null
+   id: string,
+   breakoutRoomId?: string
 ) => {
    let documentSnap: any = firestore.collection("livestreams").doc(id)
 
@@ -53,9 +57,9 @@ export const livestreamGetRecordingToken = async (
 }
 
 export const livestreamUpdateRecordingToken = async (
-   id,
-   data,
-   breakoutRoomId?
+   id: string,
+   data: any,
+   breakoutRoomId?: string
 ) => {
    let ref = firestore.collection("livestreams").doc(id)
 
@@ -67,9 +71,9 @@ export const livestreamUpdateRecordingToken = async (
 }
 
 export const livestreamSetIsRecording = async (
-   id,
+   id: string,
    value = true,
-   breakoutRoomId = null
+   breakoutRoomId?: string
 ) => {
    let ref = firestore.collection("livestreams").doc(id)
 

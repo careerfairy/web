@@ -1,10 +1,11 @@
 import functions = require("firebase-functions")
-import { groupRepo, userRepo } from "../api/repositories"
+import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
 import { UserData } from "@careerfairy/shared-lib/users"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { InferType } from "yup"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Validate the data object argument in a function call
@@ -140,4 +141,15 @@ export async function userIsSignedInAndIsCFAdmin(
    const idToken = await validateUserAuthExists(context)
    await validateUserIsCFAdmin(idToken.email)
    return
+}
+
+export async function validateLivestreamExists(
+   livestreamId: string
+): Promise<LivestreamEvent> {
+   const livestream = await livestreamsRepo.getById(livestreamId)
+
+   if (!livestream) {
+      logAndThrow("Livestream does not exist", livestreamId)
+   }
+   return livestream
 }

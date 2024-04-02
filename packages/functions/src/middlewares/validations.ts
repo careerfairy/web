@@ -1,5 +1,6 @@
 import {
    validateData,
+   validateLivestreamExists,
    validateUserAuthExists,
    validateUserIsCFAdmin,
    validateUserIsGroupAdmin as validateUserIsGroupAdminFn,
@@ -9,6 +10,7 @@ import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { object } from "yup"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Validate if the user is authed, is group admin or is cf admin
@@ -82,6 +84,21 @@ export const dataValidation = <T extends ObjectShape>(
          await validateData(data, objectSchema)
       } else {
          await validateData(data, object(objectSchema))
+      }
+
+      return next()
+   }
+}
+
+export const livestreamExists = (): OnCallMiddleware<{
+   livestream: LivestreamEvent
+}> => {
+   return async (data, context, next) => {
+      const livestream = await validateLivestreamExists(data.livestreamId)
+
+      context.middlewares = {
+         ...context.middlewares,
+         livestream,
       }
 
       return next()
