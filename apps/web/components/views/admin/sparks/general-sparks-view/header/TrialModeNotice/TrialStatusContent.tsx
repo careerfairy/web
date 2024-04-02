@@ -112,7 +112,7 @@ const TrialStatusContent = () => {
             <UpgradeSparksPlanButton
                text="Upgrade now"
                icon={<Star strokeWidth={3} />}
-            ></UpgradeSparksPlanButton>
+            />
          </Box>
       </Fragment>
    )

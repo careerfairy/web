@@ -9,6 +9,11 @@ import GroupPlanSelectSkeletonMobile from "./skeletons/GroupPlanSelectSkeletonMo
 const mobileBreakpoint = "md"
 
 const styles = sxStyles({
+   titleWrapper: {
+      mr: {
+         xs: "45px",
+      },
+   },
    title: {
       color: (theme) => theme.palette.neutral[800],
       mr: 15,
@@ -56,7 +61,11 @@ const SelectSparksPlanView = () => {
 const View = () => {
    return (
       <Box>
-         <Typography component="h1" sx={styles.title}>
+         <Typography
+            component="h1"
+            variant="brandedH1"
+            sx={styles.titleWrapper}
+         >
             <Box>
                Select your{" "}
                <Box component="span" color="secondary.main">

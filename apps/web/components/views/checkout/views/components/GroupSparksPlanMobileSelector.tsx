@@ -1,5 +1,5 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
-import { Stack, Box, useTheme } from "@mui/material"
+import { Stack, Box, useTheme, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import React from "react"
 import { CheckCircle, XCircle } from "react-feather"
@@ -53,11 +53,7 @@ const styles = sxStyles({
    },
    selectedPlanPrice: {
       color: (theme) => theme.palette.neutral[800],
-      fontFamily: "Poppins",
-      fontSize: "16px",
-      fontStyle: "normal",
       fontWeight: "600",
-      lineHeight: "24px" /* 150% */,
    },
    planWrapper: {
       width: "100%",
@@ -131,15 +127,14 @@ const GroupSparksPlanMobileSelector = () => {
                      {PLAN_CONSTANTS[selectedPlan].description}
                   </Box>
                </Box>
-
-               <Box component="span" sx={styles.selectedPlanPrice}>
+               <Typography variant="medium" sx={styles.selectedPlanPrice}>
                   <ConditionalWrapper condition={Boolean(stripePrice)}>
                      {commafy(stripePrice.unit_amount / 100) +
                         " " +
                         stripePrice.currency.toUpperCase() +
                         "/year"}
                   </ConditionalWrapper>
-               </Box>
+               </Typography>
             </Stack>
             <Stack direction={"column"} spacing={2} sx={[styles.planFeatures]}>
                {features.map((feature) => {

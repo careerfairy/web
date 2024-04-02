@@ -27,6 +27,7 @@ import NewFeatureHint from "../../components/util/NewFeatureHint"
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 import { Box } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import StarIcon from "components/views/common/icons/StarIcon"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
@@ -89,26 +90,7 @@ const GroupNavList = () => {
                                 condition={showSparksUpgradeWarning}
                              >
                                 <Box alignItems={"center"}>
-                                   <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      style={{ marginTop: 5, marginRight: 70 }}
-                                      width="18"
-                                      height="18"
-                                      fill="none"
-                                   >
-                                      <circle
-                                         cx="9"
-                                         cy="9"
-                                         r="4"
-                                         fill="#FE9B0E"
-                                      />
-                                      <circle
-                                         cx="9"
-                                         cy="9"
-                                         r="7.5"
-                                         stroke="#FE9B0E"
-                                      />
-                                   </svg>
+                                   <StarIcon />
                                 </Box>
                              </ConditionalWrapper>
                           ),
