@@ -12,16 +12,28 @@ type LivestreamFetchWrapperProps = {
 const LivestreamFetchWrapper: FC<
    WrapperProps & LivestreamFetchWrapperProps
 > = ({ livestreamId, children }) => {
-   const collection = "livestreams"
    const pathSegments = [livestreamId]
 
    return (
       <FirestoreConditionalDocumentFetcher
          shouldFetch={Boolean(livestreamId)}
-         collection={collection}
+         collection={"livestreams"}
          pathSegments={pathSegments}
       >
-         {children}
+         {(livestreamDocument) => {
+            if (!livestreamDocument) {
+               return (
+                  <FirestoreConditionalDocumentFetcher
+                     shouldFetch={Boolean(livestreamId)}
+                     collection={"draftLivestreams"}
+                     pathSegments={pathSegments}
+                  >
+                     {children}
+                  </FirestoreConditionalDocumentFetcher>
+               )
+            }
+            return children(livestreamDocument as LivestreamEvent)
+         }}
       </FirestoreConditionalDocumentFetcher>
    )
 }
