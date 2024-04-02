@@ -390,10 +390,26 @@ const handleReminder = async (
          filterEndDate
       )
 
+      functions.logger.log(
+         `Found ${streams
+            .map((s) => s.id)
+            .join(
+               ", "
+            )} streams that will start between ${filterStartDate.toLocaleString()} and ${filterEndDate.toLocaleString()} and will be reminded ${
+            reminder.timeMessage
+         }`
+      )
+
       const emailsToSave = await handleSendEmail(
          streams,
          reminder,
          generateReminderEmailData
+      )
+
+      functions.logger.log(
+         `Found ${
+            Object.keys(emailsToSave || {}).length
+         } emails to save for reminder ${reminder.key}`
       )
 
       if (emailsToSave) {
@@ -431,12 +447,19 @@ const handleSendEmail = (
             `Livestream with ${company} is F2F, no reminder email sent out`
          )
       } else {
+         functions.logger.log(
+            `Generating reminder email for livestream ${stream.id}`
+         )
          const emailsData = handleGenerateEmailData({
             stream,
             reminder,
             minutesToRemindBefore: minutesBefore,
             emailMaxChunkSize,
          })
+
+         functions.logger.log(
+            `Generated ${emailsData.length} emails for livestream ${stream.id}`
+         )
 
          emailsData.forEach((emailData, index) => {
             const currentChunk = `${index + 1}of${emailsData.length}`
@@ -504,6 +527,9 @@ const createSendEmailPromise = (
 
    return sendMessage(emailData)
       .then(() => {
+         functions.logger.log(
+            `Email ${key} with chunk ${currentChunk} was sent for stream ${id}`
+         )
          return { reminderKey: key, streamId: id, chunk: currentChunk }
       })
       .catch((error) => {
