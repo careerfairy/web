@@ -33,6 +33,9 @@ const styles = sxStyles({
          m: "-4px",
          borderColor: "transparent",
       },
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+         borderColor: "transparent",
+      },
       "&.Mui-disabled .MuiOutlinedInput-notchedOutline": {
          borderColor: "transparent !important",
       },
