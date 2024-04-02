@@ -70,7 +70,10 @@ export const Content = ({ scrollToBottom }: Props) => {
       }
    }, [chatEntries, scrollToBottom])
 
-   const sortedChatEntries = useMemo(() => chatEntries.reverse(), [chatEntries])
+   const sortedChatEntries = useMemo(
+      () => [...chatEntries].reverse(),
+      [chatEntries]
+   )
 
    if (!chatEntries.length) return <EmptyChatView />
 
