@@ -60,8 +60,10 @@ export const useGroupsQuestions = (groups: Group[]): ReturnType => {
       }
    }
 
+   const swrKey = `groupsQuestions-${groupIds.sort().join("-")}`
+
    const { data, isLoading, isValidating, error } = useSWR(
-      groupIds.length > 0 ? "groupsQuestions" : null,
+      groupIds.length > 0 ? swrKey : null,
       fetchQuestions,
       reducedRemoteCallsOptions
    )
