@@ -45,7 +45,6 @@ type LivestreamCreationContextType = {
    shouldShowAlertIndicator: boolean
    isGeneralTabInvalid: boolean
    isSpeakerTabInvalid: boolean
-   isUniversityEvent: boolean // edge case where university cohost events with companies
    isCohostedEvent: boolean
    isCFAdmin: boolean
 }
@@ -94,8 +93,9 @@ export const LivestreamCreationContextProvider: FC<
    const formHasCriticalValidationErrors =
       isGeneralTabInvalid || isSpeakerTabInvalid
 
-   const isUniversityEvent = Boolean(group?.universityCode)
-   const isCohostedEvent = Boolean(livestream.groupIds.length > 1)
+   const isCohostedEvent = Boolean(
+      livestream.groupIds.length > 1 || group?.universityCode
+   )
 
    const isCFAdmin = userData?.isAdmin
 
@@ -165,14 +165,12 @@ export const LivestreamCreationContextProvider: FC<
          shouldShowAlertIndicator,
          isGeneralTabInvalid,
          isSpeakerTabInvalid,
-         isUniversityEvent,
          isCohostedEvent,
          isCFAdmin,
       }),
       [
          isCFAdmin,
          isCohostedEvent,
-         isUniversityEvent,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
          shouldShowAlertIndicatorOnTab,
