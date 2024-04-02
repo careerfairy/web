@@ -1,7 +1,10 @@
-import { Box, CircularProgress, Stack, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { sxStyles } from "types/commonTypes"
 import GroupSparksPlanMobileSelector from "./components/GroupSparksPlanMobileSelector"
+import { useSelector } from "react-redux"
+import { plansDialogOpenSelector } from "store/selectors/groupSelectors"
+import GroupPlanSelectSkeletonMobile from "./skeletons/GroupPlanSelectSkeletonMobile"
 
 const mobileBreakpoint = "md"
 
@@ -40,8 +43,11 @@ const styles = sxStyles({
 })
 
 const SelectSparksPlanView = () => {
+   const open = useSelector(plansDialogOpenSelector)
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
+      <SuspenseWithBoundary
+         fallback={<GroupPlanSelectSkeletonMobile open={open} />}
+      >
          <View />
       </SuspenseWithBoundary>
    )
