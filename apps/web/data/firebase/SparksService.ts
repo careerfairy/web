@@ -261,7 +261,7 @@ export class SparksService {
    ) {
       return httpsCallable<RemoveNotificationFromUserData, void>(
          this.functions,
-         "removeAndSyncUserSparkNotification_v2"
+         "removeAndSyncUserSparkNotification_v3"
       )(data)
    }
 
