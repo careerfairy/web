@@ -1,5 +1,5 @@
 import { CircularProgress, IconButton } from "@mui/material"
-import { Fragment, useEffect, useMemo, useRef } from "react"
+import { Fragment, useEffect, useLayoutEffect, useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { ChatEntry } from "./ChatEntry"
 import { EmptyChatView } from "./EmptyChatView"
@@ -51,8 +51,6 @@ export const ChatList = (props: Props) => {
 
 export const Content = ({ scrollToBottom }: Props) => {
    const [ref, isBottom] = useInView()
-   const isBottomRef = useRef<boolean>(isBottom)
-   isBottomRef.current = isBottom
 
    const { livestreamId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
@@ -64,11 +62,11 @@ export const Content = ({ scrollToBottom }: Props) => {
       scrollToBottom("instant")
    }, [scrollToBottom])
 
-   useEffect(() => {
-      if (isBottomRef.current) {
+   useLayoutEffect(() => {
+      if (isBottom) {
          scrollToBottom("smooth")
       }
-   }, [chatEntries, scrollToBottom])
+   }, [chatEntries, isBottom, scrollToBottom])
 
    const sortedChatEntries = useMemo(
       () => [...chatEntries].reverse(),
