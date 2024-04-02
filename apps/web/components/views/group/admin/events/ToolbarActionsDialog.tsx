@@ -1,5 +1,6 @@
-import PropTypes from "prop-types"
-import React, { useState } from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import StudentViewIcon from "@mui/icons-material/FaceRounded"
+import ShareIcon from "@mui/icons-material/Share"
 import {
    Dialog,
    List,
@@ -10,22 +11,21 @@ import {
    Paper,
    Slide,
 } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
+import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
+import PropTypes from "prop-types"
+import { useState } from "react"
+import { Film as StreamIcon } from "react-feather"
 import {
    copyStringToClipboard,
    getBaseUrl,
 } from "../../../../helperFunctions/HelperFunctions"
-import ShareIcon from "@mui/icons-material/Share"
-import { Film as StreamIcon } from "react-feather"
-import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import HintIcon from "../../../common/HintIcon"
-import { useAuth } from "HOCs/AuthProvider"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
-import { useRouter } from "next/router"
-import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 
 const handleCreateDraftLivestream = async (
    authenticatedUser,
@@ -39,6 +39,7 @@ const handleCreateDraftLivestream = async (
    }
 
    const initialValues = getLivestreamInitialValues(group)
+   initialValues.groupIds = [group.id]
    const draftLivestream: LivestreamEvent = buildLivestreamObject(
       initialValues,
       false,
