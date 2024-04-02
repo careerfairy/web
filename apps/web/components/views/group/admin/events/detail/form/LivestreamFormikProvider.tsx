@@ -178,11 +178,6 @@ const convertLivestreamObjectToForm = ({
       formGeneralTabInitialValues
    )
 
-   // Handle univesrity edge case
-   general.company = group?.universityCode
-      ? formGeneralTabInitialValues.company
-      : group?.universityName || formGeneralTabInitialValues.company
-
    general.companyLogoUrl = group?.universityCode
       ? formGeneralTabInitialValues.companyLogoUrl
       : group?.logoUrl || formGeneralTabInitialValues.companyLogoUrl
