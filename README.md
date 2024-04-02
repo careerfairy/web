@@ -231,6 +231,7 @@ We use [Stripe](https://docs.stripe.com/cli) for processing payments and easily 
    1. NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY={copied_value}
    2. STRIPE_SECRET_KEY={copied_value}
 3. WebHooks Local Testing - Via the CLI its possible to forward webhooks to the local development environment, more [here](https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local)
+   1. Listen to Stripe Webhook events - `stripe listen --forward-to localhost:5001/careerfairy-e1fd9/europe-west1/stripeWebHook`
 4. Setup Price IDs - While testing the following environment variables regarding Stripe prices need to be set
    The API IDs can be found on Stripe for each product, as [Sparks Advanced CH](https://dashboard.stripe.com/test/products/prod_PlbjRlHrGoiWwW)
    1. Swiss Prices
@@ -241,6 +242,7 @@ We use [Stripe](https://docs.stripe.com/cli) for processing payments and easily 
       1. NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
       2. NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
       3. NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
+   3. Stripe specific test cards can be found [here](https://docs.stripe.com/testing#use-test-cards)
 
 # Setting Up Algolia
 

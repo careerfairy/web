@@ -3,6 +3,7 @@ import {
    GroupOption,
    GroupPhoto,
    GroupPlan,
+   GroupPlanType,
    GroupPlanTypes,
    GroupQuestion,
    GroupVideo,
@@ -349,6 +350,16 @@ export class GroupPresenter {
    hasPlanExpired() {
       const currentTime = new Date().getTime()
       return currentTime > this.getExpiresAt()
+   }
+
+   /**
+    * To check if the plan for this specific group has expired and is
+    * of any of the specified @type GroupPlanTypes.
+    */
+   hasPlanExpiredByType(types: GroupPlanType[]) {
+      if (types.length && this.plan)
+         return types.includes(this.plan?.type) && this.hasPlanExpired()
+      return this.hasPlanExpired()
    }
 
    /**

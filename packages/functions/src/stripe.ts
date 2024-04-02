@@ -209,14 +209,19 @@ export const stripeWebHook = functions
             response.status(400).send(`Webhook Error: ${err}`)
             return
          }
+         response.json({ received: true })
+      } else {
+         functions.logger.info(
+            "Invalid request method, only POST accepted:",
+            request
+         )
+         response.json({ received: false })
       }
-
-      response.json({ received: true })
    })
 
 async function handleStripeEvent(event: Stripe.Event): Promise<void> {
    try {
-      console.log("🚀 ~ handleStripeEvent ~ event:", event)
+      functions.logger.info("handleStripeEvent ~ event:", event)
       switch (event.type) {
          case "checkout.session.completed": {
             const paymentSucceedEvent =
@@ -232,6 +237,11 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
                      metadata +
                      ", Group ID: ",
                   metadata.groupId
+               )
+            } else {
+               functions.logger.error(
+                  "Could not process Stripe event checkout.session.completed based on metadata: ",
+                  metadata
                )
             }
             break

@@ -39,10 +39,6 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
       fontFamily: "Poppins",
-      fontSize: "32px",
-      fontStyle: "normal",
-      fontWeight: "700",
-      lineHeight: "48px",
       letterSpacing: {
          xs: "-0.04343rem",
          [mobileBreakpoint]: "-0.04886rem",
@@ -56,10 +52,8 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
       fontFamily: "Poppins",
-      fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
-      lineHeight: "24px",
    },
    containerWrapper: {
       flexDirection: "column",
@@ -176,7 +170,14 @@ const GroupPlansDialog = () => {
 }
 
 const Title: FC<TypographyProps<"h1">> = (props) => {
-   return <Typography component="h1" sx={styles.title} {...props} />
+   return (
+      <Typography
+         component="h1"
+         sx={styles.title}
+         variant="brandedH1"
+         {...props}
+      />
+   )
 }
 
 const Subtitle: FC<TypographyProps<"h2">> = (props) => {
@@ -184,6 +185,7 @@ const Subtitle: FC<TypographyProps<"h2">> = (props) => {
       <Typography
          component="h2"
          maxWidth={385}
+         variant="brandedBody"
          sx={styles.subtitle}
          {...props}
       />
