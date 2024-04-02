@@ -96,9 +96,9 @@ const styles = sxStyles({
    },
    mobileSparksCarousel: {
       py: "16px",
-      ".header": {
-         pr: 1.5,
-      },
+   },
+   mobileSparksCarouselHeader: {
+      pr: 2,
    },
    transition: {
       transition: "all 0.5s",
@@ -411,6 +411,7 @@ const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
                   More content from this company
                </Typography>
             }
+            headerSx={styles.mobileSparksCarouselHeader}
             groupId={livestream.groupIds[0]}
             sx={styles.mobileSparksCarousel}
             showArrows

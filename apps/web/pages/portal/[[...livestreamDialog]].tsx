@@ -42,10 +42,8 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   sparksCarousel: {
-      ".header": {
-         pr: 1.5,
-      },
+   sparksCarouselHeader: {
+      pr: 2,
    },
 })
 
@@ -115,9 +113,9 @@ const PortalPage = ({
                         <WidgetsWrapper>
                            <SparksCarouselWithSuspenseComponent
                               header={<Heading>SPARKS</Heading>}
+                              headerSx={styles.sparksCarouselHeader}
                               handleSparksClicked={handleSparksClicked}
                               showArrows={!isMobile}
-                              sx={styles.sparksCarousel}
                            />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
