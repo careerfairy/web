@@ -39,13 +39,15 @@ const handleCreateDraftLivestream = async (
    }
 
    const initialValues = getLivestreamInitialValues(group)
-   initialValues.groupIds = [group.id]
    const draftLivestream: LivestreamEvent = buildLivestreamObject(
       initialValues,
       false,
       null,
       firebase
    )
+
+   initialValues.groupIds = [group.id]
+   draftLivestream.speakers = []
 
    const draftLiveStreamId = await firebase.addLivestream(
       draftLivestream,
