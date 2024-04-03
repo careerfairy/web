@@ -353,13 +353,14 @@ export class GroupPresenter {
    }
 
    /**
-    * To check if the plan for this specific group has expired and is
-    * of any of the specified @type GroupPlanTypes.
+    * To check if the plan for this specific group is valid and is
+    * of any of the specified @type GroupPlanTypes. Meaning the plan has not expired
+    * and his of one of the specified types.
     */
-   hasPlanExpiredByType(types: GroupPlanType[]) {
-      if (types.length && this.plan)
-         return types.includes(this.plan?.type) && this.hasPlanExpired()
-      return this.hasPlanExpired()
+   isValid(types: GroupPlanType[]) {
+      if (!types || !types.length) return this.hasPlanExpired()
+      const hasType = types.includes(this.plan?.type)
+      return hasType && !this.hasPlanExpired()
    }
 
    /**
