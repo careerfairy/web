@@ -6,9 +6,10 @@ const BrandedMenu = styled((props: MenuProps) => (
    <Menu elevation={0} {...props} />
 ))(({ theme }) => ({
    "& .MuiPaper-root": {
-      borderRadius: theme.spacing(2),
+      borderRadius: "6px",
       border: "1px solid #ECECEC",
-      boxShadow: "0px 0px 15px 0px rgba(0, 0, 0, 0.05)",
+      boxShadow: "0px 0px 8px 0px rgba(20, 20, 20, 0.06)",
+      filter: "none",
       minWidth: 120,
       "& .MuiMenu-list": {
          padding: 0,
@@ -20,7 +21,7 @@ const BrandedMenu = styled((props: MenuProps) => (
          "& .MuiSvgIcon-root": {
             fontSize: 18,
             color: theme.palette.text.secondary,
-            marginRight: theme.spacing(1.5),
+            marginRight: theme.spacing(1),
          },
          "&:active": {
             backgroundColor: alpha(

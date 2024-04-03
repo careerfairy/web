@@ -1,13 +1,17 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
-import { Stack, Typography } from "@mui/material"
+import { IconButton, Stack, Typography } from "@mui/material"
 import { forwardRef, memo, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { ChatAuthor, getChatAuthor } from "./util"
+import { ChatAuthor, getChatAuthor, getIsMe } from "./util"
 import { useCompanyLogoUrl } from "store/selectors/streamingAppSelectors"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import DateUtil from "util/DateUtil"
 import LinkifyText from "components/util/LinkifyText"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { MoreVertical } from "react-feather"
+import { useStreamingContext } from "../../context"
+import { useAuth } from "HOCs/AuthProvider"
 
 const AVATAR_SIZE = 29
 
@@ -59,10 +63,18 @@ const styles = sxStyles({
       whiteSpace: "pre-line",
       lineHeight: "142.857%",
    },
+   optionsIcon: {
+      "& svg": {
+         width: 21,
+         height: 21,
+         color: (theme) => theme.brand.black[600],
+      },
+   },
 })
 
 type Props = {
    entry: LivestreamChatEntry
+   onOptionsClick: (event: React.MouseEvent<HTMLElement>) => void
 }
 
 /**
@@ -75,9 +87,20 @@ const propsAreEqual = (prevProps: Props, nextProps: Props) =>
    prevProps.entry.id === nextProps.entry.id
 
 export const ChatEntry = memo(
-   forwardRef<HTMLDivElement, Props>(({ entry }, ref) => {
+   forwardRef<HTMLDivElement, Props>(({ entry, onOptionsClick }, ref) => {
       const authorType = getChatAuthor(entry)
       const timeSinceEntry = useTimeSinceEntry(entry)
+      const { authenticatedUser, userData } = useAuth()
+      const { isHost, agoraUserId } = useStreamingContext()
+
+      const isMe = getIsMe(
+         entry,
+         agoraUserId,
+         authenticatedUser.email,
+         authenticatedUser.uid
+      )
+
+      const showOptions = Boolean(isMe || isHost || userData?.isAdmin)
 
       return (
          <Stack
@@ -85,22 +108,38 @@ export const ChatEntry = memo(
             ref={ref}
             sx={[styles.root, styles.background[authorType]]}
          >
-            <Stack direction="row" spacing={1} sx={styles.details}>
-               <EntryAvatar authorType={authorType} entry={entry} />
-               <Typography
-                  color="neutral.800"
-                  fontWeight={600}
-                  variant="small"
-                  sx={styles.displayNameColor[authorType]}
-               >
-                  {entry.authorName}
-                  {authorType === ChatAuthor.Streamer && (
-                     <Typography component="span" sx={styles.hostTag}>
-                        {" "}
-                        (Host)
-                     </Typography>
-                  )}
-               </Typography>
+            <Stack direction="row" justifyContent="space-between">
+               <Stack direction="row" spacing={1} sx={styles.details}>
+                  <EntryAvatar authorType={authorType} entry={entry} />
+                  <Typography
+                     color="neutral.800"
+                     fontWeight={600}
+                     variant="small"
+                     sx={[
+                        styles.displayNameColor[authorType],
+                        getMaxLineStyles(1),
+                     ]}
+                  >
+                     {authorType === ChatAuthor.CareerFairy
+                        ? "CareerFairy"
+                        : entry.authorName}
+                     {authorType === ChatAuthor.Streamer && (
+                        <Typography component="span" sx={styles.hostTag}>
+                           {" "}
+                           (Host)
+                        </Typography>
+                     )}
+                  </Typography>
+               </Stack>
+               {Boolean(showOptions) && (
+                  <IconButton
+                     sx={styles.optionsIcon}
+                     onClick={onOptionsClick}
+                     size="small"
+                  >
+                     <MoreVertical />
+                  </IconButton>
+               )}
             </Stack>
             <Typography
                color="neutral.800"
