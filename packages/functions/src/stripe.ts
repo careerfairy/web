@@ -34,6 +34,14 @@ type FetchStripeCustomerSession = {
    successUrl: string
 }
 
+/**
+ * Payload for fetching Stripe session status, allows to determine if a checkout was complete and paid.
+ * Receives the session ID provided from stripe via the return_url
+ */
+type FetchStripeSessionStatus = {
+   sessionId: string
+}
+
 const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
 const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
 
@@ -58,6 +66,11 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
       customerId: string().required(),
       priceId: string().required(),
       successUrl: string().required(),
+   })
+
+const fetchStripeSessionStatusSchema: SchemaOf<FetchStripeSessionStatus> =
+   object().shape({
+      sessionId: string().required(),
    })
 
 /**
@@ -182,6 +195,47 @@ export const fetchStripePrice = functions
       )
    )
 
+/**
+ * Fetches Session status from Stripe API, returning null if any exception occurs (invalid id or other)
+ */
+export const fetchStripeSessionStatus = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onCall(
+      middlewares(
+         dataValidation(fetchStripeSessionStatusSchema),
+         userShouldBeCFAdmin(),
+         async (data: FetchStripeSessionStatus, context) => {
+            functions.logger.info(
+               "fetchStripeSession by ID - session id: ",
+               data.sessionId
+            )
+
+            try {
+               const session = await stripe.checkout.sessions.retrieve(
+                  data.sessionId
+               )
+               const customer = await stripe.customers.retrieve(
+                  session.customer
+               )
+
+               return {
+                  status: session.status,
+                  paymentStatus: session.payment_status,
+                  customerEmail: customer.email,
+               }
+            } catch (error) {
+               functions.logger.error(
+                  "Error while retrieving Stripe Session Status by ID",
+                  data,
+                  error,
+                  context
+               )
+               return null
+            }
+         }
+      )
+   )
 export const stripeWebHook = functions
    .region(config.region)
    .runWith(runtimeSettings)

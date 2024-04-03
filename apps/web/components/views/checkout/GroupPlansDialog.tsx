@@ -28,6 +28,8 @@ import { SlideUpTransition } from "../common/transitions"
 import GroupPlanCheckoutView from "components/views/checkout/views/GroupPlanCheckoutView"
 import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
 import GroupPlansMobileView from "./views/GroupPlansMobileView"
+import PlanActivationConfirmationDialog from "./views/PlanActivationConfirmationDialog"
+import { useRouter } from "next/router"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -152,8 +154,14 @@ const GroupPlansDialog = () => {
    const generatedClientSecret = useSelector(clientSecret)
    const isMobile = useIsMobile()
 
+   const { query } = useRouter()
+
+   const stripeSessionId = query.stripe_session_id as string
    return (
       <>
+         <ConditionalWrapper condition={Boolean(stripeSessionId)}>
+            <PlanActivationConfirmationDialog />
+         </ConditionalWrapper>
          <ConditionalWrapper
             condition={!isMobile}
             fallback={<GroupPlansMobileView />}
