@@ -9,7 +9,6 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    dialogPaperMobile: {
-      // mt: "280px",
       minHeight: "100%",
       minWidth: "100%",
       justifyContent: "center",
