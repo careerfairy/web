@@ -22,8 +22,9 @@ import { datePickerDefaultStyles } from "../../../calendar/utils"
 import GBLocale from "date-fns/locale/en-GB"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { v4 as uuidv4 } from "uuid"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 
 const schema = yup.object().shape({
    title: yup.string().required("Required"),
@@ -90,6 +91,7 @@ const CustomJobCreateOrEditFrom = ({
    handleCancelCreateNewJob,
    job,
 }: Props) => {
+   const quillInputRef = useRef()
    const initialValues: CustomJobObj = useMemo(() => {
       // If the 'job' field is received, it indicates the intention to edit an existing job.
       if (job) {
@@ -255,14 +257,23 @@ const CustomJobCreateOrEditFrom = ({
                            label="Job Description (Required)"
                            maxRows={10}
                            inputProps={{ maxLength: 5000 }}
-                           value={values.description}
+                           value={
+                              values.description
+                                 ? values.description
+                                 : "<p></p>"
+                           } //to avoid label getting on top of editor when empty}
                            error={Boolean(
                               errors.description && touched.description
                            )}
-                           onChange={({ currentTarget: { value, name } }) =>
+                           onChange={({ target: { value, name } }) =>
                               setFieldValue(name, value)
                            }
                            sx={{ minHeight: "95px", textAlign: "start" }}
+                           inputRef={quillInputRef}
+                           InputProps={{
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              inputComponent: CustomRichTextEditor as any,
+                           }}
                         />
                         <Collapse
                            in={Boolean(

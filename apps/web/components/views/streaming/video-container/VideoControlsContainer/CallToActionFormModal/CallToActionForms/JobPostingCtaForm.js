@@ -1,10 +1,15 @@
 import React, { memo } from "react"
 import { Collapse, Grid, TextField } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import { useRef } from "react"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+
+
 
 const JobPostingCtaForm = memo(
    ({ formik, maxMessageLength, onEntered, onExited }) => {
       const now = new Date()
+      const quillInputRef = useRef()
 
       return (
          <Grid container spacing={3}>
@@ -131,6 +136,10 @@ const JobPostingCtaForm = memo(
                         Boolean(formik.touched.message) &&
                         Boolean(formik.errors.message)
                      }
+                     inputRef={quillInputRef}
+                     InputProps={{
+                        inputComponent: CustomRichTextEditor,
+                     }}
                   />
                </Collapse>
             </Grid>

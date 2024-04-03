@@ -18,16 +18,16 @@ import {
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../../util/constants"
 import { Box, CircularProgress } from "@mui/material"
-import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
 import { customJobRepo } from "../../../../../../data/RepositoryInstances"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
    wrapContainer: {
-      height: {
-         md: "100%",
-      },
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
    },
    container: {
       display: "flex",
@@ -73,6 +73,10 @@ const JobFormDialog: FC<Props> = ({
    const { group } = useGroupFromState()
    const { handleClose } = useStepper()
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const JobForm = dynamic(() => import("./JobForm"), {
+      ssr: false,
+      loading: () => <CircularProgress />,
+   })
 
    const handleSubmit = useCallback(
       async (values: JobFormValues) => {
