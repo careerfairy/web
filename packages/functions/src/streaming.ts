@@ -26,7 +26,7 @@ const deleteLivestreamChatEntrySchema: SchemaOf<DeleteLivestreamChatEntryRequest
             const { entryId, deleteAll } = obj
             const isEntryIdProvided = Boolean(entryId)
             const isDeleteAllProvided = Boolean(deleteAll)
-            // Return true if exactly one of them is provided
+
             return isEntryIdProvided !== isDeleteAllProvided
          }
       )
@@ -52,18 +52,15 @@ export const deleteLivestreamChatEntry = functions
 
             const userEmail = context.auth?.token?.email || ""
 
-            // Determine if the user is an admin
             const isAdmin = await checkIfUserIsAdmin(userEmail)
 
-            // // Validate token if necessary
-
-            // Perform deletion based on the request type
             if (deleteAll) {
                await validateTokenIfNeeded(
                   isAdmin,
                   livestreamToken,
                   context.middlewares.livestream
                )
+
                return await deleteAllEntries(livestreamId)
             } else {
                const isAuthor = await checkIfIsAuthor(
@@ -80,6 +77,7 @@ export const deleteLivestreamChatEntry = functions
                      context.middlewares.livestream
                   )
                }
+
                return await deleteSingleEntry(livestreamId, entryId)
             }
          }
