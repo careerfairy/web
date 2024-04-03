@@ -1,5 +1,13 @@
-import { CircularProgress, IconButton } from "@mui/material"
-import { Fragment, useEffect, useLayoutEffect, useMemo } from "react"
+import { CircularProgress, Collapse, IconButton } from "@mui/material"
+import {
+   Fragment,
+   MouseEvent,
+   useCallback,
+   useEffect,
+   useLayoutEffect,
+   useMemo,
+   useState,
+} from "react"
 import { ChevronDown } from "react-feather"
 import { ChatEntry } from "./ChatEntry"
 import { EmptyChatView } from "./EmptyChatView"
@@ -12,11 +20,15 @@ import { useStreamingContext } from "../../context"
 import { sxStyles } from "types/commonTypes"
 import { Box } from "@mui/material"
 import { Grow } from "@mui/material"
+import useMenuState from "components/custom-hook/useMenuState"
+import { OptionsMenu } from "./OptionsMenu"
+import { TransitionGroup } from "react-transition-group"
 
-const ARROW_HEIGHT = 40
+const ARROW_HEIGHT = 15
 
 const styles = sxStyles({
    button: {
+      height: ARROW_HEIGHT,
       ml: "auto",
       position: "sticky",
       display: "flex",
@@ -34,6 +46,7 @@ const styles = sxStyles({
    list: {
       mb: `-${ARROW_HEIGHT}px`,
       bgcolor: (theme) => theme.brand.white[100],
+      mt: "auto",
    },
    loading: {
       m: "auto",
@@ -60,6 +73,10 @@ export const Content = ({ scrollToBottom }: Props) => {
       limit: MAX_STREAM_CHAT_ENTRIES,
    })
 
+   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null)
+
+   const { anchorEl, handleClick, handleClose } = useMenuState()
+
    useEffect(() => {
       // Scroll to bottom on first load
       scrollToBottom("instant")
@@ -71,6 +88,19 @@ export const Content = ({ scrollToBottom }: Props) => {
       }
    }, [chatEntries, isBottom, scrollToBottom])
 
+   const handleOpenOptions = useCallback(
+      (event: MouseEvent<HTMLElement>, entryId: string) => {
+         handleClick(event)
+         setSelectedEntryId(entryId)
+      },
+      [handleClick]
+   )
+
+   const handleCloseOptions = useCallback(() => {
+      handleClose()
+      setSelectedEntryId(null)
+   }, [handleClose])
+
    const sortedChatEntries = useMemo(
       () => [...chatEntries].reverse(),
       [chatEntries]
@@ -80,14 +110,23 @@ export const Content = ({ scrollToBottom }: Props) => {
 
    return (
       <Fragment>
-         <Box sx={styles.list}>
-            {sortedChatEntries.map((entry, index) => (
-               <ChatEntry
-                  key={entry.id}
-                  entry={entry}
-                  ref={index === sortedChatEntries.length - 1 ? ref : null}
-               />
-            ))}
+         <Box id="chat-list" sx={styles.list}>
+            <TransitionGroup>
+               {sortedChatEntries.map((entry, index) => (
+                  <Collapse enter={false} key={entry.id}>
+                     <ChatEntry
+                        onOptionsClick={(event) =>
+                           handleOpenOptions(event, entry.id)
+                        }
+                        key={entry.id}
+                        entry={entry}
+                        ref={
+                           index === sortedChatEntries.length - 1 ? ref : null
+                        }
+                     />
+                  </Collapse>
+               ))}
+            </TransitionGroup>
          </Box>
          <Grow in={!isBottom}>
             <Box component="span" sx={styles.button}>
@@ -100,6 +139,11 @@ export const Content = ({ scrollToBottom }: Props) => {
                </IconButton>
             </Box>
          </Grow>
+         <OptionsMenu
+            handleClose={handleCloseOptions}
+            anchorEl={anchorEl}
+            selectedEntryId={selectedEntryId}
+         />
       </Fragment>
    )
 }
