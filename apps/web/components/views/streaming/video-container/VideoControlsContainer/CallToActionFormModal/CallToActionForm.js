@@ -16,6 +16,7 @@ import useSliderFullyOpened from "components/custom-hook/useSliderFullyOpened"
 import JobPostingCtaForm from "./CallToActionForms/JobPostingCtaForm"
 import SocialCtaForm from "./CallToActionForms/SocialCtaForm"
 import CustomMessageCtaForm from "./CallToActionForms/CustomMessageCtaForm"
+import { useRef } from "react"
 
 const MAX_BUTTON_TEXT_LENGTH = 45
 const MAX_MESSAGE_LENGTH = 1000
@@ -28,10 +29,13 @@ const getMaxLengthError = (maxLength) => [
 ]
 
 const now = new Date()
-const validationSchema = (type) =>
+const validationSchema = (type, quillRef) =>
    yup.object({
       message: yup
          .string("Enter your message")
+         .transform(() =>
+               quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+            ) //ReactQuill appends a new line to text
          .max(...getMaxLengthError(MAX_MESSAGE_LENGTH)),
       buttonText: yup
          .string("Enter the button text")
@@ -83,6 +87,8 @@ const CallToActionForm = memo(
          clickOnCallToAction,
          dismissCallToAction,
       } = useFirebaseService()
+
+      const quillInputRef = useRef()
 
       const canChangeMessage = useMemo(
          () => Boolean(isCustom || isJobPosting),
@@ -147,7 +153,7 @@ const CallToActionForm = memo(
             initialValues
          ),
          enableReinitialize: true,
-         validationSchema: validationSchema(initialValues.type),
+         validationSchema: validationSchema(initialValues.type, quillInputRef),
          onSubmit: async (values, { setSubmitting }) => {
             try {
                setSubmitting(true)
@@ -244,6 +250,7 @@ const CallToActionForm = memo(
                            maxMessageLength={MAX_MESSAGE_LENGTH}
                            onEntered={onEntered}
                            onExited={onExited}
+                           quillInputRef={quillInputRef}
                         />
                      )}
                      {isCustom && (

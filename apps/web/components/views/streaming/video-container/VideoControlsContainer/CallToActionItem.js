@@ -26,6 +26,7 @@ import RubberBand from "@stahl.luke/react-reveal/RubberBand"
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips"
 import TutorialContext from "../../../../../context/tutorials/TutorialContext"
 import { getRandomInt } from "../../../../helperFunctions/HelperFunctions"
+import SanitizedHTML from "components/util/SanitizedHTML"
 
 const useStyles = makeStyles(({ palette }) => ({
    root: {},
@@ -281,7 +282,7 @@ export const CallToActionItem = React.memo((props) => {
          <ListItem
             divider
             style={{
-               height: 200,
+               height: 250,
             }}
          >
             <ListItemAvatar className={classes.listItemAvatar}>
@@ -319,7 +320,9 @@ export const CallToActionItem = React.memo((props) => {
                         secondaryTypographyProps={{
                            noWrap: true,
                         }}
-                        secondary={message}
+                        secondary={
+                           <SanitizedHTML htmlString={message}/>
+                        }
                      />
                   </div>
                   <div className={classes.headerActionsWrapper}>
