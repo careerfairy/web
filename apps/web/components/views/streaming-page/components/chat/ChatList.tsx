@@ -35,6 +35,9 @@ const styles = sxStyles({
       mb: `-${ARROW_HEIGHT}px`,
       bgcolor: (theme) => theme.brand.white[100],
    },
+   loading: {
+      m: "auto",
+   },
 })
 
 type Props = {
@@ -43,7 +46,7 @@ type Props = {
 
 export const ChatList = (props: Props) => {
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
+      <SuspenseWithBoundary fallback={<CircularProgress sx={styles.loading} />}>
          <Content {...props} />
       </SuspenseWithBoundary>
    )

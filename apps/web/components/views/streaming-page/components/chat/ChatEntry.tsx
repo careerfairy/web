@@ -1,11 +1,5 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
-import {
-   Box,
-   IconButton,
-   IconButtonProps,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import { forwardRef, memo, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { ChatAuthor, getChatAuthor } from "./util"
@@ -14,9 +8,6 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import DateUtil from "util/DateUtil"
 import LinkifyText from "components/util/LinkifyText"
-import { useDeleteLivestreamChatEntry } from "components/custom-hook/streaming/useDeleteLivestreamChatEntry"
-import { useStreamingContext } from "../../context"
-import { Trash2 as DeleteIcon } from "react-feather"
 
 const AVATAR_SIZE = 29
 
@@ -68,12 +59,6 @@ const styles = sxStyles({
       whiteSpace: "pre-line",
       lineHeight: "142.857%",
    },
-   dummyDeleteButton: {
-      position: "absolute",
-      right: 0,
-      top: 0,
-      p: 1,
-   },
 })
 
 type Props = {
@@ -94,29 +79,12 @@ export const ChatEntry = memo(
       const authorType = getChatAuthor(entry)
       const timeSinceEntry = useTimeSinceEntry(entry)
 
-      const { livestreamId, agoraUserId, streamerAuthToken } =
-         useStreamingContext()
-      const { trigger: deleteChatEntry, isMutating } =
-         useDeleteLivestreamChatEntry(livestreamId)
-
       return (
          <Stack
             spacing={1}
             ref={ref}
             sx={[styles.root, styles.background[authorType]]}
          >
-            <Box sx={styles.dummyDeleteButton} component="span">
-               <DeleteChatEntryButton
-                  disabled={isMutating}
-                  onClick={() =>
-                     deleteChatEntry({
-                        agoraUserId,
-                        livestreamToken: streamerAuthToken,
-                        entryId: entry.id,
-                     })
-                  }
-               />
-            </Box>
             <Stack direction="row" spacing={1} sx={styles.details}>
                <EntryAvatar authorType={authorType} entry={entry} />
                <Typography
@@ -150,14 +118,6 @@ export const ChatEntry = memo(
    }),
    propsAreEqual
 )
-
-const DeleteChatEntryButton = (props: IconButtonProps) => {
-   return (
-      <IconButton {...props}>
-         <DeleteIcon />
-      </IconButton>
-   )
-}
 
 type EntryAvatarProps = {
    entry: LivestreamChatEntry

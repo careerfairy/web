@@ -4,6 +4,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
+      m: "auto",
       maxWidth: 162,
       color: (theme) => theme.brand.black[600],
       "& svg": {
