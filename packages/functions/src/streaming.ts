@@ -5,11 +5,10 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { SchemaOf, boolean, object, string } from "yup"
 import config from "./config"
-import { logAndThrow } from "./lib/validations"
+import { validateLivestreamToken } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, livestreamExists } from "./middlewares/validations"
 import { livestreamsRepo, userRepo } from "./api/repositories"
-import { livestreamGetSecureToken } from "./lib/livestream"
 
 const deleteLivestreamChatEntrySchema: SchemaOf<DeleteLivestreamChatEntryRequest> =
    object()
@@ -62,7 +61,6 @@ export const deleteLivestreamChatEntry = functions
             if (deleteAll) {
                await validateTokenIfNeeded(
                   isAdmin,
-                  userEmail,
                   livestreamToken,
                   context.middlewares.livestream
                )
@@ -78,7 +76,6 @@ export const deleteLivestreamChatEntry = functions
                if (!isAuthor) {
                   await validateTokenIfNeeded(
                      isAdmin,
-                     userEmail,
                      livestreamToken,
                      context.middlewares.livestream
                   )
@@ -89,51 +86,6 @@ export const deleteLivestreamChatEntry = functions
       )
    )
 
-/**
- * Validates a token for a livestream event asynchronously.
- * It verifies if the livestream is a test, if the user is an admin, or if the token matches the livestream's secure token.
- * It also addresses scenarios where no token is provided.
- *
- * @async
- * @function validateLivestreamToken
- */
-const validateLivestreamToken = async (
-   userId: string,
-   livestream: LivestreamEvent,
-   tokenToValidate: string | null
-): Promise<void> => {
-   if (livestream.test) return
-
-   if (!tokenToValidate) {
-      logAndThrow("No host token provided cannot perform action", {
-         userId,
-         livestreamId: livestream.id,
-      })
-   }
-
-   const correctToken = await livestreamGetSecureToken(livestream.id)
-
-   let errorMessage = ""
-
-   if (!correctToken.value || !tokenToValidate) {
-      errorMessage =
-         "The livestream is not a test stream and is missing a valid token"
-   }
-
-   if (correctToken && correctToken.value !== tokenToValidate) {
-      errorMessage = "The token does not match the livestream's token"
-   }
-
-   if (errorMessage) {
-      logAndThrow(errorMessage, {
-         livestreamId: livestream.id,
-         correctToken: correctToken ? correctToken.value : null,
-         tokenToValidate,
-         userId,
-      })
-   }
-}
-
 const checkIfUserIsAdmin = async (userEmail: string): Promise<boolean> => {
    if (!userEmail) return false
    const userData = await userRepo.getUserDataById(userEmail)
@@ -142,12 +94,11 @@ const checkIfUserIsAdmin = async (userEmail: string): Promise<boolean> => {
 
 const validateTokenIfNeeded = async (
    isAdmin: boolean,
-   userEmail: string,
    token: string | null,
    livestream: LivestreamEvent
 ) => {
    if (!isAdmin) {
-      await validateLivestreamToken(userEmail, livestream, token)
+      await validateLivestreamToken(livestream, token)
    }
 }
 
