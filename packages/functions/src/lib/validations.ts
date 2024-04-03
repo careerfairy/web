@@ -6,6 +6,7 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { InferType } from "yup"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { livestreamGetSecureToken } from "./livestream"
 
 /**
  * Validate the data object argument in a function call
@@ -152,4 +153,46 @@ export async function validateLivestreamExists(
       logAndThrow("Livestream does not exist", livestreamId)
    }
    return livestream
+}
+
+/**
+ * Validates the provided livestream token against the stored token.
+ * Throws an error if the livestream is not a test and the token is missing or does not match.
+ *
+ * @param livestream - The livestream event to validate the token for.
+ * @param tokenToValidate - The token to validate against the livestream's stored token.
+ */
+export async function validateLivestreamToken(
+   livestream: LivestreamEvent,
+   tokenToValidate?: string
+): Promise<void> {
+   if (livestream.test) return
+
+   if (!tokenToValidate) {
+      logAndThrow("No host token provided", {
+         livestreamId: livestream.id,
+      })
+   }
+
+   const correctToken = await livestreamGetSecureToken(livestream.id)
+
+   if (!correctToken.value) {
+      logAndThrow(
+         "The livestream is not a test stream and is missing a token",
+         {
+            livestreamId: livestream.id,
+            tokenToValidate,
+         }
+      )
+   }
+
+   if (correctToken && correctToken.value !== tokenToValidate) {
+      logAndThrow("The token does not match the livestream's token", {
+         livestreamId: livestream.id,
+         correctToken: correctToken.value,
+         tokenToValidate,
+      })
+   }
+
+   return
 }
