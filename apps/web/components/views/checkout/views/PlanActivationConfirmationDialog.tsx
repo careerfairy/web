@@ -9,8 +9,9 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    dialogPaperMobile: {
-      minWidth: "100%",
+      mt: "280px",
       minHeight: "100%",
+      minWidth: "100%",
       justifyContent: "center",
    },
    dialogPaperDesktop: {
@@ -42,7 +43,7 @@ const styles = sxStyles({
       height: "132px",
    },
    closeButton: {
-      minWidth: "610px",
+      minWidth: "95%",
       borderRadius: "20px",
    },
 })
@@ -88,7 +89,7 @@ const PaymentCompleteComponent = ({
          sx={styles.container}
          scroll="paper"
          open={isOpen}
-         maxWidth={false}
+         maxWidth={"md"}
          PaperProps={{
             sx: isMobile ? styles.dialogPaperMobile : styles.dialogPaperDesktop,
          }}
