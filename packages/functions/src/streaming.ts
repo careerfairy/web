@@ -3,6 +3,7 @@ import {
    DeleteLivestreamChatEntryRequest,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
+import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
 import { SchemaOf, boolean, object, string } from "yup"
 import config from "./config"
 import { validateLivestreamToken } from "./lib/validations"
@@ -51,6 +52,7 @@ export const deleteLivestreamChatEntry = functions
             } = requestData
 
             const userEmail = context.auth?.token?.email || ""
+            const userUid = context.auth?.token?.uid || ""
 
             const isAdmin = await checkIfUserIsAdmin(userEmail)
 
@@ -66,6 +68,7 @@ export const deleteLivestreamChatEntry = functions
                const isAuthor = await checkIfIsAuthor(
                   agoraUserId,
                   userEmail,
+                  userUid,
                   livestreamId,
                   entryId
                )
@@ -107,6 +110,7 @@ const deleteAllEntries = async (livestreamId: string) => {
 const checkIfIsAuthor = async (
    agoraUserId: string,
    userEmail: string,
+   userUid: string,
    livestreamId: string,
    entryId: string
 ) => {
@@ -116,8 +120,9 @@ const checkIfIsAuthor = async (
    )
 
    return (
-      (entryToDelete.authorEmail && entryToDelete.authorEmail === userEmail) ||
-      (entryToDelete.agoraUserId && entryToDelete.agoraUserId === agoraUserId)
+      isDefinedAndEqual(entryToDelete.authorEmail, userEmail) ||
+      isDefinedAndEqual(entryToDelete.agoraUserId, agoraUserId) ||
+      isDefinedAndEqual(entryToDelete.userUid, userUid)
    )
 }
 

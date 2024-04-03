@@ -1,4 +1,5 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
+import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
 
 export enum ChatAuthor {
    Viewer = "Viewer",
@@ -9,9 +10,14 @@ export enum ChatAuthor {
 export const isMe = (
    entry: LivestreamChatEntry,
    agoraUserId: string,
-   userEmail: string
+   userEmail: string,
+   userUid: string
 ) => {
-   return entry.agoraUserId === agoraUserId || entry.authorEmail === userEmail
+   return (
+      isDefinedAndEqual(entry.agoraUserId, agoraUserId) ||
+      isDefinedAndEqual(entry.authorEmail, userEmail) ||
+      isDefinedAndEqual(entry.userUid, userUid)
+   )
 }
 
 export const isHost = (entry: LivestreamChatEntry) => {

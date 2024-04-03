@@ -515,6 +515,7 @@ export class LivestreamService {
       type: LivestreamChatEntry["type"]
       displayName: string
       agoraUserId: string
+      userUid: string
    }) => {
       const {
          livestreamId,
@@ -523,6 +524,7 @@ export class LivestreamService {
          type,
          displayName,
          agoraUserId,
+         userUid,
       } = options
 
       const ref = doc(
@@ -545,6 +547,7 @@ export class LivestreamService {
          message,
          type,
          agoraUserId,
+         userUid,
          id: ref.id,
       })
    }
