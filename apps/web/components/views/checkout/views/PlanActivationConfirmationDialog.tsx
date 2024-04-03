@@ -9,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    dialogPaperMobile: {
-      mt: "280px",
+      // mt: "280px",
       minHeight: "100%",
       minWidth: "100%",
       justifyContent: "center",
@@ -21,7 +21,8 @@ const styles = sxStyles({
    container: {
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
+      justifyContent: "end",
+      mt: "220px",
    },
    dialogContentWrapper: {
       p: "15px",
@@ -117,7 +118,12 @@ const PaymentSuccessComponent = ({
    handleClose,
 }: PaymentSuccessComponentProps) => {
    return (
-      <Stack alignItems={"center"} sx={styles.dialogContentWrapper} spacing={3}>
+      <Stack
+         direction={"column"}
+         alignItems={"end"}
+         sx={styles.dialogContentWrapper}
+         spacing={2}
+      >
          <Stack alignItems={"center"} spacing={1}>
             <Box sx={styles.imageWrapper} />
             <Typography variant="brandedH3" sx={styles.messageTitle}>
