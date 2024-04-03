@@ -5,24 +5,32 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { SchemaOf, boolean, object, string } from "yup"
 import config from "./config"
-import { logAndThrow, validateUserIsCFAdmin } from "./lib/validations"
+import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, livestreamExists } from "./middlewares/validations"
-import { livestreamsRepo } from "./api/repositories"
+import { livestreamsRepo, userRepo } from "./api/repositories"
 import { livestreamGetSecureToken } from "./lib/livestream"
 
 const deleteLivestreamChatEntrySchema: SchemaOf<DeleteLivestreamChatEntryRequest> =
-   object().shape({
-      entryId: string().when("deleteAll", {
-         is: false,
-         then: string().required(),
-         otherwise: string().optional(),
-      }),
-      deleteAll: boolean().optional(),
-      livestreamId: string().required(),
-      livestreamToken: string().nullable(),
-      agoraUserId: string().nullable(),
-   })
+   object()
+      .shape({
+         entryId: string().nullable(),
+         deleteAll: boolean().nullable(),
+         livestreamId: string().required(),
+         livestreamToken: string().nullable(),
+         agoraUserId: string().nullable(),
+      })
+      .test(
+         "either-entryId-or-deleteAll",
+         "Either entryId or deleteAll must be provided, but not both",
+         (obj) => {
+            const { entryId, deleteAll } = obj
+            const isEntryIdProvided = Boolean(entryId)
+            const isDeleteAllProvided = Boolean(deleteAll)
+            // Return true if exactly one of them is provided
+            return isEntryIdProvided !== isDeleteAllProvided
+         }
+      )
 
 type DeleteContext = {
    livestream: LivestreamEvent
@@ -34,48 +42,49 @@ export const deleteLivestreamChatEntry = functions
       middlewares<DeleteContext, DeleteLivestreamChatEntryRequest>(
          dataValidation(deleteLivestreamChatEntrySchema),
          livestreamExists(),
-         async (data, context) => {
-            const userEmail = context.auth?.token?.email
+         async (requestData, context) => {
+            const {
+               agoraUserId,
+               livestreamId,
+               livestreamToken,
+               deleteAll,
+               entryId,
+            } = requestData
 
-            if (data.deleteAll) {
-               await validateLivestreamToken(
+            const userEmail = context.auth?.token?.email || ""
+
+            // Determine if the user is an admin
+            const isAdmin = await checkIfUserIsAdmin(userEmail)
+
+            // // Validate token if necessary
+
+            // Perform deletion based on the request type
+            if (deleteAll) {
+               await validateTokenIfNeeded(
+                  isAdmin,
                   userEmail,
-                  context.middlewares.livestream,
-                  data.livestreamToken
+                  livestreamToken,
+                  context.middlewares.livestream
                )
-               return livestreamsRepo.deleteAllLivestreamChatEntries(
-                  data.livestreamId
+               return await deleteAllEntries(livestreamId)
+            } else {
+               const isAuthor = await checkIfIsAuthor(
+                  agoraUserId,
+                  userEmail,
+                  livestreamId,
+                  entryId
                )
-            }
-            if (data.entryId) {
-               const entryToDelete =
-                  await livestreamsRepo.getLivestreamChatEntry(
-                     data.livestreamId,
-                     data.entryId
-                  )
 
-               if (
-                  entryToDelete.agoraUserId !== data.agoraUserId ||
-                  entryToDelete.authorEmail !== userEmail
-               ) {
-                  // If you are not the author of the entry, You can delete it if you have a valid token
-                  await validateLivestreamToken(
-                     context.auth?.token?.email,
-                     context.middlewares.livestream,
-                     data.livestreamToken
+               if (!isAuthor) {
+                  await validateTokenIfNeeded(
+                     isAdmin,
+                     userEmail,
+                     livestreamToken,
+                     context.middlewares.livestream
                   )
                }
-
-               return livestreamsRepo.deleteLivestreamChatEntry(
-                  data.livestreamId,
-                  data.entryId
-               )
+               return await deleteSingleEntry(livestreamId, entryId)
             }
-
-            return livestreamsRepo.deleteLivestreamChatEntry(
-               data.livestreamId,
-               data.entryId
-            )
          }
       )
    )
@@ -96,7 +105,7 @@ const validateLivestreamToken = async (
    if (livestream.test) return
 
    if (!tokenToValidate) {
-      logAndThrow("No token provided", {
+      logAndThrow("No host token provided cannot perform action", {
          userId,
          livestreamId: livestream.id,
       })
@@ -104,30 +113,18 @@ const validateLivestreamToken = async (
 
    const correctToken = await livestreamGetSecureToken(livestream.id)
 
-   if (
-      !correctToken ||
-      correctToken.value !== tokenToValidate ||
-      !tokenToValidate
-   ) {
-      let errorMessage =
+   let errorMessage = ""
+
+   if (!correctToken.value || !tokenToValidate) {
+      errorMessage =
          "The livestream is not a test stream and is missing a valid token"
-      if (!tokenToValidate) {
-         errorMessage = "No token provided"
-      } else if (correctToken && correctToken.value !== tokenToValidate) {
-         errorMessage = "The token is incorrect"
-      }
+   }
 
-      try {
-         await validateUserIsCFAdmin(userId)
-      } catch (error) {
-         logAndThrow(`${errorMessage} and user is not a CF admin`, {
-            userId,
-            livestreamId: livestream.id,
-            correctToken: correctToken ? correctToken.value : null,
-            tokenToValidate,
-         })
-      }
+   if (correctToken && correctToken.value !== tokenToValidate) {
+      errorMessage = "The token does not match the livestream's token"
+   }
 
+   if (errorMessage) {
       logAndThrow(errorMessage, {
          livestreamId: livestream.id,
          correctToken: correctToken ? correctToken.value : null,
@@ -135,4 +132,46 @@ const validateLivestreamToken = async (
          userId,
       })
    }
+}
+
+const checkIfUserIsAdmin = async (userEmail: string): Promise<boolean> => {
+   if (!userEmail) return false
+   const userData = await userRepo.getUserDataById(userEmail)
+   return Boolean(userData.isAdmin)
+}
+
+const validateTokenIfNeeded = async (
+   isAdmin: boolean,
+   userEmail: string,
+   token: string | null,
+   livestream: LivestreamEvent
+) => {
+   if (!isAdmin) {
+      await validateLivestreamToken(userEmail, livestream, token)
+   }
+}
+
+const deleteAllEntries = async (livestreamId: string) => {
+   return livestreamsRepo.deleteAllLivestreamChatEntries(livestreamId)
+}
+
+const checkIfIsAuthor = async (
+   agoraUserId: string,
+   userEmail: string,
+   livestreamId: string,
+   entryId: string
+) => {
+   const entryToDelete = await livestreamsRepo.getLivestreamChatEntry(
+      livestreamId,
+      entryId
+   )
+
+   return (
+      (entryToDelete.authorEmail && entryToDelete.authorEmail === userEmail) ||
+      (entryToDelete.agoraUserId && entryToDelete.agoraUserId === agoraUserId)
+   )
+}
+
+const deleteSingleEntry = async (livestreamId: string, entryId: string) => {
+   return livestreamsRepo.deleteLivestreamChatEntry(livestreamId, entryId)
 }
