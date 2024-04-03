@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useMemo } from "react"
-import { FormControl, FormHelperText } from "@mui/material"
+import { FormControl, FormHelperText, MenuItem } from "@mui/material"
 import {
    LivestreamGroupQuestion,
    LivestreamGroupQuestions,
@@ -14,8 +14,8 @@ import {
    FormikTouched,
 } from "formik"
 import { sxStyles } from "../../../../../types/commonTypes"
-import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
-import BaseStyles from "components/views/admin/company-information/BaseStyles"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions
@@ -112,6 +112,14 @@ const styles = sxStyles({
          paddingLeft: "0 !important",
       },
    },
+   placeholder: {
+      ["& .MuiInputBase-input"]: {
+         color: "neutral.300",
+      },
+   },
+   hideOption: {
+      display: "none",
+   },
 })
 
 const QuestionSelect = ({
@@ -120,40 +128,67 @@ const QuestionSelect = ({
    setFieldValue,
    errorText,
 }: QuestionSelectProps) => {
+   const isMobile = useIsMobile()
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
 
-   const handleQuestionChange = useCallback(
-      (_, value) => {
-         setFieldValue(inputName, value?.id)
+   const handleOptionChange = useCallback(
+      (event) => {
+         setFieldValue(inputName, event.target.value)
       },
       [inputName, setFieldValue]
    )
+
    const selectedOption =
       options.find((option) => option.id === question.selectedOptionId) || null
 
-   const isOptionEqualToValue = (option, value) => option.id == value?.id
-   const getOptionLabel = (option) => option.name || ""
+   const optionsWithPlaceholder = [
+      ...options,
+      { id: "placeholder", name: "Select an option" },
+   ]
 
    return (
       <FormControl fullWidth error={!!errorText} sx={styles.formControl}>
-         <BrandedAutocomplete
+         <BrandedTextField
             key={inputName}
             id={inputName}
-            options={options}
-            value={selectedOption}
-            isOptionEqualToValue={isOptionEqualToValue}
-            textFieldProps={{
-               name: inputName,
-               label: question.name,
-               fullWidth: true,
-               placeholder: "Select an option",
+            label={question.name}
+            value={
+               selectedOption?.id ||
+               optionsWithPlaceholder.find(
+                  (option) => option.id === "placeholder"
+               ).id
+            }
+            select
+            SelectProps={{
+               native: isMobile,
             }}
-            getOptionLabel={getOptionLabel}
-            onChange={handleQuestionChange}
-            sx={[BaseStyles.chipInput, styles.question]}
-         />
+            onChange={handleOptionChange}
+            sx={[styles.question, !selectedOption && styles.placeholder]}
+         >
+            {isMobile
+               ? optionsWithPlaceholder.map((option) => (
+                    <option
+                       key={option.id}
+                       value={option.id}
+                       style={
+                          option.id === "placeholder" ? styles.hideOption : {}
+                       }
+                    >
+                       {option.name}
+                    </option>
+                 ))
+               : optionsWithPlaceholder.map((option) => (
+                    <MenuItem
+                       key={option.id}
+                       value={option.id}
+                       sx={option.id === "placeholder" ? styles.hideOption : {}}
+                    >
+                       {option.name}
+                    </MenuItem>
+                 ))}
+         </BrandedTextField>
          <FormHelperText sx={styles.errorText}>{errorText}</FormHelperText>
       </FormControl>
    )
