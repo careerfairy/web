@@ -12,6 +12,8 @@ const styles = sxStyles({
       minHeight: "100%",
       minWidth: "100%",
       justifyContent: "center",
+      borderBottomLeftRadius: "0px",
+      borderBottomRightRadius: "0px",
    },
    dialogPaperDesktop: {
       p: "28px",
