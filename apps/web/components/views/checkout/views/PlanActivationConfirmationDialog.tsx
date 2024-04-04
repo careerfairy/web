@@ -23,6 +23,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "end",
+   },
+   containerMobile: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "end",
       mt: "220px",
    },
    dialogContentWrapper: {
@@ -88,7 +93,7 @@ const PaymentCompleteComponent = ({
    }
    return (
       <Dialog
-         sx={styles.container}
+         sx={isMobile ? styles.containerMobile : styles.container}
          scroll="paper"
          open={isOpen}
          maxWidth={"md"}
