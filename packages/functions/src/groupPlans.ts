@@ -18,7 +18,6 @@ import { validateGroupSparks } from "./util/sparks"
  * functions runtime settings
  */
 const runtimeSettings: RuntimeOptions = {
-   timeoutSeconds: 20,
    memory: "256MB",
 }
 
@@ -101,10 +100,7 @@ async function updateExpiredGroupPlans() {
       const groups = expiringGroups.filter(
          (group) =>
             // Only want those whose have publicSparks = true or undefined values, those with false are already correct
-            group.publicProfile &&
-            (group.publicSparks
-               ? group.publicSparks
-               : group.publicSparks === undefined)
+            group.publicSparks !== false
       )
       // validateGroupSparks does the actual check and update if plan is already expired
       const updatePromises = groups.map(validateGroupSparks)
