@@ -11,11 +11,13 @@ import { useFirestore } from "reactfire"
 type ChatCounterState = {
    initialLoad: boolean
    chatCount: number
+   seenChatIdsMap: Map<string, boolean>
 }
 
 const defaultState: ChatCounterState = {
    initialLoad: true,
    chatCount: 0,
+   seenChatIdsMap: new Map<string, boolean>(),
 }
 
 export const useNewChatCounter = (streamId: string, isActive: boolean) => {
@@ -33,17 +35,30 @@ export const useNewChatCounter = (streamId: string, isActive: boolean) => {
                limit(1) // Only need the most recent chat for this to work
             ),
             (snapshot) => {
-               snapshot.docChanges().forEach((docChange) => {
-                  if (docChange.type === "added") {
-                     setChatCounter((prevState) => {
-                        return {
-                           ...prevState,
-                           chatCount: prevState.initialLoad
-                              ? 0
-                              : prevState.chatCount + 1,
-                           initialLoad: false,
+               setChatCounter((prevState) => {
+                  let newChatCount = prevState.chatCount
+                  const updatedSeenChatIdsMap = new Map(
+                     prevState.seenChatIdsMap
+                  )
+
+                  snapshot.docChanges().forEach((docChange) => {
+                     if (docChange.type === "added") {
+                        const chatId = docChange.doc.id
+                        // If the chat has not been seen, add it to the map and increment the count
+                        if (!updatedSeenChatIdsMap.has(chatId)) {
+                           updatedSeenChatIdsMap.set(chatId, true)
+                           // Only increment if not initially loading
+                           if (!prevState.initialLoad) {
+                              newChatCount += 1
+                           }
                         }
-                     })
+                     }
+                  })
+
+                  return {
+                     chatCount: newChatCount,
+                     seenChatIdsMap: updatedSeenChatIdsMap,
+                     initialLoad: false,
                   }
                })
             }
