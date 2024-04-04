@@ -9,6 +9,13 @@ type FetcherType = MutationFetcher<
    Omit<DeleteLivestreamChatEntryRequest, "livestreamId" | "entryId"> // The entry ID to delete
 >
 
+const getKey = (livestreamId: string, entryId: string) => {
+   if (!entryId || !livestreamId) {
+      return null
+   }
+   return `delete-chat-entry-${livestreamId}-${entryId}`
+}
+
 /**
  * Custom hook for deleting a specific livestream chat entry.
  *
@@ -29,21 +36,15 @@ export const useDeleteLivestreamChatEntry = (
          entryId,
       })
 
-   return useSWRMutation(
-      !entryId || !livestreamId
-         ? null
-         : `delete-chat-entry-${livestreamId}-${entryId}`,
-      fetcher,
-      {
-         onError: (error, key) => {
-            errorNotification(
-               error,
-               "Failed to delete chat entry from livestream",
-               {
-                  key,
-               }
-            )
-         },
-      }
-   )
+   return useSWRMutation(getKey(livestreamId, entryId), fetcher, {
+      onError: (error, key) => {
+         errorNotification(
+            error,
+            "Failed to delete chat entry from livestream",
+            {
+               key,
+            }
+         )
+      },
+   })
 }
