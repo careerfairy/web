@@ -1,8 +1,9 @@
-import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
+import { Box, Button, Dialog, Link, Stack, Typography } from "@mui/material"
 import useStripeSessionStatus from "components/custom-hook/stripe/useStripeSessionStatus"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import AlertCircleIcon from "components/views/common/icons/AlertCircleIcon"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
 import { useState } from "react"
@@ -49,6 +50,12 @@ const styles = sxStyles({
       backgroundImage: "url('/Party-popper1.png')",
       width: "128.229px",
       height: "132px",
+   },
+   errorImageWrapper: {
+      backgroundImage: "url('/ellipse-pink.png')",
+      width: "108px",
+      height: "108px",
+      backgroundRepeat: "no-repeat",
    },
    closeButton: {
       minWidth: "95%",
@@ -107,7 +114,7 @@ const PaymentCompleteComponent = ({
       >
          <ConditionalWrapper
             condition={showSuccess}
-            fallback={<PaymentFailureComponent />}
+            fallback={<PaymentFailureComponent handleClose={closeDialog} />}
          >
             <PaymentSuccessComponent handleClose={closeDialog} />
          </ConditionalWrapper>
@@ -115,17 +122,68 @@ const PaymentCompleteComponent = ({
    )
 }
 
-const PaymentFailureComponent = () => {
-   return <>error: todo view</>
+type PaymentDialogComponentProps = {
+   handleClose: () => void
 }
 
-type PaymentSuccessComponentProps = {
-   handleClose: () => void
+const PaymentFailureComponent = ({
+   handleClose,
+}: PaymentDialogComponentProps) => {
+   return (
+      <Stack
+         direction={"column"}
+         alignItems={"end"}
+         sx={styles.dialogContentWrapper}
+         spacing={2}
+      >
+         <Stack alignItems={"center"} spacing={1}>
+            <Stack
+               sx={styles.errorImageWrapper}
+               alignContent={"center"}
+               justifyContent={"center"}
+               alignItems={"center"}
+            >
+               <AlertCircleIcon
+                  sx={{ width: "76px", height: "76px", justifyItems: "center" }}
+               />
+            </Stack>
+
+            <Typography variant="brandedH3" sx={styles.messageTitle}>
+               An error occurred
+            </Typography>
+            <Stack spacing={3}>
+               <Typography variant="brandedBody" sx={styles.messageDescription}>
+                  We{"'"}re sorry, but there seems to be a temporary issue
+                  processing your purchase. Don{"'"}t worry, your payment
+                  information is safe.
+               </Typography>
+               <Typography variant="brandedBody" sx={styles.messageDescription}>
+                  If the issue persists, please contact us at{" "}
+                  {
+                     <Link href={"mailto:info@careerfairy.io"}>
+                        info@careerfairy.io
+                     </Link>
+                  }{" "}
+                  and we{"'"}ll be happy to help.
+               </Typography>
+            </Stack>
+         </Stack>
+
+         <Button
+            sx={styles.closeButton}
+            color="error"
+            variant="contained"
+            onClick={handleClose}
+         >
+            Try again later
+         </Button>
+      </Stack>
+   )
 }
 
 const PaymentSuccessComponent = ({
    handleClose,
-}: PaymentSuccessComponentProps) => {
+}: PaymentDialogComponentProps) => {
    const { query } = useRouter()
 
    const planName = query.planName as string
