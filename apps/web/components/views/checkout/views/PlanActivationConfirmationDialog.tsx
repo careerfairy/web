@@ -123,6 +123,9 @@ type PaymentSuccessComponentProps = {
 const PaymentSuccessComponent = ({
    handleClose,
 }: PaymentSuccessComponentProps) => {
+   const { query } = useRouter()
+
+   const planName = query.planName as string
    return (
       <Stack
          direction={"column"}
@@ -133,7 +136,7 @@ const PaymentSuccessComponent = ({
          <Stack alignItems={"center"} spacing={1}>
             <Box sx={styles.imageWrapper} />
             <Typography variant="brandedH3" sx={styles.messageTitle}>
-               Your Sparks Advanced plan is now active!
+               Your Sparks {planName} plan is now active!
             </Typography>
             <Typography variant="brandedBody" sx={styles.messageDescription}>
                Discover the latest trends thanks to comprehensive Sparks
