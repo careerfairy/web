@@ -11,11 +11,20 @@ import {
 } from "./lib/sparks/notifications/userNotifications"
 import { handleCreatePublicSparksNotifications } from "./lib/sparks/notifications/publicNotifications"
 import { firestore } from "./api/firestoreAdmin"
+import { RuntimeOptions } from "firebase-functions"
 
 const removeNotificationFromUserValidator = {
    userId: string().required(),
    groupId: string().required(),
 } as const
+
+/**
+ * Runtime settings
+ */
+const runtimeSettings: RuntimeOptions = {
+   // we may load some data
+   memory: "512MB",
+}
 
 /**
  * Every day at 9 AM, check all user's sparksFeed and confirms if any of them needs to have an event sparks notification.
@@ -69,6 +78,7 @@ export const createSparksFeedEventNotifications = functions
  */
 export const removeAndSyncUserSparkNotification = functions
    .region(config.region)
+   .runWith(runtimeSettings)
    .https.onCall(
       middlewares(
          dataValidation({
