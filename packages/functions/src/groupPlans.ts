@@ -19,10 +19,7 @@ import { RuntimeOptions } from "firebase-functions"
  * functions runtime settings
  */
 const runtimeSettings: RuntimeOptions = {
-   // may take a while
-   timeoutSeconds: 60 * 9,
-   // we may load lots of data into memory
-   memory: "4GB",
+   memory: "256MB",
 }
 
 
@@ -107,10 +104,7 @@ async function updateExpiredGroupPlans() {
       const groups = expiringGroups.filter(
          (group) =>
             // Only want those whose have publicSparks = true or undefined values, those with false are already correct
-            group.publicProfile &&
-            (group.publicSparks
-               ? group.publicSparks
-               : group.publicSparks === undefined)
+            group.publicSparks !== false
       )
       // validateGroupSparks does the actual check and update if plan is already expired
       const updatePromises = groups.map(validateGroupSparks)
