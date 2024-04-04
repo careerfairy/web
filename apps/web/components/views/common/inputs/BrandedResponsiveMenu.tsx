@@ -1,5 +1,6 @@
 import {
    Box,
+   CircularProgress,
    Divider,
    List,
    ListItemButton,
@@ -13,6 +14,8 @@ import BrandedMenu from "./BrandedMenu"
 import BrandedSwipeableDrawer from "./BrandedSwipeableDrawer"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
+const LOADER_SIZE = 15
+
 const styles = sxStyles({
    icon: {
       display: "flex",
@@ -25,14 +28,33 @@ const styles = sxStyles({
          fontSize: "18px",
       },
    },
+   menuItem: {
+      position: "relative",
+   },
+   listItemLoading: {
+      "& .MuiTypography-root": {
+         opacity: 0.5,
+      },
+      "& svg": {
+         opacity: 0.5,
+      },
+   },
    singleMenuItem: {
       p: "16px !important",
    },
    drawerMenuItem: {
       p: "17px 20px !important",
+      position: "relative",
    },
    listItemDivider: {
       borderColor: (theme) => theme.brand.black[300],
+   },
+   loader: {
+      position: "absolute",
+      top: `calc(50% - ${LOADER_SIZE / 2}px)`,
+      left: `calc(50% - ${LOADER_SIZE / 2}px)`,
+      transform: "translate(-50%, -50%)",
+      color: (theme) => theme.brand.black[600],
    },
 })
 
@@ -42,6 +64,7 @@ type MenuOption = {
    handleClick: (args: unknown) => void | Promise<void>
    menuItemSxProps?: SxProps
    disabled?: boolean
+   loading?: boolean
 }
 
 type MobileDrawerProps = {
@@ -76,12 +99,17 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
                         handleClose()
                      }}
                      sx={combineStyles(
-                        styles.drawerMenuItem,
+                        [
+                           styles.drawerMenuItem,
+                           option.loading && styles.listItemLoading,
+                        ],
                         option.menuItemSxProps
                      )}
+                     disabled={option.disabled || option.loading}
                   >
                      <Box sx={styles.icon}>{option.icon}</Box>
                      <Typography variant="medium">{option.label}</Typography>
+                     {Boolean(option.loading) && <Loader />}
                   </ListItemButton>
                </>
             ))}
@@ -131,16 +159,21 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                      }
                      handleClose()
                   }}
-                  disabled={option.disabled}
+                  disabled={option.disabled || option.loading}
                   sx={combineStyles(
-                     singleOption && styles.singleMenuItem,
+                     [
+                        styles.menuItem,
+                        option.loading && styles.listItemLoading,
+                        singleOption && styles.singleMenuItem,
+                     ],
                      option.menuItemSxProps
                   )}
                >
                   <Box sx={styles.icon}>{option.icon}</Box>
                   <Typography variant="xsmall">{option.label}</Typography>
+                  {Boolean(options.length - 1 !== index) && <Divider />}
                </MenuItem>
-               {Boolean(options.length - 1 !== index) && <Divider />}
+               {Boolean(option.loading) && <Loader />}
             </Box>
          ))}
       </BrandedMenu>
@@ -183,6 +216,10 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
          )}
       </Fragment>
    )
+}
+
+const Loader = () => {
+   return <CircularProgress sx={styles.loader} size={LOADER_SIZE} />
 }
 
 export default BrandedResponsiveMenu

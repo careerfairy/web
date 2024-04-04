@@ -41,7 +41,7 @@ export const OptionsMenu = ({
                livestreamToken: streamerAuthToken,
             }),
          menuItemSxProps: [styles.delete],
-         disabled: isMutating,
+         loading: isMutating,
       },
       ...(streamIsMobile
          ? [
