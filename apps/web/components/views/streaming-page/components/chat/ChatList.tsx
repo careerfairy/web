@@ -110,23 +110,18 @@ export const Content = ({ scrollToBottom }: Props) => {
 
    return (
       <Fragment>
-         <Box id="chat-list" sx={styles.list}>
-            <TransitionGroup>
-               {sortedChatEntries.map((entry, index) => (
-                  <Collapse enter={false} key={entry.id}>
-                     <ChatEntry
-                        onOptionsClick={(event) =>
-                           handleOpenOptions(event, entry.id)
-                        }
-                        key={entry.id}
-                        entry={entry}
-                        ref={
-                           index === sortedChatEntries.length - 1 ? ref : null
-                        }
-                     />
-                  </Collapse>
-               ))}
-            </TransitionGroup>
+         <Box id="chat-list" sx={styles.list} component={TransitionGroup}>
+            {sortedChatEntries.map((entry, index) => (
+               <Collapse key={entry.id}>
+                  <ChatEntry
+                     onOptionsClick={(event) =>
+                        handleOpenOptions(event, entry.id)
+                     }
+                     entry={entry}
+                     ref={index === sortedChatEntries.length - 1 ? ref : null}
+                  />
+               </Collapse>
+            ))}
          </Box>
          <Grow in={!isBottom}>
             <Box component="span" sx={styles.button}>
