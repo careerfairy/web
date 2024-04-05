@@ -55,7 +55,7 @@ export const ADVANCED_FEATURES: PlanFeatureItem[] = [
       name: "Engagement analytics",
    },
    {
-      enabled: false,
+      enabled: true,
       name: "Audience analytics",
    },
    {
