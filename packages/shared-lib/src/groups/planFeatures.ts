@@ -14,11 +14,15 @@ export const PREMIUM_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: true,
-      name: "General analytics",
+      name: "External promotion",
    },
    {
       enabled: true,
-      name: "Reach and audience analytics",
+      name: "Engagement analytics",
+   },
+   {
+      enabled: true,
+      name: "Audience analytics",
    },
    {
       enabled: true,
@@ -44,11 +48,15 @@ export const ADVANCED_FEATURES: PlanFeatureItem[] = [
    },
    {
       enabled: true,
-      name: "General analytics",
+      name: "External promotion",
    },
    {
       enabled: true,
-      name: "Reach and audience analytics",
+      name: "Engagement analytics",
+   },
+   {
+      enabled: false,
+      name: "Audience analytics",
    },
    {
       enabled: false,
@@ -73,12 +81,16 @@ export const ESSENTIAL_FEATURES: PlanFeatureItem[] = [
       name: "Up to 4 featured employees",
    },
    {
+      enabled: false,
+      name: "External promotion",
+   },
+   {
       enabled: true,
-      name: "General analytics",
+      name: "Engagement analytics",
    },
    {
       enabled: false,
-      name: "Reach and audience analytics",
+      name: "Audience analytics",
    },
    {
       enabled: false,
