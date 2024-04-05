@@ -14,7 +14,10 @@ import {
    useState,
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
-import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import {
+   sidePanelSelector,
+   useIsConnectedOnDifferentBrowser,
+} from "store/selectors/streamingAppSelectors"
 
 type StreamContextProps = {
    livestreamId: string
@@ -55,6 +58,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const hostAuthToken = query.token?.toString() || ""
 
    const { activeView } = useAppSelector(sidePanelSelector)
+   const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
 
    const dispatch = useAppDispatch()
 
@@ -86,7 +90,10 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          token: response.token,
          uid: agoraUserId,
       },
-      Boolean(!response.isLoading && response.token) // Allow to join/re-join when the token is changed
+      // Join channel if not logged in on another browser and token is available
+      !isLoggedInOnDifferentBrowser &&
+         !response.isLoading &&
+         Boolean(response.token)
    )
 
    const client = useRTCClient()
