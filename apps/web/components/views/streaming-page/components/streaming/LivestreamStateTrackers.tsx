@@ -3,11 +3,11 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
-   setHasStarted,
+   setHasEnded,
    setLivestreamMode,
    setNumberOfParticipants,
    setScreenSharerId,
-   setStartedAt,
+   setStarted,
    setStartsAt,
 } from "store/reducers/streamingAppReducer"
 
@@ -46,13 +46,21 @@ export const LivestreamStateTrackers = (): null => {
 
    // Convert to primitive for comparison
    const startedAtMillis = livestream.startedAt?.toMillis() ?? null
+   /**
+    * Dispatch both `hasStarted` and `startedAt` as the same time to avoid race conditions.
+    */
    useEffect(() => {
-      dispatch(setStartedAt(startedAtMillis))
-   }, [dispatch, startedAtMillis])
+      dispatch(
+         setStarted({
+            hasStarted: livestream.hasStarted,
+            startedAt: startedAtMillis,
+         })
+      )
+   }, [dispatch, livestream.hasStarted, startedAtMillis])
 
    useEffect(() => {
-      dispatch(setHasStarted(Boolean(livestream.hasStarted)))
-   }, [dispatch, livestream.hasStarted])
+      dispatch(setHasEnded(Boolean(livestream.hasEnded)))
+   }, [dispatch, livestream.hasEnded])
 
    // Clean up the state on unmount
    useEffect(() => {
@@ -61,8 +69,8 @@ export const LivestreamStateTrackers = (): null => {
          dispatch(setScreenSharerId(null))
          dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
          dispatch(setStartsAt(null))
-         dispatch(setStartedAt(null))
-         dispatch(setHasStarted(false))
+         dispatch(setHasEnded(false))
+         dispatch(setStarted({ hasStarted: false, startedAt: null }))
       }
    }, [dispatch])
 
