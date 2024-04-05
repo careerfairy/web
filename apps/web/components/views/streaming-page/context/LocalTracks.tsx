@@ -12,6 +12,7 @@ import {
    createContext,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -19,6 +20,7 @@ import { useStreamingContext } from "./Streaming"
 import { type LocalUser } from "../types"
 import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
 import { useAgoraDevices } from "./AgoraDevices"
+import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -53,6 +55,7 @@ const LocalTracksContext = createContext<LocalTracksContextProps | undefined>(
 export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    children,
 }) => {
+   const isConnectedOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
    const streamingContextProps = useStreamingContext()
    const { isReady, shouldStream, currentRole } = streamingContextProps
    const currentUserUID = useCurrentUID()
@@ -66,6 +69,13 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const firstCameraId = cameras?.[0]?.deviceId
    const firstMicId = microphones?.[0]?.deviceId
+
+   useEffect(() => {
+      if (isConnectedOnDifferentBrowser) {
+         setCameraOn(false)
+         setMicrophoneMuted(true)
+      }
+   }, [isConnectedOnDifferentBrowser])
 
    const cameraTrack = useLocalCameraTrack(
       shouldStream ? Boolean(cameraOn && firstCameraId) : false,
