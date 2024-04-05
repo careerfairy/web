@@ -6,6 +6,7 @@ import {
    LivestreamEvent,
    LivestreamModes,
    UserLivestreamData,
+   LivestreamChatEntry,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -28,6 +29,7 @@ import {
    arrayUnion,
    collection,
    collectionGroup,
+   deleteDoc,
    doc,
    documentId,
    getDoc,
@@ -35,6 +37,7 @@ import {
    limit,
    query,
    runTransaction,
+   setDoc,
    updateDoc,
    where,
    writeBatch,
@@ -503,6 +506,59 @@ export class LivestreamService {
             })
          }
       })
+   }
+
+   addChatEntry = (options: {
+      livestreamId: string
+      message: string
+      authorEmail: string
+      type: LivestreamChatEntry["type"]
+      shortenedName: string
+      agoraUserId: string
+   }) => {
+      const {
+         livestreamId,
+         message,
+         authorEmail,
+         type,
+         shortenedName,
+         agoraUserId,
+      } = options
+
+      const ref = doc(
+         collection(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "chatEntries"
+         )
+      ).withConverter(createGenericConverter<LivestreamChatEntry>())
+
+      return setDoc(ref, {
+         laughing: [],
+         wow: [],
+         heart: [],
+         thumbsUp: [],
+         authorName: shortenedName,
+         timestamp: Timestamp.now(),
+         authorEmail,
+         message,
+         type,
+         agoraUserId,
+         id: ref.id,
+      })
+   }
+
+   deleteChatEntry = (livestreamId: string, chatEntryId: string) => {
+      return deleteDoc(
+         doc(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "chatEntries",
+            chatEntryId
+         )
+      )
    }
 }
 
