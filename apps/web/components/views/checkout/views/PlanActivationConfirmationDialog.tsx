@@ -129,7 +129,7 @@ const PaymentSuccessComponent = ({
    return (
       <Stack
          direction={"column"}
-         alignItems={"end"}
+         alignItems={"center"}
          sx={styles.dialogContentWrapper}
          spacing={2}
       >
