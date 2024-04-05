@@ -25,17 +25,15 @@ export class SparkReleaseEmailService {
    async fetchRequiredData() {
       // start fetching in parallel
 
-      let subscribedUsers: UserData[] = await this.userRepo.getSubscribedUsers()
-      subscribedUsers = subscribedUsers.filter(
-         (user: UserData) => user.universityCountryCode === "CH"
-      )
+      const subscribedUsers: UserData[] =
+         await this.userRepo.getSubscribedUsersByCountryCode("CH")
 
       this.subscribedUsers = convertDocArrayToDict(
          subscribedUsers as UserData[]
       )
 
       this.logger.info(
-         "Total Users subscribed to the release email for universityCountryCode === CH only, EMAILS -> ",
+         "Total Users subscribed to the release email for universityCountryCode CH only",
          subscribedUsers.length
       )
 
