@@ -1,6 +1,7 @@
 import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
 import useStripeSessionStatus from "components/custom-hook/stripe/useStripeSessionStatus"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
@@ -75,7 +76,9 @@ const PaymentCompleteComponent = ({
 }: PaymentCompleteComponentProps) => {
    const { asPath, replace } = useRouter()
    // Replacing only this query string to prevent breaking other properties if needed
-   const replaceUrl = asPath.replace("stripe_session_id=".concat(sessionId), "")
+   const url = new URL(asPath, getBaseUrl())
+   url.searchParams.delete("stripe_session_id")
+   const replaceUrl = url.pathname + url.search
 
    const [isOpen, setIsOpen] = useState(true)
    const isMobile = useIsMobile()
