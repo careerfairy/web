@@ -9,6 +9,7 @@ import {
    type UID,
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -71,7 +72,8 @@ export interface StreamingAppState {
        */
       hasStarted: boolean | undefined
       hasEnded: boolean
-   }
+      openStream: boolean
+   } | null
    rtmSignalingState: {
       failedToConnect: boolean
       viewCount: number
@@ -109,6 +111,7 @@ const initialState: StreamingAppState = {
       startedAt: null,
       hasStarted: false,
       hasEnded: false,
+      openStream: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -170,6 +173,7 @@ const streamingAppSlice = createSlice({
             }
          })
       },
+
       setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
          state.livestreamState.mode = action.payload
 
@@ -213,6 +217,12 @@ const streamingAppSlice = createSlice({
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
       },
+      setOpenStream(state, action: PayloadAction<boolean>) {
+         state.livestreamState.openStream = action.payload
+      },
+      resetLivestreamState(state) {
+         state.livestreamState = initialState.livestreamState
+      },
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
       },
@@ -237,6 +247,10 @@ const streamingAppSlice = createSlice({
             const { reason, state: rtmState } = action.payload
 
             if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+               errorLogAndNotify(
+                  new Error("RTM - User is logged in on a different browser"),
+                  { reason, rtmState }
+               )
                state.isLoggedInOnDifferentBrowser = true
             }
          }
@@ -251,9 +265,14 @@ const streamingAppSlice = createSlice({
       ) {
          state.rtcState.connectionState = action.payload
          if (action.payload) {
-            const { reason } = action.payload
+            const { reason, currentState, prevState } = action.payload
 
             if (reason === "UID_BANNED") {
+               errorLogAndNotify(new Error("RTC - User is banned"), {
+                  reason,
+                  currentState,
+                  prevState,
+               })
                state.isLoggedInOnDifferentBrowser = true
             }
          }
@@ -269,6 +288,8 @@ export const {
       setStarted,
       setStartsAt,
       setHasEnded,
+      setOpenStream,
+      resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,
