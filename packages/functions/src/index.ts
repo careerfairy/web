@@ -106,6 +106,7 @@ exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
+exports.manualSparkReleaseEmail = newsletter.manualSparkReleaseEmail
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
