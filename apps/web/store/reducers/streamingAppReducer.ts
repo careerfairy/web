@@ -61,6 +61,9 @@ export interface StreamingAppState {
       screenSharerId: string
       mode: LivestreamMode
       numberOfParticipants: number
+      startsAt: number | null
+      startedAt: number | null
+      hasStarted: boolean
    }
    rtmSignalingState: {
       failedToConnect: boolean
@@ -95,6 +98,9 @@ const initialState: StreamingAppState = {
       mode: LivestreamModes.DEFAULT,
       screenSharerId: null,
       numberOfParticipants: 0,
+      startsAt: null,
+      startedAt: null,
+      hasStarted: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -174,6 +180,21 @@ const streamingAppSlice = createSlice({
       setNumberOfParticipants(state, action: PayloadAction<number>) {
          state.livestreamState.numberOfParticipants = action.payload
       },
+      setStartedAt(state, action: PayloadAction<number | null>) {
+         if (state.livestreamState.startedAt !== action.payload) {
+            state.livestreamState.startedAt = action.payload
+         }
+      },
+      setHasStarted(state, action: PayloadAction<boolean>) {
+         if (state.livestreamState.hasStarted !== action.payload) {
+            state.livestreamState.hasStarted = action.payload
+         }
+      },
+      setStartsAt(state, action: PayloadAction<number | null>) {
+         if (state.livestreamState.startsAt !== action.payload) {
+            state.livestreamState.startsAt = action.payload
+         }
+      },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
       },
@@ -226,6 +247,9 @@ export const {
       setLivestreamMode,
       setScreenSharerId,
       setNumberOfParticipants,
+      setStartsAt,
+      setStartedAt,
+      setHasStarted,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,
