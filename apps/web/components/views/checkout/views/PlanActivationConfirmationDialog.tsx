@@ -17,6 +17,9 @@ const styles = sxStyles({
       borderBottomLeftRadius: "0px",
       borderBottomRightRadius: "0px",
    },
+   link: {
+      color: (theme) => theme.palette.neutral[600],
+   },
    dialogPaperDesktop: {
       p: "28px",
       justifyContent: "center",
@@ -132,7 +135,7 @@ const PaymentFailureComponent = ({
    return (
       <Stack
          direction={"column"}
-         alignItems={"end"}
+         alignItems={"center"}
          sx={styles.dialogContentWrapper}
          spacing={2}
       >
@@ -160,7 +163,7 @@ const PaymentFailureComponent = ({
                <Typography variant="brandedBody" sx={styles.messageDescription}>
                   If the issue persists, please contact us at{" "}
                   {
-                     <Link href={"mailto:info@careerfairy.io"}>
+                     <Link href={"mailto:info@careerfairy.io"} sx={styles.link}>
                         info@careerfairy.io
                      </Link>
                   }{" "}
