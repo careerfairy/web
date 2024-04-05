@@ -116,10 +116,12 @@ const View = () => {
       [dispatch]
    )
 
-   const { customerSessionSecret: customerSessionSecret } =
-      useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
+   const {
+      customerSessionSecret: customerSessionSecret,
+      loading: loadingSecret,
+   } = useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
 
-   const disabled = !selectedPlan
+   const disabled = !selectedPlan || loadingSecret || !customerSessionSecret
    const redirectToCheckout = async (e: FormEvent) => {
       e.preventDefault()
       setClientSecret(customerSessionSecret)

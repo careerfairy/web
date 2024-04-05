@@ -179,9 +179,6 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
             <Typography variant="brandedH1" color={color} sx={styles.planTitle}>
                {props.title}
             </Typography>
-            {/* <Box component="span" color={color} sx={styles.planTitle}>
-               {props.title}
-            </Box> */}
 
             <Box component="span" color={color} sx={styles.planDescription}>
                {props.description}

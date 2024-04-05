@@ -25,6 +25,7 @@ const swrOptions: SWRConfiguration = {
  */
 type Result = {
    customerSessionSecret: string
+   loading: boolean
 }
 const CUSTOMER_ID_PREFIX = "Group_"
 /**
@@ -59,7 +60,7 @@ const useStripeCustomerSession = (
       plan,
       userEmail,
    ])
-   const { data } = useSWR(
+   const { data, isLoading } = useSWR(
       ["fetchStripeCustomerSession", options],
       fetcher,
       swrOptions
@@ -68,8 +69,9 @@ const useStripeCustomerSession = (
    return useMemo(() => {
       return {
          customerSessionSecret: data.customerSessionSecret,
+         loading: isLoading,
       }
-   }, [data])
+   }, [data.customerSessionSecret, isLoading])
 }
 
 export default useStripeCustomerSession
