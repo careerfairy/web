@@ -200,17 +200,18 @@ const MobileDrawer = ({
    primaryAction,
    secondaryAction,
 }: Props) => {
-   const DrawerComponent = handleClose ? SwipeableDrawer : Drawer
+   const isSwipeable = Boolean(handleClose)
+   const DrawerComponent = isSwipeable ? SwipeableDrawer : Drawer
 
    return (
       <DrawerComponent
-         onOpen={() => {}}
          onClose={handleClose}
          open={open}
          anchor="bottom"
          PaperProps={{
             sx: styles.paper,
          }}
+         {...(isSwipeable && { onOpen: () => {} })}
       >
          <Stack
             alignItems="center"

@@ -74,5 +74,26 @@ export const AgoraTrackers = () => {
       }
    )
 
+   useEffect(() => {
+      if (!rtmChannel) {
+         dispatch(setViewCount(0))
+      }
+   }, [dispatch, rtmChannel])
+
+   /**
+    * Resets streaming state on component unmount.
+    *
+    * Ensures that the streaming state is reset to its initial values when the component is unmounted,
+    * clearing any residual data such as view count, audio levels, and connection states for both RTC and RTM clients.
+    */
+   useEffect(() => {
+      return () => {
+         dispatch(setViewCount(0))
+         dispatch(setAudioLevels([]))
+         dispatch(setRTMConnectionState(null))
+         dispatch(setRTCConnectionState(null))
+      }
+   }, [dispatch])
+
    return null
 }

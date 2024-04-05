@@ -63,7 +63,14 @@ export interface StreamingAppState {
       numberOfParticipants: number
       startsAt: number | null
       startedAt: number | null
-      hasStarted: boolean
+      /**
+       * Indicates the streaming state:
+       * - `undefined`: The stream has never been started.
+       * - `false`: The stream has ended.
+       * - `true`: The stream was restarted.
+       */
+      hasStarted: boolean | undefined
+      hasEnded: boolean
    }
    rtmSignalingState: {
       failedToConnect: boolean
@@ -71,14 +78,14 @@ export interface StreamingAppState {
       connectionState: {
          state: RtmStatusCode.ConnectionState
          reason: RtmStatusCode.ConnectionChangeReason
-      }
+      } | null
    }
    rtcState: {
-      connectionState?: {
+      connectionState: {
          currentState: ConnectionState
          prevState: ConnectionState
          reason: ConnectionDisconnectedReason
-      }
+      } | null
    }
    isLoggedInOnDifferentBrowser: boolean
 }
@@ -101,6 +108,7 @@ const initialState: StreamingAppState = {
       startsAt: null,
       startedAt: null,
       hasStarted: false,
+      hasEnded: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -180,19 +188,26 @@ const streamingAppSlice = createSlice({
       setNumberOfParticipants(state, action: PayloadAction<number>) {
          state.livestreamState.numberOfParticipants = action.payload
       },
-      setStartedAt(state, action: PayloadAction<number | null>) {
-         if (state.livestreamState.startedAt !== action.payload) {
-            state.livestreamState.startedAt = action.payload
-         }
-      },
-      setHasStarted(state, action: PayloadAction<boolean>) {
-         if (state.livestreamState.hasStarted !== action.payload) {
-            state.livestreamState.hasStarted = action.payload
-         }
-      },
       setStartsAt(state, action: PayloadAction<number | null>) {
          if (state.livestreamState.startsAt !== action.payload) {
             state.livestreamState.startsAt = action.payload
+         }
+      },
+      setStarted(
+         state,
+         action: PayloadAction<
+            Pick<
+               StreamingAppState["livestreamState"],
+               "startedAt" | "hasStarted"
+            >
+         >
+      ) {
+         state.livestreamState.startedAt = action.payload.startedAt
+         state.livestreamState.hasStarted = action.payload.hasStarted
+      },
+      setHasEnded(state, action: PayloadAction<boolean>) {
+         if (state.livestreamState.hasEnded !== action.payload) {
+            state.livestreamState.hasEnded = action.payload
          }
       },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
@@ -218,10 +233,12 @@ const streamingAppSlice = createSlice({
          >
       ) {
          state.rtmSignalingState.connectionState = action.payload
-         const { reason, state: rtmState } = action.payload
+         if (action.payload) {
+            const { reason, state: rtmState } = action.payload
 
-         if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
 
@@ -233,10 +250,12 @@ const streamingAppSlice = createSlice({
          action: PayloadAction<StreamingAppState["rtcState"]["connectionState"]>
       ) {
          state.rtcState.connectionState = action.payload
-         const { reason } = action.payload
+         if (action.payload) {
+            const { reason } = action.payload
 
-         if (reason === "UID_BANNED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "UID_BANNED") {
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
    },
@@ -247,9 +266,9 @@ export const {
       setLivestreamMode,
       setScreenSharerId,
       setNumberOfParticipants,
+      setStarted,
       setStartsAt,
-      setStartedAt,
-      setHasStarted,
+      setHasEnded,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,

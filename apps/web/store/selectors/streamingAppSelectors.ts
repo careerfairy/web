@@ -68,3 +68,6 @@ export const useStartedAt = () =>
 
 export const useStartsAt = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.startsAt)
+
+export const useHasEnded = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.hasEnded)

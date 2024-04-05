@@ -1,4 +1,4 @@
-import { useRemoteUsers } from "agora-rtc-react"
+import { useIsConnected, useRemoteUsers } from "agora-rtc-react"
 import { useMemo } from "react"
 import { useLocalTracks } from "../../context"
 import { RemoteUser, UserStream } from "../../types"
@@ -14,6 +14,7 @@ import { useIsScreenShareMode } from "store/selectors/streamingAppSelectors"
  */
 export const useStreams = (): UserStream[] => {
    const remoteStreamers = useRemoteUsers()
+   const isConnected = useIsConnected()
    const isScreenShareMode = useIsScreenShareMode()
 
    const { localUser, readyToPublish: readyToPublishLocalUser } =
@@ -27,16 +28,18 @@ export const useStreams = (): UserStream[] => {
 
    return useMemo(() => {
       // Start by mapping remoteStreamers to include the 'type' property
-      const combinedStreamers: UserStream[] = remoteStreamers
-         .filter((user) => user.uid !== screenShareUID) // Agora rule: User should never subscribe to their own local screen share
-         .map<RemoteUser>((user) => ({
-            user,
-            type: user.uid
-               .toString()
-               .startsWith(STREAM_IDENTIFIERS.SCREEN_SHARE)
-               ? "remote-user-screen"
-               : "remote-user",
-         }))
+      const combinedStreamers: UserStream[] = isConnected
+         ? remoteStreamers
+              .filter((user) => user.uid !== screenShareUID) // Agora rule: User should never subscribe to their own local screen share
+              .map<RemoteUser>((user) => ({
+                 user,
+                 type: user.uid
+                    .toString()
+                    .startsWith(STREAM_IDENTIFIERS.SCREEN_SHARE)
+                    ? "remote-user-screen"
+                    : "remote-user",
+              }))
+         : []
 
       if (readyToPublishLocalUser) {
          combinedStreamers.push(localUser)
@@ -48,6 +51,7 @@ export const useStreams = (): UserStream[] => {
 
       return combinedStreamers
    }, [
+      isConnected,
       isScreenShareMode,
       localUser,
       localUserScreen,
