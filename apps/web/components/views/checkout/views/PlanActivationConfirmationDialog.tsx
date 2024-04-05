@@ -55,14 +55,21 @@ const styles = sxStyles({
       height: "132px",
    },
    errorImageWrapper: {
-      backgroundImage: "url('/ellipse-pink.png')",
       width: "108px",
       height: "108px",
-      backgroundRepeat: "no-repeat",
+      backgroundColor: (theme) => theme.brand.error[50],
+      borderRadius: "50%",
+      alignContent: "center",
    },
    closeButton: {
       minWidth: "95%",
       borderRadius: "20px",
+   },
+   alertIcon: {
+      width: "76px",
+      height: "76px",
+      ml: "16px",
+      mt: "6px",
    },
 })
 
@@ -140,16 +147,9 @@ const PaymentFailureComponent = ({
          spacing={2}
       >
          <Stack alignItems={"center"} spacing={1}>
-            <Stack
-               sx={styles.errorImageWrapper}
-               alignContent={"center"}
-               justifyContent={"center"}
-               alignItems={"center"}
-            >
-               <AlertCircleIcon
-                  sx={{ width: "76px", height: "76px", justifyItems: "center" }}
-               />
-            </Stack>
+            <Box sx={styles.errorImageWrapper}>
+               <AlertCircleIcon sx={styles.alertIcon} />
+            </Box>
 
             <Typography variant="brandedH3" sx={styles.messageTitle}>
                An error occurred
