@@ -60,14 +60,9 @@ export class UserFunctionsRepository
       countryCode: string,
       userEmails?: string[]
    ): Promise<UserData[]> {
-      const earlierThan = DateTime.now()
-         .minus({ months: SUBSCRIBED_BEFORE_MONTHS_COUNT })
-         .toJSDate()
-
       let query = this.firestore
          .collection("userData")
          .where("unsubscribed", "==", false)
-         .where("lastActivityAt", ">=", earlierThan)
          .where("universityCountryCode", "==", countryCode)
 
       if (userEmails?.length) {
