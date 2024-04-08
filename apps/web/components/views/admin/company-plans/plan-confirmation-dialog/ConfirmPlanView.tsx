@@ -9,14 +9,13 @@ type ConfirmPlanProps = {
 }
 
 const planTitlesDictionary: Record<GroupPlanType, string> = {
-   trial: PLAN_CONSTANTS[GroupPlanTypes.Tier1].name.concat(" plan"),
+   trial: PLAN_CONSTANTS[GroupPlanTypes.Trial].name.concat(" plan"),
    tier1: PLAN_CONSTANTS[GroupPlanTypes.Tier1].name.concat(" plan"),
-   tier2: PLAN_CONSTANTS[GroupPlanTypes.Tier1].name.concat(" plan"),
-   tier3: PLAN_CONSTANTS[GroupPlanTypes.Tier1].name.concat(" plan"),
+   tier2: PLAN_CONSTANTS[GroupPlanTypes.Tier2].name.concat(" plan"),
+   tier3: PLAN_CONSTANTS[GroupPlanTypes.Tier3].name.concat(" plan"),
 }
 
 const ConfirmPlanView = ({ plan }: ConfirmPlanProps) => {
-   console.log("🚀 ~ ConfirmPlanView ~ plan:", plan)
    const { handleClose, isMutating, groupToManage, startPlanAndGoToSuccess } =
       usePlanConfirmationDialog()
 
@@ -24,6 +23,8 @@ const ConfirmPlanView = ({ plan }: ConfirmPlanProps) => {
       groupToManage?.universityName,
       plan
    )
+   const planTitle = planTitlesDictionary[plan]
+
    return (
       <DialogBody
          handleClose={handleClose}
@@ -33,14 +34,14 @@ const ConfirmPlanView = ({ plan }: ConfirmPlanProps) => {
                <DialogBody.ActionButton
                   buttonType="primary"
                   loading={isMutating}
-                  onClick={() => startPlanAndGoToSuccess(GroupPlanTypes.Tier1)}
+                  onClick={() => startPlanAndGoToSuccess(plan)}
                >
                   Proceed
                </DialogBody.ActionButton>
             </>
          }
          icon={<Clock />}
-         title={planTitlesDictionary[plan]}
+         title={planTitle}
          content={planContentDescription}
       />
    )
