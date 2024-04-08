@@ -12,6 +12,7 @@ import {
    LivestreamEventPublicData,
    LivestreamEventSerialized,
    LivestreamJobApplicationDetails,
+   LivestreamPoll,
    LivestreamRecordingDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
@@ -275,6 +276,37 @@ export interface ILivestreamRepository {
       isDraft: boolean,
       image: ImageType
    ): Promise<void>
+
+   /**
+    * Creates a poll for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param options - The options of the poll
+    * @param question - The question of the poll
+    */
+   createPoll(
+      livestreamId: string,
+      options: LivestreamPoll["options"],
+      question: LivestreamPoll["question"]
+   ): Promise<void>
+
+   /**
+    * Updates a poll for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param pollId - The ID of the poll
+    * @param poll - The poll data to update
+    */
+   updatePoll(
+      livestreamId: string,
+      pollId: string,
+      poll: Pick<LivestreamPoll, "options" | "question" | "state">
+   ): Promise<void>
+
+   /**
+    * Deletes a poll from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param pollId - The ID of the poll
+    */
+   deletePoll(livestreamId: string, pollId: string): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1193,6 +1225,64 @@ export class FirebaseLivestreamRepository
          .map((result: PromiseFulfilledResult<RecordingToken>) => result.value)
 
       return recordingToken
+   }
+
+   async createPoll(
+      livestreamId: string,
+      options: LivestreamPoll["options"],
+      question: LivestreamPoll["question"]
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("polls")
+         .withConverter(createCompatGenericConverter<LivestreamPoll>())
+         .doc()
+
+      const details: LivestreamPoll = {
+         options,
+         question,
+         state: "upcoming",
+         timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
+         voters: [],
+         id: docRef.id,
+      }
+
+      return docRef.set(details)
+   }
+
+   async updatePoll(
+      livestreamId: string,
+      pollId: string,
+      poll: Pick<LivestreamPoll, "options" | "question" | "state">
+   ): Promise<void> {
+      const { options, question, state } = poll
+
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("polls")
+         .withConverter(createCompatGenericConverter<LivestreamPoll>())
+         .doc(pollId)
+
+      const updateData: Pick<LivestreamPoll, "options" | "question" | "state"> =
+         {
+            ...(options && { options }),
+            ...(question && { question }),
+            ...(state && { state }),
+         }
+
+      return docRef.update(updateData)
+   }
+
+   async deletePoll(livestreamId: string, pollId: string): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("polls")
+         .doc(pollId)
+
+      return docRef.delete()
    }
 }
 
