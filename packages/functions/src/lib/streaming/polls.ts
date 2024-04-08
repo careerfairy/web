@@ -13,6 +13,7 @@ import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
 import { livestreamsRepo } from "../../api/repositories"
+import { v4 as uuid } from "uuid"
 
 const createPollSchema: yup.SchemaOf<CreateLivestreamPollRequest> =
    basePollSchema.concat(
@@ -46,7 +47,11 @@ export const createPoll = functions.region(config.region).https.onCall(
             question,
          })
 
-         await livestreamsRepo.createPoll(livestreamId, options, question)
+         await livestreamsRepo.createPoll(
+            livestreamId,
+            options.map((o) => ({ ...o, id: uuid() })),
+            question
+         )
 
          functions.logger.info("Poll created", {
             livestreamId,
@@ -56,8 +61,10 @@ export const createPoll = functions.region(config.region).https.onCall(
 )
 
 const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> =
-   createPollSchema.concat(
+   basePollSchema.concat(
       yup.object({
+         livestreamId: yup.string().required(),
+         livestreamToken: yup.string().nullable(),
          pollId: yup.string().required(),
          state: yup
             .mixed<LivestreamPoll["state"]>()
@@ -92,8 +99,13 @@ export const editPoll = functions.region(config.region).https.onCall(
             state,
          })
 
+         const optionsWithIds = options.map((o) => ({
+            ...o,
+            id: o.id || uuid(),
+         }))
+
          await livestreamsRepo.updatePoll(livestreamId, pollId, {
-            options,
+            options: optionsWithIds,
             question,
             state,
          })

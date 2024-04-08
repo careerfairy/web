@@ -12,7 +12,7 @@ export type CreateLivestreamPollRequest = {
    livestreamId: string
    livestreamToken: string | null
    question: string
-   options: LivestreamPoll["options"]
+   options: { text: string }[]
 }
 
 export type UpdateLivestreamPollRequest = {
@@ -20,7 +20,7 @@ export type UpdateLivestreamPollRequest = {
    livestreamToken: string | null
    pollId: string
    question: string
-   options: LivestreamPoll["options"]
+   options: { text: string; id?: string }[]
    state: LivestreamPoll["state"]
 }
 
