@@ -96,6 +96,8 @@ export const manualSparkReleaseEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
+      functions.logger.info("manualSparkReleaseEmail: v1.0")
+
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
          return
