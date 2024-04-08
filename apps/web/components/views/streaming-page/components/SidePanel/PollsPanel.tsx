@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useState } from "react"
 import { SidePanelView } from "./SidePanelView"
 import { PollIcon } from "components/views/common/icons"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { PollCreationButton } from "../polls/PollCreationButton"
+import { CreateOrEditPollForm } from "../polls/CreateOrEditPollForm"
 
 const styles = sxStyles({
    contentWrapperViewer: {
@@ -14,8 +15,10 @@ const styles = sxStyles({
       p: 1.5,
    },
 })
+
 export const PollsPanel = () => {
    const { isHost } = useStreamingContext()
+   const [isCreatePollOpen, setIsCreatePollOpen] = useState(false)
 
    return (
       <SidePanelView
@@ -26,7 +29,10 @@ export const PollsPanel = () => {
          title="Polls"
          icon={<PollIcon />}
       >
-         {isHost ? <PollCreationButton /> : null}
+         {isHost ? (
+            <PollCreationButton onClick={() => setIsCreatePollOpen(true)} />
+         ) : null}
+         {isCreatePollOpen && isHost ? <CreateOrEditPollForm /> : null}
          content
       </SidePanelView>
    )

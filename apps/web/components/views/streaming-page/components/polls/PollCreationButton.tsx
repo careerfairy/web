@@ -1,8 +1,12 @@
 import { Button } from "@mui/material"
 
-export const PollCreationButton = () => {
+type PollCreationButtonProps = {
+   onClick: () => void
+}
+
+export const PollCreationButton = ({ onClick }: PollCreationButtonProps) => {
    return (
-      <Button color="primary" variant="contained" fullWidth>
+      <Button color="primary" variant="contained" fullWidth onClick={onClick}>
          Create new poll
       </Button>
    )
