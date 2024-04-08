@@ -1,11 +1,10 @@
 import {
    LivestreamPoll,
-   // basePollSchema,
-   // getBasePollSchema,
+   basePollSchema,
 } from "@careerfairy/shared-lib/livestreams"
 import {
    Button,
-   Collapse,
+   FormHelperText,
    IconButton,
    InputAdornment,
    Stack,
@@ -19,7 +18,10 @@ import { sxStyles } from "types/commonTypes"
 import * as yup from "yup"
 import { useStreamingContext } from "../../context"
 import { PlusCircle, Trash } from "react-feather"
-import { TransitionGroup } from "react-transition-group"
+import { v4 as uuid } from "uuid"
+import { LoadingButton } from "@mui/lab"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { Box } from "@mui/material"
 
 const styles = sxStyles({
    form: {
@@ -40,25 +42,37 @@ const styles = sxStyles({
          height: 16,
       },
    },
+   errorMessage: {
+      textAlign: "center",
+   },
 })
 
 type Props = {
    poll?: LivestreamPoll | null
+   onSuccess?: () => void
+}
+
+type FormValues = yup.InferType<typeof basePollSchema>
+
+const generateOption = () => {
+   return {
+      text: "",
+      id: uuid(),
+   }
 }
 
 export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
-   ({ poll }, ref) => {
+   ({ poll, onSuccess }, ref) => {
       const { livestreamId, agoraUserToken } = useStreamingContext()
+      const { errorNotification } = useSnackbarNotifications()
       const isEdit = Boolean(poll)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const basePollSchema = {} as any
-      // const basePollSchema = getBasePollSchema(isEdit)
-
-      type FormValues = yup.InferType<typeof basePollSchema>
       const formMethods = useYupForm({
          schema: basePollSchema,
-         defaultValues: isEdit ? poll : { question: "", options: [] },
+         defaultValues: isEdit
+            ? poll
+            : { question: "", options: [generateOption(), generateOption()] },
+         mode: "onChange",
       })
 
       const { fields, append, remove } = useFieldArray({
@@ -66,78 +80,82 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
          name: "options",
       })
 
-      console.log(
-         "🚀 ~ file: CreateOrEditPollForm.tsx:76 ~ errors:",
-         formMethods.formState.errors
-      )
-
-      const onSubmit: SubmitHandler<FormValues> = (data) => {
+      const onSubmit: SubmitHandler<FormValues> = async (data) => {
          const { question, options } = data
-         console.log("🚀 ~ file: CreateOrEditPollForm.tsx:30 ~ poll:", data)
-         if (isEdit) {
-            return livestreamService.updatePoll({
-               livestreamId,
-               livestreamToken: agoraUserToken,
-               pollId: poll.id,
-               question,
-               options,
-               state: poll.state,
-            })
-         } else {
-            return livestreamService.createPoll({
-               livestreamId,
-               livestreamToken: agoraUserToken,
-               question,
-               options,
-            })
+         try {
+            if (isEdit) {
+               await livestreamService.updatePoll({
+                  livestreamId,
+                  livestreamToken: agoraUserToken,
+                  pollId: poll.id,
+                  question,
+                  options,
+                  state: poll.state,
+               })
+            } else {
+               await livestreamService.createPoll({
+                  livestreamId,
+                  livestreamToken: agoraUserToken,
+                  question,
+                  options,
+               })
+            }
+
+            onSuccess?.()
+
+            formMethods.reset(data)
+         } catch (error) {
+            errorNotification(
+               error,
+               `Failed to ${
+                  isEdit ? "update" : "create"
+               } poll, please try again.`
+            )
          }
       }
 
       return (
          <FormProvider {...formMethods}>
             <Stack
-               sx={styles.form}
+               ref={ref}
                spacing={3}
                component="form"
+               sx={styles.form}
+               onKeyDown={preventSubmitOnEnter}
                onSubmit={formMethods.handleSubmit(onSubmit)}
-               ref={ref}
             >
-               <ControlledBrandedTextField
-                  name="question"
-                  label="Question"
-                  required
-               />
-               <Stack spacing={1.5} component={TransitionGroup}>
+               <ControlledBrandedTextField name="question" label="Question" />
+               <Stack spacing={1.5}>
                   {fields.map((option, index) => (
-                     <Collapse key={option.id}>
-                        <ControlledBrandedTextField
-                           fullWidth
-                           name={`options.${index}.text`}
-                           InputProps={{
-                              endAdornment: (
-                                 <InputAdornment position="end">
-                                    <IconButton
-                                       sx={styles.removeOptionButton}
-                                       aria-label="toggle password visibility"
-                                       onClick={() => remove(index)}
-                                       edge="end"
-                                       size="small"
-                                    >
-                                       <Trash />
-                                    </IconButton>
-                                 </InputAdornment>
-                              ),
-                           }}
-                           label={`Option ${index + 1}`}
-                        />
-                     </Collapse>
+                     <ControlledBrandedTextField
+                        key={option.id}
+                        fullWidth
+                        name={`options.${index}.text`}
+                        InputProps={{
+                           endAdornment: (
+                              <InputAdornment position="end">
+                                 <IconButton
+                                    sx={styles.removeOptionButton}
+                                    aria-label="toggle password visibility"
+                                    onClick={() => remove(index)}
+                                    disabled={fields.length <= 2}
+                                    edge="end"
+                                    size="small"
+                                 >
+                                    <Trash />
+                                 </IconButton>
+                              </InputAdornment>
+                           ),
+                        }}
+                        label={`Option ${index + 1}`}
+                     />
                   ))}
                   {fields.length <= 4 && (
                      <Button
                         variant="outlined"
                         color="grey"
                         startIcon={<PlusCircle />}
-                        onClick={() => append({ text: "", id: undefined })}
+                        onClick={() => append(generateOption())}
                         sx={styles.addOptionButton}
                         disabled={fields.length >= 4}
                      >
@@ -145,13 +163,36 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                      </Button>
                   )}
                </Stack>
-               <Button variant="contained" color="primary" type="submit">
-                  {isEdit ? "Update Poll" : "Create Poll"}
-               </Button>
+               <Box width="100%" component="span">
+                  <LoadingButton
+                     fullWidth
+                     variant="contained"
+                     color="primary"
+                     type="submit"
+                     disabled={
+                        formMethods.formState.isSubmitting ||
+                        !formMethods.formState.isDirty
+                     }
+                     loading={formMethods.formState.isSubmitting}
+                  >
+                     {isEdit ? "Update Poll" : "Create Poll"}
+                  </LoadingButton>
+                  {Boolean(formMethods.formState.errors.options?.root) && (
+                     <FormHelperText sx={styles.errorMessage} error>
+                        {formMethods.formState.errors.options?.root.message}
+                     </FormHelperText>
+                  )}
+               </Box>
             </Stack>
          </FormProvider>
       )
    }
 )
+
+const preventSubmitOnEnter = (e: React.KeyboardEvent) => {
+   if (e.key === "Enter") {
+      e.preventDefault()
+   }
+}
 
 CreateOrEditPollForm.displayName = "CreateOrEditPollForm"
