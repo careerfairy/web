@@ -7,10 +7,11 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import React, { createContext, useCallback, useMemo } from "react"
 import SelectPlanView from "./SelectPlanView"
-import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
 import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
 import SuccessView from "./SuccessView"
 import { useStartPlanMutation } from "./useStartPlanMutation"
+import ConfirmPlanView from "./ConfirmPlanView"
+import dynamic from "next/dynamic"
 
 type Props = {
    open: boolean
@@ -20,8 +21,10 @@ type Props = {
 
 export const PlanConfirmationDialogKeys = {
    SelectPlan: "select-plan",
-   ConfirmSparksPlan: "confirm-sparks-plan",
    ConfirmSparksTrial: "confirm-sparks-trial",
+   ConfirmTier1Plan: "confirm-tier1-plan",
+   ConfirmTier2Plan: "confirm-tier2-plan",
+   ConfirmTier3Plan: "confirm-tier3-plan",
    Success: "success",
 } as const
 
@@ -31,12 +34,38 @@ const views = [
       Component: SelectPlanView,
    },
    {
-      key: PlanConfirmationDialogKeys.ConfirmSparksPlan,
-      Component: ConfirmSparksPlanView,
-   },
-   {
       key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
       Component: ConfirmSparksTrialView,
+   },
+   {
+      key: PlanConfirmationDialogKeys.ConfirmTier1Plan,
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/company-plans/plan-confirmation-dialog/ConfirmPlanView"
+            ),
+         { loading: () => <ConfirmPlanView plan={GroupPlanTypes.Tier1} /> }
+      ),
+   },
+   {
+      key: PlanConfirmationDialogKeys.ConfirmTier2Plan,
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/company-plans/plan-confirmation-dialog/ConfirmPlanView"
+            ),
+         { loading: () => <ConfirmPlanView plan={GroupPlanTypes.Tier2} /> }
+      ),
+   },
+   {
+      key: PlanConfirmationDialogKeys.ConfirmTier3Plan,
+      Component: dynamic(
+         () =>
+            import(
+               "components/views/admin/company-plans/plan-confirmation-dialog/ConfirmPlanView"
+            ),
+         { loading: () => <ConfirmPlanView plan={GroupPlanTypes.Tier3} /> }
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.Success,
@@ -122,7 +151,7 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
 
    if (groupToManage.plan.type === GroupPlanTypes.Trial) {
       return views.findIndex(
-         (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksPlan
+         (view) => view.key === PlanConfirmationDialogKeys.ConfirmTier1Plan
       )
    }
 
