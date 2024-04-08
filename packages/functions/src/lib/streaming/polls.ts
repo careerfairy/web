@@ -14,7 +14,7 @@ import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
 import { livestreamsRepo } from "../../api/repositories"
 
-const createOrEditPollSchema: yup.SchemaOf<CreateLivestreamPollRequest> =
+const createPollSchema: yup.SchemaOf<CreateLivestreamPollRequest> =
    basePollSchema.concat(
       yup.object({
          livestreamId: yup.string().required(),
@@ -28,7 +28,7 @@ type Context = {
 
 export const createPoll = functions.region(config.region).https.onCall(
    middlewares<Context, CreateLivestreamPollRequest>(
-      dataValidation(createOrEditPollSchema),
+      dataValidation(createPollSchema),
       livestreamExists(),
       async (requestData, context) => {
          const { livestreamId, livestreamToken, options, question } =
@@ -56,7 +56,7 @@ export const createPoll = functions.region(config.region).https.onCall(
 )
 
 const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> =
-   createOrEditPollSchema.concat(
+   createPollSchema.concat(
       yup.object({
          pollId: yup.string().required(),
          state: yup
