@@ -1,25 +1,35 @@
 import { Button, Stack } from "@mui/material"
-import { useState } from "react"
 import { CreateOrEditPollForm } from "./CreateOrEditPollForm"
 import { Collapse } from "@mui/material"
 
-export const PollCreationButton = () => {
-   const [isCreatePollOpen, setIsCreatePollOpen] = useState(true)
+type Props = {
+   isCreatePollFormOpen: boolean
+   setIsCreatePollFormOpen: (value: boolean) => void
+   hasPolls: boolean
+}
+export const PollCreationButton = ({
+   isCreatePollFormOpen,
+   setIsCreatePollFormOpen,
+   hasPolls,
+}: Props) => {
+   const shouldShowCreateForm = isCreatePollFormOpen || !hasPolls
 
    return (
-      <Stack spacing={3}>
-         <Collapse unmountOnExit in={isCreatePollOpen}>
-            <CreateOrEditPollForm />
-         </Collapse>
-         <Collapse unmountOnExit in={!isCreatePollOpen}>
+      <Stack spacing={1}>
+         <Collapse unmountOnExit in={!shouldShowCreateForm}>
             <Button
                color="primary"
                variant="contained"
                fullWidth
-               onClick={() => setIsCreatePollOpen(true)}
+               onClick={() => setIsCreatePollFormOpen(true)}
             >
                Create new poll
             </Button>
+         </Collapse>
+         <Collapse unmountOnExit in={shouldShowCreateForm}>
+            <CreateOrEditPollForm
+               onSuccess={() => setIsCreatePollFormOpen(false)}
+            />
          </Collapse>
       </Stack>
    )
