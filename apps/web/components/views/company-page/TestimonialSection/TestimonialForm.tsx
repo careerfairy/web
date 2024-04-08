@@ -113,11 +113,7 @@ const TestimonialForm = ({
                         disabled={isSubmitting}
                         onChange={handleChange}
                         error={Boolean(testimonialError)}
-                        value={
-                           testimonial.testimonial
-                              ? testimonial.testimonial
-                              : "<p></p>"
-                        } //to avoid label getting on top of editor when empty
+                        value={testimonial.testimonial || "<p></p>"} //to avoid label getting on top of editor when empty
                         variant="outlined"
                         sx={styles.multiline}
                         inputRef={testimonial.quillInputRef}

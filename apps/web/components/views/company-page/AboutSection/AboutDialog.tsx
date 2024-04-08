@@ -115,7 +115,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                            onChange={handleChange}
                            required
                            error={Boolean(errors.extraInfo)}
-                           value={values.extraInfo ? values.extraInfo : "<p></p>"} //to avoid label getting on top of editor when empty
+                           value={values.extraInfo || "<p></p>"} //to avoid label getting on top of editor when empty
                            variant="outlined"
                            className="multiLineInput"
                            inputRef={quillInputRef}
@@ -123,7 +123,6 @@ const AboutDialog = ({ handleClose }: Props) => {
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               inputComponent: CustomRichTextEditor as any,
                            }}
-
                         />
                         <Collapse
                            in={Boolean(errors.extraInfo)}
@@ -153,11 +152,13 @@ const AboutDialog = ({ handleClose }: Props) => {
    )
 }
 
-const schema = (quillRef) => (
+const schema = (quillRef) =>
    yup.object().shape({
       extraInfo: yup
          .string()
-         .transform(() => quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")) //ReactQuill appends a new line to text
+         .transform(() =>
+            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+         ) //ReactQuill appends a new line to text
          .required("Please describe your company")
          .min(
             GROUP_CONSTANTS.MIN_EXTRA_INFO_LENGTH,
@@ -184,6 +185,6 @@ const schema = (quillRef) => (
             name: yup.string(),
          })
          .required("Please add the company location"),
-}))
+   })
 
 export default AboutDialog
