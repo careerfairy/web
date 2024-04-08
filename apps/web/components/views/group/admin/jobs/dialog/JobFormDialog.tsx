@@ -4,7 +4,7 @@ import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import SteppedDialog, {
    useStepper,
 } from "../../../../stepped-dialog/SteppedDialog"
-import { FC, useCallback } from "react"
+import { FC, useCallback, useRef } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
 import * as Yup from "yup"
@@ -18,17 +18,13 @@ import {
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../../util/constants"
 import { Box, CircularProgress } from "@mui/material"
-import JobForm from "./JobForm"
 import { Timestamp } from "../../../../../../data/firebase/FirebaseInstance"
 import { customJobRepo } from "../../../../../../data/RepositoryInstances"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
-   wrapContainer: {
-      height: {
-         md: "100%",
-      },
-   },
    container: {
       display: "flex",
       flexDirection: "column",
@@ -60,6 +56,11 @@ const styles = sxStyles({
    },
 })
 
+const JobForm = dynamic(() => import("./JobForm"), {
+   ssr: false,
+   loading: () => <CircularProgress />,
+})
+
 type Props = {
    afterCreateCustomJob?: (job: PublicCustomJob) => void
    afterUpdateCustomJob?: (job: PublicCustomJob) => void
@@ -73,6 +74,7 @@ const JobFormDialog: FC<Props> = ({
    const { group } = useGroupFromState()
    const { handleClose } = useStepper()
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   const quillInputRef = useRef()
 
    const handleSubmit = useCallback(
       async (values: JobFormValues) => {
@@ -125,12 +127,11 @@ const JobFormDialog: FC<Props> = ({
                <Formik<JobFormValues>
                   initialValues={getInitialValues(job, group.groupId)}
                   onSubmit={handleSubmit}
-                  validationSchema={validationSchema}
+                  validationSchema={() => validationSchema(quillInputRef)}
                >
                   {({ dirty, handleSubmit, isSubmitting, isValid }) => (
                      <SteppedDialog.Container
                         containerSx={styles.content}
-                        sx={styles.wrapContainer}
                         withActions
                      >
                         <>
@@ -152,7 +153,7 @@ const JobFormDialog: FC<Props> = ({
                                  </SteppedDialog.Subtitle>
 
                                  <Box sx={styles.form}>
-                                    <JobForm />
+                                    <JobForm quillInputRef={quillInputRef} />
                                  </Box>
                               </>
                            </SteppedDialog.Content>
@@ -238,10 +239,23 @@ const getInitialValues = (
    }
 }
 
-const validationSchema = () => {
+const validationSchema = (quillRef) => {
    return Yup.object().shape({
       title: yup.string().required("Required"),
-      description: yup.string().required("Required"),
+      description: yup
+         .string()
+         .transform(() =>
+            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+         ) //ReactQuill appends a new line to text
+         .required("Required")
+         .min(
+            CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
+            `Must be at least ${CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH} characters`
+         )
+         .max(
+            CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH,
+            `Must be less than ${CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH} characters`
+         ),
       salary: yup.string(),
       noDateValidation: yup.boolean(),
       deadline: yup.date().when("noDateValidation", {

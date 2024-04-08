@@ -27,6 +27,8 @@ import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltip
 import TutorialContext from "../../../../../context/tutorials/TutorialContext"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useAuth } from "HOCs/AuthProvider"
+import SanitizedHTML from "components/util/SanitizedHTML"
+
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -290,7 +292,7 @@ const CallToActionSnackbar = forwardRef(
                         )}
                         <JobDetailSection
                            title="Job Description"
-                           body={message}
+                           body={<SanitizedHTML htmlString={message}/>}
                         />
                         {salary && (
                            <JobDetailSection title="Salary" body={salary} />
