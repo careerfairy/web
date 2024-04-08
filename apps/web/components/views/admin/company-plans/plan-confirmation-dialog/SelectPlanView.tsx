@@ -8,6 +8,8 @@ import {
    PlanConfirmationDialogKeys,
    usePlanConfirmationDialog,
 } from "./CompanyPlanConfirmationDialog"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    caption: {
@@ -79,10 +81,34 @@ const SelectPlanView = () => {
                   variant="outlined"
                   fullWidth
                   onClick={() =>
-                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksPlan)
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier1Plan)
                   }
                >
-                  Sparks plan
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier1].name} plan
+               </Button>
+               <Button
+                  startIcon={<BasicSparkIcon />}
+                  color="grey"
+                  sx={styles.btn}
+                  variant="outlined"
+                  fullWidth
+                  onClick={() =>
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier2Plan)
+                  }
+               >
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier2].name} plan
+               </Button>
+               <Button
+                  startIcon={<BasicSparkIcon />}
+                  color="grey"
+                  sx={styles.btn}
+                  variant="outlined"
+                  fullWidth
+                  onClick={() =>
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier3Plan)
+                  }
+               >
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier3].name} plan
                </Button>
             </Stack>
          </Stack>
