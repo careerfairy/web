@@ -10,6 +10,7 @@ import {
 } from "./CompanyPlanConfirmationDialog"
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
 
 const styles = sxStyles({
    caption: {
@@ -75,7 +76,7 @@ const SelectPlanView = () => {
                   Trial plan
                </Button>
                <Button
-                  startIcon={<BasicSparkIcon />}
+                  startIcon={<EssentialPlanIcon />}
                   color="grey"
                   sx={styles.btn}
                   variant="outlined"
