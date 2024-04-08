@@ -1,13 +1,26 @@
-import { Button } from "@mui/material"
+import { Button, Stack } from "@mui/material"
+import { useState } from "react"
+import { CreateOrEditPollForm } from "./CreateOrEditPollForm"
+import { Collapse } from "@mui/material"
 
-type PollCreationButtonProps = {
-   onClick: () => void
-}
+export const PollCreationButton = () => {
+   const [isCreatePollOpen, setIsCreatePollOpen] = useState(true)
 
-export const PollCreationButton = ({ onClick }: PollCreationButtonProps) => {
    return (
-      <Button color="primary" variant="contained" fullWidth onClick={onClick}>
-         Create new poll
-      </Button>
+      <Stack spacing={3}>
+         <Collapse unmountOnExit in={isCreatePollOpen}>
+            <CreateOrEditPollForm />
+         </Collapse>
+         <Collapse unmountOnExit in={!isCreatePollOpen}>
+            <Button
+               color="primary"
+               variant="contained"
+               fullWidth
+               onClick={() => setIsCreatePollOpen(true)}
+            >
+               Create new poll
+            </Button>
+         </Collapse>
+      </Stack>
    )
 }
