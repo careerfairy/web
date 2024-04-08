@@ -1,7 +1,12 @@
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { Chip, Stack } from "@mui/material"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { Chip, Stack, useTheme } from "@mui/material"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
 import BasicSparkIcon from "components/views/common/icons/BasicSparkIcon"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -16,7 +21,7 @@ const styles = sxStyles({
          color: "inherit !important",
       },
       "& .MuiChip-label": {
-         pl: 2,
+         pl: 1,
       },
    },
    expiredChip: {
@@ -33,6 +38,12 @@ const styles = sxStyles({
       color: "primary.600",
       borderColor: "primary.600",
       bgcolor: "#F1FCF9",
+   },
+   paidChips: {
+      color: (theme) => theme.brand.purple[600],
+      fontWeight: 400,
+      borderColor: "#D1C8F9",
+      bgcolor: "#F0EDFD",
    },
    onSparkChip: {
       color: "#6749EA",
@@ -66,22 +77,7 @@ const StatusChips = ({ presenter }: Props) => {
 
       return (
          <Wrapper>
-            {presenter.plan.type === GroupPlanTypes.Trial ? (
-               <Chip
-                  variant="outlined"
-                  sx={[styles.chip, styles.onTrialChip]}
-                  icon={<Clock />}
-                  label="On trial"
-               />
-            ) : (
-               // Else, it's a sparks plan
-               <Chip
-                  variant="outlined"
-                  sx={[styles.chip, styles.onSparkChip]}
-                  icon={<BasicSparkIcon />}
-                  label="Sparks plan"
-               />
-            )}
+            <PlanChip plan={presenter.plan.type} />
             <Chip
                variant="filled"
                sx={[styles.chip, styles.neutralChip]}
@@ -101,6 +97,42 @@ const StatusChips = ({ presenter }: Props) => {
             label="No Sparks plan"
          />
       </Wrapper>
+   )
+}
+
+type PlanChipProps = {
+   plan: GroupPlanType
+}
+
+const PlanChip = ({ plan }: PlanChipProps) => {
+   const theme = useTheme()
+
+   const isTrial = plan === GroupPlanTypes.Trial
+
+   const paidColor = theme.brand.purple[600]
+   const trialColor = theme.palette.primary[600]
+
+   let icon = <TrialPlanIcon color={trialColor} />
+
+   if (plan == GroupPlanTypes.Tier1)
+      icon = <EssentialPlanIcon color={paidColor} />
+
+   if (plan == GroupPlanTypes.Tier2)
+      icon = <AdvancedPlanIcon color={paidColor} />
+
+   if (plan == GroupPlanTypes.Tier3)
+      icon = <PremiumPlanIcon color={paidColor} />
+
+   const label = isTrial
+      ? "On trial"
+      : PLAN_CONSTANTS[plan].name.concat(" plan")
+   return (
+      <Chip
+         variant="outlined"
+         sx={[styles.chip, isTrial ? styles.onTrialChip : styles.paidChips]}
+         icon={icon}
+         label={label}
+      />
    )
 }
 

@@ -10,6 +10,10 @@ import SelectPlanView from "./SelectPlanView"
 import SuccessView from "./SuccessView"
 import { useStartPlanMutation } from "./useStartPlanMutation"
 import ConfirmPlanView from "./ConfirmPlanView"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 
 type Props = {
    open: boolean
@@ -33,19 +37,35 @@ const views = [
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
-      Component: () => ConfirmPlanView({ plan: GroupPlanTypes.Trial }),
+      Component: () =>
+         ConfirmPlanView({
+            plan: GroupPlanTypes.Trial,
+            icon: <TrialPlanIcon color="#2ABAA5" />,
+         }),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier1Plan,
-      Component: () => ConfirmPlanView({ plan: GroupPlanTypes.Tier1 }),
+      Component: () =>
+         ConfirmPlanView({
+            plan: GroupPlanTypes.Tier1,
+            icon: <EssentialPlanIcon color="#2ABAA5" />,
+         }),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier2Plan,
-      Component: () => ConfirmPlanView({ plan: GroupPlanTypes.Tier2 }),
+      Component: () =>
+         ConfirmPlanView({
+            plan: GroupPlanTypes.Tier2,
+            icon: <AdvancedPlanIcon color="#2ABAA5" />,
+         }),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier3Plan,
-      Component: () => ConfirmPlanView({ plan: GroupPlanTypes.Tier3 }),
+      Component: () =>
+         ConfirmPlanView({
+            plan: GroupPlanTypes.Tier3,
+            icon: <PremiumPlanIcon color="#2ABAA5" />,
+         }),
    },
    {
       key: PlanConfirmationDialogKeys.Success,
@@ -131,7 +151,7 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
 
    if (groupToManage.plan.type === GroupPlanTypes.Trial) {
       return views.findIndex(
-         (view) => view.key === PlanConfirmationDialogKeys.ConfirmTier1Plan
+         (view) => view.key === PlanConfirmationDialogKeys.SelectPlan
       )
    }
 
