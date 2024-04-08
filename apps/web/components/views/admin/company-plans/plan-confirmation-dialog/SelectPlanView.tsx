@@ -1,8 +1,6 @@
 import { Button, Stack, Typography } from "@mui/material"
 import DialogBody from "components/views/admin/company-plans/plan-confirmation-dialog/DialogBody"
-import BasicSparkIcon from "components/views/common/icons/BasicSparkIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import {
    PlanConfirmationDialogKeys,
@@ -11,6 +9,9 @@ import {
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 
 const styles = sxStyles({
    caption: {
@@ -64,7 +65,7 @@ const SelectPlanView = () => {
             </Stack>
             <Stack spacing={1.5}>
                <Button
-                  startIcon={<Clock />}
+                  startIcon={<TrialPlanIcon />}
                   sx={styles.btn}
                   variant="outlined"
                   color="grey"
@@ -88,7 +89,7 @@ const SelectPlanView = () => {
                   {PLAN_CONSTANTS[GroupPlanTypes.Tier1].name} plan
                </Button>
                <Button
-                  startIcon={<BasicSparkIcon />}
+                  startIcon={<AdvancedPlanIcon />}
                   color="grey"
                   sx={styles.btn}
                   variant="outlined"
@@ -100,7 +101,7 @@ const SelectPlanView = () => {
                   {PLAN_CONSTANTS[GroupPlanTypes.Tier2].name} plan
                </Button>
                <Button
-                  startIcon={<BasicSparkIcon />}
+                  startIcon={<PremiumPlanIcon />}
                   color="grey"
                   sx={styles.btn}
                   variant="outlined"

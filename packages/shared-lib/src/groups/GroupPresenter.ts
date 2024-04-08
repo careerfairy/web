@@ -387,6 +387,18 @@ export class GroupPresenter {
       return currentTime > this.getStartedAt()
    }
 
+   /**
+    * Determines whether the present group has a non trial plan.
+    * @returns boolean if the group has plan other than GroupPlanTypes.Trial
+    */
+   hasNonTrialPlan() {
+      return (
+         this.plan?.type == GroupPlanTypes.Tier1 ||
+         this.plan?.type == GroupPlanTypes.Tier2 ||
+         this.plan?.type == GroupPlanTypes.Tier3
+      )
+   }
+
    getExpiresAt() {
       return this.plan?.expiresAt?.getTime() || 0
    }

@@ -1,11 +1,12 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import DialogBody from "components/views/admin/company-plans/plan-confirmation-dialog/DialogBody"
-import { Clock } from "react-feather"
 import { usePlanConfirmationDialog } from "./CompanyPlanConfirmationDialog"
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { ReactNode } from "react"
 
 type ConfirmPlanProps = {
    plan: GroupPlanType
+   icon: ReactNode
 }
 
 const planTitlesDictionary: Record<GroupPlanType, string> = {
@@ -15,7 +16,7 @@ const planTitlesDictionary: Record<GroupPlanType, string> = {
    tier3: PLAN_CONSTANTS[GroupPlanTypes.Tier3].name.concat(" plan"),
 }
 
-const ConfirmPlanView = ({ plan }: ConfirmPlanProps) => {
+const ConfirmPlanView = ({ plan, icon }: ConfirmPlanProps) => {
    const { handleClose, isMutating, groupToManage, startPlanAndGoToSuccess } =
       usePlanConfirmationDialog()
 
@@ -40,7 +41,7 @@ const ConfirmPlanView = ({ plan }: ConfirmPlanProps) => {
                </DialogBody.ActionButton>
             </>
          }
-         icon={<Clock />}
+         icon={icon}
          title={planTitle}
          content={planContentDescription}
       />

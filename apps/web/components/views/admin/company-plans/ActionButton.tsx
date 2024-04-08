@@ -17,7 +17,7 @@ type Props = {
 }
 
 const ActionButton = ({ presenter, onClick }: Props) => {
-   const isTier1 = presenter.plan?.type === GroupPlanTypes.Tier1
+   const isNonTrialPlan = presenter.hasNonTrialPlan()
    const isTrial = presenter.plan?.type === GroupPlanTypes.Trial
 
    if (presenter.hasPlan()) {
@@ -29,7 +29,7 @@ const ActionButton = ({ presenter, onClick }: Props) => {
          )
       }
 
-      if (isTier1) {
+      if (isNonTrialPlan) {
          return (
             <Button
                sx={styles.sparksMemberBtn}
