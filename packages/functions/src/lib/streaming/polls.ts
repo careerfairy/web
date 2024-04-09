@@ -59,7 +59,7 @@ export const createPoll = functions.region(config.region).https.onCall(
    )
 )
 
-const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> = yup.object({
+const updatePollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> = yup.object({
    livestreamId: yup.string().required(),
    livestreamToken: yup.string().nullable(),
    pollId: yup.string().required(),
@@ -68,9 +68,9 @@ const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> = yup.object({
    question: basePollShape.question.notRequired(),
 })
 
-export const editPoll = functions.region(config.region).https.onCall(
+export const updatePoll = functions.region(config.region).https.onCall(
    middlewares<Context, UpdateLivestreamPollRequest>(
-      dataValidation(editPollSchema),
+      dataValidation(updatePollSchema),
       livestreamExists(),
       async (requestData, context) => {
          const {
