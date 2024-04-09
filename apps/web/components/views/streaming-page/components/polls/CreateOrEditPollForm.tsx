@@ -47,17 +47,11 @@ const styles = sxStyles({
    },
 })
 
-type EditPollFormProps = {
-   poll: LivestreamPoll
+type Props = {
    onSuccess?: () => void
    onCancel?: () => void
+   poll?: LivestreamPoll
 }
-
-type CreatePollFormProps = {
-   onSuccess?: () => void
-}
-
-type Props = EditPollFormProps | CreatePollFormProps
 
 export const basePollSchema = yup.object({
    question: basePollShape.question.required(),
@@ -81,19 +75,15 @@ const getInitialValues = (): FormValues => {
 }
 
 export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
-   (props, ref) => {
-      const isEdit = "poll" in props && props.poll !== undefined
-
-      const { onSuccess } = props
-
-      const onCancel = isEdit ? props.onCancel : undefined
+   ({ onCancel, onSuccess, poll }, ref) => {
+      const isEdit = Boolean(poll)
 
       const { livestreamId, agoraUserToken } = useStreamingContext()
       const { errorNotification } = useSnackbarNotifications()
 
       const formMethods = useYupForm({
          schema: basePollSchema,
-         defaultValues: isEdit ? props.poll : getInitialValues(),
+         defaultValues: isEdit ? poll : getInitialValues(),
          mode: "onChange",
       })
 
@@ -109,10 +99,10 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                await livestreamService.updatePoll({
                   livestreamId,
                   livestreamToken: agoraUserToken,
-                  pollId: props.poll.id,
+                  pollId: poll.id,
                   question,
                   options,
-                  state: props.poll.state,
+                  state: poll.state,
                })
             } else {
                await livestreamService.createPoll({
@@ -146,13 +136,19 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                onKeyDown={preventSubmitOnEnter}
                onSubmit={formMethods.handleSubmit(onSubmit)}
             >
-               <ControlledBrandedTextField name="question" label="Question" />
+               <ControlledBrandedTextField
+                  multiline
+                  maxRows={4}
+                  name="question"
+                  label="Question"
+               />
                <Stack spacing={1.5}>
                   {fields.map((option, index) => (
                      <ControlledBrandedTextField
                         key={option.id}
                         fullWidth
                         name={`options.${index}.text`}
+                        onKeyDown={preventSubmitOnEnter}
                         InputProps={{
                            endAdornment: (
                               <InputAdornment position="end">
@@ -212,7 +208,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         </FormHelperText>
                      )}
                   </Box>
-                  {Boolean(isEdit) && (
+                  {Boolean(onCancel) && (
                      <Button
                         variant="text"
                         color="grey"

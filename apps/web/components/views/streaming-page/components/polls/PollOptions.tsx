@@ -1,0 +1,115 @@
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
+import { Skeleton, Typography } from "@mui/material"
+import { Box, Stack } from "@mui/material"
+import { PollOptionResult } from "./PollOptionResult"
+import { useCallback } from "react"
+import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
+import { useStreamingContext } from "../../context"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      border: "1px solid #F8F8F8",
+      borderRadius: "11px",
+      p: 2,
+   },
+   coloredEdge: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: 5,
+      height: "100%",
+      backgroundColor: "grey.500",
+   },
+   skeletonProgress: {
+      borderRadius: "6px",
+   },
+})
+
+type PollOptionsProps = {
+   poll: LivestreamPoll
+}
+
+const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
+
+export const PollOptions = ({ poll }: PollOptionsProps) => {
+   return (
+      <SuspenseWithBoundary
+         fallback={
+            <Stack spacing={1}>
+               {Array.from({ length: poll.options.length || 3 }, (_, index) => (
+                  <PollOptionResultSkeleton key={index} />
+               ))}
+            </Stack>
+         }
+      >
+         <Content poll={poll} />
+      </SuspenseWithBoundary>
+   )
+}
+
+const Content = ({ poll }: PollOptionsProps) => {
+   const { livestreamId } = useStreamingContext()
+
+   const { data: voters } = useLivestreamPollVoters(livestreamId, poll.id)
+
+   const calculateOptionStats = useCallback(
+      (optionId: string) => {
+         const votersForOption = voters.filter(
+            (voter) => voter.optionId === optionId
+         )
+         const percentage =
+            voters.length > 0
+               ? Math.round((votersForOption.length / voters.length) * 100)
+               : 0
+
+         return {
+            percentage,
+            votes: votersForOption.length,
+         }
+      },
+      [voters]
+   )
+
+   return (
+      <Stack spacing={1}>
+         {poll.options.map((option, index) => (
+            <PollOptionResult
+               key={option.id}
+               option={option}
+               color={POLL_COLORS[index]}
+               stats={calculateOptionStats(option.id)}
+            />
+         ))}
+      </Stack>
+   )
+}
+
+export const PollOptionResultSkeleton = () => {
+   return (
+      <Box sx={styles.root}>
+         <Stack spacing={1}>
+            <Stack direction="row" justifyContent="space-between">
+               <Typography variant="medium">
+                  <Skeleton variant="text" width={30} />
+               </Typography>
+               <Typography variant="medium">
+                  <Skeleton variant="text" width={20} />
+               </Typography>
+            </Stack>
+            <Skeleton
+               sx={styles.skeletonProgress}
+               variant="rounded"
+               animation="wave"
+               width={`${Math.random() * 100}%`}
+               height={5}
+            />
+            <Typography variant="xsmall">
+               <Skeleton variant="text" width={100} />
+            </Typography>
+         </Stack>
+         <Box sx={styles.coloredEdge} />
+      </Box>
+   )
+}

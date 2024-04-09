@@ -1,4 +1,4 @@
-import { Button, Stack } from "@mui/material"
+import { Button, Collapse, Stack } from "@mui/material"
 import { CreateOrEditPollForm } from "./CreateOrEditPollForm"
 
 type Props = {
@@ -13,13 +13,23 @@ export const PollCreationButton = ({
 }: Props) => {
    const shouldShowCreateForm = isCreatePollFormOpen || !hasPolls
 
+   const handleCloseForm = () => {
+      setIsCreatePollFormOpen(false)
+   }
+
+   if (!hasPolls) {
+      return <CreateOrEditPollForm onSuccess={handleCloseForm} />
+   }
+
    return (
       <Stack spacing={1}>
-         {shouldShowCreateForm ? (
+         <Collapse in={isCreatePollFormOpen}>
             <CreateOrEditPollForm
-               onSuccess={() => setIsCreatePollFormOpen(false)}
+               onSuccess={handleCloseForm}
+               onCancel={handleCloseForm}
             />
-         ) : (
+         </Collapse>
+         {shouldShowCreateForm ? null : (
             <Button
                color="primary"
                variant="contained"
