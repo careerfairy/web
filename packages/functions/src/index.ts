@@ -57,6 +57,7 @@ import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
+import endOfSparksTrials = require("./sparksTrials")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -106,6 +107,9 @@ exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
+exports.manualEndOfSparksTrialEmails =
+   endOfSparksTrials.manualEndOfSparksTrialEmails
+exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
 
 // Livestreams
