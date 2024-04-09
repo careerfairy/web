@@ -1300,22 +1300,24 @@ export class FirebaseLivestreamRepository
 
       const currentPollsSnaps = await currentPollsRef.get()
 
-      const batch = this.firestore.batch()
+      if (!currentPollsSnaps.empty) {
+         const batch = this.firestore.batch()
 
-      currentPollsSnaps.docs.forEach((doc) => {
-         const updateData: Pick<LivestreamPoll, "state"> = {
-            state: "closed",
-         }
-         batch.update(doc.ref, updateData)
-      })
+         currentPollsSnaps.docs.forEach((doc) => {
+            const updateData: Pick<LivestreamPoll, "state"> = {
+               state: "closed",
+            }
+            batch.update(doc.ref, updateData)
+         })
+
+         await batch.commit()
+      }
 
       const updateData: Pick<LivestreamPoll, "state"> = {
          state: "current",
       }
 
-      batch.update(targetPollRef, updateData)
-
-      return batch.commit()
+      return targetPollRef.update(updateData)
    }
 
    async deletePoll(livestreamId: string, pollId: string): Promise<void> {

@@ -122,7 +122,7 @@ const markPollAsCurrentSchema: yup.SchemaOf<MarkLivestreamPollAsCurrentRequest> 
    yup.object({
       pollId: yup.string().required(),
       livestreamId: yup.string().required(),
-      livestreamToken: yup.string(),
+      livestreamToken: yup.string().nullable(),
    })
 
 export const markPollAsCurrent = functions.region(config.region).https.onCall(
@@ -156,7 +156,7 @@ export const markPollAsCurrent = functions.region(config.region).https.onCall(
 const deletePollSchema: yup.SchemaOf<DeleteLivestreamPollRequest> = yup.object({
    pollId: yup.string().required(),
    livestreamId: yup.string().required(),
-   livestreamToken: yup.string(),
+   livestreamToken: yup.string().nullable(),
 })
 
 export const deletePoll = functions.region(config.region).https.onCall(
