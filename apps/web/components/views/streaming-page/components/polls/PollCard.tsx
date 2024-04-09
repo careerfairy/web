@@ -9,14 +9,13 @@ import {
    Typography,
 } from "@mui/material"
 import { useStopLivestreamPoll } from "components/custom-hook/streaming/useStopLivestreamPoll"
-import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
 import dynamic from "next/dynamic"
-import React, { useCallback, useState } from "react"
+import React, { useState } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
-import { PollOptionResult } from "./PollOptionResult"
 import { useStartLivestreamPoll } from "components/custom-hook/streaming/useStartLivestreamPoll"
+import { PollOptions } from "./PollOptions"
 
 const CreateOrEditPollForm = dynamic(() =>
    import("./CreateOrEditPollForm").then((mod) => mod.CreateOrEditPollForm)
@@ -59,37 +58,16 @@ const POLL_STATUS_TEXT = {
    upcoming: "New",
 } satisfies Record<LivestreamPoll["state"], string>
 
-const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
-
 export const PollCard = React.forwardRef<HTMLDivElement, Props>(
    ({ poll }, ref) => {
       const [showResults, setShowResults] = useState(poll.state !== "closed")
       const [isEditing, setIsEditing] = useState(false)
 
-      const { livestreamId, isHost } = useStreamingContext()
-      const { data: voters } = useLivestreamPollVoters(livestreamId, poll.id)
+      const { isHost } = useStreamingContext()
 
       const handleCloseForm = () => {
          setIsEditing(false)
       }
-
-      const calculateOptionStats = useCallback(
-         (optionId: string) => {
-            const votersForOption = voters.filter(
-               (voter) => voter.optionId === optionId
-            )
-            const percentage =
-               voters.length > 0
-                  ? Math.round((votersForOption.length / voters.length) * 100)
-                  : 0
-
-            return {
-               percentage,
-               votes: votersForOption.length,
-            }
-         },
-         [voters]
-      )
 
       const showActionButton =
          poll.state === "upcoming" || poll.state === "current"
@@ -120,17 +98,8 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
             <Box pt={1.25} />
             <Typography sx={styles.question}>{poll.question}</Typography>
             <Box pt={1.5} />
-            <Collapse in={showResults}>
-               <Stack spacing={1}>
-                  {poll.options.map((option, index) => (
-                     <PollOptionResult
-                        key={option.id}
-                        option={option}
-                        color={POLL_COLORS[index]}
-                        stats={calculateOptionStats(option.id)}
-                     />
-                  ))}
-               </Stack>
+            <Collapse unmountOnExit in={showResults}>
+               <PollOptions poll={poll} />
                {Boolean(showActionButton) && <PollActionButton poll={poll} />}
             </Collapse>
             <CollapseButton
