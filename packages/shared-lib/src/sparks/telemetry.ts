@@ -33,6 +33,10 @@ type CommonClientFields = {
     * The ID of the level of study the user is currently studying.
     */
    levelOfStudy: string | null
+   /**
+    * The source of the Spark interaction (e.g., livestream_registration_flow, portal, company_page).
+    */
+   interactionSource: SparkInteractionSourceType | null
 }
 
 /**
@@ -137,3 +141,12 @@ export const SparkEventActions = {
 
 export type SparkEventActionType =
    (typeof SparkEventActions)[keyof typeof SparkEventActions]
+
+export const SparkInteractionSources = {
+   Portal: "portal",
+   Livestream_Registration_Flow: "livestream_registration_flow",
+   Company_Page: "company_page",
+} as const
+
+export type SparkInteractionSourceType =
+   (typeof SparkInteractionSources)[keyof typeof SparkInteractionSources]
