@@ -58,7 +58,7 @@ const styles = sxStyles({
    },
 })
 
-type MenuOption = {
+export type MenuOption = {
    label: string
    icon?: ReactElement
    handleClick: (args: unknown) => void | Promise<void>
@@ -172,8 +172,8 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                   <Box sx={styles.icon}>{option.icon}</Box>
                   <Typography variant="xsmall">{option.label}</Typography>
                   {Boolean(options.length - 1 !== index) && <Divider />}
+                  {Boolean(option.loading) && <Loader />}
                </MenuItem>
-               {Boolean(option.loading) && <Loader />}
             </Box>
          ))}
       </BrandedMenu>

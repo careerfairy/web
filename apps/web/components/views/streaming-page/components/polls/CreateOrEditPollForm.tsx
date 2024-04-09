@@ -1,6 +1,6 @@
 import {
    LivestreamPoll,
-   basePollSchema,
+   basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
 import {
    Button,
@@ -52,12 +52,24 @@ type Props = {
    onSuccess?: () => void
 }
 
+export const basePollSchema = yup.object({
+   question: basePollShape.question.required(),
+   options: basePollShape.options.required(),
+})
+
 type FormValues = yup.InferType<typeof basePollSchema>
 
 const generateOption = () => {
    return {
       text: "",
       id: uuid(),
+   }
+}
+
+const getInitialValues = (): FormValues => {
+   return {
+      question: "",
+      options: [generateOption(), generateOption()],
    }
 }
 
@@ -69,9 +81,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
 
       const formMethods = useYupForm({
          schema: basePollSchema,
-         defaultValues: isEdit
-            ? poll
-            : { question: "", options: [generateOption(), generateOption()] },
+         defaultValues: isEdit ? poll : getInitialValues(),
          mode: "onChange",
       })
 
@@ -101,9 +111,9 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                })
             }
 
-            onSuccess?.()
+            formMethods.reset(getInitialValues())
 
-            formMethods.reset(data)
+            onSuccess?.()
          } catch (error) {
             errorNotification(
                error,
@@ -138,7 +148,10 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                                     sx={styles.removeOptionButton}
                                     aria-label="toggle password visibility"
                                     onClick={() => remove(index)}
-                                    disabled={fields.length <= 2}
+                                    disabled={
+                                       fields.length <= 2 ||
+                                       formMethods.formState.isSubmitting
+                                    }
                                     edge="end"
                                     size="small"
                                  >
@@ -157,7 +170,10 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         startIcon={<PlusCircle />}
                         onClick={() => append(generateOption())}
                         sx={styles.addOptionButton}
-                        disabled={fields.length >= 4}
+                        disabled={
+                           fields.length >= 4 ||
+                           formMethods.formState.isSubmitting
+                        }
                      >
                         Add an option
                      </Button>
