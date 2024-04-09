@@ -24,6 +24,11 @@ const styles = sxStyles({
          pl: 1,
       },
    },
+   chipNoSparks: {
+      "& .MuiChip-label": {
+         pl: 2,
+      },
+   },
    daysLeftIcon: {
       mb: "1px",
    },
@@ -102,7 +107,7 @@ const StatusChips = ({ presenter }: Props) => {
       <Wrapper>
          <Chip
             variant="filled"
-            sx={[styles.chip, styles.neutralChip]}
+            sx={[styles.chip, styles.neutralChip, styles.chipNoSparks]}
             icon={<BasicSparkIcon />}
             label="No Sparks plan"
          />
