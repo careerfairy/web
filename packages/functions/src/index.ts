@@ -110,6 +110,8 @@ exports.manualOnboardingNewsletter =
 exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
+exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
+
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate

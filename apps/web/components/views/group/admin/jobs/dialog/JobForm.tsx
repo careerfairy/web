@@ -11,8 +11,9 @@ import BrandedAutocomplete from "../../../../common/inputs/BrandedAutocomplete"
 import { datePickerDefaultStyles } from "../../../../calendar/utils"
 import GBLocale from "date-fns/locale/en-GB"
 import DateUtil from "../../../../../../util/DateUtil"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 
-const JobForm = () => {
+const JobForm = ({ quillInputRef }) => {
    const { values, setFieldValue, errors, touched } =
       useFormikContext<JobFormValues>()
 
@@ -65,7 +66,11 @@ const JobForm = () => {
                placeholder="Tell your viewers more on what to expect about this job"
                fullWidth
                multiline
-               rows={7}
+               inputRef={quillInputRef}
+               InputProps={{
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  inputComponent: CustomRichTextEditor as any,
+               }}
             />
          </Grid>
 

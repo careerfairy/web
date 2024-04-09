@@ -1,5 +1,6 @@
 import {
    Box,
+   CircularProgress,
    Divider,
    Grid,
    IconButton,
@@ -15,10 +16,10 @@ import Link from "../../../common/Link"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import useMenuState from "../../../../custom-hook/useMenuState"
 import BrandedMenu from "../../../common/inputs/BrandedMenu"
-import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import EditIcon from "@mui/icons-material/Edit"
 import { Trash2 as DeleteIcon } from "react-feather"
 import CollapsibleText from "../../../common/inputs/CollapsibleText"
+import dynamic from "next/dynamic"
 
 const styles = sxStyles({
    wrapper: {
@@ -59,6 +60,14 @@ const styles = sxStyles({
       },
    },
 })
+
+const CustomJobCreateOrEditFrom = dynamic(
+   () => import("./CustomJobCreateOrEditFrom"),
+   {
+      ssr: false,
+      loading: () => <CircularProgress />,
+   }
+)
 
 type Props = {
    job: PublicCustomJob

@@ -22,23 +22,39 @@ import { datePickerDefaultStyles } from "../../../calendar/utils"
 import GBLocale from "date-fns/locale/en-GB"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { v4 as uuidv4 } from "uuid"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { Timestamp } from "../../../../../data/firebase/FirebaseInstance"
+import CustomRichTextEditor from "components/util/CustomRichTextEditor"
+import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
 
-const schema = yup.object().shape({
-   title: yup.string().required("Required"),
-   description: yup.string().required("Required"),
-   salary: yup.string(),
-   deadline: yup
-      .date()
-      .nullable()
-      .min(new Date(), `The date must be in the future`),
-   postingUrl: yup
-      .string()
-      .matches(URL_REGEX, { message: "Must be a valid url" })
-      .required("Required"),
-   jobType: yup.string().required("Required"),
-})
+const schema = (quillRef) =>
+   yup.object().shape({
+      title: yup.string().required("Required"),
+      description: yup
+         .string()
+         .transform(() =>
+            quillRef?.current?.unprivilegedEditor.getText().replace(/\n$/, "")
+         ) //ReactQuill appends a new line to text
+         .required("Required")
+         .min(
+            CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH,
+            `Must be at least ${CUSTOM_JOB_CONSTANTS.MIN_DESCRIPTION_LENGTH} characters`
+         )
+         .max(
+            CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH,
+            `Must be less than ${CUSTOM_JOB_CONSTANTS.MAX_DESCRIPTION_LENGTH} characters`
+         ),
+      salary: yup.string(),
+      deadline: yup
+         .date()
+         .nullable()
+         .min(new Date(), `The date must be in the future`),
+      postingUrl: yup
+         .string()
+         .matches(URL_REGEX, { message: "Must be a valid url" })
+         .required("Required"),
+      jobType: yup.string().required("Required"),
+   })
 
 /**
  * Ensure that the 'jobType' field is initialized as an empty string at the start of any form.
@@ -90,6 +106,7 @@ const CustomJobCreateOrEditFrom = ({
    handleCancelCreateNewJob,
    job,
 }: Props) => {
+   const quillInputRef = useRef()
    const initialValues: CustomJobObj = useMemo(() => {
       // If the 'job' field is received, it indicates the intention to edit an existing job.
       if (job) {
@@ -115,7 +132,7 @@ const CustomJobCreateOrEditFrom = ({
       <Box sx={styles.wrapper}>
          <Formik
             initialValues={initialValues}
-            validationSchema={schema}
+            validationSchema={() => schema(quillInputRef)}
             onSubmit={async (values, { setSubmitting, resetForm }) => {
                const formatValues: PublicCustomJob = {
                   ...values,
@@ -255,14 +272,19 @@ const CustomJobCreateOrEditFrom = ({
                            label="Job Description (Required)"
                            maxRows={10}
                            inputProps={{ maxLength: 5000 }}
-                           value={values.description}
+                           value={values.description || "<p></p>"} //to avoid label getting on top of editor when empty}
                            error={Boolean(
                               errors.description && touched.description
                            )}
-                           onChange={({ currentTarget: { value, name } }) =>
+                           onChange={({ target: { value, name } }) =>
                               setFieldValue(name, value)
                            }
                            sx={{ minHeight: "95px", textAlign: "start" }}
+                           inputRef={quillInputRef}
+                           InputProps={{
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              inputComponent: CustomRichTextEditor as any,
+                           }}
                         />
                         <Collapse
                            in={Boolean(
