@@ -19,9 +19,9 @@ export type UpdateLivestreamPollRequest = {
    livestreamId: string
    livestreamToken: string | null
    pollId: string
-   question: string
-   options: { text: string; id?: string }[]
-   state: LivestreamPoll["state"]
+   question?: string
+   options?: { text: string; id?: string }[]
+   state?: LivestreamPoll["state"]
 }
 
 export type DeleteLivestreamPollRequest = {
