@@ -3,9 +3,8 @@ import {
    CreateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    LivestreamEvent,
-   LivestreamPoll,
    UpdateLivestreamPollRequest,
-   basePollSchema,
+   basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
 import * as yup from "yup"
 import config from "../../config"
@@ -15,13 +14,12 @@ import { validateLivestreamToken } from "../validations"
 import { livestreamsRepo } from "../../api/repositories"
 import { v4 as uuid } from "uuid"
 
-const createPollSchema: yup.SchemaOf<CreateLivestreamPollRequest> =
-   basePollSchema.concat(
-      yup.object({
-         livestreamId: yup.string().required(),
-         livestreamToken: yup.string().nullable(),
-      })
-   )
+const createPollSchema: yup.SchemaOf<CreateLivestreamPollRequest> = yup.object({
+   options: basePollShape.options.required(),
+   question: basePollShape.question.required(),
+   livestreamId: yup.string().required(),
+   livestreamToken: yup.string().nullable(),
+})
 
 type Context = {
    livestream: LivestreamEvent
@@ -60,17 +58,14 @@ export const createPoll = functions.region(config.region).https.onCall(
    )
 )
 
-const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> =
-   basePollSchema.concat(
-      yup.object({
-         livestreamId: yup.string().required(),
-         livestreamToken: yup.string().nullable(),
-         pollId: yup.string().required(),
-         state: yup
-            .mixed<LivestreamPoll["state"]>()
-            .oneOf(["closed", "current", "upcoming"]),
-      })
-   )
+const editPollSchema: yup.SchemaOf<UpdateLivestreamPollRequest> = yup.object({
+   livestreamId: yup.string().required(),
+   livestreamToken: yup.string().nullable(),
+   pollId: yup.string().required(),
+   state: basePollShape.state.notRequired(),
+   options: basePollShape.options.notRequired(),
+   question: basePollShape.question.notRequired(),
+})
 
 export const editPoll = functions.region(config.region).https.onCall(
    middlewares<Context, UpdateLivestreamPollRequest>(
@@ -99,7 +94,7 @@ export const editPoll = functions.region(config.region).https.onCall(
             state,
          })
 
-         const optionsWithIds = options.map((o) => ({
+         const optionsWithIds = options?.map((o) => ({
             ...o,
             id: o.id || uuid(),
          }))
@@ -114,6 +109,10 @@ export const editPoll = functions.region(config.region).https.onCall(
             livestreamId,
             pollId,
          })
+
+         return {
+            success: true,
+         }
       }
    )
 )
@@ -121,7 +120,7 @@ export const editPoll = functions.region(config.region).https.onCall(
 const deletePollSchema: yup.SchemaOf<DeleteLivestreamPollRequest> = yup.object({
    pollId: yup.string().required(),
    livestreamId: yup.string().required(),
-   livestreamToken: yup.string().nullable(),
+   livestreamToken: yup.string(),
 })
 
 export const deletePoll = functions.region(config.region).https.onCall(

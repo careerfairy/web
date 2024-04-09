@@ -8,6 +8,9 @@ import {
    UserLivestreamData,
    LivestreamChatEntry,
    DeleteLivestreamChatEntryRequest,
+   CreateLivestreamPollRequest,
+   UpdateLivestreamPollRequest,
+   DeleteLivestreamPollRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -553,10 +556,35 @@ export class LivestreamService {
    }
 
    deleteChatEntry = async (options: DeleteLivestreamChatEntryRequest) => {
-      return void httpsCallable<DeleteLivestreamChatEntryRequest>(
+      await httpsCallable<DeleteLivestreamChatEntryRequest>(
          this.functions,
          "deleteLivestreamChatEntry"
       )(options)
+      return
+   }
+
+   createPoll = async (options: CreateLivestreamPollRequest) => {
+      await httpsCallable<CreateLivestreamPollRequest>(
+         this.functions,
+         "createPoll"
+      )(options)
+      return
+   }
+
+   updatePoll = async (options: UpdateLivestreamPollRequest) => {
+      await httpsCallable<UpdateLivestreamPollRequest>(
+         this.functions,
+         "editPoll"
+      )(options)
+      return
+   }
+
+   deletePoll = async (options: DeleteLivestreamPollRequest) => {
+      await httpsCallable<DeleteLivestreamPollRequest>(
+         this.functions,
+         "deletePoll"
+      )(options)
+      return
    }
 }
 
