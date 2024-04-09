@@ -1,7 +1,7 @@
 import { useLivestreamOngoingPoll } from "components/custom-hook/streaming/useLivestreamOngoingPoll"
 import { useStreamingContext } from "../../context"
 import { useEffect } from "react"
-import { openChat } from "store/reducers/streamingAppReducer"
+import { openPolls } from "store/reducers/streamingAppReducer"
 import { useAppDispatch } from "components/custom-hook/store"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
@@ -22,16 +22,17 @@ export const OngoingPollTracker = () => {
 export const Content = () => {
    const { livestreamId } = useStreamingContext()
    const ongoingPoll = useLivestreamOngoingPoll(livestreamId)
-   const hasOngoingPoll = Boolean(ongoingPoll)
+   const ongoingPollId = ongoingPoll?.id
 
    const dispatch = useAppDispatch()
 
    useEffect(() => {
       // When a poll is started, we want all viewers to be redirected to the polls view
-      if (hasOngoingPoll) {
-         dispatch(openChat())
+      if (ongoingPollId) {
+         alert("open chat")
+         dispatch(openPolls())
       }
-   }, [dispatch, hasOngoingPoll])
+   }, [dispatch, ongoingPollId])
 
    return null
 }
