@@ -21,6 +21,13 @@ const ActionButton = ({ presenter, onClick }: Props) => {
    const isTrial = presenter.plan?.type === GroupPlanTypes.Trial
 
    if (presenter.hasPlan()) {
+      if (presenter.hasPlanExpired()) {
+         return (
+            <LoadingButton onClick={onClick} variant="contained" fullWidth>
+               {isTrial ? "Upgrade" : "Update"} plan
+            </LoadingButton>
+         )
+      }
       if (isTrial) {
          return (
             <LoadingButton onClick={onClick} variant="contained" fullWidth>
