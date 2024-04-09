@@ -31,7 +31,7 @@ const ActionButton = ({ presenter, onClick }: Props) => {
       if (isTrial) {
          return (
             <LoadingButton onClick={onClick} variant="contained" fullWidth>
-               Upgrade to full Sparks
+               Upgrade plan
             </LoadingButton>
          )
       }

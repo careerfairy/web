@@ -5,9 +5,9 @@ import { Chip, Stack, useTheme } from "@mui/material"
 import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
 import BasicSparkIcon from "components/views/common/icons/BasicSparkIcon"
 import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import PlanDaysLeftIcon from "components/views/common/icons/PlanDaysLeftIcon"
 import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
 import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
-import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 
@@ -22,6 +22,21 @@ const styles = sxStyles({
       },
       "& .MuiChip-label": {
          pl: 1,
+      },
+   },
+   daysLeftIcon: {
+      mb: "1px",
+   },
+   chipDaysLeft: {
+      py: 0.5,
+      px: 1.5,
+      "& svg": {
+         width: 16,
+         height: 16,
+         color: "inherit !important",
+      },
+      "& .MuiChip-label": {
+         pl: 2,
       },
    },
    expiredChip: {
@@ -75,8 +90,8 @@ const StatusChips = ({ presenter }: Props) => {
             <PlanChip plan={presenter.plan.type} />
             <Chip
                variant="filled"
-               sx={[styles.chip, styles.neutralChip]}
-               icon={<Clock />}
+               sx={[styles.chipDaysLeft, styles.neutralChip]}
+               icon={<PlanDaysLeftIcon sx={styles.daysLeftIcon} />}
                label={`${timeLeft} left`}
             />
          </Wrapper>
