@@ -20,8 +20,12 @@ const Content = () => {
 
    return (
       <Stack overflow="hidden" spacing={1.5}>
-         <Slide in direction="up">
-            <PollCard poll={ongoingPoll} />
+         <Slide in={Boolean(ongoingPoll)} unmountOnExit direction="up">
+            {ongoingPoll ? (
+               <PollCard poll={ongoingPoll} />
+            ) : (
+               <PollCardSkeleton />
+            )}
          </Slide>
       </Stack>
    )

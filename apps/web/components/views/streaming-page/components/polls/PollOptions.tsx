@@ -2,11 +2,14 @@ import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { Skeleton, Typography } from "@mui/material"
 import { Box, Stack } from "@mui/material"
 import { PollOptionResult } from "./PollOptionResult"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
 import { useStreamingContext } from "../../context"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { sxStyles } from "types/commonTypes"
+import { useAuth } from "HOCs/AuthProvider"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
+import { useVoteLivestreamPollOption } from "components/custom-hook/streaming/useVoteLivestreamPollOption"
 
 const styles = sxStyles({
    root: {
@@ -50,9 +53,23 @@ export const PollOptions = ({ poll }: PollOptionsProps) => {
 }
 
 const Content = ({ poll }: PollOptionsProps) => {
-   const { livestreamId } = useStreamingContext()
+   const { authenticatedUser } = useAuth()
 
-   const { data: voters } = useLivestreamPollVoters(livestreamId, poll.id)
+   const { livestreamId, agoraUserId, isHost } = useStreamingContext()
+   const { data: voters } = useLivestreamPollVoters(livestreamId, poll)
+
+   const isOpenStream = useOpenStream()
+
+   const userId = isOpenStream
+      ? agoraUserId
+      : authenticatedUser?.email || agoraUserId
+
+   const { trigger: votePollOption, isMutating: isVoting } =
+      useVoteLivestreamPollOption(livestreamId, poll.id, userId)
+
+   const userVote = useMemo(() => {
+      return voters.find((voter) => voter.userId === userId)
+   }, [userId, voters])
 
    const calculateOptionStats = useCallback(
       (optionId: string) => {
@@ -80,6 +97,12 @@ const Content = ({ poll }: PollOptionsProps) => {
                option={option}
                color={POLL_COLORS[index]}
                stats={calculateOptionStats(option.id)}
+               enableVoting={!isHost}
+               isOptionVoted={userVote?.optionId === option.id}
+               someOptionVoted={Boolean(userVote)}
+               onVote={() => votePollOption({ optionId: option.id })}
+               isVoting={isVoting}
+               showResults={isHost || Boolean(userVote)}
             />
          ))}
       </Stack>

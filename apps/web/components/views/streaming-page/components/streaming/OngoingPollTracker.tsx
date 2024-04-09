@@ -29,7 +29,6 @@ export const Content = () => {
    useEffect(() => {
       // When a poll is started, we want all viewers to be redirected to the polls view
       if (ongoingPollId) {
-         alert("open chat")
          dispatch(openPolls())
       }
    }, [dispatch, ongoingPollId])

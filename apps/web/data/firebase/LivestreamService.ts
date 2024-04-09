@@ -12,6 +12,8 @@ import {
    UpdateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    MarkLivestreamPollAsCurrentRequest,
+   LivestreamPoll,
+   LivestreamPollVoter,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -594,6 +596,55 @@ export class LivestreamService {
          "markPollAsCurrent"
       )(options)
       return
+   }
+
+   private getPollRef(livestreamId: string, pollId: string) {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "polls",
+         pollId
+      ).withConverter(createGenericConverter<LivestreamPoll>())
+   }
+
+   async votePollOption(
+      livestreamId: string,
+      pollId: string,
+      optionId: string,
+      userIdentifier: string
+   ) {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const pollRef = this.getPollRef(livestreamId, pollId)
+         const pollDoc = await transaction.get(pollRef)
+         const data = pollDoc.data()
+
+         if (!pollDoc.exists()) {
+            throw "Poll does not exist"
+         }
+
+         const option = data.options?.find((o) => o.id === optionId)
+
+         if (!option) {
+            throw "Option does not exist"
+         }
+         const optionRef = doc(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "polls",
+            pollId,
+            "voters",
+            userIdentifier
+         ).withConverter(createGenericConverter<LivestreamPollVoter>())
+
+         transaction.set(optionRef, {
+            id: optionRef.id,
+            optionId,
+            timestamp: Timestamp.now(),
+            userId: userIdentifier,
+         })
+      })
    }
 }
 
