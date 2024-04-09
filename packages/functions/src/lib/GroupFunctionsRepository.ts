@@ -170,7 +170,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
 
    /**
     * Retrieves all groups which have a plan expiring, taking into account a number of days as buffer. The retrieves groups shall be
-    * those which have plan.expiresAt <= Now() + days
+    * those which have plan.expiresAt <= Now() + days.
     * @param type Type of plan to restrict groups by
     * @param ignoreGroupIds List of groups to be ignored from query results (not in)
     */
