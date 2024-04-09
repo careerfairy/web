@@ -1,15 +1,16 @@
-import { CircularProgress, Slide, Stack } from "@mui/material"
+import { Box, Collapse, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPolls } from "components/custom-hook/streaming/useLivestreamPolls"
-import React, { useState } from "react"
-import { useStreamingContext } from "../../context"
-import { PollCreationButton } from "./PollCreationButton"
-import { PollCard } from "./PollCard"
+import { useState } from "react"
 import { TransitionGroup } from "react-transition-group"
+import { useStreamingContext } from "../../context"
+import { PollCard } from "./PollCard"
+import { PollCardSkeleton } from "./PollCardSkeleton"
+import { PollCreationButton } from "./PollCreationButton"
 
 export const PollsView = () => {
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
+      <SuspenseWithBoundary fallback={<Loader />}>
          <Content />
       </SuspenseWithBoundary>
    )
@@ -18,6 +19,7 @@ export const PollsView = () => {
 const Content = () => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
+
    const [isCreatePollFormOpen, setIsCreatePollFormOpen] = useState(false)
 
    const hasPolls = polls.length > 0
@@ -33,11 +35,25 @@ const Content = () => {
          ) : null}
          <Stack spacing={1} component={TransitionGroup}>
             {polls.map((poll) => (
-               <Slide key={poll.id} direction="up">
-                  <PollCard poll={poll} />
-               </Slide>
+               <Collapse key={poll.id}>
+                  <Box>
+                     <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
+                        <PollCard poll={poll} />
+                     </SuspenseWithBoundary>
+                  </Box>
+               </Collapse>
             ))}
          </Stack>
+      </Stack>
+   )
+}
+
+const Loader = () => {
+   return (
+      <Stack spacing={1}>
+         {Array.from({ length: 2 }, (_, index) => (
+            <PollCardSkeleton key={index} />
+         ))}
       </Stack>
    )
 }

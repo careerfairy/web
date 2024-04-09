@@ -1,13 +1,12 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
-   Skeleton,
+   LinearProgress,
    Stack,
    Typography,
    linearProgressClasses,
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import { LinearProgress } from "@mui/material"
 
 const styles = sxStyles({
    root: {
@@ -76,24 +75,6 @@ export const PollOptionResult = ({ option, color, stats }: Props) => {
             </Typography>
          </Stack>
          <Box sx={[styles.coloredEdge, { backgroundColor: color }]} />
-      </Box>
-   )
-}
-
-export const PollOptionResultSkeleton = () => {
-   return (
-      <Box sx={styles.root}>
-         <Stack spacing={1}>
-            <Stack direction="row" justifyContent="space-between">
-               <Typography variant="medium">
-                  <Skeleton variant="text" width="20%" />
-               </Typography>
-               <Typography variant="medium">
-                  <Skeleton variant="text" width="10%" />
-               </Typography>
-            </Stack>
-         </Stack>
-         <Box sx={[styles.coloredEdge, { backgroundColor: "grey.500" }]} />
       </Box>
    )
 }

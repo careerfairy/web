@@ -1,6 +1,5 @@
 import { Button, Stack } from "@mui/material"
 import { CreateOrEditPollForm } from "./CreateOrEditPollForm"
-import { Collapse } from "@mui/material"
 
 type Props = {
    isCreatePollFormOpen: boolean
@@ -16,7 +15,11 @@ export const PollCreationButton = ({
 
    return (
       <Stack spacing={1}>
-         <Collapse unmountOnExit in={!shouldShowCreateForm}>
+         {shouldShowCreateForm ? (
+            <CreateOrEditPollForm
+               onSuccess={() => setIsCreatePollFormOpen(false)}
+            />
+         ) : (
             <Button
                color="primary"
                variant="contained"
@@ -25,12 +28,7 @@ export const PollCreationButton = ({
             >
                Create new poll
             </Button>
-         </Collapse>
-         <Collapse unmountOnExit in={shouldShowCreateForm}>
-            <CreateOrEditPollForm
-               onSuccess={() => setIsCreatePollFormOpen(false)}
-            />
-         </Collapse>
+         )}
       </Stack>
    )
 }
