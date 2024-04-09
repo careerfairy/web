@@ -176,7 +176,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     */
    getAllGroupsWithAPlanExpiring(
       types: GroupPlanType[],
-      type: GroupPlanType,
       days: number,
       logger: Logger,
       ignoreGroupIds?: string[]
@@ -652,7 +651,6 @@ export class GroupFunctionsRepository
 
    async getAllGroupsWithAPlanExpiring(
       types: GroupPlanType[],
-      type: GroupPlanType,
       days: number,
       logger: Logger,
       ignoreGroupIds: string[] = []
@@ -665,7 +663,6 @@ export class GroupFunctionsRepository
       const query = this.firestore
          .collection("careerCenterData")
          .where("plan.type", "in", types)
-         .where("plan.type", "==", type)
          .where("plan.expiresAt", "<=", preExpirationDate)
       const snaps = await query
          .orderBy("plan.expiresAt")
