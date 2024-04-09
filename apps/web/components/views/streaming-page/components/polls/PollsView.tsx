@@ -1,7 +1,7 @@
 import { Box, Collapse, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPolls } from "components/custom-hook/streaming/useLivestreamPolls"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
 import { PollCard } from "./PollCard"
@@ -20,6 +20,13 @@ const Content = () => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
 
+   // We always want to show the current/ongoing poll(s) first
+   const orderedPolls = useMemo(() => {
+      const currentPolls = polls.filter((poll) => poll.state === "current")
+      const otherPolls = polls.filter((poll) => poll.state !== "current")
+      return [...currentPolls, ...otherPolls]
+   }, [polls])
+
    const [isCreatePollFormOpen, setIsCreatePollFormOpen] = useState(false)
 
    const hasPolls = polls.length > 0
@@ -34,7 +41,7 @@ const Content = () => {
             />
          ) : null}
          <Stack spacing={1} component={TransitionGroup}>
-            {polls.map((poll) => (
+            {orderedPolls.map((poll) => (
                <Collapse key={poll.id}>
                   <Box>
                      <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
