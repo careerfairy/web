@@ -575,7 +575,7 @@ export class LivestreamService {
    updatePoll = async (options: UpdateLivestreamPollRequest) => {
       await httpsCallable<UpdateLivestreamPollRequest>(
          this.functions,
-         "editPoll"
+         "updatePoll"
       )(options)
       return
    }

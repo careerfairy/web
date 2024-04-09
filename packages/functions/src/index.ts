@@ -62,7 +62,7 @@ import {
    createPoll,
    deleteLivestreamChatEntry,
    deletePoll,
-   editPoll,
+   updatePoll,
    markPollAsCurrent,
 } from "./lib/streaming"
 
@@ -288,5 +288,5 @@ exports.fetchCompanies = companies.fetchCompanies
 exports.deleteLivestreamChatEntry = deleteLivestreamChatEntry
 exports.createPoll = createPoll
 exports.deletePoll = deletePoll
-exports.editPoll = editPoll
+exports.updatePoll = updatePoll
 exports.markPollAsCurrent = markPollAsCurrent
