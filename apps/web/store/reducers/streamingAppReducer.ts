@@ -148,8 +148,8 @@ const streamingAppSlice = createSlice({
          // Ensure the drawer opens when a new view is set
          state.sidePanel.isOpen = true
       },
-      openChat(state) {
-         state.sidePanel.activeView = ActiveViews.CHAT
+      openPolls(state) {
+         state.sidePanel.activeView = ActiveViews.POLLS
          state.sidePanel.isOpen = true
       },
       setHostStatus(state, action: PayloadAction<boolean>) {
@@ -310,7 +310,7 @@ export const {
       setRTMFailedToConnect,
       setRTMConnectionState,
       setRTCConnectionState,
-      openChat,
+      openPolls,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
