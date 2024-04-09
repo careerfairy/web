@@ -12,6 +12,8 @@ import config from "./config"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
+import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -90,6 +92,40 @@ export const manualNewsletter = functions
       }
    })
 
+export const manualTemplatedEmail = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onRequest(async (req, res) => {
+      functions.logger.info("manualTemplatedEmail: v2.0")
+
+      if (req.method !== "GET") {
+         res.status(400).send("Only GET requests are allowed")
+         return
+      }
+
+      const receivedEmails = ((req.query.emails as string) ?? "")
+         .split(",")
+         .map((email) => email?.trim())
+         .filter(Boolean)
+
+      functions.logger.info("Received emails", receivedEmails)
+
+      if (receivedEmails.length === 0) {
+         res.status(400).send("No emails provided")
+         return
+      }
+
+      if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
+         await sendManualTemplatedEmail()
+         res.status(200).send("Spark Release email sent to everyone")
+      } else {
+         await sendManualTemplatedEmail(receivedEmails)
+         res.status(200).send(
+            "Spark Release email sent to " + receivedEmails.join(", ")
+         )
+      }
+   })
+
 async function sendNewsletter(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
       functions.logger.info(
@@ -121,6 +157,37 @@ async function sendNewsletter(overrideUsers?: string[]) {
    }
 
    functions.logger.info("Newsletter sent")
+}
+
+async function sendManualTemplatedEmail(overrideUsers?: string[]) {
+   if (newsletterAlreadySent) {
+      functions.logger.info(
+         "Spark release email was already sent in this execution environment, skipping"
+      )
+      return
+   }
+
+   const emailBuilder = new ManualTemplatedEmailBuilder(
+      PostmarkEmailSender.create(),
+      functions.logger
+   )
+
+   const newsletterService = new ManualTemplatedEmailService(
+      userRepo,
+      emailBuilder,
+      functions.logger
+   )
+
+   await newsletterService.fetchRequiredData()
+
+   await newsletterService.send(overrideUsers)
+
+   if (!overrideUsers) {
+      // set this flag when sending the newsletter to everyone
+      newsletterAlreadySent = true
+   }
+
+   functions.logger.info("Newsletters execution done")
 }
 
 /**

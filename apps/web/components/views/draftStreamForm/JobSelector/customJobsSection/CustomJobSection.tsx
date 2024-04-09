@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material"
+import { CircularProgress, Grid, Typography } from "@mui/material"
 import React, {
    Dispatch,
    SetStateAction,
@@ -13,10 +13,18 @@ import {
 import FormGroup from "../../FormGroup"
 import SelectorCustomJobsDropDown from "./SelectorCustomJobsDropDown"
 import CustomJobPreview from "./CustomJobPreview"
-import CustomJobCreateOrEditFrom from "./CustomJobCreateOrEditFrom"
 import Collapse from "@mui/material/Collapse"
 import { customJobRepo } from "../../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import dynamic from "next/dynamic"
+
+const CustomJobCreateOrEditFrom = dynamic(
+   () => import("./CustomJobCreateOrEditFrom"),
+   {
+      ssr: false,
+      loading: () => <CircularProgress />,
+   }
+)
 
 type Props = {
    groupId: string

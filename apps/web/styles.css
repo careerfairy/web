@@ -133,6 +133,7 @@ a {
 .ql-editor {
    font-size: inherit;
    font-family: inherit;
+   min-height: inherit;
    padding: 0 !important;
 }
 
