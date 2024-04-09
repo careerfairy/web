@@ -12,6 +12,10 @@ const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
 
+   getSubscribedUsersByCountryCode(
+      countryCode: string,
+      userEmails?: string[]
+   ): Promise<UserData[]>
    /**
     * Retrieves the subscribed users, which were created earlier than a given number of days.
     * Differs also from @method getSubscribedUsers on the where clause, using @field createdAt instead of @field lastActivityAt for
@@ -39,6 +43,27 @@ export class UserFunctionsRepository
          .collection("userData")
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
+
+      if (userEmails?.length) {
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
+      }
+
+      const data = await query.get()
+
+      return mapFirestoreDocuments(data)
+   }
+
+   async getSubscribedUsersByCountryCode(
+      countryCode: string,
+      userEmails?: string[]
+   ): Promise<UserData[]> {
+      let query = this.firestore
+         .collection("userData")
+         .where("unsubscribed", "==", false)
+         .where("universityCountryCode", "==", countryCode)
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)
