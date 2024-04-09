@@ -25,9 +25,9 @@ const styles = sxStyles({
       },
    },
    expiredChip: {
-      color: "#FF4545",
-      bgcolor: "#FFE8E8",
-      borderColor: "#FFA2A2",
+      color: (theme) => theme.brand.error[500], //"#FF4545",
+      bgcolor: (theme) => theme.brand.error[50],
+      borderColor: (theme) => theme.brand.error[300],
    },
    neutralChip: {
       color: "#9999B1",
@@ -65,12 +65,7 @@ const StatusChips = ({ presenter }: Props) => {
       if (presenter.hasPlanExpired()) {
          return (
             <Wrapper>
-               <Chip
-                  variant="outlined"
-                  sx={[styles.chip, styles.expiredChip]}
-                  icon={<Clock />}
-                  label="Trial expired"
-               />
+               <ExpiredPlanChip presenter={presenter} />
             </Wrapper>
          )
       }
@@ -100,6 +95,28 @@ const StatusChips = ({ presenter }: Props) => {
    )
 }
 
+const ExpiredPlanChip = ({ presenter }: Props) => {
+   const theme = useTheme()
+   const expiredLabel = presenter.hasNonTrialPlan()
+      ? `${PLAN_CONSTANTS[presenter.plan.type].name} plan expired`
+      : "Trial expired"
+
+   const paidColor = theme.brand.error[500]
+   const trialColor = theme.palette.error[500]
+
+   const icon = getPlanIcon(presenter.plan.type, trialColor, paidColor)
+   return (
+      <Wrapper>
+         <Chip
+            variant="outlined"
+            sx={[styles.chip, styles.expiredChip]}
+            icon={icon}
+            label={expiredLabel}
+         />
+      </Wrapper>
+   )
+}
+
 type PlanChipProps = {
    plan: GroupPlanType
 }
@@ -112,16 +129,7 @@ const PlanChip = ({ plan }: PlanChipProps) => {
    const paidColor = theme.brand.purple[600]
    const trialColor = theme.palette.primary[600]
 
-   let icon = <TrialPlanIcon color={trialColor} />
-
-   if (plan == GroupPlanTypes.Tier1)
-      icon = <EssentialPlanIcon color={paidColor} />
-
-   if (plan == GroupPlanTypes.Tier2)
-      icon = <AdvancedPlanIcon color={paidColor} />
-
-   if (plan == GroupPlanTypes.Tier3)
-      icon = <PremiumPlanIcon color={paidColor} />
+   const icon = getPlanIcon(plan, trialColor, paidColor)
 
    const label = isTrial
       ? "On trial"
@@ -146,6 +154,27 @@ const Wrapper = ({ children }: WrapperProps) => {
          {children}
       </Stack>
    )
+}
+
+const getPlanIcon = (
+   type: GroupPlanType,
+   trialColor: string,
+   paidColor: string
+) => {
+   let icon
+
+   if (type == GroupPlanTypes.Trial) icon = <TrialPlanIcon color={trialColor} />
+
+   if (type == GroupPlanTypes.Tier1)
+      icon = <EssentialPlanIcon color={paidColor} />
+
+   if (type == GroupPlanTypes.Tier2)
+      icon = <AdvancedPlanIcon color={paidColor} />
+
+   if (type == GroupPlanTypes.Tier3)
+      icon = <PremiumPlanIcon color={paidColor} />
+
+   return icon
 }
 
 export default StatusChips

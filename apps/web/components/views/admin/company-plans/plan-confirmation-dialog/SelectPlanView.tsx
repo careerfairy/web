@@ -12,6 +12,7 @@ import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
 import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
 import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
 import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const styles = sxStyles({
    caption: {
@@ -64,18 +65,20 @@ const SelectPlanView = () => {
                </Typography>
             </Stack>
             <Stack spacing={1.5}>
-               <Button
-                  startIcon={<TrialPlanIcon />}
-                  sx={styles.btn}
-                  variant="outlined"
-                  color="grey"
-                  fullWidth
-                  onClick={() =>
-                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksTrial)
-                  }
-               >
-                  Trial plan
-               </Button>
+               <ConditionalWrapper condition={!groupToManage.hasPlan()}>
+                  <Button
+                     startIcon={<TrialPlanIcon />}
+                     sx={styles.btn}
+                     variant="outlined"
+                     color="grey"
+                     fullWidth
+                     onClick={() =>
+                        goToStep(PlanConfirmationDialogKeys.ConfirmSparksTrial)
+                     }
+                  >
+                     Trial plan
+                  </Button>
+               </ConditionalWrapper>
                <Button
                   startIcon={<EssentialPlanIcon />}
                   color="grey"
