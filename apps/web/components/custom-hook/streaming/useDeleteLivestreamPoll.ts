@@ -17,11 +17,12 @@ const getKey = (livestreamId: string, pollId: string) => {
 }
 
 /**
- * Custom hook for deleting a specific livestream chat entry.
+ * Custom hook for deleting a specific livestream poll.
  *
  * @param  livestreamId - The ID of the livestream.
- * @param  entryId - The ID of the chat entry to delete.
- * @returns An object containing the mutation function to delete a chat entry and its related SWR mutation state.
+ * @param  pollId - The ID of the poll to delete.
+ * @param  livestreamToken - The token for authenticating the livestream action.
+ * @returns An object containing the mutation function to delete a poll and its related SWR mutation state.
  */
 export const useDeleteLivestreamPoll = (
    livestreamId: string,
