@@ -11,6 +11,7 @@ import {
    CreateLivestreamPollRequest,
    UpdateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
+   MarkLivestreamPollAsCurrentRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -583,6 +584,14 @@ export class LivestreamService {
       await httpsCallable<DeleteLivestreamPollRequest>(
          this.functions,
          "deletePoll"
+      )(options)
+      return
+   }
+
+   markPollAsCurrent = async (options: MarkLivestreamPollAsCurrentRequest) => {
+      await httpsCallable<MarkLivestreamPollAsCurrentRequest>(
+         this.functions,
+         "markPollAsCurrent"
       )(options)
       return
    }
