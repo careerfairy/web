@@ -3,6 +3,7 @@ import {
    CreateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    LivestreamEvent,
+   MarkLivestreamPollAsCurrentRequest,
    UpdateLivestreamPollRequest,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
@@ -113,6 +114,41 @@ export const editPoll = functions.region(config.region).https.onCall(
          return {
             success: true,
          }
+      }
+   )
+)
+
+const markPollAsCurrentSchema: yup.SchemaOf<MarkLivestreamPollAsCurrentRequest> =
+   yup.object({
+      pollId: yup.string().required(),
+      livestreamId: yup.string().required(),
+      livestreamToken: yup.string(),
+   })
+
+export const markPollAsCurrent = functions.region(config.region).https.onCall(
+   middlewares<Context, MarkLivestreamPollAsCurrentRequest>(
+      dataValidation(markPollAsCurrentSchema),
+      livestreamExists(),
+      async (requestData, context) => {
+         const { livestreamId, livestreamToken, pollId } = requestData
+
+         await validateLivestreamToken(
+            context.auth?.token?.email,
+            context.middlewares.livestream,
+            livestreamToken
+         )
+
+         functions.logger.info("Marking poll as current", {
+            livestreamId,
+            pollId,
+         })
+
+         await livestreamsRepo.markPollAsCurrent(livestreamId, pollId)
+
+         functions.logger.info("Poll marked as current", {
+            livestreamId,
+            pollId,
+         })
       }
    )
 )

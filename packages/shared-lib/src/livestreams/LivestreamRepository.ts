@@ -302,6 +302,15 @@ export interface ILivestreamRepository {
    ): Promise<void>
 
    /**
+    * Marks a specific poll as current and sets all other polls with the state 'current' to 'closed'.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param pollId - The ID of the poll to mark as current.
+    * @returns A Promise that resolves when the transaction is complete.
+    */
+   markPollAsCurrent(livestreamId: string, pollId: string): Promise<void>
+
+   /**
     * Deletes a poll from a livestream
     * @param livestreamId - The ID of the livestream
     * @param pollId - The ID of the poll
@@ -1273,6 +1282,40 @@ export class FirebaseLivestreamRepository
          }
 
       return docRef.update(updateData)
+   }
+
+   async markPollAsCurrent(
+      livestreamId: string,
+      pollId: string
+   ): Promise<void> {
+      const pollsRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("polls")
+         .withConverter(createCompatGenericConverter<LivestreamPoll>())
+
+      const currentPollsRef = pollsRef.where("state", "==", "current")
+
+      const targetPollRef = pollsRef.doc(pollId)
+
+      const currentPollsSnaps = await currentPollsRef.get()
+
+      const batch = this.firestore.batch()
+
+      currentPollsSnaps.docs.forEach((doc) => {
+         const updateData: Pick<LivestreamPoll, "state"> = {
+            state: "closed",
+         }
+         batch.update(doc.ref, updateData)
+      })
+
+      const updateData: Pick<LivestreamPoll, "state"> = {
+         state: "current",
+      }
+
+      batch.update(targetPollRef, updateData)
+
+      return batch.commit()
    }
 
    async deletePoll(livestreamId: string, pollId: string): Promise<void> {

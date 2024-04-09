@@ -10,14 +10,14 @@ export type DeleteLivestreamChatEntryRequest = {
 
 export type CreateLivestreamPollRequest = {
    livestreamId: string
-   livestreamToken: string | null
+   livestreamToken: string
    question: string
    options: { text: string }[]
 }
 
 export type UpdateLivestreamPollRequest = {
    livestreamId: string
-   livestreamToken: string | null
+   livestreamToken: string
    pollId: string
    question?: string
    options?: { text: string; id?: string }[]
@@ -26,6 +26,12 @@ export type UpdateLivestreamPollRequest = {
 
 export type DeleteLivestreamPollRequest = {
    livestreamId: string
-   livestreamToken: string | null
+   livestreamToken: string
+   pollId: string
+}
+
+export type MarkLivestreamPollAsCurrentRequest = {
+   livestreamId: string
+   livestreamToken: string
    pollId: string
 }

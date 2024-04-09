@@ -63,6 +63,7 @@ import {
    deleteLivestreamChatEntry,
    deletePoll,
    editPoll,
+   markPollAsCurrent,
 } from "./lib/streaming"
 
 // Auth
@@ -288,3 +289,4 @@ exports.deleteLivestreamChatEntry = deleteLivestreamChatEntry
 exports.createPoll = createPoll
 exports.deletePoll = deletePoll
 exports.editPoll = editPoll
+exports.markPollAsCurrent = markPollAsCurrent
