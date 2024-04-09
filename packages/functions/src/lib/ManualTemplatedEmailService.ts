@@ -2,12 +2,12 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepos
 import { UserData } from "@careerfairy/shared-lib/users"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
-import { SparkReleaseEmailBuilder } from "./SparkReleaseEmailBuilder"
+import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 
 /**
  * Gathers all the required data to build the release email
  */
-export class SparkReleaseEmailService {
+export class ManualTemplatedEmailService {
    /**
     * The users that have subscribed to the release email
     */
@@ -15,7 +15,7 @@ export class SparkReleaseEmailService {
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
-      private readonly emailBuilder: SparkReleaseEmailBuilder,
+      private readonly emailBuilder: ManualTemplatedEmailBuilder,
       private readonly logger: Logger
    ) {}
 

@@ -5,7 +5,7 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 /**
  * Builds a Spark release email (templated) and sends it to the recipients
  */
-export class SparkReleaseEmailBuilder {
+export class ManualTemplatedEmailBuilder {
    private readonly from = "CareerFairy <noreply@careerfairy.io>"
    private recipients: TemplatedMessage[] = []
 
@@ -21,7 +21,7 @@ export class SparkReleaseEmailBuilder {
       this.recipients.push({
          From: this.from,
          To: email,
-         TemplateId: Number(process.env.POSTMARK_TEMPLATE_SPARKS_RELEASE),
+         TemplateId: Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL),
          TemplateModel: {
             name,
          },

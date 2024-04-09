@@ -12,8 +12,8 @@ import config from "./config"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import { SparkReleaseEmailBuilder } from "./lib/SparkReleaseEmailBuilder"
-import { SparkReleaseEmailService } from "./lib/SparksNewsletterService"
+import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
+import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -92,11 +92,11 @@ export const manualNewsletter = functions
       }
    })
 
-export const manualSparkReleaseEmail = functions
+export const manualTemplatedEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
-      functions.logger.info("manualSparkReleaseEmail: v1.0")
+      functions.logger.info("manualTemplatedEmail: v2.0")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -116,10 +116,10 @@ export const manualSparkReleaseEmail = functions
       }
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
-         await sendSparkReleaseEmail()
+         await sendManualTemplatedEmail()
          res.status(200).send("Spark Release email sent to everyone")
       } else {
-         await sendSparkReleaseEmail(receivedEmails)
+         await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
             "Spark Release email sent to " + receivedEmails.join(", ")
          )
@@ -159,7 +159,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
    functions.logger.info("Newsletter sent")
 }
 
-async function sendSparkReleaseEmail(overrideUsers?: string[]) {
+async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
       functions.logger.info(
          "Spark release email was already sent in this execution environment, skipping"
@@ -167,12 +167,12 @@ async function sendSparkReleaseEmail(overrideUsers?: string[]) {
       return
    }
 
-   const emailBuilder = new SparkReleaseEmailBuilder(
+   const emailBuilder = new ManualTemplatedEmailBuilder(
       PostmarkEmailSender.create(),
       functions.logger
    )
 
-   const newsletterService = new SparkReleaseEmailService(
+   const newsletterService = new ManualTemplatedEmailService(
       userRepo,
       emailBuilder,
       functions.logger
