@@ -13,7 +13,7 @@ export const useLivestreamPolls = (livestreamId: string) => {
    return useFirestoreCollection<LivestreamPoll>(
       query(
          collection(FirestoreInstance, "livestreams", livestreamId, "polls"),
-         orderBy("timestamp", "asc")
+         orderBy("timestamp", "desc")
       ),
       reactFireOptions
    )

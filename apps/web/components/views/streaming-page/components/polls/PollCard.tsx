@@ -69,6 +69,10 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
       const { livestreamId, isHost } = useStreamingContext()
       const { data: voters } = useLivestreamPollVoters(livestreamId, poll.id)
 
+      const handleCloseForm = () => {
+         setIsEditing(false)
+      }
+
       const calculateOptionStats = useCallback(
          (optionId: string) => {
             const votersForOption = voters.filter(
@@ -87,11 +91,15 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
          [voters]
       )
 
+      const showActionButton =
+         poll.state === "upcoming" || poll.state === "current"
+
       if (isEditing && isHost) {
          return (
             <CreateOrEditPollForm
                poll={poll}
-               onSuccess={() => setIsEditing(false)}
+               onSuccess={handleCloseForm}
+               onCancel={handleCloseForm}
             />
          )
       }
@@ -102,7 +110,7 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                <Typography fontWeight={600} variant="medium" color="primary">
                   {POLL_STATUS_TEXT[poll.state]}
                </Typography>
-               {Boolean(isHost) && (
+               {Boolean(isHost && showResults) && (
                   <PollOptionsMenu
                      selectedPollId={poll.id}
                      onClickEdit={() => setIsEditing(true)}
@@ -123,11 +131,12 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                      />
                   ))}
                </Stack>
-               <PollActionButton poll={poll} />
+               {Boolean(showActionButton) && <PollActionButton poll={poll} />}
             </Collapse>
             <CollapseButton
                showResults={showResults}
                onClick={() => setShowResults((prev) => !prev)}
+               paddedTop={Boolean(showResults && !showActionButton)}
             />
          </Box>
       )
@@ -137,15 +146,20 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
 type CollapseButtonProps = {
    showResults: boolean
    onClick: ButtonBaseProps["onClick"]
+   paddedTop?: boolean
 }
 
-const CollapseButton = ({ showResults, onClick }: CollapseButtonProps) => {
+const CollapseButton = ({
+   showResults,
+   onClick,
+   paddedTop,
+}: CollapseButtonProps) => {
    return (
       <Stack
          justifyContent="space-between"
          alignItems="center"
          direction="row"
-         sx={styles.expandButton}
+         sx={[styles.expandButton, paddedTop && { pt: 3 }]}
          component={ButtonBase}
          onClick={onClick}
       >

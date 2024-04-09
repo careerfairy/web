@@ -47,10 +47,17 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   poll?: LivestreamPoll | null
+type EditPollFormProps = {
+   poll: LivestreamPoll
+   onSuccess?: () => void
+   onCancel?: () => void
+}
+
+type CreatePollFormProps = {
    onSuccess?: () => void
 }
+
+type Props = EditPollFormProps | CreatePollFormProps
 
 export const basePollSchema = yup.object({
    question: basePollShape.question.required(),
@@ -74,14 +81,19 @@ const getInitialValues = (): FormValues => {
 }
 
 export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
-   ({ poll, onSuccess }, ref) => {
+   (props, ref) => {
+      const isEdit = "poll" in props && props.poll !== undefined
+
+      const { onSuccess } = props
+
+      const onCancel = isEdit ? props.onCancel : undefined
+
       const { livestreamId, agoraUserToken } = useStreamingContext()
       const { errorNotification } = useSnackbarNotifications()
-      const isEdit = Boolean(poll)
 
       const formMethods = useYupForm({
          schema: basePollSchema,
-         defaultValues: isEdit ? poll : getInitialValues(),
+         defaultValues: isEdit ? props.poll : getInitialValues(),
          mode: "onChange",
       })
 
@@ -97,10 +109,10 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                await livestreamService.updatePoll({
                   livestreamId,
                   livestreamToken: agoraUserToken,
-                  pollId: poll.id,
+                  pollId: props.poll.id,
                   question,
                   options,
-                  state: poll.state,
+                  state: props.poll.state,
                })
             } else {
                await livestreamService.createPoll({
@@ -179,26 +191,38 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                      </Button>
                   )}
                </Stack>
-               <Box width="100%" component="span">
-                  <LoadingButton
-                     fullWidth
-                     variant="contained"
-                     color="primary"
-                     type="submit"
-                     disabled={
-                        formMethods.formState.isSubmitting ||
-                        !formMethods.formState.isDirty
-                     }
-                     loading={formMethods.formState.isSubmitting}
-                  >
-                     {isEdit ? "Update Poll" : "Create Poll"}
-                  </LoadingButton>
-                  {Boolean(formMethods.formState.errors.options?.root) && (
-                     <FormHelperText sx={styles.errorMessage} error>
-                        {formMethods.formState.errors.options?.root.message}
-                     </FormHelperText>
+               <Stack spacing={1}>
+                  <Box width="100%" component="span">
+                     <LoadingButton
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={
+                           formMethods.formState.isSubmitting ||
+                           !formMethods.formState.isDirty
+                        }
+                        loading={formMethods.formState.isSubmitting}
+                     >
+                        {isEdit ? "Save changes" : "Create Poll"}
+                     </LoadingButton>
+                     {Boolean(formMethods.formState.errors.options?.root) && (
+                        <FormHelperText sx={styles.errorMessage} error>
+                           {formMethods.formState.errors.options?.root.message}
+                        </FormHelperText>
+                     )}
+                  </Box>
+                  {Boolean(isEdit) && (
+                     <Button
+                        variant="text"
+                        color="grey"
+                        fullWidth
+                        onClick={onCancel}
+                     >
+                        Cancel
+                     </Button>
                   )}
-               </Box>
+               </Stack>
             </Stack>
          </FormProvider>
       )
