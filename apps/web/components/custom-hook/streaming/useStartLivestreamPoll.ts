@@ -1,4 +1,4 @@
-import { UpdateLivestreamPollRequest } from "@careerfairy/shared-lib/livestreams"
+import { MarkLivestreamPollAsCurrentRequest } from "@careerfairy/shared-lib/livestreams"
 import { livestreamService } from "data/firebase/LivestreamService"
 import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -6,25 +6,26 @@ import useSnackbarNotifications from "../useSnackbarNotifications"
 type FetcherType = MutationFetcher<
    void, // return type
    unknown, // error type
-   Omit<UpdateLivestreamPollRequest, "livestreamId" | "entryId"> // The entry ID to delete
+   Omit<MarkLivestreamPollAsCurrentRequest, "livestreamId" | "entryId"> // The entry ID to delete
 >
 
 const getKey = (livestreamId: string, pollId: string) => {
    if (!pollId || !livestreamId) {
       return null
    }
-   return `stop-poll-${livestreamId}-${pollId}`
+   return `start-poll-${livestreamId}-${pollId}`
 }
 
 /**
- * Custom hook for stopping a specific livestream poll.
+ * Custom hook for starting a specific livestream poll.
+ *
+ * Sets all current polls for a livestream to be closed and marks the specified poll as the current poll.
  *
  * @param  livestreamId - The ID of the livestream.
- * @param  pollId - The ID of the poll to stop.
+ * @param  pollId - The ID of the poll to start.
  * @param  livestreamToken - The token for authenticating the livestream action.
- * @returns An object containing the mutation function to stop a poll and its related SWR mutation state.
  */
-export const useStopLivestreamPoll = (
+export const useStartLivestreamPoll = (
    livestreamId: string,
    pollId: string,
    livestreamToken: string
@@ -32,16 +33,15 @@ export const useStopLivestreamPoll = (
    const { errorNotification } = useSnackbarNotifications()
 
    const fetcher: FetcherType = async () =>
-      livestreamService.updatePoll({
+      livestreamService.markPollAsCurrent({
          livestreamId,
          livestreamToken,
          pollId,
-         state: "closed",
       })
 
    return useSWRMutation(getKey(livestreamId, pollId), fetcher, {
       onError: (error, key) => {
-         errorNotification(error, "Failed to stop poll from livestream", {
+         errorNotification(error, "Failed to start poll from livestream", {
             key,
             livestreamId,
             pollId,

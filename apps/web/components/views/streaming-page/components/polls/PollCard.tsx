@@ -1,6 +1,13 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
-import { Box, ButtonBase, Collapse, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   ButtonBase,
+   ButtonBaseProps,
+   Collapse,
+   Stack,
+   Typography,
+} from "@mui/material"
 import { useStopLivestreamPoll } from "components/custom-hook/streaming/useStopLivestreamPoll"
 import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
 import dynamic from "next/dynamic"
@@ -9,6 +16,7 @@ import { ChevronDown, ChevronUp } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { PollOptionResult } from "./PollOptionResult"
+import { useStartLivestreamPoll } from "components/custom-hook/streaming/useStartLivestreamPoll"
 
 const CreateOrEditPollForm = dynamic(() =>
    import("./CreateOrEditPollForm").then((mod) => mod.CreateOrEditPollForm)
@@ -117,23 +125,37 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                </Stack>
                <PollActionButton poll={poll} />
             </Collapse>
-            <Stack
-               justifyContent="space-between"
-               alignItems="center"
-               direction="row"
-               sx={styles.expandButton}
-               component={ButtonBase}
+            <CollapseButton
+               showResults={showResults}
                onClick={() => setShowResults((prev) => !prev)}
-            >
-               <Typography variant="small" color="neutral.600">
-                  {showResults ? "Collapse" : "Expand"}
-               </Typography>
-               {showResults ? <ChevronUp /> : <ChevronDown />}
-            </Stack>
+            />
          </Box>
       )
    }
 )
+
+type CollapseButtonProps = {
+   showResults: boolean
+   onClick: ButtonBaseProps["onClick"]
+}
+
+const CollapseButton = ({ showResults, onClick }: CollapseButtonProps) => {
+   return (
+      <Stack
+         justifyContent="space-between"
+         alignItems="center"
+         direction="row"
+         sx={styles.expandButton}
+         component={ButtonBase}
+         onClick={onClick}
+      >
+         <Typography variant="small" color="neutral.600">
+            {showResults ? "Collapse" : "Expand"}
+         </Typography>
+         {showResults ? <ChevronUp /> : <ChevronDown />}
+      </Stack>
+   )
+}
 
 type PollActionButtonProps = {
    poll: LivestreamPoll
@@ -142,16 +164,24 @@ type PollActionButtonProps = {
 const PollActionButton = ({ poll }: PollActionButtonProps) => {
    const { livestreamId, streamerAuthToken } = useStreamingContext()
 
-   const { trigger: stopPoll, isMutating } = useStopLivestreamPoll(
-      livestreamId,
-      poll.id,
-      streamerAuthToken
-   )
+   const { trigger: stopPoll, isMutating: stopPollMutating } =
+      useStopLivestreamPoll(livestreamId, poll.id, streamerAuthToken)
+
+   const { trigger: startPoll, isMutating: startPollMutating } =
+      useStartLivestreamPoll(livestreamId, poll.id, streamerAuthToken)
+
+   const loading = stopPollMutating || startPollMutating
 
    return (
       <Box sx={styles.action}>
          {poll.state === "upcoming" && (
-            <LoadingButton color="primary" variant="outlined" fullWidth>
+            <LoadingButton
+               color="primary"
+               variant="outlined"
+               fullWidth
+               onClick={() => startPoll()}
+               loading={loading}
+            >
                Start poll
             </LoadingButton>
          )}
@@ -161,7 +191,7 @@ const PollActionButton = ({ poll }: PollActionButtonProps) => {
                variant="contained"
                fullWidth
                onClick={() => stopPoll()}
-               loading={isMutating}
+               loading={loading}
             >
                Close poll
             </LoadingButton>
