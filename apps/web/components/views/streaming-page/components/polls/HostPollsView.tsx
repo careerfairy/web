@@ -8,7 +8,7 @@ import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
 import { PollCreationButton } from "./PollCreationButton"
 
-export const PollsView = () => {
+export const HostPollsView = () => {
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
          <Content />
