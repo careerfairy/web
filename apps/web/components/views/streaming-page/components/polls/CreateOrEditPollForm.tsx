@@ -1,5 +1,7 @@
 import {
    LivestreamPoll,
+   MAX_POLL_OPTIONS,
+   MIN_POLL_OPTIONS,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
 import {
@@ -141,6 +143,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                   maxRows={4}
                   name="question"
                   label="Question"
+                  placeholder="Insert your question here"
                />
                <Stack spacing={1.5}>
                   {fields.map((option, index) => (
@@ -148,6 +151,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         key={option.id}
                         fullWidth
                         name={`options.${index}.text`}
+                        placeholder={`Insert option ${index + 1}`}
                         onKeyDown={preventSubmitOnEnter}
                         InputProps={{
                            endAdornment: (
@@ -157,7 +161,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                                     aria-label="toggle password visibility"
                                     onClick={() => remove(index)}
                                     disabled={
-                                       fields.length <= 2 ||
+                                       fields.length <= MIN_POLL_OPTIONS ||
                                        formMethods.formState.isSubmitting
                                     }
                                     edge="end"
@@ -167,11 +171,12 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                                  </IconButton>
                               </InputAdornment>
                            ),
+                           autoComplete: "off",
                         }}
                         label={`Option ${index + 1}`}
                      />
                   ))}
-                  {fields.length <= 4 && (
+                  {fields.length < MAX_POLL_OPTIONS && (
                      <Button
                         variant="outlined"
                         color="grey"
@@ -179,7 +184,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         onClick={() => append(generateOption())}
                         sx={styles.addOptionButton}
                         disabled={
-                           fields.length >= 4 ||
+                           fields.length >= MAX_POLL_OPTIONS ||
                            formMethods.formState.isSubmitting
                         }
                      >

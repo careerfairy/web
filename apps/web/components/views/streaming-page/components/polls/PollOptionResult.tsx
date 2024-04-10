@@ -26,7 +26,8 @@ const styles = sxStyles({
    progress: {
       borderRadius: "6px",
       [`&.${linearProgressClasses.colorPrimary}`]: {
-         backgroundColor: "transparent",
+         borderRadius: "6px",
+         backgroundColor: (theme) => theme.brand.black[400],
       },
       height: 5,
    },
