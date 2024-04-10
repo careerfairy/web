@@ -1,7 +1,7 @@
 import { Box, Skeleton, Stack } from "@mui/material"
 import GroupPlansDialog from "../../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
-import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipableDrawer"
+import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 
 const styles = sxStyles({
    mobilePaperRoot: { maxHeight: "95%", backgroundColor: "#F6F6FA" },
