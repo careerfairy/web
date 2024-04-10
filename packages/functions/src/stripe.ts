@@ -234,7 +234,7 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
 
                functions.logger.info(
                   "✅ Successfully processed event - Stripe Customer: " +
-                     metadata +
+                     JSON.stringify(metadata) +
                      ", Group ID: ",
                   metadata.groupId
                )
