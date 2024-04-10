@@ -513,7 +513,7 @@ export class LivestreamService {
       message: string
       authorEmail: string
       type: LivestreamChatEntry["type"]
-      shortenedName: string
+      displayName: string
       agoraUserId: string
    }) => {
       const {
@@ -521,7 +521,7 @@ export class LivestreamService {
          message,
          authorEmail,
          type,
-         shortenedName,
+         displayName,
          agoraUserId,
       } = options
 
@@ -539,7 +539,7 @@ export class LivestreamService {
          wow: [],
          heart: [],
          thumbsUp: [],
-         authorName: shortenedName,
+         authorName: displayName,
          timestamp: Timestamp.now(),
          authorEmail,
          message,
