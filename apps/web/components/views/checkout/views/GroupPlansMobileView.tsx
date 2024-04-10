@@ -9,7 +9,6 @@ import {
    plansDialogOpenSelector,
    selectedPlanSelector,
 } from "store/selectors/groupSelectors"
-import BrandedSwipableDrawer from "../../common/inputs/BrandedSwipableDrawer"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import SelectGroupPlanMobileView from "../views/SelectGroupPlanMobileView"
 import GroupPlanCheckoutMobileView from "../views/GroupPlanCheckoutMobileView"
@@ -20,6 +19,7 @@ import React from "react"
 import { useSparksPlansForm } from "../GroupPlansDialog"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import GroupPlanSkeletonMobile from "./skeletons/GroupPlanSkeletonMobileView"
+import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 
 const mobileBreakpoint = "md"
 
