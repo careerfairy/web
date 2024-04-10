@@ -6,24 +6,29 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import { sxStyles } from "types/commonTypes"
-import { ChatWidget } from "../chat/ChatWidget"
+import { ChatInput } from "../chat/ChatInput"
+import { ChatList } from "../chat/ChatList"
+import { useScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
 
 const styles = sxStyles({
    root: {
       p: 0,
       display: "flex",
+      flexDirection: "column",
+      position: "relative",
    },
    portraitChat: {
-      minHeight: 372,
+      height: 372,
    },
    landscapeChat: {
-      minHeight: 294,
+      height: 294,
    },
 })
 
 export const ChatPanel = () => {
    const isMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
+   const { scrollToBottom, ref } = useScrollToBottom()
 
    const chatPanelStyles = streamIsLandscape
       ? styles.landscapeChat
@@ -35,8 +40,10 @@ export const ChatPanel = () => {
          title="Chat"
          icon={<MessageCircle />}
          contentWrapperStyles={[styles.root, isMobile && chatPanelStyles]}
+         bottomContent={<ChatInput onMessageSend={scrollToBottom} />}
+         contentRef={ref}
       >
-         <ChatWidget />
+         <ChatList scrollToBottom={scrollToBottom} />
       </SidePanelView>
    )
 }

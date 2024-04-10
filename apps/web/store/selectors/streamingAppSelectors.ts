@@ -74,3 +74,6 @@ export const useHasEnded = () =>
 
 export const useOpenStream = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.openStream)
+
+export const useCompanyLogoUrl = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.companyLogoUrl)
