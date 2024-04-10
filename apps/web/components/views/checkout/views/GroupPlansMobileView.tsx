@@ -73,7 +73,6 @@ const styles = sxStyles({
       width: "100%",
       color: (theme) => theme.brand.white[100],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -82,6 +81,9 @@ const styles = sxStyles({
    cancelButton: {
       color: (theme) => theme.palette.black[700],
       zIndex: 10,
+   },
+   swipableDrawer: {
+      maxHeight: "90%",
    },
 })
 
@@ -99,11 +101,15 @@ const View = () => {
    const selectedPlan = useSelector(selectedPlanSelector)
    const { group } = useGroup()
    const { authenticatedUser } = useAuth()
+   const dispatch = useDispatch()
 
    const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
       useSparksPlansForm()
 
-   const dispatch = useDispatch()
+   const {
+      customerSessionSecret: customerSessionSecret,
+      loading: loadingSecret,
+   } = useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
 
    const handleCloseGroupPlansDialog = useCallback(
       (forceClose: boolean = false) => {
@@ -116,21 +122,17 @@ const View = () => {
       [dispatch]
    )
 
-   const {
-      customerSessionSecret: customerSessionSecret,
-      loading: loadingSecret,
-   } = useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
-
-   const disabled = !selectedPlan || loadingSecret || !customerSessionSecret
    const redirectToCheckout = async (e: FormEvent) => {
       e.preventDefault()
       setClientSecret(customerSessionSecret)
       goToSelectPlanView(selectedPlan)
    }
 
+   const disabled = !selectedPlan || loadingSecret || !customerSessionSecret
+
    return (
       <BrandedSwipableDrawer
-         sx={{ maxHeight: "90%" }}
+         sx={styles.swipableDrawer}
          open={open}
          onOpen={() => {}}
          PaperProps={{

@@ -17,14 +17,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   text: string
+   text?: string
    icon: React.ReactNode
 }
 
-const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
+const UpgradePlanButton = ({ text = "Upgrade Now", icon }: Props) => {
    const dispatch = useDispatch()
-
-   const buttonText = text ? text : "Upgrade Now"
 
    const handleOpen = useCallback(
       (e: FormEvent) => {
@@ -41,10 +39,10 @@ const UpgradeSparksPlanButton = ({ text, icon }: Props) => {
             sx={styles.checkoutButton}
             startIcon={icon || <Star strokeWidth={3} />}
          >
-            {buttonText}
+            {text}
          </Button>
       </Box>
    )
 }
 
-export default UpgradeSparksPlanButton
+export default UpgradePlanButton

@@ -8,7 +8,6 @@ import StripeCheckoutComponent from "../forms/StripeCheckoutComponent"
 const styles = sxStyles({
    title: {
       color: (theme) => theme.brand.purple[600],
-      fontFamily: "Poppins",
       fontSize: "28px",
       fontStyle: "normal",
       fontWeight: 700,
@@ -43,7 +42,7 @@ const View = () => {
          </Box>
          <Box mr={5}>
             Once you confirm the payment, your plan will be updated
-            automatically and you{"'"}ll receive a invoice straight to your
+            automatically and you{"'"}ll receive an invoice directly in your
             email.
          </Box>
          <Box mt={5} />

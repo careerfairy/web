@@ -3,7 +3,7 @@ import { Box, Stack, SxProps, Theme } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import UpgradeSparksPlanButton from "./UpgradePlanButton"
+import UpgradePlanButton from "./UpgradePlanButton"
 import { Star } from "react-feather"
 import useIsMobile from "components/custom-hook/useIsMobile"
 
@@ -72,7 +72,7 @@ const UpgradePlanBanner = ({ title, description, bannerSx, show }: Props) => {
                <Box>{description}</Box>
             </Stack>
             <Box sx={styles.buttonWrapper}>
-               <UpgradeSparksPlanButton
+               <UpgradePlanButton
                   text="Upgrade now"
                   icon={<Star strokeWidth={3} />}
                />

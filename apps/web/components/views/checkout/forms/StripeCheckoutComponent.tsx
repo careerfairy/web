@@ -13,7 +13,7 @@ type Props = {
    clientSecret: string
 }
 
-function StripeCheckoutComponent({ clientSecret }: Props) {
+const StripeCheckoutComponent = ({ clientSecret }: Props) => {
    const options = {
       // passing the client secret obtained from the server
       clientSecret: clientSecret,

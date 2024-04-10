@@ -38,7 +38,6 @@ const styles = sxStyles({
    title: {
       color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
-      fontFamily: "Poppins",
       letterSpacing: {
          xs: "-0.04343rem",
          [mobileBreakpoint]: "-0.04886rem",
@@ -51,7 +50,6 @@ const styles = sxStyles({
       },
       color: (theme) => theme.palette.neutral[800],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontStyle: "normal",
       fontWeight: "400",
    },
@@ -260,16 +258,9 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
  * which ensures that the state update and navigation don't occur in the same rendering phase.
  *
  * @param {Function} setState - The function to update the state.
- * @param {Function} goToStep - The function to navigate to a step.
  * @param {any} stateValue - The new state value.
- * @param {string} step - The step to navigate to.
  */
-function setState(
-   // eslint-disable-next-line @typescript-eslint/ban-types
-   setState: Function,
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   stateValue: any
-) {
+function setState(setState: (value) => void, stateValue: unknown) {
    setState(stateValue)
 }
 

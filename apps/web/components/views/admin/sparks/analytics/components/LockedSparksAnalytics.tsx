@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import GroupPlansDialog from "components/views/checkout/GroupPlansDialog"
-import UpgradeSparksPlanButton from "components/views/checkout/forms/UpgradePlanButton"
+import UpgradePlanButton from "components/views/checkout/forms/UpgradePlanButton"
 import LockedIcon from "components/views/common/icons/LockedIcon"
 import Image from "next/image"
 import React from "react"
@@ -122,7 +122,7 @@ const Info = () => {
          </Box>
          <Box sx={styles.text}>
             <GroupPlansDialog />
-            <UpgradeSparksPlanButton
+            <UpgradePlanButton
                text="Unlock it now"
                icon={<Unlock strokeWidth={3} />}
             />

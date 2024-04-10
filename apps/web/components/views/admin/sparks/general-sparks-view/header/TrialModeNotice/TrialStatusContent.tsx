@@ -4,7 +4,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import Message from "./Message"
 import Progress from "./Progress"
-import UpgradeSparksPlanButton from "components/views/checkout/forms/UpgradePlanButton"
+import UpgradePlanButton from "components/views/checkout/forms/UpgradePlanButton"
 import { Star } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 
@@ -109,7 +109,7 @@ const TrialStatusContent = () => {
             metPublishingCriteria={groupPresenter.publicSparks}
          />
          <Box>
-            <UpgradeSparksPlanButton
+            <UpgradePlanButton
                text="Upgrade now"
                icon={<Star strokeWidth={3} />}
             />

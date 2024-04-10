@@ -45,7 +45,7 @@ const View = () => {
             </GroupPlansDialog.Title>
             <GroupPlansDialog.Subtitle>
                Once you confirm the payment, your plan will be updated
-               automatically and you{"'"}ll receive a invoice straight to your
+               automatically and you{"'"}ll receive an invoice directly in your
                email.
             </GroupPlansDialog.Subtitle>
             <Box mt={5} />

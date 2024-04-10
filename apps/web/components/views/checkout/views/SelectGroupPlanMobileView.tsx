@@ -18,7 +18,6 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[800],
       mr: 15,
       textAlign: "start",
-      fontFamily: "Poppins",
       fontSize: "32px",
       fontStyle: "normal",
       fontWeight: "700",
@@ -39,7 +38,6 @@ const styles = sxStyles({
    checkoutDescription: {
       color: (theme) => theme.palette.neutral[600],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",

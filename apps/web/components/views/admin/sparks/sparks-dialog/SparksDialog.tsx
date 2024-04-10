@@ -485,12 +485,9 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
  * @param {string} step - The step to navigate to.
  */
 function setStateAndNavigate(
-   // eslint-disable-next-line @typescript-eslint/ban-types
-   setState: Function,
-   // eslint-disable-next-line @typescript-eslint/ban-types
-   goToStep: Function,
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   stateValue: any,
+   setState: (value) => void,
+   goToStep: (step) => void,
+   stateValue: unknown,
    step: SparkDialogStep
 ) {
    setState(stateValue)

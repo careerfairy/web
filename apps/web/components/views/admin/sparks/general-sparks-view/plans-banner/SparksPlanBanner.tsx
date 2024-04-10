@@ -24,7 +24,6 @@ const styles = sxStyles({
    bannerTitle: {
       color: (theme) => theme.brand.white[100],
       textAlign: "left",
-      fontFamily: "Poppins",
       fontSize: "20px",
       fontStyle: "normal",
       fontWeight: "600",
@@ -37,7 +36,6 @@ const styles = sxStyles({
    bannerDescriptionWarning: {
       py: 2,
       color: (theme) => theme.brand.white[100],
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -58,7 +56,6 @@ const styles = sxStyles({
    bannerDescription: {
       py: 2,
       color: (theme) => theme.palette.neutral[900],
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -135,14 +132,12 @@ const TrialEndUpgradeTitle = ({ days }: TrialEndProps) => {
    const monthShort = month.at(0).toUpperCase() + month.substring(1)
    const endsOn = `on ${endDate.day} ${monthShort} ${endDate.year}`
    return (
-      <>
-         <StatusTitle
-            preTitle="Your Sparks trial "
-            afterTitle={endsOn}
-            daysLeft={days}
-            critical={true}
-         />
-      </>
+      <StatusTitle
+         preTitle="Your Sparks trial "
+         afterTitle={endsOn}
+         daysLeft={days}
+         critical={true}
+      />
    )
 }
 
@@ -152,6 +147,7 @@ type StatusTitleProps = {
    preTitle: string
    afterTitle: string
 }
+
 const StatusTitle = (props: StatusTitleProps) => {
    return (
       <Box sx={styles.statusTitle}>
@@ -190,6 +186,7 @@ type StatusDescriptionFullProps = {
    sx: SxProps
    showSx?: SxProps
 }
+
 const StatusDescriptionFull = ({ sx, showSx }: StatusDescriptionFullProps) => {
    const [showingMore, setShowingMore] = useState(false)
    const isMobile = useIsMobile()
@@ -239,6 +236,7 @@ type ShowMoreComponentProps = {
    full: string
    showSx?: SxProps
 }
+
 const ShowMoreComponent = (props: ShowMoreComponentProps) => {
    const [showingMore, setShowingMore] = useState(false)
    const text = props.full
