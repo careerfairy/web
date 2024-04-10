@@ -115,8 +115,7 @@ export const PollOptionResult = ({
    return (
       <LoadingButton
          onClick={enableVoting ? onVote : undefined}
-         loading={isVoting}
-         disabled={isOptionVoted || !enableVoting}
+         disabled={isOptionVoted || !enableVoting || isVoting}
          aria-label={option.text}
          sx={[
             styles.root,

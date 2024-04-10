@@ -2,7 +2,7 @@ import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { Skeleton, Typography } from "@mui/material"
 import { Box, Stack } from "@mui/material"
 import { PollOptionResult } from "./PollOptionResult"
-import { useCallback, useMemo } from "react"
+import { Fragment, useCallback, useMemo } from "react"
 import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
 import { useStreamingContext } from "../../context"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
@@ -109,7 +109,11 @@ const Content = ({ poll }: PollOptionsProps) => {
    )
 }
 
-export const PollOptionResultSkeleton = () => {
+export const PollOptionResultSkeleton = ({
+   showResultsSkeleton = true,
+}: {
+   showResultsSkeleton?: boolean
+}) => {
    return (
       <Box sx={styles.root}>
          <Stack spacing={1}>
@@ -117,20 +121,26 @@ export const PollOptionResultSkeleton = () => {
                <Typography variant="medium">
                   <Skeleton variant="text" width={30} />
                </Typography>
-               <Typography variant="medium">
-                  <Skeleton variant="text" width={20} />
-               </Typography>
+               {Boolean(showResultsSkeleton) && (
+                  <Typography variant="medium">
+                     <Skeleton variant="text" width={20} />
+                  </Typography>
+               )}
             </Stack>
-            <Skeleton
-               sx={styles.skeletonProgress}
-               variant="rounded"
-               animation="wave"
-               width={`${Math.random() * 100}%`}
-               height={5}
-            />
-            <Typography variant="xsmall">
-               <Skeleton variant="text" width={100} />
-            </Typography>
+            {Boolean(showResultsSkeleton) && (
+               <Fragment>
+                  <Skeleton
+                     sx={styles.skeletonProgress}
+                     variant="rounded"
+                     animation="wave"
+                     width={`${Math.random() * 100}%`}
+                     height={5}
+                  />
+                  <Typography variant="xsmall">
+                     <Skeleton variant="text" width={100} />
+                  </Typography>
+               </Fragment>
+            )}
          </Stack>
          <Box sx={styles.coloredEdge} />
       </Box>
