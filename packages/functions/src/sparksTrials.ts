@@ -65,6 +65,6 @@ async function sendEndOfSparksTrialEmails() {
    await trialService.buildNotifications()
    await trialService.createNotifications()
 
-
+   // disable for now
    await emailBuilder.send()
 }
