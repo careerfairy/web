@@ -9,6 +9,7 @@ import { Fragment } from "react"
 import { Trash2 as DeleteIcon, Edit, MoreVertical } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 
 const styles = sxStyles({
    delete: {
@@ -24,11 +25,11 @@ const styles = sxStyles({
 })
 
 type Props = {
-   selectedPollId: string | null
+   poll: LivestreamPoll
    onClickEdit: () => void
 }
 
-export const PollOptionsMenu = ({ selectedPollId, onClickEdit }: Props) => {
+export const PollOptionsMenu = ({ poll, onClickEdit }: Props) => {
    const { anchorEl, handleClick, handleClose } = useMenuState()
 
    const streamIsMobile = useStreamIsMobile()
@@ -37,34 +38,38 @@ export const PollOptionsMenu = ({ selectedPollId, onClickEdit }: Props) => {
 
    const { trigger: deleteChatEntry, isMutating } = useDeleteLivestreamPoll(
       livestreamId,
-      selectedPollId,
+      poll.id,
       streamerAuthToken
    )
 
    const open = Boolean(anchorEl)
 
    const options: MenuOption[] = [
-      {
-         label: "Edit poll",
-         icon: <Edit />,
-         handleClick: onClickEdit,
-      },
-      {
-         label: "Delete poll",
-         icon: <DeleteIcon />,
-         handleClick: () => deleteChatEntry(),
-         menuItemSxProps: [styles.delete],
-         loading: isMutating,
-      },
-      ...(streamIsMobile
+      ...(poll.state === "upcoming" // Only newly created polls can be edited
          ? [
               {
-                 label: "Cancel",
-                 handleClick: () => null,
+                 label: "Edit poll",
+                 icon: <Edit />,
+                 handleClick: onClickEdit,
+              },
+           ]
+         : []),
+      ...(poll.state !== "current" // If a poll is ongoing, we can't delete it
+         ? [
+              {
+                 label: "Delete poll",
+                 icon: <DeleteIcon />,
+                 handleClick: () => deleteChatEntry(),
+                 menuItemSxProps: [styles.delete],
+                 loading: isMutating,
               },
            ]
          : []),
    ]
+
+   if (options.length === 0) {
+      return null
+   }
 
    return (
       <Fragment>
@@ -77,6 +82,7 @@ export const PollOptionsMenu = ({ selectedPollId, onClickEdit }: Props) => {
             handleClose={handleClose}
             anchorEl={anchorEl}
             isMobileOverride={streamIsMobile}
+            enableDrawerCancelButton
          />
       </Fragment>
    )

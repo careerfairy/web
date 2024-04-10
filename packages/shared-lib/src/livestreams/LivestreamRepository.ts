@@ -278,6 +278,13 @@ export interface ILivestreamRepository {
    ): Promise<void>
 
    /**
+    * Fetches a poll from a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param pollId - The ID of the poll
+    */
+   getPoll(livestreamId: string, pollId: string): Promise<LivestreamPoll>
+
+   /**
     * Creates a poll for a livestream
     * @param livestreamId - The ID of the livestream
     * @param options - The options of the poll
@@ -298,7 +305,7 @@ export interface ILivestreamRepository {
    updatePoll(
       livestreamId: string,
       pollId: string,
-      poll: Pick<LivestreamPoll, "options" | "question" | "state">
+      poll: Partial<Pick<LivestreamPoll, "options" | "question" | "state">>
    ): Promise<void>
 
    /**
@@ -1236,6 +1243,26 @@ export class FirebaseLivestreamRepository
       return recordingToken
    }
 
+   async getPoll(
+      livestreamId: string,
+      pollId: string
+   ): Promise<LivestreamPoll> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("polls")
+         .doc(pollId)
+         .withConverter(createCompatGenericConverter<LivestreamPoll>())
+
+      const doc = await docRef.get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data()
+   }
+
    async createPoll(
       livestreamId: string,
       options: LivestreamPoll["options"],
@@ -1263,10 +1290,8 @@ export class FirebaseLivestreamRepository
    async updatePoll(
       livestreamId: string,
       pollId: string,
-      poll: Pick<LivestreamPoll, "options" | "question" | "state">
+      poll: Partial<Pick<LivestreamPoll, "options" | "question" | "state">>
    ): Promise<void> {
-      const { options, question, state } = poll
-
       const docRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -1274,14 +1299,7 @@ export class FirebaseLivestreamRepository
          .withConverter(createCompatGenericConverter<LivestreamPoll>())
          .doc(pollId)
 
-      const updateData: Pick<LivestreamPoll, "options" | "question" | "state"> =
-         {
-            ...(options && { options }),
-            ...(question && { question }),
-            ...(state && { state }),
-         }
-
-      return docRef.update(updateData)
+      return docRef.update(poll)
    }
 
    async markPollAsCurrent(
