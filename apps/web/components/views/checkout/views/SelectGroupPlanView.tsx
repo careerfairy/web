@@ -42,9 +42,6 @@ const styles = sxStyles({
       direction: "column",
       spacing: 2,
    },
-   cancelButton: {
-      color: (theme) => theme.palette.black[700],
-   },
    checkoutDescription: {
       color: (theme) => theme.palette.neutral[600],
       textAlign: "center",
