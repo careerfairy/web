@@ -3,6 +3,7 @@ import GroupPlansDialog from "../../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "components/views/common/transitions"
 import CloseIcon from "@mui/icons-material/CloseRounded"
+import { FC } from "react"
 
 const mobileBreakpoint = "md"
 
@@ -29,6 +30,7 @@ const styles = sxStyles({
    },
    skeletonWrapper: {
       p: "20px",
+      alignItems: "center",
    },
    planSkeleton: {
       width: "100vw",
@@ -52,7 +54,6 @@ const styles = sxStyles({
       height: "40px",
       color: (theme) => theme.brand.white[100],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -64,10 +65,14 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.black,
    },
 })
+
 type SkeletonSelectSparksPlanProps = {
    open: boolean
 }
-const SkeletonSelectSparksPlan = ({ open }: SkeletonSelectSparksPlanProps) => {
+
+const SkeletonSelectSparksPlan: FC<SkeletonSelectSparksPlanProps> = ({
+   open,
+}) => {
    return (
       <Dialog
          scroll="paper"
@@ -75,7 +80,7 @@ const SkeletonSelectSparksPlan = ({ open }: SkeletonSelectSparksPlanProps) => {
          maxWidth={false}
          TransitionComponent={SlideUpTransition}
       >
-         <Stack alignItems={"center"} sx={styles.skeletonWrapper}>
+         <Stack sx={styles.skeletonWrapper}>
             <Stack alignItems={"center"}>
                <GroupPlansDialog.Title>
                   Select your{" "}

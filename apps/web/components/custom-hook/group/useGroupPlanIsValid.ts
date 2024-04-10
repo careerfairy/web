@@ -15,7 +15,7 @@ const useGroupPlanIsValid = (
    let valid = false
    if (group.length) {
       const groupPresenter = GroupPresenter.createFromDocument(group.at(0))
-      valid = groupPresenter.isPlanValidByType(types)
+      valid = groupPresenter.isPlanValidByTypes(types)
    }
 
    return { valid: valid }

@@ -1,7 +1,7 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { Stack, Box, useTheme, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import React from "react"
+import React, { FC } from "react"
 import { CheckCircle, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useSparksPlansForm } from "../../GroupPlansDialog"
@@ -19,9 +19,10 @@ const styles = sxStyles({
    planFeatures: {
       pt: 1,
       borderRadius: "12px",
+      direction: "column",
+      spacing: 2,
    },
    planTitle: {
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: 700,
@@ -29,7 +30,6 @@ const styles = sxStyles({
    },
    selectedPlanTitle: {
       color: (theme) => theme.palette.neutral[800],
-      fontFamily: "Poppins",
       fontSize: "32px",
       fontStyle: "normal",
       fontWeight: "700",
@@ -37,14 +37,12 @@ const styles = sxStyles({
    },
    selectedPlanDescription: {
       color: (theme) => theme.palette.neutral[700],
-      fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",
       lineHeight: "20px" /* 142.857% */,
    },
    planDescription: {
-      fontFamily: "Poppins",
       fontSize: "10px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -136,7 +134,7 @@ const GroupSparksPlanMobileSelector = () => {
                   </ConditionalWrapper>
                </Typography>
             </Stack>
-            <Stack direction={"column"} spacing={2} sx={[styles.planFeatures]}>
+            <Stack sx={[styles.planFeatures]}>
                {features.map((feature) => {
                   return (
                      <Box key={feature.name}>
@@ -179,7 +177,8 @@ type GroupSparksPlanProps = {
    description: string
    plan: GroupPlanType
 }
-const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
+
+const GroupSparksPlanComponent: FC<GroupSparksPlanProps> = (props) => {
    const theme = useTheme()
    const { setPlan } = useSparksPlansForm()
    const selectedPlan = useSelector(selectedPlanSelector)
@@ -230,11 +229,11 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
       </Box>
    )
 }
-export function commafy(num) {
+export const commafy = (num) => {
    return numberWith(num, "’")
 }
 
-function numberWith(x: number, separator) {
+const numberWith = (x: number, separator) => {
    return x.toLocaleString("en-US").replace(",", separator)
 }
 export default GroupSparksPlanMobileSelector

@@ -2,6 +2,7 @@ import { Box, Skeleton, Stack } from "@mui/material"
 import GroupPlansDialog from "../../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
+import { FC } from "react"
 
 const styles = sxStyles({
    mobilePaperRoot: { maxHeight: "95%", backgroundColor: "#F6F6FA" },
@@ -56,18 +57,21 @@ const styles = sxStyles({
       width: "83px",
       px: "10px",
    },
+   swipeableDrawer: {
+      maxHeight: "90%",
+   },
 })
 
 type GroupPlanSelectSkeletonMobileProps = {
    open: boolean
 }
 
-const GroupPlanSelectSkeletonMobile = ({
+const GroupPlanSelectSkeletonMobile: FC<GroupPlanSelectSkeletonMobileProps> = ({
    open,
-}: GroupPlanSelectSkeletonMobileProps) => {
+}) => {
    return (
       <BrandedSwipableDrawer
-         sx={{ maxHeight: "90%" }}
+         sx={styles.swipeableDrawer}
          open={open}
          onOpen={() => {}}
          PaperProps={{

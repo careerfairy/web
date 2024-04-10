@@ -357,7 +357,7 @@ export class GroupPresenter {
     * of any of the specified @type GroupPlanTypes. Meaning the plan has not expired
     * and his of one of the specified types.
     */
-   isPlanValidByType(types: GroupPlanType[]) {
+   isPlanValidByTypes(types: GroupPlanType[]) {
       if (!types || !types.length) return this.hasPlanExpired()
       const hasType = types.includes(this.plan?.type)
       return hasType && !this.hasPlanExpired()

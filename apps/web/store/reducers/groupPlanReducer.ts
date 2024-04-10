@@ -54,14 +54,12 @@ export const groupPlansSlice = createSlice({
          state.plansDialogOpen = false
          state.groupPlansForm.selectedPlan = null
          state.confirmCloseSparksDialogOpen = false
-         state.groupPlansForm = initialState.groupPlansForm // Reset the initial state completely
+         state.groupPlansForm = initialState.groupPlansForm
       },
-      // Actions for setting values on the form
       setPlan: (state, action: PayloadAction<GroupPlanType>) => {
          state.groupPlansForm.selectedPlan =
             action.payload || initialState.groupPlansForm.selectedPlan
       },
-      // Actions for setting values on the form
       setSecret: (state, action: PayloadAction<string>) => {
          state.groupPlansForm.clientSecret =
             action.payload || initialState.groupPlansForm.clientSecret
@@ -69,7 +67,6 @@ export const groupPlansSlice = createSlice({
    },
 })
 
-// Export actions
 export const {
    setPlan,
    setSecret,
@@ -78,5 +75,4 @@ export const {
    openGroupPlansDialog,
 } = groupPlansSlice.actions
 
-// Export reducer
 export default groupPlansSlice.reducer

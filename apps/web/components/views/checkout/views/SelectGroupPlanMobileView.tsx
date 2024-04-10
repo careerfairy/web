@@ -34,6 +34,8 @@ const styles = sxStyles({
    checkoutWrapper: {
       mt: 2,
       alignItems: "center",
+      direction: "column",
+      spacing: 2,
    },
    checkoutDescription: {
       color: (theme) => theme.palette.neutral[600],
@@ -42,6 +44,9 @@ const styles = sxStyles({
       fontStyle: "normal",
       fontWeight: "400",
       lineHeight: "20px",
+      display: "flex",
+      width: "100%",
+      alignContent: "start",
    },
 })
 
@@ -89,13 +94,8 @@ const View = () => {
                   md: 0,
                }}
             />
-            <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
-               <Box
-                  sx={styles.checkoutDescription}
-                  display={"flex"}
-                  width={"100%"}
-                  alignContent={"start"}
-               >
+            <Stack sx={styles.checkoutWrapper}>
+               <Box sx={styles.checkoutDescription}>
                   Content available for 1 year
                </Box>
             </Stack>

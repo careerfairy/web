@@ -1,7 +1,7 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { Stack, Box, useTheme, Typography } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import React from "react"
+import React, { FC } from "react"
 import { Check, CheckCircle, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useSparksPlansForm } from "../../GroupPlansDialog"
@@ -25,7 +25,6 @@ const styles = sxStyles({
       fontWeight: 700,
    },
    planDescription: {
-      fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -33,7 +32,6 @@ const styles = sxStyles({
       minHeight: "40px",
    },
    planPricing: {
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "600",
@@ -47,11 +45,12 @@ const styles = sxStyles({
       display: "flex",
       padding: "20px",
       flexDirection: "column",
-      justifyContent: "center",
       alignItems: "flex-start",
       gap: "8px",
       alignSelf: "stretch",
       borderRadius: "12px 12px 8px 8px",
+      justifyContent: "space-around",
+      direction: "column",
    },
    contentWrapper: {
       borderRadius: "14px",
@@ -104,7 +103,8 @@ type GroupSparksPlanFeatureProps = {
    name: string
    enabled: boolean
 }
-const GroupSparksPlanFeature = (props: GroupSparksPlanFeatureProps) => {
+
+const GroupSparksPlanFeature: FC<GroupSparksPlanFeatureProps> = (props) => {
    const theme = useTheme()
    const color = props.enabled ? "#6749EA" : theme.palette.neutral[800]
 
@@ -120,12 +120,14 @@ const GroupSparksPlanFeature = (props: GroupSparksPlanFeatureProps) => {
       </Stack>
    )
 }
+
 type GroupSparksPlanProps = {
    title: string
    description: string
    plan: GroupPlanType
 }
-const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
+
+const GroupSparksPlanComponent: FC<GroupSparksPlanProps> = (props) => {
    const { setPlan } = useSparksPlansForm()
    const { group } = useGroup()
    const theme = useTheme()
@@ -174,7 +176,6 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
          <Stack
             direction={"column"}
             sx={[styles.planWrapper, { backgroundColor: headerBgColor }]}
-            justifyContent={"space-around"}
          >
             <Typography variant="brandedH1" color={color} sx={styles.planTitle}>
                {props.title}
@@ -198,7 +199,7 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
             spacing={1}
             sx={[styles.planFeatures, { background: featuresBackgroundColor }]}
          >
-            {features.map((feature, idx, items) => {
+            {features.map((feature, index, items) => {
                return (
                   <Box key={feature.name}>
                      <Box pl={2}>
@@ -209,7 +210,7 @@ const GroupSparksPlanComponent = (props: GroupSparksPlanProps) => {
                         />
                      </Box>
                      <ConditionalWrapper
-                        condition={idx != items.length - 1}
+                        condition={index != items.length - 1}
                         fallback={<Box mt={"10px"} />}
                      >
                         <hr style={styles.planSeparator} color="#E1E1E1" />

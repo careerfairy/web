@@ -32,7 +32,6 @@ const styles = sxStyles({
       width: "276px",
       color: (theme) => theme.brand.white[100],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -41,11 +40,12 @@ const styles = sxStyles({
    checkoutWrapper: {
       mt: 2,
       alignItems: "center",
+      direction: "column",
+      spacing: 2,
    },
    checkoutDescription: {
       color: (theme) => theme.palette.neutral[600],
       textAlign: "center",
-      fontFamily: "Poppins",
       fontSize: "14px",
       fontStyle: "normal",
       fontWeight: "400",
@@ -92,7 +92,7 @@ type GroupPlansProps = {
 
 const GroupPlans = (props: GroupPlansProps) => {
    return (
-      <GroupPlansDialog.Container sx={{}}>
+      <GroupPlansDialog.Container>
          <GroupPlansDialog.Content sx={styles.content}>
             <GroupPlansDialog.Title>
                Select your{" "}
@@ -119,7 +119,7 @@ const GroupPlans = (props: GroupPlansProps) => {
                   md: 0,
                }}
             />
-            <Stack direction={"column"} spacing={2} sx={styles.checkoutWrapper}>
+            <Stack sx={styles.checkoutWrapper}>
                <Box>
                   <Button
                      disabled={props.disabled}

@@ -20,7 +20,7 @@ type StripeConfig = {
    priceId: (countryCode: string) => string
 }
 
-interface AnalyticsPlanConstants {
+type AnalyticsPlanConstants = {
    MINIMUM_DUMMY: number
 }
 interface SparksPlanConstants {
@@ -102,7 +102,7 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 6,
-         MAX_SPARK_CREATOR_COUNT: 4, // No limit
+         MAX_SPARK_CREATOR_COUNT: 4,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
       },
       jobs: {
