@@ -38,6 +38,7 @@ const styles = sxStyles({
       width: "100%",
       color: "#757575",
       p: 0,
+      fontFamily: "inherit",
       "& svg": {
          width: 24,
          height: 24,
@@ -70,7 +71,7 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
       }
 
       const showActionButton =
-         poll.state === "upcoming" || poll.state === "current"
+         (poll.state === "upcoming" || poll.state === "current") && isHost
 
       if (isEditing && isHost) {
          return (
@@ -98,15 +99,17 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
             <Box pt={1.25} />
             <Typography sx={styles.question}>{poll.question}</Typography>
             <Box pt={1.5} />
-            <Collapse unmountOnExit in={showResults}>
+            <Collapse unmountOnExit in={showResults || !isHost}>
                <PollOptions poll={poll} />
                {Boolean(showActionButton) && <PollActionButton poll={poll} />}
             </Collapse>
-            <CollapseButton
-               showResults={showResults}
-               onClick={() => setShowResults((prev) => !prev)}
-               paddedTop={Boolean(showResults && !showActionButton)}
-            />
+            {Boolean(isHost) && (
+               <CollapseButton
+                  showResults={showResults}
+                  onClick={() => setShowResults((prev) => !prev)}
+                  paddedTop={Boolean(showResults && !showActionButton)}
+               />
+            )}
          </Box>
       )
    }
