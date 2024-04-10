@@ -7,6 +7,7 @@ import { useStreamingContext } from "../../context"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
 import { PollCreationButton } from "./PollCreationButton"
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 
 export const HostPollsView = () => {
    return (
@@ -16,16 +17,20 @@ export const HostPollsView = () => {
    )
 }
 
+const customSortPolls = (a: LivestreamPoll, b: LivestreamPoll) => {
+   const priority: Record<LivestreamPoll["state"], number> = {
+      current: 1,
+      upcoming: 2,
+      closed: 3,
+   }
+   return priority[a.state] - priority[b.state]
+}
+
 const Content = () => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
 
-   // We always want to show the current/ongoing poll(s) first
-   const orderedPolls = useMemo(() => {
-      const currentPolls = polls.filter((poll) => poll.state === "current")
-      const otherPolls = polls.filter((poll) => poll.state !== "current")
-      return [...currentPolls, ...otherPolls]
-   }, [polls])
+   const orderedPolls = useMemo(() => [...polls].sort(customSortPolls), [polls])
 
    const [isCreatePollFormOpen, setIsCreatePollFormOpen] = useState(false)
 

@@ -16,10 +16,12 @@ const styles = sxStyles({
       color: "error.main",
    },
    optionsIcon: {
+      p: 0.2,
+      m: -0.2,
       "& svg": {
-         width: 21,
-         height: 21,
-         color: (theme) => theme.brand.black[600],
+         width: 24,
+         height: 24,
+         color: "neutral.700",
       },
    },
 })

@@ -7,11 +7,7 @@ import { HostPollsView } from "../polls/HostPollsView"
 import { ViewerPollsView } from "../polls/ViewerPollsView"
 
 const styles = sxStyles({
-   contentWrapperViewer: {
-      px: 2,
-      py: 1.5,
-   },
-   contentWrapperHost: {
+   root: {
       p: 1.5,
    },
 })
@@ -21,9 +17,7 @@ export const PollsPanel = () => {
 
    return (
       <SidePanelView
-         contentWrapperStyles={
-            isHost ? styles.contentWrapperHost : styles.contentWrapperViewer
-         }
+         contentWrapperStyles={styles.root}
          id="polls-panel"
          title="Polls"
          icon={<PollIcon />}

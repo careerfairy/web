@@ -6,7 +6,7 @@ import { PollOptionResultSkeleton } from "./PollOptions"
 const styles = sxStyles({
    root: {
       border: "1px solid #F8F8F8",
-      borderRadius: "11px",
+      borderRadius: "12px",
       p: 2,
       position: "relative",
       overflow: "hidden",
