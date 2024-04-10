@@ -119,9 +119,7 @@ exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
-exports.manualEndOfSparksTrialEmails =
-   endOfSparksTrials.manualEndOfSparksTrialEmails
-exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
+
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook
 exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
