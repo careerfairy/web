@@ -7,7 +7,9 @@ import { PollCardSkeleton } from "./PollCardSkeleton"
 
 export const ViewerPollsView = () => {
    return (
-      <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
+      <SuspenseWithBoundary
+         fallback={<PollCardSkeleton showResultsSkeleton={false} />}
+      >
          <Content />
       </SuspenseWithBoundary>
    )
@@ -24,7 +26,7 @@ const Content = () => {
             {ongoingPoll ? (
                <PollCard poll={ongoingPoll} />
             ) : (
-               <PollCardSkeleton />
+               <PollCardSkeleton showResultsSkeleton={false} />
             )}
          </Slide>
       </Stack>

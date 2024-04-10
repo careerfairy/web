@@ -8,28 +8,42 @@ const styles = sxStyles({
       border: "1px solid #F8F8F8",
       borderRadius: "11px",
       p: 2,
+      position: "relative",
+      overflow: "hidden",
    },
 })
 
-export const PollCardSkeleton = React.forwardRef<HTMLDivElement>((_, ref) => {
-   return (
-      <Box sx={styles.root} ref={ref}>
-         <Typography variant="medium" color="primary">
-            <Skeleton variant="text" width={100} />
-         </Typography>
-         <Box pt={1.25} />
-         <Typography>
-            <Skeleton variant="text" width={200} />
-         </Typography>
-         <Box pt={1.5} />
-         <Stack spacing={1}>
-            <PollOptionResultSkeleton />
-            <PollOptionResultSkeleton />
-            <PollOptionResultSkeleton />
-         </Stack>
-         <Box pt={0.3} />
-      </Box>
-   )
-})
+type Props = {
+   showResultsSkeleton?: boolean
+}
+
+export const PollCardSkeleton = React.forwardRef<HTMLDivElement, Props>(
+   ({ showResultsSkeleton }, ref) => {
+      return (
+         <Box sx={styles.root} ref={ref}>
+            <Typography variant="medium" color="primary">
+               <Skeleton variant="text" width={100} />
+            </Typography>
+            <Box pt={1.25} />
+            <Typography>
+               <Skeleton variant="text" width={200} />
+            </Typography>
+            <Box pt={1.5} />
+            <Stack spacing={1}>
+               <PollOptionResultSkeleton
+                  showResultsSkeleton={showResultsSkeleton}
+               />
+               <PollOptionResultSkeleton
+                  showResultsSkeleton={showResultsSkeleton}
+               />
+               <PollOptionResultSkeleton
+                  showResultsSkeleton={showResultsSkeleton}
+               />
+            </Stack>
+            <Box pt={0.3} />
+         </Box>
+      )
+   }
+)
 
 PollCardSkeleton.displayName = "PollCardSkeleton"
