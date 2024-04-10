@@ -21,28 +21,11 @@ const styles = sxStyles({
          color: "inherit !important",
       },
       "& .MuiChip-label": {
-         pl: 1,
-      },
-   },
-   chipNoSparks: {
-      "& .MuiChip-label": {
          pl: 2,
       },
    },
    daysLeftIcon: {
       mb: "1px",
-   },
-   chipDaysLeft: {
-      py: 0.5,
-      px: 1.5,
-      "& svg": {
-         width: 16,
-         height: 16,
-         color: "inherit !important",
-      },
-      "& .MuiChip-label": {
-         pl: 2,
-      },
    },
    expiredChip: {
       color: (theme) => theme.brand.error[500], //"#FF4545",
@@ -95,7 +78,7 @@ const StatusChips = ({ presenter }: Props) => {
             <PlanChip plan={presenter.plan.type} />
             <Chip
                variant="filled"
-               sx={[styles.chipDaysLeft, styles.neutralChip]}
+               sx={[styles.chip, styles.neutralChip]}
                icon={<PlanDaysLeftIcon sx={styles.daysLeftIcon} />}
                label={`${timeLeft} left`}
             />
@@ -107,7 +90,7 @@ const StatusChips = ({ presenter }: Props) => {
       <Wrapper>
          <Chip
             variant="filled"
-            sx={[styles.chip, styles.neutralChip, styles.chipNoSparks]}
+            sx={[styles.chip, styles.neutralChip]}
             icon={<BasicSparkIcon />}
             label="No Sparks plan"
          />
@@ -183,16 +166,17 @@ const getPlanIcon = (
 ) => {
    let icon
 
-   if (type == GroupPlanTypes.Trial) icon = <TrialPlanIcon color={trialColor} />
+   if (type == GroupPlanTypes.Trial)
+      icon = <TrialPlanIcon sx={{ color: trialColor }} />
 
    if (type == GroupPlanTypes.Tier1)
-      icon = <EssentialPlanIcon color={paidColor} />
+      icon = <EssentialPlanIcon sx={{ color: paidColor }} />
 
    if (type == GroupPlanTypes.Tier2)
-      icon = <AdvancedPlanIcon color={paidColor} />
+      icon = <AdvancedPlanIcon sx={{ color: paidColor }} />
 
    if (type == GroupPlanTypes.Tier3)
-      icon = <PremiumPlanIcon color={paidColor} />
+      icon = <PremiumPlanIcon sx={{ color: paidColor }} />
 
    return icon
 }
