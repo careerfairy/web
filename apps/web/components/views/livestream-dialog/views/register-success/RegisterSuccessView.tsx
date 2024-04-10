@@ -18,7 +18,7 @@ import Stack from "@mui/material/Stack"
 import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import { responsiveConfetti } from "../../../../util/confetti"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
 import { useRouter } from "next/router"
 import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
@@ -29,6 +29,8 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import SparksCarouselWithSuspenseComponent, {
    MobileSparksArrows,
 } from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { setInteractionSource } from "store/reducers/sparksFeedReducer"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 
 const styles = sxStyles({
    fullHeight: {
@@ -184,11 +186,17 @@ const MobileSparksTransition = ({ isSparksOpen, handleDiscoverSparks }) => {
 const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
    const isMobile = useIsMobile()
    const router = useRouter()
+   const dispatch = useDispatch()
    const { livestream } = useLiveStreamDialog()
 
    const handleSparkClick = useCallback(
       (spark: Spark) => {
          if (spark) {
+            dispatch(
+               setInteractionSource(
+                  SparkInteractionSources.Livestream_Registration_Flow
+               )
+            )
             router.push({
                pathname: `/sparks/${spark.id}`,
                query: {
@@ -199,7 +207,7 @@ const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
          }
          return
       },
-      [livestream.groupIds, router]
+      [livestream.groupIds, router, dispatch]
    )
 
    return (
