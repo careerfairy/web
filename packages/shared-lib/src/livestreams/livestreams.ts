@@ -328,6 +328,11 @@ export interface RecordingToken extends Identifiable {
    sid: string
 }
 
+// Path: /livestreams/{livestreamId}/secureToken
+export interface LivestreamSecureToken extends Identifiable {
+   value: string
+}
+
 // Recording Stats for each user
 // The document is consists of the userId and the date rounded to the nearest hour
 // The minutesWatched is the sum of all the minutes watched in that hour
@@ -505,6 +510,7 @@ export interface LivestreamChatEntry extends Identifiable {
    timestamp: firebase.firestore.Timestamp
 
    agoraUserId?: string
+   userUid?: string
 
    type?: // used to identify a chat entry that was sent by a host to all breakout rooms (only used in the UI)
    | "broadcast"

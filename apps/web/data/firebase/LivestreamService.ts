@@ -7,6 +7,7 @@ import {
    LivestreamModes,
    UserLivestreamData,
    LivestreamChatEntry,
+   DeleteLivestreamChatEntryRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -29,7 +30,6 @@ import {
    arrayUnion,
    collection,
    collectionGroup,
-   deleteDoc,
    doc,
    documentId,
    getDoc,
@@ -515,6 +515,7 @@ export class LivestreamService {
       type: LivestreamChatEntry["type"]
       displayName: string
       agoraUserId: string
+      userUid: string
    }) => {
       const {
          livestreamId,
@@ -523,6 +524,7 @@ export class LivestreamService {
          type,
          displayName,
          agoraUserId,
+         userUid,
       } = options
 
       const ref = doc(
@@ -545,20 +547,16 @@ export class LivestreamService {
          message,
          type,
          agoraUserId,
+         userUid,
          id: ref.id,
       })
    }
 
-   deleteChatEntry = (livestreamId: string, chatEntryId: string) => {
-      return deleteDoc(
-         doc(
-            FirestoreInstance,
-            "livestreams",
-            livestreamId,
-            "chatEntries",
-            chatEntryId
-         )
-      )
+   deleteChatEntry = async (options: DeleteLivestreamChatEntryRequest) => {
+      return void httpsCallable<DeleteLivestreamChatEntryRequest>(
+         this.functions,
+         "deleteLivestreamChatEntry"
+      )(options)
    }
 }
 

@@ -126,6 +126,7 @@ export const ChatInput = ({ onMessageSend }: Props) => {
             displayName: displayName,
             authorEmail: getAuthorEmail(),
             agoraUserId,
+            userUid: authenticatedUser.uid || "",
          })
       } catch (error) {
          errorNotification(
