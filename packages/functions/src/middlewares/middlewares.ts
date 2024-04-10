@@ -1,7 +1,9 @@
 import { https } from "firebase-functions"
 
+export type CallableContext = https.CallableContext
+
 export type MiddlewareContext<T extends Record<string, unknown>> =
-   https.CallableContext & {
+   CallableContext & {
       /**
        * Allow middlewares to store data for the next middleware to access
        */
@@ -9,9 +11,10 @@ export type MiddlewareContext<T extends Record<string, unknown>> =
    }
 
 export type OnCallMiddleware<
-   T extends Record<string, unknown> = Record<string, unknown>
+   T extends Record<string, unknown> = Record<string, unknown>,
+   TData = any
 > = (
-   data: any,
+   data: TData,
    context: MiddlewareContext<T>,
    /**
     * Calls the next middleware in the chain
@@ -24,11 +27,12 @@ export type OnCallMiddleware<
  * @param middlewares
  */
 export const middlewares = <
-   T extends Record<string, unknown> = Record<string, unknown>
+   T extends Record<string, unknown> = Record<string, unknown>,
+   TData = any
 >(
-   ...middlewares: OnCallMiddleware<T>[]
+   ...middlewares: OnCallMiddleware<T, TData>[]
 ) => {
-   return (data, context) => {
+   return (data: TData, context: MiddlewareContext<T>) => {
       let idx = 0
 
       const next = async () => {

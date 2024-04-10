@@ -59,7 +59,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const hasStarted = useHasStarted()
    const hasEnded = useHasEnded()
 
-   const hostAuthToken = query.token?.toString() || ""
+   const hostAuthToken = query.token?.toString() || null
 
    const { activeView } = useAppSelector(sidePanelSelector)
    const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
