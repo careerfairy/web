@@ -1,6 +1,7 @@
 import functions = require("firebase-functions")
 import {
    DeleteLivestreamChatEntryRequest,
+   LivestreamChatEntry,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
@@ -65,12 +66,19 @@ export const deleteLivestreamChatEntry = functions
 
                return await deleteAllEntries(livestreamId)
             } else {
+               const entryToDelete =
+                  await livestreamsRepo.getLivestreamChatEntry(
+                     livestreamId,
+                     entryId
+                  )
+
+               if (!entryToDelete) return
+
                const isAuthor = await checkIfIsAuthor(
                   agoraUserId,
                   userEmail,
                   userUid,
-                  livestreamId,
-                  entryId
+                  entryToDelete
                )
 
                if (!isAuthor) {
@@ -111,14 +119,8 @@ const checkIfIsAuthor = async (
    agoraUserId: string,
    userEmail: string,
    userUid: string,
-   livestreamId: string,
-   entryId: string
+   entryToDelete: LivestreamChatEntry
 ) => {
-   const entryToDelete = await livestreamsRepo.getLivestreamChatEntry(
-      livestreamId,
-      entryId
-   )
-
    return (
       isDefinedAndEqual(entryToDelete.authorEmail, userEmail) ||
       isDefinedAndEqual(entryToDelete.agoraUserId, agoraUserId) ||

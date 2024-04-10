@@ -6,24 +6,37 @@ import useSnackbarNotifications from "../useSnackbarNotifications"
 type FetcherType = MutationFetcher<
    void, // return type
    unknown, // error type
-   Omit<DeleteLivestreamChatEntryRequest, "livestreamId"> // The entry ID to delete
+   Omit<DeleteLivestreamChatEntryRequest, "livestreamId" | "entryId"> // The entry ID to delete
 >
 
+const getKey = (livestreamId: string, entryId: string) => {
+   if (!entryId || !livestreamId) {
+      return null
+   }
+   return `delete-chat-entry-${livestreamId}-${entryId}`
+}
+
 /**
- * Custom hook for deleting a specific livestream chat entry or all entries of a livestream.
+ * Custom hook for deleting a specific livestream chat entry.
  *
- * @param {string} livestreamId - The ID of the livestream.
- * @returns An object containing the mutation function to delete a chat entry or all chat entries and its related SWR mutation state.
+ * @param  livestreamId - The ID of the livestream.
+ * @param  entryId - The ID of the chat entry to delete.
+ * @returns An object containing the mutation function to delete a chat entry and its related SWR mutation state.
  */
-export const useDeleteLivestreamChatEntry = (livestreamId: string) => {
+export const useDeleteLivestreamChatEntry = (
+   livestreamId: string,
+   entryId: string
+) => {
    const { errorNotification } = useSnackbarNotifications()
+
    const fetcher: FetcherType = async (_, options) =>
       livestreamService.deleteChatEntry({
          ...options.arg,
          livestreamId,
+         entryId,
       })
 
-   return useSWRMutation(`delete-chat-entry-${livestreamId}`, fetcher, {
+   return useSWRMutation(getKey(livestreamId, entryId), fetcher, {
       onError: (error, key) => {
          errorNotification(
             error,

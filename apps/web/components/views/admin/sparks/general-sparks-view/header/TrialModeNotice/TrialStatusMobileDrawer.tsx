@@ -1,7 +1,7 @@
 import { sxStyles } from "types/commonTypes"
 
 import { Box, SwipeableDrawerProps } from "@mui/material"
-import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipableDrawer"
+import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 import TrialStatusContent from "./TrialStatusContent"
 
 const styles = sxStyles({
@@ -19,11 +19,11 @@ type Props = {
 
 const TrialStatusMobileDrawer = ({ open, onClose, onOpen }: Props) => {
    return (
-      <BrandedSwipableDrawer onClose={onClose} onOpen={onOpen} open={open}>
+      <BrandedSwipeableDrawer onClose={onClose} onOpen={onOpen} open={open}>
          <Box sx={styles.root}>
             <TrialStatusContent />
          </Box>
-      </BrandedSwipableDrawer>
+      </BrandedSwipeableDrawer>
    )
 }
 
