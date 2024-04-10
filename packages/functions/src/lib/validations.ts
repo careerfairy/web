@@ -163,9 +163,18 @@ export async function validateLivestreamExists(
  * @param tokenToValidate - The token to validate against the livestream's stored token.
  */
 export async function validateLivestreamToken(
+   userEmail: string,
    livestream: LivestreamEvent,
    tokenToValidate?: string
 ): Promise<void> {
+   if (userEmail) {
+      const userData = await userRepo.getUserDataById(userEmail)
+
+      const isAdmin = Boolean(userData.isAdmin)
+
+      if (isAdmin) return
+   }
+
    if (livestream.test) return
 
    if (!tokenToValidate) {

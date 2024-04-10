@@ -6,11 +6,11 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
 import { SchemaOf, boolean, object, string } from "yup"
-import config from "./config"
-import { validateLivestreamToken } from "./lib/validations"
-import { middlewares } from "./middlewares/middlewares"
-import { dataValidation, livestreamExists } from "./middlewares/validations"
-import { livestreamsRepo, userRepo } from "./api/repositories"
+import config from "../../config"
+import { validateLivestreamToken } from "../validations"
+import { middlewares } from "../../middlewares/middlewares"
+import { dataValidation, livestreamExists } from "../../middlewares/validations"
+import { livestreamsRepo } from "../../api/repositories"
 
 const deleteLivestreamChatEntrySchema: SchemaOf<DeleteLivestreamChatEntryRequest> =
    object()
@@ -55,13 +55,11 @@ export const deleteLivestreamChatEntry = functions
             const userEmail = context.auth?.token?.email || ""
             const userUid = context.auth?.token?.uid || ""
 
-            const isAdmin = await checkIfUserIsAdmin(userEmail)
-
             if (deleteAll) {
-               await validateTokenIfNeeded(
-                  isAdmin,
-                  livestreamToken,
-                  context.middlewares.livestream
+               await validateLivestreamToken(
+                  userEmail,
+                  context.middlewares.livestream,
+                  livestreamToken
                )
 
                return await deleteAllEntries(livestreamId)
@@ -82,10 +80,10 @@ export const deleteLivestreamChatEntry = functions
                )
 
                if (!isAuthor) {
-                  await validateTokenIfNeeded(
-                     isAdmin,
-                     livestreamToken,
-                     context.middlewares.livestream
+                  await validateLivestreamToken(
+                     userEmail,
+                     context.middlewares.livestream,
+                     livestreamToken
                   )
                }
 
@@ -94,22 +92,6 @@ export const deleteLivestreamChatEntry = functions
          }
       )
    )
-
-const checkIfUserIsAdmin = async (userEmail: string): Promise<boolean> => {
-   if (!userEmail) return false
-   const userData = await userRepo.getUserDataById(userEmail)
-   return Boolean(userData.isAdmin)
-}
-
-const validateTokenIfNeeded = async (
-   isAdmin: boolean,
-   token: string | null,
-   livestream: LivestreamEvent
-) => {
-   if (!isAdmin) {
-      await validateLivestreamToken(livestream, token)
-   }
-}
 
 const deleteAllEntries = async (livestreamId: string) => {
    return livestreamsRepo.deleteAllLivestreamChatEntries(livestreamId)
