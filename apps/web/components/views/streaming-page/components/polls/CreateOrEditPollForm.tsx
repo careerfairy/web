@@ -19,7 +19,7 @@ import { FormProvider, SubmitHandler, useFieldArray } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import * as yup from "yup"
 import { useStreamingContext } from "../../context"
-import { PlusCircle, Trash } from "react-feather"
+import { PlusCircle, Trash2 } from "react-feather"
 import { v4 as uuid } from "uuid"
 import { LoadingButton } from "@mui/lab"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -29,9 +29,10 @@ const styles = sxStyles({
    form: {
       width: "100%",
       p: 1.5,
-      border: "1px solid #F8F8F8",
-      background: "#FFF",
       borderRadius: "11px",
+      border: "1px solid",
+      borderColor: (theme) => theme.brand.white[500],
+      backgroundColor: (theme) => theme.brand.white[100],
    },
    addOptionButton: {
       color: "neutral.500",
@@ -42,6 +43,7 @@ const styles = sxStyles({
       "& svg": {
          width: 16,
          height: 16,
+         color: "neutral.600",
       },
    },
    errorMessage: {
@@ -132,7 +134,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
          <FormProvider {...formMethods}>
             <Stack
                ref={ref}
-               spacing={3}
+               spacing={2}
                component="form"
                sx={styles.form}
                onKeyDown={preventSubmitOnEnter}
@@ -145,7 +147,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                   label="Question"
                   placeholder="Insert your question here"
                />
-               <Stack spacing={1.5}>
+               <Stack spacing={1}>
                   {fields.map((option, index) => (
                      <ControlledBrandedTextField
                         key={option.id}
@@ -154,23 +156,23 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         placeholder={`Insert option ${index + 1}`}
                         onKeyDown={preventSubmitOnEnter}
                         InputProps={{
-                           endAdornment: (
-                              <InputAdornment position="end">
-                                 <IconButton
-                                    sx={styles.removeOptionButton}
-                                    aria-label="toggle password visibility"
-                                    onClick={() => remove(index)}
-                                    disabled={
-                                       fields.length <= MIN_POLL_OPTIONS ||
-                                       formMethods.formState.isSubmitting
-                                    }
-                                    edge="end"
-                                    size="small"
-                                 >
-                                    <Trash />
-                                 </IconButton>
-                              </InputAdornment>
-                           ),
+                           endAdornment:
+                              fields.length <= MIN_POLL_OPTIONS ? null : (
+                                 <InputAdornment position="end">
+                                    <IconButton
+                                       sx={styles.removeOptionButton}
+                                       aria-label="toggle password visibility"
+                                       onClick={() => remove(index)}
+                                       disabled={
+                                          formMethods.formState.isSubmitting
+                                       }
+                                       edge="end"
+                                       size="small"
+                                    >
+                                       <Trash2 />
+                                    </IconButton>
+                                 </InputAdornment>
+                              ),
                            autoComplete: "off",
                         }}
                         label={`Option ${index + 1}`}

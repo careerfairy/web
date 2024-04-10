@@ -14,7 +14,7 @@ import { useVoteLivestreamPollOption } from "components/custom-hook/streaming/us
 const styles = sxStyles({
    root: {
       border: "1px solid #F8F8F8",
-      borderRadius: "11px",
+      borderRadius: "12px",
       p: 2,
    },
    coloredEdge: {
@@ -26,7 +26,7 @@ const styles = sxStyles({
       backgroundColor: "grey.500",
    },
    skeletonProgress: {
-      borderRadius: "6px",
+      borderRadius: "8px",
    },
 })
 
