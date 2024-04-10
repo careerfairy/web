@@ -14,12 +14,19 @@ import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
 import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
 import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
 import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
+import { sxStyles } from "types/commonTypes"
 
 type Props = {
    open: boolean
    handleClose: () => void
    groupToManage: GroupPresenter
 }
+
+const styles = sxStyles({
+   planIcons: {
+      color: "#2ABAA5",
+   },
+})
 
 export const PlanConfirmationDialogKeys = {
    SelectPlan: "select-plan",
@@ -37,35 +44,39 @@ const views = [
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
-      Component: () =>
-         ConfirmPlanView({
-            plan: GroupPlanTypes.Trial,
-            icon: <TrialPlanIcon color="#2ABAA5" />,
-         }),
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Trial}
+            icon={<TrialPlanIcon sx={styles.planIcons} />}
+         />
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier1Plan,
-      Component: () =>
-         ConfirmPlanView({
-            plan: GroupPlanTypes.Tier1,
-            icon: <EssentialPlanIcon color="#2ABAA5" />,
-         }),
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier1}
+            icon={<EssentialPlanIcon sx={styles.planIcons} />}
+         />
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier2Plan,
-      Component: () =>
-         ConfirmPlanView({
-            plan: GroupPlanTypes.Tier2,
-            icon: <AdvancedPlanIcon color="#2ABAA5" />,
-         }),
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier2}
+            icon={<AdvancedPlanIcon sx={styles.planIcons} />}
+         />
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.ConfirmTier3Plan,
-      Component: () =>
-         ConfirmPlanView({
-            plan: GroupPlanTypes.Tier3,
-            icon: <PremiumPlanIcon color="#2ABAA5" />,
-         }),
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier3}
+            icon={<PremiumPlanIcon sx={styles.planIcons} />}
+         />
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.Success,
@@ -143,7 +154,7 @@ const CompanyPlanConfirmationDialog = ({
 }
 
 const getInitialStep = (groupToManage: GroupPresenter) => {
-   if (!groupToManage.hasPlan()) {
+   if (!groupToManage.hasPlan() || groupToManage.hasPlanExpired()) {
       return views.findIndex(
          (view) => view.key === PlanConfirmationDialogKeys.SelectPlan
       )
