@@ -28,7 +28,7 @@ const styles = sxStyles({
       mb: "1px",
    },
    expiredChip: {
-      color: (theme) => theme.brand.error[500], //"#FF4545",
+      color: (theme) => theme.brand.error[500],
       bgcolor: (theme) => theme.brand.error[50],
       borderColor: (theme) => theme.brand.error[300],
    },

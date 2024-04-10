@@ -14,19 +14,12 @@ import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
 import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
 import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
 import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
-import { sxStyles } from "types/commonTypes"
 
 type Props = {
    open: boolean
    handleClose: () => void
    groupToManage: GroupPresenter
 }
-
-const styles = sxStyles({
-   planIcons: {
-      color: "#2ABAA5",
-   },
-})
 
 export const PlanConfirmationDialogKeys = {
    SelectPlan: "select-plan",
@@ -47,7 +40,7 @@ const views = [
       Component: () => (
          <ConfirmPlanView
             plan={GroupPlanTypes.Trial}
-            icon={<TrialPlanIcon sx={styles.planIcons} />}
+            icon={<TrialPlanIcon />}
          />
       ),
    },
@@ -56,7 +49,7 @@ const views = [
       Component: () => (
          <ConfirmPlanView
             plan={GroupPlanTypes.Tier1}
-            icon={<EssentialPlanIcon sx={styles.planIcons} />}
+            icon={<EssentialPlanIcon />}
          />
       ),
    },
@@ -65,7 +58,7 @@ const views = [
       Component: () => (
          <ConfirmPlanView
             plan={GroupPlanTypes.Tier2}
-            icon={<AdvancedPlanIcon sx={styles.planIcons} />}
+            icon={<AdvancedPlanIcon />}
          />
       ),
    },
@@ -74,7 +67,7 @@ const views = [
       Component: () => (
          <ConfirmPlanView
             plan={GroupPlanTypes.Tier3}
-            icon={<PremiumPlanIcon sx={styles.planIcons} />}
+            icon={<PremiumPlanIcon />}
          />
       ),
    },
