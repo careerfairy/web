@@ -3,7 +3,7 @@ import { useFirestore } from "reactfire"
 import { useStreamingContext } from "../../context"
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { Skeleton, Typography } from "@mui/material"
-import useCountQuery from "components/custom-hook/useCountQuery"
+import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
 
 const useTotalVoteCount = (
    livestreamId: string,
@@ -12,7 +12,7 @@ const useTotalVoteCount = (
 ) => {
    const firestore = useFirestore()
 
-   return useCountQuery(
+   return useSWRCountQuery(
       query(
          collection(
             firestore,

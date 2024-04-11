@@ -4,7 +4,7 @@ import { collection, orderBy, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
-import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
+import useCountQuery from "components/custom-hook/useCountQuery"
 import {
    CardVotes,
    CardVotesOption,
@@ -110,7 +110,7 @@ const usePollVotersCount = (
    pollId: string,
    optionId?: string
 ) => {
-   return useSWRCountQuery(
+   return useCountQuery(
       query(
          collection(
             FirestoreInstance,
