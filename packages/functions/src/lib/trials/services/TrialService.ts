@@ -145,7 +145,7 @@ export class TrialService {
       const link = `${getHost()}/group/${admin.groupId}/admin/sparks`
 
       return {
-         user_name: admin.displayName,
+         user_name: admin.firstName,
          groupId: admin.groupId,
          company_sparks_link: addUtmTagsToLink({
             link,
