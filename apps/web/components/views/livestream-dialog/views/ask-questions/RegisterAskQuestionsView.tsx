@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react"
-import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
+import BaseDialogView, {
+   HeroContent,
+   HeroTitle,
+   MainContent,
+} from "../../BaseDialogView"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import Typography from "@mui/material/Typography"
 import { sxStyles } from "../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
-import Image from "next/legacy/image"
 import Stack from "@mui/material/Stack"
 import { InputBase } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
@@ -22,24 +25,9 @@ import { useFirebaseService } from "../../../../../context/firebase/FirebaseServ
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
-   title: {
-      textAlign: "center",
-      fontWeight: 500,
-      fontSize: {
-         xs: "1.4285rem",
-         sm: "2.571rem",
-      },
-      maxWidth: 655,
-   },
-   logoWrapper: {
-      p: 1,
-      background: "white",
-      borderRadius: 2,
-      display: "flex",
-      width: 65,
-   },
    questionForm: {
       width: "100%",
       borderRadius: 2,
@@ -59,25 +47,39 @@ const styles = sxStyles({
       p: 1,
    },
    contentOffset: {
-      mt: -8,
+      mt: { xs: -7.8, md: -15 },
+      height: "100%",
+      display: "flex",
    },
    formInput: {
       fontSize: "1.143rem",
       border: "none",
       boxShadow: "none",
+      "& textarea": {
+         "&::placeholder": {
+            color: "neutral.600",
+            opacity: 1,
+         },
+      },
    },
    btn: {
       ml: "auto",
-      boxShadow: "none",
-      py: 0.75,
-      px: 2.5,
-      fontSize: "1.214rem",
-      fontWeight: 400,
-      textTransform: "none",
    },
-   questionListTitle: {
-      fontSize: "1.2rem",
-      fontWeight: 500,
+   heroContent: {
+      height: { xs: "229px", md: "366px" },
+      justifyContent: "start",
+      flex: "none",
+   },
+   mainContent: {
+      px: { xs: "10px", md: "45px" },
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+   },
+   heroContentStack: {
+      alignItems: "center",
+      pb: 2,
+      marginTop: -1,
    },
 })
 
@@ -113,28 +115,27 @@ const RegisterAskQuestionsView = () => {
                onBackPosition={"top-left"}
                onBackClick={() => goToView("livestream-details")}
                noMinHeight
+               sx={styles.heroContent}
             >
-               <Stack alignItems="center" spacing={1.75} pb={2}>
-                  <Box sx={styles.logoWrapper}>
-                     <Image
-                        src={getResizedUrl(livestream.companyLogoUrl, "lg")}
-                        width={50}
-                        height={50}
-                        objectFit={"contain"}
-                        alt={livestream.company}
-                     />
-                  </Box>
-                  <Typography sx={styles.title} component="h1">
-                     What questions should the speaker answer?
-                  </Typography>
+               <Stack spacing={{ xs: 0.5, md: 3 }} sx={styles.heroContentStack}>
+                  <CircularLogo
+                     src={getResizedUrl(livestream.companyLogoUrl, "lg")}
+                     alt={livestream.company}
+                     size={isMobile ? 80 : 104}
+                  />
+                  <HeroTitle>
+                     What questions should
+                     <br />
+                     the speaker answer?
+                  </HeroTitle>
                </Stack>
             </HeroContent>
          }
          mainContent={
-            <MainContent>
-               <Stack sx={styles.contentOffset} spacing={2}>
+            <MainContent sx={styles.mainContent}>
+               <Stack sx={styles.contentOffset} spacing={3}>
                   <Formik
-                     initialValues={initailValues}
+                     initialValues={initialValues}
                      validationSchema={questionSchema}
                      onSubmit={async (values, helpers) => {
                         const newQuestion = await createLivestreamQuestion(
@@ -199,13 +200,6 @@ const RegisterAskQuestionsView = () => {
                         </Box>
                      )}
                   </Formik>
-                  <Typography
-                     gutterBottom
-                     component="h6"
-                     sx={styles.questionListTitle}
-                  >
-                     Other users questions
-                  </Typography>
                   <QuestionsComponent
                      livestream={livestream}
                      userAddedQuestions={newlyCreatedQuestions}
@@ -220,7 +214,7 @@ const RegisterAskQuestionsView = () => {
                sx={styles.btn}
                variant="contained"
                disableElevation
-               size="small"
+               size="medium"
                fullWidth={isMobile}
                onClick={() => goToView("register-join-talent-pool")}
                color="secondary"
@@ -234,7 +228,7 @@ const RegisterAskQuestionsView = () => {
 
 const questionSchema = Yup.object().shape({
    question: Yup.string()
-      .required("This field is required")
+      .required("")
       .min(
          minQuestionLength,
          `Question must be at least ${minQuestionLength} characters long`
@@ -245,7 +239,7 @@ const questionSchema = Yup.object().shape({
       ),
 })
 
-const initailValues = {
+const initialValues = {
    question: "",
 } as const
 

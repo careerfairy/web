@@ -130,5 +130,11 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "Group ID for spark ownership"
+   },
+   {
+      "name": "interactionSource",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Source of the Spark interaction (e.g., livestream_registration_flow, portal, company_page)"
    }
 ]

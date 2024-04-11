@@ -6,7 +6,7 @@ const RegisterJoinTalentPoolViewSkeleton = () => {
 }
 
 const BodySkeleton = () => {
-   return <Skeleton width="100%" height={100} />
+   return <Skeleton width="90%" height={120} />
 }
 
 export default RegisterJoinTalentPoolViewSkeleton

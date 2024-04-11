@@ -43,7 +43,7 @@ const LinkMenuItem = ({ children, filename = false, href, ...rest }) => (
    </MenuItem>
 )
 
-const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
+const Dropdown = ({ filename, handleClose, anchorEl, urls, onItemClick }) => {
    return (
       <Menu
          id="add to calendar menu"
@@ -52,7 +52,7 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
          onClose={handleClose}
       >
          <LinkMenuItem
-            onClick={handleClose}
+            onClick={onItemClick}
             download={filename}
             href={urls.ics}
          >
@@ -61,7 +61,7 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
             </ListItemIcon>
             <ListItemText primary="Apple Calendar" />
          </LinkMenuItem>
-         <LinkMenuItem href={urls.google} onClick={handleClose}>
+         <LinkMenuItem href={urls.google} onClick={onItemClick}>
             <ListItemIcon>
                <Avatar sx={styles.avatar} src={googleIcon} />
             </ListItemIcon>
@@ -70,20 +70,20 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
          <LinkMenuItem
             href={urls.ics}
             download={filename}
-            onClick={handleClose}
+            onClick={onItemClick}
          >
             <ListItemIcon>
                <Avatar sx={styles.avatar} src={outlookYellowIcon} />
             </ListItemIcon>
             <ListItemText primary="Outlook" />
          </LinkMenuItem>
-         <LinkMenuItem href={urls.outlook} onClick={handleClose}>
+         <LinkMenuItem href={urls.outlook} onClick={onItemClick}>
             <ListItemIcon>
                <Avatar sx={styles.avatar} src={outlookBlueIcon} />
             </ListItemIcon>
             <ListItemText primary="Outlook Web App" />
          </LinkMenuItem>
-         <LinkMenuItem href={urls.yahoo} onClick={handleClose}>
+         <LinkMenuItem href={urls.yahoo} onClick={onItemClick}>
             <ListItemIcon>
                <Avatar sx={styles.avatar} src={yahooIcon} />
             </ListItemIcon>
@@ -105,6 +105,11 @@ type Props = {
    children: (handler: (event: any) => void) => void
    event: LivestreamEvent
    filename: string
+   /**
+    *
+    * Action to take when clicking on a menu item of the calendar dropdown.
+    */
+   onCalendarClick?: () => void
 }
 
 export const createCalendarEvent = (
@@ -134,6 +139,7 @@ export const AddToCalendar = memo(function AddToCalendar({
    children,
    event,
    filename = "download",
+   onCalendarClick,
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
@@ -148,6 +154,11 @@ export const AddToCalendar = memo(function AddToCalendar({
       setAnchorEl(null)
    }, [])
 
+   const handleItemClick = useCallback(() => {
+      handleClose()
+      onCalendarClick && onCalendarClick()
+   }, [onCalendarClick, handleClose])
+
    return (
       <>
          {children(handleClick)}
@@ -156,6 +167,7 @@ export const AddToCalendar = memo(function AddToCalendar({
             anchorEl={anchorEl}
             handleClose={handleClose}
             urls={urls}
+            onItemClick={handleItemClick}
          />
       </>
    )

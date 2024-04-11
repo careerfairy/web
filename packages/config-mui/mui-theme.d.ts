@@ -90,6 +90,14 @@ declare module "@mui/material/styles" {
       medium: React.CSSProperties
       small: React.CSSProperties
       xsmall: React.CSSProperties
+      mobileBrandedH1: React.CSSProperties
+      desktopBrandedH1: React.CSSProperties
+      mobileBrandedH2: React.CSSProperties
+      desktopBrandedH2: React.CSSProperties
+      mobileBrandedH3: React.CSSProperties
+      desktopBrandedH3: React.CSSProperties
+      mobileBrandedH4: React.CSSProperties
+      desktopBrandedH4: React.CSSProperties
       brandedH1: React.CSSProperties
       brandedH2: React.CSSProperties
       brandedH3: React.CSSProperties
@@ -102,6 +110,14 @@ declare module "@mui/material/styles" {
       medium?: React.CSSProperties
       small?: React.CSSProperties
       xsmall?: React.CSSProperties
+      mobileBrandedH1?: React.CSSProperties
+      desktopBrandedH1?: React.CSSProperties
+      mobileBrandedH2?: React.CSSProperties
+      desktopBrandedH2?: React.CSSProperties
+      mobileBrandedH3?: React.CSSProperties
+      desktopBrandedH3?: React.CSSProperties
+      mobileBrandedH4?: React.CSSProperties
+      desktopBrandedH4?: React.CSSProperties
       brandedH1?: React.CSSProperties
       brandedH2?: React.CSSProperties
       brandedH3?: React.CSSProperties
@@ -148,6 +164,14 @@ declare module "@mui/material/Typography" {
       medium: true
       small: true
       xsmall: true
+      mobileBrandedH1: true
+      desktopBrandedH1: true
+      mobileBrandedH2: true
+      desktopBrandedH2: true
+      mobileBrandedH3: true
+      desktopBrandedH3: true
+      mobileBrandedH4: true
+      desktopBrandedH4: true
       brandedH1: true
       brandedH2: true
       brandedH3: true

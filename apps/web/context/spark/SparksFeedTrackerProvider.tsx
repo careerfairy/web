@@ -13,6 +13,7 @@ import { useSelector } from "react-redux"
 import {
    activeSparkSelector,
    currentSparkIdSelector,
+   interactionSourceSelector,
    isOnFirstSparkSelector,
    originalSparkIdSelector,
 } from "store/selectors/sparksFeedSelectors"
@@ -63,6 +64,7 @@ export const SparksFeedTrackerProvider: FC<{
    const isFirstSpark = useSelector(isOnFirstSparkSelector)
    const categoryId = useSelector(activeSparkSelector)?.category?.id || null
    const groupId = useSelector(activeSparkSelector)?.group.id || null
+   const interactionSource = useSelector(interactionSourceSelector) || null
 
    const addEventToBatch = useBatchedEvents<SparkEventClient>(
       (data) => sparkService.trackSparkEvents(data),
@@ -123,6 +125,7 @@ export const SparksFeedTrackerProvider: FC<{
             universityName: userData?.university?.name || null,
             sessionId,
             stringTimestamp: new Date().toISOString(),
+            interactionSource,
          }
 
          switch (options.actionType) {
@@ -185,6 +188,7 @@ export const SparksFeedTrackerProvider: FC<{
          userData?.university?.name,
          sessionId,
          addEventToBatch,
+         interactionSource,
       ]
    )
 
@@ -209,6 +213,7 @@ export const SparksFeedTrackerProvider: FC<{
             levelOfStudy: userData?.levelOfStudy?.id || null,
             universityId: userData?.university?.code || null,
             universityName: userData?.university?.name || null,
+            interactionSource,
          }
 
          addSecondsWatchedToBatch(secondWatched)
@@ -224,6 +229,7 @@ export const SparksFeedTrackerProvider: FC<{
          userData?.university?.name,
          userData?.universityCountryCode,
          visitorId,
+         interactionSource,
       ]
    )
 

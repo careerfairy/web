@@ -53,6 +53,7 @@ export interface LivestreamEvent extends Identifiable {
    registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
+   startedAt?: firebase.firestore.Timestamp
    hasEnded?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
@@ -327,6 +328,11 @@ export interface RecordingToken extends Identifiable {
    sid: string
 }
 
+// Path: /livestreams/{livestreamId}/secureToken
+export interface LivestreamSecureToken extends Identifiable {
+   value: string
+}
+
 // Recording Stats for each user
 // The document is consists of the userId and the date rounded to the nearest hour
 // The minutesWatched is the sum of all the minutes watched in that hour
@@ -503,10 +509,14 @@ export interface LivestreamChatEntry extends Identifiable {
    message: string
    timestamp: firebase.firestore.Timestamp
 
+   agoraUserId?: string
+   userUid?: string
+
    type?: // used to identify a chat entry that was sent by a host to all breakout rooms (only used in the UI)
    | "broadcast"
       // used to identify a chat entry that was sent by a host (only used in the UI)
       | "streamer"
+      | "viewer"
 
    /*
     * Array of userIds who reacted with 😮
@@ -572,16 +582,19 @@ export interface LivestreamEventSerialized
       | "created"
       | "start"
       | "startDate"
+      | "startedAt"
       | "lastUpdated"
       | "lastUpdatedAuthorInfo"
    > {
    createdDateString: string
    startDateString: string
+   startedAtDateString: string
    lastUpdatedDateString: string
 }
 
 export interface LivestreamEventParsed extends LivestreamEventSerialized {
    startDate: Date
+   startedAt: Date
    createdDate: Date
    lastUpdatedDate: Date
 }

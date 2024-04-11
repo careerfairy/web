@@ -1,10 +1,12 @@
 import functions = require("firebase-functions")
-import { groupRepo, userRepo } from "../api/repositories"
+import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
 import { UserData } from "@careerfairy/shared-lib/users"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { InferType } from "yup"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { livestreamGetSecureToken } from "./livestream"
 
 /**
  * Validate the data object argument in a function call
@@ -139,5 +141,67 @@ export async function userIsSignedInAndIsCFAdmin(
    // validations that throw exceptions
    const idToken = await validateUserAuthExists(context)
    await validateUserIsCFAdmin(idToken.email)
+   return
+}
+
+export async function validateLivestreamExists(
+   livestreamId: string
+): Promise<LivestreamEvent> {
+   const livestream = await livestreamsRepo.getById(livestreamId)
+
+   if (!livestream) {
+      logAndThrow("Livestream does not exist", livestreamId)
+   }
+   return livestream
+}
+
+/**
+ * Validates the provided livestream token against the stored token.
+ * Throws an error if the livestream is not a test and the token is missing or does not match.
+ *
+ * @param livestream - The livestream event to validate the token for.
+ * @param tokenToValidate - The token to validate against the livestream's stored token.
+ */
+export async function validateLivestreamToken(
+   userEmail: string,
+   livestream: LivestreamEvent,
+   tokenToValidate?: string
+): Promise<void> {
+   if (userEmail) {
+      const userData = await userRepo.getUserDataById(userEmail)
+
+      const isAdmin = Boolean(userData.isAdmin)
+
+      if (isAdmin) return
+   }
+
+   if (livestream.test) return
+
+   if (!tokenToValidate) {
+      logAndThrow("No host token provided", {
+         livestreamId: livestream.id,
+      })
+   }
+
+   const correctToken = await livestreamGetSecureToken(livestream.id)
+
+   if (!correctToken.value) {
+      logAndThrow(
+         "The livestream is not a test stream and is missing a token",
+         {
+            livestreamId: livestream.id,
+            tokenToValidate,
+         }
+      )
+   }
+
+   if (correctToken && correctToken.value !== tokenToValidate) {
+      logAndThrow("The token does not match the livestream's token", {
+         livestreamId: livestream.id,
+         correctToken: correctToken.value,
+         tokenToValidate,
+      })
+   }
+
    return
 }

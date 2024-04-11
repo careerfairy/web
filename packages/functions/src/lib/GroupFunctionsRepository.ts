@@ -39,6 +39,8 @@ import * as functions from "firebase-functions"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { ServerClient } from "postmark"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { DateTime } from "luxon"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -165,6 +167,19 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @returns A promise that resolves with an array of Group objects.
     */
    getAllGroupsWithAPlan(): Promise<Group[]>
+
+   /**
+    * Retrieves all groups which have a plan expiring, taking into account a number of days as buffer. The retrieves groups shall be
+    * those which have plan.expiresAt <= Now() + days.
+    * @param type Type of plan to restrict groups by
+    * @param ignoreGroupIds List of groups to be ignored from query results (not in)
+    */
+   getAllGroupsWithAPlanExpiring(
+      type: GroupPlanType,
+      days: number,
+      logger: Logger,
+      ignoreGroupIds?: string[]
+   ): Promise<Group[]>
 
    /**
     * Sends a reminder email to the group admins when the trial plan creation period is near to end.
@@ -634,6 +649,29 @@ export class GroupFunctionsRepository
       return mapFirestoreDocuments<Group>(snaps)
    }
 
+   async getAllGroupsWithAPlanExpiring(
+      type: GroupPlanType,
+      days: number,
+      logger: Logger,
+      ignoreGroupIds: string[] = []
+   ): Promise<Group[]> {
+      const preExpirationDate = DateTime.now().plus({ days: days }).toJSDate()
+      logger.info(
+         " - getAllGroupsWithAPlanExpiring using expiration date -> ",
+         preExpirationDate
+      )
+      const query = this.firestore
+         .collection("careerCenterData")
+         .where("plan.type", "==", type)
+         .where("plan.expiresAt", "<=", preExpirationDate)
+      const snaps = await query
+         .orderBy("plan.expiresAt")
+         .withConverter(createCompatGenericConverter<Group>())
+         .get()
+      return mapFirestoreDocuments<Group>(snaps)?.filter(
+         (group) => !ignoreGroupIds.includes(group.groupId)
+      )
+   }
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
       client: ServerClient
