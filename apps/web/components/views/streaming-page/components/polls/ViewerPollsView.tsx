@@ -4,6 +4,7 @@ import { useLivestreamOngoingPoll } from "components/custom-hook/streaming/useLi
 import { useStreamingContext } from "../../context"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
+import { EmptyPollsView } from "./EmptyPollsView"
 
 export const ViewerPollsView = () => {
    return (
@@ -19,6 +20,10 @@ const Content = () => {
    const { livestreamId } = useStreamingContext()
 
    const ongoingPoll = useLivestreamOngoingPoll(livestreamId)
+
+   if (!ongoingPoll) {
+      return <EmptyPollsView />
+   }
 
    return (
       <Stack overflow="hidden" spacing={1.5}>

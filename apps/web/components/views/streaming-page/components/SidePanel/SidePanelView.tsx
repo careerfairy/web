@@ -7,7 +7,7 @@ import { ReactNode, RefObject } from "react"
 
 const styles = sxStyles({
    baseBgColor: {
-      bgcolor: "#FDFDFD",
+      bgcolor: (theme) => theme.brand.white[50],
    },
    root: {
       display: "flex",
@@ -23,7 +23,8 @@ const styles = sxStyles({
       justifyContent: "center",
       px: 2,
       py: 1.5,
-      borderBottom: "1px solid #F9F9F9",
+      borderBottom: "1px solid",
+      borderColor: (theme) => theme.brand.black[300],
       position: "sticky",
       top: 0,
       zIndex: 1,
