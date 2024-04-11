@@ -9,7 +9,11 @@ import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotific
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { validate } from "../../../common/registration-modal/steps/LivestreamGroupQuestionForm/util"
-import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
+import BaseDialogView, {
+   HeroContent,
+   HeroTitle,
+   MainContent,
+} from "../../BaseDialogView"
 import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
 import RegistrationPreConditions from "../../RegistrationPreConditions"
 import useRegistrationHandler from "../../useRegistrationHandler"
@@ -19,18 +23,9 @@ import Image from "next/legacy/image"
 import { GroupWithPolicy } from "@careerfairy/shared-lib/src/groups"
 import Link from "../../../common/Link"
 import LivestreamGroupQuestionsSelector from "./LivestreamGroupQuestionsSelector"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({
-   title: {
-      textAlign: "center",
-      fontWeight: 500,
-      lineHeight: 1.3,
-      fontSize: {
-         xs: "1.9rem",
-         sm: "2.571rem",
-      },
-      maxWidth: 655,
-   },
    logoWrapper: {
       p: 1,
       background: "white",
@@ -40,30 +35,47 @@ const styles = sxStyles({
       boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
    },
    contentOffset: {
-      mt: -13,
+      mt: { xs: -11, md: -15 },
+      width: "100%",
    },
    consentText: {
       fontSize: 16,
       textAlign: "center",
+      color: "neutral.800",
    },
    btn: {
       boxShadow: "none",
-      fontSize: 14,
-      padding: "9px 45px",
-      "&:disabled": {
-         backgroundColor: "#E8E8E8",
-         color: "#999999",
-      },
-      textTransform: "none",
+      padding: "8px 58px",
       transition: (theme) => theme.transitions.create(["opacity"]),
    },
    btnCancel: {
       textTransform: "none",
-      color: "#ABABAB",
-      padding: "5px 0",
+      padding: "8px 58px",
+      color: (theme) => theme.brand.black[700],
    },
    fullWidth: {
       width: "100%",
+   },
+   heroContent: {
+      height: { xs: "229px", md: "366px" },
+   },
+   actionButtons: {
+      width: {
+         xs: "100%",
+         md: "auto",
+      },
+   },
+   avatar: {
+      borderRadius: { xs: "70px", md: "91px" },
+      border: "1.5px solid",
+      borderColor: (theme) => theme.brand.white[400],
+   },
+   policyLink: {
+      marginLeft: "4px",
+      textDecoration: "none",
+   },
+   minHeight: {
+      minHeight: { xs: "300px", md: "400px" },
    },
 })
 
@@ -151,6 +163,7 @@ const GroupQuestionsForm = () => {
                               onRegisterSuccess ? undefined : goToPrevious
                            }
                            noMinHeight
+                           sx={styles.heroContent}
                         >
                            <Stack
                               alignItems="center"
@@ -158,62 +171,86 @@ const GroupQuestionsForm = () => {
                               pt={3}
                               pb={9}
                            >
-                              <HostTitle companyName={livestream.company} />
+                              <HeroTitle>
+                                 {livestream.company}
+                                 <br />
+                                 would like to know more about you
+                              </HeroTitle>
                            </Stack>
                         </HeroContent>
                      }
                      mainContent={
-                        <MainContent>
+                        <MainContent sx={styles.minHeight}>
                            <Stack
                               alignItems="center"
                               spacing={5}
                               sx={styles.contentOffset}
                               px={isMobile ? 1 : 5}
                            >
-                              <HostImage
-                                 imageUrl={livestream.companyLogoUrl}
-                                 alt={livestream.company}
-                              />
-                              {Object.keys(values).length ? (
-                                 <Stack spacing={2} sx={styles.fullWidth}>
-                                    {Object.values(values).map(
-                                       (groupQuestions) => (
-                                          <LivestreamGroupQuestionsSelector
-                                             // @ts-ignore
-                                             key={groupQuestions.groupId}
-                                             errors={errors}
-                                             touched={touched}
-                                             handleBlur={handleBlur}
-                                             groupQuestions={groupQuestions}
-                                             setFieldValue={setFieldValue}
-                                          />
-                                       )
-                                    )}
+                              <Stack
+                                 spacing={isMobile ? 3 : 8}
+                                 alignItems="center"
+                                 sx={styles.fullWidth}
+                              >
+                                 <Stack
+                                    spacing={4}
+                                    alignItems="center"
+                                    sx={styles.fullWidth}
+                                 >
+                                    <CircularLogo
+                                       src={getResizedUrl(
+                                          livestream.companyLogoUrl,
+                                          "lg"
+                                       )}
+                                       alt={livestream.company}
+                                       size={isMobile ? 80 : 136}
+                                       sx={styles.avatar}
+                                    />
+                                    {Object.keys(values).length ? (
+                                       <Stack spacing={2} sx={styles.fullWidth}>
+                                          {Object.values(values).map(
+                                             (groupQuestions) => (
+                                                <LivestreamGroupQuestionsSelector
+                                                   // @ts-ignore
+                                                   key={groupQuestions.groupId}
+                                                   errors={errors}
+                                                   touched={touched}
+                                                   handleBlur={handleBlur}
+                                                   groupQuestions={
+                                                      groupQuestions
+                                                   }
+                                                   setFieldValue={setFieldValue}
+                                                />
+                                             )
+                                          )}
+                                       </Stack>
+                                    ) : null}
                                  </Stack>
-                              ) : null}
 
-                              {policiesToAccept ? (
-                                 <ConsentText
-                                    groupsWithPolicies={groupsWithPolicies}
+                                 {policiesToAccept ? (
+                                    <ConsentText
+                                       groupsWithPolicies={groupsWithPolicies}
+                                    />
+                                 ) : null}
+                              </Stack>
+
+                              {isMobile ? null : (
+                                 <ActionButtons
+                                    disabled={Object.keys(errors).length > 0}
+                                    policiesToAccept={policiesToAccept}
                                  />
-                              ) : null}
-
-                              <PrimarySecondaryButtons
-                                 disabled={Object.keys(errors).length > 0}
-                                 primaryText={
-                                    policiesToAccept
-                                       ? "Accept & Proceed"
-                                       : "Answer & Proceed"
-                                 }
-                                 typeSubmit
-                                 onClickSecondary={
-                                    onRegisterSuccess
-                                       ? undefined
-                                       : () => goToView("livestream-details")
-                                 }
-                              />
+                              )}
                            </Stack>
                         </MainContent>
+                     }
+                     hideBottomDivider
+                     fixedBottomContent={
+                        isMobile ? (
+                           <ActionButtons
+                              disabled={Object.keys(errors).length > 0}
+                              policiesToAccept={policiesToAccept}
+                           />
+                        ) : null
                      }
                   />
                </Form>
@@ -223,18 +260,24 @@ const GroupQuestionsForm = () => {
    )
 }
 
-const HostTitle = ({ companyName }: { companyName: string }) => {
+const ActionButtons = ({ disabled, policiesToAccept }) => {
+   const { goToView, onRegisterSuccess } = useLiveStreamDialog()
+
    return (
-      <Typography
-         align="center"
-         variant={"h3"}
-         component="h1"
-         sx={styles.title}
-      >
-         {companyName}
-         <br />
-         Would Like To Know More About You
-      </Typography>
+      <Box sx={styles.actionButtons}>
+         <PrimarySecondaryButtons
+            disabled={disabled}
+            primaryText={
+               policiesToAccept ? "Accept & Proceed" : "Answer & Proceed"
+            }
+            typeSubmit
+            onClickSecondary={
+               onRegisterSuccess
+                  ? undefined
+                  : () => goToView("livestream-details")
+            }
+         />
+      </Box>
    )
 }
 
@@ -264,25 +307,25 @@ const ConsentText = ({
    groupsWithPolicies: GroupWithPolicy[]
 }) => {
    return (
-      <Box>
-         <Typography sx={styles.consentText}>
-            Your information (full name, email address, university affiliation)
-            will be transferred to the organiser when you register to one or
-            more of their live streams. The data protection notice of the
-            organiser applies:
-            {groupsWithPolicies.map((group) => (
+      <Stack spacing={1}>
+         {groupsWithPolicies.map((group) => (
+            <Typography key={group.id} sx={styles.consentText}>
+               Your information (full name, email address, university
+               affiliation) will be transferred to the organiser when you
+               register to one or more of their live streams. The data
+               protection notice of the organiser applies. You can find it
                <Link
-                  key={group.id}
                   target="_blank"
-                  style={{ marginLeft: "10px" }}
                   href={group.privacyPolicyUrl}
                   rel="noreferrer"
+                  sx={styles.policyLink}
                >
-                  {group.universityName}
+                  here
                </Link>
-            ))}
-         </Typography>
-      </Box>
+               .
+            </Typography>
+         ))}
+      </Stack>
    )
 }
 
@@ -306,7 +349,7 @@ export const PrimarySecondaryButtons = ({
    secondaryText = "Cancel",
 }: ButtonProps) => {
    return (
-      <Stack direction="column" spacing={1}>
+      <Stack direction="column" spacing={1.5}>
          <Button
             disabled={disabled || loading}
             sx={styles.btn}
@@ -314,7 +357,7 @@ export const PrimarySecondaryButtons = ({
             onClick={onClickPrimary ? onClickPrimary : undefined}
             variant="contained"
             disableElevation
-            size="small"
+            size="medium"
             color="secondary"
             startIcon={
                loading ? (

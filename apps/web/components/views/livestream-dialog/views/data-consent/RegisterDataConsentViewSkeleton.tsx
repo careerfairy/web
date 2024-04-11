@@ -6,11 +6,9 @@ import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { ReactNode } from "react"
 
 const styles = sxStyles({
-   logoSkeleton: {
-      borderRadius: 4,
-   },
+   logoSkeleton: {},
    contentOffset: {
-      mt: -13,
+      mt: { xs: -11, md: -15 },
    },
    marginAuto: {
       mx: "auto",
@@ -30,11 +28,11 @@ const RegisterDataConsentViewSkeleton = ({ body }: { body?: ReactNode }) => {
                <Stack
                   alignItems="center"
                   justifyContent={"center"}
-                  pt={3}
-                  pb={9}
+                  pt={isMobile ? 6 : 12}
+                  pb={isMobile ? 8 : 15}
                   sx={{ width: "100%" }}
                >
-                  <HostTitleSkeleton />
+                  <HeroTitleSkeleton />
                </Stack>
             </HeroContent>
          }
@@ -42,7 +40,7 @@ const RegisterDataConsentViewSkeleton = ({ body }: { body?: ReactNode }) => {
             <MainContent>
                <Stack
                   alignItems="center"
-                  spacing={5}
+                  spacing={7}
                   sx={styles.contentOffset}
                   px={isMobile ? 1 : 5}
                >
@@ -58,7 +56,7 @@ const RegisterDataConsentViewSkeleton = ({ body }: { body?: ReactNode }) => {
    )
 }
 
-const HostTitleSkeleton = () => {
+const HeroTitleSkeleton = () => {
    return (
       <>
          <Skeleton sx={styles.marginAuto} width="30%" height={30} />
@@ -68,12 +66,13 @@ const HostTitleSkeleton = () => {
 }
 
 const HostImageSkeleton = () => {
+   const isMobile = useIsMobile()
    return (
       <Skeleton
          sx={styles.logoSkeleton}
-         variant={"rectangular"}
-         width={130}
-         height={130}
+         variant={"circular"}
+         width={isMobile ? 80 : 136}
+         height={isMobile ? 80 : 136}
       />
    )
 }

@@ -76,5 +76,11 @@
       "type": "STRING",
       "mode": "NULLABLE",
       "description": "Level of study of the user at the time of the event"
+   },
+   {
+      "name": "interactionSource",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Source of the Spark interaction (e.g., livestream_registration_flow, portal, company_page)"
    }
 ]
