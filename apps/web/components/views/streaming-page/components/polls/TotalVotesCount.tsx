@@ -1,9 +1,9 @@
-import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
 import { collection, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import { useStreamingContext } from "../../context"
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { Skeleton, Typography } from "@mui/material"
+import useCountQuery from "components/custom-hook/useCountQuery"
 
 const useTotalVoteCount = (
    livestreamId: string,
@@ -12,7 +12,7 @@ const useTotalVoteCount = (
 ) => {
    const firestore = useFirestore()
 
-   return useSWRCountQuery(
+   return useCountQuery(
       query(
          collection(
             firestore,
@@ -39,7 +39,7 @@ export const TotalVotesCount = ({ poll }: Props) => {
 
    const optionsIds = poll.options?.map((option) => option.id)
 
-   const { data: count, isLoading } = useTotalVoteCount(
+   const { count, loading } = useTotalVoteCount(
       livestreamId,
       poll.id,
       optionsIds
@@ -47,7 +47,7 @@ export const TotalVotesCount = ({ poll }: Props) => {
 
    return (
       <Typography variant="xsmall" color="neutral.200">
-         {isLoading ? <Skeleton width={40} variant="text" /> : `${count} votes`}
+         {loading ? <Skeleton width={40} variant="text" /> : `${count} votes`}
       </Typography>
    )
 }
