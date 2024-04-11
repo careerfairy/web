@@ -49,20 +49,11 @@ const ConfirmPlanView = ({ plan, icon }: ConfirmPlanProps) => {
 }
 
 const getPlanDescriptionContent = (groupName: string, plan: GroupPlanType) => {
-   switch (plan) {
-      case "trial": {
-         return `You're about to upgrade ${groupName} to the Sparks trial. This upgrade is permanent and cannot be reversed. Want to proceed?`
-      }
-      case "tier1": {
-         return `You're about to upgrade ${groupName} to the Essential plan. This upgrade is permanent and cannot be reversed. Want to proceed?`
-      }
-      case "tier2": {
-         return `You're about to upgrade ${groupName} to the Advanced plan. This upgrade is permanent and cannot be reversed. Want to proceed?`
-      }
-      case "tier3": {
-         return `You're about to upgrade ${groupName} to the Premium plan. This upgrade is permanent and cannot be reversed. Want to proceed?`
-      }
-   }
+   " "
+   const planName =
+      plan == GroupPlanTypes.Trial ? "Sparks trial" : planTitlesDictionary[plan]
+
+   return `You're about to upgrade ${groupName} to the ${planName}. This upgrade is permanent and cannot be reversed. Want to proceed?`
 }
 
 export default ConfirmPlanView

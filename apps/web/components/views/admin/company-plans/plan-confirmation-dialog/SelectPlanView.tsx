@@ -18,7 +18,7 @@ const styles = sxStyles({
    caption: {
       fontSize: "1.28571rem",
       fontWeight: 600,
-      color: "#5C5C6A",
+      color: (theme) => theme.palette.neutral[600],
    },
    header: {
       fontWeight: 700,
@@ -28,9 +28,9 @@ const styles = sxStyles({
    },
    btn: {
       borderRadius: 2,
-      border: `1px solid #EEEEEE !important`,
-      color: "#5C5C6A",
-      bgcolor: "#FAFAFE",
+      border: (theme) => `1px solid ${theme.brand.black[400]} !important`,
+      color: (theme) => theme.palette.neutral[600],
+      bgcolor: (theme) => theme.brand.white[300],
       textTransform: "none",
       "& svg": {
          fontSize: 20,

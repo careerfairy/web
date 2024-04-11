@@ -8,6 +8,7 @@ import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
 import PlanDaysLeftIcon from "components/views/common/icons/PlanDaysLeftIcon"
 import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
 import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
+import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 
@@ -33,25 +34,25 @@ const styles = sxStyles({
       borderColor: (theme) => theme.brand.error[300],
    },
    neutralChip: {
-      color: "#9999B1",
-      borderColor: "#9999B1",
-      bgcolor: "#F6F6FA",
+      color: (theme) => theme.palette.neutral[400],
+      borderColor: (theme) => theme.palette.neutral[400],
+      bgcolor: (theme) => theme.brand.white,
    },
    onTrialChip: {
-      color: "primary.600",
-      borderColor: "primary.600",
-      bgcolor: "#F1FCF9",
+      color: (theme) => theme.palette.primary[600],
+      borderColor: (theme) => theme.palette.primary[600],
+      bgcolor: (theme) => theme.palette.primary.light,
    },
    paidChips: {
       color: (theme) => theme.brand.purple[600],
       fontWeight: 400,
-      borderColor: "#D1C8F9",
-      bgcolor: "#F0EDFD",
+      borderColor: (theme) => theme.palette.secondary.contrastText,
+      bgcolor: (theme) => theme.palette.secondary.light,
    },
    onSparkChip: {
-      color: "#6749EA",
-      borderColor: "#D1C8F9",
-      bgcolor: "#F0EDFD",
+      color: (theme) => theme.palette.secondary.main,
+      borderColor: (theme) => theme.palette.secondary.contrastText,
+      bgcolor: (theme) => theme.palette.secondary.light,
    },
 })
 
@@ -124,7 +125,7 @@ type PlanChipProps = {
    plan: GroupPlanType
 }
 
-const PlanChip = ({ plan }: PlanChipProps) => {
+const PlanChip: FC<PlanChipProps> = ({ plan }) => {
    const theme = useTheme()
 
    const isTrial = plan === GroupPlanTypes.Trial
