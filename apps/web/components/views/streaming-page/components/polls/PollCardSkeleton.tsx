@@ -23,9 +23,9 @@ export const PollCardSkeleton = React.forwardRef<HTMLDivElement>((_, ref) => {
          </Typography>
          <Box pt={1.5} />
          <Stack spacing={1}>
-            {Array.from({ length: 3 }, (_, index) => (
-               <PollOptionResultSkeleton key={index} />
-            ))}
+            <PollOptionResultSkeleton />
+            <PollOptionResultSkeleton />
+            <PollOptionResultSkeleton />
          </Stack>
          <Box pt={0.3} />
       </Box>
