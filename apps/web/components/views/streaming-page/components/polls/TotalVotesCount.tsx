@@ -23,10 +23,7 @@ const useTotalVoteCount = (
             "voters"
          ),
          optionsIds ? where("optionId", "in", optionsIds) : undefined
-      ),
-      {
-         revalidateOnFocus: false,
-      }
+      )
    )
 }
 

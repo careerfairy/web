@@ -122,7 +122,10 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
             {Boolean(enableDrawerCancelButton) && (
                <Fragment>
                   <Divider sx={styles.listItemDivider} />
-                  <ListItemButton sx={[styles.drawerMenuItem]}>
+                  <ListItemButton
+                     onClick={handleClose}
+                     sx={[styles.drawerMenuItem]}
+                  >
                      <Typography variant="medium">Cancel</Typography>
                   </ListItemButton>
                </Fragment>
