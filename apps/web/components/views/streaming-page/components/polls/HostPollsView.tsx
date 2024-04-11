@@ -12,13 +12,13 @@ import { ConfirmDeletePollDialog } from "./ConfirmDeletePollDialog"
 import { ConfirmReopenPollDialog } from "./ConfirmReopenPollDialog"
 
 type Props = {
-   scrollToTop: () => void
+   onPollStarted: () => void
 }
 
-export const HostPollsView = ({ scrollToTop }: Props) => {
+export const HostPollsView = (props: Props) => {
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
-         <Content scrollToTop={scrollToTop} />
+         <Content {...props} />
       </SuspenseWithBoundary>
    )
 }
@@ -32,7 +32,7 @@ const customSortPolls = (a: LivestreamPoll, b: LivestreamPoll) => {
    return priority[a.state] - priority[b.state]
 }
 
-const Content = ({ scrollToTop }: Props) => {
+const Content = ({ onPollStarted }: Props) => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
    const [pollIdToDelete, setPollIdToDelete] = useState<string | null>(null)
@@ -80,7 +80,7 @@ const Content = ({ scrollToTop }: Props) => {
                               poll={poll}
                               onClickDelete={handleOpenPollDeleteDialog}
                               onClickReopen={handleOpenPollReopenDialog}
-                              onPollStarted={scrollToTop}
+                              onPollStarted={onPollStarted}
                            />
                         </SuspenseWithBoundary>
                      </Box>
@@ -97,7 +97,7 @@ const Content = ({ scrollToTop }: Props) => {
             open={Boolean(pollIdToReopen)}
             onClose={handleClosePollReopenDialog}
             pollId={pollIdToReopen}
-            onPollStarted={scrollToTop}
+            onPollStarted={onPollStarted}
          />
       </Fragment>
    )
