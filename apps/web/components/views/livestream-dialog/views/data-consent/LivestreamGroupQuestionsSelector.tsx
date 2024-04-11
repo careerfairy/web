@@ -1,13 +1,5 @@
 import React, { Fragment, useCallback, useMemo } from "react"
-import {
-   FormControl,
-   FormHelperText,
-   InputLabel,
-   MenuItem,
-   Select,
-   SelectChangeEvent,
-   styled,
-} from "@mui/material"
+import { FormControl, FormHelperText, MenuItem } from "@mui/material"
 import {
    LivestreamGroupQuestion,
    LivestreamGroupQuestions,
@@ -21,9 +13,9 @@ import {
    FormikHelpers,
    FormikTouched,
 } from "formik"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../types/commonTypes"
-import ExpandMore from "@mui/icons-material/ExpandMore"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions
@@ -45,7 +37,7 @@ const LivestreamGroupQuestionsSelector = ({
 
    return (
       <Fragment>
-         {questions.map((question) => {
+         {questions.map((question: LivestreamGroupQuestion) => {
             const errorText =
                errors[groupQuestions.groupId]?.questions?.[question.id]
                   ?.selectedOptionId
@@ -99,6 +91,9 @@ const styles = sxStyles({
       ["& legend"]: {
          marginLeft: "15px",
       },
+      ["& .Mui-error"]: {
+         pl: 0,
+      },
    },
    menuItem: {
       paddingLeft: "40px",
@@ -111,71 +106,89 @@ const styles = sxStyles({
    errorText: {
       paddingLeft: "30px",
    },
-})
-
-const StyledSelect = styled(Select)(() => ({
-   fontSize: "16px !important",
-   "& .MuiSelect-select": {
-      paddingLeft: "40px",
-      boxShadow: "none",
+   question: {
+      ["label"]: {
+         left: "0 !important",
+         paddingLeft: "0 !important",
+      },
    },
-})) as unknown as typeof Select
+   placeholder: {
+      ["& .MuiInputBase-input"]: {
+         color: "neutral.300",
+      },
+   },
+   hideOption: {
+      display: "none",
+   },
+})
 
 const QuestionSelect = ({
    inputName,
    question,
    setFieldValue,
-   handleBlur,
    errorText,
 }: QuestionSelectProps) => {
    const isMobile = useIsMobile()
-
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
 
-   const handleChange = useCallback(
-      (event: SelectChangeEvent) => {
+   const handleOptionChange = useCallback(
+      (event) => {
          setFieldValue(inputName, event.target.value)
       },
       [inputName, setFieldValue]
    )
 
+   const selectedOption =
+      options.find((option) => option.id === question.selectedOptionId) || null
+
+   const optionsWithPlaceholder = [
+      ...options,
+      { id: "placeholder", name: "Select an option" },
+   ]
+
    return (
       <FormControl fullWidth error={!!errorText} sx={styles.formControl}>
-         <InputLabel sx={styles.label} id={`${inputName}-label`}>
-            {question.name}
-         </InputLabel>
-
-         <StyledSelect
-            sx={styles.select}
-            id={`${inputName}`}
-            name={inputName}
+         <BrandedTextField
+            key={inputName}
+            id={inputName}
             label={question.name}
-            onBlur={handleBlur}
-            value={question.selectedOptionId || ""}
-            onChange={handleChange}
-            native={isMobile}
-            variant="outlined"
-            IconComponent={ExpandMore}
+            value={
+               selectedOption?.id ||
+               optionsWithPlaceholder.find(
+                  (option) => option.id === "placeholder"
+               ).id
+            }
+            select
+            SelectProps={{
+               native: isMobile,
+            }}
+            onChange={handleOptionChange}
+            sx={[styles.question, !selectedOption && styles.placeholder]}
          >
-            {isMobile ? <option value="" disabled></option> : null}
-            {options.map((option) =>
-               isMobile ? (
-                  <option key={option.id} value={option.id}>
-                     {option.name}
-                  </option>
-               ) : (
-                  <MenuItem
-                     sx={styles.menuItem}
-                     key={option.id}
-                     value={option.id}
-                  >
-                     {option.name}
-                  </MenuItem>
-               )
-            )}
-         </StyledSelect>
+            {isMobile
+               ? optionsWithPlaceholder.map((option) => (
+                    <option
+                       key={option.id}
+                       value={option.id}
+                       style={
+                          option.id === "placeholder" ? styles.hideOption : {}
+                       }
+                    >
+                       {option.name}
+                    </option>
+                 ))
+               : optionsWithPlaceholder.map((option) => (
+                    <MenuItem
+                       key={option.id}
+                       value={option.id}
+                       sx={option.id === "placeholder" ? styles.hideOption : {}}
+                    >
+                       {option.name}
+                    </MenuItem>
+                 ))}
+         </BrandedTextField>
          <FormHelperText sx={styles.errorText}>{errorText}</FormHelperText>
       </FormControl>
    )

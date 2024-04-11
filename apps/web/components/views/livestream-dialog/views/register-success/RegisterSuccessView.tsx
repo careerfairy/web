@@ -1,8 +1,16 @@
-import React, { FC, useCallback, useEffect } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { Box, Button, Grow, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   CircularProgress,
+   Fade,
+   Grid,
+   Slide,
+   Typography,
+} from "@mui/material"
 import { confetti } from "../../../../../constants/images"
 import Image from "next/legacy/image"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
@@ -10,9 +18,19 @@ import Stack from "@mui/material/Stack"
 import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import { responsiveConfetti } from "../../../../util/confetti"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { eventDetailsDialogVisibilitySelector } from "../../../../../store/selectors/sparksFeedSelectors"
 import { useRouter } from "next/router"
+import SparkCarouselCard from "components/views/sparks/components/spark-card/SparkCarouselCard"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import useGroupHasSparks from "components/custom-hook/spark/useGroupHasSparks"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import SparksCarouselWithSuspenseComponent, {
+   MobileSparksArrows,
+} from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { setInteractionSource } from "store/reducers/sparksFeedReducer"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 
 const styles = sxStyles({
    fullHeight: {
@@ -20,77 +38,107 @@ const styles = sxStyles({
    },
    mainContentWrapper: {
       display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-   },
-   mainContent: {
-      display: "flex",
       flexDirection: "column",
-      alignItems: "center",
-      py: {
-         md: 5,
-      },
-      lineHeight: "150%",
-      justifyContent: {
-         xs: "space-between",
-         md: "center",
-      },
-      minHeight: {
-         xs: 650,
-      },
    },
    confettiGraphic: {
-      mx: "auto",
+      width: "100%",
+      textAlign: "center",
+   },
+   confettiGraphicSparksOpen: {
+      transition: "all 0.5s",
+      width: { xs: "0%", md: "7%" },
    },
    title: {
-      display: "inline-block",
-      position: "relative",
       textAlign: "center",
-      fontWeight: 600,
+      fontWeight: 700,
+      pt: { xs: 1, md: 0 },
+      mb: 1,
+   },
+   bigTitle: {
+      fontSize: { xs: "28px !important", md: "48px !important" },
+      marginBottom: { xs: 4, md: 6 },
    },
    description: {
       textAlign: "center",
-      fontSize: "1.142rem",
-      my: "auto",
       maxWidth: 680,
+      fontWeight: 400,
    },
-   btn: {
-      textTransform: "none",
-      boxShadow: "none",
+   header: {
+      display: "inline-flex",
+      flexFlow: "wrap",
+      justifyContent: "center",
+      textAlign: "center",
+      width: "100%",
    },
-   discoverBtn: {
-      color: "grey.600",
+   buttonsWrapper: {
+      display: "flex",
+      justifyContent: "center",
+      mb: { xs: 3.5, md: 4 },
+      width: "100%",
    },
    buttons: {
-      maxWidth: 400,
-      width: "100%",
+      minWidth: { xs: "100%", md: "267px" },
+   },
+   mobileSparksWrapper: {
+      borderRadius: "12px 12px 0px 0px",
+      background: (theme) => theme.brand.white[400],
+   },
+   sparkCarouselTitle: {
+      fontWeight: 600,
+   },
+   sparkGridItem: {
+      height: 390,
+   },
+   sparksWrapper: {
+      padding: 1.2,
+      pb: "18px",
+      display: "inline-flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   mobileSparksCarousel: {
+      py: "16px",
+   },
+   mobileSparksCarouselHeader: {
+      pr: 2,
+   },
+   transition: {
+      transition: "all 0.5s",
+   },
+   contentWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      height: "100%",
+   },
+   contentWrapperSparksOpen: {
+      height: "unset",
+   },
+   copy: {
+      textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
+   sparksContentOffset: {
+      margin: { xs: "0 -24px" },
    },
 })
 
-type Props = {}
-
-const RegisterSuccessView: FC<Props> = () => {
-   const route = useRouter()
-   const { closeDialog, livestream, activeView } = useLiveStreamDialog()
-   const eventDetailsDialogVisibility = useSelector(
-      eventDetailsDialogVisibilitySelector
-   )
-
+const RegisterSuccessView: FC = () => {
+   const { closeDialog, activeView } = useLiveStreamDialog()
    const isMobile = useIsMobile()
+   const [isSparksOpen, setIsSparksOpen] = useState(false)
+
+   const handleDiscoverSparks = () => {
+      setIsSparksOpen(true)
+   }
 
    useEffect(() => {
       if (activeView !== "register-success") return
 
       responsiveConfetti(isMobile)
    }, [isMobile, activeView])
-
-   const handleBackClick = useCallback(() => {
-      if (eventDetailsDialogVisibility) {
-         closeDialog()
-      } else {
-         void route.push("/next-livestreams")
-      }
-   }, [closeDialog, eventDetailsDialogVisibility, route])
 
    return (
       <BaseDialogView
@@ -101,72 +149,283 @@ const RegisterSuccessView: FC<Props> = () => {
                onBackClick={closeDialog}
                onBackPosition="top-right"
             >
-               <Grow in>
-                  <Box sx={styles.mainContent}>
-                     <Box sx={styles.confettiGraphic}>
-                        <Image
-                           src={confetti}
-                           objectFit={"contain"}
-                           width={150}
-                           height={150}
-                           priority
-                           quality={100}
-                           alt={"confetti"}
-                        />
-                     </Box>
-                     <Typography mb={2} sx={styles.title} variant={"h2"}>
-                        Registration{" "}
-                        <Typography
-                           sx={styles.title}
-                           variant={"h2"}
-                           color="primary.main"
-                        >
-                           Successful
-                        </Typography>
-                     </Typography>
-                     <Typography sx={styles.description}>
-                        You can continue exploring and browsing through other
-                        content on our platform. We will send you a reminder as
-                        soon as this live stream is about to start, so you can
-                        join it. Additionally, you can add the live stream to
-                        your calendar to ensure you don&apos;t forget about it.
-                     </Typography>
-                     <Stack spacing={1} mt={4} sx={styles.buttons}>
-                        <AddToCalendar
-                           event={livestream}
-                           filename={`${livestream.company}-event`}
-                        >
-                           {(handleClick) => (
-                              <Button
-                                 fullWidth
-                                 variant={"contained"}
-                                 color={"secondary"}
-                                 onClick={handleClick}
-                                 sx={styles.btn}
-                                 startIcon={<CalendarIcon />}
-                              >
-                                 Add to calendar
-                              </Button>
-                           )}
-                        </AddToCalendar>
-
-                        <Button
-                           fullWidth
-                           variant={"text"}
-                           color={"grey"}
-                           onClick={handleBackClick}
-                           sx={[styles.btn, styles.discoverBtn]}
-                        >
-                           {eventDetailsDialogVisibility
-                              ? "Back to Sparks"
-                              : "Discover more live streams"}
-                        </Button>
-                     </Stack>
-                  </Box>
-               </Grow>
+               {isMobile && isSparksOpen ? (
+                  <MobileSparksTransition
+                     isSparksOpen={isSparksOpen}
+                     handleDiscoverSparks={handleDiscoverSparks}
+                  />
+               ) : (
+                  <Component
+                     isSparksOpen={isSparksOpen}
+                     handleDiscoverSparks={handleDiscoverSparks}
+                  />
+               )}
             </MainContent>
          }
       />
+   )
+}
+
+const MobileSparksTransition = ({ isSparksOpen, handleDiscoverSparks }) => {
+   return (
+      <Slide direction="up" in={isSparksOpen} unmountOnExit>
+         <Box>
+            <Fade in={isSparksOpen} timeout={800}>
+               <Box>
+                  <Component
+                     isSparksOpen={isSparksOpen}
+                     handleDiscoverSparks={handleDiscoverSparks}
+                  />
+               </Box>
+            </Fade>
+         </Box>
+      </Slide>
+   )
+}
+
+const Component = ({ isSparksOpen, handleDiscoverSparks }) => {
+   const isMobile = useIsMobile()
+   const router = useRouter()
+   const dispatch = useDispatch()
+   const { livestream } = useLiveStreamDialog()
+
+   const handleSparkClick = useCallback(
+      (spark: Spark) => {
+         if (spark) {
+            dispatch(
+               setInteractionSource(
+                  SparkInteractionSources.Livestream_Registration_Flow
+               )
+            )
+            router.push({
+               pathname: `/sparks/${spark.id}`,
+               query: {
+                  ...router.query, // spread current query params
+                  groupId: livestream.groupIds[0],
+               },
+            })
+         }
+         return
+      },
+      [livestream.groupIds, router, dispatch]
+   )
+
+   return (
+      <Box
+         sx={[
+            styles.contentWrapper,
+            isSparksOpen && styles.contentWrapperSparksOpen,
+         ]}
+      >
+         <Header isSparksOpen={isSparksOpen} />
+         <Box sx={styles.copy} gap={isSparksOpen ? 1.4 : 4}>
+            {isSparksOpen ? (
+               <Typography variant={"brandedBody"} sx={styles.description}>
+                  Your journey doesn{"'"}t stop here: discover more about{" "}
+                  <b>{livestream.company}</b> in their Sparks and add the live
+                  stream to your calendar to ensure you won{"'"}t miss it.
+               </Typography>
+            ) : (
+               <Typography variant="brandedBody" sx={styles.description}>
+                  Feel free to continue exploring and browsing other content on
+                  our platform. We{"'"}ll send you a reminder just before this
+                  live stream begins so you can easily join. You can also add
+                  the live stream to your calendar to ensure you won
+                  {"'"}t miss it.
+               </Typography>
+            )}
+            <SuspenseWithBoundary
+               fallback={
+                  <Box>
+                     <CircularProgress />
+                  </Box>
+               }
+            >
+               <ActionButtons
+                  handleDiscoverSparks={handleDiscoverSparks}
+                  isSparksOpen={isSparksOpen}
+               />
+            </SuspenseWithBoundary>
+         </Box>
+         <Slide direction="up" in={isSparksOpen} unmountOnExit>
+            <Box>
+               <Fade in={isSparksOpen} timeout={600}>
+                  <Box sx={styles.sparksContentOffset}>
+                     <SuspenseWithBoundary fallback={<CircularProgress />}>
+                        {isMobile ? (
+                           <SparksMobileCarousel
+                              livestream={livestream}
+                              handleSparkClick={handleSparkClick}
+                           />
+                        ) : (
+                           <SparksGrid
+                              livestream={livestream}
+                              handleSparkClick={handleSparkClick}
+                           />
+                        )}
+                     </SuspenseWithBoundary>
+                  </Box>
+               </Fade>
+            </Box>
+         </Slide>
+      </Box>
+   )
+}
+
+const Header = ({ isSparksOpen }) => {
+   const isMobile = useIsMobile()
+
+   return (
+      <Box sx={styles.header}>
+         <Box
+            sx={[
+               styles.confettiGraphic,
+               isSparksOpen && styles.confettiGraphicSparksOpen,
+            ]}
+         >
+            <Image
+               src={confetti}
+               objectFit={"contain"}
+               width={isMobile ? 196 : 268}
+               height={isMobile ? 196 : 268}
+               priority
+               quality={100}
+               alt={"confetti"}
+            />
+         </Box>
+
+         <Typography
+            sx={[
+               styles.title,
+               styles.transition,
+               !isSparksOpen && styles.bigTitle,
+            ]}
+            variant={isSparksOpen && isMobile ? "brandedH2" : "brandedH1"}
+            component={isSparksOpen && isMobile ? "h2" : "h1"}
+         >
+            {"Successfully "}
+            <Typography
+               sx={[styles.transition, !isSparksOpen && styles.bigTitle]}
+               variant={isSparksOpen && isMobile ? "brandedH2" : "brandedH1"}
+               color="primary.main"
+            >
+               {isSparksOpen && isMobile ? <br /> : null}
+               Registered
+            </Typography>
+         </Typography>
+      </Box>
+   )
+}
+
+const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
+   const route = useRouter()
+   const { closeDialog, livestream } = useLiveStreamDialog()
+   const groupHasSparks = useGroupHasSparks(livestream.groupIds[0])
+   const eventDetailsDialogVisibility = useSelector(
+      eventDetailsDialogVisibilitySelector
+   )
+
+   const handleBackClick = useCallback(() => {
+      if (eventDetailsDialogVisibility) {
+         closeDialog()
+      } else {
+         void route.push("/next-livestreams")
+      }
+   }, [closeDialog, eventDetailsDialogVisibility, route])
+
+   return (
+      <Box sx={styles.buttonsWrapper}>
+         <Stack spacing={1.2} sx={styles.buttons}>
+            <AddToCalendar
+               event={livestream}
+               filename={`${livestream.company}-event`}
+               onCalendarClick={() => groupHasSparks && handleDiscoverSparks()}
+            >
+               {(handleClick) => (
+                  <Button
+                     fullWidth
+                     variant={"contained"}
+                     color={"primary"}
+                     onClick={handleClick}
+                     size="large"
+                     startIcon={<CalendarIcon />}
+                  >
+                     Add to calendar
+                  </Button>
+               )}
+            </AddToCalendar>
+
+            {!isSparksOpen && (
+               <Button
+                  variant={groupHasSparks ? "outlined" : "text"}
+                  color={groupHasSparks ? "primary" : "grey"}
+                  onClick={
+                     groupHasSparks ? handleDiscoverSparks : handleBackClick
+                  }
+                  size="large"
+               >
+                  {groupHasSparks
+                     ? "Discover company Sparks"
+                     : eventDetailsDialogVisibility
+                     ? "Back to Sparks"
+                     : "Discover more live streams"}
+               </Button>
+            )}
+         </Stack>
+      </Box>
+   )
+}
+
+const SparksGrid = ({ livestream, handleSparkClick }) => {
+   const { data: publicSparks } = useGroupSparks(livestream.groupIds[0], {
+      isPublished: true,
+   })
+   return (
+      <Box sx={styles.sparksWrapper} gap={1.2}>
+         <Typography
+            variant={"brandedH4"}
+            display="block"
+            align="center"
+            sx={styles.sparkCarouselTitle}
+         >
+            More content from this company
+         </Typography>
+         <Grid container spacing={2}>
+            {publicSparks.map((spark: Spark) => (
+               <Grid key={spark.id} item sm={4} sx={styles.sparkGridItem}>
+                  <SparkCarouselCard
+                     spark={spark}
+                     onClick={() => {
+                        handleSparkClick(spark)
+                     }}
+                  />
+               </Grid>
+            ))}
+         </Grid>
+      </Box>
+   )
+}
+
+const SparksMobileCarousel = ({ livestream, handleSparkClick }) => {
+   return (
+      <Box sx={styles.mobileSparksWrapper}>
+         <SparksCarouselWithSuspenseComponent
+            handleSparksClicked={handleSparkClick}
+            header={
+               <Typography
+                  variant={"brandedBody"}
+                  sx={styles.sparkCarouselTitle}
+               >
+                  More content from this company
+               </Typography>
+            }
+            headerSx={styles.mobileSparksCarouselHeader}
+            groupId={livestream.groupIds[0]}
+            sx={styles.mobileSparksCarousel}
+            showArrows
+            arrows={MobileSparksArrows}
+         />
+      </Box>
    )
 }
 
