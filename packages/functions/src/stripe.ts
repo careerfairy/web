@@ -88,22 +88,8 @@ export const fetchStripeCustomerSession = functions
                let groupCustomer = notDeleted?.length
                   ? notDeleted.at(0)
                   : undefined
-               let createCustomer = groupCustomer === undefined
 
-               if (!groupCustomer) {
-                  createCustomer = true
-               }
-               if (groupCustomer) {
-                  groupCustomer = await stripe.customers.update(
-                     groupCustomer.id,
-                     {
-                        metadata: {
-                           groupId: data.groupId,
-                           version: STRIPE_CUSTOMER_METADATA_VERSION,
-                        },
-                     }
-                  )
-               }
+               const createCustomer = groupCustomer === undefined
 
                if (createCustomer) {
                   groupCustomer = await stripe.customers.create({
@@ -115,6 +101,16 @@ export const fetchStripeCustomerSession = functions
                      },
                   })
                   functions.logger.info("Created customer:", groupCustomer)
+               } else {
+                  groupCustomer = await stripe.customers.update(
+                     groupCustomer.id,
+                     {
+                        metadata: {
+                           groupId: data.groupId,
+                           version: STRIPE_CUSTOMER_METADATA_VERSION,
+                        },
+                     }
+                  )
                }
 
                const customerSession = await stripe.checkout.sessions.create({
@@ -194,19 +190,23 @@ export const stripeWebHook = functions
       const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET
 
       if (request.method === "POST") {
-         const buf = request.rawBody
+         const buffer = request.rawBody
 
-         const sig = request.headers["stripe-signature"]
+         const signature = request.headers["stripe-signature"]
 
          let event: Stripe.Event = null
 
          try {
-            event = Stripe.webhooks.constructEvent(buf, sig, webhookSecret)
+            event = Stripe.webhooks.constructEvent(
+               buffer,
+               signature,
+               webhookSecret
+            )
 
             await handleStripeEvent(event)
-         } catch (err) {
-            functions.logger.info("Error handling Stripe Event :", err)
-            response.status(400).send(`Webhook Error: ${err}`)
+         } catch (error) {
+            functions.logger.info("Error handling Stripe Event :", error)
+            response.status(400).send(`Webhook Error: ${error}`)
             return
          }
          response.json({ received: true })
