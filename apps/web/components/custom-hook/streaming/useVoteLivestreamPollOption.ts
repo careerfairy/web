@@ -18,12 +18,12 @@ const getKey = (livestreamId: string, pollId: string) => {
 }
 
 /**
- * Custom hook for stopping a specific livestream poll.
+ * Custom hook for voting on a specific livestream poll.
  *
  * @param  livestreamId - The ID of the livestream.
- * @param  pollId - The ID of the poll to stop.
+ * @param  pollId - The ID of the poll to vote on.
  * @param  livestreamToken - The token for authenticating the livestream action.
- * @returns An object containing the mutation function to stop a poll and its related SWR mutation state.
+ * @returns An object containing the mutation function to vote on a poll and its related SWR mutation state.
  */
 export const useVoteLivestreamPollOption = (
    livestreamId: string,
