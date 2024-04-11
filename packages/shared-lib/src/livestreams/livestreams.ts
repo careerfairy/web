@@ -496,6 +496,7 @@ export interface LivestreamQuestion extends Identifiable {
 export interface LivestreamPoll extends Identifiable {
    voters: string[]
    timestamp: firebase.firestore.Timestamp
+   closedAt: firebase.firestore.Timestamp
    state: "current" | "closed" | "upcoming"
    question: string
    options: {

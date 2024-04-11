@@ -16,6 +16,8 @@ const styles = sxStyles({
       border: "1px solid #F8F8F8",
       borderRadius: "12px",
       p: 2,
+      position: "relative",
+      overflow: "hidden",
    },
    coloredEdge: {
       position: "absolute",
@@ -32,11 +34,12 @@ const styles = sxStyles({
 
 type PollOptionsProps = {
    poll: LivestreamPoll
+   showResults?: boolean
 }
 
 const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
 
-export const PollOptions = ({ poll }: PollOptionsProps) => {
+export const PollOptions = ({ poll, showResults }: PollOptionsProps) => {
    return (
       <SuspenseWithBoundary
          fallback={
@@ -47,12 +50,12 @@ export const PollOptions = ({ poll }: PollOptionsProps) => {
             </Stack>
          }
       >
-         <Content poll={poll} />
+         <Content poll={poll} showResults={showResults} />
       </SuspenseWithBoundary>
    )
 }
 
-const Content = ({ poll }: PollOptionsProps) => {
+const Content = ({ poll, showResults }: PollOptionsProps) => {
    const { authenticatedUser } = useAuth()
 
    const { livestreamId, agoraUserId, isHost } = useStreamingContext()
@@ -97,12 +100,13 @@ const Content = ({ poll }: PollOptionsProps) => {
                option={option}
                color={POLL_COLORS[index]}
                stats={calculateOptionStats(option.id)}
-               enableVoting={!isHost}
+               enableVoting={!isHost && !showResults}
                isOptionVoted={userVote?.optionId === option.id}
                someOptionVoted={Boolean(userVote)}
-               onVote={() => votePollOption({ optionId: option.id })}
                isVoting={isVoting}
-               showResults={isHost || Boolean(userVote)}
+               showVoteIcon={!isHost}
+               showResults={isHost || Boolean(userVote) || showResults}
+               onVote={() => votePollOption({ optionId: option.id })}
             />
          ))}
       </Stack>
