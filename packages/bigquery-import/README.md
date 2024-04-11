@@ -25,8 +25,8 @@ To update a schema file (adding/changing/removing fields):
 
 1. Update the schema file
 2. Delete the two related schema views from BigQuery
-   1. `careerfairy-e1fd9.firestore_export.userData_schema_userData_schema_changelog` (example)
-   2. `careerfairy-e1fd9.firestore_export.userData_schema_userData_schema_latest` (example)
+   1. `careerfairy-e1fd9.firestore_export.livestreams_schema_livestreams_changelog` (example)
+   2. `careerfairy-e1fd9.firestore_export.livestreams_schema_livestreams_latest` (example)
 3. Deploy
 
 ```sh

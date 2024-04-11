@@ -49,6 +49,24 @@
       {
          "name": "universityName",
          "type": "string"
+      },
+      {
+         "fields": [
+            {
+               "name": "type",
+               "type": "string"
+            },
+            {
+               "name": "startedAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "expiresAt",
+               "type": "timestamp"
+            }
+         ],
+         "name": "plan",
+         "type": "map"
       }
    ]
 }
