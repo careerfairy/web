@@ -11,16 +11,20 @@ const styles = sxStyles({
       position: "relative",
       overflow: "hidden",
    },
+   noBorder: {
+      border: "none",
+   },
 })
 
 type Props = {
    showResultsSkeleton?: boolean
+   noBorder?: boolean
 }
 
 export const PollCardSkeleton = React.forwardRef<HTMLDivElement, Props>(
-   ({ showResultsSkeleton }, ref) => {
+   ({ showResultsSkeleton, noBorder }, ref) => {
       return (
-         <Box sx={styles.root} ref={ref}>
+         <Box sx={[styles.root, noBorder && styles.noBorder]} ref={ref}>
             <Typography variant="medium" color="primary">
                <Skeleton variant="text" width={100} />
             </Typography>
