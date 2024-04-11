@@ -5,7 +5,10 @@ import { setCORSHeaders } from "./util"
 import { groupRepo } from "./api/repositories"
 import { Stripe } from "stripe"
 import { middlewares } from "./middlewares/middlewares"
-import { dataValidation, userShouldBeCFAdmin } from "./middlewares/validations"
+import {
+   dataValidation,
+   userShouldBeGroupAdmin,
+} from "./middlewares/validations"
 import { SchemaOf, mixed, object, string } from "yup"
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { logAndThrow } from "./lib/validations"
@@ -16,6 +19,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
  * Payload for retrieving Stripe Price information
  */
 type FetchStripePrice = {
+   groupId: string
    priceId: string
 }
 
@@ -45,6 +49,7 @@ const runtimeSettings: RuntimeOptions = {
 }
 
 const fetchStripePriceSchema: SchemaOf<FetchStripePrice> = object().shape({
+   groupId: string().required(),
    priceId: string().required(),
 })
 
@@ -69,7 +74,7 @@ export const fetchStripeCustomerSession = functions
    .https.onCall(
       middlewares(
          dataValidation(fetchStripeCustomerSessionSchema),
-         userShouldBeCFAdmin(),
+         userShouldBeGroupAdmin(),
          async (data: FetchStripeCustomerSession, context) => {
             functions.logger.info("fetchStripeCustomerSession - data: ", data)
 
@@ -158,7 +163,7 @@ export const fetchStripePrice = functions
    .https.onCall(
       middlewares(
          dataValidation(fetchStripePriceSchema),
-         userShouldBeCFAdmin(),
+         userShouldBeGroupAdmin(),
          async (data: FetchStripePrice, context) => {
             functions.logger.info("fetchStripePrice - priceId: ", data.priceId)
 
