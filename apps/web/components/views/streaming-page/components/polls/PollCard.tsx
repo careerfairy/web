@@ -12,7 +12,7 @@ import { useStopLivestreamPoll } from "components/custom-hook/streaming/useStopL
 import dynamic from "next/dynamic"
 import React, { useState } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
-import { combineStyles, sxStyles } from "types/commonTypes"
+import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useStartLivestreamPoll } from "components/custom-hook/streaming/useStartLivestreamPoll"
 import { PollOptions } from "./PollOptions"
@@ -38,13 +38,15 @@ const styles = sxStyles({
       borderColor: "transparent",
       boxShadow: (theme) => `inset 0 0 0 1.5px ${theme.palette.primary.main}`,
    },
+   noBorder: {
+      border: "none",
+   },
    question: {
       wordBreak: "break-word",
    },
    expandButton: {
       borderRadius: "6px",
       width: "100%",
-      color: "neutral.700",
       p: 0,
       fontFamily: "inherit",
       "& svg": {
@@ -52,11 +54,8 @@ const styles = sxStyles({
          height: 24,
       },
    },
-   closedPollExpandButton: {
-      color: "neutral.400",
-   },
-   topPadding: {
-      pt: 1.5,
+   topMargin: {
+      mt: 1.5,
    },
    action: {
       pt: 2,
@@ -65,6 +64,9 @@ const styles = sxStyles({
 
 type Props = {
    poll: LivestreamPoll
+   onClickDelete?: (pollId: string) => void
+   onClickReopen?: (pollId: string) => void
+   onPollStarted?: () => void
 }
 
 const POLL_STATUS_TEXT = {
@@ -74,7 +76,7 @@ const POLL_STATUS_TEXT = {
 } satisfies Record<LivestreamPoll["state"], string>
 
 export const PollCard = React.forwardRef<HTMLDivElement, Props>(
-   ({ poll }, ref) => {
+   ({ poll, onClickDelete, onClickReopen, onPollStarted }, ref) => {
       const [showResults, setShowResults] = useState(poll.state !== "closed")
       const [isEditing, setIsEditing] = useState(false)
 
@@ -99,7 +101,11 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
 
       return (
          <Box
-            sx={[styles.root, poll.state === "current" && styles.greenBorder]}
+            sx={[
+               styles.root,
+               poll.state === "current" && isHost && styles.greenBorder,
+               !isHost && styles.noBorder,
+            ]}
             ref={ref}
          >
             <Stack
@@ -118,6 +124,8 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                   <PollOptionsMenu
                      poll={poll}
                      onClickEdit={() => setIsEditing(true)}
+                     onClickDelete={onClickDelete}
+                     onClickReopen={onClickReopen}
                   />
                )}
             </Stack>
@@ -141,7 +149,9 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                in={showResults || poll.state === "current"}
             >
                <PollOptions poll={poll} />
-               {Boolean(showActionButton) && <PollActionButton poll={poll} />}
+               {Boolean(showActionButton) && (
+                  <PollActionButton poll={poll} onPollStarted={onPollStarted} />
+               )}
             </Collapse>
             {Boolean(isHost) && poll.state !== "current" && (
                <CollapseButton
@@ -169,25 +179,22 @@ const CollapseButton = ({
    showResults,
    paddedTop,
    pollClosed,
-   sx,
    ...rest
 }: CollapseButtonProps) => {
+   const noun = pollClosed ? "results" : "details"
+
    return (
       <Stack
          justifyContent="space-between"
          alignItems="center"
          direction="row"
-         sx={combineStyles(
-            styles.expandButton,
-            pollClosed && styles.closedPollExpandButton,
-            paddedTop && styles.topPadding,
-            sx
-         )}
+         sx={[styles.expandButton, paddedTop && styles.topMargin]}
          component={ButtonBase}
+         color={pollClosed ? "neutral.400" : "neutral.700"}
          {...rest}
       >
-         <Typography variant="small" color="neutral.600">
-            {showResults ? "Hide details" : "Show results"}
+         <Typography variant="small">
+            {showResults ? `Hide ${noun}` : `Show ${noun}`}
          </Typography>
          {showResults ? <ChevronUp /> : <ChevronDown />}
       </Stack>
@@ -202,9 +209,10 @@ const POLL_STATUS_TEXT_COLOR = {
 
 type PollActionButtonProps = {
    poll: LivestreamPoll
+   onPollStarted?: () => void
 }
 
-const PollActionButton = ({ poll }: PollActionButtonProps) => {
+const PollActionButton = ({ poll, onPollStarted }: PollActionButtonProps) => {
    const { livestreamId, streamerAuthToken } = useStreamingContext()
 
    const { trigger: stopPoll, isMutating: stopPollMutating } =
@@ -222,7 +230,11 @@ const PollActionButton = ({ poll }: PollActionButtonProps) => {
                color="primary"
                variant="outlined"
                fullWidth
-               onClick={() => startPoll()}
+               onClick={() => {
+                  startPoll().then(() => {
+                     onPollStarted?.()
+                  })
+               }}
                loading={loading}
             >
                Start poll
