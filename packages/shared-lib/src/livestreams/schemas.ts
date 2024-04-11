@@ -26,10 +26,25 @@ export const basePollShape = {
          `At least ${MIN_POLL_OPTIONS} options are required`
       )
       .max(MAX_POLL_OPTIONS, `Max ${MAX_POLL_OPTIONS} options are allowed`)
-      .test("unique-options", "Options must be unique", (options) => {
-         const texts = options?.map((option) => option.text) || []
-         const uniqueTexts = new Set(texts)
-         return uniqueTexts.size === texts.length
+      .test("unique-options", "Options must be unique", function (options) {
+         if (!options) return true
+
+         const texts = options.map((option) => option.text)
+         const textsSet = new Set(texts)
+         if (textsSet.size !== texts.length) {
+            // Duplicate found
+            // Find the first duplicate
+            for (let i = 0; i < texts.length; i++) {
+               const text = texts[i]
+               if (texts.indexOf(text) !== i) {
+                  return this.createError({
+                     path: `options[${i}].text`,
+                     message: "Options must be unique",
+                  })
+               }
+            }
+         }
+         return true // No duplicates, validation passes
       }),
    state: yup
       .mixed<LivestreamPoll["state"]>()

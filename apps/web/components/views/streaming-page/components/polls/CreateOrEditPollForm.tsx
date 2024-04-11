@@ -4,13 +4,7 @@ import {
    MIN_POLL_OPTIONS,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   Button,
-   FormHelperText,
-   IconButton,
-   InputAdornment,
-   Stack,
-} from "@mui/material"
+import { Button, IconButton, InputAdornment, Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { livestreamService } from "data/firebase/LivestreamService"
@@ -29,7 +23,7 @@ const styles = sxStyles({
    form: {
       width: "100%",
       p: 1.5,
-      borderRadius: "11px",
+      borderRadius: "12px",
       border: "1px solid",
       borderColor: (theme) => theme.brand.white[500],
       backgroundColor: (theme) => theme.brand.white[100],
@@ -88,7 +82,8 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
       const formMethods = useYupForm({
          schema: basePollSchema,
          defaultValues: isEdit ? poll : getInitialValues(),
-         mode: "onChange",
+         mode: "all",
+         reValidateMode: "onBlur",
       })
 
       const { fields, append, remove } = useFieldArray({
@@ -137,7 +132,6 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                spacing={2}
                component="form"
                sx={styles.form}
-               onKeyDown={preventSubmitOnEnter}
                onSubmit={formMethods.handleSubmit(onSubmit)}
             >
                <ControlledBrandedTextField
@@ -182,6 +176,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                      <Button
                         variant="outlined"
                         color="grey"
+                        type="button"
                         startIcon={<PlusCircle />}
                         onClick={() => append(generateOption())}
                         sx={styles.addOptionButton}
@@ -203,17 +198,13 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         type="submit"
                         disabled={
                            formMethods.formState.isSubmitting ||
-                           !formMethods.formState.isDirty
+                           !formMethods.formState.isDirty ||
+                           !formMethods.formState.isValid
                         }
                         loading={formMethods.formState.isSubmitting}
                      >
                         {isEdit ? "Save changes" : "Create Poll"}
                      </LoadingButton>
-                     {Boolean(formMethods.formState.errors.options?.root) && (
-                        <FormHelperText sx={styles.errorMessage} error>
-                           {formMethods.formState.errors.options?.root.message}
-                        </FormHelperText>
-                     )}
                   </Box>
                   {Boolean(onCancel) && (
                      <Button
