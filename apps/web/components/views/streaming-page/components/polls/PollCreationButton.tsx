@@ -11,8 +11,6 @@ export const PollCreationButton = ({
    setIsCreatePollFormOpen,
    hasPolls,
 }: Props) => {
-   const shouldShowCreateForm = isCreatePollFormOpen || !hasPolls
-
    const handleCloseForm = () => {
       setIsCreatePollFormOpen(false)
    }
@@ -29,7 +27,7 @@ export const PollCreationButton = ({
                onCancel={handleCloseForm}
             />
          </Collapse>
-         {shouldShowCreateForm ? null : (
+         {isCreatePollFormOpen ? null : (
             <Button
                color="primary"
                variant="contained"

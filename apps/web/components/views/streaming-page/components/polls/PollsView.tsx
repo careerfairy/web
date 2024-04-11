@@ -58,9 +58,8 @@ const Content = () => {
 const Loader = () => {
    return (
       <Stack spacing={1}>
-         {Array.from({ length: 2 }, (_, index) => (
-            <PollCardSkeleton key={index} />
-         ))}
+         <PollCardSkeleton />
+         <PollCardSkeleton />
       </Stack>
    )
 }
