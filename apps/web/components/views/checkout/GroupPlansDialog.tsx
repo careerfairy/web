@@ -33,6 +33,11 @@ const actionsHeight = 87
 const mobileTopPadding = 20
 const mobileBreakpoint = "md"
 
+export const GROUP_PLANS_DIALOG_TITLE = "Select your "
+export const GROUP_PLANS_DIALOG_TITLE_SPARKS = "Sparks"
+export const GROUP_PLANS_DIALOG_SUBTITLE =
+   "Tailored offers that best suit YOUR needs."
+
 const styles = sxStyles({
    dialogPaperMobile: { minWidth: "100%", minHeight: "100%" },
    title: {

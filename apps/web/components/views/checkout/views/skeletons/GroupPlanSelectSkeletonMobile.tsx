@@ -1,5 +1,9 @@
 import { Box, Skeleton, Stack } from "@mui/material"
-import GroupPlansDialog from "../../GroupPlansDialog"
+import GroupPlansDialog, {
+   GROUP_PLANS_DIALOG_SUBTITLE,
+   GROUP_PLANS_DIALOG_TITLE,
+   GROUP_PLANS_DIALOG_TITLE_SPARKS,
+} from "../../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 import { FC } from "react"
@@ -86,14 +90,14 @@ const GroupPlanSelectSkeletonMobile: FC<GroupPlanSelectSkeletonMobileProps> = ({
          <Stack sx={styles.skeletonWrapper}>
             <Stack alignItems={"center"}>
                <GroupPlansDialog.Title>
-                  Select your{" "}
+                  {GROUP_PLANS_DIALOG_TITLE}
                   <Box component="span" color="secondary.main">
-                     Sparks
+                     {GROUP_PLANS_DIALOG_TITLE_SPARKS}
                   </Box>{" "}
                   plan
                </GroupPlansDialog.Title>
                <GroupPlansDialog.Subtitle>
-                  Tailored offers that best suit YOUR needs.
+                  {GROUP_PLANS_DIALOG_SUBTITLE}
                </GroupPlansDialog.Subtitle>
             </Stack>
             <Stack

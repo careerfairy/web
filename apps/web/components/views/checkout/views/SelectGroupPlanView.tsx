@@ -1,6 +1,10 @@
 import { Box, Button, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import GroupPlansDialog from "../GroupPlansDialog"
+import GroupPlansDialog, {
+   GROUP_PLANS_DIALOG_SUBTITLE,
+   GROUP_PLANS_DIALOG_TITLE,
+   GROUP_PLANS_DIALOG_TITLE_SPARKS,
+} from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import GroupSparksPlanDesktopSelector from "./components/GroupSparksPlanDesktopSelector"
 import { useSelector } from "react-redux"
@@ -73,14 +77,14 @@ const GroupPlans = (props: GroupPlansProps) => {
       <GroupPlansDialog.Container>
          <GroupPlansDialog.Content sx={styles.content}>
             <GroupPlansDialog.Title>
-               Select your{" "}
+               {GROUP_PLANS_DIALOG_TITLE}
                <Box component="span" color="secondary.main">
-                  Sparks
+                  {GROUP_PLANS_DIALOG_TITLE_SPARKS}
                </Box>{" "}
                plan
             </GroupPlansDialog.Title>
             <GroupPlansDialog.Subtitle>
-               Tailored offers that best suit YOUR needs.
+               {GROUP_PLANS_DIALOG_SUBTITLE}
             </GroupPlansDialog.Subtitle>
             <Box mt={5} />
             <Box
