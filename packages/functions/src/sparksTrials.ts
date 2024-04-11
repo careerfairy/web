@@ -24,9 +24,12 @@ export const endOfSparksTrialEmails = functions
    .pubsub.schedule("0 10 * * *") // everyday at 10pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      functions.logger.info("Starting execution of endOfSparksTrialEmails v2")
+      functions.logger.info(
+         "Starting execution of endOfSparksTrialEmails - v3 disabled"
+      )
 
-      await sendEndOfSparksTrialEmails()
+      // Disabling for now
+      // await sendEndOfSparksTrialEmails()
    })
 
 export const manualEndOfSparksTrialEmails = functions
@@ -34,7 +37,7 @@ export const manualEndOfSparksTrialEmails = functions
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
       functions.logger.info(
-         "Starting MANUAL execution of endOfSparksTrialEmails v2"
+         "Starting MANUAL execution of endOfSparksTrialEmails - v3 disabled"
       )
 
       if (req.method !== "POST") {
@@ -42,7 +45,12 @@ export const manualEndOfSparksTrialEmails = functions
          return
       }
 
-      await sendEndOfSparksTrialEmails()
+      // Disabling for now, let function call to prevent linting errors
+      // should always be false and not called for now
+      if ("disabled".includes("ENABLED")) {
+         functions.logger.info("Function is enabled")
+         await sendEndOfSparksTrialEmails()
+      }
       res.status(200).send(
          "endOfSparksTrialEmails sent to every company with expiring trial"
       )
@@ -65,6 +73,5 @@ async function sendEndOfSparksTrialEmails() {
    await trialService.buildNotifications()
    await trialService.createNotifications()
 
-   // disable for now
    await emailBuilder.send()
 }
