@@ -11,19 +11,20 @@ import {
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       fontFamily: "inherit",
       position: "relative",
       overflow: "hidden",
       borderRadius: "8px",
       p: 2,
-      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      border: `1px solid ${theme.brand.white[500]}`,
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
       transition: (theme) => theme.transitions.create("box-shadow"),
       boxSizing: "border-box",
-   },
+      background: theme.brand.white[200],
+   }),
    buttonRoot: {
       "&:hover, &:focus": {
          backgroundColor: (theme) => theme.palette.action.hover,

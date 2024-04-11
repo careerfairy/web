@@ -1,18 +1,24 @@
 import { Box, Collapse, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPolls } from "components/custom-hook/streaming/useLivestreamPolls"
-import { useMemo, useState } from "react"
+import { Fragment, useMemo, useState } from "react"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
 import { PollCreationButton } from "./PollCreationButton"
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
+import { ConfirmDeletePollDialog } from "./ConfirmDeletePollDialog"
+import { ConfirmReopenPollDialog } from "./ConfirmReopenPollDialog"
 
-export const HostPollsView = () => {
+type Props = {
+   scrollToTop: () => void
+}
+
+export const HostPollsView = ({ scrollToTop }: Props) => {
    return (
       <SuspenseWithBoundary fallback={<Loader />}>
-         <Content />
+         <Content scrollToTop={scrollToTop} />
       </SuspenseWithBoundary>
    )
 }
@@ -26,37 +32,74 @@ const customSortPolls = (a: LivestreamPoll, b: LivestreamPoll) => {
    return priority[a.state] - priority[b.state]
 }
 
-const Content = () => {
+const Content = ({ scrollToTop }: Props) => {
    const { livestreamId, isHost } = useStreamingContext()
    const { data: polls } = useLivestreamPolls(livestreamId)
+   const [pollIdToDelete, setPollIdToDelete] = useState<string | null>(null)
+
+   const [pollIdToReopen, setPollIdToReopen] = useState<string | null>(null)
 
    const orderedPolls = useMemo(() => [...polls].sort(customSortPolls), [polls])
 
    const [isCreatePollFormOpen, setIsCreatePollFormOpen] = useState(false)
 
+   const handleOpenPollDeleteDialog = (pollId: string) => {
+      setPollIdToDelete(pollId)
+   }
+
+   const handleOpenPollReopenDialog = (pollId: string) => {
+      setPollIdToReopen(pollId)
+   }
+
+   const handleClosePollDeleteDialog = () => {
+      setPollIdToDelete(null)
+   }
+
+   const handleClosePollReopenDialog = () => {
+      setPollIdToReopen(null)
+   }
+
    const hasPolls = polls.length > 0
 
    return (
-      <Stack spacing={1.5}>
-         {isHost ? (
-            <PollCreationButton
-               setIsCreatePollFormOpen={setIsCreatePollFormOpen}
-               isCreatePollFormOpen={isCreatePollFormOpen}
-               hasPolls={hasPolls}
-            />
-         ) : null}
-         <Stack spacing={1} component={TransitionGroup}>
-            {orderedPolls.map((poll) => (
-               <Collapse key={poll.id}>
-                  <Box>
-                     <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
-                        <PollCard poll={poll} />
-                     </SuspenseWithBoundary>
-                  </Box>
-               </Collapse>
-            ))}
+      <Fragment>
+         <Stack spacing={1.5}>
+            {isHost ? (
+               <PollCreationButton
+                  setIsCreatePollFormOpen={setIsCreatePollFormOpen}
+                  isCreatePollFormOpen={isCreatePollFormOpen}
+                  hasPolls={hasPolls}
+               />
+            ) : null}
+            <Stack spacing={1} component={TransitionGroup}>
+               {orderedPolls.map((poll) => (
+                  <Collapse key={poll.id}>
+                     <Box>
+                        <SuspenseWithBoundary fallback={<PollCardSkeleton />}>
+                           <PollCard
+                              poll={poll}
+                              onClickDelete={handleOpenPollDeleteDialog}
+                              onClickReopen={handleOpenPollReopenDialog}
+                              onPollStarted={scrollToTop}
+                           />
+                        </SuspenseWithBoundary>
+                     </Box>
+                  </Collapse>
+               ))}
+            </Stack>
          </Stack>
-      </Stack>
+         <ConfirmDeletePollDialog
+            open={Boolean(pollIdToDelete)}
+            onClose={handleClosePollDeleteDialog}
+            pollId={pollIdToDelete}
+         />
+         <ConfirmReopenPollDialog
+            open={Boolean(pollIdToReopen)}
+            onClose={handleClosePollReopenDialog}
+            pollId={pollIdToReopen}
+            onPollStarted={scrollToTop}
+         />
+      </Fragment>
    )
 }
 
