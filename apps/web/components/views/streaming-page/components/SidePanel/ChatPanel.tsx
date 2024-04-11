@@ -8,7 +8,7 @@ import {
 import { sxStyles } from "types/commonTypes"
 import { ChatInput } from "../chat/ChatInput"
 import { ChatList } from "../chat/ChatList"
-import { useScroll } from "components/custom-hook/utils/useScrollToBottom"
+import { useScroll } from "components/custom-hook/utils/useScroll"
 
 const styles = sxStyles({
    root: {

@@ -5,7 +5,7 @@ import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { HostPollsView } from "../polls/HostPollsView"
 import { ViewerPollsView } from "../polls/ViewerPollsView"
-import { useScroll } from "components/custom-hook/utils/useScrollToBottom"
+import { useScroll } from "components/custom-hook/utils/useScroll"
 
 const styles = sxStyles({
    root: {
@@ -30,7 +30,7 @@ export const PollsPanel = () => {
          contentRef={ref}
       >
          {isHost ? (
-            <HostPollsView scrollToTop={scrollToTop} />
+            <HostPollsView onPollStarted={scrollToTop} />
          ) : (
             <ViewerPollsView />
          )}
