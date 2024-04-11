@@ -134,10 +134,8 @@ export const validateGroupSparks = async (group: Group) => {
 }
 
 function hasGroupPlanExpired(group: Group): boolean {
-   if (group.plan) {
-      if (group.plan.expiresAt.toMillis() < Date.now()) {
-         return true
-      }
+   if (group.plan?.expiresAt.toMillis() < Date.now()) {
+      return true
    }
    return false
 }
