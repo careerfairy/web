@@ -2,6 +2,7 @@ import { useFormikContext } from "formik"
 import { JobFormValues } from "./JobFormDialog"
 import { Box, Grid } from "@mui/material"
 import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import BrandedTextField, {
    FormBrandedTextField,
 } from "../../../../common/inputs/BrandedTextField"
