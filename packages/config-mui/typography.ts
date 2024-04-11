@@ -1,6 +1,41 @@
 import { ThemeOptions } from "@mui/material/styles"
 import { breakpoints } from "./breakpoints"
 
+const responsiveVariants = {
+   mobileBrandedH1: {
+      fontSize: "2rem", // 28px
+      lineHeight: 1.5,
+   },
+   desktopBrandedH1: {
+      fontSize: "2.71429rem", // 38px
+      lineHeight: 1.5,
+   },
+   mobileBrandedH2: {
+      fontSize: "1.71429rem", // 24px
+      lineHeight: 1.5,
+   },
+   desktopBrandedH2: {
+      fontSize: "2rem", // 32px
+      lineHeight: 1.5,
+   },
+   mobileBrandedH3: {
+      fontSize: "1.42857rem", // 20px
+      lineHeight: 1.5,
+   },
+   desktopBrandedH3: {
+      fontSize: "1.7142857143rem", // 24px
+      lineHeight: 1.5,
+   },
+   mobileBrandedH4: {
+      fontSize: "1.28571rem", // 18px
+      lineHeight: 1.55556,
+   },
+   desktopBrandedH4: {
+      fontSize: "1.42857rem", // 20px
+      lineHeight: 1.5,
+   },
+} satisfies ThemeOptions["typography"]
+
 export const getTypography = (
    fontFamily: string
 ): ThemeOptions["typography"] => {
@@ -8,34 +43,22 @@ export const getTypography = (
 
    return {
       brandedH1: {
-         fontSize: "2rem", // 28px
-         lineHeight: 1.5,
-         [desktop]: {
-            fontSize: "2.71429rem", // 38px
-         },
+         ...responsiveVariants.mobileBrandedH1,
+         [desktop]: responsiveVariants.desktopBrandedH1,
       },
       brandedH2: {
-         fontSize: "1.71429rem", // 24px
-         lineHeight: 1.5,
-         [desktop]: {
-            fontSize: "2rem", // 32px
-         },
+         ...responsiveVariants.mobileBrandedH2,
+         [desktop]: responsiveVariants.desktopBrandedH2,
       },
       brandedH3: {
-         fontSize: "1.42857rem", // 20px
-         lineHeight: 1.5,
-         [desktop]: {
-            fontSize: "1.7142857143rem", // 24px
-         },
+         ...responsiveVariants.mobileBrandedH3,
+         [desktop]: responsiveVariants.desktopBrandedH3,
       },
       brandedH4: {
-         fontSize: "1.28571rem", // 18px
-         lineHeight: 1.55556,
-         [desktop]: {
-            fontSize: "1.42857rem", // 20px
-            lineHeight: 1.5,
-         },
+         ...responsiveVariants.mobileBrandedH4,
+         [desktop]: responsiveVariants.desktopBrandedH4,
       },
+      ...responsiveVariants,
       brandedH5: {
          fontSize: "1.28571rem", // 18px
          lineHeight: 1.55556,

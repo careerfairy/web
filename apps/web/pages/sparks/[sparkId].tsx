@@ -26,6 +26,7 @@ import {
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
    removeNotificationsByType,
+   setInteractionSource,
 } from "store/reducers/sparksFeedReducer"
 import {
    activeSparkSelector,
@@ -100,6 +101,12 @@ const SparksPage: NextPage<
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [groupId])
+
+   useEffect(() => {
+      return () => {
+         dispatch(setInteractionSource(null))
+      }
+   }, [dispatch])
 
    useEffect(() => {
       if (

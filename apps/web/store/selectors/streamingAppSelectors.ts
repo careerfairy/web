@@ -59,3 +59,21 @@ export const useFailedToConnectToRTM = () =>
    useAppSelector(
       (state) => state.streamingApp.rtmSignalingState.failedToConnect
    )
+
+export const useHasStarted = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.hasStarted)
+
+export const useStartedAt = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.startedAt)
+
+export const useStartsAt = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.startsAt)
+
+export const useHasEnded = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.hasEnded)
+
+export const useOpenStream = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.openStream)
+
+export const useCompanyLogoUrl = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.companyLogoUrl)

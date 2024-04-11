@@ -1,9 +1,9 @@
 import { SwipeableDrawer, SwipeableDrawerProps } from "@mui/material"
 import { styled } from "@mui/material/styles"
 
-const BrandedSwipableDrawer = styled((props: SwipeableDrawerProps) => (
+const BrandedSwipeableDrawer = styled((props: SwipeableDrawerProps) => (
    <SwipeableDrawer anchor="bottom" {...props} />
-))(({}) => ({
+))(() => ({
    "& .MuiPaper-root": {
       ":before": {
          content: '""',
@@ -21,4 +21,4 @@ const BrandedSwipableDrawer = styled((props: SwipeableDrawerProps) => (
    },
 }))
 
-export default BrandedSwipableDrawer
+export default BrandedSwipeableDrawer

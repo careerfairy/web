@@ -106,7 +106,7 @@ export class SparksService {
    async trackSparkEvents(data: SparkEventClient[]) {
       return httpsCallable<SparkClientEventsPayload, void>(
          this.functions,
-         "trackSparkEvents_v4"
+         "trackSparkEvents_v5"
       )({
          events: data,
       })
@@ -120,7 +120,7 @@ export class SparksService {
    async trackSparkSecondsWatched(data: SparkSecondWatchedClient[]) {
       return httpsCallable<SparkSecondsWatchedClientPayload, void>(
          this.functions,
-         "trackSparkSecondsWatched_v2"
+         "trackSparkSecondsWatched_v3"
       )({
          events: data,
       })

@@ -1,4 +1,8 @@
-import { middlewares, OnCallMiddleware } from "../middlewares"
+import {
+   middlewares,
+   OnCallMiddleware,
+   type CallableContext,
+} from "../middlewares"
 
 test("First middleware should return result instance", async () => {
    // arrange
@@ -6,7 +10,7 @@ test("First middleware should return result instance", async () => {
    const chain = middlewares(handler(expected))
 
    // act
-   const result = await chain({}, {})
+   const result = await chain({}, {} as CallableContext)
 
    // assert
    expect(result).toBe(expected)
@@ -18,7 +22,7 @@ test("Second middleware should return result", async () => {
    const chain = middlewares(noop, handler(expected))
 
    // act
-   const result = await chain({}, {})
+   const result = await chain({}, {} as CallableContext)
 
    // assert
    expect(result).toBe(expected)
@@ -29,11 +33,11 @@ test("First middleware throws and circuits the chain", async () => {
    const chain = middlewares(validateDataExists, handler(expected))
 
    // confirm it works with valid data {}
-   const result = await chain({}, {})
+   const result = await chain({}, {} as CallableContext)
    expect(result).toBe(expected)
 
    await expect(async () => {
-      await chain(null, {})
+      await chain(null, {} as CallableContext)
    }).rejects.toThrow("data field must be preset")
 })
 
@@ -43,9 +47,9 @@ test("Dummy cache middleware works", async () => {
    const chain = middlewares(cache(database, "key1"), handler("1"))
 
    // reach the final middleware & populate cache
-   expect(await chain({}, {})).toBe("1")
+   expect(await chain({}, {} as CallableContext)).toBe("1")
    // should have the value cached
-   expect(await chain({}, {})).toBe("cached:1")
+   expect(await chain({}, {} as CallableContext)).toBe("cached:1")
 })
 
 test("Last middleware throws when calling next", async () => {
@@ -54,7 +58,7 @@ test("Last middleware throws when calling next", async () => {
    })
 
    await expect(async () => {
-      await chain({}, {})
+      await chain({}, {} as CallableContext)
    }).rejects.toThrow("No next middleware to call, you're the last one")
 })
 
@@ -63,7 +67,7 @@ test("Use context value from previous middleware", async () => {
       return Promise.resolve(context.middlewares.flag)
    })
 
-   expect(await chain({}, {})).toBe(true)
+   expect(await chain({}, {} as CallableContext)).toBe(true)
 })
 
 /*

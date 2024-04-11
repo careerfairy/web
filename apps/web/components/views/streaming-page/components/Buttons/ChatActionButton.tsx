@@ -4,6 +4,8 @@ import { forwardRef } from "react"
 import { MessageCircle } from "react-feather"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
+import { useNewChatCounter } from "components/custom-hook/streaming/useNewChatCounter"
+import { useStreamingContext } from "../../context"
 
 export const ChatActionButton = forwardRef<
    HTMLButtonElement,
@@ -13,8 +15,11 @@ export const ChatActionButton = forwardRef<
       ActiveViews.CHAT
    )
 
+   const { livestreamId } = useStreamingContext()
+   const numberOfNewChats = useNewChatCounter(livestreamId, !isActive)
+
    return (
-      <BrandedBadge color="error" badgeContent={2}>
+      <BrandedBadge color="error" badgeContent={numberOfNewChats}>
          <ActionBarButtonStyled
             onClick={handleSetActive}
             active={isActive}

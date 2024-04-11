@@ -38,6 +38,17 @@ import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
+import { useDispatch } from "react-redux"
+import { setInteractionSource } from "store/reducers/sparksFeedReducer"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+
+const styles = sxStyles({
+   sparksCarouselHeader: {
+      pr: 2,
+   },
+})
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -48,6 +59,8 @@ const PortalPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
+   const isMobile = useIsMobile()
+   const dispatch = useDispatch()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -68,6 +81,8 @@ const PortalPage = ({
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
+
+      dispatch(setInteractionSource(SparkInteractionSources.Portal))
       return router.push({
          pathname: `/sparks/${spark.id}`,
          query: { ...router.query }, // spread current query params
@@ -104,7 +119,9 @@ const PortalPage = ({
                         <WidgetsWrapper>
                            <SparksCarouselWithSuspenseComponent
                               header={<Heading>SPARKS</Heading>}
+                              headerSx={styles.sparksCarouselHeader}
                               handleSparksClicked={handleSparksClicked}
+                              showArrows={!isMobile}
                            />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />

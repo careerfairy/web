@@ -14,7 +14,12 @@ import {
    useState,
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
-import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import {
+   sidePanelSelector,
+   useHasEnded,
+   useHasStarted,
+   useIsConnectedOnDifferentBrowser,
+} from "store/selectors/streamingAppSelectors"
 
 type StreamContextProps = {
    livestreamId: string
@@ -51,10 +56,13 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 }) => {
    const { query } = useRouter()
    const [isReady, setIsReady] = useState(false)
+   const hasStarted = useHasStarted()
+   const hasEnded = useHasEnded()
 
-   const hostAuthToken = query.token?.toString() || ""
+   const hostAuthToken = query.token?.toString() || null
 
    const { activeView } = useAppSelector(sidePanelSelector)
+   const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
 
    const dispatch = useAppDispatch()
 
@@ -79,6 +87,8 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       uid: agoraUserId,
    })
 
+   const viewerCanJoin = !isHost && !hasEnded && hasStarted
+
    const { isLoading } = useJoin(
       {
          appid: agoraCredentials.appID,
@@ -86,7 +96,11 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          token: response.token,
          uid: agoraUserId,
       },
-      Boolean(!response.isLoading && response.token) // Allow to join/re-join when the token is changed
+      (isHost || viewerCanJoin) &&
+         // Join channel if not logged in on another browser and token is available
+         !isLoggedInOnDifferentBrowser &&
+         !response.isLoading &&
+         Boolean(response.token)
    )
 
    const client = useRTCClient()

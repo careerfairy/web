@@ -57,6 +57,14 @@ import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
+import endOfSparksTrials = require("./sparksTrials")
+import {
+   createPoll,
+   deleteLivestreamChatEntry,
+   deletePoll,
+   updatePoll,
+   markPollAsCurrent,
+} from "./lib/streaming"
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -106,6 +114,10 @@ exports.manualNewsletter = newsletter.manualNewsletter
 exports.onboardingNewsletter = onboardingNewsletter.onboardingNewsletter
 exports.manualOnboardingNewsletter =
    onboardingNewsletter.manualOnboardingNewsletter
+exports.manualEndOfSparksTrialEmails =
+   endOfSparksTrials.manualEndOfSparksTrialEmails
+exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
+exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
@@ -245,8 +257,8 @@ exports.getSparksFeed_v3 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
-exports.trackSparkEvents_v4 = userSparks.trackSparkEvents
-exports.trackSparkSecondsWatched_v2 = userSparks.trackSparkSecondsWatched
+exports.trackSparkEvents_v5 = userSparks.trackSparkEvents
+exports.trackSparkSecondsWatched_v3 = userSparks.trackSparkSecondsWatched
 exports.getSparksAnalytics_v2 = sparksAnalytics.getSparksAnalytics
 
 // Custom Jobs
@@ -271,3 +283,10 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 
 // Company | Group Functions
 exports.fetchCompanies = companies.fetchCompanies
+
+// Streaming
+exports.deleteLivestreamChatEntry = deleteLivestreamChatEntry
+exports.createPoll = createPoll
+exports.deletePoll = deletePoll
+exports.updatePoll = updatePoll
+exports.markPollAsCurrent = markPollAsCurrent

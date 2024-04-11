@@ -89,3 +89,6 @@ export const eventToRegisterTo = (state: RootState) =>
 export const jobToOpen = (state: RootState) => state.sparksFeed.jobToOpen
 
 export const autoAction = (state: RootState) => state.sparksFeed.autoAction
+
+export const interactionSourceSelector = (state: RootState) =>
+   state.sparksFeed.interactionSource

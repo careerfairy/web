@@ -9,6 +9,7 @@ import {
    type UID,
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -61,21 +62,33 @@ export interface StreamingAppState {
       screenSharerId: string
       mode: LivestreamMode
       numberOfParticipants: number
-   }
+      startsAt: number | null
+      startedAt: number | null
+      /**
+       * Indicates the streaming state:
+       * - `undefined`: The stream has never been started.
+       * - `false`: The stream has ended.
+       * - `true`: The stream was restarted.
+       */
+      hasStarted: boolean | undefined
+      hasEnded: boolean
+      openStream: boolean
+      companyLogoUrl: string
+   } | null
    rtmSignalingState: {
       failedToConnect: boolean
       viewCount: number
       connectionState: {
          state: RtmStatusCode.ConnectionState
          reason: RtmStatusCode.ConnectionChangeReason
-      }
+      } | null
    }
    rtcState: {
-      connectionState?: {
+      connectionState: {
          currentState: ConnectionState
          prevState: ConnectionState
          reason: ConnectionDisconnectedReason
-      }
+      } | null
    }
    isLoggedInOnDifferentBrowser: boolean
 }
@@ -95,6 +108,12 @@ const initialState: StreamingAppState = {
       mode: LivestreamModes.DEFAULT,
       screenSharerId: null,
       numberOfParticipants: 0,
+      startsAt: null,
+      startedAt: null,
+      hasStarted: false,
+      hasEnded: false,
+      openStream: false,
+      companyLogoUrl: "",
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -156,6 +175,7 @@ const streamingAppSlice = createSlice({
             }
          })
       },
+
       setLivestreamMode(state, action: PayloadAction<LivestreamMode>) {
          state.livestreamState.mode = action.payload
 
@@ -174,8 +194,39 @@ const streamingAppSlice = createSlice({
       setNumberOfParticipants(state, action: PayloadAction<number>) {
          state.livestreamState.numberOfParticipants = action.payload
       },
+      setStartsAt(state, action: PayloadAction<number | null>) {
+         if (state.livestreamState.startsAt !== action.payload) {
+            state.livestreamState.startsAt = action.payload
+         }
+      },
+      setStarted(
+         state,
+         action: PayloadAction<
+            Pick<
+               StreamingAppState["livestreamState"],
+               "startedAt" | "hasStarted"
+            >
+         >
+      ) {
+         state.livestreamState.startedAt = action.payload.startedAt
+         state.livestreamState.hasStarted = action.payload.hasStarted
+      },
+      setHasEnded(state, action: PayloadAction<boolean>) {
+         if (state.livestreamState.hasEnded !== action.payload) {
+            state.livestreamState.hasEnded = action.payload
+         }
+      },
       setScreenSharerId(state, action: PayloadAction<string | null>) {
          state.livestreamState.screenSharerId = action.payload
+      },
+      setOpenStream(state, action: PayloadAction<boolean>) {
+         state.livestreamState.openStream = action.payload
+      },
+      setCompanyLogoUrl(state, action: PayloadAction<string>) {
+         state.livestreamState.companyLogoUrl = action.payload
+      },
+      resetLivestreamState(state) {
+         state.livestreamState = initialState.livestreamState
       },
       toggleSettingsMenu(state) {
          state.settingsMenu.isOpen = !state.settingsMenu.isOpen
@@ -197,10 +248,16 @@ const streamingAppSlice = createSlice({
          >
       ) {
          state.rtmSignalingState.connectionState = action.payload
-         const { reason, state: rtmState } = action.payload
+         if (action.payload) {
+            const { reason, state: rtmState } = action.payload
 
-         if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "REMOTE_LOGIN" && rtmState === "ABORTED") {
+               errorLogAndNotify(
+                  new Error("RTM - User is logged in on a different browser"),
+                  { reason, rtmState }
+               )
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
 
@@ -212,10 +269,17 @@ const streamingAppSlice = createSlice({
          action: PayloadAction<StreamingAppState["rtcState"]["connectionState"]>
       ) {
          state.rtcState.connectionState = action.payload
-         const { reason } = action.payload
+         if (action.payload) {
+            const { reason, currentState, prevState } = action.payload
 
-         if (reason === "UID_BANNED") {
-            state.isLoggedInOnDifferentBrowser = true
+            if (reason === "UID_BANNED") {
+               errorLogAndNotify(new Error("RTC - User is banned"), {
+                  reason,
+                  currentState,
+                  prevState,
+               })
+               state.isLoggedInOnDifferentBrowser = true
+            }
          }
       },
    },
@@ -226,6 +290,12 @@ export const {
       setLivestreamMode,
       setScreenSharerId,
       setNumberOfParticipants,
+      setStarted,
+      setStartsAt,
+      setHasEnded,
+      setOpenStream,
+      setCompanyLogoUrl,
+      resetLivestreamState,
       toggleSidePanel,
       closeSidePanel,
       setActiveView,

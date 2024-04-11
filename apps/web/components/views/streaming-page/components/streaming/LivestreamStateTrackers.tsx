@@ -3,10 +3,16 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
+   resetLivestreamState,
+   setHasEnded,
    setLivestreamMode,
    setNumberOfParticipants,
+   setOpenStream,
    setScreenSharerId,
+   setStarted,
+   setStartsAt,
 } from "store/reducers/streamingAppReducer"
+import { setCompanyLogoUrl } from "../../../../../store/reducers/streamingAppReducer"
 
 /**
  * Component to track and update the livestream state in the Redux store.
@@ -35,12 +41,42 @@ export const LivestreamStateTrackers = (): null => {
       )
    }, [dispatch, livestream.participatingStudents?.length])
 
+   // convert to primitive for comparison
+   const startsAtMillis = livestream.start?.toMillis() ?? null
+   useEffect(() => {
+      dispatch(setStartsAt(startsAtMillis))
+   }, [dispatch, startsAtMillis])
+
+   // Convert to primitive for comparison
+   const startedAtMillis = livestream.startedAt?.toMillis() ?? null
+   /**
+    * Dispatch both `hasStarted` and `startedAt` as the same time to avoid race conditions.
+    */
+   useEffect(() => {
+      dispatch(
+         setStarted({
+            hasStarted: livestream.hasStarted,
+            startedAt: startedAtMillis,
+         })
+      )
+   }, [dispatch, livestream.hasStarted, startedAtMillis])
+
+   useEffect(() => {
+      dispatch(setHasEnded(Boolean(livestream.hasEnded)))
+   }, [dispatch, livestream.hasEnded])
+
+   useEffect(() => {
+      dispatch(setOpenStream(Boolean(livestream.openStream)))
+   }, [dispatch, livestream.openStream])
+
+   useEffect(() => {
+      dispatch(setCompanyLogoUrl(livestream.companyLogoUrl))
+   }, [dispatch, livestream.companyLogoUrl])
+
    // Clean up the state on unmount
    useEffect(() => {
       return () => {
-         dispatch(setNumberOfParticipants(0))
-         dispatch(setScreenSharerId(null))
-         dispatch(setLivestreamMode(LivestreamModes.DEFAULT))
+         dispatch(resetLivestreamState())
       }
    }, [dispatch])
 

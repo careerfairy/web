@@ -6,6 +6,12 @@ import {
    LivestreamEvent,
    LivestreamModes,
    UserLivestreamData,
+   LivestreamChatEntry,
+   DeleteLivestreamChatEntryRequest,
+   CreateLivestreamPollRequest,
+   UpdateLivestreamPollRequest,
+   DeleteLivestreamPollRequest,
+   MarkLivestreamPollAsCurrentRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -34,6 +40,8 @@ import {
    getDocs,
    limit,
    query,
+   runTransaction,
+   setDoc,
    updateDoc,
    where,
    writeBatch,
@@ -456,6 +464,136 @@ export class LivestreamService {
       })
 
       return batch.commit()
+   }
+   /**
+    * Sets the status of a livestream to either started or not started.
+    * If `shouldStart` is true, performs a transaction to ensure the stream isn't restarted if already started.
+    * Otherwise, performs a normal update operation to mark the stream as ended.
+    *
+    * @param {string} livestreamId - The ID of the livestream to update.
+    * @param {boolean} shouldStart - A boolean indicating if the livestream has started.
+    * @returns A promise resolved with the result of the update operation.
+    */
+   async updateLivestreamStartEndState(
+      livestreamId: string,
+      shouldStart: boolean
+   ) {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const livestreamDoc = await transaction.get(livestreamRef)
+         if (!livestreamDoc.exists()) {
+            throw "Document does not exist!"
+         }
+         const data = livestreamDoc.data()
+         if (shouldStart) {
+            const updateData: UpdateData<LivestreamEvent> = {
+               hasStarted: true,
+               hasEnded: false,
+            }
+
+            if (!data.hasStarted) {
+               // Only update the startedAt field if the stream wasn't started before
+               updateData.startedAt = Timestamp.now()
+            }
+
+            transaction.update(livestreamRef, {
+               hasStarted: true,
+               hasEnded: false,
+               startedAt: Timestamp.now(),
+            })
+         } else {
+            // should end
+
+            transaction.update(livestreamRef, {
+               hasEnded: true,
+               hasStarted: false,
+            })
+         }
+      })
+   }
+
+   addChatEntry = (options: {
+      livestreamId: string
+      message: string
+      authorEmail: string
+      type: LivestreamChatEntry["type"]
+      displayName: string
+      agoraUserId: string
+      userUid: string
+   }) => {
+      const {
+         livestreamId,
+         message,
+         authorEmail,
+         type,
+         displayName,
+         agoraUserId,
+         userUid,
+      } = options
+
+      const ref = doc(
+         collection(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "chatEntries"
+         )
+      ).withConverter(createGenericConverter<LivestreamChatEntry>())
+
+      return setDoc(ref, {
+         laughing: [],
+         wow: [],
+         heart: [],
+         thumbsUp: [],
+         authorName: displayName,
+         timestamp: Timestamp.now(),
+         authorEmail,
+         message,
+         type,
+         agoraUserId,
+         userUid,
+         id: ref.id,
+      })
+   }
+
+   deleteChatEntry = async (options: DeleteLivestreamChatEntryRequest) => {
+      await httpsCallable<DeleteLivestreamChatEntryRequest>(
+         this.functions,
+         "deleteLivestreamChatEntry"
+      )(options)
+      return
+   }
+
+   createPoll = async (options: CreateLivestreamPollRequest) => {
+      await httpsCallable<CreateLivestreamPollRequest>(
+         this.functions,
+         "createPoll"
+      )(options)
+      return
+   }
+
+   updatePoll = async (options: UpdateLivestreamPollRequest) => {
+      await httpsCallable<UpdateLivestreamPollRequest>(
+         this.functions,
+         "updatePoll"
+      )(options)
+      return
+   }
+
+   deletePoll = async (options: DeleteLivestreamPollRequest) => {
+      await httpsCallable<DeleteLivestreamPollRequest>(
+         this.functions,
+         "deletePoll"
+      )(options)
+      return
+   }
+
+   markPollAsCurrent = async (options: MarkLivestreamPollAsCurrentRequest) => {
+      await httpsCallable<MarkLivestreamPollAsCurrentRequest>(
+         this.functions,
+         "markPollAsCurrent"
+      )(options)
+      return
    }
 }
 

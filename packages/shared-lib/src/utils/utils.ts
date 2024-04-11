@@ -325,3 +325,16 @@ export const getDateDifferenceInDays = (
    const diffDays = Math.ceil(diff / (1000 * 3600 * 24))
    return diffDays
 }
+
+/**
+ * Checks if a value is both defined and strictly equal to another value.
+ * @param value - The value to check.
+ * @param  toCompare - The value to compare against.
+ * @returns True if `value` is defined and strictly equals `toCompare`, otherwise false.
+ */
+export const isDefinedAndEqual = <T>(
+   value: T | undefined,
+   toCompare: T
+): boolean => {
+   return value !== undefined && value === toCompare
+}
