@@ -6,6 +6,7 @@ import useFunctionsSWR, {
 } from "../utils/useFunctionsSWRFetcher"
 import Stripe from "stripe"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -34,11 +35,13 @@ type Result = {
  */
 const useStripeSessionStatus = (sessionId: string): Result => {
    const fetcher = useFunctionsSWR<Result[]>()
+   const { group } = useGroup()
    const options = useMemo(() => {
       return {
          sessionId: sessionId,
+         groupId: group.id,
       }
-   }, [sessionId])
+   }, [group.id, sessionId])
    return useSWR(["fetchStripeSessionStatus", options], fetcher, swrOptions)
 }
 

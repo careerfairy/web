@@ -43,6 +43,7 @@ type FetchStripeCustomerSession = {
  */
 type FetchStripeSessionStatus = {
    sessionId: string
+   groupId: string
 }
 
 const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
@@ -52,8 +53,7 @@ const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
  * Functions runtime settings
  */
 const runtimeSettings: RuntimeOptions = {
-   timeoutSeconds: 20,
-   memory: "128MB",
+   memory: "256MB",
 }
 
 const fetchStripePriceSchema: SchemaOf<FetchStripePrice> = object().shape({
@@ -75,6 +75,7 @@ const fetchStripeCustomerSessionSchema: SchemaOf<FetchStripeCustomerSession> =
 const fetchStripeSessionStatusSchema: SchemaOf<FetchStripeSessionStatus> =
    object().shape({
       sessionId: string().required(),
+      groupId: string().required(),
    })
 
 /**
@@ -204,7 +205,7 @@ export const fetchStripeSessionStatus = functions
    .https.onCall(
       middlewares(
          dataValidation(fetchStripeSessionStatusSchema),
-         userShouldBeCFAdmin(),
+         userShouldBeGroupAdmin(),
          async (data: FetchStripeSessionStatus, context) => {
             functions.logger.info(
                "fetchStripeSession by ID - session id: ",
