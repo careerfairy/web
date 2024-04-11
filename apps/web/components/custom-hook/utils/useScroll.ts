@@ -1,6 +1,6 @@
 import { RefObject, useCallback, useRef } from "react"
 
-export type ScrollToBottom<T extends HTMLElement = HTMLDivElement> = {
+export type ScrollTo<T extends HTMLElement = HTMLDivElement> = {
    scrollToBottom: (behavior?: ScrollBehavior) => void
    scrollToTop: (behavior?: ScrollBehavior) => void
    ref: RefObject<T>
@@ -12,7 +12,7 @@ export type ScrollToBottom<T extends HTMLElement = HTMLDivElement> = {
  * @template T The HTMLElement type that the ref will point to.
  * @returns An object containing a ref to the element and a scrollToBottom function.
  */
-export const useScroll = <T extends HTMLElement>(): ScrollToBottom<T> => {
+export const useScroll = <T extends HTMLElement>(): ScrollTo<T> => {
    const ref = useRef<T>(null)
 
    const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
