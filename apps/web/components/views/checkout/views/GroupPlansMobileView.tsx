@@ -1,25 +1,21 @@
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { Box, IconButton, Button, Stack } from "@mui/material"
-import { FormEvent, useCallback } from "react"
+import { useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { sxStyles } from "types/commonTypes"
 import { closeGroupPlansDialog } from "store/reducers/groupPlanReducer"
 import {
    clientSecret,
    plansDialogOpenSelector,
-   selectedPlanSelector,
 } from "store/selectors/groupSelectors"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import SelectGroupPlanMobileView from "../views/SelectGroupPlanMobileView"
 import GroupPlanCheckoutMobileView from "../views/GroupPlanCheckoutMobileView"
-import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useAuth } from "HOCs/AuthProvider"
 import React from "react"
-import { useSparksPlansForm } from "../GroupPlansDialog"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import GroupPlanSkeletonMobile from "./skeletons/GroupPlanSkeletonMobileView"
 import BrandedSwipableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
+import useStripePlanCheckout from "components/custom-hook/stripe/useStripePlanCheckout"
 
 const mobileBreakpoint = "md"
 
@@ -98,18 +94,10 @@ const GroupPlansMobileView = () => {
 const View = () => {
    const generatedClientSecret = useSelector(clientSecret)
    const open = useSelector(plansDialogOpenSelector)
-   const selectedPlan = useSelector(selectedPlanSelector)
-   const { group } = useGroup()
-   const { authenticatedUser } = useAuth()
+
    const dispatch = useDispatch()
 
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
-
-   const {
-      customerSessionSecret: customerSessionSecret,
-      loading: loadingSecret,
-   } = useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
+   const { disabled, redirectToCheckout } = useStripePlanCheckout()
 
    const handleCloseGroupPlansDialog = useCallback(
       (forceClose: boolean = false) => {
@@ -121,14 +109,6 @@ const View = () => {
       },
       [dispatch]
    )
-
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-      setClientSecret(customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-   }
-
-   const disabled = !selectedPlan || loadingSecret || !customerSessionSecret
 
    return (
       <BrandedSwipableDrawer

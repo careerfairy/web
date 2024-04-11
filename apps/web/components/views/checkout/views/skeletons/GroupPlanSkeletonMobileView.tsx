@@ -39,6 +39,9 @@ const styles = sxStyles({
    },
    plansFeaturesSkeletonWrapper: {
       my: "25px",
+      direction: "column",
+      spacing: 1,
+      alignItems: "start",
    },
    planSkeletonDisclaimer: {
       height: "20px",
@@ -131,12 +134,7 @@ const GroupPlanSkeletonMobile: FC<GroupPlanSkeletonMobileProps> = ({
                   sx={styles.planSkeletonPrice}
                />
             </Stack>
-            <Stack
-               direction={"column"}
-               spacing={1}
-               alignItems={"start"}
-               sx={styles.plansFeaturesSkeletonWrapper}
-            >
+            <Stack sx={styles.plansFeaturesSkeletonWrapper}>
                <Skeleton
                   variant="rounded"
                   animation="wave"

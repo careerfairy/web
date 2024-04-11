@@ -26,6 +26,7 @@ const swrOptions: SWRConfiguration = {
 type Result = {
    customerSessionSecret: string
    loading: boolean
+   error: unknown
 }
 const CUSTOMER_ID_PREFIX = "Group_"
 /**
@@ -60,18 +61,22 @@ const useStripeCustomerSession = (
       plan,
       userEmail,
    ])
-   const { data, isLoading } = useSWR(
+   const { data, isLoading, error } = useSWR(
       ["fetchStripeCustomerSession", options],
       fetcher,
       swrOptions
    )
 
+   if (error) {
+      console.error("Error fetching stripe customer session: ", error)
+   }
    return useMemo(() => {
       return {
          customerSessionSecret: data.customerSessionSecret,
          loading: isLoading,
+         error: error,
       }
-   }, [data.customerSessionSecret, isLoading])
+   }, [data.customerSessionSecret, isLoading, error])
 }
 
 export default useStripeCustomerSession

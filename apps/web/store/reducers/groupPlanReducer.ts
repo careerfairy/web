@@ -1,7 +1,7 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-interface IGroupPlanState {
+type IGroupPlanState = {
    plansDialogOpen: boolean
    confirmCloseSparksDialogOpen: boolean
    groupPlansForm: {

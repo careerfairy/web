@@ -1,18 +1,13 @@
 import { Box, Button, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import GroupPlansDialog, { useSparksPlansForm } from "../GroupPlansDialog"
+import GroupPlansDialog from "../GroupPlansDialog"
 import { sxStyles } from "types/commonTypes"
 import GroupSparksPlanDesktopSelector from "./components/GroupSparksPlanDesktopSelector"
 import { useSelector } from "react-redux"
-import {
-   plansDialogOpenSelector,
-   selectedPlanSelector,
-} from "store/selectors/groupSelectors"
+import { plansDialogOpenSelector } from "store/selectors/groupSelectors"
 import { FormEvent } from "react"
-import { useAuth } from "HOCs/AuthProvider"
-import useStripeCustomerSession from "components/custom-hook/stripe/useStripeCustomerSession"
 import SkeletonSelectSparksPlan from "./skeletons/GroupPlanSkeletonView"
+import useStripePlanCheckout from "components/custom-hook/stripe/useStripePlanCheckout"
 
 const styles = sxStyles({
    content: {
@@ -63,24 +58,7 @@ const SelectSparksPlanView = () => {
 }
 
 const View = () => {
-   const { authenticatedUser } = useAuth()
-   const { group } = useGroup()
-   const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
-      useSparksPlansForm()
-
-   const selectedPlan = useSelector(selectedPlanSelector)
-
-   const {
-      customerSessionSecret: customerSessionSecret,
-      loading: loadingSecret,
-   } = useStripeCustomerSession(group, selectedPlan, authenticatedUser.email)
-   const disabled = !selectedPlan || loadingSecret || !customerSessionSecret
-   const redirectToCheckout = async (e: FormEvent) => {
-      e.preventDefault()
-
-      setClientSecret(customerSessionSecret)
-      goToSelectPlanView(selectedPlan)
-   }
+   const { disabled, redirectToCheckout } = useStripePlanCheckout()
 
    return <GroupPlans disabled={disabled} handleSelect={redirectToCheckout} />
 }
