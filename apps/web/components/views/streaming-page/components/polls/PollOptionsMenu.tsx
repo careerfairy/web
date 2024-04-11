@@ -95,7 +95,6 @@ export const PollOptionsMenu = ({
             handleClose={handleClose}
             anchorEl={anchorEl}
             isMobileOverride={streamIsMobile}
-            enableDrawerCancelButton
          />
       </Fragment>
    )

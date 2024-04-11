@@ -10,7 +10,7 @@ const BrandedMenu = styled((props: MenuProps) => (
       border: "1px solid #ECECEC",
       boxShadow: "0px 0px 8px 0px rgba(20, 20, 20, 0.06)",
       filter: "none",
-      minWidth: 120,
+      minWidth: 205,
       "& .MuiMenu-list": {
          padding: 0,
       },

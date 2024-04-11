@@ -82,7 +82,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
    open,
    handleClose,
    options,
-   enableDrawerCancelButton = true,
+   enableDrawerCancelButton,
 }) => {
    return (
       <BrandedSwipeableDrawer

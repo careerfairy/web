@@ -120,7 +120,7 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                >
                   {POLL_STATUS_TEXT[poll.state]}
                </Typography>
-               {Boolean(isHost && showResults) && (
+               {Boolean(isHost) && (
                   <PollOptionsMenu
                      poll={poll}
                      onClickEdit={() => setIsEditing(true)}
