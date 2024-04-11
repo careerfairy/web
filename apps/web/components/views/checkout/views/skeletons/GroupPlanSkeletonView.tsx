@@ -56,7 +56,7 @@ const styles = sxStyles({
       },
       width: "276px",
       height: "40px",
-      color: (theme) => theme.brand.white[100],
+      color: "white.100",
       textAlign: "center",
       fontSize: "16px",
       fontStyle: "normal",
