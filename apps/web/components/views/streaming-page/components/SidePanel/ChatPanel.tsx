@@ -8,7 +8,7 @@ import {
 import { sxStyles } from "types/commonTypes"
 import { ChatInput } from "../chat/ChatInput"
 import { ChatList } from "../chat/ChatList"
-import { useScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
+import { useScroll } from "components/custom-hook/utils/useScrollToBottom"
 
 const styles = sxStyles({
    root: {
@@ -28,7 +28,7 @@ const styles = sxStyles({
 export const ChatPanel = () => {
    const isMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
-   const { scrollToBottom, ref } = useScrollToBottom()
+   const { scrollToBottom, ref } = useScroll()
 
    const chatPanelStyles = streamIsLandscape
       ? styles.landscapeChat
