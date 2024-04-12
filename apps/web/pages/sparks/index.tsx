@@ -1,5 +1,6 @@
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps } from "next"
+import { encode } from "querystring"
 
 /**
  *  This page is used to redirect to the next spark if a user lands on the /sparks page.
@@ -9,16 +10,20 @@ export default function Sparks() {
    return <div>No sparks available.</div>
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
    })
 
+   const queryParamString = encode(context.query)
+
    if (sparks.length > 0) {
       return {
          redirect: {
-            destination: `/sparks/${sparks[0].id}`,
+            destination: `/sparks/${sparks[0].id}${
+               queryParamString && `?${queryParamString}`
+            }`,
             permanent: false,
          },
       }
