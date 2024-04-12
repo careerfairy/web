@@ -103,10 +103,13 @@ const SparksPage: NextPage<
    }, [groupId])
 
    useEffect(() => {
+      if (query.interactionSource && !Array.isArray(query.interactionSource)) {
+         dispatch(setInteractionSource(query.interactionSource))
+      }
       return () => {
          dispatch(setInteractionSource(null))
       }
-   }, [dispatch])
+   }, [dispatch, query.interactionSource])
 
    useEffect(() => {
       if (
