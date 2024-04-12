@@ -6,10 +6,7 @@ import { useRouter } from "next/router"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Box, Typography } from "@mui/material"
 import { useDispatch } from "react-redux"
-import {
-   setCameFromCompanyPageLink,
-   setInteractionSource,
-} from "store/reducers/sparksFeedReducer"
+import { setCameFromCompanyPageLink } from "store/reducers/sparksFeedReducer"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 
@@ -31,13 +28,13 @@ const SparksSection: FC<Props> = ({ groupId }) => {
    const handleSparksClicked = useCallback(
       (spark: Spark) => {
          if (spark) {
-            dispatch(setInteractionSource(SparkInteractionSources.Company_Page))
             dispatch(setCameFromCompanyPageLink(router.asPath))
             router.push({
                pathname: `/sparks/${spark.id}`,
                query: {
                   ...router.query, // spread current query params
                   groupId: group.id,
+                  interactionSource: SparkInteractionSources.Company_Page,
                },
             })
          }
