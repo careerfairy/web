@@ -23,7 +23,7 @@ const runtimeSettings: RuntimeOptions = {
    memory: "4GB",
 }
 
-const ITEMS_PER_BATCH = 450
+const ITEMS_PER_BATCH = 250
 /**
  * Check and send onboarding newsletter everyday at a specific time
  */
