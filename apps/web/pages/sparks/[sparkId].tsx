@@ -44,7 +44,13 @@ import { useAuth } from "HOCs/AuthProvider"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedSpark, groupId, userEmail, conversionInterval }) => {
+> = ({
+   serializedSpark,
+   groupId,
+   userEmail,
+   conversionInterval,
+   interactionSource,
+}) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
 
@@ -103,10 +109,16 @@ const SparksPage: NextPage<
    }, [groupId])
 
    useEffect(() => {
+      if (!interactionSource) {
+         dispatch(setInteractionSource(null))
+      }
+
+      dispatch(setInteractionSource(interactionSource))
+
       return () => {
          dispatch(setInteractionSource(null))
       }
-   }, [dispatch])
+   }, [dispatch, interactionSource])
 
    useEffect(() => {
       if (
@@ -228,6 +240,7 @@ type SparksPageProps = {
    groupId: string | null
    userEmail: string | null
    conversionInterval: number
+   interactionSource: string | null
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -243,6 +256,10 @@ export const getServerSideProps: GetServerSideProps<
 
    const conversionInterval = context.query.conversionInterval
       ? context.query.conversionInterval.toString()
+      : null
+
+   const interactionSource = context.query.interactionSource
+      ? context.query.interactionSource.toString()
       : null
 
    const token = getUserTokenFromCookie(context)
@@ -266,6 +283,7 @@ export const getServerSideProps: GetServerSideProps<
          groupId,
          userEmail: token?.email ?? null,
          conversionInterval: +conversionInterval,
+         interactionSource,
       },
    }
 }
