@@ -6,6 +6,7 @@ import EmptySparksView from "./empty-sparks-view/EmptySparksView"
 import GeneralSparksView from "./general-sparks-view/GeneralSparksView"
 import SparksDialog from "./sparks-dialog/SparksDialog"
 import SparksOnboardingDialog from "./sparks-onboarding-dialog/SparksOnboardingDialog"
+import GroupPlansDialog from "components/views/checkout/GroupPlansDialog"
 
 const Sparks = () => {
    return (
@@ -17,11 +18,11 @@ const Sparks = () => {
 
 const SparksComponent = () => {
    const { group } = useGroup()
-
    const groupHasSparks = useGroupHasSparks(group.id)
 
    return (
       <Fragment>
+         <GroupPlansDialog />
          {groupHasSparks ? <GeneralSparksView /> : <EmptySparksView />}
          <SparksDialog />
          <SparksOnboardingDialog />
