@@ -1,19 +1,24 @@
 import { Button, Stack, Typography } from "@mui/material"
 import DialogBody from "components/views/admin/company-plans/plan-confirmation-dialog/DialogBody"
-import BasicSparkIcon from "components/views/common/icons/BasicSparkIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import {
    PlanConfirmationDialogKeys,
    usePlanConfirmationDialog,
 } from "./CompanyPlanConfirmationDialog"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const styles = sxStyles({
    caption: {
       fontSize: "1.28571rem",
       fontWeight: 600,
-      color: "#5C5C6A",
+      color: (theme) => theme.palette.neutral[600],
    },
    header: {
       fontWeight: 700,
@@ -23,9 +28,9 @@ const styles = sxStyles({
    },
    btn: {
       borderRadius: 2,
-      border: `1px solid #EEEEEE !important`,
-      color: "#5C5C6A",
-      bgcolor: "#FAFAFE",
+      border: (theme) => `1px solid ${theme.brand.black[400]} !important`,
+      color: (theme) => theme.palette.neutral[600],
+      bgcolor: (theme) => theme.brand.white[300],
       textTransform: "none",
       "& svg": {
          fontSize: 20,
@@ -60,29 +65,55 @@ const SelectPlanView = () => {
                </Typography>
             </Stack>
             <Stack spacing={1.5}>
+               <ConditionalWrapper condition={!groupToManage.hasPlan()}>
+                  <Button
+                     startIcon={<TrialPlanIcon />}
+                     sx={styles.btn}
+                     variant="outlined"
+                     color="grey"
+                     fullWidth
+                     onClick={() =>
+                        goToStep(PlanConfirmationDialogKeys.ConfirmSparksTrial)
+                     }
+                  >
+                     Trial plan
+                  </Button>
+               </ConditionalWrapper>
                <Button
-                  startIcon={<Clock />}
+                  startIcon={<EssentialPlanIcon />}
+                  color="grey"
                   sx={styles.btn}
                   variant="outlined"
-                  color="grey"
                   fullWidth
                   onClick={() =>
-                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksTrial)
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier1Plan)
                   }
                >
-                  Trial plan
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier1].name} plan
                </Button>
                <Button
-                  startIcon={<BasicSparkIcon />}
+                  startIcon={<AdvancedPlanIcon />}
                   color="grey"
                   sx={styles.btn}
                   variant="outlined"
                   fullWidth
                   onClick={() =>
-                     goToStep(PlanConfirmationDialogKeys.ConfirmSparksPlan)
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier2Plan)
                   }
                >
-                  Sparks plan
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier2].name} plan
+               </Button>
+               <Button
+                  startIcon={<PremiumPlanIcon />}
+                  color="grey"
+                  sx={styles.btn}
+                  variant="outlined"
+                  fullWidth
+                  onClick={() =>
+                     goToStep(PlanConfirmationDialogKeys.ConfirmTier3Plan)
+                  }
+               >
+                  {PLAN_CONSTANTS[GroupPlanTypes.Tier3].name} plan
                </Button>
             </Stack>
          </Stack>
