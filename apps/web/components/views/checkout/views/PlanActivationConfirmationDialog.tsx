@@ -1,11 +1,12 @@
-import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
+import { Box, Button, Dialog, Link, Stack, Typography } from "@mui/material"
 import useStripeSessionStatus from "components/custom-hook/stripe/useStripeSessionStatus"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import AlertCircleIcon from "components/views/common/icons/AlertCircleIcon"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -15,6 +16,9 @@ const styles = sxStyles({
       justifyContent: "center",
       borderBottomLeftRadius: "0px",
       borderBottomRightRadius: "0px",
+   },
+   link: {
+      color: (theme) => theme.palette.neutral[600],
    },
    dialogPaperDesktop: {
       p: "28px",
@@ -33,6 +37,7 @@ const styles = sxStyles({
    },
    dialogContentWrapper: {
       p: "15px",
+      alignItems: "center"
    },
    messageTitle: {
       maxWidth: "350px",
@@ -50,9 +55,22 @@ const styles = sxStyles({
       width: "128.229px",
       height: "132px",
    },
+   errorImageWrapper: {
+      width: "108px",
+      height: "108px",
+      backgroundColor: (theme) => theme.brand.error[50],
+      borderRadius: "50%",
+      alignContent: "center",
+   },
    closeButton: {
       minWidth: "95%",
       borderRadius: "20px",
+   },
+   alertIcon: {
+      width: "76px",
+      height: "76px",
+      ml: "16px",
+      mt: "6px",
    },
 })
 
@@ -71,11 +89,11 @@ const PlanActivationConfirmationDialog = () => {
 type PaymentCompleteComponentProps = {
    sessionId: string
 }
-
-const PaymentCompleteComponent: FC<PaymentCompleteComponentProps> = ({
+const PaymentCompleteComponent = ({
    sessionId,
-}) => {
+}: PaymentCompleteComponentProps) => {
    const { asPath, replace } = useRouter()
+   
    const [isOpen, setIsOpen] = useState(true)
    const isMobile = useIsMobile()
 
@@ -86,17 +104,17 @@ const PaymentCompleteComponent: FC<PaymentCompleteComponentProps> = ({
       replace(replaceUrl)
    }
 
+   // Replacing only this query string to prevent breaking other properties if needed
+   const url = new URL(asPath, getBaseUrl())
+   url.searchParams.delete("stripe_session_id")
+   const replaceUrl = url.pathname + url.search
+
    const showSuccess =
       Boolean(sessionStatus) &&
       sessionStatus.status == "complete" &&
       sessionStatus.paymentStatus == "paid"
 
-   // Replacing only this query string to prevent breaking other properties if needed
-   const url = new URL(asPath, getBaseUrl())
-   url.searchParams.delete("stripe_session_id")
-
-   const replaceUrl = url.pathname + url.search
-
+   
    return (
       <Dialog
          sx={isMobile ? styles.containerMobile : styles.container}
@@ -110,7 +128,7 @@ const PaymentCompleteComponent: FC<PaymentCompleteComponentProps> = ({
       >
          <ConditionalWrapper
             condition={showSuccess}
-            fallback={<PaymentFailureComponent />}
+            fallback={<PaymentFailureComponent handleClose={closeDialog} />}
          >
             <PaymentSuccessComponent handleClose={closeDialog} />
          </ConditionalWrapper>
@@ -118,24 +136,66 @@ const PaymentCompleteComponent: FC<PaymentCompleteComponentProps> = ({
    )
 }
 
-const PaymentFailureComponent = () => {
-   return <>error: todo view</>
-}
-
-type PaymentSuccessComponentProps = {
+type PaymentDialogComponentProps = {
    handleClose: () => void
 }
 
-const PaymentSuccessComponent: FC<PaymentSuccessComponentProps> = ({
+const PaymentFailureComponent = ({
    handleClose,
-}) => {
+}: PaymentDialogComponentProps) => {
+   return (
+      <Stack
+         direction={"column"} 
+         sx={styles.dialogContentWrapper}
+         spacing={2}
+      >
+         <Stack alignItems={"center"} spacing={1}>
+            <Box sx={styles.errorImageWrapper}>
+               <AlertCircleIcon sx={styles.alertIcon} />
+            </Box>
+
+            <Typography variant="brandedH3" sx={styles.messageTitle}>
+               An error occurred
+            </Typography>
+            <Stack spacing={3}>
+               <Typography variant="brandedBody" sx={styles.messageDescription}>
+                  We{"'"}re sorry, but there seems to be a temporary issue
+                  processing your purchase. Don{"'"}t worry, your payment
+                  information is safe.
+               </Typography>
+               <Typography variant="brandedBody" sx={styles.messageDescription}>
+                  If the issue persists, please contact us at{" "}
+                  {
+                     <Link href={"mailto:info@careerfairy.io"} sx={styles.link}>
+                        info@careerfairy.io
+                     </Link>
+                  }{" "}
+                  and we{"'"}ll be happy to help.
+               </Typography>
+            </Stack>
+         </Stack>
+
+         <Button
+            sx={styles.closeButton}
+            color="error"
+            variant="contained"
+            onClick={handleClose}
+         >
+            Try again later
+         </Button>
+      </Stack>
+   )
+}
+
+const PaymentSuccessComponent = ({
+   handleClose,
+}: PaymentDialogComponentProps) => {
    const { query } = useRouter()
 
    const planName = query.planName as string
    return (
       <Stack
-         direction={"column"}
-         alignItems={"center"}
+         direction={"column"} 
          sx={styles.dialogContentWrapper}
          spacing={2}
       >
