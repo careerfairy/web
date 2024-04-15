@@ -65,6 +65,7 @@ import {
    updatePoll,
    markPollAsCurrent,
 } from "./lib/streaming"
+import stripe = require("./stripe")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -118,6 +119,11 @@ exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
 exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
+
+// Stripe
+exports.stripeWebHook = stripe.stripeWebHook
+exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
+exports.fetchStripePrice = stripe.fetchStripePrice
 
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
