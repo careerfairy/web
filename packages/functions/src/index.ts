@@ -58,13 +58,7 @@ import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
-import {
-   createPoll,
-   deleteLivestreamChatEntry,
-   deletePoll,
-   updatePoll,
-   markPollAsCurrent,
-} from "./lib/streaming"
+import * as streaming from "./lib/streaming"
 import stripe = require("./stripe")
 
 // Auth
@@ -293,8 +287,10 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 exports.fetchCompanies = companies.fetchCompanies
 
 // Streaming
-exports.deleteLivestreamChatEntry = deleteLivestreamChatEntry
-exports.createPoll = createPoll
-exports.deletePoll = deletePoll
-exports.updatePoll = updatePoll
-exports.markPollAsCurrent = markPollAsCurrent
+exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry
+exports.createPoll = streaming.createPoll
+exports.deletePoll = streaming.deletePoll
+exports.updatePoll = streaming.updatePoll
+exports.markPollAsCurrent = streaming.markPollAsCurrent
+exports.resetQuestion = streaming.resetQuestion
+exports.answerQuestion = streaming.answerQuestion
