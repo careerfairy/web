@@ -787,13 +787,7 @@ export class LivestreamService {
                title: options.title,
                author: options.author,
                timestamp: Timestamp.now(),
-               voterIds: [],
-               emailOfVoters: [],
-               numberOfComments: 0,
-               votes: 0,
-               firstComment: null,
-               type: "new",
-            } satisfies PartialWithFieldValue<LivestreamQuestion>
+            } satisfies PartialWithFieldValue<LivestreamQuestionComment>
 
             transaction.update(questionRef, {
                numberOfComments: increment(1),
