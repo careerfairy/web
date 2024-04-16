@@ -1,11 +1,14 @@
 import * as yup from "yup"
 import { LivestreamPoll } from "./livestreams"
 
+export const MIN_POLL_OPTIONS = 2
+export const MAX_POLL_OPTIONS = 4
+
 export const basePollShape = {
    question: yup
       .string()
       .trim()
-      .min(3, "Question must be at least 3 characters long"),
+      .min(3, "Question must be at least 3 characters"),
    options: yup
       .array()
       .of(
@@ -18,8 +21,11 @@ export const basePollShape = {
             id: yup.string().optional(),
          })
       )
-      .min(2, "At least 2 options are required")
-      .max(5, "Max 5 options are allowed")
+      .min(
+         MIN_POLL_OPTIONS,
+         `At least ${MIN_POLL_OPTIONS} options are required`
+      )
+      .max(MAX_POLL_OPTIONS, `Max ${MAX_POLL_OPTIONS} options are allowed`)
       .test("unique-options", "Options must be unique", (options) => {
          const texts = options?.map((option) => option.text) || []
          const uniqueTexts = new Set(texts)
