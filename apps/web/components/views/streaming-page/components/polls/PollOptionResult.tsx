@@ -1,0 +1,81 @@
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
+import {
+   Box,
+   LinearProgress,
+   Stack,
+   Typography,
+   linearProgressClasses,
+} from "@mui/material"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      position: "relative",
+      overflow: "hidden",
+      borderRadius: "6px",
+      p: 2,
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+   },
+   coloredEdge: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: 5,
+      height: "100%",
+   },
+   progress: {
+      borderRadius: "6px",
+      [`&.${linearProgressClasses.colorPrimary}`]: {
+         borderRadius: "6px",
+         backgroundColor: (theme) => theme.brand.black[400],
+      },
+      height: 5,
+   },
+})
+
+type Props = {
+   option: LivestreamPoll["options"][number]
+   color: string
+   stats: {
+      percentage: number
+      votes: number
+   }
+}
+
+export const PollOptionResult = ({ option, color, stats }: Props) => {
+   return (
+      <Box sx={styles.root}>
+         <Stack spacing={1}>
+            <Stack direction="row" justifyContent="space-between">
+               <Typography color="neutral.800" variant="medium">
+                  {option.text}
+               </Typography>
+               <Typography
+                  color="neutral.800"
+                  variant="medium"
+                  fontWeight={600}
+               >
+                  {stats.percentage}%
+               </Typography>
+            </Stack>
+            <LinearProgress
+               value={stats.percentage}
+               variant="determinate"
+               sx={[
+                  styles.progress,
+                  {
+                     [`& .${linearProgressClasses.bar}`]: {
+                        backgroundColor: color,
+                        borderRadius: "6px",
+                     },
+                  },
+               ]}
+            />
+            <Typography variant="xsmall" color="neutral.400">
+               {stats.votes} votes
+            </Typography>
+         </Stack>
+         <Box sx={[styles.coloredEdge, { backgroundColor: color }]} />
+      </Box>
+   )
+}

@@ -39,6 +39,10 @@ const styles = sxStyles({
          opacity: 0.5,
       },
    },
+   borderBottom: {
+      borderBottom: "1px solid",
+      borderColor: (theme) => theme.brand.black[300],
+   },
    singleMenuItem: {
       p: "16px !important",
    },
@@ -58,7 +62,7 @@ const styles = sxStyles({
    },
 })
 
-type MenuOption = {
+export type MenuOption = {
    label: string
    icon?: ReactElement
    handleClick: (args: unknown) => void | Promise<void>
@@ -86,7 +90,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
       >
          <List>
             {options.map((option, index) => (
-               <>
+               <Fragment key={index}>
                   {index !== 0 && <Divider sx={styles.listItemDivider} />}
                   <ListItemButton
                      key={index}
@@ -111,7 +115,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
                      <Typography variant="medium">{option.label}</Typography>
                      {Boolean(option.loading) && <Loader />}
                   </ListItemButton>
-               </>
+               </Fragment>
             ))}
          </List>
       </BrandedSwipeableDrawer>
@@ -165,6 +169,7 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                         styles.menuItem,
                         option.loading && styles.listItemLoading,
                         singleOption && styles.singleMenuItem,
+                        index !== options.length - 1 && styles.borderBottom,
                      ],
                      option.menuItemSxProps
                   )}
@@ -172,8 +177,8 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                   <Box sx={styles.icon}>{option.icon}</Box>
                   <Typography variant="xsmall">{option.label}</Typography>
                   {Boolean(options.length - 1 !== index) && <Divider />}
+                  {Boolean(option.loading) && <Loader />}
                </MenuItem>
-               {Boolean(option.loading) && <Loader />}
             </Box>
          ))}
       </BrandedMenu>

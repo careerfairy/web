@@ -492,6 +492,7 @@ export interface LivestreamQuestion extends Identifiable {
    displayName?: string
 }
 
+// Collection Path: livestreams/{livestreamId}/polls/{pollId}
 export interface LivestreamPoll extends Identifiable {
    voters: string[]
    timestamp: firebase.firestore.Timestamp
@@ -501,6 +502,13 @@ export interface LivestreamPoll extends Identifiable {
       id: string
       text: string
    }[]
+}
+
+// Collection Path: livestreams/{livestreamId}/polls/{pollId}/voters/{userId}
+export interface LivestreamPollVoter extends Identifiable {
+   optionId: string
+   userId: string
+   timestamp: firebase.firestore.Timestamp
 }
 
 export interface LivestreamChatEntry extends Identifiable {
