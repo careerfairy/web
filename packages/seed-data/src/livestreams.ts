@@ -445,6 +445,11 @@ export const generateLiveStreamUserQuestion = (
    title: question,
    type: "new",
    votes: 0,
+   voterIds: [],
+   emailOfVoters: [],
+   numberOfComments: 0,
+   firstComment: null,
+   displayName: faker.name.firstName(),
 })
 
 const generateSpeaker = (): Speaker => ({

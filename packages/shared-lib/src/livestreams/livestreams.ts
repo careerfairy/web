@@ -488,7 +488,7 @@ export interface LivestreamQuestion extends Identifiable {
    /**
     * We store the most recent comment to the question on the question document
     * */
-   firstComment?: LivestreamQuestion
+   firstComment?: LivestreamQuestionComment
    /*
     * The number of comments on the question
     * */
