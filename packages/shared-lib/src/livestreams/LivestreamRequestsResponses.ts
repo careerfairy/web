@@ -36,7 +36,7 @@ export type MarkLivestreamPollAsCurrentRequest = {
    pollId: string
 }
 
-export type AnswerLivestreamQuestionRequest = {
+export type MarkLivestreamQuestionAsCurrentRequest = {
    livestreamId: string
    livestreamToken: string | null
    question: string

@@ -6,12 +6,12 @@ import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
 import { livestreamsRepo } from "../../api/repositories"
 import {
-   AnswerLivestreamQuestionRequest,
+   MarkLivestreamQuestionAsCurrentRequest,
    LivestreamEvent,
    ResetLivestreamQuestionRequest,
 } from "@careerfairy/shared-lib/livestreams"
 
-const answerQuestionSchema: yup.SchemaOf<AnswerLivestreamQuestionRequest> =
+const markQuestionAsCurrentSchema: yup.SchemaOf<MarkLivestreamQuestionAsCurrentRequest> =
    yup.object({
       question: yup.string().required(),
       livestreamId: yup.string().required(),
@@ -29,32 +29,34 @@ type Context = {
    livestream: LivestreamEvent
 }
 
-export const answerQuestion = functions.region(config.region).https.onCall(
-   middlewares<Context, AnswerLivestreamQuestionRequest>(
-      dataValidation(answerQuestionSchema),
-      livestreamExists(),
-      async (requestData, context) => {
-         const { livestreamId, livestreamToken, question } = requestData
+export const markQuestionAsCurrent = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares<Context, MarkLivestreamQuestionAsCurrentRequest>(
+         dataValidation(markQuestionAsCurrentSchema),
+         livestreamExists(),
+         async (requestData, context) => {
+            const { livestreamId, livestreamToken, question } = requestData
 
-         await validateLivestreamToken(
-            context.auth?.token?.email,
-            context.middlewares.livestream,
-            livestreamToken
-         )
+            await validateLivestreamToken(
+               context.auth?.token?.email,
+               context.middlewares.livestream,
+               livestreamToken
+            )
 
-         functions.logger.info("Answering question", {
-            livestreamId,
-            question,
-         })
+            functions.logger.info("Marking question as current", {
+               livestreamId,
+               question,
+            })
 
-         await livestreamsRepo.answerQuestion(livestreamId, question)
+            await livestreamsRepo.answerQuestion(livestreamId, question)
 
-         functions.logger.info("Question answered", {
-            livestreamId,
-         })
-      }
+            functions.logger.info("Question marked as current", {
+               livestreamId,
+            })
+         }
+      )
    )
-)
 
 export const resetQuestion = functions.region(config.region).https.onCall(
    middlewares<Context, ResetLivestreamQuestionRequest>(
