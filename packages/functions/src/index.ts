@@ -293,4 +293,4 @@ exports.deletePoll = streaming.deletePoll
 exports.updatePoll = streaming.updatePoll
 exports.markPollAsCurrent = streaming.markPollAsCurrent
 exports.resetQuestion = streaming.resetQuestion
-exports.answerQuestion = streaming.answerQuestion
+exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent

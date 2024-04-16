@@ -14,7 +14,7 @@ import {
    MarkLivestreamPollAsCurrentRequest,
    LivestreamPollVoter,
    ResetLivestreamQuestionRequest,
-   AnswerLivestreamQuestionRequest,
+   MarkLivestreamQuestionAsCurrentRequest,
    LivestreamQuestion,
    LivestreamQuestionComment,
    hasUpvotedLivestreamQuestion,
@@ -658,10 +658,12 @@ export class LivestreamService {
    /**
     * Marks a question as the current one being answered
     */
-   async answerQuestion(options: AnswerLivestreamQuestionRequest) {
-      await httpsCallable<AnswerLivestreamQuestionRequest>(
+   async markQuestionAsCurrent(
+      options: MarkLivestreamQuestionAsCurrentRequest
+   ) {
+      await httpsCallable<MarkLivestreamQuestionAsCurrentRequest>(
          this.functions,
-         "answerQuestion"
+         "markQuestionAsCurrent"
       )(options)
    }
 
