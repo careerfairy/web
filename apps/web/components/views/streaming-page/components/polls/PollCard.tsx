@@ -71,7 +71,7 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
       }
 
       const showActionButton =
-         (poll.state === "upcoming" || poll.state === "current") && isHost
+         isHost && (poll.state === "upcoming" || poll.state === "current")
 
       if (isEditing && isHost) {
          return (
