@@ -668,13 +668,11 @@ export class LivestreamService {
    }
 
    /**
-    * Gets a Firestore document reference for a question in a livestream or breakout room.
-    * Returns a reference to an existing question if a question ID is given.
-    * Without a question ID, it creates a new question reference in the specified breakout room or in the main livestream if no breakout room ID is provided.
-    *
-    * @param livestreamId - Identifier for the livestream.
-    * @param breakOutRoomId - Optional identifier for a breakout room.
-    * @param questionId - Optional identifier for a question. Generates a new question reference if omitted.
+    * Returns a reference to a question in a livestream or breakout room.
+    * If a question ID is provided, it returns a reference to an existing question.
+    * If no question ID is provided, it creates a new question reference in the specified breakout room or in the main livestream if no breakout room ID is provided.
+    * @param livestreamRef - Livestream document reference.
+    * @param questionId - Optional question ID.
     * @returns Firestore document reference for the question.
     */
    private getQuestionRef(
@@ -687,6 +685,12 @@ export class LivestreamService {
       ).withConverter(createGenericConverter<LivestreamQuestion>())
    }
 
+   /**
+    * Creates a question in a livestream or breakout room.
+    * @param livestreamRef - Livestream document reference.
+    * @param options - Question options.
+    * @returns A promise resolved with the result of the create operation.
+    */
    createQuestion = async (
       livestreamRef: DocumentReference<LivestreamEvent>,
       options: Pick<
@@ -730,6 +734,13 @@ export class LivestreamService {
       return deleteDoc(ref)
    }
 
+   /**
+    * Toggles the upvote status of a question.
+    * @param livestreamRef - Livestream document reference.
+    * @param questionId - Question ID.
+    * @param args - User identifiers (email and uid)
+    * @returns A promise resolved with the result of the toggle operation.
+    */
    toggleUpvoteQuestion = async (
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string,
@@ -767,6 +778,13 @@ export class LivestreamService {
       })
    }
 
+   /**
+    * Adds a comment to a question.
+    * @param livestreamRef - Livestream document reference.
+    * @param questionId - Question ID.
+    * @param options - Comment options.
+    * @returns A promise resolved with the result of the comment operation.
+    */
    async commentOnQuestion(
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string,
