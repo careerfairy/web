@@ -44,6 +44,9 @@ import { sxStyles } from "../../../../../types/commonTypes"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import Stack from "@mui/material/Stack"
 import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/dist/users/UserBadges"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { useStreamingRef } from "components/custom-hook/live-stream/useStreamRoomRef"
+import { hasUpvotedLivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 
 const styles = sxStyles({
    chatInput: {
@@ -216,11 +219,8 @@ const QuestionContainer = ({
 }: QuestionContainerProps) => {
    const firebase = useFirebaseService()
    const streamRef = useStreamRef()
-   const {
-      currentLivestream: livestream,
-      isBreakout,
-      presenter,
-   } = useCurrentStream()
+   const streamingRef = useStreamingRef()
+   const { currentLivestream: livestream, presenter } = useCurrentStream()
    const [newCommentTitle, setNewCommentTitle] = useState("")
    const [comments, setComments] = useState([])
    const [showAllReactions, setShowAllReactions] = useState(false)
@@ -234,15 +234,11 @@ const QuestionContainer = ({
       (!userData && !(livestream?.test || livestream.openStream))
    const active = question?.type === "current"
    const old = question?.type !== "new"
-   const upvoted =
-      (!userData && !livestream?.test) ||
-      (question?.emailOfVoters
-         ? question?.emailOfVoters.indexOf(
-              livestream?.test || livestream?.openStream
-                 ? "streamerEmail" + sessionUuid
-                 : authenticatedUser.email
-           ) > -1
-         : false)
+   const upvoted = hasUpvotedLivestreamQuestion(question, {
+      email: authenticatedUser.email,
+      uid: sessionUuid,
+      deprecatedSessionUuid: sessionUuid,
+   })
 
    const questionIsBeingAnswered = Boolean(
       question?.type === "current" && isNextQuestions
@@ -308,31 +304,12 @@ const QuestionContainer = ({
          }
 
          setDisableComments(true)
-         const newComment = streamer
-            ? {
-                 title: newCommentTitle,
-                 author: "Streamer",
-              }
-            : {
-                 title: newCommentTitle,
-                 author: userData
-                    ? userData.firstName + " " + userData.lastName.charAt(0)
-                    : "anonymous",
-              }
 
-         if (isBreakout) {
-            await firebase.putQuestionCommentWithTransaction(
-               streamRef,
-               question.id,
-               newComment
-            )
-         } else {
-            await firebase.putQuestionComment(
-               streamRef,
-               question.id,
-               newComment
-            )
-         }
+         await livestreamService.commentOnQuestion(streamingRef, question.id, {
+            title: newCommentTitle,
+            author: getAuthor(),
+            uid: authenticatedUser.uid,
+         })
 
          setNewCommentTitle("")
          setDisableComments(false)
@@ -343,6 +320,16 @@ const QuestionContainer = ({
       }
    }
 
+   const getAuthor = () => {
+      if (streamer) {
+         return "Streamer"
+      }
+      if (userData) {
+         return `${userData.firstName} ${userData.lastName}`
+      }
+      return "anonymous"
+   }
+
    const addNewCommentOnEnter: KeyboardEventHandler = (target) => {
       if (target.key === "Enter") {
          addNewComment().then(() => handleConfirmStep(1))
@@ -350,11 +337,10 @@ const QuestionContainer = ({
    }
 
    function upvoteLivestreamQuestion() {
-      let authEmail =
-         livestream.test || livestream.openStream
-            ? "streamerEmail" + sessionUuid
-            : authenticatedUser.email
-      firebase.upvoteLivestreamQuestionWithRef(streamRef, question, authEmail)
+      livestreamService.toggleUpvoteQuestion(streamingRef, question.id, {
+         email: authenticatedUser.email,
+         uid: sessionUuid,
+      })
    }
 
    const isOpen = (property) => {
@@ -383,7 +369,7 @@ const QuestionContainer = ({
       }
    }
 
-   let commentsElements = comments.map((comment) => {
+   const commentsElements = comments.map((comment) => {
       return (
          <Slide key={comment.id} in direction="right">
             <Box
@@ -443,7 +429,7 @@ const QuestionContainer = ({
                   spacing={2}
                   sx={styles.topContainer}
                >
-                  {canDeleteQuestion && (
+                  {Boolean(canDeleteQuestion) && (
                      <Box sx={styles.deleteButton}>
                         <IconButton
                            size={"small"}
@@ -520,11 +506,11 @@ const QuestionContainer = ({
                {commentsElements[0]}
                <Collapse
                   style={{ width: "100%" }}
-                  in={
+                  in={Boolean(
                      showAllReactions &&
-                     !loadingQuestions &&
-                     question.id === openQuestionId
-                  }
+                        !loadingQuestions &&
+                        question.id === openQuestionId
+                  )}
                >
                   {commentsElements.slice(1)}
                </Collapse>
