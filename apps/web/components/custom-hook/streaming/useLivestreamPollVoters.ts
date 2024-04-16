@@ -1,6 +1,9 @@
-import { LivestreamPollVoter } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamPoll,
+   LivestreamPollVoter,
+} from "@careerfairy/shared-lib/livestreams"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, query } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { ReactFireOptions } from "reactfire"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
@@ -11,8 +14,10 @@ const reactFireOptions: ReactFireOptions = {
 
 export const useLivestreamPollVoters = (
    livestreamId: string,
-   pollId: string
+   poll: LivestreamPoll
 ) => {
+   const optionsIds = poll.options?.map((option) => option.id)
+
    return useFirestoreCollection<LivestreamPollVoter>(
       query(
          collection(
@@ -20,9 +25,10 @@ export const useLivestreamPollVoters = (
             "livestreams",
             livestreamId,
             "polls",
-            pollId,
+            poll.id,
             "voters"
-         )
+         ),
+         optionsIds ? where("optionId", "in", optionsIds) : undefined
       ),
       reactFireOptions
    )

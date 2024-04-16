@@ -12,6 +12,7 @@ import {
    UpdateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    MarkLivestreamPollAsCurrentRequest,
+   LivestreamPollVoter,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -594,6 +595,34 @@ export class LivestreamService {
          "markPollAsCurrent"
       )(options)
       return
+   }
+
+   async votePollOption(
+      livestreamId: string,
+      pollId: string,
+      optionId: string,
+      userIdentifier: string
+   ) {
+      const optionRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "polls",
+         pollId,
+         "voters",
+         userIdentifier
+      ).withConverter(createGenericConverter<LivestreamPollVoter>())
+
+      setDoc(
+         optionRef,
+         {
+            id: optionRef.id,
+            optionId,
+            timestamp: Timestamp.now(),
+            userId: userIdentifier,
+         },
+         { merge: true }
+      )
    }
 }
 
