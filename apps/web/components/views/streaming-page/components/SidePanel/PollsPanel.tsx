@@ -3,7 +3,8 @@ import { SidePanelView } from "./SidePanelView"
 import { PollIcon } from "components/views/common/icons"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
-import { PollsView } from "../polls/PollsView"
+import { HostPollsView } from "../polls/HostPollsView"
+import { ViewerPollsView } from "../polls/ViewerPollsView"
 
 const styles = sxStyles({
    contentWrapperViewer: {
@@ -27,7 +28,7 @@ export const PollsPanel = () => {
          title="Polls"
          icon={<PollIcon />}
       >
-         <PollsView />
+         {isHost ? <HostPollsView /> : <ViewerPollsView />}
       </SidePanelView>
    )
 }

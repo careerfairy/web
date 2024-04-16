@@ -123,6 +123,14 @@ const ViewerTrackers = dynamic(
    { ssr: false }
 )
 
+const OngoingPollTracker = dynamic(
+   () =>
+      import("./components/streaming/OngoingPollTracker").then(
+         (mod) => mod.OngoingPollTracker
+      ),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -194,6 +202,7 @@ const Component = ({ isHost }: Props) => {
                         </AgoraDevicesProvider>
                         <AgoraTrackers />
                         {isHost ? null : <ViewerTrackers />}
+                        {isHost ? null : <OngoingPollTracker />}
                         <SessionConflictModal />
                      </RTMSignalingProvider>
                   </StreamingProvider>

@@ -97,7 +97,9 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                )}
             </Stack>
             <Box pt={1.25} />
-            <Typography sx={styles.question}>{poll.question}</Typography>
+            <Typography aria-label="Poll question" sx={styles.question}>
+               {poll.question}
+            </Typography>
             <Box pt={1.5} />
             <Collapse unmountOnExit in={showResults || !isHost}>
                <PollOptions poll={poll} />
