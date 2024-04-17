@@ -294,3 +294,5 @@ exports.updatePoll = streaming.updatePoll
 exports.markPollAsCurrent = streaming.markPollAsCurrent
 exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
+exports.deleteQuestionComment = streaming.deleteQuestionComment
+exports.deleteQuestion = streaming.deleteQuestion

@@ -18,6 +18,8 @@ import {
    LivestreamQuestion,
    LivestreamQuestionComment,
    hasUpvotedLivestreamQuestion,
+   DeleteLivestreamQuestionRequest,
+   DeleteLivestreamQuestionCommentRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -668,6 +670,46 @@ export class LivestreamService {
    }
 
    /**
+    * Deletes a question from a livestream using a callable cloud function
+    * @param options - Options
+    */
+   deleteQuestionCallable = async (
+      options: DeleteLivestreamQuestionRequest
+   ) => {
+      await httpsCallable<DeleteLivestreamQuestionRequest>(
+         this.functions,
+         "deleteQuestion"
+      )(options)
+   }
+
+   /**
+    * Deletes a comment from a question
+    * @param options - Options
+    */
+   deleteQuestionComment = async (
+      options: DeleteLivestreamQuestionCommentRequest
+   ) => {
+      await httpsCallable<DeleteLivestreamQuestionCommentRequest>(
+         this.functions,
+         "deleteQuestionComment"
+      )(options)
+   }
+
+   /**
+    * Deletes a question from a livestream
+    * @param livestreamId - Livestream ID
+    * @param questionId - Question ID
+    * @returns A promise resolved with the result of the delete operation
+    */
+   deleteQuestion = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string
+   ) => {
+      const ref = this.getQuestionRef(livestreamRef, questionId)
+      return deleteDoc(ref)
+   }
+
+   /**
     * Returns a reference to a question in a livestream or breakout room.
     * If a question ID is provided, it returns a reference to an existing question.
     * If no question ID is provided, it creates a new question reference in the specified breakout room or in the main livestream if no breakout room ID is provided.
@@ -718,20 +760,6 @@ export class LivestreamService {
       await setDoc(ref, newQuestion)
 
       return newQuestion
-   }
-
-   /**
-    * Deletes a question from a livestream
-    * @param livestreamId - Livestream ID
-    * @param questionId - Question ID
-    * @returns A promise resolved with the result of the delete operation
-    */
-   deleteQuestion = async (
-      livestreamRef: DocumentReference<LivestreamEvent>,
-      questionId: string
-   ) => {
-      const ref = this.getQuestionRef(livestreamRef, questionId)
-      return deleteDoc(ref)
    }
 
    /**
