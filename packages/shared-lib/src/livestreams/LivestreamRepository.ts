@@ -14,7 +14,6 @@ import {
    LivestreamJobApplicationDetails,
    LivestreamPoll,
    LivestreamQuestion,
-   LivestreamQuestionComment,
    LivestreamRecordingDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
@@ -345,47 +344,6 @@ export interface ILivestreamRepository {
     * @param livestreamId - The ID of the livestream
     */
    resetAllQuestions(livestreamId: string): Promise<void>
-
-   /**
-    * Deletes a comment from a question from a livestream
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question
-    * @param commentId - The ID of the comment
-    */
-   deleteQuestionComment(
-      livestreamId: string,
-      questionId: string,
-      commentId: string
-   ): Promise<void>
-
-   /**
-    * Deletes a question from a livestream
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question
-    */
-   deleteQuestion(livestreamId: string, questionId: string): Promise<void>
-
-   /**
-    * Fetches a question from a livestream
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question
-    */
-   getQuestion(
-      livestreamId: string,
-      questionId: string
-   ): Promise<LivestreamQuestion>
-
-   /**
-    * Fetches a comment from a question from a livestream
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question
-    * @param commentId - The ID of the comment
-    */
-   getQuestionComment(
-      livestreamId: string,
-      questionId: string,
-      commentId: string
-   ): Promise<LivestreamQuestionComment>
 }
 
 export class FirebaseLivestreamRepository
@@ -1486,92 +1444,6 @@ export class FirebaseLivestreamRepository
       }
 
       return questionsRef.update(updateData)
-   }
-
-   async deleteQuestionComment(
-      livestreamId: string,
-      questionId: string,
-      commentId: string
-   ): Promise<void> {
-      const commentsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(questionId)
-         .collection("comments")
-         .doc(commentId)
-
-      return commentsRef.delete()
-   }
-
-   async deleteQuestion(
-      livestreamId: string,
-      questionId: string
-   ): Promise<void> {
-      const batch = this.firestore.batch()
-
-      const questionsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(questionId)
-
-      // delete all comments
-      const commentsRef = questionsRef.collection("comments")
-      const commentsSnaps = await commentsRef.get()
-
-      commentsSnaps.docs.forEach((doc) => {
-         batch.delete(doc.ref)
-      })
-
-      batch.delete(questionsRef)
-
-      return batch.commit()
-   }
-
-   async getQuestion(
-      livestreamId: string,
-      questionId: string
-   ): Promise<LivestreamQuestion> {
-      const questionsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(questionId)
-         .withConverter(createCompatGenericConverter<LivestreamQuestion>())
-
-      const doc = await questionsRef.get()
-
-      if (!doc.exists) {
-         return null
-      }
-
-      return doc.data()
-   }
-
-   async getQuestionComment(
-      livestreamId: string,
-      questionId: string,
-      commentId: string
-   ): Promise<LivestreamQuestionComment> {
-      const commentsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(questionId)
-         .collection("comments")
-         .doc(commentId)
-         .withConverter(
-            createCompatGenericConverter<LivestreamQuestionComment>()
-         )
-
-      const doc = await commentsRef.get()
-
-      if (!doc.exists) {
-         return null
-      }
-
-      return doc.data()
    }
 }
 

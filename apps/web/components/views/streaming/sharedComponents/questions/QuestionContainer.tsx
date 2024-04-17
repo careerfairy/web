@@ -46,7 +46,10 @@ import Stack from "@mui/material/Stack"
 import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/dist/users/UserBadges"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useStreamingRef } from "components/custom-hook/live-stream/useStreamRoomRef"
-import { hasUpvotedLivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import {
+   checkIsQuestionAuthor,
+   hasUpvotedLivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
 
 const styles = sxStyles({
    chatInput: {
@@ -245,12 +248,10 @@ const QuestionContainer = ({
    )
 
    const canDeleteQuestion =
-      Boolean(
+      (checkIsQuestionAuthor(question, authenticatedUser) ||
          streamer ||
-            userData?.userEmail === question?.author ||
-            userData?.isAdmin ||
-            presenter.isStreamAdmin(adminGroups)
-      ) && !questionIsBeingAnswered
+         presenter.isStreamAdmin(adminGroups)) &&
+      !questionIsBeingAnswered
 
    useEffect(() => {
       if (livestream.id && question.id && showAllReactions) {

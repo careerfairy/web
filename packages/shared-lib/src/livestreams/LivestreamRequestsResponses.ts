@@ -47,18 +47,3 @@ export type ResetLivestreamQuestionRequest = {
    livestreamToken: string
    questionId: string | null
 }
-
-export type DeleteLivestreamQuestionRequest = {
-   questionId: string
-   agoraUserId: string
-   livestreamToken: string | null
-   livestreamId: string
-}
-
-export type DeleteLivestreamQuestionCommentRequest = {
-   questionId: string
-   commentId: string
-   agoraUserId: string
-   livestreamToken: string | null
-   livestreamId: string
-}
