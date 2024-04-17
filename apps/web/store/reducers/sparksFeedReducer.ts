@@ -7,7 +7,6 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
-import { SparkInteractionSourceType } from "@careerfairy/shared-lib/sparks/telemetry"
 
 type Status = "idle" | "loading" | "failed"
 
@@ -45,7 +44,7 @@ interface SparksState {
    jobToOpen: string | null
    autoAction: AutomaticActions
    conversionCardInterval: number
-   interactionSource: SparkInteractionSourceType
+   interactionSource: string
 }
 
 const initialState: SparksState = {
@@ -213,10 +212,7 @@ const sparksFeedSlice = createSlice({
       setCameFromCompanyPageLink: (state, action: PayloadAction<string>) => {
          state.cameFromCompanyPageLink = action.payload
       },
-      setInteractionSource: (
-         state,
-         action: PayloadAction<SparkInteractionSourceType>
-      ) => {
+      setInteractionSource: (state, action: PayloadAction<string>) => {
          state.interactionSource = action.payload
       },
       setEventToRegisterTo: (state, action: PayloadAction<string>) => {

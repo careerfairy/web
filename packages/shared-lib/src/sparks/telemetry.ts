@@ -36,7 +36,7 @@ type CommonClientFields = {
    /**
     * The source of the Spark interaction (e.g., livestream_registration_flow, portal, company_page).
     */
-   interactionSource: SparkInteractionSourceType | null
+   interactionSource: string | null
 }
 
 /**
@@ -147,6 +147,3 @@ export const SparkInteractionSources = {
    Livestream_Registration_Flow: "livestream_registration_flow",
    Company_Page: "company_page",
 } as const
-
-export type SparkInteractionSourceType =
-   (typeof SparkInteractionSources)[keyof typeof SparkInteractionSources]
