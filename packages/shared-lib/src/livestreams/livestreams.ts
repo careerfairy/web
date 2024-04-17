@@ -519,7 +519,12 @@ export interface LivestreamQuestionComment extends Identifiable {
    /**
     * The auth uid of the user that created the comment
     */
-   uid?: string
+   userUid?: string
+
+   /**
+    * The agoraUserId generated for the user for that particular livestream
+    */
+   agoraUserId?: string
 }
 
 // Collection Path: livestreams/{livestreamId}/polls/{pollId}

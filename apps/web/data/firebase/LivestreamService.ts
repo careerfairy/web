@@ -782,13 +782,16 @@ export class LivestreamService {
     * Adds a comment to a question.
     * @param livestreamRef - Livestream document reference.
     * @param questionId - Question ID.
-    * @param options - Comment options.
+    * @param data - New comment data.
     * @returns A promise resolved with the result of the comment operation.
     */
    async commentOnQuestion(
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string,
-      options: Pick<LivestreamQuestionComment, "title" | "author" | "uid">
+      data: Pick<
+         LivestreamQuestionComment,
+         "title" | "author" | "userUid" | "agoraUserId"
+      >
    ) {
       const questionRef = this.getQuestionRef(livestreamRef, questionId)
 
@@ -802,12 +805,14 @@ export class LivestreamService {
          if (questionDoc.exists()) {
             const question = questionDoc.data()
 
-            const newComment = {
+            const newComment: LivestreamQuestionComment = {
                id: commentRef.id,
-               title: options.title,
-               author: options.author,
+               title: data.title,
+               author: data.author,
+               userUid: data.userUid || "",
+               agoraUserId: data.agoraUserId || "",
                timestamp: Timestamp.now(),
-            } satisfies PartialWithFieldValue<LivestreamQuestionComment>
+            }
 
             transaction.update(questionRef, {
                numberOfComments: increment(1),

@@ -308,7 +308,7 @@ const QuestionContainer = ({
          await livestreamService.commentOnQuestion(streamingRef, question.id, {
             title: newCommentTitle,
             author: getAuthor(),
-            uid: authenticatedUser.uid,
+            userUid: authenticatedUser.uid,
          })
 
          setNewCommentTitle("")
