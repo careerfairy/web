@@ -11,7 +11,7 @@ import { ThumbsUp, CheckCircle } from "react-feather"
 import { LoadingButton } from "@mui/lab"
 import { useAuth } from "HOCs/AuthProvider"
 import { CommentInput } from "./CommentInput"
-import { QuestionComments } from "./Comments"
+import { CommentsList } from "./CommentsList"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -167,7 +167,7 @@ const Content = ({ question, topPadding }: ContentProps) => {
                <StreamerActions question={question} />
                <Stack spacing={1}>
                   <CommentInput />
-                  <QuestionComments question={question} />
+                  <CommentsList question={question} />
                </Stack>
             </Stack>
          </Stack>
