@@ -473,7 +473,7 @@ export type LivestreamEventPublicData = Partial<
 // Collection Path: livestreams/{livestreamId}/questions/{questionId}
 export interface LivestreamQuestion extends Identifiable {
    /**
-    * The email, auth uid, or temporary ID(uuidv4) of the user that created the question
+    * The email or auth uid of the user that created the question
     */
    author: string
    timestamp: firebase.firestore.Timestamp
@@ -500,6 +500,10 @@ export interface LivestreamQuestion extends Identifiable {
    badges: string[]
 
    displayName?: string
+   /*
+    * The agoraUserId generated for the user for that particular livestream
+    */
+   agoraUserId?: string
 }
 
 // Collection Path: livestreams/{livestreamId}/questions/{questionId}/comments/{commentId}
