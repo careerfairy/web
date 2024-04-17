@@ -1,22 +1,15 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
-import {
-   Box,
-   ButtonBase,
-   ButtonBaseProps,
-   Collapse,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { Box, Collapse, Stack, Typography } from "@mui/material"
 import { useStopLivestreamPoll } from "components/custom-hook/streaming/useStopLivestreamPoll"
 import dynamic from "next/dynamic"
 import React, { useState } from "react"
-import { ChevronDown, ChevronUp } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useStartLivestreamPoll } from "components/custom-hook/streaming/useStartLivestreamPoll"
 import { PollOptions } from "./PollOptions"
 import { TotalVotesCount } from "./TotalVotesCount"
+import { CollapseButton } from "../Buttons/CollapseButton"
 
 const CreateOrEditPollForm = dynamic(() =>
    import("./CreateOrEditPollForm").then((mod) => mod.CreateOrEditPollForm)
@@ -163,51 +156,29 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
             </Collapse>
             {Boolean(isHost) && poll.state !== "current" && (
                <CollapseButton
-                  showResults={showOptions}
+                  open={showOptions}
                   onClick={() => setShowOptions((prev) => !prev)}
-                  paddedTop={Boolean(
-                     showOptions &&
-                        (showActionButton || poll.state === "closed")
-                  )}
-                  pollClosed={poll.state === "closed"}
+                  sx={
+                     Boolean(
+                        showOptions &&
+                           (showActionButton || poll.state === "closed")
+                     ) && styles.topMargin
+                  }
+                  color={
+                     poll.state === "closed" ? "neutral.400" : "neutral.700"
+                  }
+                  openText={
+                     poll.state === "closed" ? "Hide results" : "Hide details"
+                  }
+                  closeText={
+                     poll.state === "closed" ? "Show results" : "Show details"
+                  }
                />
             )}
          </Box>
       )
    }
 )
-
-type CollapseButtonProps = {
-   showResults: boolean
-   paddedTop?: boolean
-   pollClosed?: boolean
-} & ButtonBaseProps
-
-const CollapseButton = ({
-   showResults,
-   paddedTop,
-   pollClosed,
-   ...rest
-}: CollapseButtonProps) => {
-   const noun = pollClosed ? "results" : "details"
-
-   return (
-      <Stack
-         justifyContent="space-between"
-         alignItems="center"
-         direction="row"
-         sx={[styles.expandButton, paddedTop && styles.topMargin]}
-         component={ButtonBase}
-         color={pollClosed ? "neutral.400" : "neutral.700"}
-         {...rest}
-      >
-         <Typography variant="small">
-            {showResults ? `Hide ${noun}` : `Show ${noun}`}
-         </Typography>
-         {showResults ? <ChevronUp /> : <ChevronDown />}
-      </Stack>
-   )
-}
 
 const POLL_STATUS_TEXT_COLOR = {
    current: "primary.main",
