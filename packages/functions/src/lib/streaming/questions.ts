@@ -9,6 +9,10 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    LivestreamEvent,
    ResetLivestreamQuestionRequest,
+   DeleteLivestreamQuestionRequest,
+   DeleteLivestreamQuestionCommentRequest,
+   checkIsQuestionAuthor,
+   checkIsQuestionCommentAuthor,
 } from "@careerfairy/shared-lib/livestreams"
 
 const markQuestionAsCurrentSchema: yup.SchemaOf<MarkLivestreamQuestionAsCurrentRequest> =
@@ -23,6 +27,23 @@ const resetQuestionSchema: yup.SchemaOf<ResetLivestreamQuestionRequest> =
       livestreamId: yup.string().required(),
       livestreamToken: yup.string().nullable(),
       questionId: yup.string().notRequired(),
+   })
+
+const deleteQuestionSchema: yup.SchemaOf<DeleteLivestreamQuestionRequest> =
+   yup.object({
+      livestreamId: yup.string().required(),
+      livestreamToken: yup.string().nullable(),
+      questionId: yup.string().required(),
+      agoraUserId: yup.string().required(),
+   })
+
+const deleteQuestionCommentSchema: yup.SchemaOf<DeleteLivestreamQuestionCommentRequest> =
+   yup.object({
+      livestreamId: yup.string().required(),
+      livestreamToken: yup.string().nullable(),
+      questionId: yup.string().required(),
+      commentId: yup.string().required(),
+      agoraUserId: yup.string().required(),
    })
 
 type Context = {
@@ -95,3 +116,101 @@ export const resetQuestion = functions.region(config.region).https.onCall(
       }
    )
 )
+
+export const deleteQuestion = functions.region(config.region).https.onCall(
+   middlewares<Context, DeleteLivestreamQuestionRequest>(
+      dataValidation(deleteQuestionSchema),
+      livestreamExists(),
+      async (requestData, context) => {
+         const { livestreamId, livestreamToken, questionId, agoraUserId } =
+            requestData
+
+         const question = await livestreamsRepo.getQuestion(
+            livestreamId,
+            questionId
+         )
+
+         const isAuthor = checkIsQuestionAuthor(question, {
+            email: context.auth?.token?.email,
+            uid: context.auth?.token?.uid,
+            agoraUid: agoraUserId,
+         })
+
+         if (!isAuthor) {
+            await validateLivestreamToken(
+               context.auth?.token?.email,
+               context.middlewares.livestream,
+               livestreamToken
+            )
+         }
+
+         functions.logger.info("Deleting question", {
+            livestreamId,
+            questionId,
+         })
+
+         await livestreamsRepo.deleteQuestion(livestreamId, questionId)
+
+         functions.logger.info("Question and its comments deleted", {
+            livestreamId,
+            questionId,
+         })
+      }
+   )
+)
+
+export const deleteQuestionComment = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares<Context, DeleteLivestreamQuestionCommentRequest>(
+         dataValidation(deleteQuestionCommentSchema),
+         livestreamExists(),
+         async (requestData, context) => {
+            const {
+               livestreamId,
+               livestreamToken,
+               questionId,
+               commentId,
+               agoraUserId,
+            } = requestData
+
+            const comment = await livestreamsRepo.getQuestionComment(
+               livestreamId,
+               questionId,
+               commentId
+            )
+
+            const isAuthor = checkIsQuestionCommentAuthor(comment, {
+               email: context.auth?.token?.email,
+               uid: context.auth?.token?.uid,
+               agoraUid: agoraUserId,
+            })
+
+            if (!isAuthor) {
+               await validateLivestreamToken(
+                  context.auth?.token?.email,
+                  context.middlewares.livestream,
+                  livestreamToken
+               )
+            }
+
+            functions.logger.info("Deleting question comment", {
+               livestreamId,
+               questionId,
+               commentId,
+            })
+
+            await livestreamsRepo.deleteQuestionComment(
+               livestreamId,
+               questionId,
+               commentId
+            )
+
+            functions.logger.info("Question comment deleted", {
+               livestreamId,
+               questionId,
+               commentId,
+            })
+         }
+      )
+   )
