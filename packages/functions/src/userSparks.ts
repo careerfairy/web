@@ -16,7 +16,6 @@ import {
    SparkSecondWatched,
    SparkEventClient,
    SparkSecondsWatchedClientPayload,
-   SparkInteractionSources,
 } from "@careerfairy/shared-lib/sparks/telemetry"
 import { getCountryCode } from "./util"
 
@@ -132,9 +131,7 @@ const sparkEventClientSchema: SchemaOf<SparkClientEventsPayload> =
             universityId: string().nullable(),
             fieldOfStudy: string().nullable(),
             levelOfStudy: string().nullable(),
-            interactionSource: mixed()
-               .nullable()
-               .oneOf([...Object.values(SparkInteractionSources), null]),
+            interactionSource: string().nullable(),
          })
       ),
    })
@@ -178,9 +175,7 @@ const sparkSecondsWatchedClientSchema: SchemaOf<SparkSecondsWatchedClientPayload
             universityId: string().nullable(),
             fieldOfStudy: string().nullable(),
             levelOfStudy: string().nullable(),
-            interactionSource: mixed()
-               .nullable()
-               .oneOf([...Object.values(SparkInteractionSources), null]),
+            interactionSource: string().nullable(),
          })
       ),
    })
