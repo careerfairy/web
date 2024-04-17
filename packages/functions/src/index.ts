@@ -121,8 +121,6 @@ exports.fetchStripePrice = stripe.fetchStripePrice
 exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 
 // Livestreams
-exports.setFirstCommentOfQuestionOnCreate =
-   livestreams.setFirstCommentOfQuestionOnCreate
 exports.sendLivestreamRegistrationConfirmationEmail_v2 =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
