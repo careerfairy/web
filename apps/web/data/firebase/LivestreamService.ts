@@ -18,8 +18,6 @@ import {
    LivestreamQuestion,
    LivestreamQuestionComment,
    hasUpvotedLivestreamQuestion,
-   DeleteLivestreamQuestionRequest,
-   DeleteLivestreamQuestionCommentRequest,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -45,7 +43,6 @@ import {
    arrayUnion,
    collection,
    collectionGroup,
-   deleteDoc,
    doc,
    documentId,
    getDoc,
@@ -670,16 +667,27 @@ export class LivestreamService {
    }
 
    /**
-    * Deletes a question from a livestream using a callable cloud function
-    * @param options - Options
+    * Deletes a question from a livestream along with all its comments
+    * @param livestreamRef - Livestream document reference
+    * @param questionId - Question ID
     */
-   deleteQuestionCallable = async (
-      options: DeleteLivestreamQuestionRequest
+   deleteQuestion = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string
    ) => {
-      await httpsCallable<DeleteLivestreamQuestionRequest>(
-         this.functions,
-         "deleteQuestion"
-      )(options)
+      const batch = writeBatch(FirestoreInstance)
+      const ref = this.getQuestionRef(livestreamRef, questionId)
+
+      const commentsRef = collection(ref, "comments")
+      const comments = await getDocs(commentsRef)
+
+      comments.forEach((comment) => {
+         batch.delete(comment.ref)
+      })
+
+      batch.delete(ref)
+
+      return batch.commit()
    }
 
    /**
@@ -687,44 +695,59 @@ export class LivestreamService {
     * @param options - Options
     */
    deleteQuestionComment = async (
-      options: DeleteLivestreamQuestionCommentRequest
-   ) => {
-      await httpsCallable<DeleteLivestreamQuestionCommentRequest>(
-         this.functions,
-         "deleteQuestionComment"
-      )(options)
-   }
-
-   /**
-    * Deletes a question from a livestream
-    * @param livestreamId - Livestream ID
-    * @param questionId - Question ID
-    * @returns A promise resolved with the result of the delete operation
-    */
-   deleteQuestion = async (
       livestreamRef: DocumentReference<LivestreamEvent>,
-      questionId: string
+      questionId: string,
+      commentId: string
    ) => {
-      const ref = this.getQuestionRef(livestreamRef, questionId)
-      return deleteDoc(ref)
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ref = this.getCommentRef(livestreamRef, questionId, commentId)
+
+         const questionRef = this.getQuestionRef(livestreamRef, questionId)
+
+         const questionDoc = await transaction.get(questionRef)
+
+         if (questionDoc.exists()) {
+            transaction.update(questionRef, {
+               numberOfComments: increment(-1),
+            })
+         }
+
+         transaction.delete(ref)
+      })
    }
 
    /**
-    * Returns a reference to a question in a livestream or breakout room.
-    * If a question ID is provided, it returns a reference to an existing question.
-    * If no question ID is provided, it creates a new question reference in the specified breakout room or in the main livestream if no breakout room ID is provided.
-    * @param livestreamRef - Livestream document reference.
-    * @param questionId - Optional question ID.
-    * @returns Firestore document reference for the question.
+    * Retrieves or creates a Firestore document reference for a question within a livestream or breakout room.
+    * @param livestreamRef - Reference to the livestream/breakout room document.
+    * @param questionId - Question ID
+    * @returns Document reference for the question.
     */
    private getQuestionRef(
       livestreamRef: DocumentReference<LivestreamEvent>,
-      questionId?: string
+      questionId: string
    ) {
       return doc(
          collection(livestreamRef, "questions"),
-         ...(questionId ? [questionId] : [])
+         questionId
       ).withConverter(createGenericConverter<LivestreamQuestion>())
+   }
+
+   /**
+    * Get a comment reference to a question from a livestream or breakout room
+    * @param livestreamRef - Reference to the livestream/breakout room document
+    * @param questionId - Question ID
+    * @param commentId - Comment ID
+    * @returns Document reference for the comment
+    */
+   private getCommentRef(
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string,
+      commentId: string
+   ) {
+      const questionRef = this.getQuestionRef(livestreamRef, questionId)
+      return doc(collection(questionRef, "comments"), commentId).withConverter(
+         createGenericConverter<LivestreamQuestionComment>()
+      )
    }
 
    /**
@@ -740,10 +763,12 @@ export class LivestreamService {
          "title" | "displayName" | "author" | "badges"
       >
    ) => {
-      const ref = this.getQuestionRef(livestreamRef)
+      const newQuestionRef = doc(
+         collection(livestreamRef, "questions")
+      ).withConverter(createGenericConverter<LivestreamQuestion>())
 
       const newQuestion = {
-         id: ref.id,
+         id: newQuestionRef.id,
          badges: options.badges,
          title: options.title,
          displayName: options.displayName,
@@ -757,7 +782,7 @@ export class LivestreamService {
          type: "new",
       } satisfies PartialWithFieldValue<LivestreamQuestion>
 
-      await setDoc(ref, newQuestion)
+      await setDoc(newQuestionRef, newQuestion)
 
       return newQuestion
    }
@@ -826,7 +851,7 @@ export class LivestreamService {
       return runTransaction(FirestoreInstance, async (transaction) => {
          const questionDoc = await transaction.get(questionRef)
 
-         const commentRef = doc(
+         const newCommentRef = doc(
             collection(questionRef, "comments")
          ).withConverter(createGenericConverter<LivestreamQuestionComment>())
 
@@ -834,7 +859,7 @@ export class LivestreamService {
             const question = questionDoc.data()
 
             const newComment: LivestreamQuestionComment = {
-               id: commentRef.id,
+               id: newCommentRef.id,
                title: data.title,
                author: data.author,
                userUid: data.userUid || "",
@@ -847,7 +872,7 @@ export class LivestreamService {
                ...(question.firstComment ? {} : { firstComment: newComment }),
             })
 
-            transaction.set(commentRef, newComment)
+            transaction.set(newCommentRef, newComment)
          } else {
             throw new Error(
                `Question ${questionId} does not exist at path ${questionRef.path}`
