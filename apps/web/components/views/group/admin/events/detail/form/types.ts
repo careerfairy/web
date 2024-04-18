@@ -8,12 +8,19 @@ import {
    GroupOption,
    GroupQuestion,
 } from "@careerfairy/shared-lib/groups"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
-   EventRating,
    LivestreamEvent,
-   LivestreamGroupQuestions,
+   LivestreamLanguage,
 } from "@careerfairy/shared-lib/livestreams"
-import { LivestreamCreator } from "./views/questions/commons"
+import {
+   FeedbackQuestionFormValues,
+   RegistrationQuestionFormValues,
+} from "./views/questions/commons"
+
+export type LivestreamFormSpeaker = Creator & {
+   isCreator?: boolean
+}
 
 export type LivestreamFormGeneralTabValues = {
    title: string
@@ -23,10 +30,13 @@ export type LivestreamFormGeneralTabValues = {
    backgroundImageUrl: string
    startDate: Date
    duration: number
-   language: string
+   language: LivestreamLanguage
    summary: string
    reasonsToJoin: string[]
-   categories: GroupOption[]
+   categories: {
+      values: GroupOption[]
+      options: GroupOption[]
+   }
    targetCountries: GroupOption[]
    targetUniversities: GroupOption[]
    targetFieldsOfStudy: FieldOfStudy[]
@@ -35,16 +45,17 @@ export type LivestreamFormGeneralTabValues = {
 }
 
 export type LivestreamFormSpeakersTabValues = {
-   values: LivestreamCreator[]
-   options: LivestreamCreator[]
+   values: Creator[]
+   options: LivestreamFormSpeaker[]
+   creatorsIds: Creator["id"][]
 }
 
-export type RegistrationQuestion = Omit<LivestreamGroupQuestions, "questions"> &
-   GroupQuestion
-
 export type LivestreamFormQuestionsTabValues = {
-   registrationQuestions: RegistrationQuestion[]
-   feedbackQuestions: EventRating[]
+   registrationQuestions: {
+      values: RegistrationQuestionFormValues[]
+      options: GroupQuestion[]
+   }
+   feedbackQuestions: FeedbackQuestionFormValues[]
    hosts: Group[]
 }
 
