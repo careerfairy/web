@@ -1,5 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Chip, Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useEffect } from "react"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
@@ -19,6 +20,7 @@ const RegistrationQuestionsListForCFAdmin = () => {
       isValidating: groupsValidating,
       error,
    } = useGroupsSWR()
+
    const { livestream } = useLivestreamCreationContext()
    const {
       values: { questions },
@@ -30,7 +32,7 @@ const RegistrationQuestionsListForCFAdmin = () => {
          const initialValue = allGroups.filter((group) =>
             livestream.groupIds.includes(group.groupId)
          )
-         setFieldValue("questions.hosts", initialValue, false)
+         setFieldValue("questions.hosts", initialValue)
       }
    }, [
       allGroups,
@@ -53,9 +55,8 @@ const RegistrationQuestionsListForCFAdmin = () => {
          </Stack>
       )
    }
-
    return (
-      <>
+      <SuspenseWithBoundary>
          <MultiChipSelect
             id="questions.hosts"
             options={allGroups}
@@ -66,21 +67,26 @@ const RegistrationQuestionsListForCFAdmin = () => {
                label: "Live Stream Hosts",
                placeholder: "Add some hosts to your live stream",
             }}
+            isOptionEqualToValue={(option, value) =>
+               option.groupId === value.groupId
+            }
             getOptionLabel={(group: Group) => group.universityName}
             onChange={async (_, value) => {
                const registrationQuestionsFiltered =
-                  questions.registrationQuestions.filter((question) =>
-                     value.some((group) => group.id === question.groupId)
+                  questions.registrationQuestions.values.filter((question) =>
+                     value.some((group) => group.groupId === question.groupId)
                   )
                await Promise.all([
                   setFieldValue(
-                     "questions.registrationQuestions",
+                     "questions.registrationQuestions.values",
                      registrationQuestionsFiltered
                   ),
                   setFieldValue("questions.hosts", value),
                ])
             }}
-            getOptionDisabled={(group) => group.id === currentGroup.groupId}
+            getOptionDisabled={(group) =>
+               group.groupId === currentGroup.groupId
+            }
             renderTags={(value: Group[], getTagProps) => {
                const sortedValues = value.sort((a, b) =>
                   a.universityName.localeCompare(b.universityName)
@@ -110,7 +116,7 @@ const RegistrationQuestionsListForCFAdmin = () => {
             }}
          />
          <GroupedRegistrationQuestions allGroups={allGroups} />
-      </>
+      </SuspenseWithBoundary>
    )
 }
 
