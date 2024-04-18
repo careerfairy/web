@@ -1,4 +1,3 @@
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import MultiChipSelect from "../general/components/MultiChipSelect"
@@ -10,14 +9,12 @@ const RegistrationQuestions = () => {
    } = useLivestreamFormValues()
    const { isCFAdmin } = useLivestreamCreationContext()
 
-   const { groupQuestions } = useGroup()
-
    if (!isCFAdmin) {
       return (
          <MultiChipSelect
-            id="questions.registrationQuestions"
-            options={groupQuestions}
-            value={questions.registrationQuestions ?? []}
+            id="questions.registrationQuestions.values"
+            options={questions.registrationQuestions.options}
+            value={questions.registrationQuestions.values ?? []}
             multiple
             disableCloseOnSelect
             textFieldProps={{
