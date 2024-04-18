@@ -49,6 +49,10 @@
       {
          "name": "universityName",
          "type": "string"
+      },
+      {
+         "name": "universityCode",
+         "type": "string"
       }
    ]
 }
