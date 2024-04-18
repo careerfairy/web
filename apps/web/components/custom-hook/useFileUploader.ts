@@ -1,5 +1,5 @@
 import { FileUploaderProps } from "components/views/common/FileUploader"
-import { useCallback, useState, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import useSnackbarNotifications from "./useSnackbarNotifications"
 
 type UseFileUploaderParams = {
@@ -7,7 +7,9 @@ type UseFileUploaderParams = {
    maxFileSize: number
    multiple?: boolean
    onValidated: (file: File | File[]) => void
+   onCancel?: FileUploaderProps["onCancel"]
    customValidations?: FileUploaderProps["customValidations"]
+   name?: FileUploaderProps["name"]
 }
 
 type UseFileUploader = {
@@ -21,6 +23,8 @@ const useFileUploader = ({
    multiple = false,
    onValidated: onSelect,
    customValidations,
+   onCancel,
+   name,
 }: UseFileUploaderParams): UseFileUploader => {
    const [dragActive, setDragActive] = useState(false)
    const { errorNotification } = useSnackbarNotifications()
@@ -44,6 +48,8 @@ const useFileUploader = ({
             onDraggingStateChange: setDragActive,
             handleChange: onSelect,
             customValidations,
+            onCancel,
+            name,
          },
          dragActive,
       }),
@@ -53,8 +59,10 @@ const useFileUploader = ({
          multiple,
          maxFileSize,
          onSelect,
+         onCancel,
          customValidations,
          dragActive,
+         name,
       ]
    )
 }
