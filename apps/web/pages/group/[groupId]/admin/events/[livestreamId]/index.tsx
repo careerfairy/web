@@ -1,6 +1,7 @@
 import useAdminGroup from "components/custom-hook/useAdminGroup"
-import { LivestreamButtonActions } from "components/views/admin/livestream/LivestreamButtonActions"
+import { LivestreamAutoSaveContextProvider } from "components/views/group/admin/events/detail/LivestreamAutoSaveContext"
 import { LivestreamCreationContextProvider } from "components/views/group/admin/events/detail/LivestreamCreationContext"
+import { LivestreamTopActions } from "components/views/group/admin/events/detail/LivestreamTopActions"
 import LivestreamForm from "components/views/group/admin/events/detail/form/LivestreamForm"
 import LivestreamFormikProvider from "components/views/group/admin/events/detail/form/LivestreamFormikProvider"
 import LivestreamAdminDetailTopBarNavigation from "components/views/group/admin/events/detail/navigation/LivestreamAdminDetailTopBarNavigation"
@@ -27,21 +28,24 @@ const LivestreamAdminDetailsPage = () => {
                   livestream={livestream}
                   group={group}
                >
-                  <GroupDashboardLayout
-                     titleComponent={"Live stream Details"}
-                     groupId={groupId as string}
-                     topBarCta={<LivestreamButtonActions />}
-                     topBarNavigation={
-                        <LivestreamAdminDetailTopBarNavigation />
-                     }
-                     bottomBarNavigation={
-                        <LivestreamAdminDetailBottomBarNavigation />
-                     }
-                     backgroundColor="#FDFDFD"
-                  >
-                     <DashboardHead title="CareerFairy | Editing Live Stream of " />
-                     <LivestreamForm />
-                  </GroupDashboardLayout>
+                  <LivestreamAutoSaveContextProvider>
+                     <GroupDashboardLayout
+                        titleComponent={"Live stream Details"}
+                        groupId={groupId as string}
+                        topBarCta={<LivestreamTopActions />}
+                        topBarMobileCta={<LivestreamTopActions />}
+                        topBarNavigation={
+                           <LivestreamAdminDetailTopBarNavigation />
+                        }
+                        bottomBarNavigation={
+                           <LivestreamAdminDetailBottomBarNavigation />
+                        }
+                        backgroundColor="#FDFDFD"
+                     >
+                        <DashboardHead title="CareerFairy | Editing Live Stream of " />
+                        <LivestreamForm />
+                     </GroupDashboardLayout>
+                  </LivestreamAutoSaveContextProvider>
                </LivestreamCreationContextProvider>
             </LivestreamFormikProvider>
          )}
