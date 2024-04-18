@@ -1,17 +1,18 @@
+import firebase from "firebase/compat/app"
+import { Job, JobIdentifier } from "../ats/Job"
 import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
+import { PublicCustomJob } from "../customJobs/customJobs"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Group, GroupQuestion } from "../groups"
+import { Creator } from "../groups/creators"
 import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserPublicData,
    UserStats,
 } from "../users"
-import firebase from "firebase/compat/app"
-import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
-import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
-import { PublicCustomJob } from "../customJobs/customJobs"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 4
@@ -139,7 +140,7 @@ export interface LivestreamEvent extends Identifiable {
     * This is used for data relationship and syncing purposes.
     * Relates with creators in careerCenterData/creator sub collection.
     */
-   creatorsIds?: Speaker["id"][]
+   creatorsIds?: Creator["id"][]
 
    /**
     * The actual details of the speakers in the livestream
@@ -242,6 +243,7 @@ export type LivestreamMode =
 export type LivestreamLanguage = {
    code?: string
    name?: string
+   shortName?: string
 }
 
 export type AuthorInfo = {
