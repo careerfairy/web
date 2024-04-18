@@ -1,9 +1,4 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { MoreVertical, X as DeleteIcon, Edit2 as EditIcon } from "react-feather"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import useMenuState from "components/custom-hook/useMenuState"
-import BrandedMenu from "components/views/common/inputs/BrandedMenu"
-import { Dispatch, FC, ReactElement, SetStateAction, useState } from "react"
 import {
    Box,
    Divider,
@@ -12,6 +7,11 @@ import {
    SwipeableDrawer,
    SxProps,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import useMenuState from "components/custom-hook/useMenuState"
+import BrandedMenu from "components/views/common/inputs/BrandedMenu"
+import { Dispatch, ReactElement, SetStateAction, useState } from "react"
+import { X as DeleteIcon, Edit2 as EditIcon, MoreVertical } from "react-feather"
 
 const styles = sxStyles({
    icon: {
@@ -57,11 +57,11 @@ type MobileDrawerProps = {
    setIsDrawerOpen: Dispatch<SetStateAction<boolean>>
 } & MoreMenuProps
 
-const MobileDrawer: FC<MobileDrawerProps> = ({
+const MobileDrawer = ({
    isDrawerOpen,
    setIsDrawerOpen,
    options,
-}) => {
+}: MobileDrawerProps) => {
    return (
       <SwipeableDrawer
          anchor="bottom"
@@ -95,7 +95,7 @@ type MoreMenuProps = {
    options: Option[]
 }
 
-const MoreMenu: FC<MoreMenuProps> = ({ options }) => {
+const MoreMenu = ({ options }: MoreMenuProps) => {
    const isMobile = useIsMobile()
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -160,13 +160,13 @@ type MoreMenuWithEditAndRemoveProps = {
    labels?: string[]
 }
 
-const defaultLabels = ["Edit details", "Remove item"] as const
+const defaultLabels = ["Edit details", "Remove item"]
 
-const MoreMenuWithEditAndRemoveOptions: FC<MoreMenuWithEditAndRemoveProps> = ({
+const MoreMenuWithEditAndRemoveOptions = ({
    handleEdit,
    handleRemove,
    labels = defaultLabels,
-}) => {
+}: MoreMenuWithEditAndRemoveProps) => {
    const options: MoreMenuProps["options"] = [
       {
          label: labels[0],
