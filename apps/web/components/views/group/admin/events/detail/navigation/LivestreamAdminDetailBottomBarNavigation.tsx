@@ -1,9 +1,10 @@
 import { Box, Button, IconButton, SwipeableDrawer } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ElementType, FC, useState } from "react"
+import { ElementType, useState } from "react"
 import { ChevronLeft, ChevronRight, IconProps, Info } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
+import { PublishButton } from "../PublishButton"
 import InvalidAlertDialog from "../form/InvalidAlertDialog"
 import { InvalidAlertTooltipContent } from "../form/InvalidAlertTooltip"
 import { TAB_VALUES } from "../form/commons"
@@ -56,10 +57,10 @@ const styles = sxStyles({
 type ButtonOrIconButtonProps = React.ComponentProps<typeof Button> &
    React.ComponentProps<typeof IconButton>
 
-const ButtonOrIconButton: FC<ButtonOrIconButtonProps> = ({
+const ButtonOrIconButton = ({
    children,
    ...props
-}) => {
+}: ButtonOrIconButtonProps) => {
    const isMobile = useIsMobile()
 
    return isMobile ? (
@@ -76,7 +77,7 @@ type ButtonContentProps = {
    Icon: ElementType<IconProps>
 }
 
-const ButtonContent: FC<ButtonContentProps> = ({ label, Icon }) => {
+const ButtonContent = ({ label, Icon }: ButtonContentProps) => {
    const isMobile = useIsMobile()
 
    const mobileIconSize = 32
@@ -122,6 +123,7 @@ const LivestreamAdminDetailBottomBarNavigation = () => {
             </ButtonOrIconButton>
          </Box>
          <InvalidAlertDialog />
+         {Boolean(isMobile) && <PublishButton />}
          {Boolean(isMobile && shouldShowAlertIndicator) && (
             <InvalidAlertMobile />
          )}
