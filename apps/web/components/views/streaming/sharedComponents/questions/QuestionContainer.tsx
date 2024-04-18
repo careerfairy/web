@@ -310,7 +310,7 @@ const QuestionContainer = ({
             title: newCommentTitle,
             author: getAuthor(),
             userUid: authenticatedUser.uid,
-            authorType: userData.isAdmin
+            authorType: userData?.isAdmin
                ? "careerfairy"
                : streamer
                ? "streamer"
