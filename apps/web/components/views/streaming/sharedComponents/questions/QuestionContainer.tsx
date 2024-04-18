@@ -310,6 +310,11 @@ const QuestionContainer = ({
             title: newCommentTitle,
             author: getAuthor(),
             userUid: authenticatedUser.uid,
+            authorType: userData.isAdmin
+               ? "careerfairy"
+               : streamer
+               ? "streamer"
+               : "viewer",
          })
 
          setNewCommentTitle("")
