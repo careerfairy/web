@@ -7,7 +7,7 @@ import useSWR from "swr"
 import { LivestreamFormQuestionsTabValues } from "../../types"
 
 type GroupQuestionsByGroup =
-   LivestreamFormQuestionsTabValues["registrationQuestions"]
+   LivestreamFormQuestionsTabValues["registrationQuestions"]["values"]
 
 type ReturnType = {
    groupsQuestions: GroupQuestionsByGroup
