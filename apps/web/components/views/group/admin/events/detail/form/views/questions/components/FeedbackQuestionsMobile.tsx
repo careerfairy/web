@@ -1,10 +1,12 @@
-import { FC, useCallback, useState } from "react"
-import RemoveQuestion from "./RemoveQuestion"
-import { SwipeableDrawer } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { FeedbackQuestionsProp } from "../commons"
+import { SwipeableDrawer } from "@mui/material"
+import { useCallback, useState } from "react"
+import { useLivestreamCreationContext } from "../../../../LivestreamCreationContext"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { getNewQuestionFormValues } from "../commons"
 import AddQuestionButton from "./AddQuestionButton"
 import FeedbackQuestionMobile from "./FeedbackQuestionMobile"
+import RemoveQuestion from "./RemoveQuestion"
 
 const styles = sxStyles({
    drawer: {
@@ -15,36 +17,64 @@ const styles = sxStyles({
    },
 })
 
-const FeedbackQuestionsMobile: FC<
-   FeedbackQuestionsProp & { handleAddQuestionClick: () => void }
-> = ({
-   questions,
-   handleAddQuestionClick, // this is for testing purposes only
-}) => {
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const FeedbackQuestionsMobile = () => {
+   const {
+      values: { questions },
+      setFieldValue,
+   } = useLivestreamFormValues()
+   const { livestream } = useLivestreamCreationContext()
    const [currentQuestion, setCurrentQuestion] = useState(null)
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-   const handleEdit = useCallback((_, question) => {
-      setCurrentQuestion(question)
-   }, [])
-
-   const handleRemove = useCallback((_, question) => {
+   const handleRemove = useCallback((question) => {
       setCurrentQuestion(question)
       setIsDrawerOpen(true)
    }, [])
 
+   const handleAddQuestionClick = useCallback(() => {
+      setFieldValue("questions.feedbackQuestions", [
+         ...questions.feedbackQuestions,
+         getNewQuestionFormValues,
+      ])
+   }, [questions, setFieldValue])
+
+   const handleRemoveClick = useCallback(() => {
+      setFieldValue(
+         "questions.feedbackQuestions",
+         questions.feedbackQuestions.map((question) => {
+            if (question.id === currentQuestion.id) {
+               return {
+                  ...currentQuestion,
+                  deleted: true,
+               }
+            } else {
+               return question
+            }
+         })
+      )
+      setIsDrawerOpen(false)
+      setCurrentQuestion(null)
+   }, [currentQuestion, questions, setFieldValue])
+
+   const handleCancelClick = useCallback(() => {
+      setIsDrawerOpen(false)
+      setCurrentQuestion(null)
+   }, [])
+
    return (
       <>
-         {questions.map((question, index) => (
-            <FeedbackQuestionMobile
-               key={index}
-               question={question}
-               handleEdit={(event) => handleEdit(event, question)}
-               handleRemove={(event) => handleRemove(event, question)}
-            />
-         ))}
-         <AddQuestionButton handleClick={handleAddQuestionClick} />
+         {questions.feedbackQuestions
+            .filter((question) => !question.deleted)
+            .map((question, index) => (
+               <FeedbackQuestionMobile
+                  key={index}
+                  question={question}
+                  handleRemove={() => handleRemove(question)}
+               />
+            ))}
+         {!livestream.hasEnded && (
+            <AddQuestionButton handleClick={handleAddQuestionClick} />
+         )}
          <SwipeableDrawer
             anchor="bottom"
             onClose={() => setIsDrawerOpen(false)}
@@ -52,7 +82,10 @@ const FeedbackQuestionsMobile: FC<
             open={isDrawerOpen}
             sx={styles.drawer}
          >
-            <RemoveQuestion handleCancelClick={() => setIsDrawerOpen(false)} />
+            <RemoveQuestion
+               handleRemoveClick={handleRemoveClick}
+               handleCancelClick={handleCancelClick}
+            />
          </SwipeableDrawer>
       </>
    )
