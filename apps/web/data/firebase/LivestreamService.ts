@@ -705,10 +705,19 @@ export class LivestreamService {
          const questionRef = this.getQuestionRef(livestreamRef, questionId)
 
          const questionDoc = await transaction.get(questionRef)
+         const commentDoc = await transaction.get(ref)
+
+         if (!commentDoc.exists()) {
+            throw new Error("Comment does not exist")
+         }
 
          if (questionDoc.exists()) {
+            const firstComment = questionDoc.data().firstComment
             transaction.update(questionRef, {
                numberOfComments: increment(-1),
+               ...(firstComment?.id === commentId
+                  ? { firstComment: null }
+                  : {}),
             })
          }
 
@@ -843,7 +852,7 @@ export class LivestreamService {
       questionId: string,
       data: Pick<
          LivestreamQuestionComment,
-         "title" | "author" | "userUid" | "agoraUserId"
+         "title" | "author" | "userUid" | "agoraUserId" | "authorType"
       >
    ) {
       const questionRef = this.getQuestionRef(livestreamRef, questionId)
@@ -864,6 +873,7 @@ export class LivestreamService {
                author: data.author,
                userUid: data.userUid || "",
                agoraUserId: data.agoraUserId || "",
+               authorType: data.authorType,
                timestamp: Timestamp.now(),
             }
 
