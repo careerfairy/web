@@ -1,21 +1,24 @@
 import {
-  PublicCustomJob,
-  pickPublicDataFromCustomJob,
+   PublicCustomJob,
+   pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { useAuth } from "HOCs/AuthProvider"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { FC, ReactNode } from "react"
 import {
-  LivestreamFormGeneralTabValues,
-  LivestreamFormJobsTabValues,
-  LivestreamFormQuestionsTabValues,
-  LivestreamFormSpeakersTabValues,
-  LivestreamFormValues,
+   LivestreamFormGeneralTabValues,
+   LivestreamFormJobsTabValues,
+   LivestreamFormQuestionsTabValues,
+   LivestreamFormSpeakersTabValues,
+   LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
 import { LivestreamCreator } from "./views/questions/commons"
@@ -47,6 +50,7 @@ const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
    registrationQuestions: [],
    feedbackQuestions: [],
+   hosts: [],
 }
 
 const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
@@ -63,9 +67,11 @@ const formInitialValues: LivestreamFormValues = {
 
 type ConvertLivestreamObjectToFormArgs = {
    livestream: LivestreamEvent
+   group: Group
    existingInterests: Interest[]
    customJobs: PublicCustomJob[]
    creators: Creator[]
+   userData: UserData
 }
 
 /*
@@ -125,11 +131,40 @@ function unionCreatorsAndSpeakers(
    return Array.from(uniqueMap.values())
 }
 
+function buildRegistrationQuestions(
+   groupQuestionsMap: LivestreamEvent["groupQuestionsMap"],
+   isAdmin: boolean,
+   group: { groupId: string }
+): LivestreamFormQuestionsTabValues["registrationQuestions"] {
+   const filteredGroupQuestionsMap = isAdmin
+      ? groupQuestionsMap
+      : { [group.groupId]: groupQuestionsMap[group.groupId] }
+
+   return Object.keys(filteredGroupQuestionsMap).flatMap((groupId) => {
+      const livestreamQuestionMap = filteredGroupQuestionsMap[groupId]
+      const questions = Object.values(livestreamQuestionMap.questions).map(
+         (question) => {
+            const { groupId, groupName, universityCode } = livestreamQuestionMap
+            return {
+               groupId,
+               groupName,
+               universityCode,
+               ...question,
+            }
+         }
+      )
+
+      return questions
+   })
+}
+
 const convertLivestreamObjectToForm = ({
    livestream,
+   group,
    existingInterests,
    customJobs,
    creators,
+   userData,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
@@ -142,6 +177,14 @@ const convertLivestreamObjectToForm = ({
    const general: LivestreamFormGeneralTabValues = valuesReducer(
       formGeneralTabInitialValues
    )
+
+   general.companyLogoUrl = group?.universityCode
+      ? formGeneralTabInitialValues.companyLogoUrl
+      : group?.logoUrl || formGeneralTabInitialValues.companyLogoUrl
+
+   general.backgroundImageUrl = group?.universityCode
+      ? formGeneralTabInitialValues.backgroundImageUrl
+      : group?.bannerImageUrl || formGeneralTabInitialValues.backgroundImageUrl
 
    // Simple name remapping s
    general.categories = existingInterests.filter((interest) =>
@@ -170,7 +213,15 @@ const convertLivestreamObjectToForm = ({
             livestream.speakers
          ),
       },
-      questions: valuesReducer(formQuestionsTabInitialValues),
+      questions: {
+         registrationQuestions: buildRegistrationQuestions(
+            livestream.groupQuestionsMap,
+            userData.isAdmin,
+            group
+         ),
+         feedbackQuestions: formQuestionsTabInitialValues.feedbackQuestions,
+         hosts: formQuestionsTabInitialValues.hosts,
+      },
       jobs: {
          jobs: livestream.jobs,
          customJobs: customJobs.map(pickPublicDataFromCustomJob),
@@ -180,27 +231,30 @@ const convertLivestreamObjectToForm = ({
 
 type Props = {
    livestream: LivestreamEvent
-   groupId: string
+   group: Group
    children: ReactNode
 }
 
 const LivestreamFormikProvider: FC<Props> = ({
    livestream,
-   groupId,
+   group,
    children,
 }) => {
+   const { userData } = useAuth()
    const { data: existingInterests } = useInterests()
-   const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
+   const initialSelectedCustomJobs = useGroupCustomJobs(group?.id, {
       livestreamId: livestream?.id,
    })
-   const { data: creators } = useGroupCreators(groupId)
+   const { data: creators } = useGroupCreators(group?.id)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
+           group,
            existingInterests,
            customJobs: initialSelectedCustomJobs,
            creators,
+           userData,
         })
       : formInitialValues
 

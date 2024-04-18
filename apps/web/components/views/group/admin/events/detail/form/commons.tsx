@@ -45,3 +45,18 @@ export const ESTIMATED_DURATIONS = [
    { minutes: 175, name: "2 hours 55 minutes" },
    { minutes: 180, name: "3 hours" },
 ]
+
+export const hashToColor = (id: string) => {
+   let hash = 0
+   for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash)
+   }
+
+   let color = "#"
+   for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff
+      color += ("00" + value.toString(16)).substr(-2)
+   }
+
+   return color
+}
