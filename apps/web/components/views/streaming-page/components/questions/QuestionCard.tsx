@@ -5,26 +5,28 @@ import {
 import { Box, Stack, Typography } from "@mui/material"
 import { Fragment, forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
-import { QuestionOptionsMenu } from "./QuestionOptionsMenu"
-import { useStreamingContext } from "../../context"
 import { ThumbsUp, CheckCircle } from "react-feather"
 import { LoadingButton } from "@mui/lab"
 import { useAuth } from "HOCs/AuthProvider"
 import { CommentInput } from "./CommentInput"
 import { CommentsList } from "./CommentsList"
+import BrandedOptions from "components/views/common/inputs/BrandedOptions"
+import { useQuestionsListContext } from "./QuestionsLisProvider"
 
 const styles = sxStyles({
    root: (theme) => ({
-      border: "1px solid",
-      borderColor: theme.brand.white[500],
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
       backgroundColor: theme.brand.white[100],
       borderRadius: "12px",
-      transition: theme.transitions.create("border-color"),
+      transition: theme.transitions.create("border"),
       overflow: "hidden",
       position: "relative",
    }),
    greenBorder: {
-      borderColor: "primary.main",
+      border: (theme) => `1px solid ${theme.palette.primary.main}`,
+   },
+   whiteBorder: {
+      border: (theme) => `2px solid ${theme.brand.white[500]}`,
    },
    voteButton: {
       p: 0,
@@ -64,19 +66,17 @@ const styles = sxStyles({
 
 type Props = {
    question: LivestreamQuestion
-   onClickDelete: (questionId: string) => void
-   onClickReset: (questionId: string) => void
 }
 
 export const QuestionCard = forwardRef<HTMLDivElement, Props>(
-   ({ question, onClickDelete, onClickReset }, ref) => {
-      const { isHost, agoraUserId } = useStreamingContext()
-
+   ({ question }, ref) => {
+      const { onQuestionOptionsClick } = useQuestionsListContext()
       return (
          <Box
             sx={[
                styles.root,
                question.type === "current" && styles.greenBorder,
+               question.type === "done" && styles.whiteBorder,
             ]}
             ref={ref}
          >
@@ -94,12 +94,8 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
                   question.type === "done" && styles.whiteOptions,
                ]}
             >
-               <QuestionOptionsMenu
-                  isHost={isHost}
-                  agoraUid={agoraUserId}
-                  question={question}
-                  onClickDelete={onClickDelete}
-                  onClickReset={onClickReset}
+               <BrandedOptions
+                  onClick={(event) => onQuestionOptionsClick(event, question)}
                />
             </Box>
          </Box>

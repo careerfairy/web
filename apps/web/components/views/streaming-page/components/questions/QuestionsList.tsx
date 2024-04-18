@@ -2,9 +2,9 @@ import { useLivestreamQuestions } from "components/custom-hook/streaming/useLive
 import { useStreamingContext } from "../../context"
 import { QuestionTab } from "./PanelTabs"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { CircularProgress, Slide, Stack } from "@mui/material"
+import { CircularProgress, Stack } from "@mui/material"
 import { QuestionCard } from "./QuestionCard"
-import { TransitionGroup } from "react-transition-group"
+import QuestionsListContextProvider from "./QuestionsLisProvider"
 
 type Props = {
    type: QuestionTab
@@ -26,16 +26,12 @@ const Content = ({ type }: Props) => {
    })
 
    return (
-      <Stack spacing={2} overflow="hidden" component={TransitionGroup}>
-         {questions.map((question) => (
-            <Slide key={question.id} direction="left">
-               <QuestionCard
-                  question={question}
-                  onClickDelete={() => {}}
-                  onClickReset={() => {}}
-               />
-            </Slide>
-         ))}
-      </Stack>
+      <QuestionsListContextProvider>
+         <Stack spacing={2} overflow="hidden">
+            {questions.map((question) => (
+               <QuestionCard key={question.id} question={question} />
+            ))}
+         </Stack>
+      </QuestionsListContextProvider>
    )
 }
