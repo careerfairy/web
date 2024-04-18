@@ -31,6 +31,9 @@ const styles = sxStyles({
    input: {
       width: "100%",
       height: 38,
+      "& input": {
+         pr: 3,
+      },
    },
 })
 
