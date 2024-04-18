@@ -26,6 +26,10 @@ import {
    getBaseUrl,
 } from "../../../../helperFunctions/HelperFunctions"
 import HintIcon from "../../../common/HintIcon"
+import {
+   feedbackQuestionFormInitialValues,
+   mapFeedbackQuestionToRatings,
+} from "./detail/form/views/questions/commons"
 
 const handleCreateDraftLivestream = async (
    authenticatedUser,
@@ -46,14 +50,20 @@ const handleCreateDraftLivestream = async (
       firebase
    )
 
-   initialValues.groupIds = [group.id]
+   draftLivestream.groupIds = [group.id]
    draftLivestream.speakers = []
+
+   const initialFeedbackQuestions = feedbackQuestionFormInitialValues.map(
+      (question) =>
+         mapFeedbackQuestionToRatings(question, draftLivestream.duration)
+   )
 
    const draftLiveStreamId = await firebase.addLivestream(
       draftLivestream,
       "draftLivestreams",
       author,
-      null
+      null,
+      initialFeedbackQuestions
    )
 
    return router.push({
