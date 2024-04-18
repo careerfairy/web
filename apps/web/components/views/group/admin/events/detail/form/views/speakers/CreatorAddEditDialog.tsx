@@ -1,19 +1,18 @@
-import { FC } from "react"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import BrandedDialog, {
    BrandedDialogProps,
 } from "../questions/components/BrandedDialog"
 import CreatorFormDialog from "./CreatorFormDialog"
-import { LivestreamCreator } from "../questions/commons"
 
 type FeedbackQuestionAddEditDialogProps = {
-   creator?: LivestreamCreator
+   creator?: Creator
 } & Omit<BrandedDialogProps, "children">
 
-const CreatorAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
+const CreatorAddEditDialog = ({
    creator,
    isDialogOpen,
    handleCloseDialog,
-}) => (
+}: FeedbackQuestionAddEditDialogProps) => (
    <BrandedDialog
       isDialogOpen={isDialogOpen}
       handleCloseDialog={handleCloseDialog}
