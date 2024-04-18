@@ -6,14 +6,16 @@ import {
    TableHead,
    TableRow,
 } from "@mui/material"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { FeedbackQuestionsProp } from "../commons"
-import MoreMenuWithEditAndRemoveOptions from "./MoreMenu"
-import { FC, useCallback, useState } from "react"
+import { useLivestreamCreationContext } from "../../../../LivestreamCreationContext"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { FeedbackQuestionsLabels, getNewQuestionFormValues } from "../commons"
+import AddQuestionButton from "./AddQuestionButton"
 import FeedbackQuestionAddEditDialog from "./FeedbackQuestionAddEditDialog"
 import FeedbackQuestionRemoveDialog from "./FeedbackQuestionRemoveDialog"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import AddQuestionButton from "./AddQuestionButton"
+import MoreMenuWithEditAndRemoveOptions from "./MoreMenu"
 
 const styles = sxStyles({
    table: {
@@ -54,7 +56,12 @@ const styles = sxStyles({
    },
 })
 
-const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
+const FeedbackQuestionsDesktop = () => {
+   const {
+      values: { questions },
+      setFieldValue,
+   } = useLivestreamFormValues()
+   const { livestream } = useLivestreamCreationContext()
    const [currentQuestion, setCurrentQuestion] = useState(null)
 
    const [
@@ -64,7 +71,7 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
    ] = useDialogStateHandler()
 
    const handleAddQuestionClick = useCallback(() => {
-      setCurrentQuestion(null)
+      setCurrentQuestion(getNewQuestionFormValues)
       handleAddEditOpenDialog()
    }, [handleAddEditOpenDialog])
 
@@ -79,13 +86,35 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
    const [isRemoveDialogOpen, handleRemoveOpenDialog, handleRemoveCloseDialog] =
       useDialogStateHandler()
 
-   const handleRemove = useCallback(
+   const handleRemoveDialogOpen = useCallback(
       (_, question) => {
          setCurrentQuestion(question)
          handleRemoveOpenDialog()
       },
       [handleRemoveOpenDialog]
    )
+
+   const handleRemoveClick = useCallback(() => {
+      setFieldValue(
+         "questions.feedbackQuestions",
+         questions.feedbackQuestions.map((question) => {
+            if (question.id === currentQuestion?.id) {
+               return {
+                  ...currentQuestion,
+                  deleted: true,
+               }
+            } else {
+               return question
+            }
+         })
+      )
+      handleRemoveCloseDialog()
+   }, [
+      currentQuestion,
+      handleRemoveCloseDialog,
+      questions.feedbackQuestions,
+      setFieldValue,
+   ])
 
    return (
       <>
@@ -96,44 +125,57 @@ const FeedbackQuestionsDesktop: FC<FeedbackQuestionsProp> = ({ questions }) => {
                      <TableCell>Question</TableCell>
                      <TableCell>Type</TableCell>
                      <TableCell>Appear after</TableCell>
-                     <TableCell />
+                     {!livestream.hasEnded && <TableCell />}
                   </TableRow>
                </TableHead>
                <TableBody sx={styles.table.body}>
-                  {questions.map((question, index) => (
-                     <TableRow key={index}>
-                        <TableCell component="th" scope="row">
-                           {question.title}
-                        </TableCell>
-                        <TableCell>{question.type}</TableCell>
-                        <TableCell>{`${question.appearAfter} minutes`}</TableCell>
-                        <TableCell>
-                           <MoreMenuWithEditAndRemoveOptions
-                              handleEdit={(event) =>
-                                 handleEdit(event, question)
-                              }
-                              handleRemove={(event) =>
-                                 handleRemove(event, question)
-                              }
-                              labels={["Edit question", "Remove question"]}
-                           />
-                        </TableCell>
-                     </TableRow>
-                  ))}
+                  {questions.feedbackQuestions
+                     .filter((question) => !question.deleted)
+                     .map((question, index) => (
+                        <TableRow key={index}>
+                           <TableCell component="th" scope="row">
+                              {question.question}
+                           </TableCell>
+                           <TableCell>
+                              {FeedbackQuestionsLabels[question.type]}
+                           </TableCell>
+                           <TableCell>{`${question.appearAfter} minutes`}</TableCell>
+                           {!livestream.hasEnded && (
+                              <TableCell>
+                                 <MoreMenuWithEditAndRemoveOptions
+                                    handleEdit={(event) =>
+                                       handleEdit(event, question)
+                                    }
+                                    handleRemove={(event) =>
+                                       handleRemoveDialogOpen(event, question)
+                                    }
+                                    labels={[
+                                       "Edit question",
+                                       "Remove question",
+                                    ]}
+                                 />
+                              </TableCell>
+                           )}
+                        </TableRow>
+                     ))}
                </TableBody>
             </Table>
          </TableContainer>
-         <AddQuestionButton handleClick={handleAddQuestionClick} />
-         <FeedbackQuestionAddEditDialog
-            question={currentQuestion}
-            isDialogOpen={isAddEditDialogOpen}
-            handleCloseDialog={handleAddEditCloseDialog}
-         />
-         <FeedbackQuestionRemoveDialog
-            question={currentQuestion}
-            isDialogOpen={isRemoveDialogOpen}
-            handleCloseDialog={handleRemoveCloseDialog}
-         />
+         {!livestream.hasEnded && (
+            <>
+               <AddQuestionButton handleClick={handleAddQuestionClick} />
+               <FeedbackQuestionAddEditDialog
+                  question={currentQuestion}
+                  isDialogOpen={isAddEditDialogOpen}
+                  handleCloseDialog={handleAddEditCloseDialog}
+               />
+               <FeedbackQuestionRemoveDialog
+                  isDialogOpen={isRemoveDialogOpen}
+                  handleRemoveClick={handleRemoveClick}
+                  handleCloseDialog={handleRemoveCloseDialog}
+               />
+            </>
+         )}
       </>
    )
 }

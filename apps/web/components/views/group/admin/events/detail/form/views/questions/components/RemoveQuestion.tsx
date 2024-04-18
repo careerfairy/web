@@ -1,8 +1,7 @@
-import { FC } from "react"
-import { Stack } from "@mui/material"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Trash2 as DeleteIcon } from "react-feather"
+import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import { Trash2 as DeleteIcon } from "react-feather"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -64,10 +63,14 @@ const styles = sxStyles({
 })
 
 type RemoveQuestionProps = {
+   handleRemoveClick: () => void
    handleCancelClick: () => void
 }
 
-const RemoveQuestion: FC<RemoveQuestionProps> = ({ handleCancelClick }) => {
+const RemoveQuestion = ({
+   handleRemoveClick,
+   handleCancelClick,
+}: RemoveQuestionProps) => {
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -102,11 +105,11 @@ const RemoveQuestion: FC<RemoveQuestionProps> = ({ handleCancelClick }) => {
             <SteppedDialog.Button
                variant="contained"
                color={"error"}
-               disabled={false}
                type="submit"
-               onClick={undefined}
-               loading={false}
+               onClick={handleRemoveClick}
                sx={styles.actionBtn}
+               disabled={false}
+               loading={false}
             >
                {"Yes, I'm sure"}
             </SteppedDialog.Button>
