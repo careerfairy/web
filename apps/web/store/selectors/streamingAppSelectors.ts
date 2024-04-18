@@ -18,6 +18,9 @@ export const sidePanelSelector = (state: RootState) =>
 export const audioLevelsSelector = (state: RootState) =>
    state.streamingApp.audioLevels
 
+export const rtcStateSelector = (state: RootState) =>
+   state.streamingApp.rtcState
+
 export const userIsSpeakingSelector = (userId: UID) => (state: RootState) =>
    Boolean(state.streamingApp.audioLevels[userId]?.level > 60)
 
