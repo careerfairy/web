@@ -1,9 +1,8 @@
-import AtsNotLinked from "./components/AtsNotLinked"
-import { sxStyles } from "types/commonTypes"
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material"
-import { AlertCircle as AlertIcon } from "react-feather"
 import { useATSAccount } from "components/views/group/admin/ats-integration/ATSAccountContextProvider"
-import { FC } from "react"
+import { AlertCircle as AlertIcon } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import AtsNotLinked from "./components/AtsNotLinked"
 
 const styles = sxStyles({
    wrap: {
@@ -31,7 +30,7 @@ type Props = {
    onDialogOpen: () => void
 }
 
-const AtsAccountIncomplete: FC<Props> = ({ onDialogOpen }) => {
+const AtsAccountIncomplete = ({ onDialogOpen }: Props) => {
    const theme = useTheme()
    const { atsAccount } = useATSAccount()
 
