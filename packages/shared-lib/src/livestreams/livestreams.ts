@@ -508,6 +508,7 @@ export interface LivestreamQuestion extends Identifiable {
 
 // Collection Path: livestreams/{livestreamId}/questions/{questionId}/comments/{commentId}
 export interface LivestreamQuestionComment extends Identifiable {
+   authorType: "careerfairy" | "streamer" | "viewer"
    /**
     * Display name of the user that created the comment
     */
