@@ -1,3 +1,6 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import {
    MAX_TAB_VALUE,
@@ -21,6 +24,7 @@ import {
 } from "./form/validationSchemas"
 
 type LivestreamCreationContextType = {
+   livestream: LivestreamEvent
    tabToNavigateTo: TAB_VALUES
    tabValue: TAB_VALUES
    setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
@@ -39,8 +43,10 @@ type LivestreamCreationContextType = {
    >
    shouldShowAlertDialog: boolean
    shouldShowAlertIndicator: boolean
-   isGenralTabInvalid: boolean
+   isGeneralTabInvalid: boolean
    isSpeakerTabInvalid: boolean
+   isCohostedEvent: boolean
+   isCFAdmin: boolean
 }
 
 const LivestreamCreationContext = createContext<
@@ -48,12 +54,15 @@ const LivestreamCreationContext = createContext<
 >(undefined)
 
 type LivestreamCreationContextProviderType = {
+   livestream: LivestreamEvent
+   group: Group
    children: ReactNode
 }
 
 export const LivestreamCreationContextProvider: FC<
    LivestreamCreationContextProviderType
-> = ({ children }) => {
+> = ({ livestream, group, children }) => {
+   const { userData } = useAuth()
    const {
       values: { general, speakers },
    } = useLivestreamFormValues()
@@ -75,21 +84,27 @@ export const LivestreamCreationContextProvider: FC<
       handleValidationCloseDialog,
    ] = useDialogStateHandler()
 
-   const isGenralTabInvalid =
+   const isGeneralTabInvalid =
       !livestreamFormGeneralTabSchema.isValidSync(general) &&
       tabsVisited[TAB_VALUES.GENERAL]
    const isSpeakerTabInvalid =
       !livestreamFormSpeakersTabSchema.isValidSync(speakers) &&
       tabsVisited[TAB_VALUES.SPEAKERS]
    const formHasCriticalValidationErrors =
-      isGenralTabInvalid || isSpeakerTabInvalid
+      isGeneralTabInvalid || isSpeakerTabInvalid
+
+   const isCohostedEvent = Boolean(
+      livestream.groupIds.length > 1 || group?.universityCode
+   )
+
+   const isCFAdmin = userData?.isAdmin
 
    const shouldShowAlertIndicatorOnTab = useMemo(
       () => ({
-         [TAB_VALUES.GENERAL]: alertState !== undefined && isGenralTabInvalid,
+         [TAB_VALUES.GENERAL]: alertState !== undefined && isGeneralTabInvalid,
          [TAB_VALUES.SPEAKERS]: alertState !== undefined && isSpeakerTabInvalid,
       }),
-      [alertState, isGenralTabInvalid, isSpeakerTabInvalid]
+      [alertState, isGeneralTabInvalid, isSpeakerTabInvalid]
    )
 
    const shouldShowAlertIndicator =
@@ -132,6 +147,7 @@ export const LivestreamCreationContextProvider: FC<
 
    const value = useMemo(
       () => ({
+         livestream,
          tabToNavigateTo,
          tabValue,
          setTabValue,
@@ -147,10 +163,14 @@ export const LivestreamCreationContextProvider: FC<
          shouldShowAlertIndicatorOnTab,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
-         isGenralTabInvalid,
+         isGeneralTabInvalid,
          isSpeakerTabInvalid,
+         isCohostedEvent,
+         isCFAdmin,
       }),
       [
+         isCFAdmin,
+         isCohostedEvent,
          shouldShowAlertDialog,
          shouldShowAlertIndicator,
          shouldShowAlertIndicatorOnTab,
@@ -164,8 +184,9 @@ export const LivestreamCreationContextProvider: FC<
          alertState,
          tabValue,
          tabToNavigateTo,
-         isGenralTabInvalid,
+         isGeneralTabInvalid,
          isSpeakerTabInvalid,
+         livestream,
       ]
    )
 

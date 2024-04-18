@@ -36,11 +36,11 @@ export const InvalidAlertTooltipContent: FC<
    InvalidAlertTooltipContentProps
 > = ({ handleOkClick }) => {
    const isMobile = useIsMobile()
-   const { isGenralTabInvalid, isSpeakerTabInvalid } =
+   const { isGeneralTabInvalid, isSpeakerTabInvalid } =
       useLivestreamCreationContext()
 
    const tabsWithErros = [
-      isGenralTabInvalid && tabLabelsMap.general,
+      isGeneralTabInvalid && tabLabelsMap.general,
       isSpeakerTabInvalid && tabLabelsMap.speakers,
    ].filter(Boolean)
 

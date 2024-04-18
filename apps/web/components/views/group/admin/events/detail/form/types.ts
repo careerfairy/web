@@ -1,15 +1,19 @@
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
+   Group,
+   GroupOption,
+   GroupQuestion,
+} from "@careerfairy/shared-lib/groups"
+import {
    EventRating,
    LivestreamEvent,
-   LivestreamGroupQuestion,
+   LivestreamGroupQuestions,
 } from "@careerfairy/shared-lib/livestreams"
-import { GroupOption } from "@careerfairy/shared-lib/groups"
 import { LivestreamCreator } from "./views/questions/commons"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export type LivestreamFormGeneralTabValues = {
    title: string
@@ -35,9 +39,13 @@ export type LivestreamFormSpeakersTabValues = {
    options: LivestreamCreator[]
 }
 
+export type RegistrationQuestion = Omit<LivestreamGroupQuestions, "questions"> &
+   GroupQuestion
+
 export type LivestreamFormQuestionsTabValues = {
-   registrationQuestions: LivestreamGroupQuestion[]
+   registrationQuestions: RegistrationQuestion[]
    feedbackQuestions: EventRating[]
+   hosts: Group[]
 }
 
 export type LivestreamFormJobsTabValues = {
