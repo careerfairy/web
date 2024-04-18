@@ -6,7 +6,6 @@ import {
 } from "components/views/common/inputs/BrandedAutocomplete"
 import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
 import { useFormikContext } from "formik"
-import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -26,11 +25,11 @@ type MultiChipSelectProps = {
 } & BrandedAutocompleteProps &
    Pick<AutocompleteProps<unknown, boolean, boolean, boolean>, "renderTags">
 
-const MultiChipSelect: FC<MultiChipSelectProps> = ({
+const MultiChipSelect = ({
    keyOptionIndexer,
    textFieldProps,
    ...props
-}) => {
+}: MultiChipSelectProps) => {
    const { id, value, multiple } = props
 
    const { label, required, placeholder } = textFieldProps
