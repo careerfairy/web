@@ -2,16 +2,17 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import FirestoreConditionalDocumentFetcher, {
    WrapperProps,
 } from "HOCs/FirestoreConditionalDocumentFetcher"
-import { FC, ReactNode } from "react"
+import { ReactNode } from "react"
 
 type LivestreamFetchWrapperProps = {
    livestreamId: string
    children: (livestream: LivestreamEvent | null) => ReactNode
 }
 
-const LivestreamFetchWrapper: FC<
-   WrapperProps & LivestreamFetchWrapperProps
-> = ({ livestreamId, children }) => {
+const LivestreamFetchWrapper = ({
+   livestreamId,
+   children,
+}: WrapperProps & LivestreamFetchWrapperProps) => {
    const pathSegments = [livestreamId]
 
    return (
@@ -28,10 +29,20 @@ const LivestreamFetchWrapper: FC<
                      collection={"draftLivestreams"}
                      pathSegments={pathSegments}
                   >
-                     {children}
+                     {(draftLivestreamDocument) => {
+                        // eslint-disable-next-line no-extra-semi
+                        ;(draftLivestreamDocument as LivestreamEvent).isDraft =
+                           true
+
+                        return children(
+                           draftLivestreamDocument as LivestreamEvent
+                        )
+                     }}
                   </FirestoreConditionalDocumentFetcher>
                )
             }
+            // eslint-disable-next-line no-extra-semi
+            ;(livestreamDocument as LivestreamEvent).isDraft = false
             return children(livestreamDocument as LivestreamEvent)
          }}
       </FirestoreConditionalDocumentFetcher>
