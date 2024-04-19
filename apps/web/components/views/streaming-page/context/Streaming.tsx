@@ -1,8 +1,11 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { agoraCredentials } from "data/agora/AgoraInstance"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { DocumentReference } from "firebase/firestore"
 import { useRouter } from "next/router"
 import {
    FC,
@@ -37,6 +40,8 @@ type StreamContextProps = {
    setIsReady: (isReady: boolean) => void
    isJoining: boolean
    currentRole: ClientRole
+   // The livestream or breakout-room document reference
+   streamRef: DocumentReference<LivestreamEvent>
 }
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
@@ -121,6 +126,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          setIsReady,
          isJoining: isLoading,
          currentRole: config.currentRole,
+         streamRef: livestreamService.getLivestreamRef(livestreamId),
       }),
       [
          livestreamId,

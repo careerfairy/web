@@ -7,6 +7,11 @@ import { useYupForm } from "components/custom-hook/form/useYupForm"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { Controller } from "react-hook-form"
 import { StreamInput } from "../StreamInput"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { useStreamingContext } from "../../context"
+import { getStreamerDisplayName } from "../../util"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    root: {
@@ -31,7 +36,7 @@ const styles = sxStyles({
    input: {
       width: "100%",
       height: 38,
-      "& input": {
+      "& .MuiInputBase-input": {
          pr: 3,
       },
    },
@@ -45,8 +50,16 @@ const schema = Yup.object({
 
 type FormValues = Yup.InferType<typeof schema>
 
-export const CommentInput = () => {
+type Props = {
+   questionId: string
+}
+
+export const CommentInput = ({ questionId }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
+   const { agoraUserId, streamRef, isHost } = useStreamingContext()
+   const { userData, authenticatedUser } = useAuth()
+
+   const { data: streamerDetails } = useStreamerDetails(agoraUserId)
 
    const { control, handleSubmit, reset, formState } = useYupForm({
       schema,
@@ -57,18 +70,30 @@ export const CommentInput = () => {
 
    const onSubmit = async (data: FormValues) => {
       try {
-         // Reset form fields after submission
          reset({
             message: "",
          })
 
-         // submit comment
+         await livestreamService.commentOnQuestion(streamRef, questionId, {
+            author: getStreamerDisplayName(
+               streamerDetails?.firstName,
+               streamerDetails?.lastName
+            ),
+            authorType: userData?.isAdmin
+               ? "careerfairy"
+               : isHost
+               ? "streamer"
+               : "viewer",
+            title: data.message,
+            agoraUserId,
+            userUid: authenticatedUser?.uid,
+         })
       } catch (error) {
          errorNotification(
             error,
-            "An error occurred while sending your message. Please try again in a few moments."
+            "An error occurred while posting your comment. Please try again in a few moments."
          )
-         // Fall back to the original message if the new message fails to send
+
          reset({
             message: data.message,
          })
@@ -89,6 +114,8 @@ export const CommentInput = () => {
                   sx={styles.input}
                   readOnly={formState.isSubmitting}
                   placeholder="Answer with text"
+                  autoComplete="off"
+                  size="small"
                   endAdornment={
                      <Fab
                         aria-label="Send message"
