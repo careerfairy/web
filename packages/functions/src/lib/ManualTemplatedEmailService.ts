@@ -70,16 +70,14 @@ export class ManualTemplatedEmailService {
     * for testing purposes
     */
    send() {
-      // COMMENTED OUT AS PRECAUTION
-      this.logger.info("Sending is disabled", this.emailBuilder)
-      // const emails = Object.keys(this.subscribedUsers)
+      const emails = Object.keys(this.subscribedUsers)
 
-      // for (const userEmail of emails) {
-      //    const name = this.subscribedUsers[userEmail]?.firstName ?? ""
+      for (const userEmail of emails) {
+         const name = this.subscribedUsers[userEmail]?.firstName ?? ""
 
-      //    this.emailBuilder.addRecipient(userEmail, name)
-      // }
+         this.emailBuilder.addRecipient(userEmail, name)
+      }
 
-      // return this.emailBuilder.send()
+      return this.emailBuilder.send()
    }
 }

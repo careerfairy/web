@@ -96,9 +96,7 @@ export const manualTemplatedEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
-      functions.logger.info(
-         "manualTemplatedEmail: v3.0 - AAB Talent Pool (disabled)"
-      )
+      functions.logger.info("manualTemplatedEmail: v3.0 - AAB Talent Pool")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
