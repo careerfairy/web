@@ -667,13 +667,19 @@ class FirebaseService {
          }
 
          for (const rating of ratings) {
-            const ratingRef = this.firestore
+            const collectionRef = this.firestore
                .collection(collection)
                .doc(livestreamsRef.id)
                .collection("rating")
-               .doc(rating.id)
 
-            batch.set(ratingRef, rating)
+            if (rating.id) {
+               const ratingRef = collectionRef.doc(rating.id)
+               batch.set(ratingRef, rating, { merge: true })
+            } else {
+               const { id, ...ratingWithoutId } = rating
+               const newRatingRef = collectionRef.doc()
+               batch.set(newRatingRef, ratingWithoutId, { merge: true })
+            }
          }
 
          const promotionsRef = this.firestore
