@@ -4,6 +4,7 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
 import { ILivestreamFunctionsRepository } from "./LivestreamFunctionsRepository"
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 
 /**
  * Gathers all the required data to build the release email
@@ -46,10 +47,13 @@ export class ManualTemplatedEmailService {
          "upcoming"
       )
 
-      // TODO: Improve by removing duplicates
-      const aabTalentPool = aabPastLivestreams
-         .flatMap((stream) => stream.talentPool)
-         .concat(aabUpcomingLivestreams.flatMap((stream) => stream.talentPool))
+      const aabTalentPool = removeDuplicates(
+         aabPastLivestreams
+            .flatMap((stream) => stream.talentPool)
+            .concat(
+               aabUpcomingLivestreams.flatMap((stream) => stream.talentPool)
+            )
+      )
 
       if (!livestreams || !livestreams.length) {
          this.logger.error("Could not retrieve AAB livestream by ID")
