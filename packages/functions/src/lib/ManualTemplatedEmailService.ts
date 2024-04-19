@@ -26,14 +26,30 @@ export class ManualTemplatedEmailService {
     */
    async fetchRequiredData(overrideUsers: string[]) {
       // start fetching
+      const ABB_LIVESTREAM_ID = "WWV4LsLI1Ec0dQjiiUyn" // NESTLE Testing livestream -> "Bdx3RrkeYI2XFqEm6j7L"
+      const ABB_GROUP_ID = "lgHmyR0XipDBcYm0UPtH" // NESTLE Testing group -> "CDsb5v08tGhFikXvGDw4"
 
       const fetchedUsers = await this.userRepo.getSubscribedUsers(overrideUsers)
       const subscribedUsers: UserData[] = fetchedUsers ? fetchedUsers : []
 
       // AAB Livestream
       const livestreams = await this.livestreamRepo.getLivestreamsByIds([
-         "WWV4LsLI1Ec0dQjiiUyn",
+         ABB_LIVESTREAM_ID,
       ])
+
+      const aabPastLivestreams = await this.livestreamRepo.getEventsOfGroup(
+         ABB_GROUP_ID,
+         "past"
+      )
+      const aabUpcomingLivestreams = await this.livestreamRepo.getEventsOfGroup(
+         ABB_GROUP_ID,
+         "upcoming"
+      )
+
+      // TODO: Improve by removing duplicates
+      const aabTalentPool = aabPastLivestreams
+         .flatMap((stream) => stream.talentPool)
+         .concat(aabUpcomingLivestreams.flatMap((stream) => stream.talentPool))
 
       if (!livestreams || !livestreams.length) {
          this.logger.error("Could not retrieve AAB livestream by ID")
@@ -47,7 +63,7 @@ export class ManualTemplatedEmailService {
          const isUserRegistered = aabLivestream.registeredUsers.includes(
             user.id
          )
-         const isUserInTalentPool = aabLivestream.talentPool?.includes(user.id)
+         const isUserInTalentPool = aabTalentPool.includes(user.id)
          return !isUserRegistered && isUserInTalentPool
       })
 
@@ -57,7 +73,7 @@ export class ManualTemplatedEmailService {
 
       this.logger.info(
          "Total Users subscribed to the release email for AAB Talent Pool communication",
-         this.subscribedUsers
+         (this.subscribedUsers && this.subscribedUsers.length) || 0
       )
 
       return this

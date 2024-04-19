@@ -180,7 +180,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    await newsletterService.fetchRequiredData(overrideUsers)
 
    // Disable for now
-   // await newsletterService.send()
+   await newsletterService.send()
 
    if (!overrideUsers) {
       // set this flag when sending the newsletter to everyone
@@ -188,7 +188,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    }
 
    functions.logger.info(
-      "ABB talent pool communication execution done - disabled"
+      "ABB talent pool communication execution done - disabled."
    )
 }
 
