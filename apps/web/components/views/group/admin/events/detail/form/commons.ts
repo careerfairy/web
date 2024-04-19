@@ -177,14 +177,22 @@ export const mapFormValuesToLivestreamObject = (
          formValues.questions.registrationQuestions.values
       )
 
-   result.interestsIds = mappedInterestsIds
+   if (mappedInterestsIds.length > 0) {
+      result.interestsIds = mappedInterestsIds
+   }
 
-   result.creatorsIds = creatorsIds
+   if (creatorsIds.length > 0) {
+      result.creatorsIds = creatorsIds
+   }
 
-   result.speakers = mappedSpeakers
+   if (mappedSpeakers?.length > 0) {
+      result.speakers = mappedSpeakers
+   }
 
-   result.groupQuestionsMap =
-      mappedRegistrationQuestions as LivestreamGroupQuestionsMap
+   if (Object.keys(mappedRegistrationQuestions).length > 0) {
+      result.groupQuestionsMap =
+         mappedRegistrationQuestions as LivestreamGroupQuestionsMap
+   }
 
    return result
 }
