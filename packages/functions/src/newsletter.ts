@@ -179,7 +179,8 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    await newsletterService.fetchRequiredData(overrideUsers)
 
-   await newsletterService.send()
+   // Disable for now
+   // await newsletterService.send()
 
    if (!overrideUsers) {
       // set this flag when sending the newsletter to everyone
