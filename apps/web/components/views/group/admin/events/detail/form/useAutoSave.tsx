@@ -103,10 +103,14 @@ export const useAutoSave = () => {
          feedbackQuestions: LivestreamFormQuestionsTabValues["feedbackQuestions"]
       ) => {
          for (const question of feedbackQuestions) {
+            if (!question.question || !question.type || !question.appearAfter) {
+               continue
+            }
             const rating = mapFeedbackQuestionToRatings(
                question,
                livestream.duration
             )
+
             if (question.deleted) {
                await firebaseService.deleteFeedbackQuestion(
                   livestream.id,
