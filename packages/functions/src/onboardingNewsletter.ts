@@ -77,7 +77,7 @@ export const manualOnboardingNewsletter = functions
    })
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
-   functions.logger.info("sendOnboardingNewsletter ~ V2 ")
+   functions.logger.info("sendOnboardingNewsletter ~ V3 ")
    const dataLoader = await NewsletterDataFetcher.create()
    let allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
       overrideUsers,
