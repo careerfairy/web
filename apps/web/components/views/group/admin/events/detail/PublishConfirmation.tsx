@@ -1,6 +1,9 @@
+import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Timestamp } from "firebase/firestore"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamDialog } from "layouts/GroupDashboardLayout/useLivestreamDialog"
 import { useSnackbar } from "notistack"
@@ -76,6 +79,7 @@ export type RemoveQuestionProps = {
 export const PublishConfirmation = ({
    handleCancelClick,
 }: RemoveQuestionProps) => {
+   const firebaseService = useFirebaseService()
    const { values, isValid } = useLivestreamFormValues()
    const { livestream } = useLivestreamCreationContext()
    const { group } = useGroup()
@@ -93,6 +97,20 @@ export const PublishConfirmation = ({
       try {
          const livestreamObject = mapFormValuesToLivestreamObject(values)
          livestreamObject.id = livestream.id
+         livestreamObject.test = false
+         livestreamObject.hasEnded = false
+         livestreamObject.questionsDisabled = false
+         livestreamObject.denyRecordingAccess = false
+         livestreamObject.triGrams = livestreamTriGrams(
+            livestreamObject.title,
+            livestreamObject.company
+         )
+         livestreamObject.lastUpdated =
+            firebaseService.getServerTimestamp() as unknown as Timestamp
+         livestreamObject.hasJobs =
+            values.jobs.customJobs.length > 0 || values.jobs.jobs.length > 0
+         livestreamObject.type = "upcoming"
+
          await handlePublishStream(livestreamObject, {})
       } catch (error) {
          console.error("Auto-save failed:", error)
@@ -104,6 +122,7 @@ export const PublishConfirmation = ({
       }
    }, [
       enqueueSnackbar,
+      firebaseService,
       handleCancelClick,
       handlePublishStream,
       isValid,
