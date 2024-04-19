@@ -1,3 +1,4 @@
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
@@ -110,6 +111,13 @@ export const PublishConfirmation = ({
          livestreamObject.hasJobs =
             values.jobs.customJobs.length > 0 || values.jobs.jobs.length > 0
          livestreamObject.type = "upcoming"
+
+         const metaData = getMetaDataFromEventHosts(values.questions.hosts)
+         if (metaData) {
+            livestreamObject.companySizes = metaData.companySizes
+            livestreamObject.companyIndustries = metaData.companyIndustries
+            livestreamObject.companyCountries = metaData.companyCountries
+         }
 
          await handlePublishStream(livestreamObject, {})
       } catch (error) {
