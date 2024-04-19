@@ -34,7 +34,7 @@ const FeedbackQuestionsMobile = () => {
    const handleAddQuestionClick = useCallback(() => {
       setFieldValue("questions.feedbackQuestions", [
          ...questions.feedbackQuestions,
-         getNewQuestionFormValues,
+         getNewQuestionFormValues(),
       ])
    }, [questions, setFieldValue])
 
