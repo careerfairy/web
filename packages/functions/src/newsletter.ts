@@ -187,7 +187,9 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("ABB talent pool communication execution done")
+   functions.logger.info(
+      "ABB talent pool communication execution done - disabled"
+   )
 }
 
 /**
