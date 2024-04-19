@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { customJobRepo } from "data/RepositoryInstances"
 import { FormikErrors } from "formik"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { cloneDeep, omit } from "lodash"
 import { useSnackbar } from "notistack"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -82,8 +79,6 @@ const getFormValuesWithoutErrors = (
 }
 
 export const useAutoSave = () => {
-   const { group } = useGroup()
-   const { authenticatedUser } = useAuth()
    const firebaseService = useFirebaseService()
    const { livestream, targetLivestreamCollection } =
       useLivestreamCreationContext()
@@ -148,18 +143,42 @@ export const useAutoSave = () => {
       [livestream.id]
    )
 
-   const updateDraftLivestream = useCallback(
-      async (newValues) => {
+   const updateLivestream = useCallback(
+      async (newValues: Partial<LivestreamFormValues>) => {
+         const mappedObject = mapFormValuesToLivestreamObject(
+            newValues,
+            firebaseService
+         )
+
+         console.log("🚀 ~ useEffect ~ mappedObject:", mappedObject)
+
+         if (newValues?.questions?.feedbackQuestions?.length > 0) {
+            updateFeedbackQuestions(newValues.questions.feedbackQuestions)
+         }
+
+         if (newValues?.jobs?.customJobs?.length > 0) {
+            updateCustomJobs(newValues.jobs.customJobs)
+         }
+
+         console.log("📈📈📈 ~ newValues:", newValues)
+
          await firebaseService.updateLivestream(
-            { ...newValues, id: livestream.id },
+            { ...mappedObject, id: livestream.id },
             targetLivestreamCollection,
             {}
          )
       },
-      [firebaseService, livestream.id, targetLivestreamCollection]
+      [
+         firebaseService,
+         livestream.id,
+         targetLivestreamCollection,
+         updateCustomJobs,
+         updateFeedbackQuestions,
+      ]
    )
 
    const handleAutoSave = useCallback(async () => {
+      console.log("🚀 ~ useEffect ~ previousValues:", previousValues)
       console.log("🚀 ~ useEffect ~ values:", values)
       console.log("🚀 ~ useAutoSave ~ errors:", errors)
       if (haveValuesChanged) {
@@ -173,53 +192,22 @@ export const useAutoSave = () => {
                "🚀 ~ useEffect ~ formValuesWithoutErrors:",
                formValuesWithoutErrors
             )
-            const mappedObject = mapFormValuesToLivestreamObject(
-               formValuesWithoutErrors,
-               firebaseService
-            )
 
-            console.log("🚀 ~ useEffect ~ mappedObject:", mappedObject)
-
-            if (
-               formValuesWithoutErrors?.questions?.feedbackQuestions?.length > 0
-            ) {
-               updateFeedbackQuestions(
-                  formValuesWithoutErrors.questions.feedbackQuestions
-               )
-            }
-
-            if (formValuesWithoutErrors?.jobs?.customJobs?.length > 0) {
-               updateCustomJobs(formValuesWithoutErrors.jobs.customJobs)
-            }
-
-            updateDraftLivestream(mappedObject)
+            updateLivestream(formValuesWithoutErrors)
+         } else if (isValid) {
+            updateLivestream(values)
          }
-         /*
-         else if (isValid) {
-            const author = {
-               groupId: group.id,
-               email: authenticatedUser.email,
-            }
-            // this object needs to have the live stream Id
-            const livestreamObject = mapFormValuesToLivestreamObject(values)
-            console.log("livestreamObject", livestreamObject)
-            /*
-            const id = await firebaseService.addLivestream(
-               livestreamObject,
-               "livestreams",
-               author,
-               null
-            )
-            *
-         }
-         */
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [values, errors])
 
    useEffect(() => {
       if (haveValuesChanged && !isAutoSaving) {
-         setIsAutoSaving(true)
+         if (livestream.isDraft) {
+            setIsAutoSaving(true)
+         } else if (isValid) {
+            setIsAutoSaving(true)
+         }
       }
 
       const debounceTimeout = setTimeout(async () => {
