@@ -5,6 +5,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback, useState } from "react"
 import { useLivestreamCreationContext } from "./LivestreamCreationContext"
 import { PublishConfirmation } from "./PublishConfirmation"
+import { useAutoSave } from "./form/useAutoSave"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
 import BrandedDialog from "./form/views/questions/components/BrandedDialog"
 
@@ -30,6 +31,7 @@ export const PublishButton = () => {
    const isMobile = useIsMobile()
    const { isValid } = useLivestreamFormValues()
    const { livestream } = useLivestreamCreationContext()
+   const { isAutoSaving } = useAutoSave()
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -52,7 +54,7 @@ export const PublishButton = () => {
             variant="contained"
             color="secondary"
             sx={styles.button}
-            disabled={!isValid}
+            disabled={!isValid || isAutoSaving}
             onClick={handlePublishButtonClick}
          >
             Publish
