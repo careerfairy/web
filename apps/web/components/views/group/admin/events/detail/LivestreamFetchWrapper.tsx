@@ -30,6 +30,10 @@ const LivestreamFetchWrapper = ({
                      pathSegments={pathSegments}
                   >
                      {(draftLivestreamDocument) => {
+                        if (!draftLivestreamDocument) {
+                           return null
+                        }
+
                         // eslint-disable-next-line no-extra-semi
                         ;(draftLivestreamDocument as LivestreamEvent).isDraft =
                            true
