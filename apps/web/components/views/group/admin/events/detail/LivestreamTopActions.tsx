@@ -11,11 +11,6 @@ import { PublishButton } from "./PublishButton"
 const ICON_SIZE = 18
 
 const styles = sxStyles({
-   button: {
-      display: "flex",
-      height: "40px",
-      padding: "12px 24px !important",
-   },
    wrapper: {
       color: "#3A70E2",
       textAlign: "center",
