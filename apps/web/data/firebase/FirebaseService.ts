@@ -2685,12 +2685,17 @@ class FirebaseService {
       feedbackId,
       data
    ) => {
-      const feedbackRef = this.firestore
+      const collectionRef = this.firestore
          .collection(targetCollection)
          .doc(livestreamId)
          .collection("rating")
-         .doc(feedbackId)
-      return feedbackRef.set(data, { merge: true })
+      if (feedbackId) {
+         const feedbackRef = collectionRef.doc(feedbackId)
+         return feedbackRef.set(data, { merge: true })
+      } else {
+         const { id, ...rest } = data
+         return collectionRef.add(rest)
+      }
    }
 
    listenToLivestreamRatings = (livestreamId, callback) => {
