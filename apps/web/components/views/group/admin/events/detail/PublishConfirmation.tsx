@@ -12,6 +12,7 @@ import { useCallback } from "react"
 import { CheckCircle } from "react-feather"
 import { useLivestreamCreationContext } from "./LivestreamCreationContext"
 import { mapFormValuesToLivestreamObject } from "./form/commons"
+import { useAutoSave } from "./form/useAutoSave"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
 
 const styles = sxStyles({
@@ -86,6 +87,7 @@ export const PublishConfirmation = ({
    const { group } = useGroup()
    const { isPublishing, handlePublishStream } = useLivestreamDialog(group)
    const { enqueueSnackbar } = useSnackbar()
+   const { isAutoSaving } = useAutoSave()
 
    const handlePublishClick = useCallback(async () => {
       if (!isValid) {
@@ -175,7 +177,7 @@ export const PublishConfirmation = ({
                type="submit"
                onClick={handlePublishClick}
                sx={styles.actionBtn}
-               disabled={!isValid}
+               disabled={!isValid || isAutoSaving}
                loading={isPublishing}
             >
                {"Publish"}
