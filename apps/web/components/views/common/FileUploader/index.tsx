@@ -79,7 +79,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
    } = props
    const labelRef = useRef<HTMLLabelElement>(null)
    const inputRef = useRef<HTMLInputElement>(null)
-   if (onCancel !== undefined) {
+   if (onCancel) {
       inputRef.current?.addEventListener("cancel", (e) => {
          onCancel(e)
       })
