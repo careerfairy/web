@@ -93,10 +93,6 @@ export const PublishConfirmation = ({
       try {
          const livestreamObject = mapFormValuesToLivestreamObject(values)
          livestreamObject.id = livestream.id
-         console.log(
-            "🚀 ~ handlePublishLivestream ~ livestreamObject:",
-            livestreamObject
-         )
          await handlePublishStream(livestreamObject, {})
       } catch (error) {
          console.error("Auto-save failed:", error)
