@@ -77,7 +77,7 @@ export class ManualTemplatedEmailService {
 
       this.logger.info(
          "Total Users subscribed to the release email for AAB Talent Pool communication",
-         (this.subscribedUsers && this.subscribedUsers.length) || 0
+         Object.keys(this.subscribedUsers).length
       )
 
       return this
