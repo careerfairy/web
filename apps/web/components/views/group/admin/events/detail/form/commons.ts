@@ -5,6 +5,9 @@ import {
    LivestreamGroupQuestionsMap,
    Speaker,
 } from "@careerfairy/shared-lib/livestreams"
+import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
+import FirebaseService from "data/firebase/FirebaseService"
+import { Timestamp } from "firebase/firestore"
 import { get, has, omit, set } from "lodash"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
 
@@ -144,7 +147,8 @@ const formValuesLivestreamEventPropertyMap = [
 ] as const
 
 export const mapFormValuesToLivestreamObject = (
-   formValues: Partial<LivestreamFormValues>
+   formValues: Partial<LivestreamFormValues>,
+   firebaseService: FirebaseService
 ): Partial<LivestreamEvent> => {
    const result: Partial<LivestreamEvent> = {}
 
@@ -193,6 +197,19 @@ export const mapFormValuesToLivestreamObject = (
       result.groupQuestionsMap =
          mappedRegistrationQuestions as LivestreamGroupQuestionsMap
    }
+
+   if (formValues.general.title) {
+      result.triGrams = livestreamTriGrams(result.title, result.company)
+   }
+
+   if (formValues.jobs.customJobs || formValues.jobs.jobs) {
+      result.hasJobs =
+         formValues.jobs?.customJobs?.length > 0 ||
+         formValues.jobs?.jobs?.length > 0
+   }
+
+   result.lastUpdated =
+      firebaseService.getServerTimestamp() as unknown as Timestamp
 
    return result
 }
