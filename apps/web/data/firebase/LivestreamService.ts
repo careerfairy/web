@@ -806,7 +806,7 @@ export class LivestreamService {
    toggleUpvoteQuestion = async (
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string,
-      args: { email: string; uid: string }
+      args: { email: string; uid: string; deprecatedSessionUuid?: string }
    ) => {
       return runTransaction(FirestoreInstance, async (transaction) => {
          const questionRef = this.getQuestionRef(livestreamRef, questionId)
@@ -821,9 +821,11 @@ export class LivestreamService {
             if (hasUpvoted) {
                transaction.update(questionRef, {
                   votes: increment(-1),
-                  voterIds: arrayRemove(args.uid),
+                  ...(args.uid ? { voterIds: arrayRemove(args.uid) } : {}),
                   // Take the chance to remove the user's email from deprecated emailOfVoters
-                  emailOfVoters: arrayRemove(args.email),
+                  ...(args.email
+                     ? { emailOfVoters: arrayRemove(args.email) }
+                     : {}),
                })
                return "downvoted"
             } else {

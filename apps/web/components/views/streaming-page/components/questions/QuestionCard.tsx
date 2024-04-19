@@ -1,17 +1,14 @@
-import {
-   LivestreamQuestion,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack, Typography } from "@mui/material"
 import { Fragment, forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
-import { ThumbsUp, CheckCircle } from "react-feather"
+import { CheckCircle } from "react-feather"
 import { LoadingButton } from "@mui/lab"
-import { useAuth } from "HOCs/AuthProvider"
 import { CommentInput } from "./CommentInput"
 import { CommentsList } from "./CommentsList"
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { useQuestionsListContext } from "./QuestionsLisProvider"
+import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -28,22 +25,7 @@ const styles = sxStyles({
    whiteBorder: {
       border: (theme) => `2px solid ${theme.brand.white[500]}`,
    },
-   voteButton: {
-      p: 0,
-      borderRadius: 2,
-      fontSize: "16px",
-      minWidth: "auto",
-      minHeight: "auto",
-      lineHeight: 1.5,
-      "& .MuiButton-startIcon": {
-         marginRight: 1.25,
-         ml: 0,
-      },
-      "& svg": {
-         width: "14.762px",
-         height: "15px",
-      },
-   },
+
    questionHeaderGreen: (theme) => ({
       color: theme.brand.white[100],
       backgroundColor: "primary.main",
@@ -139,9 +121,6 @@ type ContentProps = {
 }
 
 const Content = ({ question, topPadding }: ContentProps) => {
-   const { authenticatedUser } = useAuth()
-   const hasUpvoted = hasUpvotedLivestreamQuestion(question, authenticatedUser)
-
    return (
       <Stack spacing={3} p={1.5} pt={topPadding ? 1.5 : undefined}>
          <Typography variant="brandedBody" paddingRight={3} color="neutral.800">
@@ -149,20 +128,12 @@ const Content = ({ question, topPadding }: ContentProps) => {
          </Typography>
          <Stack spacing={3}>
             <span>
-               <LoadingButton
-                  startIcon={<ThumbsUp />}
-                  size="small"
-                  variant="text"
-                  color={hasUpvoted ? "primary" : "grey"}
-                  sx={styles.voteButton}
-               >
-                  {question.votes || 0} likes
-               </LoadingButton>
+               <ToggleUpvoteButton question={question} />
             </span>
             <Stack spacing={1.5}>
                <StreamerActions question={question} />
                <Stack spacing={1}>
-                  <CommentInput />
+                  <CommentInput questionId={question.id} />
                   <CommentsList question={question} />
                </Stack>
             </Stack>
