@@ -141,7 +141,7 @@ const formValuesLivestreamEventPropertyMap = [
    ["general.groupIds", "groupIds"],
    ["questions.registrationQuestions.values", "groupQuestionsMap"],
    ["jobs.jobs", "jobs"],
-]
+] as const
 
 export const mapFormValuesToLivestreamObject = (
    formValues: Partial<LivestreamFormValues>
