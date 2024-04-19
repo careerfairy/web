@@ -4,7 +4,6 @@ import {
    EventRating,
    LivestreamGroupQuestions,
 } from "@careerfairy/shared-lib/livestreams"
-import { v4 as uuid } from "uuid"
 import * as yup from "yup"
 import { LivestreamFormGeneralTabValues } from "../../types"
 
@@ -30,11 +29,9 @@ export type FeedbackQuestionFormValues = {
    deleted?: boolean
 } & Identifiable
 
-export const EDITING_ID = "editing-feedback-question" as const
-
 export const getNewQuestionFormValues = (): FeedbackQuestionFormValues => {
    return {
-      id: uuid(),
+      id: undefined,
       question: undefined,
       type: undefined,
       appearAfter: undefined,
@@ -50,13 +47,13 @@ export type RegistrationQuestionFormValues = Omit<
 
 export const feedbackQuestionFormInitialValues: FeedbackQuestionFormValues[] = [
    {
-      id: uuid(),
+      id: undefined,
       question: "How happy are you with the content shared by us?",
       type: FeedbackQuestionType.STAR_RATING,
       appearAfter: 30,
    },
    {
-      id: uuid(),
+      id: undefined,
       question:
          "Help us to improve: How can they make the experience more useful to you and other students?",
       type: FeedbackQuestionType.TEXT,
