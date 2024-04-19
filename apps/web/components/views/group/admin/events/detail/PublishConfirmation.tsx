@@ -1,19 +1,11 @@
-import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
-import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { Timestamp } from "firebase/firestore"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useLivestreamDialog } from "layouts/GroupDashboardLayout/useLivestreamDialog"
 import { useSnackbar } from "notistack"
 import { useCallback } from "react"
 import { CheckCircle } from "react-feather"
-import { useLivestreamCreationContext } from "./LivestreamCreationContext"
-import { mapFormValuesToLivestreamObject } from "./form/commons"
-import { useAutoSave } from "./form/useAutoSave"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
+import { usePublishLivestream } from "./form/usePublishLivestream"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -81,64 +73,22 @@ export type RemoveQuestionProps = {
 export const PublishConfirmation = ({
    handleCancelClick,
 }: RemoveQuestionProps) => {
-   const firebaseService = useFirebaseService()
-   const { values, isValid } = useLivestreamFormValues()
-   const { livestream } = useLivestreamCreationContext()
-   const { group } = useGroup()
-   const { isPublishing, handlePublishStream } = useLivestreamDialog(group)
+   const { isValid } = useLivestreamFormValues()
+   const { isPublishing, publishLivestream } = usePublishLivestream()
    const { enqueueSnackbar } = useSnackbar()
-   const { isAutoSaving } = useAutoSave()
 
    const handlePublishClick = useCallback(async () => {
-      if (!isValid) {
-         enqueueSnackbar("Form is invalid, please fix errors first.", {
-            variant: "error",
-         })
-         return
-      }
-
       try {
-         const livestreamObject = mapFormValuesToLivestreamObject(values)
-         livestreamObject.id = livestream.id
-         livestreamObject.test = false
-         livestreamObject.hasEnded = false
-         livestreamObject.questionsDisabled = false
-         livestreamObject.denyRecordingAccess = false
-         livestreamObject.triGrams = livestreamTriGrams(
-            livestreamObject.title,
-            livestreamObject.company
-         )
-         livestreamObject.lastUpdated =
-            firebaseService.getServerTimestamp() as unknown as Timestamp
-         livestreamObject.hasJobs =
-            values.jobs.customJobs.length > 0 || values.jobs.jobs.length > 0
-         livestreamObject.type = "upcoming"
-
-         const metaData = getMetaDataFromEventHosts(values.questions.hosts)
-         if (metaData) {
-            livestreamObject.companySizes = metaData.companySizes
-            livestreamObject.companyIndustries = metaData.companyIndustries
-            livestreamObject.companyCountries = metaData.companyCountries
-         }
-
-         await handlePublishStream(livestreamObject, {})
+         await publishLivestream()
       } catch (error) {
-         console.error("Auto-save failed:", error)
-         enqueueSnackbar("Failed to auto-save live stream", {
+         console.error("Publish failed:", error)
+         enqueueSnackbar("Failed to publish draft", {
             variant: "error",
          })
       } finally {
          handleCancelClick()
       }
-   }, [
-      enqueueSnackbar,
-      firebaseService,
-      handleCancelClick,
-      handlePublishStream,
-      isValid,
-      livestream.id,
-      values,
-   ])
+   }, [enqueueSnackbar, handleCancelClick, publishLivestream])
 
    return (
       <SteppedDialog.Container
@@ -177,10 +127,10 @@ export const PublishConfirmation = ({
                type="submit"
                onClick={handlePublishClick}
                sx={styles.actionBtn}
-               disabled={!isValid || isAutoSaving}
+               disabled={!isValid}
                loading={isPublishing}
             >
-               {"Publish"}
+               {isPublishing ? "" : "Publish"}
             </SteppedDialog.Button>
          </SteppedDialog.Actions>
       </SteppedDialog.Container>
