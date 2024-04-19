@@ -96,7 +96,7 @@ export const manualTemplatedEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
-      functions.logger.info("manualTemplatedEmail: v2.0")
+      functions.logger.info("manualTemplatedEmail: v3.0 - AAB Talent Pool")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +117,11 @@ export const manualTemplatedEmail = functions
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("Spark Release email sent to everyone")
+         res.status(200).send("AAB Talent Pool email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "Spark Release email sent to " + receivedEmails.join(", ")
+            "AAB Talent Pool email sent to " + receivedEmails.join(", ")
          )
       }
    })
@@ -161,9 +161,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      functions.logger.info(
-         "Spark release email was already sent in this execution environment, skipping"
-      )
+      functions.logger.info("ABB talent pool communication, skipping")
       return
    }
 
@@ -174,20 +172,22 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
+      livestreamsRepo,
       emailBuilder,
       functions.logger
    )
 
-   await newsletterService.fetchRequiredData()
+   await newsletterService.fetchRequiredData(overrideUsers)
 
-   await newsletterService.send(overrideUsers)
+   // Disable for now
+   // await newsletterService.send()
 
    if (!overrideUsers) {
       // set this flag when sending the newsletter to everyone
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("Newsletters execution done")
+   functions.logger.info("ABB talent pool communication execution done")
 }
 
 /**

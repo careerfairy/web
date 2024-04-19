@@ -3,6 +3,7 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 import { ManualTemplatedEmailBuilder } from "./ManualTemplatedEmailBuilder"
+import { ILivestreamFunctionsRepository } from "./LivestreamFunctionsRepository"
 
 /**
  * Gathers all the required data to build the release email
@@ -15,26 +16,48 @@ export class ManualTemplatedEmailService {
 
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
+      private readonly livestreamRepo: ILivestreamFunctionsRepository,
       private readonly emailBuilder: ManualTemplatedEmailBuilder,
       private readonly logger: Logger
    ) {}
 
    /**
-    * Fetches the required data for generating the release email
+    * Fetches the required data for generating the email
     */
-   async fetchRequiredData() {
-      // start fetching in parallel
+   async fetchRequiredData(overrideUsers: string[]) {
+      // start fetching
 
-      const subscribedUsers: UserData[] =
-         await this.userRepo.getSubscribedUsersByCountryCode("CH")
+      const fetchedUsers = await this.userRepo.getSubscribedUsers(overrideUsers)
+      const subscribedUsers: UserData[] = fetchedUsers ? fetchedUsers : []
+
+      // AAB Livestream
+      const livestreams = await this.livestreamRepo.getLivestreamsByIds([
+         "WWV4LsLI1Ec0dQjiiUyn",
+      ])
+
+      if (!livestreams || !livestreams.length) {
+         this.logger.error("Could not retrieve AAB livestream by ID")
+         return this
+      }
+
+      const aabLivestream = livestreams.at(0)
+
+      // Filter: User is in ABB talent pool AND
+      const filteredRegisteredUsers = subscribedUsers.filter((user) => {
+         const isUserRegistered = aabLivestream.registeredUsers.includes(
+            user.id
+         )
+         const isUserInTalentPool = aabLivestream.talentPool?.includes(user.id)
+         return !isUserRegistered && isUserInTalentPool
+      })
 
       this.subscribedUsers = convertDocArrayToDict(
-         subscribedUsers as UserData[]
+         filteredRegisteredUsers as UserData[]
       )
 
       this.logger.info(
-         "Total Users subscribed to the release email for universityCountryCode CH only",
-         subscribedUsers.length
+         "Total Users subscribed to the release email for AAB Talent Pool communication",
+         this.subscribedUsers
       )
 
       return this
@@ -46,15 +69,17 @@ export class ManualTemplatedEmailService {
     * Possibility of overriding the users to send the release email to
     * for testing purposes
     */
-   send(overrideUsers?: string[]) {
-      const emails = overrideUsers ?? Object.keys(this.subscribedUsers)
+   send() {
+      // COMMENTED OUT AS PRECAUTION
+      this.logger.info("Sending is disabled", this.emailBuilder)
+      // const emails = Object.keys(this.subscribedUsers)
 
-      for (const userEmail of emails) {
-         const name = this.subscribedUsers[userEmail]?.firstName ?? ""
+      // for (const userEmail of emails) {
+      //    const name = this.subscribedUsers[userEmail]?.firstName ?? ""
 
-         this.emailBuilder.addRecipient(userEmail, name)
-      }
+      //    this.emailBuilder.addRecipient(userEmail, name)
+      // }
 
-      return this.emailBuilder.send()
+      // return this.emailBuilder.send()
    }
 }
