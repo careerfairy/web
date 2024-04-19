@@ -174,7 +174,8 @@ export const useAutoSave = () => {
                formValuesWithoutErrors
             )
             const mappedObject = mapFormValuesToLivestreamObject(
-               formValuesWithoutErrors
+               formValuesWithoutErrors,
+               firebaseService
             )
 
             console.log("🚀 ~ useEffect ~ mappedObject:", mappedObject)
