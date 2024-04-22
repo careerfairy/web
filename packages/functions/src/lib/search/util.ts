@@ -17,12 +17,12 @@ export const logDeleteIndex = (id: string) => {
 }
 
 // Helper function to append the environment prefix to the index name so Type
-export const appendEnvPrefix = <T extends string>(value: T) => {
-   return `${value}${getEnvPrefix()}`
+export const prependEnvPrefix = <T extends string>(value: T) => {
+   return `${getEnvPrefix() ? `${getEnvPrefix()}_` : ""}${value}` as const
 }
 
 export const initAlgoliaIndex = (indexName: string) => {
-   return algoliaClient.initIndex(appendEnvPrefix(indexName))
+   return algoliaClient.initIndex(prependEnvPrefix(indexName))
 }
 
 type ReplicaEntry = `${string}_${string}_${"asc" | "desc"}`
@@ -39,7 +39,7 @@ async function configureReplica(
 
    const replicaIndex = algoliaClient.initIndex(replicaEntry)
 
-   return replicaIndex.setSettings({
+   await replicaIndex.setSettings({
       ...indexSettings,
       ranking: [
          `${order}(${attribute})`,
@@ -54,23 +54,27 @@ async function configureReplica(
       ],
       replicas: [],
    })
+
+   return prependEnvPrefix(replicaEntry)
 }
 
 export const configureSettings = async (
    settings: IndexSettings,
    index: SearchIndex
 ) => {
-   const newSettings = {
-      ...settings,
-      replicas:
-         (settings.replicas?.map(appendEnvPrefix) as ReplicaEntry[]) || [],
-   }
+   const configuredReplicas = await Promise.all(
+      settings.replicas?.map(
+         async (entry) => await configureReplica(entry, settings)
+      ) || []
+   )
 
-   for (const entry of settings.replicas) {
-      await configureReplica(entry, newSettings)
-   }
-
-   await index.setSettings(newSettings, {
-      forwardToReplicas: true,
-   })
+   await index.setSettings(
+      {
+         ...settings,
+         replicas: configuredReplicas,
+      },
+      {
+         forwardToReplicas: true,
+      }
+   )
 }

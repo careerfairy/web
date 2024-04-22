@@ -392,12 +392,12 @@ export const getEnvPrefix = () => {
    }
 
    if (isTestEnvironment()) {
-      return "_test"
+      return "test"
    }
 
    const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
 
-   return `_${prefix}`
+   return prefix
 }
 
 export const logAxiosError = (error: any) => {
