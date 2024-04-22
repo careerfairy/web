@@ -17,11 +17,14 @@ import {
 import {
    ArrayFilterFieldType,
    BooleanFilterFieldType,
+   LivestreamReplicaType,
 } from "@careerfairy/shared-lib/livestreams/search"
 
 type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
 }
+
+type Key = ["searchLivestreams", string, string, number, LivestreamReplicaType]
 
 export type FilterOptions = {
    arrayFilters?: Partial<Record<ArrayFilterFieldType, string[]>>
@@ -88,11 +91,11 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
 export function useLivestreamSearchAlgolia(
    inputValue: string,
    options: FilterOptions,
-
+   targetReplica?: LivestreamReplicaType,
    disable?: boolean
 ) {
    const getKey = useCallback(
-      (pageIndex: number, previousPageData: Data | null) => {
+      (pageIndex: number, previousPageData: Data | null): Key => {
          // If reached the end of the list, return null to stop fetching
          if (previousPageData && !previousPageData.hits.length) return null
          return [
@@ -100,17 +103,19 @@ export function useLivestreamSearchAlgolia(
             inputValue,
             buildAlgoliaFilterString(options),
             pageIndex,
+            targetReplica,
          ]
       },
-      [inputValue, options]
+      [inputValue, options, targetReplica]
    )
 
-   const fetcher = async (key): Promise<Data> => {
-      const [, inputValue, filters, page] = key
+   const fetcher = async (key: Key): Promise<Data> => {
+      const [, inputValue, filters, page, replica] = key
       const result = await algoliaRepo.searchLivestreams(
          inputValue,
          filters,
-         page
+         page,
+         replica
       )
       return {
          ...result,

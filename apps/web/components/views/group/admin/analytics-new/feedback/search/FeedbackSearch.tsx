@@ -13,6 +13,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Search as FindIcon } from "react-feather"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { LivestreamSearchResult } from "types/algolia"
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 
 const styles = sxStyles({
    root: {
@@ -80,7 +81,11 @@ const FeedbackSearch: FC = () => {
             }
          >
             <LivestreamSearch
-               orderByDirection={SORT_DIRECTIONS[sortDirection]}
+               targetReplica={
+                  sortDirection === "Latest"
+                     ? LIVESTREAM_REPLICAS.START_DESC
+                     : LIVESTREAM_REPLICAS.START_ASC
+               }
                handleChange={handleChange}
                value={null}
                inputValue={inputValue}
