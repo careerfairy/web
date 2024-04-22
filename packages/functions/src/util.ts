@@ -391,6 +391,10 @@ export const getEnvPrefix = () => {
       return ""
    }
 
+   if (isTestEnvironment()) {
+      return "_test"
+   }
+
    const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
 
    return `_${prefix}`
