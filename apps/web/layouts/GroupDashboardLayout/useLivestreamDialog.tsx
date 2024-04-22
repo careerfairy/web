@@ -62,7 +62,7 @@ export const useLivestreamDialog = (group: Group) => {
    )
 
    const handlePublishStream = useCallback(
-      async (streamObj, promotion) => {
+      async (streamObj, promotion, ratings?) => {
          try {
             setIsPublishing(true)
             const newStream = { ...streamObj }
@@ -72,7 +72,8 @@ export const useLivestreamDialog = (group: Group) => {
                newStream,
                "livestreams",
                author,
-               promotion
+               promotion,
+               ratings
             )
             newStream.id = publishedStreamId
 
