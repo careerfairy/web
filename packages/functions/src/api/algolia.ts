@@ -4,7 +4,7 @@ import { isTestEnvironment } from "src/util"
 let appId: string
 let apiKey: string
 
-// TODO: Relocate this variable to a test env file as part of PR: https://github.com/careerfairy/web/pull/915
+// TODO: Relocate these test variables to a test env file as part of PR: https://github.com/careerfairy/web/pull/915
 if (isTestEnvironment()) {
    appId = "W1YCBYSEZ3"
    apiKey = "799a8ac590c7132b16979367215eb8c3"
