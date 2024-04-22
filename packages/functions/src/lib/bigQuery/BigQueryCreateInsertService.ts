@@ -22,7 +22,7 @@ class BigQueryCreateInsertService<TRow> extends BigQueryServiceCore {
    ) {
       super(bigQueryClient)
       this.datasetId = datasetId
-      this.tableId = `${tableId}${getEnvPrefix()}`
+      this.tableId = `${tableId}${getEnvPrefix() ? `_${getEnvPrefix()}` : ""}`
       this.tableOptions = tableOptions
    }
 

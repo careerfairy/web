@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import * as Sentry from "@sentry/nextjs"
@@ -79,10 +80,9 @@ export function getReferralInformation() {
  * @returns {string}
  */
 export function getListSeparator() {
-   let list = ["a", "b"],
-      str
+   const list = ["a", "b"]
    if (list.toLocaleString) {
-      str = list.toLocaleString()
+      const str = list.toLocaleString()
       if (str.indexOf(";") > 0 && str.indexOf(",") === -1) {
          return ";"
       }
@@ -101,7 +101,7 @@ export function getCSVDelimiterBasedOnOS() {
 }
 
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
-   let params = new URL(url).searchParams
+   const params = new URL(url).searchParams
    return params.get(queryParam)
 }
 
@@ -216,7 +216,7 @@ export const capitalizeFirstLetter = (string: string) => {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export const errorLogAndNotify = (error: Error, metadata?: any) => {
+export const errorLogAndNotify = (error: Error, metadata?: object) => {
    console.error("error", error)
    Sentry.captureException(error, metadata)
 }
@@ -242,15 +242,15 @@ export const shouldUseEmulators = () => {
 
 export const getEnvPrefix = () => {
    if (!shouldUseEmulators()) {
-      return "" // no prefix for production
+      return "prod"
    }
 
    const prefix = process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
 
-   return `_${prefix}`
+   return `${prefix}`
 }
 
-export const getDictValues = <K extends keyof any, T>(
+export const getDictValues = <K extends keyof unknown, T>(
    valueKeys: K[],
    dict: Record<K, T>
 ): T[] => {
