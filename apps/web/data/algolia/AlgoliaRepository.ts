@@ -5,6 +5,7 @@ import { SortType } from "../../components/views/common/filter/FilterMenu"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { initAlgoliaIndex } from "./util"
 import { AlgoliaLivestreamResponse } from "types/algolia"
+import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
 
 export interface IAlgoliaRepository {
    searchWishes(
@@ -14,7 +15,8 @@ export interface IAlgoliaRepository {
    searchLivestreams(
       query: string,
       filters: string,
-      page: number
+      page: number,
+      targetReplica?: LivestreamReplicaType
    ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
 }
 interface SearchWishesOptions {
@@ -62,8 +64,15 @@ class AlgoliaRepository implements IAlgoliaRepository {
       })
    }
 
-   async searchLivestreams(query: string, filters: string, page: number) {
-      const index = initAlgoliaIndex("livestreams")
+   async searchLivestreams(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: LivestreamReplicaType
+   ) {
+      const index = initAlgoliaIndex(
+         targetReplica ? targetReplica : "livestreams"
+      )
       return index.search<AlgoliaLivestreamResponse>(query, {
          filters,
          page,

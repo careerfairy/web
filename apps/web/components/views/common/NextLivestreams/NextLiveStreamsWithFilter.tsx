@@ -1,4 +1,11 @@
-import { Box, Card, Container, Grid, Typography } from "@mui/material"
+import {
+   Box,
+   Card,
+   CircularProgress,
+   Container,
+   Grid,
+   Typography,
+} from "@mui/material"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Search as FindIcon } from "react-feather"
@@ -23,6 +30,8 @@ import useLivestreamsSWR, {
 } from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { LivestreamSearchResult } from "types/algolia"
 import { useInView } from "react-intersection-observer"
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
+import { useDebounce } from "react-use"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -43,6 +52,10 @@ const styles = sxStyles({
       ml: { xs: 2, md: 4 },
       backgroundColor: "white",
       borderRadius: wishListBorderRadius,
+   },
+   loader: {
+      display: "flex",
+      justifyContent: "center",
    },
 })
 
@@ -75,6 +88,16 @@ const NextLiveStreamsWithFilter = ({
       useFieldsOfStudy()
 
    const [inputValue, setInputValue] = useState("")
+
+   const [debouncedInputValue, setDebouncedInputValue] = useState("")
+
+   useDebounce(
+      () => {
+         setDebouncedInputValue(inputValue)
+      },
+      250,
+      [inputValue]
+   )
 
    const {
       languages,
@@ -167,10 +190,16 @@ const NextLiveStreamsWithFilter = ({
       ]
    )
 
+   const targetReplica =
+      initialTabValue === "pastEvents"
+         ? LIVESTREAM_REPLICAS.START_DESC
+         : LIVESTREAM_REPLICAS.START_ASC
+
    const { data: livestreams } = useLivestreamsSWR(swrQuery)
    const { data, setSize, isValidating } = useLivestreamSearchAlgolia(
-      inputValue,
-      filterOptions
+      debouncedInputValue,
+      filterOptions,
+      targetReplica
    )
 
    const infiniteLivestreams = useMemo(() => {
@@ -254,14 +283,15 @@ const NextLiveStreamsWithFilter = ({
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
-                     orderByDirection={hasPastEvents ? "desc" : "asc"}
                      handleChange={handleSearch}
                      value={null}
                      endIcon={<FindIcon color={"black"} />}
                      hasPastEvents={hasPastEvents}
                      filterOptions={filterOptions}
                      inputValue={inputValue}
+                     debouncedInputValue={debouncedInputValue}
                      setInputValue={setInputValue}
+                     targetReplica={targetReplica}
                      freeSolo
                   />
                </Card>
@@ -282,6 +312,11 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+         {Boolean(isValidating) && (
+            <Box sx={styles.loader}>
+               <CircularProgress />
+            </Box>
+         )}
          <Box ref={ref} />
       </>
    )

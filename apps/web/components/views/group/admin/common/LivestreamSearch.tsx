@@ -4,7 +4,6 @@ import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import {
    FilterOptions,
@@ -13,6 +12,7 @@ import {
 import { LivestreamSearchResult } from "types/algolia"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import { Tag } from "react-feather"
+import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
 
 const styles = sxStyles({
    root: {
@@ -59,25 +59,33 @@ type Props = {
    filterOptions: FilterOptions
    placeholderText?: string
    inputValue: string
+   // optional: if you want to use debounce and separate the input ui and search state
+   debouncedInputValue?: string
    setInputValue: (value: string) => void
    freeSolo?: boolean
+   targetReplica?: LivestreamReplicaType
 }
 
 const LivestreamSearch: FC<Props> = ({
    value,
    handleChange,
-   orderByDirection,
    startIcon,
    endIcon,
    filterOptions,
    placeholderText = "Search by title, company or industry",
    inputValue,
+   debouncedInputValue,
    setInputValue,
    freeSolo,
+   targetReplica,
 }) => {
    const [open, setOpen] = useState(false)
 
-   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions)
+   const { data } = useLivestreamSearchAlgolia(
+      debouncedInputValue ?? inputValue,
+      filterOptions,
+      targetReplica
+   )
 
    const firstPage = data?.[0]
 
@@ -90,12 +98,8 @@ const LivestreamSearch: FC<Props> = ({
          sortedHits.push(value)
       }
 
-      sortedHits.sort((a, b) =>
-         sortLivestreamsDesc(a, b, orderByDirection === "asc")
-      )
-
       return sortedHits
-   }, [firstPage, orderByDirection, value])
+   }, [firstPage, value])
 
    return (
       <AutocompleteSearch
