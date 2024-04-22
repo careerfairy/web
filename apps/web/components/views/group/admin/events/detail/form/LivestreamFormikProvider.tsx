@@ -126,13 +126,17 @@ const buildRegistrationQuestions = (
    isAdmin: boolean,
    group: { groupId: string }
 ): LivestreamFormQuestionsTabValues["registrationQuestions"]["values"] => {
+   if (!groupQuestionsMap[group.groupId]) {
+      return []
+   }
+
    const filteredGroupQuestionsMap = isAdmin
       ? groupQuestionsMap
       : { [group.groupId]: groupQuestionsMap[group.groupId] }
 
    return Object.keys(filteredGroupQuestionsMap).flatMap((groupId) => {
       const livestreamQuestionMap = filteredGroupQuestionsMap[groupId]
-      const questions = Object.values(livestreamQuestionMap.questions).map(
+      const questions = Object.values(livestreamQuestionMap?.questions)?.map(
          (question) => {
             const { groupId, groupName, universityCode } = livestreamQuestionMap
             return {
@@ -210,15 +214,21 @@ const convertLivestreamObjectToForm = ({
    // Previously was a single field (i.e. a single string) and now it's an array of strings
    general.reasonsToJoin = livestream.reasonsToJoinLivestream
       ? [livestream.reasonsToJoinLivestream, undefined, undefined]
-      : livestream.reasonsToJoinLivestream_v2
+      : livestream.reasonsToJoinLivestream_v2 ||
+        formGeneralTabInitialValues.reasonsToJoin
+
+   // This is to ensure backwards compatibility
+   const filteredSpeakers = livestream.speakers.filter(
+      (speaker) => speaker.firstName && speaker.lastName
+   )
+
+   const mappedSpeakers = filteredSpeakers.map(mapSpeakerToCreator)
 
    return {
       general: general,
       speakers: {
-         values: livestream.speakers
-            ? livestream.speakers.map(mapSpeakerToCreator)
-            : [],
-         options: unionCreatorsAndSpeakers(creators, livestream.speakers),
+         values: livestream.speakers ? mappedSpeakers : [],
+         options: unionCreatorsAndSpeakers(creators, filteredSpeakers),
          creatorsIds: livestream.creatorsIds,
       },
       questions: {
