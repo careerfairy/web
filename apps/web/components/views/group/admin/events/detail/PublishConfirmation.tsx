@@ -117,6 +117,7 @@ export const PublishConfirmation = ({
                color="grey"
                onClick={handleCancelClick}
                sx={[styles.cancelBtn, styles.actionBtn]}
+               disabled={isPublishing}
             >
                Keep editing
             </SteppedDialog.Button>
