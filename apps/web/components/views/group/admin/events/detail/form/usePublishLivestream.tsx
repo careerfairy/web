@@ -48,6 +48,7 @@ export const usePublishLivestream = () => {
             (question) =>
                question.question && question.type && question.appearAfter
          )
+         .filter((question) => !question.deleted)
          .map((question) =>
             mapFeedbackQuestionToRatings(question, livestreamObject.duration)
          )
