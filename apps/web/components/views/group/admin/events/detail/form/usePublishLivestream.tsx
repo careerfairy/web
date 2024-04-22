@@ -7,6 +7,7 @@ import { useCallback } from "react"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
 import { mapFormValuesToLivestreamObject } from "./commons"
 import { useLivestreamFormValues } from "./useLivestreamFormValues"
+import { mapFeedbackQuestionToRatings } from "./views/questions/commons"
 
 export const usePublishLivestream = () => {
    const firebaseService = useFirebaseService()
@@ -42,7 +43,16 @@ export const usePublishLivestream = () => {
          livestreamObject.companyCountries = metaData.companyCountries
       }
 
-      return handlePublishStream(livestreamObject, {})
+      const ratings = values.questions.feedbackQuestions
+         .filter(
+            (question) =>
+               question.question && question.type && question.appearAfter
+         )
+         .map((question) =>
+            mapFeedbackQuestionToRatings(question, livestreamObject.duration)
+         )
+
+      return handlePublishStream(livestreamObject, {}, ratings)
    }, [
       enqueueSnackbar,
       firebaseService,
