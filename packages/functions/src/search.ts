@@ -72,7 +72,7 @@ export const fullIndexSync = functions
       } = knownIndexes[indexName]
 
       if (settings) {
-         functions.logger.info(`Configuring settings for ${indexName} v5`)
+         functions.logger.info(`Configuring settings for ${indexName}`)
          await configureSettings(settings, index)
          functions.logger.info(`Settings configured for ${indexName}`)
       }

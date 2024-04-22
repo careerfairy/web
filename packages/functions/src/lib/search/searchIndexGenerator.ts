@@ -115,8 +115,8 @@ const handleDeleteDocument = async (
       functions.logger.error(e)
    }
 }
-// Helper type to extract keys with number type properties
-type NumericKeys<T> = {
+// Helper type to extract keys with number or string type properties like `startTimeMs` or `title`
+type NumericKey<T> = {
    [K in keyof T]: T[K] extends number | string | boolean
       ? K extends string
          ? K
@@ -142,7 +142,7 @@ export type IndexSettings<
     * Specifies the replicas for indexing in the format example: `livestreams_startTimeMs_asc`.
     * Ensure `attributeName` is a numeric or string key from `DataTypeTransformed`.
     */
-   replicas: Array<`${TIndexName}_${NumericKeys<DataTypeTransformed>}_${
+   replicas: Array<`${TIndexName}_${NumericKey<DataTypeTransformed>}_${
       | "asc"
       | "desc"}`>
 }
@@ -176,11 +176,6 @@ export type Index<
     */
    transformData?: DocumentTransformer<DataType, DataTypeTransformed>
    settings?: IndexSettings<DataTypeTransformed, TIndexName>
-   /**
-    * Specifies the replicas for indexing in the format: `${attributeName}_${sortingOrder}`.
-    * Ensure `attributeName` is a numeric or string key from `DataTypeTransformed`.
-    */
-   // replicaEntries?: Array<ReplicaEntry>
    /**
     * Function that determines whether or not to index a document. If not provided, all documents will be indexed.
     * @param doc The document to index

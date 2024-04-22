@@ -29,7 +29,7 @@ type ReplicaEntry = `${string}_${string}_${"asc" | "desc"}`
 
 async function configureReplica(
    replicaEntry: ReplicaEntry,
-   rootIndexSettings: IndexSettings
+   indexSettings: IndexSettings
 ) {
    const [, attribute, order] = replicaEntry.split("_") as [
       string, // index name
@@ -39,9 +39,8 @@ async function configureReplica(
 
    const replicaIndex = algoliaClient.initIndex(replicaEntry)
 
-   delete rootIndexSettings.replicas
-
    return replicaIndex.setSettings({
+      ...indexSettings,
       ranking: [
          `${order}(${attribute})`,
          "typo",
@@ -53,7 +52,7 @@ async function configureReplica(
          "exact",
          "custom",
       ],
-      ...rootIndexSettings,
+      replicas: [],
    })
 }
 
