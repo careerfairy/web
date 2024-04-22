@@ -19,6 +19,7 @@ import {
    BooleanFilterFieldType,
    LivestreamReplicaType,
 } from "@careerfairy/shared-lib/livestreams/search"
+import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
 
 type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
@@ -37,6 +38,7 @@ export type FilterOptions = {
 
 const now = new Date()
 const past = new Date(0)
+const earliestEventBufferTime = getEarliestEventBufferTime()
 
 /**
  * Generates a date filter string for Algolia search based on the provided date filter options.
@@ -50,7 +52,7 @@ const generateDateFilterString = (
 
    switch (dateFilter) {
       case "future":
-         return generateDateFilter("startTimeMs", now, null)
+         return generateDateFilter("startTimeMs", earliestEventBufferTime, null)
       case "past":
          return generateDateFilter("startTimeMs", past, now)
       default:

@@ -1,5 +1,5 @@
 import algoliasearch from "algoliasearch"
-import { isTestEnvironment } from "src/util"
+import { isTestEnvironment } from "../util"
 
 let appId: string
 let apiKey: string
