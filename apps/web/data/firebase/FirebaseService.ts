@@ -616,12 +616,12 @@ class FirebaseService {
       collection: "livestreams" | "draftLivestreams",
       author: AuthorInfo,
       promotion,
-      feedbackQuestions?: EventRating[]
+      newRatings?: EventRating[]
    ) => {
       try {
          let ratings: EventRating[] = []
-         if (feedbackQuestions) {
-            ratings = [...feedbackQuestions]
+         if (newRatings) {
+            ratings = [...newRatings]
          } else {
             ratings = [
                {
