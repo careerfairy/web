@@ -56,6 +56,13 @@ export const configureSettings = async (
 ) => {
    await index.setSettings(settings)
 
+   const env = {
+      appId: process.env.ALGOLIA_APP_ID,
+      apiKey: process.env.ALGOLIA_API_KEY,
+   }
+
+   console.log("🚀 ~ HABIB-LOG env:", env)
+
    for (const entry of settings.replicas) {
       await configureReplica(entry, settings)
    }
