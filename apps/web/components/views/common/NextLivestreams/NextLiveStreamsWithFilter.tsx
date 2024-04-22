@@ -25,9 +25,6 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
-import useLivestreamsSWR, {
-   UseLivestreamsSWROptions,
-} from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { LivestreamSearchResult } from "types/algolia"
 import { useInView } from "react-intersection-observer"
 import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
@@ -84,8 +81,7 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
 
-   const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
-      useFieldsOfStudy()
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
 
    const [inputValue, setInputValue] = useState("")
 
@@ -103,7 +99,6 @@ const NextLiveStreamsWithFilter = ({
       languages,
       companyCountries,
       companyIndustries,
-      recordedOnly,
       fieldsOfStudy,
       companyId,
       denyRecordingAccess,
@@ -130,36 +125,6 @@ const NextLiveStreamsWithFilter = ({
          FilterEnum.FIELDS_OF_STUDY,
       ],
       [companyId, hasPastEvents]
-   )
-
-   const mapFieldsOfStudy = useMemo(
-      () =>
-         allFieldsOfStudy?.filter((item) => fieldsOfStudy?.includes(item.id)),
-      [allFieldsOfStudy, fieldsOfStudy]
-   )
-
-   const swrQuery = useMemo<UseLivestreamsSWROptions>(
-      () => ({
-         languageCodes: languages,
-         companyCountries: companyCountries,
-         companyIndustries: companyIndustries,
-         targetFieldsOfStudy: mapFieldsOfStudy,
-         withRecordings: recordedOnly,
-         targetGroupId: companyId,
-         withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-         type: initialTabValue,
-         disabled: isLoadingFieldsOfStudy,
-      }),
-      [
-         languages,
-         companyCountries,
-         companyIndustries,
-         mapFieldsOfStudy,
-         recordedOnly,
-         companyId,
-         initialTabValue,
-         isLoadingFieldsOfStudy,
-      ]
    )
 
    const filterOptions = useMemo<FilterOptions>(
@@ -195,12 +160,13 @@ const NextLiveStreamsWithFilter = ({
          ? LIVESTREAM_REPLICAS.START_DESC
          : LIVESTREAM_REPLICAS.START_ASC
 
-   const { data: livestreams } = useLivestreamsSWR(swrQuery)
    const { data, setSize, isValidating } = useLivestreamSearchAlgolia(
       debouncedInputValue,
       filterOptions,
       targetReplica
    )
+
+   const numberOfResults = data?.[0]?.nbHits || 0
 
    const infiniteLivestreams = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) || []
@@ -298,7 +264,7 @@ const NextLiveStreamsWithFilter = ({
                <Box sx={styles.filter}>
                   <Filter
                      filtersToShow={filtersToShow}
-                     numberOfResults={livestreams?.length}
+                     numberOfResults={numberOfResults}
                   />
                </Box>
             </Box>
