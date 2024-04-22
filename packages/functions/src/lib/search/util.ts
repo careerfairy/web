@@ -66,9 +66,11 @@ export const configureSettings = async (
          (settings.replicas?.map(appendEnvPrefix) as ReplicaEntry[]) || [],
    }
 
-   await index.setSettings(newSettings)
-
    for (const entry of settings.replicas) {
       await configureReplica(entry, newSettings)
    }
+
+   await index.setSettings(newSettings, {
+      forwardToReplicas: true,
+   })
 }
