@@ -1,6 +1,6 @@
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
 import { useRouter } from "next/router"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import Link from "../../../../components/views/common/Link"
@@ -14,11 +14,15 @@ import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 import { ParsedUrlQuery } from "querystring"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
-import { FilterOptions } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import useLivestreamsSWR, {
    UseLivestreamsSWROptions,
 } from "components/custom-hook/live-stream/useLivestreamsSWR"
 import { LivestreamSearchResult } from "types/algolia"
+import { useInView } from "react-intersection-observer"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -70,6 +74,8 @@ const NextLiveStreamsWithFilter = ({
    const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
       useFieldsOfStudy()
 
+   const [inputValue, setInputValue] = useState("")
+
    const {
       languages,
       companyCountries,
@@ -81,6 +87,11 @@ const NextLiveStreamsWithFilter = ({
    } = useMemo(() => getQueryVariables(query), [query])
 
    const isMobile = useIsMobile()
+
+   const { inView, ref } = useInView({
+      rootMargin: "0px 0px 200px 0px",
+   })
+
    const hasPastEvents = useMemo(
       () => initialTabValue === "pastEvents",
       [initialTabValue]
@@ -157,6 +168,25 @@ const NextLiveStreamsWithFilter = ({
    )
 
    const { data: livestreams } = useLivestreamsSWR(swrQuery)
+   const { data, setSize, isValidating } = useLivestreamSearchAlgolia(
+      inputValue,
+      filterOptions
+   )
+
+   const infiniteLivestreams = useMemo(() => {
+      return data?.flatMap((page) => page.deserializedHits) || []
+   }, [data])
+
+   const isValidatingRef = useRef(isValidating)
+   isValidatingRef.current = isValidating
+
+   useEffect(() => {
+      if (isValidatingRef.current) return
+
+      if (inView) {
+         setSize((prevSize) => prevSize + 1)
+      }
+   }, [inView, setSize])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -230,6 +260,9 @@ const NextLiveStreamsWithFilter = ({
                      endIcon={<FindIcon color={"black"} />}
                      hasPastEvents={hasPastEvents}
                      filterOptions={filterOptions}
+                     inputValue={inputValue}
+                     setInputValue={setInputValue}
+                     freeSolo
                   />
                </Card>
                <Box sx={styles.filter}>
@@ -243,12 +276,13 @@ const NextLiveStreamsWithFilter = ({
 
          <StreamsSection
             value={initialTabValue}
-            upcomingLivestreams={livestreams}
+            upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
-            pastLivestreams={livestreams}
+            pastLivestreams={infiniteLivestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+         <Box ref={ref} />
       </>
    )
 }

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import LivestreamSearch from "../../../common/LivestreamSearch"
@@ -43,6 +43,8 @@ const FeedbackSearch: FC = () => {
    const { setSortDirection, sortDirection, handleOpenFeedbackDialog } =
       useFeedbackPageContext()
 
+   const [inputValue, setInputValue] = useState("")
+
    const handleChange = useCallback(
       (hit: LivestreamSearchResult | null) => {
          if (hit) {
@@ -81,6 +83,8 @@ const FeedbackSearch: FC = () => {
                orderByDirection={SORT_DIRECTIONS[sortDirection]}
                handleChange={handleChange}
                value={null}
+               inputValue={inputValue}
+               setInputValue={setInputValue}
                placeholderText="Search by title"
                startIcon={<FindIcon color={"black"} />}
                filterOptions={{
