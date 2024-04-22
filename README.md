@@ -246,25 +246,19 @@ We use [Stripe](https://docs.stripe.com/cli) for processing payments and easily 
 
 # Setting Up Algolia
 
-### Creating Your Application in Algolia
+## Algolia Setup for Web App
 
-In order to get your environment variables, you will need to create a new application in Algolia.
+1. **Environment Variables:** Ensure you have the Algolia environment variables set up in your `.env.local` file for the web app. You need to specify the Algolia App ID and the Algolia Search API Key, they can be obtained by logging into the [shared](https://www.notion.so/Algolia-Search-b05602e4ff25447d8e1c0e865f627cb1) Algolia account. Refer to the example in `apps/web/.env.local.example`:
 
-1. **Navigate to the Algolia Dashboard:** Start by logging into your Algolia account and accessing your dashboard via Algolia [Dashboard](https://dashboard.algolia.com/dashboard), the credentials can be found [here](ttps://www.notion.so/Algolia-Search-b05602e4ff25447d8e1c0e865f627cb1).
-2. **Create a new Application:** Click on settings at the bottom left, then click applications and final click "Create Application". Go back to settings -> applications then click on the dots right next to the application called (unnamed application) and rename it to your name.
-3. **Create an API Key:** Go to settings -> API Keys -> All API Keys -> New API Key. Give it a description "Cloud functions admin API key", then scroll to the bottom and select the scopes. The scopes should be `search` and `addObject`, `deleteObject`, `listIndexes`, `deleteIndex`, `editSettings` then click "Create".
+```sell
+NEXT_PUBLIC_ALGOLIA_APP_ID=ask-your-team
+NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=ask-your-team
+NEXT_PUBLIC_DEV_NAME=dev_firstName
+```
 
-### Where to Find Environment Variables
+## Full Index Sync with Algolia
 
-First, navigate to your application in Algolia and click on the settings icon. If you don't have your own personal application, follow the [Creating Your Application in Algolia](#creating-your-application-in-algolia) section.
-
-1. **Algolia App ID:** Go to Settings -> API Keys You should then be able to see a button to copy the Application ID
-2. **Algolia Search API Key:** Go to Settings -> API Keys You should then be able to copy the Search-only API Key
-3. **Algolia Admin API Key:** Go to Settings -> API Keys -> All API Keys You should copy the custom key you created
-
-### Full Index Sync with Algolia
-
-To synchronize a Firestore collection with Algolia, you can trigger a full index sync. This process is defined in `packages/functions/src/search.ts`. Please make sure you have the the steps above to get the environment variables.
+To synchronize a Firestore collection with Algolia, you can trigger a full index sync. This process is defined in `packages/functions/src/search.ts`.
 
 1. **Triggering the Sync:** Use the curl command to start the sync. Replace `indexName` with one of the available index names at `packages/functions/src/lib/search/searchIndexes.ts` and `secretKey` with the `ALGOLIA_FULL_SYNC_SECRET_KEY` found in `packages/functions/.env`.
 
