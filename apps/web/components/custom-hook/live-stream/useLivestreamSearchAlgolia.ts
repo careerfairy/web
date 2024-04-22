@@ -1,5 +1,5 @@
 import algoliaRepo from "data/algolia/AlgoliaRepository"
-import useSWR from "swr"
+import useSWRInfinite from "swr/infinite"
 import { errorLogAndNotify } from "util/CommonUtil"
 import {
    AlgoliaLivestreamResponse,
@@ -7,8 +7,7 @@ import {
    LivestreamSearchResult,
 } from "types/algolia"
 import { SearchResponse } from "@algolia/client-search"
-import { useState } from "react"
-import { useDebounce } from "react-use"
+import { useCallback } from "react"
 import {
    deserializeAlgoliaSearchResponse,
    generateArrayFilterString,
@@ -33,6 +32,9 @@ export type FilterOptions = {
       | DateFilterFieldType<AlgoliaLivestreamResponse>
 }
 
+const now = new Date()
+const past = new Date(0)
+
 /**
  * Generates a date filter string for Algolia search based on the provided date filter options.
  * @param {FilterOptions['dateFilter']} dateFilter - The date filter option.
@@ -45,9 +47,9 @@ const generateDateFilterString = (
 
    switch (dateFilter) {
       case "future":
-         return generateDateFilter("startTimeMs", new Date(), null)
+         return generateDateFilter("startTimeMs", now, null)
       case "past":
-         return generateDateFilter("startTimeMs", new Date(0), new Date())
+         return generateDateFilter("startTimeMs", past, now)
       default:
          return generateDateFilter(
             dateFilter.attribute,
@@ -78,11 +80,6 @@ const buildAlgoliaFilterString = (options: FilterOptions): string => {
    return filters.filter(Boolean).join(" AND ")
 }
 
-type DebouncedSearch = {
-   filters: string
-   inputValue: string
-}
-
 /**
  * A custom React hook used for performing searches of livestream events in Algolia.
  * @param  inputValue - The search string input by the user
@@ -91,45 +88,38 @@ type DebouncedSearch = {
 export function useLivestreamSearchAlgolia(
    inputValue: string,
    options: FilterOptions,
+
    disable?: boolean
 ) {
-   const filters = buildAlgoliaFilterString(options)
-
-   const [debouncedSearch, setDebouncedSearch] = useState<DebouncedSearch>({
-      filters,
-      inputValue,
-   })
-
-   useDebounce(
-      () => {
-         setDebouncedSearch({
-            filters,
+   const getKey = useCallback(
+      (pageIndex: number, previousPageData: Data | null) => {
+         // If reached the end of the list, return null to stop fetching
+         if (previousPageData && !previousPageData.hits.length) return null
+         return [
+            "searchLivestreams",
             inputValue,
-         })
+            buildAlgoliaFilterString(options),
+            pageIndex,
+         ]
       },
-      500,
       [inputValue, options]
    )
 
-   return useSWR<Data>(
-      disable
-         ? null
-         : `search-livestreams-input-${debouncedSearch.inputValue}-filters-${debouncedSearch.filters}`,
-      async () => {
-         if (!debouncedSearch.inputValue && !debouncedSearch.filters)
-            return null
-
-         const result = await algoliaRepo.searchLivestreams(
-            debouncedSearch.inputValue,
-            debouncedSearch.filters
-         )
-         return {
-            ...result,
-            deserializedHits: result.hits.map(deserializeAlgoliaSearchResponse),
-         }
-      },
-      {
-         onError: errorLogAndNotify,
+   const fetcher = async (key): Promise<Data> => {
+      const [, inputValue, filters, page] = key
+      const result = await algoliaRepo.searchLivestreams(
+         inputValue,
+         filters,
+         page
+      )
+      return {
+         ...result,
+         deserializedHits: result.hits.map(deserializeAlgoliaSearchResponse),
       }
-   )
+   }
+
+   return useSWRInfinite<Data>(disable ? null : getKey, fetcher, {
+      onError: errorLogAndNotify,
+      keepPreviousData: true,
+   })
 }

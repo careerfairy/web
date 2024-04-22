@@ -36,6 +36,7 @@ const livestreamIndex = {
    settings: {
       attributesForFaceting: LIVESTREAM_FILTERING_FIELDS,
       searchableAttributes: LIVESTREAM_SEARCHABLE_ATTRIBUTES,
+      replicas: ["livestreams_startTimeMs_desc", "livestreams_startTimeMs_asc"],
    },
 } satisfies Index<LivestreamEvent, TransformedLivestreamEvent>
 

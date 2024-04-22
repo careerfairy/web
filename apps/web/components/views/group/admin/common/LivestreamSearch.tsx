@@ -58,6 +58,9 @@ type Props = {
    includeHiddenEvents?: boolean
    filterOptions: FilterOptions
    placeholderText?: string
+   inputValue: string
+   setInputValue: (value: string) => void
+   freeSolo?: boolean
 }
 
 const LivestreamSearch: FC<Props> = ({
@@ -68,15 +71,19 @@ const LivestreamSearch: FC<Props> = ({
    endIcon,
    filterOptions,
    placeholderText = "Search by title, company or industry",
+   inputValue,
+   setInputValue,
+   freeSolo,
 }) => {
-   const [inputValue, setInputValue] = useState("")
-
    const [open, setOpen] = useState(false)
 
-   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions, !open)
+   const { data } = useLivestreamSearchAlgolia(inputValue, filterOptions)
+
+   const firstPage = data?.[0]
 
    const sortedLivestreamHits = useMemo(() => {
-      const sortedHits: LivestreamSearchResult[] = data?.deserializedHits || []
+      const sortedHits: LivestreamSearchResult[] =
+         firstPage?.deserializedHits || []
 
       if (value && !sortedHits?.find((hit) => hit.id === value?.id)) {
          // add current value to sortedHits array if it's not already in there
@@ -88,7 +95,7 @@ const LivestreamSearch: FC<Props> = ({
       )
 
       return sortedHits
-   }, [data, orderByDirection, value])
+   }, [firstPage, orderByDirection, value])
 
    return (
       <AutocompleteSearch
@@ -107,6 +114,7 @@ const LivestreamSearch: FC<Props> = ({
          open={open}
          setOpen={setOpen}
          disableFiltering // Filtering is now done by Algolia, not by the component
+         freeSolo={freeSolo}
       />
    )
 }
