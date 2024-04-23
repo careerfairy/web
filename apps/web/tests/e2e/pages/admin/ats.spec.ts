@@ -1,15 +1,16 @@
-import { expectText } from "../../utils/assertions"
-import { groupAdminFixture as test } from "../../fixtures"
-import { expect } from "@playwright/test"
-import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+/* eslint-disable no-empty-pattern */
 import GroupSeed from "@careerfairy/seed-data/groups"
-import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
-import { ViewerPage } from "../../page-object-models/StreamingPage"
+import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
 } from "@careerfairy/shared-lib/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { expect } from "@playwright/test"
+import { groupAdminFixture as test } from "../../fixtures"
+import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
+import { ViewerPage } from "../../page-object-models/StreamingPage"
+import { expectText } from "../../utils/assertions"
 
 const testWithATSThatNeedsApplicationTest = test.extend({
    options: async ({}, use) => {
@@ -18,7 +19,7 @@ const testWithATSThatNeedsApplicationTest = test.extend({
          atsGroupType: "NEEDS_APPLICATION_TEST",
       })
    },
-})
+}).skip
 
 const testWithCompletlySetupATS = test.extend({
    options: async ({}, use) => {

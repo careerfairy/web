@@ -10,14 +10,15 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import Link from "next/link"
 import { FC, useCallback, useMemo, useRef } from "react"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useCompanyPage } from ".."
 import EventCarousel from "./EventCarousel"
-import StayUpToDateBanner from "./StayUpToDateBanner"
 import MoreCard from "./MoreCard"
+import StayUpToDateBanner from "./StayUpToDateBanner"
 
 const styles = sxStyles({
    titleSection: {
@@ -77,6 +78,7 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
    const isMobile = useIsMobile()
 
    const { group, editMode } = useCompanyPage()
+   const { editLivestream, livestreamCreationFlowV2 } = useLivestreamRouting()
 
    const sliderRef = useRef(null)
 
@@ -172,7 +174,13 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                                              color="primary"
                                              onClick={(e) => {
                                                 e.stopPropagation()
-                                                return handleOpenEvent(event)
+                                                if (livestreamCreationFlowV2) {
+                                                   return editLivestream(
+                                                      event.id
+                                                   )
+                                                } else {
+                                                   return handleOpenEvent(event)
+                                                }
                                              }}
                                              fullWidth
                                              size="small"

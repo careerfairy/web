@@ -43,7 +43,7 @@ const LogoUploader = () => {
 
    const handleUploadCompanyLogo = async (fileObject: File) => {
       const { url } = await handleUploadImage(fileObject)
-      setFieldValue("companyLogoUrl", url, true)
+      setFieldValue("general.companyLogoUrl", url, true)
    }
 
    return (

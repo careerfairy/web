@@ -5,7 +5,6 @@ import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
-import { FC } from "react"
 import MoreMenuWithEditAndRemoveOptions from "../questions/components/MoreMenu"
 
 const styles = sxStyles({
@@ -63,11 +62,11 @@ type SpeakersCardProps = {
    handleRemove: () => void
 }
 
-const SpeakersCard: FC<SpeakersCardProps> = ({
+const SpeakersCard = ({
    speaker,
    handleEdit,
    handleRemove,
-}) => {
+}: SpeakersCardProps) => {
    const isMobile = useIsMobile()
 
    const speakerHasStory = Boolean(speaker.story)

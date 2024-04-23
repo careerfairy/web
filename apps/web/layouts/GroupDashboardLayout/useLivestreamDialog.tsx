@@ -1,15 +1,15 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { prettyLocalizedDate } from "components/helperFunctions/HelperFunctions"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useAuth } from "HOCs/AuthProvider"
+import { prettyLocalizedDate } from "components/helperFunctions/HelperFunctions"
+import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
+import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
-import { v4 as uuidv4 } from "uuid"
 import * as actions from "store/actions"
-import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
-import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { v4 as uuidv4 } from "uuid"
 import { customJobServiceInstance } from "../../data/firebase/CustomJobService"
 
 /**
@@ -62,7 +62,7 @@ export const useLivestreamDialog = (group: Group) => {
    )
 
    const handlePublishStream = useCallback(
-      async (streamObj, promotion) => {
+      async (streamObj, promotion, ratings?) => {
          try {
             setIsPublishing(true)
             const newStream = { ...streamObj }
@@ -72,7 +72,8 @@ export const useLivestreamDialog = (group: Group) => {
                newStream,
                "livestreams",
                author,
-               promotion
+               promotion,
+               ratings
             )
             newStream.id = publishedStreamId
 
