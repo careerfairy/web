@@ -250,7 +250,7 @@ export const getEnvPrefix = () => {
    return `${prefix}`
 }
 
-export const getDictValues = <K extends keyof unknown, T>(
+export const getDictValues = <K extends keyof any, T>(
    valueKeys: K[],
    dict: Record<K, T>
 ): T[] => {
