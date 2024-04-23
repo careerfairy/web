@@ -7,7 +7,7 @@ import EmptyFormSection from "../../EmptyFormSection"
 import FormSectionHeader from "../../FormSectionHeader"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import CreatorDialog from "./CreatorAddEditDialog"
-import SelectSpeakersDropDown from "./SelectSpeakerDropDown"
+import SelectSpeakersDropDown from "./SelectSpeakersDropDown"
 import SpeakersCard from "./SpeakersCard"
 
 const LivestreamFormSpeakersStep = () => {
