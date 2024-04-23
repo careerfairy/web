@@ -9,23 +9,23 @@ import {
    Typography,
 } from "@mui/material"
 
-import React, { FC, useCallback, useState } from "react"
-import { sxStyles } from "types/commonTypes"
-import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
-import ReferralWidget from "components/views/common/ReferralWidget"
+import { useTheme } from "@mui/styles"
 import useSocials, {
    SocialPlatformObject,
    SocialPlatformType,
 } from "components/custom-hook/useSocials"
+import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
+import ReferralWidget from "components/views/common/ReferralWidget"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
-import {
-   Copy as CopyIcon,
-   CheckCircle as CheckIcon,
-   X as CloseIcon,
-} from "react-feather"
-import { useTheme } from "@mui/styles"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { DRAWER_WIDTH } from "constants/layout"
+import { FC, useCallback, useState } from "react"
+import {
+   CheckCircle as CheckIcon,
+   X as CloseIcon,
+   Copy as CopyIcon,
+} from "react-feather"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    titleContainer: {
@@ -125,7 +125,7 @@ const SparksShareDialog: FC<Props> = ({
    const copySparkLinkToClipboard = useCallback(() => {
       onShareOptionClick(SocialPlatformObject.Copy)
       setIsCopied(true)
-      const sourceLink = shareUrl + "&utm_source=CareerFairy"
+      const sourceLink = shareUrl + "&utm_source=careerfairy"
       copyStringToClipboard(sourceLink)
    }, [onShareOptionClick, shareUrl])
 
