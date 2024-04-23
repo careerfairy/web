@@ -29,7 +29,11 @@ export const useStreamerDetails = (uid: UID) => {
       },
       {
          ...reducedRemoteCallsOptions,
-         onError: errorLogAndNotify,
+         onError: (error, key) =>
+            errorLogAndNotify(error, {
+               message: "Error fetching streamer details",
+               key,
+            }),
          suspense: false,
          fallbackData: initialData,
       }

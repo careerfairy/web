@@ -17,7 +17,7 @@ export type UseUserSparkLike = {
    /** Whether there was an error fetching the data */
    isError: boolean
    /** Toggle the like for the spark */
-   toggleLike: () => Promise<any>
+   toggleLike: () => Promise<unknown>
 }
 
 /**
@@ -42,7 +42,11 @@ const useUserSparkLike = (
       error,
       isLoading: isFetchingLikedStatus,
    } = useSWR(key, fetcher, {
-      onError: errorLogAndNotify,
+      onError: (error, key) =>
+         errorLogAndNotify(error, {
+            message: "Error fetching spark likes",
+            key,
+         }),
    })
 
    const { trigger: toggleLike, isMutating } = useSWRMutation(
@@ -60,7 +64,11 @@ const useUserSparkLike = (
             }
          },
 
-         onError: errorLogAndNotify,
+         onError: (error, key) =>
+            errorLogAndNotify(error, {
+               message: "Error toggling spark like",
+               key,
+            }),
       }
    )
 
