@@ -2,7 +2,7 @@ import { logger } from "firebase-functions"
 import { algoliaClient } from "../../api/algolia"
 import { SearchIndex } from "algoliasearch"
 import { IndexSettings } from "./searchIndexGenerator"
-import { getEnvPrefix } from "../../util"
+import { isProductionEnvironment, isTestEnvironment } from "../../util"
 
 export const logCreateIndex = (id: string, data: object) => {
    logger.info(`Creating new Algolia index for document ${id}`, data)
@@ -16,9 +16,23 @@ export const logDeleteIndex = (id: string) => {
    logger.info(`Deleting existing Algolia index for document ${id}`)
 }
 
+export const getAlgoliaIndexPrefix = () => {
+   if (isProductionEnvironment()) {
+      return "prod"
+   }
+
+   if (isTestEnvironment()) {
+      return "test"
+   }
+
+   const prefix = process.env.DEV_NAME || "unknown"
+
+   return `${prefix}`
+}
+
 // Helper function to append the environment prefix to the index name so Type
 export const prependEnvPrefix = <T extends string>(value: T) => {
-   return `${getEnvPrefix() ? `${getEnvPrefix()}_` : ""}${value}` as const
+   return `${getAlgoliaIndexPrefix()}_${value}` as const
 }
 
 export const initAlgoliaIndex = (indexName: string) => {
