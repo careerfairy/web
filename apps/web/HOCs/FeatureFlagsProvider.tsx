@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
+import React, { useEffect, useState } from "react"
 
 type FlagKeys =
    | "atsAdminPageFlag"
@@ -63,7 +63,7 @@ export const flagsInitialState = {
     * Hide or Show
     */
    livestreamCreationFlowV2: {
-      enabled: false,
+      enabled: true,
       conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
 } satisfies Record<FlagKeys, FeatureFlag>
