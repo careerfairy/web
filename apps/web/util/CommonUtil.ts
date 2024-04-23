@@ -245,9 +245,18 @@ export const getEnvPrefix = () => {
       return "prod"
    }
 
-   const prefix = process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
+   if (process.env.NEXT_PUBLIC_DEV_NAME === "test") {
+      if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
+         console.log(
+            "🚀 ~ Habib - Web App - NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
+            process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+         )
+         return `test_${process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID}`
+      }
+      return "test"
+   }
 
-   return `${prefix}`
+   return process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
 }
 
 export const getDictValues = <K extends keyof any, T>(
