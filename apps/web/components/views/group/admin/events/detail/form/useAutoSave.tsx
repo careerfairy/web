@@ -70,7 +70,6 @@ const getFormValuesWithoutErrors = (
    // Output example: ["general", "general.title"]
    const keysPathThatDiffer = getDeepKeysPaths(errors)
 
-   // Output example: ["general.title"]
    const onlyNestedKeyPathThatDiffer = keysPathThatDiffer.filter((key) =>
       hasAnyStringThatStartsWith(keysPathThatDiffer, key)
    )
@@ -180,10 +179,6 @@ export const useAutoSave = () => {
             const formValuesWithoutErrors = getFormValuesWithoutErrors(
                cloneDeep(values),
                errors
-            )
-            console.log(
-               "🚀 ~ useEffect ~ formValuesWithoutErrors:",
-               formValuesWithoutErrors
             )
 
             updateLivestream(formValuesWithoutErrors)
