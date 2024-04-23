@@ -240,19 +240,23 @@ export const shouldUseEmulators = () => {
    return false
 }
 
+export const getWorkflowId = () => {
+   return (
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      process.env.NEXT_PUBLIC_DEV_NAME
+   )
+}
+
+export const isTestEnvironment = () => {
+   return process.env.NEXT_PUBLIC_DEV_NAME === "test"
+}
+
 export const getEnvPrefix = () => {
    if (!shouldUseEmulators()) {
       return "prod"
    }
 
-   if (process.env.NEXT_PUBLIC_DEV_NAME === "test") {
-      if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
-         console.log(
-            "🚀 ~ Habib - Web App - NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
-            process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
-         )
-         return `test_${process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID}`
-      }
+   if (isTestEnvironment()) {
       return "test"
    }
 
