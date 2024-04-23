@@ -7,12 +7,12 @@ import { ReactNode } from "react"
 type LivestreamFetchWrapperProps = {
    livestreamId: string
    children: (livestream: LivestreamEvent | null) => ReactNode
-}
+} & WrapperProps
 
 const LivestreamFetchWrapper = ({
    livestreamId,
    children,
-}: WrapperProps & LivestreamFetchWrapperProps) => {
+}: LivestreamFetchWrapperProps) => {
    const pathSegments = [livestreamId]
 
    return (
