@@ -20,6 +20,7 @@ import {
    LivestreamReplicaType,
 } from "@careerfairy/shared-lib/livestreams/search"
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
+import { DateTime } from "luxon"
 
 type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
@@ -37,7 +38,8 @@ export type FilterOptions = {
 }
 
 const now = new Date()
-const past = new Date(0)
+const past = DateTime.local().minus({ months: 36 }).toJSDate()
+
 const earliestEventBufferTime = getEarliestEventBufferTime()
 
 /**

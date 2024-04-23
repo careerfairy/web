@@ -49,9 +49,9 @@ async function configureReplica(
       "asc" | "desc" // order
    ]
 
-   const replicaIndex = algoliaClient.initIndex(replicaEntry)
+   const replicaIndex = algoliaClient.initIndex(prependEnvPrefix(replicaEntry))
 
-   await replicaIndex.setSettings({
+   const replicaSettings = {
       ...indexSettings,
       ranking: [
          `${order}(${attribute})`,
@@ -65,9 +65,9 @@ async function configureReplica(
          "custom",
       ],
       replicas: [],
-   })
+   }
 
-   return prependEnvPrefix(replicaEntry)
+   return replicaIndex.setSettings(replicaSettings)
 }
 
 export const configureSettings = async (
@@ -85,16 +85,16 @@ export const configureSettings = async (
       }),
    }
 
-   const configuredReplicas = await Promise.all(
-      newSettings.replicas?.map(
-         async (entry) => await configureReplica(entry, newSettings)
-      ) || []
-   )
+   if (newSettings.replicas) {
+      for (const entry of newSettings.replicas) {
+         await configureReplica(entry, newSettings)
+      }
+   }
 
    await index.setSettings(
       {
          ...newSettings,
-         replicas: configuredReplicas,
+         replicas: newSettings.replicas.map(prependEnvPrefix),
       },
       {
          forwardToReplicas: true,
