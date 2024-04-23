@@ -1,4 +1,3 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import ShareIcon from "@mui/icons-material/Share"
 import {
@@ -11,12 +10,7 @@ import {
    Paper,
    Slide,
 } from "@mui/material"
-import { useAuth } from "HOCs/AuthProvider"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
-import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import PropTypes from "prop-types"
 import { useState } from "react"
@@ -26,69 +20,19 @@ import {
    getBaseUrl,
 } from "../../../../helperFunctions/HelperFunctions"
 import HintIcon from "../../../common/HintIcon"
-import {
-   feedbackQuestionFormInitialValues,
-   mapFeedbackQuestionToRatings,
-} from "./detail/form/views/questions/commons"
-
-const handleCreateDraftLivestream = async (
-   authenticatedUser,
-   group,
-   firebase,
-   router
-) => {
-   const author = {
-      groupId: group.id,
-      email: authenticatedUser.email,
-   }
-
-   const initialValues = getLivestreamInitialValues(group)
-   const draftLivestream: LivestreamEvent = buildLivestreamObject(
-      initialValues,
-      false,
-      null,
-      firebase
-   )
-
-   draftLivestream.groupIds = [group.id]
-   draftLivestream.speakers = []
-
-   const initialFeedbackQuestions = feedbackQuestionFormInitialValues.map(
-      (question) =>
-         mapFeedbackQuestionToRatings(question, draftLivestream.duration)
-   )
-
-   const draftLiveStreamId = await firebase.addLivestream(
-      draftLivestream,
-      "draftLivestreams",
-      author,
-      null,
-      initialFeedbackQuestions
-   )
-
-   return router.push({
-      pathname: `/group/${group.id}/admin/events/${draftLiveStreamId}`,
-   })
-}
+import { useLivestreamRouting } from "./useLivestreamRouting"
 
 const ToolbarActionsDialogContent = ({
    handleClose,
    handleOpenNewStreamModal,
    group,
 }) => {
-   const router = useRouter()
-   const firebase = useFirebaseService()
-   const { authenticatedUser } = useAuth()
    const featureFlags = useFeatureFlags()
+   const { createDraftLivestream } = useLivestreamRouting()
    const { enqueueSnackbar } = useSnackbar()
 
    const handleNewStream_v2 = async () => {
-      await handleCreateDraftLivestream(
-         authenticatedUser,
-         group,
-         firebase,
-         router
-      )
+      await createDraftLivestream()
    }
 
    // eslint-disable-next-line react/hook-use-state

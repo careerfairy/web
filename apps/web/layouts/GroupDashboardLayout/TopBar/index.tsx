@@ -1,12 +1,14 @@
 // material-ui
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
 
 // project imports
+import { LoadingButton } from "@mui/lab"
 import { alpha } from "@mui/material/styles"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"
 import { useGroup } from ".."
@@ -74,6 +76,8 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
    const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
+   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
+      useLivestreamRouting()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
@@ -100,16 +104,19 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
             {isMobile
                ? mobileCta
                : cta || (
-                    <Button
-                       onClick={() =>
-                          livestreamDialog.handleOpenNewStreamModal()
-                       }
+                    <LoadingButton
                        size={"large"}
                        variant={"outlined"}
                        color={"secondary"}
+                       loading={isCreating}
+                       onClick={() =>
+                          livestreamCreationFlowV2
+                             ? createDraftLivestream()
+                             : livestreamDialog.handleOpenNewStreamModal()
+                       }
                     >
                        Create New Live Stream
-                    </Button>
+                    </LoadingButton>
                  )}
             {/* notification & profile */}
             <UserAvatarWithDetails />

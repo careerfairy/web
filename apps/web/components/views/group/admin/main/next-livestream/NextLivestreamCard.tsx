@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LoadingButton } from "@mui/lab"
 import { Box, Button, Grid, Skeleton, Typography } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
@@ -6,6 +7,7 @@ import { CheckCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import CardCustom from "../../common/CardCustom"
+import { useLivestreamRouting } from "../../events/useLivestreamRouting"
 import { useMainPageContext } from "../MainPageProvider"
 import { GoToLivestreamButton } from "./GoToLivestreamButton"
 import { LivestreamChips } from "./LivestreamChips"
@@ -193,11 +195,22 @@ const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
 const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
    const { isDraft, isCloseToLivestreamStart } = useNextLivestreamCardLogic()
    const { livestreamDialog } = useGroup()
+   const { editLivestream, livestreamCreationFlowV2 } = useLivestreamRouting()
 
    const onManageLivestream = useCallback(() => {
       livestream.isDraft = isDraft()
-      livestreamDialog.handleEditStream(livestream)
-   }, [isDraft, livestream, livestreamDialog])
+      if (livestreamCreationFlowV2) {
+         return editLivestream(livestream.id)
+      } else {
+         livestreamDialog.handleEditStream(livestream)
+      }
+   }, [
+      isDraft,
+      livestream,
+      livestreamDialog,
+      editLivestream,
+      livestreamCreationFlowV2,
+   ])
 
    return (
       <Box textAlign="right" my={2}>
@@ -286,6 +299,8 @@ const LoadingSkeleton = () => {
 
 const NoLivestreams = () => {
    const { livestreamDialog } = useGroup()
+   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
+      useLivestreamRouting()
    return (
       <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
@@ -295,13 +310,18 @@ const NoLivestreams = () => {
          </Typography>
 
          <Box mt={2} mb={3} display="flex" justifyContent="center">
-            <Button
+            <LoadingButton
                color="secondary"
                variant="contained"
-               onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+               onClick={() =>
+                  livestreamCreationFlowV2
+                     ? createDraftLivestream()
+                     : livestreamDialog.handleOpenNewStreamModal()
+               }
+               loading={isCreating}
             >
                Create New Live Stream
-            </Button>
+            </LoadingButton>
          </Box>
       </Box>
    )
