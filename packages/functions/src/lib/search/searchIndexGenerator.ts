@@ -18,8 +18,17 @@ type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
    doc: DataType
 ) => DataTypeTransformed
 
+/**
+ * Get the workflow id from the environment variables
+ * This is used to isolate test data and operations
+ * @returns the workflow id or the dev name or "unknown" if neither is set
+ */
 export const getWorkflowId = () => {
-   return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || process.env.DEV_NAME
+   return (
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      process.env.DEV_NAME ||
+      "unknown"
+   )
 }
 
 export const getData = (
