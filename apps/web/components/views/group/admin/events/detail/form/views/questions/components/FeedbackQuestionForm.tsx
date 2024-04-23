@@ -71,7 +71,7 @@ const FeedbackQuestionForm = ({
                value={typeInitialValue}
                keyOptionIndexer="id"
                textFieldProps={{
-                  label: "Question Type",
+                  label: "Question type",
                   placeholder: "Choose the question type",
                   required: true,
                }}
@@ -84,7 +84,7 @@ const FeedbackQuestionForm = ({
                options={ESTIMATED_DURATIONS}
                keyOptionIndexer="minutes"
                textFieldProps={{
-                  label: "Appear After",
+                  label: "Appear after",
                   placeholder: "When is it appearing?",
                   required: true,
                }}
