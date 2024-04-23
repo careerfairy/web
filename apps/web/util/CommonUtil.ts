@@ -216,7 +216,7 @@ export const capitalizeFirstLetter = (string: string) => {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export const errorLogAndNotify = (error: Error, metadata?: object) => {
+export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
    Sentry.captureException(error, metadata)
 }
@@ -240,10 +240,16 @@ export const shouldUseEmulators = () => {
    return false
 }
 
-export const getWorkflowId = () => {
+/**
+ * Get the workflow id from the environment variables
+ * This is used to isolate test data and operations
+ * @returns the workflow id or the dev name or "unknown" if neither is set
+ */
+export const getWorkflowId = (): string => {
    return (
       process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
-      process.env.NEXT_PUBLIC_DEV_NAME
+      process.env.NEXT_PUBLIC_DEV_NAME ||
+      "unknown"
    )
 }
 
