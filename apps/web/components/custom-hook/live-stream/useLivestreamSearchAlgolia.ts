@@ -126,7 +126,11 @@ export function useLivestreamSearchAlgolia(
    }
 
    return useSWRInfinite<Data>(disable ? null : getKey, fetcher, {
-      onError: errorLogAndNotify,
+      onError: (error, key) =>
+         errorLogAndNotify(error, {
+            message: "Error fetching livestreams",
+            key,
+         }),
       keepPreviousData: true,
    })
 }
