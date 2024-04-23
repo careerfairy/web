@@ -16,7 +16,7 @@ import { useTabNavigationAndValidation } from "./navigation/useTabNavigationAndV
 
 type LivestreamCreationContextType = {
    livestream: LivestreamEvent
-   targetLivestreamCollection: string
+   targetLivestreamCollection: "livestreams" | "draftLivestreams"
    tabToNavigateTo: TAB_VALUES
    tabValue: TAB_VALUES
    setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
@@ -73,9 +73,8 @@ export const LivestreamCreationContextProvider = ({
       isSpeakerTabInvalid,
    } = useTabNavigationAndValidation(values.general, values.speakers)
 
-   const targetLivestreamCollection = livestream.isDraft
-      ? "draftLivestreams"
-      : "livestreams"
+   const targetLivestreamCollection: LivestreamCreationContextType["targetLivestreamCollection"] =
+      livestream.isDraft ? "draftLivestreams" : "livestreams"
 
    const isCohostedEvent = Boolean(
       livestream?.groupIds.length > 1 || group?.universityCode
