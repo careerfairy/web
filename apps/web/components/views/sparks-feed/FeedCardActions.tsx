@@ -1,9 +1,10 @@
-import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 import { SparkPresenter } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { FC, MouseEvent, useCallback, useMemo, useState } from "react"
 
 import { sxStyles } from "types/commonTypes"
 
+import Work from "@mui/icons-material/Work"
 import {
    Box,
    BoxProps,
@@ -15,35 +16,34 @@ import {
    Typography,
    alpha,
 } from "@mui/material"
-import Work from "@mui/icons-material/Work"
 
+import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { useAuth } from "HOCs/AuthProvider"
+import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import useMenuState from "components/custom-hook/useMenuState"
+import {
+   SocialPlatformObject,
+   SocialPlatformType,
+} from "components/custom-hook/useSocials"
+import FilterIcon from "components/views/common/icons/FilterIcon"
 import LikeIcon from "components/views/common/icons/LikeIcon"
 import ShareIcon from "components/views/common/icons/ShareIcon"
-import FilterIcon from "components/views/common/icons/FilterIcon"
-import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
-import SparksShareDialog from "../sparks/components/SparksShareDialog"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { useAuth } from "HOCs/AuthProvider"
-import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
+import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { sparkService } from "data/firebase/SparksService"
 import { useSelector } from "react-redux"
 import {
    currentSparkIdSelector,
    selectedSparkCategoriesSelector,
 } from "store/selectors/sparksFeedSelectors"
-import { SparkEventActions } from "@careerfairy/shared-lib/sparks/telemetry"
-import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
 import Link from "../common/Link"
-import {
-   SocialPlatformObject,
-   SocialPlatformType,
-} from "components/custom-hook/useSocials"
-import useUserSparkLike from "components/custom-hook/spark/useUserSparkLike"
-import useMenuState from "components/custom-hook/useMenuState"
 import LoginButton from "../common/LoginButton"
 import LikeActiveIcon from "../common/icons/LikeActiveIcon"
-import { sparkService } from "data/firebase/SparksService"
+import SparksShareDialog from "../sparks/components/SparksShareDialog"
+import SparksFilterDialog from "../sparks/components/spark-card/SparkFilterDialog"
+import useSparksFeedIsFullScreen from "./hooks/useSparksFeedIsFullScreen"
 
 const actionWidth = 52
 
@@ -336,7 +336,7 @@ const ShareAction: FC<ShareActionProps> = ({ sparkId }) => {
    const shareUrl = useMemo(() => {
       return `${getHost()}/sparks/${sparkId}?referral=${
          userData?.referralCode
-      }&invite=${sparkId}&utm_medium=Sparks_referrals&utm_campaign=Sparks`
+      }&invite=${sparkId}&utm_medium=sparks-referrals&utm_campaign=sparks`
    }, [sparkId, userData?.referralCode])
 
    const shareData = useMemo(() => {
