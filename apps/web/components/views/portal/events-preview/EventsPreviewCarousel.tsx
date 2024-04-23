@@ -1,27 +1,28 @@
-import React, { ReactNode, useMemo } from "react"
-import Box from "@mui/material/Box"
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { sxStyles } from "types/commonTypes"
 import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import {
-   Typography,
+   Button,
+   IconButton,
    Stack,
+   SxProps,
+   Typography,
+   TypographyProps,
    useMediaQuery,
    useTheme,
-   SxProps,
-   IconButton,
-   Button,
-   TypographyProps,
 } from "@mui/material"
-import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
-import Link from "next/link"
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import Box from "@mui/material/Box"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ArrowLeft, ArrowRight } from "react-feather"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
+import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
+import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import Link from "next/link"
+import React, { ReactNode, useMemo } from "react"
+import { ArrowLeft, ArrowRight } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 
 const slideSpacing = 21
 
@@ -229,6 +230,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       const [emblaRef, emblaApi] = useEmblaCarousel(options, emblaPlugins)
 
       const isMobile = useIsMobile()
+      const { editLivestream, livestreamCreationFlowV2 } =
+         useLivestreamRouting()
 
       const {
          breakpoints: { up },
@@ -450,9 +453,17 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                                       color="primary"
                                                       onClick={(e) => {
                                                          e.stopPropagation()
-                                                         return handleOpenEvent(
-                                                            event
-                                                         )
+                                                         if (
+                                                            livestreamCreationFlowV2
+                                                         ) {
+                                                            return editLivestream(
+                                                               event.id
+                                                            )
+                                                         } else {
+                                                            return handleOpenEvent(
+                                                               event
+                                                            )
+                                                         }
                                                       }}
                                                       fullWidth
                                                       size="small"
