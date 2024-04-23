@@ -284,11 +284,6 @@ const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
         })
       : formInitialValues
 
-   console.log(
-      "🤦‍♂️🤦‍♂️🤦‍♂️🤦‍♂️🤦‍♂️ ~ LivestreamFormikProvider ~ formValues:",
-      formValues
-   )
-
    return (
       <Formik<LivestreamFormValues>
          initialValues={formValues}
