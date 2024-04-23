@@ -11,6 +11,7 @@ import BrandedResponsiveMenu, {
 import { Trash2 as DeleteIcon } from "react-feather"
 import { useStreamingContext } from "../../context"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { useMemo } from "react"
 
 type Props = {
    handleClose: () => void
@@ -19,15 +20,47 @@ type Props = {
    anchorEl: HTMLElement
 }
 
+/**
+ * Controls the visibility of the options menu and its options
+ */
+export const useCommentVisibilityControls = (
+   comment: LivestreamQuestionComment
+) => {
+   const { isHost, agoraUserId } = useStreamingContext()
+   const { authenticatedUser } = useAuth()
+
+   return useMemo(() => {
+      const isAuthor =
+         comment &&
+         checkIsQuestionCommentAuthor(comment, {
+            uid: authenticatedUser.uid,
+            agoraUid: agoraUserId,
+            email: authenticatedUser.email,
+         })
+
+      const showDelete = isHost || isAuthor
+
+      return {
+         showDelete,
+         showOptions: showDelete,
+      }
+   }, [
+      comment,
+      authenticatedUser.uid,
+      agoraUserId,
+      authenticatedUser.email,
+      isHost,
+   ])
+}
+
 export const CommentOptionsMenu = ({
    questionId,
    handleClose,
    anchorEl,
    comment,
 }: Props) => {
-   const { authenticatedUser } = useAuth()
    const streamIsMobile = useStreamIsMobile()
-   const { isHost, agoraUserId, livestreamId } = useStreamingContext()
+   const { livestreamId } = useStreamingContext()
 
    const open = Boolean(anchorEl)
 
@@ -38,16 +71,12 @@ export const CommentOptionsMenu = ({
          comment?.id
       )
 
+   const { showDelete } = useCommentVisibilityControls(comment)
+
    const getOptions = () => {
       const options: MenuOption[] = []
 
-      if (
-         isHost ||
-         checkIsQuestionCommentAuthor(comment, {
-            uid: authenticatedUser.uid,
-            agoraUid: agoraUserId,
-         })
-      ) {
+      if (showDelete) {
          options.push({
             label: "Delete comment",
             icon: <DeleteIcon />,
