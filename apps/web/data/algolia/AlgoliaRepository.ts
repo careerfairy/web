@@ -1,11 +1,12 @@
 import algoliaSearchClient from "./AlgoliaInstance"
-import { SearchClient } from "algoliasearch"
+import { SearchClient, SearchIndex } from "algoliasearch"
 import { SearchResponse } from "@algolia/client-search"
 import { SortType } from "../../components/views/common/filter/FilterMenu"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { initAlgoliaIndex } from "./util"
 import { AlgoliaLivestreamResponse } from "types/algolia"
 import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
+import { getWorkflowId, isTestEnvironment } from "util/CommonUtil"
 
 export interface IAlgoliaRepository {
    searchWishes(
@@ -73,11 +74,31 @@ class AlgoliaRepository implements IAlgoliaRepository {
       const index = initAlgoliaIndex(
          targetReplica ? targetReplica : "livestreams"
       )
-      return index.search<AlgoliaLivestreamResponse>(query, {
+
+      return handleSearch<AlgoliaLivestreamResponse>(
+         index,
+         query,
          filters,
-         page,
-      })
+         page
+      )
    }
+}
+
+/**
+ * A wrapper for search operations, adjusting queries for test environments.
+ */
+const handleSearch = <AlgoliaResponseType>(
+   index: SearchIndex,
+   query: string,
+   filters: string,
+   page: number
+) => {
+   return index.search<AlgoliaResponseType>(query, {
+      filters:
+         (isTestEnvironment() ? `workflowId:${getWorkflowId()} AND` : "") +
+         filters,
+      page,
+   })
 }
 
 // Singleton

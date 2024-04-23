@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions"
 
-import { ChangeType, getChangeTypeEnum } from "../../util"
+import { ChangeType, getChangeTypeEnum, isTestEnvironment } from "../../util"
 import {
    initAlgoliaIndex,
    logCreateIndex,
@@ -18,6 +18,10 @@ type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
    doc: DataType
 ) => DataTypeTransformed
 
+export const getWorkflowId = () => {
+   return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || process.env.DEV_NAME
+}
+
 export const getData = (
    snapshot: DocumentSnapshot,
    fields: string[],
@@ -27,6 +31,9 @@ export const getData = (
       [key: string]: boolean | string | number
    } = {
       objectID: snapshot.id,
+      ...(isTestEnvironment() && {
+         workflowId: getWorkflowId(),
+      }),
    }
 
    let data = snapshot.data()

@@ -22,13 +22,6 @@ export const getAlgoliaIndexPrefix = () => {
    }
 
    if (isTestEnvironment()) {
-      console.log(
-         "🚀 ~ Habib - Functions - NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
-         process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
-      )
-      if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
-         return `test_${process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID}`
-      }
       return "test"
    }
 
@@ -81,15 +74,26 @@ export const configureSettings = async (
    settings: IndexSettings,
    index: SearchIndex
 ) => {
+   const newSettings: IndexSettings = {
+      ...settings,
+      ...(isTestEnvironment() && {
+         attributesForFaceting: [
+            ...(settings.attributesForFaceting || []),
+            // add the workflowId attribute to the faceting attributes so e2e tests can filter by workflowId
+            "workflowId",
+         ],
+      }),
+   }
+
    const configuredReplicas = await Promise.all(
-      settings.replicas?.map(
-         async (entry) => await configureReplica(entry, settings)
+      newSettings.replicas?.map(
+         async (entry) => await configureReplica(entry, newSettings)
       ) || []
    )
 
    await index.setSettings(
       {
-         ...settings,
+         ...newSettings,
          replicas: configuredReplicas,
       },
       {
