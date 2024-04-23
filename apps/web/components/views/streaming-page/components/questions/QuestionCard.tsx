@@ -9,6 +9,7 @@ import { CommentsList } from "./CommentsList"
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { useQuestionsListContext } from "./QuestionsLisProvider"
 import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
+import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -53,6 +54,8 @@ type Props = {
 export const QuestionCard = forwardRef<HTMLDivElement, Props>(
    ({ question }, ref) => {
       const { onQuestionOptionsClick } = useQuestionsListContext()
+      const { showOptions } = useQuestionsVisibilityControls(question)
+
       return (
          <Box
             sx={[
@@ -76,9 +79,13 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
                   question.type === "done" && styles.whiteOptions,
                ]}
             >
-               <BrandedOptions
-                  onClick={(event) => onQuestionOptionsClick(event, question)}
-               />
+               {Boolean(showOptions) && (
+                  <BrandedOptions
+                     onClick={(event) =>
+                        onQuestionOptionsClick(event, question)
+                     }
+                  />
+               )}
             </Box>
          </Box>
       )

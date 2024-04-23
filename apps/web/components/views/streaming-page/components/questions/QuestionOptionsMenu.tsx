@@ -12,11 +12,51 @@ import { useStreamingContext } from "../../context"
 import { useDeleteLivestreamQuestion } from "components/custom-hook/streaming/useDeleteLivestreamQuestion"
 import { useResetLivestreamQuestion } from "components/custom-hook/streaming/useResetLivestreamQuestion"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { useMemo } from "react"
 
 type Props = {
    handleClose: () => void
    question: LivestreamQuestion
    anchorEl: HTMLElement
+}
+
+/**
+ * Controls the visibility of the options menu and its options
+ */
+export const useQuestionsVisibilityControls = (
+   question: LivestreamQuestion
+) => {
+   const { isHost, agoraUserId } = useStreamingContext()
+   const { authenticatedUser } = useAuth()
+
+   return useMemo(() => {
+      const isAuthor =
+         question &&
+         checkIsQuestionAuthor(question, {
+            email: authenticatedUser.email,
+            uid: authenticatedUser.uid,
+            agoraUid: agoraUserId,
+         })
+
+      const showReset =
+         isHost &&
+         question &&
+         (question.type === "current" || question.type === "done")
+
+      const showDelete = isHost || isAuthor
+
+      return {
+         showReset,
+         showDelete,
+         showOptions: showReset || showDelete,
+      }
+   }, [
+      question,
+      authenticatedUser.email,
+      authenticatedUser.uid,
+      agoraUserId,
+      isHost,
+   ])
 }
 
 export const QuestionOptionsMenu = ({
@@ -25,10 +65,8 @@ export const QuestionOptionsMenu = ({
    anchorEl,
 }: Props) => {
    const open = Boolean(anchorEl)
-   const { authenticatedUser } = useAuth()
    const streamIsMobile = useStreamIsMobile()
-   const { isHost, agoraUserId, livestreamId, streamerAuthToken } =
-      useStreamingContext()
+   const { livestreamId, streamerAuthToken } = useStreamingContext()
 
    const { trigger: triggerDeleteQuestion, isMutating: isDeletingQuestion } =
       useDeleteLivestreamQuestion(
@@ -39,15 +77,18 @@ export const QuestionOptionsMenu = ({
    const { trigger: triggerResetQuestion, isMutating: isResettingQuestion } =
       useResetLivestreamQuestion(livestreamId, question?.id, streamerAuthToken)
 
+   const { showReset, showDelete } = useQuestionsVisibilityControls(question)
+
    const isMutating = isDeletingQuestion || isResettingQuestion
 
    const getOptions = () => {
       const options: MenuOption[] = []
 
-      if (
-         (isHost && question?.type === "current") ||
-         question?.type === "done"
-      ) {
+      if (!question) {
+         return options
+      }
+
+      if (showReset) {
          options.push({
             label: "Reset state",
             icon: <RefreshCw />,
@@ -56,14 +97,7 @@ export const QuestionOptionsMenu = ({
          })
       }
 
-      if (
-         isHost ||
-         checkIsQuestionAuthor(question, {
-            email: authenticatedUser.email,
-            uid: authenticatedUser.uid,
-            agoraUid: agoraUserId,
-         })
-      ) {
+      if (showDelete) {
          options.push({
             label: "Delete question",
             icon: <DeleteIcon />,
