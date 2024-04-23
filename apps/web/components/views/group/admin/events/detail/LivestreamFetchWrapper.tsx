@@ -34,20 +34,22 @@ const LivestreamFetchWrapper = ({
                            return null
                         }
 
-                        // eslint-disable-next-line no-extra-semi
-                        ;(draftLivestreamDocument as LivestreamEvent).isDraft =
-                           true
+                        const document = {
+                           ...draftLivestreamDocument,
+                           isDraft: true,
+                        } as LivestreamEvent
 
-                        return children(
-                           draftLivestreamDocument as LivestreamEvent
-                        )
+                        return children(document)
                      }}
                   </FirestoreConditionalDocumentFetcher>
                )
             }
-            // eslint-disable-next-line no-extra-semi
-            ;(livestreamDocument as LivestreamEvent).isDraft = false
-            return children(livestreamDocument as LivestreamEvent)
+            const document = {
+               ...livestreamDocument,
+               isDraft: false,
+            } as LivestreamEvent
+
+            return children(document)
          }}
       </FirestoreConditionalDocumentFetcher>
    )
