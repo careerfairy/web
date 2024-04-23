@@ -155,7 +155,7 @@ jobs:
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
          - name: Generate UUID
-           run: echo "UNIQUE_UUID=$(uuidgen)" >> $GITHUB_ENV
+           run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
