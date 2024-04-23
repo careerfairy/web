@@ -1,9 +1,12 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useSnackbar } from "notistack"
 import { useCallback } from "react"
 import { CheckCircle } from "react-feather"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useLivestreamCreationContext } from "./LivestreamCreationContext"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
 import { usePublishLivestream } from "./form/usePublishLivestream"
 
@@ -74,6 +77,8 @@ export const PublishConfirmation = ({
    handleCancelClick,
 }: RemoveQuestionProps) => {
    const { isValid } = useLivestreamFormValues()
+   const { group } = useGroup()
+   const { livestream } = useLivestreamCreationContext()
    const { isPublishing, publishLivestream } = usePublishLivestream()
    const { enqueueSnackbar } = useSnackbar()
 
@@ -81,14 +86,24 @@ export const PublishConfirmation = ({
       try {
          await publishLivestream()
       } catch (error) {
-         console.error("Publish failed:", error)
-         enqueueSnackbar("Failed to publish draft", {
+         errorLogAndNotify(error, {
+            message: "Failed to publish stream",
+            livestreamId: livestream.id,
+            groupId: group.id,
+         })
+         enqueueSnackbar("Failed to publish stream", {
             variant: "error",
          })
       } finally {
          handleCancelClick()
       }
-   }, [enqueueSnackbar, handleCancelClick, publishLivestream])
+   }, [
+      enqueueSnackbar,
+      group.id,
+      handleCancelClick,
+      livestream.id,
+      publishLivestream,
+   ])
 
    return (
       <SteppedDialog.Container
