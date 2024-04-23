@@ -22,12 +22,17 @@ export const getAlgoliaIndexPrefix = () => {
    }
 
    if (isTestEnvironment()) {
+      console.log(
+         "🚀 ~ Habib - Functions - NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:",
+         process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+      )
+      if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
+         return `test_${process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID}`
+      }
       return "test"
    }
 
-   const prefix = process.env.DEV_NAME || "unknown"
-
-   return `${prefix}`
+   return process.env.DEV_NAME || "unknown"
 }
 
 // Helper function to append the environment prefix to the index name so Type

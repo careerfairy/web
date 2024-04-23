@@ -152,10 +152,14 @@ jobs:
 
          - name: Install Playwright's dependencies
            run: npx playwright install --with-deps
-
+         - name: Install uuid-runtime
+           run: sudo apt-get install uuid-runtime
+         - name: Generate UUID
+           run: echo "UNIQUE_UUID=$(uuidgen)" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
