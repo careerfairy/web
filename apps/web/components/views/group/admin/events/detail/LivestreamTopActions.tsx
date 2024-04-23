@@ -12,7 +12,7 @@ const ICON_SIZE = 18
 
 const styles = sxStyles({
    wrapper: {
-      color: "#3A70E2",
+      color: (theme) => theme.brand.info.main,
       textAlign: "center",
       fontSize: "16px",
       fontStyle: "normal",

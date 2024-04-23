@@ -54,7 +54,7 @@ const styles = sxStyles({
          md: "space-evenly",
       },
       borderTop: "none !important",
-      backgroundColor: "#FFFFFF !important",
+      backgroundColor: (theme) => theme.brand.white[50] + " !important",
    },
    cancelBtn: {
       color: "grey",
