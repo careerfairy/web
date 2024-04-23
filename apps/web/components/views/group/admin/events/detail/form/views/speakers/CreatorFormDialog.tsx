@@ -141,7 +141,7 @@ const CreatorFormDialog = ({
                                  <FormBrandedTextField
                                     name="firstName"
                                     type="text"
-                                    label="First Name"
+                                    label="First name"
                                     placeholder="John"
                                     fullWidth
                                     requiredText={"(required)"}
@@ -151,7 +151,7 @@ const CreatorFormDialog = ({
                                  <FormBrandedTextField
                                     name="lastName"
                                     type="text"
-                                    label="Last Name"
+                                    label="Last name"
                                     placeholder="Doe"
                                     fullWidth
                                     requiredText={"(required)"}
@@ -172,7 +172,7 @@ const CreatorFormDialog = ({
                                  <FormBrandedTextField
                                     name="linkedInUrl"
                                     type="text"
-                                    label="LinkedIn Link"
+                                    label="LinkedIn link"
                                     placeholder="E.g.,: linkedin.com/in/user"
                                     autoComplete="url"
                                     fullWidth
