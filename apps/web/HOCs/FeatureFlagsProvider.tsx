@@ -64,7 +64,6 @@ export const flagsInitialState = {
     */
    livestreamCreationFlowV2: {
       enabled: true,
-      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
    },
 } satisfies Record<FlagKeys, FeatureFlag>
 

@@ -37,28 +37,28 @@ const ToolbarActionsDialogContent = ({
 
    // eslint-disable-next-line react/hook-use-state
    const [actions] = useState([
-      {
-         name: "Create a draft live stream",
-         onClick: () => {
-            handleOpenNewStreamModal()
-            handleClose()
-         },
-         icon: <StreamIcon />,
-         description:
-            "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
-      },
-      ...(featureFlags.livestreamCreationFlowV2
+      ...(!featureFlags.livestreamCreationFlowV2
          ? [
               {
-                 name: "Create a draft live stream V2",
-                 onClick: async () => {
-                    await handleNewStream_v2()
+                 name: "Create a draft live stream (Legacy)",
+                 onClick: () => {
+                    handleOpenNewStreamModal()
+                    handleClose()
                  },
                  icon: <StreamIcon />,
-                 description: "New live stream creation form!",
+                 description:
+                    "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
               },
            ]
          : []),
+      {
+         name: "Create a draft live stream",
+         onClick: async () => {
+            await handleNewStream_v2()
+         },
+         icon: <StreamIcon />,
+         description: "New live stream creation form!",
+      },
       {
          name: "Share a link to create a draft live stream",
          onClick: () => {
