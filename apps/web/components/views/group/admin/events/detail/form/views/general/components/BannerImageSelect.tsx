@@ -45,8 +45,9 @@ const styles = sxStyles({
    fileUploaderButton: {
       padding: "4px 16px",
       "&:hover": {
-         backgroundColor: "#6749EA !important",
-         color: "#FEFEFE !important",
+         backgroundColor: (theme) =>
+            theme.palette.secondary.main + "!important",
+         color: (theme) => theme.brand.white[100] + "!important",
       },
    },
    changeBannerButtonWrapper: {
@@ -117,7 +118,10 @@ const getStyles = (hasError: boolean) =>
          },
          alignItems: "center",
          justifyContent: "center",
-         border: `1px solid ${hasError ? "#FF1616" : "#EBEBEF"}`,
+         border: (theme) =>
+            `1px solid ${
+               hasError ? theme.brand.error.main : theme.palette.neutral[50]
+            }`,
          borderRadius: "16px",
       },
       ...styles,
@@ -234,7 +238,9 @@ const BannerImageSelect = () => {
       },
       onCancel: async () => {
          handleTouched()
-         await helpers.setError("Please provide a banner image")
+         if (!field.value) {
+            await helpers.setError("Please provide a banner image")
+         }
       },
    })
 
