@@ -212,10 +212,26 @@ const convertLivestreamObjectToForm = ({
 
    // This is to ensure backwards compatibility
    // Previously was a single field (i.e. a single string) and now it's an array of strings
-   general.reasonsToJoin = livestream.reasonsToJoinLivestream
-      ? [livestream.reasonsToJoinLivestream, undefined, undefined]
-      : livestream.reasonsToJoinLivestream_v2 ||
-        formGeneralTabInitialValues.reasonsToJoin
+   if (livestream.reasonsToJoinLivestream) {
+      if (
+         !livestream.reasonsToJoinLivestream_v2 ||
+         livestream.reasonsToJoinLivestream_v2?.length === 0
+      ) {
+         general.reasonsToJoin = [
+            livestream.reasonsToJoinLivestream,
+            undefined,
+            undefined,
+         ]
+      } else {
+         general.reasonsToJoin =
+            livestream.reasonsToJoinLivestream_v2 ||
+            formGeneralTabInitialValues.reasonsToJoin
+      }
+   } else {
+      general.reasonsToJoin =
+         livestream.reasonsToJoinLivestream_v2 ||
+         formGeneralTabInitialValues.reasonsToJoin
+   }
 
    // This is to ensure backwards compatibility
    const filteredSpeakers = livestream.speakers.filter(
