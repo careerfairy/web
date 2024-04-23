@@ -150,8 +150,6 @@ export const useAutoSave = () => {
             firebaseService
          )
 
-         console.log("🚀 ~ useEffect ~ mappedObject:", mappedObject)
-
          if (newValues?.questions?.feedbackQuestions?.length > 0) {
             updateFeedbackQuestions(newValues.questions.feedbackQuestions)
          }
@@ -159,8 +157,6 @@ export const useAutoSave = () => {
          if (newValues?.jobs?.customJobs?.length > 0) {
             updateCustomJobs(newValues.jobs.customJobs)
          }
-
-         console.log("📈📈📈 ~ newValues:", newValues)
 
          await firebaseService.updateLivestream(
             { ...mappedObject, id: livestream.id },
@@ -178,9 +174,6 @@ export const useAutoSave = () => {
    )
 
    const handleAutoSave = useCallback(async () => {
-      console.log("🚀 ~ useEffect ~ previousValues:", previousValues)
-      console.log("🚀 ~ useEffect ~ values:", values)
-      console.log("🚀 ~ useAutoSave ~ errors:", errors)
       if (haveValuesChanged) {
          setPreviousValues(values)
          if (livestream.isDraft) {
