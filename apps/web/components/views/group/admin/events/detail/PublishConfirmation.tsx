@@ -1,7 +1,14 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { Trash2 as DeleteIcon } from "react-feather"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useSnackbar } from "notistack"
+import { useCallback } from "react"
+import { CheckCircle } from "react-feather"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useLivestreamCreationContext } from "./LivestreamCreationContext"
+import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
+import { usePublishLivestream } from "./form/usePublishLivestream"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -50,7 +57,7 @@ const styles = sxStyles({
          md: "space-evenly",
       },
       borderTop: "none !important",
-      backgroundColor: "#FFFFFF !important",
+      backgroundColor: (theme) => theme.brand.white[50] + " !important",
    },
    cancelBtn: {
       color: "grey",
@@ -62,15 +69,42 @@ const styles = sxStyles({
    },
 })
 
-type RemoveQuestionProps = {
-   handleRemoveClick: () => void
+export type RemoveQuestionProps = {
    handleCancelClick: () => void
 }
 
-const RemoveQuestion = ({
-   handleRemoveClick,
+export const PublishConfirmation = ({
    handleCancelClick,
 }: RemoveQuestionProps) => {
+   const { isValid } = useLivestreamFormValues()
+   const { group } = useGroup()
+   const { livestream } = useLivestreamCreationContext()
+   const { isPublishing, publishLivestream } = usePublishLivestream()
+   const { enqueueSnackbar } = useSnackbar()
+
+   const handlePublishClick = useCallback(async () => {
+      try {
+         await publishLivestream()
+      } catch (error) {
+         errorLogAndNotify(error, {
+            message: "Failed to publish stream",
+            livestreamId: livestream.id,
+            groupId: group.id,
+         })
+         enqueueSnackbar("Failed to publish stream", {
+            variant: "error",
+         })
+      } finally {
+         handleCancelClick()
+      }
+   }, [
+      enqueueSnackbar,
+      group.id,
+      handleCancelClick,
+      livestream.id,
+      publishLivestream,
+   ])
+
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
@@ -80,15 +114,15 @@ const RemoveQuestion = ({
       >
          <SteppedDialog.Content sx={styles.container}>
             <Stack spacing={3} sx={styles.info}>
-               <DeleteIcon color={"#FF4545"} size={48} />
+               <CheckCircle color={"#856DEE"} size={40} />
 
                <SteppedDialog.Title sx={styles.title}>
-                  Remove question?
+                  Ready to publish?
                </SteppedDialog.Title>
 
                <SteppedDialog.Subtitle sx={styles.subtitle}>
-                  Are you sure you want to remove this question? All data
-                  inserted will be lost.
+                  Publishing your live stream will allow students to see the
+                  details and register to attend.
                </SteppedDialog.Subtitle>
             </Stack>
          </SteppedDialog.Content>
@@ -98,24 +132,23 @@ const RemoveQuestion = ({
                color="grey"
                onClick={handleCancelClick}
                sx={[styles.cancelBtn, styles.actionBtn]}
+               disabled={isPublishing}
             >
-               Cancel
+               Keep editing
             </SteppedDialog.Button>
 
             <SteppedDialog.Button
                variant="contained"
-               color={"error"}
+               color={"secondary"}
                type="submit"
-               onClick={handleRemoveClick}
+               onClick={handlePublishClick}
                sx={styles.actionBtn}
-               disabled={false}
-               loading={false}
+               disabled={!isValid}
+               loading={isPublishing}
             >
-               {"Yes, I'm sure"}
+               {isPublishing ? "" : "Publish"}
             </SteppedDialog.Button>
          </SteppedDialog.Actions>
       </SteppedDialog.Container>
    )
 }
-
-export default RemoveQuestion

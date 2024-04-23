@@ -1,21 +1,23 @@
 // material-ui
-import { Box, Button, Typography } from "@mui/material"
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
+import { Box, Typography } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 
 // project imports
-import { sxStyles } from "../../../types/commonTypes"
-import useIsMobile from "../../../components/custom-hook/useIsMobile"
-import UserAvatarWithDetails from "./UserAvatarWithDetails"
-import NotificationsButton from "./NotificationsButton"
-import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import { LoadingButton } from "@mui/lab"
 import { alpha } from "@mui/material/styles"
-import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
-import { useGroup } from ".."
-import { ReactNode } from "react"
+import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
+import { ReactNode } from "react"
+import { useGroup } from ".."
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import { sxStyles } from "../../../types/commonTypes"
+import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
+import NotificationsButton from "./NotificationsButton"
+import UserAvatarWithDetails from "./UserAvatarWithDetails"
 
 const getStyles = (hasNavigationBar?: boolean) =>
    sxStyles({
@@ -66,13 +68,16 @@ const getStyles = (hasNavigationBar?: boolean) =>
 type Props = {
    title: ReactNode
    cta?: ReactNode
+   mobileCta?: ReactNode
    navigation?: ReactNode
 }
 
-const TopBar = ({ title, cta, navigation }: Props) => {
+const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
    const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
+   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
+      useLivestreamRouting()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
@@ -97,18 +102,21 @@ const TopBar = ({ title, cta, navigation }: Props) => {
             }}
          >
             {isMobile
-               ? null
+               ? mobileCta
                : cta || (
-                    <Button
-                       onClick={() =>
-                          livestreamDialog.handleOpenNewStreamModal()
-                       }
+                    <LoadingButton
                        size={"large"}
                        variant={"outlined"}
                        color={"secondary"}
+                       loading={isCreating}
+                       onClick={() =>
+                          livestreamCreationFlowV2
+                             ? createDraftLivestream()
+                             : livestreamDialog.handleOpenNewStreamModal()
+                       }
                     >
                        Create New Live Stream
-                    </Button>
+                    </LoadingButton>
                  )}
             {/* notification & profile */}
             <UserAvatarWithDetails />

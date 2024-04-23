@@ -1,27 +1,25 @@
-import React from "react"
-import MultiChipSelect from "./MultiChipSelect"
 import { languageCodes } from "components/helperFunctions/streamFormFunctions"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import MultiChipSelect from "./MultiChipSelect"
 
 const LanguageSelect = () => {
    const {
       values: { general },
    } = useLivestreamFormValues()
 
-   const initialFormValue = languageCodes.find(
-      (language) => language.code === general.language
-   )
-
    return (
       <MultiChipSelect
          id="general.language"
          options={languageCodes}
-         value={initialFormValue}
-         keyOptionIndexer="code"
+         value={general.language}
          textFieldProps={{
             label: "Choose a language",
             placeholder: "English",
             required: true,
+         }}
+         isOptionEqualToValue={(option, value) => {
+            if (!value) return false
+            return option.code === value.code
          }}
       />
    )

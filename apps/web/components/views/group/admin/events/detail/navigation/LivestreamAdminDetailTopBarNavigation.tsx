@@ -1,7 +1,6 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Tab, Tabs } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { FC } from "react"
 import { Info } from "react-feather"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
 import { TAB_VALUES } from "../form/commons"
@@ -53,7 +52,7 @@ const TabAlertIcon = () => (
    </Box>
 )
 
-const LivestreamAdminDetailTopBarNavigation: FC = () => {
+const LivestreamAdminDetailTopBarNavigation = () => {
    const isMobile = useIsMobile()
 
    const {
