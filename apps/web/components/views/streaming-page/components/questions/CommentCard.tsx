@@ -1,15 +1,11 @@
-import {
-   LivestreamQuestionComment,
-   checkIsQuestionCommentAuthor,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamQuestionComment } from "@careerfairy/shared-lib/livestreams"
 import { Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { UserDetails } from "../UserDetails"
 import { getUserTypeFromComment } from "./util"
-import { useAuth } from "HOCs/AuthProvider"
-import { useStreamingContext } from "../../context"
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { Box } from "@mui/material"
+import { useCommentVisibilityControls } from "./CommentOptionsMenu"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -35,16 +31,8 @@ type Props = {
 }
 export const CommentCard = ({ comment, onOptionsClick }: Props) => {
    const userType = getUserTypeFromComment(comment)
-   const { authenticatedUser } = useAuth()
 
-   const { agoraUserId, isHost } = useStreamingContext()
-
-   const isCommentAuthor = checkIsQuestionCommentAuthor(comment, {
-      uid: authenticatedUser.uid,
-      agoraUid: agoraUserId,
-   })
-
-   const showOptions = isHost || isCommentAuthor
+   const { showOptions } = useCommentVisibilityControls(comment)
 
    return (
       <Stack sx={styles.root} spacing={1.25}>
