@@ -13,7 +13,7 @@ const LivestreamFormQuestionsStep = () => {
 
          <FormSectionHeader
             title="Feedback Questions"
-            subtitle="These questions will be asked during the live stream to the audience"
+            subtitle="During the live stream, these feedback questions will be automatically asked to the attendees. This feedback will help you gauge the content of your stream. Use these questions as they are, or modify them, or ask your own personalised questions."
             divider
          />
          <FeedbackQuestions />
