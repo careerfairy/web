@@ -1,15 +1,14 @@
-import React, { FC } from "react"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Stack from "@mui/material/Stack"
-import { Typography } from "@mui/material"
-import SanitizedHTML from "../../../../../util/SanitizedHTML"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import Skeleton from "@mui/material/Skeleton"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import CollapsibleText from "../../../../common/inputs/CollapsibleText"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
+import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import { FC } from "react"
+import { sxStyles } from "../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../util/DateUtil"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import SanitizedHTML from "../../../../../util/SanitizedHTML"
 
 const styles = sxStyles({
    root: {},
@@ -38,7 +37,7 @@ const styles = sxStyles({
    wrapper: {
       display: "flex",
       flexDirection: "column",
-      gap: "16px"
+      gap: "16px",
    },
    confirmationWrapper: {
       display: "flex",
@@ -75,15 +74,7 @@ const JobDescription: FC<Props> = ({ job }) => {
             <Typography sx={styles.jobTitle} variant="h6">
                Job Description
             </Typography>
-            {isAtsJob ? (
-               <SanitizedHTML sx={styles.html} htmlString={job.description} />
-            ) : (
-               <CollapsibleText
-                  text={job.description}
-                  collapsedSize={"5em"}
-                  textStyle={styles.html}
-               />
-            )}
+            <SanitizedHTML sx={styles.html} htmlString={job.description} />
          </Box>
 
          {jobSalary ? (
