@@ -1,16 +1,17 @@
 import { combineStyles, sxStyles } from "types/commonTypes"
 
-import { ResponsiveStreamButton } from "../Buttons"
-import { AlertCircle, CheckCircle, XCircle } from "react-feather"
-import React, { useMemo } from "react"
 import { Box, Stack, SxProps, Tooltip } from "@mui/material"
 import {
    ConnectionState,
    useConnectionState,
    useNetworkQuality,
 } from "agora-rtc-react"
-import { WifiIcon } from "./WifiIcon"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { ConnectionStates } from "constants/streaming"
+import { useMemo } from "react"
+import { AlertCircle, CheckCircle, XCircle } from "react-feather"
+import { ResponsiveStreamButton } from "../Buttons"
+import { WifiIcon } from "./WifiIcon"
 
 const styles = sxStyles({
    root: {
@@ -49,14 +50,6 @@ const styles = sxStyles({
       py: 1,
    },
 })
-
-const ConnectionStates: Record<ConnectionState, ConnectionState> = {
-   CONNECTED: "CONNECTED",
-   CONNECTING: "CONNECTING",
-   RECONNECTING: "RECONNECTING",
-   DISCONNECTED: "DISCONNECTED",
-   DISCONNECTING: "DISCONNECTING",
-}
 
 const getRtcConnectionInfo = (status: ConnectionState) => {
    switch (status) {
