@@ -470,17 +470,25 @@ export type LivestreamEventPublicData = Partial<
    id: LivestreamEvent["id"]
 }
 
+// Collection Path: livestreams/{livestreamId}/questions/{questionId}
 export interface LivestreamQuestion extends Identifiable {
+   /**
+    * The email or auth uid of the user that created the question
+    */
    author: string
    timestamp: firebase.firestore.Timestamp
    title: string
-   type: "new" | "current"
+   type: "new" | "current" | "done"
    votes: number
    emailOfVoters?: string[]
    /**
+    * The user Auth or temporary IDs that have upvoted the question
+    */
+   voterIds: string[]
+   /**
     * We store the most recent comment to the question on the question document
     * */
-   firstComment?: LivestreamQuestion
+   firstComment?: LivestreamQuestionComment
    /*
     * The number of comments on the question
     * */
@@ -492,6 +500,38 @@ export interface LivestreamQuestion extends Identifiable {
    badges: string[]
 
    displayName?: string
+   /*
+    * The agoraUserId generated for the user for that particular livestream
+    */
+   agoraUserId?: string
+}
+
+// Collection Path: livestreams/{livestreamId}/questions/{questionId}/comments/{commentId}
+export interface LivestreamQuestionComment extends Identifiable {
+   authorType: "careerfairy" | "streamer" | "viewer"
+   /**
+    * Display name of the user that created the comment
+    */
+   author: string
+   /**
+    * The time at which the comment was created
+    */
+   timestamp: firebase.firestore.Timestamp
+
+   /**
+    * The comment its self
+    */
+   title: string
+
+   /**
+    * The auth uid of the user that created the comment
+    */
+   userUid?: string
+
+   /**
+    * The agoraUserId generated for the user for that particular livestream
+    */
+   agoraUserId?: string
 }
 
 // Collection Path: livestreams/{livestreamId}/polls/{pollId}
