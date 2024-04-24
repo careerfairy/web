@@ -5,30 +5,35 @@ import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { HostPollsView } from "../polls/HostPollsView"
 import { ViewerPollsView } from "../polls/ViewerPollsView"
+import { useScroll } from "components/custom-hook/utils/useScroll"
 
 const styles = sxStyles({
-   contentWrapperViewer: {
-      px: 2,
-      py: 1.5,
-   },
-   contentWrapperHost: {
+   root: {
       p: 1.5,
+   },
+   viewerRoot: {
+      p: 0,
    },
 })
 
 export const PollsPanel = () => {
    const { isHost } = useStreamingContext()
 
+   const { scrollToTop, ref } = useScroll()
+
    return (
       <SidePanelView
-         contentWrapperStyles={
-            isHost ? styles.contentWrapperHost : styles.contentWrapperViewer
-         }
+         contentWrapperStyles={[styles.root, !isHost && styles.viewerRoot]}
          id="polls-panel"
          title="Polls"
          icon={<PollIcon />}
+         contentRef={ref}
       >
-         {isHost ? <HostPollsView /> : <ViewerPollsView />}
+         {isHost ? (
+            <HostPollsView onPollStarted={scrollToTop} />
+         ) : (
+            <ViewerPollsView />
+         )}
       </SidePanelView>
    )
 }

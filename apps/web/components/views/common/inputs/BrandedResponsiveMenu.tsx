@@ -75,12 +75,14 @@ type MobileDrawerProps = {
    open: boolean
    handleClose: () => void
    options: MenuOption[]
+   enableDrawerCancelButton?: boolean
 }
 
 const MobileDrawer: FC<MobileDrawerProps> = ({
    open,
    handleClose,
    options,
+   enableDrawerCancelButton,
 }) => {
    return (
       <BrandedSwipeableDrawer
@@ -117,6 +119,17 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
                   </ListItemButton>
                </Fragment>
             ))}
+            {Boolean(enableDrawerCancelButton) && (
+               <Fragment>
+                  <Divider sx={styles.listItemDivider} />
+                  <ListItemButton
+                     onClick={handleClose}
+                     sx={[styles.drawerMenuItem]}
+                  >
+                     <Typography variant="medium">Cancel</Typography>
+                  </ListItemButton>
+               </Fragment>
+            )}
          </List>
       </BrandedSwipeableDrawer>
    )
@@ -191,6 +204,7 @@ export type MoreMenuProps = {
    open: boolean
    anchorEl: HTMLElement | null
    handleClose: () => void
+   enableDrawerCancelButton?: boolean
 }
 
 const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
@@ -199,6 +213,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
    open,
    anchorEl,
    handleClose,
+   enableDrawerCancelButton,
 }) => {
    const defaultIsMobile = useIsMobile()
    const isMobile = isMobileOverride ?? defaultIsMobile
@@ -210,6 +225,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
                options={options}
                open={open}
                handleClose={handleClose}
+               enableDrawerCancelButton={enableDrawerCancelButton}
             />
          ) : (
             <DesktopMenu

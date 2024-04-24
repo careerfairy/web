@@ -4,13 +4,7 @@ import {
    MIN_POLL_OPTIONS,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   Button,
-   FormHelperText,
-   IconButton,
-   InputAdornment,
-   Stack,
-} from "@mui/material"
+import { Button, IconButton, InputAdornment, Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { livestreamService } from "data/firebase/LivestreamService"
@@ -19,7 +13,7 @@ import { FormProvider, SubmitHandler, useFieldArray } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import * as yup from "yup"
 import { useStreamingContext } from "../../context"
-import { PlusCircle, Trash } from "react-feather"
+import { PlusCircle, Trash2 } from "react-feather"
 import { v4 as uuid } from "uuid"
 import { LoadingButton } from "@mui/lab"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -29,9 +23,10 @@ const styles = sxStyles({
    form: {
       width: "100%",
       p: 1.5,
-      border: "1px solid #F8F8F8",
-      background: "#FFF",
-      borderRadius: "11px",
+      borderRadius: "12px",
+      border: "1px solid",
+      borderColor: (theme) => theme.brand.white[500],
+      backgroundColor: (theme) => theme.brand.white[100],
    },
    addOptionButton: {
       color: "neutral.500",
@@ -42,6 +37,7 @@ const styles = sxStyles({
       "& svg": {
          width: 16,
          height: 16,
+         color: "neutral.600",
       },
    },
    errorMessage: {
@@ -86,7 +82,8 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
       const formMethods = useYupForm({
          schema: basePollSchema,
          defaultValues: isEdit ? poll : getInitialValues(),
-         mode: "onChange",
+         mode: "all",
+         reValidateMode: "onBlur",
       })
 
       const { fields, append, remove } = useFieldArray({
@@ -132,10 +129,9 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
          <FormProvider {...formMethods}>
             <Stack
                ref={ref}
-               spacing={3}
+               spacing={2}
                component="form"
                sx={styles.form}
-               onKeyDown={preventSubmitOnEnter}
                onSubmit={formMethods.handleSubmit(onSubmit)}
             >
                <ControlledBrandedTextField
@@ -145,7 +141,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                   label="Question"
                   placeholder="Insert your question here"
                />
-               <Stack spacing={1.5}>
+               <Stack spacing={1}>
                   {fields.map((option, index) => (
                      <ControlledBrandedTextField
                         key={option.id}
@@ -154,23 +150,23 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         placeholder={`Insert option ${index + 1}`}
                         onKeyDown={preventSubmitOnEnter}
                         InputProps={{
-                           endAdornment: (
-                              <InputAdornment position="end">
-                                 <IconButton
-                                    sx={styles.removeOptionButton}
-                                    aria-label="toggle password visibility"
-                                    onClick={() => remove(index)}
-                                    disabled={
-                                       fields.length <= MIN_POLL_OPTIONS ||
-                                       formMethods.formState.isSubmitting
-                                    }
-                                    edge="end"
-                                    size="small"
-                                 >
-                                    <Trash />
-                                 </IconButton>
-                              </InputAdornment>
-                           ),
+                           endAdornment:
+                              fields.length <= MIN_POLL_OPTIONS ? null : (
+                                 <InputAdornment position="end">
+                                    <IconButton
+                                       sx={styles.removeOptionButton}
+                                       aria-label="toggle password visibility"
+                                       onClick={() => remove(index)}
+                                       disabled={
+                                          formMethods.formState.isSubmitting
+                                       }
+                                       edge="end"
+                                       size="small"
+                                    >
+                                       <Trash2 />
+                                    </IconButton>
+                                 </InputAdornment>
+                              ),
                            autoComplete: "off",
                         }}
                         label={`Option ${index + 1}`}
@@ -180,6 +176,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                      <Button
                         variant="outlined"
                         color="grey"
+                        type="button"
                         startIcon={<PlusCircle />}
                         onClick={() => append(generateOption())}
                         sx={styles.addOptionButton}
@@ -201,17 +198,13 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
                         type="submit"
                         disabled={
                            formMethods.formState.isSubmitting ||
-                           !formMethods.formState.isDirty
+                           !formMethods.formState.isDirty ||
+                           !formMethods.formState.isValid
                         }
                         loading={formMethods.formState.isSubmitting}
                      >
                         {isEdit ? "Save changes" : "Create Poll"}
                      </LoadingButton>
-                     {Boolean(formMethods.formState.errors.options?.root) && (
-                        <FormHelperText sx={styles.errorMessage} error>
-                           {formMethods.formState.errors.options?.root.message}
-                        </FormHelperText>
-                     )}
                   </Box>
                   {Boolean(onCancel) && (
                      <Button
