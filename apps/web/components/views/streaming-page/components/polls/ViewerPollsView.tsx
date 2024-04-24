@@ -1,11 +1,11 @@
 import { Slide, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useLivestreamMostRecentClosedPoll } from "components/custom-hook/streaming/useLivestreamMostRecentClosedPoll"
 import { useLivestreamOngoingPoll } from "components/custom-hook/streaming/useLivestreamOngoingPoll"
 import { useStreamingContext } from "../../context"
+import { EmptyPollsView } from "./EmptyPollsView"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
-import { EmptyPollsView } from "./EmptyPollsView"
-import { useLivestreamMostRecentClosedPoll } from "components/custom-hook/streaming/useLivestreamMostRecentClosedPoll"
 
 export const ViewerPollsView = () => {
    return (
@@ -23,7 +23,7 @@ const Content = () => {
    const ongoingPoll = useLivestreamOngoingPoll(livestreamId)
    const mostRecentClosedPoll = useLivestreamMostRecentClosedPoll(livestreamId)
 
-   const pollToShow = ongoingPoll ? ongoingPoll : mostRecentClosedPoll
+   const pollToShow = ongoingPoll || mostRecentClosedPoll
 
    if (!pollToShow) {
       return <EmptyPollsView />
