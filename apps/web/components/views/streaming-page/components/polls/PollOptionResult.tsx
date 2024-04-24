@@ -11,23 +11,24 @@ import {
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       fontFamily: "inherit",
       position: "relative",
       overflow: "hidden",
-      borderRadius: "6px",
+      borderRadius: "8px",
       p: 2,
-      border: (theme) => `1px solid ${theme.brand.white[500]}`,
+      border: `1px solid ${theme.brand.white[500]}`,
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
+      transition: (theme) => theme.transitions.create("box-shadow"),
+      boxSizing: "border-box",
+      background: theme.brand.white[200],
+   }),
+   buttonRoot: {
       "&:hover, &:focus": {
          backgroundColor: (theme) => theme.palette.action.hover,
       },
-      transition: (theme) => theme.transitions.create("border"),
-   },
-   customHorizontalPadding: {
-      px: 1.75,
    },
    coloredEdge: {
       position: "absolute",
@@ -112,16 +113,19 @@ export const PollOptionResult = ({
 }: Props) => {
    const showBorderHighlight = enableVoting && isOptionVoted
 
+   const disableOnClick = !enableVoting || isVoting || isOptionVoted
+
    return (
-      <LoadingButton
-         onClick={enableVoting ? onVote : undefined}
-         disabled={isOptionVoted || !enableVoting || isVoting}
+      <Box
+         component={enableVoting ? LoadingButton : Box}
+         onClick={disableOnClick ? undefined : onVote}
+         disabled={!enableVoting}
          aria-label={option.text}
          sx={[
             styles.root,
-            enableVoting && styles.customHorizontalPadding,
+            enableVoting && styles.buttonRoot,
             showBorderHighlight && {
-               border: `1.5px solid ${color}`,
+               boxShadow: `inset 0 0 0 1.5px ${color} !important`,
             },
             { color },
          ]}
@@ -132,22 +136,21 @@ export const PollOptionResult = ({
                   <VoteIcon hasVoted={isOptionVoted} />
                </span>
             )}
-            <Stack width="100%" spacing={1}>
-               <Stack direction="row" justifyContent="space-between">
-                  <Typography color="neutral.800" variant="medium">
-                     {option.text}
-                  </Typography>
+            <Box width="100%">
+               <Stack
+                  direction="row"
+                  color="neutral.800"
+                  justifyContent="space-between"
+               >
+                  <Typography variant="small">{option.text}</Typography>
                   <Grow in={showResults}>
-                     <Typography
-                        color="neutral.800"
-                        variant="medium"
-                        fontWeight={600}
-                     >
+                     <Typography variant="small" fontWeight={600}>
                         {stats.percentage}%
                      </Typography>
                   </Grow>
                </Stack>
                <Collapse unmountOnExit in={showResults}>
+                  <Box pt={1.1875} />
                   <LinearProgress
                      value={stats.percentage}
                      variant="determinate"
@@ -161,6 +164,8 @@ export const PollOptionResult = ({
                         },
                      ]}
                   />
+                  <Box pt={1.1875} />
+
                   <Typography
                      textAlign="start"
                      variant="xsmall"
@@ -170,7 +175,7 @@ export const PollOptionResult = ({
                      {stats.votes} votes
                   </Typography>
                </Collapse>
-            </Stack>
+            </Box>
          </Stack>
          <Box
             sx={[
@@ -179,7 +184,7 @@ export const PollOptionResult = ({
                someOptionVoted && styles.nowWidth,
             ]}
          />
-      </LoadingButton>
+      </Box>
    )
 }
 

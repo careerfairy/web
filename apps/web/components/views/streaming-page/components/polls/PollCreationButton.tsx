@@ -21,7 +21,7 @@ export const PollCreationButton = ({
 
    return (
       <Stack spacing={1}>
-         <Collapse in={isCreatePollFormOpen}>
+         <Collapse unmountOnExit in={isCreatePollFormOpen}>
             <CreateOrEditPollForm
                onSuccess={handleCloseForm}
                onCancel={handleCloseForm}

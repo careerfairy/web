@@ -16,6 +16,7 @@ import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useStartLivestreamPoll } from "components/custom-hook/streaming/useStartLivestreamPoll"
 import { PollOptions } from "./PollOptions"
+import { TotalVotesCount } from "./TotalVotesCount"
 
 const CreateOrEditPollForm = dynamic(() =>
    import("./CreateOrEditPollForm").then((mod) => mod.CreateOrEditPollForm)
@@ -26,9 +27,19 @@ const PollOptionsMenu = dynamic(() =>
 
 const styles = sxStyles({
    root: {
-      border: "1px solid #F8F8F8",
-      borderRadius: "11px",
-      p: 2,
+      border: "1px solid",
+      borderColor: (theme) => theme.brand.white[500],
+      backgroundColor: (theme) => theme.brand.white[100],
+      borderRadius: "12px",
+      p: 1.5,
+      transition: (theme) => theme.transitions.create("box-shadow"),
+   },
+   greenBorder: {
+      borderColor: "transparent",
+      boxShadow: (theme) => `inset 0 0 0 1.5px ${theme.palette.primary.main}`,
+   },
+   noBorder: {
+      border: "none",
    },
    question: {
       wordBreak: "break-word",
@@ -36,7 +47,6 @@ const styles = sxStyles({
    expandButton: {
       borderRadius: "6px",
       width: "100%",
-      color: "#757575",
       p: 0,
       fontFamily: "inherit",
       "& svg": {
@@ -44,23 +54,29 @@ const styles = sxStyles({
          height: 24,
       },
    },
+   topMargin: {
+      mt: 1.5,
+   },
    action: {
-      py: 3,
+      pt: 2,
    },
 })
 
 type Props = {
    poll: LivestreamPoll
+   onClickDelete?: (pollId: string) => void
+   onClickReopen?: (pollId: string) => void
+   onPollStarted?: () => void
 }
 
 const POLL_STATUS_TEXT = {
    closed: "Closed poll",
-   current: "Ongoing",
+   current: "Ongoing poll",
    upcoming: "New",
 } satisfies Record<LivestreamPoll["state"], string>
 
 export const PollCard = React.forwardRef<HTMLDivElement, Props>(
-   ({ poll }, ref) => {
+   ({ poll, onClickDelete, onClickReopen, onPollStarted }, ref) => {
       const [showResults, setShowResults] = useState(poll.state !== "closed")
       const [isEditing, setIsEditing] = useState(false)
 
@@ -84,32 +100,68 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
       }
 
       return (
-         <Box sx={styles.root} ref={ref}>
-            <Stack direction="row" justifyContent="space-between">
-               <Typography fontWeight={600} variant="medium" color="primary">
+         <Box
+            sx={[
+               styles.root,
+               poll.state === "current" && isHost && styles.greenBorder,
+               !isHost && styles.noBorder,
+            ]}
+            ref={ref}
+         >
+            <Stack
+               direction="row"
+               justifyContent="space-between"
+               alignItems="center"
+            >
+               <Typography
+                  fontWeight={poll.state === "current" ? 600 : 400}
+                  variant="small"
+                  color={POLL_STATUS_TEXT_COLOR[poll.state]}
+               >
                   {POLL_STATUS_TEXT[poll.state]}
                </Typography>
-               {Boolean(isHost && showResults) && (
+               {Boolean(isHost) && (
                   <PollOptionsMenu
-                     selectedPollId={poll.id}
+                     poll={poll}
                      onClickEdit={() => setIsEditing(true)}
+                     onClickDelete={onClickDelete}
+                     onClickReopen={onClickReopen}
                   />
                )}
             </Stack>
             <Box pt={1.25} />
-            <Typography aria-label="Poll question" sx={styles.question}>
-               {poll.question}
-            </Typography>
+            <Stack>
+               <Typography
+                  aria-label="Poll question"
+                  variant="medium"
+                  color={
+                     poll.state === "closed" ? "neutral.500" : "neutral.800"
+                  }
+                  sx={styles.question}
+               >
+                  {poll.question}
+               </Typography>
+               {poll.state === "closed" && <TotalVotesCount poll={poll} />}
+            </Stack>
             <Box pt={1.5} />
-            <Collapse unmountOnExit in={showResults || !isHost}>
+            <Collapse
+               unmountOnExit
+               in={showResults || poll.state === "current"}
+            >
                <PollOptions poll={poll} />
-               {Boolean(showActionButton) && <PollActionButton poll={poll} />}
+               {Boolean(showActionButton) && (
+                  <PollActionButton poll={poll} onPollStarted={onPollStarted} />
+               )}
             </Collapse>
-            {Boolean(isHost) && (
+            {Boolean(isHost) && poll.state !== "current" && (
                <CollapseButton
                   showResults={showResults}
                   onClick={() => setShowResults((prev) => !prev)}
-                  paddedTop={Boolean(showResults && !showActionButton)}
+                  paddedTop={Boolean(
+                     showResults &&
+                        (showActionButton || poll.state === "closed")
+                  )}
+                  pollClosed={poll.state === "closed"}
                />
             )}
          </Box>
@@ -119,37 +171,48 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
 
 type CollapseButtonProps = {
    showResults: boolean
-   onClick: ButtonBaseProps["onClick"]
    paddedTop?: boolean
-}
+   pollClosed?: boolean
+} & ButtonBaseProps
 
 const CollapseButton = ({
    showResults,
-   onClick,
    paddedTop,
+   pollClosed,
+   ...rest
 }: CollapseButtonProps) => {
+   const noun = pollClosed ? "results" : "details"
+
    return (
       <Stack
          justifyContent="space-between"
          alignItems="center"
          direction="row"
-         sx={[styles.expandButton, paddedTop && { pt: 3 }]}
+         sx={[styles.expandButton, paddedTop && styles.topMargin]}
          component={ButtonBase}
-         onClick={onClick}
+         color={pollClosed ? "neutral.400" : "neutral.700"}
+         {...rest}
       >
-         <Typography variant="small" color="neutral.600">
-            {showResults ? "Collapse" : "Expand"}
+         <Typography variant="small">
+            {showResults ? `Hide ${noun}` : `Show ${noun}`}
          </Typography>
          {showResults ? <ChevronUp /> : <ChevronDown />}
       </Stack>
    )
 }
 
+const POLL_STATUS_TEXT_COLOR = {
+   current: "primary.main",
+   closed: "neutral.400",
+   upcoming: "primary.700",
+} satisfies Record<LivestreamPoll["state"], string>
+
 type PollActionButtonProps = {
    poll: LivestreamPoll
+   onPollStarted?: () => void
 }
 
-const PollActionButton = ({ poll }: PollActionButtonProps) => {
+const PollActionButton = ({ poll, onPollStarted }: PollActionButtonProps) => {
    const { livestreamId, streamerAuthToken } = useStreamingContext()
 
    const { trigger: stopPoll, isMutating: stopPollMutating } =
@@ -167,7 +230,11 @@ const PollActionButton = ({ poll }: PollActionButtonProps) => {
                color="primary"
                variant="outlined"
                fullWidth
-               onClick={() => startPoll()}
+               onClick={() => {
+                  startPoll().then(() => {
+                     onPollStarted?.()
+                  })
+               }}
                loading={loading}
             >
                Start poll
@@ -175,8 +242,8 @@ const PollActionButton = ({ poll }: PollActionButtonProps) => {
          )}
          {poll.state === "current" && (
             <LoadingButton
-               color="primary"
-               variant="contained"
+               color="error"
+               variant="outlined"
                fullWidth
                onClick={() => stopPoll()}
                loading={loading}
