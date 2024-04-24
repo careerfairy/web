@@ -2110,7 +2110,10 @@ class FirebaseService {
 
    setPollState = (streamRef, pollId, state) => {
       const ref = streamRef.collection("polls").doc(pollId)
-      return ref.update({ state: state })
+      return ref.update({
+         state: state,
+         ...(state === "closed" && { closedAt: this.getServerTimestamp() }),
+      })
    }
 
    listenToHandRaiseState = (streamRef, userEmail, callback) => {

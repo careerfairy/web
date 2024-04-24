@@ -1282,6 +1282,7 @@ export class FirebaseLivestreamRepository
          timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          voters: [],
          id: docRef.id,
+         closedAt: null,
       }
 
       return docRef.set(details)
@@ -1299,7 +1300,14 @@ export class FirebaseLivestreamRepository
          .withConverter(createCompatGenericConverter<LivestreamPoll>())
          .doc(pollId)
 
-      return docRef.update(poll)
+      const updateData: Partial<LivestreamPoll> = {
+         ...poll,
+         ...(poll.state === "closed" && {
+            closedAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
+         }),
+      }
+
+      return docRef.update(updateData)
    }
 
    async markPollAsCurrent(
@@ -1321,8 +1329,9 @@ export class FirebaseLivestreamRepository
       const batch = this.firestore.batch()
 
       currentPollsSnaps.docs.forEach((doc) => {
-         const updateData: Pick<LivestreamPoll, "state"> = {
+         const updateData: Pick<LivestreamPoll, "state" | "closedAt"> = {
             state: "closed",
+            closedAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          }
          batch.update(doc.ref, updateData)
       })
