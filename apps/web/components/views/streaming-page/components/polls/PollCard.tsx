@@ -64,6 +64,7 @@ const styles = sxStyles({
 
 type Props = {
    poll: LivestreamPoll
+   showResults?: boolean
    onClickDelete?: (pollId: string) => void
    onClickReopen?: (pollId: string) => void
    onPollStarted?: () => void
@@ -76,8 +77,13 @@ const POLL_STATUS_TEXT = {
 } satisfies Record<LivestreamPoll["state"], string>
 
 export const PollCard = React.forwardRef<HTMLDivElement, Props>(
-   ({ poll, onClickDelete, onClickReopen, onPollStarted }, ref) => {
-      const [showResults, setShowResults] = useState(poll.state !== "closed")
+   (
+      { poll, onClickDelete, onClickReopen, onPollStarted, showResults },
+      ref
+   ) => {
+      const [showOptions, setShowOptions] = useState(
+         poll.state !== "closed" || showResults
+      )
       const [isEditing, setIsEditing] = useState(false)
 
       const { isHost } = useStreamingContext()
@@ -141,24 +147,26 @@ export const PollCard = React.forwardRef<HTMLDivElement, Props>(
                >
                   {poll.question}
                </Typography>
-               {poll.state === "closed" && <TotalVotesCount poll={poll} />}
+               {poll.state === "closed" && !showResults && (
+                  <TotalVotesCount poll={poll} />
+               )}
             </Stack>
             <Box pt={1.5} />
             <Collapse
                unmountOnExit
-               in={showResults || poll.state === "current"}
+               in={showOptions || poll.state === "current"}
             >
-               <PollOptions poll={poll} />
+               <PollOptions poll={poll} showResults={showResults} />
                {Boolean(showActionButton) && (
                   <PollActionButton poll={poll} onPollStarted={onPollStarted} />
                )}
             </Collapse>
             {Boolean(isHost) && poll.state !== "current" && (
                <CollapseButton
-                  showResults={showResults}
-                  onClick={() => setShowResults((prev) => !prev)}
+                  showResults={showOptions}
+                  onClick={() => setShowOptions((prev) => !prev)}
                   paddedTop={Boolean(
-                     showResults &&
+                     showOptions &&
                         (showActionButton || poll.state === "closed")
                   )}
                   pollClosed={poll.state === "closed"}

@@ -1,10 +1,11 @@
 import { Slide, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useLivestreamMostRecentClosedPoll } from "components/custom-hook/streaming/useLivestreamMostRecentClosedPoll"
 import { useLivestreamOngoingPoll } from "components/custom-hook/streaming/useLivestreamOngoingPoll"
 import { useStreamingContext } from "../../context"
+import { EmptyPollsView } from "./EmptyPollsView"
 import { PollCard } from "./PollCard"
 import { PollCardSkeleton } from "./PollCardSkeleton"
-import { EmptyPollsView } from "./EmptyPollsView"
 
 export const ViewerPollsView = () => {
    return (
@@ -20,18 +21,24 @@ const Content = () => {
    const { livestreamId } = useStreamingContext()
 
    const ongoingPoll = useLivestreamOngoingPoll(livestreamId)
+   const mostRecentClosedPoll = useLivestreamMostRecentClosedPoll(livestreamId)
 
-   if (!ongoingPoll) {
+   const pollToShow = ongoingPoll || mostRecentClosedPoll
+
+   if (!pollToShow) {
       return <EmptyPollsView />
    }
 
    return (
       <Stack overflow="hidden" spacing={1.5}>
-         <Slide in={Boolean(ongoingPoll)} unmountOnExit direction="up">
-            {ongoingPoll ? (
-               <PollCard poll={ongoingPoll} />
+         <Slide in={Boolean(pollToShow)} unmountOnExit direction="up">
+            {pollToShow ? (
+               <PollCard
+                  poll={pollToShow}
+                  showResults={pollToShow.state === "closed"}
+               />
             ) : (
-               <PollCardSkeleton showResultsSkeleton={false} />
+               <PollCardSkeleton noBorder showResultsSkeleton={false} />
             )}
          </Slide>
       </Stack>

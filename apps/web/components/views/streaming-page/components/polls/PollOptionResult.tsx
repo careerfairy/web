@@ -59,6 +59,9 @@ const styles = sxStyles({
       justifyContent: "center",
       transition: (theme) => theme.transitions.create("background-color"),
    },
+   voteIconDisabled: {
+      backgroundColor: (theme) => theme.brand.white[400],
+   },
    voteIconActive: {
       backgroundColor: "secondary.50",
    },
@@ -67,6 +70,9 @@ const styles = sxStyles({
       height: 12,
       bgcolor: "neutral.800",
       borderRadius: "50%",
+   },
+   voteIconDotDisabled: {
+      bgcolor: (theme) => theme.brand.black[600],
    },
 })
 
@@ -81,6 +87,10 @@ type Props = {
     * Determines if voting is enabled for the poll.
     */
    enableVoting: boolean
+   /**
+    * Indicates if the vote icon should be shown.
+    */
+   showVoteIcon: boolean
    /**
     * Indicates if the current user has voted for any option in the poll.
     */
@@ -105,13 +115,14 @@ export const PollOptionResult = ({
    color,
    stats,
    enableVoting,
+   showVoteIcon,
    someOptionVoted,
    isOptionVoted,
    onVote,
    isVoting,
    showResults,
 }: Props) => {
-   const showBorderHighlight = enableVoting && isOptionVoted
+   const showBorderHighlight = (enableVoting || showResults) && isOptionVoted
 
    const disableOnClick = !enableVoting || isVoting || isOptionVoted
 
@@ -131,9 +142,9 @@ export const PollOptionResult = ({
          ]}
       >
          <Stack direction="row" width="100%" alignItems="center" spacing={1.5}>
-            {Boolean(enableVoting) && (
+            {Boolean(showVoteIcon) && (
                <span>
-                  <VoteIcon hasVoted={isOptionVoted} />
+                  <VoteIcon disabled={!enableVoting} hasVoted={isOptionVoted} />
                </span>
             )}
             <Box width="100%">
@@ -190,13 +201,22 @@ export const PollOptionResult = ({
 
 type VoteIconProps = {
    hasVoted: boolean
+   disabled: boolean
 }
 
-const VoteIcon = ({ hasVoted }: VoteIconProps) => {
+const VoteIcon = ({ hasVoted, disabled }: VoteIconProps) => {
    return (
-      <Box sx={[styles.voteIcon, hasVoted && styles.voteIconActive]}>
+      <Box
+         sx={[
+            styles.voteIcon,
+            hasVoted && styles.voteIconActive,
+            disabled && styles.voteIconDisabled,
+         ]}
+      >
          <Grow in={hasVoted}>
-            <Box sx={styles.voteIconDot} />
+            <Box
+               sx={[styles.voteIconDot, disabled && styles.voteIconDotDisabled]}
+            />
          </Grow>
       </Box>
    )
