@@ -3,18 +3,18 @@ import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { useTheme } from "@mui/material"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC, useCallback, useMemo } from "react"
+import { useCallback, useMemo } from "react"
+import { Briefcase } from "react-feather"
 import { useDispatch } from "react-redux"
 import { openJobsDialog } from "store/reducers/adminJobsReducer"
 import EmptyFormSection from "../../../EmptyFormSection"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import JobCardPreview from "./JobCardPreview"
-import { Briefcase } from "react-feather"
 
 type Props = {
    fieldId: string
 }
-const JobList: FC<Props> = ({ fieldId }) => {
+const JobList = ({ fieldId }: Props) => {
    const theme = useTheme()
    const dispatch = useDispatch()
    const featureFlags = useFeatureFlags()

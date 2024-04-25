@@ -1,18 +1,20 @@
 /* eslint-disable */
-import { v4 as uuidv4 } from "uuid"
 import {
-   FORTY_FIVE_MINUTES_IN_MILLISECONDS,
-   START_DATE_FOR_REPORTED_EVENTS,
-} from "../constants/streamContants"
-import DateUtil from "util/DateUtil"
-import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
-import firebase from "firebase/compat/app"
-import { HandRaiseState } from "types/handraise"
+   OnSnapshotCallback,
+   createCompatGenericConverter,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
+import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
+import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import {
-   getQueryStringFromUrl,
-   getReferralInformation,
-   shouldUseEmulators,
-} from "../../util/CommonUtil"
+   GROUP_DASHBOARD_ROLE,
+   Group,
+   GroupQuestion,
+   GroupWithPolicy,
+   UserGroupData,
+} from "@careerfairy/shared-lib/groups"
+import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import {
    AuthorInfo,
    EventRating,
@@ -23,45 +25,43 @@ import {
    LivestreamImpression,
    LivestreamPromotions,
    LivestreamQuestion,
-   pickPublicDataFromLivestream,
    UserLivestreamData,
+   pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
-import SessionStorageUtil from "../../util/SessionStorageUtil"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-   GroupQuestion,
-   GroupWithPolicy,
-   UserGroupData,
-} from "@careerfairy/shared-lib/groups"
-import {
-   getLivestreamGroupQuestionAnswers,
    TalentProfile,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
+   getLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/users"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
+import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { EmoteMessage } from "context/agora/RTMContext"
+import firebase from "firebase/compat/app"
+import { HandRaiseState } from "types/handraise"
+import DateUtil from "util/DateUtil"
+import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
+import {
+   getQueryStringFromUrl,
+   getReferralInformation,
+   shouldUseEmulators,
+} from "../../util/CommonUtil"
 import CookiesUtil from "../../util/CookiesUtil"
-import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import SessionStorageUtil from "../../util/SessionStorageUtil"
 import { makeUrls } from "../../util/makeUrls"
 import {
-   createCompatGenericConverter,
-   OnSnapshotCallback,
-} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+   FORTY_FIVE_MINUTES_IN_MILLISECONDS,
+   START_DATE_FOR_REPORTED_EVENTS,
+} from "../constants/streamContants"
+import { clearFirestoreCache } from "../util/authUtil"
+import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
+import { recommendationServiceInstance } from "./RecommendationService"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
-import { recommendationServiceInstance } from "./RecommendationService"
-import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
-import { clearFirestoreCache } from "../util/authUtil"
-import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
-import { EmoteMessage } from "context/agora/RTMContext"
-import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -615,29 +615,35 @@ class FirebaseService {
       livestream: LivestreamEvent,
       collection: "livestreams" | "draftLivestreams",
       author: AuthorInfo,
-      promotion
+      promotion,
+      newRatings?: EventRating[]
    ) => {
       try {
-         const ratings: EventRating[] = [
-            {
-               question: `How happy are you with the content shared by ${livestream.company}?`,
-               id: "company",
-               appearAfter: 30,
-               hasText: false,
-               noStars: false,
-               isSentimentRating: false,
-               isForEnd: false,
-            },
-            {
-               question: `Help ${livestream.company} improve: How can we make the experience more useful to you?`,
-               appearAfter: 40,
-               id: "companyFeedback",
-               hasText: true,
-               noStars: true,
-               isSentimentRating: false,
-               isForEnd: false,
-            },
-         ]
+         let ratings: EventRating[] = []
+         if (newRatings) {
+            ratings = [...newRatings]
+         } else {
+            ratings = [
+               {
+                  question: `How happy are you with the content shared by ${livestream.company}?`,
+                  id: "company",
+                  appearAfter: 30,
+                  hasText: false,
+                  noStars: false,
+                  isSentimentRating: false,
+                  isForEnd: false,
+               },
+               {
+                  question: `Help ${livestream.company} improve: How can we make the experience more useful to you?`,
+                  appearAfter: 40,
+                  id: "companyFeedback",
+                  hasText: true,
+                  noStars: true,
+                  isSentimentRating: false,
+                  isForEnd: false,
+               },
+            ]
+         }
 
          const batch = this.firestore.batch()
          const livestreamsRef = this.firestore.collection(collection).doc()
@@ -661,13 +667,19 @@ class FirebaseService {
          }
 
          for (const rating of ratings) {
-            const ratingRef = this.firestore
+            const collectionRef = this.firestore
                .collection(collection)
                .doc(livestreamsRef.id)
                .collection("rating")
-               .doc(rating.id)
 
-            batch.set(ratingRef, rating)
+            if (rating.id) {
+               const ratingRef = collectionRef.doc(rating.id)
+               batch.set(ratingRef, rating, { merge: true })
+            } else {
+               const { id, ...ratingWithoutId } = rating
+               const newRatingRef = collectionRef.doc()
+               batch.set(newRatingRef, ratingWithoutId, { merge: true })
+            }
          }
 
          const promotionsRef = this.firestore
@@ -757,6 +769,7 @@ class FirebaseService {
       batch.set(promotionRef, promotion, { merge: true })
 
       await batch.commit()
+
       return livestream.id
    }
 
@@ -1113,13 +1126,6 @@ class FirebaseService {
       return streamRef.collection("questions").where("type", "==", "done")
    }
 
-   deleteLivestreamQuestion = (
-      streamRef: DocumentReference<firebase.firestore.DocumentData>,
-      questionId: string
-   ) => {
-      return streamRef.collection("questions").doc(questionId).delete()
-   }
-
    listenToLivestreamQuestions = (livestreamId, callback) => {
       const ref = this.firestore
          .collection("livestreams")
@@ -1191,133 +1197,6 @@ class FirebaseService {
             })
          })
       })
-   }
-
-   putQuestionComment = (streamRef, questionId, comment) => {
-      const ref = streamRef
-         .collection("questions")
-         .doc(questionId)
-         .collection("comments")
-      return ref.add({ ...comment, timestamp: this.getServerTimestamp() })
-   }
-
-   putQuestionCommentWithTransaction = async (
-      livestreamRef,
-      questionId,
-      comment
-   ) => {
-      const questionRef = livestreamRef.collection("questions").doc(questionId)
-      const commentRef = livestreamRef
-         .collection("questions")
-         .doc(questionId)
-         .collection("comments")
-         .doc()
-      const newComment = {
-         ...comment,
-         id: commentRef.id,
-         timestamp: this.getServerTimestamp(),
-      }
-
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(questionRef).then((question) => {
-            if (question.exists) {
-               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-               const questionData: any = question.data()
-               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-               const questionDataToUpdate: any = {
-                  numberOfComments: firebase.firestore.FieldValue.increment(1),
-               }
-               if (!questionData.firstComment) {
-                  questionDataToUpdate.firstComment = newComment
-               }
-               transaction.update(questionRef, questionDataToUpdate)
-               transaction.set(commentRef, newComment)
-            }
-         })
-      })
-   }
-
-   createLivestreamQuestion = async (
-      livestreamId: string,
-      question: Pick<LivestreamQuestion, "displayName" | "author" | "title">
-   ): Promise<LivestreamQuestion> => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc()
-
-      const newQuestion: LivestreamQuestion = {
-         ...question,
-         timestamp: firebase.firestore.Timestamp.now(),
-         id: ref.id,
-         badges: [],
-         votes: 0,
-         type: "new",
-         emailOfVoters: [],
-         numberOfComments: 0,
-         firstComment: null,
-      }
-      await ref.set(newQuestion)
-
-      return newQuestion
-   }
-
-   addLivestreamQuestion = (
-      streamRef,
-      question: Omit<LivestreamQuestion, "id" | "timestamp">
-   ) => {
-      const ref = streamRef.collection("questions")
-      const addQuestionData: Omit<LivestreamQuestion, "id"> = {
-         ...question,
-         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-      }
-      return ref.add(addQuestionData)
-   }
-
-   upvoteLivestreamQuestion = async (
-      livestreamId: string,
-      question: LivestreamQuestion,
-      userEmail: string
-   ): Promise<"upvoted" | "downvoted"> => {
-      const ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(question.id)
-
-      const hasVoted = question.emailOfVoters?.includes(userEmail)
-
-      if (hasVoted) {
-         await ref.update({
-            votes: firebase.firestore.FieldValue.increment(-1),
-            emailOfVoters: firebase.firestore.FieldValue.arrayRemove(userEmail),
-         })
-         return "downvoted"
-      }
-
-      await ref.update({
-         votes: firebase.firestore.FieldValue.increment(1),
-         emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
-      })
-      return "upvoted"
-   }
-
-   upvoteLivestreamQuestionWithRef = (streamRef, question, userEmail) => {
-      const ref = streamRef.collection("questions").doc(question.id)
-      return ref.update({
-         votes: firebase.firestore.FieldValue.increment(1),
-         emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
-      })
-   }
-
-   putLivestreamComment = (livestreamId, comment) => {
-      comment.timestamp = firebase.firestore.Timestamp.fromDate(new Date())
-      const ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("comments")
-      return ref.add(comment)
    }
 
    listenToChatEntries = (
@@ -2097,7 +1976,10 @@ class FirebaseService {
 
    setPollState = (streamRef, pollId, state) => {
       const ref = streamRef.collection("polls").doc(pollId)
-      return ref.update({ state: state })
+      return ref.update({
+         state: state,
+         ...(state === "closed" && { closedAt: this.getServerTimestamp() }),
+      })
    }
 
    listenToHandRaiseState = (streamRef, userEmail, callback) => {
@@ -2651,9 +2533,13 @@ class FirebaseService {
       return feedbackRef.update(data)
    }
 
-   deleteFeedbackQuestion = async (livestreamId, feedbackId) => {
+   deleteFeedbackQuestion = async (
+      livestreamId,
+      feedbackId,
+      targetCollection = "livestreams"
+   ) => {
       const feedbackRef = this.firestore
-         .collection("livestreams")
+         .collection(targetCollection)
          .doc(livestreamId)
          .collection("rating")
          .doc(feedbackId)
@@ -2666,6 +2552,25 @@ class FirebaseService {
          .doc(livestreamId)
          .collection("rating")
       return feedbackRef.add(data)
+   }
+
+   upsertFeedbackQuestion = async (
+      targetCollection,
+      livestreamId,
+      feedbackId,
+      data
+   ) => {
+      const collectionRef = this.firestore
+         .collection(targetCollection)
+         .doc(livestreamId)
+         .collection("rating")
+      if (feedbackId) {
+         const feedbackRef = collectionRef.doc(feedbackId)
+         return feedbackRef.set(data, { merge: true })
+      } else {
+         const { id, ...rest } = data
+         return collectionRef.add(rest)
+      }
    }
 
    listenToLivestreamRatings = (livestreamId, callback) => {

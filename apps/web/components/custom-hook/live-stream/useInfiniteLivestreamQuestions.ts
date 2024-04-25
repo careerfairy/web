@@ -13,12 +13,12 @@ import useInfiniteCollection, {
 } from "../utils/useInfiniteCollection"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import FirebaseService from "../../../data/firebase/FirebaseService"
+import LivestreamService from "data/firebase/LivestreamService"
 
 type UseInfiniteLivestreamQuestions = InfiniteCollection<LivestreamQuestion> & {
    handleClientToggleUpvoteQuestion: (
       question: LivestreamQuestion,
-      status: Awaited<ReturnType<FirebaseService["upvoteLivestreamQuestion"]>>
+      status: Awaited<ReturnType<LivestreamService["toggleUpvoteQuestion"]>>
    ) => void
 }
 
@@ -76,23 +76,28 @@ const useInfiniteLivestreamQuestions = (
       UseInfiniteLivestreamQuestions["handleClientToggleUpvoteQuestion"]
    >(
       (question, status) => {
-         if (!authenticatedUser?.email) return
+         if (!authenticatedUser?.uid) return
 
-         let updateData: Pick<LivestreamQuestion, "emailOfVoters" | "votes">
-         const emailOfVoters = question.emailOfVoters || []
+         let updateData: Pick<
+            LivestreamQuestion,
+            "voterIds" | "emailOfVoters" | "votes"
+         >
+         const voterIds = question.voterIds || []
 
          switch (status) {
             case "upvoted":
                updateData = {
-                  emailOfVoters: [
-                     ...new Set([...emailOfVoters, authenticatedUser.email]),
-                  ],
+                  voterIds: [...new Set([...voterIds, authenticatedUser.uid])],
                   votes: question.votes + 1,
                }
                break
             case "downvoted":
                updateData = {
-                  emailOfVoters: emailOfVoters.filter(
+                  voterIds: voterIds.filter(
+                     (email) => email !== authenticatedUser.uid
+                  ),
+                  // Take chance to remove email deprecated emailOfVoters
+                  emailOfVoters: question?.emailOfVoters?.filter(
                      (email) => email !== authenticatedUser.email
                   ),
                   votes: question.votes - 1,
@@ -105,7 +110,7 @@ const useInfiniteLivestreamQuestions = (
 
          queryData.handleClientSideUpdate(question.id, updateData)
       },
-      [authenticatedUser.email, queryData]
+      [authenticatedUser.email, authenticatedUser.uid, queryData]
    )
 
    return useMemo(

@@ -1,8 +1,11 @@
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import GroupPlansDialog from "components/views/checkout/GroupPlansDialog"
+import UpgradePlanButton from "components/views/checkout/forms/UpgradePlanButton"
 import LockedIcon from "components/views/common/icons/LockedIcon"
 import Image from "next/image"
 import React from "react"
+import { Unlock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -75,7 +78,6 @@ const styles = sxStyles({
       },
    },
 })
-
 const lockedSparkAnalyticsDesktopImage =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fsparks-locked-background.png?alt=media&token=f724cb9e-1a8d-4891-a56c-432039935835"
 const lockedSparkAnalyticsMobileImage =
@@ -119,7 +121,11 @@ const Info = () => {
             ))}
          </Box>
          <Box sx={styles.text}>
-            Talk to your Success Manager to unlock the full power of Sparks.
+            <GroupPlansDialog />
+            <UpgradePlanButton
+               text="Unlock it now"
+               icon={<Unlock strokeWidth={3} />}
+            />
          </Box>
       </Stack>
    )

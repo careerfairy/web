@@ -1,6 +1,6 @@
-import MultiChipSelect from "./MultiChipSelect"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import { ESTIMATED_DURATIONS } from "../../../commons"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import MultiChipSelect from "./MultiChipSelect"
 
 const EstimatedDurationSelect = () => {
    const {

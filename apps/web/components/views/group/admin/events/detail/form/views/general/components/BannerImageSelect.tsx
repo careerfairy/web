@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @next/next/no-img-element */
-import React, { useCallback, useEffect, useState } from "react"
 import {
    Box,
    Button,
@@ -9,26 +6,21 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { UploadIcon } from "./UploadIcon"
-import { sxStyles } from "types/commonTypes"
+import useFileUploader from "components/custom-hook/useFileUploader"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import FilePickerContainer from "components/ssr/FilePickerContainer"
 import { uploadLogo } from "components/helperFunctions/HelperFunctions"
-import { useField } from "formik"
 import { getDownloadUrl } from "components/helperFunctions/streamFormFunctions"
+import FileUploader from "components/views/common/FileUploader"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useField } from "formik"
+import { useCallback } from "react"
+import { sxStyles } from "types/commonTypes"
+import { UploadIcon } from "./UploadIcon"
 
 const PLACEHOLDER_BANNER_URL =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flivestream_creation_banner_placeholder.png?alt=media&token=e12cc34a-44e5-4c00-8ac5-ed6ec232bc69"
 
 const styles = sxStyles({
-   root: {
-      height: "429px",
-      alignItems: "center",
-      justifyContent: "center",
-      border: "1px solid #EBEBEF",
-      borderRadius: "16px",
-   },
    placeholderLogoContainer: {
       height: "111px",
    },
@@ -50,90 +42,229 @@ const styles = sxStyles({
       },
       textAlign: "center",
    },
-   uploadButton: {
-      backgroundColor: "#FAFAFE",
+   fileUploaderButton: {
+      padding: "4px 16px",
+      "&:hover": {
+         backgroundColor: (theme) =>
+            theme.palette.secondary.main + "!important",
+         color: (theme) => theme.brand.white[100] + "!important",
+      },
+   },
+   changeBannerButtonWrapper: {
+      position: "absolute",
+      top: "18px",
+      right: "18px",
+   },
+   dragAndDropView: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      margin: "0px !important",
+      width: "100%",
+      height: "100%",
+      borderRadius: "16px",
+      border: "1px solid #6749EA",
+      background: "rgba(240, 237, 253, 0.90)",
+      zIndex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+   },
+   dragAndDropViewLabel: {
+      fontSize: "24px",
+      fontStyle: "normal",
+      fontWeight: 600,
+      lineHeight: "36px",
+      color: "neutral.700",
+   },
+   dragAndDropViewIcon: {
+      width: "64px",
+      height: "64px",
+   },
+   fileUploader: {
+      width: "100%",
+      height: "100%",
+   },
+   errorMessage: {
+      gridColumn: 2,
+      textAlignLast: "center",
+   },
+   bannerImage: {
+      borderRadius: "18px",
+      padding: "10px",
+      width: "100%",
+      height: "100%",
+      margin: 0,
+      objectFit: "cover",
+      objectPosition: "center",
+   },
+   emptyBannerWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      height: "100%",
+      gap: "12px",
    },
 })
 
-/*
- *
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- * PLEASE IGNORE THIS COMPONENT FOR NOW, STILL NEEDS WORK, WILL TACKLE IT LATER
- *
- */
-const BannerImageSelect = () => {
+const getStyles = (hasError: boolean) =>
+   sxStyles({
+      root: {
+         position: "relative",
+         height: {
+            xs: "275px",
+            md: "429px",
+         },
+         alignItems: "center",
+         justifyContent: "center",
+         border: (theme) =>
+            `1px solid ${
+               hasError ? theme.brand.error.main : theme.palette.neutral[50]
+            }`,
+         borderRadius: "16px",
+      },
+      ...styles,
+   })
+
+const FIELD_NAME = "general.backgroundImageUrl"
+
+const DragAndDropView = () => {
+   return (
+      <Stack spacing="12px" sx={styles.dragAndDropView}>
+         <UploadIcon sx={styles.dragAndDropViewIcon} />
+         <Typography sx={styles.dragAndDropViewLabel}>
+            Drop your file to upload
+         </Typography>
+      </Stack>
+   )
+}
+
+type FileUploaderButtonProps = {
+   buttonLabel: string
+   hideIcon?: boolean
+}
+
+const FileUploaderButton = ({
+   buttonLabel,
+   hideIcon = false,
+}: FileUploaderButtonProps) => {
    const isMobile = useIsMobile()
+
+   return (
+      <>
+         <Button
+            endIcon={hideIcon ? null : <UploadIcon />}
+            size={isMobile ? "small" : "medium"}
+            variant="outlined"
+            color="secondary"
+            sx={styles.fileUploaderButton}
+         >
+            <Typography>{buttonLabel}</Typography>
+         </Button>
+      </>
+   )
+}
+
+const EmptyBanner = () => {
+   return (
+      <Box sx={styles.emptyBannerWrapper}>
+         <Box sx={styles.placeholderLogoContainer}>
+            <Box
+               component="img"
+               src={PLACEHOLDER_BANNER_URL}
+               alt="Upload Banner"
+            />
+         </Box>
+         <Box>
+            <Typography sx={styles.label}>
+               Upload your live stream banner image
+            </Typography>
+            <Typography sx={styles.recommendedSize}>
+               Recommended size: 1920x1080
+            </Typography>
+         </Box>
+         <FileUploaderButton buttonLabel="Upload banner" />
+      </Box>
+   )
+}
+
+type BannerWithImage = {
+   imageUrl: string
+}
+
+const BannerWithImage = ({ imageUrl }: BannerWithImage) => {
+   return (
+      <>
+         <Box sx={styles.changeBannerButtonWrapper}>
+            <FileUploaderButton buttonLabel="Change banner" hideIcon={true} />
+         </Box>
+         <Box
+            component="img"
+            src={imageUrl}
+            alt="Banner"
+            sx={styles.bannerImage}
+         />
+      </>
+   )
+}
+
+const BannerImageSelect = () => {
    const firebase = useFirebaseService()
-   const [field, meta, helpers] = useField("general.backgroundImageUrl")
+   const [field, meta, helpers] = useField(FIELD_NAME)
 
-   const [filePickerError, setFilePickerError] = useState(null)
+   const handleTouched = useCallback(() => {
+      helpers.setTouched(true, false)
+   }, [helpers])
 
-   useEffect(() => {
-      setFilePickerError(meta.error)
-   }, [meta])
+   const { fileUploaderProps, dragActive } = useFileUploader({
+      name: "general.backgroundImageUrl",
+      acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
+      maxFileSize: 10, // MB
+      multiple: false,
+      onValidated: async (file) => {
+         const newFile = Array.isArray(file) ? file[0] : file
+         await uploadLogo(
+            "illustration-images",
+            newFile,
+            firebase,
+            async (newUrl, fullPath) => {
+               await helpers.setValue(getDownloadUrl(fullPath), true)
+               handleTouched()
+               await helpers.setError(undefined)
+            },
+            () => {}
+         )
+      },
+      onCancel: async () => {
+         handleTouched()
+         if (!field.value) {
+            await helpers.setError("Please provide a banner image")
+         }
+      },
+   })
 
-   const handleFilePickerChange = useCallback((fileObject) => {
-      /*
-    uploadLogo(
-        "illustration-images",
-        fileObject,
-        firebase,
-        (newUrl, fullPath) => {
-          helpers.setValue(getDownloadUrl(fullPath), true)
-          setFilePickerError(null)
-        },
-        () => {}
-        )
-        */
-      setFilePickerError(null)
-   }, [])
-
-   const handleFilePickerError = useCallback((errMsg) => {
-      console.log("ERROOOOOOR", errMsg)
-      setFilePickerError(errMsg)
-   }, [])
+   const styles = getStyles(Boolean(meta.touched && meta.error))
 
    return (
       <>
          <Stack spacing="10px" direction="column" sx={styles.root}>
-            <Box sx={styles.placeholderLogoContainer}>
-               <img src={PLACEHOLDER_BANNER_URL} alt={"Banner Upload Banner"} />
-            </Box>
-            <Box>
-               <Typography sx={styles.label}>
-                  Upload your live stream banner image
-               </Typography>
-               <Typography sx={styles.recommendedSize}>
-                  Recommended size: 1920x1080
-               </Typography>
-            </Box>
-            <FilePickerContainer
-               extensions={["jpg", "jpeg", "png"]}
-               maxSize={10}
-               onChange={handleFilePickerChange}
-               onError={handleFilePickerError}
-            >
-               <Button
-                  endIcon={<UploadIcon />}
-                  size={isMobile ? "small" : "medium"}
-                  variant="outlined"
-                  color="secondary"
-               >
-                  <Typography>Upload banner</Typography>
-               </Button>
-            </FilePickerContainer>
+            <FileUploader {...fileUploaderProps} sx={styles.fileUploader}>
+               <>
+                  {field.value ? (
+                     <BannerWithImage imageUrl={field.value} />
+                  ) : (
+                     <EmptyBanner />
+                  )}
+                  {dragActive ? <DragAndDropView /> : null}
+               </>
+            </FileUploader>
          </Stack>
          <Collapse
-            in={Boolean(filePickerError)}
-            sx={{ textAlignLast: "center" }}
+            in={Boolean(meta.touched && meta.error)}
+            sx={styles.errorMessage}
          >
-            <FormHelperText error>{filePickerError}</FormHelperText>
+            <FormHelperText error>{meta.error}</FormHelperText>
          </Collapse>
       </>
    )
