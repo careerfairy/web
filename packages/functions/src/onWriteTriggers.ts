@@ -3,7 +3,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/customJobs/metadata"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { hasMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
+import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { UserStats } from "@careerfairy/shared-lib/src/users"
 import { firestore } from "./api/firestoreAdmin"
@@ -244,8 +244,11 @@ export const onWriteGroup = functions
          const newValue = change.after?.data() as Group
          const previousValue = change.before?.data() as Group
 
-         if (hasMetadataChanged(previousValue, newValue)) {
-            console.log("🚀 ~ .onWrite ~ hasMetadataChanged livestreams:", true)
+         if (hasGroupMetadataChanged(previousValue, newValue)) {
+            console.log(
+               "🚀 ~ .onWrite ~ hasGroupMetadataChanged livestreams:",
+               true
+            )
             sideEffectPromises.push(
                livestreamsRepo.syncLivestreamMetadata(groupId, newValue)
             )
