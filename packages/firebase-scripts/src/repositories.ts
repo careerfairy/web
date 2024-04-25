@@ -1,5 +1,16 @@
-import { auth, firestore } from "./lib/firebase"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
+import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "../../shared-lib/src/universities/UniversityRepository"
+import {
+   CustomJobScriptsRepository,
+   ICustomJobScriptsRepository,
+} from "./api/CustomJobsScriptRepository"
+import {
+   GroupScriptsRepository,
+   IGroupScriptsRepository,
+} from "./api/GroupScriptsRepository"
 import {
    ILivestreamScriptsRepository,
    LivestreamScriptsRepository,
@@ -8,14 +19,7 @@ import {
    IUserScriptsRepository,
    UserScriptsRepository,
 } from "./api/UserScriptsRepository"
-import {
-   GroupScriptsRepository,
-   IGroupScriptsRepository,
-} from "./api/GroupScriptsRepository"
-import {
-   FirebaseUniversityRepository,
-   IUniversityRepository,
-} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
+import { auth, firestore } from "./lib/firebase"
 
 const firestoreInstance = firestore as any
 const authInstance = auth
@@ -41,3 +45,6 @@ export const livestreamRepo: ILivestreamScriptsRepository =
 
 export const universitiesRepo: IUniversityRepository =
    new FirebaseUniversityRepository(firestoreInstance)
+
+export const customJobRepo: ICustomJobScriptsRepository =
+   new CustomJobScriptsRepository(firestore as any, FieldValue)

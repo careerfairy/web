@@ -1,5 +1,5 @@
-import { LivestreamEvent } from "../livestreams"
 import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
+import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
 
 /*
@@ -337,4 +337,16 @@ export const isDefinedAndEqual = <T>(
    toCompare: T
 ): boolean => {
    return value !== undefined && value === toCompare
+}
+
+/**
+ * Returns the difference between two arrays as a new array, containing only the differing elements.
+ * @param array1 Base array for difference
+ * @param array2 Comparison array to be used against @param array1 (Base) for differences
+ * @returns New array containing only differing elements
+ */
+export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
+   return array2.filter((element) => {
+      return !array1.includes(element)
+   })
 }

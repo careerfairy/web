@@ -1,5 +1,5 @@
-import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat"
+import { Identifiable } from "../commonTypes"
 import { UserData } from "../users"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
@@ -25,6 +25,11 @@ export interface CustomJob extends Identifiable {
    // livestreams ids where this job opening is shown
    livestreams: string[]
    deleted?: boolean
+
+   // cascaded properties from groups (collection /careerCenterData)
+   companyCountry?: string
+   companyIndustries?: string[]
+   companySize?: string
 }
 
 export type PublicCustomJob = Pick<
