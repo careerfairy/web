@@ -2,7 +2,7 @@ import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, orderBy, query } from "firebase/firestore"
 import { ReactFireOptions } from "reactfire"
-import { useFirestoreCollection } from "../utils/useFirestoreCollection"
+import { useFirestoreCollection } from "../../utils/useFirestoreCollection"
 
 const reactFireOptions: ReactFireOptions = {
    suspense: true,

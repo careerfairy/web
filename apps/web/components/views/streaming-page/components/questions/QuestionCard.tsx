@@ -1,15 +1,18 @@
 import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
-import { Box, Stack, Typography } from "@mui/material"
-import { Fragment, forwardRef } from "react"
-import { sxStyles } from "types/commonTypes"
-import { CheckCircle } from "react-feather"
 import { LoadingButton } from "@mui/lab"
+import { Box, Stack, Typography } from "@mui/material"
+import { useMarkQuestionAsDone } from "components/custom-hook/streaming/question"
+import { useMarkQuestionAsCurrent } from "components/custom-hook/streaming/question/useMarkQuestionAsCurrent"
+import BrandedOptions from "components/views/common/inputs/BrandedOptions"
+import { Fragment, forwardRef } from "react"
+import { CheckCircle } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
 import { CommentInput } from "./CommentInput"
 import { CommentsList } from "./CommentsList"
-import BrandedOptions from "components/views/common/inputs/BrandedOptions"
+import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
 import { useQuestionsListContext } from "./QuestionsLisProvider"
 import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
-import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
 
 const styles = sxStyles({
    root: (theme) => ({
@@ -104,6 +107,7 @@ const Header = ({ question }: AnswererHeaderProps) => {
    return (
       <Stack
          p={1.5}
+         pb={question.type !== "done" && 0}
          sx={[question.type === "done" && styles.questionHeaderGreen]}
          spacing={1.5}
       >
@@ -150,15 +154,36 @@ const Content = ({ question, topPadding }: ContentProps) => {
 }
 
 const StreamerActions = ({ question }: StreamerActionsProps) => {
+   const { streamerAuthToken, livestreamId } = useStreamingContext()
+   const {
+      trigger: markQuestionAsDone,
+      isMutating: markQuestionAsDonePending,
+   } = useMarkQuestionAsDone(livestreamId, question.id, streamerAuthToken)
+
+   const {
+      trigger: markQuestionAsCurrent,
+      isMutating: markQuestionAsCurrentPending,
+   } = useMarkQuestionAsCurrent(livestreamId, question.id, streamerAuthToken)
+
    return (
       <Fragment>
          {question.type === "new" && (
-            <LoadingButton color="primary" variant="outlined">
+            <LoadingButton
+               color="primary"
+               variant="outlined"
+               onClick={() => markQuestionAsCurrent()}
+               loading={markQuestionAsCurrentPending}
+            >
                Answer question
             </LoadingButton>
          )}
          {question.type === "current" && (
-            <LoadingButton color="primary" variant="contained">
+            <LoadingButton
+               color="primary"
+               variant="contained"
+               onClick={() => markQuestionAsDone()}
+               loading={markQuestionAsDonePending}
+            >
                Mark as answered
             </LoadingButton>
          )}
