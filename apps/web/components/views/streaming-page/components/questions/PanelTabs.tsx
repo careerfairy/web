@@ -8,6 +8,7 @@ import {
 } from "@mui/material"
 import { useCountTotalQuestions } from "components/custom-hook/streaming/question/useCountTotalQuestions"
 import { swipeableTabA11yProps } from "materialUI/GlobalPanels/GlobalPanels"
+import { SyntheticEvent } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 
@@ -37,8 +38,6 @@ const styles = sxStyles({
       height: HEIGHT - BORDER_THICKNESS * 2,
       borderRadius: `${BORDER_RADIUS}px`,
       textTransform: "none",
-      fontSize: "16px",
-      lineHeight: 1.5,
       zIndex: 1,
       color: theme.brand.black[700],
       [`&.${tabClasses.selected}`]: {
@@ -48,9 +47,9 @@ const styles = sxStyles({
    }),
 
    count: {
-      mt: "auto",
-      mb: "2px",
-      lineHeight: 2,
+      mt: "auto !important",
+      mb: "4px !important",
+      lineHeight: "16px",
    },
 })
 
@@ -92,10 +91,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
    const upcomingCountString = formatCount(upcomingQuestionsCount)
    const answeredCountString = formatCount(answeredQuestionsCount)
 
-   const handleChange = (
-      _event: React.SyntheticEvent,
-      newValue: QuestionTab
-   ) => {
+   const handleChange = (_event: SyntheticEvent, newValue: QuestionTab) => {
       setValue(newValue)
    }
 
@@ -112,7 +108,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
          <Tab
             label={
                <Stack direction="row" spacing={0.5}>
-                  <span>Upcoming</span>
+                  <Typography variant="medium">Upcoming</Typography>
                   {Boolean(upcomingCountString) && (
                      <Typography sx={styles.count} variant="xsmall">
                         {upcomingCountString}
@@ -127,7 +123,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
          <Tab
             label={
                <Stack direction="row" spacing={0.5}>
-                  <span>Answered</span>
+                  <Typography variant="medium">Answered</Typography>
                   {Boolean(answeredCountString) && (
                      <Typography sx={styles.count} variant="xsmall">
                         {answeredCountString}
