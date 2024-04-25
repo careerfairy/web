@@ -25,16 +25,15 @@ export const hasCustomJobsGroupMetaDataChanged = (
    currentValue: Group
 ): boolean => {
    const countryChanged =
-      previousValue?.companyCountry != currentValue?.companyCountry
+      previousValue?.companyCountry?.id != currentValue?.companyCountry?.id
 
    const industriesChanged = Boolean(
       getArrayDifference(
-         previousValue?.companyIndustries,
-         currentValue?.companyIndustries
+         previousValue?.companyIndustries.map((industry) => industry.id),
+         currentValue?.companyIndustries.map((industry) => industry.id)
       ).length
    )
 
-   const sizeChanged = previousValue?.companySize === currentValue?.companySize
-
+   const sizeChanged = previousValue?.companySize != currentValue?.companySize
    return countryChanged || industriesChanged || sizeChanged
 }
