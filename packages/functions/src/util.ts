@@ -1,24 +1,24 @@
-import { DateTime } from "luxon"
-import { customAlphabet } from "nanoid"
-import { https, Request, Response } from "firebase-functions"
+import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
 import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
-import { ClientError } from "graphql-request"
-import * as crypto from "crypto"
-import { promisify } from "util"
-import * as zlib from "zlib"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import * as crypto from "crypto"
+import { firestore } from "firebase-admin"
+import type { Change } from "firebase-functions"
+import { https, Request, Response } from "firebase-functions"
+import { ClientError } from "graphql-request"
+import { DateTime } from "luxon"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
+import { customAlphabet } from "nanoid"
+import { promisify } from "util"
+import * as zlib from "zlib"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
-import type { Change } from "firebase-functions"
-import { firestore } from "firebase-admin"
 import DocumentSnapshot = firestore.DocumentSnapshot
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 export const setCORSHeaders = (req: Request, res: Response): void => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -270,12 +270,6 @@ export const addDaysDate = (date: Date, days: number): Date => {
 
 export const removeMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() - minutes * 60000)
-}
-
-export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
-   return array2.filter((element) => {
-      return !array1.includes(element)
-   })
 }
 
 export const makeRequestingGroupIdFirst = (

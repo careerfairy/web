@@ -99,37 +99,30 @@ export const hasMetadataChanged = (
    const countryChanged =
       previousValue?.companyCountry?.id != currentValue?.companyCountry?.id
 
-   console.log("🚀 ~ countryChanged:", countryChanged)
-
-   const industriesChanged = Boolean(
-      getArrayDifference(
-         previousValue?.companyIndustries?.map((industry) => industry.id),
-         currentValue?.companyIndustries?.map((industry) => industry.id)
-      ).length
+   const industriesDifference = getArrayDifference(
+      previousValue?.companyIndustries?.map((industry) => industry.id),
+      currentValue?.companyIndustries?.map((industry) => industry.id)
    )
 
-   console.log("🚀 ~ industriesChanged:", industriesChanged)
+   const industriesChanged = Boolean(industriesDifference?.length)
 
    const sizeChanged = previousValue?.companySize != currentValue?.companySize
-   console.log("🚀 ~ sizeChanged:", sizeChanged)
 
-   const targetCountriesChanged = Boolean(
-      getArrayDifference(
-         previousValue?.targetedCountries?.map((country) => country.id),
-         currentValue?.targetedCountries?.map((country) => country.id)
-      ).length
+   const targetCountriesDifference = getArrayDifference(
+      previousValue?.targetedCountries?.map((country) => country.id),
+      currentValue?.targetedCountries?.map((country) => country.id)
    )
 
-   console.log("🚀 ~ targetCountriesChanged:", targetCountriesChanged)
+   const targetCountriesChanged = Boolean(targetCountriesDifference.length)
+
+   const targetUniversitiesDifference = getArrayDifference(
+      previousValue?.targetedUniversities?.map((uni) => uni.id),
+      currentValue?.targetedUniversities?.map((uni) => uni.id)
+   )
 
    const targetUniversitiesChanged = Boolean(
-      getArrayDifference(
-         previousValue?.targetedUniversities?.map((uni) => uni.id),
-         currentValue?.targetedUniversities?.map((uni) => uni.id)
-      ).length
+      targetUniversitiesDifference.length
    )
-
-   console.log("🚀 ~ targetUniversitiesChanged:", targetUniversitiesChanged)
 
    const fieldsOfStudyDifferences = getArrayDifference(
       previousValue?.targetedFieldsOfStudy?.map(
@@ -139,14 +132,8 @@ export const hasMetadataChanged = (
          (fieldOfStudy) => fieldOfStudy.id
       )
    )
+
    const targetFieldsOfStudiesChanged = Boolean(fieldsOfStudyDifferences.length)
-   console.log("🚀 ~ fieldsOfStudyDifferences:", fieldsOfStudyDifferences)
-   console.log(
-      "🚀 ~ targetFieldsOfStudiesChanged:",
-      targetFieldsOfStudiesChanged,
-      currentValue?.targetedFieldsOfStudy,
-      previousValue?.targetedFieldsOfStudy
-   )
 
    return (
       countryChanged ||
