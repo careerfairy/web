@@ -48,6 +48,7 @@ import {
    getDocs,
    increment,
    limit,
+   orderBy,
    query,
    runTransaction,
    setDoc,
@@ -711,28 +712,53 @@ export class LivestreamService {
       commentId: string
    ) => {
       return runTransaction(FirestoreInstance, async (transaction) => {
-         const ref = this.getCommentRef(livestreamRef, questionId, commentId)
+         const commentRef = this.getCommentRef(
+            livestreamRef,
+            questionId,
+            commentId
+         )
 
          const questionRef = this.getQuestionRef(livestreamRef, questionId)
 
          const questionDoc = await transaction.get(questionRef)
-         const commentDoc = await transaction.get(ref)
+         const commentDoc = await transaction.get(commentRef)
 
          if (!commentDoc.exists()) {
             throw new Error("Comment does not exist")
          }
 
          if (questionDoc.exists()) {
-            const firstComment = questionDoc.data().firstComment
-            transaction.update(questionRef, {
+            const replacementFirstCommentsSnap = await getDocs(
+               query(
+                  collection(questionRef, "comments"),
+                  orderBy("timestamp", "asc"),
+                  limit(2)
+               ).withConverter(
+                  createGenericConverter<LivestreamQuestionComment>()
+               )
+            )
+
+            const currentFirstComment = questionDoc.data().firstComment
+
+            const isFirstCommentDeleted = currentFirstComment?.id === commentId
+
+            const updateData: PartialWithFieldValue<LivestreamQuestion> = {
                numberOfComments: increment(-1),
-               ...(firstComment?.id === commentId
-                  ? { firstComment: null }
-                  : {}),
-            })
+            }
+
+            if (isFirstCommentDeleted) {
+               const replacementFirstComment =
+                  replacementFirstCommentsSnap.docs
+                     .find((comment) => comment.id !== commentId)
+                     ?.data() || null
+
+               updateData.firstComment = replacementFirstComment
+            }
+
+            transaction.update(questionRef, updateData)
          }
 
-         transaction.delete(ref)
+         transaction.delete(commentRef)
       })
    }
 
@@ -742,7 +768,7 @@ export class LivestreamService {
     * @param questionId - Question ID
     * @returns Document reference for the question.
     */
-   private getQuestionRef(
+   getQuestionRef(
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string
    ) {
@@ -780,7 +806,7 @@ export class LivestreamService {
       livestreamRef: DocumentReference<LivestreamEvent>,
       options: Pick<
          LivestreamQuestion,
-         "title" | "displayName" | "author" | "badges"
+         "title" | "displayName" | "author" | "badges" | "agoraUserId"
       >
    ) => {
       const newQuestionRef = doc(
@@ -789,10 +815,11 @@ export class LivestreamService {
 
       const newQuestion = {
          id: newQuestionRef.id,
-         badges: options.badges,
+         badges: options.badges || [],
          title: options.title,
          displayName: options.displayName,
-         author: options.author,
+         author: options.author || "",
+         agoraUserId: options.agoraUserId || "",
          timestamp: Timestamp.now(),
          voterIds: [],
          emailOfVoters: [],

@@ -1,10 +1,10 @@
-import { ReactNode, createContext, useContext, useMemo, useState } from "react"
-import { QuestionOptionsMenu } from "./QuestionOptionsMenu"
-import { CommentOptionsMenu } from "./CommentOptionsMenu"
 import {
    LivestreamQuestion,
    LivestreamQuestionComment,
 } from "@careerfairy/shared-lib/livestreams"
+import { ReactNode, createContext, useContext, useMemo, useState } from "react"
+import { CommentOptionsMenu } from "./CommentOptionsMenu"
+import { QuestionOptionsMenu } from "./QuestionOptionsMenu"
 
 export type QuestionMenuProps = {
    question: LivestreamQuestion
@@ -29,6 +29,8 @@ type QuestionsListContextType = {
       event: React.MouseEvent<HTMLElement>,
       question: LivestreamQuestion
    ) => void
+   questionIdWithOpenedCommentList: string | null
+   setQuestionIdWithOpenedCommentList: (questionId: string | null) => void
 }
 
 const QuestionsListContext = createContext<QuestionsListContextType | null>(
@@ -44,6 +46,9 @@ const QuestionsListContextProvider = ({ children }: Props) => {
       useState<QuestionMenuProps | null>(null)
    const [commentMenuProps, setCommentMenuProps] =
       useState<CommentMenuProps | null>(null)
+
+   const [questionIdWithOpenedCommentList, setQuestionIdWithOpenedCommentList] =
+      useState<string | null>(null)
 
    const value = useMemo<QuestionsListContextType>(
       () => ({
@@ -69,13 +74,10 @@ const QuestionsListContextProvider = ({ children }: Props) => {
                anchorEl: event.currentTarget,
             })
          },
+         questionIdWithOpenedCommentList,
+         setQuestionIdWithOpenedCommentList,
       }),
-      [
-         questionMenuProps,
-         setQuestionMenuProps,
-         commentMenuProps,
-         setCommentMenuProps,
-      ]
+      [questionMenuProps, commentMenuProps, questionIdWithOpenedCommentList]
    )
 
    return (

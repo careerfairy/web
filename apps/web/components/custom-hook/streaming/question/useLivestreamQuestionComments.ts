@@ -1,4 +1,4 @@
-import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamQuestionComment } from "@careerfairy/shared-lib/livestreams"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, orderBy, query } from "firebase/firestore"
 import { ReactFireOptions } from "reactfire"
@@ -19,7 +19,7 @@ export const useLivestreamQuestionComments = (
    livestreamId: string,
    questionId: string
 ) => {
-   return useFirestoreCollection<LivestreamQuestion>(
+   return useFirestoreCollection<LivestreamQuestionComment>(
       query(
          collection(
             FirestoreInstance,
