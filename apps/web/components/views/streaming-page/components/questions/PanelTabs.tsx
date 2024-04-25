@@ -11,6 +11,7 @@ import { swipeableTabA11yProps } from "materialUI/GlobalPanels/GlobalPanels"
 import { SyntheticEvent } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
+import { MIN_QUESTIONS_TO_SHOW } from "./util"
 
 const BORDER_RADIUS = 51
 const BORDER_THICKNESS = 1
@@ -18,6 +19,9 @@ const HEIGHT = 40
 
 const styles = sxStyles({
    root: (theme) => ({
+      position: "sticky",
+      top: 0,
+      zIndex: 1,
       [`& .${tabsClasses.indicator}`]: {
          height: "100%",
          zIndex: 0,
@@ -54,8 +58,8 @@ const styles = sxStyles({
 })
 
 export enum QuestionTab {
-   UPCOMING = "upcoming",
-   ANSWERED = "answered",
+   UPCOMING,
+   ANSWERED,
 }
 
 type PanelTabsProps = {
@@ -65,6 +69,10 @@ type PanelTabsProps = {
 
 const formatCount = (count: number) => {
    if (!count) return ""
+
+   if (count < MIN_QUESTIONS_TO_SHOW) {
+      return ""
+   }
 
    if (count > 99) {
       return "(99+)"
@@ -79,6 +87,7 @@ const formatCount = (count: number) => {
 
 export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
    const { livestreamId } = useStreamingContext()
+
    const { count: upcomingQuestionsCount } = useCountTotalQuestions(
       livestreamId,
       "upcoming"

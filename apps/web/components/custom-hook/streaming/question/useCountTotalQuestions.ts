@@ -11,7 +11,7 @@ export const useCountTotalQuestions = (
    const q = query(
       collection(firestore, "livestreams", livestreamId, "questions"),
       type === "upcoming"
-         ? where("type", "in", ["done", "current"])
+         ? where("type", "in", ["new", "current"])
          : where("type", "==", "done")
    )
 

@@ -1,3 +1,4 @@
+import { useScroll } from "components/custom-hook/utils/useScroll"
 import { QaIcon } from "components/views/common/icons"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
@@ -13,6 +14,8 @@ const styles = sxStyles({
 
 export const QAndAPanel = () => {
    const { isHost } = useStreamingContext()
+   const { scrollToTop, ref } = useScroll()
+
    return (
       <SidePanelView
          id="qanda-panel"
@@ -20,8 +23,9 @@ export const QAndAPanel = () => {
          icon={<QaIcon />}
          contentWrapperStyles={styles.root}
          bottomContent={isHost ? null : <QuestionInput />}
+         contentRef={ref}
       >
-         <QuestionsView />
+         <QuestionsView scrollToTop={scrollToTop} />
       </SidePanelView>
    )
 }

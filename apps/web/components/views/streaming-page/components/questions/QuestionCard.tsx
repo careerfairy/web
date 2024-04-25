@@ -52,10 +52,11 @@ export const questionCardStyles = sxStyles({
 
 type Props = {
    question: LivestreamQuestion
+   onQuestionMarkedAsAnswered?: () => void
 }
 
 export const QuestionCard = forwardRef<HTMLDivElement, Props>(
-   ({ question }, ref) => {
+   ({ question, onQuestionMarkedAsAnswered }, ref) => {
       const { onQuestionOptionsClick } = useQuestionsListContext()
       const { showOptions } = useQuestionsVisibilityControls(question)
 
@@ -74,6 +75,7 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
             <Content
                question={question}
                topPadding={question.type === "new" || question.type === "done"}
+               onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
             />
             <Box
                component="span"
@@ -97,6 +99,7 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
 
 type StreamerActionsProps = {
    question: LivestreamQuestion
+   onQuestionMarkedAsAnswered?: () => void
 }
 
 type AnswererHeaderProps = {
@@ -134,9 +137,14 @@ const Header = ({ question }: AnswererHeaderProps) => {
 type ContentProps = {
    question: LivestreamQuestion
    topPadding: boolean
+   onQuestionMarkedAsAnswered?: () => void
 }
 
-const Content = ({ question, topPadding }: ContentProps) => {
+const Content = ({
+   question,
+   topPadding,
+   onQuestionMarkedAsAnswered,
+}: ContentProps) => {
    const { setQuestionIdWithOpenedCommentList } = useQuestionsListContext()
    const { isHost } = useStreamingContext()
 
@@ -153,7 +161,12 @@ const Content = ({ question, topPadding }: ContentProps) => {
                {Boolean(isHost) && (
                   <Stack id="comment-input-and-list" spacing={1}>
                      <Stack spacing={1.5}>
-                        <StreamerActions question={question} />
+                        <StreamerActions
+                           question={question}
+                           onQuestionMarkedAsAnswered={
+                              onQuestionMarkedAsAnswered
+                           }
+                        />
                         <CommentInput
                            questionId={question.id}
                            onCommentPosted={() =>
@@ -170,7 +183,10 @@ const Content = ({ question, topPadding }: ContentProps) => {
    )
 }
 
-const StreamerActions = ({ question }: StreamerActionsProps) => {
+const StreamerActions = ({
+   question,
+   onQuestionMarkedAsAnswered,
+}: StreamerActionsProps) => {
    const { streamerAuthToken, livestreamId } = useStreamingContext()
    const {
       trigger: markQuestionAsDone,
@@ -188,7 +204,9 @@ const StreamerActions = ({ question }: StreamerActionsProps) => {
             <LoadingButton
                color="primary"
                variant="outlined"
-               onClick={() => markQuestionAsCurrent()}
+               onClick={() =>
+                  markQuestionAsCurrent().then(onQuestionMarkedAsAnswered)
+               }
                loading={markQuestionAsCurrentPending}
             >
                Answer question
