@@ -224,7 +224,7 @@ const NextLiveStreamsWithFilter = ({
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
       (hit: LivestreamSearchResult | null) => {
-         if (!hit) return
+         if (!hit || typeof hit === "string") return
          void push(
             buildDialogLink({
                router,

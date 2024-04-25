@@ -189,5 +189,7 @@ const isOptionEqualToValue = (
    value: LivestreamSearchResult
 ) => option.id === value.id
 
-const getOptionLabel = (option: LivestreamSearchResult) => option.title
+const getOptionLabel = (option: LivestreamSearchResult) =>
+   typeof option === "string" ? option : option.title
+
 export default LivestreamSearch
