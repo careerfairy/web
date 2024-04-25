@@ -1,17 +1,15 @@
-import { Box } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import { Send } from "react-feather"
-import { Fab } from "@mui/material"
-import * as Yup from "yup"
+import { Box, Fab, OutlinedInput } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { Controller } from "react-hook-form"
-import { StreamInput } from "../StreamInput"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { Send } from "react-feather"
+import { Controller } from "react-hook-form"
+import { sxStyles } from "types/commonTypes"
+import * as Yup from "yup"
 import { useStreamingContext } from "../../context"
 import { getStreamerDisplayName } from "../../util"
-import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
-import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    root: {
@@ -36,6 +34,8 @@ const styles = sxStyles({
    input: {
       width: "100%",
       height: 38,
+      borderRadius: "24px",
+      border: (theme) => `1px solid ${theme.palette.neutral[100]}`,
       "& .MuiInputBase-input": {
          pr: 3,
       },
@@ -52,9 +52,10 @@ type FormValues = Yup.InferType<typeof schema>
 
 type Props = {
    questionId: string
+   onCommentPosted?: () => void
 }
 
-export const CommentInput = ({ questionId }: Props) => {
+export const CommentInput = ({ questionId, onCommentPosted }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
    const { agoraUserId, streamRef, isHost } = useStreamingContext()
    const { userData, authenticatedUser } = useAuth()
@@ -88,6 +89,8 @@ export const CommentInput = ({ questionId }: Props) => {
             agoraUserId,
             userUid: authenticatedUser?.uid,
          })
+
+         onCommentPosted?.()
       } catch (error) {
          errorNotification(
             error,
@@ -106,7 +109,7 @@ export const CommentInput = ({ questionId }: Props) => {
             name="message"
             control={control}
             render={({ field }) => (
-               <StreamInput
+               <OutlinedInput
                   {...field}
                   onChange={(e) => {
                      field.onChange(e.target.value.slice(0, MAX_MESSAGE_LENGTH))

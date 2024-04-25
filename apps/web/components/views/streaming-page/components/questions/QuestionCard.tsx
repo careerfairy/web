@@ -132,6 +132,8 @@ type ContentProps = {
 }
 
 const Content = ({ question, topPadding }: ContentProps) => {
+   const { setQuestionIdWithOpenedCommentList } = useQuestionsListContext()
+
    return (
       <Stack spacing={3} p={1.5} pt={topPadding ? 1.5 : undefined}>
          <Typography variant="brandedBody" paddingRight={3} color="neutral.800">
@@ -144,7 +146,12 @@ const Content = ({ question, topPadding }: ContentProps) => {
             <Stack spacing={1.5}>
                <StreamerActions question={question} />
                <Stack spacing={1}>
-                  <CommentInput questionId={question.id} />
+                  <CommentInput
+                     questionId={question.id}
+                     onCommentPosted={() =>
+                        setQuestionIdWithOpenedCommentList(question.id)
+                     }
+                  />
                   <CommentsList question={question} />
                </Stack>
             </Stack>

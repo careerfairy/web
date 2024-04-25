@@ -1,6 +1,15 @@
-import { Tab, Tabs, tabsClasses, tabClasses } from "@mui/material"
+import {
+   Stack,
+   Tab,
+   Tabs,
+   Typography,
+   tabClasses,
+   tabsClasses,
+} from "@mui/material"
+import { useCountTotalQuestions } from "components/custom-hook/streaming/question/useCountTotalQuestions"
 import { swipeableTabA11yProps } from "materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
 
 const BORDER_RADIUS = 51
 const BORDER_THICKNESS = 1
@@ -23,6 +32,7 @@ const styles = sxStyles({
    }),
    tab: (theme) => ({
       p: 0,
+      flexWrap: "wrap",
       minHeight: "auto",
       height: HEIGHT - BORDER_THICKNESS * 2,
       borderRadius: `${BORDER_RADIUS}px`,
@@ -36,6 +46,12 @@ const styles = sxStyles({
       },
       transition: theme.transitions.create("color"),
    }),
+
+   count: {
+      mt: "auto",
+      mb: "2px",
+      lineHeight: 2,
+   },
 })
 
 export enum QuestionTab {
@@ -48,7 +64,34 @@ type PanelTabsProps = {
    setValue: (value: QuestionTab) => void
 }
 
+const formatCount = (count: number) => {
+   if (!count) return ""
+
+   if (count > 99) {
+      return "(99+)"
+   }
+
+   if (count < 1) {
+      return ""
+   }
+
+   return `(${count})`
+}
+
 export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
+   const { livestreamId } = useStreamingContext()
+   const { count: upcomingQuestionsCount } = useCountTotalQuestions(
+      livestreamId,
+      "upcoming"
+   )
+   const { count: answeredQuestionsCount } = useCountTotalQuestions(
+      livestreamId,
+      "answered"
+   )
+
+   const upcomingCountString = formatCount(upcomingQuestionsCount)
+   const answeredCountString = formatCount(answeredQuestionsCount)
+
    const handleChange = (
       _event: React.SyntheticEvent,
       newValue: QuestionTab
@@ -67,13 +110,31 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
          aria-label="Q&A Tabs"
       >
          <Tab
-            label="Upcoming"
+            label={
+               <Stack direction="row" spacing={0.5}>
+                  <span>Upcoming</span>
+                  {Boolean(upcomingCountString) && (
+                     <Typography sx={styles.count} variant="xsmall">
+                        {upcomingCountString}
+                     </Typography>
+                  )}
+               </Stack>
+            }
             value={QuestionTab.UPCOMING}
             {...swipeableTabA11yProps(0)}
             sx={styles.tab}
          />
          <Tab
-            label="Answered"
+            label={
+               <Stack direction="row" spacing={0.5}>
+                  <span>Answered</span>
+                  {Boolean(answeredCountString) && (
+                     <Typography sx={styles.count} variant="xsmall">
+                        {answeredCountString}
+                     </Typography>
+                  )}
+               </Stack>
+            }
             value={QuestionTab.ANSWERED}
             {...swipeableTabA11yProps(1)}
             sx={styles.tab}
