@@ -1,15 +1,15 @@
-import React, { useState } from "react"
-import { Tabs, Tab, Box } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
-import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
-import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
-import { useGroup } from "layouts/GroupDashboardLayout"
+import { Box, Tab, Tabs } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useState } from "react"
+import { sxStyles } from "types/commonTypes"
+import SparksAudienceTab from "./audience-tab/SparksAudienceTab"
+import { LockedSparksAnalytics } from "./components/LockedSparksAnalytics"
+import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
+import SparksOverviewTab from "./overview-tab/SparksOverviewTab"
 
 const styles = sxStyles({
    root: {
@@ -87,7 +87,7 @@ const GroupSparkAnalytics = () => {
    }
 
    // CF Admins can see analytics in trial mode
-   const shouldLockAnalytics = !planStatus.valid || !userData.isAdmin
+   const shouldLockAnalytics = !userData.isAdmin && !planStatus.valid
 
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
