@@ -21,11 +21,11 @@ import {
 } from "@careerfairy/shared-lib/constants/forms"
 import { QuestionsComponent } from "../livestream-details/main-content/Questions"
 import Button from "@mui/material/Button"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { livestreamService } from "data/firebase/LivestreamService"
 
 const styles = sxStyles({
    questionForm: {
@@ -86,6 +86,7 @@ const styles = sxStyles({
 const RegisterAskQuestionsView = () => {
    const { livestream, goToView } = useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
+   const { createLivestreamQuestion } = useFirebaseService()
 
    const [newlyCreatedQuestions, setNewlyCreatedQuestions] = useState<
       LivestreamQuestion[]
@@ -137,17 +138,15 @@ const RegisterAskQuestionsView = () => {
                      initialValues={initialValues}
                      validationSchema={questionSchema}
                      onSubmit={async (values, helpers) => {
-                        const newQuestion =
-                           await livestreamService.createQuestion(
-                              livestreamService.getLivestreamRef(livestream.id),
-                              {
-                                 title: values.question,
-                                 displayName:
-                                    userPresenter?.getDisplayName?.() || null,
-                                 author: authenticatedUser.uid,
-                                 badges: [],
-                              }
-                           )
+                        const newQuestion = await createLivestreamQuestion(
+                           livestream.id,
+                           {
+                              title: values.question,
+                              displayName:
+                                 userPresenter?.getDisplayName?.() || null,
+                              author: authenticatedUser.email,
+                           }
+                        )
 
                         // set newly created question to be displayed at the top of the list
                         setNewlyCreatedQuestions((prev) => [

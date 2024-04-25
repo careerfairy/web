@@ -1,5 +1,4 @@
 import { Typography, TypographyProps } from "@mui/material"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -88,36 +87,14 @@ const TrialEndingMessage = () => {
    const expirationDate = DateUtil.formatDateToDayMonthYear(
       groupPresenter.plan.expiresAt
    )
-   const trialEnded =
-      groupPresenter.isTrialPlan() && groupPresenter.hasPlanExpired()
 
-   return (
-      <ConditionalWrapper
-         condition={!trialEnded}
-         fallback={<TrialEndedMessage expirationDate={expirationDate} />}
-      >
-         <MessageText>
-            Your free trial ends in {planDaysLeft} days on {expirationDate}.
-            <DoubleBreak />
-            Elevate your success with Sparks. Access comprehensive analytics,
-            create more engaging content, and attract the right talent all year
-            round. Talk to your Success Manager to unlock the full power of
-            Sparks.
-         </MessageText>
-      </ConditionalWrapper>
-   )
-}
-
-type TrialEndedMessageProps = {
-   expirationDate: string
-}
-const TrialEndedMessage = ({ expirationDate }: TrialEndedMessageProps) => {
    return (
       <MessageText>
-         Your Sparks trial ended on {expirationDate}, and your Sparks are
-         currently unavailable. Upgrade now to reactivate them, gain in-depth
-         analytics, create more engaging content, and attract top talent all
-         year round!
+         Your free trial ends in {planDaysLeft} days on {expirationDate}.
+         <DoubleBreak />
+         Elevate your success with Sparks. Access comprehensive analytics,
+         create more engaging content, and attract the right talent all year
+         round. Talk to your Success Manager to unlock the full power of Sparks.
       </MessageText>
    )
 }

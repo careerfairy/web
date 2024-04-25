@@ -218,32 +218,6 @@ We use ImageKit for real-time video optimization and transformation. Each develo
 9. You can leave the other options as default and click "Save" at the top right corner.
 10.   Now your ImageKit account is ready to use 🚀
 
-# Stripe Setup
-
-We use [Stripe](https://docs.stripe.com/cli) for processing payments and easily integrate Stripe forms into our application.
-
-**For access you will need to request your team for additional support**
-
-### Configure Local Development
-
-1. Navigate to [Stripe dashboard in Dev Mode](https://dashboard.stripe.com/test/dashboard) and sign up for a new account. Request access if needed.
-2. On [API Keys](https://dashboard.stripe.com/test/apikeys) copy the publishable and secret keys
-   1. NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY={copied_value}
-   2. STRIPE_SECRET_KEY={copied_value}
-3. WebHooks Local Testing - Via the CLI its possible to forward webhooks to the local development environment, more [here](https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local)
-   1. Listen to Stripe Webhook events - `stripe listen --forward-to http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/stripeWebHook`
-4. Setup Price IDs - While testing the following environment variables regarding Stripe prices need to be set
-   The API IDs can be found on Stripe for each product, as [Sparks Advanced CH](https://dashboard.stripe.com/test/products/prod_PlbjRlHrGoiWwW)
-   1. Swiss Prices
-      1. NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID_CH
-      2. NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID_CH
-      3. NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID_CH
-   2. Non Swiss Prices
-      1. NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
-      2. NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
-      3. NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
-   3. Stripe specific test cards can be found [here](https://docs.stripe.com/testing#use-test-cards)
-
 # Setting Up Algolia
 
 ## Algolia Setup for Web App

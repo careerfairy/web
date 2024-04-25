@@ -1,9 +1,8 @@
+import { sxStyles } from "types/commonTypes"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { Box, FormControlLabel, Typography } from "@mui/material"
-import { FormBrandedSwitch } from "components/views/common/inputs/BrandedSwitch"
 import BrandedTooltip from "components/views/common/tooltips/BrandedTooltip"
-import { sxStyles } from "types/commonTypes"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { FormBrandedSwitch } from "components/views/common/inputs/BrandedSwitch"
 
 const styles = sxStyles({
    makeExclusiveSwitch: {
@@ -50,20 +49,11 @@ const MakeExclusiveSwitchLabel = () => {
 }
 
 const MakeExclusiveSwitch = () => {
-   const {
-      values: { general },
-   } = useLivestreamFormValues()
    return (
       <Box>
          <FormControlLabel
             sx={styles.makeExclusiveSwitch}
-            control={
-               <FormBrandedSwitch
-                  name="general.hidden"
-                  value={general.hidden}
-                  checked={general.hidden}
-               />
-            }
+            control={<FormBrandedSwitch name="general.hidden" />}
             label={<MakeExclusiveSwitchLabel />}
             labelPlacement="bottom"
          />

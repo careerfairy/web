@@ -175,7 +175,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * @param ignoreGroupIds List of groups to be ignored from query results (not in)
     */
    getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
+      type: GroupPlanType,
       days: number,
       logger: Logger,
       ignoreGroupIds?: string[]
@@ -603,17 +603,13 @@ export class GroupFunctionsRepository
             getPlanConstants(planType).sparks.PLAN_DURATION_MILLISECONDS
       )
 
-      const toUpdate: Pick<
-         Group,
-         "plan" | "sparksAdminPageFlag" | "publicSparks"
-      > = {
+      const toUpdate: Pick<Group, "plan" | "sparksAdminPageFlag"> = {
          plan: {
             type: planType,
             startedAt: now,
             expiresAt,
          },
          sparksAdminPageFlag: true,
-         publicSparks: true,
       }
 
       return groupRef.update(toUpdate)
@@ -654,7 +650,7 @@ export class GroupFunctionsRepository
    }
 
    async getAllGroupsWithAPlanExpiring(
-      types: GroupPlanType[],
+      type: GroupPlanType,
       days: number,
       logger: Logger,
       ignoreGroupIds: string[] = []
@@ -666,7 +662,7 @@ export class GroupFunctionsRepository
       )
       const query = this.firestore
          .collection("careerCenterData")
-         .where("plan.type", "in", types)
+         .where("plan.type", "==", type)
          .where("plan.expiresAt", "<=", preExpirationDate)
       const snaps = await query
          .orderBy("plan.expiresAt")
@@ -676,7 +672,6 @@ export class GroupFunctionsRepository
          (group) => !ignoreGroupIds.includes(group.groupId)
       )
    }
-
    async sendTrialPlanCreationPeriodInCriticalStateReminder(
       group: Group,
       client: ServerClient

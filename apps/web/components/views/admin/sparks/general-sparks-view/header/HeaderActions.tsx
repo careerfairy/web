@@ -68,7 +68,6 @@ const HeaderActions = () => {
    const { group, groupPresenter } = useGroup()
 
    const maxPublicSparks = groupPresenter.getMaxPublicSparks()
-
    const isTrialPlan = groupPresenter.isTrialPlan()
 
    const { data: publicSparks } = useGroupSparks(group.groupId, {
@@ -76,12 +75,7 @@ const HeaderActions = () => {
       limit: maxPublicSparks,
    })
 
-   const hasReachedMaxSparks = groupPresenter.hasReachedMaxSparks(
-      publicSparks.length
-   )
-
-   const isCriticalState =
-      publicSparks.length >= maxPublicSparks - 2 && !hasReachedMaxSparks
+   const isCriticalState = publicSparks.length >= maxPublicSparks - 2
 
    if (isMobile) {
       return (
@@ -108,7 +102,7 @@ const HeaderActions = () => {
                      <InfoTooltip />
                   </Stack>
                </Stack>
-               {group.plan ? (
+               {group.publicSparks || isTrialPlan ? (
                   <Stack
                      spacing={2}
                      direction="row"
@@ -135,7 +129,7 @@ const HeaderActions = () => {
 
    return (
       <Stack spacing={2} direction="row" justifyContent="space-between">
-         {group.plan ? (
+         {group.publicSparks || isTrialPlan ? (
             <Stack spacing={2} direction="row" alignItems="center">
                <SparksCounter
                   isCriticalState={isCriticalState}

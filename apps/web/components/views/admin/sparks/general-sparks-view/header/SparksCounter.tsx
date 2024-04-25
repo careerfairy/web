@@ -49,38 +49,27 @@ const SparksCounter: FC<Props> = ({
 }) => {
    const { groupPresenter } = useGroup()
    const isTrialPlan = groupPresenter.isTrialPlan()
-   const planLimitReached = groupPresenter.hasReachedMaxSparks(
-      publicSparks.length
-   )
 
    const tooltipMessage = getTooltipMessage(
       isTrialPlan,
       isCriticalState,
-      maxPublicSparks,
-      planLimitReached
+      maxPublicSparks
    )
-   const unlimited = groupPresenter.hasUnlimitedSparks()
-   const maxSparks = unlimited ? 100 : maxPublicSparks
-   const slots = unlimited
-      ? "Unlimited "
-      : `${publicSparks.length}/${maxPublicSparks}`
 
-   const progressColor =
-      isCriticalState || planLimitReached ? "error" : "secondary"
    return (
       <BrandedTooltip title={tooltipMessage} sx={styles.tooltip}>
          <Box alignSelf={"center"}>
             <Typography variant={"body1"} sx={styles.progressCount}>
-               {slots} Spark slots
+               {publicSparks.length}/{maxPublicSparks} Spark slots
             </Typography>
 
             <LinearProgress
                sx={styles.progressBar}
-               color={progressColor}
+               color={isCriticalState ? "error" : "secondary"}
                variant="determinate"
                value={
                   publicSparks.length
-                     ? (publicSparks.length / maxSparks) * 100
+                     ? (publicSparks.length / maxPublicSparks) * 100
                      : 0
                }
             />
@@ -88,18 +77,6 @@ const SparksCounter: FC<Props> = ({
       </BrandedTooltip>
    )
 }
-const renderLimitReachedMessage = () => (
-   <Box>
-      <Typography variant={"h6"} sx={styles.headerMessage}>
-         All Sparks used!
-      </Typography>
-      <Typography variant={"body1"} fontSize={16}>
-         Your company{"'"}s been using Sparks like a champ! To keep the
-         recognition flowing and continue engaging your awesome talent, consider
-         adding more Sparks to your plan.
-      </Typography>
-   </Box>
-)
 
 const renderCriticalMessage = () => (
    <Box>
@@ -112,14 +89,14 @@ const renderCriticalMessage = () => (
       </Typography>
    </Box>
 )
-const renderDefaultMessage = () => (
+const renderDefaultMessage = (maxPublicSparks: number) => (
    <Box>
       <Typography variant={"h6"} sx={styles.headerMessage}>
          Your company Sparks are visible!
       </Typography>
       <Typography variant={"body1"} fontSize={16}>
          {`Congrats! Your Sparks are now live on CareerFairy. Currently you can
-            publish unlimited Sparks.`}
+            publish a maximum of ${maxPublicSparks} Sparks.`}
       </Typography>
    </Box>
 )
@@ -135,8 +112,7 @@ const renderTrialMessage = (maxPublicSparks: number) => (
 const getTooltipMessage = (
    isTrialPlan: boolean,
    isCriticalState: boolean,
-   maxPublicSparks: number,
-   planLimitReached: boolean
+   maxPublicSparks: number
 ) => {
    if (isTrialPlan) {
       return renderTrialMessage(maxPublicSparks)
@@ -146,11 +122,7 @@ const getTooltipMessage = (
       return renderCriticalMessage()
    }
 
-   if (planLimitReached) {
-      return renderLimitReachedMessage()
-   }
-
-   return renderDefaultMessage()
+   return renderDefaultMessage(maxPublicSparks)
 }
 
 export default SparksCounter

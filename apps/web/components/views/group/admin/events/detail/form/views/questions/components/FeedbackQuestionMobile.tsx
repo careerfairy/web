@@ -1,17 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Edit2 as EditIcon, Save, Trash2 as DeleteIcon } from "react-feather"
+import { Formik } from "formik"
+import { FC, useMemo, useState } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Button, Stack, Typography } from "@mui/material"
-import { Formik } from "formik"
-import { useCallback, useMemo, useState } from "react"
-import { Trash2 as DeleteIcon, Edit2 as EditIcon, Save } from "react-feather"
-import { useLivestreamCreationContext } from "../../../../LivestreamCreationContext"
-import { ESTIMATED_DURATIONS } from "../../../commons"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import FeedbackQuestionForm from "./FeedbackQuestionForm"
 import {
    FeedbackQuestionFormValues,
-   FeedbackQuestionsLabels,
+   feedbackQuestionFormInitialValues,
    feedbackQuestionValidationSchema,
 } from "../commons"
-import FeedbackQuestionForm from "./FeedbackQuestionForm"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { ESTIMATED_DURATIONS } from "../../../commons"
 
 const styles = sxStyles({
    container: {
@@ -79,41 +79,32 @@ const styles = sxStyles({
 type FeedbackQuestionMobileProps = {
    key: string | number
    question: FeedbackQuestionFormValues
-   handleRemove: () => void
+   handleEdit: (args: unknown) => void
+   handleRemove: (args: unknown) => void
 }
 
-const FeedbackQuestionMobile = ({
+const FeedbackQuestionMobile: FC<FeedbackQuestionMobileProps> = ({
    key,
    question,
+   handleEdit,
    handleRemove,
-}: FeedbackQuestionMobileProps) => {
-   const {
-      values: { questions },
-      setFieldValue,
-   } = useLivestreamFormValues()
-   const { livestream } = useLivestreamCreationContext()
-   const [isEditing, setIsEditing] = useState(Boolean(question.isNew))
+}) => {
+   const [isEditing, setIsEditing] = useState(false)
 
-   const handleEdit = useCallback(
-      (editedQuestion) => {
-         const updatedQuestions = questions.feedbackQuestions.map((q) =>
-            q.id === editedQuestion.id ? { ...editedQuestion, isNew: false } : q
-         )
-         setFieldValue("questions.feedbackQuestions", updatedQuestions)
-         setIsEditing(false)
-      },
-      [questions, setFieldValue]
-   )
+   const [isRemoveDialogOpen, handleOpenCloseDialog, handleRemoveCloseDialog] =
+      useDialogStateHandler()
+
+   const initialValues =
+      (question as FeedbackQuestionFormValues) ||
+      feedbackQuestionFormInitialValues
 
    const appearAfterLabel = useMemo(
       () =>
          ESTIMATED_DURATIONS.find(
             (duration) => duration.minutes === question.appearAfter
-         )?.name,
+         ).name,
       [question.appearAfter]
    )
-
-   const initialValues = question
 
    return (
       <Stack key={key} sx={styles.container}>
@@ -124,58 +115,46 @@ const FeedbackQuestionMobile = ({
                validationSchema={feedbackQuestionValidationSchema}
                enableReinitialize
             >
-               {({ values, isValid }) => {
-                  const isEditingNew =
-                     values.question === undefined ||
-                     values.type === undefined ||
-                     values.appearAfter === undefined
-
-                  return (
-                     <>
-                        <FeedbackQuestionForm questionFormValues={values} />
-                        <Stack sx={styles.actionButtonsContainer}>
-                           <Button
-                              variant="outlined"
-                              color="error"
-                              onClick={() => {
-                                 setIsEditing(false)
-                                 handleRemove()
-                              }}
-                              endIcon={<DeleteIcon />}
-                              sx={styles.buttonExtraSmall}
-                           >
-                              Remove question
-                           </Button>
-                           <Button
-                              variant="contained"
-                              color="secondary"
-                              disabled={!isValid || isEditingNew}
-                              onClick={() => handleEdit(values)}
-                              endIcon={<Save />}
-                              sx={styles.buttonExtraSmall}
-                           >
-                              Save
-                           </Button>
-                        </Stack>
-                     </>
-                  )
-               }}
+               {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+                  <>
+                     <FeedbackQuestionForm />
+                     <Stack sx={styles.actionButtonsContainer}>
+                        <Button
+                           variant="outlined"
+                           color="error"
+                           onClick={handleRemove}
+                           endIcon={<DeleteIcon />}
+                           sx={styles.buttonExtraSmall}
+                        >
+                           Remove question
+                        </Button>
+                        <Button
+                           variant="contained"
+                           color="secondary"
+                           disabled={!isValid}
+                           onClick={() => setIsEditing(false)}
+                           endIcon={<Save />}
+                           sx={styles.buttonExtraSmall}
+                        >
+                           Save
+                        </Button>
+                     </Stack>
+                  </>
+               )}
             </Formik>
          ) : (
             <>
-               <Typography>{question.question}</Typography>
-               <Typography>{FeedbackQuestionsLabels[question.type]}</Typography>
+               <Typography>{question.title}</Typography>
+               <Typography>{question.type}</Typography>
                <Typography>{appearAfterLabel}</Typography>
-               {!livestream.hasEnded && (
-                  <Button
-                     sx={styles.editButton}
-                     endIcon={<EditIcon />}
-                     onClick={() => setIsEditing(true)}
-                     fullWidth
-                  >
-                     Edit
-                  </Button>
-               )}
+               <Button
+                  sx={styles.editButton}
+                  endIcon={<EditIcon />}
+                  onClick={() => setIsEditing(true)}
+                  fullWidth
+               >
+                  Edit
+               </Button>
             </>
          )}
       </Stack>

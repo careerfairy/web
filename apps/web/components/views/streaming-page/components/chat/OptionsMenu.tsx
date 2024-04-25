@@ -43,6 +43,14 @@ export const OptionsMenu = ({
          menuItemSxProps: [styles.delete],
          loading: isMutating,
       },
+      ...(streamIsMobile
+         ? [
+              {
+                 label: "Cancel",
+                 handleClick: () => null,
+              },
+           ]
+         : []),
    ]
 
    return (
@@ -52,7 +60,6 @@ export const OptionsMenu = ({
          handleClose={handleClose}
          anchorEl={anchorEl}
          isMobileOverride={streamIsMobile}
-         enableDrawerCancelButton
       />
    )
 }

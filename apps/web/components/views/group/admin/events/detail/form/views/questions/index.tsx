@@ -1,19 +1,37 @@
-import FormSectionHeader from "../../FormSectionHeader"
 import FeedbackQuestions from "./FeedbackQuestions"
-import RegistrationQuestions from "./RegistrationQuestions"
+import FormSectionHeader from "../../FormSectionHeader"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import MultiChipSelect from "../general/components/MultiChipSelect"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 
 const LivestreamFormQuestionsStep = () => {
+   const {
+      values: { questions },
+   } = useLivestreamFormValues()
+
+   const { groupQuestions } = useGroup()
+
    return (
       <>
          <FormSectionHeader
             title="Registration Questions"
             subtitle="Add questions that you want participants to reply during your live stream registration"
          />
-         <RegistrationQuestions />
-
+         <MultiChipSelect
+            id="questions.registrationQuestions"
+            options={groupQuestions}
+            value={questions.registrationQuestions ?? []}
+            multiple
+            disableCloseOnSelect
+            textFieldProps={{
+               label: "Questions for live stream registration",
+               placeholder:
+                  "Add some questions you'd like to ask on event registration",
+            }}
+         />
          <FormSectionHeader
             title="Feedback Questions"
-            subtitle="During the live stream, these feedback questions will be automatically asked to the attendees. This feedback will help you gauge the content of your stream. Use these questions as they are, or modify them, or ask your own personalised questions."
+            subtitle="These questions will be asked during the live stream to the audience"
             divider
          />
          <FeedbackQuestions />

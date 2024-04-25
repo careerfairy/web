@@ -1,18 +1,17 @@
-import firebase from "firebase/compat/app"
-import { Job, JobIdentifier } from "../ats/Job"
 import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
-import { PublicCustomJob } from "../customJobs/customJobs"
-import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Group, GroupQuestion } from "../groups"
-import { Creator } from "../groups/creators"
 import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserPublicData,
    UserStats,
 } from "../users"
+import firebase from "firebase/compat/app"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
+import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
+import { PublicCustomJob } from "../customJobs/customJobs"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 4
@@ -141,7 +140,7 @@ export interface LivestreamEvent extends Identifiable {
     * This is used for data relationship and syncing purposes.
     * Relates with creators in careerCenterData/creator sub collection.
     */
-   creatorsIds?: Creator["id"][]
+   creatorsIds?: Speaker["id"][]
 
    /**
     * The actual details of the speakers in the livestream
@@ -244,7 +243,6 @@ export type LivestreamMode =
 export type LivestreamLanguage = {
    code?: string
    name?: string
-   shortName?: string
 }
 
 export type AuthorInfo = {
@@ -470,25 +468,17 @@ export type LivestreamEventPublicData = Partial<
    id: LivestreamEvent["id"]
 }
 
-// Collection Path: livestreams/{livestreamId}/questions/{questionId}
 export interface LivestreamQuestion extends Identifiable {
-   /**
-    * The email or auth uid of the user that created the question
-    */
    author: string
    timestamp: firebase.firestore.Timestamp
    title: string
-   type: "new" | "current" | "done"
+   type: "new" | "current"
    votes: number
    emailOfVoters?: string[]
    /**
-    * The user Auth or temporary IDs that have upvoted the question
-    */
-   voterIds: string[]
-   /**
     * We store the most recent comment to the question on the question document
     * */
-   firstComment?: LivestreamQuestionComment
+   firstComment?: LivestreamQuestion
    /*
     * The number of comments on the question
     * */
@@ -500,58 +490,17 @@ export interface LivestreamQuestion extends Identifiable {
    badges: string[]
 
    displayName?: string
-   /*
-    * The agoraUserId generated for the user for that particular livestream
-    */
-   agoraUserId?: string
 }
 
-// Collection Path: livestreams/{livestreamId}/questions/{questionId}/comments/{commentId}
-export interface LivestreamQuestionComment extends Identifiable {
-   authorType: "careerfairy" | "streamer" | "viewer"
-   /**
-    * Display name of the user that created the comment
-    */
-   author: string
-   /**
-    * The time at which the comment was created
-    */
-   timestamp: firebase.firestore.Timestamp
-
-   /**
-    * The comment its self
-    */
-   title: string
-
-   /**
-    * The auth uid of the user that created the comment
-    */
-   userUid?: string
-
-   /**
-    * The agoraUserId generated for the user for that particular livestream
-    */
-   agoraUserId?: string
-}
-
-// Collection Path: livestreams/{livestreamId}/polls/{pollId}
 export interface LivestreamPoll extends Identifiable {
    voters: string[]
    timestamp: firebase.firestore.Timestamp
-   closedAt: firebase.firestore.Timestamp
    state: "current" | "closed" | "upcoming"
    question: string
    options: {
       id: string
       text: string
    }[]
-}
-
-// Collection Path: livestreams/{livestreamId}/polls/{pollId}/voters/{userId}
-export interface LivestreamPollVoter extends Identifiable {
-   optionId: string
-   userId: string
-   timestamp: firebase.firestore.Timestamp
 }
 
 export interface LivestreamChatEntry extends Identifiable {

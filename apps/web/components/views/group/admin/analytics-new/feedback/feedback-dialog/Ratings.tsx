@@ -1,23 +1,23 @@
+import Stack from "@mui/material/Stack"
+import { Box, ButtonBase, Typography } from "@mui/material"
+import Skeleton from "@mui/material/Skeleton"
+import {
+   RatingWithLabel,
+   RatingWithLabelSkeleton,
+} from "../../../common/inputs"
+import React, { FC } from "react"
+import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 import { EventRating } from "@careerfairy/shared-lib/livestreams"
+import { collection, query } from "firebase/firestore"
+import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import {
    getGlobalRatingAverage,
    getTotalNumberOfRatings,
 } from "@careerfairy/shared-lib/livestreams/ratings"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Box, ButtonBase, Typography } from "@mui/material"
-import Skeleton from "@mui/material/Skeleton"
-import Stack from "@mui/material/Stack"
-import { collection, query } from "firebase/firestore"
-import { FC } from "react"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { sxStyles } from "../../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 import Link from "../../../../../common/Link"
-import {
-   RatingWithLabel,
-   RatingWithLabelSkeleton,
-} from "../../../common/inputs"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 
 const styles = sxStyles({
    question: {

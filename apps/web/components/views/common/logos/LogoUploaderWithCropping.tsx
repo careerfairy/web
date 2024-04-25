@@ -1,12 +1,12 @@
-import { LOGO_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { Avatar, Box, Stack, Typography } from "@mui/material"
-import useFileUploader from "components/custom-hook/useFileUploader"
 import { FC, useState } from "react"
-import { Image as ImageIcon } from "react-feather"
-import { sxStyles } from "types/commonTypes"
-import FileUploader from "../FileUploader"
-import { getImageDimensionsValidator } from "../FileUploader/validations"
 import ImageCropperDialog from "../ImageCropperDialog"
+import FileUploader from "../FileUploader"
+import { sxStyles } from "types/commonTypes"
+import useFileUploader from "components/custom-hook/useFileUploader"
+import { LOGO_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { getImageDimensionsValidator } from "../FileUploader/validations"
+import { Avatar, Box, Stack, Typography } from "@mui/material"
+import { Image as ImageIcon } from "react-feather"
 
 const styles = sxStyles({
    companyLogo: {
@@ -48,7 +48,6 @@ const styles = sxStyles({
       border: `1px solid #EDE7FD`,
       borderRadius: "50%",
       background: "#F7F8FC",
-      paddingX: "1rem",
    },
    imageLabelVisible: {
       "& .MuiAvatar-root": {
@@ -85,8 +84,8 @@ const Logo: FC<LogoProps> = ({ dragActive, url }) => {
          ]}
       >
          <Stack sx={styles.imageLabel} className="change-image-label">
-            <ImageIcon size={36} strokeWidth={1.5} />
-            <Typography variant="body1" marginTop="4px">
+            <ImageIcon />
+            <Typography variant="body1">
                {url ? "Change company picture" : "Upload company picture"}
             </Typography>
          </Stack>

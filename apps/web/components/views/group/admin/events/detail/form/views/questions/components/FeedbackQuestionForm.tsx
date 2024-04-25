@@ -1,13 +1,8 @@
-import { sxStyles } from "@careerfairy/shared-ui"
 import { Grid } from "@mui/material"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
-import { ESTIMATED_DURATIONS } from "../../../commons"
 import MultiChipSelect from "../../general/components/MultiChipSelect"
-import {
-   FeedbackQuestionFormValues,
-   FeedbackQuestionType,
-   FeedbackQuestionsLabels,
-} from "../commons"
+import { ESTIMATED_DURATIONS } from "../../../commons"
 
 const styles = sxStyles({
    mobileHelper: {
@@ -20,78 +15,75 @@ const styles = sxStyles({
    },
 })
 
+enum FeedbackQuestionTypes {
+   STAR,
+   NUMBER,
+   SENTIMENT,
+   TEXT,
+   BINARY,
+}
+
 const QUESTION_TYPES = [
    {
-      id: FeedbackQuestionType.STAR_RATING,
-      name: FeedbackQuestionsLabels[FeedbackQuestionType.STAR_RATING],
+      id: FeedbackQuestionTypes.STAR,
+      name: "Star rating",
    },
    {
-      id: FeedbackQuestionType.SENTIMENT_RATING,
-      name: FeedbackQuestionsLabels[FeedbackQuestionType.SENTIMENT_RATING],
+      id: FeedbackQuestionTypes.NUMBER,
+      name: "Number rating",
    },
    {
-      id: FeedbackQuestionType.TEXT,
-      name: FeedbackQuestionsLabels[FeedbackQuestionType.TEXT],
+      id: FeedbackQuestionTypes.SENTIMENT,
+      name: "Sentiment rating",
    },
    {
-      id: FeedbackQuestionType.TEXT_WITH_RATING,
-      name: FeedbackQuestionsLabels[FeedbackQuestionType.TEXT_WITH_RATING],
+      id: FeedbackQuestionTypes.TEXT,
+      name: "Written review",
+   },
+   {
+      id: FeedbackQuestionTypes.BINARY,
+      name: "Yes or No",
    },
 ] as const
 
-type FeedbackQuestionFormProps = {
-   questionFormValues: FeedbackQuestionFormValues
-}
-
-const FeedbackQuestionForm = ({
-   questionFormValues,
-}: FeedbackQuestionFormProps) => {
-   const typeInitialValue = QUESTION_TYPES.find(
-      (type) => type.id === questionFormValues?.type
-   )
-   const appearAfterInitialValue = ESTIMATED_DURATIONS.find(
-      (duration) => duration.minutes === questionFormValues?.appearAfter
-   )
-
-   return (
-      <Grid container spacing={2} sx={styles.mobileHelper}>
-         <Grid xs={12} item>
-            <FormBrandedTextField
-               name="question"
-               label="Question"
-               placeholder="Insert the question you want your audience to answer"
-               fullWidth
-               requiredText="(required)"
-            />
-         </Grid>
-         <Grid xs={12} md={6} item>
-            <MultiChipSelect
-               id="type"
-               options={QUESTION_TYPES}
-               value={typeInitialValue}
-               keyOptionIndexer="id"
-               textFieldProps={{
-                  label: "Question type",
-                  placeholder: "Choose the question type",
-                  required: true,
-               }}
-            />
-         </Grid>
-         <Grid xs={12} md={6} item>
-            <MultiChipSelect
-               id="appearAfter"
-               value={appearAfterInitialValue}
-               options={ESTIMATED_DURATIONS}
-               keyOptionIndexer="minutes"
-               textFieldProps={{
-                  label: "Appear after",
-                  placeholder: "When is it appearing?",
-                  required: true,
-               }}
-            />
-         </Grid>
+const FeedbackQuestionForm = () => (
+   <Grid container spacing={2} sx={styles.mobileHelper}>
+      <Grid xs={12} item>
+         <FormBrandedTextField
+            name="title"
+            label="Question"
+            placeholder="Insert the question you want your audience to answer"
+            fullWidth
+            requiredText="(required)"
+         />
       </Grid>
-   )
-}
+      <Grid xs={12} md={6} item>
+         <MultiChipSelect
+            id="type"
+            options={QUESTION_TYPES}
+            value={undefined}
+            keyOptionIndexer="id"
+            textFieldProps={{
+               label: "Question Type",
+               placeholder: "Choose the question type",
+               required: true,
+            }}
+         />
+      </Grid>
+      <Grid xs={12} md={6} item>
+         <MultiChipSelect
+            id="appearAfter"
+            options={ESTIMATED_DURATIONS}
+            value={undefined}
+            keyOptionIndexer="minutes"
+            textFieldProps={{
+               label: "Appear After",
+               placeholder: "When is it appearing?",
+               required: true,
+            }}
+         />
+      </Grid>
+   </Grid>
+)
 
 export default FeedbackQuestionForm

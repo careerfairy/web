@@ -1,30 +1,24 @@
 import {
-   PublicCustomJob,
-   pickPublicDataFromCustomJob,
+  PublicCustomJob,
+  pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group, GroupQuestion } from "@careerfairy/shared-lib/groups"
 import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { useAuth } from "HOCs/AuthProvider"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
-import { ReactNode } from "react"
-import { useGroupQuestions } from "../useGroupQuestions"
+import { FC, ReactNode } from "react"
 import {
-   LivestreamFormGeneralTabValues,
-   LivestreamFormJobsTabValues,
-   LivestreamFormQuestionsTabValues,
-   LivestreamFormSpeaker,
-   LivestreamFormSpeakersTabValues,
-   LivestreamFormValues,
+  LivestreamFormGeneralTabValues,
+  LivestreamFormJobsTabValues,
+  LivestreamFormQuestionsTabValues,
+  LivestreamFormSpeakersTabValues,
+  LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import { FeedbackQuestionFormValues } from "./views/questions/commons"
-import { useFeedbackQuestions } from "./views/questions/useFeedbackQuestions"
+import { LivestreamCreator } from "./views/questions/commons"
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    title: "",
@@ -34,13 +28,10 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    backgroundImageUrl: "",
    startDate: null,
    duration: null,
-   language: null,
+   language: "",
    summary: "",
    reasonsToJoin: [],
-   categories: {
-      values: [],
-      options: [],
-   },
+   categories: [],
    targetCountries: [],
    targetUniversities: [],
    targetFieldsOfStudy: [],
@@ -51,16 +42,11 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
 const formSpeakersTabInitialValues: LivestreamFormSpeakersTabValues = {
    values: [],
    options: [],
-   creatorsIds: [],
 }
 
 const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
-   registrationQuestions: {
-      values: [],
-      options: [],
-   },
+   registrationQuestions: [],
    feedbackQuestions: [],
-   hosts: [],
 }
 
 const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
@@ -75,44 +61,62 @@ const formInitialValues: LivestreamFormValues = {
    jobs: { ...formJobsTabInitialValues },
 }
 
-const mapSpeakerToCreator = (speaker: Speaker): Creator => {
+type ConvertLivestreamObjectToFormArgs = {
+   livestream: LivestreamEvent
+   existingInterests: Interest[]
+   customJobs: PublicCustomJob[]
+   creators: Creator[]
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapCreatorToLivestreamCreator(creator: Creator): LivestreamCreator {
    return {
+      ...creator,
+      originalId: creator.id,
+      id: creator.email,
+   }
+}
+
+/*
+ * The email is the id only in the client-side
+ * This is to ensure backwards compatibility
+ * Old speaker object id's format is UID
+ * while Creators objects ids' are firestore default format
+ */
+function mapSpeakerToCreator(speaker: Speaker): LivestreamCreator {
+   return {
+      originalId: speaker.id,
       id: speaker.id,
       groupId: null,
       documentType: "groupCreator",
-      firstName: speaker.firstName || null,
-      lastName: speaker.lastName || null,
-      position: speaker.position || null,
-      email: speaker.email || null,
-      avatarUrl: speaker.avatar || null,
+      firstName: speaker.firstName,
+      lastName: speaker.lastName,
+      position: speaker.position,
+      email: speaker.email,
+      avatarUrl: speaker.avatar,
       createdAt: null,
       updatedAt: null,
       linkedInUrl: "",
-      story: speaker.background || null,
+      story: speaker.background,
       roles: [CreatorRoles.Speaker],
    }
 }
 
-const unionCreatorsAndSpeakers = (
-   creators: Creator[],
+function unionCreatorsAndSpeakers(
+   creators: LivestreamCreator[],
    speakers: Speaker[]
-): LivestreamFormSpeaker[] => {
-   const extendedCreators = creators.map((creator) => {
-      return {
-         ...creator,
-         isCreator: true,
-      }
-   })
+): LivestreamCreator[] {
+   const mergedArray = [...creators, ...speakers.map(mapSpeakerToCreator)]
 
-   const mergedArray = [
-      ...extendedCreators,
-      ...speakers.map(mapSpeakerToCreator),
-   ]
-
-   const uniqueMap = new Map<string, Creator>()
+   const uniqueMap = new Map<string, LivestreamCreator>()
 
    mergedArray.forEach((item) => {
-      const key = item.id
+      const key = item.id || item.email
       if (!uniqueMap.has(key)) {
          uniqueMap.set(key, item)
       }
@@ -121,57 +125,11 @@ const unionCreatorsAndSpeakers = (
    return Array.from(uniqueMap.values())
 }
 
-const buildRegistrationQuestions = (
-   groupQuestionsMap: LivestreamEvent["groupQuestionsMap"],
-   isAdmin: boolean,
-   group: { groupId: string }
-): LivestreamFormQuestionsTabValues["registrationQuestions"]["values"] => {
-   if (!groupQuestionsMap[group.groupId]) {
-      return []
-   }
-
-   const filteredGroupQuestionsMap = isAdmin
-      ? groupQuestionsMap
-      : { [group.groupId]: groupQuestionsMap[group.groupId] }
-
-   return Object.keys(filteredGroupQuestionsMap).flatMap((groupId) => {
-      const livestreamQuestionMap = filteredGroupQuestionsMap[groupId]
-      const questions = Object.values(livestreamQuestionMap?.questions)?.map(
-         (question) => {
-            const { groupId, groupName, universityCode } = livestreamQuestionMap
-            return {
-               groupId,
-               groupName,
-               universityCode,
-               ...question,
-            }
-         }
-      )
-
-      return questions
-   })
-}
-
-type ConvertLivestreamObjectToFormArgs = {
-   livestream: LivestreamEvent
-   group: Group
-   existingInterests: Interest[]
-   groupQuestions: GroupQuestion[]
-   feedbackQuestions: FeedbackQuestionFormValues[]
-   customJobs: PublicCustomJob[]
-   creators: Creator[]
-   userData: UserData
-}
-
 const convertLivestreamObjectToForm = ({
    livestream,
-   group,
    existingInterests,
-   groupQuestions,
-   feedbackQuestions,
    customJobs,
    creators,
-   userData,
 }: ConvertLivestreamObjectToFormArgs): LivestreamFormValues => {
    const valuesReducer = <T,>(values: T) =>
       Object.keys(values).reduce(
@@ -185,26 +143,13 @@ const convertLivestreamObjectToForm = ({
       formGeneralTabInitialValues
    )
 
-   if (general.companyLogoUrl === "") {
-      general.companyLogoUrl = group?.universityCode
-         ? formGeneralTabInitialValues.companyLogoUrl
-         : group?.logoUrl || formGeneralTabInitialValues.companyLogoUrl
-   }
-
-   if (general.backgroundImageUrl === "") {
-      general.backgroundImageUrl = group?.universityCode
-         ? formGeneralTabInitialValues.backgroundImageUrl
-         : group?.bannerImageUrl ||
-           formGeneralTabInitialValues.backgroundImageUrl
-   }
-
-   general.categories.values = existingInterests.filter((interest) =>
+   // Simple name remapping s
+   general.categories = existingInterests.filter((interest) =>
       livestream.interestsIds.includes(interest.id)
    )
-   general.categories.options = existingInterests
 
    general.language =
-      livestream.language || formGeneralTabInitialValues.language
+      livestream.language?.code || formGeneralTabInitialValues.language
 
    // This field was originally named "start" and it's now "startDate"
    general.startDate =
@@ -212,57 +157,22 @@ const convertLivestreamObjectToForm = ({
 
    // This is to ensure backwards compatibility
    // Previously was a single field (i.e. a single string) and now it's an array of strings
-   if (livestream.reasonsToJoinLivestream) {
-      if (
-         !livestream.reasonsToJoinLivestream_v2 ||
-         livestream.reasonsToJoinLivestream_v2?.length === 0
-      ) {
-         general.reasonsToJoin = [
-            livestream.reasonsToJoinLivestream,
-            undefined,
-            undefined,
-         ]
-      } else {
-         general.reasonsToJoin =
-            livestream.reasonsToJoinLivestream_v2 ||
-            formGeneralTabInitialValues.reasonsToJoin
-      }
-   } else {
-      general.reasonsToJoin =
-         livestream.reasonsToJoinLivestream_v2 ||
-         formGeneralTabInitialValues.reasonsToJoin
-   }
-
-   // This is to ensure backwards compatibility
-   const filteredSpeakers = livestream.speakers.filter(
-      (speaker) => speaker.firstName && speaker.lastName
-   )
-
-   const mappedSpeakers = filteredSpeakers.map(mapSpeakerToCreator)
+   general.reasonsToJoin = livestream.reasonsToJoinLivestream
+      ? [livestream.reasonsToJoinLivestream, undefined, undefined]
+      : livestream.reasonsToJoinLivestream_v2
 
    return {
       general: general,
       speakers: {
-         values: livestream.speakers ? mappedSpeakers : [],
-         options: unionCreatorsAndSpeakers(creators, filteredSpeakers),
-         creatorsIds: livestream.creatorsIds,
+         values: livestream.speakers.map(mapSpeakerToCreator),
+         options: unionCreatorsAndSpeakers(
+            creators.map(mapCreatorToLivestreamCreator),
+            livestream.speakers
+         ),
       },
-      questions: {
-         registrationQuestions: {
-            values: buildRegistrationQuestions(
-               livestream.groupQuestionsMap,
-               userData.isAdmin,
-               group
-            ),
-            options: groupQuestions,
-         },
-         feedbackQuestions:
-            feedbackQuestions ||
-            formQuestionsTabInitialValues.feedbackQuestions,
-         hosts: formQuestionsTabInitialValues.hosts,
-      },
+      questions: valuesReducer(formQuestionsTabInitialValues),
       jobs: {
-         jobs: livestream.jobs || formJobsTabInitialValues.jobs,
+         jobs: livestream.jobs,
          customJobs: customJobs.map(pickPublicDataFromCustomJob),
       } as LivestreamFormJobsTabValues,
    }
@@ -270,33 +180,27 @@ const convertLivestreamObjectToForm = ({
 
 type Props = {
    livestream: LivestreamEvent
-   group: Group
+   groupId: string
    children: ReactNode
 }
 
-const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
-   const { userData } = useAuth()
+const LivestreamFormikProvider: FC<Props> = ({
+   livestream,
+   groupId,
+   children,
+}) => {
    const { data: existingInterests } = useInterests()
-   const { data: creators } = useGroupCreators(group?.id)
-   const { groupQuestions } = useGroupQuestions(group?.id)
-   const { feedbackQuestions } = useFeedbackQuestions(
-      livestream.id,
-      livestream.isDraft ? "draftLivestreams" : "livestreams"
-   )
-   const initialSelectedCustomJobs = useGroupCustomJobs(group?.id, {
+   const initialSelectedCustomJobs = useGroupCustomJobs(groupId, {
       livestreamId: livestream?.id,
    })
+   const { data: creators } = useGroupCreators(groupId)
 
    const formValues: LivestreamFormValues = livestream
       ? convertLivestreamObjectToForm({
            livestream,
-           group,
            existingInterests,
-           groupQuestions,
-           feedbackQuestions,
            customJobs: initialSelectedCustomJobs,
            creators,
-           userData,
         })
       : formInitialValues
 

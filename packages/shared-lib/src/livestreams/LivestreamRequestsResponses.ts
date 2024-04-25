@@ -35,15 +35,3 @@ export type MarkLivestreamPollAsCurrentRequest = {
    livestreamToken: string
    pollId: string
 }
-
-export type MarkLivestreamQuestionAsCurrentRequest = {
-   livestreamId: string
-   livestreamToken: string | null
-   question: string
-}
-
-export type ResetLivestreamQuestionRequest = {
-   livestreamId: string
-   livestreamToken: string
-   questionId: string | null
-}

@@ -8,17 +8,14 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
-import {
-   BrandedAutocompleteProps,
-   FormBrandedAutocomplete,
-} from "components/views/common/inputs/BrandedAutocomplete"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
 import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
-import { SyntheticEvent, useMemo } from "react"
+import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { LivestreamCreator } from "../questions/commons"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    menuItem: {
@@ -72,20 +69,21 @@ const styles = sxStyles({
 })
 
 type Props = {
+   fieldId: string
    label: string
    placeholder: string
    handleCreateNew: () => void
-   options: Creator[]
-   values?: Creator[]
-} & BrandedAutocompleteProps
+   options: LivestreamCreator[]
+   values?: LivestreamCreator[]
+}
 
 const SelectSpeakersDropDown = ({
+   fieldId,
    label,
    placeholder,
    options,
    handleCreateNew,
    values,
-   ...props
 }: Props) => {
    const isMobile = useIsMobile()
    const { setFieldValue, isSubmitting } = useLivestreamFormValues()
@@ -107,23 +105,20 @@ const SelectSpeakersDropDown = ({
       [handleCreateNew, options?.length]
    )
 
-   const onChangeHandler = async (
-      event: SyntheticEvent,
-      selectedOptions: Creator[]
-   ) => {
-      await setFieldValue(props.id, selectedOptions)
+   const onChangeHandler = async (_, selectedOptions: LivestreamCreator[]) => {
+      await setFieldValue(fieldId, selectedOptions)
    }
 
    return (
-      <FormBrandedAutocomplete
-         name={props.id}
+      <BrandedAutocomplete
+         key={fieldId}
          value={values}
          options={options}
          isOptionEqualToValue={isOptionEqualToValue}
          getOptionLabel={getLabelFn}
          sx={BaseStyles.chipInput}
          textFieldProps={{
-            name: props.id,
+            name: fieldId,
             label: label,
             fullWidth: true,
             placeholder: placeholder,
@@ -134,15 +129,14 @@ const SelectSpeakersDropDown = ({
          disableCloseOnSelect
          initialOptionSection={renderCreateNewCreatorOption}
          getOptionElement={(speaker) =>
-            getOptionElement(speaker as Creator, isMobile)
+            getOptionElement(speaker as LivestreamCreator, isMobile)
          }
          disabled={isSubmitting}
-         {...props}
       />
    )
 }
 
-const getOptionElement = (speaker: Creator, isMobile: boolean) => (
+const getOptionElement = (speaker: LivestreamCreator, isMobile: boolean) => (
    <Stack direction="row" padding="16px" gap="8px" width="100%">
       <CreatorAvatar
          creator={{
@@ -185,11 +179,13 @@ const getOptionElement = (speaker: Creator, isMobile: boolean) => (
    </Stack>
 )
 
-const getLabelFn = (value: Creator) => {
+const getLabelFn = (value: LivestreamCreator) => {
    return `${value.firstName} ${value.lastName}`
 }
 
-const isOptionEqualToValue = (option: Creator, value: Creator): boolean =>
-   option.id === value.id
+const isOptionEqualToValue = (
+   option: LivestreamCreator,
+   value: LivestreamCreator
+): boolean => option.id === value.id
 
 export default SelectSpeakersDropDown

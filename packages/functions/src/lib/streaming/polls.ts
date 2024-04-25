@@ -3,7 +3,6 @@ import {
    CreateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    LivestreamEvent,
-   LivestreamPoll,
    MarkLivestreamPollAsCurrentRequest,
    UpdateLivestreamPollRequest,
    basePollShape,
@@ -12,7 +11,7 @@ import * as yup from "yup"
 import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
-import { logAndThrow, validateLivestreamToken } from "../validations"
+import { validateLivestreamToken } from "../validations"
 import { livestreamsRepo } from "../../api/repositories"
 import { v4 as uuid } from "uuid"
 
@@ -88,44 +87,6 @@ export const updatePoll = functions.region(config.region).https.onCall(
             context.middlewares.livestream,
             livestreamToken
          )
-
-         const currentPoll = await livestreamsRepo.getPoll(livestreamId, pollId)
-
-         if (!currentPoll) {
-            logAndThrow("Poll not found", {
-               pollId,
-               livestreamId,
-               userId: context.auth?.token?.uid,
-               userEmail: context.auth?.token?.email,
-            })
-         }
-
-         // validate that only the state can be changed to 'closed' or 'current'
-         if (currentPoll.state !== "upcoming" && state !== "upcoming") {
-            if (options || question) {
-               logAndThrow(
-                  "Cannot change options or question unless the state is 'upcoming'",
-                  {
-                     pollId,
-                     livestreamId,
-                     userId: context.auth?.token?.uid,
-                     userEmail: context.auth?.token?.email,
-                  }
-               )
-            }
-            if (state && !["closed", "current"].includes(state)) {
-               logAndThrow(
-                  "State can only be updated to 'closed' or 'current'",
-                  {
-                     pollId,
-                     livestreamId,
-                     userId: context.auth?.token?.uid,
-                     userEmail: context.auth?.token?.email,
-                  }
-               )
-            }
-         }
-
          functions.logger.info("Updating poll", {
             livestreamId,
             pollId,
@@ -134,24 +95,16 @@ export const updatePoll = functions.region(config.region).https.onCall(
             state,
          })
 
-         const updateData: Partial<
-            Pick<LivestreamPoll, "options" | "question" | "state">
-         > = {}
+         const optionsWithIds = options?.map((o) => ({
+            ...o,
+            id: o.id || uuid(),
+         }))
 
-         if (options) {
-            updateData.options = options.map((o) => ({
-               ...o,
-               id: o.id || uuid(),
-            }))
-         }
-         if (question) {
-            updateData.question = question
-         }
-         if (state) {
-            updateData.state = state
-         }
-
-         await livestreamsRepo.updatePoll(livestreamId, pollId, updateData)
+         await livestreamsRepo.updatePoll(livestreamId, pollId, {
+            options: optionsWithIds,
+            question,
+            state,
+         })
 
          functions.logger.info("Poll updated", {
             livestreamId,
