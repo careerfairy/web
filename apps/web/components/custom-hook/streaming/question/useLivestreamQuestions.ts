@@ -2,8 +2,8 @@ import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, limit, orderBy, query, where } from "firebase/firestore"
 import { ReactFireOptions } from "reactfire"
-import { useFirestoreCollection } from "../utils/useFirestoreCollection"
-import useSWRCountQuery from "../useSWRCountQuery"
+import useSWRCountQuery from "../../useSWRCountQuery"
+import { useFirestoreCollection } from "../../utils/useFirestoreCollection"
 
 const reactFireOptions: ReactFireOptions = {
    suspense: true,
