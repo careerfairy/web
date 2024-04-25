@@ -14,7 +14,7 @@ import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
 import { useQuestionsListContext } from "./QuestionsLisProvider"
 import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
 
-const styles = sxStyles({
+export const questionCardStyles = sxStyles({
    root: (theme) => ({
       border: (theme) => `1px solid ${theme.brand.white[500]}`,
       backgroundColor: theme.brand.white[100],
@@ -62,9 +62,9 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
       return (
          <Box
             sx={[
-               styles.root,
-               question.type === "current" && styles.greenBorder,
-               question.type === "done" && styles.whiteBorder,
+               questionCardStyles.root,
+               question.type === "current" && questionCardStyles.greenBorder,
+               question.type === "done" && questionCardStyles.whiteBorder,
             ]}
             ref={ref}
          >
@@ -78,8 +78,8 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
             <Box
                component="span"
                sx={[
-                  styles.options,
-                  question.type === "done" && styles.whiteOptions,
+                  questionCardStyles.options,
+                  question.type === "done" && questionCardStyles.whiteOptions,
                ]}
             >
                {Boolean(showOptions) && (
@@ -107,8 +107,10 @@ const Header = ({ question }: AnswererHeaderProps) => {
    return (
       <Stack
          p={1.5}
-         pb={question.type !== "done" && 0}
-         sx={[question.type === "done" && styles.questionHeaderGreen]}
+         pb={question.type === "current" ? 0 : 1.5}
+         sx={[
+            question.type === "done" && questionCardStyles.questionHeaderGreen,
+         ]}
          spacing={1.5}
       >
          {question.type === "current" && (
@@ -119,7 +121,10 @@ const Header = ({ question }: AnswererHeaderProps) => {
          {question.type === "done" && (
             <Stack spacing={1} alignItems="center" direction="row">
                <Typography variant="small">Answered</Typography>
-               <Box component={CheckCircle} sx={styles.checkCircle} />
+               <Box
+                  component={CheckCircle}
+                  sx={questionCardStyles.checkCircle}
+               />
             </Stack>
          )}
       </Stack>
@@ -133,28 +138,33 @@ type ContentProps = {
 
 const Content = ({ question, topPadding }: ContentProps) => {
    const { setQuestionIdWithOpenedCommentList } = useQuestionsListContext()
+   const { isHost } = useStreamingContext()
 
    return (
       <Stack spacing={3} p={1.5} pt={topPadding ? 1.5 : undefined}>
          <Typography variant="brandedBody" paddingRight={3} color="neutral.800">
             {question.title}
          </Typography>
-         <Stack spacing={3}>
-            <span>
-               <ToggleUpvoteButton question={question} />
-            </span>
-            <Stack spacing={1.5}>
-               <StreamerActions question={question} />
-               <Stack spacing={1}>
-                  <CommentInput
-                     questionId={question.id}
-                     onCommentPosted={() =>
-                        setQuestionIdWithOpenedCommentList(question.id)
-                     }
-                  />
-                  <CommentsList question={question} />
-               </Stack>
+         <Stack spacing={1}>
+            <Stack spacing={3}>
+               <span>
+                  <ToggleUpvoteButton question={question} />
+               </span>
+               {Boolean(isHost) && (
+                  <Stack id="comment-input-and-list" spacing={1}>
+                     <Stack spacing={1.5}>
+                        <StreamerActions question={question} />
+                        <CommentInput
+                           questionId={question.id}
+                           onCommentPosted={() =>
+                              setQuestionIdWithOpenedCommentList(question.id)
+                           }
+                        />
+                     </Stack>
+                  </Stack>
+               )}
             </Stack>
+            <CommentsList question={question} />
          </Stack>
       </Stack>
    )

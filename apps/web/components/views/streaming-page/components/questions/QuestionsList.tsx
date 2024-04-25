@@ -1,10 +1,11 @@
-import { CircularProgress, Collapse, Stack } from "@mui/material"
+import { Slide, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamQuestions } from "components/custom-hook/streaming/question/useLivestreamQuestions"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
 import { QuestionTab } from "./PanelTabs"
 import { QuestionCard } from "./QuestionCard"
+import { QuestionCardSkeleton } from "./QuestionCardSkeleton"
 import QuestionsListContextProvider from "./QuestionsLisProvider"
 
 type Props = {
@@ -12,7 +13,15 @@ type Props = {
 }
 export const QuestionsList = (props: Props) => {
    return (
-      <SuspenseWithBoundary fallback={<CircularProgress />}>
+      <SuspenseWithBoundary
+         fallback={
+            <Stack spacing={2}>
+               <QuestionCardSkeleton />
+               <QuestionCardSkeleton />
+               <QuestionCardSkeleton />
+            </Stack>
+         }
+      >
          <Content {...props} />
       </SuspenseWithBoundary>
    )
@@ -30,9 +39,13 @@ const Content = ({ type }: Props) => {
       <QuestionsListContextProvider>
          <Stack spacing={2} overflow="hidden" component={TransitionGroup}>
             {questions.map((question) => (
-               <Collapse key={question.id}>
+               <Slide
+                  direction={type === QuestionTab.ANSWERED ? "left" : "right"}
+                  key={question.id}
+                  exit={false}
+               >
                   <QuestionCard question={question} />
-               </Collapse>
+               </Slide>
             ))}
          </Stack>
       </QuestionsListContextProvider>
