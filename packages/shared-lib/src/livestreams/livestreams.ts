@@ -199,7 +199,9 @@ export interface LivestreamEvent extends Identifiable {
    companySizes?: string[] // ["1-20", "21-100", "101-1000", "1001+"]
    companyIndustries?: string[] // ["Technology", "Finance", "Education", "Healthcare", "Other"]
    companyCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
-
+   companyTargetedCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
+   companyTargetedUniversities?: string[] // [TODO: Add examples]
+   companyTargetedFieldsOfStudies?: string[] // [TODO: Add examples]
    /**
     * Flag to distinguish between a draft and a livestream
     * (different collections), internal use

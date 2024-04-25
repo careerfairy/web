@@ -2,11 +2,15 @@ import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
+import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import {
    FirebaseUniversityRepository,
    IUniversityRepository,
-} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
-import { FieldValue, Timestamp } from "firebase-admin/firestore"
+} from "../../shared-lib/src/universities/UniversityRepository"
+import {
+   CustomJobScriptsRepository,
+   ICustomJobScriptsRepository,
+} from "./api/CustomJobsScriptRepository"
 import {
    GroupScriptsRepository,
    IGroupScriptsRepository,
@@ -49,3 +53,6 @@ export const universitiesRepo: IUniversityRepository =
 
 export const fieldOfStudyRepo: IFieldOfStudyRepository =
    new FirebaseFieldOfStudyRepository(firestoreInstance)
+
+export const customJobRepo: ICustomJobScriptsRepository =
+   new CustomJobScriptsRepository(firestore as any, FieldValue)
