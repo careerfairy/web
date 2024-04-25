@@ -346,6 +346,8 @@ export const isDefinedAndEqual = <T>(
  * @returns New array containing only differing elements
  */
 export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
+   console.log("🚀 ~ getArrayDifference ~ array2:", array2)
+   console.log("🚀 ~ getArrayDifference ~ array1:", array1)
    return array2.filter((element) => {
       return !array1.includes(element)
    })
