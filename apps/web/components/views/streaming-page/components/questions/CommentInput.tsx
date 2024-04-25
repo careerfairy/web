@@ -1,9 +1,10 @@
-import { Box, Fab, OutlinedInput } from "@mui/material"
+import { Box, CircularProgress, Fab, OutlinedInput } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { Fragment } from "react"
 import { Send } from "react-feather"
 import { Controller } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
@@ -39,6 +40,15 @@ const styles = sxStyles({
       "& .MuiInputBase-input": {
          pr: 3,
       },
+   },
+   loader: {
+      width: 30,
+      height: 30,
+      position: "absolute",
+      right: 4,
+      top: "50%",
+      transform: "translateY(-50%)",
+      minHeight: "auto",
    },
 })
 
@@ -120,24 +130,38 @@ export const CommentInput = ({ questionId, onCommentPosted }: Props) => {
                   autoComplete="off"
                   size="small"
                   endAdornment={
-                     <Fab
-                        aria-label="Send message"
-                        color="primary"
-                        size="small"
-                        disabled={
-                           !formState.isDirty ||
-                           !formState.isValid ||
-                           formState.isSubmitting
-                        }
-                        type="submit"
-                        sx={styles.sendButton}
-                     >
-                        <Send />
-                     </Fab>
+                     <Fragment>
+                        {formState.isSubmitting ? (
+                           <LoadingIndicator />
+                        ) : (
+                           <Fab
+                              aria-label="Send message"
+                              color="primary"
+                              size="small"
+                              disabled={
+                                 !formState.isDirty ||
+                                 !formState.isValid ||
+                                 formState.isSubmitting
+                              }
+                              type="submit"
+                              sx={styles.sendButton}
+                           >
+                              <Send />
+                           </Fab>
+                        )}
+                     </Fragment>
                   }
                />
             )}
          />
+      </Box>
+   )
+}
+
+const LoadingIndicator = () => {
+   return (
+      <Box sx={styles.loader} component="span">
+         <CircularProgress size="inherit" />
       </Box>
    )
 }
