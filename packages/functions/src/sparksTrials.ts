@@ -1,10 +1,10 @@
 import { RuntimeOptions } from "firebase-functions"
-import functions = require("firebase-functions")
 import { PostmarkEmailSender } from "./api/postmark"
 import { emailNotificationsRepo, groupRepo } from "./api/repositories"
 import config from "./config"
 import { TrialService } from "./lib/trials/services/TrialService"
 import { SparkTrialEndEmailBuilder } from "./lib/trials/sparks/SparksTrialEndEmailBuilder"
+import functions = require("firebase-functions")
 
 /**
  * Sparks Trial End Emails functions runtime settings
@@ -65,6 +65,5 @@ async function sendEndOfSparksTrialEmails() {
    await trialService.buildNotifications()
    await trialService.createNotifications()
 
-   // disable for now
    await emailBuilder.send()
 }
