@@ -426,6 +426,7 @@ const Container: FC<SparksDialogContainerProps> = ({
    )
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type ContentProps = BoxProps<"span"> & {}
 
 const Content: FC<ContentProps> = ({ sx, ...props }) => {
@@ -484,9 +485,9 @@ const CustomButton: FC<LoadingButtonProps> = ({ children, sx, ...props }) => {
  * @param {string} step - The step to navigate to.
  */
 function setStateAndNavigate(
-   setState: Function,
-   goToStep: Function,
-   stateValue: any,
+   setState: (value) => void,
+   goToStep: (step) => void,
+   stateValue: unknown,
    step: SparkDialogStep
 ) {
    setState(stateValue)

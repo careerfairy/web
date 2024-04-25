@@ -4,6 +4,9 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
 import Message from "./Message"
 import Progress from "./Progress"
+import UpgradePlanButton from "components/views/checkout/forms/UpgradePlanButton"
+import { Star } from "react-feather"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 
 const styles = sxStyles({
    progressSection: {
@@ -60,33 +63,32 @@ const TrialStatusContent = () => {
    const contentCreationBarCritical =
       contentCreationAboutToExpire || failedToMakeEnoughInContentCreationPeriod
 
+   const planExpired = groupPresenter.hasPlanExpired()
    const trialBarCritical =
-      trialAboutToExpire || failedToMakeEnoughInContentCreationPeriod
-
-   if (groupPresenter.hasPlanExpired()) {
-      return (
-         <Typography sx={styles.title}>
-            Your trial has expired. Please contact your key success manager to
-            unlock the full power of Sparks.
-         </Typography>
-      )
-   }
+      trialAboutToExpire ||
+      failedToMakeEnoughInContentCreationPeriod ||
+      planExpired
 
    return (
       <Fragment>
-         {isInContentCreationPeriod && !groupPresenter.publicSparks ? (
-            <StatusTitle
-               title="on content creation period"
-               daysLeft={remainingDaysLeftForContentCreation}
-               critical={contentCreationAboutToExpire}
-            />
-         ) : (
-            <StatusTitle
-               title="on your trial"
-               daysLeft={remainingDaysLeftForPlan}
-               critical={trialAboutToExpire}
-            />
-         )}
+         <ConditionalWrapper
+            condition={!planExpired}
+            fallback={<PlanEndStatusTitle title="Spark it up! Upgrade now." />}
+         >
+            {isInContentCreationPeriod && !groupPresenter.publicSparks ? (
+               <StatusTitle
+                  title="on content creation period"
+                  daysLeft={remainingDaysLeftForContentCreation}
+                  critical={contentCreationAboutToExpire}
+               />
+            ) : (
+               <StatusTitle
+                  title="on your trial"
+                  daysLeft={remainingDaysLeftForPlan}
+                  critical={trialAboutToExpire}
+               />
+            )}
+         </ConditionalWrapper>
          <Box sx={styles.progressSection}>
             <Progress
                sx={styles.contentCreationBar}
@@ -106,6 +108,12 @@ const TrialStatusContent = () => {
             trialAboutToExpire={trialAboutToExpire}
             metPublishingCriteria={groupPresenter.publicSparks}
          />
+         <Box>
+            <UpgradePlanButton
+               text="Upgrade now"
+               icon={<Star strokeWidth={3} />}
+            />
+         </Box>
       </Fragment>
    )
 }
@@ -134,4 +142,11 @@ const StatusTitle = (props: MessageProps) => {
    )
 }
 
+type PlanEndProps = {
+   title: string
+}
+
+const PlanEndStatusTitle = (props: PlanEndProps) => {
+   return <Typography sx={styles.title}>{props.title}</Typography>
+}
 export default TrialStatusContent

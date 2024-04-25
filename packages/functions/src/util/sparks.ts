@@ -35,6 +35,15 @@ export const validateGroupSparks = async (group: Group) => {
       const minSparksPerCreatorToPublishSparks =
          groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
 
+      // If the groups current plan has expired no need for the other validations and set publicSparks = false
+      if (hasGroupPlanExpired(group)) {
+         // only update if needed
+         if (publicSparks) {
+            return groupRepo.updatePublicSparks(groupId, false)
+         }
+         return
+      }
+
       // If the group is not yet a public group there's no need to do all the other validations
       if (!publicProfile) {
          functions.logger.log(
@@ -122,4 +131,11 @@ export const validateGroupSparks = async (group: Group) => {
    } catch (error) {
       return functions.logger.error("Error during Spark validation", { error })
    }
+}
+
+function hasGroupPlanExpired(group: Group): boolean {
+   if (group.plan?.expiresAt.toMillis() < Date.now()) {
+      return true
+   }
+   return false
 }

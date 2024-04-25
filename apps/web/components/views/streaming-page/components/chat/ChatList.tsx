@@ -12,7 +12,7 @@ import { ChevronDown } from "react-feather"
 import { ChatEntry } from "./ChatEntry"
 import { EmptyChatView } from "./EmptyChatView"
 import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
-import { ScrollToBottom } from "components/custom-hook/utils/useScrollToBottom"
+import { ScrollTo } from "components/custom-hook/utils/useScroll"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
 import { useInView } from "react-intersection-observer"
@@ -54,7 +54,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   scrollToBottom: ScrollToBottom["scrollToBottom"]
+   scrollToBottom: ScrollTo["scrollToBottom"]
 }
 
 export const ChatList = (props: Props) => {

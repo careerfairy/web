@@ -1,9 +1,9 @@
 import { getGlobalRatingAverage } from "@careerfairy/shared-lib/livestreams/ratings"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
-   Button,
    CircularProgress,
    Pagination,
    Rating,
@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../../common/CardCustom"
+import { useLivestreamRouting } from "../../events/useLivestreamRouting"
 import useGroupLivestreamStats from "./useGroupLivestreamStats"
 
 const styles = sxStyles({
@@ -247,6 +248,8 @@ const FeedbackCardContent = ({
 
 const NoLivestreams = () => {
    const { livestreamDialog } = useGroup()
+   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
+      useLivestreamRouting()
    return (
       <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
@@ -256,13 +259,18 @@ const NoLivestreams = () => {
          </Typography>
 
          <Box mt={2} mb={3} display="flex" justifyContent="center">
-            <Button
+            <LoadingButton
                color="secondary"
                variant="contained"
-               onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+               onClick={() =>
+                  livestreamCreationFlowV2
+                     ? createDraftLivestream()
+                     : livestreamDialog.handleOpenNewStreamModal()
+               }
+               loading={isCreating}
             >
                Create New Live Stream
-            </Button>
+            </LoadingButton>
          </Box>
       </Box>
    )

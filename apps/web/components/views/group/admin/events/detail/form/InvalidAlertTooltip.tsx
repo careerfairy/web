@@ -9,7 +9,6 @@ import {
    tooltipClasses,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { FC } from "react"
 import { Info } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
@@ -32,15 +31,15 @@ type InvalidAlertTooltipContentProps = {
    handleOkClick?: () => void
 }
 
-export const InvalidAlertTooltipContent: FC<
-   InvalidAlertTooltipContentProps
-> = ({ handleOkClick }) => {
+export const InvalidAlertTooltipContent = ({
+   handleOkClick,
+}: InvalidAlertTooltipContentProps) => {
    const isMobile = useIsMobile()
-   const { isGenralTabInvalid, isSpeakerTabInvalid } =
+   const { isGeneralTabInvalid, isSpeakerTabInvalid } =
       useLivestreamCreationContext()
 
    const tabsWithErros = [
-      isGenralTabInvalid && tabLabelsMap.general,
+      isGeneralTabInvalid && tabLabelsMap.general,
       isSpeakerTabInvalid && tabLabelsMap.speakers,
    ].filter(Boolean)
 
