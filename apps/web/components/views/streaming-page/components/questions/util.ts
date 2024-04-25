@@ -18,3 +18,5 @@ export const getUserTypeFromComment = (comment: LivestreamQuestionComment) => {
    }
    return UserType.Viewer
 }
+
+export const MIN_QUESTIONS_TO_SHOW = 10
