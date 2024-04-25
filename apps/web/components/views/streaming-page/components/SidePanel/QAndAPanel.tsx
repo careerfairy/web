@@ -1,8 +1,9 @@
-import React from "react"
-import { SidePanelView } from "./SidePanelView"
 import { QaIcon } from "components/views/common/icons"
-import { QuestionsView } from "../questions/QuestionsView"
 import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
+import { QuestionInput } from "../questions/QuestionInput"
+import { QuestionsView } from "../questions/QuestionsView"
+import { SidePanelView } from "./SidePanelView"
 
 const styles = sxStyles({
    root: {
@@ -11,12 +12,14 @@ const styles = sxStyles({
 })
 
 export const QAndAPanel = () => {
+   const { isHost } = useStreamingContext()
    return (
       <SidePanelView
          id="qanda-panel"
          title="Questions and Answers"
          icon={<QaIcon />}
          contentWrapperStyles={styles.root}
+         bottomContent={isHost ? null : <QuestionInput />}
       >
          <QuestionsView />
       </SidePanelView>
