@@ -1,19 +1,20 @@
-import { FC } from "react"
-import { Grid } from "@mui/material"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
+import { Grid } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
+import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC } from "react"
+import BulletChart from "../components/BulletChart"
 import { GroupSparkAnalyticsCardContainer } from "../components/GroupSparkAnalyticsCardContainer"
 import { GroupSparkAnalyticsCardContainerTitle } from "../components/GroupSparkAnalyticsCardTitle"
+import { LockedSparksAudienceTab } from "../components/LockedSparksAudienceTab"
 import CFPieChart from "../components/charts/CFPieChart"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import useSparksAnalytics from "components/custom-hook/spark/analytics/useSparksAnalytics"
-import BulletChart from "../components/BulletChart"
 import {
    EmptyDataCheckerForBulletChart,
    EmptyDataCheckerForPieChart,
 } from "./EmptyDataCheckers"
-import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
-import { LockedSparksAudienceTab } from "../components/LockedSparksAudienceTab"
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const updateRelativePercentage = (data, maxValue) => {
    return data.map((item) => ({
@@ -27,6 +28,7 @@ type SparksAudienceTabProps = {
 }
 
 const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
+   const { userData } = useAuth()
    const { group } = useGroup()
    const planStatus = useGroupPlanIsValid(group.groupId, [
       GroupPlanTypes.Tier2,
@@ -36,7 +38,7 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]
 
-   const shouldLockAudiences = !planStatus.valid
+   const shouldLockAudiences = !userData.isAdmin && !planStatus.valid
    /*
     * The calculations below scale the bars' values relative to the maximum
     * absolute value of the dataset. This creates a better user experience
