@@ -1,28 +1,34 @@
-import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { useAuth } from "HOCs/AuthProvider"
-import { TAB_VALUES } from "components/views/group/admin/events/detail/form/commons"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import {
+   MAX_TAB_VALUE,
+   TAB_VALUES,
+} from "components/views/group/admin/events/detail/form/commons"
 import {
    Dispatch,
+   FC,
    ReactNode,
    SetStateAction,
    createContext,
+   useCallback,
    useContext,
    useMemo,
+   useState,
 } from "react"
-import { useEffectOnce } from "react-use"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
-import { useTabNavigationAndValidation } from "./navigation/useTabNavigationAndValidation"
+import {
+   livestreamFormGeneralTabSchema,
+   livestreamFormSpeakersTabSchema,
+} from "./form/validationSchemas"
 
 type LivestreamCreationContextType = {
-   livestream: LivestreamEvent
-   targetLivestreamCollection: "livestreams" | "draftLivestreams"
    tabToNavigateTo: TAB_VALUES
    tabValue: TAB_VALUES
    setTabValue: Dispatch<SetStateAction<TAB_VALUES>>
    navPreviousTab: () => void
    navNextTab: () => void
    navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
+   isNavigatingForward: boolean
+   alertState: boolean
    setAlertState: Dispatch<SetStateAction<boolean>>
    isValidationDialogOpen: boolean
    handleValidationOpenDialog: () => void
@@ -31,11 +37,10 @@ type LivestreamCreationContextType = {
       TAB_VALUES.GENERAL | TAB_VALUES.SPEAKERS,
       boolean
    >
+   shouldShowAlertDialog: boolean
    shouldShowAlertIndicator: boolean
-   isGeneralTabInvalid: boolean
+   isGenralTabInvalid: boolean
    isSpeakerTabInvalid: boolean
-   isCohostedEvent: boolean
-   isCFAdmin: boolean
 }
 
 const LivestreamCreationContext = createContext<
@@ -43,91 +48,126 @@ const LivestreamCreationContext = createContext<
 >(undefined)
 
 type LivestreamCreationContextProviderType = {
-   livestream: LivestreamEvent
-   group: Group
    children: ReactNode
 }
 
-export const LivestreamCreationContextProvider = ({
-   livestream,
-   group,
-   children,
-}: LivestreamCreationContextProviderType) => {
-   const { userData } = useAuth()
-   const { values, validateForm } = useLivestreamFormValues()
-
+export const LivestreamCreationContextProvider: FC<
+   LivestreamCreationContextProviderType
+> = ({ children }) => {
    const {
-      tabValue,
-      setTabValue,
-      tabToNavigateTo,
-      navPreviousTab,
-      navNextTab,
-      navigateWithValidationCheck,
-      setAlertState,
+      values: { general, speakers },
+   } = useLivestreamFormValues()
+   const [tabValue, setTabValue] = useState<TAB_VALUES>(TAB_VALUES.GENERAL)
+   const [isNavigatingForward, setIsNavigatingForward] = useState(true)
+   const [tabToNavigateTo, setTabToNavigateTo] = useState<TAB_VALUES>(undefined)
+   const [tabsVisited, setTabsVisited] = useState<Record<TAB_VALUES, boolean>>({
+      [TAB_VALUES.GENERAL]: true,
+      [TAB_VALUES.SPEAKERS]: false,
+      [TAB_VALUES.QUESTIONS]: false,
+      [TAB_VALUES.JOBS]: false,
+   })
+
+   const [alertState, setAlertState] = useState(undefined)
+
+   const [
       isValidationDialogOpen,
       handleValidationOpenDialog,
       handleValidationCloseDialog,
-      shouldShowAlertIndicatorOnTab,
-      shouldShowAlertIndicator,
-      isGeneralTabInvalid,
-      isSpeakerTabInvalid,
-   } = useTabNavigationAndValidation(values.general, values.speakers)
+   ] = useDialogStateHandler()
 
-   const targetLivestreamCollection: LivestreamCreationContextType["targetLivestreamCollection"] =
-      livestream.isDraft ? "draftLivestreams" : "livestreams"
+   const isGenralTabInvalid =
+      !livestreamFormGeneralTabSchema.isValidSync(general) &&
+      tabsVisited[TAB_VALUES.GENERAL]
+   const isSpeakerTabInvalid =
+      !livestreamFormSpeakersTabSchema.isValidSync(speakers) &&
+      tabsVisited[TAB_VALUES.SPEAKERS]
+   const formHasCriticalValidationErrors =
+      isGenralTabInvalid || isSpeakerTabInvalid
 
-   const isCohostedEvent = Boolean(
-      livestream?.groupIds.length > 1 || group?.universityCode
+   const shouldShowAlertIndicatorOnTab = useMemo(
+      () => ({
+         [TAB_VALUES.GENERAL]: alertState !== undefined && isGenralTabInvalid,
+         [TAB_VALUES.SPEAKERS]: alertState !== undefined && isSpeakerTabInvalid,
+      }),
+      [alertState, isGenralTabInvalid, isSpeakerTabInvalid]
    )
-   const isCFAdmin = userData?.isAdmin
+
+   const shouldShowAlertIndicator =
+      alertState !== undefined && formHasCriticalValidationErrors
+
+   const shouldShowAlertDialog =
+      (alertState === true || alertState == undefined) &&
+      formHasCriticalValidationErrors
+
+   const navigateWithValidationCheck = useCallback(
+      (newTabValue) => {
+         if (shouldShowAlertDialog) {
+            setAlertState(true)
+            handleValidationOpenDialog()
+            setTabToNavigateTo(newTabValue)
+         } else {
+            setTabValue(newTabValue)
+         }
+
+         if (!tabsVisited[tabValue]) {
+            setTabsVisited((prev) => ({ ...prev, [tabValue]: true }))
+         }
+      },
+      [handleValidationOpenDialog, shouldShowAlertDialog, tabValue, tabsVisited]
+   )
+
+   const navPreviousTab = useCallback(() => {
+      if (tabValue !== TAB_VALUES.GENERAL) {
+         setIsNavigatingForward(false)
+         navigateWithValidationCheck(tabValue - 1)
+      }
+   }, [navigateWithValidationCheck, tabValue])
+
+   const navNextTab = useCallback(() => {
+      if (tabValue !== MAX_TAB_VALUE) {
+         setIsNavigatingForward(true)
+         navigateWithValidationCheck(tabValue + 1)
+      }
+   }, [navigateWithValidationCheck, tabValue])
 
    const value = useMemo(
       () => ({
-         livestream,
-         targetLivestreamCollection,
          tabToNavigateTo,
          tabValue,
          setTabValue,
          navPreviousTab,
          navNextTab,
          navigateWithValidationCheck,
+         isNavigatingForward,
+         alertState,
          setAlertState,
          isValidationDialogOpen,
          handleValidationOpenDialog,
          handleValidationCloseDialog,
          shouldShowAlertIndicatorOnTab,
+         shouldShowAlertDialog,
          shouldShowAlertIndicator,
-         isGeneralTabInvalid,
+         isGenralTabInvalid,
          isSpeakerTabInvalid,
-         isCohostedEvent,
-         isCFAdmin,
       }),
       [
-         livestream,
-         targetLivestreamCollection,
-         tabToNavigateTo,
-         tabValue,
-         setTabValue,
-         navPreviousTab,
-         navNextTab,
-         navigateWithValidationCheck,
-         setAlertState,
-         isValidationDialogOpen,
-         handleValidationOpenDialog,
-         handleValidationCloseDialog,
-         shouldShowAlertIndicatorOnTab,
+         shouldShowAlertDialog,
          shouldShowAlertIndicator,
-         isGeneralTabInvalid,
+         shouldShowAlertIndicatorOnTab,
+         handleValidationCloseDialog,
+         handleValidationOpenDialog,
+         isValidationDialogOpen,
+         navigateWithValidationCheck,
+         navNextTab,
+         navPreviousTab,
+         isNavigatingForward,
+         alertState,
+         tabValue,
+         tabToNavigateTo,
+         isGenralTabInvalid,
          isSpeakerTabInvalid,
-         isCohostedEvent,
-         isCFAdmin,
       ]
    )
-
-   // this is needed becase isValid is true on first load
-   useEffectOnce(() => {
-      validateForm(values)
-   })
 
    return (
       <LivestreamCreationContext.Provider value={value}>

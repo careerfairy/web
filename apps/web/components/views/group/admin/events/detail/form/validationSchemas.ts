@@ -1,4 +1,4 @@
-import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
+import CreateCreatorSchema from "components/views/sparks/forms/schemas/CreateCreatorSchema"
 import * as yup from "yup"
 import { LivestreamFormGeneralTabValues } from "./types"
 
@@ -15,12 +15,6 @@ const groupOptionShape = yup.object().shape({
    name: yup.string().required(),
 })
 
-const language: yup.SchemaOf<LivestreamLanguage> = yup.object().shape({
-   code: yup.string().required(),
-   name: yup.string().required(),
-   shortName: yup.string().required(),
-})
-
 const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValues> =
    yup.object().shape({
       id: yup.string(),
@@ -29,19 +23,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required(REQUIRED_FIELD_MESSAGE)
          .min(10, getMinCharactersMessage("title", 10)),
       hidden: yup.bool().notRequired(),
-      company: yup
-         .string()
-         .test(
-            "is-undefined-or-empty",
-            REQUIRED_FIELD_MESSAGE,
-            (value) => value !== undefined && value !== ""
-         )
-         .test(
-            "min-length-requirement",
-            "Company name must have at least 3 characters",
-            (value) => value === null || value?.length > 2
-         )
-         .notRequired(),
+      company: yup.string().notRequired(),
       companyLogoUrl: yup.string().notRequired(),
       backgroundImageUrl: yup
          .string()
@@ -52,40 +34,25 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .min(new Date(), "Choose a date in the future")
          .required(REQUIRED_FIELD_MESSAGE),
       duration: yup.number().nullable().required(REQUIRED_FIELD_MESSAGE),
-      language: language.required(REQUIRED_FIELD_MESSAGE),
+      language: yup.string().required(REQUIRED_FIELD_MESSAGE),
       summary: yup
          .string()
          .required(REQUIRED_FIELD_MESSAGE)
          .min(50, getMinCharactersMessage("Live stream summary", 50)),
       reasonsToJoin: yup
          .array()
-         .min(3)
-         .transform((value, originalValue) => {
-            if (value || originalValue) {
-               return [
-                  value?.[0] || originalValue?.[0],
-                  value?.[1] || originalValue?.[1],
-                  value?.[2] || originalValue?.[2],
-               ]
-            }
-            return [undefined, undefined, undefined]
-         })
          .of(
             yup
                .string()
-               .min(20, "Minimum of 20 characters")
                .required(REQUIRED_FIELD_MESSAGE)
+               .min(20, "Minimum of 20 characters")
          )
-         .test("wololo", null, (value) => {
-            return value.filter(Boolean).length > 0
-         }),
-      categories: yup.object().shape({
-         values: yup
-            .array()
-            .of(groupOptionShape)
-            .min(1, getSelectAtLeastOneMessage("category")),
-         options: yup.array().of(groupOptionShape),
-      }),
+         .required(),
+      categories: yup
+         .array()
+         .of(groupOptionShape)
+         .required()
+         .min(1, getSelectAtLeastOneMessage("category")),
       targetCountries: yup.array().of(groupOptionShape),
       targetUniversities: yup.array().of(groupOptionShape),
       targetFieldsOfStudy: yup
@@ -103,27 +70,16 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
 
 const livestreamFormSpeakersTabValuesSchema = yup
    .array()
-   .min(1, "Add at least one speaker")
-   .test(
-      "any-legacy-speaker-without-required-fields",
-      "Add the missing fields of highlighted speakers",
-      (value) => {
-         const speakersWithMissingFields = value?.filter(
-            (item) => Boolean(item.email) === false
-         )
-         return speakersWithMissingFields?.length === 0
-      }
-   )
+   .of(CreateCreatorSchema)
+   .min(1)
 
 const livestreamFormSpeakersTabSchema = yup.object().shape({
    values: livestreamFormSpeakersTabValuesSchema,
+   options: yup.object().nullable(),
 })
 
 const livestreamFormQuestionsTabSchema = yup.object().shape({
-   registrationQuestions: yup.object().shape({
-      values: yup.mixed(),
-      options: yup.mixed(),
-   }),
+   registrationQuestions: yup.mixed(),
    feedbackQuestions: yup.mixed(),
 })
 

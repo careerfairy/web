@@ -1,8 +1,8 @@
 import React, {
    memo,
    useCallback,
+   useEffect,
    useLayoutEffect,
-   useMemo,
    useRef,
    useState,
 } from "react"
@@ -46,16 +46,14 @@ import {
 } from "../../../../context/stream/StreamContext"
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { v4 as uuidv4 } from "uuid"
-import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
-import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../types/commonTypes"
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal"
 import { StyledBox } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import Box from "@mui/material/Box"
 import { rewardService } from "data/firebase/RewardService"
-import { livestreamService } from "data/firebase/LivestreamService"
-import { useStreamingRef } from "components/custom-hook/live-stream/useStreamRoomRef"
 
 const styles = sxStyles({
    view: {
@@ -137,14 +135,14 @@ const QuestionCategory = ({
    const theme = useTheme()
 
    const streamRef = useStreamRef()
-   const streamingRef = useStreamingRef()
 
    const dispatch = useDispatch()
    const [showQuestionModal, setShowQuestionModal] = useState(false)
    const [touched, setTouched] = useState(false)
    const [value, setValue] = useState(0)
-   const sessionUuid = useMemo(uuidv4, [])
+   const [sessionUuid] = useState(uuidv4())
    const [submittingQuestion, setSubmittingQuestion] = useState(false)
+   const [goingToQuestion, setGoingToQuestion] = useState(false)
    const [newQuestionTitle, setNewQuestionTitle] = useState("")
    const [openQuestionId, setOpenQuestionId] = useState("")
    const { authenticatedUser, userData, userPresenter } = useAuth()
@@ -152,7 +150,7 @@ const QuestionCategory = ({
 
    const parentRef = useRef<SwipeableViews>(null)
 
-   const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming] =
+   const [itemsUpcoming, loadMoreUpcoming, hasMoreUpcoming, totalUpcoming] =
       useInfiniteScroll<LivestreamQuestion>(
          firebase.listenToUpcomingLivestreamQuestions(streamRef),
          10
@@ -163,6 +161,35 @@ const QuestionCategory = ({
          firebase.listenToPastLivestreamQuestions(streamRef),
          10
       )
+
+   useEffect(() => {
+      if (totalUpcoming.length) {
+         // const newlyAskedQuestion = [...totalUpcoming].reverse().find(question => question.timestamp.toDate() > now)
+         // if (newlyAskedQuestion?.type === "new") {
+         //     const answerNewQuestion = () => {
+         //         goToThisQuestion(newlyAskedQuestion.id)
+         //         dispatch(actions.closeSnackbar(newlyAskedQuestion.id))
+         //     }
+         //     dispatch(actions.enqueueSnackbar({
+         //         message: `${newlyAskedQuestion.displayName} just asked a the following question: ${truncate(newlyAskedQuestion.title, 40)}`,
+         //         options: {
+         //             variant: "info",
+         //             key: newlyAskedQuestion.id,
+         //             action: streamer && (
+         //                 <Button
+         //                     color="primary"
+         //                     disabled={goingToQuestion}
+         //                     variant="contained"
+         //                     onClick={answerNewQuestion}
+         //                 >
+         //                     Answer Now
+         //                 </Button>
+         //             )
+         //         }
+         //     }))
+         // }
+      }
+   }, [totalUpcoming])
 
    useLayoutEffect(() => {
       function updateSize() {
@@ -193,6 +220,7 @@ const QuestionCategory = ({
    const goToThisQuestion = useCallback(
       async (nextQuestionId) => {
          try {
+            setGoingToQuestion(true)
             const currentQuestion = itemsUpcoming.find(
                (question) => question.type === "current"
             )
@@ -212,6 +240,7 @@ const QuestionCategory = ({
          } catch (e) {
             dispatch(actions.sendGeneralError(e))
          }
+         setGoingToQuestion(false)
       },
       [itemsUpcoming, firebase, streamRef, dispatch]
    )
@@ -227,19 +256,28 @@ const QuestionCategory = ({
       }
       setSubmittingQuestion(true)
       try {
-         await livestreamService.createQuestion(streamingRef, {
+         // infer argument type from the function signature
+
+         await firebase.addLivestreamQuestion(streamRef, {
             title: newQuestionTitle,
-            author: authenticatedUser.uid || "open@careerfairy.io",
+            votes: 0,
+            type: "new",
+            author: !(livestream.test || livestream.openStream)
+               ? authenticatedUser.email
+               : "open@careerfairy.io",
             displayName: !(livestream.test || livestream.openStream)
-               ? `${userData?.firstName} ${userData?.lastName}`
+               ? `${userData.firstName} ${userData.lastName}`
                : "A viewer",
-            badges: userData?.badges || [],
+            // save the user badges on the question
+            ...(userData?.badges?.length > 0 && {
+               badges: userData.badges,
+            }),
          })
 
          if (userData) {
             rewardService
                .userAction("LIVESTREAM_USER_ASKED_QUESTION", mainStreamId)
-               .then(() => console.log("Rewarded Question Asked"))
+               .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
          }
       } catch (e) {
@@ -254,10 +292,7 @@ const QuestionCategory = ({
       if (!questionIdToDelete) return
       try {
          setDeletingQuestion(true)
-         await livestreamService.deleteQuestion(
-            streamingRef,
-            questionIdToDelete
-         )
+         await firebase.deleteLivestreamQuestion(streamRef, questionIdToDelete)
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
@@ -265,7 +300,7 @@ const QuestionCategory = ({
       setDeletingQuestion(false)
    }
 
-   const upcomingQuestionsElements = itemsUpcoming
+   let upcomingQuestionsElements = itemsUpcoming
       .sort(sortByQuestionsHighlightBadge)
       .map((question, index) => {
          return (
@@ -287,7 +322,7 @@ const QuestionCategory = ({
          )
       })
 
-   const pastQuestionsElements = itemsPast
+   let pastQuestionsElements = itemsPast
       .sort(sortByQuestionsHighlightBadge)
       .map((question, index) => {
          return (
@@ -406,7 +441,7 @@ const QuestionCategory = ({
                   )}
                </StyledBox>
             </Box>
-            {Boolean(showQuestionModal) && (
+            {showQuestionModal && (
                <Dialog
                   TransitionComponent={Slide}
                   PaperProps={{ className: `notranslate`, sx: styles.dialog }}
@@ -440,9 +475,7 @@ const QuestionCategory = ({
                         </Typography>
                      </Collapse>
 
-                     {Boolean(
-                        userPresenter?.questionsShouldBeHighlighted()
-                     ) && (
+                     {userPresenter?.questionsShouldBeHighlighted() && (
                         <Typography color="lightgrey" mt={1}>
                            Your question will be highlighted with your{" "}
                            {
@@ -479,7 +512,7 @@ const QuestionCategory = ({
                </Dialog>
             )}
          </CategoryContainerTopAligned>
-         {Boolean(questionIdToDelete) && (
+         {questionIdToDelete && (
             <ConfirmDeleteModal
                title={"Delete question"}
                description={

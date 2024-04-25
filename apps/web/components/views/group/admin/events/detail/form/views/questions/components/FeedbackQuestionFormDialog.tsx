@@ -1,14 +1,14 @@
-import { sxStyles } from "@careerfairy/shared-ui"
-import { Box } from "@mui/material"
-import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
+import { FC } from "react"
 import { Formik } from "formik"
-import { useCallback } from "react"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { Box } from "@mui/material"
+import { sxStyles } from "@careerfairy/shared-ui"
+import FeedbackQuestionForm from "./FeedbackQuestionForm"
+import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import {
    FeedbackQuestionFormValues,
+   feedbackQuestionFormInitialValues,
    feedbackQuestionValidationSchema,
 } from "../commons"
-import FeedbackQuestionForm from "./FeedbackQuestionForm"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -46,49 +46,29 @@ const styles = sxStyles({
 })
 
 type FeedbackQuestionEditDialogProps = {
-   question: FeedbackQuestionFormValues
+   question?: object
    handleClose: () => void
 }
 
-const FeedbackQuestionEditDialog = ({
+const FeedbackQuestionEditDialog: FC<FeedbackQuestionEditDialogProps> = ({
    question,
    handleClose,
-}: FeedbackQuestionEditDialogProps) => {
-   const {
-      values: { questions },
-      setFieldValue,
-   } = useLivestreamFormValues()
-   const isEdit = Boolean(!question.isNew)
-   const initialValues = question
+}) => {
+   const isEdit = Boolean(question)
+   const initialValues =
+      (question as FeedbackQuestionFormValues) ||
+      feedbackQuestionFormInitialValues
 
-   const handleSubmit = useCallback(
-      (newQuestion) => {
-         if (isEdit) {
-            setFieldValue(
-               "questions.feedbackQuestions",
-               questions.feedbackQuestions.map((q) =>
-                  q.id === newQuestion.id ? newQuestion : q
-               )
-            )
-         } else {
-            setFieldValue("questions.feedbackQuestions", [
-               ...questions.feedbackQuestions,
-               { ...newQuestion, isNew: false },
-            ])
-         }
-         handleClose()
-      },
-      [isEdit, questions, setFieldValue, handleClose]
-   )
+   const handleSubmit = undefined
 
    return (
       <Formik<FeedbackQuestionFormValues>
          initialValues={initialValues}
-         onSubmit={undefined}
+         onSubmit={handleSubmit}
          validationSchema={feedbackQuestionValidationSchema}
          enableReinitialize
       >
-         {({ values, dirty, isValid }) => (
+         {({ dirty, handleSubmit, isSubmitting, isValid }) => (
             <SteppedDialog.Container
                containerSx={styles.content}
                sx={styles.wrapContainer}
@@ -108,7 +88,7 @@ const FeedbackQuestionEditDialog = ({
                         </SteppedDialog.Subtitle>
 
                         <Box sx={styles.form}>
-                           <FeedbackQuestionForm questionFormValues={values} />
+                           <FeedbackQuestionForm />
                         </Box>
                      </>
                   </SteppedDialog.Content>
@@ -125,9 +105,10 @@ const FeedbackQuestionEditDialog = ({
                      <SteppedDialog.Button
                         variant="contained"
                         color={"secondary"}
-                        disabled={!isValid || !dirty}
+                        disabled={isSubmitting || !isValid || !dirty}
                         type="submit"
-                        onClick={() => handleSubmit(values)}
+                        onClick={() => handleSubmit()}
+                        loading={isSubmitting}
                      >
                         {isEdit ? "Save" : "Create"}
                      </SteppedDialog.Button>
@@ -143,7 +124,7 @@ type DialogTitleProps = {
    isEdit: boolean
 }
 
-const DialogTitle = ({ isEdit }: DialogTitleProps) => (
+const DialogTitle: FC<DialogTitleProps> = ({ isEdit }) => (
    <>
       {isEdit ? "Edit your" : "Add"}{" "}
       <Box component="span" color="secondary.main">

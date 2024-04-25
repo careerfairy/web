@@ -1,16 +1,17 @@
-import { FeedbackQuestionFormValues } from "../commons"
-import BrandedDialog, { BrandedDialogProps } from "./BrandedDialog"
+import { FC } from "react"
 import FeedbackQuestionFormDialog from "./FeedbackQuestionFormDialog"
+import BrandedDialog, { BrandedDialogProps } from "./BrandedDialog"
+import { FeedbackQuestionFormValues } from "../commons"
 
 type FeedbackQuestionAddEditDialogProps = {
    question?: FeedbackQuestionFormValues
 } & Omit<BrandedDialogProps, "children">
 
-const FeedbackQuestionAddEditDialog = ({
+const FeedbackQuestionAddEditDialog: FC<FeedbackQuestionAddEditDialogProps> = ({
    question,
    isDialogOpen,
    handleCloseDialog,
-}: FeedbackQuestionAddEditDialogProps) => (
+}) => (
    <BrandedDialog
       isDialogOpen={isDialogOpen}
       handleCloseDialog={handleCloseDialog}

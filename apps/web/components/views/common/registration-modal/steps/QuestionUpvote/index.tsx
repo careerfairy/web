@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
    Box,
    Button,
@@ -17,11 +18,6 @@ import { useRouter } from "next/router"
 import GroupLogo from "../../common/GroupLogo"
 import QuestionVotingContainer from "../../../QuestionVotingContainer"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
-import { livestreamService } from "data/firebase/LivestreamService"
-import {
-   LivestreamQuestion,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
 
 const questionsContainerHeight = 400
 const mobileQuestionsContainerHeight = 300
@@ -65,6 +61,7 @@ const QuestionUpvote = () => {
 
       return () => clearTimeout(timeout)
    }, [show])
+   const { upvoteLivestreamQuestion } = useFirebaseService()
 
    const { push } = useRouter()
    const { authenticatedUser, userData } = useAuth()
@@ -74,30 +71,28 @@ const QuestionUpvote = () => {
          return push("/signup")
       }
       try {
-         await livestreamService.toggleUpvoteQuestion(
-            livestreamService.getLivestreamRef(livestream.id),
-            question.id,
-            authenticatedUser
+         await upvoteLivestreamQuestion(
+            livestream.id,
+            question,
+            authenticatedUser.email
          )
 
          recommendationServiceInstance.upvoteQuestion(livestream, userData)
 
-         handleClientSideQuestionUpdate<LivestreamQuestion>(question.id, {
+         handleClientSideQuestionUpdate(question.id, {
             votes: question.votes + 1 || 1,
-            voterIds: question.voterIds?.concat(authenticatedUser.uid) || [
-               authenticatedUser.uid,
-            ],
+            emailOfVoters: question.emailOfVoters?.concat(
+               authenticatedUser.email
+            ) || [authenticatedUser.email],
          })
-      } catch (e) {
-         console.error(e)
-      }
+      } catch (e) {}
    }
 
    function hasVoted(question) {
-      if (!authenticatedUser) {
+      if (!authenticatedUser || !question.emailOfVoters) {
          return false
       }
-      return hasUpvotedLivestreamQuestion(question, authenticatedUser)
+      return question.emailOfVoters.indexOf(authenticatedUser.email) > -1
    }
 
    if (!livestream) return null

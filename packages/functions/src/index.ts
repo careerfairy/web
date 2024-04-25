@@ -58,8 +58,13 @@ import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
-import * as streaming from "./lib/streaming"
-import stripe = require("./stripe")
+import {
+   createPoll,
+   deleteLivestreamChatEntry,
+   deletePoll,
+   updatePoll,
+   markPollAsCurrent,
+} from "./lib/streaming"
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -112,15 +117,11 @@ exports.manualOnboardingNewsletter =
 exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
-exports.manualAABTalentPoolCommunication = newsletter.manualTemplatedEmail
-
-// Stripe
-exports.stripeWebHook = stripe.stripeWebHook
-exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
-exports.fetchStripePrice = stripe.fetchStripePrice
-exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
+exports.manualSparkReleaseEmail = newsletter.manualTemplatedEmail
 
 // Livestreams
+exports.setFirstCommentOfQuestionOnCreate =
+   livestreams.setFirstCommentOfQuestionOnCreate
 exports.sendLivestreamRegistrationConfirmationEmail_v2 =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
@@ -271,8 +272,7 @@ exports.transferCustomJobsFromDraftToPublishedLivestream =
 exports.startPlan_v3 = groupPlans.startPlan
 exports.sendReminderToNearEndSparksTrialPlanCreationPeriod =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
-exports.checkExpiredPlans = groupPlans.checkExpiredPlans
-exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
+
 // Search
 exports.fullIndexSync = search.fullIndexSync
 
@@ -285,10 +285,8 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 exports.fetchCompanies = companies.fetchCompanies
 
 // Streaming
-exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry
-exports.createPoll = streaming.createPoll
-exports.deletePoll = streaming.deletePoll
-exports.updatePoll = streaming.updatePoll
-exports.markPollAsCurrent = streaming.markPollAsCurrent
-exports.resetQuestion = streaming.resetQuestion
-exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
+exports.deleteLivestreamChatEntry = deleteLivestreamChatEntry
+exports.createPoll = createPoll
+exports.deletePoll = deletePoll
+exports.updatePoll = updatePoll
+exports.markPollAsCurrent = markPollAsCurrent

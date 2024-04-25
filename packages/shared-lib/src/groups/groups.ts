@@ -106,8 +106,6 @@ export const GroupPlanTypes = {
     * The group is on the base plan that includes the regular spark features
     */
    Tier1: "tier1",
-   Tier2: "tier2",
-   Tier3: "tier3",
 } as const
 
 export type GroupPlanType = (typeof GroupPlanTypes)[keyof typeof GroupPlanTypes]

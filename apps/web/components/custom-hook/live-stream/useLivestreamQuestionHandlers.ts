@@ -1,5 +1,6 @@
 import { useRouter } from "next/router"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { useCallback, useMemo, useState } from "react"
 import {
    LivestreamEvent,
@@ -7,15 +8,13 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
-import LivestreamService, {
-   livestreamService,
-} from "data/firebase/LivestreamService"
+import FirebaseService from "../../../data/firebase/FirebaseService"
 
 type UseLivestreamQuestionHandlers = {
    toggleUpvoteQuestion: (
       question: LivestreamQuestion,
       livestream: LivestreamEvent
-   ) => ReturnType<LivestreamService["toggleUpvoteQuestion"]>
+   ) => ReturnType<FirebaseService["upvoteLivestreamQuestion"]>
    isUpvoting: boolean
    hasUpvotedQuestion: (question: LivestreamQuestion) => boolean
 }
@@ -24,6 +23,8 @@ const useLivestreamQuestionHandlers = (): UseLivestreamQuestionHandlers => {
    const { push, asPath } = useRouter()
    const { authenticatedUser, userData, isLoggedOut } = useAuth()
    const [isUpvoting, setIsUpvoting] = useState(false)
+
+   const { upvoteLivestreamQuestion } = useFirebaseService()
 
    const toggleUpvoteQuestion = useCallback(
       async (question: LivestreamQuestion, livestream: LivestreamEvent) => {
@@ -35,10 +36,10 @@ const useLivestreamQuestionHandlers = (): UseLivestreamQuestionHandlers => {
          }
          try {
             setIsUpvoting(true)
-            const status = await livestreamService.toggleUpvoteQuestion(
-               livestreamService.getLivestreamRef(livestream.id),
-               question.id,
-               authenticatedUser
+            const status = await upvoteLivestreamQuestion(
+               livestream.id,
+               question,
+               authenticatedUser.email
             )
 
             if (status === "upvoted") {
@@ -62,7 +63,14 @@ const useLivestreamQuestionHandlers = (): UseLivestreamQuestionHandlers => {
             setIsUpvoting(false)
          }
       },
-      [isLoggedOut, push, asPath, authenticatedUser, userData]
+      [
+         isLoggedOut,
+         push,
+         asPath,
+         upvoteLivestreamQuestion,
+         authenticatedUser.email,
+         userData,
+      ]
    )
 
    const hasUpvotedQuestion = useCallback(

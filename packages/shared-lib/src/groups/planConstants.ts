@@ -1,28 +1,7 @@
 import { GroupPlanType } from "."
-import {
-   ADVANCED_FEATURES,
-   ESSENTIAL_FEATURES,
-   PREMIUM_FEATURES,
-   PlanFeatureItem,
-} from "./planFeatures"
 
 export type PlanFeature = "sparks" | "jobs"
 
-/**
- * Configurations related to Stripe payments, the important ones are:
- *  - priceId: Unique ID of the Stripe price, defines a unique campaign e.g: Sparks 1 Year subscription / 5.000 CHF
- *       Not used for now, but can be if manual checkout is implemented.
- *
- * These are defined as functions as the Price IDs to be used change depending on group companyCountry.id
- * Additional Price info https://docs.stripe.com/products-prices/how-products-and-prices-work#what-is-a-price
- */
-type StripeConfig = {
-   priceId: (countryCode: string) => string
-}
-
-type AnalyticsPlanConstants = {
-   MINIMUM_DUMMY: number
-}
 interface SparksPlanConstants {
    /** The minimum number of creators required to publish sparks. */
    MINIMUM_CREATORS_TO_PUBLISH_SPARKS: number
@@ -46,33 +25,13 @@ interface JobsPlanConstants {
    // Empty for now - wgoncalves - disabled eslint for now
 }
 
-const resolveByCountry = (
-   code: string,
-   countryCode: string,
-   value: string,
-   fallback: string
-) => {
-   return code == countryCode ? value : fallback
-}
-
 export type PlanConstants = {
-   name: string // Name of the plan, UI plan name
-   description: string // Description of the plan, UI description
    sparks: SparksPlanConstants
    jobs: JobsPlanConstants
-   analytics?: AnalyticsPlanConstants
-   stripe: StripeConfig
-   features: PlanFeatureItem[] // List of plan features, shown in UI for checkout
 }
 
 export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
    trial: {
-      name: "Trial",
-      description: "Trial plan",
-      stripe: {
-         priceId: () => resolveByCountry("", "CH", "", ""), // Not to be used
-      },
-      features: ESSENTIAL_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
@@ -86,79 +45,12 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
    },
    tier1: {
-      name: "Essential",
-      description: "Jumpstart your employer branding",
-      stripe: {
-         priceId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_ESSENTIAL_STRIPE_PRICE_ID
-            ),
-      },
-      features: ESSENTIAL_FEATURES,
       sparks: {
          MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
          MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 6,
-         MAX_SPARK_CREATOR_COUNT: 4,
+         MAX_PUBLIC_SPARKS: 15,
+         MAX_SPARK_CREATOR_COUNT: 200, // No limit
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
-      },
-      jobs: {
-         // Empty for now
-      },
-   },
-   tier2: {
-      name: "Advanced",
-      description: "Scale up your employer brand narrative",
-      stripe: {
-         priceId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_ADVANCED_STRIPE_PRICE_ID
-            ),
-      },
-      features: ADVANCED_FEATURES,
-      sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 10,
-         MAX_SPARK_CREATOR_COUNT: 7,
-         PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
-      },
-      analytics: {
-         MINIMUM_DUMMY: 1,
-      },
-      jobs: {
-         // Empty for now
-      },
-   },
-   tier3: {
-      name: "Premium",
-      description:
-         "Gain unparalleled insights into your employer brand perception",
-      stripe: {
-         priceId: (countryCode) =>
-            resolveByCountry(
-               countryCode,
-               "CH",
-               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID_CH,
-               process.env.NEXT_PUBLIC_SPARKS_PREMIUM_STRIPE_PRICE_ID
-            ),
-      },
-      features: PREMIUM_FEATURES,
-      sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
-         MAX_PUBLIC_SPARKS: 200, // Unlimited
-         MAX_SPARK_CREATOR_COUNT: 200, // Unlimited
-         PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
-      },
-      analytics: {
-         MINIMUM_DUMMY: 1,
       },
       jobs: {
          // Empty for now

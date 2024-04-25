@@ -1,7 +1,8 @@
-import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Button } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
+import { FC } from "react"
 import { PlusCircle } from "react-feather"
+import { Box, Button } from "@mui/material"
+import { sxStyles } from "@careerfairy/shared-ui"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    container: (theme) => ({
@@ -24,7 +25,7 @@ type AddQuestionButtonProps = {
    handleClick: () => void
 }
 
-const AddQuestionButton = ({ handleClick }: AddQuestionButtonProps) => {
+const AddQuestionButton: FC<AddQuestionButtonProps> = ({ handleClick }) => {
    const isMobile = useIsMobile()
    return (
       <Box sx={styles.container}>

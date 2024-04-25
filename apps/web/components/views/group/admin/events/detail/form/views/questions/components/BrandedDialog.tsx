@@ -1,9 +1,9 @@
+import { FC, ReactNode } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Dialog, PaperProps } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { NICE_SCROLLBAR_STYLES } from "constants/layout"
-import { ReactNode } from "react"
 import { combineStyles } from "types/commonTypes"
+import { Dialog, PaperProps } from "@mui/material"
+import { NICE_SCROLLBAR_STYLES } from "constants/layout"
+import useIsMobile from "components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    dialogPaper: {
@@ -31,12 +31,12 @@ export type BrandedDialogProps = {
    paperSx?: PaperProps["sx"]
 }
 
-const BrandedDialog = ({
+const BrandedDialog: FC<BrandedDialogProps> = ({
    isDialogOpen,
    handleCloseDialog,
    children,
    paperSx,
-}: BrandedDialogProps) => {
+}) => {
    const isMobile = useIsMobile()
 
    return (

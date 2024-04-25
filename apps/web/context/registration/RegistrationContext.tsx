@@ -48,10 +48,7 @@ interface DefaultContext {
    setSliding: (sliding: boolean) => void
    sliding: boolean
    questions: LivestreamQuestion[]
-   handleClientSideQuestionUpdate: <T>(
-      docId: string,
-      updateData: Partial<T>
-   ) => void
+   handleClientSideQuestionUpdate: <T>(docId: string, updateData: T) => void
    groupsWithPolicies: GroupWithPolicy[]
    hasAgreedToAll: boolean
    completeRegistrationProcess: (
@@ -200,7 +197,7 @@ export function RegistrationContextProvider({
 
    useEffect(() => {
       if (userData?.authId && !userStats?.hasRegisteredOnAnyLivestream) {
-         const updateUserHasRegisteredToAnyLivestreamEver = async () => {
+         ;(async () => {
             try {
                const isUserRegisterOnAnyLivestream =
                   await livestreamRepo.isUserRegisterOnAnyLivestream(
@@ -216,9 +213,7 @@ export function RegistrationContextProvider({
                   message: `Not able to very if ${userData.userEmail} has registered to any Livestream`,
                })
             }
-         }
-
-         updateUserHasRegisteredToAnyLivestreamEver()
+         })()
       }
    }, [
       userData?.authId,
@@ -314,11 +309,10 @@ export function RegistrationContextProvider({
       } else {
          setGroup({})
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [groups])
 
    useEffect(() => {
-      const getPolicyStatus = async () => {
+      ;(async function () {
          if (groups?.length) {
             setGettingPolicyStatus(true)
             const { hasAgreedToAll, groupsWithPolicies } =
@@ -334,11 +328,7 @@ export function RegistrationContextProvider({
             setHasAgreedToAll(false)
          }
          setGettingPolicyStatus(false)
-      }
-
-      getPolicyStatus()
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      })()
    }, [groups])
 
    const handleSendConfirmEmail = useCallback(

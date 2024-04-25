@@ -13,7 +13,6 @@ import {
    LivestreamEventSerialized,
    LivestreamJobApplicationDetails,
    LivestreamPoll,
-   LivestreamQuestion,
    LivestreamRecordingDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
@@ -279,13 +278,6 @@ export interface ILivestreamRepository {
    ): Promise<void>
 
    /**
-    * Fetches a poll from a livestream
-    * @param livestreamId - The ID of the livestream
-    * @param pollId - The ID of the poll
-    */
-   getPoll(livestreamId: string, pollId: string): Promise<LivestreamPoll>
-
-   /**
     * Creates a poll for a livestream
     * @param livestreamId - The ID of the livestream
     * @param options - The options of the poll
@@ -306,7 +298,7 @@ export interface ILivestreamRepository {
    updatePoll(
       livestreamId: string,
       pollId: string,
-      poll: Partial<Pick<LivestreamPoll, "options" | "question" | "state">>
+      poll: Pick<LivestreamPoll, "options" | "question" | "state">
    ): Promise<void>
 
    /**
@@ -324,26 +316,6 @@ export interface ILivestreamRepository {
     * @param pollId - The ID of the poll
     */
    deletePoll(livestreamId: string, pollId: string): Promise<void>
-
-   /**
-    * Answers a question for a livestream (marks the question as current and marks the previous current question(s) as done)
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question to answer
-    */
-   answerQuestion(livestreamId: string, questionId: string): Promise<void>
-
-   /**
-    * Resets a question for a livestream back to unanswered
-    * @param livestreamId - The ID of the livestream
-    * @param questionId - The ID of the question to reset
-    */
-   resetQuestion(livestreamId: string, questionId: string): Promise<void>
-
-   /**
-    * Resets all questions for a livestream back to unanswered
-    * @param livestreamId - The ID of the livestream
-    */
-   resetAllQuestions(livestreamId: string): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1264,26 +1236,6 @@ export class FirebaseLivestreamRepository
       return recordingToken
    }
 
-   async getPoll(
-      livestreamId: string,
-      pollId: string
-   ): Promise<LivestreamPoll> {
-      const docRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("polls")
-         .doc(pollId)
-         .withConverter(createCompatGenericConverter<LivestreamPoll>())
-
-      const doc = await docRef.get()
-
-      if (!doc.exists) {
-         return null
-      }
-
-      return doc.data()
-   }
-
    async createPoll(
       livestreamId: string,
       options: LivestreamPoll["options"],
@@ -1303,7 +1255,6 @@ export class FirebaseLivestreamRepository
          timestamp: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          voters: [],
          id: docRef.id,
-         closedAt: null,
       }
 
       return docRef.set(details)
@@ -1312,8 +1263,10 @@ export class FirebaseLivestreamRepository
    async updatePoll(
       livestreamId: string,
       pollId: string,
-      poll: Partial<Pick<LivestreamPoll, "options" | "question" | "state">>
+      poll: Pick<LivestreamPoll, "options" | "question" | "state">
    ): Promise<void> {
+      const { options, question, state } = poll
+
       const docRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -1321,12 +1274,12 @@ export class FirebaseLivestreamRepository
          .withConverter(createCompatGenericConverter<LivestreamPoll>())
          .doc(pollId)
 
-      const updateData: Partial<LivestreamPoll> = {
-         ...poll,
-         ...(poll.state === "closed" && {
-            closedAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
-         }),
-      }
+      const updateData: Pick<LivestreamPoll, "options" | "question" | "state"> =
+         {
+            ...(options && { options }),
+            ...(question && { question }),
+            ...(state && { state }),
+         }
 
       return docRef.update(updateData)
    }
@@ -1350,9 +1303,8 @@ export class FirebaseLivestreamRepository
       const batch = this.firestore.batch()
 
       currentPollsSnaps.docs.forEach((doc) => {
-         const updateData: Pick<LivestreamPoll, "state" | "closedAt"> = {
+         const updateData: Pick<LivestreamPoll, "state"> = {
             state: "closed",
-            closedAt: this.fieldValue.serverTimestamp() as unknown as Timestamp,
          }
          batch.update(doc.ref, updateData)
       })
@@ -1374,76 +1326,6 @@ export class FirebaseLivestreamRepository
          .doc(pollId)
 
       return docRef.delete()
-   }
-
-   async answerQuestion(
-      livestreamId: string,
-      questionId: string
-   ): Promise<void> {
-      const questionsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .withConverter(createCompatGenericConverter<LivestreamQuestion>())
-
-      const currentQuestionsRef = questionsRef.where("type", "==", "current")
-      const targetQuestionRef = questionsRef.doc(questionId)
-
-      const currentQuestionsSnaps = await currentQuestionsRef.get()
-
-      const batch = this.firestore.batch()
-
-      currentQuestionsSnaps.docs.forEach((doc) => {
-         const updateData: Pick<LivestreamQuestion, "type"> = {
-            type: "done",
-         }
-
-         batch.update(doc.ref, updateData)
-      })
-
-      const targetQuestionData: Pick<LivestreamQuestion, "type"> = {
-         type: "current",
-      }
-
-      batch.update(targetQuestionRef, targetQuestionData)
-
-      return batch.commit()
-   }
-
-   async resetAllQuestions(livestreamId: string): Promise<void> {
-      const questionsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .where("type", "!=", "done")
-         .withConverter(createCompatGenericConverter<LivestreamQuestion>())
-
-      const batch = this.firestore.batch()
-
-      const questionsSnaps = await questionsRef.get()
-
-      questionsSnaps.docs.forEach((doc) => {
-         const updateData: Pick<LivestreamQuestion, "type"> = {
-            type: "new",
-         }
-         batch.update(doc.ref, updateData)
-      })
-
-      return batch.commit()
-   }
-
-   resetQuestion(livestreamId: string, questionId: string): Promise<void> {
-      const questionsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("questions")
-         .doc(questionId)
-
-      const updateData: Pick<LivestreamQuestion, "type"> = {
-         type: "new",
-      }
-
-      return questionsRef.update(updateData)
    }
 }
 

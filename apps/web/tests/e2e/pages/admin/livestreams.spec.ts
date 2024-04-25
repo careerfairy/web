@@ -1,7 +1,7 @@
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 import { groupAdminFixture as test } from "../../fixtures"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
-test.skip("Group Admin Livestreams", () => {
+test.describe("Group Admin Livestreams", () => {
    // Only run those tests on chromium
    test.skip(({ browserName }) => browserName !== "chromium")
 

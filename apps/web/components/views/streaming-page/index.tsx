@@ -1,15 +1,15 @@
-import { CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamData } from "components/custom-hook/streaming/useLivestreamData"
 import { useConditionalRedirect } from "components/custom-hook/useConditionalRedirect"
 import { appendCurrentQueryParams } from "components/util/url"
 import { Fragment, useMemo } from "react"
+import { CircularProgress } from "@mui/material"
 import { getAgoraUserId } from "./util"
 
 import { useAuth } from "HOCs/AuthProvider"
+import { useRouter } from "next/router"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
-import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/viewer/WaitingRoom"
 
@@ -17,14 +17,6 @@ const SessionConflictModal = dynamic(
    () =>
       import("./components/SessionConflictModal").then(
          (mod) => mod.SessionConflictModal
-      ),
-   { ssr: false }
-)
-
-const SessionDisconnectedModal = dynamic(
-   () =>
-      import("./components/SessionDisconnectedModal").then(
-         (mod) => mod.SessionDisconnectedModal
       ),
    { ssr: false }
 )
@@ -131,14 +123,6 @@ const ViewerTrackers = dynamic(
    { ssr: false }
 )
 
-const OngoingPollTracker = dynamic(
-   () =>
-      import("./components/streaming/OngoingPollTracker").then(
-         (mod) => mod.OngoingPollTracker
-      ),
-   { ssr: false }
-)
-
 type Props = {
    isHost: boolean
 }
@@ -210,9 +194,7 @@ const Component = ({ isHost }: Props) => {
                         </AgoraDevicesProvider>
                         <AgoraTrackers />
                         {isHost ? null : <ViewerTrackers />}
-                        {isHost ? null : <OngoingPollTracker />}
                         <SessionConflictModal />
-                        <SessionDisconnectedModal />
                      </RTMSignalingProvider>
                   </StreamingProvider>
                </UserClientProvider>

@@ -1,7 +1,8 @@
+import { FC } from "react"
+import RemoveQuestion from "./RemoveQuestion"
 import { sxStyles } from "@careerfairy/shared-ui"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedDialog, { BrandedDialogProps } from "./BrandedDialog"
-import RemoveQuestion from "./RemoveQuestion"
 
 const styles = sxStyles({
    paper: {
@@ -11,14 +12,15 @@ const styles = sxStyles({
 })
 
 type FeedbackQuestionRemoveDialogProps = {
-   handleRemoveClick: () => void
+   question: object
 } & Omit<BrandedDialogProps, "children">
 
-const FeedbackQuestionRemoveDialog = ({
+const FeedbackQuestionRemoveDialog: FC<FeedbackQuestionRemoveDialogProps> = ({
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   question,
    isDialogOpen,
-   handleRemoveClick,
    handleCloseDialog,
-}: FeedbackQuestionRemoveDialogProps) => {
+}) => {
    const isMobile = useIsMobile()
 
    return (
@@ -27,10 +29,7 @@ const FeedbackQuestionRemoveDialog = ({
          handleCloseDialog={handleCloseDialog}
          paperSx={Boolean(!isMobile) && styles.paper}
       >
-         <RemoveQuestion
-            handleRemoveClick={handleRemoveClick}
-            handleCancelClick={handleCloseDialog}
-         />
+         <RemoveQuestion handleCancelClick={handleCloseDialog} />
       </BrandedDialog>
    )
 }

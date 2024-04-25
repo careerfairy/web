@@ -1,16 +1,16 @@
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import useGroupATSJobsAllIntegrations from "components/custom-hook/useGroupATSJobsAllIntegrations"
 import { useATSAccount } from "components/views/group/admin/ats-integration/ATSAccountContextProvider"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useMemo } from "react"
-import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { FC, useMemo } from "react"
 import MultiChipSelect from "../../general/components/MultiChipSelect"
+import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 type Props = {
    fieldId: string
 }
 
-const AtsJobSelector = ({ fieldId }: Props) => {
+const AtsJobSelector: FC<Props> = ({ fieldId }) => {
    const { group } = useGroup()
    const { atsAccount } = useATSAccount()
    const allJobs = useGroupATSJobsAllIntegrations([atsAccount])

@@ -11,9 +11,6 @@ import {
    EmptyDataCheckerForBulletChart,
    EmptyDataCheckerForPieChart,
 } from "./EmptyDataCheckers"
-import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
-import { LockedSparksAudienceTab } from "../components/LockedSparksAudienceTab"
-import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 
 const updateRelativePercentage = (data, maxValue) => {
    return data.map((item) => ({
@@ -28,15 +25,9 @@ type SparksAudienceTabProps = {
 
 const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
    const { group } = useGroup()
-   const planStatus = useGroupPlanIsValid(group.groupId, [
-      GroupPlanTypes.Tier2,
-      GroupPlanTypes.Tier3,
-   ])
-
    const { topCountries, topUniversities, topFieldsOfStudy, levelsOfStudy } =
       useSparksAnalytics(group.id)[timeFilter]
 
-   const shouldLockAudiences = !planStatus.valid
    /*
     * The calculations below scale the bars' values relative to the maximum
     * absolute value of the dataset. This creates a better user experience
@@ -64,9 +55,6 @@ const SparksAudienceTab: FC<SparksAudienceTabProps> = ({ timeFilter }) => {
       maxUniversityValue
    )
 
-   if (shouldLockAudiences) {
-      return <LockedSparksAudienceTab />
-   }
    return (
       <Grid container spacing={5} marginBottom={10} alignItems="stretch">
          <Grid item xs={12} md={6}>

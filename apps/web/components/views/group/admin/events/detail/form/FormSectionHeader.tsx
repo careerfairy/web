@@ -1,6 +1,6 @@
+import { FC, ReactNode } from "react"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Typography } from "@mui/material"
-import { ReactNode } from "react"
 
 const styles = sxStyles({
    sectionDivider: {
@@ -21,12 +21,12 @@ type FormSectionHeaderProps = {
    divider?: boolean
 }
 
-const FormSectionHeader = ({
+const FormSectionHeader: FC<FormSectionHeaderProps> = ({
    title,
    subtitle,
    actions,
    divider = false,
-}: FormSectionHeaderProps) => {
+}) => {
    return (
       <Stack
          direction={{ xs: "column", md: "row" }}

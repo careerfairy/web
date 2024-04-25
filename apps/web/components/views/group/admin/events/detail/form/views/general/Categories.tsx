@@ -1,20 +1,13 @@
 import FormSectionHeader from "../../FormSectionHeader"
-import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import MultiChipSelect from "./components/MultiChipSelect"
-
-const FIELD_NAME = "general.categories.values"
+import { useInterests } from "components/custom-hook/useCollection"
+import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 
 const Categories = () => {
    const {
       values: { general },
-      setFieldValue,
-      validateField,
    } = useLivestreamFormValues()
-
-   const onChangeHandler = async (_, selectedOptions) => {
-      await setFieldValue(FIELD_NAME, selectedOptions)
-      await validateField(FIELD_NAME)
-   }
+   const { data: existingInterests } = useInterests()
 
    return (
       <>
@@ -24,9 +17,9 @@ const Categories = () => {
             divider
          />
          <MultiChipSelect
-            id={FIELD_NAME}
-            value={general.categories.values}
-            options={general.categories.options}
+            id="general.categories"
+            options={existingInterests}
+            value={general.categories ?? []}
             multiple
             disableCloseOnSelect
             textFieldProps={{
@@ -35,8 +28,6 @@ const Categories = () => {
                   "Choose 5 categories that best describe this live stream",
                required: true,
             }}
-            onChange={onChangeHandler}
-            limit={5}
          />
       </>
    )

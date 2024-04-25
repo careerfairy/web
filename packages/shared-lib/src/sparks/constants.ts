@@ -48,9 +48,4 @@ export const SPARK_CONSTANTS = {
     * The number of seconds to auto-playing a spark video
     */
    SECONDS_TO_AUTO_PLAY: 5000,
-
-   /**
-    * Number of days for showing Sparks plan warning expiration.
-    */
-   SPARKS_NAV_TITLE_WARNING_PLAN_DAYS: 7,
 }
