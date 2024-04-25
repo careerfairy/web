@@ -103,8 +103,8 @@ export const hasMetadataChanged = (
 
    const industriesChanged = Boolean(
       getArrayDifference(
-         previousValue?.companyIndustries.map((industry) => industry.id),
-         currentValue?.companyIndustries.map((industry) => industry.id)
+         previousValue?.companyIndustries?.map((industry) => industry.id),
+         currentValue?.companyIndustries?.map((industry) => industry.id)
       ).length
    )
 
@@ -115,8 +115,8 @@ export const hasMetadataChanged = (
 
    const targetCountriesChanged = Boolean(
       getArrayDifference(
-         previousValue?.targetedCountries.map((country) => country.id),
-         currentValue?.targetedCountries.map((country) => country.id)
+         previousValue?.targetedCountries?.map((country) => country.id),
+         currentValue?.targetedCountries?.map((country) => country.id)
       ).length
    )
 
@@ -124,27 +124,28 @@ export const hasMetadataChanged = (
 
    const targetUniversitiesChanged = Boolean(
       getArrayDifference(
-         previousValue?.targetedUniversities.map((uni) => uni.id),
-         currentValue?.targetedUniversities.map((uni) => uni.id)
+         previousValue?.targetedUniversities?.map((uni) => uni.id),
+         currentValue?.targetedUniversities?.map((uni) => uni.id)
       ).length
    )
 
    console.log("🚀 ~ targetUniversitiesChanged:", targetUniversitiesChanged)
 
-   const targetFieldsOfStudiesChanged = Boolean(
-      getArrayDifference(
-         previousValue?.targetedFieldsOfStudy.map(
-            (fieldOfStudy) => fieldOfStudy.id
-         ),
-         currentValue?.targetedFieldsOfStudy.map(
-            (fieldOfStudy) => fieldOfStudy.id
-         )
-      ).length
+   const fieldsOfStudyDifferences = getArrayDifference(
+      previousValue?.targetedFieldsOfStudy?.map(
+         (fieldOfStudy) => fieldOfStudy.id
+      ),
+      currentValue?.targetedFieldsOfStudy?.map(
+         (fieldOfStudy) => fieldOfStudy.id
+      )
    )
-
+   const targetFieldsOfStudiesChanged = Boolean(fieldsOfStudyDifferences.length)
+   console.log("🚀 ~ fieldsOfStudyDifferences:", fieldsOfStudyDifferences)
    console.log(
       "🚀 ~ targetFieldsOfStudiesChanged:",
-      targetFieldsOfStudiesChanged
+      targetFieldsOfStudiesChanged,
+      currentValue?.targetedFieldsOfStudy,
+      previousValue?.targetedFieldsOfStudy
    )
 
    return (
