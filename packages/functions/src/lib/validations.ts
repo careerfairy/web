@@ -125,22 +125,7 @@ export function validateUserAuthNotExistent(
 }
 
 export function logAndThrow(message: string, ...context: any[]): never {
-   // Prepare the additional context for logging
-   const additionalContext = context?.map((item) => {
-      if (item instanceof Error) {
-         // Convert Error to a plain object including message and stack
-         return {
-            errorMessage: item.message,
-            errorStack: item.stack,
-         }
-      }
-      return item
-   })
-
-   // Ensure the last argument is a plain object for the jsonPayload, functions logger will not log the error object, it will just show an empty object
-   const logObject = { additionalContext }
-
-   functions.logger.error(message, logObject)
+   functions.logger.error(message, { ...context })
    throw new functions.https.HttpsError("failed-precondition", message)
 }
 

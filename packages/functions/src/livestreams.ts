@@ -9,7 +9,7 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { firestore } from "./api/firestoreAdmin"
+import { FieldValue, firestore } from "./api/firestoreAdmin"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { InferType, array, boolean, mixed, object, string } from "yup"
@@ -190,6 +190,39 @@ export const sendHybridEventRegistrationConfirmationEmail = functions
             return { status: 500, error: error }
          }
       )
+   })
+
+export const setFirstCommentOfQuestionOnCreate = functions
+   .region(config.region)
+   .firestore.document(
+      "livestreams/{livestream}/questions/{question}/comments/{comment}"
+   )
+   .onCreate(async (commentSnap) => {
+      try {
+         const commentData = commentSnap.data()
+         const questionRef = commentSnap.ref.parent.parent
+         const questionSnap = await questionRef.get()
+         if (questionSnap.exists) {
+            const questionData = questionSnap.data()
+            const questionDataToUpdate: any = {
+               numberOfComments: FieldValue.increment(1),
+            }
+            if (!questionData.firstComment) {
+               questionDataToUpdate.firstComment = commentData
+            }
+            const successMessage = questionData.firstComment
+               ? "Question already has first comment, only increment"
+               : `Updated question doc (${questionRef.path}) with new first comment`
+            await questionRef.update(questionDataToUpdate)
+            functions.logger.log(successMessage)
+         } else {
+            functions.logger.warn(
+               `The question (${questionRef.path}) does not exist for comment ${commentSnap.ref.path}`
+            )
+         }
+      } catch (e) {
+         functions.logger.error("error in setFirstCommentOfQuestionOnCreate", e)
+      }
    })
 
 export const notifySlackWhenALivestreamStarts = functions

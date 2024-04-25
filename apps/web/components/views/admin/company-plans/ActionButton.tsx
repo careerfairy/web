@@ -17,26 +17,19 @@ type Props = {
 }
 
 const ActionButton = ({ presenter, onClick }: Props) => {
-   const isNonTrialPlan = presenter.hasNonTrialPlan()
+   const isTier1 = presenter.plan?.type === GroupPlanTypes.Tier1
    const isTrial = presenter.plan?.type === GroupPlanTypes.Trial
 
    if (presenter.hasPlan()) {
-      if (presenter.hasPlanExpired()) {
-         return (
-            <LoadingButton onClick={onClick} variant="contained" fullWidth>
-               {isTrial ? "Upgrade" : "Update"} plan
-            </LoadingButton>
-         )
-      }
       if (isTrial) {
          return (
             <LoadingButton onClick={onClick} variant="contained" fullWidth>
-               Upgrade plan
+               Upgrade to full Sparks
             </LoadingButton>
          )
       }
 
-      if (isNonTrialPlan) {
+      if (isTier1) {
          return (
             <Button
                sx={styles.sparksMemberBtn}

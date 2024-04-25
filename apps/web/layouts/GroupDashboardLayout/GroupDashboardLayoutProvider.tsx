@@ -6,9 +6,9 @@ import {
    useMemo,
    useReducer,
 } from "react"
+import TopBar from "./TopBar"
 import AdminGenericLayout from "../AdminGenericLayout"
 import NavBar from "./NavBar"
-import TopBar from "./TopBar"
 
 type IGroupDashboardState = {
    layout: {
@@ -70,7 +70,6 @@ type Props = {
    children: ReactNode
    titleComponent: ReactNode
    topBarCta?: ReactNode
-   topBarMobileCta?: ReactNode
    topBarNavigation?: ReactNode
    bottomBarNavigation?: ReactNode
    backgroundColor?: string
@@ -87,7 +86,6 @@ const GroupDashboardLayoutProvider = ({
    children,
    titleComponent,
    topBarCta,
-   topBarMobileCta,
    topBarNavigation,
    bottomBarNavigation,
    backgroundColor,
@@ -127,7 +125,6 @@ const GroupDashboardLayoutProvider = ({
             headerContent={
                <TopBar
                   cta={topBarCta}
-                  mobileCta={topBarMobileCta}
                   navigation={topBarNavigation}
                   title={titleComponent}
                />

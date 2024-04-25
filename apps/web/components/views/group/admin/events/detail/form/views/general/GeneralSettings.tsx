@@ -1,29 +1,12 @@
-import { sxStyles } from "@careerfairy/shared-ui"
-import { Grid, Stack } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
-import { useLivestreamCreationContext } from "../../../LivestreamCreationContext"
+import { Grid } from "@mui/material"
 import FormSectionHeader from "../../FormSectionHeader"
-import BannerImageSelect from "./components/BannerImageSelect"
-import EstimatedDurationSelect from "./components/EstimatedDurationSelect"
 import LanguageSelect from "./components/LanguageSelect"
-import LogoUploader from "./components/LogoUploader"
-import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import BannerImageSelect from "./components/BannerImageSelect"
 import StartDateTimePicker from "./components/StartDateTimePicker"
-
-const styles = sxStyles({
-   logoAndBannerWrapper: {
-      display: "grid",
-   },
-   logoAndBannerWrapperDesktop: {
-      gridTemplateColumns: "0.19fr 1fr",
-      columnGap: "16px",
-   },
-   logoAndBannerWrapperMobile: {
-      gridTemplateRows: "156px 1fr",
-      rowGap: "16px",
-   },
-})
+import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
+import EstimatedDurationSelect from "./components/EstimatedDurationSelect"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 
 const SUMMARY_PLACEHOLDER = `Describe your live stream
   • [Company] is one of the leading companies in the [industry]. We have [XYZ] employees globally...
@@ -32,7 +15,6 @@ const SUMMARY_PLACEHOLDER = `Describe your live stream
 
 const GeneralSettings = () => {
    const isMobile = useIsMobile()
-   const { isCohostedEvent } = useLivestreamCreationContext()
 
    return (
       <>
@@ -47,21 +29,7 @@ const GeneralSettings = () => {
             placeholder="Insert your live stream title"
             requiredText="(required)"
          />
-         {isCohostedEvent ? (
-            <Stack
-               sx={[
-                  styles.logoAndBannerWrapper,
-                  isMobile
-                     ? styles.logoAndBannerWrapperMobile
-                     : styles.logoAndBannerWrapperDesktop,
-               ]}
-            >
-               <LogoUploader />
-               <BannerImageSelect />
-            </Stack>
-         ) : (
-            <BannerImageSelect />
-         )}
+         <BannerImageSelect />
          <Grid container columnSpacing={2} rowSpacing={isMobile ? 2 : null}>
             <Grid item xs={12} md={4}>
                <StartDateTimePicker />
@@ -73,16 +41,6 @@ const GeneralSettings = () => {
                <LanguageSelect />
             </Grid>
          </Grid>
-         {Boolean(isCohostedEvent) && (
-            <FormBrandedTextField
-               name="general.company"
-               label="Company name"
-               placeholder="Company name"
-               requiredText="(required)"
-               inputProps={{ maxLength: 70 }}
-               helperText="This will be shown on the livestream page"
-            />
-         )}
          <FormBrandedTextField
             name="general.summary"
             label="What is the live stream about?"

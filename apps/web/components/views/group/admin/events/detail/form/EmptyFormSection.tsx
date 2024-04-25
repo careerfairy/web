@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { ReactNode } from "react"
+import { FC, ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -26,7 +26,11 @@ type EmptyFormSectionProps = {
    caption: string
 }
 
-const EmptyFormSection = ({ icon, title, caption }: EmptyFormSectionProps) => {
+const EmptyFormSection: FC<EmptyFormSectionProps> = ({
+   icon,
+   title,
+   caption,
+}) => {
    return (
       <Box sx={styles.wrap}>
          <Stack spacing={2} sx={styles.content}>

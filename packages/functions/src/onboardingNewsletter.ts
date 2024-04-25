@@ -23,7 +23,7 @@ const runtimeSettings: RuntimeOptions = {
    memory: "4GB",
 }
 
-const ITEMS_PER_BATCH = 250
+const ITEMS_PER_BATCH = 450
 /**
  * Check and send onboarding newsletter everyday at a specific time
  */
@@ -77,7 +77,7 @@ export const manualOnboardingNewsletter = functions
    })
 
 async function sendOnboardingNewsletter(overrideUsers?: string[]) {
-   functions.logger.info("sendOnboardingNewsletter ~ V3 ")
+   functions.logger.info("sendOnboardingNewsletter ~ V2 ")
    const dataLoader = await NewsletterDataFetcher.create()
    let allSubscribedUsers = await userRepo.getSubscribedUsersEarlierThan(
       overrideUsers,

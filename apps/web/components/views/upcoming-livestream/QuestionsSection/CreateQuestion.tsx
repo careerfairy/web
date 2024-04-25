@@ -5,6 +5,7 @@ import {
    maxQuestionLength,
    minQuestionLength,
 } from "@careerfairy/shared-lib/constants/forms"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
@@ -16,7 +17,6 @@ import {
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
-import { livestreamService } from "data/firebase/LivestreamService"
 
 const styles = {
    root: {
@@ -30,6 +30,7 @@ type Props = {
    onQuestionAdded: (question: LivestreamQuestion) => void
 }
 const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
+   const { createLivestreamQuestion } = useFirebaseService()
    const { authenticatedUser, userData, userPresenter, isLoggedIn } = useAuth()
    const dispatch = useDispatch()
    const { replace, asPath } = useRouter()
@@ -53,13 +54,12 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
             })
          }
          try {
-            const newlyCreatedQuestion = await livestreamService.createQuestion(
-               livestreamService.getLivestreamRef(livestream.id),
+            const newlyCreatedQuestion = await createLivestreamQuestion(
+               livestream.id,
                {
                   title: values.questionTitle,
-                  author: authenticatedUser.uid,
+                  author: authenticatedUser.email,
                   displayName: userPresenter?.getDisplayName?.() || null,
-                  badges: [],
                }
             )
 

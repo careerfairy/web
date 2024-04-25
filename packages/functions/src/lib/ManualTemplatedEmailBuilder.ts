@@ -23,10 +23,10 @@ export class ManualTemplatedEmailBuilder {
          To: email,
          TemplateId: Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL),
          TemplateModel: {
-            firstName: name,
+            name,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "aab-talent-pool",
+         Tag: "sparks-release",
       })
    }
 

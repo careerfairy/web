@@ -1,7 +1,8 @@
-import Switch, { SwitchProps } from "@mui/material/Switch"
-import { styled } from "@mui/material/styles"
-import { useField } from "formik"
 import { FC } from "react"
+import * as React from "react"
+import { styled } from "@mui/material/styles"
+import Switch, { SwitchProps } from "@mui/material/Switch"
+import { useField } from "formik"
 
 const BrandedSwitch = styled((props: SwitchProps) => (
    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />

@@ -1,14 +1,3 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-   GroupOption,
-   GroupQuestion,
-} from "@careerfairy/shared-lib/groups"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
-import { CircularProgress, Typography } from "@mui/material"
-import { useRouter } from "next/router"
 import React, {
    createContext,
    FC,
@@ -18,16 +7,27 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { isEmpty, isLoaded } from "react-redux-firebase"
-import { useSessionStorage } from "react-use"
-import useAdminGroup from "../../components/custom-hook/useAdminGroup"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
-import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
-import { groupRepo } from "../../data/RepositoryInstances"
-import GroupsUtil from "../../data/util/GroupsUtil"
+import { useRouter } from "next/router"
 import { useAuth } from "../../HOCs/AuthProvider"
+import { isEmpty, isLoaded } from "react-redux-firebase"
+import useAdminGroup from "../../components/custom-hook/useAdminGroup"
+import { CircularProgress, Typography } from "@mui/material"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+   GroupOption,
+   GroupQuestion,
+} from "@careerfairy/shared-lib/groups"
+import GroupsUtil from "../../data/util/GroupsUtil"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { groupRepo } from "../../data/RepositoryInstances"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
+import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 import { useLivestreamDialog } from "./useLivestreamDialog"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
+import { useSessionStorage } from "react-use"
 
 /**
  * The shrunk state of the left menu
@@ -70,7 +70,6 @@ type GroupDashboardLayoutProps = {
    titleComponent: React.ReactNode
    children: React.ReactNode
    topBarCta?: React.ReactNode
-   topBarMobileCta?: React.ReactNode
    topBarNavigation?: React.ReactNode
    bottomBarNavigation?: React.ReactNode
    backgroundColor?: string
@@ -225,7 +224,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider
                topBarCta={props.topBarCta}
-               topBarMobileCta={props.topBarMobileCta}
                topBarNavigation={props.topBarNavigation}
                bottomBarNavigation={props.bottomBarNavigation}
                titleComponent={titleComponent}

@@ -1,18 +1,14 @@
-import {
-   Group,
-   GroupAdmin,
-   GroupPlanTypes,
-} from "@careerfairy/shared-lib/groups"
+import { Group, GroupAdmin } from "@careerfairy/shared-lib/groups"
 import { IEmailNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
-import { EmailNotificationDetails } from "@careerfairy/shared-lib/notifications/notifications"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { IGroupFunctionsRepository } from "src/lib/GroupFunctionsRepository"
 import {
    SparkTrialEndEmailBuilder,
    SparksEndOfTrialData,
 } from "../sparks/SparksTrialEndEmailBuilder"
+import { EmailNotificationDetails } from "@careerfairy/shared-lib/notifications/notifications"
+import { getHost } from "@careerfairy/shared-lib/utils/urls"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 const SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS = 7
 
@@ -53,7 +49,7 @@ export class TrialService {
       this.logger.info(" - ignore groups: ", ignoreGroups)
 
       this.groups = await this.groupRepo.getAllGroupsWithAPlanExpiring(
-         [GroupPlanTypes.Trial],
+         "trial",
          SPARKS_TRIAL_EXPIRE_NOTIFICATION_DAYS,
          this.logger,
          ignoreGroups
@@ -149,7 +145,7 @@ export class TrialService {
       const link = `${getHost()}/group/${admin.groupId}/admin/sparks`
 
       return {
-         user_name: admin.firstName,
+         user_name: admin.displayName,
          groupId: admin.groupId,
          company_sparks_link: addUtmTagsToLink({
             link,

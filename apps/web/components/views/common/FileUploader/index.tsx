@@ -1,10 +1,10 @@
-import { Box } from "@mui/material"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
-import { SxProps } from "@mui/system"
-import React, { SyntheticEvent, useEffect, useRef } from "react"
-import { combineStyles, sxStyles } from "../../../../types/commonTypes"
+import React, { useEffect, useRef } from "react"
 import useDragging from "./useDragging"
 import { acceptedExt, checkType, getFileSizeMB } from "./utils"
+import { Box } from "@mui/material"
+import { combineStyles, sxStyles } from "../../../../types/commonTypes"
+import { SxProps } from "@mui/system"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 const styles = sxStyles({
    root: {
@@ -43,7 +43,6 @@ export type FileUploaderProps = {
    onCustomError?: (message: string) => void
    onDrop?: (file: File | Array<File>) => void
    onSelect?: (file: File | Array<File>) => void
-   onCancel?: (event: Event) => void
    handleChange?: (fileOrFiles: Array<File> | File) => void
    onDraggingStateChange?: (dragging: boolean) => void
    customValidations?: ValidationObject[]
@@ -75,15 +74,9 @@ const FileUploader: React.FC<FileUploaderProps> = (
       required,
       onDraggingStateChange,
       sx,
-      onCancel,
    } = props
    const labelRef = useRef<HTMLLabelElement>(null)
    const inputRef = useRef<HTMLInputElement>(null)
-   if (onCancel) {
-      inputRef.current?.addEventListener("cancel", (e) => {
-         onCancel(e)
-      })
-   }
 
    const validateFile = async (file: File) => {
       const extension: string = file.name.split(".").pop() as string
@@ -162,11 +155,11 @@ const FileUploader: React.FC<FileUploaderProps> = (
       return false
    }
 
-   const blockEvent = (ev: SyntheticEvent) => {
+   const blockEvent = (ev: any) => {
       ev.preventDefault()
       ev.stopPropagation()
    }
-   const handleClick = (ev: SyntheticEvent) => {
+   const handleClick = (ev: any) => {
       ev.stopPropagation()
       // eslint-disable-next-line no-param-reassign
       if (inputRef && inputRef.current) {
@@ -174,7 +167,6 @@ const FileUploader: React.FC<FileUploaderProps> = (
       }
    }
 
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const handleInputChange = async (ev: any) => {
       const allFiles = ev.target.files
       const files = multiple ? allFiles : allFiles[0]
@@ -195,8 +187,9 @@ const FileUploader: React.FC<FileUploaderProps> = (
    }, [dragging])
 
    useEffect(() => {
-      if (!fileOrFiles && inputRef.current) {
-         inputRef.current.value = ""
+      if (fileOrFiles) {
+      } else {
+         if (inputRef.current) inputRef.current.value = ""
       }
    }, [fileOrFiles])
 
