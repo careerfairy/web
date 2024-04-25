@@ -48,7 +48,7 @@ const styles = sxStyles({
 
    count: {
       mt: "auto !important",
-      mb: "4px !important",
+      mb: "3px !important",
       lineHeight: "16px",
    },
 })
@@ -119,6 +119,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
             value={QuestionTab.UPCOMING}
             {...swipeableTabA11yProps(0)}
             sx={styles.tab}
+            disableTouchRipple
          />
          <Tab
             label={
@@ -131,6 +132,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
                   )}
                </Stack>
             }
+            disableTouchRipple
             value={QuestionTab.ANSWERED}
             {...swipeableTabA11yProps(1)}
             sx={styles.tab}
