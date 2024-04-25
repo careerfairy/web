@@ -1,46 +1,46 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import MaterialTable, {
-   MTableAction,
-   Column,
-   Options,
    Action,
+   Column,
+   MTableAction,
+   Options,
 } from "@material-table/core"
+import AddBoxIcon from "@mui/icons-material/AddBox"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditIcon from "@mui/icons-material/Edit"
+import DraftLinkIcon from "@mui/icons-material/Link"
+import PublishIcon from "@mui/icons-material/Publish"
+import GetStreamerLinksIcon from "@mui/icons-material/Share"
+import { Box, CircularProgress } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
+import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
+import { useRouter } from "next/router"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useDispatch } from "react-redux"
+import * as storeActions from "store/actions"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 import {
    copyStringToClipboard,
    getBaseUrl,
    getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/Delete"
-import Speakers from "./Speakers"
-import CompanyLogo from "./CompanyLogo"
-import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
-import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
-import GetStreamerLinksIcon from "@mui/icons-material/Share"
-import PublishIcon from "@mui/icons-material/Publish"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { Box, CircularProgress } from "@mui/material"
-import { useDispatch } from "react-redux"
-import DraftLinkIcon from "@mui/icons-material/Link"
-import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
 import PdfReportDownloadDialog from "../PdfReportDownloadDialog"
-import GroupLogos from "./GroupLogos"
-import AddBoxIcon from "@mui/icons-material/AddBox"
 import ToolbarActionsDialog from "../ToolbarActionsDialog"
-import { useTheme } from "@mui/material/styles"
-import * as storeActions from "store/actions"
-import ManageStreamActions from "./ManageStreamActions"
-import ToolbarDialogAction from "./ToolbarDialogAction"
-import { useRouter } from "next/router"
-import MoreOptionsMenu from "./MoreOptionsMenu"
+import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
+import CompanyLogo from "./CompanyLogo"
+import GroupLogos from "./GroupLogos"
 import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import ManageStreamActions from "./ManageStreamActions"
+import MoreOptionsMenu from "./MoreOptionsMenu"
+import Speakers from "./Speakers"
+import ToolbarDialogAction from "./ToolbarDialogAction"
 
 interface Props {
    streams: LivestreamEvent[]
@@ -233,23 +233,27 @@ const EventsTable = ({
 
    const manageStreamActions = useCallback(
       (rowData) => {
-         const editLivestreamInV2FlowOption = {
+         const editLivestreamLegacyDialogOption = {
             icon: <EditIcon color="action" />,
-            tooltip: "Edit Event V2",
-            onClick: () => handleEditStreamV2(group.groupId, rowData.id),
-            hintTitle: "Edit live stream in new flow",
+            tooltip: isDraft
+               ? "Edit Draft Event (Legacy)"
+               : "Edit Event (Legacy)",
+            onClick: () => handleEditStream(rowData),
+            hintTitle: isDraft
+               ? "Edit Draft Event (Legacy)"
+               : "Edit Event (Legacy)",
             hintDescription:
-               "Edit the details of the event like the start date and speakers in the new flow.",
+               "Edit the details of the event like the start date and speakers.",
          }
 
          const result = [
             {
                icon: <EditIcon color="action" />,
-               tooltip: isDraft ? "Edit Draft Event" : "Edit Event",
-               onClick: () => handleEditStream(rowData),
-               hintTitle: isDraft ? "Edit Draft Event" : "Edit Event",
+               tooltip: "Edit Event",
+               onClick: () => handleEditStreamV2(group.groupId, rowData.id),
+               hintTitle: "Edit live stream in new flow",
                hintDescription:
-                  "Edit the details of the event like the start date and speakers.",
+                  "Edit the details of the event like the start date and speakers in the new flow.",
             },
             pdfReportAction(rowData),
             registeredStudentsAction(rowData),
@@ -319,8 +323,8 @@ const EventsTable = ({
             },
          ]
 
-         if (featureFlags.livestreamCreationFlowV2)
-            return [editLivestreamInV2FlowOption, ...result]
+         if (!featureFlags.livestreamCreationFlowV2)
+            return [editLivestreamLegacyDialogOption, ...result]
 
          return result
       },

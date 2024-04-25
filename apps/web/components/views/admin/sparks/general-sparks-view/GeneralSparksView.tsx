@@ -6,6 +6,8 @@ import CreatorSparksCollection from "./CreatorSparksCollection"
 import HeaderActions from "./header/HeaderActions"
 import SparksProgressIndicator from "./header/SparksProgressIndicator"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import SparksPlanBanner from "./plans-banner/SparksPlanBanner"
 
 const styles = sxStyles({
    creatorSparksCollectionContainer: {
@@ -14,14 +16,22 @@ const styles = sxStyles({
 })
 
 const GeneralSparksView: FC = () => {
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
+   const planDays = groupPresenter.getPlanDaysLeft()
+   const planExpired = groupPresenter.hasPlanExpired()
+
    return (
       <Stack pb={4} alignItems="center" spacing={4.125}>
-         {group.publicSparks ? null : (
+         <SparksPlanBanner
+            planDays={planDays}
+            showDayOne={planDays < 1}
+            showDaySeven={planDays > 0 && planDays <= 7}
+         />
+         <ConditionalWrapper condition={!planExpired && !group.publicSparks}>
             <SparksContainer>
                <SparksProgressIndicator />
             </SparksContainer>
-         )}
+         </ConditionalWrapper>
          <SparksContainer>
             <HeaderActions />
          </SparksContainer>

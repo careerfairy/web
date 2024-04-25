@@ -12,6 +12,12 @@ import {
    UpdateLivestreamPollRequest,
    DeleteLivestreamPollRequest,
    MarkLivestreamPollAsCurrentRequest,
+   LivestreamPollVoter,
+   ResetLivestreamQuestionRequest,
+   MarkLivestreamQuestionAsCurrentRequest,
+   LivestreamQuestion,
+   LivestreamQuestionComment,
+   hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { Functions, httpsCallable } from "firebase/functions"
 import { mapFromServerSide } from "util/serverUtil"
@@ -29,8 +35,11 @@ import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/vi
 import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
+   DocumentReference,
+   PartialWithFieldValue,
    Timestamp,
    UpdateData,
+   arrayRemove,
    arrayUnion,
    collection,
    collectionGroup,
@@ -38,6 +47,7 @@ import {
    documentId,
    getDoc,
    getDocs,
+   increment,
    limit,
    query,
    runTransaction,
@@ -320,10 +330,20 @@ export class LivestreamService {
       )
    }
 
-   private getLivestreamRef(livestreamId: string) {
-      return doc(FirestoreInstance, "livestreams", livestreamId).withConverter(
-         createGenericConverter<LivestreamEvent>()
-      )
+   /**
+    * Gets a Firestore document reference for a livestream or its breakout room.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param breakoutRoomId - Optional ID of the breakout room.
+    * @returns Firestore document reference.
+    */
+   getLivestreamRef(livestreamId: string, breakoutRoomId?: string) {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         ...(breakoutRoomId ? ["breakoutRooms", breakoutRoomId] : [])
+      ).withConverter(createGenericConverter<LivestreamEvent>())
    }
 
    private getUserLivestreamDataRef(livestreamId: string, userEmail: string) {
@@ -594,6 +614,281 @@ export class LivestreamService {
          "markPollAsCurrent"
       )(options)
       return
+   }
+
+   async votePollOption(
+      livestreamId: string,
+      pollId: string,
+      optionId: string,
+      userIdentifier: string
+   ) {
+      const optionRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "polls",
+         pollId,
+         "voters",
+         userIdentifier
+      ).withConverter(createGenericConverter<LivestreamPollVoter>())
+
+      setDoc(
+         optionRef,
+         {
+            id: optionRef.id,
+            optionId,
+            timestamp: Timestamp.now(),
+            userId: userIdentifier,
+         },
+         { merge: true }
+      )
+   }
+
+   /**
+    * Resets a question or all questions for a livestream
+    */
+   async resetQuestion(options: ResetLivestreamQuestionRequest) {
+      await httpsCallable<ResetLivestreamQuestionRequest>(
+         this.functions,
+         "resetQuestion"
+      )(options)
+   }
+
+   /**
+    * Marks a question as the current one being answered
+    */
+   async markQuestionAsCurrent(
+      options: MarkLivestreamQuestionAsCurrentRequest
+   ) {
+      await httpsCallable<MarkLivestreamQuestionAsCurrentRequest>(
+         this.functions,
+         "markQuestionAsCurrent"
+      )(options)
+   }
+
+   /**
+    * Deletes a question from a livestream along with all its comments
+    * @param livestreamRef - Livestream document reference
+    * @param questionId - Question ID
+    */
+   deleteQuestion = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string
+   ) => {
+      const batch = writeBatch(FirestoreInstance)
+      const ref = this.getQuestionRef(livestreamRef, questionId)
+
+      const commentsRef = collection(ref, "comments")
+      const comments = await getDocs(commentsRef)
+
+      comments.forEach((comment) => {
+         batch.delete(comment.ref)
+      })
+
+      batch.delete(ref)
+
+      return batch.commit()
+   }
+
+   /**
+    * Deletes a comment from a question
+    * @param options - Options
+    */
+   deleteQuestionComment = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string,
+      commentId: string
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const ref = this.getCommentRef(livestreamRef, questionId, commentId)
+
+         const questionRef = this.getQuestionRef(livestreamRef, questionId)
+
+         const questionDoc = await transaction.get(questionRef)
+         const commentDoc = await transaction.get(ref)
+
+         if (!commentDoc.exists()) {
+            throw new Error("Comment does not exist")
+         }
+
+         if (questionDoc.exists()) {
+            const firstComment = questionDoc.data().firstComment
+            transaction.update(questionRef, {
+               numberOfComments: increment(-1),
+               ...(firstComment?.id === commentId
+                  ? { firstComment: null }
+                  : {}),
+            })
+         }
+
+         transaction.delete(ref)
+      })
+   }
+
+   /**
+    * Retrieves or creates a Firestore document reference for a question within a livestream or breakout room.
+    * @param livestreamRef - Reference to the livestream/breakout room document.
+    * @param questionId - Question ID
+    * @returns Document reference for the question.
+    */
+   private getQuestionRef(
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string
+   ) {
+      return doc(
+         collection(livestreamRef, "questions"),
+         questionId
+      ).withConverter(createGenericConverter<LivestreamQuestion>())
+   }
+
+   /**
+    * Get a comment reference to a question from a livestream or breakout room
+    * @param livestreamRef - Reference to the livestream/breakout room document
+    * @param questionId - Question ID
+    * @param commentId - Comment ID
+    * @returns Document reference for the comment
+    */
+   private getCommentRef(
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string,
+      commentId: string
+   ) {
+      const questionRef = this.getQuestionRef(livestreamRef, questionId)
+      return doc(collection(questionRef, "comments"), commentId).withConverter(
+         createGenericConverter<LivestreamQuestionComment>()
+      )
+   }
+
+   /**
+    * Creates a question in a livestream or breakout room.
+    * @param livestreamRef - Livestream document reference.
+    * @param options - Question options.
+    * @returns A promise resolved with the result of the create operation.
+    */
+   createQuestion = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      options: Pick<
+         LivestreamQuestion,
+         "title" | "displayName" | "author" | "badges"
+      >
+   ) => {
+      const newQuestionRef = doc(
+         collection(livestreamRef, "questions")
+      ).withConverter(createGenericConverter<LivestreamQuestion>())
+
+      const newQuestion = {
+         id: newQuestionRef.id,
+         badges: options.badges,
+         title: options.title,
+         displayName: options.displayName,
+         author: options.author,
+         timestamp: Timestamp.now(),
+         voterIds: [],
+         emailOfVoters: [],
+         numberOfComments: 0,
+         votes: 0,
+         firstComment: null,
+         type: "new",
+      } satisfies PartialWithFieldValue<LivestreamQuestion>
+
+      await setDoc(newQuestionRef, newQuestion)
+
+      return newQuestion
+   }
+
+   /**
+    * Toggles the upvote status of a question.
+    * @param livestreamRef - Livestream document reference.
+    * @param questionId - Question ID.
+    * @param args - User identifiers (email and uid)
+    * @returns A promise resolved with the result of the toggle operation.
+    */
+   toggleUpvoteQuestion = async (
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string,
+      args: { email: string; uid: string }
+   ) => {
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const questionRef = this.getQuestionRef(livestreamRef, questionId)
+
+         const questionDoc = await transaction.get(questionRef)
+
+         if (questionDoc.exists()) {
+            const question = questionDoc.data()
+
+            const hasUpvoted = hasUpvotedLivestreamQuestion(question, args)
+
+            if (hasUpvoted) {
+               transaction.update(questionRef, {
+                  votes: increment(-1),
+                  voterIds: arrayRemove(args.uid),
+                  // Take the chance to remove the user's email from deprecated emailOfVoters
+                  emailOfVoters: arrayRemove(args.email),
+               })
+               return "downvoted"
+            } else {
+               // We no longer want to store the user's email
+               transaction.update(questionRef, {
+                  votes: increment(1),
+                  voterIds: arrayUnion(args.uid),
+               })
+               return "upvoted"
+            }
+         } else {
+            throw new Error("Question does not exist")
+         }
+      })
+   }
+
+   /**
+    * Adds a comment to a question.
+    * @param livestreamRef - Livestream document reference.
+    * @param questionId - Question ID.
+    * @param data - New comment data.
+    * @returns A promise resolved with the result of the comment operation.
+    */
+   async commentOnQuestion(
+      livestreamRef: DocumentReference<LivestreamEvent>,
+      questionId: string,
+      data: Pick<
+         LivestreamQuestionComment,
+         "title" | "author" | "userUid" | "agoraUserId" | "authorType"
+      >
+   ) {
+      const questionRef = this.getQuestionRef(livestreamRef, questionId)
+
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const questionDoc = await transaction.get(questionRef)
+
+         const newCommentRef = doc(
+            collection(questionRef, "comments")
+         ).withConverter(createGenericConverter<LivestreamQuestionComment>())
+
+         if (questionDoc.exists()) {
+            const question = questionDoc.data()
+
+            const newComment: LivestreamQuestionComment = {
+               id: newCommentRef.id,
+               title: data.title,
+               author: data.author,
+               userUid: data.userUid || "",
+               agoraUserId: data.agoraUserId || "",
+               authorType: data.authorType,
+               timestamp: Timestamp.now(),
+            }
+
+            transaction.update(questionRef, {
+               numberOfComments: increment(1),
+               ...(question.firstComment ? {} : { firstComment: newComment }),
+            })
+
+            transaction.set(newCommentRef, newComment)
+         } else {
+            throw new Error(
+               `Question ${questionId} does not exist at path ${questionRef.path}`
+            )
+         }
+      })
    }
 }
 

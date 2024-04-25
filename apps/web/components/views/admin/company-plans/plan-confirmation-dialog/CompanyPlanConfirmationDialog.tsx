@@ -7,10 +7,13 @@ import SteppedDialog, {
 } from "components/views/stepped-dialog/SteppedDialog"
 import React, { createContext, useCallback, useMemo } from "react"
 import SelectPlanView from "./SelectPlanView"
-import ConfirmSparksPlanView from "./ConfirmSparksPlanView"
-import ConfirmSparksTrialView from "./ConfirmSparksTrialView"
 import SuccessView from "./SuccessView"
 import { useStartPlanMutation } from "./useStartPlanMutation"
+import ConfirmPlanView from "./ConfirmPlanView"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 
 type Props = {
    open: boolean
@@ -20,8 +23,10 @@ type Props = {
 
 export const PlanConfirmationDialogKeys = {
    SelectPlan: "select-plan",
-   ConfirmSparksPlan: "confirm-sparks-plan",
    ConfirmSparksTrial: "confirm-sparks-trial",
+   ConfirmTier1Plan: "confirm-tier1-plan",
+   ConfirmTier2Plan: "confirm-tier2-plan",
+   ConfirmTier3Plan: "confirm-tier3-plan",
    Success: "success",
 } as const
 
@@ -31,12 +36,40 @@ const views = [
       Component: SelectPlanView,
    },
    {
-      key: PlanConfirmationDialogKeys.ConfirmSparksPlan,
-      Component: ConfirmSparksPlanView,
+      key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Trial}
+            icon={<TrialPlanIcon />}
+         />
+      ),
    },
    {
-      key: PlanConfirmationDialogKeys.ConfirmSparksTrial,
-      Component: ConfirmSparksTrialView,
+      key: PlanConfirmationDialogKeys.ConfirmTier1Plan,
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier1}
+            icon={<EssentialPlanIcon />}
+         />
+      ),
+   },
+   {
+      key: PlanConfirmationDialogKeys.ConfirmTier2Plan,
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier2}
+            icon={<AdvancedPlanIcon />}
+         />
+      ),
+   },
+   {
+      key: PlanConfirmationDialogKeys.ConfirmTier3Plan,
+      Component: () => (
+         <ConfirmPlanView
+            plan={GroupPlanTypes.Tier3}
+            icon={<PremiumPlanIcon />}
+         />
+      ),
    },
    {
       key: PlanConfirmationDialogKeys.Success,
@@ -114,7 +147,7 @@ const CompanyPlanConfirmationDialog = ({
 }
 
 const getInitialStep = (groupToManage: GroupPresenter) => {
-   if (!groupToManage.hasPlan()) {
+   if (!groupToManage.hasPlan() || groupToManage.hasPlanExpired()) {
       return views.findIndex(
          (view) => view.key === PlanConfirmationDialogKeys.SelectPlan
       )
@@ -122,7 +155,7 @@ const getInitialStep = (groupToManage: GroupPresenter) => {
 
    if (groupToManage.plan.type === GroupPlanTypes.Trial) {
       return views.findIndex(
-         (view) => view.key === PlanConfirmationDialogKeys.ConfirmSparksPlan
+         (view) => view.key === PlanConfirmationDialogKeys.SelectPlan
       )
    }
 

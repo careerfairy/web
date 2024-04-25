@@ -1,3 +1,5 @@
+import { ConnectionState } from "agora-rtc-react"
+
 export const STREAM_IDENTIFIERS = {
    /** If an agora UID starts with this, it is a recording */
    RECORDING: "recording",
@@ -13,3 +15,11 @@ export const STREAM_IDENTIFIERS = {
 
 export type StreamIdentifier =
    (typeof STREAM_IDENTIFIERS)[keyof typeof STREAM_IDENTIFIERS]
+
+export const ConnectionStates: Record<ConnectionState, ConnectionState> = {
+   CONNECTED: "CONNECTED",
+   CONNECTING: "CONNECTING",
+   RECONNECTING: "RECONNECTING",
+   DISCONNECTED: "DISCONNECTED",
+   DISCONNECTING: "DISCONNECTING",
+}
