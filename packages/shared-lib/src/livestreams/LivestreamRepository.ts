@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { OrderByDirection } from "firebase/firestore"
 import BaseFirebaseRepository, {
+   DocRef,
    createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
@@ -9,6 +10,7 @@ import { Job, JobIdentifier } from "../ats/Job"
 import { Create, ImageType } from "../commonTypes"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
+import { Group } from "../groups"
 import { UserPublicData } from "../users"
 import { chunkArray, containsAny } from "../utils"
 import {
@@ -28,6 +30,7 @@ import {
    UserParticipatingStats,
    getEarliestEventBufferTime,
 } from "./livestreams"
+import { getMetaDataFromEventHosts } from "./metadata"
 import {
    LiveStreamStats,
    LivestreamStatsToUpdate,
@@ -351,6 +354,13 @@ export interface ILivestreamRepository {
     * @param livestreamId - The ID of the livestream
     */
    resetAllQuestions(livestreamId: string): Promise<void>
+
+   /**
+    * Synchs metadata to be cascaded to the livestream.
+    * @param groupId Group ID, used mainly because it group.id might be empty
+    * @param group Group object containing details about the company
+    */
+   syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -1468,6 +1478,52 @@ export class FirebaseLivestreamRepository
       }
 
       return questionsRef.update(updateData)
+   }
+
+   async syncLivestreamMetadata(groupId: string, group: Group): Promise<void> {
+      const query = this.eventsOfGroupQuery(groupId)
+
+      const snapshots = await query.get()
+
+      const livestreamsWithRef = mapFirestoreDocuments(
+         snapshots,
+         true
+      ) as DocRef[]
+
+      const chunks = chunkArray(livestreamsWithRef, 450)
+
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+
+         chunk.forEach((doc) => {
+            // TODO: Check if ok, since it should be from all livestream groups
+            const metadataFromHost = getMetaDataFromEventHosts([group])
+
+            const toUpdate: Pick<
+               LivestreamEvent,
+               | "companyCountries"
+               | "companyIndustries"
+               | "companySizes"
+               | "companyTargetedFieldsOfStudies"
+               | "companyTargetedUniversities"
+               | "companyTargetedCountries"
+            > = {
+               companyCountries: metadataFromHost.companyCountries,
+               companyIndustries: metadataFromHost.companyIndustries,
+               companyTargetedCountries:
+                  metadataFromHost.companyTargetedCountries,
+               companyTargetedFieldsOfStudies:
+                  metadataFromHost.companyTargetedFieldsOfStudies,
+               companyTargetedUniversities:
+                  metadataFromHost.companyTargetedUniversities,
+            }
+            batch.update(doc._ref, toUpdate)
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
    }
 }
 

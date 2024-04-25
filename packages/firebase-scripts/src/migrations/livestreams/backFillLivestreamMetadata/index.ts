@@ -1,15 +1,15 @@
+import { convertDocArrayToDict } from "@careerfairy/shared-lib/src/BaseFirebaseRepository"
+import { Group } from "@careerfairy/shared-lib/src/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/src/livestreams/metadata"
+import { isEmpty } from "lodash"
 import Counter from "../../../lib/Counter"
-import { throwMigrationError } from "../../../util/misc"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
-import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { DataWithRef } from "../../../util/types"
-import { Group } from "@careerfairy/shared-lib/dist/groups/groups"
-import { isEmpty } from "lodash"
 import { logAction } from "../../../util/logger"
-import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/dist/livestreams/metadata"
+import { throwMigrationError } from "../../../util/misc"
+import { DataWithRef } from "../../../util/types"
 
 const counter = new Counter()
 
@@ -86,11 +86,21 @@ const cascadeHostsMetaDataToLivestream = async (
                // update livestream with metadata
                const toUpdate: Pick<
                   LivestreamEvent,
-                  "companyIndustries" | "companyCountries" | "companySizes"
+                  | "companyIndustries"
+                  | "companyCountries"
+                  | "companySizes"
+                  | "companyTargetedCountries"
+                  | "companyTargetedUniversities"
+                  | "companyTargetedFieldsOfStudies"
                > = {
                   companyIndustries: metadata.companyIndustries,
                   companyCountries: metadata.companyCountries,
                   companySizes: metadata.companySizes,
+                  companyTargetedCountries: metadata.companyTargetedCountries,
+                  companyTargetedFieldsOfStudies:
+                     metadata.companyTargetedFieldsOfStudies,
+                  companyTargetedUniversities:
+                     metadata.companyTargetedUniversities,
                }
 
                batch.update(stream._ref as any, toUpdate)
