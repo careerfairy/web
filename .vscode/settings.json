@@ -1,3 +1,6 @@
 {
-   "cSpell.words": ["careerfairy", "livestream"]
+   "cSpell.words": ["careerfairy", "livestream"],
+   "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+   }
 }

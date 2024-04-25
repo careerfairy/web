@@ -16,6 +16,7 @@ import userDataSetReducer from "./userDataSetReducer"
 import firebaseReducer from "./firebaseReducer"
 import adminJobsReducer from "./adminJobsReducer"
 import { streamingAppReducer } from "./streamingAppReducer"
+import groupPlanReducer from "./groupPlanReducer"
 
 const reducers = {
    auth: authReducer,
@@ -31,6 +32,7 @@ const reducers = {
    stream: streamReducer,
    streamAdmin: streamAdminReducer,
    adminSparks: adminSparksReducer,
+   groupPlan: groupPlanReducer,
    sparksFeed: sparksFeedReducer,
    adminJobs: adminJobsReducer,
    streamingApp: streamingAppReducer,

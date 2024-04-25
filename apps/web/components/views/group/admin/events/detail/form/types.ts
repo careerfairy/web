@@ -1,15 +1,26 @@
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import {
-   EventRating,
+   Group,
+   GroupOption,
+   GroupQuestion,
+} from "@careerfairy/shared-lib/groups"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
    LivestreamEvent,
-   LivestreamGroupQuestion,
+   LivestreamLanguage,
 } from "@careerfairy/shared-lib/livestreams"
-import { GroupOption } from "@careerfairy/shared-lib/groups"
-import { LivestreamCreator } from "./views/questions/commons"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   FeedbackQuestionFormValues,
+   RegistrationQuestionFormValues,
+} from "./views/questions/commons"
+
+export type LivestreamFormSpeaker = Creator & {
+   isCreator?: boolean
+}
 
 export type LivestreamFormGeneralTabValues = {
    title: string
@@ -19,10 +30,13 @@ export type LivestreamFormGeneralTabValues = {
    backgroundImageUrl: string
    startDate: Date
    duration: number
-   language: string
+   language: LivestreamLanguage
    summary: string
    reasonsToJoin: string[]
-   categories: GroupOption[]
+   categories: {
+      values: GroupOption[]
+      options: GroupOption[]
+   }
    targetCountries: GroupOption[]
    targetUniversities: GroupOption[]
    targetFieldsOfStudy: FieldOfStudy[]
@@ -31,13 +45,18 @@ export type LivestreamFormGeneralTabValues = {
 }
 
 export type LivestreamFormSpeakersTabValues = {
-   values: LivestreamCreator[]
-   options: LivestreamCreator[]
+   values: Creator[]
+   options: LivestreamFormSpeaker[]
+   creatorsIds: Creator["id"][]
 }
 
 export type LivestreamFormQuestionsTabValues = {
-   registrationQuestions: LivestreamGroupQuestion[]
-   feedbackQuestions: EventRating[]
+   registrationQuestions: {
+      values: RegistrationQuestionFormValues[]
+      options: GroupQuestion[]
+   }
+   feedbackQuestions: FeedbackQuestionFormValues[]
+   hosts: Group[]
 }
 
 export type LivestreamFormJobsTabValues = {

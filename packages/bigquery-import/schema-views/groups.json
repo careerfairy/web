@@ -67,6 +67,10 @@
          ],
          "name": "plan",
          "type": "map"
+      },
+      {
+         "name": "universityCode",
+         "type": "string"
       }
    ]
 }

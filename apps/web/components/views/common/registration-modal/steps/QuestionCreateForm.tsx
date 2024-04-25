@@ -13,7 +13,6 @@ import {
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useFormik } from "formik"
 import { questionIcon } from "../../../../../constants/svgs"
 import {
@@ -23,6 +22,7 @@ import {
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { rewardService } from "data/firebase/RewardService"
+import { livestreamService } from "data/firebase/LivestreamService"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -69,7 +69,6 @@ const QuestionCreateForm = () => {
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
-   const { createLivestreamQuestion } = useFirebaseService()
    const { authenticatedUser, userData, userPresenter } = useAuth()
 
    const {
@@ -89,11 +88,15 @@ const QuestionCreateForm = () => {
             return replace("/signup")
          }
          try {
-            await createLivestreamQuestion(livestream?.id, {
-               title: values.questionTitle,
-               author: authenticatedUser.email,
-               displayName: userPresenter?.getDisplayName?.() || null,
-            })
+            await livestreamService.createQuestion(
+               livestreamService.getLivestreamRef(livestream?.id),
+               {
+                  title: values.questionTitle,
+                  author: authenticatedUser.uid,
+                  displayName: userPresenter?.getDisplayName?.() || null,
+                  badges: [],
+               }
+            )
 
             rewardService
                .userAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)

@@ -57,10 +57,7 @@ const styles = sxStyles({
    },
    description: {
       textAlign: "center",
-      color: {
-         xs: "neutral.700",
-         tablet: "neutral.800",
-      },
+      color: "neutral.700",
       pt: 1.5,
       pb: {
          xs: 4,
@@ -105,6 +102,7 @@ export type ConfirmationDialogAction = {
 
 type Props = {
    open: boolean
+   hideCloseIcon?: boolean
    handleClose?: () => void
    title: string
    description: string | ReactNode
@@ -118,6 +116,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
    const {
       open,
       handleClose,
+      hideCloseIcon,
       title,
       description,
       icon,
@@ -165,7 +164,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
                   {title}
                </Typography>
             </Stack>
-            {Boolean(handleClose) && (
+            {Boolean(handleClose && !hideCloseIcon) && (
                <CloseIconButton handleClose={handleClose} />
             )}
          </DialogTitle>
@@ -194,6 +193,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
 const MobileDrawer = ({
    open,
    handleClose,
+   hideCloseIcon,
    title,
    description,
    icon,
@@ -226,7 +226,9 @@ const MobileDrawer = ({
                {title}
             </Typography>
          </Stack>
-         {Boolean(handleClose) && <CloseIconButton handleClose={handleClose} />}
+         {Boolean(handleClose && !hideCloseIcon) && (
+            <CloseIconButton handleClose={handleClose} />
+         )}
          <Typography
             id="confirmation-dialog-description"
             sx={styles.description}

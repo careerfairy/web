@@ -3,6 +3,7 @@ import {
    GroupOption,
    GroupPhoto,
    GroupPlan,
+   GroupPlanType,
    GroupPlanTypes,
    GroupQuestion,
    GroupVideo,
@@ -286,6 +287,23 @@ export class GroupPresenter {
    }
 
    /**
+    * Determines if the group has reached the maximum number of public sparks based on the current
+    * group plan.
+    * @param publicSparksCount Current public sparks count
+    * @returns boolean indicating whether the maximum number of publishable sparks has been reached
+    */
+   hasReachedMaxSparks(publicSparksCount: number) {
+      return publicSparksCount >= this.getMaxPublicSparks()
+   }
+
+   /**
+    * Determines if the current group's plan encompasses unlimited sparks
+    * @returns boolean indicating whether the group has unlimited sparks or not
+    */
+   hasUnlimitedSparks() {
+      return this.plan?.type == GroupPlanTypes.Tier3
+   }
+   /**
     * To get the minimum number of creators required to publish sparks for this specific group
     * This amount may be different depending on the group agreements
     */
@@ -335,6 +353,17 @@ export class GroupPresenter {
    }
 
    /**
+    * To check if the plan for this specific group is valid and is
+    * of any of the specified @type GroupPlanTypes. Meaning the plan has not expired
+    * and his of one of the specified types.
+    */
+   isPlanValidByTypes(types: GroupPlanType[]) {
+      if (!types || !types.length) return this.hasPlanExpired()
+      const hasType = types.includes(this.plan?.type)
+      return hasType && !this.hasPlanExpired()
+   }
+
+   /**
     * To check if the plan for this specific group exists
     *
     * @returns true if the plan exists, false otherwise
@@ -356,6 +385,18 @@ export class GroupPresenter {
    hasPlanStarted() {
       const currentTime = new Date().getTime()
       return currentTime > this.getStartedAt()
+   }
+
+   /**
+    * Determines whether the present group has a non trial plan.
+    * @returns boolean if the group has plan other than GroupPlanTypes.Trial
+    */
+   hasNonTrialPlan() {
+      return (
+         this.plan?.type == GroupPlanTypes.Tier1 ||
+         this.plan?.type == GroupPlanTypes.Tier2 ||
+         this.plan?.type == GroupPlanTypes.Tier3
+      )
    }
 
    getExpiresAt() {

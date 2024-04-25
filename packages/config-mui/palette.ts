@@ -82,7 +82,7 @@ export const brand = {
    black: {
       "100": "#FAFAFA",
       "200": "#FAFAFA",
-      "300": "#F5F5F5",
+      "300": "#F3F3F3",
       "400": "#EEEEEE",
       "500": "#E1E1E1",
       "600": "#CACACA",

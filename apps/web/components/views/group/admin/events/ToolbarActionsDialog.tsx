@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
-import React, { useState } from "react"
+import StudentViewIcon from "@mui/icons-material/FaceRounded"
+import ShareIcon from "@mui/icons-material/Share"
 import {
    Dialog,
    List,
@@ -10,98 +10,55 @@ import {
    Paper,
    Slide,
 } from "@mui/material"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useSnackbar } from "notistack"
+import PropTypes from "prop-types"
+import { useState } from "react"
+import { Film as StreamIcon } from "react-feather"
 import {
    copyStringToClipboard,
    getBaseUrl,
 } from "../../../../helperFunctions/HelperFunctions"
-import ShareIcon from "@mui/icons-material/Share"
-import { Film as StreamIcon } from "react-feather"
-import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import HintIcon from "../../../common/HintIcon"
-import { useAuth } from "HOCs/AuthProvider"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
-import { useRouter } from "next/router"
-import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-
-const handleCreateDraftLivestream = async (
-   authenticatedUser,
-   group,
-   firebase,
-   router
-) => {
-   const author = {
-      groupId: group.id,
-      email: authenticatedUser.email,
-   }
-
-   const initialValues = getLivestreamInitialValues(group)
-   const draftLivestream: LivestreamEvent = buildLivestreamObject(
-      initialValues,
-      false,
-      null,
-      firebase
-   )
-
-   const draftLiveStreamId = await firebase.addLivestream(
-      draftLivestream,
-      "draftLivestreams",
-      author,
-      null
-   )
-
-   return router.push({
-      pathname: `/group/${group.id}/admin/events/${draftLiveStreamId}`,
-   })
-}
+import { useLivestreamRouting } from "./useLivestreamRouting"
 
 const ToolbarActionsDialogContent = ({
    handleClose,
    handleOpenNewStreamModal,
    group,
 }) => {
-   const router = useRouter()
-   const firebase = useFirebaseService()
-   const { authenticatedUser } = useAuth()
    const featureFlags = useFeatureFlags()
+   const { createDraftLivestream } = useLivestreamRouting()
    const { enqueueSnackbar } = useSnackbar()
 
    const handleNewStream_v2 = async () => {
-      await handleCreateDraftLivestream(
-         authenticatedUser,
-         group,
-         firebase,
-         router
-      )
+      await createDraftLivestream()
    }
 
    // eslint-disable-next-line react/hook-use-state
    const [actions] = useState([
-      {
-         name: "Create a draft live stream",
-         onClick: () => {
-            handleOpenNewStreamModal()
-            handleClose()
-         },
-         icon: <StreamIcon />,
-         description:
-            "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
-      },
-      ...(featureFlags.livestreamCreationFlowV2
+      ...(!featureFlags.livestreamCreationFlowV2
          ? [
               {
-                 name: "Create a draft live stream V2",
-                 onClick: async () => {
-                    await handleNewStream_v2()
+                 name: "Create a draft live stream (Legacy)",
+                 onClick: () => {
+                    handleOpenNewStreamModal()
+                    handleClose()
                  },
                  icon: <StreamIcon />,
-                 description: "New live stream creation form!",
+                 description:
+                    "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
               },
            ]
          : []),
+      {
+         name: "Create a draft live stream",
+         onClick: async () => {
+            await handleNewStream_v2()
+         },
+         icon: <StreamIcon />,
+         description: "New live stream creation form!",
+      },
       {
          name: "Share a link to create a draft live stream",
          onClick: () => {

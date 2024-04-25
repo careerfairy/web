@@ -1,24 +1,27 @@
-import { useCallback } from "react"
-import {
-   useUniversityCountries,
-   useFieldsOfStudy,
-   useLevelsOfStudy,
-} from "components/custom-hook/useCollection"
 import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
-import FormSectionHeader from "../../FormSectionHeader"
-import MultiChipSelect from "./components/MultiChipSelect"
-import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import {
    GroupOption,
    GroupTargetUniversity,
 } from "@careerfairy/shared-lib/groups"
+import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import {
    University,
    UniversityCountry,
    universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
+import { Stack } from "@mui/material"
+import {
+   useFieldsOfStudy,
+   useLevelsOfStudy,
+   useUniversityCountries,
+} from "components/custom-hook/useCollection"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { useCallback } from "react"
+import FormSectionHeader from "../../FormSectionHeader"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
+import InputSkeleton from "../questions/InputSkeleton"
+import MultiChipSelect from "./components/MultiChipSelect"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 type UniversityOption = University & {
    country: string
@@ -57,13 +60,25 @@ const getUniversityOptions = (
    return universityOptions
 }
 
-const AudienceTargeting = () => {
+const AudienceTargetingContent = () => {
    const {
       values: { general },
    } = useLivestreamFormValues()
-   const { data: universitiesByCountry } = useUniversityCountries()
-   const { data: allFieldsOfStudy } = useFieldsOfStudy()
-   const { data: allLevelsOfStudy } = useLevelsOfStudy()
+   const {
+      data: universitiesByCountry,
+      isLoading: universitiesByCountryLoading,
+      error: universitiesByCountryError,
+   } = useUniversityCountries()
+   const {
+      data: allFieldsOfStudy,
+      isLoading: allFieldsOfStudyLoading,
+      error: allFieldsOfStudyError,
+   } = useFieldsOfStudy()
+   const {
+      data: allLevelsOfStudy,
+      isLoading: allLevelsOfStudyLoading,
+      error: allLevelsOfStudyError,
+   } = useLevelsOfStudy()
 
    const filterUniversitiesBySelectedContries = useCallback(
       (selectedCountries: GroupOption[]) => {
@@ -77,13 +92,31 @@ const AudienceTargeting = () => {
       [universitiesByCountry]
    )
 
+   if (
+      universitiesByCountryError ||
+      allFieldsOfStudyError ||
+      allLevelsOfStudyError
+   ) {
+      return <div>Error</div>
+   }
+
+   if (
+      universitiesByCountryLoading ||
+      allFieldsOfStudyLoading ||
+      allLevelsOfStudyLoading
+   ) {
+      return (
+         <Stack spacing={2}>
+            <InputSkeleton />
+            <InputSkeleton />
+            <InputSkeleton />
+            <InputSkeleton />
+         </Stack>
+      )
+   }
+
    return (
       <>
-         <FormSectionHeader
-            title="Target Students"
-            subtitle="Select the target audience for this live stream"
-            divider
-         />
          <MultiChipSelect
             id="general.targetCountries"
             options={CompanyCountryValues}
@@ -96,7 +129,7 @@ const AudienceTargeting = () => {
                placeholder: "Select country",
             }}
          />
-         {general.targetCountries.length === 0 ? (
+         {general.targetCountries?.length === 0 ? (
             <BrandedTextField
                disabled
                label="By university"
@@ -104,7 +137,7 @@ const AudienceTargeting = () => {
             />
          ) : (
             <MultiChipSelect
-               id="targetUniversities"
+               id="general.targetUniversities"
                options={filterUniversitiesBySelectedContries(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   general.targetCountries as any
@@ -146,6 +179,19 @@ const AudienceTargeting = () => {
             }}
          />
       </>
+   )
+}
+
+const AudienceTargeting = () => {
+   return (
+      <SuspenseWithBoundary>
+         <FormSectionHeader
+            title="Target Students"
+            subtitle="Select the target audience for this live stream"
+            divider
+         />
+         <AudienceTargetingContent />
+      </SuspenseWithBoundary>
    )
 }
 
