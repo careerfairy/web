@@ -4,14 +4,14 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { useDeleteLivestreamQuestionComment } from "components/custom-hook/streaming/useDeleteLivestreamQuestionComment"
+import { useDeleteLivestreamQuestionComment } from "components/custom-hook/streaming/question/useDeleteLivestreamQuestionComment"
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "components/views/common/inputs/BrandedResponsiveMenu"
-import { Trash2 as DeleteIcon } from "react-feather"
-import { useStreamingContext } from "../../context"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useMemo } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useStreamingContext } from "../../context"
 
 type Props = {
    handleClose: () => void

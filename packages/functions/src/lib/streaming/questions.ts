@@ -1,19 +1,27 @@
 import functions = require("firebase-functions")
+import {
+   LivestreamEvent,
+   MarkLivestreamQuestionAsCurrentRequest,
+   MarkLivestreamQuestionAsDoneRequest,
+   ResetLivestreamQuestionRequest,
+} from "@careerfairy/shared-lib/livestreams"
 import * as yup from "yup"
+import { livestreamsRepo } from "../../api/repositories"
 import config from "../../config"
 import { middlewares } from "../../middlewares/middlewares"
 import { dataValidation, livestreamExists } from "../../middlewares/validations"
 import { validateLivestreamToken } from "../validations"
-import { livestreamsRepo } from "../../api/repositories"
-import {
-   MarkLivestreamQuestionAsCurrentRequest,
-   LivestreamEvent,
-   ResetLivestreamQuestionRequest,
-} from "@careerfairy/shared-lib/livestreams"
 
 const markQuestionAsCurrentSchema: yup.SchemaOf<MarkLivestreamQuestionAsCurrentRequest> =
    yup.object({
-      question: yup.string().required(),
+      questionId: yup.string().required(),
+      livestreamId: yup.string().required(),
+      livestreamToken: yup.string().nullable(),
+   })
+
+const markQuestionAsDoneSchema: yup.SchemaOf<MarkLivestreamQuestionAsDoneRequest> =
+   yup.object({
+      questionId: yup.string().required(),
       livestreamId: yup.string().required(),
       livestreamToken: yup.string().nullable(),
    })
@@ -36,7 +44,7 @@ export const markQuestionAsCurrent = functions
          dataValidation(markQuestionAsCurrentSchema),
          livestreamExists(),
          async (requestData, context) => {
-            const { livestreamId, livestreamToken, question } = requestData
+            const { livestreamId, livestreamToken, questionId } = requestData
 
             await validateLivestreamToken(
                context.auth?.token?.email,
@@ -46,10 +54,10 @@ export const markQuestionAsCurrent = functions
 
             functions.logger.info("Marking question as current", {
                livestreamId,
-               question,
+               questionId,
             })
 
-            await livestreamsRepo.answerQuestion(livestreamId, question)
+            await livestreamsRepo.answerQuestion(livestreamId, questionId)
 
             functions.logger.info("Question marked as current", {
                livestreamId,
@@ -57,6 +65,34 @@ export const markQuestionAsCurrent = functions
          }
       )
    )
+
+export const markQuestionAsDone = functions.region(config.region).https.onCall(
+   middlewares<Context, MarkLivestreamQuestionAsDoneRequest>(
+      dataValidation(markQuestionAsDoneSchema),
+      livestreamExists(),
+      async (requestData, context) => {
+         const { livestreamId, livestreamToken, questionId } = requestData
+
+         await validateLivestreamToken(
+            context.auth?.token?.email,
+            context.middlewares.livestream,
+            livestreamToken
+         )
+
+         functions.logger.info("Marking question as done", {
+            livestreamId,
+            questionId,
+         })
+
+         await livestreamsRepo.markQuestionAsDone(livestreamId, questionId)
+
+         functions.logger.info("Question marked as done", {
+            livestreamId,
+            questionId,
+         })
+      }
+   )
+)
 
 export const resetQuestion = functions.region(config.region).https.onCall(
    middlewares<Context, ResetLivestreamQuestionRequest>(

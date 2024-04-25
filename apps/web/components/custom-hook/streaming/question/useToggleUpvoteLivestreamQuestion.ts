@@ -2,7 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { DocumentReference } from "firebase/firestore"
 import useSWRMutation from "swr/mutation"
-import useSnackbarNotifications from "../useSnackbarNotifications"
+import useSnackbarNotifications from "../../useSnackbarNotifications"
 
 const getKey = (livestreamId: string, questionId: string) => {
    if (!questionId || !livestreamId) {

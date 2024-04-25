@@ -1,39 +1,38 @@
-import {
-   CategoryDataOption as LivestreamCategoryDataOption,
-   FilterLivestreamsOptions,
-   LivestreamQueryOptions,
-   LivestreamMode,
-   LivestreamEvent,
-   LivestreamModes,
-   UserLivestreamData,
-   LivestreamChatEntry,
-   DeleteLivestreamChatEntryRequest,
-   CreateLivestreamPollRequest,
-   UpdateLivestreamPollRequest,
-   DeleteLivestreamPollRequest,
-   MarkLivestreamPollAsCurrentRequest,
-   LivestreamPollVoter,
-   ResetLivestreamQuestionRequest,
-   MarkLivestreamQuestionAsCurrentRequest,
-   LivestreamQuestion,
-   LivestreamQuestionComment,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
-import { Functions, httpsCallable } from "firebase/functions"
-import { mapFromServerSide } from "util/serverUtil"
-import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    AgoraRTCTokenRequest,
-   AgoraRTMTokenRequest,
    AgoraRTCTokenResponse,
+   AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import FirebaseService from "./FirebaseService"
-import GroupsUtil from "data/util/GroupsUtil"
-import { groupRepo } from "data/RepositoryInstances"
-import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   CreateLivestreamPollRequest,
+   DeleteLivestreamChatEntryRequest,
+   DeleteLivestreamPollRequest,
+   FilterLivestreamsOptions,
+   CategoryDataOption as LivestreamCategoryDataOption,
+   LivestreamChatEntry,
+   LivestreamEvent,
+   LivestreamMode,
+   LivestreamModes,
+   LivestreamPollVoter,
+   LivestreamQueryOptions,
+   LivestreamQuestion,
+   LivestreamQuestionComment,
+   MarkLivestreamPollAsCurrentRequest,
+   MarkLivestreamQuestionAsCurrentRequest,
+   MarkLivestreamQuestionAsDoneRequest,
+   ResetLivestreamQuestionRequest,
+   UpdateLivestreamPollRequest,
+   UserLivestreamData,
+   hasUpvotedLivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+import { groupRepo } from "data/RepositoryInstances"
+import GroupsUtil from "data/util/GroupsUtil"
 import {
    DocumentReference,
    PartialWithFieldValue,
@@ -56,9 +55,11 @@ import {
    where,
    writeBatch,
 } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+import { Functions, httpsCallable } from "firebase/functions"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { mapFromServerSide } from "util/serverUtil"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import FirebaseService from "./FirebaseService"
 
 type StreamerDetails = {
    firstName: string
@@ -663,6 +664,16 @@ export class LivestreamService {
       await httpsCallable<MarkLivestreamQuestionAsCurrentRequest>(
          this.functions,
          "markQuestionAsCurrent"
+      )(options)
+   }
+
+   /**
+    * Marks a question as done for a livestream
+    */
+   async markQuestionAsDone(options: MarkLivestreamQuestionAsDoneRequest) {
+      await httpsCallable<MarkLivestreamQuestionAsDoneRequest>(
+         this.functions,
+         "markQuestionAsDone"
       )(options)
    }
 
