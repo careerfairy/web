@@ -13,6 +13,7 @@ module.exports = {
    ],
    plugins: ["@typescript-eslint"],
    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
       "react/jsx-no-constructed-context-values": "warn",
       "react/jsx-no-leaked-render": "warn",
       "react/no-object-type-as-default-prop": "warn",

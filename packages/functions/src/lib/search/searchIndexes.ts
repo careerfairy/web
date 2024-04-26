@@ -2,6 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    LIVESTREAM_FIELDS_TO_INDEX,
    LIVESTREAM_FILTERING_FIELDS,
+   LIVESTREAM_REPLICAS,
    LIVESTREAM_SEARCHABLE_ATTRIBUTES,
    TransformedLivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/search"
@@ -36,6 +37,7 @@ const livestreamIndex = {
    settings: {
       attributesForFaceting: LIVESTREAM_FILTERING_FIELDS,
       searchableAttributes: LIVESTREAM_SEARCHABLE_ATTRIBUTES,
+      replicas: [LIVESTREAM_REPLICAS.START_DESC, LIVESTREAM_REPLICAS.START_ASC],
    },
 } satisfies Index<LivestreamEvent, TransformedLivestreamEvent>
 
