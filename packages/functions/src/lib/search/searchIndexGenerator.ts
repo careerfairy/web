@@ -1,11 +1,12 @@
 import * as functions from "firebase-functions"
 
-import { ChangeType, getChangeTypeEnum } from "../../util"
+import { ChangeType, getChangeTypeEnum, isTestEnvironment } from "../../util"
 import {
    initAlgoliaIndex,
    logCreateIndex,
    logDeleteIndex,
    logUpdateIndex,
+   configureSettings,
 } from "./util"
 
 import { DocumentSnapshot, Query } from "firebase-admin/firestore"
@@ -17,6 +18,19 @@ type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
    doc: DataType
 ) => DataTypeTransformed
 
+/**
+ * Get the workflow id from the environment variables
+ * This is used to isolate test data and operations
+ * @returns the workflow id or the dev name or "unknown" if neither is set
+ */
+export const getWorkflowId = () => {
+   return (
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      process.env.DEV_NAME ||
+      "unknown"
+   )
+}
+
 export const getData = (
    snapshot: DocumentSnapshot,
    fields: string[],
@@ -26,6 +40,9 @@ export const getData = (
       [key: string]: boolean | string | number
    } = {
       objectID: snapshot.id,
+      ...(isTestEnvironment() && {
+         workflowId: getWorkflowId(),
+      }),
    }
 
    let data = snapshot.data()
@@ -114,6 +131,37 @@ const handleDeleteDocument = async (
       functions.logger.error(e)
    }
 }
+// Helper type to extract keys with number or string type properties like `startTimeMs` or `title`
+type NumericKey<T> = {
+   [K in keyof T]: T[K] extends number | string | boolean
+      ? K extends string
+         ? K
+         : never
+      : never
+}[keyof T]
+
+export type IndexSettings<
+   DataTypeTransformed = any,
+   TIndexName extends string = string
+> = {
+   /**
+    * Attributes for text search; listing more enhances speed and reduces index size.
+    * The position of attributes in the list determines their priority in the search.
+    */
+   searchableAttributes: Array<keyof DataTypeTransformed & string>
+   /**
+    * Attributes to use for filtering like tags, company, isPublic, etc.
+    */
+   attributesForFaceting: Array<keyof DataTypeTransformed & string>
+
+   /**
+    * Specifies the replicas for indexing in the format example: `livestreams_startTimeMs_asc`.
+    * Ensure `attributeName` is a numeric or string key from `DataTypeTransformed`.
+    */
+   replicas: Array<`${TIndexName}_${NumericKey<DataTypeTransformed>}_${
+      | "asc"
+      | "desc"}`>
+}
 
 /**
  * Defines the structure for an index configuration.
@@ -121,7 +169,11 @@ const handleDeleteDocument = async (
  * @template DataType The type of the data before any transformation. Defaults to any.
  * @template DataTypeTransformed The type of the data after transformation. Defaults to the same as DataType.
  */
-export type Index<DataType = any, DataTypeTransformed = DataType> = {
+export type Index<
+   DataType = any,
+   DataTypeTransformed = DataType,
+   TIndexName extends string = string
+> = {
    /**
     * Path to the collection to index (e.g. "livestreams" or "livestreams/{docId}/questions")
     */
@@ -134,22 +186,12 @@ export type Index<DataType = any, DataTypeTransformed = DataType> = {
    /**
     * Name of the index in Algolia
     */
-   indexName: string
+   indexName: TIndexName
    /**
     * Function to transform the data before indexing.
     */
    transformData?: DocumentTransformer<DataType, DataTypeTransformed>
-   settings?: {
-      /**
-       * Attributes for text search; listing more enhances speed and reduces index size.
-       * The position of attributes in the list determines their priority in the search.
-       */
-      searchableAttributes: Array<keyof DataTypeTransformed & string>
-      /**
-       * Attributes to use for filtering like tags, company, isPublic, etc.
-       */
-      attributesForFaceting: Array<keyof DataTypeTransformed & string>
-   }
+   settings?: IndexSettings<DataTypeTransformed, TIndexName>
    /**
     * Function that determines whether or not to index a document. If not provided, all documents will be indexed.
     * @param doc The document to index
@@ -184,7 +226,7 @@ export function generateFunctionsFromIndexes(indexes: Record<string, Index>) {
          .firestore.document(documentPath)
          .onWrite(async (change) => {
             if (settings) {
-               await indexClient.setSettings(settings)
+               await configureSettings(settings, indexClient)
             }
 
             const changeType = getChangeTypeEnum(change)

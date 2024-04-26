@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import { Box, Card } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import LivestreamSearch from "../../../common/LivestreamSearch"
@@ -31,6 +31,7 @@ const LivestreamSearchNav = () => {
    const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
    const { push } = useRouter()
    const { group } = useGroup()
+   const [inputValue, setInputValue] = useState("")
 
    const handleChange = useCallback(
       (newValue: LivestreamSearchResult | null) => {
@@ -55,6 +56,8 @@ const LivestreamSearchNav = () => {
          <Box sx={styles.searchWrapper} flex={1}>
             <Card sx={styles.searchCard}>
                <LivestreamSearch
+                  inputValue={inputValue}
+                  setInputValue={setInputValue}
                   handleChange={handleChange}
                   value={
                      (currentStreamStats?.livestream as LivestreamSearchResult) ??
