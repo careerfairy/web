@@ -28,12 +28,10 @@ const styles = sxStyles({
          borderRadius: `${BORDER_RADIUS}px`,
       },
       [`& .${tabsClasses.flexContainer}`]: {
-         borderRadius: `${BORDER_RADIUS}px`,
-         border: `${BORDER_THICKNESS}px solid ${theme.brand.white[500]}`,
          background: theme.brand.white[300],
       },
+      border: `${BORDER_THICKNESS}px solid ${theme.brand.white[500]}`,
       borderRadius: `${BORDER_RADIUS}px`,
-      boxShadow: "rgba(33, 35, 38, 0.1) 0px 10px 10px -10px", // Added shadow effect
       overflow: "hidden",
       minHeight: HEIGHT,
       height: HEIGHT,
