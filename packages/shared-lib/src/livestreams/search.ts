@@ -133,3 +133,11 @@ export type BooleanFilterFieldType = Extract<
    FilterFieldType,
    "denyRecordingAccess" | "hasJobs" | "hidden" | "test" | "hasEnded"
 >
+
+export const LIVESTREAM_REPLICAS = {
+   START_ASC: "livestreams_startTimeMs_asc",
+   START_DESC: "livestreams_startTimeMs_desc",
+} as const
+
+export type LivestreamReplicaType =
+   (typeof LIVESTREAM_REPLICAS)[keyof typeof LIVESTREAM_REPLICAS]
