@@ -1,9 +1,11 @@
 import { Collapse, Stack, useTheme } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { useLivestreamQuestions } from "components/custom-hook/streaming/question/useLivestreamQuestions"
 import { SwipeablePanel } from "materialUI/GlobalPanels/GlobalPanels"
 import { useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
+import Masonry from "react-responsive-masonry"
 import SwipeableViews from "react-swipeable-views"
 import { TransitionGroup } from "react-transition-group"
 import { useStreamingContext } from "../../context"
@@ -72,6 +74,8 @@ const ListView = ({
 }: ListViewProps) => {
    const { livestreamId } = useStreamingContext()
 
+   const streamIsLandscape = useStreamIsLandscape()
+
    const [limit, setLimit] = useState(MIN_QUESTIONS_TO_SHOW)
 
    const [ref, inView] = useInView()
@@ -89,19 +93,32 @@ const ListView = ({
 
    return (
       <QuestionsListContextProvider>
-         <Stack spacing={2} overflow="hidden" component={TransitionGroup}>
-            {questions.map((question, index) => (
-               <Collapse
-                  ref={index === questions.length - 1 ? ref : null}
-                  key={question.id}
-               >
+         {streamIsLandscape ? (
+            <Masonry columnsCount={streamIsLandscape ? 2 : 1} gutter="8px">
+               {questions.map((question, index) => (
                   <QuestionCard
+                     key={question.id}
+                     ref={index === questions.length - 1 ? ref : null}
                      question={question}
                      onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
                   />
-               </Collapse>
-            ))}
-         </Stack>
+               ))}
+            </Masonry>
+         ) : (
+            <Stack spacing={1} component={TransitionGroup}>
+               {questions.map((question, index) => (
+                  <Collapse
+                     key={question.id}
+                     ref={index === questions.length - 1 ? ref : null}
+                  >
+                     <QuestionCard
+                        question={question}
+                        onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+                     />
+                  </Collapse>
+               ))}
+            </Stack>
+         )}
       </QuestionsListContextProvider>
    )
 }

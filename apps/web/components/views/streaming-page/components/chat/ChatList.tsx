@@ -1,4 +1,15 @@
-import { CircularProgress, Collapse, IconButton } from "@mui/material"
+import {
+   Box,
+   CircularProgress,
+   Collapse,
+   Grow,
+   IconButton,
+} from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
+import useMenuState from "components/custom-hook/useMenuState"
+import { ScrollTo } from "components/custom-hook/utils/useScroll"
+import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
 import {
    Fragment,
    MouseEvent,
@@ -9,20 +20,13 @@ import {
    useState,
 } from "react"
 import { ChevronDown } from "react-feather"
+import { useInView } from "react-intersection-observer"
+import { TransitionGroup } from "react-transition-group"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
 import { ChatEntry } from "./ChatEntry"
 import { EmptyChatView } from "./EmptyChatView"
-import { MAX_STREAM_CHAT_ENTRIES } from "constants/streams"
-import { ScrollTo } from "components/custom-hook/utils/useScroll"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useChatEntries } from "components/custom-hook/streaming/useChatEntries"
-import { useInView } from "react-intersection-observer"
-import { useStreamingContext } from "../../context"
-import { sxStyles } from "types/commonTypes"
-import { Box } from "@mui/material"
-import { Grow } from "@mui/material"
-import useMenuState from "components/custom-hook/useMenuState"
 import { OptionsMenu } from "./OptionsMenu"
-import { TransitionGroup } from "react-transition-group"
 
 const ARROW_HEIGHT = 15
 
@@ -66,7 +70,9 @@ export const ChatList = (props: Props) => {
 }
 
 export const Content = ({ scrollToBottom }: Props) => {
-   const [ref, isBottom] = useInView()
+   const [ref, isBottom] = useInView({
+      rootMargin: "100% 0px 0px 0px",
+   })
 
    const { livestreamId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
@@ -84,7 +90,9 @@ export const Content = ({ scrollToBottom }: Props) => {
 
    useLayoutEffect(() => {
       if (isBottom) {
-         scrollToBottom("smooth")
+         setTimeout(() => {
+            scrollToBottom("smooth")
+         }, 500)
       }
    }, [chatEntries, isBottom, scrollToBottom])
 
