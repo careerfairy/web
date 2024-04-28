@@ -1,14 +1,15 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
-} from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
+} from "@careerfairy/shared-lib/dist/customJobs/CustomJobRepository"
 import {
    CustomJob,
+   CustomJobApplicant,
    CustomJobStats,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+} from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
 
@@ -199,7 +200,7 @@ export class CustomJobFunctionsRepository
       return batch.commit()
    }
 
-   groupCustomJobsQuery(groupId: string) {
+   groupCustomJobsApplicationsQuery(groupId: string) {
       return this.firestore
          .collection("jobApplications")
          .where("groupId", "==", groupId)
@@ -210,11 +211,14 @@ export class CustomJobFunctionsRepository
       groupId: string,
       group: Group
    ): Promise<void> {
-      const groupJobsQuery = this.groupCustomJobsQuery(groupId)
+      const groupJobsQuery = this.groupCustomJobsApplicationsQuery(groupId)
 
       const snapshots = await groupJobsQuery.get()
 
-      const groupCustomJobsWithRef = mapFirestoreDocuments(snapshots, true)
+      const groupCustomJobsWithRef = mapFirestoreDocuments<
+         CustomJobApplicant,
+         true
+      >(snapshots, true)
 
       const chunks = chunkArray(groupCustomJobsWithRef, 450)
 
@@ -223,7 +227,7 @@ export class CustomJobFunctionsRepository
 
          chunk.forEach((doc) => {
             const toUpdate: Pick<
-               CustomJob,
+               CustomJobApplicant,
                "companyCountry" | "companyIndustries" | "companySize"
             > = {
                companyCountry: group.companyCountry?.id,
