@@ -1,7 +1,7 @@
-import { convertDocArrayToDict } from "@careerfairy/shared-lib/src/BaseFirebaseRepository"
-import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
-import { getMetaDataFromCustomJobGroup } from "@careerfairy/shared-lib/src/customJobs/metadata"
-import { Group } from "@careerfairy/shared-lib/src/groups"
+import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import { getMetaDataFromCustomJobGroup } from "@careerfairy/shared-lib/dist/customJobs/metadata"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { isEmpty } from "lodash"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
@@ -14,7 +14,7 @@ import { DataWithRef } from "../../../util/types"
 const counter = new Counter()
 
 // types
-type CustomJobWithRef = DataWithRef<true, CustomJob>
+type CustomJobApplicantsWithRef = DataWithRef<true, CustomJobApplicant>
 
 // cached globally
 let groupsDict: Record<string, Group>
@@ -23,25 +23,25 @@ export async function run() {
    try {
       Counter.log("Fetching data - mock implementation")
 
-      const [customJobs, groups] = await logAction(
+      const [allJobApplications, groups] = await logAction(
          () =>
             Promise.all([
-               customJobRepo.getAllCustomJobs<true>(),
+               customJobRepo.getAllJobApplications(true),
                groupRepo.getAllGroups(),
             ]),
-         "Fetching all custom jobs and groups"
+         "Fetching all Job Applications and Groups"
       )
 
       Counter.log(
-         `Fetched ${customJobs.length} custom jobs and ${groups.length} groups`
+         `Fetched ${allJobApplications.length} Job Applications and ${groups.length} groups`
       )
 
-      counter.addToReadCount(customJobs.length + groups.length)
+      counter.addToReadCount(allJobApplications.length + groups.length)
 
       groupsDict = convertDocArrayToDict(groups)
 
-      // cascade group metadata to customJobs
-      await cascadeGroupMetaDataToCustomJobs(customJobs)
+      // cascade group metadata to Job Applications
+      await cascadeGroupMetaDataToCustomJobs(allJobApplications)
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -51,25 +51,25 @@ export async function run() {
 }
 
 const cascadeGroupMetaDataToCustomJobs = async (
-   customJobs: CustomJobWithRef[]
+   jobApplications: CustomJobApplicantsWithRef[]
 ) => {
    let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
-   const totalDocs = customJobs
-   const totalNumDocs = customJobs.length
+   const totalDocs = jobApplications
+   const totalNumDocs = jobApplications.length
 
    writeProgressBar.start(totalNumDocs, 0)
 
    for (let i = 0; i < totalNumDocs; i += batchSize) {
       const batch = firestore.batch()
 
-      const customJobsChunk = totalDocs.slice(i, i + batchSize) // Slice the data into batches
+      const customJobsApplicantsChunk = totalDocs.slice(i, i + batchSize) // Slice the data into batches
 
-      customJobsChunk.forEach((customJob) => {
+      customJobsApplicantsChunk.forEach((customJobApplicant) => {
          writeProgressBar.increment() // Increment progress bar
 
          // Get event hosts from groupsDict
-         const jobGroup = groupsDict[customJob.groupId]
+         const jobGroup = groupsDict[customJobApplicant.groupId]
 
          if (jobGroup) {
             // get metadata from event hosts
@@ -83,7 +83,7 @@ const cascadeGroupMetaDataToCustomJobs = async (
             if (hasMetadataToUpdate) {
                // update customJob with metadata
                const toUpdate: Pick<
-                  CustomJob,
+                  CustomJobApplicant,
                   "companyCountry" | "companyIndustries" | "companySize"
                > = {
                   companyCountry: metadata.companyCountry,
@@ -91,7 +91,7 @@ const cascadeGroupMetaDataToCustomJobs = async (
                   companySize: metadata.companySize,
                }
 
-               batch.update(customJob._ref as any, toUpdate)
+               batch.update(customJobApplicant._ref as any, toUpdate)
                counter.writeIncrement() // Increment write counter
             }
          }

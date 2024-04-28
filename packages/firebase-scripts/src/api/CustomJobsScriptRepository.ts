@@ -1,23 +1,28 @@
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
-} from "@careerfairy/shared-lib/src/customJobs/CustomJobRepository"
-import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
+} from "@careerfairy/shared-lib/dist/customJobs/CustomJobRepository"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 import { DataWithRef } from "../util/types"
 
 export interface ICustomJobScriptsRepository extends ICustomJobRepository {
-   getAllCustomJobs<T extends boolean>(
+   getAllJobApplications<T extends boolean>(
       withRef?: T
-   ): Promise<DataWithRef<T, CustomJob>[]>
+   ): Promise<DataWithRef<T, CustomJobApplicant>[]>
 }
 
 export class CustomJobScriptsRepository
    extends FirebaseCustomJobRepository
    implements ICustomJobScriptsRepository
 {
-   async getAllCustomJobs<T extends boolean>(
+   async getAllJobApplications<T extends boolean>(
       withRef?: T
-   ): Promise<DataWithRef<T, CustomJob>[]> {
-      throw "Not implemented yet"
+   ): Promise<DataWithRef<T, CustomJobApplicant>[]> {
+      const customJobs = await this.firestore
+         .collectionGroup("jobApplications")
+         .orderBy("job.createdAt", "desc")
+         .get()
+      return mapFirestoreDocuments<CustomJobApplicant, T>(customJobs, withRef)
    }
 }

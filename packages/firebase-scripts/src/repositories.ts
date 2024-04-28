@@ -6,19 +6,19 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import {
    FirebaseUniversityRepository,
    IUniversityRepository,
-} from "../../shared-lib/src/universities/UniversityRepository"
+} from "../../shared-lib/dist/universities/UniversityRepository"
 import {
    CustomJobScriptsRepository,
    ICustomJobScriptsRepository,
-} from "./api/CustomJobsScriptRepository"
+} from "../dist/api/CustomJobsScriptRepository"
 import {
    GroupScriptsRepository,
    IGroupScriptsRepository,
-} from "./api/GroupScriptsRepository"
+} from "../dist/api/GroupScriptsRepository"
 import {
    ILivestreamScriptsRepository,
    LivestreamScriptsRepository,
-} from "./api/LivestreamScriptsRepository"
+} from "../dist/api/LivestreamScriptsRepository"
 import {
    IUserScriptsRepository,
    UserScriptsRepository,
