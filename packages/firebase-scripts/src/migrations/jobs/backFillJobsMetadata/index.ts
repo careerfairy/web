@@ -21,7 +21,7 @@ let groupsDict: Record<string, Group>
 
 export async function run() {
    try {
-      Counter.log("Fetching data - mock implementation")
+      Counter.log("Fetching data for Backfilling Job Applications")
 
       const [allJobApplications, groups] = await logAction(
          () =>
@@ -101,5 +101,5 @@ const cascadeGroupMetaDataToCustomJobs = async (
    }
 
    writeProgressBar.stop()
-   Counter.log("All customJob batches committed! :)")
+   Counter.log("All Job Applications batches committed! :)")
 }
