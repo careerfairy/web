@@ -1,4 +1,4 @@
-import uniq from "lodash.uniq"
+import uniq = require("lodash.uniq")
 import { Group } from "../groups"
 import { getArrayDifference } from "../utils"
 import { LivestreamEvent } from "./livestreams"
