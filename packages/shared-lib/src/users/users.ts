@@ -1,8 +1,10 @@
-import { Identifiable, UTMParams } from "../commonTypes"
 import firebase from "firebase/compat/app"
+import { Job } from "../ats/Job"
+import { Identifiable, UTMParams } from "../commonTypes"
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import {
-   Group,
    GROUP_DASHBOARD_ROLE,
+   Group,
    GroupQuestion,
    GroupQuestionOption,
    PublicGroup,
@@ -13,9 +15,7 @@ import {
    LivestreamEventPublicData,
    LivestreamGroupQuestionsMap,
 } from "../livestreams"
-import { Job } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
-import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -104,6 +104,8 @@ export interface UserData extends Identifiable {
     * Indicates if the user has completed the Sparks onboarding process
     */
    hasCompletedSparksB2BOnboarding?: boolean
+
+   companyUserFollowsIds?: Pick<CompanyFollowed, "groupId">[]
 }
 
 /*
