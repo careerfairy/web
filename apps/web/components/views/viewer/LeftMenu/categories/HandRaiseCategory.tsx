@@ -1,17 +1,17 @@
-import React, { useEffect } from "react"
-import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest"
-import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested"
-import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied"
-import HandRaiseConnecting from "./hand-raise/active/HandRaiseConnecting"
-import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected"
-import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
+import { useEffect } from "react"
+import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
 import useHandRaiseState from "../../../../custom-hook/useHandRaiseState"
 import HandRaisePromptDialog from "./hand-raise/HandRaisePromptDialog"
-import * as actions from "store/actions"
-import { useDispatch } from "react-redux"
 import HandRaiseAcquiringMedia from "./hand-raise/active/HandRaiseAcquiringMedia"
-import { HandRaiseState } from "types/handraise"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import HandRaiseConnected from "./hand-raise/active/HandRaiseConnected"
+import HandRaiseConnecting from "./hand-raise/active/HandRaiseConnecting"
+import HandRaiseDenied from "./hand-raise/active/HandRaiseDenied"
+import HandRaisePriorRequest from "./hand-raise/active/HandRaisePriorRequest"
+import HandRaiseRequested from "./hand-raise/active/HandRaiseRequested"
+import HandRaiseInactive from "./hand-raise/inactive/HandRaiseInactive"
 
 const HandRaiseCategory = ({
    livestream,
@@ -40,6 +40,7 @@ const HandRaiseCategory = ({
       } else {
          setHandRaiseActive(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       handRaiseState?.state,
       livestream.handRaiseActive,
@@ -60,6 +61,7 @@ const HandRaiseCategory = ({
          // connected, you should be put back in the connecting phase
          void updateHandRaiseRequest(HandRaiseState.connecting)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    const requestHandRaise = async () => {
@@ -73,6 +75,8 @@ const HandRaiseCategory = ({
    const unRequestHandRaise = () => {
       return updateHandRaiseRequest(HandRaiseState.unrequested)
    }
+
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const startConnectingHandRaise = () => {
       return updateHandRaiseRequest(HandRaiseState.connecting)
    }

@@ -1,7 +1,11 @@
-import React, { memo } from "react"
-import { Button, Grow } from "@mui/material"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded"
 import HandRaiseIcon from "@mui/icons-material/PanToolOutlined"
+import { Button, Grow } from "@mui/material"
+import useTimeOut from "components/custom-hook/useTimeOut"
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
@@ -10,8 +14,7 @@ import {
    CategorySubtitle,
    ThemedPermanentMarker,
 } from "materialUI/GlobalTitles"
-import useTimeOut from "components/custom-hook/useTimeOut"
-import { HandRaise, HandRaiseState } from "types/handraise"
+import { memo } from "react"
 
 const DELAY_IN_SECONDS = 5
 

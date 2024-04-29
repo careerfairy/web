@@ -24,11 +24,11 @@ import {
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
    LivestreamPromotions,
-   LivestreamQuestion,
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
+import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    TalentProfile,
    UserData,
@@ -40,7 +40,6 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { EmoteMessage } from "context/agora/RTMContext"
 import firebase from "firebase/compat/app"
-import { HandRaiseState } from "types/handraise"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
