@@ -10,15 +10,15 @@ import {
 import {
    CustomJobScriptsRepository,
    ICustomJobScriptsRepository,
-} from "../dist/api/CustomJobsScriptRepository"
+} from "./api/CustomJobsScriptRepository"
 import {
    GroupScriptsRepository,
    IGroupScriptsRepository,
-} from "../dist/api/GroupScriptsRepository"
+} from "./api/GroupScriptsRepository"
 import {
    ILivestreamScriptsRepository,
    LivestreamScriptsRepository,
-} from "../dist/api/LivestreamScriptsRepository"
+} from "./api/LivestreamScriptsRepository"
 import {
    IUserScriptsRepository,
    UserScriptsRepository,
