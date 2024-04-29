@@ -6,16 +6,16 @@ import {
 import { UserReminderType } from "@careerfairy/shared-lib/src/users"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
-import UserUtil from "../../../data/util/UserUtil"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useUserReminders } from "../../../HOCs/UserReminderProvider"
-import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
+import { sparkService } from "../../../data/firebase/SparksService"
+import UserUtil from "../../../data/util/UserUtil"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
-import { sparkService } from "../../../data/firebase/SparksService"
 
 /**
  * Logic for handling the register button click
@@ -134,9 +134,14 @@ export default function useRegistrationHandler() {
          ? { utm_source: "careerfairy", utm_medium: "sparks" }
          : null
 
+      const isOnJobDetailsDialog = asPath.includes("job-details")
+      const path = isOnJobDetailsDialog
+         ? asPath.split("job-details")[0]
+         : asPath
+
       return push({
          pathname: `/login`,
-         query: { absolutePath: asPath, ...utmParams },
+         query: { absolutePath: `${path}/register`, ...utmParams },
       })
    }, [asPath, pathname, push])
 
