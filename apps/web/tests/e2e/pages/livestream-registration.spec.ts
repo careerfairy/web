@@ -213,7 +213,7 @@ test.describe("Livestream Registration Signed Out", () => {
       // livestream dialog should be open after redirect
       await expect(page.getByText(livestream.title).first()).toBeVisible()
 
-      // redirected to livestream on the next step of the registration process
+      // Wait for the URL to redirect to the livestream registration page
       await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 
@@ -243,7 +243,7 @@ test.describe("Livestream Registration Signed Out", () => {
       const email = UserSeed.getRandomEmail()
       await signup.signupUser(email)
 
-      // redirection to livestream on the next step of the registration process
+      // Wait for the URL to redirect to the livestream registration page 1st step of the registration process
       await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 })
