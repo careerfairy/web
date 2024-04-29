@@ -1,13 +1,13 @@
-import { FC, forwardRef, ReactNode } from "react"
-import Stack from "@mui/material/Stack"
-import { combineStyles, sxStyles } from "../../../types/commonTypes"
-import { Box, Container, IconButton, Typography } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
-import Image from "next/legacy/image"
-import { useMeasure } from "react-use"
-import { SxProps } from "@mui/system"
+import { Box, Container, IconButton, Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { SxProps } from "@mui/system"
+import Image from "next/legacy/image"
+import { FC, forwardRef, ReactNode } from "react"
+import { useMeasure } from "react-use"
+import { combineStyles, sxStyles } from "../../../types/commonTypes"
 
 const responsiveBreakpoint = "md"
 
@@ -177,7 +177,10 @@ const BackAndCloseButton: FC<BackAndCloseButtonProps> = ({
    if (onBackPosition === "top-left") {
       return (
          <Box color={color} sx={styles.topLeft}>
-            <IconButton onClick={onBackClick}>
+            <IconButton
+               data-testid="livestream-dialog-back-button"
+               onClick={onBackClick}
+            >
                <BackIcon sx={[styles.closeIcon, colorStyle]} />
             </IconButton>
          </Box>
