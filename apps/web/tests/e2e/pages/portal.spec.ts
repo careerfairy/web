@@ -1,11 +1,11 @@
-import { expect } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
+import { expect } from "@playwright/test"
 import { signedInFixture as test } from "../fixtures"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { LoginPage } from "../page-object-models/LoginPage"
-import { setupLivestreamData, setupUserSignUpData } from "../setupData"
-import { SignupPage } from "../page-object-models/SignupPage"
 import { PortalPage } from "../page-object-models/PortalPage"
+import { SignupPage } from "../page-object-models/SignupPage"
+import { setupLivestreamData, setupUserSignUpData } from "../setupData"
 
 test.describe("Welcome Dialog", () => {
    test("Welcome dialog should not appear when complete", async ({
@@ -60,7 +60,9 @@ test.describe("Welcome Dialog", () => {
       await signup.signupUser(email)
 
       // redirection to livestream should work
-      await page.waitForURL(`**/portal/livestream/${livestream.id}`)
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
+
+      await livestreamDialogPage.clickOnDialogBackButton()
       await livestreamDialogPage.closeDialog()
 
       const portal = new PortalPage(page)
