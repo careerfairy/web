@@ -25,11 +25,6 @@ export interface CustomJob extends Identifiable {
    // livestreams ids where this job opening is shown
    livestreams: string[]
    deleted?: boolean
-
-   // cascaded properties from groups (collection /careerCenterData)
-   companyCountry?: string
-   companyIndustries?: string[]
-   companySize?: string
 }
 
 export type PublicCustomJob = Pick<
@@ -101,4 +96,8 @@ export interface CustomJobApplicant extends Identifiable {
    appliedAt: firebase.firestore.Timestamp
    livestreamId: string // The associated livestream where the user applied to the job
    job: CustomJob
+   // cascaded properties from groups (collection /careerCenterData)
+   companyCountry?: string
+   companyIndustries?: string[]
+   companySize?: string
 }
