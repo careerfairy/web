@@ -1,15 +1,15 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
-} from "@careerfairy/shared-lib/dist/customJobs/CustomJobRepository"
+} from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
 import {
    CustomJob,
    CustomJobApplicant,
    CustomJobStats,
-} from "@careerfairy/shared-lib/dist/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
 
@@ -212,6 +212,7 @@ export class CustomJobFunctionsRepository
       group: Group
    ): Promise<void> {
       const groupJobsQuery = this.groupCustomJobsApplicationsQuery(groupId)
+      console.log("🚀 ~ executing syncCustomJobDataGroupMetaData:", groupId)
 
       const snapshots = await groupJobsQuery.get()
 

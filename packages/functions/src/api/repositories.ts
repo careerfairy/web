@@ -16,7 +16,10 @@ import {
 } from "../lib/LivestreamFunctionsRepository"
 import { BigQueryRepository, IBigQueryRepository } from "./bigQuery"
 
-import { getATSRepository } from "../lib/merge/util"
+import {
+   EmailNotificationFunctionsRepository,
+   IEmailNotificationRepository,
+} from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
@@ -26,31 +29,28 @@ import {
    IUserFunctionsRepository,
    UserFunctionsRepository,
 } from "../lib/UserFunctionsRepository"
+import { getATSRepository } from "../lib/merge/util"
 import {
    ISparkFunctionsRepository,
    SparkFunctionsRepository,
 } from "../lib/sparks/SparkFunctionsRepository"
-import {
-   IEmailNotificationRepository,
-   EmailNotificationFunctionsRepository,
-} from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
 
-import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
-import { FieldValue, firestore, Timestamp, storage } from "./firestoreAdmin"
-
-import logger = require("firebase-functions/logger")
-import bigQueryClient from "./bigQueryClient"
-import {
-   sparkEventsHandler,
-   sparkSecondsWatchedHanlder,
-} from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
-import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
 } from "../lib/CustomJobFunctionsRepository"
+import {
+   sparkEventsHandler,
+   sparkSecondsWatchedHanlder,
+} from "../lib/bigQuery/sparks/SparksBigQueryServices"
+import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
+import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
+import bigQueryClient from "./bigQueryClient"
+import { FieldValue, Timestamp, firestore, storage } from "./firestoreAdmin"
+
+import logger = require("firebase-functions/logger")
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestore as any, FieldValue)
