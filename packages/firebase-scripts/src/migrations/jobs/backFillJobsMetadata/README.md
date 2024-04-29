@@ -1,7 +1,7 @@
-# Back-fill Custom Job (Job Applications) Metadata
+# Back-fill Custom Job Applications Metadata
 
-Will fetch all custom jobs and groups, then look at all the job hosts
-and cascade their metadata to the live stream document.
+Will fetch all custom job applications (collection /jobApllications) and groups, then look at all the job application hosts (group/company)
+and cascade their metadata to the jobApllications/{id} document.
 
 The metadata that is cascaded is:
 
