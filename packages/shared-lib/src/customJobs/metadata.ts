@@ -1,9 +1,9 @@
 import { Group } from "../groups"
 import { getArrayDifference } from "../utils"
-import { CustomJob } from "./customJobs"
+import { CustomJobApplicant } from "./customJobs"
 
 type MetaData = Pick<
-   CustomJob,
+   CustomJobApplicant,
    "companyCountry" | "companyIndustries" | "companySize"
 >
 

@@ -11,6 +11,7 @@ import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
 
+const RUNNING_VERSION = "0.1"
 const counter = new Counter()
 
 // types
@@ -21,7 +22,9 @@ let groupsDict: Record<string, Group>
 
 export async function run() {
    try {
-      Counter.log("Fetching data for Backfilling Job Applications")
+      Counter.log(
+         `Fetching data for Backfilling Job Applications - version ${RUNNING_VERSION}`
+      )
 
       const [allJobApplications, groups] = await logAction(
          () =>
