@@ -1,5 +1,5 @@
 import { uniq } from "lodash"
-import { Group } from "../groups"
+import { Group, GroupOption } from "../groups"
 import { getArrayDifference } from "../utils"
 import { LivestreamEvent } from "./livestreams"
 
@@ -100,8 +100,8 @@ export const hasMetadataChanged = (
       previousValue?.companyCountry?.id != currentValue?.companyCountry?.id
 
    const industriesDifference = getArrayDifference(
-      previousValue?.companyIndustries?.map((industry) => industry.id),
-      currentValue?.companyIndustries?.map((industry) => industry.id)
+      previousValue?.companyIndustries?.map(groupOptionId),
+      currentValue?.companyIndustries?.map(groupOptionId)
    )
 
    const industriesChanged = Boolean(industriesDifference?.length)
@@ -109,15 +109,15 @@ export const hasMetadataChanged = (
    const sizeChanged = previousValue?.companySize != currentValue?.companySize
 
    const targetCountriesDifference = getArrayDifference(
-      previousValue?.targetedCountries?.map((country) => country.id),
-      currentValue?.targetedCountries?.map((country) => country.id)
+      previousValue?.targetedCountries?.map(groupOptionId),
+      currentValue?.targetedCountries?.map(groupOptionId)
    )
 
    const targetCountriesChanged = Boolean(targetCountriesDifference.length)
 
    const targetUniversitiesDifference = getArrayDifference(
-      previousValue?.targetedUniversities?.map((uni) => uni.id),
-      currentValue?.targetedUniversities?.map((uni) => uni.id)
+      previousValue?.targetedUniversities?.map(groupOptionId),
+      currentValue?.targetedUniversities?.map(groupOptionId)
    )
 
    const targetUniversitiesChanged = Boolean(
@@ -125,12 +125,8 @@ export const hasMetadataChanged = (
    )
 
    const fieldsOfStudyDifferences = getArrayDifference(
-      previousValue?.targetedFieldsOfStudy?.map(
-         (fieldOfStudy) => fieldOfStudy.id
-      ),
-      currentValue?.targetedFieldsOfStudy?.map(
-         (fieldOfStudy) => fieldOfStudy.id
-      )
+      previousValue?.targetedFieldsOfStudy?.map(groupOptionId),
+      currentValue?.targetedFieldsOfStudy?.map(groupOptionId)
    )
 
    const targetFieldsOfStudiesChanged = Boolean(fieldsOfStudyDifferences.length)
@@ -143,4 +139,8 @@ export const hasMetadataChanged = (
       targetUniversitiesChanged ||
       targetFieldsOfStudiesChanged
    )
+}
+
+const groupOptionId = (option: GroupOption): string => {
+   return option.id
 }
