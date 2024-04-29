@@ -23,7 +23,7 @@ let groupsDict: Record<string, Group>
 export async function run() {
    try {
       Counter.log(
-         `Fetching data for Backfilling Job Applications - version ${RUNNING_VERSION}`
+         `Fetching data for Backfilling Job Applications - v${RUNNING_VERSION}`
       )
 
       const [allJobApplications, groups] = await logAction(
