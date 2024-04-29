@@ -1,13 +1,13 @@
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { collection, query, where } from "firebase/firestore"
+import { useEffect, useMemo } from "react"
+import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import useSWR, { preload } from "swr"
+import { useAuth } from "../../HOCs/AuthProvider"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
-import { useEffect, useMemo } from "react"
-import { useFirestore, useFirestoreCollectionData } from "reactfire"
-import { collection, query, where } from "firebase/firestore"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { useAuth } from "../../HOCs/AuthProvider"
 
 type Config = {
    limit: FirebaseInArrayLimit
@@ -48,6 +48,7 @@ const useRecommendedEvents = (
    )
 
    const { data: events, status } = useFirestoreCollectionData<LivestreamEvent>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collectionRef as any,
       {
          idField: "id",
@@ -60,12 +61,22 @@ const useRecommendedEvents = (
       events || []
    )
 
+   //TODO: memoise
+   const sortedEvents = [...filteredEvents].sort(
+      (baseEvent, comparisonEvent) => {
+         return (
+            eventIds.indexOf(baseEvent.id) -
+            eventIds.indexOf(comparisonEvent.id)
+         )
+      }
+   )
+
    return useMemo(
       () => ({
-         events: filteredEvents,
+         events: sortedEvents,
          loading: status === "loading",
       }),
-      [filteredEvents, status]
+      [status, sortedEvents]
    )
 }
 
