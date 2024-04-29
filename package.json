@@ -11,6 +11,7 @@
       "dev": "turbo run dev --parallel",
       "test": "turbo test",
       "clean": "turbo run clean",
+      "clean-packages-dist": "func() { rimraf packages/\"$1\"/dist; }; func",
       "start": "turbo run start --parallel",
       "storybook": "turbo storybook",
       "storybook-build": "turbo storybook-build",
