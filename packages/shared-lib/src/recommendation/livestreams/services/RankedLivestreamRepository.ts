@@ -3,6 +3,7 @@ import { LivestreamEvent } from "../../../livestreams"
 import { sortLivestreamsDesc } from "../../../utils"
 import { RankedLivestreamEvent } from "../../livestreams/RankedLivestreamEvent"
 import { sortRankedByPoints } from "../../utils"
+import { RECOMMENDATION_POINTS } from "../constants"
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
@@ -19,14 +20,6 @@ type RankEventsArgs = {
  * update it to fetch the data from a data bundle
  */
 export class RankedLivestreamRepository {
-   private readonly pointsPerInterestMatch = 1
-   private readonly pointsPerCountryMatch = 3
-   private readonly pointsPerFieldOfStudyMatch = 5
-   private readonly pointsPerCompanyIndustryMatch = 2
-   private readonly pointsPerCompanySizeMatch = 1
-   private readonly pointsPerUniversityCountryMatch = 5
-   private readonly pointsPerSpokenLanguageMatch = 3
-
    private readonly livestreams: RankedLivestreamEvent[]
 
    constructor(livestreams: LivestreamEvent[]) {
@@ -51,7 +44,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerFieldOfStudyMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerFieldOfStudyMatch,
          rankedLivestreams: events,
          targetUserIds: fieldOfStudies.map((f) => f.id),
          targetLivestreamIdsGetter: (stream) => stream.getFieldOfStudyIds(),
@@ -63,16 +56,17 @@ export class RankedLivestreamRepository {
       limit = 10
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
-         "companyCountries",
+         "companyTargetedCountries",
          countriesOfInterest,
          limit
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerCountryMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCountryOfInterestMatch,
          rankedLivestreams: events,
          targetUserIds: countriesOfInterest,
-         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getCompanyTargetCountries(),
       })
    }
 
@@ -87,7 +81,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerCompanyIndustryMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanyIndustryMatch,
          rankedLivestreams: events,
          targetUserIds: industries,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
@@ -105,7 +99,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerCompanySizeMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanySizeMatch,
          rankedLivestreams: events,
          targetUserIds: sizes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
@@ -123,28 +117,144 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerInterestMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerInterestMatch,
          rankedLivestreams: events,
          targetUserIds: interestIds,
          targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
       })
    }
 
-   public getEventsBasedOnUniversityCountry(
+   public getEventsBasedOnTargetCountry(
       universityCountryCode: string,
       limit = 10
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
-         "companyCountries",
+         "targetCountries",
          [universityCountryCode],
          limit
       )
 
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerUniversityCountryMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerUniversityCountryMatch,
          rankedLivestreams: events,
          targetUserIds: [universityCountryCode],
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
+      })
+   }
+
+   public getEventsBasedOnTargetUniversity(
+      universityCode: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "targetUniversities",
+         [universityCode],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.pointsPerTargetUniversityNameMatch,
+         rankedLivestreams: events,
+         targetUserIds: [universityCode],
+         targetLivestreamIdsGetter: (stream) => stream.getTargetUniversities(),
+      })
+   }
+
+   public getEventsBasedOnTargetLevelOfStudy(
+      levelOfStudyId: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "targetLevelsOfStudy",
+         [levelOfStudyId],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerTargetLevelOfStudyMatch,
+         rankedLivestreams: events,
+         targetUserIds: [levelOfStudyId],
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getTargetLevelOfStudyIds(),
+      })
+   }
+
+   public getEventsBasedOnCompanies(
+      groupIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "groupIds",
+         [groupIds],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanyMatch,
+         rankedLivestreams: events,
+         targetUserIds: [groupIds],
+         targetLivestreamIdsGetter: (stream) => stream.getGroupIds(),
+      })
+   }
+
+   public getEventsBasedOnCompanyTargetCountry(
+      countryCode: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyTargetedCountries",
+         [countryCode],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.pointsPerCompanyTargetCountryMatch,
+         rankedLivestreams: events,
+         targetUserIds: [countryCode],
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getCompanyTargetCountries(),
+      })
+   }
+
+   public getEventsBasedOnCompanyTargetUniversities(
+      universityCode: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyTargetedUniversities",
+         [universityCode],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.pointsPerCompanyTargetUniversitiesMatch,
+         rankedLivestreams: events,
+         targetUserIds: [universityCode],
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getCompanyTargetUniversities(),
+      })
+   }
+
+   public getEventsBasedOnCompanyTargetFieldOfStudy(
+      fieldsOfStudyIds: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyTargetedFieldsOfStudies",
+         [fieldsOfStudyIds],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.pointsPerCompanyTargetFieldsOfStudyMatch,
+         rankedLivestreams: events,
+         targetUserIds: [fieldsOfStudyIds],
+         targetLivestreamIdsGetter: (stream) =>
+            stream.getCompanyTargetFieldsOfStudies(),
       })
    }
 
@@ -152,8 +262,9 @@ export class RankedLivestreamRepository {
       spokenLanguages: string[]
    ): RankedLivestreamEvent[] {
       return this.rankEvents({
-         pointsPerMatch: this.pointsPerSpokenLanguageMatch,
-         pointsPerMissingMatch: -this.pointsPerSpokenLanguageMatch, // decrease points if the user does not speak the language
+         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerSpokenLanguageMatch,
+         pointsPerMissingMatch:
+            -RECOMMENDATION_POINTS.pointsPerSpokenLanguageDeduct, // decrease points if the user does not speak the language
          // use all livestreams since we want to decrease the points if the user does not speak the language
          rankedLivestreams: this.livestreams,
          targetUserIds: spokenLanguages,
@@ -197,8 +308,8 @@ export class RankedLivestreamRepository {
          const numMissingMatches = targetUserIds.length - numMatches
 
          if (numMissingMatches > 0) {
-            const missMacthPoints = numMissingMatches * pointsPerMissingMatch
-            rankedLivestream.addPoints(missMacthPoints)
+            const mismatchPoints = numMissingMatches * pointsPerMissingMatch
+            rankedLivestream.addPoints(mismatchPoints)
          }
 
          // Add points to the event based on the number of matches

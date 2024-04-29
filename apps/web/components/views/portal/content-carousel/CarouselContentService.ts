@@ -3,11 +3,11 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import { sparkService } from "data/firebase/SparksService"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
-import { firebaseServiceInstance } from "data/firebase/FirebaseService"
-import { sparkService } from "data/firebase/SparksService"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -67,6 +67,10 @@ export class CarouselContentService {
 
    constructor(options: GetContentOptions) {
       this.options = options
+      console.log(
+         "🚀 ~ CarouselContentService ~ constructor ~ options:",
+         options?.upcomingLivestreams.map((l) => l.title + " - " + l.title)
+      )
       this.pastEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
@@ -98,6 +102,10 @@ export class CarouselContentService {
             ),
          ])
 
+      console.log(
+         "🚀 ~ CarouselContentService ~ getCarouselContent ~ recommendedUpcomingLivestreams:",
+         recommendedUpcomingLivestreams.map((l) => l.id + " - " + l.title)
+      )
       const numberOfCredits = this.options.userData?.credits ?? 0
 
       // Scenario selection

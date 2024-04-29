@@ -1,19 +1,19 @@
 import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
 import {
    handlePromisesAllSettled,
    sortRankedByPoints,
 } from "@careerfairy/shared-lib/recommendation/utils"
-import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
-import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
+import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 
 /**
  * Best livestreams for a user based on their Metadata
