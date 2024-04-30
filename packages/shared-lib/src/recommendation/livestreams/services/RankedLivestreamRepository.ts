@@ -44,7 +44,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerFieldOfStudyMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_FIELD_OF_STUDY_MATCH,
          rankedLivestreams: events,
          targetUserIds: fieldOfStudies.map((f) => f.id),
          targetLivestreamIdsGetter: (stream) => stream.getFieldOfStudyIds(),
@@ -62,7 +62,8 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCountryOfInterestMatch,
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_COMPANY_TARGET_COUNTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: countriesOfInterest,
          targetLivestreamIdsGetter: (stream) =>
@@ -81,7 +82,8 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanyIndustryMatch,
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_COMPANY_INDUSTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: industries,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
@@ -99,7 +101,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanySizeMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
          targetUserIds: sizes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
@@ -117,7 +119,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerInterestMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_INTEREST_MATCH,
          rankedLivestreams: events,
          targetUserIds: interestIds,
          targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
@@ -135,7 +137,8 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerUniversityCountryMatch,
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_UNIVERSITY_COUNTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [universityCountryCode],
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
@@ -154,7 +157,7 @@ export class RankedLivestreamRepository {
 
       return this.rankEvents({
          pointsPerMatch:
-            RECOMMENDATION_POINTS.pointsPerTargetUniversityNameMatch,
+            RECOMMENDATION_POINTS.POINTS_PER_TARGET_UNIVERSITY_NAME_MATCH,
          rankedLivestreams: events,
          targetUserIds: [universityCode],
          targetLivestreamIdsGetter: (stream) => stream.getTargetUniversities(),
@@ -172,7 +175,8 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerTargetLevelOfStudyMatch,
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.POINTS_PER_TARGET_LEVEL_OF_STUDY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [levelOfStudyId],
          targetLivestreamIdsGetter: (stream) =>
@@ -191,7 +195,7 @@ export class RankedLivestreamRepository {
       )
 
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerCompanyMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_COMPANY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [groupIds],
          targetLivestreamIdsGetter: (stream) => stream.getGroupIds(),
@@ -210,7 +214,7 @@ export class RankedLivestreamRepository {
 
       return this.rankEvents({
          pointsPerMatch:
-            RECOMMENDATION_POINTS.pointsPerCompanyTargetCountryMatch,
+            RECOMMENDATION_POINTS.POINTS_PER_COMPANY_TARGET_COUNTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [countryCode],
          targetLivestreamIdsGetter: (stream) =>
@@ -230,7 +234,7 @@ export class RankedLivestreamRepository {
 
       return this.rankEvents({
          pointsPerMatch:
-            RECOMMENDATION_POINTS.pointsPerCompanyTargetUniversitiesMatch,
+            RECOMMENDATION_POINTS.POINTS_PER_COMPANY_TARGET_UNIVERSITIES_MATCH,
          rankedLivestreams: events,
          targetUserIds: [universityCode],
          targetLivestreamIdsGetter: (stream) =>
@@ -250,7 +254,7 @@ export class RankedLivestreamRepository {
 
       return this.rankEvents({
          pointsPerMatch:
-            RECOMMENDATION_POINTS.pointsPerCompanyTargetFieldsOfStudyMatch,
+            RECOMMENDATION_POINTS.POINTS_PER_COMPANY_TARGET_FIELDS_OF_STUDY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [fieldsOfStudyIds],
          targetLivestreamIdsGetter: (stream) =>
@@ -262,9 +266,9 @@ export class RankedLivestreamRepository {
       spokenLanguages: string[]
    ): RankedLivestreamEvent[] {
       return this.rankEvents({
-         pointsPerMatch: RECOMMENDATION_POINTS.pointsPerSpokenLanguageMatch,
+         pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_MATCH,
          pointsPerMissingMatch:
-            -RECOMMENDATION_POINTS.pointsPerSpokenLanguageDeduct, // decrease points if the user does not speak the language
+            -RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_DEDUCT, // decrease points if the user does not speak the language
          // use all livestreams since we want to decrease the points if the user does not speak the language
          rankedLivestreams: this.livestreams,
          targetUserIds: spokenLanguages,
@@ -310,8 +314,13 @@ export class RankedLivestreamRepository {
          if (numMissingMatches > 0) {
             const mismatchPoints = numMissingMatches * pointsPerMissingMatch
             console.log(
-               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ pointsPerMissingMatch:",
-               pointsPerMissingMatch
+               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ numMissingMatches,pointsPerMissingMatch,mismatches,id: ",
+               numMissingMatches,
+               pointsPerMissingMatch == 0 ? "-00" : pointsPerMissingMatch, // For formatting purposes only
+               pointsPerMissingMatch != 0
+                  ? `{ targetIds[${targetIds}] <> targetUserIds[${targetUserIds}] }`
+                  : "{ no pointsPerMissingMatch }",
+               rankedLivestream.model.id
             )
             rankedLivestream.addPoints(mismatchPoints)
          }
