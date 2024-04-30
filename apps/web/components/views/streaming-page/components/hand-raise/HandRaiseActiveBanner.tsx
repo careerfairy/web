@@ -1,5 +1,6 @@
 import { Box, Collapse, Typography } from "@mui/material"
-import { useHandRaiseActive } from "store/selectors/streamingAppSelectors"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 
@@ -27,13 +28,29 @@ const styles = sxStyles({
 })
 
 export const HandRaiseActiveBanner = () => {
-   const { isHost } = useStreamingContext()
-   const handRaiseActive = useHandRaiseActive()
+   const { isHost, agoraUserId, livestreamId } = useStreamingContext()
+   const handRaiseActive = useStreamHandRaiseActive()
 
-   if (!isHost) return null // TODO: Add banner for when user raises hand
+   const { isActive: userHandRaiseActive } = useUserHandRaiseState(
+      livestreamId,
+      agoraUserId
+   )
+
+   if (isHost) {
+      return (
+         <Collapse in={handRaiseActive} unmountOnExit>
+            <Box sx={styles.root}>
+               <Typography sx={styles.text}>
+                  <b>Hand raise active:</b> Your audience can now request to
+                  join via audio and video.
+               </Typography>
+            </Box>
+         </Collapse>
+      )
+   }
 
    return (
-      <Collapse in={handRaiseActive} unmountOnExit>
+      <Collapse in={userHandRaiseActive} unmountOnExit>
          <Box sx={styles.root}>
             <Typography sx={styles.text}>
                <b>Hand raise active:</b> Your audience can now request to join
