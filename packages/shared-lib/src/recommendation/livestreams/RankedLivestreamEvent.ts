@@ -11,13 +11,14 @@ export class RankedLivestreamEvent {
       this.model = model
       this.id = model.id
       // Divide popularity by the median value and ensure the minimum value is 1
+      //TODO: Confirm persistance of rule
       this.points = model?.popularity
          ? model.popularity / 120 < 1
             ? 1
             : model.popularity / 120
          : 1
 
-      this.points = this.aggregationPoints(this, this.points)
+      this.points = this.calculateInitialPoints(this, this.points)
    }
 
    private additionalPopularityPoints = (
@@ -25,31 +26,23 @@ export class RankedLivestreamEvent {
       popularity: number
    ): number => {
       if (!popularity) {
-         // console.log(
-         //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: NONE`
-         // )
          return points
       }
 
+      // using const to allow debugging if needed
       const resultPoints =
-         points + RECOMMENDATION_POINTS.popularityDenominator / popularity
+         points + RECOMMENDATION_POINTS.POPULARITY_NUMERATOR / popularity
 
-      // console.log(
-      //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: ${popularity} -> ${points} + ${RECOMMENDATION_POINTS.popularityDenominator} / ${popularity} = ${resultPoints}`
-      // )
       return resultPoints
    }
 
    private additionalPointsIfJobsLinked = (points: number): number => {
-      const resultPoints = points + RECOMMENDATION_POINTS.pointsIfJobsLinked
+      const resultPoints = points + RECOMMENDATION_POINTS.POINTS_IF_JOBS_LINKED
 
-      // console.log(
-      //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: true -> ${points} + ${RECOMMENDATION_POINTS.pointsIfJobsLinked} = ${resultPoints}`
-      // )
       return resultPoints
    }
 
-   private aggregationPoints(
+   private calculateInitialPoints(
       rankedLivestream: RankedLivestreamEvent,
       calculatedPoints: number
    ): number {
@@ -58,9 +51,7 @@ export class RankedLivestreamEvent {
       if (rankedLivestream.model?.hasJobs) {
          points = this.additionalPointsIfJobsLinked(points)
       } else {
-         // console.log(
-         //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: NONE`
-         // )
+         // Place holder for debugging when not having jobs
       }
 
       points = this.additionalPopularityPoints(
