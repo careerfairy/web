@@ -309,6 +309,10 @@ export class RankedLivestreamRepository {
 
          if (numMissingMatches > 0) {
             const mismatchPoints = numMissingMatches * pointsPerMissingMatch
+            console.log(
+               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ pointsPerMissingMatch:",
+               pointsPerMissingMatch
+            )
             rankedLivestream.addPoints(mismatchPoints)
          }
 
