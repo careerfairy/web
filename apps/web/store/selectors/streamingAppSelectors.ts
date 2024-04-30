@@ -78,5 +78,5 @@ export const useOpenStream = () =>
 export const useCompanyLogoUrl = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.companyLogoUrl)
 
-export const useHandRaiseActive = () =>
+export const useStreamHandRaiseActive = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.handRaiseActive)

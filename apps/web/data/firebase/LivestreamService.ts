@@ -29,6 +29,10 @@ import {
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
@@ -943,6 +947,31 @@ export class LivestreamService {
          "toggleHandRaise"
       )(options)
       return
+   }
+
+   async setUserHandRaiseState(
+      livestreamId: string,
+      agoraUserId: string,
+      displayName: string,
+      newState: HandRaiseState
+   ) {
+      const handRaiseStateRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "handRaises",
+         agoraUserId
+      ).withConverter(createGenericConverter<HandRaise>())
+
+      return setDoc(
+         handRaiseStateRef,
+         {
+            name: displayName,
+            state: newState,
+            timeStamp: Timestamp.now(),
+         },
+         { merge: true }
+      )
    }
 }
 
