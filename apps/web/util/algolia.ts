@@ -41,9 +41,13 @@ export const deserializeAlgoliaSearchResponse = <
       return value
    }
 
-   return Object.fromEntries(
+   const entity = Object.fromEntries(
       Object.entries(hit).map(([key, value]) => [key, convertValue(value)])
-   ) as DeserializedResultType
+   ) as DeserializedResultType & { id: string }
+
+   entity.id = hit.objectID
+
+   return entity
 }
 
 /**

@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import * as Sentry from "@sentry/nextjs"
@@ -79,10 +80,9 @@ export function getReferralInformation() {
  * @returns {string}
  */
 export function getListSeparator() {
-   let list = ["a", "b"],
-      str
+   const list = ["a", "b"]
    if (list.toLocaleString) {
-      str = list.toLocaleString()
+      const str = list.toLocaleString()
       if (str.indexOf(";") > 0 && str.indexOf(",") === -1) {
          return ";"
       }
@@ -101,7 +101,7 @@ export function getCSVDelimiterBasedOnOS() {
 }
 
 export const getQueryStringFromUrl = (url = "", queryParam = "") => {
-   let params = new URL(url).searchParams
+   const params = new URL(url).searchParams
    return params.get(queryParam)
 }
 
@@ -240,14 +240,33 @@ export const shouldUseEmulators = () => {
    return false
 }
 
+/**
+ * Get the workflow id from the environment variables
+ * This is used to isolate test data and operations
+ * @returns the workflow id or the dev name or "unknown" if neither is set
+ */
+export const getWorkflowId = (): string => {
+   return (
+      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
+      process.env.NEXT_PUBLIC_DEV_NAME ||
+      "unknown"
+   )
+}
+
+export const isTestEnvironment = () => {
+   return process.env.NEXT_PUBLIC_DEV_NAME === "test"
+}
+
 export const getEnvPrefix = () => {
    if (!shouldUseEmulators()) {
-      return "" // no prefix for production
+      return "prod"
    }
 
-   const prefix = process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
+   if (isTestEnvironment()) {
+      return "test"
+   }
 
-   return `_${prefix}`
+   return process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
 }
 
 export const getDictValues = <K extends keyof any, T>(

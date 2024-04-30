@@ -11,7 +11,7 @@ import { IndexName, indexNames, knownIndexes } from "./lib/search/searchIndexes"
 import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
 import { getData } from "./lib/search/searchIndexGenerator"
-import { initAlgoliaIndex } from "./lib/search/util"
+import { configureSettings, initAlgoliaIndex } from "./lib/search/util"
 import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
 
 const DOCS_PER_INDEXING = 250
@@ -72,7 +72,9 @@ export const fullIndexSync = functions
       } = knownIndexes[indexName]
 
       if (settings) {
-         await index.setSettings(settings)
+         functions.logger.info(`Configuring settings for ${indexName}`)
+         await configureSettings(settings, index)
+         functions.logger.info(`Settings configured for ${indexName}`)
       }
 
       // Reference to the Firestore collection
