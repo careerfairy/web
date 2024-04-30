@@ -1,13 +1,12 @@
-import React, { FC, SyntheticEvent, useCallback, useMemo } from "react"
+import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
+import { InputAdornment, Paper, styled } from "@mui/material"
 import Autocomplete, {
    AutocompleteInputChangeReason,
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete"
-import { InputAdornment, styled } from "@mui/material"
+import React, { FC, SyntheticEvent, useCallback, useMemo } from "react"
 import { sxStyles } from "../../../types/commonTypes"
 import { StyledTextField } from "../group/admin/common/inputs"
-import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
-import { Paper } from "@mui/material"
 
 const styles = sxStyles({
    listBox: {
@@ -145,7 +144,6 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                : noOptionsText
          }
          onChange={onChange}
-         inputValue={inputValue}
          onInputChange={onInputChange}
          renderInput={(params) => (
             <StyledTextField
