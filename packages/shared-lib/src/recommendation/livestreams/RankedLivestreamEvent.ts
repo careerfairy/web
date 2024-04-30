@@ -24,28 +24,28 @@ export class RankedLivestreamEvent {
       points: number,
       popularity: number
    ): number => {
-      if (popularity == undefined) {
-         console.log(
-            `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: NONE`
-         )
+      if (!popularity) {
+         // console.log(
+         //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: NONE`
+         // )
          return points
       }
 
       const resultPoints =
          points + RECOMMENDATION_POINTS.popularityDenominator / popularity
 
-      console.log(
-         `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: ${popularity} -> ${points} + ${RECOMMENDATION_POINTS.popularityDenominator} / ${popularity} = ${resultPoints}`
-      )
+      // console.log(
+      //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: ${popularity} -> ${points} + ${RECOMMENDATION_POINTS.popularityDenominator} / ${popularity} = ${resultPoints}`
+      // )
       return resultPoints
    }
 
    private additionalPointsIfJobsLinked = (points: number): number => {
       const resultPoints = points + RECOMMENDATION_POINTS.pointsIfJobsLinked
 
-      console.log(
-         `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: true -> ${points} + ${RECOMMENDATION_POINTS.pointsIfJobsLinked} = ${resultPoints}`
-      )
+      // console.log(
+      //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: true -> ${points} + ${RECOMMENDATION_POINTS.pointsIfJobsLinked} = ${resultPoints}`
+      // )
       return resultPoints
    }
 
@@ -58,9 +58,9 @@ export class RankedLivestreamEvent {
       if (rankedLivestream.model?.hasJobs) {
          points = this.additionalPointsIfJobsLinked(points)
       } else {
-         console.log(
-            `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: NONE`
-         )
+         // console.log(
+         //    `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: NONE`
+         // )
       }
 
       points = this.additionalPopularityPoints(
