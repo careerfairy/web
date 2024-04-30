@@ -1,15 +1,16 @@
-import React, { useCallback } from "react"
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { Box, Card } from "@mui/material"
-import { sxStyles } from "../../../../../../../types/commonTypes"
-import LivestreamSearch from "../../../common/LivestreamSearch"
 import Stack from "@mui/material/Stack"
-import UserTypeTabs from "./UserTypeTabs"
-import ExportPdfButton from "../../../common/ExportPDFButton"
-import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 import { useRouter } from "next/router"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { useCallback, useEffect, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import { LivestreamSearchResult } from "types/algolia"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import ExportPdfButton from "../../../common/ExportPDFButton"
+import LivestreamSearch from "../../../common/LivestreamSearch"
+import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
+import UserTypeTabs from "./UserTypeTabs"
 
 const spacing = 3
 
@@ -31,6 +32,7 @@ const LivestreamSearchNav = () => {
    const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
    const { push } = useRouter()
    const { group } = useGroup()
+   const [inputValue, setInputValue] = useState("")
 
    const handleChange = useCallback(
       (newValue: LivestreamSearchResult | null) => {
@@ -45,6 +47,12 @@ const LivestreamSearchNav = () => {
       [group.id, push]
    )
 
+   useEffect(() => {
+      if (currentStreamStats?.livestream) {
+         setInputValue(currentStreamStats.livestream.title)
+      }
+   }, [currentStreamStats?.livestream])
+
    return (
       <Stack
          sx={styles.wrapper}
@@ -55,6 +63,9 @@ const LivestreamSearchNav = () => {
          <Box sx={styles.searchWrapper} flex={1}>
             <Card sx={styles.searchCard}>
                <LivestreamSearch
+                  targetReplica={LIVESTREAM_REPLICAS.START_DESC}
+                  inputValue={inputValue}
+                  setInputValue={setInputValue}
                   handleChange={handleChange}
                   value={
                      (currentStreamStats?.livestream as LivestreamSearchResult) ??

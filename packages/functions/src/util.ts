@@ -386,12 +386,12 @@ export const isProductionEnvironment = () => {
    return process.env.NODE_ENV === "production"
 }
 
-export const getEnvPrefix = () => {
+export const getBigQueryTablePrefix = () => {
    if (isProductionEnvironment()) {
       return ""
    }
 
-   const prefix = process.env.BIGQUERY_TABLE_PREFIX || "unknown"
+   const prefix = process.env.DEV_NAME || "unknown"
 
    return `_${prefix}`
 }

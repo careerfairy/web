@@ -1,5 +1,6 @@
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, SyntheticEvent, useCallback, useMemo } from "react"
 import Autocomplete, {
+   AutocompleteInputChangeReason,
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete"
 import { InputAdornment, styled } from "@mui/material"
@@ -49,6 +50,7 @@ type AutocompleteSearchProps<TOption = unknown> = {
    disableFiltering?: boolean
    open?: boolean
    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+   freeSolo?: boolean
 }
 
 const StyledPaper = styled(Paper)({
@@ -81,6 +83,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    disableFiltering,
    open,
    setOpen,
+   freeSolo,
 }) => {
    const inputTooSmall = minCharacters && inputValue.length < minCharacters
 
@@ -99,14 +102,20 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    )
 
    const onInputChange = useCallback(
-      (event, newInputValue: string, reason) => {
+      (
+         event: SyntheticEvent,
+         value: string,
+         reason: AutocompleteInputChangeReason
+      ) => {
          if (reason === "reset") {
-            setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
+            if (!freeSolo) {
+               setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
+            }
             return
          }
-         setInputValue(newInputValue)
+         setInputValue(value)
       },
-      [setInputValue]
+      [freeSolo, setInputValue]
    )
 
    return (
@@ -136,6 +145,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                : noOptionsText
          }
          onChange={onChange}
+         inputValue={inputValue}
          onInputChange={onInputChange}
          renderInput={(params) => (
             <StyledTextField
@@ -164,6 +174,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          )}
          renderOption={renderOption}
          filterOptions={disableFiltering ? (x) => x : undefined}
+         freeSolo={freeSolo}
       />
    )
 }

@@ -1,6 +1,13 @@
-import { Box, Card, Container, Grid, Typography } from "@mui/material"
+import {
+   Box,
+   Card,
+   CircularProgress,
+   Container,
+   Grid,
+   Typography,
+} from "@mui/material"
 import { useRouter } from "next/router"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import Link from "../../../../components/views/common/Link"
@@ -14,11 +21,14 @@ import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 import { ParsedUrlQuery } from "querystring"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
-import { FilterOptions } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
-import useLivestreamsSWR, {
-   UseLivestreamsSWROptions,
-} from "components/custom-hook/live-stream/useLivestreamsSWR"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { LivestreamSearchResult } from "types/algolia"
+import { useInView } from "react-intersection-observer"
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
+import { useDebounce } from "react-use"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -39,6 +49,10 @@ const styles = sxStyles({
       ml: { xs: 2, md: 4 },
       backgroundColor: "white",
       borderRadius: wishListBorderRadius,
+   },
+   loader: {
+      display: "flex",
+      justifyContent: "center",
    },
 })
 
@@ -67,20 +81,35 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
 
-   const { data: allFieldsOfStudy, isLoading: isLoadingFieldsOfStudy } =
-      useFieldsOfStudy()
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
+
+   const [inputValue, setInputValue] = useState("")
+
+   const [debouncedInputValue, setDebouncedInputValue] = useState("")
+
+   useDebounce(
+      () => {
+         setDebouncedInputValue(inputValue)
+      },
+      250,
+      [inputValue]
+   )
 
    const {
       languages,
       companyCountries,
       companyIndustries,
-      recordedOnly,
       fieldsOfStudy,
       companyId,
       denyRecordingAccess,
    } = useMemo(() => getQueryVariables(query), [query])
 
    const isMobile = useIsMobile()
+
+   const { inView, ref } = useInView({
+      rootMargin: "0px 0px 200px 0px",
+   })
+
    const hasPastEvents = useMemo(
       () => initialTabValue === "pastEvents",
       [initialTabValue]
@@ -96,36 +125,6 @@ const NextLiveStreamsWithFilter = ({
          FilterEnum.FIELDS_OF_STUDY,
       ],
       [companyId, hasPastEvents]
-   )
-
-   const mapFieldsOfStudy = useMemo(
-      () =>
-         allFieldsOfStudy?.filter((item) => fieldsOfStudy?.includes(item.id)),
-      [allFieldsOfStudy, fieldsOfStudy]
-   )
-
-   const swrQuery = useMemo<UseLivestreamsSWROptions>(
-      () => ({
-         languageCodes: languages,
-         companyCountries: companyCountries,
-         companyIndustries: companyIndustries,
-         targetFieldsOfStudy: mapFieldsOfStudy,
-         withRecordings: recordedOnly,
-         targetGroupId: companyId,
-         withHidden: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
-         type: initialTabValue,
-         disabled: isLoadingFieldsOfStudy,
-      }),
-      [
-         languages,
-         companyCountries,
-         companyIndustries,
-         mapFieldsOfStudy,
-         recordedOnly,
-         companyId,
-         initialTabValue,
-         isLoadingFieldsOfStudy,
-      ]
    )
 
    const filterOptions = useMemo<FilterOptions>(
@@ -156,7 +155,33 @@ const NextLiveStreamsWithFilter = ({
       ]
    )
 
-   const { data: livestreams } = useLivestreamsSWR(swrQuery)
+   const targetReplica =
+      initialTabValue === "pastEvents"
+         ? LIVESTREAM_REPLICAS.START_DESC
+         : LIVESTREAM_REPLICAS.START_ASC
+
+   const { data, setSize, isValidating } = useLivestreamSearchAlgolia(
+      debouncedInputValue,
+      filterOptions,
+      targetReplica
+   )
+
+   const numberOfResults = data?.[0]?.nbHits || 0
+
+   const infiniteLivestreams = useMemo(() => {
+      return data?.flatMap((page) => page.deserializedHits) || []
+   }, [data])
+
+   const isValidatingRef = useRef(isValidating)
+   isValidatingRef.current = isValidating
+
+   useEffect(() => {
+      if (isValidatingRef.current) return
+
+      if (inView) {
+         setSize((prevSize) => prevSize + 1)
+      }
+   }, [inView, setSize])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -199,7 +224,7 @@ const NextLiveStreamsWithFilter = ({
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
       (hit: LivestreamSearchResult | null) => {
-         if (!hit) return
+         if (!hit || typeof hit === "string") return
          void push(
             buildDialogLink({
                router,
@@ -224,18 +249,22 @@ const NextLiveStreamsWithFilter = ({
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
-                     orderByDirection={hasPastEvents ? "desc" : "asc"}
                      handleChange={handleSearch}
                      value={null}
                      endIcon={<FindIcon color={"black"} />}
                      hasPastEvents={hasPastEvents}
                      filterOptions={filterOptions}
+                     inputValue={inputValue}
+                     debouncedInputValue={debouncedInputValue}
+                     setInputValue={setInputValue}
+                     targetReplica={targetReplica}
+                     freeSolo
                   />
                </Card>
                <Box sx={styles.filter}>
                   <Filter
                      filtersToShow={filtersToShow}
-                     numberOfResults={livestreams?.length}
+                     numberOfResults={numberOfResults}
                   />
                </Box>
             </Box>
@@ -243,12 +272,18 @@ const NextLiveStreamsWithFilter = ({
 
          <StreamsSection
             value={initialTabValue}
-            upcomingLivestreams={livestreams}
+            upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
-            pastLivestreams={livestreams}
+            pastLivestreams={infiniteLivestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+         {Boolean(isValidating) && (
+            <Box sx={styles.loader}>
+               <CircularProgress />
+            </Box>
+         )}
+         <Box ref={ref} />
       </>
    )
 }
