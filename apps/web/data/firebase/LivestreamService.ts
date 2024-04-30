@@ -24,6 +24,7 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ResetLivestreamQuestionRequest,
+   ToggleHandRaiseRequest,
    UpdateLivestreamPollRequest,
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
@@ -929,6 +930,19 @@ export class LivestreamService {
             )
          }
       })
+   }
+
+   /**
+    * Starts a hand raise in
+    * @param options - Hand raise options.
+    * @returns A promise resolved with the result of the hand raise operation.
+    */
+   async toggleHandRaise(options: ToggleHandRaiseRequest) {
+      await httpsCallable<ToggleHandRaiseRequest>(
+         this.functions,
+         "toggleHandRaise"
+      )(options)
+      return
    }
 }
 
