@@ -245,20 +245,12 @@ export const onWriteGroup = functions
          const previousValue = change.before?.data() as Group
 
          if (hasGroupMetadataChanged(previousValue, newValue)) {
-            console.log(
-               "🚀 ~ .onWrite ~ hasGroupMetadataChanged:",
-               hasGroupMetadataChanged
-            )
             sideEffectPromises.push(
                livestreamsRepo.syncLivestreamMetadata(groupId, newValue)
             )
          }
 
          if (hasCustomJobsGroupMetaDataChanged(previousValue, newValue)) {
-            console.log(
-               "🚀 ~ .onWrite ~ hasCustomJobsGroupMetaDataChanged:",
-               hasCustomJobsGroupMetaDataChanged
-            )
             sideEffectPromises.push(
                customJobRepo.syncCustomJobDataGroupMetaData(groupId, newValue)
             )
