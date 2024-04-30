@@ -1,14 +1,14 @@
-import { expect } from "@playwright/test"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 import UserSeed from "@careerfairy/seed-data/dist/users"
-import { expectExactText } from "../utils/assertions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
+import { expect } from "@playwright/test"
 import { signedInFixture as test } from "../fixtures"
+import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { LoginPage } from "../page-object-models/LoginPage"
-import { setupLivestreamData, setupUserSignUpData } from "../setupData"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 import { SignupPage } from "../page-object-models/SignupPage"
+import { setupLivestreamData, setupUserSignUpData } from "../setupData"
+import { expectExactText } from "../utils/assertions"
 
 test.describe("Livestream Registration Signed In", () => {
    test("successful registration on a livestream event from the portal page", async ({
@@ -207,14 +207,13 @@ test.describe("Livestream Registration Signed Out", () => {
       await LoginPage.login(page, {
          openPage: false,
          email,
-         waitForURL: `**/portal/livestream/${livestream.id}`,
+         waitForURL: `**/portal/livestream/${livestream.id}/register`,
       })
 
       // livestream dialog should be open after redirect
       await expect(page.getByText(livestream.title).first()).toBeVisible()
 
-      // register click should go to the next step
-      await livestreamDialogPage.registrationButton.click()
+      // Wait for the URL to redirect to the livestream registration page
       await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 
@@ -244,11 +243,7 @@ test.describe("Livestream Registration Signed Out", () => {
       const email = UserSeed.getRandomEmail()
       await signup.signupUser(email)
 
-      // redirection to livestream should work
-      await page.waitForURL(`**/portal/livestream/${livestream.id}`)
-
-      // register click should go to the next step
-      await livestreamDialogPage.registrationButton.click()
+      // Wait for the URL to redirect to the livestream registration page 1st step of the registration process
       await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 })
