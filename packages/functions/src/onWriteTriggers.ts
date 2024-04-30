@@ -249,9 +249,9 @@ export const onWriteGroup = functions
                "🚀 ~ .onWrite ~ hasGroupMetadataChanged:",
                hasGroupMetadataChanged
             )
-            // sideEffectPromises.push(
-            //    livestreamsRepo.syncLivestreamMetadata(groupId, newValue)
-            // )
+            sideEffectPromises.push(
+               livestreamsRepo.syncLivestreamMetadata(groupId, newValue)
+            )
          }
 
          if (hasCustomJobsGroupMetaDataChanged(previousValue, newValue)) {
@@ -259,9 +259,9 @@ export const onWriteGroup = functions
                "🚀 ~ .onWrite ~ hasCustomJobsGroupMetaDataChanged:",
                hasCustomJobsGroupMetaDataChanged
             )
-            // sideEffectPromises.push(
-            //    customJobRepo.syncCustomJobDataGroupMetaData(groupId, newValue)
-            // )
+            sideEffectPromises.push(
+               customJobRepo.syncCustomJobDataGroupMetaData(groupId, newValue)
+            )
          }
       }
 
