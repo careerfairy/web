@@ -2,7 +2,7 @@ import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { Box, Card } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { useRouter } from "next/router"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import { LivestreamSearchResult } from "types/algolia"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
@@ -46,12 +46,6 @@ const LivestreamSearchNav = () => {
       },
       [group.id, push]
    )
-
-   useEffect(() => {
-      if (currentStreamStats?.livestream) {
-         setInputValue(currentStreamStats.livestream.title)
-      }
-   }, [currentStreamStats?.livestream])
 
    return (
       <Stack
