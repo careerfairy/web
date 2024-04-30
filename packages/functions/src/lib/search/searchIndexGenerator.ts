@@ -2,15 +2,15 @@ import * as functions from "firebase-functions"
 
 import { ChangeType, getChangeTypeEnum, isTestEnvironment } from "../../util"
 import {
+   configureSettings,
    initAlgoliaIndex,
    logCreateIndex,
    logDeleteIndex,
    logUpdateIndex,
-   configureSettings,
 } from "./util"
 
-import { DocumentSnapshot, Query } from "firebase-admin/firestore"
 import { SearchIndex } from "algoliasearch"
+import { DocumentSnapshot, Query } from "firebase-admin/firestore"
 import config from "../../config"
 import { defaultTriggerRunTimeConfig } from "../triggers/util"
 
@@ -24,11 +24,14 @@ type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
  * @returns the workflow id or the dev name or "unknown" if neither is set
  */
 export const getWorkflowId = () => {
-   return (
-      process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
-      process.env.DEV_NAME ||
-      "unknown"
-   )
+   if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
+      return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+   }
+
+   if (isTestEnvironment()) {
+      return "test"
+   }
+   return process.env.DEV_NAME || "unknown"
 }
 
 export const getData = (
