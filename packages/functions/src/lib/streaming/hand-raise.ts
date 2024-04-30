@@ -38,7 +38,6 @@ export const toggleHandRaise = functions.region(config.region).https.onCall(
             livestreamId,
          })
 
-         // Assuming there's a repository function to toggle hand raise status
          await livestreamsRepo.updateHandRaise(
             livestreamId,
             !livestream.handRaiseActive
