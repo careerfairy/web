@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 
 type CompleteLivestreamQuestionsViewOptions = {
    questionToAsk?: string
@@ -13,6 +13,7 @@ export default class LivestreamDialogPage extends CommonPage {
    public notEnoughCreditsButton: Locator
    public buyRecordingButton: Locator
    public signUpToWatchButton: Locator
+   public backButton: Locator
 
    constructor(page: Page, public livestream: LivestreamEvent) {
       super(page)
@@ -36,6 +37,8 @@ export default class LivestreamDialogPage extends CommonPage {
       this.signUpToWatchButton = page.getByTestId(
          "livestream-signup-watch-button"
       )
+
+      this.backButton = page.getByTestId("livestream-dialog-back-button")
    }
 
    async openDialog(waitForTitle: boolean = true) {
@@ -133,6 +136,10 @@ export default class LivestreamDialogPage extends CommonPage {
 
    async closeDialog() {
       await this.page.getByTestId("livestream-dialog-close").click()
+   }
+
+   async clickOnDialogBackButton() {
+      await this.backButton.click()
    }
 
    async cancelRegistrationClick() {
