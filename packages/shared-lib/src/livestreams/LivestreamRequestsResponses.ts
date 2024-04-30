@@ -53,3 +53,8 @@ export type ResetLivestreamQuestionRequest = {
    livestreamToken: string
    questionId: string | null
 }
+
+export type ToggleHandRaiseRequest = {
+   livestreamId: string
+   livestreamToken: string
+}

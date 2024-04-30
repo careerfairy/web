@@ -1,16 +1,20 @@
-import { sxStyles } from "types/commonTypes"
-import { Box, SwipeableDrawer, Collapse } from "@mui/material"
+import { Box, Collapse, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
-import { ActiveView, toggleSidePanel } from "store/reducers/streamingAppReducer"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { ReactNode } from "react"
+import {
+   ActiveView,
+   ActiveViews,
+   toggleSidePanel,
+} from "store/reducers/streamingAppReducer"
 import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
 import { CTAPanel } from "./CTAPanel"
 import { ChatPanel } from "./ChatPanel"
+import { HandRaisePanel } from "./HandRaisePanel"
 import { JobsPanel } from "./JobsPanel"
 import { PollsPanel } from "./PollsPanel"
 import { QAndAPanel } from "./QAndAPanel"
-import { HandRaisePanel } from "./HandRaisePanel"
-import { ReactNode } from "react"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { ViewersPanel } from "./ViewersPanel"
 
 const drawerWidth = 328
@@ -62,7 +66,9 @@ export const SidePanel = () => {
 
    const content = viewComponents[activeView] ?? viewComponents.default
 
-   const isMaxHeight = activeView === "viewers"
+   const isMaxHeight =
+      activeView === ActiveViews.VIEWERS ||
+      activeView === ActiveViews.HAND_RAISE
 
    if (isMobile) {
       return (

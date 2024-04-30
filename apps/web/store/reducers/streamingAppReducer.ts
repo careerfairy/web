@@ -2,7 +2,7 @@ import {
    LivestreamMode,
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import {
    ConnectionDisconnectedReason,
    ConnectionState,
@@ -74,6 +74,7 @@ export interface StreamingAppState {
       hasEnded: boolean
       openStream: boolean
       companyLogoUrl: string
+      handRaiseActive: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -114,6 +115,7 @@ const initialState: StreamingAppState = {
       hasEnded: false,
       openStream: false,
       companyLogoUrl: "",
+      handRaiseActive: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -229,6 +231,9 @@ const streamingAppSlice = createSlice({
       setCompanyLogoUrl(state, action: PayloadAction<string>) {
          state.livestreamState.companyLogoUrl = action.payload
       },
+      setHandRaiseActive(state, action: PayloadAction<boolean>) {
+         state.livestreamState.handRaiseActive = action.payload
+      },
       resetLivestreamState(state) {
          state.livestreamState = initialState.livestreamState
       },
@@ -311,6 +316,7 @@ export const {
       setRTMConnectionState,
       setRTCConnectionState,
       openPolls,
+      setHandRaiseActive,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

@@ -50,7 +50,7 @@ export interface HandRaise extends Identifiable {
     */
    state: HandRaiseState
    /**
-    * The timestamp of the hand raise
+    * The last time the hand raise was updated
     */
    timeStamp: Timestamp
    /**
