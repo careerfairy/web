@@ -41,7 +41,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userCountriesOfInterest() {
       if (this.user.countriesOfInterest?.length > 0) {
-         // Fetch the top recommended events based on the user's field of study
+         // Fetch the top recommended events based on the user's countries of interest
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCountriesOfInterest(
                this.user.countriesOfInterest,
@@ -82,7 +82,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userUniversity() {
       if (this.user.university?.code) {
-         // Fetch recommended events based on the user's interests
+         // Fetch recommended events based on the user's university code
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnTargetUniversity(
                this.user.university?.code,
@@ -96,7 +96,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userLevelsOfStudy() {
       if (this.user.levelOfStudy?.id) {
-         // Fetch recommended events based on the user's interests
+         // Fetch recommended events based on the user's levels of study
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnTargetLevelOfStudy(
                this.user.levelOfStudy?.id,
@@ -126,7 +126,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userUniversityCompanyTargetCountry() {
       if (this.user.universityCountryCode) {
-         // Fetch recommended events based on the user's followed companies
+         // Fetch recommended events based on the user's university country code against the events company targeted countries
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCompanyTargetCountry(
                this.user.universityCountryCode,
@@ -140,7 +140,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userCompanyTargetUniversity() {
       if (this.user.universityCountryCode) {
-         // Fetch recommended events based on the user's followed companies
+         // Fetch recommended events based on the user's university country code against the events company targeted universities
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCompanyTargetUniversities(
                this.user.universityCountryCode,
@@ -154,7 +154,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userCompanyTargetFieldsOfStudy() {
       if (this.user.fieldOfStudy?.id) {
-         // Fetch recommended events based on the user's fields of study
+         // Fetch recommended events based on the user's field of study against events company targeted fields of study
          this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCompanyTargetFieldOfStudy(
                this.user.fieldOfStudy?.id,
