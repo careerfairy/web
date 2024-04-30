@@ -20,7 +20,7 @@ export class RecommendationsBuilder {
       const rankedLivestreams = sortRankedByPoints<RankedLivestreamEvent>(
          uniqueEvents
       ).slice(0, this.limit)
-      // console.log("🚀 ~ RecommendationsBuilder ~ result:", rankedLivestreams.map( l => l.model?.id + " - " + l.model?.title + " = " + l.getPoints() ))
+
       return rankedLivestreams
    }
 }

@@ -17,27 +17,25 @@ export class RankedLivestreamEvent {
             : model.popularity / 120
          : 1
 
-      console.log(
-         "🚀 ~ RankedLivestreamEvent ~ constructor ~ points before AGG:",
-         this.points
-      )
       this.points = this.aggregationPoints(this, this.points)
-      console.log(
-         "🚀 ~ RankedLivestreamEvent ~ constructor ~ points before AGG:",
-         this.points
-      )
    }
 
    private additionalPopularityPoints = (
       points: number,
       popularity: number
    ): number => {
-      if (popularity == undefined) return points
+      if (popularity == undefined) {
+         console.log(
+            `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: NONE`
+         )
+         return points
+      }
 
       const resultPoints =
          points + RECOMMENDATION_POINTS.popularityDenominator / popularity
+
       console.log(
-         `🚀 REC_ENGINE-ranking:                  additionalPopularityPoint -> spopularity={denominator: ${RECOMMENDATION_POINTS.popularityDenominator}, popularity: ${popularity}}, sourcePoints=${points}, aggregatedJobsPoints=${resultPoints} `
+         `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    popularity: ${popularity} -> ${points} + ${RECOMMENDATION_POINTS.popularityDenominator} / ${popularity} = ${resultPoints}`
       )
       return resultPoints
    }
@@ -46,7 +44,7 @@ export class RankedLivestreamEvent {
       const resultPoints = points + RECOMMENDATION_POINTS.pointsIfJobsLinked
 
       console.log(
-         `🚀 REC_ENGINE-ranking:                additionalPointsIfJobsLinked -> sourcePoints=${points}, aggregatedJobsPoints=${resultPoints} `
+         `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: true -> ${points} + ${RECOMMENDATION_POINTS.pointsIfJobsLinked} = ${resultPoints}`
       )
       return resultPoints
    }
@@ -59,19 +57,15 @@ export class RankedLivestreamEvent {
 
       if (rankedLivestream.model?.hasJobs) {
          points = this.additionalPointsIfJobsLinked(points)
+      } else {
          console.log(
-            `🚀 REC_ENGINE-ranking:           hasJobs: inputPoints=${calculatedPoints}, aggregatedPoints=${points}`
+            `🚀 REC_ENGINE{${this.model?.id}-${this.model?.title}}:    jobsLinked: NONE`
          )
       }
-
-      const inputPoints = points
 
       points = this.additionalPopularityPoints(
          points,
          rankedLivestream.model?.popularity
-      )
-      console.log(
-         `🚀 REC_ENGINE-ranking:              popularityPoints: inputPoints=${inputPoints}, aggregatedPoints=${points}`
       )
       return points
    }

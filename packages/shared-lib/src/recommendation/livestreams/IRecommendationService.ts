@@ -138,7 +138,7 @@ export default class RecommendationServiceCore {
       limit: number,
       implicitData?: ImplicitLivestreamRecommendationData // TODO: Use implicit data for implicit data usage in recommendation
    ): RankedLivestreamEvent[] {
-      this.log.info(
+      console.log(
          "🚀 ~ RecommendationServiceCore ~ implicitData:",
          implicitData
       )
@@ -148,7 +148,7 @@ export default class RecommendationServiceCore {
          new RankedLivestreamRepository(livestreams)
       )
 
-      const recommendedEvents = userRecommendationBuilder
+      return userRecommendationBuilder
          .userUniversityCountry()
          .userUniversity()
          .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
@@ -160,16 +160,5 @@ export default class RecommendationServiceCore {
          .userCompanyTargetUniversity()
          .userCompanyTargetFieldsOfStudy()
          .get()
-
-      console.log(
-         "🚀 ~ RecommendationServiceCore ~ recommendedEvents:",
-         recommendedEvents?.map(
-            (l) =>
-               `User ${userData.id} -> ${l.model.id}: ${
-                  l.model.title
-               } - points: ${l.getPoints()}`
-         )
-      )
-      return recommendedEvents
    }
 }
