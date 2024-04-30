@@ -1,8 +1,8 @@
 export const RECOMMENDATION_POINTS = {
    // These values are isolated, as in the current design they are not needed
-   pointsPerInterestMatch: 1,
-   pointsPerCompanyIndustryMatch: 2,
-   pointsPerCompanySizeMatch: 1,
+   POINTS_PER_INTEREST_MATCH: 1,
+   POINTS_PER_COMPANY_INDUSTRY_MATCH: 2,
+   POINTS_PER_COMPANY_SIZE_MATCH: 1,
 
    /** These values are in the same order as provided in the Figma design as to be easier to match the points system
       5 points if live stream TargetCountry matches
@@ -16,19 +16,19 @@ export const RECOMMENDATION_POINTS = {
       2 points if company TargetUniversity matches
       1 points if company TargetFieldofStudy matches
     */
-   pointsPerUniversityCountryMatch: 5,
-   pointsPerTargetUniversityNameMatch: 5,
-   pointsPerFieldOfStudyMatch: 3,
-   pointsPerTargetLevelOfStudyMatch: 2,
-   pointsPerSpokenLanguageMatch: 15,
-   pointsPerSpokenLanguageDeduct: 10,
-   pointsPerCompanyMatch: 10,
-   pointsPerCompanyTargetCountryMatch: 2,
-   pointsPerCountryOfInterestMatch: 1,
-   pointsPerCompanyTargetUniversitiesMatch: 2,
-   pointsPerCompanyTargetFieldsOfStudyMatch: 1,
+   POINTS_PER_UNIVERSITY_COUNTRY_MATCH: 5,
+   POINTS_PER_TARGET_UNIVERSITY_NAME_MATCH: 5,
+   POINTS_PER_FIELD_OF_STUDY_MATCH: 3,
+   POINTS_PER_TARGET_LEVEL_OF_STUDY_MATCH: 2,
+   POINTS_PER_SPOKEN_LANGUAGE_MATCH: 15,
+   POINTS_PER_SPOKEN_LANGUAGE_DEDUCT: 10,
+   POINTS_PER_COMPANY_MATCH: 10,
+   POINTS_PER_COMPANY_TARGET_COUNTRY_MATCH: 2,
+   POINTS_PER_COUNTRY_OF_INTEREST_MATCH: 1,
+   POINTS_PER_COMPANY_TARGET_UNIVERSITIES_MATCH: 2,
+   POINTS_PER_COMPANY_TARGET_FIELDS_OF_STUDY_MATCH: 1,
 
-   // Aggregation points
-   pointsIfJobsLinked: 10,
-   popularityDenominator: 1000,
+   // Initial points calculation
+   POINTS_IF_JOBS_LINKED: 10,
+   POPULARITY_NUMERATOR: 1000,
 }

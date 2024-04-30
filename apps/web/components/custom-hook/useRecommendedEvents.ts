@@ -61,14 +61,17 @@ const useRecommendedEvents = (
       events || []
    )
 
-   //TODO: memoise
-   const sortedEvents = [...filteredEvents].sort(
-      (baseEvent, comparisonEvent) => {
-         return (
-            eventIds.indexOf(baseEvent.id) -
-            eventIds.indexOf(comparisonEvent.id)
-         )
-      }
+   // Sort the fetched livestreams based on index returned by recommendation engine, as collectionRef query
+   // does not take into account the sorting position
+   const sortedEvents = useMemo(
+      () =>
+         [...filteredEvents].sort((baseEvent, comparisonEvent) => {
+            return (
+               eventIds.indexOf(baseEvent.id) -
+               eventIds.indexOf(comparisonEvent.id)
+            )
+         }),
+      [eventIds, filteredEvents]
    )
 
    return useMemo(
