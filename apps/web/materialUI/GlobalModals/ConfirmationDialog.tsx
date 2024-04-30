@@ -160,6 +160,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
                   fontWeight={700}
                   variant="desktopBrandedH4"
                   component="h4"
+                  textAlign="center"
                >
                   {title}
                </Typography>
@@ -222,7 +223,11 @@ const MobileDrawer = ({
             sx={styles.iconWrapper}
          >
             {icon}
-            <Typography fontWeight={600} variant="desktopBrandedH4">
+            <Typography
+               fontWeight={600}
+               variant="desktopBrandedH4"
+               textAlign="center"
+            >
                {title}
             </Typography>
          </Stack>

@@ -5,8 +5,8 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import {
-   useHandRaiseActive,
    useIsSpotlightMode,
+   useStreamHandRaiseActive,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
@@ -40,7 +40,7 @@ export const MiddleContent = () => {
    const isLandscape = useStreamIsLandscape()
    const isMobile = useStreamIsMobile()
    const isSpotlightMode = useIsSpotlightMode()
-   const handRaiseActive = useHandRaiseActive()
+   const handRaiseActive = useStreamHandRaiseActive()
    const { isHost } = useStreamingContext()
 
    const { isOpen } = useSideDrawer()
