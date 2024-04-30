@@ -1,4 +1,5 @@
-import { Slide } from "@mui/material"
+import { CollapseAndGrow } from "components/util/animations"
+import { Fragment } from "react"
 import { useHandRaiseActive } from "store/selectors/streamingAppSelectors"
 import { HandRaiseInactive } from "./HandRaiseInactive"
 import { HandRaiseManager } from "./HandRaiseManager"
@@ -6,17 +7,14 @@ import { HandRaiseManager } from "./HandRaiseManager"
 export const HostHandRaiseView = () => {
    const handRaiseIsActive = useHandRaiseActive()
 
-   if (handRaiseIsActive) {
-      return (
-         <Slide in appear>
-            <HandRaiseManager />
-         </Slide>
-      )
-   }
-
    return (
-      <Slide in appear>
-         <HandRaiseInactive />
-      </Slide>
+      <Fragment>
+         <CollapseAndGrow in={handRaiseIsActive}>
+            <HandRaiseManager />
+         </CollapseAndGrow>
+         <CollapseAndGrow in={!handRaiseIsActive}>
+            <HandRaiseInactive />
+         </CollapseAndGrow>
+      </Fragment>
    )
 }
