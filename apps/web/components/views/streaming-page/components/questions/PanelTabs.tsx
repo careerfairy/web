@@ -46,7 +46,7 @@ const styles = sxStyles({
       zIndex: 1,
       color: theme.brand.black[700],
       [`&.${tabClasses.selected}`]: {
-         color: "white",
+         color: theme.brand.white[100],
       },
       transition: theme.transitions.create("color"),
    }),
