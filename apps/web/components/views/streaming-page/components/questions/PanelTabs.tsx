@@ -18,10 +18,7 @@ const BORDER_THICKNESS = 1
 const HEIGHT = 40
 
 const styles = sxStyles({
-   root: (theme) => ({
-      position: "sticky",
-      top: 0,
-      zIndex: 1,
+   tabs: (theme) => ({
       [`& .${tabsClasses.indicator}`]: {
          height: "100%",
          zIndex: 0,
@@ -112,7 +109,7 @@ export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
          indicatorColor="primary"
          textColor="inherit"
          variant="fullWidth"
-         sx={styles.root}
+         sx={styles.tabs}
          aria-label="Q&A Tabs"
       >
          <Tab
