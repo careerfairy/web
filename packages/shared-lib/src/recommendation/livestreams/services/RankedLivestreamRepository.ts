@@ -11,6 +11,7 @@ type RankEventsArgs = {
    targetLivestreamIdsGetter: (stream: RankedLivestreamEvent) => unknown[]
    pointsPerMatch: number
    pointsPerMissingMatch?: number
+   missingMatchesMultiplier?: number
 }
 
 /**
@@ -298,6 +299,7 @@ export class RankedLivestreamRepository {
       targetLivestreamIdsGetter,
       targetUserIds,
       pointsPerMissingMatch = 0,
+      missingMatchesMultiplier = 1,
    }: RankEventsArgs): RankedLivestreamEvent[] {
       rankedLivestreams.forEach((rankedLivestream) => {
          // This is the number of matches between the user's interests or
@@ -312,9 +314,11 @@ export class RankedLivestreamRepository {
          const numMissingMatches = targetUserIds.length - numMatches
 
          if (numMissingMatches > 0) {
-            const mismatchPoints = numMissingMatches * pointsPerMissingMatch
+            const mismatchPoints =
+               missingMatchesMultiplier * pointsPerMissingMatch
             console.log(
-               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ numMissingMatches,pointsPerMissingMatch,mismatches,id: ",
+               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ missingMatchesMultiplier,numMissingMatches,pointsPerMissingMatch,mismatches,id: ",
+               missingMatchesMultiplier,
                numMissingMatches,
                pointsPerMissingMatch == 0 ? "-00" : pointsPerMissingMatch, // For formatting purposes only
                pointsPerMissingMatch != 0
