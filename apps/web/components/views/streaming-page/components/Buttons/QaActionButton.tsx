@@ -1,7 +1,8 @@
-import { QaIcon } from "components/views/common/icons"
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
+import { QaIcon } from "components/views/common/icons"
 import { forwardRef } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 export const QaActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -11,14 +12,16 @@ export const QaActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       )
 
       return (
-         <ActionBarButtonStyled
-            onClick={handleSetActive}
-            active={isActive}
-            ref={ref}
-            {...props}
-         >
-            <QaIcon />
-         </ActionBarButtonStyled>
+         <BrandedTooltip title="Questions and answers">
+            <ActionBarButtonStyled
+               onClick={handleSetActive}
+               active={isActive}
+               ref={ref}
+               {...props}
+            >
+               <QaIcon />
+            </ActionBarButtonStyled>
+         </BrandedTooltip>
       )
    }
 )
