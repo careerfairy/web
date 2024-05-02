@@ -118,7 +118,7 @@ const Header = ({ question }: AnswererHeaderProps) => {
       >
          {question.type === "current" && (
             <Typography variant="small" color="primary">
-               Answering
+               Highlighted
             </Typography>
          )}
          {question.type === "done" && (
@@ -209,7 +209,7 @@ const StreamerActions = ({
                }
                loading={markQuestionAsCurrentPending}
             >
-               Answer question
+               Highlight question
             </LoadingButton>
          )}
          {question.type === "current" && (
