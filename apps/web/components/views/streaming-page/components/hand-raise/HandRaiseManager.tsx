@@ -1,10 +1,12 @@
 import { LoadingButton } from "@mui/lab"
-import { Stack } from "@mui/material"
+import { Collapse, Stack } from "@mui/material"
+import { useHandRaisers } from "components/custom-hook/streaming/hand-raise/useHandRaisers"
 import { useToggleHandRaise } from "components/custom-hook/streaming/hand-raise/useToggleHandRaise"
 import { forwardRef } from "react"
 import { TransitionGroup } from "react-transition-group"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
+import { HandRaiseCard } from "./HandRaiseCard"
 
 const styles = sxStyles({
    root: {
@@ -14,11 +16,13 @@ const styles = sxStyles({
 })
 
 export const HandRaiseManager = forwardRef<HTMLDivElement>((_, ref) => {
-   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { livestreamId, streamerAuthToken } = useStreamingContext()
    const { trigger: toggleHandRaise, isMutating } = useToggleHandRaise(
       livestreamId,
-      agoraUserId
+      streamerAuthToken
    )
+
+   const { data: handRaisers } = useHandRaisers(livestreamId)
 
    return (
       <Stack ref={ref} spacing={2} sx={styles.root}>
@@ -31,7 +35,11 @@ export const HandRaiseManager = forwardRef<HTMLDivElement>((_, ref) => {
             Deactivate hand raise
          </LoadingButton>
          <Stack spacing={1.5} component={TransitionGroup}>
-            Hand raisers
+            {handRaisers.map((handRaise) => (
+               <Collapse key={handRaise.id}>
+                  <HandRaiseCard handRaise={handRaise} />
+               </Collapse>
+            ))}
          </Stack>
       </Stack>
    )

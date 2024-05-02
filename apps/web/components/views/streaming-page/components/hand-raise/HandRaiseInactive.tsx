@@ -35,10 +35,10 @@ export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
    const streamIsMobile = useStreamIsMobile()
    const streamIsLandscape = useStreamIsLandscape()
 
-   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { livestreamId, streamerAuthToken } = useStreamingContext()
    const { trigger: toggleHandRaise, isMutating } = useToggleHandRaise(
       livestreamId,
-      agoraUserId
+      streamerAuthToken
    )
 
    return (

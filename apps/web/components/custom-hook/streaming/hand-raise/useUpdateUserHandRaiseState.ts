@@ -2,44 +2,46 @@ import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getStreamerDisplayName } from "components/views/streaming-page/util"
 import { livestreamService } from "data/firebase/LivestreamService"
-import useSWRMutation from "swr/mutation"
+import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { useStreamerDetails } from "../useStreamerDetails"
 
-const getKey = (livestreamId: string, agoraUserId: string) => {
-   if (!livestreamId || !agoraUserId) {
+type FetcherType = MutationFetcher<
+   void, // return type
+   unknown, // error type
+   HandRaiseState
+>
+
+const getKey = (livestreamId: string, handRaiseId: string) => {
+   if (!livestreamId || !handRaiseId) {
       return null
    }
-   return `update-hand-raise-${livestreamId}-${agoraUserId}`
+   return `update-hand-raise-${livestreamId}-${handRaiseId}`
 }
 
 /**
  * Custom hook for updating the hand raise state of a user in a livestream.
- *
  * @param  livestreamId - The ID of the livestream.
- * @param  agoraUserId - The Agora user ID of the participant.
- * @param  displayName - The display name of the participant.
- * @param  newState - The new state of the hand raise.
+ * @param  handRaiseId - The ID of the hand raise.
  */
 export const useUpdateUserHandRaiseState = (
    livestreamId: string,
-   agoraUserId: string,
-   newState: HandRaiseState
+   handRaiseId: string
 ) => {
    const { errorNotification } = useSnackbarNotifications()
-   const { data: streamerDetails } = useStreamerDetails(agoraUserId)
+   const { data: streamerDetails } = useStreamerDetails(handRaiseId)
 
-   const fetcher = async () =>
+   const fetcher: FetcherType = async (_, options) =>
       livestreamService.setUserHandRaiseState(
          livestreamId,
-         agoraUserId,
+         handRaiseId,
          getStreamerDisplayName(
             streamerDetails.firstName,
             streamerDetails.lastName
          ),
-         newState
+         options.arg
       )
 
-   return useSWRMutation(getKey(livestreamId, agoraUserId), fetcher, {
+   return useSWRMutation(getKey(livestreamId, handRaiseId), fetcher, {
       onError: (error, key) => {
          errorNotification(
             error,
@@ -47,7 +49,7 @@ export const useUpdateUserHandRaiseState = (
             {
                key,
                livestreamId,
-               agoraUserId,
+               handRaiseId,
             }
          )
       },
