@@ -27,9 +27,6 @@ export const QuestionsList = ({
    onQuestionMarkedAsAnswered,
 }: Props) => {
    const theme = useTheme()
-   const handleChangeIndex = (index: QuestionTab) => {
-      setTabValue(index)
-   }
 
    return (
       <SuspenseWithBoundary
@@ -44,7 +41,7 @@ export const QuestionsList = ({
          <SwipeableViews
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={tabValue}
-            onChangeIndex={handleChangeIndex}
+            onChangeIndex={setTabValue}
          >
             <SwipeablePanel value={QuestionTab.UPCOMING} index={tabValue}>
                <ListView
