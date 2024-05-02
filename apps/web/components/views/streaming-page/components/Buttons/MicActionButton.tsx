@@ -2,9 +2,10 @@ import { forwardRef } from "react"
 import { Mic, MicOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context"
-import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 import { getDeviceButtonColor, getMicrophoneErrorMessage } from "../../util"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
    off: {
@@ -31,16 +32,18 @@ export const MicActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
          <DeviceErrorWrapper
             errorMessage={getMicrophoneErrorMessage(micError || fetchMicsError)}
          >
-            <ActionBarButtonStyled
-               color={getDeviceButtonColor(active, isLoading, micError)}
-               ref={ref}
-               onClick={toggleMicMuted}
-               sx={active ? undefined : styles.off}
-               disabled={Boolean(micError) || isLoading}
-               {...props}
-            >
-               {active ? <Mic /> : <MicOff />}
-            </ActionBarButtonStyled>
+            <BrandedTooltip title={active ? "Mute" : "Unmute"}>
+               <ActionBarButtonStyled
+                  color={getDeviceButtonColor(active, isLoading, micError)}
+                  ref={ref}
+                  onClick={toggleMicMuted}
+                  sx={active ? undefined : styles.off}
+                  disabled={Boolean(micError) || isLoading}
+                  {...props}
+               >
+                  {active ? <Mic /> : <MicOff />}
+               </ActionBarButtonStyled>
+            </BrandedTooltip>
          </DeviceErrorWrapper>
       )
    }

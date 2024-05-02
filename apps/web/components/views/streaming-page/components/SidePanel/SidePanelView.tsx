@@ -1,9 +1,9 @@
-import { combineStyles, sxStyles } from "types/commonTypes"
-import { Box, IconButton, Typography, BoxProps } from "@mui/material"
-import { useAppDispatch } from "components/custom-hook/store"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
-import { toggleSidePanel } from "store/reducers/streamingAppReducer"
+import { Box, BoxProps, IconButton, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { ReactNode, RefObject } from "react"
+import { toggleSidePanel } from "store/reducers/streamingAppReducer"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    baseBgColor: {
@@ -59,6 +59,7 @@ type Props = {
    contentWrapperStyles?: BoxProps["sx"]
    contentRef?: RefObject<HTMLElement>
    bottomContent?: ReactNode
+   handlePanelToggle?: () => void
 }
 
 export const SidePanelView = ({
@@ -69,6 +70,7 @@ export const SidePanelView = ({
    contentWrapperStyles,
    bottomContent,
    contentRef,
+   handlePanelToggle,
 }: Props) => {
    const dispatch = useAppDispatch()
    const handleToggle = () => {
@@ -86,7 +88,7 @@ export const SidePanelView = ({
             <Typography variant="medium">{title}</Typography>
             <IconButton
                size="small"
-               onClick={handleToggle}
+               onClick={handlePanelToggle ?? handleToggle}
                sx={styles.closeIcon}
             >
                <CloseRoundedIcon fontSize="small" />

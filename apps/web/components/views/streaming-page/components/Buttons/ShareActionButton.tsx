@@ -1,14 +1,15 @@
+import { Tooltip } from "@mui/material"
+import { AgoraRTCReactError } from "agora-rtc-react"
+import useMenuState from "components/custom-hook/useMenuState"
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { forwardRef } from "react"
 import { Airplay } from "react-feather"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import useMenuState from "components/custom-hook/useMenuState"
-import { ShareMenu } from "../ShareMenu"
-import { Tooltip } from "@mui/material"
-import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
+import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 import { useScreenShare } from "../../context/ScreenShare"
 import { getDeviceButtonColor, getRTCErrorCode } from "../../util"
-import { AgoraRTCReactError } from "agora-rtc-react"
-import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
+import { BrandedTooltip } from "../BrandedTooltip"
+import { ShareMenu } from "../ShareMenu"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 import { StopSharingButton } from "./StopSharingButton"
 
 export const ShareActionButton = forwardRef<
@@ -34,20 +35,22 @@ export const ShareActionButton = forwardRef<
                color="warning"
                badgeContent={screenShareError ? "!" : undefined}
             >
-               <ActionBarButtonStyled
-                  color={getDeviceButtonColor(
-                     true,
-                     isLoadingScreenShare,
-                     screenShareError
-                  )}
-                  active={open}
-                  disabled={isLoadingScreenShare}
-                  ref={ref}
-                  {...props}
-                  onClick={handleClick}
-               >
-                  <Airplay />
-               </ActionBarButtonStyled>
+               <BrandedTooltip title="Share content">
+                  <ActionBarButtonStyled
+                     color={getDeviceButtonColor(
+                        true,
+                        isLoadingScreenShare,
+                        screenShareError
+                     )}
+                     active={open}
+                     disabled={isLoadingScreenShare}
+                     ref={ref}
+                     {...props}
+                     onClick={handleClick}
+                  >
+                     <Airplay />
+                  </ActionBarButtonStyled>
+               </BrandedTooltip>
             </BrandedBadge>
          </Tooltip>
          <ShareMenu open={open} anchorEl={anchorEl} handleClose={handleClose} />
