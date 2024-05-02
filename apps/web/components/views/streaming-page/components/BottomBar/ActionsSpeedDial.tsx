@@ -1,14 +1,14 @@
-import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
 import SpeedDial from "@mui/material/SpeedDial"
 import SpeedDialAction from "@mui/material/SpeedDialAction"
 import SpeedDialIcon from "@mui/material/SpeedDialIcon"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { useState, useRef, ReactNode } from "react"
+import { ReactNode, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
-import { AllActions, ActionName } from "./AllActionComponents"
+import { sxStyles } from "types/commonTypes"
+import { ActionName, AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -137,7 +137,6 @@ export const ActionsSpeedDial = () => {
                <SpeedDialAction
                   key={action}
                   icon={AllActions[action]}
-                  tooltipTitle={action}
                   FabProps={{
                      sx: [styles.noShadow, styles.speedDialAction],
                      component: "div",

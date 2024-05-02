@@ -1,18 +1,18 @@
-import React, { FC, useMemo } from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
-import useSWRMutation from "swr/mutation"
-import { groupRepo } from "../../../../data/RepositoryInstances"
-import { Group } from "@careerfairy/shared-lib/groups"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
-import LoadingButton from "@mui/lab/LoadingButton"
 import FollowedIcon from "@mui/icons-material/CheckRounded"
+import LoadingButton from "@mui/lab/LoadingButton"
 import { Button, ButtonProps } from "@mui/material"
 import { useRouter } from "next/router"
-import Link from "../Link"
-import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
+import { FC, useMemo } from "react"
 import { useMountedState } from "react-use"
+import useSWRMutation from "swr/mutation"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { groupRepo } from "../../../../data/RepositoryInstances"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
+import Link from "../Link"
 
 type Arguments = {
    arg: {
@@ -38,8 +38,14 @@ const toggleFollowCompany = (
 
 type Props = {
    group: Group
+   followText?: string
 } & Omit<ButtonProps, "onClick">
-const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
+const AuthedFollowButton: FC<Props> = ({
+   group,
+   disabled,
+   followText = "Follow",
+   ...buttonProps
+}) => {
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -99,12 +105,15 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
          {...buttonProps}
          variant={companyFollowedData ? "outlined" : "contained"}
       >
-         {companyFollowedData ? "Following" : "Follow"}
+         {companyFollowedData ? "Following" : followText}
       </LoadingButton>
    )
 }
 
-const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
+const NonAuthedFollowButton: FC<ButtonProps & { followText?: string }> = ({
+   followText = "Follow",
+   ...buttonProps
+}) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
@@ -123,7 +132,7 @@ const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
             variant="contained"
             data-testid="non-authed-follow-button"
          >
-            Follow
+            {followText}
          </Button>
       </Link>
    )
