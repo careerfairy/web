@@ -1,3 +1,4 @@
+import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import {
    AgoraRTCReactError,
    IAgoraRTCError,
@@ -6,6 +7,9 @@ import {
    useLocalMicrophoneTrack,
    usePublish,
 } from "agora-rtc-react"
+import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
 import {
    FC,
    ReactNode,
@@ -16,11 +20,11 @@ import {
    useMemo,
    useState,
 } from "react"
-import { useStreamingContext } from "./Streaming"
-import { type LocalUser } from "../types"
-import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
-import { useAgoraDevices } from "./AgoraDevices"
+import { usePrevious } from "react-use"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
+import { type LocalUser } from "../types"
+import { useAgoraDevices } from "./AgoraDevices"
+import { useStreamingContext } from "./Streaming"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -70,6 +74,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const firstCameraId = cameras?.[0]?.deviceId
    const firstMicId = microphones?.[0]?.deviceId
 
+   const { userCanJoinPanel: viewerCanJoinPanel } = useUserHandRaiseState(
+      streamingContextProps.livestreamId,
+      streamingContextProps.agoraUserId
+   )
+
    useEffect(() => {
       if (isConnectedOnDifferentBrowser) {
          setCameraOn(false)
@@ -116,7 +125,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const toggleCamera = useCallback(() => setCameraOn((prev) => !prev), [])
 
-   const readyToPublish = shouldStream && isReady && currentRole === "host"
+   const readyToPublish =
+      shouldStream &&
+      isReady &&
+      currentRole === "host" &&
+      (streamingContextProps.isHost || viewerCanJoinPanel)
 
    const localUser = useMemo<LocalUser>(
       () => /* If the user is ready to publish, return the local user object*/ ({
@@ -136,11 +149,6 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          microphoneTrack.localMicrophoneTrack,
          cameraTrack.localCameraTrack,
       ]
-   )
-
-   usePublish(
-      [microphoneTrack.localMicrophoneTrack, cameraTrack.localCameraTrack],
-      readyToPublish
    )
 
    const value = useMemo<LocalTracksContextProps>(
@@ -188,9 +196,59 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    return (
       <LocalTracksContext.Provider value={value}>
+         {Boolean(readyToPublish) && (
+            <PublishComponent
+               microphoneTrack={microphoneTrack}
+               cameraTrack={cameraTrack}
+            />
+         )}
          {children}
       </LocalTracksContext.Provider>
    )
+}
+
+type PublishComponentProps = {
+   microphoneTrack: ReturnType<typeof useLocalMicrophoneTrack>
+   cameraTrack: ReturnType<typeof useLocalCameraTrack>
+}
+
+const PublishComponent = ({
+   microphoneTrack,
+   cameraTrack,
+}: PublishComponentProps) => {
+   const { error, isLoading } = usePublish([
+      microphoneTrack.localMicrophoneTrack,
+      cameraTrack.localCameraTrack,
+   ])
+
+   const prevIsLoading = usePrevious(isLoading)
+
+   const { livestreamId, agoraUserId, isHost } = useStreamingContext()
+
+   const { trigger: triggerUserHandRaiseState } = useUpdateUserHandRaiseState(
+      livestreamId,
+      agoraUserId
+   )
+
+   useEffect(() => {
+      if (isHost) {
+         return // Do not trigger hand raise state for host
+      }
+
+      if (prevIsLoading && !isLoading && !error) {
+         return void triggerUserHandRaiseState(HandRaiseState.connected)
+      }
+
+      if (isLoading) {
+         return void triggerUserHandRaiseState(HandRaiseState.connecting)
+      }
+
+      if (error) {
+         return void triggerUserHandRaiseState(HandRaiseState.unrequested)
+      }
+   }, [error, isLoading, prevIsLoading, triggerUserHandRaiseState, isHost])
+
+   return null
 }
 
 export const useLocalTracks = () => {

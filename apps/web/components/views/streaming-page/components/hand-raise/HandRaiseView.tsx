@@ -1,3 +1,5 @@
+import { CircularProgress } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { CollapseAndGrow } from "components/util/animations"
 import { Fragment } from "react"
 import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
@@ -10,7 +12,9 @@ export const HostHandRaiseView = () => {
    return (
       <Fragment>
          <CollapseAndGrow in={handRaiseIsActive}>
-            <HandRaiseManager />
+            <SuspenseWithBoundary fallback={<CircularProgress />}>
+               <HandRaiseManager />
+            </SuspenseWithBoundary>
          </CollapseAndGrow>
          <CollapseAndGrow in={!handRaiseIsActive}>
             <HandRaiseInactive />

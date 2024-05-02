@@ -1,4 +1,6 @@
+import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
+import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { HandRaiseIcon } from "components/views/common/icons"
@@ -21,20 +23,22 @@ export const HandRaiseActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
 >((props, ref) => {
-   const { isHost, agoraUserId, livestreamId } = useStreamingContext()
-
+   const { handleSetActive, isActive } = useActiveSidePanelView(
+      ActiveViews.HAND_RAISE
+   )
    const streamHandRaiseIsActive = useStreamHandRaiseActive()
+   const { isHost, agoraUserId, livestreamId, setIsReady } =
+      useStreamingContext()
 
-   const { isActive: userHandRaiseActive } = useUserHandRaiseState(
+   const { userHandRaiseIsActive: userHandRaiseActive } = useUserHandRaiseState(
       livestreamId,
       agoraUserId
    )
 
-   const handRaiseIsActiveForViewer = streamHandRaiseIsActive && !isHost
+   const { trigger: updateHandRaiseState, isMutating } =
+      useUpdateUserHandRaiseState(livestreamId, agoraUserId)
 
-   const { handleSetActive, isActive } = useActiveSidePanelView(
-      ActiveViews.HAND_RAISE
-   )
+   const handRaiseIsActiveForViewer = streamHandRaiseIsActive && !isHost
 
    const [
       isHandRaiseDialogOpen,
@@ -48,8 +52,9 @@ export const HandRaiseActionButton = forwardRef<
       } else {
          // Viewer logic
          if (userHandRaiseActive) {
-            // stop the hand raise
-            alert("stop the hand raise not implemented")
+            updateHandRaiseState(HandRaiseState.unrequested).then(() => {
+               setIsReady(false)
+            })
          } else {
             handleOpenHandRaiseDialog()
          }
@@ -74,6 +79,11 @@ export const HandRaiseActionButton = forwardRef<
          <ConfirmHandRaiseDialog
             handleClose={handleCloseHandRaiseDialog}
             open={Boolean(isHandRaiseDialogOpen && handRaiseIsActiveForViewer)}
+            onConfirm={() => {
+               setIsReady(false)
+               return updateHandRaiseState(HandRaiseState.acquire_media)
+            }}
+            loading={isMutating}
          />
       </Fragment>
    )

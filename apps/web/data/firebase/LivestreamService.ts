@@ -951,7 +951,7 @@ export class LivestreamService {
 
    async setUserHandRaiseState(
       livestreamId: string,
-      agoraUserId: string,
+      handRaiseId: string,
       displayName: string,
       newState: HandRaiseState
    ) {
@@ -960,12 +960,13 @@ export class LivestreamService {
          "livestreams",
          livestreamId,
          "handRaises",
-         agoraUserId
+         handRaiseId
       ).withConverter(createGenericConverter<HandRaise>())
 
       return setDoc(
          handRaiseStateRef,
          {
+            id: handRaiseStateRef.id,
             name: displayName,
             state: newState,
             timeStamp: Timestamp.now(),

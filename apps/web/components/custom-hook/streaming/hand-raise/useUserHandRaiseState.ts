@@ -1,6 +1,7 @@
 import {
    HandRaise,
-   HandRaiseState,
+   isHandRaiseActive,
+   isUserCanJoinPanel,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { useMemo } from "react"
 import { ReactFireOptions } from "reactfire"
@@ -13,9 +14,13 @@ const reactFireOptions: ReactFireOptions = {
 
 type UseUserHandRaiseState = {
    /**
-    * Whether the hand raise is active, i.e. the hand raise state is not unrequested or denied or loading
+    * Whether the hand raise is active, is invited, is connecting or is connected and re
     */
-   isActive: boolean
+   userHandRaiseIsActive: boolean
+   /**
+    * Whether the viewer should join the panel with the hosts without need to request once more
+    */
+   userCanJoinPanel: boolean
    /**
     * Whether the hand raise state is loading
     */
@@ -45,13 +50,9 @@ export const useUserHandRaiseState = (
    )
 
    return useMemo<UseUserHandRaiseState>(() => {
-      const isActive =
-         handRaise?.state &&
-         handRaise.state !== HandRaiseState.unrequested &&
-         handRaise.state !== HandRaiseState.denied
-
       return {
-         isActive,
+         userHandRaiseIsActive: isHandRaiseActive(handRaise),
+         userCanJoinPanel: isUserCanJoinPanel(handRaise),
          isLoading: status === "loading",
          error,
          handRaise,

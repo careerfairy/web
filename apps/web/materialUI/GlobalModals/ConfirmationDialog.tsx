@@ -45,8 +45,8 @@ const styles = sxStyles({
       right: 0,
       p: 2.5,
       "& svg": {
-         width: 32,
-         height: 32,
+         width: "32px !important",
+         height: "32px !important",
       },
    },
    titleWrapper: {
