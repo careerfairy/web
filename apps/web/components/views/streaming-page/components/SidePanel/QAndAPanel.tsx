@@ -8,7 +8,7 @@ import { SidePanelView } from "./SidePanelView"
 
 const styles = sxStyles({
    root: {
-      p: 1.5,
+      p: 0,
    },
 })
 
@@ -25,7 +25,7 @@ export const QAndAPanel = () => {
          bottomContent={isHost ? null : <QuestionInput />}
          contentRef={ref}
       >
-         <QuestionsView scrollToTop={scrollToTop} />
+         <QuestionsView scrollToTop={scrollToTop} containerRef={ref} />
       </SidePanelView>
    )
 }
