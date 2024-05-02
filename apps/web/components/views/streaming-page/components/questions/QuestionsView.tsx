@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Stack, useScrollTrigger } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { RefObject, useState } from "react"
+import { useTimeout } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { PanelTabs, QuestionTab } from "./PanelTabs"
 import { QuestionsList } from "./QuestionsList"
@@ -39,8 +40,11 @@ export const QuestionsView = (props: Props) => {
 const Content = ({ scrollToTop, containerRef }: Props) => {
    const [tabValue, setTabValue] = useState(QuestionTab.UPCOMING)
 
+   // Force re-render so containerRef is updated from null to HTMLElement
+   useTimeout()
+
    const tabsFloating = useScrollTrigger({
-      target: containerRef.current,
+      target: containerRef.current || undefined,
       threshold: 0,
       disableHysteresis: true,
    })
