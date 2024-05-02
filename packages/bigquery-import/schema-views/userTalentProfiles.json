@@ -1,0 +1,64 @@
+{
+   "fields": [
+      {
+         "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "userEmail",
+         "type": "string"
+      },
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "joinedAt",
+         "type": "timestamp"
+      },
+      {
+         "fields": [
+            {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "id",
+               "type": "string"
+            }
+         ],
+         "name": "user",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "title",
+               "type": "string"
+            },
+            {
+               "name": "start",
+               "type": "timestamp"
+            },
+            {
+               "name": "company",
+               "type": "string"
+            },
+            {
+               "name": "companyId",
+               "type": "string"
+            }
+         ],
+         "name": "mostRecentLivestream",
+         "type": "map"
+      }
+   ]
+}
