@@ -36,29 +36,27 @@ export const CommentsList = ({ question }: Props) => {
 
    return (
       <Fragment>
+         <CommentCard
+            comment={question.firstComment}
+            onOptionsClick={(event) =>
+               onCommentOptionsClick(event, question.id, question.firstComment)
+            }
+         />
          <Collapse unmountOnExit in={isOpen}>
             <SuspenseWithBoundary
                fallback={
                   <ListSkeleton
-                     numberOfComments={question.numberOfComments || 1}
+                     numberOfComments={
+                        question.numberOfComments > 1
+                           ? question.numberOfComments - 1
+                           : 0
+                     }
                   />
                }
             >
                <List question={question} />
             </SuspenseWithBoundary>
          </Collapse>
-         {!isOpen && (
-            <CommentCard
-               comment={question.firstComment}
-               onOptionsClick={(event) =>
-                  onCommentOptionsClick(
-                     event,
-                     question.id,
-                     question.firstComment
-                  )
-               }
-            />
-         )}
          {Boolean(hasMoreComments) && (
             <CollapseButton
                open={isOpen}
@@ -86,20 +84,18 @@ const List = ({ question }: ListProps) => {
 
    return (
       <TransitionGroup component={Stack} spacing={1}>
-         {comments.map((comment) => (
-            <Slide
-               key={comment.id}
-               direction="left"
-               appear={comment.id !== question.firstComment.id}
-            >
-               <CommentCard
-                  comment={comment}
-                  onOptionsClick={(event) =>
-                     onCommentOptionsClick(event, question.id, comment)
-                  }
-               />
-            </Slide>
-         ))}
+         {comments
+            .filter((comment) => comment.id !== question.firstComment.id)
+            .map((comment) => (
+               <Slide key={comment.id} direction="left">
+                  <CommentCard
+                     comment={comment}
+                     onOptionsClick={(event) =>
+                        onCommentOptionsClick(event, question.id, comment)
+                     }
+                  />
+               </Slide>
+            ))}
       </TransitionGroup>
    )
 }
@@ -110,10 +106,10 @@ type ListSkeletonProps = {
 
 const ListSkeleton = ({ numberOfComments }: ListSkeletonProps) => {
    return (
-      <Fragment>
+      <Stack spacing={1}>
          {Array.from({ length: numberOfComments }, (_, index) => (
             <CommentCardSkeleton key={index} />
          ))}
-      </Fragment>
+      </Stack>
    )
 }
