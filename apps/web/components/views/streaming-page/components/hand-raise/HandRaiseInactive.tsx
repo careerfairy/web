@@ -44,7 +44,7 @@ export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
             spacing={streamIsLandscape ? 1 : 1.5}
             alignItems="center"
             justifyContent="center"
-            maxWidth={streamIsLandscape ? 400 : 303}
+            maxWidth={streamIsLandscape ? 500 : 303}
          >
             <HandRaiseIcon sx={styles.icon} />
             <Typography
@@ -56,8 +56,9 @@ export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
                Hand raise is not&nbsp;active
             </Typography>
             <Typography textAlign="center" variant="medium" color="neutral.800">
-               Allow viewers to join your stream via audio and video by
-               activating the hand raise feature.
+               Engage with talent directly! By activating the hand raise feature
+               talent will be able to join your stream with audio and video and
+               ask you their own questions.
             </Typography>
          </Stack>
          <LoadingButton
