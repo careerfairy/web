@@ -69,6 +69,7 @@ export type MenuOption = {
    menuItemSxProps?: SxProps
    disabled?: boolean
    loading?: boolean
+   color?: string
 }
 
 type MobileDrawerProps = {
@@ -108,6 +109,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
                         [
                            styles.drawerMenuItem,
                            option.loading && styles.listItemLoading,
+                           option.color && { color: option.color },
                         ],
                         option.menuItemSxProps
                      )}
@@ -183,6 +185,7 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                         option.loading && styles.listItemLoading,
                         singleOption && styles.singleMenuItem,
                         index !== options.length - 1 && styles.borderBottom,
+                        option.color && { color: option.color },
                      ],
                      option.menuItemSxProps
                   )}

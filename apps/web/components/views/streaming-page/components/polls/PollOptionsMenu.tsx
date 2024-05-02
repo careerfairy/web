@@ -1,31 +1,17 @@
-import { IconButton } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedResponsiveMenu, {
    MenuOption,
 } from "components/views/common/inputs/BrandedResponsiveMenu"
 import { Fragment } from "react"
-import {
-   Trash2 as DeleteIcon,
-   Edit,
-   MoreVertical,
-   RefreshCw,
-} from "react-feather"
+import { Trash2 as DeleteIcon, Edit, RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
+import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 
 const styles = sxStyles({
    delete: {
       color: "error.main",
-   },
-   optionsIcon: {
-      p: 0.2,
-      m: -0.2,
-      "& svg": {
-         width: 24,
-         height: 24,
-         color: "neutral.700",
-      },
    },
 })
 
@@ -86,9 +72,7 @@ export const PollOptionsMenu = ({
 
    return (
       <Fragment>
-         <IconButton onClick={handleClick} sx={styles.optionsIcon} size="small">
-            <MoreVertical />
-         </IconButton>
+         <BrandedOptions onClick={handleClick} />
          <BrandedResponsiveMenu
             options={options}
             open={open}

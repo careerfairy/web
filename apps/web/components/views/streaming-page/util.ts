@@ -127,3 +127,9 @@ export const getAgoraRTC = async () => {
 export const getStreamerDisplayName = (firstName: string, lastName: string) => {
    return [firstName, lastName].filter(Boolean).join(" ")
 }
+
+export enum UserType {
+   Viewer = "Viewer",
+   Streamer = "Streamer",
+   CareerFairy = "CareerFairy",
+}
