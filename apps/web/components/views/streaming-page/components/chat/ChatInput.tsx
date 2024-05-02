@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Fab, OutlinedInput } from "@mui/material"
+import { Box, CircularProgress, Fab } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { Send } from "react-feather"
@@ -11,6 +11,7 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { getStreamerDisplayName } from "../../util"
+import { StreamInput } from "../StreamInput"
 
 const styles = sxStyles({
    root: {
@@ -26,26 +27,7 @@ const styles = sxStyles({
       py: 0.75,
       flex: 1,
       width: "100%",
-      borderRadius: "24px",
       minHeight: 40,
-      border: (theme) => `1px solid ${theme.palette.neutral[100]}`,
-      "& .MuiOutlinedInput-notchedOutline": {
-         m: "-4px",
-         borderColor: "transparent",
-      },
-      "&:hover .MuiOutlinedInput-notchedOutline": {
-         borderColor: "transparent",
-      },
-      "&.Mui-disabled .MuiOutlinedInput-notchedOutline": {
-         borderColor: "transparent !important",
-      },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-         borderColor: (theme) => theme.brand.info[600],
-      },
-      "& legend": {
-         display: "none",
-      },
-      "& fieldset": { top: 0 },
    },
    sendButton: {
       filter: "none",
@@ -146,7 +128,7 @@ export const ChatInput = ({ onMessageSend }: Props) => {
             name="message"
             control={control}
             render={({ field }) => (
-               <OutlinedInput
+               <StreamInput
                   {...field}
                   onKeyDown={(event) => {
                      if (event.key === "Enter" && !event.shiftKey) {

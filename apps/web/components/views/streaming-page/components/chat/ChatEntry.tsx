@@ -2,18 +2,14 @@ import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import { IconButton, Stack, Typography } from "@mui/material"
 import { forwardRef, memo, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { ChatAuthor, getChatAuthor, getIsMe } from "./util"
-import { useCompanyLogoUrl } from "store/selectors/streamingAppSelectors"
-import CircularLogo from "components/views/common/logos/CircularLogo"
-import ColorizedAvatar from "components/views/common/ColorizedAvatar"
+import { getChatAuthor, getIsMe } from "./util"
 import DateUtil from "util/DateUtil"
 import LinkifyText from "components/util/LinkifyText"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { MoreVertical } from "react-feather"
 import { useStreamingContext } from "../../context"
 import { useAuth } from "HOCs/AuthProvider"
-
-const AVATAR_SIZE = 29
+import { UserType } from "../../util"
+import { UserDetails } from "../UserDetails"
 
 const styles = sxStyles({
    root: {
@@ -21,40 +17,14 @@ const styles = sxStyles({
       px: 2,
       py: 1.5,
    },
-   details: {
-      alignItems: "center",
-   },
-   avatar: {
-      height: AVATAR_SIZE,
-      width: AVATAR_SIZE,
-      color: "white",
-      fontSize: "1rem",
-   },
-   displayNameColor: {
-      [ChatAuthor.Streamer]: {
-         color: "secondary.main",
-      },
-      [ChatAuthor.CareerFairy]: {
-         color: "primary.main",
-      },
-      [ChatAuthor.Viewer]: {
-         color: "neutral.800",
-      },
-   },
-   hostTag: {
-      fontSize: "0.714rem",
-      color: (theme) => theme.brand.black[700],
-      fontStyle: "italic",
-      fontWeight: 400,
-   },
    background: {
-      [ChatAuthor.Streamer]: {
+      [UserType.Streamer]: {
          bgcolor: "#FAF9FF",
       },
-      [ChatAuthor.CareerFairy]: {
+      [UserType.CareerFairy]: {
          bgcolor: "#F9FFFE",
       },
-      [ChatAuthor.Viewer]: {
+      [UserType.Viewer]: {
          bgcolor: "none",
       },
    },
@@ -88,7 +58,7 @@ const propsAreEqual = (prevProps: Props, nextProps: Props) =>
 
 export const ChatEntry = memo(
    forwardRef<HTMLDivElement, Props>(({ entry, onOptionsClick }, ref) => {
-      const authorType = getChatAuthor(entry)
+      const userType = getChatAuthor(entry)
       const timeSinceEntry = useTimeSinceEntry(entry)
       const { authenticatedUser, userData } = useAuth()
       const { isHost, agoraUserId } = useStreamingContext()
@@ -106,31 +76,13 @@ export const ChatEntry = memo(
          <Stack
             spacing={1}
             ref={ref}
-            sx={[styles.root, styles.background[authorType]]}
+            sx={[styles.root, styles.background[userType]]}
          >
             <Stack direction="row" justifyContent="space-between">
-               <Stack direction="row" spacing={1} sx={styles.details}>
-                  <EntryAvatar authorType={authorType} entry={entry} />
-                  <Typography
-                     color="neutral.800"
-                     fontWeight={600}
-                     variant="small"
-                     sx={[
-                        styles.displayNameColor[authorType],
-                        getMaxLineStyles(1),
-                     ]}
-                  >
-                     {authorType === ChatAuthor.CareerFairy
-                        ? "CareerFairy"
-                        : entry.authorName}
-                     {authorType === ChatAuthor.Streamer && (
-                        <Typography component="span" sx={styles.hostTag}>
-                           {" "}
-                           (Host)
-                        </Typography>
-                     )}
-                  </Typography>
-               </Stack>
+               <UserDetails
+                  userType={userType}
+                  displayName={entry.authorName}
+               />
                {Boolean(showOptions) && (
                   <IconButton
                      sx={styles.optionsIcon}
@@ -157,42 +109,6 @@ export const ChatEntry = memo(
    }),
    propsAreEqual
 )
-
-type EntryAvatarProps = {
-   entry: LivestreamChatEntry
-   authorType: ChatAuthor
-}
-
-const EntryAvatar = ({ entry, authorType }: EntryAvatarProps) => {
-   const companyLogoUrl = useCompanyLogoUrl()
-
-   const [firstName, lastName] = entry.authorName.split(" ")
-
-   if (
-      authorType === ChatAuthor.Viewer ||
-      (authorType === ChatAuthor.Streamer && !companyLogoUrl) // Edge-case: When livestream is missing company logo, we use initials
-   ) {
-      return (
-         <ColorizedAvatar
-            sx={styles.avatar}
-            firstName={firstName}
-            lastName={lastName}
-         />
-      )
-   }
-
-   return (
-      <CircularLogo
-         src={
-            authorType === ChatAuthor.Streamer
-               ? companyLogoUrl
-               : "/logo-green.png"
-         }
-         size={AVATAR_SIZE}
-         alt={entry.authorName}
-      />
-   )
-}
 
 const useTimeSinceEntry = (entry: LivestreamChatEntry) => {
    const [timeSince, setTimeSince] = useState(() =>
