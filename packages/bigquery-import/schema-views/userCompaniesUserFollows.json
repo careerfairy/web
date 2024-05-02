@@ -1,0 +1,72 @@
+{
+   "fields": [
+      {
+         "name": "groupId",
+         "type": "string"
+      },
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
+         "fields": [
+            {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "id",
+               "type": "string"
+            }
+         ],
+         "name": "user",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "description",
+               "type": "string"
+            },
+            {
+               "name": "logoUrl",
+               "type": "string"
+            },
+            {
+               "name": "extraInfo",
+               "type": "string"
+            },
+            {
+               "name": "universityName",
+               "type": "string"
+            },
+            {
+               "name": "universityCode",
+               "type": "string"
+            },
+            {
+               "name": "publicSparks",
+               "type": "boolean"
+            },
+            {
+               "name": "publicProfile",
+               "type": "boolean"
+            }
+         ],
+         "name": "group",
+         "type": "map"
+      }
+   ]
+}
