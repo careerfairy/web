@@ -12,7 +12,7 @@ import { validateLivestreamToken } from "../validations"
 
 const toggleHandRaiseSchema: yup.SchemaOf<ToggleHandRaiseRequest> = yup.object({
    livestreamId: yup.string().required(),
-   livestreamToken: yup.string().required(),
+   livestreamToken: yup.string().nullable(),
 })
 
 type Context = {
