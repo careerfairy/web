@@ -52,7 +52,7 @@ export const useLivestreamQuestions = (
  * Custom hook to fetch the total count of livestream questions based on the type.
  * @param livestreamId - The unique identifier for the livestream.
  * @param type - The type of questions to count, either "upcoming" or "answered".
- * @returns The total count of questions as a SWR response.
+ * @returns The total count of questions as an SWR response.
  */
 export const useLivestreamQuestionsTotalCount = (
    livestreamId: string,
