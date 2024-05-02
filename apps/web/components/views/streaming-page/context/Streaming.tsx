@@ -2,6 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { livestreamService } from "data/firebase/LivestreamService"
@@ -69,6 +70,11 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const { activeView } = useAppSelector(sidePanelSelector)
    const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
 
+   const {
+      userHandRaiseIsActive: isUserHandRaiseActive,
+      userCanJoinPanel: viewerCanJoinPanel,
+   } = useUserHandRaiseState(livestreamId, agoraUserId)
+
    const dispatch = useAppDispatch()
 
    const isHandRaiseActive = activeView === ActiveViews.HAND_RAISE
@@ -81,8 +87,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       }
    }, [isHost, isHandRaiseActive, dispatch])
 
-   const shouldStream = isHost
-   // TODO: OR Viewer has raised their hand and the host has accepted them
+   const shouldStream = isHost || isUserHandRaiseActive
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
@@ -111,7 +116,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const client = useRTCClient()
 
    const config = useClientConfig(client, {
-      hostCondition: shouldStream && isReady,
+      hostCondition: shouldStream && isReady && (isHost || viewerCanJoinPanel),
    })
 
    const value = useMemo<StreamContextProps>(
