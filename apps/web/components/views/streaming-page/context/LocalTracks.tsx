@@ -1,4 +1,3 @@
-import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import {
    AgoraRTCReactError,
    IAgoraRTCError,
@@ -7,7 +6,7 @@ import {
    useLocalMicrophoneTrack,
    usePublish,
 } from "agora-rtc-react"
-import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
+import { useHandleHandRaise } from "components/custom-hook/streaming/hand-raise/useHandleHandRaise"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
 import {
@@ -20,7 +19,6 @@ import {
    useMemo,
    useState,
 } from "react"
-import { usePrevious } from "react-use"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
 import { type LocalUser } from "../types"
 import { useAgoraDevices } from "./AgoraDevices"
@@ -216,37 +214,20 @@ const PublishComponent = ({
    microphoneTrack,
    cameraTrack,
 }: PublishComponentProps) => {
+   const { livestreamId, agoraUserId, isHost } = useStreamingContext()
+
    const { error, isLoading } = usePublish([
       microphoneTrack.localMicrophoneTrack,
       cameraTrack.localCameraTrack,
    ])
 
-   const prevIsLoading = usePrevious(isLoading)
-
-   const { livestreamId, agoraUserId, isHost } = useStreamingContext()
-
-   const { trigger: triggerUserHandRaiseState } = useUpdateUserHandRaiseState(
+   useHandleHandRaise({
       livestreamId,
-      agoraUserId
-   )
-
-   useEffect(() => {
-      if (isHost) {
-         return // Do not trigger hand raise state for host
-      }
-
-      if (prevIsLoading && !isLoading && !error) {
-         return void triggerUserHandRaiseState(HandRaiseState.connected)
-      }
-
-      if (isLoading) {
-         return void triggerUserHandRaiseState(HandRaiseState.connecting)
-      }
-
-      if (error) {
-         return void triggerUserHandRaiseState(HandRaiseState.unrequested)
-      }
-   }, [error, isLoading, prevIsLoading, triggerUserHandRaiseState, isHost])
+      agoraUserId,
+      disabled: isHost,
+      isPublishingTracks: isLoading,
+      error,
+   })
 
    return null
 }
