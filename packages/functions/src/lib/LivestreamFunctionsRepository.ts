@@ -172,8 +172,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<void>
 
    /**
-    * Update the hand raise state for a user in a livestream
-    * @param livestreamId - The ID of the livestream.
+    * Update the hand raise state for a user in a live stream
+    * @param livestreamId - The ID of the live stream.
     * @param handRaise - The new hand raise state.
     */
    updateHandRaise(livestreamId: string, handRaise: boolean): Promise<void>
