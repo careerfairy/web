@@ -4,19 +4,17 @@ import { DocumentReference } from "firebase/firestore"
 import useSWRMutation from "swr/mutation"
 import useSnackbarNotifications from "../../useSnackbarNotifications"
 
-const getKey = (livestreamId: string, questionId: string) => {
-   if (!questionId || !livestreamId) {
+const getKey = (livestreamPath: string, questionId: string) => {
+   if (!questionId || !livestreamPath) {
       return null
    }
-   return `delete-question-${livestreamId}-${questionId}`
+   return `delete-question-${livestreamPath}/questions/${questionId}`
 }
 
 /**
- * Custom hook for deleting a specific livestream question.
- *
- * @param  livestreamId - The ID of the livestream.
+ * Custom hook for deleting a specific livestream question or breakout-room question.
+ * @param  streamRef - The reference to the livestream.
  * @param  questionId - The ID of the question to delete.
- * @param  livestreamToken - The token for authenticating the livestream action.
  * @returns An object containing the mutation function to delete a question and its related SWR mutation state.
  */
 export const useDeleteLivestreamQuestion = (
@@ -27,13 +25,17 @@ export const useDeleteLivestreamQuestion = (
 
    const fetcher = () => livestreamService.deleteQuestion(streamRef, questionId)
 
-   return useSWRMutation(getKey(streamRef.id, questionId), fetcher, {
+   return useSWRMutation(getKey(streamRef.path, questionId), fetcher, {
       onError: (error, key) => {
-         errorNotification(error, "Failed to delete question from livestream", {
-            key,
-            questionId,
-            streamRef,
-         })
+         errorNotification(
+            error,
+            "Failed to delete question from live stream",
+            {
+               key,
+               questionId,
+               streamRef,
+            }
+         )
       },
    })
 }
