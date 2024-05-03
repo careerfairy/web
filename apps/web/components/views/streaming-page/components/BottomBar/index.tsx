@@ -1,10 +1,11 @@
-import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { sxStyles } from "types/commonTypes"
 import { Box, Divider, Stack } from "@mui/material"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { AllActions } from "./AllActionComponents"
+import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
+import { AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -105,10 +106,15 @@ const ViewerView = () => {
    const isMobile = useStreamIsMobile()
 
    const { shouldStream } = useStreamingContext()
+   const handRaiseActive = useStreamHandRaiseActive()
+
+   const filteredActions = getViewerActionNames(isMobile, shouldStream).filter(
+      (action) => action !== "Hand raise" || handRaiseActive
+   )
 
    return (
       <ActionsBar>
-         {getViewerActionNames(isMobile, shouldStream).map(
+         {filteredActions.map(
             (action, index) =>
                BottomBarActions[action] || <DividerComponent key={index} />
          )}
