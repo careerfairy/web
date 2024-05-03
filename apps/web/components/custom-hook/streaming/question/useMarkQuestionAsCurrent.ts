@@ -10,11 +10,11 @@ const getKey = (livestreamId: string, questionId: string) => {
 }
 
 /**
- * Custom hook for marking a specific livestream question as the current one being answered.
+ * Custom hook for marking a specific live stream question as the current one being answered.
  *
- * @param  livestreamId - The ID of the livestream.
+ * @param  livestreamId - The ID of the live stream.
  * @param  questionId - The ID of the question to mark as current.
- * @param  livestreamToken - The token for authenticating the livestream action.
+ * @param  livestreamToken - The token for authenticating the live stream action.
  * @returns An object containing the mutation function to mark a question as current and its related SWR mutation state.
  */
 export const useMarkQuestionAsCurrent = (
@@ -35,7 +35,7 @@ export const useMarkQuestionAsCurrent = (
       onError: (error, key) => {
          errorNotification(
             error,
-            "Failed to mark question as current in livestream",
+            "Failed to mark question as current in live stream",
             {
                key,
                questionId,
