@@ -1,10 +1,7 @@
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import React, { ReactElement, useCallback, useMemo, useState } from "react"
-import Box from "@mui/material/Box"
-import Link from "../../../../common/Link"
-import JobEntryApply from "./JobEntryApply"
-import Typography from "@mui/material/Typography"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import CloseIcon from "@mui/icons-material/Close"
 import {
    Avatar,
    Dialog,
@@ -13,20 +10,23 @@ import {
    DialogTitle,
    Stack,
 } from "@mui/material"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import CloseIcon from "@mui/icons-material/Close"
+import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
-import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import DateUtil from "../../../../../../util/DateUtil"
-import CvUploadSection from "./CvUploadSection"
-import CollapsibleText from "../../../../common/inputs/CollapsibleText"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
-import CustomJobEntryApply from "./CustomJobEntryApply"
-import CustomJobApplyConfirmationDialog from "./CustomJobApplyConfirmationDialog"
+import Typography from "@mui/material/Typography"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import { ReactElement, useCallback, useMemo, useState } from "react"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import DateUtil from "../../../../../../util/DateUtil"
+import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import Link from "../../../../common/Link"
+import CustomJobApplyConfirmationDialog from "./CustomJobApplyConfirmationDialog"
+import CustomJobEntryApply from "./CustomJobEntryApply"
+import CvUploadSection from "./CvUploadSection"
+import JobEntryApply from "./JobEntryApply"
 
 const styles = sxStyles({
    header: {
@@ -254,10 +254,7 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                   <Typography variant={"subtitle1"} sx={styles.subTitle}>
                      Job description
                   </Typography>
-                  <CollapsibleText
-                     text={job.description}
-                     collapsedSize={isMobile ? 190 : 80}
-                  />
+                  <SanitizedHTML htmlString={job.description} />
                </Box>
 
                {jobSalary ? (
