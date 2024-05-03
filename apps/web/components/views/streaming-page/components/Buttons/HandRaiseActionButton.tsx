@@ -70,7 +70,7 @@ export const HandRaiseActionButton = forwardRef<
             {...props}
             sx={combineStyles(
                props.sx,
-               userHandRaiseActive && styles.handRaiseActive
+               userHandRaiseActive && !isHost && styles.handRaiseActive
             )}
             color="primary"
          >
