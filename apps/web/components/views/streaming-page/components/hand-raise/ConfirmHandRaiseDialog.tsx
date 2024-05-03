@@ -26,7 +26,7 @@ export const ConfirmHandRaiseDialog = ({
    return (
       <ConfirmationDialog
          open={open}
-         title={"You\u2019re about to raise your hand!"}
+         title={"You’re about to raise your hand!"}
          handleClose={handleClose}
          description={<Description />}
          icon={<HandIcon sx={styles.handIcon} />}
@@ -52,12 +52,11 @@ export const ConfirmHandRaiseDialog = ({
 const Description = () => {
    return (
       <Fragment>
-         {
-            "As soon as the streamer accepts your request you\u2019re going to actively join the live stream. Your camera and microphone will be active."
-         }
+         As soon as the streamer accepts your request you’re going to actively
+         join the live stream. Your camera and microphone will be active.
          <br />
          <br />
-         {"Would you like to proceed?"}
+         Would you like to proceed?
       </Fragment>
    )
 }
