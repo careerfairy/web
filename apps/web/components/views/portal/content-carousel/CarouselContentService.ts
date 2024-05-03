@@ -1,7 +1,9 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import { sparkService } from "data/firebase/SparksService"
@@ -15,6 +17,9 @@ export type GetContentOptions = {
    registeredRecordedLivestreamsForUser: LivestreamEvent[]
    userData?: UserData
    userStats?: UserStats
+   watchedLivestreams?: LivestreamEvent[]
+   watchedSparks?: Spark[]
+   appliedJobs?: CustomJobApplicant[]
 }
 
 export type LivestreamEventWithType = LivestreamEvent & {
@@ -67,6 +72,7 @@ export class CarouselContentService {
 
    constructor(options: GetContentOptions) {
       this.options = options
+      // TODO: Pass implicit data
       this.pastEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
@@ -86,6 +92,7 @@ export class CarouselContentService {
    }
 
    public async getCarouselContent(): Promise<CarouselContent[]> {
+      // TODO: pass all data needed for implicit recommendation
       const [recommendedPastLivestreams, recommendedUpcomingLivestreams] =
          await Promise.all([
             this.getRecommendedStreams(

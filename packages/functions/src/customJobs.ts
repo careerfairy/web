@@ -1,14 +1,31 @@
 import functions = require("firebase-functions")
+import { RuntimeOptions } from "firebase-functions"
+import { SchemaOf, array, number, object, string } from "yup"
+import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
-import { onCallWrapper } from "./util"
 import { middlewares } from "./middlewares/middlewares"
 import {
    dataValidation,
    userAuthExists,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
-import { string, array } from "yup"
-import { userRepo, customJobRepo } from "./api/repositories"
+import { onCallWrapper } from "./util"
+
+/**
+ * Functions runtime settings
+ */
+const runtimeSettings: RuntimeOptions = {
+   memory: "256MB",
+}
+
+type GetUserJobApplications = {
+   limit: number
+}
+
+const getUserJobApplicationsSchema: SchemaOf<GetUserJobApplications> =
+   object().shape({
+      limit: number().min(1).default(20).required(),
+   })
 
 export const userApplyToCustomJob = functions
    .region(config.region)
@@ -150,5 +167,32 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
                draftCustomJobsIds
             )
          })
+      )
+   )
+
+export const getSparksByIds = functions
+   .region(config.region)
+   .runWith(runtimeSettings)
+   .https.onCall(
+      middlewares(
+         dataValidation(getUserJobApplicationsSchema),
+         userAuthExists(),
+         async (data: GetUserJobApplications, context) => {
+            try {
+               // TODO: Check no need to fetch from /jobApplications, since the user data should be backfilled
+               return await userRepo.getJobApplications(
+                  context.auth?.token?.email
+               )
+               // Testing
+            } catch (error) {
+               functions.logger.error(
+                  "Error while retrieving User JobApplications",
+                  data,
+                  error,
+                  context
+               )
+               return null
+            }
+         }
       )
    )
