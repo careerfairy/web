@@ -360,6 +360,12 @@ export interface ILivestreamRepository {
     * @param group Group object containing details about the company
     */
    syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
+
+   getWatchedRecordingEventsByUserId(
+      userEmail: string,
+      limit?: 10,
+      ignoreLivestreamIds?: string[]
+   ): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -1507,6 +1513,56 @@ export class FirebaseLivestreamRepository
       })
 
       await Promise.allSettled(promises)
+   }
+
+   async getUserInteractedLivestreams(
+      userEmail: string,
+      limit?: 10
+   ): Promise<LivestreamEvent[]> {
+      const userPaticipatedEvents = await this.getParticipatedEvents(
+         userEmail,
+         { limit: limit, orderByDirection: "desc" }
+      )
+
+      const ignoreIds = userPaticipatedEvents.map((livestream) => livestream.id)
+      //TODO: Issue recording stats do not save when user watched recording
+      const userWatchedRecordingEvents =
+         await this.getWatchedRecordingEventsByUserId(
+            userEmail,
+            limit,
+            ignoreIds
+         )
+      console.log(
+         "🚀 ~ getUserInteractedLivestreams ~ userWatchedRecordingEvents:",
+         userWatchedRecordingEvents
+      )
+      return []
+   }
+
+   async getWatchedRecordingEventsByUserId(
+      userEmail: string,
+      limit?: 10,
+      ignoreLivestreamIds?: string[]
+   ): Promise<LivestreamEvent[]> {
+      let query = this.firestore
+         .collection("recordingStats")
+         .where("stats.viewers", "array-contains", userEmail)
+
+      if (ignoreLivestreamIds) {
+         query = query.where(
+            "stats.livestreamId",
+            "not-in",
+            ignoreLivestreamIds
+         )
+      }
+
+      const recordingStats = await query.get()
+
+      const livestreamIds = recordingStats?.docs
+         ?.map((stats) => stats?.data() as LivestreamRecordingDetails)
+         ?.map((recordingDetail) => recordingDetail.livestreamId)
+
+      return this.getLivestreamsByIds(livestreamIds)
    }
 }
 

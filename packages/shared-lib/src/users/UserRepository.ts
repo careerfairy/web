@@ -1,27 +1,29 @@
+import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
+   mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
+import { Application } from "../ats/Application"
+import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
+import { Create } from "../commonTypes"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
+import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
    RegistrationStep,
    SavedRecruiter,
-   UserActivity,
    UserATSDocument,
    UserATSRelations,
+   UserActivity,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
    UserStats,
 } from "./users"
-import firebase from "firebase/compat/app"
-import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
-import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
-import { Application } from "../ats/Application"
-import { FieldOfStudy } from "../fieldOfStudy"
-import { Create } from "../commonTypes"
-import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
    updateUserData(userId: string, data: Partial<UserData>): Promise<void>
@@ -180,6 +182,8 @@ export interface IUserRepository {
       userEmail: string,
       notificationId: string
    ): Promise<void>
+
+   getUserSeenSparks(userEmail: string): Promise<SeenSparks>
 }
 
 export class FirebaseUserRepository
@@ -810,6 +814,17 @@ export class FirebaseUserRepository
       return ref.update({
          readAt: this.fieldValue.serverTimestamp() as Timestamp,
       })
+   }
+
+   async getUserSeenSparks(userEmail: string): Promise<SeenSparks> {
+      const query = this.firestore
+         .collection("seenSparks")
+         .where("userId", "==", userEmail)
+
+      const dataSnapshot = await query.get()
+
+      return mapFirestoreDocuments<SeenSparks>(dataSnapshot)?.at(0)
+      // return dataSnapshot.docs?.map( doc => doc.data() as SeenSparks)?.at(0)
    }
 }
 
