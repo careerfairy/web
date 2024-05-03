@@ -36,7 +36,7 @@ export const HandRaiseActionButton = forwardRef<
    )
 
    const { trigger: updateHandRaiseState, isMutating } =
-      useUpdateUserHandRaiseState(livestreamId, agoraUserId)
+      useUpdateUserHandRaiseState(livestreamId)
 
    const handRaiseIsActiveForViewer = streamHandRaiseIsActive && !isHost
 
@@ -53,7 +53,10 @@ export const HandRaiseActionButton = forwardRef<
       }
 
       if (userHandRaiseActive) {
-         updateHandRaiseState(HandRaiseState.unrequested).then(() => {
+         updateHandRaiseState({
+            state: HandRaiseState.unrequested,
+            handRaiseId: agoraUserId,
+         }).then(() => {
             setIsReady(false)
          })
       } else {
@@ -81,7 +84,10 @@ export const HandRaiseActionButton = forwardRef<
             open={Boolean(isHandRaiseDialogOpen && handRaiseIsActiveForViewer)}
             onConfirm={() => {
                setIsReady(false)
-               return updateHandRaiseState(HandRaiseState.acquire_media)
+               return updateHandRaiseState({
+                  state: HandRaiseState.acquire_media,
+                  handRaiseId: agoraUserId,
+               })
             }}
             loading={isMutating}
          />

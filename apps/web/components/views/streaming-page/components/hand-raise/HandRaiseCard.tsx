@@ -28,7 +28,7 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
    const {
       trigger: updateUserHandRaiseState,
       isMutating: isUpdatingUserHandRaiseState,
-   } = useUpdateUserHandRaiseState(livestreamId, handRaise.id)
+   } = useUpdateUserHandRaiseState(livestreamId)
 
    return (
       <Stack sx={styles.root} spacing={1} p={1} key={handRaise.id}>
@@ -37,7 +37,12 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
             <LoadingButton
                color="error"
                variant="text"
-               onClick={() => updateUserHandRaiseState(HandRaiseState.denied)}
+               onClick={() =>
+                  updateUserHandRaiseState({
+                     state: HandRaiseState.denied,
+                     handRaiseId: handRaise.id,
+                  })
+               }
                loading={isUpdatingUserHandRaiseState}
             >
                Remove participant
@@ -47,7 +52,10 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
                <LoadingButton
                   fullWidth
                   onClick={() =>
-                     updateUserHandRaiseState(HandRaiseState.denied)
+                     updateUserHandRaiseState({
+                        state: HandRaiseState.denied,
+                        handRaiseId: handRaise.id,
+                     })
                   }
                   loading={isUpdatingUserHandRaiseState}
                   color="grey"
@@ -58,7 +66,10 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
                <LoadingButton
                   fullWidth
                   onClick={() =>
-                     updateUserHandRaiseState(HandRaiseState.invited)
+                     updateUserHandRaiseState({
+                        state: HandRaiseState.invited,
+                        handRaiseId: handRaise.id,
+                     })
                   }
                   loading={isUpdatingUserHandRaiseState}
                   color="primary"
