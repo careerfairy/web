@@ -24,10 +24,8 @@ export const useHandleHandRaise = ({
    isPublishingTracks,
    error,
 }: UseHandleHandRaiseParams) => {
-   const { trigger: triggerUserHandRaiseState } = useUpdateUserHandRaiseState(
-      livestreamId,
-      agoraUserId
-   )
+   const { trigger: triggerUserHandRaiseState } =
+      useUpdateUserHandRaiseState(livestreamId)
    const prevIsPublishingTracks = usePrevious(isPublishingTracks)
 
    useEffect(() => {
@@ -36,11 +34,20 @@ export const useHandleHandRaise = ({
       }
 
       if (prevIsPublishingTracks && !isPublishingTracks && !error) {
-         triggerUserHandRaiseState(HandRaiseState.connected)
+         triggerUserHandRaiseState({
+            state: HandRaiseState.connected,
+            handRaiseId: agoraUserId,
+         })
       } else if (isPublishingTracks) {
-         triggerUserHandRaiseState(HandRaiseState.connecting)
+         triggerUserHandRaiseState({
+            state: HandRaiseState.connecting,
+            handRaiseId: agoraUserId,
+         })
       } else if (error) {
-         triggerUserHandRaiseState(HandRaiseState.unrequested)
+         triggerUserHandRaiseState({
+            state: HandRaiseState.unrequested,
+            handRaiseId: agoraUserId,
+         })
       }
    }, [
       error,
@@ -48,5 +55,6 @@ export const useHandleHandRaise = ({
       prevIsPublishingTracks,
       triggerUserHandRaiseState,
       disabled,
+      agoraUserId,
    ])
 }
