@@ -10,10 +10,10 @@ const getKey = (livestreamId: string) => {
 }
 
 /**
- * Custom hook for toggling the hand raise state in a livestream.
+ * Custom hook for toggling the hand raise state in a live stream.
  *
- * @param  livestreamId - The ID of the livestream.
- * @param  livestreamToken - The token for authenticating the livestream action.
+ * @param  livestreamId - The ID of the live stream.
+ * @param  livestreamToken - The token for authenticating the live stream action.
  */
 export const useToggleHandRaise = (
    livestreamId: string,
@@ -29,10 +29,14 @@ export const useToggleHandRaise = (
 
    return useSWRMutation(getKey(livestreamId), fetcher, {
       onError: (error, key) => {
-         errorNotification(error, "Failed to toggle hand raise in livestream", {
-            key,
-            livestreamId,
-         })
+         errorNotification(
+            error,
+            "Failed to toggle hand raise in live stream",
+            {
+               key,
+               livestreamId,
+            }
+         )
       },
    })
 }
