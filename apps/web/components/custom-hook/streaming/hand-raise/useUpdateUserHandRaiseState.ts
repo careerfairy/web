@@ -19,8 +19,8 @@ const getKey = (livestreamId: string, handRaiseId: string) => {
 }
 
 /**
- * Custom hook for updating the hand raise state of a user in a livestream.
- * @param  livestreamId - The ID of the livestream.
+ * Custom hook for updating the hand raise state of a user in a live stream.
+ * @param  livestreamId - The ID of the live stream.
  * @param  handRaiseId - The ID of the hand raise.
  */
 export const useUpdateUserHandRaiseState = (
@@ -45,7 +45,7 @@ export const useUpdateUserHandRaiseState = (
       onError: (error, key) => {
          errorNotification(
             error,
-            "Failed to update hand raise state in livestream",
+            "Failed to update hand raise state in live stream",
             {
                key,
                livestreamId,

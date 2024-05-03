@@ -49,15 +49,15 @@ export const HandRaiseActionButton = forwardRef<
    const handleClick = () => {
       if (isHost) {
          handleSetActive()
+         return
+      }
+      // Viewer logic
+      if (userHandRaiseActive) {
+         updateHandRaiseState(HandRaiseState.unrequested).then(() => {
+            setIsReady(false)
+         })
       } else {
-         // Viewer logic
-         if (userHandRaiseActive) {
-            updateHandRaiseState(HandRaiseState.unrequested).then(() => {
-               setIsReady(false)
-            })
-         } else {
-            handleOpenHandRaiseDialog()
-         }
+         handleOpenHandRaiseDialog()
       }
    }
 
