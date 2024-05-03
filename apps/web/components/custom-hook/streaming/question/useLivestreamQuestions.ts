@@ -30,8 +30,8 @@ const getBaseQuery = (livestreamId: string, type: Options["type"]) => {
 }
 
 /**
- * Custom hook to fetch a collection of livestream questions based on the specified type and limit.
- * @param livestreamId - The unique identifier for the livestream.
+ * Custom hook to fetch a collection of live stream questions based on the specified type and limit.
+ * @param livestreamId - The unique identifier for the live stream.
  * @param options - Configuration options including type and limit of questions.
  * @returns A collection of livestream questions.
  */

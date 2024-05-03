@@ -10,10 +10,10 @@ const reactFireOptions: ReactFireOptions = {
 }
 
 /**
- * Custom hook to fetch a collection of livestream questions based on the specified type and limit.
+ * Custom hook to fetch a collection of livestream question comments.
  * @param livestreamId - The unique identifier for the livestream.
- * @param options - Configuration options including type and limit of questions.
- * @returns A collection of livestream questions.
+ * @param questionId - The unique identifier for the question.
+ * @returns A collection of live stream question comments.
  */
 export const useLivestreamQuestionComments = (
    livestreamId: string,
