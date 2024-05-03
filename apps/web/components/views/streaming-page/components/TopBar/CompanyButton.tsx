@@ -12,17 +12,15 @@ import {
    tooltipClasses,
 } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useLivestreamCompanyHost from "components/custom-hook/live-stream/useLivestreamCompanyHost"
+import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import {
-   useLivestreamData,
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import FollowButton from "components/views/common/company/FollowButton"
 import { CompanyIcon } from "components/views/common/icons"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { groupRepo } from "data/RepositoryInstances"
-import { ComponentType, useEffect, useMemo, useState } from "react"
+import { ComponentType, useMemo, useState } from "react"
 import { ExternalLink, MapPin, Tag, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
@@ -122,70 +120,59 @@ export const CompanyButton = () => {
 const CompanyButtonLayout = () => {
    const isMobile = useStreamIsMobile()
    const [isInfoOpen, setIsInfoOpen] = useState(false)
-   const [hostCompany, setHostCompany] = useState<Group>(null)
-   const { groupIds } = useLivestreamData()
-   const hostId = useLivestreamCompanyHost(groupIds)
+   const { livestreamId } = useStreamingContext()
+   const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
 
    const toggleInfoOpen = () => {
       setIsInfoOpen((tooltipOpen) => !tooltipOpen)
    }
 
-   useEffect(() => {
-      const fetchGroupInfo = async () => {
-         if (hostId) {
-            const group = await groupRepo.getGroupById(hostId)
-            group.publicProfile && setHostCompany(group)
-         }
-      }
-      fetchGroupInfo()
-   }, [hostId])
+   if (!hostCompany || !hostCompany.publicProfile) return null
 
    return (
       <>
-         {hostCompany ? (
-            isMobile ? (
-               <>
+         {isMobile ? (
+            <>
+               <CompanyLogo
+                  src={hostCompany.logoUrl}
+                  alt={hostCompany.universityName}
+                  onClick={toggleInfoOpen}
+                  size={32}
+               />
+
+               <SwipeableDrawer
+                  open={isInfoOpen}
+                  onOpen={() => null}
+                  onClose={toggleInfoOpen}
+                  anchor="bottom"
+                  PaperProps={{ sx: styles.paper }}
+               >
+                  <SidePanelView
+                     id="company-panel"
+                     title="Company Information"
+                     icon={<CompanyIcon />}
+                     handlePanelToggle={toggleInfoOpen}
+                  >
+                     <Content company={hostCompany} />
+                  </SidePanelView>
+               </SwipeableDrawer>
+            </>
+         ) : (
+            <StyledTooltip
+               disableHoverListener
+               open={isInfoOpen}
+               title={<Content company={hostCompany} />}
+            >
+               <Box>
                   <CompanyLogo
                      src={hostCompany.logoUrl}
                      alt={hostCompany.universityName}
                      onClick={toggleInfoOpen}
-                     size={32}
+                     size={40}
                   />
-
-                  <SwipeableDrawer
-                     open={isInfoOpen}
-                     onOpen={() => null}
-                     onClose={toggleInfoOpen}
-                     anchor="bottom"
-                     PaperProps={{ sx: styles.paper }}
-                  >
-                     <SidePanelView
-                        id="company-panel"
-                        title="Company Information"
-                        icon={<CompanyIcon />}
-                        handlePanelToggle={toggleInfoOpen}
-                     >
-                        <Content company={hostCompany} />
-                     </SidePanelView>
-                  </SwipeableDrawer>
-               </>
-            ) : (
-               <StyledTooltip
-                  disableHoverListener
-                  open={isInfoOpen}
-                  title={<Content company={hostCompany} />}
-               >
-                  <Box>
-                     <CompanyLogo
-                        src={hostCompany.logoUrl}
-                        alt={hostCompany.universityName}
-                        onClick={toggleInfoOpen}
-                        size={40}
-                     />
-                  </Box>
-               </StyledTooltip>
-            )
-         ) : null}
+               </Box>
+            </StyledTooltip>
+         )}
       </>
    )
 }
