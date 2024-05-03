@@ -139,6 +139,14 @@ const OngoingPollTracker = dynamic(
    { ssr: false }
 )
 
+const HandRaiseNotificationTracker = dynamic(
+   () =>
+      import("./components/hand-raise/HandRaiseNotificationTracker").then(
+         (mod) => mod.HandRaiseNotificationTracker
+      ),
+   { ssr: false }
+)
+
 type Props = {
    isHost: boolean
 }
@@ -211,6 +219,7 @@ const Component = ({ isHost }: Props) => {
                         <AgoraTrackers />
                         {isHost ? null : <ViewerTrackers />}
                         {isHost ? null : <OngoingPollTracker />}
+                        {isHost ? <HandRaiseNotificationTracker /> : null}
                         <SessionConflictModal />
                         <SessionDisconnectedModal />
                      </RTMSignalingProvider>
