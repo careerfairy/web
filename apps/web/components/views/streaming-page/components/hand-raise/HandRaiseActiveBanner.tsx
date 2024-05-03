@@ -76,5 +76,5 @@ const handRaiseSubtitles = {
    [HandRaiseState.connecting]: "Connecting",
    [HandRaiseState.invited]: "Connecting to the stream",
    [HandRaiseState.connected]: "You are connected",
-   [HandRaiseState.unrequested]: "Hand Raise is not active",
+   [HandRaiseState.unrequested]: "Hand raise is not active",
 }
