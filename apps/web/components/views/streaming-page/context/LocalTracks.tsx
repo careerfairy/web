@@ -90,12 +90,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameraId: firstCameraId,
       }
    )
-   const microphoneTrack = useLocalMicrophoneTrack(
-      shouldStream && Boolean(firstMicId),
-      {
-         microphoneId: firstMicId,
-      }
-   )
+
+   const micReady = Boolean(shouldStream && firstMicId)
+   const microphoneTrack = useLocalMicrophoneTrack(micReady, {
+      microphoneId: firstMicId,
+   })
 
    const {
       activeDeviceId: activeMicrophoneId,

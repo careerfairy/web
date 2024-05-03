@@ -51,7 +51,7 @@ export const HandRaiseActionButton = forwardRef<
          handleSetActive()
          return
       }
-      // Viewer logic
+
       if (userHandRaiseActive) {
          updateHandRaiseState(HandRaiseState.unrequested).then(() => {
             setIsReady(false)
@@ -70,7 +70,7 @@ export const HandRaiseActionButton = forwardRef<
             {...props}
             sx={combineStyles(
                props.sx,
-               handRaiseIsActiveForViewer && styles.handRaiseActive
+               userHandRaiseActive && styles.handRaiseActive
             )}
             color="primary"
          >
