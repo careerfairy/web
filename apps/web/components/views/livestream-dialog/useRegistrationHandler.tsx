@@ -135,13 +135,18 @@ export default function useRegistrationHandler() {
          : null
 
       const isOnJobDetailsDialog = asPath.includes("job-details")
-      const path = isOnJobDetailsDialog
+
+      const rawPath = isOnJobDetailsDialog
          ? asPath.split("job-details")[0]
          : asPath
 
+      const path = rawPath.includes("?")
+         ? rawPath.replace("?", "/register?")
+         : `${rawPath}/register`
+
       return push({
          pathname: `/login`,
-         query: { absolutePath: `${path}/register`, ...utmParams },
+         query: { absolutePath: path, ...utmParams },
       })
    }, [asPath, pathname, push])
 
