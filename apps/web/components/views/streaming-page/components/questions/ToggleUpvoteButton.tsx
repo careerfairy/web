@@ -3,6 +3,7 @@ import {
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
+import { buttonClasses } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useToggleUpvoteLivestreamQuestion } from "components/custom-hook/streaming/question/useToggleUpvoteLivestreamQuestion"
 import { ThumbsUp } from "react-feather"
@@ -17,7 +18,7 @@ const styles = sxStyles({
       minWidth: "auto",
       minHeight: "auto",
       lineHeight: 1.5,
-      "& .MuiButton-startIcon": {
+      [`& .${buttonClasses.startIcon}`]: {
          marginRight: 1.25,
          ml: 0,
       },

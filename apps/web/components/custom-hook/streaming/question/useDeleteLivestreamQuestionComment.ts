@@ -5,20 +5,20 @@ import useSWRMutation from "swr/mutation"
 import useSnackbarNotifications from "../../useSnackbarNotifications"
 
 const getKey = (
-   livestreamId: string,
+   livestreamPath: string,
    questionId: string,
    commentId: string
 ) => {
-   if (!questionId || !livestreamId || !commentId) {
+   if (!questionId || !livestreamPath || !commentId) {
       return null
    }
-   return `delete-comment-${livestreamId}-${questionId}-${commentId}`
+   return `delete-comment-${livestreamPath}/questions/${questionId}/comments/${commentId}`
 }
 
 /**
- * Custom hook for deleting a specific comment on a livestream question.
+ * Custom hook for deleting a specific comment on a live stream question.
  *
- * @param  streamRef - The Firestore reference to the livestream.
+ * @param  streamRef - The Firestore reference to a live stream or breakout-room
  * @param  questionId - The ID of the question.
  * @param  commentId - The ID of the comment to delete.
  * @returns An object containing the mutation function to delete a comment and its related SWR mutation state.
@@ -33,18 +33,22 @@ export const useDeleteLivestreamQuestionComment = (
    const fetcher = () =>
       livestreamService.deleteQuestionComment(streamRef, questionId, commentId)
 
-   return useSWRMutation(getKey(streamRef.id, questionId, commentId), fetcher, {
-      onError: (error, key) => {
-         errorNotification(
-            error,
-            "Failed to delete comment from question in livestream",
-            {
-               key,
-               questionId,
-               commentId,
-               streamRef,
-            }
-         )
-      },
-   })
+   return useSWRMutation(
+      getKey(streamRef.path, questionId, commentId),
+      fetcher,
+      {
+         onError: (error, key) => {
+            errorNotification(
+               error,
+               "Failed to delete comment from question in live stream",
+               {
+                  key,
+                  questionId,
+                  commentId,
+                  streamRef,
+               }
+            )
+         },
+      }
+   )
 }

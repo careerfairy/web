@@ -10,11 +10,11 @@ const getKey = (livestreamId: string, questionId: string) => {
 }
 
 /**
- * Custom hook for resetting a specific livestream question.
+ * Custom hook for resetting a specific live stream question.
  *
- * @param  livestreamId - The ID of the livestream.
+ * @param  livestreamId - The ID of the live stream.
  * @param  questionId - The ID of the question to reset.
- * @param  livestreamToken - The token for authenticating the livestream action.
+ * @param  livestreamToken - The token for authenticating the live stream action.
  * @returns An object containing the mutation function to reset a question and its related SWR mutation state.
  */
 export const useResetLivestreamQuestion = (
@@ -33,7 +33,7 @@ export const useResetLivestreamQuestion = (
 
    return useSWRMutation(getKey(livestreamId, questionId), fetcher, {
       onError: (error, key) => {
-         errorNotification(error, "Failed to reset question in livestream", {
+         errorNotification(error, "Failed to reset question in live stream", {
             key,
             questionId,
          })

@@ -32,9 +32,9 @@ type Props = {
 
 export const CommentCard = forwardRef<HTMLDivElement, Props>(
    ({ comment, onOptionsClick }, ref) => {
-      const userType = getUserTypeFromComment(comment)
-
       const { showOptions } = useCommentVisibilityControls(comment)
+
+      const userType = getUserTypeFromComment(comment)
 
       return (
          <Stack sx={commentCardStyles.root} spacing={1.25} ref={ref}>
