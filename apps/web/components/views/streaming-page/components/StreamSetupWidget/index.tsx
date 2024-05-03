@@ -88,7 +88,7 @@ const Content = () => {
    const {
       trigger: updateUserHandRaiseState,
       isMutating: isUpdatingUserHandRaiseState,
-   } = useUpdateUserHandRaiseState(livestreamId, agoraUserId)
+   } = useUpdateUserHandRaiseState(livestreamId)
 
    // To help brain understand the code
    const isViewer = !isHost
@@ -123,9 +123,10 @@ const Content = () => {
                      color="grey"
                      size="small"
                      onClick={async () => {
-                        await updateUserHandRaiseState(
-                           HandRaiseState.unrequested
-                        )
+                        await updateUserHandRaiseState({
+                           state: HandRaiseState.unrequested,
+                           handRaiseId: agoraUserId,
+                        })
                      }}
                      loading={isUpdatingUserHandRaiseState}
                   >
@@ -143,9 +144,10 @@ const Content = () => {
 
                         if (!userCanJoinPanel) {
                            // Request to join the panel if hand raiser
-                           await updateUserHandRaiseState(
-                              HandRaiseState.requested
-                           )
+                           await updateUserHandRaiseState({
+                              state: HandRaiseState.requested,
+                              handRaiseId: agoraUserId,
+                           })
                         }
                      }
                      setIsReady(true)
