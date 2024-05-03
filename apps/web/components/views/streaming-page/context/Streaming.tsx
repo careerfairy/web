@@ -87,7 +87,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       }
    }, [isHost, isHandRaiseActive, dispatch])
 
-   const shouldStream = isHost || isUserHandRaiseActive
+   const shouldStream = Boolean(isHost || isUserHandRaiseActive)
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
