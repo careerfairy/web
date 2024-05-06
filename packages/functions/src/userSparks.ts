@@ -1,22 +1,22 @@
 import functions = require("firebase-functions")
-import { number, SchemaOf, mixed, array, string, object } from "yup"
+import { SchemaOf, array, mixed, number, object, string } from "yup"
 
+import { sparkRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
-import { sparkRepo } from "./api/repositories"
 
-import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 import {
+   SparkClientEventsPayload,
    SparkEvent,
    SparkEventActions,
-   SparkClientEventsPayload,
-   SparkSecondWatchedClient,
-   SparkSecondWatched,
    SparkEventClient,
+   SparkSecondWatched,
+   SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/telemetry"
+import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { getCountryCode } from "./util"
 
 export const getSparksFeed = functions
@@ -41,7 +41,16 @@ export const getSparksFeed = functions
                         data.numberOfSparks
                      )
                   } else {
-                     return sparkRepo.getPublicSparksFeed(data.numberOfSparks)
+                     const logOutUserCountryCode = getCountryCode(context)
+                     console.log(
+                        "🚀 ~ logOutUserCountryCode:",
+                        logOutUserCountryCode
+                     )
+
+                     return sparkRepo.getPublicSparksFeed(
+                        data.numberOfSparks,
+                        logOutUserCountryCode
+                     )
                   }
                }
 

@@ -19,7 +19,15 @@ import {
    createSeenSparksDocument,
    getCategoryById,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   SparkEvent,
+   SparkSecondWatched,
+} from "@careerfairy/shared-lib/sparks/telemetry"
+import { Identifiable } from "@careerfairy/shared-lib/src/commonTypes"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { DocumentSnapshot } from "firebase-admin/firestore"
+import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
 import { DateTime } from "luxon"
 import { FunctionsLogger } from "src/util"
@@ -29,21 +37,13 @@ import {
    Storage,
    Timestamp,
 } from "../../api/firestoreAdmin"
+import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
 import { createGenericConverter } from "../../util/firestore-admin"
 import { addAddedToFeedAt } from "../../util/sparks"
-import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import BigQueryCreateInsertService from "../bigQuery/BigQueryCreateInsertService"
-import {
-   SparkEvent,
-   SparkSecondWatched,
-} from "@careerfairy/shared-lib/sparks/telemetry"
-import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import * as functions from "firebase-functions"
-import { livestreamsRepo, sparkRepo, userRepo } from "../../api/repositories"
-import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
 import SparkRecommendationService from "../recommendation/SparkRecommendationService"
-import { Identifiable } from "@careerfairy/shared-lib/src/commonTypes"
+import { SparksDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import { SparksFeedReplenisher } from "./sparksFeedReplenisher"
 
 export interface ISparkFunctionsRepository {
    /**
@@ -120,8 +120,12 @@ export interface ISparkFunctionsRepository {
    /**
     * Get the public feed of Sparks
     * @param limit ${limit} The number of sparks to fetch (default: 10)
+    * @param countryCode The country code to customize the feed when the user is logged out
     */
-   getPublicSparksFeed(limit?: number): Promise<SerializedSpark[]>
+   getPublicSparksFeed(
+      limit?: number,
+      countryCode?: string
+   ): Promise<SerializedSpark[]>
 
    /**
     * Get the group's feed of Sparks
@@ -544,19 +548,38 @@ export class SparkFunctionsRepository
       )
    }
 
-   async getPublicSparksFeed(limit = 10): Promise<SerializedSpark[]> {
-      const publicFeedRef = this.firestore
+   async getPublicSparksFeed(
+      limit = 10,
+      countryCode = ""
+   ): Promise<SerializedSpark[]> {
+      const query = this.firestore
          .collection("sparks")
          .where("group.publicSparks", "==", true)
          .orderBy("publishedAt", "desc")
-         .limit(limit)
-         .withConverter(createGenericConverter<Spark>())
+
+      if (countryCode.length === 0) {
+         query.limit(limit)
+      }
+
+      const publicFeedRef = query.withConverter(createGenericConverter<Spark>())
 
       const publicFeedSnap = await publicFeedRef.get()
 
-      return publicFeedSnap.docs.map((doc) =>
+      const sparks = publicFeedSnap.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
+
+      if (countryCode.length === 0) {
+         return sparks
+      }
+
+      const filterAllSparksByCountryCode = sparks.filter((spark) =>
+         spark.group.targetedCountries.some(
+            (targetedCountry) => targetedCountry.id === countryCode
+         )
+      )
+
+      return filterAllSparksByCountryCode.slice(0, limit - 1)
    }
 
    async getGroupSparksFeed(
