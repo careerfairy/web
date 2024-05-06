@@ -1,11 +1,11 @@
 import functions = require("firebase-functions")
-import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
-import { CallableContext } from "firebase-functions/lib/common/providers/https"
-import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
-import { UserData } from "@careerfairy/shared-lib/users"
-import ObjectSchema, { ObjectShape } from "yup/lib/object"
-import { InferType } from "yup"
+import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import { InferType } from "yup"
+import ObjectSchema, { ObjectShape } from "yup/lib/object"
+import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
 import { livestreamGetSecureToken } from "./livestream"
 
 /**
