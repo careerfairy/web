@@ -1,3 +1,5 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import {
    SerializedSpark,
    SparkPresenter,
@@ -20,31 +22,29 @@ import {
    SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/telemetry"
+import { UserData, UserSparksNotification } from "@careerfairy/shared-lib/users"
 import {
+   PartialWithFieldValue,
    Query,
+   Timestamp,
    collection,
+   collectionGroup,
+   deleteField,
    doc,
+   getCountFromServer,
    getDoc,
    getDocs,
    limit,
    orderBy,
    query,
-   startAfter,
-   where,
-   getCountFromServer,
-   collectionGroup,
-   Timestamp,
-   deleteField,
    setDoc,
-   PartialWithFieldValue,
+   startAfter,
    updateDoc,
+   where,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
-import { UserData, UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -94,7 +94,7 @@ export class SparksService {
          SerializedSpark[]
       >(
          this.functions,
-         "getSparksFeed_v3"
+         "getSparksFeed_v4"
       )(data)
 
       return serializedSparks.map(SparkPresenter.deserialize)
