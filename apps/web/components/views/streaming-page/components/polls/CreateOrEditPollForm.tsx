@@ -4,20 +4,19 @@ import {
    MIN_POLL_OPTIONS,
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
-import { Button, IconButton, InputAdornment, Stack } from "@mui/material"
+import { LoadingButton } from "@mui/lab"
+import { Box, Button, IconButton, InputAdornment, Stack } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { forwardRef } from "react"
+import { PlusCircle, Trash2 } from "react-feather"
 import { FormProvider, SubmitHandler, useFieldArray } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import { v4 as uuid } from "uuid"
 import * as yup from "yup"
 import { useStreamingContext } from "../../context"
-import { PlusCircle, Trash2 } from "react-feather"
-import { v4 as uuid } from "uuid"
-import { LoadingButton } from "@mui/lab"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { Box } from "@mui/material"
 
 const styles = sxStyles({
    form: {
@@ -76,7 +75,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
    ({ onCancel, onSuccess, poll }, ref) => {
       const isEdit = Boolean(poll)
 
-      const { livestreamId, agoraUserToken } = useStreamingContext()
+      const { livestreamId, streamerAuthToken } = useStreamingContext()
       const { errorNotification } = useSnackbarNotifications()
 
       const formMethods = useYupForm({
@@ -97,7 +96,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
             if (isEdit) {
                await livestreamService.updatePoll({
                   livestreamId,
-                  livestreamToken: agoraUserToken,
+                  livestreamToken: streamerAuthToken,
                   pollId: poll.id,
                   question,
                   options,
@@ -106,7 +105,7 @@ export const CreateOrEditPollForm = forwardRef<HTMLFormElement, Props>(
             } else {
                await livestreamService.createPoll({
                   livestreamId,
-                  livestreamToken: agoraUserToken,
+                  livestreamToken: streamerAuthToken,
                   question,
                   options,
                })
