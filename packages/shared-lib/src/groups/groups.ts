@@ -1,9 +1,9 @@
-import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
-import { convertDictToDocArray } from "../BaseFirebaseRepository"
-import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
-import { UserData } from "../users"
+import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
+import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
+import { UserData } from "../users"
+import { dynamicSort } from "../utils"
 
 // CareerCenterData collection
 export interface Group extends Identifiable {
@@ -296,14 +296,13 @@ export type PublicGroup = Pick<
    | "publicSparks"
    | "publicProfile"
    | "careerPageUrl"
-   | "targetedCountries"
    | "targetedUniversities"
    | "targetedFieldsOfStudy"
    | "plan"
    | "companyIndustries"
    | "companyCountry"
    | "companySize"
->
+> & { targetedCountriesIds?: string[] }
 
 export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
    return {
@@ -316,13 +315,14 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       publicSparks: group.publicSparks ?? null,
       publicProfile: group.publicProfile ?? false,
       careerPageUrl: group.careerPageUrl ?? null,
-      targetedCountries: group.targetedCountries ?? [],
       targetedUniversities: group.targetedUniversities ?? [],
       targetedFieldsOfStudy: group.targetedFieldsOfStudy ?? [],
       plan: group.plan ?? null,
       companyIndustries: group.companyIndustries ?? [],
       companyCountry: group.companyCountry ?? null,
       companySize: group.companySize ?? null,
+      targetedCountriesIds:
+         group?.targetedCountries?.map((option) => option.id) ?? [],
    }
 }
 

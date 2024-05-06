@@ -36,7 +36,7 @@ export class RankedSpark {
    }
 
    getCompanyTargetCountriesIds(): string[] {
-      return this.model.spark.group?.targetedCountries.map((e) => e.id) || []
+      return this.model.spark.group?.targetedCountriesIds || []
    }
 
    getCompanyTargetFieldsOfStudyIds(): string[] {

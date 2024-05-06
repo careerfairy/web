@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
+import { Create, ImageType } from "../commonTypes"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import {
    CompanyFollowed,
@@ -12,6 +13,7 @@ import {
    UserAdminGroup,
    UserData,
 } from "../users"
+import { containsAny } from "../utils/utils"
 import {
    AddCreatorData,
    Creator,
@@ -33,8 +35,6 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
-import { Create, ImageType } from "../commonTypes"
-import { containsAny } from "../utils/utils"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cloneDeep = require("lodash.clonedeep")
@@ -151,7 +151,6 @@ export interface IGroupRepository {
          | "companySize"
          | "companyIndustries"
          | "companyCountry"
-         | "targetedCountries"
          | "targetedUniversities"
          | "targetedFieldsOfStudy"
          | "privacyPolicyActive"
@@ -159,7 +158,7 @@ export interface IGroupRepository {
          | "universityName"
          | "normalizedUniversityName"
          | "careerPageUrl"
-      >
+      > & { targetedCountriesIds?: string[] }
    ): Promise<void>
 
    updateGroupTestimonials(groupId: string, testimonials: Testimonial[])

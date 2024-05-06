@@ -60,10 +60,9 @@ export class RankedSparkRepository {
    ): RankedSpark[] {
       // Get sparks filtered by targeted countries based on the countries of interest
       const sparks = this.getSparksFilteredByGroupArrayFields(
-         "targetedCountries",
+         "targetedCountriesIds",
          countriesIds,
-         limit,
-         "id"
+         limit
       )
 
       return this.rankSparks({
@@ -369,7 +368,9 @@ export class RankedSparkRepository {
                validationField
             ) {
                return sparkFieldValue.some((value) =>
-                  values.includes(value[validationField])
+                  values.includes(
+                     validationField ? value[validationField] : value
+                  )
                )
             }
 
