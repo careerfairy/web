@@ -1,5 +1,6 @@
 import { LivestreamQuestionComment } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack, Typography } from "@mui/material"
+import LinkifyText from "components/util/LinkifyText"
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -22,6 +23,10 @@ export const commentCardStyles = sxStyles({
          height: 21,
          color: (theme) => theme.brand.black[600],
       },
+   },
+   title: {
+      wordBreak: "break-word",
+      whiteSpace: "pre-line",
    },
 })
 
@@ -46,8 +51,12 @@ export const CommentCard = forwardRef<HTMLDivElement, Props>(
                   </Box>
                )}
             </Stack>
-            <Typography variant="small" color="neutral.700">
-               {comment.title}
+            <Typography
+               variant="small"
+               sx={commentCardStyles.title}
+               color="neutral.700"
+            >
+               <LinkifyText>{comment.title}</LinkifyText>
             </Typography>
          </Stack>
       )
