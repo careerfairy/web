@@ -43,9 +43,18 @@ const styles = sxStyles({
       px: 4,
       pb: 2.5,
    },
+   actionsMobile: {
+      pt: 0,
+      p: 1.5,
+   },
    dialogContent: {
       p: 4,
       pb: 3,
+      borderBottom: "none",
+   },
+   dialogContentMobile: {
+      p: 1.5,
+      pb: 2,
       borderBottom: "none",
    },
 })
@@ -85,6 +94,8 @@ const Content = () => {
    const { userHandRaiseIsActive: isHandRaiseActive, userCanJoinPanel } =
       useUserHandRaiseState(livestreamId, agoraUserId)
 
+   const streamIsMobile = useStreamIsMobile()
+
    const {
       trigger: updateUserHandRaiseState,
       isMutating: isUpdatingUserHandRaiseState,
@@ -95,7 +106,14 @@ const Content = () => {
 
    return (
       <Fragment>
-         <DialogContent sx={styles.dialogContent} dividers>
+         <DialogContent
+            sx={
+               streamIsMobile
+                  ? styles.dialogContentMobile
+                  : styles.dialogContent
+            }
+            dividers
+         >
             <Box>
                <SetupCameraVideo />
                <Box pb={1.5} />
@@ -111,7 +129,10 @@ const Content = () => {
                </Grid>
             </Box>
          </DialogContent>
-         <DialogActions sx={styles.actions} disableSpacing>
+         <DialogActions
+            sx={streamIsMobile ? styles.actionsMobile : styles.actions}
+            disableSpacing
+         >
             <MicActionButton />
             <Box mr={2.5} ml={1.5}>
                <VideoActionButton />
@@ -154,7 +175,7 @@ const Content = () => {
                   }}
                >
                   {isHandRaiseActive && isViewer && !userCanJoinPanel
-                     ? "Request to join"
+                     ? "Raise hand"
                      : "Join live stream"}
                </LoadingButton>
             </Stack>
