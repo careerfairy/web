@@ -6,11 +6,9 @@ import {
    tabClasses,
    tabsClasses,
 } from "@mui/material"
-import { useCountTotalQuestions } from "components/custom-hook/streaming/question/useCountTotalQuestions"
 import { swipeableTabA11yProps } from "materialUI/GlobalPanels/GlobalPanels"
 import { SyntheticEvent } from "react"
 import { sxStyles } from "types/commonTypes"
-import { useStreamingContext } from "../../context"
 import { MIN_QUESTIONS_TO_SHOW } from "./util"
 
 const BORDER_RADIUS = 51
@@ -63,6 +61,8 @@ export enum QuestionTab {
 type PanelTabsProps = {
    value: QuestionTab
    setValue: (value: QuestionTab) => void
+   upcomingQuestionsCount: number
+   answeredQuestionsCount: number
 }
 
 const formatCount = (count: number) => {
@@ -83,18 +83,12 @@ const formatCount = (count: number) => {
    return `(${count})`
 }
 
-export const PanelTabs = ({ value, setValue }: PanelTabsProps) => {
-   const { livestreamId } = useStreamingContext()
-
-   const { count: upcomingQuestionsCount } = useCountTotalQuestions(
-      livestreamId,
-      "upcoming"
-   )
-   const { count: answeredQuestionsCount } = useCountTotalQuestions(
-      livestreamId,
-      "answered"
-   )
-
+export const PanelTabs = ({
+   value,
+   setValue,
+   upcomingQuestionsCount,
+   answeredQuestionsCount,
+}: PanelTabsProps) => {
    const upcomingCountString = formatCount(upcomingQuestionsCount)
    const answeredCountString = formatCount(answeredQuestionsCount)
 

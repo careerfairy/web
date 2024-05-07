@@ -48,15 +48,20 @@ export const questionCardStyles = sxStyles({
          color: (theme) => theme.brand.white[100],
       },
    },
+   title: {
+      wordBreak: "break-word",
+      whiteSpace: "pre-line",
+   },
 })
 
 type Props = {
    question: LivestreamQuestion
    onQuestionMarkedAsAnswered?: () => void
+   onQuestionHighlighted?: () => void
 }
 
 export const QuestionCard = forwardRef<HTMLDivElement, Props>(
-   ({ question, onQuestionMarkedAsAnswered }, ref) => {
+   ({ question, onQuestionMarkedAsAnswered, onQuestionHighlighted }, ref) => {
       const { onQuestionOptionsClick } = useQuestionsListContext()
       const { showOptions } = useQuestionsVisibilityControls(question)
 
@@ -76,6 +81,7 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
                question={question}
                topPadding={question.type === "new" || question.type === "done"}
                onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+               onQuestionHighlighted={onQuestionHighlighted}
             />
             <Box
                component="span"
@@ -100,6 +106,7 @@ export const QuestionCard = forwardRef<HTMLDivElement, Props>(
 type StreamerActionsProps = {
    question: LivestreamQuestion
    onQuestionMarkedAsAnswered?: () => void
+   onQuestionHighlighted?: () => void
 }
 
 type AnswererHeaderProps = {
@@ -138,19 +145,26 @@ type ContentProps = {
    question: LivestreamQuestion
    topPadding: boolean
    onQuestionMarkedAsAnswered?: () => void
+   onQuestionHighlighted?: () => void
 }
 
 const Content = ({
    question,
    topPadding,
    onQuestionMarkedAsAnswered,
+   onQuestionHighlighted,
 }: ContentProps) => {
    const { setQuestionIdWithOpenedCommentList } = useQuestionsListContext()
    const { isHost } = useStreamingContext()
 
    return (
       <Stack spacing={3} p={1.5} pt={topPadding ? 1.5 : undefined}>
-         <Typography variant="brandedBody" paddingRight={3} color="neutral.800">
+         <Typography
+            variant="brandedBody"
+            sx={questionCardStyles.title}
+            paddingRight={3}
+            color="neutral.800"
+         >
             {question.title}
          </Typography>
          <Stack spacing={1}>
@@ -166,6 +180,7 @@ const Content = ({
                            onQuestionMarkedAsAnswered={
                               onQuestionMarkedAsAnswered
                            }
+                           onQuestionHighlighted={onQuestionHighlighted}
                         />
                         <CommentInput
                            questionId={question.id}
@@ -186,6 +201,7 @@ const Content = ({
 const StreamerActions = ({
    question,
    onQuestionMarkedAsAnswered,
+   onQuestionHighlighted,
 }: StreamerActionsProps) => {
    const { streamerAuthToken, livestreamId } = useStreamingContext()
    const {
@@ -205,7 +221,7 @@ const StreamerActions = ({
                color="primary"
                variant="outlined"
                onClick={() =>
-                  markQuestionAsCurrent().then(onQuestionMarkedAsAnswered)
+                  markQuestionAsCurrent().then(onQuestionHighlighted)
                }
                loading={markQuestionAsCurrentPending}
             >
@@ -216,7 +232,9 @@ const StreamerActions = ({
             <LoadingButton
                color="primary"
                variant="contained"
-               onClick={() => markQuestionAsDone()}
+               onClick={() =>
+                  markQuestionAsDone().then(onQuestionMarkedAsAnswered)
+               }
                loading={markQuestionAsDonePending}
             >
                Mark as answered

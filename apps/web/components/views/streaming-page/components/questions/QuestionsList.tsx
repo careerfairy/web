@@ -2,8 +2,9 @@ import { Collapse, Stack, useTheme } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { useLivestreamQuestions } from "components/custom-hook/streaming/question/useLivestreamQuestions"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import { SwipeablePanel } from "materialUI/GlobalPanels/GlobalPanels"
-import { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import Masonry from "react-responsive-masonry"
 import SwipeableViews from "react-swipeable-views"
@@ -18,14 +19,18 @@ import { MIN_QUESTIONS_TO_SHOW } from "./util"
 type Props = {
    tabValue: QuestionTab
    onQuestionMarkedAsAnswered?: () => void
+   onQuestionHighlighted?: () => void
    setTabValue: (value: QuestionTab) => void
 }
 
-export const QuestionsList = ({
-   setTabValue,
-   tabValue,
-   onQuestionMarkedAsAnswered,
-}: Props) => {
+export const QuestionsList = memo((props: Props) => {
+   useTraceUpdate(props)
+   const {
+      tabValue,
+      setTabValue,
+      onQuestionMarkedAsAnswered,
+      onQuestionHighlighted,
+   } = props
    const theme = useTheme()
 
    return (
@@ -46,28 +51,34 @@ export const QuestionsList = ({
             <SwipeablePanel value={QuestionTab.UPCOMING} index={tabValue}>
                <ListView
                   onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+                  onQuestionHighlighted={onQuestionHighlighted}
                   tabValue={QuestionTab.UPCOMING}
                />
             </SwipeablePanel>
             <SwipeablePanel value={QuestionTab.ANSWERED} index={tabValue}>
                <ListView
                   onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+                  onQuestionHighlighted={onQuestionHighlighted}
                   tabValue={QuestionTab.ANSWERED}
                />
             </SwipeablePanel>
          </SwipeableViews>
       </SuspenseWithBoundary>
    )
-}
+})
+
+QuestionsList.displayName = "QuestionsList"
 
 type ListViewProps = {
    tabValue: QuestionTab
    onQuestionMarkedAsAnswered: () => void
+   onQuestionHighlighted: () => void
 }
 
 const ListView = ({
    tabValue: type,
    onQuestionMarkedAsAnswered,
+   onQuestionHighlighted,
 }: ListViewProps) => {
    const { livestreamId } = useStreamingContext()
 
@@ -98,6 +109,7 @@ const ListView = ({
                      ref={index === questions.length - 1 ? ref : null}
                      question={question}
                      onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+                     onQuestionHighlighted={onQuestionHighlighted}
                   />
                ))}
             </Masonry>
@@ -111,6 +123,7 @@ const ListView = ({
                      <QuestionCard
                         question={question}
                         onQuestionMarkedAsAnswered={onQuestionMarkedAsAnswered}
+                        onQuestionHighlighted={onQuestionHighlighted}
                      />
                   </Collapse>
                ))}

@@ -41,7 +41,7 @@ export type CountQuery = {
    loading: boolean
    count: number | null
    error: Error | undefined
-   refetch: () => void
+   refetch: () => Promise<void>
 }
 
 /**
