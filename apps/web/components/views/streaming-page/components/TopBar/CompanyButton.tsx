@@ -1,5 +1,4 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Button,
@@ -18,10 +17,12 @@ import {
    useStreamIsLandscape,
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import FollowButton from "components/views/common/company/FollowButton"
 import { CompanyIcon } from "components/views/common/icons"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { ComponentType, useMemo, useState } from "react"
+import Link from "next/link"
+import { ComponentType, useState } from "react"
 import { ExternalLink, MapPin, Tag, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
@@ -48,8 +49,13 @@ const styles = sxStyles({
       gap: 1.5,
       flex: "1 0 0",
    },
+   viewerMinWidth: {
+      minWidth: "200px",
+   },
+   companyInfoWrapperMaxWidth: {
+      maxWidth: "250px",
+   },
    companyInfo: {
-      gap: 1,
       flex: "1 0 0",
    },
    companyInfoLandscape: {
@@ -57,6 +63,16 @@ const styles = sxStyles({
    },
    companyTitle: {
       fontWeight: 600,
+      display: "inline-block",
+   },
+   companyTitleLimit: {
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      mb: 0,
+   },
+   companyTitleMobile: {
+      mb: 1,
    },
    actionButtonsWrapper: {
       justifyContent: "center",
@@ -86,17 +102,20 @@ const styles = sxStyles({
    icon: {
       flexShrink: 0,
       width: "12px",
-      alignItems: "flex-start",
+      height: "auto",
+      alignSelf: "flex-start",
+      paddingTop: "2px",
    },
    smallText: {
       fontWeight: 400,
+      display: "flex",
    },
    textAlign: {
       textAlign: "center",
       alignItems: "center",
    },
-   alignCenter: {
-      alignSelf: "center",
+   alignIcon: {
+      minWidth: "fit-content",
    },
    visitButton: {
       color: (theme) => theme.brand.black[700],
@@ -132,7 +151,7 @@ const CompanyButtonLayout = () => {
       setIsInfoOpen(false)
    }
 
-   if (!hostCompany || !hostCompany.publicProfile) return null
+   if (!hostCompany) return null
 
    return (
       <>
@@ -190,7 +209,7 @@ const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
    <Tooltip {...props} classes={{ popper: className }} />
 ))({
    [`& .${tooltipClasses.tooltip}`]: {
-      maxWidth: "445px",
+      maxWidth: "none",
       padding: 0,
    },
 })
@@ -204,12 +223,6 @@ const Content = ({ company }: Props) => {
    const streamIsLandscape = useStreamIsLandscape()
    const { isHost } = useStreamingContext()
 
-   const companyTitleShort = useMemo(() => {
-      if (company.universityName) {
-         return getSubstringWithEllipsis(company.universityName, 16)
-      }
-   }, [company.universityName])
-
    return (
       <Stack
          sx={[styles.contentWrapper, isMobile && styles.wrapperMobile]}
@@ -219,26 +232,40 @@ const Content = ({ company }: Props) => {
             direction={isMobile ? "column" : "row"}
             sx={[
                styles.companyInfoWrapper,
+               (isHost || !company.publicProfile) && styles.viewerMinWidth,
+               !streamIsLandscape && styles.companyInfoWrapperMaxWidth,
                streamIsLandscape
                   ? styles.companyInfoLandscape
                   : isMobile && styles.textAlign,
             ]}
          >
-            <CompanyLogo
-               src={company.logoUrl}
-               alt={company.universityName}
-               size={isMobile ? 64 : 48}
-            />
+            <Link href={makeGroupCompanyPageUrl(company)} target="_blank">
+               <CompanyLogo
+                  src={company.logoUrl}
+                  alt={company.universityName}
+                  size={isMobile ? 64 : 48}
+               />
+            </Link>
 
             <Stack
                sx={[
                   styles.companyInfo,
+                  !isMobile && { overflow: "auto" },
                   isMobile && !streamIsLandscape && styles.textAlign,
                ]}
+               gap={isMobile ? 1 : 0.5}
             >
                {company.universityName ? (
-                  <Typography variant="brandedBody" sx={styles.companyTitle}>
-                     {isMobile ? company.universityName : companyTitleShort}
+                  <Typography
+                     variant="brandedBody"
+                     sx={[
+                        styles.companyTitle,
+                        isMobile
+                           ? styles.companyTitleMobile
+                           : styles.companyTitleLimit,
+                     ]}
+                  >
+                     {company.universityName}
                   </Typography>
                ) : null}
 
@@ -257,11 +284,13 @@ const Content = ({ company }: Props) => {
                         .join(", ")}
                   />
                )}
-               <CompanyInfoIcon icon={Users} title={company.companySize} />
+               {company.companySize ? (
+                  <CompanyInfoIcon icon={Users} title={company.companySize} />
+               ) : null}
             </Stack>
          </Stack>
 
-         {!isHost && (
+         {!isHost && company.publicProfile ? (
             <Stack
                sx={[
                   styles.actionButtonsWrapper,
@@ -274,7 +303,7 @@ const Content = ({ company }: Props) => {
             >
                <ActionButtons company={company} />
             </Stack>
-         )}
+         ) : null}
       </Stack>
    )
 }
@@ -285,9 +314,7 @@ const ActionButtons = ({ company }: { company: Group }) => {
          <FollowButton
             variant="contained"
             size="small"
-            startIcon={null}
             sx={styles.followButton}
-            followText="Follow company"
             group={company}
          />
          <Button
@@ -298,7 +325,7 @@ const ActionButtons = ({ company }: { company: Group }) => {
             href={makeGroupCompanyPageUrl(company)}
             target="_blank"
          >
-            Visit company page
+            Company page
          </Button>
       </>
    )
@@ -310,10 +337,11 @@ type InfoIcon = {
 }
 
 const CompanyInfoIcon = ({ icon, title }: InfoIcon) => {
+   const isMobile = useIsMobile()
    return (
       <Box sx={styles.companyIcon}>
          <Box component={icon} sx={styles.icon} />
-         <Box sx={[styles.alignCenter, styles.smallText]}>
+         <Box sx={[isMobile && styles.alignIcon, styles.smallText]}>
             <Typography variant="xsmall">{title}</Typography>
          </Box>
       </Box>
@@ -328,13 +356,15 @@ type LogoButton = {
 }
 
 const CompanyLogo = ({ src, alt, size, onClick }: LogoButton) => {
+   const isClickable = Boolean(onClick)
+
    return (
       <>
          <CircularButton
             sx={{ height: size, width: size }}
-            disableRipple={onClick == undefined}
-            disableFocusRipple={onClick == undefined}
-            disableTouchRipple={onClick == undefined}
+            disableRipple={isClickable}
+            disableFocusRipple={isClickable}
+            disableTouchRipple={isClickable}
             onClick={onClick}
          >
             {src ? (

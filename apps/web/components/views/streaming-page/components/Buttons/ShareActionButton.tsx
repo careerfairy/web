@@ -23,7 +23,7 @@ export const ShareActionButton = forwardRef<
    const isSpotlightMode = useIsSpotlightMode()
 
    if (isSpotlightMode) {
-      return <StopSharingButton />
+      return <StopSharingButton enableTooltip {...props} />
    }
 
    return (
