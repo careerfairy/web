@@ -20,6 +20,15 @@ const styles = sxStyles({
       opacity: 0.5,
       color: "primary.main",
    },
+   title: {
+      fontWeight: 700,
+      color: "primary.main",
+      textAlign: "center",
+   },
+   description: {
+      textAlign: "center",
+      color: "neutral.800",
+   },
 })
 
 export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
@@ -47,15 +56,10 @@ export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
             maxWidth={streamIsLandscape ? 500 : 303}
          >
             <HandRaiseIcon sx={styles.icon} />
-            <Typography
-               variant="mobileBrandedH1"
-               fontWeight={700}
-               color="primary.main"
-               textAlign="center"
-            >
+            <Typography variant="mobileBrandedH1" sx={styles.title}>
                Hand raise is not&nbsp;active
             </Typography>
-            <Typography textAlign="center" variant="medium" color="neutral.800">
+            <Typography variant="medium" sx={styles.description}>
                Engage with talent directly! By activating the hand raise feature
                talent will be able to join your stream with audio and video to
                ask you their own questions.
