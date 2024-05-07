@@ -1,10 +1,10 @@
+import { Box, Stack } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { sxStyles } from "types/commonTypes"
-import { Box, Divider, Stack } from "@mui/material"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { AllActions } from "./AllActionComponents"
+import { sxStyles } from "types/commonTypes"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
+import { AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -27,11 +27,9 @@ export const BottomBar = () => {
    return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
 }
 
-const DividerComponent = () => <Divider orientation="vertical" flexItem />
-
 export const BottomBarActions = {
    ...AllActions,
-   SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
+   SpeedDial: () => <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
 export type BottomBarActionName = keyof typeof BottomBarActions
@@ -61,10 +59,10 @@ const HostView = () => {
 
    return (
       <ActionsBar>
-         {getHostActionNames(isMobile).map(
-            (action, index) =>
-               BottomBarActions[action] || <DividerComponent key={index} />
-         )}
+         {getHostActionNames(isMobile).map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={index} />
+         })}
       </ActionsBar>
    )
 }
@@ -108,10 +106,10 @@ const ViewerView = () => {
 
    return (
       <ActionsBar>
-         {getViewerActionNames(isMobile, shouldStream).map(
-            (action, index) =>
-               BottomBarActions[action] || <DividerComponent key={index} />
-         )}
+         {getViewerActionNames(isMobile, shouldStream).map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={index} />
+         })}
       </ActionsBar>
    )
 }

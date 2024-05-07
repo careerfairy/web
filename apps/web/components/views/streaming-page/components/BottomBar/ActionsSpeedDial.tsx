@@ -8,7 +8,8 @@ import { ReactNode, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
 import { sxStyles } from "types/commonTypes"
-import { ActionName, AllActions } from "./AllActionComponents"
+import { tooltipStyles } from "../BrandedTooltip"
+import { ActionName, ActionTooltips, AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -133,16 +134,23 @@ export const ActionsSpeedDial = () => {
                sx: styles.noShadow,
             }}
          >
-            {actions.map((action) => (
-               <SpeedDialAction
-                  key={action}
-                  icon={AllActions[action]}
-                  FabProps={{
-                     sx: [styles.noShadow, styles.speedDialAction],
-                     component: "div",
-                  }}
-               />
-            ))}
+            {actions.map((action) => {
+               const Icon = AllActions[action]
+               return (
+                  <SpeedDialAction
+                     key={action}
+                     icon={<Icon />}
+                     tooltipTitle={ActionTooltips[action]}
+                     FabProps={{
+                        sx: [styles.noShadow, styles.speedDialAction],
+                        component: "div",
+                     }}
+                     slotProps={{
+                        tooltip: { sx: tooltipStyles.tooltip },
+                     }}
+                  />
+               )
+            })}
          </SpeedDial>
       </Box>
    )

@@ -4,6 +4,7 @@ import { StopIcon } from "components/views/common/icons/StopIcon"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
@@ -24,13 +25,13 @@ const styles = sxStyles({
 export const StopSharingButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { livestreamId } = useStreamingContext()
    const { trigger: setLivestreamMode, isMutating } =
       useSetLivestreamMode(livestreamId)
 
    return (
-      <BrandedTooltip title="Stop sharing">
+      <BrandedTooltip title={enableTooltip ? ActionTooltips.StopShare : null}>
          <ActionBarButtonStyled
             {...props}
             disabled={isMutating}
