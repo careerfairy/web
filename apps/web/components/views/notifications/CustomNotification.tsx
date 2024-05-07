@@ -30,8 +30,9 @@ const styles = sxStyles({
       p: 2,
    },
    expand: {
-      p: 1,
-      m: -1,
+      p: 0.5,
+      m: -0.5,
+      color: "#CACACA",
    },
 })
 
@@ -74,7 +75,7 @@ const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
                      sx={styles.expand}
                      onClick={handleDismiss}
                   >
-                     <CloseIcon fontSize="small" />
+                     <CloseIcon color="inherit" fontSize="small" />
                   </IconButton>
                </Box>
             </Card>
