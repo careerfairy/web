@@ -160,7 +160,6 @@ interface JoinComponentProps {
  * joining the channel when the component mounts. It is crucial that this component unmounts properly
  * to ensure the user leaves the channel, preventing any session persistence issues.
  */
-
 const JoinComponent = ({
    livestreamId,
    agoraUserId,
