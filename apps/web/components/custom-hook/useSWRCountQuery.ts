@@ -1,7 +1,7 @@
 import { getCountFromServer, Query } from "@firebase/firestore"
 import { queryEqual } from "firebase/firestore"
 import { ReactFireGlobals } from "reactfire"
-import useSWR, { SWRConfiguration } from "swr"
+import useSWR, { KeyedMutator, SWRConfiguration } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 const fetchCount = async (q: Query) => {
@@ -41,7 +41,7 @@ export type CountQuery = {
    loading: boolean
    count: number | null
    error: Error | undefined
-   refetch: () => Promise<void>
+   refetch: KeyedMutator<number>
 }
 
 /**
