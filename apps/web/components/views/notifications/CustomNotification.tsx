@@ -58,6 +58,7 @@ const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
                      <Typography
                         fontWeight={700}
                         variant="brandedH5"
+                        component="h5"
                         color={getColor(variant)}
                      >
                         {props.title}
