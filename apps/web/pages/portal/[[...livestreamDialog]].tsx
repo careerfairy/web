@@ -28,7 +28,6 @@ import {
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
-import useUserCustomJobApplications from "components/custom-hook/custom-job/useUserJobApplications"
 import useUserSeenSparks from "components/custom-hook/spark/useUserSeenSparks"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -68,16 +67,17 @@ const PortalPage = ({
       authenticatedUser.email
    )
 
-   const { sparks: seenSparks, error: seenSparksError } = useUserSeenSparks()
-   const { jobApplications, error: jobApplicationsError } =
-      useUserCustomJobApplications()
+   const { sparks: seenSparks } = useUserSeenSparks()
+   // const { jobApplications  } =
+   //    useUserCustomJobApplications()
 
-   console.log("🚀 ~ watchedSparks, error: ", seenSparks, seenSparksError)
-   console.log(
-      "🚀 ~ jobApplications, jobApplicationsError: ",
-      jobApplications,
-      jobApplicationsError
-   )
+   // const { events: interactedEvents } = useInteractedLivestreams()
+   console.log("🚀 ~ watchedSparks: ", seenSparks)
+   // console.log(
+   //    "🚀 ~ jobApplications: ",
+   //    jobApplications
+   // )
+   // console.log("🚀 ~ interactedEvents:", interactedEvents)
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds

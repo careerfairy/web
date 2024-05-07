@@ -15,7 +15,7 @@ const useUserCustomJobApplications = (limit?: 10) => {
       isLoading,
    } = useSWR<UserJobApplicationDocument[]>(
       [
-         "getUserJobApplications",
+         "getUserCustomJobApplications",
          {
             limit: limit,
          },
@@ -25,7 +25,7 @@ const useUserCustomJobApplications = (limit?: 10) => {
          onError: (error, key) =>
             errorLogAndNotify(error, {
                message:
-                  "Error Fetching user job applications by IDs via function",
+                  "Error Fetching user custom job applications by IDs via function",
                key,
             }),
          ...reducedRemoteCallsOptions,

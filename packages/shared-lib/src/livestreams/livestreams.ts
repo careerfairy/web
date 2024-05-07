@@ -370,6 +370,10 @@ export interface LivestreamRecordingDetails extends Identifiable {
    // all the recording viewers
    viewers: string[]
 
+   // Map containing the most recent timestamp for when a user last seen a recording
+   viewersLastSeenAt?: {
+      [viewer: string]: Timestamp
+   }
    // recording viewers that bought access
    // for analytics purposes
    viewersThroughCredits?: string[]
