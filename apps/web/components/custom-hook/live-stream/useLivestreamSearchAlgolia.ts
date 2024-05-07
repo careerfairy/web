@@ -1,26 +1,26 @@
+import { SearchResponse } from "@algolia/client-search"
+import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
+import {
+   ArrayFilterFieldType,
+   BooleanFilterFieldType,
+   LivestreamReplicaType,
+} from "@careerfairy/shared-lib/livestreams/search"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
+import { DateTime } from "luxon"
+import { useCallback } from "react"
 import useSWRInfinite from "swr/infinite"
-import { errorLogAndNotify } from "util/CommonUtil"
 import {
    AlgoliaLivestreamResponse,
    DateFilterFieldType,
    LivestreamSearchResult,
 } from "types/algolia"
-import { SearchResponse } from "@algolia/client-search"
-import { useCallback } from "react"
+import { errorLogAndNotify, isTestEnvironment } from "util/CommonUtil"
 import {
    deserializeAlgoliaSearchResponse,
    generateArrayFilterString,
    generateBooleanFilterStrings,
    generateDateFilter,
 } from "util/algolia"
-import {
-   ArrayFilterFieldType,
-   BooleanFilterFieldType,
-   LivestreamReplicaType,
-} from "@careerfairy/shared-lib/livestreams/search"
-import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
-import { DateTime } from "luxon"
 
 type Data = SearchResponse<AlgoliaLivestreamResponse> & {
    deserializedHits: LivestreamSearchResult[]
@@ -134,5 +134,6 @@ export function useLivestreamSearchAlgolia(
             key,
          }),
       keepPreviousData: true,
+      refreshInterval: isTestEnvironment() ? 1000 : undefined,
    })
 }
