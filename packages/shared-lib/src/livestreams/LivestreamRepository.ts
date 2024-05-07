@@ -43,6 +43,7 @@ type UpdateRecordingStatsProps = {
    userId?: string
    onlyIncrementMinutes?: boolean
    usedCredits?: boolean
+   viewedAt?: Timestamp
 }
 
 export type PastEventsOptions = {
@@ -361,10 +362,9 @@ export interface ILivestreamRepository {
     */
    syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
 
-   getWatchedRecordingEventsByUserId(
-      userEmail: string,
-      limit?: 10,
-      ignoreLivestreamIds?: string[]
+   getUserInteractedLivestreams(
+      userId: string,
+      limit?: number
    ): Promise<LivestreamEvent[]>
 }
 
@@ -1226,6 +1226,7 @@ export class FirebaseLivestreamRepository
       userId,
       onlyIncrementMinutes,
       usedCredits,
+      viewedAt,
    }: UpdateRecordingStatsProps) {
       const docRef = this.firestore
          .collection("livestreams")
@@ -1241,6 +1242,10 @@ export class FirebaseLivestreamRepository
          ) as unknown as number,
          viewers: this.fieldValue.arrayUnion(userId) as unknown as string[],
          views: this.fieldValue.increment(1) as unknown as number,
+      }
+
+      if (viewedAt) {
+         details.viewersLastSeenAt[userId] = viewedAt
       }
 
       if (usedCredits) {
@@ -1515,54 +1520,126 @@ export class FirebaseLivestreamRepository
       await Promise.allSettled(promises)
    }
 
-   async getUserInteractedLivestreams(
-      userEmail: string,
-      limit?: 10
-   ): Promise<LivestreamEvent[]> {
-      const userPaticipatedEvents = await this.getParticipatedEvents(
-         userEmail,
-         { limit: limit, orderByDirection: "desc" }
-      )
-
-      const ignoreIds = userPaticipatedEvents.map((livestream) => livestream.id)
-      //TODO: Issue recording stats do not save when user watched recording
-      const userWatchedRecordingEvents =
-         await this.getWatchedRecordingEventsByUserId(
-            userEmail,
-            limit,
-            ignoreIds
-         )
-      console.log(
-         "🚀 ~ getUserInteractedLivestreams ~ userWatchedRecordingEvents:",
-         userWatchedRecordingEvents
-      )
-      return []
-   }
-
-   async getWatchedRecordingEventsByUserId(
-      userEmail: string,
+   async getUserLivestreamData(
+      userId: string,
       limit?: 10,
-      ignoreLivestreamIds?: string[]
-   ): Promise<LivestreamEvent[]> {
-      let query = this.firestore
-         .collection("recordingStats")
-         .where("stats.viewers", "array-contains", userEmail)
+      ignoreIds?: string[]
+   ): Promise<UserLivestreamData[]> {
+      let query = await this.firestore
+         .collection("userLivestreamData")
+         .where("id", "==", userId)
+         .orderBy("participated.date", "desc")
+         .limit(limit)
 
-      if (ignoreLivestreamIds) {
-         query = query.where(
-            "stats.livestreamId",
-            "not-in",
-            ignoreLivestreamIds
-         )
+      if (ignoreIds) {
+         query = query.where("livestreamId", "not-in", ignoreIds)
       }
 
-      const recordingStats = await query.get()
+      const snap = await query.get()
 
-      const livestreamIds = recordingStats?.docs
-         ?.map((stats) => stats?.data() as LivestreamRecordingDetails)
-         ?.map((recordingDetail) => recordingDetail.livestreamId)
+      return mapFirestoreDocuments<UserLivestreamData>(snap) || []
+   }
 
-      return this.getLivestreamsByIds(livestreamIds)
+   async getUserRecordingStats(
+      userEmail: string,
+      unique: boolean
+   ): Promise<RecordingStatsUser[]> {
+      const query = this.firestore
+         .collection("recordingStatsUser")
+         .where("userId", "==", userEmail)
+         .orderBy("date", "desc")
+
+      const data = await query.get()
+      const recordingStatsData = mapFirestoreDocuments<RecordingStatsUser>(data)
+
+      const recordingStats = recordingStatsData ? recordingStatsData : []
+
+      if (unique) {
+         // Filtering the results, to only consider the more recent hourly watched recording
+         // Meaning if a user has watched multiple recordings for the same livestream in several hours
+         // only the last hour data will be considered
+         const filteredStats = recordingStats.filter((stat) => {
+            const otherHourViews = recordingStats.filter((recordingStat) => {
+               return (
+                  recordingStat.userId == stat.userId &&
+                  recordingStat.livestreamId == stat.livestreamId &&
+                  recordingStat.id != stat.id
+               )
+            })
+
+            if (otherHourViews.length) {
+               const hasMoreRecent = otherHourViews.find((recordingStat) => {
+                  return recordingStat.date.toMillis() > stat.date.toMillis()
+               })
+
+               return !hasMoreRecent
+            }
+
+            return true
+         })
+
+         return filteredStats
+      }
+
+      return recordingStats
+   }
+
+   async getUserInteractedLivestreams(
+      userId: string,
+      limit?: 10
+   ): Promise<LivestreamEvent[]> {
+      // Limit in memory
+      const recordingData = await this.getUserRecordingStats(userId, true)
+      const userRecordingData = recordingData.slice(0, limit)
+
+      const ignoreIds = userRecordingData.map((data) => data.livestreamId)
+      const userLivestreamParticipatingData = await this.getUserLivestreamData(
+         userId,
+         limit,
+         ignoreIds
+      )
+
+      const sortedLivestreamsIds = userRecordingData
+         .map((recording) => {
+            return {
+               livestreamId: recording.livestreamId,
+               date: recording.date,
+            }
+         })
+         .concat(
+            userLivestreamParticipatingData.map((participatingData) => {
+               return {
+                  livestreamId: participatingData.livestreamId,
+                  date: participatingData?.participated?.date,
+               }
+            })
+         )
+         .sort((baseLivestreamData, comparisonLivestreamData) => {
+            return (
+               comparisonLivestreamData.date.toMillis() -
+               baseLivestreamData.date.toMillis()
+            )
+         })
+         .slice(0, limit)
+         .map((data) => data.livestreamId)
+
+      // Will need to re sort as the query might not respect the order
+      const livestreams = await this.getLivestreamsByIds(sortedLivestreamsIds)
+
+      const sortedLivestreams = (livestreams || []).sort(
+         (baseLivestream, comparisonLivestream) => {
+            const baseSortedIndex = sortedLivestreamsIds.indexOf(
+               baseLivestream.id
+            )
+            const comparisonSortedIndex = sortedLivestreamsIds.indexOf(
+               comparisonLivestream.id
+            )
+
+            // TODO: Confirm order
+            return comparisonSortedIndex - baseSortedIndex
+         }
+      )
+      return sortedLivestreams
    }
 }
 
