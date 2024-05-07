@@ -57,7 +57,7 @@ export const HandRaiseInactive = forwardRef<HTMLDivElement>((_, ref) => {
             </Typography>
             <Typography textAlign="center" variant="medium" color="neutral.800">
                Engage with talent directly! By activating the hand raise feature
-               talent will be able to join your stream with audio and video and
+               talent will be able to join your stream with audio and video to
                ask you their own questions.
             </Typography>
          </Stack>
