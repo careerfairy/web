@@ -4,8 +4,9 @@ import {
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { LoadingButton } from "@mui/lab"
-import { Stack } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
+import CustomNotification from "components/views/notifications/CustomNotification"
 import {
    collection,
    onSnapshot,
@@ -14,7 +15,7 @@ import {
    where,
 } from "firebase/firestore"
 import { useSnackbar } from "notistack"
-import { useEffect, useRef } from "react"
+import { forwardRef, useEffect, useRef } from "react"
 import { useFirestore } from "reactfire"
 import { useStreamingContext } from "../../context"
 
@@ -38,7 +39,6 @@ export const HandRaiseNotificationTracker = () => {
                collection(db, "livestreams", livestreamId, "handRaises"),
                where("state", "in", [
                   HandRaiseState.requested,
-                  HandRaiseState.connecting,
                   HandRaiseState.connected,
                ]),
                orderBy("timeStamp", "desc")
@@ -48,55 +48,40 @@ export const HandRaiseNotificationTracker = () => {
                   if (change.type === "removed") return
 
                   const handRaiser = change.doc.data()
-                  const snackbarKey = change.doc.id
-                  closeSnackbar(snackbarKey) // close the snackbar if it exists
 
                   if (!initialLoaded.current) return
 
+                  closeSnackbar(handRaiser.id)
                   if (handRaiser.state === HandRaiseState.requested) {
                      enqueueSnackbar(
                         `${handRaiser.name} requested to raise their hand`,
                         {
                            variant: "info",
-                           key: change.doc.id,
-                           preventDuplicate: true,
-                           action: (key) => (
-                              <Stack
-                                 justifyContent="flex-end"
-                                 direction="row"
-                                 spacing={1}
-                              >
-                                 <LoadingButton
-                                    loading={isUpdatingUserHandRaiseState}
-                                    onClick={async () => {
-                                       await updateUserHandRaiseState({
-                                          state: HandRaiseState.denied,
-                                          handRaiseId: handRaiser.id,
-                                       })
-                                       closeSnackbar(key)
-                                    }}
-                                    variant="outlined"
-                                    color="grey"
-                                    size="small"
-                                 >
-                                    Deny
-                                 </LoadingButton>
-                                 <LoadingButton
-                                    loading={isUpdatingUserHandRaiseState}
-                                    onClick={async () => {
-                                       await updateUserHandRaiseState({
-                                          state: HandRaiseState.invited,
-                                          handRaiseId: handRaiser.id,
-                                       })
-                                       closeSnackbar(key)
-                                    }}
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                 >
-                                    Approve
-                                 </LoadingButton>
-                              </Stack>
+                           key: handRaiser.id,
+                           content: () => (
+                              <HandRaiseRequestedNotification
+                                 handRaise={handRaiser}
+                                 livestreamId={livestreamId}
+                                 key={handRaiser.id}
+                              />
+                           ),
+                        }
+                     )
+                  }
+
+                  if (handRaiser.state === HandRaiseState.connecting) {
+                     enqueueSnackbar(
+                        `${handRaiser.name} is connecting to the panel`,
+                        {
+                           variant: "info",
+                           key: handRaiser.id,
+                           content: () => (
+                              <CustomNotification
+                                 title="Hand raiser"
+                                 variant="info"
+                                 id={handRaiser.id}
+                                 content={`${handRaiser.name} is connecting to the panel`}
+                              />
                            ),
                         }
                      )
@@ -105,20 +90,16 @@ export const HandRaiseNotificationTracker = () => {
                   if (handRaiser.state === HandRaiseState.connected) {
                      enqueueSnackbar(`${handRaiser.name} joined the panel`, {
                         variant: "info",
-                        preventDuplicate: true,
-                        key: change.doc.id,
+                        key: handRaiser.id,
+                        content: () => (
+                           <CustomNotification
+                              title="Hand raiser"
+                              variant="success"
+                              id={handRaiser.id}
+                              content={`${handRaiser.name} has joined the panel.`}
+                           />
+                        ),
                      })
-                  }
-
-                  if (handRaiser.state === HandRaiseState.connecting) {
-                     enqueueSnackbar(
-                        `${handRaiser.name} is connecting to the panel`,
-                        {
-                           variant: "info",
-                           preventDuplicate: true,
-                           key: change.doc.id,
-                        }
-                     )
                   }
                })
                initialLoaded.current = true
@@ -137,3 +118,66 @@ export const HandRaiseNotificationTracker = () => {
 
    return null
 }
+
+type HandRaiseNotificationProps = {
+   handRaise: HandRaise
+   livestreamId: string
+}
+
+const HandRaiseRequestedNotification = forwardRef<
+   HTMLDivElement,
+   HandRaiseNotificationProps
+>(({ handRaise, livestreamId }, ref) => {
+   const {
+      trigger: updateUserHandRaiseState,
+      isMutating: isUpdatingUserHandRaiseState,
+   } = useUpdateUserHandRaiseState(livestreamId)
+
+   return (
+      <CustomNotification
+         ref={ref}
+         title="New hand raiser"
+         variant="success"
+         id={handRaise.id}
+         content={
+            <Stack direction="row" alignItems="center" spacing={1.25}>
+               <Typography variant="small">
+                  {handRaise.name} has raised their hand.
+               </Typography>
+               <Stack direction="row" spacing={1}>
+                  <LoadingButton
+                     loading={isUpdatingUserHandRaiseState}
+                     onClick={() =>
+                        updateUserHandRaiseState({
+                           state: HandRaiseState.denied,
+                           handRaiseId: handRaise.id,
+                        })
+                     }
+                     size="small"
+                     color="grey"
+                     variant="outlined"
+                  >
+                     Deny
+                  </LoadingButton>
+                  <LoadingButton
+                     loading={isUpdatingUserHandRaiseState}
+                     onClick={() =>
+                        updateUserHandRaiseState({
+                           state: HandRaiseState.invited,
+                           handRaiseId: handRaise.id,
+                        })
+                     }
+                     size="small"
+                     color="primary"
+                     variant="contained"
+                  >
+                     Approve
+                  </LoadingButton>
+               </Stack>
+            </Stack>
+         }
+      />
+   )
+})
+
+HandRaiseRequestedNotification.displayName = "HandRaiseRequestedNotification"
