@@ -1,4 +1,4 @@
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -6,23 +6,16 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-const functionName = "getUserSeenSparks"
-
-/**
- * TODO: Update documentation
- * @param limit
- * @returns
- */
-export const useUserSeenSparks = (limit?: 20) => {
+const useInteractedLivestreams = (limit?: 10) => {
    const fetcher = useFunctionsSWR()
 
    const {
-      data: sparks,
+      data: interactedEvents,
       error,
       isLoading,
-   } = useSWR<Spark[]>(
+   } = useSWR<LivestreamEvent[]>(
       [
-         functionName,
+         "getInteractedLivestreams",
          {
             limit: limit,
          },
@@ -31,7 +24,8 @@ export const useUserSeenSparks = (limit?: 20) => {
       {
          onError: (error, key) =>
             errorLogAndNotify(error, {
-               message: "Error Fetching user SeenSparks by IDs via function",
+               message:
+                  "Error Fetching user Interacted Livestreams via function",
                key,
             }),
          ...reducedRemoteCallsOptions,
@@ -41,12 +35,12 @@ export const useUserSeenSparks = (limit?: 20) => {
 
    return useMemo(
       () => ({
-         sparks: sparks,
+         events: interactedEvents,
          loading: isLoading,
          error: error,
       }),
-      [error, isLoading, sparks]
+      [error, isLoading, interactedEvents]
    )
 }
 
-export default useUserSeenSparks
+export default useInteractedLivestreams
