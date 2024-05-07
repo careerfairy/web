@@ -13,7 +13,7 @@ const styles = sxStyles({
       "@media (min-width:600px)": {
          minWidth: "344px !important",
       },
-      maxWidth: 450,
+      maxWidth: 460,
    },
    card: {
       width: "100%",
@@ -53,7 +53,7 @@ const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
       return (
          <Box component={SnackbarContent} ref={ref} sx={styles.root}>
             <Card sx={styles.card}>
-               <Stack spacing={1.5}>
+               <Stack spacing={1.25}>
                   {props.title ? (
                      <Typography
                         fontWeight={700}
