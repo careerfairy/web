@@ -18,11 +18,11 @@ const runtimeSettings: RuntimeOptions = {
    memory: "256MB",
 }
 
-type GetUserJobApplications = {
+type GetUserCustomJobApplications = {
    limit: number
 }
 
-const getUserJobApplicationsSchema: SchemaOf<GetUserJobApplications> =
+const getUserCustomJobApplicationsSchema: SchemaOf<GetUserCustomJobApplications> =
    object().shape({
       limit: number().min(1).default(20).required(),
    })
@@ -170,16 +170,17 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
       )
    )
 
-export const getSparksByIds = functions
+export const getUserCustomJobApplications = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onCall(
       middlewares(
-         dataValidation(getUserJobApplicationsSchema),
+         dataValidation(getUserCustomJobApplicationsSchema),
          userAuthExists(),
-         async (data: GetUserJobApplications, context) => {
+         async (data: GetUserCustomJobApplications, context) => {
             try {
                // TODO: Check no need to fetch from /jobApplications, since the user data should be backfilled
+               // TODO: Apply limit
                return await userRepo.getJobApplications(
                   context.auth?.token?.email
                )
