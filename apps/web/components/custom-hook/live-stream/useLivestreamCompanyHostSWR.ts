@@ -8,7 +8,7 @@ const swrOptions: SWRConfiguration = {
    suspense: true,
    onError: (error, key) =>
       errorLogAndNotify(error, {
-         message: `Error fetching livestream host data with options: ${key}`,
+         message: `Error fetching live stream host data with options: ${key}`,
       }),
 }
 

@@ -24,7 +24,7 @@ export const HandRaiseActionButton = forwardRef<
 
    return (
       <BrandedTooltip
-         title={enableTooltip ? ActionTooltips["Hand Raise"] : null}
+         title={enableTooltip ? ActionTooltips["Hand raise"] : null}
       >
          <ActionBarButtonStyled
             active={isActive}

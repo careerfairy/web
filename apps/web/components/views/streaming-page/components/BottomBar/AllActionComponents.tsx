@@ -48,10 +48,10 @@ export const AllActions = {
 export type ActionName = keyof typeof AllActions
 
 export const ActionTooltips = {
-   "Hand Raise": "Hand Raise",
-   "Q&A": "Questions and Answers",
+   "Hand raise": "Hand raise",
+   "Q&A": "Questions and answers",
    Polls: "Polls",
-   Jobs: "Linked Jobs",
+   Jobs: "Linked jobs",
    Reactions: "Reactions",
    Chat: "Chat",
    Settings: "Settings",

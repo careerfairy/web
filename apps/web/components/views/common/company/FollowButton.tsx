@@ -38,14 +38,8 @@ const toggleFollowCompany = (
 
 type Props = {
    group: Group
-   followText?: string
 } & Omit<ButtonProps, "onClick">
-const AuthedFollowButton: FC<Props> = ({
-   group,
-   disabled,
-   followText = "Follow",
-   ...buttonProps
-}) => {
+const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -105,15 +99,12 @@ const AuthedFollowButton: FC<Props> = ({
          {...buttonProps}
          variant={companyFollowedData ? "outlined" : "contained"}
       >
-         {companyFollowedData ? "Following" : followText}
+         {companyFollowedData ? "Following" : "Follow"}
       </LoadingButton>
    )
 }
 
-const NonAuthedFollowButton: FC<ButtonProps & { followText?: string }> = ({
-   followText = "Follow",
-   ...buttonProps
-}) => {
+const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
@@ -132,7 +123,7 @@ const NonAuthedFollowButton: FC<ButtonProps & { followText?: string }> = ({
             variant="contained"
             data-testid="non-authed-follow-button"
          >
-            {followText}
+            Follow
          </Button>
       </Link>
    )
