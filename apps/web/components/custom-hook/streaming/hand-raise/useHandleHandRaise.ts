@@ -17,13 +17,9 @@ type UseHandleHandRaiseParams = {
  * @param {boolean} params.isPublishingTracks - True if user tracks are being published.
  * @param {Error} params.error - Current error state during publishing, if any.
  */
-export const useHandleHandRaise = ({
-   livestreamId,
-   agoraUserId,
-   disabled,
-   isPublishingTracks,
-   error,
-}: UseHandleHandRaiseParams) => {
+export const useHandleHandRaise = (props: UseHandleHandRaiseParams) => {
+   const { livestreamId, agoraUserId, disabled, isPublishingTracks, error } =
+      props
    const { trigger: triggerUserHandRaiseState } =
       useUpdateUserHandRaiseState(livestreamId)
    const prevIsPublishingTracks = usePrevious(isPublishingTracks)
@@ -38,7 +34,7 @@ export const useHandleHandRaise = ({
             state: HandRaiseState.connected,
             handRaiseId: agoraUserId,
          })
-      } else if (isPublishingTracks) {
+      } else if (isPublishingTracks && !prevIsPublishingTracks) {
          triggerUserHandRaiseState({
             state: HandRaiseState.connecting,
             handRaiseId: agoraUserId,
