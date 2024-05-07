@@ -3,6 +3,7 @@ import { Video, VideoOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context/LocalTracks"
 import { getCameraErrorMessage, getDeviceButtonColor } from "../../util"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
@@ -18,7 +19,7 @@ const styles = sxStyles({
 export const VideoActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const {
       toggleCamera,
       cameraOn,
@@ -32,7 +33,13 @@ export const VideoActionButton = forwardRef<
          errorMessage={getCameraErrorMessage(cameraError || fetchCamerasError)}
       >
          <BrandedTooltip
-            title={cameraOn ? "Switch camera off" : "Switch camera on"}
+            title={
+               enableTooltip
+                  ? cameraOn
+                     ? ActionTooltips.VideoTurnOff
+                     : ActionTooltips.VideoTurnOn
+                  : null
+            }
          >
             <ActionBarButtonStyled
                color={getDeviceButtonColor(cameraOn, isLoading, cameraError)}

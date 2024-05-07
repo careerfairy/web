@@ -3,6 +3,7 @@ import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Button,
+   ClickAwayListener,
    Stack,
    SwipeableDrawer,
    Tooltip,
@@ -127,6 +128,10 @@ const CompanyButtonLayout = () => {
       setIsInfoOpen((tooltipOpen) => !tooltipOpen)
    }
 
+   const closeTooltip = () => {
+      setIsInfoOpen(false)
+   }
+
    if (!hostCompany || !hostCompany.publicProfile) return null
 
    return (
@@ -158,20 +163,24 @@ const CompanyButtonLayout = () => {
                </SwipeableDrawer>
             </>
          ) : (
-            <StyledTooltip
-               disableHoverListener
-               open={isInfoOpen}
-               title={<Content company={hostCompany} />}
-            >
+            <ClickAwayListener onClickAway={closeTooltip}>
                <Box>
-                  <CompanyLogo
-                     src={hostCompany.logoUrl}
-                     alt={hostCompany.universityName}
-                     onClick={toggleInfoOpen}
-                     size={40}
-                  />
+                  <StyledTooltip
+                     disableHoverListener
+                     open={isInfoOpen}
+                     title={<Content company={hostCompany} />}
+                  >
+                     <Box>
+                        <CompanyLogo
+                           src={hostCompany.logoUrl}
+                           alt={hostCompany.universityName}
+                           onClick={toggleInfoOpen}
+                           size={40}
+                        />
+                     </Box>
+                  </StyledTooltip>
                </Box>
-            </StyledTooltip>
+            </ClickAwayListener>
          )}
       </>
    )

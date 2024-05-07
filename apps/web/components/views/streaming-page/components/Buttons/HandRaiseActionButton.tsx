@@ -1,25 +1,21 @@
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { HandRaiseIcon } from "components/views/common/icons"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { forwardRef } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 export const HandRaiseActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { isHost } = useStreamingContext()
 
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.HAND_RAISE
    )
-   const { shouldStream } = useStreamingContext()
-   const isMobile = useIsMobile()
-
-   const isSpeedDial = shouldStream && isMobile
 
    const handleClick = () => {
       if (!isHost) return
@@ -28,8 +24,7 @@ export const HandRaiseActionButton = forwardRef<
 
    return (
       <BrandedTooltip
-         title={"Hand raise"}
-         placement={isSpeedDial ? "left" : "top"}
+         title={enableTooltip ? ActionTooltips["Hand Raise"] : null}
       >
          <ActionBarButtonStyled
             active={isActive}

@@ -1,29 +1,21 @@
 import { useActiveSidePanelView } from "components/custom-hook/streaming"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { forwardRef } from "react"
 import { Briefcase } from "react-feather"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
-import { useStreamingContext } from "../../context"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 export const JobsActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.JOBS
    )
-   const { shouldStream } = useStreamingContext()
-   const isMobile = useIsMobile()
-
-   const isSpeedDial = shouldStream && isMobile
 
    return (
-      <BrandedTooltip
-         title={"Linked Jobs"}
-         placement={isSpeedDial ? "left" : "top"}
-      >
+      <BrandedTooltip title={enableTooltip ? ActionTooltips.Jobs : null}>
          <ActionBarButtonStyled
             onClick={handleSetActive}
             active={isActive}

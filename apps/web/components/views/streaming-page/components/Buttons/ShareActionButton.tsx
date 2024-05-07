@@ -7,6 +7,7 @@ import { Airplay } from "react-feather"
 import { useIsSpotlightMode } from "store/selectors/streamingAppSelectors"
 import { useScreenShare } from "../../context/ScreenShare"
 import { getDeviceButtonColor, getRTCErrorCode } from "../../util"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ShareMenu } from "../ShareMenu"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
@@ -15,7 +16,7 @@ import { StopSharingButton } from "./StopSharingButton"
 export const ShareActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { anchorEl, handleClick, open, handleClose } = useMenuState()
    const { screenShareError, isLoadingScreenShare } = useScreenShare()
 
@@ -35,7 +36,9 @@ export const ShareActionButton = forwardRef<
                color="warning"
                badgeContent={screenShareError ? "!" : undefined}
             >
-               <BrandedTooltip title="Share content">
+               <BrandedTooltip
+                  title={enableTooltip ? ActionTooltips.Share : null}
+               >
                   <ActionBarButtonStyled
                      color={getDeviceButtonColor(
                         true,
