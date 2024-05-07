@@ -49,9 +49,9 @@ export const HandRaiseNotificationTracker = () => {
 
                   const handRaiser = change.doc.data()
 
+                  closeSnackbar(handRaiser.id)
                   if (!initialLoaded.current) return
 
-                  closeSnackbar(handRaiser.id)
                   if (handRaiser.state === HandRaiseState.requested) {
                      enqueueSnackbar(
                         `${handRaiser.name} requested to raise their hand`,
