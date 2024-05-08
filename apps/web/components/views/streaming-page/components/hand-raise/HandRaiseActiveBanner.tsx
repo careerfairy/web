@@ -2,7 +2,7 @@ import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { Box, Collapse, Typography } from "@mui/material"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { ReactNode } from "react"
-import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
+import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 
@@ -31,14 +31,14 @@ const styles = sxStyles({
 
 export const HandRaiseActiveBanner = () => {
    const { isHost, agoraUserId, livestreamId } = useStreamingContext()
-   const handRaiseActive = useStreamHandRaiseActive()
+   const handRaiseEnabled = useStreamHandRaiseEnabled()
 
    const { userHandRaiseIsActive: userHandRaiseActive, handRaise } =
       useUserHandRaiseState(livestreamId, agoraUserId)
 
    if (isHost) {
       return (
-         <Banner in={handRaiseActive}>
+         <Banner in={handRaiseEnabled}>
             <b>Hand raise active:</b> Your audience can now request to join via
             audio and video.
          </Banner>

@@ -2,7 +2,7 @@ import { Box, Divider, Stack } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
-import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
+import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
 import { AllActions } from "./AllActionComponents"
@@ -71,7 +71,8 @@ const HostView = () => {
 }
 const getViewerActionNames = (
    isMobile: boolean,
-   isStreaming: boolean
+   isStreaming: boolean,
+   handRaiseEnabled: boolean
 ): BottomBarActionName[] => {
    if (isStreaming) {
       if (isMobile) {
@@ -80,7 +81,7 @@ const getViewerActionNames = (
             "Video",
             "Divider",
             "Q&A",
-            "Hand raise",
+            ...(handRaiseEnabled ? ["Hand raise"] : []),
             "Polls",
             "SpeedDial",
          ]
@@ -91,7 +92,7 @@ const getViewerActionNames = (
          "Video",
          "Divider",
          "Q&A",
-         "Hand raise",
+         ...(handRaiseEnabled ? ["Hand raise"] : []),
          "Polls",
          "Chat",
          "Reactions",
@@ -99,17 +100,25 @@ const getViewerActionNames = (
          "Settings",
       ]
    }
-   return ["Q&A", "Hand raise", "Polls", "Chat", "Reactions"]
+   return [
+      "Q&A",
+      ...(handRaiseEnabled ? ["Hand raise"] : []),
+      "Polls",
+      "Chat",
+      "Reactions",
+   ]
 }
 
 const ViewerView = () => {
    const isMobile = useStreamIsMobile()
 
    const { shouldStream } = useStreamingContext()
-   const handRaiseActive = useStreamHandRaiseActive()
+   const handRaiseActive = useStreamHandRaiseEnabled()
 
-   const filteredActions = getViewerActionNames(isMobile, shouldStream).filter(
-      (action) => action !== "Hand raise" || handRaiseActive
+   const filteredActions = getViewerActionNames(
+      isMobile,
+      shouldStream,
+      handRaiseActive
    )
 
    return (

@@ -4,7 +4,7 @@ import { useLivestreamData } from "components/custom-hook/streaming"
 import { useEffect } from "react"
 import {
    resetLivestreamState,
-   setHandRaiseActive,
+   setHandRaiseEnabled,
    setHasEnded,
    setLivestreamMode,
    setNumberOfParticipants,
@@ -75,7 +75,7 @@ export const LivestreamStateTrackers = (): null => {
    }, [dispatch, livestream.companyLogoUrl])
 
    useEffect(() => {
-      dispatch(setHandRaiseActive(Boolean(livestream.handRaiseActive)))
+      dispatch(setHandRaiseEnabled(Boolean(livestream.handRaiseActive)))
    }, [dispatch, livestream.handRaiseActive])
 
    // Clean up the state on unmount
