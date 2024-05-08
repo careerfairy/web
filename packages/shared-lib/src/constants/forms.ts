@@ -1641,7 +1641,9 @@ export const getCountryOptionByCountryCode = (
    const countryOption = countriesOptionCodes.find(
       (option) => option.id.toLowerCase() === countryCode.toLowerCase()
    )
-   delete countryOption.groupId
 
-   return countryOption
+   return {
+      id: countryOption.id,
+      name: countryOption.name,
+   } as OptionGroup
 }
