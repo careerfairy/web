@@ -6,7 +6,8 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-const useUserCustomJobApplications = (limit?: 10) => {
+const useUserCustomJobApplications = (limit?: number) => {
+   if (!limit) limit = 10
    const fetcher = useFunctionsSWR()
 
    const {
