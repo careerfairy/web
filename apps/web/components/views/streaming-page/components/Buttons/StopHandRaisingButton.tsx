@@ -38,7 +38,7 @@ export const StopHandRaisingButton = forwardRef<
             onClick={() =>
                updateHandRaiseState({
                   handRaiseId: agoraUserId,
-                  state: HandRaiseState.unrequested,
+                  state: HandRaiseState.denied,
                })
             }
          >

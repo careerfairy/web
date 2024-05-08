@@ -21,9 +21,12 @@ import { useFirestore } from "reactfire"
 import { incrementNumberOfHandRaiseNotifications } from "store/reducers/streamingAppReducer"
 import { useStreamingContext } from "../../context"
 
+const buildKey = (handRaise: HandRaise) => `${handRaise.id}-${handRaise.state}`
+
 export const HandRaiseNotificationTracker = () => {
    const { livestreamId, isHost } = useStreamingContext()
    const dispatch = useAppDispatch()
+   const activeNotifications = useRef<SnackbarKey[]>([])
 
    const {
       trigger: updateUserHandRaiseState,
@@ -38,6 +41,7 @@ export const HandRaiseNotificationTracker = () => {
 
    useEffect(() => {
       if (livestreamId && isHost) {
+         if (isUpdatingUserHandRaiseState) return
          return onSnapshot(
             query(
                collection(db, "livestreams", livestreamId, "handRaises"),
@@ -49,15 +53,16 @@ export const HandRaiseNotificationTracker = () => {
                orderBy("timeStamp", "desc")
             ).withConverter(createGenericConverter<HandRaise>()),
             (snapshot) => {
-               const changes = snapshot.docChanges()
-               console.table(
-                  changes.map((c) => ({
-                     ...c,
-                     state: c.doc.data().state,
-                  }))
-               )
-               changes.forEach((change) => {
+               snapshot.docChanges().forEach((change) => {
+                  let notificationKey: SnackbarKey | undefined
                   const handRaiser = change.doc.data()
+
+                  activeNotifications.current.forEach((key) => {
+                     if (key.toString().includes(handRaiser.id)) {
+                        closeSnackbar(key)
+                     }
+                  })
+
                   if (change.type === "removed") {
                      if (handRaiser.state === HandRaiseState.requested) {
                         dispatch(incrementNumberOfHandRaiseNotifications(-1))
@@ -65,21 +70,24 @@ export const HandRaiseNotificationTracker = () => {
                      return
                   }
 
-                  closeSnackbar(handRaiser.id)
+                  if (handRaiser.state === HandRaiseState.requested) {
+                     dispatch(incrementNumberOfHandRaiseNotifications(1))
+                  }
+
+                  // Don't show previous/old notifications on page load
                   if (!initialLoaded.current) return
 
                   if (handRaiser.state === HandRaiseState.requested) {
-                     dispatch(incrementNumberOfHandRaiseNotifications(1))
-                     enqueueSnackbar(
+                     notificationKey = enqueueSnackbar(
                         `${handRaiser.name} has raised their hand.`,
                         {
                            variant: "info",
-                           key: handRaiser.id,
+                           key: buildKey(handRaiser),
                            content: (key, message) => (
                               <HandRaiseRequestedNotification
                                  handRaise={handRaiser}
                                  livestreamId={livestreamId}
-                                 key={key}
+                                 id={key}
                                  message={message}
                               />
                            ),
@@ -88,29 +96,11 @@ export const HandRaiseNotificationTracker = () => {
                   }
 
                   if (handRaiser.state === HandRaiseState.connecting) {
-                     enqueueSnackbar(
+                     notificationKey = enqueueSnackbar(
                         `${handRaiser.name} is connecting to the panel`,
                         {
                            variant: "info",
-                           key: handRaiser.id,
-                           content: (key, message) => (
-                              <CustomNotification
-                                 title="Hand raiser"
-                                 variant="info"
-                                 id={key}
-                                 content={message}
-                              />
-                           ),
-                        }
-                     )
-                  }
-
-                  if (handRaiser.state === HandRaiseState.connected) {
-                     enqueueSnackbar(
-                        `${handRaiser.name} has joined the panel`,
-                        {
-                           variant: "info",
-                           key: handRaiser.id,
+                           key: buildKey(handRaiser),
                            content: (key, message) => (
                               <CustomNotification
                                  title="Hand raiser"
@@ -121,6 +111,28 @@ export const HandRaiseNotificationTracker = () => {
                            ),
                         }
                      )
+                  }
+
+                  if (handRaiser.state === HandRaiseState.connected) {
+                     notificationKey = enqueueSnackbar(
+                        `${handRaiser.name} has joined the panel`,
+                        {
+                           variant: "info",
+                           key: buildKey(handRaiser),
+                           content: (key, message) => (
+                              <CustomNotification
+                                 title="Hand raiser"
+                                 variant="success"
+                                 id={key}
+                                 content={message}
+                              />
+                           ),
+                        }
+                     )
+                  }
+
+                  if (notificationKey) {
+                     activeNotifications.current.push(notificationKey)
                   }
                })
                initialLoaded.current = true
@@ -145,13 +157,13 @@ type HandRaiseNotificationProps = {
    handRaise: HandRaise
    livestreamId: string
    message: ReactNode
-   key: SnackbarKey
+   id: SnackbarKey
 }
 
 const HandRaiseRequestedNotification = forwardRef<
    HTMLDivElement,
    HandRaiseNotificationProps
->(({ handRaise, livestreamId, message, key }, ref) => {
+>(({ handRaise, livestreamId, message, id }, ref) => {
    const {
       trigger: updateUserHandRaiseState,
       isMutating: isUpdatingUserHandRaiseState,
@@ -159,7 +171,7 @@ const HandRaiseRequestedNotification = forwardRef<
 
    return (
       <CustomNotification
-         id={key}
+         id={id}
          ref={ref}
          title="New hand raiser"
          variant="success"
