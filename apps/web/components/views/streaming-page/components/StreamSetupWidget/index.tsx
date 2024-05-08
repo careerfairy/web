@@ -46,8 +46,6 @@ const styles = sxStyles({
    actionsMobile: {
       pt: 0,
       p: 1.5,
-      position: "sticky",
-      bottom: 0,
    },
    dialogContent: {
       p: 4,

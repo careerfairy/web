@@ -82,3 +82,9 @@ export const useStreamHandRaiseEnabled = () =>
    useAppSelector(
       (state) => state.streamingApp.livestreamState.handRaiseEnabled
    )
+
+export const useNumberOfHandRaiseNotifications = () =>
+   useAppSelector(
+      (state) =>
+         state.streamingApp.livestreamState.numberOfHandRaiseNotifications
+   )

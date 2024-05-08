@@ -4,10 +4,14 @@ import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/ha
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { HandRaiseIcon } from "components/views/common/icons"
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { Fragment, forwardRef } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
-import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
+import {
+   useNumberOfHandRaiseNotifications,
+   useStreamHandRaiseEnabled,
+} from "store/selectors/streamingAppSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { ConfirmHandRaiseDialog } from "../hand-raise/ConfirmHandRaiseDialog"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
@@ -26,6 +30,8 @@ export const HandRaiseActionButton = forwardRef<
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.HAND_RAISE
    )
+
+   const numberOfHandRaiseNotifications = useNumberOfHandRaiseNotifications()
    const streamHandRaiseEnabled = useStreamHandRaiseEnabled()
    const { isHost, agoraUserId, livestreamId, setIsReady } =
       useStreamingContext()
@@ -66,19 +72,24 @@ export const HandRaiseActionButton = forwardRef<
 
    return (
       <Fragment>
-         <ActionBarButtonStyled
-            active={isActive}
-            onClick={handleClick}
-            ref={ref}
-            {...props}
-            sx={combineStyles(
-               props.sx,
-               userHandRaiseActive && !isHost && styles.handRaiseActive
-            )}
-            color="primary"
+         <BrandedBadge
+            color="error"
+            badgeContent={numberOfHandRaiseNotifications || null}
          >
-            <HandRaiseIcon />
-         </ActionBarButtonStyled>
+            <ActionBarButtonStyled
+               active={isActive}
+               onClick={handleClick}
+               ref={ref}
+               {...props}
+               sx={combineStyles(
+                  props.sx,
+                  userHandRaiseActive && !isHost && styles.handRaiseActive
+               )}
+               color="primary"
+            >
+               <HandRaiseIcon />
+            </ActionBarButtonStyled>
+         </BrandedBadge>
          <ConfirmHandRaiseDialog
             handleClose={handleCloseHandRaiseDialog}
             open={Boolean(isHandRaiseDialogOpen && handRaiseIsActiveForViewer)}

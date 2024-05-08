@@ -138,6 +138,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
          maxWidth="xs"
+         TransitionProps={{ unmountOnExit: true }}
          fullScreen={isMobile}
          PaperProps={{
             sx: styles.dialogPaper,
