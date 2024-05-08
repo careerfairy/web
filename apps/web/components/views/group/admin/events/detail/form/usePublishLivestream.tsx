@@ -1,4 +1,5 @@
 import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
+import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamDialog } from "layouts/GroupDashboardLayout/useLivestreamDialog"
@@ -16,6 +17,7 @@ export const usePublishLivestream = () => {
    const { group } = useGroup()
    const { isPublishing, handlePublishStream } = useLivestreamDialog(group)
    const { enqueueSnackbar } = useSnackbar()
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
 
    const publishLivestream = useCallback(async () => {
       if (!isValid) {
@@ -27,6 +29,7 @@ export const usePublishLivestream = () => {
 
       const livestreamObject = mapFormValuesToLivestreamObject(
          values,
+         allFieldsOfStudy,
          firebaseService
       )
       livestreamObject.id = livestream.id
@@ -55,6 +58,7 @@ export const usePublishLivestream = () => {
 
       return handlePublishStream(livestreamObject, {}, ratings)
    }, [
+      allFieldsOfStudy,
       enqueueSnackbar,
       firebaseService,
       handlePublishStream,
