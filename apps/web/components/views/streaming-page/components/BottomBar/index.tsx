@@ -1,5 +1,6 @@
 import { Box, Divider, Stack } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
 import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
@@ -72,8 +73,10 @@ const HostView = () => {
 const getViewerActionNames = (
    isMobile: boolean,
    isStreaming: boolean,
-   handRaiseEnabled: boolean
+   handRaiseEnabled: boolean,
+   userCanJoinPanel: boolean
 ): BottomBarActionName[] => {
+   const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
    if (isStreaming) {
       if (isMobile) {
          return [
@@ -81,9 +84,12 @@ const getViewerActionNames = (
             "Video",
             "Divider",
             "Q&A",
-            ...(handRaiseEnabled ? ["Hand raise"] : []),
+            ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
             "Polls",
             "SpeedDial",
+            ...(userCanJoinPanel
+               ? (["Divider", "Stop hand raise"] as const)
+               : []),
          ]
       }
 
@@ -92,17 +98,18 @@ const getViewerActionNames = (
          "Video",
          "Divider",
          "Q&A",
-         ...(handRaiseEnabled ? ["Hand raise"] : []),
+         ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
          "Polls",
          "Chat",
          "Reactions",
          "Divider",
          "Settings",
+         ...(userCanJoinPanel ? (["Stop hand raise"] as const) : []),
       ]
    }
    return [
       "Q&A",
-      ...(handRaiseEnabled ? ["Hand raise"] : []),
+      ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
       "Polls",
       "Chat",
       "Reactions",
@@ -112,13 +119,16 @@ const getViewerActionNames = (
 const ViewerView = () => {
    const isMobile = useStreamIsMobile()
 
-   const { shouldStream } = useStreamingContext()
-   const handRaiseActive = useStreamHandRaiseEnabled()
+   const { shouldStream, agoraUserId, livestreamId } = useStreamingContext()
+   const handRaiseEnabled = useStreamHandRaiseEnabled()
+
+   const { userCanJoinPanel } = useUserHandRaiseState(livestreamId, agoraUserId)
 
    const filteredActions = getViewerActionNames(
       isMobile,
       shouldStream,
-      handRaiseActive
+      handRaiseEnabled,
+      userCanJoinPanel
    )
 
    return (
