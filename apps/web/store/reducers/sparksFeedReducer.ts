@@ -45,7 +45,8 @@ interface SparksState {
    autoAction: AutomaticActions
    conversionCardInterval: number
    interactionSource: string
-   loggedOutCountryCode: string
+   anonymousUserCountryCode?: string
+   countrySpecificFeed?: boolean
 }
 
 const initialState: SparksState = {
@@ -73,15 +74,21 @@ const initialState: SparksState = {
    autoAction: null,
    conversionCardInterval: 0,
    interactionSource: null,
-   loggedOutCountryCode: "",
+   anonymousUserCountryCode: null,
+   countrySpecificFeed: null,
 }
 
 // Async thunk to fetch the next sparks
 export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
-   async (_, { getState }) => {
+   async (_, { getState, dispatch }) => {
       const state = getState() as RootState
-      const { sparks, hasMoreSparks } = state.sparksFeed
+      const {
+         sparks,
+         hasMoreSparks,
+         anonymousUserCountryCode,
+         countrySpecificFeed,
+      } = state.sparksFeed
 
       if (!hasMoreSparks) {
          return []
@@ -89,6 +96,11 @@ export const fetchNextSparks = createAsyncThunk(
 
       const lastSpark = sparks[sparks.length - 1]
       const sparkOptions = getSparkOptions(state)
+
+      if (!anonymousUserCountryCode && countrySpecificFeed) {
+         dispatch(disableCountrySpecificFeed())
+         return sparkService.fetchNextSparks(null, sparkOptions)
+      }
 
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
@@ -262,6 +274,9 @@ const sparksFeedSlice = createSlice({
          state.playing = true
          state.conversionCardInterval = 0
       },
+      disableCountrySpecificFeed: (state) => {
+         state.countrySpecificFeed = null
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -271,8 +286,11 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               const { sparks, numberOfSparksToFetch, loggedOutCountryCode } =
-                  state
+               const {
+                  sparks,
+                  numberOfSparksToFetch,
+                  anonymousUserCountryCode,
+               } = state
 
                state.fetchNextSparksStatus = "idle"
 
@@ -284,9 +302,9 @@ const sparksFeedSlice = createSlice({
 
                if (
                   action.payload.length < numberOfSparksToFetch &&
-                  loggedOutCountryCode
+                  anonymousUserCountryCode
                ) {
-                  state.loggedOutCountryCode = ""
+                  state.anonymousUserCountryCode = null
                }
 
                if (action.payload.length === 0) {
@@ -307,11 +325,11 @@ const sparksFeedSlice = createSlice({
                state,
                action: PayloadAction<{
                   sparks: SparkPresenter[]
-                  loggedOutCountryCode?: string
+                  anonymousUserCountryCode?: string
                }>
             ) => {
                const { sparks, numberOfSparksToFetch } = state
-               const { sparks: sparksPayload, loggedOutCountryCode } =
+               const { sparks: sparksPayload, anonymousUserCountryCode } =
                   action.payload
 
                state.initialFetchStatus = "idle"
@@ -323,7 +341,8 @@ const sparksFeedSlice = createSlice({
                )
 
                state.sparks = newSparks
-               state.loggedOutCountryCode = loggedOutCountryCode
+               state.anonymousUserCountryCode = anonymousUserCountryCode
+               state.countrySpecificFeed = Boolean(anonymousUserCountryCode)
 
                if (sparksPayload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
@@ -363,13 +382,13 @@ const getSparkOptions = (state: RootState) => {
       groupId,
       userEmail,
       sparkCategoryIds,
-      loggedOutCountryCode,
+      anonymousUserCountryCode,
    } = state.sparksFeed
 
    return {
       numberOfSparks: numberOfSparksToFetch,
       sparkCategoryIds,
-      loggedOutCountryCode,
+      anonymousUserCountryCode,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }
@@ -452,6 +471,7 @@ export const {
    togglePlaying,
    setConversionCardInterval,
    removeNotificationsByType,
+   disableCountrySpecificFeed,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

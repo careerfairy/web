@@ -319,7 +319,7 @@ export type GetFeedData = {
     * Country code when the user is not logged in
     * This is used to provide localized content in the feed for users who are not logged in.
     */
-   loggedOutCountryCode?: string
+   anonymousUserCountryCode?: string
 } & (
    | {
         /**

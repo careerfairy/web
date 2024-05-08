@@ -1,6 +1,6 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
-import { getCountryOptionById } from "@careerfairy/shared-lib/constants/forms"
+import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
 import {
    SerializedSpark,
    SparkPresenter,
@@ -91,12 +91,12 @@ export class SparksService {
     */
    async fetchFeed(data: GetFeedData) {
       const {
-         data: { sparks: serializedSparks, loggedOutCountryCode },
+         data: { sparks: serializedSparks, anonymousUserCountryCode },
       } = await httpsCallable<
          GetFeedData,
          {
             sparks: SerializedSpark[]
-            loggedOutCountryCode?: string
+            anonymousUserCountryCode?: string
          }
       >(
          this.functions,
@@ -105,7 +105,7 @@ export class SparksService {
 
       return {
          sparks: serializedSparks.map(SparkPresenter.deserialize),
-         loggedOutCountryCode,
+         anonymousUserCountryCode,
       }
    }
    /**
@@ -150,7 +150,7 @@ export class SparksService {
       lastSpark: SparkPresenter | Spark | null,
       options: GetFeedData = { userId: null }
    ): Promise<SparkPresenter[]> {
-      const { numberOfSparks = 10, loggedOutCountryCode = "" } = options
+      const { numberOfSparks = 10, anonymousUserCountryCode = "" } = options
 
       const db = FirestoreInstance
 
@@ -182,8 +182,10 @@ export class SparksService {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
 
-         if (loggedOutCountryCode) {
-            const loggedOutCountry = getCountryOptionById(loggedOutCountryCode)
+         if (anonymousUserCountryCode) {
+            const loggedOutCountry = getCountryOptionByCountryCode(
+               anonymousUserCountryCode
+            )
 
             baseQuery = query(
                baseQuery,
