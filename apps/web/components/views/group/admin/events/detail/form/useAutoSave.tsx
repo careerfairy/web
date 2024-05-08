@@ -1,3 +1,4 @@
+import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { customJobRepo } from "data/RepositoryInstances"
 import { FormikErrors } from "formik"
@@ -83,6 +84,7 @@ export const useAutoSave = () => {
       useLivestreamCreationContext()
    const { values, errors, isValid } = useLivestreamFormValues()
    const { enqueueSnackbar } = useSnackbar()
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
 
    const [isAutoSaving, setIsAutoSaving] = useState(false)
    const [previousValues, setPreviousValues] = useState(values)
@@ -146,6 +148,7 @@ export const useAutoSave = () => {
       async (newValues: Partial<LivestreamFormValues>) => {
          const mappedObject = mapFormValuesToLivestreamObject(
             newValues,
+            allFieldsOfStudy,
             firebaseService
          )
 
@@ -164,6 +167,7 @@ export const useAutoSave = () => {
          )
       },
       [
+         allFieldsOfStudy,
          firebaseService,
          livestream.id,
          targetLivestreamCollection,
