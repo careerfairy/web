@@ -14,7 +14,9 @@ const styles = sxStyles({
       height: "48px !important",
    },
 })
+
 const now = Date.now()
+
 export const ThanksForJoiningHandRaiseDialog = () => {
    const [open, setOpen] = useState(false)
 
