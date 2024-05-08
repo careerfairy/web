@@ -7,7 +7,7 @@ import {
    TableRow,
 } from "@mui/material"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamCreationContext } from "../../../../LivestreamCreationContext"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
@@ -116,51 +116,64 @@ const FeedbackQuestionsDesktop = () => {
       setFieldValue,
    ])
 
+   const hasFeedbackQuestions = useMemo(
+      () =>
+         questions.feedbackQuestions &&
+         questions.feedbackQuestions.filter((question) => !question.deleted)
+            .length > 0,
+      [questions.feedbackQuestions]
+   )
+
    return (
       <>
-         <TableContainer sx={styles.table.container}>
-            <Table aria-label="Feedback questions table">
-               <TableHead sx={styles.table.head}>
-                  <TableRow>
-                     <TableCell>Question</TableCell>
-                     <TableCell>Type</TableCell>
-                     <TableCell>Appear after</TableCell>
-                     {!livestream.hasEnded && <TableCell />}
-                  </TableRow>
-               </TableHead>
-               <TableBody sx={styles.table.body}>
-                  {questions.feedbackQuestions
-                     .filter((question) => !question.deleted)
-                     .map((question, index) => (
-                        <TableRow key={index}>
-                           <TableCell component="th" scope="row">
-                              {question.question}
-                           </TableCell>
-                           <TableCell>
-                              {FeedbackQuestionsLabels[question.type]}
-                           </TableCell>
-                           <TableCell>{`${question.appearAfter} minutes`}</TableCell>
-                           {!livestream.hasEnded && (
-                              <TableCell>
-                                 <MoreMenuWithEditAndRemoveOptions
-                                    handleEdit={(event) =>
-                                       handleEdit(event, question)
-                                    }
-                                    handleRemove={(event) =>
-                                       handleRemoveDialogOpen(event, question)
-                                    }
-                                    labels={[
-                                       "Edit question",
-                                       "Remove question",
-                                    ]}
-                                 />
+         {Boolean(hasFeedbackQuestions) && (
+            <TableContainer sx={styles.table.container}>
+               <Table aria-label="Feedback questions table">
+                  <TableHead sx={styles.table.head}>
+                     <TableRow>
+                        <TableCell>Question</TableCell>
+                        <TableCell>Type</TableCell>
+                        <TableCell>Appear after</TableCell>
+                        {!livestream.hasEnded && <TableCell />}
+                     </TableRow>
+                  </TableHead>
+                  <TableBody sx={styles.table.body}>
+                     {questions.feedbackQuestions
+                        .filter((question) => !question.deleted)
+                        .map((question, index) => (
+                           <TableRow key={index}>
+                              <TableCell component="th" scope="row">
+                                 {question.question}
                               </TableCell>
-                           )}
-                        </TableRow>
-                     ))}
-               </TableBody>
-            </Table>
-         </TableContainer>
+                              <TableCell>
+                                 {FeedbackQuestionsLabels[question.type]}
+                              </TableCell>
+                              <TableCell>{`${question.appearAfter} minutes`}</TableCell>
+                              {!livestream.hasEnded && (
+                                 <TableCell>
+                                    <MoreMenuWithEditAndRemoveOptions
+                                       handleEdit={(event) =>
+                                          handleEdit(event, question)
+                                       }
+                                       handleRemove={(event) =>
+                                          handleRemoveDialogOpen(
+                                             event,
+                                             question
+                                          )
+                                       }
+                                       labels={[
+                                          "Edit question",
+                                          "Remove question",
+                                       ]}
+                                    />
+                                 </TableCell>
+                              )}
+                           </TableRow>
+                        ))}
+                  </TableBody>
+               </Table>
+            </TableContainer>
+         )}
          {!livestream.hasEnded && (
             <>
                <AddQuestionButton handleClick={handleAddQuestionClick} />
