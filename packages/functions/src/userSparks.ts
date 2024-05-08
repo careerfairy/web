@@ -46,14 +46,14 @@ export const getSparksFeed = functions
                   }
 
                   const anonymousUserCountryCode = getCountryCode(context)
-                  const loggedOutCountry = getCountryOptionByCountryCode(
+                  const anonymousUserCountry = getCountryOptionByCountryCode(
                      anonymousUserCountryCode
                   )
 
                   return {
                      sparks: await sparkRepo.getPublicSparksFeed(
                         data.numberOfSparks,
-                        loggedOutCountry
+                        anonymousUserCountry
                      ),
                      anonymousUserCountryCode,
                   }
