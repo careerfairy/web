@@ -6,6 +6,7 @@ import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 
+import { getCountryOptionById } from "@careerfairy/shared-lib/constants/forms"
 import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    SparkClientEventsPayload,
@@ -36,24 +37,34 @@ export const getSparksFeed = functions
             try {
                if ("userId" in data) {
                   if (data.userId) {
-                     return sparkRepo.getUserSparksFeed(
-                        data.userId,
-                        data.numberOfSparks
-                     )
-                  } else {
-                     const loggedOutCountryCode = getCountryCode(context)
-                     return sparkRepo.getPublicSparksFeed(
+                     return {
+                        sparks: sparkRepo.getUserSparksFeed(
+                           data.userId,
+                           data.numberOfSparks
+                        ),
+                     }
+                  }
+
+                  const loggedOutCountryCode = getCountryCode(context)
+                  const loggedOutCountry =
+                     getCountryOptionById(loggedOutCountryCode)
+
+                  return {
+                     sparks: await sparkRepo.getPublicSparksFeed(
                         data.numberOfSparks,
-                        loggedOutCountryCode
-                     )
+                        loggedOutCountry
+                     ),
+                     loggedOutCountryCode,
                   }
                }
 
                if ("groupId" in data) {
-                  return sparkRepo.getGroupSparksFeed(
-                     data.groupId,
-                     data.numberOfSparks
-                  )
+                  return {
+                     sparks: sparkRepo.getGroupSparksFeed(
+                        data.groupId,
+                        data.numberOfSparks
+                     ),
+                  }
                }
 
                throw new functions.https.HttpsError(

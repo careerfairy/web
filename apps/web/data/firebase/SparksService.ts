@@ -1,5 +1,6 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import { getCountryOptionById } from "@careerfairy/shared-lib/constants/forms"
 import {
    SerializedSpark,
    SparkPresenter,
@@ -89,15 +90,23 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      const { data: serializedSparks } = await httpsCallable<
+      const {
+         data: { sparks: serializedSparks, loggedOutCountryCode },
+      } = await httpsCallable<
          GetFeedData,
-         SerializedSpark[]
+         {
+            sparks: SerializedSpark[]
+            loggedOutCountryCode?: string
+         }
       >(
          this.functions,
          "getSparksFeed_v4"
       )(data)
 
-      return serializedSparks.map(SparkPresenter.deserialize)
+      return {
+         sparks: serializedSparks.map(SparkPresenter.deserialize),
+         loggedOutCountryCode,
+      }
    }
    /**
     * Calls the trackSparkEvents cloud function with the provided data.
@@ -141,7 +150,7 @@ export class SparksService {
       lastSpark: SparkPresenter | Spark | null,
       options: GetFeedData = { userId: null }
    ): Promise<SparkPresenter[]> {
-      const { numberOfSparks = 10 } = options
+      const { numberOfSparks = 10, loggedOutCountryCode = "" } = options
 
       const db = FirestoreInstance
 
@@ -172,6 +181,19 @@ export class SparksService {
       } else {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
+
+         if (loggedOutCountryCode) {
+            const loggedOutCountry = getCountryOptionById(loggedOutCountryCode)
+
+            baseQuery = query(
+               baseQuery,
+               where(
+                  "group.targetedCountries",
+                  "array-contains",
+                  loggedOutCountry
+               )
+            )
+         }
       }
 
       // Filter the sparks by category if provided

@@ -3,10 +3,10 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 type Status = "idle" | "loading" | "failed"
 
@@ -45,6 +45,7 @@ interface SparksState {
    autoAction: AutomaticActions
    conversionCardInterval: number
    interactionSource: string
+   loggedOutCountryCode: string
 }
 
 const initialState: SparksState = {
@@ -72,6 +73,7 @@ const initialState: SparksState = {
    autoAction: null,
    conversionCardInterval: 0,
    interactionSource: null,
+   loggedOutCountryCode: "",
 }
 
 // Async thunk to fetch the next sparks
@@ -269,7 +271,8 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               const { sparks } = state
+               const { sparks, numberOfSparksToFetch, loggedOutCountryCode } =
+                  state
 
                state.fetchNextSparksStatus = "idle"
 
@@ -278,6 +281,13 @@ const sparksFeedSlice = createSlice({
                   ...sparks,
                   ...action.payload,
                ])
+
+               if (
+                  action.payload.length < numberOfSparksToFetch &&
+                  loggedOutCountryCode
+               ) {
+                  state.loggedOutCountryCode = ""
+               }
 
                if (action.payload.length === 0) {
                   state.hasMoreSparks = false
@@ -293,20 +303,29 @@ const sparksFeedSlice = createSlice({
          })
          .addCase(
             fetchInitialSparksFeed.fulfilled,
-            (state, action: PayloadAction<SparkPresenter[]>) => {
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  loggedOutCountryCode?: string
+               }>
+            ) => {
                const { sparks, numberOfSparksToFetch } = state
+               const { sparks: sparksPayload, loggedOutCountryCode } =
+                  action.payload
 
                state.initialFetchStatus = "idle"
                state.initialSparksFetched = true
 
                const newSparks = insertNotificationIfNeeded(
                   state,
-                  mergeSparks(sparks, action.payload)
+                  mergeSparks(sparks, sparksPayload)
                )
 
                state.sparks = newSparks
+               state.loggedOutCountryCode = loggedOutCountryCode
 
-               if (action.payload.length < numberOfSparksToFetch) {
+               if (sparksPayload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
                }
             }
@@ -339,11 +358,18 @@ const mergeSparks = (
  * @returns spark options
  */
 const getSparkOptions = (state: RootState) => {
-   const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
-      state.sparksFeed
+   const {
+      numberOfSparksToFetch,
+      groupId,
+      userEmail,
+      sparkCategoryIds,
+      loggedOutCountryCode,
+   } = state.sparksFeed
+
    return {
       numberOfSparks: numberOfSparksToFetch,
-      sparkCategoryIds: sparkCategoryIds,
+      sparkCategoryIds,
+      loggedOutCountryCode,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }

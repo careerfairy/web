@@ -23,7 +23,10 @@ import {
    SparkEvent,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/telemetry"
-import { Identifiable } from "@careerfairy/shared-lib/src/commonTypes"
+import {
+   Identifiable,
+   OptionGroup,
+} from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { DocumentSnapshot } from "firebase-admin/firestore"
@@ -123,7 +126,7 @@ export interface ISparkFunctionsRepository {
     */
    getPublicSparksFeed(
       limit?: number,
-      countryCode?: string
+      countryCode?: OptionGroup
    ): Promise<SerializedSpark[]>
 
    /**
@@ -549,19 +552,32 @@ export class SparkFunctionsRepository
 
    async getPublicSparksFeed(
       limit = 10,
-      countryCode = ""
+      countryCode: OptionGroup
    ): Promise<SerializedSpark[]> {
       let query = this.firestore
          .collection("sparks")
          .where("group.publicSparks", "==", true)
 
-      if (countryCode) {
-         query = query.where(
-            "group.targetedCountryIds",
-            "array-contains",
-            countryCode
+      // If there is no logged out country code, we want to get all the public sparks without any additional logic
+      if (!countryCode) {
+         const publicFeedRef = query
+            .orderBy("publishedAt", "desc")
+            .limit(limit)
+            .withConverter(createGenericConverter<Spark>())
+
+         const publicFeedSnap = await publicFeedRef.get()
+
+         return publicFeedSnap.docs.map((doc) =>
+            SparkPresenter.serialize(doc.data())
          )
       }
+
+      // In case of logged out country code, we want to get 1st all the targetedCountries sparks
+      query = query.where(
+         "group.targetedCountries",
+         "array-contains",
+         countryCode
+      )
 
       const publicFeedRef = query
          .orderBy("publishedAt", "desc")
@@ -570,9 +586,43 @@ export class SparkFunctionsRepository
 
       const publicFeedSnap = await publicFeedRef.get()
 
-      return publicFeedSnap.docs.map((doc) =>
+      const targetedSparks = publicFeedSnap.docs.map((doc) =>
          SparkPresenter.serialize(doc.data())
       )
+
+      if (targetedSparks.length < limit) {
+         const publicFeedRef = this.firestore
+            .collection("sparks")
+            .where("group.publicSparks", "==", true)
+            .orderBy("publishedAt", "desc")
+            .limit(limit)
+            .withConverter(createGenericConverter<Spark>())
+
+         const publicFeedSnap = await publicFeedRef.get()
+
+         const publicSparks = publicFeedSnap.docs.map((doc) =>
+            SparkPresenter.serialize(doc.data())
+         )
+
+         if (targetedSparks.length === 0) {
+            return publicSparks
+         }
+
+         const publicSparksWithoutDuplicates = publicSparks.filter((spark) =>
+            targetedSparks.some(
+               (targetedSpark) => targetedSpark.id !== spark.id
+            )
+         )
+
+         const result = [
+            ...targetedSparks,
+            ...publicSparksWithoutDuplicates,
+         ].slice(0, limit)
+
+         return result
+      }
+
+      return targetedSparks
    }
 
    async getGroupSparksFeed(

@@ -1,9 +1,4 @@
 import * as ModuleAlias from "module-alias"
-import { bundles } from "./bundles"
-import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
-import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
-import { knownIndexes } from "./lib/search/searchIndexes"
-import * as streaming from "./lib/streaming"
 
 /**
  * Fix runtime import of local packages
@@ -20,6 +15,13 @@ import dotenv = require("dotenv")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
+
+// to prevent import issue
+import { bundles } from "./bundles"
+import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
+import { knownIndexes } from "./lib/search/searchIndexes"
+import * as streaming from "./lib/streaming"
 
 // Imported Individual Cloud functions
 import auth = require("./auth")
