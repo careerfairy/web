@@ -42,7 +42,7 @@ export const possibleGenders = [
 export const regionGroupId = "Regions"
 export const countryGroupId = "Country"
 
-export const countriesOptionCodes = [
+export const countriesOptionCodes: OptionGroup[] = [
    {
       id: "AF",
       name: "Afghanistan",
@@ -1634,3 +1634,12 @@ export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
       name: country.name,
    })
 )
+
+export const getCountryOptionById = (countryCode: string): OptionGroup => {
+   const countryOption = countriesOptionCodes.find(
+      (option) => option.id.toLowerCase() === countryCode.toLowerCase()
+   )
+   delete countryOption.groupId
+
+   return countryOption
+}
