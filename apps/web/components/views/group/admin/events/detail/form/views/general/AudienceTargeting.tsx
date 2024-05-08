@@ -10,6 +10,7 @@ import {
    universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
 import { Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import {
    useFieldsOfStudy,
    useLevelsOfStudy,
@@ -21,7 +22,6 @@ import FormSectionHeader from "../../FormSectionHeader"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import InputSkeleton from "../questions/InputSkeleton"
 import MultiChipSelect from "./components/MultiChipSelect"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 type UniversityOption = University & {
    country: string
@@ -157,7 +157,6 @@ const AudienceTargetingContent = () => {
             id="general.targetFieldsOfStudy"
             options={allFieldsOfStudy}
             value={general.targetFieldsOfStudy}
-            limit={GROUP_CONSTANTS.MAX_TARGET_FIELD_OF_STUDY_COUNT}
             multiple
             disableCloseOnSelect
             textFieldProps={{
@@ -165,6 +164,7 @@ const AudienceTargetingContent = () => {
                placeholder: "Select fields of study",
                required: true,
             }}
+            selectAllFieldLabel="Any field of study"
          />
          <MultiChipSelect
             id="general.targetLevelsOfStudy"
