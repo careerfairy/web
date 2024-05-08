@@ -5,6 +5,7 @@ import {
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { LoadingButton } from "@mui/lab"
 import { Stack, Typography } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import CustomNotification from "components/views/notifications/CustomNotification"
 import {
@@ -17,10 +18,13 @@ import {
 import { SnackbarKey, useSnackbar } from "notistack"
 import { ReactNode, forwardRef, useEffect, useRef } from "react"
 import { useFirestore } from "reactfire"
+import { incrementNumberOfHandRaiseNotifications } from "store/reducers/streamingAppReducer"
 import { useStreamingContext } from "../../context"
 
 export const HandRaiseNotificationTracker = () => {
    const { livestreamId, isHost } = useStreamingContext()
+   const dispatch = useAppDispatch()
+
    const {
       trigger: updateUserHandRaiseState,
       isMutating: isUpdatingUserHandRaiseState,
@@ -39,20 +43,33 @@ export const HandRaiseNotificationTracker = () => {
                collection(db, "livestreams", livestreamId, "handRaises"),
                where("state", "in", [
                   HandRaiseState.requested,
+                  HandRaiseState.connecting,
                   HandRaiseState.connected,
                ]),
                orderBy("timeStamp", "desc")
             ).withConverter(createGenericConverter<HandRaise>()),
             (snapshot) => {
-               snapshot.docChanges().forEach((change) => {
-                  if (change.type === "removed") return
-
+               const changes = snapshot.docChanges()
+               console.table(
+                  changes.map((c) => ({
+                     ...c,
+                     state: c.doc.data().state,
+                  }))
+               )
+               changes.forEach((change) => {
                   const handRaiser = change.doc.data()
+                  if (change.type === "removed") {
+                     if (handRaiser.state === HandRaiseState.requested) {
+                        dispatch(incrementNumberOfHandRaiseNotifications(-1))
+                     }
+                     return
+                  }
 
                   closeSnackbar(handRaiser.id)
                   if (!initialLoaded.current) return
 
                   if (handRaiser.state === HandRaiseState.requested) {
+                     dispatch(incrementNumberOfHandRaiseNotifications(1))
                      enqueueSnackbar(
                         `${handRaiser.name} has raised their hand.`,
                         {
@@ -118,6 +135,7 @@ export const HandRaiseNotificationTracker = () => {
       isUpdatingUserHandRaiseState,
       updateUserHandRaiseState,
       closeSnackbar,
+      dispatch,
    ])
 
    return null
@@ -153,7 +171,7 @@ const HandRaiseRequestedNotification = forwardRef<
                      loading={isUpdatingUserHandRaiseState}
                      onClick={() =>
                         updateUserHandRaiseState({
-                           state: HandRaiseState.denied,
+                           state: HandRaiseState.unrequested,
                            handRaiseId: handRaise.id,
                         })
                      }

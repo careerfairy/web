@@ -1,16 +1,17 @@
 import {
-   SettingsActionButton,
-   JobsActionButton,
-   ReactionsActionButton,
-   ChatActionButton,
-   PollActionButton,
-   HandRaiseActionButton,
-   QaActionButton,
    CTAActionButton,
-   ShareActionButton,
+   ChatActionButton,
+   HandRaiseActionButton,
+   JobsActionButton,
    MicActionButton,
+   PollActionButton,
+   QaActionButton,
+   ReactionsActionButton,
+   SettingsActionButton,
+   ShareActionButton,
    VideoActionButton,
 } from "../Buttons"
+import { StopHandRaisingButton } from "../Buttons/StopHandRaisingButton"
 
 export const AllActions = {
    "Hand raise": <HandRaiseActionButton key="Hand raise" />,
@@ -24,6 +25,7 @@ export const AllActions = {
    Share: <ShareActionButton key="Share" />,
    Mic: <MicActionButton key="Mic" />,
    Video: <VideoActionButton key="Video" />,
+   "Stop hand raise": <StopHandRaisingButton key="Stop hand raise" />,
    Divider: null,
 } as const
 
