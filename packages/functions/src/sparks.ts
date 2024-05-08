@@ -65,9 +65,11 @@ export const getUserSeenSparks = functions
                const seenSparks = await userRepo.getUserSeenSparks(
                   context.auth?.token?.email
                )
+
+               if (!seenSparks) return []
+
                const sparkIds = sortSparksMapIds(seenSparks.sparks, data.limit)
 
-               if (!sparkIds.length) return []
                return sparkRepo.getSparksByIds(sparkIds)
             } catch (error) {
                functions.logger.error(
@@ -100,11 +102,9 @@ const sortSparksMapIds = (
       })
       .sort(
          (baseSpark, comparisonSpark) =>
-            baseSpark.seenTimestamp.toMillis() -
-            comparisonSpark.seenTimestamp.toMillis()
+            comparisonSpark.seenTimestamp.toMillis() -
+            baseSpark.seenTimestamp.toMillis()
       )
 
-   return sortedSparks
-      .map((sortedSpark) => sortedSpark.sparkId)
-      .filter((_, idx) => idx < limit)
+   return sortedSparks.map((sortedSpark) => sortedSpark.sparkId).slice(0, limit)
 }

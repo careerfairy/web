@@ -6,7 +6,9 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-const useInteractedLivestreams = (limit?: 10) => {
+const useInteractedLivestreams = (limit?: number) => {
+   if (!limit) limit = 10
+
    const fetcher = useFunctionsSWR()
 
    const {

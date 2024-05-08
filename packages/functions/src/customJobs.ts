@@ -179,12 +179,13 @@ export const getUserCustomJobApplications = functions
          userAuthExists(),
          async (data: GetUserCustomJobApplications, context) => {
             try {
-               // TODO: Check no need to fetch from /jobApplications, since the user data should be backfilled
-               // TODO: Apply limit
-               return await userRepo.getJobApplications(
-                  context.auth?.token?.email
-               )
-               // Testing
+               const userCustomJobApplications =
+                  await userRepo.getCustomJobApplications(
+                     context.auth?.token?.email,
+                     data.limit
+                  )
+
+               return userCustomJobApplications
             } catch (error) {
                functions.logger.error(
                   "Error while retrieving User JobApplications",
