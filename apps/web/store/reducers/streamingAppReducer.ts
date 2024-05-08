@@ -74,7 +74,7 @@ export interface StreamingAppState {
       hasEnded: boolean
       openStream: boolean
       companyLogoUrl: string
-      handRaiseActive: boolean
+      handRaiseEnabled: boolean
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -115,7 +115,7 @@ const initialState: StreamingAppState = {
       hasEnded: false,
       openStream: false,
       companyLogoUrl: "",
-      handRaiseActive: false,
+      handRaiseEnabled: false,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -231,8 +231,8 @@ const streamingAppSlice = createSlice({
       setCompanyLogoUrl(state, action: PayloadAction<string>) {
          state.livestreamState.companyLogoUrl = action.payload
       },
-      setHandRaiseActive(state, action: PayloadAction<boolean>) {
-         state.livestreamState.handRaiseActive = action.payload
+      setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
+         state.livestreamState.handRaiseEnabled = action.payload
       },
       resetLivestreamState(state) {
          state.livestreamState = initialState.livestreamState
@@ -316,7 +316,7 @@ export const {
       setRTMConnectionState,
       setRTCConnectionState,
       openPolls,
-      setHandRaiseActive,
+      setHandRaiseEnabled,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
