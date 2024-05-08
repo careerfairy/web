@@ -1,11 +1,10 @@
 import { Stack, Typography } from "@mui/material"
-import React from "react"
-import { UserType, getStreamerDisplayName } from "../util"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import { sxStyles } from "types/commonTypes"
-import { useCompanyLogoUrl } from "store/selectors/streamingAppSelectors"
 import ColorizedAvatar from "components/views/common/ColorizedAvatar"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useCompanyLogoUrl } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
+import { UserType, getStreamerDisplayName } from "../util"
 
 const AVATAR_SIZE = 29
 
@@ -41,9 +40,10 @@ const styles = sxStyles({
 type Props = {
    userType: UserType
    displayName: string
+   color?: string
 }
 
-export const UserDetails = ({ userType, displayName }: Props) => {
+export const UserDetails = ({ userType, displayName, color }: Props) => {
    const [firstName, lastName] = displayName.split(" ")
    return (
       <Stack direction="row" spacing={1} sx={styles.details}>
@@ -56,11 +56,17 @@ export const UserDetails = ({ userType, displayName }: Props) => {
             color="neutral.800"
             fontWeight={600}
             variant="small"
-            sx={[styles.displayNameColor[userType], getMaxLineStyles(1)]}
+            sx={[
+               color ? { color } : styles.displayNameColor[userType],
+               getMaxLineStyles(1),
+            ]}
          >
             {userType === UserType.CareerFairy ? "CareerFairy" : displayName}
             {userType === UserType.Streamer && (
-               <Typography component="span" sx={styles.hostTag}>
+               <Typography
+                  component="span"
+                  sx={[styles.hostTag, color && { color }]}
+               >
                   {" "}
                   (Host)
                </Typography>
