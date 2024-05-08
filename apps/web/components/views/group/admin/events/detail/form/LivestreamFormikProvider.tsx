@@ -126,7 +126,7 @@ const buildRegistrationQuestions = (
    isAdmin: boolean,
    group: { groupId: string }
 ): LivestreamFormQuestionsTabValues["registrationQuestions"]["values"] => {
-   if (!groupQuestionsMap[group.groupId]) {
+   if (!isAdmin && !groupQuestionsMap[group.groupId]) {
       return []
    }
 
