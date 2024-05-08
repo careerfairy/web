@@ -7,7 +7,7 @@ import { HandRaiseIcon } from "components/views/common/icons"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { Fragment, forwardRef } from "react"
 import { ActiveViews } from "store/reducers/streamingAppReducer"
-import { useStreamHandRaiseActive } from "store/selectors/streamingAppSelectors"
+import { useStreamHandRaiseEnabled } from "store/selectors/streamingAppSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { ConfirmHandRaiseDialog } from "../hand-raise/ConfirmHandRaiseDialog"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
@@ -26,7 +26,7 @@ export const HandRaiseActionButton = forwardRef<
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.HAND_RAISE
    )
-   const streamHandRaiseIsActive = useStreamHandRaiseActive()
+   const streamHandRaiseEnabled = useStreamHandRaiseEnabled()
    const { isHost, agoraUserId, livestreamId, setIsReady } =
       useStreamingContext()
 
@@ -38,7 +38,7 @@ export const HandRaiseActionButton = forwardRef<
    const { trigger: updateHandRaiseState, isMutating } =
       useUpdateUserHandRaiseState(livestreamId)
 
-   const handRaiseIsActiveForViewer = streamHandRaiseIsActive && !isHost
+   const handRaiseIsActiveForViewer = streamHandRaiseEnabled && !isHost
 
    const [
       isHandRaiseDialogOpen,

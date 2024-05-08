@@ -46,6 +46,8 @@ const styles = sxStyles({
    actionsMobile: {
       pt: 0,
       p: 1.5,
+      position: "sticky",
+      bottom: 0,
    },
    dialogContent: {
       p: 4,
@@ -140,7 +142,7 @@ const Content = () => {
             <Stack direction="row" spacing={1}>
                {Boolean(isHandRaiseActive && isViewer) && (
                   <LoadingButton
-                     variant="text"
+                     variant="outlined"
                      color="grey"
                      size="small"
                      onClick={async () => {
