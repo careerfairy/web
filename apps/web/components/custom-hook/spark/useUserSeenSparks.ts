@@ -13,7 +13,8 @@ const functionName = "getUserSeenSparks"
  * @param limit
  * @returns
  */
-export const useUserSeenSparks = (limit?: 20) => {
+export const useUserSeenSparks = (limit?: number) => {
+   if (!limit) limit = 10
    const fetcher = useFunctionsSWR()
 
    const {
