@@ -28,7 +28,7 @@ export const ThanksForJoiningHandRaiseDialog = () => {
       if (handRaise?.state === HandRaiseState.denied && timeStamp >= now) {
          setOpen(true)
       }
-   }, [handRaise.state, timeStamp])
+   }, [handRaise?.state, timeStamp])
 
    return (
       <ConfirmationDialog
