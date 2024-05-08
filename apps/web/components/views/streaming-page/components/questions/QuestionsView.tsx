@@ -70,20 +70,22 @@ const Content = ({ scrollToTop, containerRef }: Props) => {
       [scrollToTop]
    )
 
+   const recountQuestions = useCallback(
+      () =>
+         Promise.allSettled([
+            refetchUpcomingQuestionsCount(),
+            refetchAnsweredQuestionsCount(),
+         ]),
+      [refetchUpcomingQuestionsCount, refetchAnsweredQuestionsCount]
+   )
+
    const onQuestionHighlighted = useCallback(() => {
-      Promise.allSettled([
-         refetchUpcomingQuestionsCount(),
-         refetchAnsweredQuestionsCount(),
-      ]).then(() => {
+      recountQuestions().then(() => {
          setTimeout(() => {
             scrollToTop()
          }, 500)
       })
-   }, [
-      scrollToTop,
-      refetchUpcomingQuestionsCount,
-      refetchAnsweredQuestionsCount,
-   ])
+   }, [scrollToTop, recountQuestions])
 
    return (
       <Stack>
@@ -99,7 +101,7 @@ const Content = ({ scrollToTop, containerRef }: Props) => {
             <QuestionsList
                tabValue={tabValue}
                setTabValue={handleChangeTab}
-               onQuestionMarkedAsAnswered={scrollToTop}
+               onQuestionMarkedAsAnswered={recountQuestions}
                onQuestionHighlighted={onQuestionHighlighted}
             />
          </Box>
