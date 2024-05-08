@@ -6,7 +6,7 @@ import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 
-import { getCountryOptionById } from "@careerfairy/shared-lib/constants/forms"
+import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
 import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    SparkClientEventsPayload,
@@ -45,16 +45,17 @@ export const getSparksFeed = functions
                      }
                   }
 
-                  const loggedOutCountryCode = getCountryCode(context)
-                  const loggedOutCountry =
-                     getCountryOptionById(loggedOutCountryCode)
+                  const anonymousUserCountryCode = getCountryCode(context)
+                  const loggedOutCountry = getCountryOptionByCountryCode(
+                     anonymousUserCountryCode
+                  )
 
                   return {
                      sparks: await sparkRepo.getPublicSparksFeed(
                         data.numberOfSparks,
                         loggedOutCountry
                      ),
-                     loggedOutCountryCode,
+                     anonymousUserCountryCode,
                   }
                }
 
