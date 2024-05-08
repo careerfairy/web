@@ -1515,22 +1515,30 @@ export class FirebaseLivestreamRepository
 
    async getUserLivestreamData(
       userId: string,
-      limit?: 10,
+      limit: number,
       ignoreIds?: string[]
    ): Promise<UserLivestreamData[]> {
+      console.log("🚀 ~ userId:", userId)
       let query = await this.firestore
-         .collection("userLivestreamData")
-         .where("id", "==", userId)
-         .orderBy("participated.date", "desc")
+         .collectionGroup("userLivestreamData")
+         .where("user.id", "==", userId)
          .limit(limit)
 
-      if (ignoreIds) {
-         query = query.where("livestreamId", "not-in", ignoreIds)
-      }
+      // if (ignoreIds?.length) {
+      //    query = query.where("livestreamId", "not-in", ignoreIds)
+      // }
+
+      query = query.orderBy("participated.date", "desc").limit(limit)
 
       const snap = await query.get()
+      console.log("🚀 ~ getUserLivestreamData count:", snap.docs?.length)
 
-      return mapFirestoreDocuments<UserLivestreamData>(snap) || []
+      return (
+         mapFirestoreDocuments<UserLivestreamData>(snap)?.filter((data) => {
+            console.log("🚀 ~ filtering->data:", data.livestreamId)
+            return !ignoreIds?.includes(data.livestreamId)
+         }) || []
+      )
    }
 
    async getUserRecordingStats(
@@ -1538,7 +1546,7 @@ export class FirebaseLivestreamRepository
       unique: boolean
    ): Promise<RecordingStatsUser[]> {
       const query = this.firestore
-         .collection("recordingStatsUser")
+         .collectionGroup("recordingStatsUser")
          .where("userId", "==", userEmail)
          .orderBy("date", "desc")
 
@@ -1586,13 +1594,15 @@ export class FirebaseLivestreamRepository
       const userRecordingData = recordingData.slice(0, limit)
 
       const ignoreIds = userRecordingData.map((data) => data.livestreamId)
+      console.log("🚀 ~ ignoreIds:", ignoreIds)
+
       const userLivestreamParticipatingData = await this.getUserLivestreamData(
          userId,
          limit,
          ignoreIds
       )
 
-      const sortedLivestreamsIds = userRecordingData
+      const allLivestreamData = userRecordingData
          .map((recording) => {
             return {
                livestreamId: recording.livestreamId,
@@ -1607,6 +1617,17 @@ export class FirebaseLivestreamRepository
                }
             })
          )
+      console.log(
+         "🚀 ~ allLivestreamData:",
+         allLivestreamData?.map((d) => {
+            return {
+               id: d.livestreamId,
+               date: d.date.toDate().toISOString(),
+            }
+         })
+      )
+
+      const sortedLivestreamsIds = allLivestreamData
          .sort((baseLivestreamData, comparisonLivestreamData) => {
             return (
                comparisonLivestreamData.date.toMillis() -
@@ -1624,15 +1645,16 @@ export class FirebaseLivestreamRepository
             const baseSortedIndex = sortedLivestreamsIds.indexOf(
                baseLivestream.id
             )
+
             const comparisonSortedIndex = sortedLivestreamsIds.indexOf(
                comparisonLivestream.id
             )
 
-            // TODO: Confirm order
-            return comparisonSortedIndex - baseSortedIndex
+            return baseSortedIndex - comparisonSortedIndex
          }
       )
       return sortedLivestreams
+      // return []
    }
 }
 

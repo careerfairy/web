@@ -6,6 +6,7 @@ import BaseFirebaseRepository, {
 import { Application } from "../ats/Application"
 import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
 import { Create } from "../commonTypes"
+import { CustomJobApplicant } from "../customJobs/customJobs"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
@@ -184,6 +185,11 @@ export interface IUserRepository {
    ): Promise<void>
 
    getUserSeenSparks(userEmail: string): Promise<SeenSparks>
+
+   getCustomJobApplications(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]>
 }
 
 export class FirebaseUserRepository
@@ -586,6 +592,21 @@ export class FirebaseUserRepository
       return this.addIdToDocs<UserJobApplicationDocument>(data.docs)
    }
 
+   async getCustomJobApplications(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]> {
+      const collectionRef = this.firestore
+         .collection("jobApplications")
+         .where("user.id", "==", userId)
+         .orderBy("appliedAt", "desc")
+         .limit(limit)
+
+      const data = await collectionRef.get()
+
+      return this.addIdToDocs<CustomJobApplicant>(data.docs)
+   }
+
    updateAdditionalInformation(userEmail, fields): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -818,6 +839,8 @@ export class FirebaseUserRepository
 
    async getUserSeenSparks(userEmail: string): Promise<SeenSparks> {
       const query = this.firestore
+         .collection("userData")
+         .doc(userEmail)
          .collection("seenSparks")
          .where("userId", "==", userEmail)
 
