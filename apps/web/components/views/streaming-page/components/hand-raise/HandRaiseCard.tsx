@@ -53,7 +53,7 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
                   fullWidth
                   onClick={() =>
                      updateUserHandRaiseState({
-                        state: HandRaiseState.denied,
+                        state: HandRaiseState.unrequested,
                         handRaiseId: handRaise.id,
                      })
                   }

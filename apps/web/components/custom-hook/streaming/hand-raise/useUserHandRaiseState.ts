@@ -14,7 +14,7 @@ const reactFireOptions: ReactFireOptions = {
 
 type UseUserHandRaiseState = {
    /**
-    * Whether the hand raise is active, is invited, is connecting or is connected and re
+    * Whether the hand raise is active, aquiring_media, requested, invited, connecting and connected
     */
    userHandRaiseIsActive: boolean
    /**

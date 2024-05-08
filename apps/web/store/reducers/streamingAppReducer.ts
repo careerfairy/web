@@ -62,6 +62,8 @@ export interface StreamingAppState {
       screenSharerId: string
       mode: LivestreamMode
       numberOfParticipants: number
+      /* number of new hand raises since the stream enabled hand raise */
+      numberOfHandRaiseNotifications: number
       startsAt: number | null
       startedAt: number | null
       /**
@@ -116,6 +118,7 @@ const initialState: StreamingAppState = {
       openStream: false,
       companyLogoUrl: "",
       handRaiseEnabled: false,
+      numberOfHandRaiseNotifications: 0,
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -232,7 +235,22 @@ const streamingAppSlice = createSlice({
          state.livestreamState.companyLogoUrl = action.payload
       },
       setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
+         if (state.livestreamState.handRaiseEnabled !== action.payload) {
+            // Reset the number of new hand raises to zero when the hand raise is toggled
+            state.livestreamState.numberOfHandRaiseNotifications = 0
+         }
          state.livestreamState.handRaiseEnabled = action.payload
+      },
+      incrementNumberOfHandRaiseNotifications(
+         state,
+         action: PayloadAction<number>
+      ) {
+         // Increment/Decrement the number of new hand raise notifications by the given amount, min zero
+         state.livestreamState.numberOfHandRaiseNotifications = Math.max(
+            0,
+            state.livestreamState.numberOfHandRaiseNotifications +
+               action.payload
+         )
       },
       resetLivestreamState(state) {
          state.livestreamState = initialState.livestreamState
@@ -317,6 +335,7 @@ export const {
       setRTCConnectionState,
       openPolls,
       setHandRaiseEnabled,
+      incrementNumberOfHandRaiseNotifications,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
