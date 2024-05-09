@@ -70,6 +70,7 @@ export const getUserSeenSparks = functions
 
                const sparkIds = sortSparksMapIds(seenSparks.sparks, data.limit)
 
+               // TODO: Ensuring view order stays the same
                return sparkRepo.getSparksByIds(sparkIds)
             } catch (error) {
                functions.logger.error(
