@@ -132,20 +132,47 @@ export const useAutoSave = () => {
    )
 
    const updateCustomJobs = useCallback(
-      async (customJobs: LivestreamFormJobsTabValues["customJobs"]) => {
-         for (const job of customJobs) {
-            await customJobRepo.updateCustomJobWithLinkedLivestreams(
-               livestream.id,
-               [job.id],
-               job.deleted
+      async (
+         previousCustomJobs: LivestreamFormJobsTabValues["customJobs"],
+         newCustomJobs: LivestreamFormJobsTabValues["customJobs"]
+      ) => {
+         const removedCustomJobs = previousCustomJobs.filter(
+            (prevJob) =>
+               !newCustomJobs.some((newJob) => newJob.id === prevJob.id)
+         )
+
+         const promises = []
+
+         for (const job of removedCustomJobs) {
+            promises.push(
+               customJobRepo.updateCustomJobWithLinkedLivestreams(
+                  livestream.id,
+                  [job.id],
+                  true
+               )
             )
          }
+
+         for (const job of newCustomJobs) {
+            promises.push(
+               customJobRepo.updateCustomJobWithLinkedLivestreams(
+                  livestream.id,
+                  [job.id],
+                  false
+               )
+            )
+         }
+
+         await Promise.all(promises)
       },
       [livestream.id]
    )
 
    const updateLivestream = useCallback(
-      async (newValues: Partial<LivestreamFormValues>) => {
+      async (
+         newValues: Partial<LivestreamFormValues>,
+         previousJobs: LivestreamFormJobsTabValues
+      ) => {
          const mappedObject = mapFormValuesToLivestreamObject(
             newValues,
             allFieldsOfStudy,
@@ -156,9 +183,7 @@ export const useAutoSave = () => {
             updateFeedbackQuestions(newValues.questions.feedbackQuestions)
          }
 
-         if (newValues?.jobs?.customJobs?.length > 0) {
-            updateCustomJobs(newValues.jobs.customJobs)
-         }
+         updateCustomJobs(previousJobs.customJobs, newValues.jobs.customJobs)
 
          await firebaseService.updateLivestream(
             { ...mappedObject, id: livestream.id },
@@ -177,6 +202,7 @@ export const useAutoSave = () => {
    )
 
    const handleAutoSave = useCallback(async () => {
+      const previousJobs = cloneDeep(previousValues.jobs)
       if (haveValuesChanged) {
          setPreviousValues(values)
          if (livestream.isDraft) {
@@ -185,9 +211,9 @@ export const useAutoSave = () => {
                errors
             )
 
-            updateLivestream(formValuesWithoutErrors)
+            updateLivestream(formValuesWithoutErrors, previousJobs)
          } else if (isValid) {
-            updateLivestream(values)
+            updateLivestream(values, previousJobs)
          }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
