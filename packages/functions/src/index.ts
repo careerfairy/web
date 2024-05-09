@@ -42,8 +42,6 @@ import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
 import onDeleteTriggers = require("./onDeleteTriggers")
-import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
-import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
@@ -53,14 +51,16 @@ import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 import groupPlans = require("./groupPlans")
 import search = require("./search")
-import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
-import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
-import * as streaming from "./lib/streaming"
 import stripe = require("./stripe")
-
+// Commenting to prevent re-order of packages
+import { bundles } from "./bundles"
+import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
+import { knownIndexes } from "./lib/search/searchIndexes"
+import * as streaming from "./lib/streaming"
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
@@ -112,7 +112,7 @@ exports.manualOnboardingNewsletter =
 exports.manualEndOfSparksTrialEmails =
    endOfSparksTrials.manualEndOfSparksTrialEmails
 exports.endOfSparksTrialEmails = endOfSparksTrials.endOfSparksTrialEmails
-exports.manualAABTalentPoolCommunication = newsletter.manualTemplatedEmail
+exports.manualBeefResolution = newsletter.manualTemplatedEmail
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook

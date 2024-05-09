@@ -1,19 +1,19 @@
 import { RuntimeOptions } from "firebase-functions"
-import functions = require("firebase-functions")
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
 import {
-   groupRepo,
-   userRepo,
-   livestreamsRepo,
    emailNotificationsRepo,
+   groupRepo,
+   livestreamsRepo,
+   userRepo,
 } from "./api/repositories"
 import config from "./config"
+import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
+import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
-import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
+import functions = require("firebase-functions")
 
 /**
  * To be sure we only send 1 newsletter when manually triggered
@@ -96,7 +96,7 @@ export const manualTemplatedEmail = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
-      functions.logger.info("manualTemplatedEmail: v3.0 - AAB Talent Pool")
+      functions.logger.info("manualTemplatedEmail: v4.0 - Beef Resolution")
 
       if (req.method !== "GET") {
          res.status(400).send("Only GET requests are allowed")
@@ -117,11 +117,11 @@ export const manualTemplatedEmail = functions
 
       if (receivedEmails.length === 1 && receivedEmails[0] === "everyone") {
          await sendManualTemplatedEmail()
-         res.status(200).send("AAB Talent Pool email sent to everyone")
+         res.status(200).send("Resolution email sent to everyone")
       } else {
          await sendManualTemplatedEmail(receivedEmails)
          res.status(200).send(
-            "AAB Talent Pool email sent to " + receivedEmails.join(", ")
+            "Resolution email sent to " + receivedEmails.join(", ")
          )
       }
    })
@@ -161,9 +161,14 @@ async function sendNewsletter(overrideUsers?: string[]) {
 
 async function sendManualTemplatedEmail(overrideUsers?: string[]) {
    if (newsletterAlreadySent) {
-      functions.logger.info("ABB talent pool communication, skipping")
+      functions.logger.info("Resolution email already sent, skipping.")
       return
    }
+
+   functions.logger.info(
+      "Resolution email template -> ",
+      Number(process.env.POSTMARK_TEMPLATE_MANUAL_EMAIL)
+   )
 
    const emailBuilder = new ManualTemplatedEmailBuilder(
       PostmarkEmailSender.create(),
@@ -172,7 +177,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
 
    const newsletterService = new ManualTemplatedEmailService(
       userRepo,
-      livestreamsRepo,
+      // livestreamsRepo,
       emailBuilder,
       functions.logger
    )
@@ -186,7 +191,7 @@ async function sendManualTemplatedEmail(overrideUsers?: string[]) {
       newsletterAlreadySent = true
    }
 
-   functions.logger.info("ABB talent pool communication execution done")
+   functions.logger.info("Resolution email communication execution done")
 }
 
 /**

@@ -11,7 +11,10 @@ const SUBSCRIBED_BEFORE_MONTHS_COUNT = 18
 
 export interface IUserFunctionsRepository extends IUserRepository {
    getSubscribedUsers(userEmails?: string[]): Promise<UserData[]>
-
+   getAllSubscribedUsersFromUniversityCountry(
+      userEmails?: string[],
+      countryCode?: string
+   ): Promise<UserData[]>
    getSubscribedUsersByCountryCode(
       countryCode: string,
       userEmails?: string[]
@@ -43,6 +46,27 @@ export class UserFunctionsRepository
          .collection("userData")
          .where("unsubscribed", "==", false)
          .where("lastActivityAt", ">=", earlierThan)
+
+      if (userEmails?.length) {
+         const withinLimit = isWithinNormalizationLimit(30, userEmails)
+         if (withinLimit) {
+            query = query.where("userEmail", "in", userEmails)
+         }
+      }
+
+      const data = await query.get()
+
+      return mapFirestoreDocuments(data)
+   }
+
+   async getAllSubscribedUsersFromUniversityCountry(
+      userEmails?: string[],
+      countryCode?: string
+   ): Promise<UserData[]> {
+      let query = this.firestore
+         .collection("userData")
+         .where("unsubscribed", "==", false)
+         .where("universityCountryCode", "==", countryCode)
 
       if (userEmails?.length) {
          const withinLimit = isWithinNormalizationLimit(30, userEmails)

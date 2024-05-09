@@ -1,6 +1,6 @@
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../api/postmark"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 /**
  * Builds a Spark release email (templated) and sends it to the recipients
@@ -26,7 +26,7 @@ export class ManualTemplatedEmailBuilder {
             firstName: name,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
-         Tag: "aab-talent-pool",
+         Tag: "beef-resolution", // :)
       })
    }
 
