@@ -61,6 +61,7 @@ export const ESTIMATED_DURATIONS = [
 ]
 
 export const SELECT_ALL_ID = "select-all"
+const OTHER_OPTION_ID = "other"
 
 export const hashToColor = (id: string) => {
    if (!id) return
@@ -77,6 +78,12 @@ export const hashToColor = (id: string) => {
    }
 
    return color
+}
+
+export const getFieldsOfStudyWithoutOtherOptions = (
+   allFieldsOfStudy: FieldOfStudy[]
+) => {
+   return allFieldsOfStudy.filter((field) => field.id !== OTHER_OPTION_ID)
 }
 
 const mapCreatorToSpeaker = (creator: Creator): Speaker => {

@@ -17,8 +17,9 @@ import {
    useUniversityCountries,
 } from "components/custom-hook/useCollection"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import FormSectionHeader from "../../FormSectionHeader"
+import { getFieldsOfStudyWithoutOtherOptions } from "../../commons"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import InputSkeleton from "../questions/InputSkeleton"
 import MultiChipSelect from "./components/MultiChipSelect"
@@ -92,6 +93,11 @@ const AudienceTargetingContent = () => {
       [universitiesByCountry]
    )
 
+   // We are excluding the "Other" option only in B2B because we have the "Any field of study" option
+   const allFieldsOfStudyWithoutOther = useMemo(() => {
+      return getFieldsOfStudyWithoutOtherOptions(allFieldsOfStudy)
+   }, [allFieldsOfStudy])
+
    if (
       universitiesByCountryError ||
       allFieldsOfStudyError ||
@@ -155,7 +161,7 @@ const AudienceTargetingContent = () => {
          )}
          <MultiChipSelect
             id="general.targetFieldsOfStudy"
-            options={allFieldsOfStudy}
+            options={allFieldsOfStudyWithoutOther}
             value={general.targetFieldsOfStudy}
             multiple
             disableCloseOnSelect
