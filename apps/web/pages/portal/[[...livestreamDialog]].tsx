@@ -4,9 +4,10 @@ import { Box } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
+   SerializedContent,
    type CarouselContent,
 } from "../../components/views/portal/content-carousel/CarouselContentService"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
@@ -55,6 +56,7 @@ const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
    recordedEventsToShare,
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
@@ -64,10 +66,10 @@ const PortalPage = ({
    const router = useRouter()
    const isMobile = useIsMobile()
 
-   console.log(
-      "🚀 ~ userData.id, authenticatedUser.email:",
-      authenticatedUser.email
-   )
+   const [
+      updatedSerializedCarouselContent,
+      setUpdatedSerializedCarouselContent,
+   ] = useState<SerializedContent[]>([])
 
    const { sparks: seenSparks } = useUserSeenSparks()
    const { jobApplications } = useUserCustomJobApplications()
@@ -89,24 +91,41 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const carouselContentService = new CarouselContentService({
-      userData: userData,
-      userStats: serverUserStats,
-      pastLivestreams: pastEvents || [],
-      upcomingLivestreams: comingUpNextEvents || [],
-      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-      watchedSparks: seenSparks || [],
-      // watchedLivestreams: [],
-      // watchedSparks: [],
-      // appliedJobs: []
-   })
-   console.log("🚀 ~ carouselContentService:", carouselContentService)
-
    const carouselContent = useMemo<CarouselContent[]>(() => {
       return CarouselContentService.deserializeContent(
-         serializedCarouselContent
+         updatedSerializedCarouselContent
       )
-   }, [serializedCarouselContent])
+   }, [updatedSerializedCarouselContent])
+
+   useEffect(() => {
+      async function getContent() {
+         const carouselContentService = new CarouselContentService({
+            userData: userData,
+            userStats: serverUserStats,
+            pastLivestreams: pastEvents || [],
+            upcomingLivestreams: comingUpNextEvents || [],
+            registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+            watchedSparks: seenSparks || [],
+            watchedLivestreams: interactedEvents || [],
+            appliedJobs: jobApplications || [],
+         })
+         const updatedSerializedContent =
+            await carouselContentService.getCarouselContent()
+         setUpdatedSerializedCarouselContent(
+            CarouselContentService.serializeContent(updatedSerializedContent)
+         )
+      }
+      getContent()
+   }, [
+      comingUpNextEvents,
+      interactedEvents,
+      jobApplications,
+      pastEvents,
+      recordedEventsToShare,
+      seenSparks,
+      serverUserStats,
+      userData,
+   ])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return

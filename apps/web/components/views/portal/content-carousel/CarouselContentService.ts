@@ -3,6 +3,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
@@ -67,19 +68,28 @@ export type SerializedContent =
  *   */
 export class CarouselContentService {
    private options: GetContentOptions
+   private implicitData: ImplicitLivestreamRecommendationData
    private readonly pastEventsService: IRecommendationService
    private readonly upcomingEventsService: IRecommendationService
 
    constructor(options: GetContentOptions) {
       this.options = options
-      // TODO: Pass implicit data
+      const implicitRecommendationData = {
+         watchedLivestreams: options.watchedLivestreams,
+         watchedSparks: options.watchedSparks,
+         appliedJobs: options.appliedJobs,
+      }
+
+      this.implicitData = implicitRecommendationData
       this.pastEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
          filterStreamsForUnregisteredUsersAndNonBuyers(
             options.pastLivestreams,
             options.userStats
-         )
+         ),
+         false,
+         implicitRecommendationData
       )
       this.upcomingEventsService = ExistingDataRecommendationService.create(
          console,
@@ -87,12 +97,13 @@ export class CarouselContentService {
          filterNonRegisteredStreams(
             options.upcomingLivestreams,
             options.userStats
-         )
+         ),
+         false,
+         implicitRecommendationData
       )
    }
 
    public async getCarouselContent(): Promise<CarouselContent[]> {
-      // TODO: pass all data needed for implicit recommendation
       const [recommendedPastLivestreams, recommendedUpcomingLivestreams] =
          await Promise.all([
             this.getRecommendedStreams(
