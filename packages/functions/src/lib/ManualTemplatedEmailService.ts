@@ -26,19 +26,23 @@ export class ManualTemplatedEmailService {
    async fetchRequiredData(overrideUsers: string[]) {
       // start fetching
 
-      const fetchedUsers =
-         await this.userRepo.getAllSubscribedUsersFromUniversityCountry(
-            overrideUsers,
-            "DE"
-         )
-      const subscribedUsers: UserData[] = fetchedUsers ? fetchedUsers : []
-
-      this.subscribedUsers = convertDocArrayToDict(
-         subscribedUsers as UserData[]
+      const fetchedUsers = await this.userRepo.getAllSubscribedUsers(
+         overrideUsers
       )
 
+      const subscribedUsers: UserData[] = fetchedUsers ? fetchedUsers : []
+
+      const filteredUsers = subscribedUsers.filter((user) => {
+         return (
+            user?.universityCountryCode == "DE" ||
+            user?.spokenLanguages?.includes("de")
+         )
+      })
+
+      this.subscribedUsers = convertDocArrayToDict(filteredUsers as UserData[])
+
       this.logger.info(
-         "Total German student Users subscribed to the resolution email",
+         "Total German student and German speaking Users subscribed to the resolution email",
          Object.keys(this.subscribedUsers).length
       )
 
