@@ -29,6 +29,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required(REQUIRED_FIELD_MESSAGE)
          .min(10, getMinCharactersMessage("title", 10)),
       hidden: yup.bool().notRequired(),
+      isDraft: yup.bool().notRequired(),
       company: yup
          .string()
          .test(
@@ -49,7 +50,31 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
       startDate: yup
          .date()
          .nullable()
-         .min(new Date(), "Choose a date in the future")
+         .test("past-live-stream-check", null, function (value, context) {
+            const {
+               path,
+               parent,
+               createError,
+               // @ts-ignore
+               originalValue,
+            } = context
+
+            const wasPastLivestream =
+               originalValue &&
+               !parent.isDraft &&
+               new Date(originalValue) <= new Date(Date.now() - 1000 * 60 * 45)
+
+            if (wasPastLivestream) {
+               return true
+            } else if (value && new Date(value) <= new Date(Date.now())) {
+               return createError({
+                  path,
+                  message: "Choose a date in the future",
+               })
+            }
+
+            return true
+         })
          .required(REQUIRED_FIELD_MESSAGE),
       duration: yup.number().nullable().required(REQUIRED_FIELD_MESSAGE),
       language: language.required(REQUIRED_FIELD_MESSAGE),
@@ -76,7 +101,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
                .min(20, "Minimum of 20 characters")
                .required(REQUIRED_FIELD_MESSAGE)
          )
-         .test("wololo", null, (value) => {
+         .test("length-requirement", null, (value) => {
             return value.filter(Boolean).length > 0
          }),
       categories: yup.object().shape({

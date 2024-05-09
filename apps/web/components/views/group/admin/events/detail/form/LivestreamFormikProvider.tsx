@@ -210,6 +210,8 @@ const convertLivestreamObjectToForm = ({
    general.startDate =
       livestream.start.toDate() || formGeneralTabInitialValues.startDate
 
+   general.isDraft = livestream.isDraft
+
    // This is to ensure backwards compatibility
    // Previously was a single field (i.e. a single string) and now it's an array of strings
    if (livestream.reasonsToJoinLivestream) {
