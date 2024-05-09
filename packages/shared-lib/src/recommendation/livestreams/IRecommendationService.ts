@@ -148,6 +148,10 @@ export default class RecommendationServiceCore {
          new RankedLivestreamRepository(livestreams)
       )
 
+      if (implicitData) {
+         userRecommendationBuilder.setImplicitData(implicitData)
+      }
+
       return userRecommendationBuilder
          .userUniversityCountry()
          .userUniversity()
@@ -159,6 +163,17 @@ export default class RecommendationServiceCore {
          .userCountriesOfInterest()
          .userCompanyTargetUniversity()
          .userCompanyTargetFieldsOfStudy()
+         .userImplicitInteractedEventsCompanyCountry()
+         .userImplicitInteractedEventsCompanyIndustries()
+         .userImplicitInteractedEventsCompanySize()
+         .userImplicitInteractedEventsInterests()
+         .userImplicitInteractedEventsLanguage()
+         .userImplicitWatchedSparksCompanyCountry()
+         .userImplicitWatchedSparksCompanyIndustries()
+         .userImplicitWatchedSparksCompanySize()
+         .userImplicitAppliedJobsCompanyCountry()
+         .userImplicitAppliedJobsCompanyIndustries()
+         .userImplicitAppliedJobsCompanySize()
          .get()
    }
 }

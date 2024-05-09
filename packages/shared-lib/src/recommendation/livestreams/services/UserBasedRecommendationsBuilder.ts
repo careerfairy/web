@@ -1,14 +1,22 @@
 import { UserData } from "../../../users"
+import { ImplicitLivestreamRecommendationData } from "../ImplicitLivestreamRecommendationData"
+import { RankedLivestreamEvent } from "../RankedLivestreamEvent"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
+import { ImplicitDataRepository } from "../implicit/ImplicitDataRepository"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
 export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
+   private implicitDataRepo: ImplicitDataRepository
    constructor(
       limit: number,
       private readonly user: UserData,
       private readonly rankedLivestreamRepo: RankedLivestreamRepository
    ) {
       super(limit)
+   }
+
+   public setImplicitData(implicitData: ImplicitLivestreamRecommendationData) {
+      this.implicitDataRepo = new ImplicitDataRepository(implicitData)
    }
 
    public userInterests() {
@@ -164,5 +172,206 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       }
 
       return this
+   }
+
+   // Implicit Data
+
+   public userImplicitInteractedEventsCompanyCountry() {
+      this.addImplicitResults(
+         (implicitDataRepo) => {
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ CALLED ~ implicitDataRepo:",
+               Boolean(implicitDataRepo)
+            )
+            const result =
+               implicitDataRepo.getInteractedEventsCompanyCountries()
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ userImplicitInteractedEventsCompanyCountry ~ result:",
+               result
+            )
+            return result
+         },
+         (values) => {
+            console.log(
+               "🚀 ~ UserBasedRecommendationsBuilder ~ this.addImplicitResults ~ values:",
+               values
+            )
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsCompanyCountries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      console.log(
+         "🚀 ~ UserBasedRecommendationsBuilder ~ userImplicitInteractedEventsCompanyCountry ~ ADDDED:"
+      )
+      return this
+   }
+
+   public userImplicitInteractedEventsCompanyIndustries() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getInteractedEventsCompanyIndustries(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsCompanyIndustries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitInteractedEventsCompanySize() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getInteractedEventsCompanySizes(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsCompanySize(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitInteractedEventsInterests() {
+      this.addImplicitResults(
+         (implicitDataRepo) => implicitDataRepo.getInteractedEventsInterests(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsInterests(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitInteractedEventsLanguage() {
+      this.addImplicitResults(
+         (implicitDataRepo) => implicitDataRepo.getInteractedEventsLanguages(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsLanguages(
+               values
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitWatchedSparksCompanyCountry() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getWatchedSparksCompanyCountries(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitSparksCompanyCountries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitWatchedSparksCompanyIndustries() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getWatchedSparksCompanyIndustries(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitSparksCompanyIndustries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitWatchedSparksCompanySize() {
+      this.addImplicitResults(
+         (implicitDataRepo) => implicitDataRepo.getWatchedSparksCompanySizes(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitSparksCompanySize(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitAppliedJobsCompanyCountry() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getAppliedJobsCompanyCountries(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitAppliedJobsCompanyCountries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitAppliedJobsCompanyIndustries() {
+      this.addImplicitResults(
+         (implicitDataRepo) =>
+            implicitDataRepo.getAppliedJobsCompanyIndustries(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitAppliedJobsCompanyIndustries(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   public userImplicitAppliedJobsCompanySize() {
+      this.addImplicitResults(
+         (implicitDataRepo) => implicitDataRepo.getAppliedJobsCompanySizes(),
+         (values) => {
+            return this.rankedLivestreamRepo.getEventsBasedOnImplicitAppliedJobsCompanySize(
+               values,
+               this.limit
+            )
+         }
+      )
+
+      return this
+   }
+
+   private addImplicitResults(
+      valuesGetter: (implicitDataRepo: ImplicitDataRepository) => string[],
+      eventsGetter: (values: string[]) => RankedLivestreamEvent[]
+   ) {
+      if (this.implicitDataRepo) {
+         console.log(
+            "🚀 ~ UserBasedRecommendationsBuilder ~ addImplicitResults ~ implicitDataRepo: "
+         )
+         const values = valuesGetter(this.implicitDataRepo)
+         console.log(
+            "🚀 ~ UserBasedRecommendationsBuilder ~ addImplicitResults ~ values:",
+            values
+         )
+         if (values?.length) {
+            this.addResults(eventsGetter(values))
+         }
+      } else {
+         console.log("🚀 ~ UBRB ~ addImplicitResults ~ no implicit data -> ")
+      }
    }
 }
