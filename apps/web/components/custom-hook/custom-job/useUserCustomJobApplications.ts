@@ -1,4 +1,4 @@
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/users"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -14,7 +14,7 @@ const useUserCustomJobApplications = (limit?: number) => {
       data: jobApplications,
       error,
       isLoading,
-   } = useSWR<UserJobApplicationDocument[]>(
+   } = useSWR<CustomJobApplicant[]>(
       [
          "getUserCustomJobApplications",
          {
