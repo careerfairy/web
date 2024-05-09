@@ -14,6 +14,7 @@ import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { ReactNode } from "react"
 import { useGroupQuestions } from "../useGroupQuestions"
+import { getFieldsOfStudyWithoutOtherOptions } from "./commons"
 import {
    LivestreamFormGeneralTabValues,
    LivestreamFormJobsTabValues,
@@ -234,6 +235,10 @@ const convertLivestreamObjectToForm = ({
          livestream.reasonsToJoinLivestream_v2 ||
          formGeneralTabInitialValues.reasonsToJoin
    }
+
+   general.targetFieldsOfStudy = getFieldsOfStudyWithoutOtherOptions(
+      general.targetFieldsOfStudy
+   )
 
    // This is to ensure backwards compatibility
    const filteredSpeakers = livestream.speakers.filter(
