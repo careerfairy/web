@@ -148,28 +148,30 @@ export default class RecommendationServiceCore {
          userRecommendationBuilder.setImplicitData(implicitData)
       }
 
-      return userRecommendationBuilder
-         .userUniversityCountry()
-         .userUniversity()
-         .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
-         .userLevelsOfStudy()
-         .userSpokenLanguages()
-         .userFollowedCompanies()
-         .userUniversityCompanyTargetCountry()
-         .userCountriesOfInterest()
-         .userCompanyTargetUniversity()
-         .userCompanyTargetFieldsOfStudy()
-         .userImplicitInteractedEventsCompanyCountry()
-         .userImplicitInteractedEventsCompanyIndustries()
-         .userImplicitInteractedEventsCompanySize()
-         .userImplicitInteractedEventsInterests()
-         .userImplicitInteractedEventsLanguage()
-         .userImplicitWatchedSparksCompanyCountry()
-         .userImplicitWatchedSparksCompanyIndustries()
-         .userImplicitWatchedSparksCompanySize()
-         .userImplicitAppliedJobsCompanyCountry()
-         .userImplicitAppliedJobsCompanyIndustries()
-         .userImplicitAppliedJobsCompanySize()
-         .get()
+      return (
+         userRecommendationBuilder
+            .userUniversityCountry()
+            .userUniversity()
+            .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
+            .userLevelsOfStudy()
+            .userSpokenLanguages()
+            .userFollowedCompanies()
+            .userUniversityCompanyTargetCountry()
+            .userCountriesOfInterest()
+            .userCompanyTargetUniversity()
+            .userCompanyTargetFieldsOfStudy()
+            // .userImplicitInteractedEventsCompanyCountry()
+            // .userImplicitInteractedEventsCompanyIndustries()
+            // .userImplicitInteractedEventsCompanySize()
+            // .userImplicitInteractedEventsInterests()
+            // .userImplicitInteractedEventsLanguage()
+            // .userImplicitWatchedSparksCompanyCountry()
+            .userImplicitWatchedSparksCompanyIndustries()
+            // .userImplicitWatchedSparksCompanySize()
+            // .userImplicitAppliedJobsCompanyCountry()
+            // .userImplicitAppliedJobsCompanyIndustries()
+            // .userImplicitAppliedJobsCompanySize()
+            .get()
+      )
    }
 }

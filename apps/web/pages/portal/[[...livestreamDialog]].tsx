@@ -70,6 +70,7 @@ const PortalPage = ({
    ] = useState<SerializedContent[]>([])
 
    const { sparks: seenSparks } = useUserSeenSparks()
+   console.log("🚀 ~ seenSparks:", seenSparks)
    const { jobApplications } = useUserCustomJobApplications()
    const { events: interactedEvents } = useInteractedLivestreams()
 
