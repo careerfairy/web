@@ -543,16 +543,7 @@ export class RankedLivestreamRepository {
                   ? missingMatchesMultiplier
                   : numMissingMatches
             const mismatchPoints = mismatchMultiplier * pointsPerMissingMatch
-            console.log(
-               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ missingMatchesMultiplier,numMissingMatches,pointsPerMissingMatch,mismatches,id: ",
-               missingMatchesMultiplier,
-               numMissingMatches,
-               pointsPerMissingMatch == 0 ? "-00" : pointsPerMissingMatch, // For formatting purposes only
-               pointsPerMissingMatch != 0
-                  ? `{ targetIds[${targetIds}] <> targetUserIds[${targetUserIds}] }`
-                  : "{ no pointsPerMissingMatch }",
-               rankedLivestream.model.id
-            )
+
             rankedLivestream.addPoints(mismatchPoints)
          }
 
