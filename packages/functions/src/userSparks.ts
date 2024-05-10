@@ -38,7 +38,7 @@ export const getSparksFeed = functions
                if ("userId" in data) {
                   if (data.userId) {
                      return {
-                        sparks: sparkRepo.getUserSparksFeed(
+                        sparks: await sparkRepo.getUserSparksFeed(
                            data.userId,
                            data.numberOfSparks
                         ),
@@ -61,7 +61,7 @@ export const getSparksFeed = functions
 
                if ("groupId" in data) {
                   return {
-                     sparks: sparkRepo.getGroupSparksFeed(
+                     sparks: await sparkRepo.getGroupSparksFeed(
                         data.groupId,
                         data.numberOfSparks
                      ),
