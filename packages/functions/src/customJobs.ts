@@ -1,5 +1,4 @@
 import functions = require("firebase-functions")
-import { RuntimeOptions } from "firebase-functions"
 import { SchemaOf, array, number, object, string } from "yup"
 import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
@@ -10,13 +9,6 @@ import {
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
 import { onCallWrapper } from "./util"
-
-/**
- * Functions runtime settings
- */
-const runtimeSettings: RuntimeOptions = {
-   memory: "256MB",
-}
 
 type GetUserCustomJobApplications = {
    limit: number
@@ -172,7 +164,6 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
 
 export const getUserCustomJobApplications = functions
    .region(config.region)
-   .runWith(runtimeSettings)
    .https.onCall(
       middlewares(
          dataValidation(getUserCustomJobApplicationsSchema),

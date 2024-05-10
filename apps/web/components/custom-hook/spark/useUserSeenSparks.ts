@@ -9,9 +9,9 @@ import useFunctionsSWR, {
 const functionName = "getUserSeenSparks"
 
 /**
- * TODO: Update documentation
- * @param limit
- * @returns
+ * Retrieves all of the user Seen Sparks sorted by latest seen.
+ * @param limit Items limit.
+ * @returns Spark[]
  */
 export const useUserSeenSparks = (limit?: number) => {
    if (!limit) limit = 10

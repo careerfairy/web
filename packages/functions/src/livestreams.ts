@@ -370,19 +370,14 @@ export const getInteractedLivestreams = functions
          userAuthExists(),
          async (data: GetInteractedLivestreams, context) => {
             try {
-               // TODO: Check no need to fetch from /jobApplications, since the user data should be backfilled
                const interactedEvents =
                   await livestreamsRepo.getUserInteractedLivestreams(
                      context.auth.token.email,
                      data.limit
                   )
-               console.log(
-                  "🚀 ~ interactedEvents:",
-                  interactedEvents?.map((e) => e.id)
-               )
+
                return interactedEvents
             } catch (error) {
-               console.log("🚀 ~ GetInteractedLivestreams-error:", error)
                functions.logger.error(
                   "Error while retrieving InteractedLivestreams",
                   data,
