@@ -7,9 +7,7 @@ import { ImplicitLivestreamRecommendationData } from "../ImplicitLivestreamRecom
  * update it to fetch the data from a data bundle
  */
 export class ImplicitDataRepository {
-   constructor(private readonly data: ImplicitLivestreamRecommendationData) {
-      console.log("🚀 ~ ImplicitDataRepository ~ constructor ~ data:", data)
-   }
+   constructor(private readonly data: ImplicitLivestreamRecommendationData) {}
 
    // Mainly using methods as to compute values on demand
    // If performance becomes an issue due to multiple usages and always computing on demand
@@ -18,10 +16,6 @@ export class ImplicitDataRepository {
    // Interacted Livestreams
 
    public getInteractedEventsCompanyCountries(): string[] {
-      console.log(
-         "🚀 ~ ImplicitDataRepository ~ getInteractedEventsCompanyCountries:",
-         this.data
-      )
       return (
          this.data.watchedLivestreams?.flatMap(
             (event) => event.companyCountries
