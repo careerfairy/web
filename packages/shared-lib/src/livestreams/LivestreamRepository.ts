@@ -1522,7 +1522,6 @@ export class FirebaseLivestreamRepository
       limit: number,
       ignoreIds?: string[]
    ): Promise<UserLivestreamData[]> {
-      console.log("🚀 ~ userId:", userId)
       const query = await this.firestore
          .collectionGroup("userLivestreamData")
          .where("user.id", "==", userId)
@@ -1594,7 +1593,6 @@ export class FirebaseLivestreamRepository
       const userRecordingData = recordingData.slice(0, limit)
 
       const ignoreIds = userRecordingData.map((data) => data.livestreamId)
-      console.log("🚀 ~ ignoreIds:", ignoreIds)
 
       const userLivestreamParticipatingData = await this.getUserLivestreamData(
          userId,
