@@ -1,6 +1,11 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
+import {
+   EmailNotification,
+   EmailNotificationType,
+} from "@careerfairy/shared-lib/notifications/notifications"
 import { UserData } from "@careerfairy/shared-lib/users"
 import {
    getDateDifferenceInDays,
@@ -8,15 +13,10 @@ import {
 } from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IGroupFunctionsRepository } from "../../GroupFunctionsRepository"
-import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
-import { IRecommendationDataFetcher } from "../../recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
 import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
-import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
-import {
-   EmailNotification,
-   EmailNotificationType,
-} from "@careerfairy/shared-lib/notifications/notifications"
+import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
+import { IRecommendationDataFetcher } from "../../recommendation/services/DataFetcherRecommendations"
+import { NewsletterEmailBuilder } from "../NewsletterEmailBuilder"
 
 const TOLERANCE_DAYS = 2
 /**
@@ -180,6 +180,7 @@ export class NewsletterService {
                user,
                this.futureLivestreams,
                this.pastLivestreams,
+               null, // TODO: Add implicit data
                false
             )
 

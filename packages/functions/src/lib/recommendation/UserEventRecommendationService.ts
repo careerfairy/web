@@ -28,7 +28,7 @@ export default class UserEventRecommendationService
       private readonly user: UserData,
       private readonly futureLivestreams: LivestreamEvent[],
       private readonly pastLivestreams: LivestreamEvent[],
-      private readonly implicitData: ImplicitLivestreamRecommendationData,
+      private readonly implicitData?: ImplicitLivestreamRecommendationData,
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
       debug = true
