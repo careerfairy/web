@@ -21,12 +21,6 @@ export class RecommendationsBuilder {
          uniqueEvents
       ).slice(0, this.limit)
 
-      rankedLivestreams.forEach((l) => {
-         console.log(
-            `🚀 ~ RecommendationsBuilder POINTS ~ ${l.model.id}: {jobs: ${l.model.hasJobs}, popularity: ${l.model.popularity}} -> `,
-            l.getPoints()
-         )
-      })
       return rankedLivestreams
    }
 }

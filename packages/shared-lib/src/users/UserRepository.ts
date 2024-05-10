@@ -184,7 +184,7 @@ export interface IUserRepository {
       notificationId: string
    ): Promise<void>
 
-   getUserSeenSparks(userEmail: string): Promise<SeenSparks>
+   getUserSeenSparks(userEmail: string): Promise<SeenSparks[]>
 
    getCustomJobApplications(
       userId: string,
@@ -837,7 +837,7 @@ export class FirebaseUserRepository
       })
    }
 
-   async getUserSeenSparks(userEmail: string): Promise<SeenSparks> {
+   async getUserSeenSparks(userEmail: string): Promise<SeenSparks[]> {
       const query = this.firestore
          .collection("userData")
          .doc(userEmail)
@@ -846,8 +846,14 @@ export class FirebaseUserRepository
 
       const dataSnapshot = await query.get()
 
-      return mapFirestoreDocuments<SeenSparks>(dataSnapshot)?.at(0)
-      // return dataSnapshot.docs?.map( doc => doc.data() as SeenSparks)?.at(0)
+      const sortedSeenSparks = mapFirestoreDocuments<SeenSparks>(
+         dataSnapshot
+      )?.sort(
+         (baseDoc, comparisonDoc) =>
+            Number(comparisonDoc.id) - Number(baseDoc.id)
+      )
+
+      return sortedSeenSparks
    }
 }
 
