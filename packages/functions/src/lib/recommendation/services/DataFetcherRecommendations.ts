@@ -1,16 +1,17 @@
+import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
-import { BundleLoader } from "../../bundleLoader"
 import {
    LikedSparks,
    SeenSparks,
    SharedSparks,
+   Spark,
    SparkStats,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
-
+import { BundleLoader } from "../../bundleLoader"
 /**
  * Interface that holds the contract that fetches data for
  * the recommendation service
@@ -21,6 +22,8 @@ export interface IRecommendationDataFetcher {
    getPastLivestreams(): Promise<LivestreamEvent[]>
 
    getUser(): Promise<UserData>
+
+   getWatchedSparks(userId: string): Promise<Spark[]>
 }
 
 /**
@@ -29,7 +32,11 @@ export interface IRecommendationDataFetcher {
  * Useful when generating the newsletters, generic data for all users
  */
 export class NewsletterDataFetcher implements IRecommendationDataFetcher {
-   constructor(private readonly loader: BundleLoader) {}
+   constructor(
+      private readonly loader: BundleLoader,
+      private readonly userRepo: IUserRepository,
+      private readonly sparksRepo: ISparkFunctionsRepository
+   ) {}
 
    getUser(): Promise<UserData> {
       // no need to fetch the user here
@@ -45,7 +52,31 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
       return this.loader.getDocs<LivestreamEvent>("past-livestreams-query")
    }
 
-   static async create(): Promise<NewsletterDataFetcher> {
+   async getWatchedSparks(userId: string): Promise<Spark[]> {
+      // fetch the last 10 registered livestreams for this user only
+      const seenSparks = await this.userRepo.getUserSeenSparks(userId)
+
+      if (!seenSparks) return []
+
+      const sparkIds = sortSeenSparks(seenSparks, 10)
+
+      const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
+
+      // Re sort ensuring order stays the same after fetching data
+      const sortedSparks = (sparks || []).sort((baseSpark, comparisonSpark) => {
+         const baseSortedIndex = sparkIds.indexOf(baseSpark.id)
+         const comparisonSortedIndex = sparkIds.indexOf(comparisonSpark.id)
+
+         return baseSortedIndex - comparisonSortedIndex
+      })
+
+      return sortedSparks
+   }
+
+   static async create(
+      userRepo: IUserRepository,
+      sparksRepo: ISparkFunctionsRepository
+   ): Promise<NewsletterDataFetcher> {
       const loader = new BundleLoader()
 
       // fetch the bundles data from remote cdn
@@ -54,7 +85,7 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
          loader.fetch("pastYearLivestreams"),
       ])
 
-      return new NewsletterDataFetcher(loader)
+      return new NewsletterDataFetcher(loader, userRepo, sparksRepo)
    }
 }
 
@@ -68,7 +99,8 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
    constructor(
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
-      private readonly userRepo: IUserRepository
+      private readonly userRepo: IUserRepository,
+      private readonly sparksRepo: ISparkFunctionsRepository
    ) {
       this.loader = new BundleLoader()
    }
@@ -91,7 +123,65 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
          limit: 10,
       })
    }
+
+   async getWatchedSparks(userId: string): Promise<Spark[]> {
+      // fetch the last 10 registered livestreams for this user only
+      const seenSparks = await this.userRepo.getUserSeenSparks(userId)
+
+      if (!seenSparks) return []
+
+      const sparkIds = sortSeenSparks(seenSparks, 10)
+
+      const sparks = await this.sparksRepo.getSparksByIds(sparkIds)
+
+      // Re sort ensuring order stays the same after fetching data
+      const sortedSparks = (sparks || []).sort((baseSpark, comparisonSpark) => {
+         const baseSortedIndex = sparkIds.indexOf(baseSpark.id)
+         const comparisonSortedIndex = sparkIds.indexOf(comparisonSpark.id)
+
+         return baseSortedIndex - comparisonSortedIndex
+      })
+
+      return sortedSparks
+   }
 }
+
+const sortSparksMapIds = (sparks: {
+   [sparkId: string]: Timestamp
+}): string[] => {
+   const keys = Object.keys(sparks)
+
+   if (!keys.length) return []
+   const sortedSparks = keys
+      .map((sparkId) => {
+         return {
+            sparkId: sparkId,
+            seenTimestamp: sparks[sparkId],
+         }
+      })
+      .sort(sortSparksBySeenTimestamp)
+
+   return sortedSparks.map((sortedSpark) => sortedSpark.sparkId)
+}
+
+const sortSeenSparks = (seenSparks: SeenSparks[], limit: number): string[] => {
+   const allSparks = seenSparks
+      .flatMap((seenSpark) => {
+         const sortedSparkIds = sortSparksMapIds(seenSpark.sparks)
+         return sortedSparkIds.map((id) => {
+            return {
+               sparkId: id,
+               seenTimestamp: seenSpark.sparks[id],
+            }
+         })
+      })
+      .sort(sortSparksBySeenTimestamp)
+
+   return allSparks.map((sortedSpark) => sortedSpark.sparkId).slice(0, limit)
+}
+
+const sortSparksBySeenTimestamp = (baseSpark, comparisonSpark) =>
+   comparisonSpark.seenTimestamp.toMillis() - baseSpark.seenTimestamp.toMillis()
 
 export class SparksDataFetcher {
    private loader: BundleLoader

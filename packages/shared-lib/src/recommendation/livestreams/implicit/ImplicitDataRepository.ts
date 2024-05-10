@@ -47,24 +47,44 @@ export class ImplicitDataRepository {
 
    public getInteractedEventsLanguages(): string[] {
       return (
-         this.data.watchedLivestreams?.flatMap(
-            (event) => event.language?.code
-         ) || []
+         this.data.watchedLivestreams?.map((event) => event.language?.code) ||
+         []
       )
    }
 
    // Watched Sparks
 
    public getWatchedSparksCompanyCountries(): string[] {
-      return this.data.watchedSparks?.map(
-         (spark) => spark.group?.companyCountry?.id
-      )
+      return this.data.watchedSparks
+         ?.map((spark) => spark.group?.companyCountry?.id)
+         .filter(Boolean)
    }
 
    public getWatchedSparksCompanyIndustries(): string[] {
-      return this.data.watchedSparks?.flatMap((spark) =>
-         spark.group?.companyIndustries?.map((industry) => industry.id)
+      console.log(
+         "🚀 ~ ImplicitDataRepository ~ industries ~ this.data.watchedSparks:",
+         this.data.watchedSparks?.map((s) => {
+            return {
+               id: s.id,
+               indus: s.group?.companyIndustries?.map(
+                  (industry) => industry.id
+               ),
+            }
+         })
       )
+      // Using variable for debugging
+      const industries =
+         this.data.watchedSparks
+            ?.flatMap((spark) => {
+               return spark.group?.companyIndustries?.map(
+                  (industry) => industry.id
+               )
+            })
+            ?.filter(Boolean) || []
+
+      console.log("🚀 ~ IMPLICIT INDUSTRIES -> :", industries)
+
+      return this.uniqueArray(industries)
    }
 
    public getWatchedSparksCompanySizes(): string[] {
@@ -88,6 +108,12 @@ export class ImplicitDataRepository {
    public getAppliedJobsCompanySizes(): string[] {
       return this.data.appliedJobs?.map(
          (jobApplication) => jobApplication.companySize
+      )
+   }
+
+   private uniqueArray<T>(items: T[]) {
+      return items.filter(
+         (value, index, array) => array.indexOf(value) === index
       )
    }
 }
