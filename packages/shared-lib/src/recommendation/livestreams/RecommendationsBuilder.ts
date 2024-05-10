@@ -23,7 +23,9 @@ export class RecommendationsBuilder {
 
       rankedLivestreams.forEach((l) => {
          console.log(
-            `🚀 ~ RecommendationsBuilder POINTS ~ ${l.model.id} -> `,
+            `🚀 ~ RecommendationsBuilder POINTS ~ ${
+               l.model.id
+            }: {companySizes: ${l.getCompanySizes()},companyCountries: ${l.getCompanyCountries()} } -> `,
             l.getPoints()
          )
       })
