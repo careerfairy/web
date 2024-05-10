@@ -56,8 +56,6 @@ const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
    recordedEventsToShare,
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -72,13 +70,9 @@ const PortalPage = ({
    ] = useState<SerializedContent[]>([])
 
    const { sparks: seenSparks } = useUserSeenSparks()
+   console.log("🚀 ~ seenSparks:", seenSparks)
    const { jobApplications } = useUserCustomJobApplications()
-
    const { events: interactedEvents } = useInteractedLivestreams()
-
-   console.log("🚀 ~ watchedSparks: ", seenSparks)
-   console.log("🚀 ~ jobApplications: ", jobApplications)
-   console.log("🚀 ~ interactedEvents:", interactedEvents)
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds

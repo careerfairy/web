@@ -43,7 +43,6 @@ type UpdateRecordingStatsProps = {
    userId?: string
    onlyIncrementMinutes?: boolean
    usedCredits?: boolean
-   viewedAt?: Timestamp
 }
 
 export type PastEventsOptions = {
@@ -362,6 +361,16 @@ export interface ILivestreamRepository {
     */
    syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
 
+   /**
+    * Fetches the users latest interacted livestreams, with interacted meaning all livestreams which the user
+    * has either participated or watched a recording of.
+    * This method implements sorting of the interacted livestreams via the participation date or recording viewing date.
+    * A precedence is taken for the recording date if the user has participated in the livestream as well. Meaning all the fetched participated
+    * user livestreams MUST IGNORE the livestreams for which the user has seen the recordings, since the recordings will always be more recent than the
+    * livestream participation date.
+    * @param userId ID of the user
+    * @param limit Limit number of items to retrieve
+    */
    getUserInteractedLivestreams(
       userId: string,
       limit?: number
@@ -1226,7 +1235,6 @@ export class FirebaseLivestreamRepository
       userId,
       onlyIncrementMinutes,
       usedCredits,
-      viewedAt,
    }: UpdateRecordingStatsProps) {
       const docRef = this.firestore
          .collection("livestreams")
@@ -1242,10 +1250,6 @@ export class FirebaseLivestreamRepository
          ) as unknown as number,
          viewers: this.fieldValue.arrayUnion(userId) as unknown as string[],
          views: this.fieldValue.increment(1) as unknown as number,
-      }
-
-      if (viewedAt) {
-         details.viewersLastSeenAt[userId] = viewedAt
       }
 
       if (usedCredits) {
@@ -1526,23 +1530,16 @@ export class FirebaseLivestreamRepository
       ignoreIds?: string[]
    ): Promise<UserLivestreamData[]> {
       console.log("🚀 ~ userId:", userId)
-      let query = await this.firestore
+      const query = await this.firestore
          .collectionGroup("userLivestreamData")
          .where("user.id", "==", userId)
+         .orderBy("participated.date", "desc")
          .limit(limit)
 
-      // if (ignoreIds?.length) {
-      //    query = query.where("livestreamId", "not-in", ignoreIds)
-      // }
-
-      query = query.orderBy("participated.date", "desc").limit(limit)
-
       const snap = await query.get()
-      console.log("🚀 ~ getUserLivestreamData count:", snap.docs?.length)
 
       return (
          mapFirestoreDocuments<UserLivestreamData>(snap)?.filter((data) => {
-            console.log("🚀 ~ filtering->data:", data.livestreamId)
             return !ignoreIds?.includes(data.livestreamId)
          }) || []
       )
@@ -1567,6 +1564,7 @@ export class FirebaseLivestreamRepository
          // Meaning if a user has watched multiple recordings for the same livestream in several hours
          // only the last hour data will be considered
          const filteredStats = recordingStats.filter((stat) => {
+            // Find other recording stats for the same user and livestream
             const otherHourViews = recordingStats.filter((recordingStat) => {
                return (
                   recordingStat.userId == stat.userId &&
@@ -1576,6 +1574,7 @@ export class FirebaseLivestreamRepository
             })
 
             if (otherHourViews.length) {
+               // Check if any other recording stats has a more recent date
                const hasMoreRecent = otherHourViews.find((recordingStat) => {
                   return recordingStat.date.toMillis() > stat.date.toMillis()
                })
@@ -1583,6 +1582,7 @@ export class FirebaseLivestreamRepository
                return !hasMoreRecent
             }
 
+            // Keep this recording
             return true
          })
 
@@ -1624,15 +1624,6 @@ export class FirebaseLivestreamRepository
                }
             })
          )
-      console.log(
-         "🚀 ~ allLivestreamData:",
-         allLivestreamData?.map((d) => {
-            return {
-               id: d.livestreamId,
-               date: d.date.toDate().toISOString(),
-            }
-         })
-      )
 
       const sortedLivestreamsIds = allLivestreamData
          .sort((baseLivestreamData, comparisonLivestreamData) => {
@@ -1661,7 +1652,6 @@ export class FirebaseLivestreamRepository
          }
       )
       return sortedLivestreams
-      // return []
    }
 }
 
