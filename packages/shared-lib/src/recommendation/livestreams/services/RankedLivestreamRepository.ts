@@ -394,7 +394,7 @@ export class RankedLivestreamRepository {
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_WATCHED_SPARKS_COMPANY_COUNTRY_MATCH,
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_COUNTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [countryCodes],
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
@@ -407,16 +407,22 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyIndustries",
-         [industryIds],
+         industryIds,
          limit
+      )
+
+      console.log(
+         "🚀 ~ GET EVENTS IMPLICIT INDUSTRIES ~ industryIds, events:",
+         industryIds,
+         events.map((e) => e.id)
       )
 
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_WATCHED_SPARKS_COMPANY_INDUSTRY_MATCH,
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_INDUSTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [industryIds],
+         targetUserIds: industryIds,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
       })
    }
@@ -434,7 +440,7 @@ export class RankedLivestreamRepository {
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_WATCHED_SPARKS_COMPANY_SIZE_MATCH,
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
          targetUserIds: [companySizes],
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
@@ -454,7 +460,7 @@ export class RankedLivestreamRepository {
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_APPLIED_JOB_COMPANY_COUNTRY_MATCH,
+               .POINTS_PER_APPLIED_JOB_COMPANY_COUNTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [countryCodes],
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
@@ -474,7 +480,7 @@ export class RankedLivestreamRepository {
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_APPLIED_JOB_COMPANY_INDUSTRY_MATCH,
+               .POINTS_PER_APPLIED_JOB_COMPANY_INDUSTRY_MATCH,
          rankedLivestreams: events,
          targetUserIds: [industryIds],
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
@@ -494,7 +500,7 @@ export class RankedLivestreamRepository {
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
-               .POINTS_PER_INTERACTED_APPLIED_JOB_COMPANY_SIZE_MATCH,
+               .POINTS_PER_APPLIED_JOB_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
          targetUserIds: [companySizes],
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
@@ -509,6 +515,13 @@ export class RankedLivestreamRepository {
       return this.livestreams
          .filter((stream) => {
             const streamArrayField = stream.model[field]
+            if (field == "companyIndustries")
+               console.log(
+                  "🚀 ~ RankedLivestreamRepository ~ .filter ~ id,streamArrayField,values:",
+                  stream.model.id,
+                  streamArrayField,
+                  values
+               )
             if (!streamArrayField || !Array.isArray(streamArrayField))
                return false
 

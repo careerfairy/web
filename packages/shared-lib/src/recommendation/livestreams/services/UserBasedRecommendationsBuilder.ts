@@ -346,9 +346,9 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
     * @param valuesGetter Function for retrieving the data to fetch events from.
     * @param eventsGetter Function for retrieving events using the results from calling @param valuesGetter
     */
-   private addImplicitResults(
-      valuesGetter: (implicitDataRepo: ImplicitDataRepository) => string[],
-      eventsGetter: (values: string[]) => RankedLivestreamEvent[]
+   private addImplicitResults<T>(
+      valuesGetter: (implicitDataRepo: ImplicitDataRepository) => T[],
+      eventsGetter: (values: T[]) => RankedLivestreamEvent[]
    ) {
       if (this.implicitDataRepo) {
          const values = valuesGetter(this.implicitDataRepo)
