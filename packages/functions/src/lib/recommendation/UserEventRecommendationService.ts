@@ -6,6 +6,7 @@ import RecommendationServiceCore, {
 import { UserData } from "@careerfairy/shared-lib/users"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
 import {
@@ -27,6 +28,7 @@ export default class UserEventRecommendationService
       private readonly user: UserData,
       private readonly futureLivestreams: LivestreamEvent[],
       private readonly pastLivestreams: LivestreamEvent[],
+      private readonly implicitData: ImplicitLivestreamRecommendationData,
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
       debug = true
@@ -50,7 +52,8 @@ export default class UserEventRecommendationService
                this.getRecommendedEventsBasedOnUserData(
                   this.user,
                   this.futureLivestreams,
-                  10
+                  10,
+                  this.implicitData
                )
             )
          ),
@@ -138,10 +141,18 @@ export default class UserEventRecommendationService
          dataFetcher.getPastLivestreams(),
       ])
 
+      const watchedSparks = await dataFetcher.getWatchedSparks(user.userEmail)
+
+      const implicitData: ImplicitLivestreamRecommendationData = {
+         watchedSparks: watchedSparks,
+         watchedLivestreams: [],
+         appliedJobs: [],
+      }
       return new UserEventRecommendationService(
          user,
          futureLivestreams,
-         pastLivestreams
+         pastLivestreams,
+         implicitData
       )
    }
 }
