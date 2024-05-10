@@ -1636,8 +1636,12 @@ export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
 )
 
 export const getCountryOptionByCountryCode = (
-   countryCode: string
-): OptionGroup => {
+   countryCode?: string
+): OptionGroup | null => {
+   if (!countryCode) {
+      return null
+   }
+
    const countryOption = countriesOptionCodes.find(
       (option) => option.id.toLowerCase() === countryCode.toLowerCase()
    )
