@@ -9,10 +9,10 @@ import useFunctionsSWR, {
 const functionName = "getSparksByIds"
 
 /**
- * TODO: Add documentation and error notification
- * @param sparkIds
- * @param limit
- * @returns
+ * Retrieves sparks by the provided IDs
+ * @param sparkIds IDs of the Sparks to be fetched
+ * @param limit Limit of the items to be retrieved.
+ * @returns Sparks[], is loading and error
  */
 const useSparksByIds = (sparkIds: string[]) => {
    const fetcher = useFunctionsSWR()

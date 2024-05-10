@@ -57,13 +57,19 @@ export type SerializedContent =
  *   upcomingLivestreams: LivestreamEvent[],
  *   registeredRecordedLivestreamsForUser: LivestreamEvent[],
  *   userData?: UserData,
- *   userStats?: UserStats
+ *   userStats?: UserStats,
+ *   watchedLivestreams?: LivestreamEvent[],
+ *   watchedSparks?: Spark[],
+ *   appliedJobs?: CustomJobApplicant[]
  *   }
  *   - pastLivestreams: An array of past livestream events
  *   - upcomingLivestreams: An array of upcoming livestream events
  *   - registeredRecordedLivestreamsForUser: An array of recorded livestream events that the user has registered for
  *   - userData: The user's data
  *   - userStats: The user's stats
+ *   - watchedLivestreams: The user's latest watched livestreams, including recordings
+ *   - watchedSparks: The user's latest watched sparks
+ *   - appliedJobs: The user's latest applied jobs
  *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended livestream events
  *   */
 export class CarouselContentService {

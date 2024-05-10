@@ -6,6 +6,12 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
+/**
+ * Fetches the latest user interacted livestreams, which includes participated livestreams or
+ * livestreams which the user has seen a recording of.
+ * @param limit Limit of the items to fetch.
+ * @returns LivestreamEvent[] Collection of the latest livestreams for which the user has had an interaction.
+ */
 const useInteractedLivestreams = (limit?: number) => {
    if (!limit) limit = 10
 
@@ -27,7 +33,7 @@ const useInteractedLivestreams = (limit?: number) => {
          onError: (error, key) =>
             errorLogAndNotify(error, {
                message:
-                  "Error Fetching user Interacted Livestreams via function",
+                  "Error Fetching user Interacted Livestreams via cloud function",
                key,
             }),
          ...reducedRemoteCallsOptions,

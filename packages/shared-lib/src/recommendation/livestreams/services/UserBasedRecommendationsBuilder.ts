@@ -179,23 +179,9 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    public userImplicitInteractedEventsCompanyCountry() {
       this.addImplicitResults(
          (implicitDataRepo) => {
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ CALLED ~ implicitDataRepo:",
-               Boolean(implicitDataRepo)
-            )
-            const result =
-               implicitDataRepo.getInteractedEventsCompanyCountries()
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ userImplicitInteractedEventsCompanyCountry ~ result:",
-               result
-            )
-            return result
+            return implicitDataRepo.getInteractedEventsCompanyCountries()
          },
          (values) => {
-            console.log(
-               "🚀 ~ UserBasedRecommendationsBuilder ~ this.addImplicitResults ~ values:",
-               values
-            )
             return this.rankedLivestreamRepo.getEventsBasedOnImplicitEventsCompanyCountries(
                values,
                this.limit
@@ -203,9 +189,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
          }
       )
 
-      console.log(
-         "🚀 ~ UserBasedRecommendationsBuilder ~ userImplicitInteractedEventsCompanyCountry ~ ADDDED:"
-      )
       return this
    }
 
@@ -354,24 +337,24 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       return this
    }
 
+   /**
+    * Facilitates usage of implicit data, delegating the check of implicit date repository to this single method
+    * which also takes 2 functions as parameters, which when combined can be used to add to the results
+    * by calling this.addResults.
+    *
+    * Simplification of i.e this.userFollowedCompanies
+    * @param valuesGetter Function for retrieving the data to fetch events from.
+    * @param eventsGetter Function for retrieving events using the results from calling @param valuesGetter
+    */
    private addImplicitResults(
       valuesGetter: (implicitDataRepo: ImplicitDataRepository) => string[],
       eventsGetter: (values: string[]) => RankedLivestreamEvent[]
    ) {
       if (this.implicitDataRepo) {
-         console.log(
-            "🚀 ~ UserBasedRecommendationsBuilder ~ addImplicitResults ~ implicitDataRepo: "
-         )
          const values = valuesGetter(this.implicitDataRepo)
-         console.log(
-            "🚀 ~ UserBasedRecommendationsBuilder ~ addImplicitResults ~ values:",
-            values
-         )
          if (values?.length) {
             this.addResults(eventsGetter(values))
          }
-      } else {
-         console.log("🚀 ~ UBRB ~ addImplicitResults ~ no implicit data -> ")
       }
    }
 }
