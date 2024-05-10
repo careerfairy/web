@@ -1,3 +1,4 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
@@ -24,6 +25,10 @@ export interface IRecommendationDataFetcher {
    getUser(): Promise<UserData>
 
    getWatchedSparks(userId: string): Promise<Spark[]>
+
+   getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]>
+
+   getAppliedJobs(userId: string): Promise<CustomJobApplicant[]>
 }
 
 /**
@@ -35,7 +40,8 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
    constructor(
       private readonly loader: BundleLoader,
       private readonly userRepo: IUserRepository,
-      private readonly sparksRepo: ISparkFunctionsRepository
+      private readonly sparksRepo: ISparkFunctionsRepository,
+      private readonly livestreamRepo: ILivestreamRepository
    ) {}
 
    getUser(): Promise<UserData> {
@@ -50,6 +56,14 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
 
    getPastLivestreams(): Promise<LivestreamEvent[]> {
       return this.loader.getDocs<LivestreamEvent>("past-livestreams-query")
+   }
+
+   async getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]> {
+      return this.livestreamRepo.getUserInteractedLivestreams(userId, 10)
+   }
+
+   async getAppliedJobs(userId: string): Promise<CustomJobApplicant[]> {
+      return this.userRepo.getCustomJobApplications(userId, 10)
    }
 
    async getWatchedSparks(userId: string): Promise<Spark[]> {
@@ -75,7 +89,8 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
 
    static async create(
       userRepo: IUserRepository,
-      sparksRepo: ISparkFunctionsRepository
+      sparksRepo: ISparkFunctionsRepository,
+      livestreamRepo: ILivestreamRepository
    ): Promise<NewsletterDataFetcher> {
       const loader = new BundleLoader()
 
@@ -85,7 +100,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
          loader.fetch("pastYearLivestreams"),
       ])
 
-      return new NewsletterDataFetcher(loader, userRepo, sparksRepo)
+      return new NewsletterDataFetcher(
+         loader,
+         userRepo,
+         sparksRepo,
+         livestreamRepo
+      )
    }
 }
 
@@ -122,6 +142,14 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
          orderByDirection: "desc",
          limit: 10,
       })
+   }
+
+   async getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]> {
+      return this.livestreamRepo.getUserInteractedLivestreams(userId, 10)
+   }
+
+   async getAppliedJobs(userId: string): Promise<CustomJobApplicant[]> {
+      return this.userRepo.getCustomJobApplications(userId, 10)
    }
 
    async getWatchedSparks(userId: string): Promise<Spark[]> {

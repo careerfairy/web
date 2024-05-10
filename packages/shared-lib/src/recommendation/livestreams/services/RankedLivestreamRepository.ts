@@ -289,8 +289,13 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyCountries",
-         [countryCodes],
+         countryCodes,
          limit
+      )
+      console.log(
+         "🚀 ~ INTERACTED EVENTS COMPANY CODES ~ countryCodes,events:",
+         countryCodes,
+         events?.map((e) => e.id)
       )
 
       return this.rankEvents({
@@ -298,7 +303,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_INTERACTED_EVENT_COMPANY_COUNTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [countryCodes],
+         targetUserIds: countryCodes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
       })
    }
@@ -309,8 +314,13 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyIndustries",
-         [industryIds],
+         industryIds,
          limit
+      )
+      console.log(
+         "🚀 ~ getEventsBasedOnImplicitEventsCompanyIndustries ~ industryIds,events:",
+         industryIds,
+         events
       )
 
       return this.rankEvents({
@@ -318,7 +328,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_INTERACTED_EVENT_COMPANY_INDUSTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [industryIds],
+         targetUserIds: industryIds,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
       })
    }
@@ -329,7 +339,7 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companySizes",
-         [companySizes],
+         companySizes,
          limit
       )
 
@@ -338,7 +348,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_INTERACTED_EVENT_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [companySizes],
+         targetUserIds: companySizes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
       })
    }
@@ -349,7 +359,7 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "interestsIds",
-         [interestIds],
+         interestIds,
          limit
       )
 
@@ -358,7 +368,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_INTERACTED_EVENT_COMPANY_INTERESTS_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [interestIds],
+         targetUserIds: interestIds,
          targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
       })
    }
@@ -387,8 +397,13 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyCountries",
-         [countryCodes],
+         countryCodes,
          limit
+      )
+      console.log(
+         "🚀 ~ WATCHED SPARKS COUNTRIES ~ countryCodes,events:",
+         countryCodes,
+         events?.map((e) => e.id)
       )
 
       return this.rankEvents({
@@ -396,7 +411,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_WATCHED_SPARKS_COMPANY_COUNTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [countryCodes],
+         targetUserIds: countryCodes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
       })
    }
@@ -409,12 +424,6 @@ export class RankedLivestreamRepository {
          "companyIndustries",
          industryIds,
          limit
-      )
-
-      console.log(
-         "🚀 ~ GET EVENTS IMPLICIT INDUSTRIES ~ industryIds, events:",
-         industryIds,
-         events.map((e) => e.id)
       )
 
       return this.rankEvents({
@@ -433,16 +442,20 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companySizes",
-         [companySizes],
+         companySizes,
          limit
       )
-
+      console.log(
+         "🚀 ~ WATCHED SPARKS COMPANY SIZES ~ companySizes,events:",
+         companySizes,
+         events?.map((e) => e.id)
+      )
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_WATCHED_SPARKS_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [companySizes],
+         targetUserIds: companySizes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
       })
    }
@@ -453,7 +466,7 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyCountries",
-         [countryCodes],
+         countryCodes,
          limit
       )
 
@@ -462,7 +475,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_APPLIED_JOB_COMPANY_COUNTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [countryCodes],
+         targetUserIds: countryCodes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
       })
    }
@@ -473,7 +486,7 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companyIndustries",
-         [industryIds],
+         industryIds,
          limit
       )
 
@@ -482,7 +495,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_APPLIED_JOB_COMPANY_INDUSTRY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [industryIds],
+         targetUserIds: industryIds,
          targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
       })
    }
@@ -493,8 +506,14 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "companySizes",
-         [companySizes],
+         companySizes,
          limit
+      )
+
+      console.log(
+         "🚀 ~ APPLIED JOBS COMPANY SIZES ~ companySizes,events:",
+         companySizes,
+         events?.map((e) => e.id)
       )
 
       return this.rankEvents({
@@ -502,7 +521,7 @@ export class RankedLivestreamRepository {
             RECOMMENDATION_POINTS.IMPLICIT
                .POINTS_PER_APPLIED_JOB_COMPANY_SIZE_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [companySizes],
+         targetUserIds: companySizes,
          targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
       })
    }
@@ -515,13 +534,13 @@ export class RankedLivestreamRepository {
       return this.livestreams
          .filter((stream) => {
             const streamArrayField = stream.model[field]
-            if (field == "companyIndustries")
-               console.log(
-                  "🚀 ~ RankedLivestreamRepository ~ .filter ~ id,streamArrayField,values:",
-                  stream.model.id,
-                  streamArrayField,
-                  values
-               )
+            // if (field == "companyIndustries")
+            //    console.log(
+            //       "🚀 ~ RankedLivestreamRepository ~ .filter ~ id,streamArrayField,values:",
+            //       stream.model.id,
+            //       streamArrayField,
+            //       values
+            //    )
             if (!streamArrayField || !Array.isArray(streamArrayField))
                return false
 

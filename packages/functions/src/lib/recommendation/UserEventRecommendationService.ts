@@ -141,13 +141,18 @@ export default class UserEventRecommendationService
          dataFetcher.getPastLivestreams(),
       ])
 
-      const watchedSparks = await dataFetcher.getWatchedSparks(user.userEmail)
+      const [watchedSparks, interactedEvents, appliedJobs] = await Promise.all([
+         dataFetcher.getWatchedSparks(user.userEmail),
+         dataFetcher.getInteractedLivestreams(user.userEmail),
+         dataFetcher.getAppliedJobs(user.userEmail),
+      ])
 
       const implicitData: ImplicitLivestreamRecommendationData = {
          watchedSparks: watchedSparks,
-         watchedLivestreams: [],
-         appliedJobs: [],
+         watchedLivestreams: interactedEvents,
+         appliedJobs: appliedJobs,
       }
+
       return new UserEventRecommendationService(
          user,
          futureLivestreams,
