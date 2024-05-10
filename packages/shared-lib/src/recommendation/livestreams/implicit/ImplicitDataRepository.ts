@@ -16,62 +16,78 @@ export class ImplicitDataRepository {
    // Interacted Livestreams
 
    public getInteractedEventsCompanyCountries(): string[] {
-      return (
+      const countryIds = (
          this.data.watchedLivestreams?.flatMap(
             (event) => event.companyCountries
          ) || []
-      )
+      )?.filter(Boolean)
+
+      return this.uniqueArray(countryIds)
    }
 
    public getInteractedEventsCompanyIndustries(): string[] {
-      return (
-         this.data.watchedLivestreams?.flatMap(
-            (event) => event.companyIndustries
-         ) || []
+      const industryIds = this.uniqueArray(
+         (
+            this.data.watchedLivestreams?.flatMap(
+               (event) => event.companyIndustries
+            ) || []
+         )?.filter(Boolean)
       )
+
+      return industryIds
    }
 
    public getInteractedEventsCompanySizes(): string[] {
-      return (
-         this.data.watchedLivestreams?.flatMap((event) => event.companySizes) ||
-         []
+      const sizes = this.uniqueArray(
+         (
+            this.data.watchedLivestreams?.flatMap(
+               (event) => event.companySizes
+            ) || []
+         )?.filter(Boolean) || []
       )
+      return sizes
    }
 
    public getInteractedEventsInterests(): string[] {
-      return (
-         this.data.watchedLivestreams?.flatMap((event) => event.interestsIds) ||
-         []
+      const interestIds = this.uniqueArray(
+         (
+            this.data.watchedLivestreams?.flatMap(
+               (event) => event.interestsIds
+            ) || []
+         )?.filter(Boolean) || []
       )
+      return interestIds
    }
 
    public getInteractedEventsLanguages(): string[] {
-      return (
-         this.data.watchedLivestreams?.map((event) => event.language?.code) ||
-         []
+      const languageCodes = this.uniqueArray(
+         (
+            this.data.watchedLivestreams?.map(
+               (event) => event.language?.code
+            ) || []
+         )?.filter(Boolean) || []
       )
+      return languageCodes
    }
 
    // Watched Sparks
 
    public getWatchedSparksCompanyCountries(): string[] {
-      return this.data.watchedSparks
-         ?.map((spark) => spark.group?.companyCountry?.id)
-         .filter(Boolean)
+      const countryIds = this.uniqueArray(
+         this.data.watchedSparks
+            ?.map((spark) => spark.group?.companyCountry?.id)
+            .filter(Boolean) || []
+      )
+
+      console.log(
+         "🚀 ~ ImplicitDataRepository ~ getWatchedSparksCompanyCountries ~ countryIds:",
+         countryIds
+      )
+
+      return countryIds
    }
 
    public getWatchedSparksCompanyIndustries(): string[] {
-      console.log(
-         "🚀 ~ ImplicitDataRepository ~ industries ~ this.data.watchedSparks:",
-         this.data.watchedSparks?.map((s) => {
-            return {
-               id: s.id,
-               indus: s.group?.companyIndustries?.map(
-                  (industry) => industry.id
-               ),
-            }
-         })
-      )
       // Using variable for debugging
       const industries =
          this.data.watchedSparks
@@ -82,33 +98,46 @@ export class ImplicitDataRepository {
             })
             ?.filter(Boolean) || []
 
-      console.log("🚀 ~ IMPLICIT INDUSTRIES -> :", industries)
-
       return this.uniqueArray(industries)
    }
 
    public getWatchedSparksCompanySizes(): string[] {
-      return this.data.watchedSparks?.map((spark) => spark.group?.companySize)
+      const sizes = this.uniqueArray(
+         this.data.watchedSparks
+            ?.map((spark) => spark.group?.companySize)
+            ?.filter(Boolean) || []
+      )
+      // console.log("🚀 ~ IMPLICIT SIZES:", sizes)
+      return sizes
    }
 
    // Applied Jobs
 
    public getAppliedJobsCompanyCountries(): string[] {
-      return this.data.appliedJobs?.map(
-         (jobApplication) => jobApplication.companyCountry
+      const countryIds = this.uniqueArray(
+         this.data.appliedJobs
+            ?.map((jobApplication) => jobApplication.companyCountry)
+            ?.filter(Boolean) || []
       )
+      return countryIds
    }
 
    public getAppliedJobsCompanyIndustries(): string[] {
-      return this.data.appliedJobs?.flatMap(
-         (jobApplication) => jobApplication.companyIndustries
+      const appliedJobs = this.uniqueArray(
+         this.data.appliedJobs
+            ?.flatMap((jobApplication) => jobApplication.companyIndustries)
+            ?.filter(Boolean) || []
       )
+      return appliedJobs
    }
 
    public getAppliedJobsCompanySizes(): string[] {
-      return this.data.appliedJobs?.map(
-         (jobApplication) => jobApplication.companySize
+      const sizes = this.uniqueArray(
+         this.data.appliedJobs
+            ?.map((jobApplication) => jobApplication.companySize)
+            ?.filter(Boolean) || []
       )
+      return sizes
    }
 
    private uniqueArray<T>(items: T[]) {
