@@ -1,11 +1,6 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
-
-export enum ChatAuthor {
-   Viewer = "Viewer",
-   Streamer = "Streamer",
-   CareerFairy = "CareerFairy",
-}
+import { UserType } from "../../util"
 
 export const getIsMe = (
    entry: LivestreamChatEntry,
@@ -30,10 +25,10 @@ export const getIsCareerFairy = (entry: LivestreamChatEntry) => {
 
 export const getChatAuthor = (entry: LivestreamChatEntry) => {
    if (getIsCareerFairy(entry)) {
-      return ChatAuthor.CareerFairy
+      return UserType.CareerFairy
    }
    if (getIsHost(entry)) {
-      return ChatAuthor.Streamer
+      return UserType.Streamer
    }
-   return ChatAuthor.Viewer
+   return UserType.Viewer
 }
