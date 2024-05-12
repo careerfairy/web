@@ -16,6 +16,13 @@ import dotenv = require("dotenv")
 // load values from the .env file in this directory into process.env
 dotenv.config()
 
+// to prevent import issue
+import { bundles } from "./bundles"
+import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
+import { knownIndexes } from "./lib/search/searchIndexes"
+import * as streaming from "./lib/streaming"
+
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -42,8 +49,6 @@ import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
 import onDeleteTriggers = require("./onDeleteTriggers")
-import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
-import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 import groupSparks = require("./groupSparks")
@@ -53,12 +58,9 @@ import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
 import groupPlans = require("./groupPlans")
 import search = require("./search")
-import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
-import { knownIndexes } from "./lib/search/searchIndexes"
 import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
-import * as streaming from "./lib/streaming"
 import stripe = require("./stripe")
 
 // Auth
@@ -252,7 +254,7 @@ exports.removeAndSyncUserSparkNotification_v2 =
    notificationSparks.removeAndSyncUserSparkNotification
 
 // User Spark Functions
-exports.getSparksFeed_v3 = userSparks.getSparksFeed
+exports.getSparksFeed_v4 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
 
 // Spark Analytics Functions
