@@ -1,3 +1,6 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
+import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
 import {
    SerializedSpark,
    SparkPresenter,
@@ -20,31 +23,29 @@ import {
    SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/telemetry"
+import { UserData, UserSparksNotification } from "@careerfairy/shared-lib/users"
 import {
+   PartialWithFieldValue,
    Query,
+   Timestamp,
    collection,
+   collectionGroup,
+   deleteField,
    doc,
+   getCountFromServer,
    getDoc,
    getDocs,
    limit,
    orderBy,
    query,
-   startAfter,
-   where,
-   getCountFromServer,
-   collectionGroup,
-   Timestamp,
-   deleteField,
    setDoc,
-   PartialWithFieldValue,
+   startAfter,
    updateDoc,
+   where,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import { DateTime } from "luxon"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
-import { UserData, UserSparksNotification } from "@careerfairy/shared-lib/users"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class SparksService {
    constructor(private readonly functions: Functions) {}
@@ -89,15 +90,23 @@ export class SparksService {
     * - If the user does not have a feed, a feed will be lazily created and returned
     */
    async fetchFeed(data: GetFeedData) {
-      const { data: serializedSparks } = await httpsCallable<
+      const {
+         data: { sparks: serializedSparks, anonymousUserCountryCode },
+      } = await httpsCallable<
          GetFeedData,
-         SerializedSpark[]
+         {
+            sparks: SerializedSpark[]
+            anonymousUserCountryCode?: string
+         }
       >(
          this.functions,
-         "getSparksFeed_v3"
+         "getSparksFeed_v4"
       )(data)
 
-      return serializedSparks.map(SparkPresenter.deserialize)
+      return {
+         sparks: serializedSparks.map(SparkPresenter.deserialize),
+         anonymousUserCountryCode,
+      }
    }
    /**
     * Calls the trackSparkEvents cloud function with the provided data.
@@ -141,7 +150,7 @@ export class SparksService {
       lastSpark: SparkPresenter | Spark | null,
       options: GetFeedData = { userId: null }
    ): Promise<SparkPresenter[]> {
-      const { numberOfSparks = 10 } = options
+      const { numberOfSparks = 10, anonymousUserCountryCode = "" } = options
 
       const db = FirestoreInstance
 
@@ -172,6 +181,21 @@ export class SparksService {
       } else {
          // Query the public sparks feed
          baseQuery = query(collection(db, "sparks"))
+
+         if (anonymousUserCountryCode) {
+            const loggedOutCountry = getCountryOptionByCountryCode(
+               anonymousUserCountryCode
+            )
+
+            baseQuery = query(
+               baseQuery,
+               where(
+                  "group.targetedCountries",
+                  "array-contains",
+                  loggedOutCountry
+               )
+            )
+         }
       }
 
       // Filter the sparks by category if provided
