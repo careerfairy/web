@@ -1,6 +1,7 @@
 import { sparkService } from "data/firebase/SparksService"
 import { GetServerSideProps } from "next"
 import { encode } from "querystring"
+import { getUserTokenFromCookie } from "util/serverUtil"
 
 /**
  *  This page is used to redirect to the next spark if a user lands on the /sparks page.
@@ -11,10 +12,38 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-   const sparks = await sparkService.fetchNextSparks(null, {
-      numberOfSparks: 1,
-      userId: null,
-   })
+   const token = getUserTokenFromCookie(context)
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ token:",
+      token
+   )
+   let sparks = []
+
+   if (token?.email) {
+      console.log(
+         "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ token?.email:",
+         token?.email
+      )
+      sparks = await sparkService.fetchNextSparks(null, {
+         numberOfSparks: 1,
+         userId: token?.email,
+      })
+      console.log(
+         "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks:",
+         sparks
+      )
+   }
+
+   if (!sparks?.length) {
+      sparks = await sparkService.fetchNextSparks(null, {
+         numberOfSparks: 1,
+         userId: null,
+      })
+      console.log(
+         "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks:",
+         sparks
+      )
+   }
 
    const queryParamString = encode(context.query)
 
