@@ -1,4 +1,5 @@
 import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
 import * as yup from "yup"
 import { LivestreamFormGeneralTabValues } from "./types"
 
@@ -62,7 +63,10 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
             const wasPastLivestream =
                originalValue &&
                !parent.isDraft &&
-               new Date(originalValue) <= new Date(Date.now() - 1000 * 60 * 45)
+               new Date(originalValue) <=
+                  new Date(
+                     Date.now() - 1000 * 60 * UPCOMING_STREAM_THRESHOLD_MINUTES
+                  )
 
             if (wasPastLivestream) {
                return true

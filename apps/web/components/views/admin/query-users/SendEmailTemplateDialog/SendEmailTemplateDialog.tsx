@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import {
    Box,
    Button,
@@ -12,22 +14,18 @@ import {
    Stepper,
    useMediaQuery,
 } from "@mui/material"
-import { GlassDialog } from "materialUI/GlobalModals"
 import { useTheme } from "@mui/material/styles"
-import { useFirestore } from "react-redux-firebase"
-import {
-   FORTY_FIVE_MINUTES_IN_MILLISECONDS,
-   UPCOMING_LIVESTREAMS_NAME,
-} from "../../../../../data/constants/streamContants"
+import { GlassDialog } from "materialUI/GlobalModals"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
+import { useFirestore } from "react-redux-firebase"
+import { UPCOMING_LIVESTREAMS_NAME } from "../../../../../data/constants/streamContants"
+import { RootState } from "../../../../../store"
+import EventAutoSelect from "../../../common/EventAutoSelect"
+import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview"
 import EmailTemplateCard from "./EmailTemplateCard"
 import EmailTemplateForm from "./EmailTemplateForm"
 import useTemplates from "./templates"
-import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview"
-import EventAutoSelect from "../../../common/EventAutoSelect"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { RootState } from "../../../../../store"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 function getSteps() {
    return [
@@ -75,7 +73,7 @@ const EventSelectView = ({
             <Box marginRight="auto">
                <Button onClick={handleClose}>Close</Button>
             </Box>
-            {targetStream && (
+            {Boolean(targetStream) && (
                <Button variant="contained" color="primary" onClick={handleNext}>
                   Continue
                </Button>
@@ -116,7 +114,7 @@ const TemplateSelectView = ({
                <Button onClick={handleClose}>Close</Button>
             </Box>
             <Button onClick={handleBack}>Back</Button>{" "}
-            {targetTemplate && (
+            {Boolean(targetTemplate) && (
                <Button onClick={handleNext} color="primary" variant="contained">
                   Next
                </Button>
@@ -153,7 +151,7 @@ function getStepContent(stepIndex, props: TemplateDialogStepProps) {
          return "Unknown stepIndex"
    }
 }
-const targetTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
+const targetTime = new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS)
 
 interface ContentProps {
    queryOptions: BigQueryUserQueryOptions
@@ -168,6 +166,7 @@ const Content = ({ handleClose, totalUsers, queryOptions }: ContentProps) => {
    const steps = getSteps()
 
    useEffect(() => {
+      // eslint-disable-next-line no-extra-semi
       ;(async function () {
          await firestore.get({
             collection: "livestreams",
@@ -179,11 +178,13 @@ const Content = ({ handleClose, totalUsers, queryOptions }: ContentProps) => {
             storeAs: UPCOMING_LIVESTREAMS_NAME,
          })
       })()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    useEffect(() => {
       // if no event is selected please stay on the first step
       if (!targetStream) handleReset()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(targetStream)])
 
    const handleNext = () => {
