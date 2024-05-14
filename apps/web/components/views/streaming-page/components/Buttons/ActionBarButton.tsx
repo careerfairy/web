@@ -4,6 +4,7 @@ import { ComponentProps } from "react"
 
 type Props = {
    active?: boolean
+   enableTooltip?: boolean
 }
 
 export const ActionBarButtonStyled = styled(IconButton, {

@@ -937,6 +937,33 @@ export class LivestreamService {
    }
 
    /**
+    * Gets the company host of a live stream.
+    * @param livestreamId - Livestream id.
+    * @returns A promise resolved with the company Group or null if there are
+    * multiple hosts or the host is a university.
+    */
+   async getLivestreamHost(livestreamId: string) {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestreamSnapshot = await getDoc(livestreamRef)
+
+      if (!livestreamSnapshot.exists()) return null
+
+      const livestreamData = livestreamSnapshot.data()
+      if (!livestreamData.groupIds) return null
+
+      const groups = await groupRepo.getGroupsByIds(livestreamData.groupIds)
+      const companyGroups = groups.filter((group) => !group.universityCode)
+
+      const isSingleCompany = companyGroups?.length === 1
+
+      if (isSingleCompany) {
+         return companyGroups[0]
+      }
+
+      return null
+   }
+
+   /**
     * Starts a hand raise in
     * @param options - Hand raise options.
     * @returns A promise resolved with the result of the hand raise operation.

@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useStreamingContext } from "components/views/streaming-page/context"
@@ -29,11 +29,9 @@ export const BottomBar = () => {
    return <Box sx={styles.root}>{isHost ? <HostView /> : <ViewerView />}</Box>
 }
 
-const DividerComponent = () => <Divider orientation="vertical" flexItem />
-
 export const BottomBarActions = {
    ...AllActions,
-   SpeedDial: <ActionsSpeedDial key="SpeedDial" />,
+   SpeedDial: () => <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
 export type BottomBarActionName = keyof typeof BottomBarActions
@@ -63,10 +61,10 @@ const HostView = () => {
 
    return (
       <ActionsBar>
-         {getHostActionNames(isMobile).map(
-            (action, index) =>
-               BottomBarActions[action] || <DividerComponent key={index} />
-         )}
+         {getHostActionNames(isMobile).map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={index} />
+         })}
       </ActionsBar>
    )
 }
@@ -133,10 +131,10 @@ const ViewerView = () => {
 
    return (
       <ActionsBar>
-         {filteredActions.map(
-            (action, index) =>
-               BottomBarActions[action] || <DividerComponent key={index} />
-         )}
+         {filteredActions.map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={index} />
+         })}
       </ActionsBar>
    )
 }
