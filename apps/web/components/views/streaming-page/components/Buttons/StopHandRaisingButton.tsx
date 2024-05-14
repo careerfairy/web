@@ -1,10 +1,12 @@
 import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
-import { Box, Tooltip } from "@mui/material"
+import { Box } from "@mui/material"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import { forwardRef } from "react"
 import { Phone } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
@@ -23,13 +25,15 @@ const styles = sxStyles({
 export const StopHandRaisingButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { trigger: updateHandRaiseState, isMutating } =
       useUpdateUserHandRaiseState(livestreamId)
 
    return (
-      <Tooltip placement="top" title="Stop hand raise">
+      <BrandedTooltip
+         title={enableTooltip ? ActionTooltips.StopHandRaise : null}
+      >
          <ActionBarButtonStyled
             {...props}
             disabled={isMutating}
@@ -44,7 +48,7 @@ export const StopHandRaisingButton = forwardRef<
          >
             <Box component={Phone} />
          </ActionBarButtonStyled>
-      </Tooltip>
+      </BrandedTooltip>
    )
 })
 

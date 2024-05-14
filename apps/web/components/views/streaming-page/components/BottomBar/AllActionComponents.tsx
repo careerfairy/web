@@ -62,6 +62,7 @@ export const ActionTooltips = {
    CTA: "Send call to action",
    Share: "Share content",
    StopShare: "Stop sharing",
+   StopHandRaise: "Stop hand raise",
    MicMute: "Mute",
    MicUnmute: "Unmute",
    VideoTurnOff: "Switch camera off",
