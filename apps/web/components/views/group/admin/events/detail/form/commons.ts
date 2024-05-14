@@ -80,10 +80,19 @@ export const hashToColor = (id: string) => {
    return color
 }
 
-export const getFieldsOfStudyWithoutOtherOptions = (
+export const removeFieldOfStudyFromOptions = (
+   allFieldsOfStudy: FieldOfStudy[],
+   fieldOfStudyIdToRemove: FieldOfStudy["id"]
+) => {
+   return allFieldsOfStudy.filter(
+      (field) => field.id !== fieldOfStudyIdToRemove
+   )
+}
+
+export const getFieldsOfStudyWithoutOtherOption = (
    allFieldsOfStudy: FieldOfStudy[]
 ) => {
-   return allFieldsOfStudy.filter((field) => field.id !== OTHER_OPTION_ID)
+   return removeFieldOfStudyFromOptions(allFieldsOfStudy, OTHER_OPTION_ID)
 }
 
 const mapCreatorToSpeaker = (creator: Creator): Speaker => {
