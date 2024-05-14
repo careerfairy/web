@@ -1053,7 +1053,6 @@ class FirebaseService {
 
    getPastLiveStreamsByGroupId = (groupId) => {
       const START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
-      const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
       const ref = this.firestore
          .collection("livestreams")
          .where("test", "==", false)
@@ -1061,7 +1060,7 @@ class FirebaseService {
          .where(
             "start",
             "<",
-            new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS)
          )
          .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
          .orderBy("start", "desc")
@@ -2055,13 +2054,12 @@ class FirebaseService {
 
    getPastLivestreams = () => {
       const START_DATE_FOR_REPORTED_EVENTS = "September 1, 2020 00:00:00"
-      const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
       return this.firestore
          .collection("livestreams")
          .where(
             "start",
             "<",
-            new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS)
          )
          .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
          .where("test", "==", false)
@@ -2070,13 +2068,12 @@ class FirebaseService {
    }
 
    getUpcomingLivestreams = (limit) => {
-      const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
       let ref = this.firestore
          .collection("livestreams")
          .where(
             "start",
             ">",
-            new Date(Date.now() - fortyFiveMinutesInMilliseconds)
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS)
          )
          .where("test", "==", false)
          .orderBy("start", "asc")
