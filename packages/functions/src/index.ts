@@ -23,11 +23,6 @@ import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
 
 // Imported Individual Cloud functions
-import { bundles } from "./bundles"
-import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
-import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
-import { knownIndexes } from "./lib/search/searchIndexes"
-import * as streaming from "./lib/streaming"
 import auth = require("./auth")
 import agora = require("./agora")
 import backup = require("./backup")
