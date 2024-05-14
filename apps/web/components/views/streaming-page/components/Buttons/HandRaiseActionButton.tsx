@@ -13,6 +13,8 @@ import {
    useStreamHandRaiseEnabled,
 } from "store/selectors/streamingAppSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { ConfirmHandRaiseDialog } from "../hand-raise/ConfirmHandRaiseDialog"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
@@ -26,7 +28,7 @@ const styles = sxStyles({
 export const HandRaiseActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { handleSetActive, isActive } = useActiveSidePanelView(
       ActiveViews.HAND_RAISE
    )
@@ -72,24 +74,28 @@ export const HandRaiseActionButton = forwardRef<
 
    return (
       <Fragment>
-         <BrandedBadge
-            color="error"
-            badgeContent={numberOfHandRaiseNotifications || null}
+         <BrandedTooltip
+            title={enableTooltip ? ActionTooltips["Hand raise"] : null}
          >
-            <ActionBarButtonStyled
-               active={isActive}
-               onClick={handleClick}
-               ref={ref}
-               {...props}
-               sx={combineStyles(
-                  props.sx,
-                  userHandRaiseActive && !isHost && styles.handRaiseActive
-               )}
-               color="primary"
+            <BrandedBadge
+               color="error"
+               badgeContent={numberOfHandRaiseNotifications || null}
             >
-               <HandRaiseIcon />
-            </ActionBarButtonStyled>
-         </BrandedBadge>
+               <ActionBarButtonStyled
+                  active={isActive}
+                  onClick={handleClick}
+                  ref={ref}
+                  {...props}
+                  sx={combineStyles(
+                     props.sx,
+                     userHandRaiseActive && !isHost && styles.handRaiseActive
+                  )}
+                  color="primary"
+               >
+                  <HandRaiseIcon />
+               </ActionBarButtonStyled>
+            </BrandedBadge>
+         </BrandedTooltip>
          <ConfirmHandRaiseDialog
             handleClose={handleCloseHandRaiseDialog}
             open={Boolean(isHandRaiseDialogOpen && handRaiseIsActiveForViewer)}

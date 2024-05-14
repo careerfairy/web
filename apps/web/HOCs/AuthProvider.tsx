@@ -1,4 +1,15 @@
-import React, {
+import {
+   AuthUserCustomClaims,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/dist/users"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import * as Sentry from "@sentry/nextjs"
+import { clearFirestoreCache } from "data/util/authUtil"
+import dynamic from "next/dynamic"
+import { useRouter } from "next/router"
+import nookies from "nookies"
+import {
    createContext,
    useCallback,
    useContext,
@@ -6,31 +17,21 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { useRouter } from "next/router"
-import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
 import {
    FirebaseReducer,
    isLoaded,
    useFirestoreConnect,
 } from "react-redux-firebase"
-import { RootState } from "../store"
-import * as Sentry from "@sentry/nextjs"
-import nookies from "nookies"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import {
-   AuthUserCustomClaims,
-   UserData,
-   UserStats,
-} from "@careerfairy/shared-lib/dist/users"
-import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
+import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { RootState } from "../store"
+import CookiesUtil from "../util/CookiesUtil"
 import DateUtil from "../util/DateUtil"
 import { dataLayerUser } from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
-import { errorLogAndNotify } from "util/CommonUtil"
-import CookiesUtil from "../util/CookiesUtil"
-import { isAdminPath, isSecurePath, isSignupPath } from "util/AuthUtils"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -125,6 +126,7 @@ const AuthProvider = ({ children }) => {
             console.error(e)
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [auth, isLoggedIn, userData, pathname])
 
    // Backfill missing userData fields (if they don't exist)
@@ -133,7 +135,7 @@ const AuthProvider = ({ children }) => {
 
       const missingFields = ["referralCode", "timezone"]
 
-      let missingFromUserData = missingFields.filter(
+      const missingFromUserData = missingFields.filter(
          (missing) => !userData[missing]
       )
       if (missingFromUserData.length > 0) {
@@ -143,12 +145,13 @@ const AuthProvider = ({ children }) => {
          // There are missing fields
          firebaseService
             .backfillUserData({ timezone: browserTimezone })
-            .then((_) => console.log("Missing user data added."))
+            .then(() => console.log("Missing user data added."))
             .catch((e) => {
                Sentry.captureException(e)
                console.error(e)
             })
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData])
 
    const refetchClaims = useCallback(async () => {
@@ -199,6 +202,7 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
+            clearFirestoreCache()
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
