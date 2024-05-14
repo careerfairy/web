@@ -24,10 +24,13 @@ import {
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
    LivestreamPromotions,
-   LivestreamQuestion,
    UserLivestreamData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
+import {
+   UPCOMING_STREAM_THRESHOLD_MILLISECONDS,
+   UPCOMING_STREAM_THRESHOLD_MINUTES,
+} from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    TalentProfile,
@@ -52,10 +55,7 @@ import {
 import CookiesUtil from "../../util/CookiesUtil"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import { makeUrls } from "../../util/makeUrls"
-import {
-   FORTY_FIVE_MINUTES_IN_MILLISECONDS,
-   START_DATE_FOR_REPORTED_EVENTS,
-} from "../constants/streamContants"
+import { START_DATE_FOR_REPORTED_EVENTS } from "../constants/streamContants"
 import { clearFirestoreCache } from "../util/authUtil"
 import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
 import { recommendationServiceInstance } from "./RecommendationService"
@@ -308,7 +308,9 @@ class FirebaseService {
          startsAt: livestreamStartDate.toISOString(),
          endsAt: new Date(
             livestreamStartDate.getTime() +
-               (livestream.duration || 45) * 60 * 1000
+               (livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES) *
+                  60 *
+                  1000
          ).toISOString(),
       }
 
@@ -1074,7 +1076,7 @@ class FirebaseService {
          .where(
             "start",
             "<",
-            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS)
          )
          .where("start", ">", new Date(START_DATE_FOR_REPORTED_EVENTS))
          .orderBy("start", "desc")
@@ -2650,7 +2652,7 @@ class FirebaseService {
    isPastEvent = (eventStartDate) => {
       return (
          eventStartDate <
-            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS) &&
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS) &&
          eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
       )
    }
