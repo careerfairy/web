@@ -46,7 +46,7 @@ export async function run() {
       const livestreamsWithAnyFieldOfStudy = livestreams?.filter(
          (livestream) =>
             !livestream.targetFieldsOfStudy ||
-            livestream.targetFieldsOfStudy.length === 44
+            livestream.targetFieldsOfStudy.length === allFieldsOfStudy.length
       )
 
       const bulkWriter = firestore.bulkWriter()
