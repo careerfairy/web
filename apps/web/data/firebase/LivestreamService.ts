@@ -17,6 +17,7 @@ import {
    LivestreamMode,
    LivestreamModes,
    LivestreamPollVoter,
+   LivestreamPresentation,
    LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
@@ -62,7 +63,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, sanitizeFileName } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
@@ -1000,6 +1001,28 @@ export class LivestreamService {
          },
          { merge: true }
       )
+   }
+
+   setLivestreamPDFPresentation = async (
+      livestreamId: string,
+      downloadUrl: string,
+      file: File
+   ) => {
+      const ref = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "presentations",
+         "presentation"
+      ).withConverter(createGenericConverter<LivestreamPresentation>())
+
+      return setDoc(ref, {
+         downloadUrl: downloadUrl,
+         page: 1,
+         fileName: sanitizeFileName(file.name) || livestreamId,
+         fileSize: file.size || 0,
+         id: ref.id,
+      })
    }
 }
 

@@ -23,6 +23,7 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
+   LivestreamPresentation,
    LivestreamPromotions,
    UserLivestreamData,
    pickPublicDataFromLivestream,
@@ -969,16 +970,26 @@ class FirebaseService {
       })
    }
 
-   setLivestreamPresentation = (livestreamId, downloadUrl) => {
+   setLivestreamPresentation = (
+      livestreamId: string,
+      downloadUrl: string,
+      file: File
+   ) => {
       const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("presentations")
          .doc("presentation")
-      return ref.set({
+
+      const presentation: LivestreamPresentation = {
          downloadUrl: downloadUrl,
          page: 1,
-      })
+         fileName: file.name || livestreamId,
+         fileSize: file.size || 0,
+         id: ref.id,
+      }
+
+      return ref.set(presentation)
    }
 
    increaseLivestreamPresentationPageNumber = (

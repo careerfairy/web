@@ -7,6 +7,7 @@ import {
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { UserStream } from "../../../types"
+import { SpotlightPDF } from "./SpotlightPDF"
 import { SpotlightProvider } from "./SpotlightProvider"
 import { SpotlightStream } from "./SpotlightStream"
 
@@ -23,7 +24,7 @@ const styles = sxStyles({
 
 const Content = {
    [LivestreamModes.DESKTOP]: <SpotlightStream />,
-   [LivestreamModes.PRESENTATION]: <Box>Rendering PDF Spotlight Content</Box>,
+   [LivestreamModes.PRESENTATION]: <SpotlightPDF />,
    [LivestreamModes.VIDEO]: (
       <Box>Rendering YouTube Video Spotlight Content</Box>
    ),

@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from "react"
-import { pdfjs } from "react-pdf"
-import { Document, Page } from "react-pdf"
+import { Document, Page, pdfjs } from "react-pdf"
 
-import { useWindowSize } from "components/custom-hook/useWindowSize"
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight"
 import {
    Button,
    CircularProgress,
@@ -11,15 +11,14 @@ import {
    IconButton,
    LinearProgress,
 } from "@mui/material"
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight"
+import { useWindowSize } from "components/custom-hook/useWindowSize"
 
-import FilePickerContainer from "components/ssr/FilePickerContainer"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import Box from "@mui/material/Box"
-import AutoSizer from "react-virtualized-auto-sizer"
 import makeStyles from "@mui/styles/makeStyles"
+import FilePickerContainer from "components/ssr/FilePickerContainer"
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import AutoSizer from "react-virtualized-auto-sizer"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -68,6 +67,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             }
          )
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [livestreamId])
 
    function uploadLogo(logoFile) {
@@ -115,7 +115,11 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             uploadTask.snapshot.ref
                .getDownloadURL()
                .then(function (downloadURL) {
-                  firebase.setLivestreamPresentation(livestreamId, downloadURL)
+                  firebase.setLivestreamPresentation(
+                     livestreamId,
+                     downloadURL,
+                     logoFile
+                  )
                   console.log("File available at", downloadURL)
                   setUploadingPresentation(false)
                })
@@ -123,7 +127,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       )
    }
 
-   function getPageHeight(height, width) {
+   function getPageHeight(height) {
       if (showMenu) {
          if (windowSize.height > windowSize.width - 480) {
             return windowSize.width * 0.4

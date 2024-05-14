@@ -9,11 +9,15 @@ import {
    VideoIcon,
 } from "components/views/common/icons"
 
+import { useAppDispatch } from "components/custom-hook/store"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
-import { sxStyles } from "types/commonTypes"
-import { useScreenShare } from "../../context/ScreenShare"
+import { setUploadPDFPresentationDialogOpen } from "store/reducers/streamingAppReducer"
 import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
+import { useScreenShare } from "../../context/ScreenShare"
 
 const styles = sxStyles({
    root: {
@@ -62,9 +66,12 @@ type Props = MenuProps & {
 }
 
 export const ShareMenu = forwardRef<HTMLDivElement, Props>(
-   ({ handleClose, ...props }, ref) => {
+   ({ handleClose, open, ...props }, ref) => {
+      const dispatch = useAppDispatch()
       const { handleStopScreenShare, handleStartScreenShareProcess } =
          useScreenShare()
+      const { livestreamId } = useStreamingContext()
+      const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
 
       const mode = useLivestreamMode()
 
@@ -82,6 +89,11 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                }
                break
             case LivestreamModes.PRESENTATION:
+               if (active) {
+                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+               } else {
+                  dispatch(setUploadPDFPresentationDialogOpen(true))
+               }
                /**
                 * TODO:
                 * 1. Open PDF file picker
@@ -91,7 +103,6 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                 *
                 * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
                 */
-               alert("Share PDF not implemented yet")
                break
             case LivestreamModes.VIDEO:
                /**
@@ -111,6 +122,10 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
          handleClose()
       }
 
+      if (!open) {
+         return null
+      }
+
       return (
          <BrandedMenu
             {...props}
@@ -119,6 +134,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
             transformOrigin={TransformOrigin}
             onClose={handleClose}
             ref={ref}
+            open={open}
          >
             <MenuItem
                onClick={() =>

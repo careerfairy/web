@@ -1,7 +1,7 @@
 /* eslint-disable no-var */
-import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import * as Sentry from "@sentry/nextjs"
+import LocalStorageUtil from "./LocalStorageUtil"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -353,4 +353,16 @@ export const numberToString = (num: number): string => {
       return (num / 1e3).toFixed(1) + "k"
    }
    return num.toString()
+}
+
+export const sanitizeFileName = (fileName: string): string => {
+   return (
+      fileName
+         // Replace special characters with underscore
+         .replace(/[^a-zA-Z0-9.]/g, "_")
+         // Replace multiple underscores with a single one
+         .replace(/__+/g, "_")
+         // Remove leading and trailing underscores
+         .replace(/^_|_$/g, "") || "file"
+   )
 }
