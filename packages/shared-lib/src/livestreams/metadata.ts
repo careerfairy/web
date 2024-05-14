@@ -2,7 +2,6 @@ import { uniq } from "lodash"
 import { Group, GroupOption } from "../groups"
 import { getArrayDifference } from "../utils"
 import { LivestreamEvent } from "./livestreams"
-
 type MetaData = Pick<
    LivestreamEvent,
    | "companyCountries"

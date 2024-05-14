@@ -11,7 +11,7 @@ import { logAction } from "../../../util/logger"
 import { throwMigrationError } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
 
-const RUNNING_VERSION = "0.1"
+const RUNNING_VERSION = "0.2"
 const counter = new Counter()
 
 // types
