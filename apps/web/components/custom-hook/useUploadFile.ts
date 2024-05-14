@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react"
 import { v4 as uuid } from "uuid"
-import useSnackbarNotifications from "./useSnackbarNotifications"
 import useFirebaseUpload from "./useFirebaseUpload"
+import useSnackbarNotifications from "./useSnackbarNotifications"
 
 export type FileMetadata = {
    url: string
@@ -39,6 +39,11 @@ type UseUploadFile = {
     * A boolean indicating if the file is currently being uploaded.
     */
    uploading: boolean
+
+   /**
+    * Cancel the upload
+    */
+   cancelUpload: () => void
 }
 
 /**
@@ -65,7 +70,7 @@ const useUploadFile = (
 ): UseUploadFile => {
    const { errorNotification } = useSnackbarNotifications()
    const [loading, setLoading] = useState(false)
-   const [upload, progress, uploading] = useFirebaseUpload()
+   const [upload, progress, uploading, , , cancelUpload] = useFirebaseUpload()
    const [fileUploaded, setFileUploaded] = useState(false)
 
    /**
@@ -113,8 +118,16 @@ const useUploadFile = (
          isLoading,
          progress,
          uploading,
+         cancelUpload,
       }),
-      [handleUploadFile, fileUploaded, isLoading, progress, uploading]
+      [
+         handleUploadFile,
+         fileUploaded,
+         isLoading,
+         progress,
+         uploading,
+         cancelUpload,
+      ]
    )
 }
 
