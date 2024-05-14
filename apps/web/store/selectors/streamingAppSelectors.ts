@@ -12,9 +12,6 @@ export const isHostSelector = (state: RootState) => state.streamingApp.isHost
 export const isSideDrawerOpenSelector = (state: RootState) =>
    state.streamingApp.sidePanel.isOpen
 
-export const sidePanelSelector = (state: RootState) =>
-   state.streamingApp.sidePanel
-
 export const audioLevelsSelector = (state: RootState) =>
    state.streamingApp.audioLevels
 
@@ -23,6 +20,9 @@ export const userIsSpeakingSelector = (userId: UID) => (state: RootState) =>
 
 export const currentScreenSharerSelector = (state: RootState) =>
    state.streamingApp.livestreamState.screenSharerId
+
+export const useSidePanel = () =>
+   useAppSelector((state) => state.streamingApp.sidePanel)
 
 export const useSettingsMenuOpen = () =>
    useAppSelector((state) => state.streamingApp.settingsMenu.isOpen)

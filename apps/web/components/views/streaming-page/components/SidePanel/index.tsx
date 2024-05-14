@@ -1,5 +1,5 @@
 import { Box, Collapse, SwipeableDrawer } from "@mui/material"
-import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { ReactNode } from "react"
 import {
@@ -7,7 +7,7 @@ import {
    ActiveViews,
    toggleSidePanel,
 } from "store/reducers/streamingAppReducer"
-import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import { useSidePanel } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { CTAPanel } from "./CTAPanel"
 import { ChatPanel } from "./ChatPanel"
@@ -58,7 +58,7 @@ export const SidePanel = () => {
    const isMobile = useStreamIsMobile()
 
    const dispatch = useAppDispatch()
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
+   const { isOpen, activeView } = useSidePanel()
 
    const handleToggle = () => {
       dispatch(toggleSidePanel())

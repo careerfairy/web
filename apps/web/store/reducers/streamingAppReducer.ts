@@ -252,6 +252,9 @@ const streamingAppSlice = createSlice({
                action.payload
          )
       },
+      resetNumberOfHandRaiseNotifications(state) {
+         state.livestreamState.numberOfHandRaiseNotifications = 0
+      },
       resetLivestreamState(state) {
          state.livestreamState = initialState.livestreamState
       },
@@ -336,6 +339,7 @@ export const {
       openPolls,
       setHandRaiseEnabled,
       incrementNumberOfHandRaiseNotifications,
+      resetNumberOfHandRaiseNotifications,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice
