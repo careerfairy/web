@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
-import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
 import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
@@ -19,10 +19,10 @@ import {
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import {
-   sidePanelSelector,
    useHasEnded,
    useHasStarted,
    useIsConnectedOnDifferentBrowser,
+   useSidePanel,
 } from "store/selectors/streamingAppSelectors"
 
 type StreamContextProps = {
@@ -67,7 +67,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const hostAuthToken = query.token?.toString() || null
 
-   const { activeView } = useAppSelector(sidePanelSelector)
+   const { activeView } = useSidePanel()
    const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
 
    const {

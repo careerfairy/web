@@ -6,11 +6,12 @@ import {
 import { LoadingButton } from "@mui/lab"
 import { Stack, Typography } from "@mui/material"
 import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { useStreamingContext } from "../../context"
-import { UserType } from "../../util"
+import { UserType, getStreamerDisplayName } from "../../util"
 import { UserDetails } from "../UserDetails"
 
 const styles = sxStyles({
@@ -31,6 +32,9 @@ const styles = sxStyles({
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[100],
       },
+   },
+   role: {
+      mt: "2px",
    },
 })
 
@@ -67,18 +71,19 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
             )}
             {handRaise.state === HandRaiseState.invited && (
                <Typography color="primary" variant="small">
-                  Invited to panel
+                  Invited to the live stream
                </Typography>
             )}
             {handRaise.state === HandRaiseState.connecting && (
-               <Typography variant="small">Connecting to the panel</Typography>
+               <Typography variant="small">
+                  Connecting to the live stream
+               </Typography>
             )}
             {handRaise.state === HandRaiseState.connected && (
                <Typography variant="small">Currently participating</Typography>
             )}
-            <UserDetails
-               displayName={handRaise.name}
-               userType={UserType.Viewer}
+            <HandRaiserDetails
+               handRaise={handRaise}
                color={isGreenBackground ? "white" : undefined}
             />
          </Stack>
@@ -95,7 +100,9 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
                loading={isUpdatingUserHandRaiseState}
                sx={styles.removeButton}
             >
-               Remove participant
+               {handRaise.state === HandRaiseState.invited
+                  ? "Cancel invite"
+                  : "Remove participant"}
             </LoadingButton>
          ) : (
             <Stack direction="row" spacing={1.5}>
@@ -133,6 +140,36 @@ export const HandRaiseCard = ({ handRaise }: Props) => {
             </Stack>
          )}
       </Stack>
+   )
+}
+
+type HandRaiserDetailsProps = {
+   handRaise: HandRaise
+   color?: string
+}
+
+const HandRaiserDetails = ({ handRaise, color }: HandRaiserDetailsProps) => {
+   const { data: streamerDetails } = useStreamerDetails(handRaise.id)
+   return (
+      <UserDetails
+         displayName={
+            getStreamerDisplayName(
+               streamerDetails.firstName,
+               streamerDetails.lastName
+            ) || handRaise.name
+         }
+         userType={UserType.Viewer}
+         color={color}
+         subHeader={
+            <Typography
+               variant="xsmall"
+               sx={styles.role}
+               color={color || "#8A8A8A"}
+            >
+               {streamerDetails.role}
+            </Typography>
+         }
+      />
    )
 }
 
