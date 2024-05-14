@@ -1,4 +1,3 @@
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
@@ -56,6 +55,11 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
       deletedCustomJob: CustomJob
    ): Promise<void>
 
+   /**
+    * Cascades data from Group to the custom jobApplications from the input Group.
+    * @param groupId ID of the group, used as a parameter since some groups might not have a groupId
+    * @param group Group object
+    */
    syncCustomJobDataGroupMetaData(groupId: string, group: Group): Promise<void>
 }
 
@@ -212,20 +216,11 @@ export class CustomJobFunctionsRepository
       group: Group
    ): Promise<void> {
       const groupJobsQuery = this.groupCustomJobsApplicationsQuery(groupId)
-      console.log("🚀 ~ executing syncCustomJobDataGroupMetaData:", groupId)
 
       const snapshots = await groupJobsQuery.get()
-
-      const groupCustomJobsWithRef = mapFirestoreDocuments<
-         CustomJobApplicant,
-         true
-      >(snapshots, true)
-
-      const chunks = chunkArray(groupCustomJobsWithRef, 450)
-
+      const chunks = chunkArray(snapshots.docs, 450)
       const promises = chunks.map(async (chunk) => {
          const batch = this.firestore.batch()
-
          chunk.forEach((doc) => {
             const toUpdate: Pick<
                CustomJobApplicant,
@@ -237,9 +232,8 @@ export class CustomJobFunctionsRepository
                ),
                companySize: group.companySize,
             }
-            batch.update(doc._ref, toUpdate)
+            batch.update(doc.ref, toUpdate)
          })
-
          return batch.commit()
       })
 

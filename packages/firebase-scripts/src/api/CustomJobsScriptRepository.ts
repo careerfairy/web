@@ -20,7 +20,7 @@ export class CustomJobScriptsRepository
       withRef?: T
    ): Promise<DataWithRef<T, CustomJobApplicant>[]> {
       const customJobs = await this.firestore
-         .collectionGroup("jobApplications")
+         .collection("jobApplications")
          .orderBy("job.createdAt", "desc")
          .get()
       return mapFirestoreDocuments<CustomJobApplicant, T>(customJobs, withRef)

@@ -1,7 +1,6 @@
 import firebase from "firebase/compat/app"
 import { OrderByDirection } from "firebase/firestore"
 import BaseFirebaseRepository, {
-   DocRef,
    createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
@@ -1482,23 +1481,15 @@ export class FirebaseLivestreamRepository
 
    async syncLivestreamMetadata(groupId: string, group: Group): Promise<void> {
       const query = this.eventsOfGroupQuery(groupId)
+      if (group.universityCode) return
 
       const snapshots = await query.get()
-
-      const livestreamsWithRef = mapFirestoreDocuments(
-         snapshots,
-         true
-      ) as DocRef[]
-
-      const chunks = chunkArray(livestreamsWithRef, 450)
-
+      const chunks = chunkArray(snapshots.docs, 450)
       const promises = chunks.map(async (chunk) => {
          const batch = this.firestore.batch()
-
          chunk.forEach((doc) => {
             // TODO: Check if ok, since it should be from all livestream groups
             const metadataFromHost = getMetaDataFromEventHosts([group])
-
             const toUpdate: Pick<
                LivestreamEvent,
                | "companyCountries"
@@ -1517,7 +1508,7 @@ export class FirebaseLivestreamRepository
                companyTargetedUniversities:
                   metadataFromHost.companyTargetedUniversities,
             }
-            batch.update(doc._ref, toUpdate)
+            batch.update(doc.ref, toUpdate)
          })
 
          return batch.commit()
