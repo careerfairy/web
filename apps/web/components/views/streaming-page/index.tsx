@@ -139,18 +139,15 @@ const ViewerTrackers = dynamic(
    { ssr: false }
 )
 
+const HostTrackers = dynamic(
+   () => import("./components/HostTrackers").then((mod) => mod.HostTrackers),
+   { ssr: false }
+)
+
 const OngoingPollTracker = dynamic(
    () =>
       import("./components/streaming/OngoingPollTracker").then(
          (mod) => mod.OngoingPollTracker
-      ),
-   { ssr: false }
-)
-
-const HandRaiseNotificationTracker = dynamic(
-   () =>
-      import("./components/hand-raise/HandRaiseNotificationTracker").then(
-         (mod) => mod.HandRaiseNotificationTracker
       ),
    { ssr: false }
 )
@@ -225,9 +222,8 @@ const Component = ({ isHost }: Props) => {
                            </LocalTracksProvider>
                         </AgoraDevicesProvider>
                         <AgoraTrackers />
-                        {isHost ? null : <ViewerTrackers />}
+                        {isHost ? <HostTrackers /> : <ViewerTrackers />}
                         {isHost ? null : <OngoingPollTracker />}
-                        {isHost ? <HandRaiseNotificationTracker /> : null}
                         {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
                         <SessionConflictModal />
                         <SessionDisconnectedModal />

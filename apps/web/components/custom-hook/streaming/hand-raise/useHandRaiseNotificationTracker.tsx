@@ -3,10 +3,7 @@ import {
    HandRaise,
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
-import { LoadingButton } from "@mui/lab"
-import { Stack, Typography } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
-import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
 import CustomNotification from "components/views/notifications/CustomNotification"
 import {
    collection,
@@ -16,32 +13,39 @@ import {
    where,
 } from "firebase/firestore"
 import { SnackbarKey, useSnackbar } from "notistack"
-import { ReactNode, forwardRef, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import { useFirestore } from "reactfire"
-import { incrementNumberOfHandRaiseNotifications } from "store/reducers/streamingAppReducer"
-import { useStreamingContext } from "../../context"
+import {
+   incrementNumberOfHandRaiseNotifications,
+   resetNumberOfHandRaiseNotifications,
+} from "store/reducers/streamingAppReducer"
+import { HandRaiseRequestedNotification } from "../../../views/streaming-page/components/hand-raise/HandRaiseRequestedNotification"
 
 const buildKey = (handRaise: HandRaise) => `${handRaise.id}-${handRaise.state}`
 
-export const HandRaiseNotificationTracker = () => {
-   const { livestreamId, isHost } = useStreamingContext()
+export const useHandRaiseNotificationTracker = (
+   livestreamId: string,
+   disabled: boolean
+) => {
    const dispatch = useAppDispatch()
    const activeNotifications = useRef<SnackbarKey[]>([])
 
-   const {
-      trigger: updateUserHandRaiseState,
-      isMutating: isUpdatingUserHandRaiseState,
-   } = useUpdateUserHandRaiseState(livestreamId)
-
    const initialLoaded = useRef(false)
+   const disabledRef = useRef(disabled)
+   disabledRef.current = disabled
 
    const db = useFirestore()
 
    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
 
    useEffect(() => {
-      if (livestreamId && isHost) {
-         if (isUpdatingUserHandRaiseState) return
+      if (disabled) {
+         dispatch(resetNumberOfHandRaiseNotifications())
+      }
+   }, [disabled, dispatch])
+
+   useEffect(() => {
+      if (livestreamId) {
          return onSnapshot(
             query(
                collection(db, "livestreams", livestreamId, "handRaises"),
@@ -53,6 +57,8 @@ export const HandRaiseNotificationTracker = () => {
                orderBy("timeStamp", "desc")
             ).withConverter(createGenericConverter<HandRaise>()),
             (snapshot) => {
+               if (disabledRef.current) return
+
                snapshot.docChanges().forEach((change) => {
                   let notificationKey: SnackbarKey | undefined
                   const handRaiser = change.doc.data()
@@ -139,79 +145,7 @@ export const HandRaiseNotificationTracker = () => {
             }
          )
       }
-   }, [
-      livestreamId,
-      isHost,
-      db,
-      enqueueSnackbar,
-      isUpdatingUserHandRaiseState,
-      updateUserHandRaiseState,
-      closeSnackbar,
-      dispatch,
-   ])
+   }, [livestreamId, db, enqueueSnackbar, closeSnackbar, dispatch])
 
    return null
 }
-
-type HandRaiseNotificationProps = {
-   handRaise: HandRaise
-   livestreamId: string
-   message: ReactNode
-   id: SnackbarKey
-}
-
-const HandRaiseRequestedNotification = forwardRef<
-   HTMLDivElement,
-   HandRaiseNotificationProps
->(({ handRaise, livestreamId, message, id }, ref) => {
-   const {
-      trigger: updateUserHandRaiseState,
-      isMutating: isUpdatingUserHandRaiseState,
-   } = useUpdateUserHandRaiseState(livestreamId)
-
-   return (
-      <CustomNotification
-         id={id}
-         ref={ref}
-         title="New hand raiser"
-         variant="success"
-         content={
-            <Stack direction="row" alignItems="center" spacing={1.25}>
-               <Typography variant="small">{message}</Typography>
-               <Stack direction="row" spacing={1}>
-                  <LoadingButton
-                     loading={isUpdatingUserHandRaiseState}
-                     onClick={() =>
-                        updateUserHandRaiseState({
-                           state: HandRaiseState.unrequested,
-                           handRaiseId: handRaise.id,
-                        })
-                     }
-                     size="small"
-                     color="grey"
-                     variant="outlined"
-                  >
-                     Deny
-                  </LoadingButton>
-                  <LoadingButton
-                     loading={isUpdatingUserHandRaiseState}
-                     onClick={() =>
-                        updateUserHandRaiseState({
-                           state: HandRaiseState.invited,
-                           handRaiseId: handRaise.id,
-                        })
-                     }
-                     size="small"
-                     color="primary"
-                     variant="contained"
-                  >
-                     Approve
-                  </LoadingButton>
-               </Stack>
-            </Stack>
-         }
-      />
-   )
-})
-
-HandRaiseRequestedNotification.displayName = "HandRaiseRequestedNotification"

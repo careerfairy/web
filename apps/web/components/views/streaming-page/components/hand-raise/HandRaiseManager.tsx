@@ -1,9 +1,10 @@
 import { LoadingButton } from "@mui/lab"
-import { Collapse, Stack } from "@mui/material"
+import { Grid, Stack } from "@mui/material"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import { useHandRaisers } from "components/custom-hook/streaming/hand-raise/useHandRaisers"
 import { useToggleHandRaise } from "components/custom-hook/streaming/hand-raise/useToggleHandRaise"
+import { CollapseAndGrow } from "components/util/animations"
 import { forwardRef } from "react"
-import { TransitionGroup } from "react-transition-group"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { HandRaiseCard } from "./HandRaiseCard"
@@ -16,6 +17,8 @@ const styles = sxStyles({
 })
 
 export const HandRaiseManager = forwardRef<HTMLDivElement>((_, ref) => {
+   const streamIsLandscape = useStreamIsLandscape()
+
    const { livestreamId, streamerAuthToken } = useStreamingContext()
    const { trigger: toggleHandRaise, isMutating } = useToggleHandRaise(
       livestreamId,
@@ -34,13 +37,17 @@ export const HandRaiseManager = forwardRef<HTMLDivElement>((_, ref) => {
          >
             Deactivate hand raise
          </LoadingButton>
-         <Stack spacing={1.5} component={TransitionGroup}>
-            {handRaisers.map((handRaise) => (
-               <Collapse key={handRaise.id}>
-                  <HandRaiseCard handRaise={handRaise} />
-               </Collapse>
-            ))}
-         </Stack>
+         <Grid container>
+            <Grid spacing={1.5} container>
+               {handRaisers.map((handRaise) => (
+                  <Grid item xs={streamIsLandscape ? 6 : 12} key={handRaise.id}>
+                     <CollapseAndGrow in>
+                        <HandRaiseCard handRaise={handRaise} />
+                     </CollapseAndGrow>
+                  </Grid>
+               ))}
+            </Grid>
+         </Grid>
       </Stack>
    )
 })
