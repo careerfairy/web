@@ -1,11 +1,11 @@
-import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useCallback } from "react"
 import { toggleSidePanel } from "store/reducers/streamingAppReducer"
-import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import { useSidePanel } from "store/selectors/streamingAppSelectors"
 
 export const useSideDrawer = () => {
    const dispatch = useAppDispatch()
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
+   const { isOpen, activeView } = useSidePanel()
 
    const toggle = useCallback(() => dispatch(toggleSidePanel()), [dispatch])
 

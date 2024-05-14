@@ -1,22 +1,23 @@
 import functions = require("firebase-functions")
-import { number, SchemaOf, mixed, array, string, object } from "yup"
+import { SchemaOf, array, mixed, number, object, string } from "yup"
 
+import { sparkRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
-import { sparkRepo } from "./api/repositories"
 
-import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
 import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
 import {
+   SparkClientEventsPayload,
    SparkEvent,
    SparkEventActions,
-   SparkClientEventsPayload,
-   SparkSecondWatchedClient,
-   SparkSecondWatched,
    SparkEventClient,
+   SparkSecondWatched,
+   SparkSecondWatchedClient,
    SparkSecondsWatchedClientPayload,
 } from "@careerfairy/shared-lib/sparks/telemetry"
+import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { getCountryCode } from "./util"
 
 export const getSparksFeed = functions
@@ -36,20 +37,35 @@ export const getSparksFeed = functions
             try {
                if ("userId" in data) {
                   if (data.userId) {
-                     return sparkRepo.getUserSparksFeed(
-                        data.userId,
-                        data.numberOfSparks
-                     )
-                  } else {
-                     return sparkRepo.getPublicSparksFeed(data.numberOfSparks)
+                     return {
+                        sparks: await sparkRepo.getUserSparksFeed(
+                           data.userId,
+                           data.numberOfSparks
+                        ),
+                     }
+                  }
+
+                  const anonymousUserCountryCode = getCountryCode(context)
+                  const anonymousUserCountry = getCountryOptionByCountryCode(
+                     anonymousUserCountryCode
+                  )
+
+                  return {
+                     sparks: await sparkRepo.getPublicSparksFeed(
+                        data.numberOfSparks,
+                        anonymousUserCountry
+                     ),
+                     anonymousUserCountryCode,
                   }
                }
 
                if ("groupId" in data) {
-                  return sparkRepo.getGroupSparksFeed(
-                     data.groupId,
-                     data.numberOfSparks
-                  )
+                  return {
+                     sparks: await sparkRepo.getGroupSparksFeed(
+                        data.groupId,
+                        data.numberOfSparks
+                     ),
+                  }
                }
 
                throw new functions.https.HttpsError(

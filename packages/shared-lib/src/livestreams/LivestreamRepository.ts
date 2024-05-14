@@ -1,12 +1,17 @@
 import firebase from "firebase/compat/app"
-import { UserPublicData } from "../users"
+import { OrderByDirection } from "firebase/firestore"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
+import { Job, JobIdentifier } from "../ats/Job"
+import { Create, ImageType } from "../commonTypes"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
+import { UserPublicData } from "../users"
+import { chunkArray, containsAny } from "../utils"
 import {
-   getEarliestEventBufferTime,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -21,18 +26,13 @@ import {
    RecordingToken,
    UserLivestreamData,
    UserParticipatingStats,
+   getEarliestEventBufferTime,
 } from "./livestreams"
-import { FieldOfStudy } from "../fieldOfStudy"
-import { Job, JobIdentifier } from "../ats/Job"
-import { chunkArray, containsAny } from "../utils"
 import {
-   createLiveStreamStatsDoc,
    LiveStreamStats,
    LivestreamStatsToUpdate,
+   createLiveStreamStatsDoc,
 } from "./stats"
-import { OrderByDirection } from "firebase/firestore"
-import { Create, ImageType } from "../commonTypes"
-import { Timestamp } from "../firebaseTypes"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -331,6 +331,13 @@ export interface ILivestreamRepository {
     * @param questionId - The ID of the question to answer
     */
    answerQuestion(livestreamId: string, questionId: string): Promise<void>
+
+   /**
+    * Marks a question as done for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param questionId - The ID of the question to mark as done
+    */
+   markQuestionAsDone(livestreamId: string, questionId: string): Promise<void>
 
    /**
     * Resets a question for a livestream back to unanswered
@@ -1408,6 +1415,23 @@ export class FirebaseLivestreamRepository
       batch.update(targetQuestionRef, targetQuestionData)
 
       return batch.commit()
+   }
+
+   async markQuestionAsDone(
+      livestreamId: string,
+      questionId: string
+   ): Promise<void> {
+      const questionsRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("questions")
+         .doc(questionId)
+
+      const updateData: Pick<LivestreamQuestion, "type"> = {
+         type: "done",
+      }
+
+      return questionsRef.update(updateData)
    }
 
    async resetAllQuestions(livestreamId: string): Promise<void> {

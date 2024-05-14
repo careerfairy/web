@@ -6,6 +6,9 @@ import {
    useLocalMicrophoneTrack,
    usePublish,
 } from "agora-rtc-react"
+import { useHandleHandRaise } from "components/custom-hook/streaming/hand-raise/useHandleHandRaise"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
 import {
    FC,
    ReactNode,
@@ -16,11 +19,10 @@ import {
    useMemo,
    useState,
 } from "react"
-import { useStreamingContext } from "./Streaming"
-import { type LocalUser } from "../types"
-import { useTrackHandler } from "components/custom-hook/streaming/useTrackHandler"
-import { useAgoraDevices } from "./AgoraDevices"
 import { useIsConnectedOnDifferentBrowser } from "store/selectors/streamingAppSelectors"
+import { type LocalUser } from "../types"
+import { useAgoraDevices } from "./AgoraDevices"
+import { useStreamingContext } from "./Streaming"
 
 type LocalTracksProviderProps = {
    children: ReactNode
@@ -70,6 +72,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const firstCameraId = cameras?.[0]?.deviceId
    const firstMicId = microphones?.[0]?.deviceId
 
+   const { userCanJoinPanel: viewerCanJoinPanel } = useUserHandRaiseState(
+      streamingContextProps.livestreamId,
+      streamingContextProps.agoraUserId
+   )
+
    useEffect(() => {
       if (isConnectedOnDifferentBrowser) {
          setCameraOn(false)
@@ -83,12 +90,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          cameraId: firstCameraId,
       }
    )
-   const microphoneTrack = useLocalMicrophoneTrack(
-      shouldStream && Boolean(firstMicId),
-      {
-         microphoneId: firstMicId,
-      }
-   )
+
+   const micReady = Boolean(shouldStream && firstMicId)
+   const microphoneTrack = useLocalMicrophoneTrack(micReady, {
+      microphoneId: firstMicId,
+   })
 
    const {
       activeDeviceId: activeMicrophoneId,
@@ -116,7 +122,11 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    const toggleCamera = useCallback(() => setCameraOn((prev) => !prev), [])
 
-   const readyToPublish = shouldStream && isReady && currentRole === "host"
+   const readyToPublish =
+      shouldStream &&
+      isReady &&
+      currentRole === "host" &&
+      (streamingContextProps.isHost || viewerCanJoinPanel)
 
    const localUser = useMemo<LocalUser>(
       () => /* If the user is ready to publish, return the local user object*/ ({
@@ -136,11 +146,6 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
          microphoneTrack.localMicrophoneTrack,
          cameraTrack.localCameraTrack,
       ]
-   )
-
-   usePublish(
-      [microphoneTrack.localMicrophoneTrack, cameraTrack.localCameraTrack],
-      readyToPublish
    )
 
    const value = useMemo<LocalTracksContextProps>(
@@ -188,9 +193,42 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
 
    return (
       <LocalTracksContext.Provider value={value}>
+         {Boolean(readyToPublish) && (
+            <PublishComponent
+               microphoneTrack={microphoneTrack}
+               cameraTrack={cameraTrack}
+            />
+         )}
          {children}
       </LocalTracksContext.Provider>
    )
+}
+
+type PublishComponentProps = {
+   microphoneTrack: ReturnType<typeof useLocalMicrophoneTrack>
+   cameraTrack: ReturnType<typeof useLocalCameraTrack>
+}
+
+const PublishComponent = ({
+   microphoneTrack,
+   cameraTrack,
+}: PublishComponentProps) => {
+   const { livestreamId, agoraUserId, isHost } = useStreamingContext()
+
+   const { error, isLoading } = usePublish([
+      microphoneTrack.localMicrophoneTrack,
+      cameraTrack.localCameraTrack,
+   ])
+
+   useHandleHandRaise({
+      livestreamId,
+      agoraUserId,
+      disabled: isHost,
+      isPublishingTracks: isLoading,
+      error,
+   })
+
+   return null
 }
 
 export const useLocalTracks = () => {

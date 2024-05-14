@@ -14,6 +14,7 @@ import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { ReactNode } from "react"
 import { useGroupQuestions } from "../useGroupQuestions"
+import { getFieldsOfStudyWithoutOtherOption } from "./commons"
 import {
    LivestreamFormGeneralTabValues,
    LivestreamFormJobsTabValues,
@@ -126,7 +127,7 @@ const buildRegistrationQuestions = (
    isAdmin: boolean,
    group: { groupId: string }
 ): LivestreamFormQuestionsTabValues["registrationQuestions"]["values"] => {
-   if (!groupQuestionsMap[group.groupId]) {
+   if (!isAdmin && !groupQuestionsMap[group.groupId]) {
       return []
    }
 
@@ -210,6 +211,8 @@ const convertLivestreamObjectToForm = ({
    general.startDate =
       livestream.start.toDate() || formGeneralTabInitialValues.startDate
 
+   general.isDraft = livestream.isDraft
+
    // This is to ensure backwards compatibility
    // Previously was a single field (i.e. a single string) and now it's an array of strings
    if (livestream.reasonsToJoinLivestream) {
@@ -232,6 +235,10 @@ const convertLivestreamObjectToForm = ({
          livestream.reasonsToJoinLivestream_v2 ||
          formGeneralTabInitialValues.reasonsToJoin
    }
+
+   general.targetFieldsOfStudy = getFieldsOfStudyWithoutOtherOption(
+      general.targetFieldsOfStudy
+   )
 
    // This is to ensure backwards compatibility
    const filteredSpeakers = livestream.speakers.filter(

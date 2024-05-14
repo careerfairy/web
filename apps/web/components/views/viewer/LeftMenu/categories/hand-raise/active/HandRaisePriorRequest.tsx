@@ -1,4 +1,7 @@
-import React, { memo } from "react"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import PanToolOutlinedIcon from "@mui/icons-material/PanToolOutlined"
 import { Button, Grow } from "@mui/material"
 import {
@@ -9,7 +12,7 @@ import {
    CategorySubtitle,
    ThemedPermanentMarker,
 } from "materialUI/GlobalTitles"
-import { HandRaise, HandRaiseState } from "types/handraise"
+import { memo } from "react"
 
 const HandRaisePriorRequest = memo(
    ({ handRaiseState, updateHandRaiseRequest }: Props) => {
