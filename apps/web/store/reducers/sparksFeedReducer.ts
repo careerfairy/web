@@ -3,10 +3,10 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
-import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 
 type Status = "idle" | "loading" | "failed"
 
@@ -45,6 +45,8 @@ interface SparksState {
    autoAction: AutomaticActions
    conversionCardInterval: number
    interactionSource: string
+   anonymousUserCountryCode?: string
+   countrySpecificFeed?: boolean
 }
 
 const initialState: SparksState = {
@@ -72,14 +74,21 @@ const initialState: SparksState = {
    autoAction: null,
    conversionCardInterval: 0,
    interactionSource: null,
+   anonymousUserCountryCode: null,
+   countrySpecificFeed: null,
 }
 
 // Async thunk to fetch the next sparks
 export const fetchNextSparks = createAsyncThunk(
    "sparks/fetchNext",
-   async (_, { getState }) => {
+   async (_, { getState, dispatch }) => {
       const state = getState() as RootState
-      const { sparks, hasMoreSparks } = state.sparksFeed
+      const {
+         sparks,
+         hasMoreSparks,
+         anonymousUserCountryCode,
+         countrySpecificFeed,
+      } = state.sparksFeed
 
       if (!hasMoreSparks) {
          return []
@@ -87,6 +96,11 @@ export const fetchNextSparks = createAsyncThunk(
 
       const lastSpark = sparks[sparks.length - 1]
       const sparkOptions = getSparkOptions(state)
+
+      if (!anonymousUserCountryCode && countrySpecificFeed) {
+         dispatch(disableCountrySpecificFeed())
+         return sparkService.fetchNextSparks(null, sparkOptions)
+      }
 
       return sparkService.fetchNextSparks(lastSpark, sparkOptions)
    }
@@ -260,6 +274,9 @@ const sparksFeedSlice = createSlice({
          state.playing = true
          state.conversionCardInterval = 0
       },
+      disableCountrySpecificFeed: (state) => {
+         state.countrySpecificFeed = null
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -269,7 +286,11 @@ const sparksFeedSlice = createSlice({
          .addCase(
             fetchNextSparks.fulfilled,
             (state, action: PayloadAction<SparkPresenter[]>) => {
-               const { sparks } = state
+               const {
+                  sparks,
+                  numberOfSparksToFetch,
+                  anonymousUserCountryCode,
+               } = state
 
                state.fetchNextSparksStatus = "idle"
 
@@ -278,6 +299,13 @@ const sparksFeedSlice = createSlice({
                   ...sparks,
                   ...action.payload,
                ])
+
+               if (
+                  action.payload.length < numberOfSparksToFetch &&
+                  anonymousUserCountryCode
+               ) {
+                  state.anonymousUserCountryCode = null
+               }
 
                if (action.payload.length === 0) {
                   state.hasMoreSparks = false
@@ -293,20 +321,30 @@ const sparksFeedSlice = createSlice({
          })
          .addCase(
             fetchInitialSparksFeed.fulfilled,
-            (state, action: PayloadAction<SparkPresenter[]>) => {
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  anonymousUserCountryCode?: string
+               }>
+            ) => {
                const { sparks, numberOfSparksToFetch } = state
+               const { sparks: sparksPayload, anonymousUserCountryCode } =
+                  action.payload
 
                state.initialFetchStatus = "idle"
                state.initialSparksFetched = true
 
                const newSparks = insertNotificationIfNeeded(
                   state,
-                  mergeSparks(sparks, action.payload)
+                  mergeSparks(sparks, sparksPayload)
                )
 
                state.sparks = newSparks
+               state.anonymousUserCountryCode = anonymousUserCountryCode
+               state.countrySpecificFeed = Boolean(anonymousUserCountryCode)
 
-               if (action.payload.length < numberOfSparksToFetch) {
+               if (sparksPayload.length < numberOfSparksToFetch) {
                   state.hasMoreSparks = false
                }
             }
@@ -339,11 +377,18 @@ const mergeSparks = (
  * @returns spark options
  */
 const getSparkOptions = (state: RootState) => {
-   const { numberOfSparksToFetch, groupId, userEmail, sparkCategoryIds } =
-      state.sparksFeed
+   const {
+      numberOfSparksToFetch,
+      groupId,
+      userEmail,
+      sparkCategoryIds,
+      anonymousUserCountryCode,
+   } = state.sparksFeed
+
    return {
       numberOfSparks: numberOfSparksToFetch,
-      sparkCategoryIds: sparkCategoryIds,
+      sparkCategoryIds,
+      anonymousUserCountryCode,
       ...(groupId ? { groupId } : { userId: userEmail || null }),
    }
 }
@@ -426,6 +471,7 @@ export const {
    togglePlaying,
    setConversionCardInterval,
    removeNotificationsByType,
+   disableCountrySpecificFeed,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer

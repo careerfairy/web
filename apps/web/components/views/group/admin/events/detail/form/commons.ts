@@ -1,3 +1,4 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import {
    LivestreamEvent,
@@ -8,7 +9,7 @@ import {
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Timestamp } from "firebase/firestore"
-import { get, has, omit, set } from "lodash"
+import { get, has, isEqual, omit, set } from "lodash"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
 
 export enum TAB_VALUES {
@@ -59,7 +60,12 @@ export const ESTIMATED_DURATIONS = [
    { minutes: 180, name: "3 hours" },
 ]
 
+export const SELECT_ALL_ID = "select-all"
+const OTHER_OPTION_ID = "other"
+
 export const hashToColor = (id: string) => {
+   if (!id) return
+
    let hash = 0
    for (let i = 0; i < id.length; i++) {
       hash = id.charCodeAt(i) + ((hash << 5) - hash)
@@ -72,6 +78,21 @@ export const hashToColor = (id: string) => {
    }
 
    return color
+}
+
+export const removeFieldOfStudyFromOptions = (
+   allFieldsOfStudy: FieldOfStudy[],
+   fieldOfStudyIdToRemove: FieldOfStudy["id"]
+) => {
+   return allFieldsOfStudy.filter(
+      (field) => field.id !== fieldOfStudyIdToRemove
+   )
+}
+
+export const getFieldsOfStudyWithoutOtherOption = (
+   allFieldsOfStudy: FieldOfStudy[]
+) => {
+   return removeFieldOfStudyFromOptions(allFieldsOfStudy, OTHER_OPTION_ID)
 }
 
 const mapCreatorToSpeaker = (creator: Creator): Speaker => {
@@ -148,6 +169,7 @@ const formValuesLivestreamEventPropertyMap = [
 
 export const mapFormValuesToLivestreamObject = (
    formValues: Partial<LivestreamFormValues>,
+   allFieldsOfStudy: FieldOfStudy[],
    firebaseService: FirebaseService
 ): Partial<LivestreamEvent> => {
    const result: Partial<LivestreamEvent> = {}
@@ -198,6 +220,20 @@ export const mapFormValuesToLivestreamObject = (
          mappedRegistrationQuestions as LivestreamGroupQuestionsMap
    }
 
+   if (
+      formValues.questions.hosts.length > 1 &&
+      !isEqual(
+         formValues.questions.hosts.map((host) => host.groupId).sort(),
+         formValues.general.groupIds.sort()
+      )
+   ) {
+      const otherHosts = formValues.questions.hosts
+         .filter((host) => host.groupId !== formValues.general.groupIds[0])
+         .map((host) => host.groupId)
+
+      result.groupIds = [formValues.general.groupIds[0], ...otherHosts]
+   }
+
    if (formValues.general.title) {
       result.triGrams = livestreamTriGrams(result.title, result.company)
    }
@@ -210,6 +246,14 @@ export const mapFormValuesToLivestreamObject = (
 
    result.lastUpdated =
       firebaseService.getServerTimestamp() as unknown as Timestamp
+
+   if (
+      formValues.general.targetFieldsOfStudy &&
+      (formValues.general.targetFieldsOfStudy.length == 1 ||
+         formValues.general.targetFieldsOfStudy[0].id === SELECT_ALL_ID)
+   ) {
+      result.targetFieldsOfStudy = allFieldsOfStudy
+   }
 
    return result
 }

@@ -13,6 +13,7 @@ import {
    ShareActionButton,
    VideoActionButton,
 } from "../Buttons"
+import { StopHandRaisingButton } from "../Buttons/StopHandRaisingButton"
 
 export const AllActions = {
    "Hand raise": (props: ActionButtonProps) => (
@@ -41,6 +42,9 @@ export const AllActions = {
    Mic: (props: ActionButtonProps) => <MicActionButton {...props} key="Mic" />,
    Video: (props: ActionButtonProps) => (
       <VideoActionButton {...props} key="Video" />
+   ),
+   "Stop hand raise": (props: ActionButtonProps) => (
+      <StopHandRaisingButton {...props} key="Stop hand raise" />
    ),
    Divider: () => <Divider orientation="vertical" flexItem />,
 } as const

@@ -1,12 +1,12 @@
-import algoliaSearchClient from "./AlgoliaInstance"
-import { SearchClient, SearchIndex } from "algoliasearch"
 import { SearchResponse } from "@algolia/client-search"
-import { SortType } from "../../components/views/common/filter/FilterMenu"
-import { Wish } from "@careerfairy/shared-lib/wishes"
-import { initAlgoliaIndex } from "./util"
-import { AlgoliaLivestreamResponse } from "types/algolia"
 import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
+import { Wish } from "@careerfairy/shared-lib/wishes"
+import { SearchClient, SearchIndex } from "algoliasearch"
+import { AlgoliaLivestreamResponse } from "types/algolia"
 import { getWorkflowId, isTestEnvironment } from "util/CommonUtil"
+import { SortType } from "../../components/views/common/filter/FilterMenu"
+import algoliaSearchClient from "./AlgoliaInstance"
+import { initAlgoliaIndex } from "./util"
 
 export interface IAlgoliaRepository {
    searchWishes(
@@ -98,6 +98,7 @@ const handleSearch = <AlgoliaResponseType>(
          (isTestEnvironment() ? `workflowId:${getWorkflowId()} AND ` : "") +
          filters,
       page,
+      cacheable: !isTestEnvironment(), // Disable caching for test environments as time is limited
    })
 }
 

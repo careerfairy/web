@@ -4,6 +4,7 @@ import {
    type IAgoraRTCClient,
 } from "agora-rtc-react"
 import { useEffect, useState } from "react"
+import { useAsync } from "react-use"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 type Options = {
@@ -15,13 +16,21 @@ export const useClientConfig = (client: IAgoraRTCClient, options: Options) => {
    const [currentRole, setCurrentRole] = useState<ClientRole>("audience")
    const isConnected = useIsConnected(client)
 
-   useEffect(() => {
+   useAsync(async () => {
       if (isConnected) {
          const newRole = options.hostCondition ? "host" : "audience"
-         client
-            .setClientRole(newRole)
-            .then(() => setCurrentRole(newRole))
-            .catch(errorLogAndNotify)
+         try {
+            if (newRole === "audience") {
+               await client.unpublish()
+            }
+            await client.setClientRole(newRole)
+            setCurrentRole(newRole)
+         } catch (err) {
+            errorLogAndNotify(err, {
+               message: "Failed to set client role",
+               newRole,
+            })
+         }
       }
    }, [client, isConnected, options.hostCondition])
 

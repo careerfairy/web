@@ -42,6 +42,7 @@ export type LivestreamFormGeneralTabValues = {
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: LevelOfStudy[]
    groupIds: string[]
+   isDraft?: boolean
 }
 
 export type LivestreamFormSpeakersTabValues = {

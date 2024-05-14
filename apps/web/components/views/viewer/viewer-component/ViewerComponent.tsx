@@ -1,3 +1,7 @@
+import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
+import { Typography } from "@mui/material"
+import makeStyles from "@mui/styles/makeStyles"
+import { useRouter } from "next/router"
 import React, {
    Fragment,
    memo,
@@ -7,35 +11,31 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import useDevices from "../../../../components/custom-hook/useDevices"
-import useMediaSources from "../../../../components/custom-hook/useMediaSources"
-import VideoControlsContainer from "../../../../components/views/streaming/video-container/VideoControlsContainer"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import makeStyles from "@mui/styles/makeStyles"
-import SettingsModal from "../../streaming/video-container/SettingsModal"
-import { Typography } from "@mui/material"
-import ScreenShareModal from "../../streaming/video-container/ScreenShareModal"
-import EmoteButtons from "../EmoteButtons"
 import { useDispatch, useSelector } from "react-redux"
-import { useRouter } from "next/router"
-import * as actions from "../../../../store/actions"
-import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
-import Streams from "../../streaming/video-container/Streams"
-import DraggableComponent from "../../banners/DraggableComponent"
-import WifiIndicator from "../../streaming/video-container/WifiIndicator"
-import StreamPublishingModal from "../../../../components/views/streaming/modal/StreamPublishingModal"
-import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import useDevices from "../../../../components/custom-hook/useDevices"
 import useHandRaiseState from "../../../../components/custom-hook/useHandRaiseState"
-import RTMContext from "../../../../context/agora/RTMContext"
-import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
-import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
+import useMediaSources from "../../../../components/custom-hook/useMediaSources"
+import StreamPublishingModal from "../../../../components/views/streaming/modal/StreamPublishingModal"
+import VideoControlsContainer from "../../../../components/views/streaming/video-container/VideoControlsContainer"
 import { useRtc } from "../../../../context/agora/RTCProvider"
-import { RootState } from "../../../../store"
+import RTMContext from "../../../../context/agora/RTMContext"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
-import { HandRaiseState } from "../../../../types/handraise"
+import { RootState } from "../../../../store"
+import * as actions from "../../../../store/actions"
+import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
-import EndOfStreamView from "./EndOfStreamView"
+import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
 import { usePreFetchRecommendedEvents } from "../../../custom-hook/useRecommendedEvents"
+import DraggableComponent from "../../banners/DraggableComponent"
+import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
+import ScreenShareModal from "../../streaming/video-container/ScreenShareModal"
+import SettingsModal from "../../streaming/video-container/SettingsModal"
+import Streams from "../../streaming/video-container/Streams"
+import WifiIndicator from "../../streaming/video-container/WifiIndicator"
+import EmoteButtons from "../EmoteButtons"
+import EndOfStreamView from "./EndOfStreamView"
+import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -144,7 +144,11 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
 
          return () => clearTimeout(timout) // Cancel opening modal if streams appear before 3 seconds
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(remoteStreams?.length), isBreakout, hasActiveRooms])
+
+   const hasBeenInvited =
+      prevHandRaiseState.current?.state === HandRaiseState.invited
 
    useEffect(() => {
       if (
@@ -155,10 +159,8 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       ) {
          void handleJoinAsHandRaiser()
       }
-   }, [
-      prevHandRaiseState.current?.state === HandRaiseState.invited,
-      showLocalStreamPublishingModal,
-   ])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [hasBeenInvited, showLocalStreamPublishingModal])
 
    useEffect(() => {
       if (
@@ -169,6 +171,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       ) {
          void handleLeaveAsHandRaiser()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [handRaiseActive, handRaiseState])
 
    // prefetch recommended events
@@ -294,7 +297,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
 
    return (
       <React.Fragment>
-         {!Boolean(mobile && handRaiseActive) && !focusModeEnabled && (
+         {!(mobile && handRaiseActive) && !focusModeEnabled && (
             <EmoteButtons createEmote={createEmote} />
          )}
          <Streams
@@ -350,7 +353,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                }}
             />
          )}
-         {handRaiseActive && (
+         {Boolean(handRaiseActive) && (
             <Fragment>
                <DraggableComponent
                   zIndex={3}
@@ -371,7 +374,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   isMainStreamer={false}
                   localStreamIsPublished={localStreamIsPublished}
                   microphoneMuted={Boolean(localStream.audioTrack?.muted)}
-                  cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
+                  cameraInactive={!localStream.videoTrack?.enabled}
                   openPublishingModal={openPublishModal}
                   viewer={true}
                   localMediaControls={localMediaControls}
@@ -379,7 +382,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   setShowSettings={setShowSettings}
                />
 
-               {showSettings && (
+               {Boolean(showSettings) && (
                   <SettingsModal
                      close={closeSettings}
                      devices={devices}
@@ -392,7 +395,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   />
                )}
 
-               {showScreenShareModal && (
+               {Boolean(showScreenShareModal) && (
                   <ScreenShareModal
                      open={showScreenShareModal}
                      handleClose={handleCloseScreenShareModal}

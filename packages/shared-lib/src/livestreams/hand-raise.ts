@@ -1,5 +1,5 @@
-import { Identifiable } from "./commonTypes"
 import firebase from "firebase/compat/app"
+import { Identifiable } from "../commonTypes"
 import Timestamp = firebase.firestore.Timestamp
 
 export enum HandRaiseState {
@@ -38,9 +38,57 @@ export enum HandRaiseState {
     */
    denied = "denied",
 }
+
+// collection path: /livestreams/{livestreamId}/handRaises/{agoraUserId}
 export interface HandRaise extends Identifiable {
+   /**
+    * Display name of the hand raiser
+    */
    name: string
+   /**
+    * The state of the hand raise
+    */
    state: HandRaiseState
+   /**
+    * The last time the hand raise was updated
+    */
    timeStamp: Timestamp
+   /**
+    * @deprecated This property is deprecated and should not be used in new implementations.
+    */
    date?: Date
+}
+
+/**
+ * The states that indicate the user is active in the hand raise and hasn't been kicked or left
+ */
+export const ACTIVE_STATES: HandRaiseState[] = [
+   HandRaiseState.acquire_media,
+   HandRaiseState.requested,
+   HandRaiseState.invited,
+   HandRaiseState.connecting,
+   HandRaiseState.connected,
+]
+
+/**
+ * The states that the user can join the panel with the hosts, after selecting device they join directly
+ */
+export const CAN_JOIN_PANEL_STATES: HandRaiseState[] = [
+   HandRaiseState.invited,
+   HandRaiseState.connecting,
+   HandRaiseState.connected,
+]
+
+/**
+ * Determines if the hand raise is currently active based on its state. EG, not unrequested or denied
+ */
+export const isHandRaiseActive = (handRaise: HandRaise) => {
+   return handRaise?.state && ACTIVE_STATES.includes(handRaise.state)
+}
+
+/**
+ * Checks if the user can join the panel directly after selecting devices without needing to request again based on the hand raise state.
+ */
+export const isUserCanJoinPanel = (handRaise: HandRaise) => {
+   return handRaise?.state && CAN_JOIN_PANEL_STATES.includes(handRaise.state)
 }
