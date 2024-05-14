@@ -14,7 +14,7 @@ import { useInterests } from "components/custom-hook/useCollection"
 import { Formik } from "formik"
 import { ReactNode } from "react"
 import { useGroupQuestions } from "../useGroupQuestions"
-import { getFieldsOfStudyWithoutOtherOptions } from "./commons"
+import { getFieldsOfStudyWithoutOtherOption } from "./commons"
 import {
    LivestreamFormGeneralTabValues,
    LivestreamFormJobsTabValues,
@@ -236,7 +236,7 @@ const convertLivestreamObjectToForm = ({
          formGeneralTabInitialValues.reasonsToJoin
    }
 
-   general.targetFieldsOfStudy = getFieldsOfStudyWithoutOtherOptions(
+   general.targetFieldsOfStudy = getFieldsOfStudyWithoutOtherOption(
       general.targetFieldsOfStudy
    )
 
