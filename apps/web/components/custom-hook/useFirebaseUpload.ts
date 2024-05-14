@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react"
+import firebase from "firebase/compat/app"
+import { useCallback, useEffect, useRef, useState } from "react"
 import FirebaseInstance from "../../data/firebase/FirebaseInstance"
 
 type UseFirebaseUploadReturnType = [
@@ -6,7 +7,8 @@ type UseFirebaseUploadReturnType = [
    number, // Progress of upload
    boolean, // Whether upload is currently in progress
    Error | null, // Error that occurred during upload (if any)
-   string | null // Download URL of uploaded file (if upload was successful)
+   string | null, // Download URL of uploaded file (if upload was successful)
+   () => void // Function to cancel the upload
 ]
 
 const useFirebaseUpload = (
@@ -16,20 +18,26 @@ const useFirebaseUpload = (
    const [isUploading, setIsUploading] = useState<boolean>(false)
    const [error, setError] = useState<Error | null>(null)
    const [downloadURL, setDownloadURL] = useState<string | null>(null)
+   const uploadTaskRef = useRef<firebase.storage.UploadTask>(null)
 
-   useEffect(() => {
-      // Reset state when path changes
+   const handleReset = useCallback(() => {
       setUploadProgress(0)
       setIsUploading(false)
       setError(null)
       setDownloadURL(null)
    }, [])
 
+   useEffect(() => {
+      // Reset state when path changes
+      handleReset()
+   }, [handleReset])
+
    const uploadFile = useCallback(
       (file: File, fullPath: string): Promise<string> => {
          return new Promise<string>((resolve, reject) => {
             const storageRef = FirebaseInstance.storage().ref(fullPath)
             const uploadTask = storageRef.put(file)
+            uploadTaskRef.current = uploadTask
 
             setIsUploading(true)
 
@@ -61,7 +69,22 @@ const useFirebaseUpload = (
       [onError]
    )
 
-   return [uploadFile, uploadProgress, isUploading, error, downloadURL]
+   const cancelUpload = useCallback(() => {
+      if (uploadTaskRef.current) {
+         uploadTaskRef.current.cancel()
+         uploadTaskRef.current = null
+         handleReset()
+      }
+   }, [handleReset])
+
+   return [
+      uploadFile,
+      uploadProgress,
+      isUploading,
+      error,
+      downloadURL,
+      cancelUpload,
+   ]
 }
 
 export default useFirebaseUpload
