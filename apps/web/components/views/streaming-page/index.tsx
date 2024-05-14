@@ -13,6 +13,14 @@ import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/viewer/WaitingRoom"
 
+const UploadPDFPresentationDialog = dynamic(
+   () =>
+      import(
+         "./components/StreamingGrid/Spotlight/UploadPDFPresentationDialog"
+      ).then((mod) => mod.UploadPDFPresentationDialog),
+   { ssr: false }
+)
+
 const ThanksForJoiningHandRaiseDialog = dynamic(
    () =>
       import("./components/hand-raise/ThanksForJoiningHandRaiseDialog").then(
@@ -225,6 +233,7 @@ const Component = ({ isHost }: Props) => {
                         {isHost ? <HostTrackers /> : <ViewerTrackers />}
                         {isHost ? null : <OngoingPollTracker />}
                         {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
+                        {isHost ? <UploadPDFPresentationDialog /> : null}
                         <SessionConflictModal />
                         <SessionDisconnectedModal />
                      </RTMSignalingProvider>
