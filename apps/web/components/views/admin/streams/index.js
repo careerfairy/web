@@ -1,10 +1,10 @@
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
+import { CircularProgress, Container, Grid, Typography } from "@mui/material"
+import makeStyles from "@mui/styles/makeStyles"
 import PropTypes from "prop-types"
 import React, { Fragment, useMemo } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import { CircularProgress, Container, Grid, Typography } from "@mui/material"
-import { isLoaded, useFirestoreConnect, isEmpty } from "react-redux-firebase"
 import { useSelector } from "react-redux"
-// import Search from "./Search"
+import { isEmpty, isLoaded, useFirestoreConnect } from "react-redux-firebase"
 import StreamsContainer from "./StreamsContainer"
 
 const useStyles = makeStyles((theme) => ({
@@ -19,8 +19,6 @@ const useStyles = makeStyles((theme) => ({
    highlighted: {},
 }))
 
-const fortyFiveMinutesInMilliseconds = 1000 * 60 * 45
-
 const AdminStreams = ({ typeOfStream }) => {
    const classes = useStyles()
 
@@ -32,7 +30,7 @@ const AdminStreams = ({ typeOfStream }) => {
                [
                   "start",
                   typeOfStream === "upcoming" ? ">" : "<",
-                  new Date(Date.now() - fortyFiveMinutesInMilliseconds),
+                  new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS),
                ],
                ["test", "==", false],
             ],
