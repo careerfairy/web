@@ -20,7 +20,6 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import DateUtil from "../../util/DateUtil"
 import {
-   getServerSideUserData,
    getServerSideUserStats,
    getUserTokenFromCookie,
    mapFromServerSide,
@@ -98,7 +97,6 @@ const PortalPage = ({
       )
    }, [serializedCarouselContent])
 
-   console.log("🚀 ~ carouselContent:", carouselContent)
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
 
@@ -194,8 +192,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    if (token?.email) {
       promises.push(
          livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
-         getServerSideUserStats(token.email),
-         getServerSideUserData(token.email)
+         getServerSideUserStats(token.email)
       )
    }
 
@@ -207,7 +204,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       livestreamDialogData,
       recordedEvents,
       userStats,
-      userData,
    ] = results.map((result) =>
       result.status === "fulfilled" ? result.value : null
    )
@@ -215,16 +211,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
-   // TODO: Remove ?
-   const carouselContentService = new CarouselContentService({
-      userData: userData,
-      userStats: userStats,
-      pastLivestreams: pastEvents || [],
-      upcomingLivestreams: comingUpNextEvents || [],
-      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-   })
-
-   const carouselContent = await carouselContentService.getCarouselContent()
 
    return {
       props: {
@@ -241,10 +227,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             recordedEventsToShare: recordedEventsToShare.map(
                LivestreamPresenter.serializeDocument
             ),
-         }),
-         ...(carouselContent && {
-            serializedCarouselContent:
-               CarouselContentService.serializeContent(carouselContent),
          }),
          livestreamDialogData,
       },
