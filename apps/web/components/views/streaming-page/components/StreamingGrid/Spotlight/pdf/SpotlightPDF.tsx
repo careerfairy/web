@@ -20,6 +20,7 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "center",
       borderRadius: "12px",
+      overflow: "hidden",
       backgroundColor: (theme) => theme.brand.white[500],
    },
 })
@@ -72,6 +73,7 @@ export const Content = () => {
             key={pdfKey}
             presentation={pdfPresentation}
             parentWidth={width}
+            livestreamId={livestreamId}
             parentHeight={height}
             setPdfNumberOfPages={setPdfNumberOfPages}
          />
