@@ -1,9 +1,10 @@
 import { uniq } from "lodash"
+import { CustomJobApplicant } from "../customJobs/customJobs"
 import { Group, GroupOption } from "../groups"
+import { LivestreamEvent } from "../livestreams"
 import { getArrayDifference } from "../utils"
-import { LivestreamEvent } from "./livestreams"
 
-export type MetaData = Pick<
+export type LivestreamMetaData = Pick<
    LivestreamEvent,
    | "companyCountries"
    | "companyIndustries"
@@ -13,7 +14,47 @@ export type MetaData = Pick<
    | "companyTargetedUniversities"
 >
 
-export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
+export type CustomJobMetaData = Pick<
+   CustomJobApplicant,
+   "companyCountry" | "companyIndustries" | "companySize"
+>
+
+export const getMetaDataFromCustomJobGroup = (
+   group: Group
+): CustomJobMetaData => {
+   // Aggregate all the metadata from the groups
+   const meta: CustomJobMetaData = {
+      companyCountry: group.companyCountry?.id,
+      companyIndustries: group?.companyIndustries?.map(
+         (industry) => industry.id
+      ),
+      companySize: group.companySize,
+   }
+
+   return meta
+}
+
+export const hasCustomJobsGroupMetaDataChanged = (
+   previousValue: Group,
+   currentValue: Group
+): boolean => {
+   const countryChanged =
+      previousValue?.companyCountry?.id != currentValue?.companyCountry?.id
+
+   const industriesChanged = Boolean(
+      getArrayDifference(
+         previousValue?.companyIndustries.map((industry) => industry.id),
+         currentValue?.companyIndustries.map((industry) => industry.id)
+      ).length
+   )
+
+   const sizeChanged = previousValue?.companySize != currentValue?.companySize
+   return countryChanged || industriesChanged || sizeChanged
+}
+
+export const getMetaDataFromEventHosts = (
+   eventHosts: Group[]
+): LivestreamMetaData => {
    const companies = eventHosts?.filter((group) => !group.universityCode)
 
    let groupsToGetMetadataFrom = eventHosts
@@ -24,7 +65,7 @@ export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
    }
 
    // Aggregate all the metadata from the groups
-   const meta = groupsToGetMetadataFrom.reduce<MetaData>(
+   const meta = groupsToGetMetadataFrom.reduce<LivestreamMetaData>(
       (acc, group) => {
          if (group.companyCountry?.id) {
             acc.companyCountries = [

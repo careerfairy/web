@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/customJobs/metadata"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -229,10 +229,11 @@ export const onWriteGroup = functions
       // Run side effects for all creator changes
       sideEffectPromises.push(sparkRepo.syncGroupDataToSpark(change, groupId))
 
+      const newValue = change.after?.data() as Group
+      const previousValue = change.before?.data() as Group
+
       if (changeTypes.isUpdate) {
          // In case the publicProfile flag changes we must validate the group sparks
-         const newValue = change.after?.data() as Group
-         const previousValue = change.before?.data() as Group
 
          if (newValue.publicProfile !== previousValue.publicProfile) {
             sideEffectPromises.push(validateGroupSparks(newValue))
@@ -241,8 +242,6 @@ export const onWriteGroup = functions
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
          // In case any of the backfills change
-         const newValue = change.after?.data() as Group
-         const previousValue = change.before?.data() as Group
 
          if (hasGroupMetadataChanged(previousValue, newValue)) {
             sideEffectPromises.push(

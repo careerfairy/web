@@ -40,6 +40,11 @@ export type PublicCustomJob = Pick<
    | "deleted"
 >
 
+export type PublicCustomJobApplicant = Pick<
+   CustomJobApplicant,
+   "id" | "jobId" | "companyCountry" | "companyIndustries" | "companySize"
+>
+
 export type JobType =
    | "Full-time"
    | "Part-time"
@@ -70,6 +75,18 @@ export const pickPublicDataFromCustomJob = (
       deadline: job.deadline ?? null,
       salary: job.salary ?? null,
       deleted: job.deleted ?? false,
+   }
+}
+
+export const pickPublicDataFromCustomJobApplicant = (
+   jobApplicant: CustomJobApplicant
+): PublicCustomJobApplicant => {
+   return {
+      id: jobApplicant.id,
+      jobId: jobApplicant.jobId ?? null,
+      companyCountry: jobApplicant?.companyCountry,
+      companyIndustries: jobApplicant?.companyIndustries ?? [],
+      companySize: jobApplicant?.companySize,
    }
 }
 
