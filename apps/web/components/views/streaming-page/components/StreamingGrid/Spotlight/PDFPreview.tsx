@@ -76,7 +76,7 @@ const styles = sxStyles({
    fileName: {
       ...getMaxLineStyles(1),
       wordBreak: "break-word",
-      pr: 2,
+      pr: 3,
    },
 })
 

@@ -1,10 +1,9 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box, CircularProgress, Collapse } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { Box, Collapse } from "@mui/material"
 import { useDeleteLivestreamPresentation } from "components/custom-hook/streaming/useDeleteLivestreamPresentation"
 import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { PDFPreview } from "./PDFPreview"
 import { PDFUpload } from "./PDFUpload"
@@ -23,17 +22,10 @@ type Props = {
    pdfPresentation: LivestreamPresentation
 }
 
-export const PDFPresentationManager = (props: Props) => {
-   return (
-      <Box sx={styles.root}>
-         <SuspenseWithBoundary fallback={<CircularProgress />}>
-            <Content {...props} />
-         </SuspenseWithBoundary>
-      </Box>
-   )
-}
-
-export const Content = ({ livestreamId, pdfPresentation }: Props) => {
+export const PDFPresentationManager = ({
+   livestreamId,
+   pdfPresentation,
+}: Props) => {
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
    const { progress, handleUploadFile } = useUploadPDFPresentation(livestreamId)
@@ -62,7 +54,7 @@ export const Content = ({ livestreamId, pdfPresentation }: Props) => {
    const hasData = Boolean(pdfPresentation || pdfFile)
 
    return (
-      <Fragment>
+      <Box sx={styles.root}>
          <Collapse unmountOnExit in={hasData}>
             <PDFPreview
                data={pdfPresentation || pdfFile}
@@ -75,6 +67,6 @@ export const Content = ({ livestreamId, pdfPresentation }: Props) => {
          <Collapse unmountOnExit in={!hasData}>
             <PDFUpload {...fileUploaderProps} dragActive={dragActive} />
          </Collapse>
-      </Fragment>
+      </Box>
    )
 }
