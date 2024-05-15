@@ -1,7 +1,7 @@
+import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress, Collapse } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useDeleteLivestreamPresentation } from "components/custom-hook/streaming/useDeleteLivestreamPresentation"
-import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
 import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
 import { Fragment, useState } from "react"
@@ -20,6 +20,7 @@ const styles = sxStyles({
 
 type Props = {
    livestreamId: string
+   pdfPresentation: LivestreamPresentation
 }
 
 export const PDFPresentationManager = (props: Props) => {
@@ -32,9 +33,7 @@ export const PDFPresentationManager = (props: Props) => {
    )
 }
 
-export const Content = ({ livestreamId }: Props) => {
-   const { data: pdfPresentation } = useLivestreamPDFPresentation(livestreamId)
-
+export const Content = ({ livestreamId, pdfPresentation }: Props) => {
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
    const { progress, handleUploadFile } = useUploadPDFPresentation(livestreamId)
@@ -55,7 +54,9 @@ export const Content = ({ livestreamId }: Props) => {
 
    const handleDeleteFile = () => {
       setPdfFile(null)
-      deletePresentation()
+      if (pdfPresentation) {
+         deletePresentation()
+      }
    }
 
    const hasData = Boolean(pdfPresentation || pdfFile)

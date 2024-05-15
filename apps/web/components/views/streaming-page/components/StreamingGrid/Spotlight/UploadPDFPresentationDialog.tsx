@@ -1,3 +1,4 @@
+import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
 import {
    Box,
@@ -9,6 +10,8 @@ import {
 } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import { PDFIcon } from "components/views/common/icons"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { setUploadPDFPresentationDialogOpen } from "store/reducers/streamingAppReducer"
@@ -104,10 +107,9 @@ type ContentProps = {
 
 const Content = ({ onClose, isMobile }: ContentProps) => {
    const { livestreamId } = useStreamingContext()
-
-   const cancel = () => {
-      onClose()
-   }
+   const { data: pdfPresentation } = useLivestreamPDFPresentation(livestreamId)
+   const { trigger: setLivestreamMode, isMutating } =
+      useSetLivestreamMode(livestreamId)
 
    return (
       <Box sx={styles.container}>
@@ -126,7 +128,10 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
                Upload your PDF
             </Typography>
          </Stack>
-         <PDFPresentationManager livestreamId={livestreamId} />
+         <PDFPresentationManager
+            pdfPresentation={pdfPresentation}
+            livestreamId={livestreamId}
+         />
          <Stack
             component={DialogActions}
             sx={[styles.actions, isMobile && styles.actionsMobile]}
@@ -134,13 +139,19 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
             direction="row"
             spacing={1.25}
          >
-            <LoadingButton onClick={cancel} variant="outlined" color="grey">
+            <LoadingButton onClick={onClose} variant="outlined" color="grey">
                Cancel
             </LoadingButton>
             <LoadingButton
                variant="contained"
                color="primary"
-               onClick={() => alert("Not implemented")}
+               disabled={!pdfPresentation?.downloadUrl}
+               loading={isMutating}
+               onClick={() =>
+                  setLivestreamMode({
+                     mode: LivestreamModes.PRESENTATION,
+                  }).then(onClose)
+               }
             >
                Share slides
             </LoadingButton>
