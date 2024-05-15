@@ -3,7 +3,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
 import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { PDFPreview } from "./PDFPreview"
 import { PDFUpload } from "./PDFUpload"
@@ -35,15 +35,7 @@ export const Content = ({ livestreamId }: Props) => {
 
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
-   const { cancelUpload, progress, handleUploadFile } =
-      useUploadPDFPresentation(livestreamId)
-
-   // Cancel upload on unmount if there is one
-   useEffect(() => {
-      return () => {
-         cancelUpload()
-      }
-   }, [cancelUpload])
+   const { progress, handleUploadFile } = useUploadPDFPresentation(livestreamId)
 
    const { fileUploaderProps, dragActive } = useFileUploader({
       acceptedFileTypes: ["pdf", "PDF"],
