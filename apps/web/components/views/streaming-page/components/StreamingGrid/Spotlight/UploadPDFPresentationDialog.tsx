@@ -2,12 +2,14 @@ import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
 import {
    Box,
+   CircularProgress,
    Dialog,
    DialogActions,
    Stack,
    SwipeableDrawer,
    Typography,
 } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
@@ -60,6 +62,12 @@ const styles = sxStyles({
       height: 84,
       color: "primary.main",
    },
+   loader: {
+      m: "auto",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 })
 
 export const UploadPDFPresentationDialog = () => {
@@ -82,7 +90,9 @@ export const UploadPDFPresentationDialog = () => {
             onClose={closeMenu}
             onOpen={closeMenu}
          >
-            <Content isMobile={isMobile} onClose={closeMenu} />
+            <SuspenseWithBoundary fallback={<Loader />}>
+               <Content isMobile={isMobile} onClose={closeMenu} />
+            </SuspenseWithBoundary>
          </SwipeableDrawer>
       )
    }
@@ -95,7 +105,9 @@ export const UploadPDFPresentationDialog = () => {
          open={settingsMenuOpen}
          TransitionProps={{ unmountOnExit: true }}
       >
-         <Content isMobile={isMobile} onClose={closeMenu} />
+         <SuspenseWithBoundary fallback={<Loader />}>
+            <Content isMobile={isMobile} onClose={closeMenu} />
+         </SuspenseWithBoundary>
       </Dialog>
    )
 }
@@ -156,6 +168,14 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
                Share slides
             </LoadingButton>
          </Stack>
+      </Box>
+   )
+}
+
+const Loader = () => {
+   return (
+      <Box sx={styles.loader}>
+         <CircularProgress />
       </Box>
    )
 }
