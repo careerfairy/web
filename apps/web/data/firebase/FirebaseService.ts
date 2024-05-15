@@ -973,7 +973,8 @@ class FirebaseService {
    setLivestreamPresentation = (
       livestreamId: string,
       downloadUrl: string,
-      file: File
+      file: File,
+      storagePath: string
    ) => {
       const ref = this.firestore
          .collection("livestreams")
@@ -982,11 +983,12 @@ class FirebaseService {
          .doc("presentation")
 
       const presentation: LivestreamPresentation = {
-         downloadUrl: downloadUrl,
+         downloadUrl,
          page: 1,
          fileName: file.name || livestreamId,
          fileSize: file.size || 0,
          id: ref.id,
+         storagePath,
       }
 
       return ref.set(presentation)
