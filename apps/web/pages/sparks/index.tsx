@@ -1,6 +1,8 @@
 import { sparkService } from "data/firebase/SparksService"
+import { lookup } from "geoip-lite"
 import { GetServerSideProps } from "next"
 import { encode } from "querystring"
+import { getUserTokenFromCookie } from "util/serverUtil"
 
 /**
  *  This page is used to redirect to the next spark if a user lands on the /sparks page.
@@ -11,9 +13,19 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+   const token = getUserTokenFromCookie(context)
+   const ipAddress =
+      context.req.headers["x-forwarded-for"] || context.req.socket.remoteAddress
+
+   // Use geoip-lite to get geolocation data based on the IP address
+   const geo = lookup(ipAddress as string)
+
+   const countryCode = geo ? geo.country : null
+
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
-      userId: null,
+      userId: token?.email ?? null,
+      anonymousUserCountryCode: token?.email ? null : countryCode,
    })
 
    const queryParamString = encode(context.query)
