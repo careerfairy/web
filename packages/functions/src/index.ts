@@ -211,7 +211,7 @@ exports.periodicallyRemoveCachedDocument =
 // exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
