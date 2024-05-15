@@ -71,12 +71,14 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    }, [livestreamId])
 
    function uploadLogo(logoFile) {
+      const getStoragePath = () => {
+         return "company_documents/" + livestreamId + ".pdf"
+      }
+
       setLoading(true)
       setUploadingPresentation(true)
       var storageRef = firebase.getStorageRef()
-      let presentationRef = storageRef.child(
-         "company_documents/" + livestreamId + ".pdf"
-      )
+      let presentationRef = storageRef.child(getStoragePath())
 
       var uploadTask = presentationRef.put(logoFile)
 
@@ -118,7 +120,8 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
                   firebase.setLivestreamPresentation(
                      livestreamId,
                      downloadURL,
-                     logoFile
+                     logoFile,
+                     getStoragePath()
                   )
                   console.log("File available at", downloadURL)
                   setUploadingPresentation(false)

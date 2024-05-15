@@ -1005,11 +1005,13 @@ export class LivestreamService {
       downloadUrl,
       fileSize,
       fileName,
+      storagePath,
    }: {
       livestreamId: string
       downloadUrl: string
       fileSize: number
       fileName: string
+      storagePath: string
    }) => {
       const ref = doc(
          FirestoreInstance,
@@ -1020,11 +1022,12 @@ export class LivestreamService {
       ).withConverter(createGenericConverter<LivestreamPresentation>())
 
       return setDoc(ref, {
-         downloadUrl: downloadUrl,
+         downloadUrl,
          page: 1,
          fileName: fileName || livestreamId,
          fileSize: fileSize || 0,
          id: ref.id,
+         storagePath,
       })
    }
 

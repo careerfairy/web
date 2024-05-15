@@ -40,7 +40,7 @@ export const PDFPresentationManager = ({
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
          setPdfFile(newFile)
-         handleUploadFile(newFile, true)
+         handleUploadFile(newFile, livestreamId)
       },
    })
 

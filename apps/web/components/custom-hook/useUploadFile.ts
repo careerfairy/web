@@ -8,7 +8,6 @@ export type FileMetadata = {
    url: string
    uid: string
    fileExtension: string
-   fileSize: number
 }
 
 /**
@@ -23,7 +22,7 @@ type UseUploadFile = {
     */
    handleUploadFile: (
       file: File,
-      keepFileName?: boolean
+      customFileName?: string
    ) => Promise<FileMetadata>
 
    /**
@@ -65,9 +64,8 @@ const useUploadFile = (
    storagePath: string,
    onUploadComplete?: (
       url: string,
-      fileName: string,
-      fileExtension: string,
-      fileSize: number
+      storagePath: string,
+      uploadedFile: File
    ) => void
 ): UseUploadFile => {
    const { errorNotification } = useSnackbarNotifications()
@@ -79,23 +77,24 @@ const useUploadFile = (
     * Function to handle the upload of a file.
     *
     * @param {File} file - The file to upload.
+    * @param {string} customFileName - The custom name of the file, eg input: "bob" -> bob.pdf
     *
     * @returns {Promise} A promise that resolves to an object containing the URL and unique ID (UUID) of the uploaded file.
     */
    const handleUploadFile = useCallback(
-      async (file: File, keepFileName?: boolean) => {
+      async (file: File, customFileName?: string) => {
          try {
             setLoading(true)
             const fileExtension = file.name.split(".").pop()
-            const fileName = keepFileName
-               ? sanitizeFileName(file.name.split(".")[0])
+            const fileName = customFileName
+               ? sanitizeFileName(customFileName)
                : uuid()
             const path = `${storagePath}/${fileName}.${fileExtension}`
             const url = await upload(file, path)
 
             // Call the provided callback function with the URL and UUID of the uploaded file
             if (onUploadComplete) {
-               onUploadComplete(url, fileName, fileExtension, file.size)
+               onUploadComplete(url, path, file)
             }
 
             setFileUploaded(true)
