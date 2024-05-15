@@ -2,13 +2,16 @@ import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    ButtonBase,
+   Collapse,
+   IconButton,
    LinearProgress,
    Stack,
    Typography,
+   linearProgressClasses,
 } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { useMemo } from "react"
-import { File as FileIcon } from "react-feather"
+import { CheckCircle, X as DeleteIcon, File as FileIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -16,6 +19,7 @@ const styles = sxStyles({
       p: 1.5,
       width: "100%",
       justifyContent: "flex-start",
+      position: "relative",
    },
    iconWrapper: {
       borderRadius: "50%",
@@ -32,55 +36,131 @@ const styles = sxStyles({
          height: 25.625,
       },
    },
+   progress: {
+      flex: 1,
+      backgroundColor: (theme) => theme.brand.black[400],
+      borderRadius: "6px",
+      [`& .${linearProgressClasses.bar}`]: {
+         borderRadius: "6px",
+      },
+   },
+   uploadedText: {
+      textAlign: "center",
+      display: "flex",
+      alignItems: "center",
+   },
+   checkCircle: {
+      width: 14,
+      height: 14,
+      color: "success.700",
+   },
+   deleteButton: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      p: 0.8,
+      "& button": {
+         p: 0.2,
+         m: -0.2,
+      },
+      "& svg": {
+         width: 24,
+         height: 24,
+      },
+   },
 })
 
 type Props = {
    data: LivestreamPresentation | File
    uploadProgress: number
+   fileUpLoaded: boolean
 }
 
-export const PDFPreview = ({ data, uploadProgress }: Props) => {
+export const PDFPreview = ({ data, uploadProgress, fileUpLoaded }: Props) => {
    const details = useMemo(() => getDetails(data), [data])
 
    return (
       <ButtonBase
          sx={styles.root}
-         href={details.downloadUrl}
-         component="a"
-         target="_blank"
+         {...(uploadProgress < 0 && {
+            href: details.downloadUrl,
+            component: "a",
+            target: "_blank",
+         })}
       >
-         <Stack direction="row" alignItems="center" spacing={1}>
-            <Box sx={styles.iconWrapper}>
-               <FileIcon />
-            </Box>
-            <Stack>
-               <Typography
-                  variant="medium"
-                  sx={getMaxLineStyles(1)}
-                  color="neutral.700"
-               >
-                  {details.fileName}
-               </Typography>
-               <Typography variant="xsmall" color="neutral.400">
-                  {details.fileSize.toFixed(2)} MB
-               </Typography>
+         <Stack width="100%" spacing={1}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+               <Box sx={styles.iconWrapper}>
+                  <FileIcon />
+               </Box>
+               <Stack alignItems="flex-start">
+                  <Typography
+                     variant="medium"
+                     sx={getMaxLineStyles(1)}
+                     color="neutral.700"
+                  >
+                     {details.fileName}
+                  </Typography>
+                  <Typography variant="xsmall" color="neutral.400">
+                     {details.fileSize.toFixed(2)} MB
+                  </Typography>
+               </Stack>
             </Stack>
-            {Boolean(uploadProgress) && (
-               <ProgressBar progress={uploadProgress} />
-            )}
+            <ProgressBar
+               progress={uploadProgress}
+               fileUpLoaded={fileUpLoaded}
+            />
          </Stack>
+         <Box sx={styles.deleteButton}>
+            <IconButton>
+               <DeleteIcon />
+            </IconButton>
+         </Box>
       </ButtonBase>
    )
 }
 
-const ProgressBar = ({ progress }: { progress: number }) => {
+type ProgressBarProps = {
+   progress: number
+   fileUpLoaded: boolean
+}
+
+const ProgressBar = ({ progress, fileUpLoaded }: ProgressBarProps) => {
+   if (fileUpLoaded) {
+      return (
+         <Collapse unmountOnExit in={fileUpLoaded}>
+            <Stack
+               direction="row"
+               alignItems="center"
+               justifyContent="center"
+               spacing={1}
+            >
+               <Box sx={styles.checkCircle} component={CheckCircle} />
+               <Typography
+                  sx={styles.uploadedText}
+                  variant="xsmall"
+                  color="neutral.700"
+               >
+                  File uploaded
+               </Typography>
+            </Stack>
+         </Collapse>
+      )
+   }
+
    return (
-      <Stack spacing={0.5}>
-         <LinearProgress variant="determinate" value={progress} />
-         <Typography variant="small" color="neutral.400">
-            {progress}%
-         </Typography>
-      </Stack>
+      <Collapse unmountOnExit in={progress > 0}>
+         <Stack direction="row" alignItems="center" spacing={2}>
+            <LinearProgress
+               sx={styles.progress}
+               variant="determinate"
+               value={progress}
+            />
+            <Typography variant="small" color="neutral.700">
+               {progress}%
+            </Typography>
+         </Stack>
+      </Collapse>
    )
 }
 

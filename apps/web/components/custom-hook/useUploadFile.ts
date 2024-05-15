@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
+import { sanitizeFileName } from "util/CommonUtil"
 import { v4 as uuid } from "uuid"
 import useFirebaseUpload from "./useFirebaseUpload"
 import useSnackbarNotifications from "./useSnackbarNotifications"
@@ -7,6 +8,7 @@ export type FileMetadata = {
    url: string
    uid: string
    fileExtension: string
+   fileSize: number
 }
 
 /**
@@ -16,9 +18,13 @@ type UseUploadFile = {
    /**
     * Function to handle the upload of a file.
     * @param file - The file to upload.
+    * @param keepFileName - If true, the file name will be kept as is, otherwise it will have a unique id.
     * @returns An object containing the url and the unique id (uid) of the uploaded file.
     */
-   handleUploadFile: (file: File) => Promise<FileMetadata>
+   handleUploadFile: (
+      file: File,
+      keepFileName?: boolean
+   ) => Promise<FileMetadata>
 
    /**
     * A boolean indicating if the file has been uploaded successfully.
@@ -65,12 +71,13 @@ const useUploadFile = (
    onUploadComplete?: (
       url: string,
       fileName: string,
-      fileExtension: string
+      fileExtension: string,
+      fileSize: number
    ) => void
 ): UseUploadFile => {
    const { errorNotification } = useSnackbarNotifications()
    const [loading, setLoading] = useState(false)
-   const [upload, progress, uploading, , , cancelUpload] = useFirebaseUpload()
+   const [upload, progress, uploading] = useFirebaseUpload()
    const [fileUploaded, setFileUploaded] = useState(false)
 
    /**
@@ -81,21 +88,23 @@ const useUploadFile = (
     * @returns {Promise} A promise that resolves to an object containing the URL and unique ID (UUID) of the uploaded file.
     */
    const handleUploadFile = useCallback(
-      async (file: File) => {
+      async (file: File, keepFileName?: boolean) => {
          try {
             setLoading(true)
             const fileExtension = file.name.split(".").pop()
-            const fileName = uuid()
+            const fileName = keepFileName
+               ? sanitizeFileName(file.name.split(".")[0])
+               : uuid()
             const path = `${storagePath}/${fileName}.${fileExtension}`
             const url = await upload(file, path)
 
             // Call the provided callback function with the URL and UUID of the uploaded file
             if (onUploadComplete) {
-               onUploadComplete(url, fileName, fileExtension)
+               onUploadComplete(url, fileName, fileExtension, file.size)
             }
 
             setFileUploaded(true)
-            return { url, uid: fileName, fileExtension }
+            return { url, uid: fileName, fileExtension, fileSize: file.size }
          } catch (error) {
             errorNotification(error, "Error uploading file", {
                storagePath,
@@ -118,16 +127,8 @@ const useUploadFile = (
          isLoading,
          progress,
          uploading,
-         cancelUpload,
       }),
-      [
-         handleUploadFile,
-         fileUploaded,
-         isLoading,
-         progress,
-         uploading,
-         cancelUpload,
-      ]
+      [handleUploadFile, fileUploaded, isLoading, progress, uploading]
    )
 }
 
