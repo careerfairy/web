@@ -16,7 +16,7 @@ import { WaitingRoom } from "./components/viewer/WaitingRoom"
 const UploadPDFPresentationDialog = dynamic(
    () =>
       import(
-         "./components/StreamingGrid/Spotlight/UploadPDFPresentationDialog"
+         "./components/StreamingGrid/Spotlight/pdf/UploadPDFPresentationDialog"
       ).then((mod) => mod.UploadPDFPresentationDialog),
    { ssr: false }
 )
