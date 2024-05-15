@@ -3,7 +3,6 @@ import {
    Box,
    IconButton,
    LinearProgress,
-   Skeleton,
    Stack,
    Typography,
    linearProgressClasses,
@@ -12,6 +11,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { forwardRef, useMemo } from "react"
 import { CheckCircle, X as DeleteIcon, File as FileIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { PDFPreviewSkeleton } from "./PDFPreviewSkeleton"
 
 const styles = sxStyles({
    root: {
@@ -88,6 +88,27 @@ type Props = {
    handleDelete: () => void
 }
 
+const getDetails = (data: File | LivestreamPresentation) => {
+   if (!data) {
+      return null
+   }
+   if (data instanceof File) {
+      return {
+         fileName: data.name,
+         fileSize: data.size / 1024 / 1024,
+         downloadUrl: URL.createObjectURL(data),
+      }
+   } else {
+      return {
+         fileName: data.fileName,
+         fileSize: Number.isFinite(data.fileSize)
+            ? data.fileSize / 1024 / 1024
+            : 0,
+         downloadUrl: data.downloadUrl,
+      }
+   }
+}
+
 export const PDFPreview = forwardRef<HTMLDivElement, Props>(
    ({ data, uploadProgress, fileUpLoaded, isDeleting, handleDelete }, ref) => {
       const details = useMemo(() => getDetails(data), [data])
@@ -100,13 +121,13 @@ export const PDFPreview = forwardRef<HTMLDivElement, Props>(
          <Box ref={ref} sx={styles.root}>
             <Stack width="100%" spacing={1}>
                <Stack
-                  href={details.downloadUrl}
-                  target="_blank"
-                  component="a"
-                  download={details.fileName}
                   direction="row"
                   alignItems="center"
                   spacing={1}
+                  href={details.downloadUrl}
+                  download={details.fileName}
+                  target="_blank"
+                  component="a"
                >
                   <Box sx={styles.iconWrapper}>
                      <FileIcon />
@@ -130,13 +151,7 @@ export const PDFPreview = forwardRef<HTMLDivElement, Props>(
                />
             </Stack>
             <Box sx={styles.deleteButton}>
-               <IconButton
-                  onClick={(e) => {
-                     e.stopPropagation()
-                     handleDelete()
-                  }}
-                  disabled={isDeleting}
-               >
+               <IconButton onClick={handleDelete} disabled={isDeleting}>
                   <DeleteIcon />
                </IconButton>
             </Box>
@@ -146,28 +161,6 @@ export const PDFPreview = forwardRef<HTMLDivElement, Props>(
 )
 
 PDFPreview.displayName = "PDFPreview"
-
-const PDFPreviewSkeleton = () => {
-   return (
-      <Stack p={1.5} width="100%" spacing={1}>
-         <Stack direction="row" alignItems="center" spacing={1}>
-            <Skeleton variant="circular" width={41} height={41} />
-            <Stack alignItems="flex-start">
-               <Typography
-                  variant="medium"
-                  sx={styles.fileName}
-                  color="neutral.700"
-               >
-                  <Skeleton variant="text" width={150} />
-               </Typography>
-               <Typography variant="xsmall" color="neutral.400">
-                  <Skeleton variant="text" width={50} />
-               </Typography>
-            </Stack>
-         </Stack>
-      </Stack>
-   )
-}
 
 type ProgressBarProps = {
    progress: number
@@ -213,29 +206,8 @@ const ProgressBar = ({ progress, fileUpLoaded }: ProgressBarProps) => {
             value={progress}
          />
          <Typography variant="small" color="neutral.700">
-            {progress}%
+            {progress.toFixed(0)}%
          </Typography>
       </Stack>
    )
-}
-
-const getDetails = (data: File | LivestreamPresentation) => {
-   if (!data) {
-      return null
-   }
-   if (data instanceof File) {
-      return {
-         fileName: data.name,
-         fileSize: data.size / 1024 / 1024,
-         downloadUrl: URL.createObjectURL(data),
-      }
-   } else {
-      return {
-         fileName: data.fileName,
-         fileSize: Number.isFinite(data.fileSize)
-            ? data.fileSize / 1024 / 1024
-            : 0,
-         downloadUrl: data.downloadUrl,
-      }
-   }
 }
