@@ -93,7 +93,7 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
       : Mode extends "video"
       ? { mode: "video"; youtubeVideoURL: string }
       : Mode extends "presentation"
-      ? { mode: "presentation"; pdfURL: string }
+      ? { mode: "presentation" }
       : never
 
 export class LivestreamService {
@@ -397,16 +397,9 @@ export class LivestreamService {
             })
 
          case LivestreamModes.PRESENTATION:
-            if (!options.pdfURL) {
-               throw new Error("PDF URL is required to start a presentation")
-            }
-            /**
-             * TODO:
-             * Batch operations (both must succeed or fail)
-             * 1. Set mode to presentation on livestreams/{id}
-             * 2. Save the PDF url at /livestreams/{id}/presentations/presentation. Look at old implementation for reference
-             */
-            return
+            return this.updateLivestream(livestreamId, {
+               mode: options.mode,
+            })
 
          case LivestreamModes.VIDEO:
             if (!options.youtubeVideoURL) {
@@ -1004,6 +997,9 @@ export class LivestreamService {
       )
    }
 
+   /**
+    * Sets the livestream PDF presentation metadata in the firestore database
+    */
    setLivestreamPDFPresentation = async ({
       livestreamId,
       downloadUrl,
