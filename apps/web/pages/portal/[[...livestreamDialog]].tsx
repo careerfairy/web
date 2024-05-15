@@ -4,11 +4,10 @@ import { Box } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import SEO from "../../components/util/SEO"
 import CarouselContentService, {
-   SerializedContent,
-   type CarouselContent,
+   CarouselContent,
 } from "../../components/views/portal/content-carousel/CarouselContentService"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
@@ -31,6 +30,7 @@ import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import useUserCustomJobApplications from "components/custom-hook/custom-job/useUserCustomJobApplications"
 import useInteractedLivestreams from "components/custom-hook/live-stream/useInteractedLivestreams"
+import useLivestreamsCarouselContentSWR from "components/custom-hook/live-stream/useLivestreamCarouselContent"
 import useUserSeenSparks from "components/custom-hook/spark/useUserSeenSparks"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -64,13 +64,7 @@ const PortalPage = ({
    const router = useRouter()
    const isMobile = useIsMobile()
 
-   const [
-      updatedSerializedCarouselContent,
-      setUpdatedSerializedCarouselContent,
-   ] = useState<SerializedContent[]>([])
-
    const { sparks: seenSparks } = useUserSeenSparks()
-   console.log("🚀 ~ seenSparks:", seenSparks)
    const { jobApplications } = useUserCustomJobApplications()
    const { events: interactedEvents } = useInteractedLivestreams()
 
@@ -85,42 +79,26 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
+   const { data: serializedCarouselContent } = useLivestreamsCarouselContentSWR(
+      {
+         userData: userData,
+         userStats: serverUserStats,
+         pastLivestreams: pastEvents || [],
+         upcomingLivestreams: comingUpNextEvents || [],
+         registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+         watchedSparks: seenSparks || [],
+         watchedLivestreams: interactedEvents || [],
+         appliedJobs: jobApplications || [],
+      }
+   )
+
    const carouselContent = useMemo<CarouselContent[]>(() => {
       return CarouselContentService.deserializeContent(
-         updatedSerializedCarouselContent
+         serializedCarouselContent
       )
-   }, [updatedSerializedCarouselContent])
+   }, [serializedCarouselContent])
 
-   useEffect(() => {
-      async function getContent() {
-         const carouselContentService = new CarouselContentService({
-            userData: userData,
-            userStats: serverUserStats,
-            pastLivestreams: pastEvents || [],
-            upcomingLivestreams: comingUpNextEvents || [],
-            registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-            watchedSparks: seenSparks || [],
-            watchedLivestreams: interactedEvents || [],
-            appliedJobs: jobApplications || [],
-         })
-         const updatedSerializedContent =
-            await carouselContentService.getCarouselContent()
-         setUpdatedSerializedCarouselContent(
-            CarouselContentService.serializeContent(updatedSerializedContent)
-         )
-      }
-      getContent()
-   }, [
-      comingUpNextEvents,
-      interactedEvents,
-      jobApplications,
-      pastEvents,
-      recordedEventsToShare,
-      seenSparks,
-      serverUserStats,
-      userData,
-   ])
-
+   console.log("🚀 ~ carouselContent:", carouselContent)
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
 
@@ -216,7 +194,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    if (token?.email) {
       promises.push(
          livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
-         // livestreamRepo.getUserSeenEventsByUserId(token?.email),
          getServerSideUserStats(token.email),
          getServerSideUserData(token.email)
       )
@@ -238,8 +215,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
-
-   // TODO: Move to client
+   // TODO: Remove ?
    const carouselContentService = new CarouselContentService({
       userData: userData,
       userStats: userStats,

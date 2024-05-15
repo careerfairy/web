@@ -1,0 +1,80 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import CarouselContentService from "components/views/portal/content-carousel/CarouselContentService"
+import { useCallback, useMemo } from "react"
+import useSWR, { SWRConfiguration } from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
+
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   keepPreviousData: false,
+   suspense: false,
+   onError: (error, key) =>
+      errorLogAndNotify(error, {
+         message: `Error fetching Carousel content via service with options: ${key}`,
+      }),
+}
+
+export type UseLivestreamCarouselContentSWROptions = {
+   userData: UserData
+   userStats: UserStats
+   pastLivestreams: LivestreamEvent[]
+   upcomingLivestreams: LivestreamEvent[]
+   registeredRecordedLivestreamsForUser: LivestreamEvent[]
+   watchedSparks: Spark[]
+   watchedLivestreams: LivestreamEvent[]
+   appliedJobs: CustomJobApplicant[]
+}
+
+const useLivestreamsCarouselContentSWR = (
+   options: UseLivestreamCarouselContentSWROptions
+) => {
+   const key = useMemo(() => JSON.stringify(options), [options])
+
+   const carouselContentService = useMemo(
+      () =>
+         new CarouselContentService({
+            userData: options.userData,
+            userStats: options.userStats,
+            pastLivestreams: options.pastLivestreams || [],
+            upcomingLivestreams: options.upcomingLivestreams || [],
+            registeredRecordedLivestreamsForUser:
+               options.registeredRecordedLivestreamsForUser || [],
+            watchedSparks: options.watchedSparks || [],
+            watchedLivestreams: options.watchedLivestreams || [],
+            appliedJobs: options.appliedJobs || [],
+         }),
+      [
+         options.appliedJobs,
+         options.pastLivestreams,
+         options.registeredRecordedLivestreamsForUser,
+         options.upcomingLivestreams,
+         options.userData,
+         options.userStats,
+         options.watchedLivestreams,
+         options.watchedSparks,
+      ]
+   )
+
+   const swrFetcher = useCallback(
+      async () =>
+         CarouselContentService.serializeContent(
+            await carouselContentService.getCarouselContent()
+         ),
+      [carouselContentService]
+   )
+
+   const result = useSWR(key, swrFetcher, swrOptions)
+   return {
+      data: result.data || [],
+      error: result.error,
+      isLoading: result.isLoading,
+      isValidating: result.isValidating,
+      mutate: result.mutate,
+   }
+}
+
+export default useLivestreamsCarouselContentSWR
