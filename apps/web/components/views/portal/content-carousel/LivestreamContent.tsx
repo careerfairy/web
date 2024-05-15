@@ -72,6 +72,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
    const subtitle = useMemo(() => {
       if (eventIsUpcoming) {
          // Should return something like "Live on 17 April 2023"
+         console.log("🚀 ~ subtitle ~ livestream:", livestream.start)
          return `Live on ${DateUtil.dateWithYear(livestream.start.toDate())}`
       }
 

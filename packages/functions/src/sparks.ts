@@ -1,7 +1,7 @@
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
 import { RuntimeOptions } from "firebase-functions"
-import { SchemaOf, array, number, object, string } from "yup"
+import { SchemaOf, number, object } from "yup"
 import { sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { middlewares } from "./middlewares/middlewares"
@@ -15,14 +15,6 @@ const runtimeSettings: RuntimeOptions = {
    memory: "256MB",
 }
 
-type GetSparksByIds = {
-   sparkIds: string[]
-}
-
-const getSparksByIdsSchema: SchemaOf<GetSparksByIds> = object().shape({
-   sparkIds: array().of(string()),
-})
-
 type GetUserSeenSparks = {
    limit: number
 }
@@ -30,29 +22,6 @@ type GetUserSeenSparks = {
 const getUserSeenSparksSchema: SchemaOf<GetUserSeenSparks> = object().shape({
    limit: number().min(1).default(20).required(),
 })
-
-export const getSparksByIds = functions
-   .region(config.region)
-   .runWith(runtimeSettings)
-   .https.onCall(
-      middlewares(
-         dataValidation(getSparksByIdsSchema),
-         userAuthExists(),
-         async (data: GetSparksByIds, context) => {
-            try {
-               return sparkRepo.getSparksByIds(data.sparkIds)
-            } catch (error) {
-               functions.logger.error(
-                  "Error while retrieving Sparks by IDs",
-                  data,
-                  error,
-                  context
-               )
-               return null
-            }
-         }
-      )
-   )
 
 export const getUserSeenSparks = functions
    .region(config.region)
