@@ -63,7 +63,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { errorLogAndNotify, sanitizeFileName } from "util/CommonUtil"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
@@ -1003,11 +1003,17 @@ export class LivestreamService {
       )
    }
 
-   setLivestreamPDFPresentation = async (
-      livestreamId: string,
-      downloadUrl: string,
-      file: File
-   ) => {
+   setLivestreamPDFPresentation = async ({
+      livestreamId,
+      downloadUrl,
+      fileSize,
+      fileName,
+   }: {
+      livestreamId: string
+      downloadUrl: string
+      fileSize: number
+      fileName: string
+   }) => {
       const ref = doc(
          FirestoreInstance,
          "livestreams",
@@ -1019,8 +1025,8 @@ export class LivestreamService {
       return setDoc(ref, {
          downloadUrl: downloadUrl,
          page: 1,
-         fileName: sanitizeFileName(file.name) || livestreamId,
-         fileSize: file.size || 0,
+         fileName: fileName || livestreamId,
+         fileSize: fileSize || 0,
          id: ref.id,
       })
    }

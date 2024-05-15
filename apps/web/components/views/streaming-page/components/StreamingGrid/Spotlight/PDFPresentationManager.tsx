@@ -1,12 +1,10 @@
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
+import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import useFirebaseUpload from "components/custom-hook/useFirebaseUpload"
-import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { errorLogAndNotify, sanitizeFileName } from "util/CommonUtil"
 import { PDFPreview } from "./PDFPreview"
 import { PDFUpload } from "./PDFUpload"
 
@@ -37,13 +35,8 @@ export const Content = ({ livestreamId }: Props) => {
 
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
-   const [uploadFile, uploadProgress, , , , cancelUpload] = useFirebaseUpload(
-      (error) =>
-         errorLogAndNotify(error, {
-            message: "Failed to upload PDF presentation",
-            title: "Upload PDF presentation failed",
-         })
-   )
+   const { cancelUpload, progress, handleUploadFile } =
+      useUploadPDFPresentation(livestreamId)
 
    // Cancel upload on unmount if there is one
    useEffect(() => {
@@ -58,26 +51,8 @@ export const Content = ({ livestreamId }: Props) => {
       multiple: false,
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
-         console.log("🚀 ~ Set PDF file")
          setPdfFile(newFile)
-
-         const sanitizedFileName = sanitizeFileName(newFile.name)
-
-         console.log("🚀 ~ Upload PDF presentation")
-         const url = await uploadFile(
-            newFile,
-            `live-stream-media/${livestreamId}/${sanitizedFileName}`
-         )
-
-         console.log("🚀 ~ Set PDF presentation")
-         await livestreamService.setLivestreamPDFPresentation(
-            livestreamId,
-            url,
-            newFile
-         )
-
-         console.log("🚀 ~ Clear PDF file")
-         setPdfFile(null)
+         handleUploadFile(newFile, true)
       },
    })
 
@@ -85,7 +60,8 @@ export const Content = ({ livestreamId }: Props) => {
       return (
          <PDFPreview
             data={pdfPresentation || pdfFile}
-            uploadProgress={uploadProgress}
+            fileUpLoaded={Boolean(progress === 100 && pdfPresentation)}
+            uploadProgress={progress}
          />
       )
    }
