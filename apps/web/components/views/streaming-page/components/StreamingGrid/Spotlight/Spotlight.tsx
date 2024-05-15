@@ -7,9 +7,9 @@ import {
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { UserStream } from "../../../types"
-import { SpotlightPDF } from "./SpotlightPDF"
 import { SpotlightProvider } from "./SpotlightProvider"
 import { SpotlightStream } from "./SpotlightStream"
+import { SpotlightPDF } from "./pdf/SpotlightPDF"
 
 const styles = sxStyles({
    root: {
