@@ -27,11 +27,11 @@ const styles = sxStyles({
       "& .MuiDrawer-paper": {
          borderTopLeftRadius: 12,
          borderTopRightRadius: 12,
-         maxHeight: "calc(100vh - 88px)",
+         maxHeight: "calc(100vh - 40px)",
       },
    },
    container: {
-      p: 4,
+      p: { xs: 2, md: 4 },
       position: "relative",
    },
    header: {
@@ -41,6 +41,16 @@ const styles = sxStyles({
       mt: 4,
       position: "sticky",
       bottom: 0,
+      "& button": {
+         width: 150,
+      },
+   },
+   actionsMobile: {
+      backgroundColor: "white",
+      borderTop: "1px solid",
+      borderColor: "neutral.50",
+      mx: -2,
+      mb: -2,
    },
    icon: {
       width: 84,
@@ -50,7 +60,7 @@ const styles = sxStyles({
 })
 
 export const UploadPDFPresentationDialog = () => {
-   const isMobile = useStreamIsMobile(650)
+   const isMobile = useStreamIsMobile()
 
    const settingsMenuOpen = useUploadPDFPresentationDialogOpen()
 
@@ -69,7 +79,7 @@ export const UploadPDFPresentationDialog = () => {
             onClose={closeMenu}
             onOpen={closeMenu}
          >
-            <Content onClose={closeMenu} />
+            <Content isMobile={isMobile} onClose={closeMenu} />
          </SwipeableDrawer>
       )
    }
@@ -82,16 +92,17 @@ export const UploadPDFPresentationDialog = () => {
          open={settingsMenuOpen}
          TransitionProps={{ unmountOnExit: true }}
       >
-         <Content onClose={closeMenu} />
+         <Content isMobile={isMobile} onClose={closeMenu} />
       </Dialog>
    )
 }
 
 type ContentProps = {
    onClose: () => void
+   isMobile: boolean
 }
 
-const Content = ({ onClose }: ContentProps) => {
+const Content = ({ onClose, isMobile }: ContentProps) => {
    const { livestreamId } = useStreamingContext()
 
    const cancel = () => {
@@ -118,15 +129,19 @@ const Content = ({ onClose }: ContentProps) => {
          <PDFPresentationManager livestreamId={livestreamId} />
          <Stack
             component={DialogActions}
-            sx={styles.actions}
-            justifyContent="center"
+            sx={[styles.actions, isMobile && styles.actionsMobile]}
+            justifyContent={isMobile ? "flex-end" : "center"}
             direction="row"
             spacing={1.25}
          >
             <LoadingButton onClick={cancel} variant="outlined" color="grey">
                Cancel
             </LoadingButton>
-            <LoadingButton disabled variant="contained" color="primary">
+            <LoadingButton
+               variant="contained"
+               color="primary"
+               onClick={() => alert("Not implemented")}
+            >
                Share slides
             </LoadingButton>
          </Stack>

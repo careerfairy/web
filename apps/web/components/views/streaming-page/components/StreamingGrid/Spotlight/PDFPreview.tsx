@@ -1,16 +1,15 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
-   ButtonBase,
-   Collapse,
    IconButton,
    LinearProgress,
+   Skeleton,
    Stack,
    Typography,
    linearProgressClasses,
 } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
-import { useMemo } from "react"
+import { forwardRef, useMemo } from "react"
 import { CheckCircle, X as DeleteIcon, File as FileIcon } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -68,55 +67,105 @@ const styles = sxStyles({
          height: 24,
       },
    },
+   progressBarContainer: {
+      display: "flex",
+      alignItems: "center",
+      height: 20,
+      justifyContent: "center",
+   },
+   fileName: {
+      ...getMaxLineStyles(1),
+      wordBreak: "break-word",
+      pr: 2,
+   },
 })
 
 type Props = {
    data: LivestreamPresentation | File
    uploadProgress: number
    fileUpLoaded: boolean
+   isDeleting: boolean
+   handleDelete: () => void
 }
 
-export const PDFPreview = ({ data, uploadProgress, fileUpLoaded }: Props) => {
-   const details = useMemo(() => getDetails(data), [data])
+export const PDFPreview = forwardRef<HTMLDivElement, Props>(
+   ({ data, uploadProgress, fileUpLoaded, isDeleting, handleDelete }, ref) => {
+      const details = useMemo(() => getDetails(data), [data])
 
-   return (
-      <ButtonBase
-         sx={styles.root}
-         {...(uploadProgress < 0 && {
-            href: details.downloadUrl,
-            component: "a",
-            target: "_blank",
-         })}
-      >
-         <Stack width="100%" spacing={1}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-               <Box sx={styles.iconWrapper}>
-                  <FileIcon />
-               </Box>
-               <Stack alignItems="flex-start">
-                  <Typography
-                     variant="medium"
-                     sx={getMaxLineStyles(1)}
-                     color="neutral.700"
-                  >
-                     {details.fileName}
-                  </Typography>
-                  <Typography variant="xsmall" color="neutral.400">
-                     {details.fileSize.toFixed(2)} MB
-                  </Typography>
+      if (!details) {
+         return <PDFPreviewSkeleton />
+      }
+
+      return (
+         <Box ref={ref} sx={styles.root}>
+            <Stack width="100%" spacing={1}>
+               <Stack
+                  href={details.downloadUrl}
+                  target="_blank"
+                  component="a"
+                  download={details.fileName}
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+               >
+                  <Box sx={styles.iconWrapper}>
+                     <FileIcon />
+                  </Box>
+                  <Stack alignItems="flex-start">
+                     <Typography
+                        variant="medium"
+                        sx={styles.fileName}
+                        color="neutral.700"
+                     >
+                        {details.fileName}
+                     </Typography>
+                     <Typography variant="xsmall" color="neutral.400">
+                        {details.fileSize.toFixed(2)} MB
+                     </Typography>
+                  </Stack>
                </Stack>
+               <ProgressBar
+                  progress={uploadProgress}
+                  fileUpLoaded={fileUpLoaded}
+               />
             </Stack>
-            <ProgressBar
-               progress={uploadProgress}
-               fileUpLoaded={fileUpLoaded}
-            />
-         </Stack>
-         <Box sx={styles.deleteButton}>
-            <IconButton>
-               <DeleteIcon />
-            </IconButton>
+            <Box sx={styles.deleteButton}>
+               <IconButton
+                  onClick={(e) => {
+                     e.stopPropagation()
+                     handleDelete()
+                  }}
+                  disabled={isDeleting}
+               >
+                  <DeleteIcon />
+               </IconButton>
+            </Box>
          </Box>
-      </ButtonBase>
+      )
+   }
+)
+
+PDFPreview.displayName = "PDFPreview"
+
+const PDFPreviewSkeleton = () => {
+   return (
+      <Stack p={1.5} width="100%" spacing={1}>
+         <Stack direction="row" alignItems="center" spacing={1}>
+            <Skeleton variant="circular" width={41} height={41} />
+            <Stack alignItems="flex-start">
+               <Typography
+                  variant="medium"
+                  sx={styles.fileName}
+                  color="neutral.700"
+               >
+                  <Skeleton variant="text" width={150} />
+               </Typography>
+               <Typography variant="xsmall" color="neutral.400">
+                  <Skeleton variant="text" width={50} />
+               </Typography>
+            </Stack>
+         </Stack>
+      </Stack>
    )
 }
 
@@ -126,45 +175,54 @@ type ProgressBarProps = {
 }
 
 const ProgressBar = ({ progress, fileUpLoaded }: ProgressBarProps) => {
+   if (!progress) {
+      return null
+   }
+
    if (fileUpLoaded) {
       return (
-         <Collapse unmountOnExit in={fileUpLoaded}>
-            <Stack
-               direction="row"
-               alignItems="center"
-               justifyContent="center"
-               spacing={1}
+         <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={1}
+            sx={styles.progressBarContainer}
+         >
+            <Box sx={styles.checkCircle} component={CheckCircle} />
+            <Typography
+               sx={styles.uploadedText}
+               variant="xsmall"
+               color="neutral.700"
             >
-               <Box sx={styles.checkCircle} component={CheckCircle} />
-               <Typography
-                  sx={styles.uploadedText}
-                  variant="xsmall"
-                  color="neutral.700"
-               >
-                  File uploaded
-               </Typography>
-            </Stack>
-         </Collapse>
+               File uploaded
+            </Typography>
+         </Stack>
       )
    }
 
    return (
-      <Collapse unmountOnExit in={progress > 0}>
-         <Stack direction="row" alignItems="center" spacing={2}>
-            <LinearProgress
-               sx={styles.progress}
-               variant="determinate"
-               value={progress}
-            />
-            <Typography variant="small" color="neutral.700">
-               {progress}%
-            </Typography>
-         </Stack>
-      </Collapse>
+      <Stack
+         sx={styles.progressBarContainer}
+         direction="row"
+         alignItems="center"
+         spacing={2}
+      >
+         <LinearProgress
+            sx={styles.progress}
+            variant="determinate"
+            value={progress}
+         />
+         <Typography variant="small" color="neutral.700">
+            {progress}%
+         </Typography>
+      </Stack>
    )
 }
 
 const getDetails = (data: File | LivestreamPresentation) => {
+   if (!data) {
+      return null
+   }
    if (data instanceof File) {
       return {
          fileName: data.name,

@@ -1,9 +1,10 @@
-import { Box, CircularProgress } from "@mui/material"
+import { Box, CircularProgress, Collapse } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useDeleteLivestreamPresentation } from "components/custom-hook/streaming/useDeleteLivestreamPresentation"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
 import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { PDFPreview } from "./PDFPreview"
 import { PDFUpload } from "./PDFUpload"
@@ -13,6 +14,7 @@ const styles = sxStyles({
       borderRadius: "8px",
       border: (theme) => `1px solid ${theme.brand.purple[100]}`,
       bgcolor: (theme) => theme.brand.white[300],
+      overflow: "hidden",
    },
 })
 
@@ -37,6 +39,9 @@ export const Content = ({ livestreamId }: Props) => {
 
    const { progress, handleUploadFile } = useUploadPDFPresentation(livestreamId)
 
+   const { trigger: deletePresentation, isMutating } =
+      useDeleteLivestreamPresentation(livestreamId)
+
    const { fileUploaderProps, dragActive } = useFileUploader({
       acceptedFileTypes: ["pdf", "PDF"],
       maxFileSize: 20, // MB
@@ -48,15 +53,27 @@ export const Content = ({ livestreamId }: Props) => {
       },
    })
 
-   if (pdfPresentation || pdfFile) {
-      return (
-         <PDFPreview
-            data={pdfPresentation || pdfFile}
-            fileUpLoaded={Boolean(progress === 100 && pdfPresentation)}
-            uploadProgress={progress}
-         />
-      )
+   const handleDeleteFile = () => {
+      setPdfFile(null)
+      deletePresentation()
    }
 
-   return <PDFUpload {...fileUploaderProps} dragActive={dragActive} />
+   const hasData = Boolean(pdfPresentation || pdfFile)
+
+   return (
+      <Fragment>
+         <Collapse unmountOnExit in={hasData}>
+            <PDFPreview
+               data={pdfPresentation || pdfFile}
+               fileUpLoaded={Boolean(progress === 100 && pdfPresentation)}
+               uploadProgress={progress}
+               isDeleting={isMutating}
+               handleDelete={handleDeleteFile}
+            />
+         </Collapse>
+         <Collapse unmountOnExit in={!hasData}>
+            <PDFUpload {...fileUploaderProps} dragActive={dragActive} />
+         </Collapse>
+      </Fragment>
+   )
 }
