@@ -45,11 +45,6 @@ type UseUploadFile = {
     * A boolean indicating if the file is currently being uploaded.
     */
    uploading: boolean
-
-   /**
-    * Cancel the upload
-    */
-   cancelUpload: () => void
 }
 
 /**
