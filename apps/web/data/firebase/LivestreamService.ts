@@ -48,6 +48,7 @@ import {
    arrayUnion,
    collection,
    collectionGroup,
+   deleteDoc,
    doc,
    documentId,
    getDoc,
@@ -1029,6 +1030,18 @@ export class LivestreamService {
          fileSize: fileSize || 0,
          id: ref.id,
       })
+   }
+
+   removeLivestreamPDFPresentation = async (livestreamId: string) => {
+      const ref = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "presentations",
+         "presentation"
+      ).withConverter(createGenericConverter<LivestreamPresentation>())
+
+      return deleteDoc(ref)
    }
 }
 
