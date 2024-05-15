@@ -8,8 +8,8 @@ import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = sxStyles({
    inner: {
-      // This is a hack to prevent the PDF from being too small
-      transform: "scale(1.01)",
+      // This is to offset the scaled down PDF while not overflowing the container
+      transform: "scale(1.02)",
    },
 })
 
@@ -119,6 +119,7 @@ export const PDFPage = ({
                onLoadSuccess={setOriginalPageDimensions}
                onLoadError={handleLoadError}
                onRenderError={handleRenderError}
+               /** Need to scale down the PDF a bit to ensure it never overflows the container */
                scale={0.99}
                /** Page only allows one dimension to be set, so we need to set the other one to undefined */
                width={width}
