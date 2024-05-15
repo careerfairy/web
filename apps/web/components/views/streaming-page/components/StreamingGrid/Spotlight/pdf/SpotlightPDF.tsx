@@ -10,6 +10,7 @@ import { useStreamingContext } from "components/views/streaming-page/context"
 import { useState } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
+import { PDFNavigation } from "./PDFNavigation"
 import { PDFPage } from "./PDFPage"
 
 const styles = sxStyles({
@@ -22,6 +23,7 @@ const styles = sxStyles({
       borderRadius: "12px",
       overflow: "hidden",
       backgroundColor: (theme) => theme.brand.white[500],
+      position: "relative",
    },
 })
 
@@ -33,7 +35,7 @@ export const SpotlightPDF = () => {
    )
 }
 export const Content = () => {
-   const { livestreamId } = useStreamingContext()
+   const { livestreamId, isHost } = useStreamingContext()
    const { data: pdfPresentation } = useLivestreamPDFPresentation(livestreamId)
    const [ref, { width, height }] = useMeasure()
 
@@ -48,10 +50,6 @@ export const Content = () => {
    const pdfKey = `landscape-${streamIsLandscape}-mobile-${isMobile}-drawer-${isOpen}`
 
    const [pdfNumberOfPages, setPdfNumberOfPages] = useState(0)
-   console.log(
-      "🚀 ~ file: SpotlightPDF.tsx:50 ~ Content ~ pdfNumberOfPages:",
-      pdfNumberOfPages
-   )
 
    if (!pdfPresentation) {
       return (
@@ -61,7 +59,7 @@ export const Content = () => {
                fontWeight={700}
                textAlign="center"
             >
-               Please wait while host loads the PDF
+               Please wait for the host to load the presentation
             </Typography>
          </Box>
       )
@@ -77,6 +75,12 @@ export const Content = () => {
             parentHeight={height}
             setPdfNumberOfPages={setPdfNumberOfPages}
          />
+         {Boolean(isHost) && (
+            <PDFNavigation
+               page={pdfPresentation.page}
+               totalPages={pdfNumberOfPages}
+            />
+         )}
       </Box>
    )
 }

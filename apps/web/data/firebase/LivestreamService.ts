@@ -997,6 +997,16 @@ export class LivestreamService {
       )
    }
 
+   getPresentationRef = (livestreamId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "presentations",
+         "presentation"
+      ).withConverter(createGenericConverter<LivestreamPresentation>())
+   }
+
    /**
     * Sets the live stream PDF presentation metadata in the firestore database
     */
@@ -1013,13 +1023,7 @@ export class LivestreamService {
       fileName: string
       storagePath: string
    }) => {
-      const ref = doc(
-         FirestoreInstance,
-         "livestreams",
-         livestreamId,
-         "presentations",
-         "presentation"
-      ).withConverter(createGenericConverter<LivestreamPresentation>())
+      const ref = this.getPresentationRef(livestreamId)
 
       return setDoc(ref, {
          downloadUrl,
@@ -1032,15 +1036,14 @@ export class LivestreamService {
    }
 
    removeLivestreamPDFPresentation = async (livestreamId: string) => {
-      const ref = doc(
-         FirestoreInstance,
-         "livestreams",
-         livestreamId,
-         "presentations",
-         "presentation"
-      ).withConverter(createGenericConverter<LivestreamPresentation>())
+      const ref = this.getPresentationRef(livestreamId)
 
       return deleteDoc(ref)
+   }
+
+   incrementLivestreamPage = async (livestreamId: string, amount: number) => {
+      const ref = this.getPresentationRef(livestreamId)
+      return updateDoc(ref, { page: increment(amount) })
    }
 }
 
