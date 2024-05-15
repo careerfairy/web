@@ -1,7 +1,10 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { CustomJobApplicant } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
-import { getMetaDataFromCustomJobGroup } from "@careerfairy/shared-lib/dist/customJobs/metadata"
+import {
+   CustomJobApplicant,
+   pickPublicDataFromCustomJobApplicant,
+} from "@careerfairy/shared-lib/dist/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { getMetaDataFromCustomJobGroup } from "@careerfairy/shared-lib/dist/groups/metadata"
 import { isEmpty } from "lodash"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
@@ -56,7 +59,7 @@ export async function run() {
 const cascadeGroupMetaDataToCustomJobs = async (
    jobApplications: CustomJobApplicantsWithRef[]
 ) => {
-   let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
+   const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
    const totalDocs = jobApplications
    const totalNumDocs = jobApplications.length
@@ -85,15 +88,14 @@ const cascadeGroupMetaDataToCustomJobs = async (
 
             if (hasMetadataToUpdate) {
                // update customJob with metadata
-               const toUpdate: Pick<
-                  CustomJobApplicant,
-                  "companyCountry" | "companyIndustries" | "companySize"
-               > = {
-                  companyCountry: metadata.companyCountry,
-                  companyIndustries: metadata.companyIndustries,
-                  companySize: metadata.companySize,
-               }
+               const toUpdate =
+                  pickPublicDataFromCustomJobApplicant(customJobApplicant)
 
+               toUpdate.companyCountry = metadata.companyCountry
+               toUpdate.companyIndustries = metadata.companyIndustries
+               toUpdate.companySize = metadata.companySize
+
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                batch.update(customJobApplicant._ref as any, toUpdate)
                counter.writeIncrement() // Increment write counter
             }

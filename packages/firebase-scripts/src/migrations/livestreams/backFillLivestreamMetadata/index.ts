@@ -1,7 +1,7 @@
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/dist/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/dist/livestreams/metadata"
 import { isEmpty } from "lodash"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
@@ -53,7 +53,7 @@ export async function run() {
 const cascadeHostsMetaDataToLivestream = async (
    livestreams: LivestreamWithRef[]
 ) => {
-   let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
+   const batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
    const totalDocs = livestreams
    const totalNumDocs = livestreams.length
@@ -103,6 +103,7 @@ const cascadeHostsMetaDataToLivestream = async (
                      metadata.companyTargetedUniversities,
                }
 
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
                batch.update(stream._ref as any, toUpdate)
                counter.writeIncrement() // Increment write counter
             }

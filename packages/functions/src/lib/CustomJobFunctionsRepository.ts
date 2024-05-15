@@ -4,10 +4,10 @@ import {
 } from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
 import {
    CustomJob,
-   CustomJobApplicant,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
@@ -222,10 +222,7 @@ export class CustomJobFunctionsRepository
       const promises = chunks.map(async (chunk) => {
          const batch = this.firestore.batch()
          chunk.forEach((doc) => {
-            const toUpdate: Pick<
-               CustomJobApplicant,
-               "companyCountry" | "companyIndustries" | "companySize"
-            > = {
+            const toUpdate: CustomJobMetaData = {
                companyCountry: group.companyCountry?.id,
                companyIndustries: group.companyIndustries?.map(
                   (industry) => industry.id

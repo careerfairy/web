@@ -29,7 +29,7 @@ import {
    UserParticipatingStats,
    getEarliestEventBufferTime,
 } from "./livestreams"
-import { getMetaDataFromEventHosts } from "./metadata"
+import { MetaData, getMetaDataFromEventHosts } from "./metadata"
 import {
    LiveStreamStats,
    LivestreamStatsToUpdate,
@@ -1490,15 +1490,7 @@ export class FirebaseLivestreamRepository
          chunk.forEach((doc) => {
             // TODO: Check if ok, since it should be from all livestream groups
             const metadataFromHost = getMetaDataFromEventHosts([group])
-            const toUpdate: Pick<
-               LivestreamEvent,
-               | "companyCountries"
-               | "companyIndustries"
-               | "companySizes"
-               | "companyTargetedFieldsOfStudies"
-               | "companyTargetedUniversities"
-               | "companyTargetedCountries"
-            > = {
+            const toUpdate: MetaData = {
                companyCountries: metadataFromHost.companyCountries,
                companyIndustries: metadataFromHost.companyIndustries,
                companyTargetedCountries:
