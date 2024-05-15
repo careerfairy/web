@@ -12,6 +12,7 @@ import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { PDFNavigation } from "./PDFNavigation"
 import { PDFPage } from "./PDFPage"
+import { UploadNewPDFButton } from "./UploadNewPDFButton"
 
 const styles = sxStyles({
    root: {
@@ -81,6 +82,7 @@ export const Content = () => {
                totalPages={pdfNumberOfPages}
             />
          )}
+         {Boolean(isHost) && <UploadNewPDFButton />}
       </Box>
    )
 }
