@@ -1,5 +1,5 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -12,7 +12,8 @@ import useFunctionsSWR, {
  * @param limit Items limit.
  * @returns Spark[]
  */
-export const useUserSeenSparks = (userData: UserData, limit: number = 10) => {
+export const useUserSeenSparks = (limit: number = 10) => {
+   const { userData } = useAuth()
    const fetcher = useFunctionsSWR()
 
    const key = userData
