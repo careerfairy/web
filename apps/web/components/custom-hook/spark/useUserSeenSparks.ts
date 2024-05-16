@@ -6,15 +6,12 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-const functionName = "getUserSeenSparks"
-
 /**
  * Retrieves all of the user Seen Sparks sorted by latest seen.
  * @param limit Items limit.
  * @returns Spark[]
  */
-export const useUserSeenSparks = (limit?: number) => {
-   if (!limit) limit = 10
+export const useUserSeenSparks = (limit: number = 10) => {
    const fetcher = useFunctionsSWR()
 
    const {
@@ -23,7 +20,7 @@ export const useUserSeenSparks = (limit?: number) => {
       isLoading,
    } = useSWR<Spark[]>(
       [
-         functionName,
+         "getUserSeenSparks",
          {
             limit: limit,
          },

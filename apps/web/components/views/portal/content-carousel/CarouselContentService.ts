@@ -47,7 +47,7 @@ export type SerializedContent =
 
 /**
  *
- * A service that provides a list of recommended livestream events for a carousel UI,
+ * A service that provides a list of recommended live stream events for a carousel UI,
  * based on the user's past activity and options passed as arguments.
  *  @class
  * @param {Object} options - An object containing various options to be used for getting
@@ -62,15 +62,15 @@ export type SerializedContent =
  *   watchedSparks?: Spark[],
  *   appliedJobs?: CustomJobApplicant[]
  *   }
- *   - pastLivestreams: An array of past livestream events
- *   - upcomingLivestreams: An array of upcoming livestream events
- *   - registeredRecordedLivestreamsForUser: An array of recorded livestream events that the user has registered for
+ *   - pastLivestreams: An array of past live stream events
+ *   - upcomingLivestreams: An array of upcoming live stream events
+ *   - registeredRecordedLivestreamsForUser: An array of recorded live stream events that the user has registered for
  *   - userData: The user's data
  *   - userStats: The user's stats
- *   - watchedLivestreams: The user's latest watched livestreams, including recordings
+ *   - watchedLivestreams: The user's latest watched live streams, including recordings
  *   - watchedSparks: The user's latest watched sparks
  *   - appliedJobs: The user's latest applied jobs
- *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended livestream events
+ *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended live stream events
  *   */
 export class CarouselContentService {
    private options: GetContentOptions
@@ -353,7 +353,7 @@ const filterStreamsForUnregisteredUsersAndNonBuyers = (
 
       const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
       // We only want to show past streams that are recorded and the user has not bought the recording
-      // and the user has not registered for the livestream
+      // and the user has not registered for the live stream
       return allowedToWatchRecording && !hasRegistered && !hasBoughtRecording
    })
 }

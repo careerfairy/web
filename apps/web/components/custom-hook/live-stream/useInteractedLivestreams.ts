@@ -12,9 +12,7 @@ import useFunctionsSWR, {
  * @param limit Limit of the items to fetch.
  * @returns LivestreamEvent[] Collection of the latest livestreams for which the user has had an interaction.
  */
-const useInteractedLivestreams = (limit?: number) => {
-   if (!limit) limit = 10
-
+const useInteractedLivestreams = (limit: number = 10) => {
    const fetcher = useFunctionsSWR()
 
    const {
@@ -33,7 +31,7 @@ const useInteractedLivestreams = (limit?: number) => {
          onError: (error, key) =>
             errorLogAndNotify(error, {
                message:
-                  "Error Fetching user Interacted Livestreams via cloud function",
+                  "Error Fetching user Interacted Live streams via cloud function",
                key,
             }),
          ...reducedRemoteCallsOptions,
