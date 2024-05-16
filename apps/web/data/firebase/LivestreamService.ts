@@ -1070,7 +1070,7 @@ export class LivestreamService {
       return setDoc(ref, {
          id: ref.id,
          url,
-         seconds: secondsInUrl || 0,
+         second: secondsInUrl || 0,
          state: "playing",
          lastPlayed: Timestamp.now(),
          updater,

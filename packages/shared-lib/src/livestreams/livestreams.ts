@@ -770,7 +770,7 @@ export interface LivestreamPresentation extends Identifiable {
  */
 export interface LivestreamVideo extends Identifiable {
    url: string
-   seconds: number
+   second: number
    state: "playing" | "paused"
    lastPlayed: firebase.firestore.Timestamp
    /** The ID of the user that can update the video */
