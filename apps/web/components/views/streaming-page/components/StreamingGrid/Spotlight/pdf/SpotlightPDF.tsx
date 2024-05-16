@@ -1,13 +1,9 @@
+import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import {
-   useSideDrawer,
-   useStreamIsLandscape,
-   useStreamIsMobile,
-} from "components/custom-hook/streaming"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { PDFNavigation } from "./PDFNavigation"
@@ -40,16 +36,6 @@ export const Content = () => {
    const { data: pdfPresentation } = useLivestreamPDFPresentation(livestreamId)
    const [ref, { width, height }] = useMeasure()
 
-   const streamIsLandscape = useStreamIsLandscape()
-   const isMobile = useStreamIsMobile()
-   const { isOpen } = useSideDrawer()
-
-   /**
-    * This key is used to reset the canvas when significant changes in responsiveness occur,
-    * which helps in avoiding annoying flickering effects.
-    */
-   const pdfKey = `landscape-${streamIsLandscape}-mobile-${isMobile}-drawer-${isOpen}`
-
    const [pdfNumberOfPages, setPdfNumberOfPages] = useState(0)
 
    if (!pdfPresentation) {
@@ -69,7 +55,6 @@ export const Content = () => {
    return (
       <Box ref={ref} sx={styles.root}>
          <PDFPage
-            key={pdfKey}
             presentation={pdfPresentation}
             parentWidth={width}
             livestreamId={livestreamId}
@@ -77,13 +62,32 @@ export const Content = () => {
             setPdfNumberOfPages={setPdfNumberOfPages}
          />
          {Boolean(isHost) && (
-            <PDFNavigation
-               page={pdfPresentation.page}
-               totalPages={pdfNumberOfPages}
+            <HostControls
+               pdfPresentation={pdfPresentation}
+               pdfNumberOfPages={pdfNumberOfPages}
             />
          )}
-         {Boolean(isHost) && <UploadNewPDFButton />}
       </Box>
+   )
+}
+
+type HostControlsProps = {
+   pdfPresentation: LivestreamPresentation
+   pdfNumberOfPages: number
+}
+
+const HostControls = ({
+   pdfPresentation,
+   pdfNumberOfPages,
+}: HostControlsProps) => {
+   return (
+      <Fragment>
+         <PDFNavigation
+            page={pdfPresentation.page}
+            totalPages={pdfNumberOfPages}
+         />
+         <UploadNewPDFButton />
+      </Fragment>
    )
 }
 

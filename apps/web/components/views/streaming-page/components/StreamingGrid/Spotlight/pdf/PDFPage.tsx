@@ -1,17 +1,11 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
-import { useTimeout } from "react-use"
-import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 
-const styles = sxStyles({
-   inner: {
-      // This is to offset the scaled down PDF while not overflowing the container
-      transform: "scale(1.02)",
-   },
-})
+// Worker needs to ba added as per docs
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 type PageDimensions = {
    width: number
@@ -48,9 +42,7 @@ export const PDFPage = ({
    livestreamId,
    setPdfNumberOfPages,
 }: Props) => {
-   const [isReady] = useTimeout(250)
-
-   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+   const isReady = useDebouncedResize(parentWidth, parentHeight)
 
    const [originalPageDimensions, setOriginalPageDimensions] =
       useState<PageDimensions>({
@@ -98,12 +90,12 @@ export const PDFPage = ({
       height = adjustedDimensions.height
    }
 
-   if (!isReady()) {
+   if (!isReady) {
       return <CircularProgress />
    }
 
    return (
-      <Box component="span" sx={styles.inner}>
+      <Box component="span">
          <Document
             loading={<CircularProgress />}
             onLoadSuccess={({ numPages }) => {
@@ -119,8 +111,6 @@ export const PDFPage = ({
                onLoadSuccess={setOriginalPageDimensions}
                onLoadError={handleLoadError}
                onRenderError={handleRenderError}
-               /** Need to scale down the PDF a bit to ensure it never overflows the container */
-               scale={0.99}
                /** Page only allows one dimension to be set, so we need to set the other one to undefined */
                width={width}
                height={height}
@@ -128,4 +118,39 @@ export const PDFPage = ({
          </Document>
       </Box>
    )
+}
+
+/**
+ * A hook that delays rendering until after window resizing has stabilized.
+ *
+ * @param {number} width - Current width of the container.
+ * @param {number} height - Current height of the container.
+ * @param {number} [delay=250] - Milliseconds to wait after resizing before confirming stabilization.
+ * @returns {boolean} - True if resizing has stabilized, allowing rendering to proceed.
+ */
+const useDebouncedResize = (
+   width: number,
+   height: number,
+   delay: number = 250
+) => {
+   const [isReady, setIsReady] = useState(false)
+   const resizeTimer = useRef<NodeJS.Timeout | null>(null)
+
+   useEffect(() => {
+      setIsReady(false) // Reset ready state on size change
+      if (resizeTimer.current) {
+         clearTimeout(resizeTimer.current)
+      }
+      resizeTimer.current = setTimeout(() => {
+         setIsReady(true)
+      }, delay) // Wait for delay ms of no size changes
+
+      return () => {
+         if (resizeTimer.current) {
+            clearTimeout(resizeTimer.current)
+         }
+      }
+   }, [width, height, delay])
+
+   return isReady
 }

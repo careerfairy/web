@@ -28,6 +28,9 @@ const styles = sxStyles({
          color: (theme) => theme.palette.neutral[800] + " !important",
       },
    },
+   pageNumber: {
+      userSelect: "none",
+   },
 })
 
 type PDFNavigationProps = {
@@ -60,7 +63,7 @@ export const PDFNavigation = ({ page, totalPages }: PDFNavigationProps) => {
                <ChevronRight />
             </IconButton>
          </Stack>
-         <Typography variant="small" color="neutral.800">
+         <Typography sx={styles.pageNumber} variant="small" color="neutral.800">
             {page} of {totalPages}
          </Typography>
       </Stack>
