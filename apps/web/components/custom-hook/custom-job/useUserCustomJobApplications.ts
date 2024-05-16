@@ -1,5 +1,5 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -13,10 +13,8 @@ import useFunctionsSWR, {
  * @param limit Limit of data items.
  * @returns CustomJobApplicant[] with the most recent applications according to @param limit.
  */
-const useUserCustomJobApplications = (
-   userData: UserData,
-   limit: number = 10
-) => {
+const useUserCustomJobApplications = (limit: number = 10) => {
+   const { userData } = useAuth()
    const fetcher = useFunctionsSWR()
 
    const key = userData

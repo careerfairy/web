@@ -63,9 +63,9 @@ const PortalPage = ({
    const router = useRouter()
    const isMobile = useIsMobile()
 
-   const { sparks: seenSparks } = useUserSeenSparks(userData)
-   const { jobApplications } = useUserCustomJobApplications(userData)
-   const { events: interactedEvents } = useInteractedLivestreams(userData)
+   const { sparks: seenSparks } = useUserSeenSparks()
+   const { jobApplications } = useUserCustomJobApplications()
+   const { events: interactedEvents } = useInteractedLivestreams()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
