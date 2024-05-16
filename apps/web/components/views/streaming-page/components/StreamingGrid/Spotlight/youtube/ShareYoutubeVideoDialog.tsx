@@ -54,6 +54,7 @@ export const ShareYoutubeVideoDialog = () => {
                id="share-youtube-drawer"
                title="Share video"
                icon={<Youtube />}
+               handlePanelToggle={closeMenu}
             >
                <ShareYoutubeVideoForm isMobile={isMobile} onClose={closeMenu} />
             </SidePanelView>
