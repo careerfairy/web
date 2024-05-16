@@ -6,9 +6,9 @@ import {
    SlideLeftTransition,
    SlideUpTransition,
 } from "components/views/common/transitions"
-import LivestreamDetailsViewSkeleton from "components/views/livestream-dialog/views/livestream-details/LivestreamDetailsViewSkeleton"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import MaximizeIcon from "./MaximizeIcon"
+import PreviewContent from "./PreviewContent"
 
 const styles = sxStyles({
    root: {
@@ -47,7 +47,7 @@ const Preview = () => {
             <MaximizeIcon sx={styles.maximizeIcon} />
          </IconButton>
          <Box sx={styles.preview}>
-            <LivestreamDetailsViewSkeleton />
+            <PreviewContent isInDialog={false} />
          </Box>
          <Dialog
             open={isOpen}
@@ -64,7 +64,10 @@ const Preview = () => {
             }}
          >
             <DialogContent>
-               <LivestreamDetailsViewSkeleton />
+               <PreviewContent
+                  isInDialog={true}
+                  handleCloseDialog={handleClose}
+               />
             </DialogContent>
          </Dialog>
       </Box>
