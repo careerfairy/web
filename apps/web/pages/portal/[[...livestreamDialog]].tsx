@@ -78,18 +78,16 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const { data: serializedCarouselContent } = useLivestreamsCarouselContentSWR(
-      {
-         userData: userData,
-         userStats: serverUserStats,
-         pastLivestreams: pastEvents || [],
-         upcomingLivestreams: comingUpNextEvents || [],
-         registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-         watchedSparks: seenSparks || [],
-         watchedLivestreams: interactedEvents || [],
-         appliedJobs: jobApplications || [],
-      }
-   )
+   const serializedCarouselContent = useLivestreamsCarouselContentSWR({
+      userData: userData,
+      userStats: serverUserStats,
+      pastLivestreams: pastEvents || [],
+      upcomingLivestreams: comingUpNextEvents || [],
+      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+      watchedSparks: seenSparks || [],
+      watchedLivestreams: interactedEvents || [],
+      appliedJobs: jobApplications || [],
+   })
 
    const carouselContent = useMemo<CarouselContent[]>(() => {
       return CarouselContentService.deserializeContent(
