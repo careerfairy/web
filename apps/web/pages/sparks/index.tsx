@@ -1,5 +1,4 @@
 import { sparkService } from "data/firebase/SparksService"
-import geoip from "geoip-lite"
 import { GetServerSideProps } from "next"
 import { encode } from "querystring"
 
@@ -12,19 +11,28 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+   const { lookup } = await import("geoip-lite")
    const ipAddress =
       context.req.headers["x-forwarded-for"] || context.req.socket.remoteAddress
 
    // Use geoip-lite to get geolocation data based on the IP address
-   const geo = geoip.lookup(ipAddress as string)
+   const geo = lookup(ipAddress as string)
 
    const anonymousUserCountryCode = geo ? geo.country : null
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ anonymousUserCountryCode:",
+      anonymousUserCountryCode
+   )
 
    const sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
       anonymousUserCountryCode,
    })
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks length:",
+      sparks?.length
+   )
 
    const queryParamString = encode(context.query)
 
