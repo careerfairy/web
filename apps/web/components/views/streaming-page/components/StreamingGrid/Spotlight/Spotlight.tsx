@@ -8,8 +8,8 @@ import {
 import { sxStyles } from "types/commonTypes"
 import { UserStream } from "../../../types"
 import { SpotlightProvider } from "./SpotlightProvider"
-import { SpotlightStream } from "./SpotlightStream"
 import { SpotlightPDF } from "./pdf/SpotlightPDF"
+import { SpotlightStream } from "./stream/SpotlightStream"
 
 const styles = sxStyles({
    root: {
