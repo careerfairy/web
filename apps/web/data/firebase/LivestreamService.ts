@@ -91,7 +91,7 @@ export type SetModeOptionsType<Mode extends LivestreamMode> =
       : Mode extends "desktop"
       ? { mode: "desktop"; screenSharerAgoraUID: string }
       : Mode extends "video"
-      ? { mode: "video"; youtubeVideoURL: string }
+      ? { mode: "video" }
       : Mode extends "presentation"
       ? { mode: "presentation" }
       : never
@@ -402,17 +402,15 @@ export class LivestreamService {
             })
 
          case LivestreamModes.VIDEO:
-            if (!options.youtubeVideoURL) {
-               throw new Error("YouTube video URL is required to start a video")
-            }
             /**
              * TODO:
              * Batch operations (both must succeed or fail)
              * 1. Set mode to video on livestreams/{id}
              * 2. Save the video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
              */
-            return
-
+            return this.updateLivestream(livestreamId, {
+               mode: options.mode,
+            })
          case LivestreamModes.DEFAULT:
             return this.updateLivestream(livestreamId, {
                mode: options.mode,

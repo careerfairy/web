@@ -13,7 +13,10 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
-import { setUploadPDFPresentationDialogOpen } from "store/reducers/streamingAppReducer"
+import {
+   setShareYoutubeVideoDialogOpen,
+   setUploadPDFPresentationDialogOpen,
+} from "store/reducers/streamingAppReducer"
 import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
@@ -96,6 +99,11 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                }
                break
             case LivestreamModes.VIDEO:
+               if (active) {
+                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+               } else {
+                  dispatch(setShareYoutubeVideoDialogOpen(true))
+               }
                /**
                 * TODO:
                 * 1. Open the youtube video URL dialog form
