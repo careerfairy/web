@@ -9,7 +9,11 @@ import {
 } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { forwardRef, useMemo } from "react"
-import { CheckCircle, X as DeleteIcon, File as FileIcon } from "react-feather"
+import {
+   CheckCircle,
+   Trash2 as DeleteIcon,
+   File as FileIcon,
+} from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { PDFPreviewSkeleton } from "./PDFPreviewSkeleton"
 
@@ -59,12 +63,12 @@ const styles = sxStyles({
       right: 0,
       p: 0.8,
       "& button": {
-         p: 0.2,
-         m: -0.2,
+         p: 0.5,
+         m: -0.5,
       },
       "& svg": {
-         width: 24,
-         height: 24,
+         width: 20,
+         height: 20,
       },
    },
    progressBarContainer: {
