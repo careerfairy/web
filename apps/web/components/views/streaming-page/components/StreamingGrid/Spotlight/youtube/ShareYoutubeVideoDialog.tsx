@@ -123,13 +123,24 @@ const Content = ({ onClose, isMobile }: ContentProps) => {
             justifyContent="center"
          >
             <Box component={Youtube} sx={styles.icon} />
-            <Typography
-               variant="desktopBrandedH3"
-               fontWeight={700}
-               color="neutral.800"
-            >
-               Upload your PDF
-            </Typography>
+            <Stack spacing={0.75} justifyContent="center" alignItems="center">
+               <Typography
+                  variant="desktopBrandedH3"
+                  fontWeight={700}
+                  color="neutral.800"
+               >
+                  Share a video
+               </Typography>
+
+               <Typography
+                  variant="medium"
+                  color="neutral.700"
+                  textAlign="center"
+               >
+                  {`When sharing a video, the player actions (play, pause, etc) will be replayed
+on the viewer's screens as well.`}
+               </Typography>
+            </Stack>
          </Stack>
          <Stack
             component={DialogActions}
