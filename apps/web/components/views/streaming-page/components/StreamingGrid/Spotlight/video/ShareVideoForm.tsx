@@ -23,7 +23,7 @@ const styles = sxStyles({
       "& button": {
          width: 150,
       },
-      "& .share-youtube-video-button": {
+      "& .share-video-button": {
          width: {
             xs: 227,
             md: 150,
@@ -37,8 +37,8 @@ const styles = sxStyles({
    },
 })
 
-const youtubeVideoUrlSchema = yup.object().shape({
-   youtubeUrl: yup
+const videoUrlSchema = yup.object().shape({
+   videoUrl: yup
       .string()
       .matches(YOUTUBE_URL_REGEX, {
          message: "Must be a valid youtube video url",
@@ -46,14 +46,14 @@ const youtubeVideoUrlSchema = yup.object().shape({
       .required("Must be a valid youtube video url"),
 })
 
-type FormValues = yup.InferType<typeof youtubeVideoUrlSchema>
+type FormValues = yup.InferType<typeof videoUrlSchema>
 
 type Props = {
    onClose: () => void
    isMobile: boolean
 }
 
-export const ShareYoutubeVideoForm = ({ onClose, isMobile }: Props) => {
+export const ShareVideoForm = ({ onClose, isMobile }: Props) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
 
    const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
@@ -61,7 +61,7 @@ export const ShareYoutubeVideoForm = ({ onClose, isMobile }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
 
    const formMethods = useYupForm({
-      schema: youtubeVideoUrlSchema,
+      schema: videoUrlSchema,
       mode: "all",
       reValidateMode: "onChange",
    })
@@ -70,7 +70,7 @@ export const ShareYoutubeVideoForm = ({ onClose, isMobile }: Props) => {
       try {
          await livestreamService.setLivestreamVideo({
             livestreamId,
-            url: data.youtubeUrl,
+            url: data.videoUrl,
             updater: agoraUserId,
          })
 
@@ -123,7 +123,7 @@ export const ShareYoutubeVideoForm = ({ onClose, isMobile }: Props) => {
                </Stack>
             </Stack>
             <ControlledBrandedTextField
-               name="youtubeUrl"
+               name="videoUrl"
                label="Insert video URL"
                placeholder="Ex: https://www.youtube.com/watch?=123hre"
                fullWidth
@@ -144,7 +144,7 @@ export const ShareYoutubeVideoForm = ({ onClose, isMobile }: Props) => {
                   loading={formMethods.formState.isSubmitting}
                   variant="contained"
                   color="primary"
-                  className="share-youtube-video-button"
+                  className="share-video-button"
                >
                   Share video
                </LoadingButton>

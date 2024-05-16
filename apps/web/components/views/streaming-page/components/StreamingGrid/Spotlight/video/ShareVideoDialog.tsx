@@ -2,11 +2,11 @@ import { Dialog, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { Youtube } from "react-feather"
-import { setShareYoutubeVideoDialogOpen } from "store/reducers/streamingAppReducer"
-import { useShareYoutubeVideoDialogOpen } from "store/selectors/streamingAppSelectors"
+import { setShareVideoDialogOpen } from "store/reducers/streamingAppReducer"
+import { useShareVideoDialogOpen } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { SidePanelView } from "../../../SidePanel/SidePanelView"
-import { ShareYoutubeVideoForm } from "./ShareYoutubeVideoForm"
+import { ShareVideoForm } from "./ShareVideoForm"
 
 const styles = sxStyles({
    dialog: {
@@ -29,15 +29,15 @@ const styles = sxStyles({
    },
 })
 
-export const ShareYoutubeVideoDialog = () => {
+export const ShareVideoDialog = () => {
    const isMobile = useStreamIsMobile()
 
-   const open = useShareYoutubeVideoDialogOpen()
+   const open = useShareVideoDialogOpen()
 
    const dispatch = useAppDispatch()
 
    const closeMenu = () => {
-      dispatch(setShareYoutubeVideoDialogOpen(false))
+      dispatch(setShareVideoDialogOpen(false))
    }
 
    if (isMobile) {
@@ -51,12 +51,12 @@ export const ShareYoutubeVideoDialog = () => {
          >
             <SidePanelView
                contentWrapperStyles={styles.drawerContent}
-               id="share-youtube-drawer"
+               id="share-video-drawer"
                title="Share video"
                icon={<Youtube />}
                handlePanelToggle={closeMenu}
             >
-               <ShareYoutubeVideoForm isMobile={isMobile} onClose={closeMenu} />
+               <ShareVideoForm isMobile={isMobile} onClose={closeMenu} />
             </SidePanelView>
          </SwipeableDrawer>
       )
@@ -70,7 +70,7 @@ export const ShareYoutubeVideoDialog = () => {
          open={open}
          TransitionProps={{ unmountOnExit: true }}
       >
-         <ShareYoutubeVideoForm isMobile={isMobile} onClose={closeMenu} />
+         <ShareVideoForm isMobile={isMobile} onClose={closeMenu} />
       </Dialog>
    )
 }
