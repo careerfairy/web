@@ -101,9 +101,9 @@ const PreviewContent = ({
                value={0}
             >
                <Tab sx={styles.tab} label={"Linked jobs"} value={0} />
-               <Tab sx={styles.tab} label={"About The Live Stream"} value={1} />
-               <Tab sx={styles.tab} label={"About The Company"} value={2} />
-               <Tab sx={styles.tab} label={"Questions"} value={3} />
+               <Tab sx={styles.tab} label={"About The Live Stream"} />
+               <Tab sx={styles.tab} label={"About The Company"} />
+               <Tab sx={styles.tab} label={"Questions"} />
             </Tabs>
          </Box>
          <Box sx={styles.mainContent}>
