@@ -29,6 +29,11 @@ export type UseLivestreamCarouselContentSWROptions = {
    appliedJobs: CustomJobApplicant[]
 }
 
+/**
+ * Used to fetch carousel content on the client, serializing the result before returning the data
+ * @param options Carousel service options
+ * @returns Serialized Carousel Content
+ */
 const useLivestreamsCarouselContentSWR = (
    options: UseLivestreamCarouselContentSWROptions
 ) => {
@@ -67,14 +72,8 @@ const useLivestreamsCarouselContentSWR = (
       [carouselContentService]
    )
 
-   const result = useSWR(key, swrFetcher, swrOptions)
-   return {
-      data: result.data || [],
-      error: result.error,
-      isLoading: result.isLoading,
-      isValidating: result.isValidating,
-      mutate: result.mutate,
-   }
+   const { data } = useSWR(key, swrFetcher, swrOptions)
+   return data || []
 }
 
 export default useLivestreamsCarouselContentSWR
