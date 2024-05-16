@@ -359,7 +359,7 @@ export class OnboardingNewsletterService {
             onboardingUser.user,
             this.futureLivestreams,
             this.pastLivestreams,
-            null, // TODO: Add implicit data
+            null,
             false
          )
 

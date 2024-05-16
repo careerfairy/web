@@ -1,5 +1,7 @@
-import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
-import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   sortSeenSparks,
+   sortSparksByIds,
+} from "@careerfairy/shared-lib/sparks/sparks"
 import { RuntimeOptions } from "firebase-functions"
 import { SchemaOf, number, object } from "yup"
 import { sparkRepo, userRepo } from "./api/repositories"
@@ -12,7 +14,7 @@ import functions = require("firebase-functions")
  * Functions runtime settings
  */
 const runtimeSettings: RuntimeOptions = {
-   memory: "256MB",
+   memory: "1GB",
 }
 
 type GetUserSeenSparks = {
@@ -40,20 +42,12 @@ export const getUserSeenSparks = functions
 
                const sparkIds = sortSeenSparks(seenSparks, data.limit)
 
-               const sparks = await sparkRepo.getSparksByIds(sparkIds)
+               const sparks = (await sparkRepo.getSparksByIds(sparkIds)) || []
 
                // Re sort ensuring order stays the same after fetching data
-               const sortedSparks = (sparks || []).sort(
-                  (baseSpark, comparisonSpark) => {
-                     const baseSortedIndex = sparkIds.indexOf(baseSpark.id)
-                     const comparisonSortedIndex = sparkIds.indexOf(
-                        comparisonSpark.id
-                     )
+               const sortedSparks = sortSparksByIds(sparkIds, sparks)
 
-                     return baseSortedIndex - comparisonSortedIndex
-                  }
-               )
-
+               // Leaving const to allow debugging
                return sortedSparks
             } catch (error) {
                functions.logger.error(
@@ -67,40 +61,3 @@ export const getUserSeenSparks = functions
          }
       )
    )
-
-const sortSparksMapIds = (sparks: {
-   [sparkId: string]: Timestamp
-}): string[] => {
-   const keys = Object.keys(sparks)
-
-   if (!keys.length) return []
-   const sortedSparks = keys
-      .map((sparkId) => {
-         return {
-            sparkId: sparkId,
-            seenTimestamp: sparks[sparkId],
-         }
-      })
-      .sort(sortSparksBySeenTimestamp)
-
-   return sortedSparks.map((sortedSpark) => sortedSpark.sparkId)
-}
-
-const sortSeenSparks = (seenSparks: SeenSparks[], limit: number): string[] => {
-   const allSparks = seenSparks
-      .flatMap((seenSpark) => {
-         const sortedSparkIds = sortSparksMapIds(seenSpark.sparks)
-         return sortedSparkIds.map((id) => {
-            return {
-               sparkId: id,
-               seenTimestamp: seenSpark.sparks[id],
-            }
-         })
-      })
-      .sort(sortSparksBySeenTimestamp)
-
-   return allSparks.map((sortedSpark) => sortedSpark.sparkId).slice(0, limit)
-}
-
-const sortSparksBySeenTimestamp = (baseSpark, comparisonSpark) =>
-   comparisonSpark.seenTimestamp.toMillis() - baseSpark.seenTimestamp.toMillis()

@@ -1,10 +1,7 @@
 import { ImplicitLivestreamRecommendationData } from "../ImplicitLivestreamRecommendationData"
 
 /**
- * Repository that fetches livestreams accordingly with some filters and ranks them
- *
- * Currently fetches the data from Firestore directly but we can
- * update it to fetch the data from a data bundle
+ * Repository that calculates live streams data, accordingly with some filters and implicit data.
  */
 export class ImplicitDataRepository {
    constructor(private readonly data: ImplicitLivestreamRecommendationData) {}
@@ -13,7 +10,7 @@ export class ImplicitDataRepository {
    // If performance becomes an issue due to multiple usages and always computing on demand
    // this can be made lazy, by storing in memory after the calculation.
 
-   // Interacted Livestreams
+   // Interacted Live streams
 
    public getInteractedEventsCompanyCountries(): string[] {
       const countryIds = (
@@ -107,7 +104,6 @@ export class ImplicitDataRepository {
             ?.map((spark) => spark.group?.companySize)
             ?.filter(Boolean) || []
       )
-      // console.log("🚀 ~ IMPLICIT SIZES:", sizes)
       return sizes
    }
 

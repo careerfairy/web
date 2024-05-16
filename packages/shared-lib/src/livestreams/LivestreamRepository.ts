@@ -11,7 +11,7 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
 import { Group } from "../groups"
 import { UserPublicData } from "../users"
-import { chunkArray, containsAny } from "../utils"
+import { arraySortByIndex, chunkArray, containsAny } from "../utils"
 import {
    LivestreamEvent,
    LivestreamEventParsed,
@@ -362,12 +362,12 @@ export interface ILivestreamRepository {
    syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
 
    /**
-    * Fetches the users latest interacted livestreams, with interacted meaning all livestreams which the user
+    * Fetches the users latest interacted live streams, with interacted meaning all live streams which the user
     * has either participated or watched a recording of.
-    * This method implements sorting of the interacted livestreams via the participation date or recording viewing date.
-    * A precedence is taken for the recording date if the user has participated in the livestream as well. Meaning all the fetched participated
-    * user livestreams MUST IGNORE the livestreams for which the user has seen the recordings, since the recordings will always be more recent than the
-    * livestream participation date.
+    * This method implements sorting of the interacted live streams via the participation date or recording viewing date.
+    * A precedence is taken for the recording date if the user has participated in the live stream as well. Meaning all the fetched participated
+    * user live streams MUST IGNORE the live streams for which the user has seen the recordings, since the recordings will always be more recent than the
+    * live stream participation date.
     * @param userId ID of the user
     * @param limit Limit number of items to retrieve
     */
@@ -1558,42 +1558,37 @@ export class FirebaseLivestreamRepository
 
       const recordingStats = recordingStatsData ? recordingStatsData : []
 
-      if (unique) {
-         // Filtering the results, to only consider the more recent hourly watched recording
-         // Meaning if a user has watched multiple recordings for the same livestream in several hours
-         // only the last hour data will be considered
-         const filteredStats = recordingStats.filter((stat) => {
-            // Find other recording stats for the same user and livestream
-            const otherHourViews = recordingStats.filter((recordingStat) => {
-               return (
-                  recordingStat.userId == stat.userId &&
-                  recordingStat.livestreamId == stat.livestreamId &&
-                  recordingStat.id != stat.id
-               )
-            })
-
-            if (otherHourViews.length) {
-               // Check if any other recording stats has a more recent date
-               const hasMoreRecent = otherHourViews.find((recordingStat) => {
-                  return recordingStat.date.toMillis() > stat.date.toMillis()
-               })
-
-               return !hasMoreRecent
-            }
-
-            // Keep this recording
-            return true
+      if (!unique) return recordingStats
+      // Filtering the results, to only consider the more recent hourly watched recording
+      // Meaning if a user has watched multiple recordings for the same livestream in several hours
+      // only the last hour data will be considered
+      const filteredStats = recordingStats.filter((stat) => {
+         // Find other recording stats for the same user and livestream
+         const otherHourViews = recordingStats.filter((recordingStat) => {
+            return (
+               recordingStat.userId == stat.userId &&
+               recordingStat.livestreamId == stat.livestreamId &&
+               recordingStat.id != stat.id
+            )
          })
+         if (otherHourViews.length) {
+            // Check if any other recording stats has a more recent date
+            const hasMoreRecent = otherHourViews.find((recordingStat) => {
+               return recordingStat.date.toMillis() > stat.date.toMillis()
+            })
+            // Keep if there isn't a more recent recording
+            return !hasMoreRecent
+         }
+         // Keep this recording
+         return true
+      })
 
-         return filteredStats
-      }
-
-      return recordingStats
+      return filteredStats
    }
 
    async getUserInteractedLivestreams(
       userId: string,
-      limit?: 10
+      limit = 10
    ): Promise<LivestreamEvent[]> {
       // Limit in memory
       const recordingData = await this.getUserRecordingStats(userId, true)
@@ -1634,20 +1629,10 @@ export class FirebaseLivestreamRepository
          .map((data) => data.livestreamId)
 
       // Will need to re sort as the query might not respect the order
-      const livestreams = await this.getLivestreamsByIds(sortedLivestreamsIds)
-
-      const sortedLivestreams = (livestreams || []).sort(
-         (baseLivestream, comparisonLivestream) => {
-            const baseSortedIndex = sortedLivestreamsIds.indexOf(
-               baseLivestream.id
-            )
-
-            const comparisonSortedIndex = sortedLivestreamsIds.indexOf(
-               comparisonLivestream.id
-            )
-
-            return baseSortedIndex - comparisonSortedIndex
-         }
+      const livestreams =
+         (await this.getLivestreamsByIds(sortedLivestreamsIds)) || []
+      const sortedLivestreams = arraySortByIndex(livestreams, (event) =>
+         sortedLivestreamsIds.indexOf(event.id)
       )
       return sortedLivestreams
    }

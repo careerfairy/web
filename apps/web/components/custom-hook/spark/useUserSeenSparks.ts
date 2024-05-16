@@ -1,4 +1,5 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -11,31 +12,31 @@ import useFunctionsSWR, {
  * @param limit Items limit.
  * @returns Spark[]
  */
-export const useUserSeenSparks = (limit: number = 10) => {
+export const useUserSeenSparks = (userData: UserData, limit: number = 10) => {
    const fetcher = useFunctionsSWR()
+
+   const key = userData
+      ? [
+           "getUserSeenSparks",
+           {
+              limit: limit,
+           },
+        ]
+      : null
 
    const {
       data: sparks,
       error,
       isLoading,
-   } = useSWR<Spark[]>(
-      [
-         "getUserSeenSparks",
-         {
-            limit: limit,
-         },
-      ],
-      fetcher,
-      {
-         onError: (error, key) =>
-            errorLogAndNotify(error, {
-               message: "Error Fetching user SeenSparks by IDs via function",
-               key,
-            }),
-         ...reducedRemoteCallsOptions,
-         suspense: false,
-      }
-   )
+   } = useSWR<Spark[]>(key, fetcher, {
+      onError: (error, key) =>
+         errorLogAndNotify(error, {
+            message: "Error Fetching user SeenSparks by IDs via function",
+            key,
+         }),
+      ...reducedRemoteCallsOptions,
+      suspense: false,
+   })
 
    return useMemo(
       () => ({

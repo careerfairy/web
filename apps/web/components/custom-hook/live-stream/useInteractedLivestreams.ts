@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { useMemo } from "react"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -12,32 +13,32 @@ import useFunctionsSWR, {
  * @param limit Limit of the items to fetch.
  * @returns LivestreamEvent[] Collection of the latest livestreams for which the user has had an interaction.
  */
-const useInteractedLivestreams = (limit: number = 10) => {
+const useInteractedLivestreams = (userData: UserData, limit: number = 10) => {
    const fetcher = useFunctionsSWR()
+
+   const key = userData
+      ? [
+           "getInteractedLivestreams",
+           {
+              limit: limit,
+           },
+        ]
+      : null
 
    const {
       data: interactedEvents,
       error,
       isLoading,
-   } = useSWR<LivestreamEvent[]>(
-      [
-         "getInteractedLivestreams",
-         {
-            limit: limit,
-         },
-      ],
-      fetcher,
-      {
-         onError: (error, key) =>
-            errorLogAndNotify(error, {
-               message:
-                  "Error Fetching user Interacted Live streams via cloud function",
-               key,
-            }),
-         ...reducedRemoteCallsOptions,
-         suspense: false,
-      }
-   )
+   } = useSWR<LivestreamEvent[]>(key, fetcher, {
+      onError: (error, key) =>
+         errorLogAndNotify(error, {
+            message:
+               "Error Fetching user Interacted Live streams via cloud function",
+            key,
+         }),
+      ...reducedRemoteCallsOptions,
+      suspense: false,
+   })
 
    return useMemo(
       () => ({

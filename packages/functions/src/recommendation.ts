@@ -36,9 +36,10 @@ export const getRecommendedEvents = functions
                   userRepo,
                   sparkRepo
                )
+
                const recommendationService =
                   await UserEventRecommendationService.create(dataFetcher)
-
+               console.log("🚀 ~ dataFetcher: CREATED_V2")
                return await recommendationService.getRecommendations(data.limit)
             } catch (error) {
                logAndThrow("Error in getting recommended events", {
