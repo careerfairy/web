@@ -21,6 +21,7 @@ import {
    LivestreamQueryOptions,
    LivestreamQuestion,
    LivestreamQuestionComment,
+   LivestreamVideo,
    MarkLivestreamPollAsCurrentRequest,
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
@@ -64,7 +65,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getQueryStringFromUrl } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
@@ -1042,6 +1043,38 @@ export class LivestreamService {
    incrementLivestreamPage = async (livestreamId: string, amount: number) => {
       const ref = this.getPresentationRef(livestreamId)
       return updateDoc(ref, { page: increment(amount) })
+   }
+
+   getVideoRef = (livestreamId: string) => {
+      return doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "videos",
+         "video"
+      ).withConverter(createGenericConverter<LivestreamVideo>())
+   }
+
+   setLivestreamVideo = async ({
+      livestreamId,
+      url,
+      updater,
+   }: {
+      livestreamId: string
+      url: string
+      updater: string
+   }) => {
+      const ref = this.getVideoRef(livestreamId)
+      const secondsInUrl = Number(getQueryStringFromUrl(url, "t"))
+
+      return setDoc(ref, {
+         id: ref.id,
+         url,
+         seconds: secondsInUrl || 0,
+         state: "playing",
+         lastPlayed: Timestamp.now(),
+         updater,
+      })
    }
 }
 

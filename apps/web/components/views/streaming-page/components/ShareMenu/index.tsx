@@ -112,7 +112,6 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                 *
                 * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
                 */
-               alert("Share Youtube video not implemented yet")
                break
             default:
                break
