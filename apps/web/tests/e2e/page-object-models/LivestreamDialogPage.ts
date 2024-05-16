@@ -42,6 +42,7 @@ export default class LivestreamDialogPage extends CommonPage {
    }
 
    async openDialog(waitForTitle: boolean = true) {
+      await this.page.reload()
       await this.page
          .getByRole("link", {
             name: this.livestream.title,
