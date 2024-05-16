@@ -12,8 +12,7 @@ import useFunctionsSWR, {
  * @param limit Limit of data items.
  * @returns CustomJobApplicant[] with the most recent applications according to @param limit.
  */
-const useUserCustomJobApplications = (limit?: number) => {
-   if (!limit) limit = 10
+const useUserCustomJobApplications = (limit: number = 10) => {
    const fetcher = useFunctionsSWR()
 
    const {
