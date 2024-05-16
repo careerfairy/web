@@ -94,15 +94,6 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                } else {
                   dispatch(setUploadPDFPresentationDialogOpen(true))
                }
-               /**
-                * TODO:
-                * 1. Open PDF file picker
-                * 2. Upload the PDF to storage
-                * 3. **Save the storage URL  at /livestreams/{id}/presentations/presentation. Look at old implementation for reference
-                * 4. Set the mode to presentation
-                *
-                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
-                */
                break
             case LivestreamModes.VIDEO:
                /**
