@@ -5,7 +5,6 @@ import {
    emailNotificationsRepo,
    groupRepo,
    livestreamsRepo,
-   sparkRepo,
    userRepo,
 } from "./api/repositories"
 import config from "./config"
@@ -135,11 +134,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
       return
    }
 
-   const dataLoader = await NewsletterDataFetcher.create(
-      userRepo,
-      sparkRepo,
-      livestreamsRepo
-   )
+   const dataLoader = await NewsletterDataFetcher.create()
    const emailBuilder = new NewsletterEmailBuilder(PostmarkEmailSender.create())
    const newsletterService = new NewsletterService(
       userRepo,

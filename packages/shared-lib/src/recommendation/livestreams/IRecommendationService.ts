@@ -136,7 +136,7 @@ export default class RecommendationServiceCore {
       userData: UserData,
       livestreams: LivestreamEvent[],
       limit: number,
-      implicitData?: ImplicitLivestreamRecommendationData // TODO: Use implicit data for implicit data usage in recommendation
+      implicitData?: ImplicitLivestreamRecommendationData
    ): RankedLivestreamEvent[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,

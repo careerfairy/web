@@ -52,7 +52,7 @@ export default class UserEventRecommendationService
                this.getRecommendedEventsBasedOnUserData(
                   this.user,
                   this.futureLivestreams,
-                  10,
+                  limit,
                   this.implicitData
                )
             )

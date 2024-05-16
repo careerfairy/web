@@ -2,6 +2,7 @@ import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 import { PublicGroup } from "../groups"
 import { PublicCreator } from "../groups/creators"
+import { arraySortByIndex } from "../utils"
 
 /**
  * Collection path:
@@ -406,3 +407,57 @@ export const getCategoryById = (categoryId: SparkCategory["id"]) => {
 
 export type SparkCategory =
    (typeof SparksCategories)[keyof typeof SparksCategories]
+
+/**
+ * By receiving an already sorted IDs list, sorts the also received Spark array
+ * via their specific position in the sorted IDs list
+ * @param sortedSparkIds
+ * @param sparks
+ * @returns Sorted Spark[]
+ */
+export const sortSparksByIds = (sortedSparkIds: string[], sparks: Spark[]) => {
+   const sortedSparks = arraySortByIndex(sparks, (spark) =>
+      sortedSparkIds.indexOf(spark.id)
+   )
+   return sortedSparks
+}
+
+const sortSparksMapIds = (sparks: {
+   [sparkId: string]: Timestamp
+}): string[] => {
+   const keys = Object.keys(sparks)
+
+   if (!keys.length) return []
+   const sortedSparks = keys
+      .map((sparkId) => {
+         return {
+            sparkId: sparkId,
+            seenTimestamp: sparks[sparkId],
+         }
+      })
+      .sort(sortSparksBySeenTimestamp)
+
+   return sortedSparks.map((sortedSpark) => sortedSpark.sparkId)
+}
+
+const sortSparksBySeenTimestamp = (baseSpark, comparisonSpark) =>
+   comparisonSpark.seenTimestamp.toMillis() - baseSpark.seenTimestamp.toMillis()
+
+export const sortSeenSparks = (
+   seenSparks: SeenSparks[],
+   limit: number
+): string[] => {
+   const allSparks = seenSparks
+      .flatMap((seenSpark) => {
+         const sortedSparkIds = sortSparksMapIds(seenSpark.sparks)
+         return sortedSparkIds.map((id) => {
+            return {
+               sparkId: id,
+               seenTimestamp: seenSpark.sparks[id],
+            }
+         })
+      })
+      .sort(sortSparksBySeenTimestamp)
+
+   return allSparks.map((sortedSpark) => sortedSpark.sparkId).slice(0, limit)
+}
