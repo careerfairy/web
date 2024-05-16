@@ -270,7 +270,7 @@ export class RankedLivestreamRepository {
          pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_MATCH,
          pointsPerMissingMatch:
             -RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_DEDUCT, // decrease points if the user does not speak the language
-         // use all livestreams since we want to decrease the points if the user does not speak the language
+         // use all live streams since we want to decrease the points if the user does not speak the language
          missingMatchesMultiplier: 1, // Ensures that pointsPerMissingMatch is deducted only once for this case
          rankedLivestreams: this.livestreams,
          targetUserIds: spokenLanguages,
