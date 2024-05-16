@@ -1076,6 +1076,26 @@ export class LivestreamService {
          updater,
       })
    }
+
+   removeLivestreamVideo = async (livestreamId: string) => {
+      const ref = this.getVideoRef(livestreamId)
+      return deleteDoc(ref)
+   }
+
+   updateVideoState = async (
+      livestreamId: string,
+      updateData: Partial<
+         Pick<LivestreamVideo, "state" | "seconds" | "updater">
+      >
+   ) => {
+      const ref = this.getVideoRef(livestreamId)
+      return updateDoc(ref, {
+         ...updateData,
+         ...(updateData.state === "playing"
+            ? { lastPlayed: Timestamp.now() }
+            : {}),
+      })
+   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
