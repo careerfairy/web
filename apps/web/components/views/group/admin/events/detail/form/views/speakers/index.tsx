@@ -5,6 +5,7 @@ import { useState } from "react"
 import { User } from "react-feather"
 import EmptyFormSection from "../../EmptyFormSection"
 import FormSectionHeader from "../../FormSectionHeader"
+import { hashToColor } from "../../commons"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import CreatorDialog from "./CreatorAddEditDialog"
 import SelectSpeakersDropDown from "./SelectSpeakersDropDown"
@@ -32,6 +33,7 @@ const LivestreamFormSpeakersStep = () => {
       setFieldValue("speakers.values", newSpeakersState, true)
    }
 
+
    return (
       <>
          <FormSectionHeader
@@ -55,7 +57,9 @@ const LivestreamFormSpeakersStep = () => {
             <>
                {speakers.values.map((speaker) => (
                   <SpeakersCard
-                     key={`speaker-card-${speaker.id}`}
+                     key={`${speaker.id}-${hashToColor(
+                        JSON.stringify(speaker)
+                     )}`}
                      speaker={speaker}
                      handleEdit={() => {
                         setCurrentCreator(speaker)
