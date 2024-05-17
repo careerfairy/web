@@ -1,6 +1,6 @@
 import { uniq } from "lodash"
 import { CustomJobApplicant } from "../customJobs/customJobs"
-import { Group, GroupOption } from "../groups"
+import { Group, GroupOption, pickPublicDataFromGroup } from "../groups"
 import { LivestreamEvent } from "../livestreams"
 import { getArrayDifference } from "../utils"
 
@@ -23,12 +23,13 @@ export const getMetaDataFromCustomJobGroup = (
    group: Group
 ): CustomJobMetaData => {
    // Aggregate all the metadata from the groups
+   const publicGroupData = pickPublicDataFromGroup(group)
    const meta: CustomJobMetaData = {
-      companyCountry: group.companyCountry?.id,
-      companyIndustries: group?.companyIndustries?.map(
+      companyCountry: publicGroupData.companyCountry?.id,
+      companyIndustries: publicGroupData?.companyIndustries?.map(
          (industry) => industry.id
       ),
-      companySize: group.companySize,
+      companySize: publicGroupData.companySize,
    }
 
    return meta
