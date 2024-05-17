@@ -1079,14 +1079,12 @@ export class LivestreamService {
 
    removeLivestreamVideo = async (livestreamId: string) => {
       const ref = this.getVideoRef(livestreamId)
-      return deleteDoc(ref)
+      return deleteDoc(ref).then(() => alert("deleted"))
    }
 
    updateVideoState = async (
       livestreamId: string,
-      updateData: Partial<
-         Pick<LivestreamVideo, "state" | "seconds" | "updater">
-      >
+      updateData: Partial<Pick<LivestreamVideo, "state" | "second" | "updater">>
    ) => {
       const ref = this.getVideoRef(livestreamId)
       return updateDoc(ref, {

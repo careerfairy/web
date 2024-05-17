@@ -39,11 +39,7 @@ export const Content = () => {
    if (!pdfPresentation) {
       return (
          <Box sx={styles.root}>
-            <Typography
-               variant="desktopBrandedH4"
-               fontWeight={700}
-               textAlign="center"
-            >
+            <Typography variant="desktopBrandedH4" textAlign="center">
                The host is loading a presentation...
             </Typography>
          </Box>

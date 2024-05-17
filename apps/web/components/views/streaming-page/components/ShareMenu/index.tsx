@@ -11,6 +11,7 @@ import {
 
 import { useAppDispatch } from "components/custom-hook/store"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
+import { useDeleteLivestreamVideo } from "components/custom-hook/streaming/video/useDeleteLivestreamVideo"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
 import {
@@ -75,6 +76,8 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
          useScreenShare()
       const { livestreamId } = useStreamingContext()
       const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
+      const { trigger: deleteLivestreamVideo } =
+         useDeleteLivestreamVideo(livestreamId)
 
       const mode = useLivestreamMode()
 
@@ -101,6 +104,7 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
             case LivestreamModes.VIDEO:
                if (active) {
                   setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+                  deleteLivestreamVideo()
                } else {
                   dispatch(setShareVideoDialogOpen(true))
                }
