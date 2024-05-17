@@ -19,28 +19,32 @@ const styles = sxStyles({
 })
 
 export const SpotlightVideo = () => {
+   return (
+      <Box sx={styles.root}>
+         <SuspenseWithBoundary fallback={<CircularProgress />}>
+            <Content />
+         </SuspenseWithBoundary>
+      </Box>
+   )
+}
+
+export const Content = () => {
    const { livestreamId, agoraUserId } = useStreamingContext()
    const { data: video } = useLivestreamVideo(livestreamId)
 
    if (!video) {
       return (
-         <Box sx={styles.root}>
-            <Typography variant="mobileBrandedH4" textAlign="center">
-               Please wait for the host to load the video
-            </Typography>
-         </Box>
+         <Typography variant="mobileBrandedH4" textAlign="center">
+            Please wait for the host to load the video
+         </Typography>
       )
    }
 
    return (
-      <Box sx={styles.root}>
-         <SuspenseWithBoundary fallback={<CircularProgress />}>
-            <SynchronizedVideo
-               video={video}
-               userId={agoraUserId}
-               livestreamId={livestreamId}
-            />
-         </SuspenseWithBoundary>
-      </Box>
+      <SynchronizedVideo
+         video={video}
+         userId={agoraUserId}
+         livestreamId={livestreamId}
+      />
    )
 }

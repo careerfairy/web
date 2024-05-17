@@ -1,20 +1,23 @@
 import { LivestreamVideo } from "@careerfairy/shared-lib/livestreams"
 import MuteIcon from "@mui/icons-material/VolumeOff"
 import UnmuteIcon from "@mui/icons-material/VolumeUp"
+import Backdrop from "@mui/material/Backdrop"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import { alpha } from "@mui/material/styles"
 import { useUpdateLivestreamVideoState } from "components/custom-hook/streaming/video/useUpdateLivestreamVideoState"
-import { Fragment, useCallback, useEffect, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
+import { Play } from "react-feather"
 import ReactPlayer, { YouTubePlayerProps } from "react-player/youtube"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = sxStyles({
    root: {
       width: "100%",
+      height: "100%",
       backgroundColor: "black",
       position: "relative",
-      height: "calc(100% - 48px)",
       "& button": {
          backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
          color: "white",
@@ -29,11 +32,12 @@ const styles = sxStyles({
       position: "absolute",
       bottom: 5,
       left: 5,
-      zIndex: "9000",
-      color: "white",
-      borderColor: "white !important",
-      // textShadow: (theme) => theme.darkTextShadow,
    },
+   backdrop: (theme) => ({
+      color: theme.palette.common.white,
+      zIndex: theme.zIndex.drawer + 1,
+      position: "absolute",
+   }),
 })
 
 type Props = {
@@ -41,6 +45,8 @@ type Props = {
    livestreamId: string
    video: LivestreamVideo
 }
+
+type ReactPlayerInstance = Parameters<YouTubePlayerProps["onReady"]>[0]
 
 export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    const { trigger: updateVideoState } =
@@ -51,48 +57,55 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    const isVideoSharerRef = useRef(isVideoSharer)
    isVideoSharerRef.current = isVideoSharer
 
-   const [autoPlayFailed, setAutoPlayFailed] = useState(false)
+   const [autoPlayFailed, setAutoPlayFailed] = useState(
+      !navigator.userActivation.hasBeenActive
+   )
 
    // If you have not interacted with the page before, you are muted
-   const [muted, setMuted] = useState(false)
-   // const [muted, setMuted] = useState(!navigator.userActivation.hasBeenActive)
-
-   console.log("🚀 ~ ", {
-      hasBeenActive: navigator.userActivation.hasBeenActive,
-      isActive: navigator.userActivation.isActive,
-      autoPlayFailed,
-      muted,
-   })
+   const [muted, setMuted] = useState(autoPlayFailed)
 
    const [reactPlayerInstance, setReactPlayerInstance] =
-      useState<ReactPlayer | null>(null)
+      useState<ReactPlayerInstance | null>(null)
 
    const playerReady = Boolean(reactPlayerInstance)
 
-   useEffect(() => {
-      if (!playerReady) return
+   const videoRef = useRef(video)
+   videoRef.current = video
 
-      if (video.state === "playing" && video.lastPlayed) {
-         handleInitialize()
+   /**
+    * Initializes the video player for all users, including the video sharer.
+    * Ensures continuous playback from the last known point if the sharer exits.
+    */
+   useEffect(() => {
+      if (!reactPlayerInstance) return
+
+      if (videoRef.current.state === "playing" && videoRef.current.lastPlayed) {
+         const secondsDiff = getSecondsBetweenDates(
+            videoRef.current.lastPlayed.toDate(),
+            new Date()
+         )
+         reactPlayerInstance.seekTo(
+            videoRef.current.second + secondsDiff,
+            "seconds"
+         )
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [playerReady])
+   }, [reactPlayerInstance])
 
+   const videoPaused = video.state === "paused"
+
+   /**
+    * Effect to handle syncing everybody else's video
+    * player to the video sharer's video player
+    */
    useEffect(() => {
-      if (playerReady && !isVideoSharer) {
+      if (videoPaused || isVideoSharer) return
+
+      if (reactPlayerInstance) {
          reactPlayerInstance.seekTo(video.second, "seconds")
       }
-   }, [video.second, playerReady, isVideoSharer, reactPlayerInstance])
+   }, [video.second, isVideoSharer, reactPlayerInstance, videoPaused])
 
-   const handleInitialize = () => {
-      const secondsDiff = getSecondsBetweenDates(
-         video.lastPlayed.toDate(),
-         new Date()
-      )
-      reactPlayerInstance?.seekTo(video.second + secondsDiff, "seconds")
-   }
-
-   const handlePlay = useCallback(async () => {
+   const handlePlay = () => {
       if (!isVideoSharer || !playerReady) {
          return
       }
@@ -102,76 +115,86 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
          second: reactPlayerInstance?.getCurrentTime() || 0,
          updater: userId,
       })
-   }, [
-      isVideoSharer,
-      playerReady,
-      updateVideoState,
-      reactPlayerInstance,
-      userId,
-   ])
+   }
 
-   const handlePause = useCallback(() => {
-      if (!isVideoSharer) {
-         return
+   const handlePause = () => {
+      if (isVideoSharer) {
+         updateVideoState({ state: "paused" })
       }
-      updateVideoState({ state: "paused" })
-   }, [isVideoSharer, updateVideoState])
+   }
 
-   const handleError: YouTubePlayerProps["onError"] = useCallback((error) => {
-      console.log("🚀 ~  ~ error:", error)
-      console.error(error)
+   const handleError: YouTubePlayerProps["onError"] = (error) => {
+      errorLogAndNotify(error, "Error playing video")
       setAutoPlayFailed(true)
-   }, [])
+   }
 
-   const handleOnReady = useCallback((player) => {
+   const handleOnReady: YouTubePlayerProps["onReady"] = (player) => {
       setReactPlayerInstance(player)
-   }, [])
+   }
+
+   const handleToggleMute = () => {
+      setMuted((prev) => !prev)
+   }
+
+   const handleClickToEnableAudio = () => {
+      setAutoPlayFailed(false)
+      setMuted(false)
+   }
 
    return (
       <Fragment>
          <Box sx={styles.root}>
-            {Boolean(!isVideoSharer && reactPlayerInstance) && (
-               <Button
-                  sx={styles.muteButton}
-                  color={"grey"}
-                  startIcon={muted ? <MuteIcon /> : <UnmuteIcon />}
-                  onClick={() => setMuted((prev) => !prev)}
-               >
-                  {muted ? "Unmute" : "Mute"}
-               </Button>
-            )}
-
             <ReactPlayer
                playing={video.state === "playing"}
-               style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "0",
-                  transform: "translateY(-50%)",
-                  pointerEvents: isVideoSharer ? "visibleFill" : "none",
-               }}
-               config={{
-                  // https://developers.google.com/youtube/player_parameters
-                  playerVars: {
-                     controls: isVideoSharer ? 1 : 0,
-                     fs: 0,
-                     disablekb: isVideoSharer ? 0 : 1,
-                     rel: 0,
-                  },
-               }}
+               config={getConfig(isVideoSharer)}
                muted={muted}
                controls={isVideoSharer}
                url={video.url}
                onError={handleError}
-               width="100%"
-               height={"100%"}
                onReady={handleOnReady}
                onPlay={handlePlay}
                onPause={handlePause}
+               width="100%"
+               height="100%"
+               style={{
+                  pointerEvents: isVideoSharer ? "visibleFill" : "none",
+               }}
             />
+            {Boolean(autoPlayFailed) && (
+               <Backdrop
+                  sx={styles.backdrop}
+                  open={autoPlayFailed}
+                  onClick={handleClickToEnableAudio}
+               >
+                  <Button size="large" startIcon={<Play />}>
+                     Click for audio
+                  </Button>
+               </Backdrop>
+            )}
+            {Boolean(!isVideoSharer && reactPlayerInstance) && (
+               <Button
+                  sx={styles.muteButton}
+                  startIcon={muted ? <MuteIcon /> : <UnmuteIcon />}
+                  onClick={handleToggleMute}
+               >
+                  {muted ? "Unmute" : "Mute"}
+               </Button>
+            )}
          </Box>
       </Fragment>
    )
+}
+
+const getConfig = (isVideoSharer: boolean): YouTubePlayerProps["config"] => {
+   return {
+      // https://developers.google.com/youtube/player_parameters
+      playerVars: {
+         controls: isVideoSharer ? 1 : 0,
+         fs: 0,
+         disablekb: isVideoSharer ? 0 : 1,
+         rel: 0,
+      },
+   }
 }
 
 const getSecondsBetweenDates = (startDate: Date, endDate: Date) => {
