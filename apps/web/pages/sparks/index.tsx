@@ -1,7 +1,6 @@
 import { sparkService } from "data/firebase/SparksService"
-import geoip from "geoip-lite"
 import { GetServerSideProps } from "next"
-import path from "path"
+// import path from "path"
 import { encode } from "querystring"
 
 /**
@@ -13,12 +12,15 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+   const geoip = await import("geoip-lite")
+
    const { req, query } = context
 
    console.log(`Current working directory: ${process.cwd()}`)
 
-   const dataPath = path.join(process.cwd(), "public/geoip-countries")
-   geoip.setDataPath(dataPath)
+   // const dataPath = path.join(process.cwd(), "public/geoip-countries")
+   geoip.reloadDataSync()
+   // geoip.setDataPath(dataPath)
 
    // default to using req.socket.remoteAddress
    let ipAddress = req.socket.remoteAddress
