@@ -1,4 +1,5 @@
 import { sparkService } from "data/firebase/SparksService"
+import { lookup } from "geoip-lite"
 import { GetServerSideProps } from "next"
 import { encode } from "querystring"
 
@@ -11,7 +12,6 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-   const { lookup } = await import("geoip-lite")
    const { req, query } = context
 
    // default to using req.socket.remoteAddress
