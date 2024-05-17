@@ -4,6 +4,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import {
    Box,
+   Button,
    Card,
    CardContent,
    CardMedia,
@@ -12,7 +13,6 @@ import {
 } from "@mui/material"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import Link from "components/views/common/Link"
-import FollowButton from "components/views/common/company/FollowButton"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
@@ -108,21 +108,11 @@ const styles = sxStyles({
    },
 })
 
-type FollowCompanyButtonProps = {
-   company: Group
-}
-
-const FollowCompanyButton = ({ company }: FollowCompanyButtonProps) => {
+const FollowCompanyButton = () => {
    return (
-      <span>
-         <FollowButton
-            variant={"outlined"}
-            size={"small"}
-            startIcon={null}
-            sx={styles.followButton}
-            group={company}
-         />
-      </span>
+      <Button variant={"contained"} size={"small"} sx={styles.followButton}>
+         Follow
+      </Button>
    )
 }
 
@@ -189,7 +179,7 @@ const AboutCompanyComponent = ({
                      ) : null}
                   </Stack>
 
-                  <FollowCompanyButton company={company} />
+                  <FollowCompanyButton />
                </Stack>
                <Stack
                   mt={2.25}
