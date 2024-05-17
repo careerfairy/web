@@ -122,12 +122,14 @@ const PreviewContent = ({
                   />
                </Section>
             </Section>
-            <AboutCompany
-               company={group}
-               backgroundImageUrl={general.backgroundImageUrl}
-               companyLogoUrl={general.companyLogoUrl}
-               companyName={general.company}
-            />
+            <Section>
+               <AboutCompany
+                  company={group}
+                  backgroundImageUrl={general.backgroundImageUrl}
+                  companyLogoUrl={general.companyLogoUrl}
+                  companyName={general.company}
+               />
+            </Section>
             <Section>
                <Questions companyName={general.company} />
             </Section>

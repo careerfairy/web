@@ -9,6 +9,7 @@ import { alpha } from "@mui/material/styles"
 import Link from "components/views/common/Link"
 import SectionTitle from "components/views/livestream-dialog/views/livestream-details/main-content/SectionTitle"
 import { Briefcase as JobIcon } from "react-feather"
+import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -39,6 +40,10 @@ const styles = sxStyles({
          sm: "max-content",
       },
    },
+   skeleton: {
+      transform: "none !important",
+      borderRadius: 5,
+   },
 })
 
 type JobsProps = {
@@ -50,16 +55,22 @@ const Jobs = ({ jobs }: JobsProps) => {
       <Box>
          <SectionTitle>Linked Jobs</SectionTitle>
          <Stack spacing={2}>
-            {jobs.map((job, index) => {
-               const isAtsLivestreamAssociation = "integrationId" in job
+            {jobs ? (
+               jobs.map((job, index) => {
+                  const isAtsLivestreamAssociation = "integrationId" in job
 
-               return (
-                  <JobItem
-                     key={index}
-                     jobName={isAtsLivestreamAssociation ? job.name : job.title}
-                  />
-               )
-            })}
+                  return (
+                     <JobItem
+                        key={index}
+                        jobName={
+                           isAtsLivestreamAssociation ? job.name : job.title
+                        }
+                     />
+                  )
+               })
+            ) : (
+               <JobsSkeleton />
+            )}
          </Stack>
       </Box>
    )
@@ -106,6 +117,10 @@ const JobItem = ({ jobName }: JobItemProps) => {
          </Box>
       </Stack>
    )
+}
+
+const JobsSkeleton = () => {
+   return <StaticSkeleton height={85} sx={styles.skeleton} />
 }
 
 export default Jobs

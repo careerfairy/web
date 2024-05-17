@@ -1,15 +1,14 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import { speakerPlaceholder } from "components/util/constants"
 import HorizontalScroll from "components/views/common/HorizontalScroll"
 import SectionTitle from "components/views/livestream-dialog/views/livestream-details/main-content/SectionTitle"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import Image from "next/legacy/image"
-import { FC } from "react"
 import { LivestreamFormSpeaker } from "../../types"
+import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    root: {
@@ -48,7 +47,7 @@ type SpeakersProps = {
 
 const Speakers = ({ speakers }: SpeakersProps) => {
    if (!speakers) {
-      return null
+      return <SpeakersSkeleton />
    }
 
    return (
@@ -102,7 +101,7 @@ const SpeakerAvatar = ({ speaker }: SpeakerAvatarProps) => {
    )
 }
 
-const SpeakerAvatarSkeleton: FC = () => {
+const SpeakerAvatarSkeleton = () => {
    return (
       <Stack spacing={0.75} direction="row" sx={styles.speakerAvatar}>
          <Box minWidth={56} minHeight={56}>
@@ -121,28 +120,28 @@ const SpeakerAvatarSkeleton: FC = () => {
                whiteSpace="nowrap"
                variant="h6"
             >
-               <Skeleton width={160} />
+               <StaticSkeleton width={160} />
             </Typography>
             <Typography
                sx={styles.position}
                whiteSpace="nowrap"
                variant="body2"
             >
-               <Skeleton width={100} />
+               <StaticSkeleton width={100} />
             </Typography>
          </Stack>
       </Stack>
    )
 }
 
-export const SpeakersSkeleton: FC = () => {
+const SpeakersSkeleton = () => {
    return (
       <Box sx={styles.root}>
          <SectionTitle>Speakers</SectionTitle>
          <Stack sx={styles.speakersWrapper} direction="row" spacing={3}>
-            {Array.from({ length: 3 }).map((_, i) => (
-               <SpeakerAvatarSkeleton key={i} />
-            ))}
+            <SpeakerAvatarSkeleton />
+            <SpeakerAvatarSkeleton />
+            <SpeakerAvatarSkeleton />
          </Stack>
       </Box>
    )
