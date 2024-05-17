@@ -43,19 +43,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
    //    anonymousUserCountryCode
    // )
 
-   const sparks = await sparkService.fetchNextSparks(null, {
+   let sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
       anonymousUserCountryCode: "AL",
    })
+
+   if (sparks.length === 0) {
+      sparks = await sparkService.fetchNextSparks(null, {
+         numberOfSparks: 1,
+         userId: null,
+      })
+   }
 
    const queryParamString = encode(query)
 
    if (sparks.length > 0) {
       return {
          redirect: {
-            destination: `/sparks/${sparks[0].id}${
-               queryParamString && `?${queryParamString}&ipAddress=${ipAddress}`
+            destination: `/sparks/${sparks[0].id}?ipAddress=${ipAddress}${
+               queryParamString && `&${queryParamString}`
             }`,
             permanent: false,
          },
