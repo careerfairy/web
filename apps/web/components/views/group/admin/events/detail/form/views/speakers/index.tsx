@@ -33,7 +33,6 @@ const LivestreamFormSpeakersStep = () => {
       setFieldValue("speakers.values", newSpeakersState, true)
    }
 
-   console.log("🚀 ~ LivestreamFormSpeakersStep ~ speakers:", speakers)
 
    return (
       <>
