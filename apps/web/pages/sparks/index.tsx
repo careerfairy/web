@@ -1,5 +1,5 @@
 import { sparkService } from "data/firebase/SparksService"
-import { lookup } from "geoip-lite"
+import geoip from "geoip-lite"
 import { GetServerSideProps } from "next"
 import { encode } from "querystring"
 
@@ -13,6 +13,7 @@ export default function Sparks() {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
    const { req, query } = context
+   geoip.setDataPath("public/geoip-countries")
 
    // default to using req.socket.remoteAddress
    let ipAddress = req.socket.remoteAddress
@@ -32,9 +33,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
    )
 
    // Use geoip-lite to get geolocation data based on the IP address
-   const geo = lookup(ipAddress)
+   const geo = geoip.lookup(ipAddress)
 
-   const anonymousUserCountryCode = geo ? geo.country : null
+   const anonymousUserCountryCode = geo ? geo.country : ""
    console.log(
       "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ anonymousUserCountryCode:",
       anonymousUserCountryCode
