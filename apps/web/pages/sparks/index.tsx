@@ -11,7 +11,7 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-   // const { lookup } = await import("geoip-lite")
+   const { lookup } = await import("geoip-lite")
    const { req, query } = context
 
    // default to using req.socket.remoteAddress
@@ -26,28 +26,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
    }
 
-   // const ipAddress =
-   // context.req.headers["x-forwarded-for"] || context.req.connection.remoteAddress || context.req.socket.remoteAddress
-
    console.log(
       "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ ipAddress:",
       ipAddress
    )
 
    // Use geoip-lite to get geolocation data based on the IP address
-   // const geo = lookup(ipAddress as string)
+   const geo = lookup(ipAddress)
 
-   // const anonymousUserCountryCode = geo ? geo.country : null
-   // console.log(
-   //    "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ anonymousUserCountryCode:",
-   //    anonymousUserCountryCode
-   // )
+   const anonymousUserCountryCode = geo ? geo.country : null
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ anonymousUserCountryCode:",
+      anonymousUserCountryCode
+   )
 
    let sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
-      anonymousUserCountryCode: "AL",
+      anonymousUserCountryCode: anonymousUserCountryCode,
    })
+
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks:",
+      sparks
+   )
 
    if (sparks.length === 0) {
       sparks = await sparkService.fetchNextSparks(null, {
