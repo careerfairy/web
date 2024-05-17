@@ -3,6 +3,7 @@ import { Box, Container } from "@mui/material"
 import Image from "next/legacy/image"
 import { ReactNode } from "react"
 import BackAndCloseButton from "./BackAndCloseButton"
+import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    heroContent: {
@@ -35,7 +36,15 @@ const styles = sxStyles({
       height: "100%",
       background: "black",
       opacity: 0.65,
-      zIndex: -1,
+      zIndex: 0,
+   },
+   backgroundImgOverlaySkeleton: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      zIndex: 0,
    },
 })
 
@@ -60,14 +69,21 @@ const HeroContent = ({
             {children}
          </Container>
          {backgroundImage ? (
-            <Image
-               alt={"background image"}
-               src={backgroundImage}
-               layout={"fill"}
-               objectFit={"cover"}
+            <>
+               <Image
+                  alt={"background image"}
+                  src={backgroundImage}
+                  layout={"fill"}
+                  objectFit={"cover"}
+               />
+               <Box sx={styles.backgroundImgOverlay} />
+            </>
+         ) : (
+            <StaticSkeleton
+               variant="rounded"
+               sx={styles.backgroundImgOverlaySkeleton}
             />
-         ) : null}
-         <Box sx={styles.backgroundImgOverlay} />
+         )}
          <BackAndCloseButton handleCloseDialog={handleCloseDialog} />
       </Box>
    )

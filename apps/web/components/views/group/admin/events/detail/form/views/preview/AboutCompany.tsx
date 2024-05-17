@@ -24,7 +24,7 @@ import SectionTitle from "components/views/livestream-dialog/views/livestream-de
 import Image from "next/legacy/image"
 import { useMemo } from "react"
 import { ChevronRight as MoreIcon } from "react-feather"
-import Section from "./Section"
+import StaticSkeleton from "./StaticSkeleton"
 
 const LOGO_SIZE = 120
 
@@ -147,11 +147,11 @@ const AboutCompanyComponent = ({
    const showCompanyPageCta = Boolean(companyPresenter?.publicProfile)
 
    if (!companyPresenter || !companyPresenter.hasMinimumData()) {
-      return null
+      return <AboutCompanySkeleton />
    }
 
    return (
-      <Section>
+      <>
          <SectionTitle>Connect with Our Brand</SectionTitle>
          <Card sx={styles.root}>
             <CardMedia sx={styles.media}>
@@ -243,7 +243,78 @@ const AboutCompanyComponent = ({
                ) : null}
             </CardContent>
          </Card>
-      </Section>
+      </>
+   )
+}
+
+export const AboutCompanySkeleton = () => {
+   return (
+      <>
+         <SectionTitle>Connect with Our Brand</SectionTitle>
+         <Card sx={styles.root}>
+            <CardMedia sx={styles.media}>
+               <Box sx={styles.overlay} />
+               <Box sx={styles.logoWrapper}>
+                  <StaticSkeleton
+                     variant="circular"
+                     width={LOGO_SIZE}
+                     height={LOGO_SIZE}
+                  />
+               </Box>
+            </CardMedia>
+            <CardContent sx={styles.content}>
+               <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="space-between"
+               >
+                  <Typography
+                     width="70%"
+                     component="h5"
+                     sx={styles.companyName}
+                  >
+                     <StaticSkeleton />
+                  </Typography>
+                  <StaticSkeleton
+                     sx={styles.button}
+                     variant="rectangular"
+                     width={100}
+                     height={30}
+                  />
+               </Stack>
+               <Stack
+                  mt={2.25}
+                  direction={{
+                     xs: "column",
+                     sm: "row",
+                  }}
+                  spacing={2}
+               >
+                  <CompanyCountryTag
+                     fontSize={"1.07rem"}
+                     text={<StaticSkeleton width={60} />}
+                  />
+                  <CompanyIndustryTag
+                     fontSize={"1.07rem"}
+                     text={<StaticSkeleton width={60} />}
+                  />
+                  <CompanySizeTag
+                     fontSize={"1.07rem"}
+                     text={<StaticSkeleton width={60} />}
+                  />
+               </Stack>
+               <Typography width="100%" sx={styles.companyDescription}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                     <StaticSkeleton key={i} />
+                  ))}
+                  <StaticSkeleton width="50%" />
+               </Typography>
+               <Typography mt={2.687} sx={styles.companyCta}>
+                  <StaticSkeleton width={200} />
+               </Typography>
+            </CardContent>
+         </Card>
+      </>
    )
 }
 

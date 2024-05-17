@@ -1,10 +1,8 @@
 import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import Box from "@mui/material/Box"
-import Skeleton from "@mui/material/Skeleton"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import WhiteTagChip from "components/views/common/chips/TagChip"
-import { FC } from "react"
+import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    tagsWrapper: {
@@ -42,10 +40,10 @@ type LivestreamTagsContainerProps = {
    language: LivestreamLanguage
    interests: any[]
 }
-const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
+const LivestreamTagsContainer = ({
    language,
    interests,
-}) => {
+}: LivestreamTagsContainerProps) => {
    return (
       <Box sx={styles.tagsWrapper}>
          {language ? (
@@ -55,17 +53,19 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
                tooltipText={`This live stream is in ${language.name}`}
                label={language.name}
             />
-         ) : null}
-         {interests.length > 0 ? (
-            <SuspenseWithBoundary fallback={<InterestSkeletons />}>
-               <InterestChips interests={interests} />
-            </SuspenseWithBoundary>
-         ) : null}
+         ) : (
+            <LanguageSkeleton />
+         )}
+         {interests?.length > 0 ? (
+            <InterestChips interests={interests} />
+         ) : (
+            <TagsSkeleton />
+         )}
       </Box>
    )
 }
 
-export const LivestreamTagsContainerSkeleton = () => {
+const TagsSkeleton = () => {
    return (
       <Box sx={styles.tagsWrapper}>
          <InterestSkeletons />
@@ -79,7 +79,7 @@ type InterestChipsProps = {
 
 const maxInterestsToShow = 2
 
-const InterestChips: FC<InterestChipsProps> = ({ interests }) => {
+const InterestChips = ({ interests }: InterestChipsProps) => {
    // Calculate the number of remaining interests
    const remainingInterests = interests.length - maxInterestsToShow
 
@@ -112,22 +112,33 @@ const InterestChips: FC<InterestChipsProps> = ({ interests }) => {
    )
 }
 
-const InterestSkeletons: FC = () => {
+const LanguageSkeleton = () => {
+   return (
+      <StaticSkeleton
+         sx={[styles.chip, styles.chipSkeleton]}
+         variant={"rectangular"}
+         height={20}
+         width={100}
+      />
+   )
+}
+
+const InterestSkeletons = () => {
    return (
       <>
-         <Skeleton
+         <StaticSkeleton
             sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}
             width={100}
          />
-         <Skeleton
+         <StaticSkeleton
             sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}
             width={150}
          />
-         <Skeleton
+         <StaticSkeleton
             sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}

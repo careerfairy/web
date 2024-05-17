@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { alpha } from "@mui/material/styles"
 import { isEmpty } from "lodash/fp"
-import { FC, memo, useCallback, useEffect, useState } from "react"
+import { memo, useCallback, useEffect, useState } from "react"
 import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
@@ -47,20 +47,26 @@ type CountdownTimerProps = {
    isPast: boolean
    startDate: Date
 }
-const CountDownTimer: FC<CountdownTimerProps> = ({ isPast, startDate }) => {
+const CountDownTimer = ({ isPast, startDate }: CountdownTimerProps) => {
    return (
       <Stack spacing={1} divider={<Divider sx={styles.divider} />}>
-         <Typography sx={styles.date} variant={"body1"} textAlign={"center"}>
-            {isPast
-               ? DateUtil.formatPastDate(startDate)
-               : DateUtil.formatLiveDate(startDate)}
-         </Typography>
-         {isPast ? null : <TimerText time={startDate} />}
+         {Boolean(startDate) && (
+            <Typography sx={styles.date} variant={"body1"} textAlign={"center"}>
+               {isPast
+                  ? DateUtil.formatPastDate(startDate)
+                  : DateUtil.formatLiveDate(startDate)}
+            </Typography>
+         )}
+         {isPast ? null : startDate ? (
+            <TimerText time={startDate} />
+         ) : (
+            <CountdownTimerSkeleton />
+         )}
       </Stack>
    )
 }
 
-export const CountdownTimerSkeleton = () => {
+const CountdownTimerSkeleton = () => {
    return (
       <Stack
          spacing={1}

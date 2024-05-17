@@ -1,7 +1,7 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import Skeleton from "@mui/material/Skeleton"
 import Typography from "@mui/material/Typography"
 import { ReactNode } from "react"
+import StaticSkeleton from "./StaticSkeleton"
 
 const styles = sxStyles({
    eventTitle: {
@@ -20,7 +20,7 @@ type Props = {
 }
 
 const LivestreamTitle = ({ text }: Props) => {
-   return (
+   return text ? (
       <Typography
          align="center"
          variant={"h3"}
@@ -29,16 +29,18 @@ const LivestreamTitle = ({ text }: Props) => {
       >
          {text}
       </Typography>
+   ) : (
+      <LivestreamTitleSkeleton />
    )
 }
 
-export const LivestreamTitleSkeleton = () => {
+const LivestreamTitleSkeleton = () => {
    return (
       <LivestreamTitle
          text={
             <>
-               <Skeleton sx={styles.skeletonText} width="80%" />
-               <Skeleton sx={styles.skeletonText} width="40%" />
+               <StaticSkeleton sx={styles.skeletonText} width="80%" />
+               <StaticSkeleton sx={styles.skeletonText} width="40%" />
             </>
          }
       />
