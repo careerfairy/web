@@ -79,11 +79,18 @@ const CreatorFormDialog = ({
    } = useLivestreamFormValues()
 
    const onSuccessfulSubmit = (newCreator: Creator) => {
-      setFieldValue("speakers.options", [
-         ...speakers.options,
-         { ...newCreator, isCreator: true },
-      ])
-      setFieldValue("speakers.values", [...speakers.values, newCreator])
+      const updatedOptions = speakers.options.map((option) =>
+         option.id === newCreator.id
+            ? { ...newCreator, isCreator: true }
+            : option
+      )
+      const updatedValues = speakers.values.map((value) =>
+         value.id === newCreator.id ? newCreator : value
+      )
+
+      setFieldValue("speakers.options", updatedOptions)
+      setFieldValue("speakers.values", updatedValues)
+
       handleClose()
    }
 
