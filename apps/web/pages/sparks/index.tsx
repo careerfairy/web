@@ -15,6 +15,8 @@ export default function Sparks() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
    const { req, query } = context
 
+   console.log(`Current working directory: ${process.cwd()}`)
+
    const dataPath = path.join(process.cwd(), "public/geoip-countries")
    geoip.setDataPath(dataPath)
 
