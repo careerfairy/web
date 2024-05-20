@@ -11,10 +11,22 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-   const sparks = await sparkService.fetchNextSparks(null, {
+   const countryCode = context.req.headers["x-vercel-ip-country"] || ""
+
+   let sparks = await sparkService.fetchNextSparks(null, {
       numberOfSparks: 1,
       userId: null,
+      anonymousUserCountryCode: Array.isArray(countryCode)
+         ? countryCode[0]
+         : countryCode,
    })
+
+   if (sparks.length === 0) {
+      sparks = await sparkService.fetchNextSparks(null, {
+         numberOfSparks: 1,
+         userId: null,
+      })
+   }
 
    const queryParamString = encode(context.query)
 
