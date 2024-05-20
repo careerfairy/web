@@ -16,12 +16,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       userId: null,
    })
 
-   if (sparks.length === 0) {
-      sparks = await sparkService.fetchNextSparks(null, {
-         numberOfSparks: 1,
-         userId: null,
-      })
-   }
    let cenas = "NADA"
 
    if (sparks) {
@@ -30,6 +24,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
          sparks
       )
       cenas = "VAMOS Lá ver"
+   }
+
+   if (sparks.length === 0) {
+      sparks = await sparkService.fetchNextSparks(null, {
+         numberOfSparks: 1,
+         userId: null,
+      })
    }
 
    const queryParamString = encode(context.query)
