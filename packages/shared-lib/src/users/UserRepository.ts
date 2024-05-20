@@ -1,27 +1,27 @@
+import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
 } from "../BaseFirebaseRepository"
+import { Application } from "../ats/Application"
+import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
+import { Create } from "../commonTypes"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import {
    CompanyFollowed,
    IUserReminder,
    RegistrationStep,
    SavedRecruiter,
-   UserActivity,
    UserATSDocument,
    UserATSRelations,
+   UserActivity,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
    UserStats,
 } from "./users"
-import firebase from "firebase/compat/app"
-import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
-import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
-import { Application } from "../ats/Application"
-import { FieldOfStudy } from "../fieldOfStudy"
-import { Create } from "../commonTypes"
-import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
    updateUserData(userId: string, data: Partial<UserData>): Promise<void>
@@ -162,6 +162,8 @@ export interface IUserRepository {
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
+   
+   deleteResume(userEmail: string): Promise<void>
 
    welcomeDialogComplete(userEmail: string): Promise<void>
 
@@ -776,6 +778,16 @@ export class FirebaseUserRepository
 
       const toUpdate: Pick<UserData, "userResume"> = {
          userResume: resumeUrl,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
+   deleteResume(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate = {
+         userResume: firebase.firestore.FieldValue.delete()
       }
 
       return docRef.update(toUpdate)

@@ -12,7 +12,7 @@ export const tooltipStyles = sxStyles({
 })
 
 export const BrandedTooltip = styled(
-   ({ className, placement = "top", ...props }: TooltipProps) => (
+   ({ className, placement = "top", children, ...props }: TooltipProps) => (
       <Tooltip
          {...props}
          componentsProps={{
@@ -22,7 +22,9 @@ export const BrandedTooltip = styled(
          }}
          placement={placement}
          classes={{ popper: className }}
-      />
+      >
+         <div>{children}</div>
+      </Tooltip>
    )
 )({
    [`& .${tooltipClasses.tooltip}`]: {
