@@ -11,20 +11,20 @@ export default function Sparks() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+   const countryCode = context.req.headers["x-vercel-ip-country"] || ""
+
+   console.log(
+      "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ countryCode:",
+      isArray(countryCode) ? countryCode[0] : countryCode
+   )
+
    let { sparks } = await sparkService.fetchFeed({
       numberOfSparks: 1,
       userId: null,
+      anonymousUserCountryCode: Array.isArray(countryCode)
+         ? countryCode[0]
+         : countryCode,
    })
-
-   let cenas = "NADA"
-
-   if (sparks) {
-      console.log(
-         "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks:",
-         sparks
-      )
-      cenas = "VAMOS Lá ver"
-   }
 
    if (sparks.length === 0) {
       sparks = await sparkService.fetchNextSparks(null, {
@@ -38,8 +38,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
    if (sparks.length > 0) {
       return {
          redirect: {
-            destination: `/sparks/${sparks[0].id}?cenas=${cenas}${
-               queryParamString && `&${queryParamString}`
+            destination: `/sparks/${sparks[0].id}${
+               queryParamString && `?${queryParamString}`
             }`,
             permanent: false,
          },
