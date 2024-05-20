@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
    console.log(
       "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ countryCode:",
-      isArray(countryCode) ? countryCode[0] : countryCode
+      Array.isArray(countryCode) ? countryCode[0] : countryCode
    )
 
    let { sparks } = await sparkService.fetchFeed({
