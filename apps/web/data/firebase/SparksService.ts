@@ -183,6 +183,11 @@ export class SparksService {
          baseQuery = query(collection(db, "sparks"))
 
          if (anonymousUserCountryCode) {
+            console.log(
+               "🚀 ~ SparksService ~ anonymousUserCountryCode:",
+               anonymousUserCountryCode
+            )
+
             const loggedOutCountry = getCountryOptionByCountryCode(
                anonymousUserCountryCode
             )
