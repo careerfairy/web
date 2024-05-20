@@ -1,25 +1,31 @@
-import { sxStyles } from "../../../../../../types/commonTypes"
-import Box from "@mui/material/Box"
-import React, { useCallback, useEffect } from "react"
-import { HelpCircle } from "react-feather"
-import { Button, CircularProgress, Stack, Typography } from "@mui/material"
-import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useLiveStreamDialog } from "../../../LivestreamDialog"
+import {
+   Button,
+   CircularProgress,
+   Stack,
+   SxProps,
+   Typography,
+} from "@mui/material"
+import Box from "@mui/material/Box"
 import { useAuth } from "HOCs/AuthProvider"
+import { useCallback, useEffect } from "react"
+import { HelpCircle } from "react-feather"
 import { useDispatch } from "react-redux"
 import {
    AutomaticActions,
    setAutoAction,
    setJobToOpen,
 } from "store/reducers/sparksFeedReducer"
+import { combineStyles, sxStyles } from "../../../../../../types/commonTypes"
+import useCustomJobApply from "../../../../../custom-hook/custom-job/useCustomJobApply"
+import { useLiveStreamDialog } from "../../../LivestreamDialog"
 
 const styles = sxStyles({
    confirmationWrapper: {
       position: "sticky",
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
-      bottom: "100px",
+      bottom: 0,
       padding: "24px",
       justifyContent: "space-between",
       alignItems: "center",
@@ -71,13 +77,15 @@ type Props = {
    handleClose: () => void
    job: PublicCustomJob
    livestreamId: string
-   autoApply: boolean
+   autoApply?: boolean
+   sx?: SxProps
 }
 const CustomJobApplyConfirmation = ({
    handleClose,
    job,
    livestreamId,
    autoApply,
+   sx,
 }: Props) => {
    const { isLoggedIn, userData } = useAuth()
    const { goToView } = useLiveStreamDialog()
@@ -113,6 +121,7 @@ const CustomJobApplyConfirmation = ({
          handleClick={isLoggedIn ? handleClick : handleRedirectClick}
          isApplying={isApplying}
          isLoggedIn={isLoggedIn}
+         sx={sx}
       />
    )
 }
@@ -123,6 +132,7 @@ type ComponentProps = {
    handleClick: () => void
    isApplying: boolean
    isLoggedIn: boolean
+   sx?: SxProps
 }
 const Component = ({
    job,
@@ -130,17 +140,19 @@ const Component = ({
    handleClick,
    isApplying,
    isLoggedIn,
+   sx,
 }: ComponentProps) => {
    return (
-      <Box sx={styles.confirmationWrapper}>
+      <Box sx={combineStyles(styles.confirmationWrapper, sx)}>
          <Box sx={styles.info}>
             <HelpCircle size={28} />
             <Box sx={styles.message}>
                <Typography variant={"h6"} sx={styles.messageText}>
                   Did you apply to
                   <Box component="span" sx={styles.messageTextBold}>
-                     {job.title} ?
+                     {job.title}
                   </Box>
+                  ?
                </Typography>
                <Typography variant={"body2"} sx={styles.messageText}>
                   {isLoggedIn

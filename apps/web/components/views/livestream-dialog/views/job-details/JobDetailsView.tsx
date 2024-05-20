@@ -1,38 +1,37 @@
-import React, { FC, useEffect, useState } from "react"
-import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
-import { useLiveStreamDialog } from "../../LivestreamDialog"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import Box from "@mui/material/Box"
-import useLivestreamJob from "../../../../custom-hook/ats/useLivestreamJob"
-import { useRouter } from "next/router"
-import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import JobHeader from "./main-content/JobHeader"
-import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
-import JobDescription from "./main-content/JobDescription"
-import Stack from "@mui/material/Stack"
-import JobCTAButton from "./main-content/JobCTAButton"
-import NotFoundView from "../common/NotFoundView"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import {
-   pickPublicDataFromCustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
-import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
-import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
-import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
-import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
-import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
-import useRegistrationHandler from "../../useRegistrationHandler"
-import ActionButton from "../livestream-details/action-button/ActionButton"
+import {
+   PublicCustomJob,
+   pickPublicDataFromCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Grid, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
-import { sxStyles } from "types/commonTypes"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import DateUtil from "util/DateUtil"
+import { useRouter } from "next/router"
+import { FC, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
+import { sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
+import useLivestreamJob from "../../../../custom-hook/ats/useLivestreamJob"
+import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
+import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
+import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
+import { useLiveStreamDialog } from "../../LivestreamDialog"
+import useRegistrationHandler from "../../useRegistrationHandler"
+import NotFoundView from "../common/NotFoundView"
+import ActionButton from "../livestream-details/action-button/ActionButton"
+import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
+import CustomJobApplyConfirmation from "./main-content/CustomJobApplyConfirmation"
+import CustomJobCTAButton from "./main-content/CustomJobCTAButton"
+import JobCTAButton from "./main-content/JobCTAButton"
+import JobDescription from "./main-content/JobDescription"
+import JobHeader from "./main-content/JobHeader"
 
 const styles = sxStyles({
    btnGrid: {
@@ -62,6 +61,9 @@ const styles = sxStyles({
    },
    heroContent: {
       padding: "10%",
+   },
+   jobApplyConfirmationDialog: {
+      bottom: "100px",
    },
 })
 
@@ -111,7 +113,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
    const isAtsJob = useIsAtsJob(job)
 
    useEffect(() => {
-      if (job && isAutoApply){
+      if (job && isAutoApply) {
          handleOpen()
       }
    }, [isAutoApply, handleOpen, job])
@@ -182,6 +184,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                         job={job as PublicCustomJob}
                         livestreamId={livestream.id}
                         autoApply={isAutoApply}
+                        sx={styles.jobApplyConfirmationDialog}
                      />
                   ) : null}
                </Stack>
@@ -211,7 +214,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                >
                   <JobButton
                      job={job as Job}
-                     livestreamPresenter={livestreamPresenter}
+                     livestreamId={livestream.id}
                      isSecondary={!isLiveStreamButtonDisabled}
                      handleOpen={handleOpen}
                   />
@@ -224,14 +227,14 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
 type JobButtonProps = {
    job: Job
-   livestreamPresenter: LivestreamPresenter
+   livestreamId: string
    isSecondary: boolean
    handleOpen: () => void
 }
 
-const JobButton: FC<JobButtonProps> = ({
+export const JobButton: FC<JobButtonProps> = ({
    job,
-   livestreamPresenter,
+   livestreamId,
    isSecondary,
    handleOpen,
 }) => {
@@ -243,14 +246,14 @@ const JobButton: FC<JobButtonProps> = ({
          {isAtsJob ? (
             !isLoggedOut && (
                <JobCTAButton
-                  livestreamPresenter={livestreamPresenter}
+                  livestreamId={livestreamId}
                   job={job as Job}
                   isSecondary={isSecondary}
                />
             )
          ) : (
             <CustomJobCTAButton
-               livestreamId={livestreamPresenter.id}
+               livestreamId={livestreamId}
                job={job as PublicCustomJob}
                handleClick={handleOpen}
                isSecondary={isSecondary}

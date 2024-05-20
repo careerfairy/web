@@ -1,49 +1,67 @@
-import { FC, useState } from "react"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
+import UploadIcon from "@mui/icons-material/CloudUploadOutlined"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { ButtonProps } from "@mui/material"
 import Button from "@mui/material/Button"
+import { alpha } from "@mui/material/styles"
+import useMenuState from "components/custom-hook/useMenuState"
+import BrandedResponsiveMenu, {
+   MenuOption,
+} from "components/views/common/inputs/BrandedResponsiveMenu"
+import { useRouter } from "next/router"
+import { FC, useState } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
+
+import useDeleteCV from "components/custom-hook/user/useDeleteCV"
+import { UserDataEntry } from "components/views/group/admin/common/table/UserLivestreamDataTable"
+import { useDownloadCV } from "components/views/group/admin/common/table/hooks"
+import { CircularButton } from "components/views/streaming-page/components/TopBar/CircularButton"
+import {
+   CheckCircle,
+   DownloadCloud,
+   FileText,
+   UploadCloud,
+} from "react-feather"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import LoadingButton from "@mui/lab/LoadingButton"
-import UploadIcon from "@mui/icons-material/CloudUploadOutlined"
-import { useRouter } from "next/router"
-import Link from "../../../../common/Link"
-import { ButtonProps } from "@mui/material"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import useJobApply from "../../../../../custom-hook/ats/useJobApply"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import CheckIcon from "@mui/icons-material/Check"
 import useUploadCV from "../../../../../custom-hook/user/useUploadCV"
-import { alpha } from "@mui/material/styles"
 import FileUploader from "../../../../common/FileUploader"
+import Link from "../../../../common/Link"
 
 const styles = sxStyles({
-   root: {},
-   btn: {
-      boxShadow: "none",
-      py: 0.75,
-      px: 2.5,
-      fontSize: "1.214rem",
-      fontWeight: 400,
-      textTransform: "none",
-   },
    loadingBtn: {
       color: "transparent !important",
    },
+   manageCvButton: (theme) => ({
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      border: `1px solid ${theme.palette.neutral[200]}`,
+      color: theme.brand.black["700"],
+   }),
    dragActive: {
       backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.2),
       border: "none",
+   },
+   menuOption: {
+      color: (theme) => theme.palette.neutral[700],
+   },
+   deleteOption: {
+      color: "error.main",
    },
 })
 
 type Props = {
    job: Job
-   livestreamPresenter: LivestreamPresenter
+   livestreamId: string
    isSecondary: boolean
 }
 
-const JobCTAButton: FC<Props> = ({ job, livestreamPresenter, isSecondary }) => {
+const JobCTAButton: FC<Props> = ({ job, livestreamId, isSecondary }) => {
    const { userPresenter, isLoggedOut, authenticatedUser } = useAuth()
-   
+
    if (job.isClosed()) {
       return <ClosedJobButton />
    }
@@ -52,14 +70,18 @@ const JobCTAButton: FC<Props> = ({ job, livestreamPresenter, isSecondary }) => {
       return <ButtonSkeleton />
    }
 
-   if (isLoggedOut) { 
+   if (isLoggedOut) {
       return <SignUpButton />
    }
 
    if (userPresenter.hasResume()) {
       return (
          <SuspenseWithBoundary>
-            <ApplyButton job={job} livestreamId={livestreamPresenter.id} isSecondary={isSecondary} />
+            <ApplyButton
+               job={job}
+               livestreamId={livestreamId}
+               isSecondary={isSecondary}
+            />
          </SuspenseWithBoundary>
       )
    }
@@ -75,7 +97,6 @@ const SignUpButton: FC = () => {
       <Button
          href={`/signup?absolutePath=${asPath}`}
          color="primary"
-         sx={styles.btn}
          {...baseButtonProps}
          component={Link}
       >
@@ -84,7 +105,7 @@ const SignUpButton: FC = () => {
    )
 }
 
-const UploadCVButton: FC<{ isSecondary: boolean }> = ({isSecondary}) => {
+const UploadCVButton: FC<{ isSecondary: boolean }> = ({ isSecondary }) => {
    const { fileUploaderProps, dragActive, isLoading } = useUploadCV()
 
    return (
@@ -93,16 +114,94 @@ const UploadCVButton: FC<{ isSecondary: boolean }> = ({isSecondary}) => {
          sx={[dragActive && styles.dragActive]}
       >
          <LoadingButton
-            sx={styles.btn}
             disabled={isLoading}
             startIcon={<UploadIcon />}
             {...baseButtonProps}
             color={isSecondary ? "grey" : "primary"}
             variant={isSecondary ? "text" : "contained"}
+            size="medium"
          >
             Upload CV
          </LoadingButton>
       </FileUploader>
+   )
+}
+
+const ManageCVButton = () => {
+   const { userData } = useAuth()
+   const { anchorEl, handleClick, handleClose } = useMenuState()
+   const { handleDownloadCV, downloadingPDF } = useDownloadCV({
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      resumeUrl: userData.userResume,
+   } as UserDataEntry)
+   const { fileUploaderProps, dragActive, isLoading } = useUploadCV({
+      onSuccess: handleClose,
+   })
+   const { handleDeleteCV, isLoadingDelete } = useDeleteCV({
+      onSuccess: handleClose,
+   })
+
+   const open = Boolean(anchorEl)
+
+   const options: MenuOption[] = [
+      {
+         label: "Download your CV",
+         icon: <DownloadCloud />,
+         handleClick: () => {
+            handleDownloadCV()
+         },
+         menuItemSxProps: [styles.menuOption],
+         loading: downloadingPDF,
+      },
+      {
+         label: "Upload new CV",
+         icon: <UploadCloud />,
+
+         menuItemSxProps: [styles.menuOption],
+         loading: isLoading,
+         handleClick: () => {},
+         keepOpen: true,
+         wrapperComponent: ({ children, ...props }) => (
+            <FileUploader
+               {...fileUploaderProps}
+               sx={[dragActive && styles.dragActive]}
+               disabled={false}
+               {...props}
+            >
+               {children}
+            </FileUploader>
+         ),
+      },
+      {
+         label: "Delete your CV",
+         icon: <DeleteIcon />,
+         handleClick: () => {
+            handleDeleteCV()
+         },
+         keepOpen: true,
+         menuItemSxProps: [styles.deleteOption],
+         loading: isLoadingDelete,
+      },
+   ]
+   return (
+      <>
+         <CircularButton
+            sx={styles.manageCvButton}
+            size="medium"
+            onClick={handleClick}
+         >
+            <FileText size={18} />
+         </CircularButton>
+
+         <BrandedResponsiveMenu
+            options={options}
+            open={open}
+            handleClose={handleClose}
+            anchorEl={anchorEl}
+            placement="top"
+         />
+      </>
    )
 }
 
@@ -112,7 +211,11 @@ type ApplyButtonProps = {
    isSecondary: boolean
 }
 
-const ApplyButton: FC<ApplyButtonProps> = ({ job, livestreamId, isSecondary }) => {
+const ApplyButton: FC<ApplyButtonProps> = ({
+   job,
+   livestreamId,
+   isSecondary,
+}) => {
    const [alreadyApplied, setAlreadyApplied] = useState(false)
 
    const { userData } = useAuth()
@@ -126,24 +229,28 @@ const ApplyButton: FC<ApplyButtonProps> = ({ job, livestreamId, isSecondary }) =
    )
 
    return (
-      <LoadingButton
-         sx={styles.btn}
-         {...baseButtonProps}
-         color={isSecondary ? "grey" : "primary"}
-         variant={isSecondary ? "text" : "contained"}
-         loading={isLoading}
-         disabled={alreadyApplied}
-         onClick={applyJob}
-         startIcon={alreadyApplied ? <CheckIcon /> : null}
-      >
-         {alreadyApplied ? "Applied" : "Apply now"}
-      </LoadingButton>
+      <>
+         {!alreadyApplied && <ManageCVButton />}
+         <LoadingButton
+            {...baseButtonProps}
+            color={isSecondary ? "grey" : "primary"}
+            variant={isSecondary ? "text" : "contained"}
+            loading={isLoading}
+            disabled={alreadyApplied}
+            onClick={applyJob}
+            endIcon={alreadyApplied ? <CheckCircle /> : null}
+            startIcon={alreadyApplied ? null : <CheckCircle />}
+            size="medium"
+         >
+            {alreadyApplied ? "Application sent" : "Apply now!"}
+         </LoadingButton>
+      </>
    )
 }
 
 const ClosedJobButton: FC = () => {
    return (
-      <Button disabled color="primary" sx={styles.btn} {...baseButtonProps}>
+      <Button disabled color="primary" {...baseButtonProps}>
          Application Closed
       </Button>
    )
@@ -151,11 +258,7 @@ const ClosedJobButton: FC = () => {
 
 const ButtonSkeleton: FC = () => {
    return (
-      <LoadingButton
-         disabled
-         sx={[styles.btn, styles.loadingBtn]}
-         {...baseButtonProps}
-      >
+      <LoadingButton disabled sx={styles.loadingBtn} {...baseButtonProps}>
          Hidden text
       </LoadingButton>
    )
