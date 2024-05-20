@@ -22,14 +22,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
          userId: null,
       })
    }
+   let cenas = "NADA"
+
+   if (sparks) {
+      console.log(
+         "🚀 ~ constgetServerSideProps:GetServerSideProps= ~ sparks:",
+         sparks
+      )
+      cenas = "VAMOS Lá ver"
+   }
 
    const queryParamString = encode(context.query)
 
    if (sparks.length > 0) {
       return {
          redirect: {
-            destination: `/sparks/${sparks[0].id}${
-               queryParamString && `?${queryParamString}`
+            destination: `/sparks/${sparks[0].id}?cenas=${cenas}${
+               queryParamString && `&${queryParamString}`
             }`,
             permanent: false,
          },
