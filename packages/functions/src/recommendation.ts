@@ -80,8 +80,6 @@ export const getUserImplicitData = functions
             data: GetUserImplicitDataSchema,
             context
          ): Promise<ImplicitLivestreamRecommendationData> => {
-            console.log("🚀 ~ GetUserImplicitDataSchema -> data:", data)
-
             try {
                const promises = [
                   livestreamsRepo.getUserInteractedLivestreams(
