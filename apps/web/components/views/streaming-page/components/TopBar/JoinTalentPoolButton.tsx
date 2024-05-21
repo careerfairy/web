@@ -1,5 +1,6 @@
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useTalentPool from "components/custom-hook/live-stream/useTalentPool"
+import { useLivestreamData } from "components/custom-hook/streaming"
 import { Check, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveStreamButton } from "../Buttons"
@@ -10,15 +11,16 @@ const styles = sxStyles({
    },
 })
 
-export const JoinTalentPoolButton = ({ livestream }) => {
+export const JoinTalentPoolButton = () => {
    return (
       <SuspenseWithBoundary fallback={<></>}>
-         <Button livestream={livestream} />
+         <Button />
       </SuspenseWithBoundary>
    )
 }
 
-const Button = ({ livestream }) => {
+const Button = () => {
+   const livestream = useLivestreamData()
    const {
       loading,
       userIsInTalentPool,
