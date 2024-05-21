@@ -1,14 +1,12 @@
-import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamPDFPresentation } from "components/custom-hook/streaming/useLivestreamPDFPresentation"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { useMeasure } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { PDFNavigation } from "./PDFNavigation"
 import { PDFPage } from "./PDFPage"
-import { UploadNewPDFButton } from "./UploadNewPDFButton"
 
 const styles = sxStyles({
    root: {
@@ -62,32 +60,12 @@ export const Content = () => {
             setPdfNumberOfPages={setPdfNumberOfPages}
          />
          {Boolean(isHost) && (
-            <HostControls
-               pdfPresentation={pdfPresentation}
-               pdfNumberOfPages={pdfNumberOfPages}
+            <PDFNavigation
+               page={pdfPresentation.page}
+               totalPages={pdfNumberOfPages}
             />
          )}
       </Box>
-   )
-}
-
-type HostControlsProps = {
-   pdfPresentation: LivestreamPresentation
-   pdfNumberOfPages: number
-}
-
-const HostControls = ({
-   pdfPresentation,
-   pdfNumberOfPages,
-}: HostControlsProps) => {
-   return (
-      <Fragment>
-         <PDFNavigation
-            page={pdfPresentation.page}
-            totalPages={pdfNumberOfPages}
-         />
-         <UploadNewPDFButton />
-      </Fragment>
    )
 }
 
