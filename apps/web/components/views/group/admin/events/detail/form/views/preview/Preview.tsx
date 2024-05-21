@@ -9,10 +9,18 @@ import {
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import MaximizeIcon from "./MaximizeIcon"
 import PreviewContent from "./PreviewContent"
+import {
+   PREVIEW_COLUMN_PADDING_X,
+   PREVIEW_COLUMN_PADDING_Y,
+   REAL_DIALOG_WIDTH,
+} from "./commons"
+
+// CSS hack: above 100% to give some bottom margin
+const PREVIEW_HEIGHT = "112.5%"
 
 const styles = sxStyles({
    root: {
-      position: "relative",
+      height: PREVIEW_HEIGHT,
    },
    maximizeButton: {
       position: "absolute",
@@ -20,24 +28,31 @@ const styles = sxStyles({
       padding: 0,
       height: "38px",
       borderRadius: "40px",
+      zIndex: 1,
    },
    maximizeIcon: {
       fontSize: 46,
    },
    preview: {
-      padding: "24px 48px",
+      maxWidth: `${REAL_DIALOG_WIDTH}px`,
+      padding: `${PREVIEW_COLUMN_PADDING_Y}px ${PREVIEW_COLUMN_PADDING_X}px`,
+      height: PREVIEW_HEIGHT,
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
       },
-      maxWidth: 915,
+      maxWidth: `${REAL_DIALOG_WIDTH}px`,
       height: "100%",
    },
 })
 
-const Preview = () => {
+type PreviewProps = {
+   scale: number
+}
+
+const Preview = ({ scale }: PreviewProps) => {
    const isMobile = useIsMobile()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
 
@@ -47,7 +62,7 @@ const Preview = () => {
             <MaximizeIcon sx={styles.maximizeIcon} />
          </IconButton>
          <Box sx={styles.preview}>
-            <PreviewContent isInDialog={false} />
+            <PreviewContent isInDialog={false} scale={scale} />
          </Box>
          <Dialog
             open={isOpen}
@@ -67,6 +82,7 @@ const Preview = () => {
                <PreviewContent
                   isInDialog={true}
                   handleCloseDialog={handleClose}
+                  scale={scale}
                />
             </DialogContent>
          </Dialog>
