@@ -1,6 +1,7 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { useMemo } from "react"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import AboutCompany from "./AboutCompany"
 import AboutLivestream from "./AboutStream"
@@ -15,19 +16,20 @@ import Questions from "./Questions"
 import Section from "./Section"
 import ShareButton from "./ShareButton"
 import Speakers from "./Speakers"
+import { REAL_DIALOG_WIDTH } from "./commons"
 
 const styles = sxStyles({
    root: {
-      p: {
+      padding: {
          xs: 1,
          md: 2.25,
       },
       borderRadius: {
          md: 5,
       },
-      maxWidth: 915,
       backgroundColor: "white",
       paddingBottom: "36px !important",
+      width: `${REAL_DIALOG_WIDTH}px`,
    },
    bottomMargin: {
       paddingBottom: "20px !important",
@@ -54,11 +56,13 @@ const styles = sxStyles({
 type PreviewContentProps = {
    isInDialog: boolean
    handleCloseDialog?: () => void
+   scale: number
 }
 
 const PreviewContent = ({
    isInDialog,
    handleCloseDialog,
+   scale,
 }: PreviewContentProps) => {
    const theme = useTheme()
    const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
@@ -66,10 +70,24 @@ const PreviewContent = ({
       values: { general, speakers, jobs },
    } = useLivestreamFormValues()
    const { group } = useGroup()
-   const hasJobs = jobs.customJobs.length > 0
+   const hasJobs = false
+
+   const scaledStyles = useMemo(
+      () => ({
+         transformOrigin: "top left",
+         "-webkit-transform": `scale(${scale})`,
+         "-moz-transform": `scale(${scale})`,
+         "-o-transform": `scale(${scale})`,
+         transform: `scale(${scale})`,
+      }),
+      [scale]
+   )
 
    return (
-      <Stack spacing={4.75} sx={isInDialog ? styles.bottomMargin : styles.root}>
+      <Stack
+         spacing={4.75}
+         sx={isInDialog ? styles.bottomMargin : [styles.root, scaledStyles]}
+      >
          <HeroContent
             backgroundImage={general.backgroundImageUrl}
             handleCloseDialog={handleCloseDialog}
@@ -98,7 +116,7 @@ const PreviewContent = ({
                allowScrollButtonsMobile
                centered={centeredNav}
                variant={centeredNav ? "standard" : "scrollable"}
-               value={0}
+               value={Boolean(isInDialog) && 0}
             >
                <Tab sx={styles.tab} label={"Linked jobs"} value={0} />
                <Tab sx={styles.tab} label={"About The Live Stream"} />
@@ -108,11 +126,11 @@ const PreviewContent = ({
          </Box>
          <Box sx={styles.mainContent}>
             {hasJobs ? (
-               <Section navOffset={44}>
+               <Section navOffset={6}>
                   <Jobs jobs={jobs.customJobs} />
                </Section>
             ) : null}
-            <Section>
+            <Section navOffset={!hasJobs ? 6 : undefined}>
                <Speakers speakers={speakers.values} />
                <Section>
                   <AboutLivestream
