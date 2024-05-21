@@ -65,10 +65,7 @@ const useLivestreamsCarouselContentSWR = (
    )
 
    const swrFetcher = useCallback(
-      async () =>
-         CarouselContentService.serializeContent(
-            await carouselContentService.getCarouselContent()
-         ),
+      async () => carouselContentService.getCarouselContent(),
       [carouselContentService]
    )
 

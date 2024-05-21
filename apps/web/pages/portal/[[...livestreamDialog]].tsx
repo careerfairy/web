@@ -6,9 +6,6 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import SEO from "../../components/util/SEO"
-import CarouselContentService, {
-   CarouselContent,
-} from "../../components/views/portal/content-carousel/CarouselContentService"
 import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
@@ -27,11 +24,9 @@ import {
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
-import useUserCustomJobApplications from "components/custom-hook/custom-job/useUserCustomJobApplications"
-import useInteractedLivestreams from "components/custom-hook/live-stream/useInteractedLivestreams"
 import useLivestreamsCarouselContentSWR from "components/custom-hook/live-stream/useLivestreamCarouselContent"
-import useUserSeenSparks from "components/custom-hook/spark/useUserSeenSparks"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserImplicitRecommendationData from "components/custom-hook/user/useUserImplicitRecommendationData"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Heading from "components/views/portal/common/Heading"
 import EventsPreviewCarousel, {
@@ -63,9 +58,8 @@ const PortalPage = ({
    const router = useRouter()
    const isMobile = useIsMobile()
 
-   const { sparks: seenSparks } = useUserSeenSparks()
-   const { jobApplications } = useUserCustomJobApplications()
-   const { events: interactedEvents } = useInteractedLivestreams()
+   const { data: implicitRecommendationData } =
+      useUserImplicitRecommendationData()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -78,22 +72,16 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const serializedCarouselContent = useLivestreamsCarouselContentSWR({
+   const carouselContent = useLivestreamsCarouselContentSWR({
       userData: userData,
       userStats: serverUserStats,
       pastLivestreams: pastEvents || [],
       upcomingLivestreams: comingUpNextEvents || [],
       registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-      watchedSparks: seenSparks || [],
-      watchedLivestreams: interactedEvents || [],
-      appliedJobs: jobApplications || [],
+      watchedSparks: implicitRecommendationData?.watchedSparks || [],
+      watchedLivestreams: implicitRecommendationData?.watchedLivestreams || [],
+      appliedJobs: implicitRecommendationData?.appliedJobs || [],
    })
-
-   const carouselContent = useMemo<CarouselContent[]>(() => {
-      return CarouselContentService.deserializeContent(
-         serializedCarouselContent
-      )
-   }, [serializedCarouselContent])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
