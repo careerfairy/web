@@ -29,6 +29,9 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useUserImplicitRecommendationData from "components/custom-hook/user/useUserImplicitRecommendationData"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Heading from "components/views/portal/common/Heading"
+import CarouselContentService, {
+   CarouselContent,
+} from "components/views/portal/content-carousel/CarouselContentService"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
@@ -72,7 +75,7 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const carouselContent = useLivestreamsCarouselContentSWR({
+   const carouselServiceContent = useLivestreamsCarouselContentSWR({
       userData: userData,
       userStats: serverUserStats,
       pastLivestreams: pastEvents || [],
@@ -82,6 +85,12 @@ const PortalPage = ({
       watchedLivestreams: implicitRecommendationData?.watchedLivestreams || [],
       appliedJobs: implicitRecommendationData?.appliedJobs || [],
    })
+
+   const carouselContent = useMemo<CarouselContent[]>(() => {
+      return CarouselContentService.deserializeContent(
+         CarouselContentService.serializeContent(carouselServiceContent)
+      )
+   }, [carouselServiceContent])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
