@@ -1,20 +1,24 @@
+import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import FileUploader, {
    FileUploaderProps,
 } from "components/views/common/FileUploader"
 import DividerWithText from "components/views/common/misc/DividerWithText"
-import { forwardRef } from "react"
-import { Upload } from "react-feather"
+import { Dispatch, Fragment, SetStateAction, forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
+import { SelectablePDFDetails } from "./PDFDetails"
 
 const styles = sxStyles({
    root: {
-      px: 1.75,
-      py: 2,
+      p: 3,
       display: "flex",
       transition: (theme) => theme.transitions.create("background-color"),
       width: "100%",
       cursor: "pointer",
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: (theme) => theme.brand.white[300],
+      overflow: "hidden",
    },
    active: {
       backgroundColor: "neutral.100",
@@ -27,56 +31,87 @@ const styles = sxStyles({
    content: {
       width: "100%",
    },
+   browseButton: {
+      mt: 2.5,
+   },
 })
 
 type Props = {
    dragActive: boolean
+   pdfPresentation: LivestreamPresentation
+   setReadyToShare: Dispatch<SetStateAction<boolean>>
+   readyToShare: boolean
 } & FileUploaderProps
 
 export const PDFUpload = forwardRef<HTMLDivElement, Props>(
-   ({ dragActive, ...props }, ref) => {
+   (
+      { dragActive, pdfPresentation, setReadyToShare, readyToShare, ...props },
+      ref
+   ) => {
       return (
-         <Box ref={ref}>
-            <FileUploader
-               sx={[styles.root, dragActive && styles.active]}
-               {...props}
-            >
-               <Stack
-                  sx={styles.content}
-                  spacing={3}
-                  justifyContent="center"
-                  alignItems="center"
+         <Stack alignItems="center" spacing={2}>
+            <Box width="100%" ref={ref}>
+               <FileUploader
+                  sx={[styles.root, dragActive && styles.active]}
+                  {...props}
                >
-                  <Stack alignItems="center" spacing={2}>
-                     <Box sx={styles.icon} component={Upload} />
-                     <Stack spacing={1.5} alignItems="center">
-                        <Typography variant="small" color="neutral.600">
-                           Drop your file here
-                        </Typography>
-                        <DividerWithText
-                           textPadding={1.25}
-                           maxWidth={94}
-                           verticalPadding={0}
+                  <Stack
+                     sx={styles.content}
+                     spacing={3}
+                     justifyContent="center"
+                     alignItems="center"
+                  >
+                     <Stack alignItems="center">
+                        <Typography
+                           variant="medium"
+                           marginBottom={1}
+                           color="neutral.600"
                         >
-                           <Typography variant="xsmall" color="neutral.400">
-                              Or
-                           </Typography>
-                        </DividerWithText>
-                        <Button color="primary" variant="contained">
+                           Choose a file or drag & drop it here
+                        </Typography>
+                        <Typography
+                           variant="xsmall"
+                           textAlign="center"
+                           color="neutral.400"
+                           maxWidth={280}
+                        >
+                           Documents must be in PDF format (.pdf). Maximum size:
+                           20MB.
+                        </Typography>
+                        <Button
+                           sx={styles.browseButton}
+                           color="grey"
+                           variant="outlined"
+                        >
                            Browse files
                         </Button>
                      </Stack>
                   </Stack>
-                  <Typography
-                     variant="xsmall"
-                     textAlign="center"
-                     color="neutral.400"
+               </FileUploader>
+            </Box>
+            {Boolean(pdfPresentation) && (
+               <Fragment>
+                  <DividerWithText
+                     textPadding={1.25}
+                     maxWidth={"100%"}
+                     verticalPadding={0}
                   >
-                     Documents must be in PDF format (.pdf). Maximum size: 20MB.
-                  </Typography>
-               </Stack>
-            </FileUploader>
-         </Box>
+                     <Typography
+                        variant="xsmall"
+                        sx={{ textWrap: "nowrap" }}
+                        color="neutral.400"
+                     >
+                        Or select your last uploaded file
+                     </Typography>
+                  </DividerWithText>
+                  <SelectablePDFDetails
+                     data={pdfPresentation}
+                     isSelected={readyToShare}
+                     onClick={() => setReadyToShare((prev) => !prev)}
+                  />
+               </Fragment>
+            )}
+         </Stack>
       )
    }
 )

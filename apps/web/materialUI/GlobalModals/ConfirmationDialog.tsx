@@ -85,7 +85,7 @@ const styles = sxStyles({
       px: 3.5,
       borderRadius: "12px 12px 0 0",
    },
-   dialogPaper: {
+   defaultMaxWidth: {
       maxWidth: 430,
    },
 })
@@ -98,6 +98,7 @@ export type ConfirmationDialogAction = {
    loading?: LoadingButtonProps["loading"]
    autoFocus?: boolean
    fullWidth?: boolean
+   disabled?: LoadingButtonProps["disabled"]
 }
 
 type Props = {
@@ -106,10 +107,12 @@ type Props = {
    handleClose?: () => void
    title: string
    description: string | ReactNode
+   additionalContent?: ReactNode
    icon: ReactNode
    primaryAction: ConfirmationDialogAction
    secondaryAction?: ConfirmationDialogAction
    sx?: DialogProps["sx"]
+   width?: number
 }
 
 const ConfirmationDialog: FC<Props> = (props) => {
@@ -119,9 +122,11 @@ const ConfirmationDialog: FC<Props> = (props) => {
       hideCloseIcon,
       title,
       description,
+      additionalContent,
       icon,
       primaryAction,
       secondaryAction,
+      width,
       sx,
    } = props
 
@@ -137,11 +142,11 @@ const ConfirmationDialog: FC<Props> = (props) => {
          onClose={handleClose}
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
-         maxWidth="xs"
+         maxWidth={width ? false : "xs"}
          TransitionProps={{ unmountOnExit: true }}
          fullScreen={isMobile}
          PaperProps={{
-            sx: styles.dialogPaper,
+            sx: [width ? { width } : styles.defaultMaxWidth],
          }}
          sx={sx}
       >
@@ -179,6 +184,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
             >
                {description}
             </Typography>
+            {additionalContent}
          </DialogContent>
          <DialogActions sx={styles.actions}>
             <Stack direction="row" spacing={1.5} width="100%">
@@ -198,6 +204,7 @@ const MobileDrawer = ({
    hideCloseIcon,
    title,
    description,
+   additionalContent,
    icon,
    primaryAction,
    secondaryAction,
@@ -242,6 +249,7 @@ const MobileDrawer = ({
          >
             {description}
          </Typography>
+         {additionalContent}
          <Stack
             direction={{
                xs: "column-reverse",

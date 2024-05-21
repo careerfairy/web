@@ -1,30 +1,31 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box, Collapse } from "@mui/material"
+import { Box } from "@mui/material"
 import { useDeleteLivestreamPresentation } from "components/custom-hook/streaming/useDeleteLivestreamPresentation"
 import useUploadPDFPresentation from "components/custom-hook/streaming/useUploadPDFPresentation"
 import useFileUploader from "components/custom-hook/useFileUploader"
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { PDFPreview } from "./PDFPreview"
+import { PDFProgress } from "./PDFDetails"
 import { PDFUpload } from "./PDFUpload"
 
 const styles = sxStyles({
    root: {
-      borderRadius: "8px",
-      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-      bgcolor: (theme) => theme.brand.white[300],
-      overflow: "hidden",
+      mb: 4,
    },
 })
 
 type Props = {
    livestreamId: string
    pdfPresentation: LivestreamPresentation
+   readyToShare: boolean
+   setReadyToShare: Dispatch<SetStateAction<boolean>>
 }
 
 export const PDFPresentationManager = ({
    livestreamId,
    pdfPresentation,
+   readyToShare,
+   setReadyToShare,
 }: Props) => {
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
@@ -40,7 +41,9 @@ export const PDFPresentationManager = ({
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
          setPdfFile(newFile)
-         handleUploadFile(newFile, livestreamId)
+         await handleUploadFile(newFile, livestreamId)
+
+         setReadyToShare(true)
       },
    })
 
@@ -51,22 +54,25 @@ export const PDFPresentationManager = ({
       }
    }
 
-   const hasData = Boolean(pdfPresentation || pdfFile)
-
    return (
       <Box sx={styles.root}>
-         <Collapse unmountOnExit in={hasData}>
-            <PDFPreview
+         {pdfFile ? (
+            <PDFProgress
                data={pdfPresentation || pdfFile}
                fileUpLoaded={Boolean(progress === 100 && pdfPresentation)}
                uploadProgress={progress}
                isDeleting={isMutating}
                handleDelete={handleDeleteFile}
             />
-         </Collapse>
-         <Collapse unmountOnExit in={!hasData}>
-            <PDFUpload {...fileUploaderProps} dragActive={dragActive} />
-         </Collapse>
+         ) : (
+            <PDFUpload
+               dragActive={dragActive}
+               readyToShare={readyToShare}
+               pdfPresentation={pdfPresentation}
+               setReadyToShare={setReadyToShare}
+               {...fileUploaderProps}
+            />
+         )}
       </Box>
    )
 }

@@ -1,8 +1,19 @@
 import { Skeleton, Stack, Typography } from "@mui/material"
+import { sxStyles } from "types/commonTypes"
 
-export const PDFPreviewSkeleton = () => {
+const styles = sxStyles({
+   root: {
+      p: 1.5,
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: (theme) => theme.brand.white[300],
+      overflow: "hidden",
+   },
+})
+
+export const PDFDetailsSkeleton = () => {
    return (
-      <Stack p={1.5} width="100%" spacing={1}>
+      <Stack sx={styles.root} width="100%" spacing={1}>
          <Stack direction="row" alignItems="center" spacing={1}>
             <Skeleton variant="circular" width={41} height={41} />
             <Stack alignItems="flex-start">
