@@ -12,20 +12,11 @@ import { isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
 import ical from "ical-generator"
 import { DateTime } from "luxon"
-import {
-   InferType,
-   SchemaOf,
-   array,
-   boolean,
-   mixed,
-   number,
-   object,
-   string,
-} from "yup"
+import { InferType, array, boolean, mixed, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
 import { livestreamsRepo } from "./api/repositories"
 import { middlewares } from "./middlewares/middlewares"
-import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { dataValidation } from "./middlewares/validations"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -355,40 +346,3 @@ export const fetchLivestreams = functions.region(config.region).https.onCall(
       }
    )
 )
-
-type GetInteractedLivestreams = {
-   limit: number
-}
-
-const getInteractedLivestreamsSchema: SchemaOf<GetInteractedLivestreams> =
-   object().shape({
-      limit: number().min(1).default(10).required(),
-   })
-
-export const getInteractedLivestreams = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation(getInteractedLivestreamsSchema),
-         userAuthExists(),
-         async (data: GetInteractedLivestreams, context) => {
-            try {
-               const interactedEvents =
-                  await livestreamsRepo.getUserInteractedLivestreams(
-                     context.auth.token.email,
-                     data.limit
-                  )
-
-               return interactedEvents
-            } catch (error) {
-               functions.logger.error(
-                  "Error while retrieving InteractedLivestreams",
-                  data,
-                  error,
-                  context
-               )
-               return null
-            }
-         }
-      )
-   )

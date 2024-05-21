@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { SchemaOf, array, number, object, string } from "yup"
+import { array, string } from "yup"
 import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { middlewares } from "./middlewares/middlewares"
@@ -9,15 +9,6 @@ import {
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
 import { onCallWrapper } from "./util"
-
-type GetUserCustomJobApplications = {
-   limit: number
-}
-
-const getUserCustomJobApplicationsSchema: SchemaOf<GetUserCustomJobApplications> =
-   object().shape({
-      limit: number().min(1).default(20).required(),
-   })
 
 export const userApplyToCustomJob = functions
    .region(config.region)
@@ -159,33 +150,5 @@ export const transferCustomJobsFromDraftToPublishedLivestream = functions
                draftCustomJobsIds
             )
          })
-      )
-   )
-
-export const getUserCustomJobApplications = functions
-   .region(config.region)
-   .https.onCall(
-      middlewares(
-         dataValidation(getUserCustomJobApplicationsSchema),
-         userAuthExists(),
-         async (data: GetUserCustomJobApplications, context) => {
-            try {
-               const userCustomJobApplications =
-                  await userRepo.getCustomJobApplications(
-                     context.auth?.token?.email,
-                     data.limit
-                  )
-
-               return userCustomJobApplications
-            } catch (error) {
-               functions.logger.error(
-                  "Error while retrieving User JobApplications",
-                  data,
-                  error,
-                  context
-               )
-               return null
-            }
-         }
       )
    )

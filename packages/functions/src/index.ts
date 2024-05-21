@@ -60,7 +60,6 @@ import companies = require("./companies")
 import onboardingNewsletter = require("./onboardingNewsletter")
 import endOfSparksTrials = require("./sparksTrials")
 import stripe = require("./stripe")
-import sparks = require("./sparks")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount
@@ -134,7 +133,6 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v2 = livestreams.getLivestreamICalendarEvent
 exports.fetchLivestreams_v2 = livestreams.fetchLivestreams
-exports.getInteractedLivestreams = livestreams.getInteractedLivestreams
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
@@ -212,6 +210,7 @@ exports.periodicallyRemoveCachedDocument =
 
 // Recommendations
 exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
+exports.getUserImplicitData = recommendation.getUserImplicitData
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
@@ -256,7 +255,6 @@ exports.removeAndSyncUserSparkNotification_v2 =
 // User Spark Functions
 exports.getSparksFeed_v4 = userSparks.getSparksFeed
 exports.markSparkAsSeenByUser_v3 = userSparks.markSparkAsSeenByUser
-exports.getUserSeenSparks = sparks.getUserSeenSparks
 
 // Spark Analytics Functions
 exports.trackSparkEvents_v6 = userSparks.trackSparkEvents
@@ -269,7 +267,6 @@ exports.updateCustomJobWithLinkedLivestreams =
    customJobs.updateCustomJobWithLinkedLivestreams
 exports.transferCustomJobsFromDraftToPublishedLivestream =
    customJobs.transferCustomJobsFromDraftToPublishedLivestream
-exports.getUserCustomJobApplications = customJobs.getUserCustomJobApplications
 
 // Group Subscription Plan Functions
 exports.startPlan_v3 = groupPlans.startPlan
