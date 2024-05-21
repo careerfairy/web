@@ -1,6 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import CloseIcon from "@mui/icons-material/Close"
+import { LoadingButton } from "@mui/lab"
 import {
    Dialog,
    DialogActions,
@@ -11,15 +12,19 @@ import {
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import Typography from "@mui/material/Typography"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { JobButton } from "components/views/livestream-dialog/views/job-details/JobDetailsView"
 import CustomJobApplyConfirmation from "components/views/livestream-dialog/views/job-details/main-content/CustomJobApplyConfirmation"
 import JobDescription from "components/views/livestream-dialog/views/job-details/main-content/JobDescription"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useState } from "react"
 import { Briefcase } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
@@ -210,6 +215,29 @@ const JobDialogActions = ({
    handleOpenConfirmationDialog,
 }) => {
    const isAtsJob = useIsAtsJob(job)
+   const [isSendingEmail, setIsSendingEmail] = useState(false)
+   const firebaseService = useFirebaseService()
+   const { userData, authenticatedUser } = useAuth()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
+
+   const sendEmailReminderForApplication = async () => {
+      setIsSendingEmail(true)
+      try {
+         await firebaseService.sendReminderEmailAboutApplicationLink({
+            recipient: authenticatedUser.email,
+            recipient_name: userData.firstName,
+            position_name: job.title,
+            application_link: job.postingUrl,
+         })
+         successNotification(
+            "We just sent you an email so that you can complete your application after this live stream."
+         )
+      } catch (error) {
+         errorNotification(error)
+      } finally {
+         setIsSendingEmail(false)
+      }
+   }
    return (
       <>
          <JobButton
@@ -218,6 +246,17 @@ const JobDialogActions = ({
             isSecondary={!isAtsJob}
             livestreamId={livestreamId}
          />
+         {!isAtsJob && (
+            <>
+               <LoadingButton
+                  variant="contained"
+                  loading={isSendingEmail}
+                  onClick={sendEmailReminderForApplication}
+               >
+                  Send email reminder
+               </LoadingButton>
+            </>
+         )}
       </>
    )
 }
