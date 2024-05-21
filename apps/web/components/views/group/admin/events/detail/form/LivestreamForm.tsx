@@ -11,6 +11,8 @@ import usePreviewScale from "./views/preview/usePreviewScale"
 import LivestreamFormQuestionsStep from "./views/questions"
 import LivestreamFormSpeakersStep from "./views/speakers"
 
+const PREVIEW_HEIGHT = "calc(100vh - 226px)"
+
 const getStyles = (columnWidth: string) =>
    sxStyles({
       root: {
@@ -25,12 +27,12 @@ const getStyles = (columnWidth: string) =>
       previewContainer: {
          position: "relative",
          marginTop: "10px !important",
-         height: "calc(100vh - 226px)",
+         height: PREVIEW_HEIGHT,
       },
       preview: {
          position: "fixed",
          // 226px is the height of the top bar + bottom bar + 10px of container's margin top
-         height: "calc(100vh - 226px)",
+         height: PREVIEW_HEIGHT,
          width: "100%",
          overflowY: "scroll",
          backgroundColor: "#F7F8FC",
