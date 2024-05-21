@@ -34,7 +34,6 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
    const router = useRouter()
    const { data } = useLivestream(livestreamData.id, livestreamData)
    const livestream = data || livestreamData
-   console.log("🚀 ~ livestream:", livestream)
 
    const livestreamPresenter = useMemo(
       () =>
