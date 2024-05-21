@@ -47,7 +47,7 @@ const useUploadCV = ({onSuccess}: UseUploadCVOptions = {})  => {
             successNotification("Your CV was uploaded!")
             onSuccess && onSuccess()
          } catch (error) {
-            errorNotification("Error uploading CV")
+            errorNotification(error)
          } finally {
             setLoading(false)
          }

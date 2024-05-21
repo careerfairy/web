@@ -36,7 +36,7 @@ const useDeleteCV = ({onSuccess}: UseDeleteCVOptions = {}) => {
             successNotification("Your CV was successfully deleted")
             onSuccess && onSuccess()
          } catch (error) {
-            errorNotification("Error deleting CV")
+            errorNotification(error)
          } finally {
             setLoading(false)
          }

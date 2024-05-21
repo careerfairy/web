@@ -228,14 +228,14 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 type JobButtonProps = {
    job: Job
    livestreamId: string
-   isSecondary: boolean
+   isSecondary?: boolean
    handleOpen: () => void
 }
 
 export const JobButton: FC<JobButtonProps> = ({
    job,
    livestreamId,
-   isSecondary,
+   isSecondary = false,
    handleOpen,
 }) => {
    const isAtsJob = useIsAtsJob(job)
