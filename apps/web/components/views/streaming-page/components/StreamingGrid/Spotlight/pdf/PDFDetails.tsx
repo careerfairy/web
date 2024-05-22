@@ -73,6 +73,8 @@ const styles = sxStyles({
       textAlign: "left",
    },
    viewIcon: {
+      position: "relative",
+      top: 2,
       width: 16,
       height: 16,
       textDecoration: "none",
