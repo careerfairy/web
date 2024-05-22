@@ -1,7 +1,7 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useMemo } from "react"
+import { forwardRef, useMemo } from "react"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import AboutCompany from "./AboutCompany"
 import AboutLivestream from "./AboutStream"
@@ -31,9 +31,6 @@ const styles = sxStyles({
       paddingBottom: "36px !important",
       width: `${REAL_DIALOG_WIDTH}px`,
    },
-   bottomMargin: {
-      paddingBottom: "20px !important",
-   },
    tabs: {
       position: "sticky",
       top: 0,
@@ -59,101 +56,107 @@ type PreviewContentProps = {
    scale: number
 }
 
-const PreviewContent = ({
-   isInDialog,
-   handleCloseDialog,
-   scale,
-}: PreviewContentProps) => {
-   const theme = useTheme()
-   const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
-   const {
-      values: { general, speakers, jobs },
-   } = useLivestreamFormValues()
-   const { group } = useGroup()
-   const hasJobs = false
+const PreviewContent = forwardRef(
+   ({ isInDialog, handleCloseDialog, scale }: PreviewContentProps, ref) => {
+      const theme = useTheme()
+      const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
+      const {
+         values: { general, speakers, jobs },
+      } = useLivestreamFormValues()
+      const { group } = useGroup()
+      const hasJobs = false
 
-   const scaledStyles = useMemo(
-      () => ({
-         transformOrigin: "top left",
-         "-webkit-transform": `scale(${scale})`,
-         "-moz-transform": `scale(${scale})`,
-         "-o-transform": `scale(${scale})`,
-         transform: `scale(${scale})`,
-      }),
-      [scale]
-   )
+      const scaledStyles = useMemo(
+         () => ({
+            transformOrigin: "top left",
+            "-webkit-transform": `scale(${scale})`,
+            "-moz-transform": `scale(${scale})`,
+            "-o-transform": `scale(${scale})`,
+            transform: `scale(${scale})`,
+         }),
+         [scale]
+      )
 
-   return (
-      <Stack
-         spacing={4.75}
-         sx={isInDialog ? styles.bottomMargin : [styles.root, scaledStyles]}
-      >
-         <HeroContent
-            backgroundImage={general.backgroundImageUrl}
-            handleCloseDialog={handleCloseDialog}
-         >
-            <ShareButton />
-            <Stack alignItems="center" justifyContent={"center"} spacing={2.5}>
-               <HostInfo
-                  companyName={general.company}
-                  companyLogoUrl={general.companyLogoUrl}
-               />
-               <LivestreamTitle text={general.title} />
-               <LivestreamTagsContainer
-                  language={general.language}
-                  interests={general.categories.values}
-               />
-               <CountDownTimer isPast={false} startDate={general.startDate} />
-               <ActionButton />
+      return (
+         <Box sx={[styles.root, scaledStyles]} ref={ref}>
+            <Stack spacing={4.75}>
+               <HeroContent
+                  backgroundImage={general.backgroundImageUrl}
+                  handleCloseDialog={handleCloseDialog}
+               >
+                  <ShareButton />
+                  <Stack
+                     alignItems="center"
+                     justifyContent={"center"}
+                     spacing={2.5}
+                  >
+                     <HostInfo
+                        companyName={general.company}
+                        companyLogoUrl={general.companyLogoUrl}
+                     />
+                     <LivestreamTitle text={general.title} />
+                     <LivestreamTagsContainer
+                        language={general.language}
+                        interests={general.categories.values}
+                     />
+                     <CountDownTimer
+                        isPast={false}
+                        startDate={general.startDate}
+                     />
+                     <ActionButton />
+                  </Stack>
+               </HeroContent>
+               <Box>
+                  <Tabs
+                     sx={styles.tabs}
+                     textColor="secondary"
+                     indicatorColor="secondary"
+                     scrollButtons
+                     allowScrollButtonsMobile
+                     centered={centeredNav}
+                     variant={centeredNav ? "standard" : "scrollable"}
+                     value={Boolean(isInDialog) && 0}
+                  >
+                     <Tab sx={styles.tab} label={"Linked jobs"} value={0} />
+                     <Tab sx={styles.tab} label={"About The Live Stream"} />
+                     <Tab sx={styles.tab} label={"About The Company"} />
+                     <Tab sx={styles.tab} label={"Questions"} />
+                  </Tabs>
+               </Box>
+               <Box sx={styles.mainContent}>
+                  {hasJobs ? (
+                     <Section navOffset={6}>
+                        <Jobs jobs={jobs.customJobs} />
+                     </Section>
+                  ) : null}
+                  <Section navOffset={!hasJobs ? 6 : undefined}>
+                     <Speakers speakers={speakers.values} />
+                     <Section>
+                        <AboutLivestream
+                           companyName={general.company}
+                           summary={general.summary}
+                           reasonsToJoin={general.reasonsToJoin}
+                        />
+                     </Section>
+                  </Section>
+                  <Section>
+                     <AboutCompany
+                        company={group}
+                        backgroundImageUrl={general.backgroundImageUrl}
+                        companyLogoUrl={general.companyLogoUrl}
+                        companyName={general.company}
+                     />
+                  </Section>
+                  <Section>
+                     <Questions companyName={general.company} />
+                  </Section>
+               </Box>
             </Stack>
-         </HeroContent>
-         <Box>
-            <Tabs
-               sx={styles.tabs}
-               textColor="secondary"
-               indicatorColor="secondary"
-               scrollButtons
-               allowScrollButtonsMobile
-               centered={centeredNav}
-               variant={centeredNav ? "standard" : "scrollable"}
-               value={Boolean(isInDialog) && 0}
-            >
-               <Tab sx={styles.tab} label={"Linked jobs"} value={0} />
-               <Tab sx={styles.tab} label={"About The Live Stream"} />
-               <Tab sx={styles.tab} label={"About The Company"} />
-               <Tab sx={styles.tab} label={"Questions"} />
-            </Tabs>
          </Box>
-         <Box sx={styles.mainContent}>
-            {hasJobs ? (
-               <Section navOffset={6}>
-                  <Jobs jobs={jobs.customJobs} />
-               </Section>
-            ) : null}
-            <Section navOffset={!hasJobs ? 6 : undefined}>
-               <Speakers speakers={speakers.values} />
-               <Section>
-                  <AboutLivestream
-                     companyName={general.company}
-                     summary={general.summary}
-                     reasonsToJoin={general.reasonsToJoin}
-                  />
-               </Section>
-            </Section>
-            <Section>
-               <AboutCompany
-                  company={group}
-                  backgroundImageUrl={general.backgroundImageUrl}
-                  companyLogoUrl={general.companyLogoUrl}
-                  companyName={general.company}
-               />
-            </Section>
-            <Section>
-               <Questions companyName={general.company} />
-            </Section>
-         </Box>
-      </Stack>
-   )
-}
+      )
+   }
+)
+
+PreviewContent.displayName = "PreviewContent"
 
 export default PreviewContent
