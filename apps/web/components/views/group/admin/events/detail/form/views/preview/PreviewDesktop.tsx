@@ -1,11 +1,5 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Dialog, DialogContent, IconButton } from "@mui/material"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import {
-   SlideLeftTransition,
-   SlideUpTransition,
-} from "components/views/common/transitions"
+import { Box, IconButton } from "@mui/material"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { useEffect, useMemo, useRef, useState } from "react"
 import MaximizeIcon from "./MaximizeIcon"
@@ -49,15 +43,14 @@ const getStyles = (responsiveHeight: string) =>
 
 type PreviewProps = {
    scale: number
+   handleDialogOpen: () => void
 }
 
-const Preview = ({ scale }: PreviewProps) => {
+const PreviewDesktop = ({ scale, handleDialogOpen }: PreviewProps) => {
    const previewRef = useRef(null)
    const [previewCalculatedHeight, setPreviewCalculatedHeight] = useState<
       number | null
    >(null)
-   const isMobile = useIsMobile()
-   const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
 
    const styles = useMemo(
       () =>
@@ -78,6 +71,7 @@ const Preview = ({ scale }: PreviewProps) => {
          }
       }
 
+      // this is to ensure the CSS transform scaling executes
       const timeoutId = setTimeout(() => {
          updateFormHeight()
          window.addEventListener("resize", updateFormHeight)
@@ -91,36 +85,14 @@ const Preview = ({ scale }: PreviewProps) => {
 
    return (
       <Box sx={styles.root}>
-         <IconButton style={styles.maximizeButton} onClick={handleOpen}>
+         <IconButton style={styles.maximizeButton} onClick={handleDialogOpen}>
             <MaximizeIcon sx={styles.maximizeIcon} />
          </IconButton>
          <Box sx={styles.preview}>
             <PreviewContent isInDialog={false} scale={scale} ref={previewRef} />
          </Box>
-         <Dialog
-            open={isOpen}
-            onClose={handleClose}
-            TransitionComponent={
-               isMobile ? SlideLeftTransition : SlideUpTransition
-            }
-            maxWidth="md"
-            fullWidth
-            fullScreen={isMobile}
-            closeAfterTransition={true}
-            PaperProps={{
-               sx: styles.dialogPaper,
-            }}
-         >
-            <DialogContent>
-               <PreviewContent
-                  isInDialog={true}
-                  handleCloseDialog={handleClose}
-                  scale={scale}
-               />
-            </DialogContent>
-         </Dialog>
       </Box>
    )
 }
 
-export default Preview
+export default PreviewDesktop
