@@ -144,6 +144,7 @@ export default class RecommendationServiceCore {
       )
 
       if (implicitData) {
+         console.log("🚀 ~ IMPLICIT DATA:", implicitData)
          userRecommendationBuilder.setImplicitData(implicitData)
       }
 
