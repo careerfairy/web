@@ -64,6 +64,11 @@ const PortalPage = ({
    const { data: implicitRecommendationData } =
       useUserImplicitRecommendationData()
 
+   console.log(
+      "🚀 ~ implicitRecommendationData -> SPARKS:",
+      implicitRecommendationData?.watchedSparks?.map((s) => s.id)
+   )
+
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )

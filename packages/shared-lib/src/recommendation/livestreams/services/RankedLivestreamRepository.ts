@@ -317,11 +317,6 @@ export class RankedLivestreamRepository {
          industryIds,
          limit
       )
-      console.log(
-         "🚀 ~ getEventsBasedOnImplicitEventsCompanyIndustries ~ industryIds,events:",
-         industryIds,
-         events
-      )
 
       return this.rankEvents({
          pointsPerMatch:

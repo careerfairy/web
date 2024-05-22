@@ -19,6 +19,11 @@ export const getUserWatchedSparks = async (
 
    // Re sort ensuring order stays the same after fetching data
    const sortedSparks = sortSparksByIds(sparkIds, sparks)
+   console.log(
+      "🚀 ~ WATCHED SPARKS FOR :",
+      userEmail,
+      sortedSparks?.map((s) => s.id)
+   )
 
    // Leaving const to allow debugging
    return sortedSparks
