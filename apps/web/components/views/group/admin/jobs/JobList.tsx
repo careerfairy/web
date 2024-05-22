@@ -1,12 +1,16 @@
-import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
-import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
-import React, { FC, useCallback, useMemo } from "react"
-import { Box, Divider, Grid, Typography, Stack, ListItem } from "@mui/material"
-import { sxStyles } from "../../../../../types/commonTypes"
-import { User, CheckCircle } from "react-feather"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
+import {
+   CustomJob,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Box, Divider, Grid, ListItem, Stack, Typography } from "@mui/material"
 import { useRouter } from "next/router"
+import { FC, useCallback, useMemo } from "react"
+import { CheckCircle, User } from "react-feather"
+import DateUtil from "util/DateUtil"
+import { sxStyles } from "../../../../../types/commonTypes"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import CreateJobButton from "../../../admin/jobs/components/CreateJobButton"
 import JobMenu from "./JobMenu"
 import JobSearch from "./JobSearch"
 
@@ -20,7 +24,7 @@ const styles = sxStyles({
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
       p: { md: 3 },
-      borderRadius: "16px",
+      borderRadius: "0 16px 16px 0",
       background: "white",
       border: "1px solid #ECECEC",
    },
@@ -127,6 +131,16 @@ const styles = sxStyles({
          cursor: "pointer",
       },
    },
+   jobState: {
+      display: "flex",
+      width: "8px",
+      borderRadius: "16px 0 0 16px",
+   },
+   listItemContainer: {
+      display: "flex",
+      flexDirection: "row",
+      width: "100%",
+   },
 })
 
 type Props = {
@@ -164,101 +178,110 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                   onClick={() => handleJobClick(job.id)}
                >
                   <Grid key={job.id} container>
-                     <Box sx={styles.itemWrapper}>
-                        <Grid
-                           item
-                           xs={12}
-                           md={4.5}
-                           lg={5.5}
-                           sx={styles.infoWrapper}
-                        >
-                           <Box sx={styles.mobileHeader}>
-                              <Typography variant={"h5"} sx={styles.title}>
-                                 {" "}
-                                 {job.title}{" "}
-                              </Typography>
-                              {isMobile ? <JobMenu jobId={job.id} /> : null}
-                           </Box>
-
-                           <Stack
-                              spacing={isMobile ? 1 : 2}
-                              sx={styles.info}
-                              direction={isMobile ? "column" : "row"}
-                              divider={
-                                 <Divider
-                                    orientation={
-                                       isMobile ? "horizontal" : "vertical"
-                                    }
-                                    flexItem
-                                 />
-                              }
+                     <Box sx={styles.listItemContainer}>
+                        <Box
+                           sx={[
+                              styles.jobState,
+                              { background: getStateColor(job) },
+                           ]}
+                        />
+                        <Box sx={styles.itemWrapper}>
+                           <Grid
+                              item
+                              xs={12}
+                              md={4.5}
+                              lg={5.5}
+                              sx={styles.infoWrapper}
                            >
-                              <Typography
-                                 variant={"subtitle1"}
-                                 sx={styles.subtitle}
-                                 minWidth={"90px"}
-                              >
-                                 {job.jobType}
-                              </Typography>
+                              <Box sx={styles.mobileHeader}>
+                                 <Typography variant={"h5"} sx={styles.title}>
+                                    {" "}
+                                    {job.title}{" "}
+                                    {job.deadline.toDate().toDateString()}
+                                 </Typography>
+                                 {isMobile ? <JobMenu jobId={job.id} /> : null}
+                              </Box>
 
-                              <Typography
-                                 variant={"subtitle1"}
-                                 sx={styles.subtitle}
+                              <Stack
+                                 spacing={isMobile ? 1 : 2}
+                                 sx={styles.info}
+                                 direction={isMobile ? "column" : "row"}
+                                 divider={
+                                    <Divider
+                                       orientation={
+                                          isMobile ? "horizontal" : "vertical"
+                                       }
+                                       flexItem
+                                    />
+                                 }
                               >
-                                 {formatJobPostingUrl(job.postingUrl)}
-                              </Typography>
-                           </Stack>
-                        </Grid>
-
-                        <Grid
-                           item
-                           xs={12}
-                           md={7}
-                           lg={6}
-                           sx={styles.statsWrapper}
-                        >
-                           <>
-                              {isMobile ? (
-                                 renderMobileStats(clicks, applicants)
-                              ) : (
-                                 <Stack
-                                    spacing={2}
-                                    sx={styles.stats}
-                                    direction="row"
+                                 <Typography
+                                    variant={"subtitle1"}
+                                    sx={styles.subtitle}
+                                    minWidth={"90px"}
                                  >
-                                    <Typography sx={styles.statsLabel}>
-                                       Applications:
-                                    </Typography>
+                                    {job.jobType}
+                                 </Typography>
 
-                                    <Box sx={styles.initialized}>
-                                       <User size={16} />
-                                       <Typography
-                                          variant={"subtitle1"}
-                                          color={"text.secondary"}
-                                       >
-                                          {clicks} Initiated
-                                       </Typography>
-                                    </Box>
-
-                                    <Box sx={styles.applications}>
-                                       <CheckCircle size={16} />
-                                       <Typography
-                                          variant={"subtitle1"}
-                                          color={"secondary.main"}
-                                       >
-                                          {applicants} Confirmed
-                                       </Typography>
-                                    </Box>
-                                 </Stack>
-                              )}
-                           </>
-                        </Grid>
-
-                        {isMobile ? null : (
-                           <Grid item xs={0.5} sx={styles.editButtonDesktop}>
-                              <JobMenu jobId={job.id} />
+                                 <Typography
+                                    variant={"subtitle1"}
+                                    sx={styles.subtitle}
+                                 >
+                                    {formatJobPostingUrl(job.postingUrl)}
+                                 </Typography>
+                              </Stack>
                            </Grid>
-                        )}
+
+                           <Grid
+                              item
+                              xs={12}
+                              md={7}
+                              lg={6}
+                              sx={styles.statsWrapper}
+                           >
+                              <>
+                                 {isMobile ? (
+                                    renderMobileStats(clicks, applicants)
+                                 ) : (
+                                    <Stack
+                                       spacing={2}
+                                       sx={styles.stats}
+                                       direction="row"
+                                    >
+                                       <Typography sx={styles.statsLabel}>
+                                          Applications:
+                                       </Typography>
+
+                                       <Box sx={styles.initialized}>
+                                          <User size={16} />
+                                          <Typography
+                                             variant={"subtitle1"}
+                                             color={"text.secondary"}
+                                          >
+                                             {clicks} Initiated
+                                          </Typography>
+                                       </Box>
+
+                                       <Box sx={styles.applications}>
+                                          <CheckCircle size={16} />
+                                          <Typography
+                                             variant={"subtitle1"}
+                                             color={"secondary.main"}
+                                          >
+                                             {applicants} Confirmed
+                                          </Typography>
+                                       </Box>
+                                    </Stack>
+                                 )}
+                              </>
+                           </Grid>
+
+                           {isMobile ? null : (
+                              <Grid item xs={0.5} sx={styles.editButtonDesktop}>
+                                 <JobMenu jobId={job.id} />
+                              </Grid>
+                           )}
+                        </Box>
                      </Box>
                   </Grid>
                </ListItem>
@@ -296,3 +319,25 @@ const formatJobPostingUrl = (postingUrl: string): string => {
 }
 
 export default JobList
+
+/**
+ *
+ * This function determines the color state of a job based on its publication status and deadline.
+ *
+ * @param job {CustomJob}
+ * @returns color {string}
+ */
+const getStateColor = (job: CustomJob): string => {
+   if (job.published) {
+      return "#7FD6C9"
+   }
+
+   const jobHasNoContent = job.livestreams.length == 0 && job.sparks.length == 0
+
+   // Job has no content associated to it and it's not expired
+   if (jobHasNoContent && !DateUtil.isDeadlineExpired(job.deadline.toDate())) {
+      return "#FE9B0E"
+   } else {
+      return "#E1E1E1"
+   }
+}

@@ -1,5 +1,6 @@
 import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import * as cliProgress from "cli-progress"
+import { Timestamp } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { logAction } from "../../../util/logger"
@@ -40,8 +41,14 @@ export async function run() {
 
          bulkWriter.update(newCustomJobRef, {
             sparks: [],
-            published: Boolean(customJob.livestreams?.length),
-            deadline: customJob.deadline ?? null,
+            published: Boolean(
+               customJob.livestreams?.length &&
+                  (customJob.deadline
+                     ? customJob.deadline.toDate() > new Date(2024, 5, 22)
+                     : true)
+            ),
+            deadline:
+               customJob.deadline ?? Timestamp.fromDate(new Date(2024, 7, 31)),
          })
 
          counter.writeIncrement()
