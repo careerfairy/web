@@ -765,7 +765,7 @@ export interface LivestreamPresentation extends Identifiable {
 }
 
 /**
- * A YouTube video for a livestream
+ * A YouTube video for a live stream
  * Document Path: livestreams/{livestreamId}/videos/video
  */
 export interface LivestreamVideo extends Identifiable {
