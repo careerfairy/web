@@ -9,9 +9,9 @@ type FetcherType = MutationFetcher<
 >
 
 /**
- * Custom hook for updating the page number of a livestream presentation.
+ * Custom hook for updating the page number of a live stream presentation.
  *
- * @param {string} livestreamId - The ID of the livestream for which the page number is to be updated.
+ * @param {string} livestreamId - The ID of the live stream for which the page number is to be updated.
  * @returns An object containing the SWR response and a function to trigger the page update.
  */
 export const useUpdatePresentationPageNumber = (livestreamId: string) => {
@@ -27,7 +27,7 @@ export const useUpdatePresentationPageNumber = (livestreamId: string) => {
       {
          onError: (error, key) => {
             errorLogAndNotify(error, {
-               message: "Error updating livestream presentation page number",
+               message: "Error updating live stream presentation page number",
                key,
             })
          },
