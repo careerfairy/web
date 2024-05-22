@@ -48,7 +48,6 @@ export const UploadPDFPresentationDialog = () => {
          width={589}
          open={settingsMenuOpen}
          title="Upload your PDF"
-         description="Upload your PDF to share your slides with the audience"
          icon={<Box component={Upload} sx={styles.icon} />}
          secondaryAction={{
             text: "Cancel",

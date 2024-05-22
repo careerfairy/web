@@ -366,3 +366,6 @@ export const sanitizeFileName = (fileName: string): string => {
          .replace(/^_|_$/g, "") || "file"
    )
 }
+
+export const convertBytesToMB = (bytes: number) =>
+   Number.isFinite(bytes) ? bytes / 1024 / 1024 : 0

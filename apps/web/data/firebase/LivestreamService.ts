@@ -78,7 +78,7 @@ type StreamerDetails = {
 }
 
 /**
- * Defines the options for setting a livestream's mode.
+ * Defines the options for setting a live stream's mode.
  * Depending on the mode, additional properties may be required:
  * - "default": No additional properties.
  * - "desktop": Requires `screenSharerAgoraUID` to identify the screen sharer.
@@ -121,10 +121,10 @@ export class LivestreamService {
    }
 
    /**
-    * Validates category data for a livestream, determining if a certain user as answered and performed all steps
-    * for a livestream registration and accepted all policies if any. Current logic is a migration of the validation done in the old streaming application.
+    * Validates category data for a live stream, determining if a certain user as answered and performed all steps
+    * for a live stream registration and accepted all policies if any. Current logic is a migration of the validation done in the old streaming application.
     * @param firebase Firebase service
-    * @param options Category validation data (livestream and userData)
+    * @param options Category validation data (live stream and userData)
     * @returns true if user has all questions answered and policies accepted, false otherwise
     */
    async checkCategoryData(
@@ -158,7 +158,7 @@ export class LivestreamService {
                ])
 
             /*
-             * Here we check if the user has answered all the questions for the livestream
+             * Here we check if the user has answered all the questions for the live stream
              * by looking at the user's answers and the livestreams questions in userData/userGroups
              * */
             const hasAnsweredAllQuestions =
@@ -340,9 +340,9 @@ export class LivestreamService {
    }
 
    /**
-    * Gets a Firestore document reference for a livestream or its breakout room.
+    * Gets a Firestore document reference for a live stream or its breakout room.
     *
-    * @param livestreamId - The ID of the livestream.
+    * @param livestreamId - The ID of the live stream.
     * @param breakoutRoomId - Optional ID of the breakout room.
     * @returns Firestore document reference.
     */
@@ -373,11 +373,11 @@ export class LivestreamService {
    }
 
    /**
-    * Sets the mode of a livestream to the provided mode (default, desktop, video, pdf)
+    * Sets the mode of a live stream to the provided mode (default, desktop, video, pdf)
     * If the mode is 'desktop', the agoraUid is required to identify the screen sharer.
-    * Updates the livestream document with the new mode and, if applicable, the screenSharerId.
+    * Updates the live stream document with the new mode and, if applicable, the screenSharerId.
     *
-    * @param params - The parameters required to start or stop sharing, including livestream ID, mode, and Agora UID.
+    * @param params - The parameters required to start or stop sharing, including live stream ID, mode, and Agora UID.
     * @returns A promise resolved with the update operation result.
     */
    async setLivestreamMode<Mode extends LivestreamMode>(
@@ -425,7 +425,7 @@ export class LivestreamService {
    }
 
    /**
-    * Updates Firestore to mark a user as participating in a livestream. This involves updating the user's status in `userLivestreamData` and adding their email to `participatingStudents`.
+    * Updates Firestore to mark a user as participating in a live stream. This involves updating the user's status in `userLivestreamData` and adding their email to `participatingStudents`.
     *
     * @param {string} livestreamId - Livestream ID.
     * @param {UserData} userData - User data.
@@ -480,7 +480,7 @@ export class LivestreamService {
          }
       )
 
-      // Set the user's email in the participants array of the livestream document
+      // Set the user's email in the participants array of the live stream document
       batch.update(livestreamRef, {
          participatingStudents: arrayUnion(userData.userEmail),
       })
@@ -488,12 +488,12 @@ export class LivestreamService {
       return batch.commit()
    }
    /**
-    * Sets the status of a livestream to either started or not started.
+    * Sets the status of a live stream to either started or not started.
     * If `shouldStart` is true, performs a transaction to ensure the stream isn't restarted if already started.
     * Otherwise, performs a normal update operation to mark the stream as ended.
     *
-    * @param {string} livestreamId - The ID of the livestream to update.
-    * @param {boolean} shouldStart - A boolean indicating if the livestream has started.
+    * @param {string} livestreamId - The ID of the live stream to update.
+    * @param {boolean} shouldStart - A boolean indicating if the live stream has started.
     * @returns A promise resolved with the result of the update operation.
     */
    async updateLivestreamStartEndState(
@@ -647,7 +647,7 @@ export class LivestreamService {
    }
 
    /**
-    * Resets a question or all questions for a livestream
+    * Resets a question or all questions for a live stream
     */
    async resetQuestion(options: ResetLivestreamQuestionRequest) {
       await httpsCallable<ResetLivestreamQuestionRequest>(
@@ -669,7 +669,7 @@ export class LivestreamService {
    }
 
    /**
-    * Marks a question as done for a livestream
+    * Marks a question as done for a live stream
     */
    async markQuestionAsDone(options: MarkLivestreamQuestionAsDoneRequest) {
       await httpsCallable<MarkLivestreamQuestionAsDoneRequest>(
@@ -679,7 +679,7 @@ export class LivestreamService {
    }
 
    /**
-    * Deletes a question from a livestream along with all its comments
+    * Deletes a question from a live stream along with all its comments
     * @param livestreamRef - Livestream document reference
     * @param questionId - Question ID
     */
@@ -763,8 +763,8 @@ export class LivestreamService {
    }
 
    /**
-    * Retrieves or creates a Firestore document reference for a question within a livestream or breakout room.
-    * @param livestreamRef - Reference to the livestream/breakout room document.
+    * Retrieves or creates a Firestore document reference for a question within a live stream or breakout room.
+    * @param livestreamRef - Reference to the live stream/breakout room document.
     * @param questionId - Question ID
     * @returns Document reference for the question.
     */
@@ -779,8 +779,8 @@ export class LivestreamService {
    }
 
    /**
-    * Get a comment reference to a question from a livestream or breakout room
-    * @param livestreamRef - Reference to the livestream/breakout room document
+    * Get a comment reference to a question from a live stream or breakout room
+    * @param livestreamRef - Reference to the live stream/breakout room document
     * @param questionId - Question ID
     * @param commentId - Comment ID
     * @returns Document reference for the comment
@@ -797,7 +797,7 @@ export class LivestreamService {
    }
 
    /**
-    * Creates a question in a livestream or breakout room.
+    * Creates a question in a live stream or breakout room.
     * @param livestreamRef - Livestream document reference.
     * @param options - Question options.
     * @returns A promise resolved with the result of the create operation.
@@ -998,7 +998,7 @@ export class LivestreamService {
    }
 
    /**
-    * Sets the livestream PDF presentation metadata in the firestore database
+    * Sets the live stream PDF presentation metadata in the firestore database
     */
    setLivestreamPDFPresentation = async ({
       livestreamId,
