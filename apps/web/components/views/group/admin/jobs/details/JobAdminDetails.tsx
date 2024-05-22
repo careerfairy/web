@@ -39,6 +39,9 @@ const styles = sxStyles({
    jobWarningIndicator: {
       backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
    },
+   jobWarningIndicator: {
+      backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
+   },
    tabsLabel: {
       fontSize: "16px",
       lineHeight: "27px",
@@ -62,6 +65,7 @@ const styles = sxStyles({
       color: (theme) => theme.brand.black[700],
    },
    tabs: {
+<<<<<<< HEAD
       borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",
@@ -81,6 +85,12 @@ const styles = sxStyles({
       mt: 4,
    },
 })
+
+enum TabsEnum {
+   APPLICATION = 0,
+   LINKED_CONTENT = 1,
+   JOB_POSTING = 2,
+}
 
 type Props = {
    job: CustomJob
@@ -111,6 +121,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
+<<<<<<< HEAD
    const jobHasNoContent = jobHubV1
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
@@ -139,6 +150,15 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                  },
               ]
             : []),
+         {
+            label: "Linked content",
+            component: () =>
+               jobHasNoContent ? (
+                  <PendingContent job={job} group={group} />
+               ) : (
+                  <LinkedContent job={job} />
+               ),
+         },
          {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
@@ -230,13 +250,36 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                />
             ) : null}
             <Tab
+               key={"Linked content"}
+               label={
+                  <Box sx={styles.applicantsTab}>
+                     <Typography
+                        sx={{
+                           ...styles.tabsLabel,
+                           ...(activeTabIndex === 1 && styles.activeTab),
+                           ...(jobHasNoContent && styles.warningTab),
+                        }}
+                     >
+                        Linked content
+                     </Typography>
+                     {jobHasNoContent ? (
+                        <Box component={AlertCircle} sx={styles.warningAlert} />
+                     ) : null}
+                  </Box>
+               }
+            />
+            <Tab
                key={"Job posting"}
                label={
                   <Typography
                      sx={{
                         ...styles.tabsLabel,
+<<<<<<< HEAD
                         ...(activeTabIndex === TabsEnum.JOB_POSTING &&
                            styles.activeTab),
+=======
+                        ...(activeTabIndex === 2 && styles.activeTab),
+>>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
                      }}
                   >
                      Job posting
