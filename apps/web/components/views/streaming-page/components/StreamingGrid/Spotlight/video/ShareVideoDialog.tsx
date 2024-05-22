@@ -1,11 +1,9 @@
 import { Dialog, SwipeableDrawer } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { Youtube } from "react-feather"
 import { setShareVideoDialogOpen } from "store/reducers/streamingAppReducer"
 import { useShareVideoDialogOpen } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { SidePanelView } from "../../../SidePanel/SidePanelView"
 import { ShareVideoForm } from "./ShareVideoForm"
 
 const styles = sxStyles({
@@ -14,10 +12,12 @@ const styles = sxStyles({
          minWidth: 589,
          maxWidth: 589,
          p: 4,
+         borderRadius: "12px",
       },
    },
    drawer: {
       "& .MuiDrawer-paper": {
+         p: 2.5,
          borderTopLeftRadius: 12,
          borderTopRightRadius: 12,
          maxHeight: "calc(100vh - 40px)",
@@ -49,15 +49,7 @@ export const ShareVideoDialog = () => {
             onClose={closeMenu}
             onOpen={closeMenu}
          >
-            <SidePanelView
-               contentWrapperStyles={styles.drawerContent}
-               id="share-video-drawer"
-               title="Share video"
-               icon={<Youtube />}
-               handlePanelToggle={closeMenu}
-            >
-               <ShareVideoForm isMobile={isMobile} onClose={closeMenu} />
-            </SidePanelView>
+            <ShareVideoForm onClose={closeMenu} />
          </SwipeableDrawer>
       )
    }
@@ -70,7 +62,7 @@ export const ShareVideoDialog = () => {
          open={open}
          TransitionProps={{ unmountOnExit: true }}
       >
-         <ShareVideoForm isMobile={isMobile} onClose={closeMenu} />
+         <ShareVideoForm onClose={closeMenu} />
       </Dialog>
    )
 }

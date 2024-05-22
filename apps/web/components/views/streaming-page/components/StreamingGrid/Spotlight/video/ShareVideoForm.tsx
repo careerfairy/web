@@ -15,24 +15,17 @@ import * as yup from "yup"
 
 const styles = sxStyles({
    header: {
-      mb: 4,
+      mb: 2,
    },
    actions: {
       mt: 4,
       p: 0,
-      "& button": {
-         width: 150,
-      },
-      "& .share-video-button": {
-         width: {
-            xs: 227,
-            md: 150,
-         },
-      },
+      maxWidth: 600,
+      mx: "auto",
    },
    icon: {
-      width: 64,
-      height: 64,
+      width: 48,
+      height: 48,
       color: "primary.main",
    },
 })
@@ -50,10 +43,9 @@ type FormValues = yup.InferType<typeof videoUrlSchema>
 
 type Props = {
    onClose: () => void
-   isMobile: boolean
 }
 
-export const ShareVideoForm = ({ onClose, isMobile }: Props) => {
+export const ShareVideoForm = ({ onClose }: Props) => {
    const { livestreamId, agoraUserId } = useStreamingContext()
 
    const { trigger: setLivestreamMode } = useSetLivestreamMode(livestreamId)
@@ -94,7 +86,7 @@ export const ShareVideoForm = ({ onClose, isMobile }: Props) => {
          <Box component="form" onSubmit={formMethods.handleSubmit(onSubmit)}>
             <Stack
                sx={styles.header}
-               spacing={3}
+               spacing={2}
                alignItems="center"
                justifyContent="center"
             >
@@ -105,9 +97,9 @@ export const ShareVideoForm = ({ onClose, isMobile }: Props) => {
                   alignItems="center"
                >
                   <Typography
-                     variant="desktopBrandedH3"
-                     fontWeight={700}
-                     color="neutral.800"
+                     variant="mobileBrandedH3"
+                     fontWeight={600}
+                     color="neutral.900"
                   >
                      Share a video
                   </Typography>
@@ -132,14 +124,20 @@ export const ShareVideoForm = ({ onClose, isMobile }: Props) => {
                sx={styles.actions}
                justifyContent={"center"}
                alignItems="center"
-               direction={isMobile ? "column-reverse" : "row"}
-               spacing={1.25}
+               direction="row"
+               spacing={1.5}
             >
-               <LoadingButton onClick={onClose} variant="outlined" color="grey">
+               <LoadingButton
+                  fullWidth
+                  onClick={onClose}
+                  variant="outlined"
+                  color="grey"
+               >
                   Cancel
                </LoadingButton>
                <LoadingButton
                   type="submit"
+                  fullWidth
                   disabled={!formMethods.formState.isDirty}
                   loading={formMethods.formState.isSubmitting}
                   variant="contained"
