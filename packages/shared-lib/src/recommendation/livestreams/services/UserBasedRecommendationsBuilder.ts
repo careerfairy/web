@@ -116,22 +116,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       return this
    }
 
-   public userFollowedCompanies() {
-      if (this.user.companyUserFollowsIds?.length) {
-         // Fetch recommended events based on the user's followed companies
-         this.addResults(
-            this.rankedLivestreamRepo.getEventsBasedOnCompanies(
-               this.user.companyUserFollowsIds?.map(
-                  (following) => following.groupId
-               ),
-               this.limit
-            )
-         )
-      }
-
-      return this
-   }
-
    public userUniversityCompanyTargetCountry() {
       if (this.user.universityCountryCode) {
          // Fetch recommended events based on the user's university country code against the events company targeted countries
@@ -175,6 +159,30 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    }
 
    // Implicit Data
+
+   public userImplicitFollowedCompanies() {
+      this.addImplicitResults(
+         (implicitDataRepo) => {
+            const vals = implicitDataRepo.getFollowedCompanyIds()
+            console.log("🚀 ~ IMPLICIT FOLLOWED COMPANIES~ values:", vals)
+            return vals
+         },
+         (values) => {
+            const res = this.rankedLivestreamRepo.getEventsBasedOnCompanies(
+               values,
+               this.limit
+            )
+            console.log(
+               "🚀 ~ IMPLICIT FOLLOWED COMPANIES~ values, res:",
+               values,
+               res?.map((r) => r.model.id)
+            )
+            return res
+         }
+      )
+
+      return this
+   }
 
    public userImplicitInteractedEventsCompanyCountry() {
       this.addImplicitResults(
@@ -342,7 +350,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
     * which also takes 2 functions as parameters, which when combined can be used to add to the results
     * by calling this.addResults.
     *
-    * Simplification of i.e this.userFollowedCompanies
+    * Simplification of i.e this.userCountriesOfInterest
     * @param valuesGetter Function for retrieving the data to fetch events from.
     * @param eventsGetter Function for retrieving events using the results from calling @param valuesGetter
     */

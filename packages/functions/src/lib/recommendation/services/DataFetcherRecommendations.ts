@@ -10,7 +10,7 @@ import {
    sortSeenSparks,
    sortSparksByIds,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
 import { BundleLoader } from "../../bundleLoader"
@@ -30,6 +30,7 @@ export interface IRecommendationDataFetcher {
    getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]>
 
    getAppliedJobs(userId: string): Promise<CustomJobApplicant[]>
+   getFollowedCompanies(userId: string): Promise<CompanyFollowed[]>
 }
 
 /**
@@ -67,6 +68,12 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
    }
 
    async getWatchedSparks(userId: string): Promise<Spark[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + userId)
+   }
+
+   async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
       // Not implemented for newsletter, since data fetching would be per
       // user meaning an excess number requests would be made for each subscribed user
       throw new Error("Not implemented: " + userId)
@@ -143,6 +150,11 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
 
       // Using const to allow easier debugging
       return sortedSparks
+   }
+
+   async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
+      const companies = await this.userRepo.getCompaniesUserFollows(userId, 10)
+      return companies || []
    }
 }
 

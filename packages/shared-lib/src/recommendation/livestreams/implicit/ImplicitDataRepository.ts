@@ -136,6 +136,17 @@ export class ImplicitDataRepository {
       return sizes
    }
 
+   // Companies followed
+   public getFollowedCompanyIds(): string[] {
+      const groupIds = (
+         this.data.followedCompanies?.flatMap(
+            (following) => following.groupId
+         ) || []
+      )?.filter(Boolean)
+
+      return this.uniqueArray(groupIds)
+   }
+
    private uniqueArray<T>(items: T[]) {
       return items.filter(
          (value, index, array) => array.indexOf(value) === index

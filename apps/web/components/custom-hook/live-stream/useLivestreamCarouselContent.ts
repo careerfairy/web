@@ -1,7 +1,11 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import {
+   CompanyFollowed,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/users"
 import CarouselContentService from "components/views/portal/content-carousel/CarouselContentService"
 import { useCallback, useMemo } from "react"
 import useSWR, { SWRConfiguration } from "swr"
@@ -27,6 +31,7 @@ export type UseLivestreamCarouselContentSWROptions = {
    watchedSparks: Spark[]
    watchedLivestreams: LivestreamEvent[]
    appliedJobs: CustomJobApplicant[]
+   userFollowedCompanies: CompanyFollowed[]
 }
 
 /**
@@ -51,6 +56,7 @@ const useLivestreamsCarouselContentSWR = (
             watchedSparks: options.watchedSparks || [],
             watchedLivestreams: options.watchedLivestreams || [],
             appliedJobs: options.appliedJobs || [],
+            followedCompanies: options.userFollowedCompanies,
          }),
       [
          options.appliedJobs,
@@ -58,6 +64,7 @@ const useLivestreamsCarouselContentSWR = (
          options.registeredRecordedLivestreamsForUser,
          options.upcomingLivestreams,
          options.userData,
+         options.userFollowedCompanies,
          options.userStats,
          options.watchedLivestreams,
          options.watchedSparks,

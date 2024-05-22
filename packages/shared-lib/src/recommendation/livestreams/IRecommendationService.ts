@@ -58,7 +58,6 @@ export default class RecommendationServiceCore {
                userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
                userLevelOfStudyId: user?.levelOfStudy?.id || "N/A",
                userSpokenLanguages: user?.spokenLanguages || [],
-               userFollowedCompanies: user?.companyUserFollowsIds || [],
                userCountriesOfInterest: user?.countriesOfInterest || [],
             },
             eventMetaData: deDupedEvents.map((e) => ({
@@ -149,16 +148,17 @@ export default class RecommendationServiceCore {
       }
 
       return userRecommendationBuilder
+         .userInterests()
          .userUniversityCountry()
          .userUniversity()
          .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
          .userLevelsOfStudy()
          .userSpokenLanguages()
-         .userFollowedCompanies()
          .userUniversityCompanyTargetCountry()
          .userCountriesOfInterest()
          .userCompanyTargetUniversity()
          .userCompanyTargetFieldsOfStudy()
+         .userImplicitFollowedCompanies()
          .userImplicitInteractedEventsCompanyCountry()
          .userImplicitInteractedEventsCompanyIndustries()
          .userImplicitInteractedEventsCompanySize()

@@ -12,6 +12,7 @@ import useFunctionsSWR, {
  * - Watched Events (participated or recording)
  * - Watched Sparks
  * - Applied Jobs
+ * - Followed Companies
  * @param config Items limit.
  * @returns ImplicitLivestreamRecommendationData implicit recommendation data
  */
@@ -26,6 +27,7 @@ export const useUserImplicitRecommendationData = () => {
               watchedEventsLimit: 10,
               watchedSparksLimit: 20,
               appliedJobsLimit: 10,
+              followedCompaniesLimit: 10,
            },
         ]
       : null

@@ -84,6 +84,8 @@ const PortalPage = ({
       watchedSparks: implicitRecommendationData?.watchedSparks || [],
       watchedLivestreams: implicitRecommendationData?.watchedLivestreams || [],
       appliedJobs: implicitRecommendationData?.appliedJobs || [],
+      userFollowedCompanies:
+         implicitRecommendationData?.followedCompanies || [],
    })
 
    const carouselContent = useMemo<CarouselContent[]>(() => {

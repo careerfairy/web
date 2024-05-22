@@ -191,14 +191,14 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "groupIds",
-         [groupIds],
+         groupIds,
          limit
       )
 
       return this.rankEvents({
          pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_COMPANY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [groupIds],
+         targetUserIds: groupIds,
          targetLivestreamIdsGetter: (stream) => stream.getGroupIds(),
       })
    }

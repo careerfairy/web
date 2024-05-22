@@ -1,6 +1,6 @@
 export const RECOMMENDATION_POINTS = {
    // These values are isolated, as in the current design they are not needed
-   POINTS_PER_INTEREST_MATCH: 1,
+   POINTS_PER_INTEREST_MATCH: 3,
    POINTS_PER_COMPANY_INDUSTRY_MATCH: 2,
    POINTS_PER_COMPANY_SIZE_MATCH: 1,
 

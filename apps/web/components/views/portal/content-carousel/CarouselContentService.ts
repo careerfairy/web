@@ -3,8 +3,13 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import {
+   CompanyFollowed,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/users"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import { sparkService } from "data/firebase/SparksService"
 import DateUtil from "util/DateUtil"
@@ -20,6 +25,7 @@ export type GetContentOptions = {
    watchedLivestreams?: LivestreamEvent[]
    watchedSparks?: Spark[]
    appliedJobs?: CustomJobApplicant[]
+   followedCompanies?: CompanyFollowed[]
 }
 
 export type LivestreamEventWithType = LivestreamEvent & {
@@ -60,6 +66,7 @@ export type SerializedContent =
  *   watchedLivestreams?: LivestreamEvent[],
  *   watchedSparks?: Spark[],
  *   appliedJobs?: CustomJobApplicant[]
+ *   followedCompanies?: CompanyFollowed[]
  *   }
  *   - pastLivestreams: An array of past live stream events
  *   - upcomingLivestreams: An array of upcoming live stream events
@@ -69,6 +76,7 @@ export type SerializedContent =
  *   - watchedLivestreams: The user's latest watched live streams, including recordings
  *   - watchedSparks: The user's latest watched sparks
  *   - appliedJobs: The user's latest applied jobs
+ *   - followedCompanies: The companies the user currently follows
  *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended live stream events
  *   */
 export class CarouselContentService {
@@ -78,10 +86,11 @@ export class CarouselContentService {
 
    constructor(options: GetContentOptions) {
       this.options = options
-      const implicitRecommendationData = {
+      const implicitRecommendationData: ImplicitLivestreamRecommendationData = {
          watchedLivestreams: options.watchedLivestreams,
          watchedSparks: options.watchedSparks,
          appliedJobs: options.appliedJobs,
+         followedCompanies: options.followedCompanies,
       }
 
       this.pastEventsService = ExistingDataRecommendationService.create(

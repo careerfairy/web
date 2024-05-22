@@ -137,6 +137,11 @@ export interface IUserRepository {
       limit: number
    ): firebase.firestore.Query<CompanyFollowed>
 
+   getCompaniesUserFollows(
+      userEmail: string,
+      limit: number
+   ): Promise<CompanyFollowed[]>
+
    /**
     * Creates a user activity document and updates his lastActivityAt field
     */
@@ -794,6 +799,16 @@ export class FirebaseUserRepository
          .collection("companiesUserFollows")
          .withConverter(createCompatGenericConverter<CompanyFollowed>())
          .limit(limit)
+   }
+
+   async getCompaniesUserFollows(
+      userId: string,
+      limit: number
+   ): Promise<CompanyFollowed[]> {
+      const query = this.getCompaniesUserFollowsQuery(userId, limit)
+
+      const snapshot = await query.get()
+      return mapFirestoreDocuments<CompanyFollowed>(snapshot)
    }
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void> {

@@ -3,6 +3,7 @@ import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJob
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { CompanyFollowed } from "@careerfairy/shared-lib/users"
 import { SchemaOf, number, object } from "yup"
 import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
@@ -18,6 +19,7 @@ type GetUserImplicitDataSchema = {
    watchedEventsLimit: number
    watchedSparksLimit: number
    appliedJobsLimit: number
+   followedCompaniesLimit: number
 }
 
 const getUserImplicitDataSchema: SchemaOf<GetUserImplicitDataSchema> =
@@ -25,6 +27,7 @@ const getUserImplicitDataSchema: SchemaOf<GetUserImplicitDataSchema> =
       watchedEventsLimit: number().default(10),
       watchedSparksLimit: number().default(20),
       appliedJobsLimit: number().default(10),
+      followedCompaniesLimit: number().default(10),
    })
 
 /**
@@ -87,17 +90,25 @@ export const getUserImplicitData = functions
                      data.watchedEventsLimit
                   ),
                   getUserWatchedSparks(
-                     context.auth?.token?.email,
+                     context.auth.token.email,
                      data.watchedSparksLimit
                   ),
                   userRepo.getCustomJobApplications(
-                     context.auth?.token?.email,
+                     context.auth.token.email,
                      data.appliedJobsLimit
+                  ),
+                  userRepo.getCompaniesUserFollows(
+                     context.auth.token.email,
+                     data.followedCompaniesLimit
                   ),
                ]
 
-               const [interactedEvents, watchedSparks, appliedJobs] =
-                  await Promise.all(promises)
+               const [
+                  interactedEvents,
+                  watchedSparks,
+                  appliedJobs,
+                  followedCompanies,
+               ] = await Promise.all(promises)
 
                return {
                   watchedLivestreams:
@@ -105,6 +116,8 @@ export const getUserImplicitData = functions
                   watchedSparks: (watchedSparks as unknown as Spark[]) || [],
                   appliedJobs:
                      (appliedJobs as unknown as CustomJobApplicant[]) || [],
+                  followedCompanies:
+                     (followedCompanies as unknown as CompanyFollowed[]) || [],
                }
             } catch (error) {
                logAndThrow(
