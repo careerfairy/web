@@ -139,7 +139,7 @@ export interface IUserRepository {
 
    getCompaniesUserFollows(
       userEmail: string,
-      limit: number
+      limit?: number
    ): Promise<CompanyFollowed[]>
 
    /**
@@ -803,9 +803,16 @@ export class FirebaseUserRepository
 
    async getCompaniesUserFollows(
       userId: string,
-      limit: number
+      limit?: number
    ): Promise<CompanyFollowed[]> {
-      const query = this.getCompaniesUserFollowsQuery(userId, limit)
+      let query = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("companiesUserFollows")
+         .orderBy("createdAt", "desc")
+         .withConverter(createCompatGenericConverter<CompanyFollowed>())
+
+      if (limit) query = query.limit(limit)
 
       const snapshot = await query.get()
       return mapFirestoreDocuments<CompanyFollowed>(snapshot)

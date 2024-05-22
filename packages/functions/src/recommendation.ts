@@ -97,10 +97,7 @@ export const getUserImplicitData = functions
                      context.auth.token.email,
                      data.appliedJobsLimit
                   ),
-                  userRepo.getCompaniesUserFollows(
-                     context.auth.token.email,
-                     data.followedCompaniesLimit
-                  ),
+                  userRepo.getCompaniesUserFollows(context.auth.token.email),
                ]
 
                const [

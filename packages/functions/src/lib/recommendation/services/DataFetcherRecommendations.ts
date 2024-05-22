@@ -153,7 +153,7 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
    }
 
    async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
-      const companies = await this.userRepo.getCompaniesUserFollows(userId, 10)
+      const companies = await this.userRepo.getCompaniesUserFollows(userId)
       return companies || []
    }
 }
