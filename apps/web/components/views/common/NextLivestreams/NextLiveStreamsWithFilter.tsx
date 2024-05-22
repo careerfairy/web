@@ -1,3 +1,5 @@
+import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
+import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import {
    Box,
    Card,
@@ -6,9 +8,17 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
+import {
+   FilterOptions,
+   useLivestreamSearchAlgolia,
+} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { useRouter } from "next/router"
+import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Search as FindIcon } from "react-feather"
+import { useInView } from "react-intersection-observer"
+import { useDebounce } from "react-use"
+import { LivestreamSearchResult } from "types/algolia"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import Link from "../../../../components/views/common/Link"
 import { wishListBorderRadius } from "../../../../constants/pages"
@@ -19,16 +29,6 @@ import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
-import { ParsedUrlQuery } from "querystring"
-import { queryParamToArr } from "@careerfairy/shared-lib/utils"
-import {
-   FilterOptions,
-   useLivestreamSearchAlgolia,
-} from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
-import { LivestreamSearchResult } from "types/algolia"
-import { useInView } from "react-intersection-observer"
-import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
-import { useDebounce } from "react-use"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -141,6 +141,9 @@ const NextLiveStreamsWithFilter = ({
             denyRecordingAccess,
             hidden: false,
             test: false,
+            ...(initialTabValue === "upcomingEvents" && {
+               hasEnded: false,
+            }),
          },
          dateFilter: hasPastEvents ? "past" : "future",
       }),
@@ -150,6 +153,7 @@ const NextLiveStreamsWithFilter = ({
          fieldsOfStudy,
          languages,
          denyRecordingAccess,
+         initialTabValue,
          hasPastEvents,
          allFieldsOfStudy,
       ]
