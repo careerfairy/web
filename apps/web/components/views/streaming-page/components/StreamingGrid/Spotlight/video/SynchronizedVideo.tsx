@@ -11,6 +11,7 @@ import { Play } from "react-feather"
 import ReactPlayer, { YouTubePlayerProps } from "react-player/youtube"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
+import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
    root: {
@@ -80,7 +81,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       if (!reactPlayerInstance) return
 
       if (videoRef.current.state === "playing" && videoRef.current.lastPlayed) {
-         const secondsDiff = getSecondsBetweenDates(
+         const secondsDiff = DateUtil.getSecondsBetweenDates(
             videoRef.current.lastPlayed.toDate(),
             new Date()
          )
@@ -195,8 +196,4 @@ const getConfig = (isVideoSharer: boolean): YouTubePlayerProps["config"] => {
          rel: 0,
       },
    }
-}
-
-const getSecondsBetweenDates = (startDate: Date, endDate: Date) => {
-   return (endDate.getTime() - startDate.getTime()) / 1000
 }
