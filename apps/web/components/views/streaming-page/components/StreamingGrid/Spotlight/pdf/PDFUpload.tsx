@@ -83,6 +83,7 @@ export const PDFUpload = forwardRef<HTMLDivElement, Props>(
                            sx={styles.browseButton}
                            color="grey"
                            variant="outlined"
+                           size="small"
                         >
                            Browse files
                         </Button>
