@@ -78,7 +78,7 @@ const PreviewContent = forwardRef(
       )
 
       return (
-         <Box sx={[styles.root, scaledStyles]} ref={ref}>
+         <Box sx={!isInDialog && [styles.root, scaledStyles]} ref={ref}>
             <Stack spacing={4.75}>
                <HeroContent
                   backgroundImage={general.backgroundImageUrl}
