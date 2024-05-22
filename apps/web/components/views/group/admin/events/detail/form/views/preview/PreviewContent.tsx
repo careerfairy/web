@@ -83,7 +83,6 @@ const PreviewContent = forwardRef(
          <Box
             sx={isInDialog ? { padding: 0 } : [styles.root, scaledStyles]}
             ref={ref}
-            id="preview-content-box"
          >
             <Stack spacing={4.75}>
                <HeroContent
