@@ -1,5 +1,6 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { forwardRef, useMemo } from "react"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
@@ -53,11 +54,12 @@ const styles = sxStyles({
 type PreviewContentProps = {
    isInDialog: boolean
    handleCloseDialog?: () => void
-   scale: number
+   scale?: number
 }
 
 const PreviewContent = forwardRef(
    ({ isInDialog, handleCloseDialog, scale }: PreviewContentProps, ref) => {
+      const isMobile = useIsMobile()
       const theme = useTheme()
       const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
       const {
@@ -66,25 +68,29 @@ const PreviewContent = forwardRef(
       const { group } = useGroup()
       const hasJobs = false
 
-      const scaledStyles = useMemo(
-         () => ({
+      const scaledStyles = useMemo(() => {
+         if (!scale) return {}
+         return {
             transformOrigin: "top left",
             "-webkit-transform": `scale(${scale})`,
             "-moz-transform": `scale(${scale})`,
             "-o-transform": `scale(${scale})`,
             transform: `scale(${scale})`,
-         }),
-         [scale]
-      )
+         }
+      }, [scale])
 
       return (
-         <Box sx={!isInDialog && [styles.root, scaledStyles]} ref={ref}>
+         <Box
+            sx={isInDialog ? { padding: 0 } : [styles.root, scaledStyles]}
+            ref={ref}
+            id="preview-content-box"
+         >
             <Stack spacing={4.75}>
                <HeroContent
                   backgroundImage={general.backgroundImageUrl}
                   handleCloseDialog={handleCloseDialog}
                >
-                  <ShareButton />
+                  {!isMobile && <ShareButton />}
                   <Stack
                      alignItems="center"
                      justifyContent={"center"}
