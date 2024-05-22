@@ -1,5 +1,6 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { Form } from "formik"
 import { useMemo, useRef } from "react"
 import { useLivestreamCreationContext } from "../LivestreamCreationContext"
@@ -42,6 +43,7 @@ const getStyles = (columnWidth: string) =>
 
 const LivestreamForm = () => {
    const formContainerRef = useRef(null)
+   const isDesktop = !useIsMobile()
    const { tabValue } = useLivestreamCreationContext()
    const { scale, previewWidth } = usePreviewScale(formContainerRef)
 
@@ -57,11 +59,13 @@ const LivestreamForm = () => {
             )}
             {tabValue === TAB_VALUES.JOBS && <LivestreamFormJobsStep />}
          </Stack>
-         <Box sx={styles.previewContainer}>
-            <Box sx={styles.preview}>
-               <Preview scale={scale} />
+         {Boolean(isDesktop) && (
+            <Box sx={styles.previewContainer}>
+               <Box sx={styles.preview}>
+                  <Preview scale={scale} />
+               </Box>
             </Box>
-         </Box>
+         )}
       </Form>
    )
 }
