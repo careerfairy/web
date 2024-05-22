@@ -70,6 +70,8 @@ const csp = {
       "https://assets-global.website-files.com",
       "https://player.vimeo.com",
       "https://js.stripe.com",
+      "https://scripts.simpleanalyticscdn.com", // Google Ads services
+      "https://www.googleadservices.com", // Google Ads services
    ],
    "style-src": [
       "'self'",
@@ -115,6 +117,7 @@ const csp = {
       "https://px.ads.linkedin.com",
       "https://vimeo.com",
       "https://api.stripe.com",
+      "https://www.google.com", // Google Ads services
    ],
    "img-src": [
       "'self'",
@@ -140,6 +143,7 @@ const csp = {
       "https://cdn.embedly.com",
       "https://js.stripe.com",
       "https://hooks.stripe.com",
+      "https://td.doubleclick.net", // Google Ads services
    ],
    "font-src": [
       "'self'",
