@@ -3,9 +3,9 @@ import useSWRMutation from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 /**
- * Custom hook using SWR for managing the deletion of a livestream PDF presentation.
+ * Custom hook using SWR for managing the deletion of a live stream PDF presentation.
  *
- * @param {string} livestreamId - The ID of the livestream for which the presentation is to be deleted.
+ * @param {string} livestreamId - The ID of the live stream for which the presentation is to be deleted.
  * @returns An object containing the SWR response and a function to trigger the deletion.
  */
 export const useDeleteLivestreamPresentation = (livestreamId: string) => {

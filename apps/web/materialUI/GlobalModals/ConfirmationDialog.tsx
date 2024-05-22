@@ -106,7 +106,7 @@ type Props = {
    hideCloseIcon?: boolean
    handleClose?: () => void
    title: string
-   description: string | ReactNode
+   description?: string | ReactNode
    additionalContent?: ReactNode
    icon: ReactNode
    primaryAction: ConfirmationDialogAction
@@ -176,14 +176,16 @@ const ConfirmationDialog: FC<Props> = (props) => {
             )}
          </DialogTitle>
          <DialogContent sx={styles.content}>
-            <Typography
-               id="confirmation-dialog-description"
-               sx={styles.description}
-               variant="medium"
-               component={DialogContentText}
-            >
-               {description}
-            </Typography>
+            {Boolean(description) && (
+               <Typography
+                  id="confirmation-dialog-description"
+                  sx={styles.description}
+                  variant="medium"
+                  component={DialogContentText}
+               >
+                  {description}
+               </Typography>
+            )}
             {additionalContent}
          </DialogContent>
          <DialogActions sx={styles.actions}>
@@ -242,13 +244,15 @@ const MobileDrawer = ({
          {Boolean(handleClose && !hideCloseIcon) && (
             <CloseIconButton handleClose={handleClose} />
          )}
-         <Typography
-            id="confirmation-dialog-description"
-            sx={styles.description}
-            variant="medium"
-         >
-            {description}
-         </Typography>
+         {Boolean(description) && (
+            <Typography
+               id="confirmation-dialog-description"
+               sx={styles.description}
+               variant="medium"
+            >
+               {description}
+            </Typography>
+         )}
          {additionalContent}
          <Stack
             direction={{

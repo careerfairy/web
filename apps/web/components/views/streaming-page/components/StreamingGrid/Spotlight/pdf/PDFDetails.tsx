@@ -16,6 +16,7 @@ import {
    File as FileIcon,
 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { convertBytesToMB } from "util/CommonUtil"
 import { BrandedTooltip } from "../../../BrandedTooltip"
 import { PDFDetailsSkeleton } from "./PDFDetailsSkeleton"
 import { ProgressBar } from "./ProgressBar"
@@ -107,15 +108,13 @@ const getDetails = (data: File | LivestreamPresentation) => {
    if (data instanceof File) {
       return {
          fileName: data.name,
-         fileSize: data.size / 1024 / 1024,
+         fileSize: convertBytesToMB(data.size),
          downloadUrl: URL.createObjectURL(data),
       }
    } else {
       return {
          fileName: data.fileName,
-         fileSize: Number.isFinite(data.fileSize)
-            ? data.fileSize / 1024 / 1024
-            : 0,
+         fileSize: convertBytesToMB(data.fileSize),
          downloadUrl: data.downloadUrl,
       }
    }

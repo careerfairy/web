@@ -65,6 +65,7 @@ export const PDFUpload = forwardRef<HTMLDivElement, Props>(
                         <Typography
                            variant="medium"
                            marginBottom={1}
+                           textAlign="center"
                            color="neutral.600"
                         >
                            Choose a file or drag & drop it here

@@ -13,6 +13,7 @@ import {
 } from "@mui/material"
 import { useWindowSize } from "components/custom-hook/useWindowSize"
 
+import { STORAGE_PATHS } from "@careerfairy/shared-lib/constants/storagePaths"
 import Box from "@mui/material/Box"
 import makeStyles from "@mui/styles/makeStyles"
 import FilePickerContainer from "components/ssr/FilePickerContainer"
@@ -70,9 +71,9 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [livestreamId])
 
-   function uploadLogo(logoFile) {
+   function uploadPresentation(logoFile) {
       const getStoragePath = () => {
-         return "company_documents/" + livestreamId + ".pdf"
+         return `${STORAGE_PATHS.presentations}/${livestreamId}.pdf`
       }
 
       setLoading(true)
@@ -207,7 +208,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
       <FilePickerContainer
          extensions={["pdf"]}
          onChange={(fileObject) => {
-            uploadLogo(fileObject)
+            uploadPresentation(fileObject)
          }}
          maxSize={20}
          onError={(errMsg) => console.log(errMsg)}
@@ -242,7 +243,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
             <FilePickerContainer
                extensions={["pdf"]}
                onChange={(fileObject) => {
-                  uploadLogo(fileObject)
+                  uploadPresentation(fileObject)
                }}
                maxSize={20}
                onError={(errMsg) => console.log(errMsg)}

@@ -751,7 +751,7 @@ export type CategoryDataOption = {
 }
 
 /**
- * A PDF presentation for a livestream
+ * A PDF presentation for a live stream
  * Document Path: livestreams/{livestreamId}/presentations/presentation
  */
 export interface LivestreamPresentation extends Identifiable {
