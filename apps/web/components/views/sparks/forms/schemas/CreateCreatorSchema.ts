@@ -16,7 +16,7 @@ const CreateCreatorSchema = yup.object().shape({
    email: yup.string().email("Invalid email").required("Email is required"),
    linkedInUrl: yup
       .string()
-      .url("Must be a valid URL")
+      .url("Must be a valid URL (e.g.,: https://linkedin.com/in/user)")
       .matches(/(^$|linkedin.com)/, "Invalid LinkedIn URL"),
    story: yup.string().max(500, "Story must be less than 500 characters"),
 
