@@ -79,14 +79,22 @@ const CreatorFormDialog = ({
    } = useLivestreamFormValues()
 
    const onSuccessfulSubmit = (newCreator: Creator) => {
-      const updatedOptions = speakers.options.map((option) =>
-         option.id === newCreator.id
-            ? { ...newCreator, isCreator: true }
-            : option
-      )
-      const updatedValues = speakers.values.map((value) =>
-         value.id === newCreator.id ? newCreator : value
-      )
+      let updatedOptions: Creator[], updatedValues: Creator[]
+
+      if (isEdit) {
+         updatedOptions = speakers.options.map((option) =>
+            option.id === newCreator.id
+               ? { ...newCreator, isCreator: true }
+               : option
+         )
+
+         updatedValues = speakers.values.map((value) =>
+            value.id === newCreator.id ? newCreator : value
+         )
+      } else {
+         updatedOptions = [...speakers.options, newCreator]
+         updatedValues = [...speakers.values, newCreator]
+      }
 
       setFieldValue("speakers.options", updatedOptions)
       setFieldValue("speakers.values", updatedValues)
@@ -180,7 +188,7 @@ const CreatorFormDialog = ({
                                     name="linkedInUrl"
                                     type="text"
                                     label="LinkedIn link"
-                                    placeholder="E.g.,: linkedin.com/in/user"
+                                    placeholder="E.g.,: https://linkedin.com/in/user"
                                     autoComplete="url"
                                     fullWidth
                                  />
