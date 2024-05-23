@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
+import { Create, ImageType } from "../commonTypes"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import {
    CompanyFollowed,
@@ -12,12 +13,8 @@ import {
    UserAdminGroup,
    UserData,
 } from "../users"
-import {
-   AddCreatorData,
-   Creator,
-   CreatorRoles,
-   UpdateCreatorData,
-} from "./creators"
+import { containsAny } from "../utils/utils"
+import { AddCreatorData, Creator, UpdateCreatorData } from "./creators"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
 import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 import {
@@ -33,8 +30,6 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
-import { Create, ImageType } from "../commonTypes"
-import { containsAny } from "../utils/utils"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cloneDeep = require("lodash.clonedeep")
@@ -917,7 +912,7 @@ export class FirebaseGroupRepository
          id: creator.email, // We use the email as the id and not firestore's auto generated id
          documentType: "groupCreator",
          groupId,
-         roles: [CreatorRoles.Spark], // By default, all creators are sparks for now
+         roles: creator.roles,
       }
 
       const creatorRef = this.firestore
