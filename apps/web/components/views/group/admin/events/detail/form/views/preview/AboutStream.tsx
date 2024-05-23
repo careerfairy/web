@@ -67,17 +67,23 @@ const ReasonsToJoin = ({ reasonsToJoin }: ReasonToJoinProps) => {
          <LinkifyText>
             <Stack spacing={2.25} sx={styles}>
                {reasonsToJoin && reasonsToJoin.length > 0 ? (
-                  reasonsToJoin.map((reason) => (
-                     <Typography
-                        key={reason}
-                        sx={(styles.reasons, styles.reasonsContainer)}
-                     >
-                        <Check color="#29BAA5" style={styles.reasonsCheck} />{" "}
-                        {reason}
-                     </Typography>
-                  ))
+                  reasonsToJoin.map((reason, index) => {
+                     if (!reason || reason === "") {
+                        return <ReasonsToJoinSkeleton key={index} count={1} />
+                     }
+
+                     return (
+                        <Typography
+                           key={index}
+                           sx={(styles.reasons, styles.reasonsContainer)}
+                        >
+                           <Check color="#29BAA5" style={styles.reasonsCheck} />{" "}
+                           {reason}
+                        </Typography>
+                     )
+                  })
                ) : (
-                  <ReasonsToJoinSkeleton />
+                  <ReasonsToJoinSkeleton count={3} />
                )}
             </Stack>
          </LinkifyText>
@@ -99,12 +105,12 @@ const SummarySkeleton = () => {
    )
 }
 
-const ReasonsToJoinSkeleton = () => {
+const ReasonsToJoinSkeleton = ({ count }) => {
    return (
       <Typography width="100%" sx={styles.reasons}>
-         <StaticSkeleton height={35} />
-         <StaticSkeleton height={35} />
-         <StaticSkeleton height={35} />
+         {Array.from({ length: count }, (_, index) => (
+            <StaticSkeleton key={index} height={35} />
+         ))}
       </Typography>
    )
 }
