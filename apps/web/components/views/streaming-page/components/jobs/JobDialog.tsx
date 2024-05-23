@@ -149,13 +149,7 @@ const JobDialog = ({ job, handleDialogClose, livestreamId, open }: Props) => {
    }
 
    return (
-      <Dialog
-         open={open}
-         onClose={handleDialogClose}
-         maxWidth={"md"}
-         fullWidth
-         fullScreen={isMobile}
-      >
+      <Dialog open={open} onClose={handleDialogClose} maxWidth={"md"} fullWidth>
          <DialogTitle sx={styles.dialogTitle}>
             <Box sx={styles.title}>
                <IconButton
