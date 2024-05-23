@@ -163,9 +163,7 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    public userImplicitFollowedCompanies() {
       this.addImplicitResults(
          (implicitDataRepo) => {
-            const vals = implicitDataRepo.getFollowedCompanyIds()
-            console.log("🚀 ~ IMPLICIT FOLLOWED COMPANIES~ values:", vals)
-            return vals
+            return implicitDataRepo.getFollowedCompanyIds()
          },
          (values) => {
             const res = this.rankedLivestreamRepo.getEventsBasedOnCompanies(

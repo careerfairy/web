@@ -1,13 +1,18 @@
 import functions = require("firebase-functions")
 import { SchemaOf, array, mixed, number, object, string } from "yup"
 
-import { sparkRepo } from "./api/repositories"
+import { sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
 import { logAndThrow } from "./lib/validations"
 import { middlewares } from "./middlewares/middlewares"
 
 import { getCountryOptionByCountryCode } from "@careerfairy/shared-lib/constants/forms"
-import { GetFeedData } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   GetFeedData,
+   Spark,
+   sortSeenSparks,
+   sortSparksByIds,
+} from "@careerfairy/shared-lib/sparks/sparks"
 import {
    SparkClientEventsPayload,
    SparkEvent,
@@ -221,6 +226,30 @@ export const trackSparkSecondsWatched = functions
          }
       )
    )
+
+export const getUserWatchedSparks = async (
+   userEmail: string,
+   limit: number
+): Promise<Spark[]> => {
+   const seenSparks = await userRepo.getUserSeenSparks(userEmail)
+
+   if (!seenSparks) return []
+
+   const sparkIds = sortSeenSparks(seenSparks, limit)
+
+   const sparks = (await sparkRepo.getSparksByIds(sparkIds)) || []
+
+   // Re sort ensuring order stays the same after fetching data
+   const sortedSparks = sortSparksByIds(sparkIds, sparks)
+   console.log(
+      "🚀 ~ WATCHED SPARKS FOR :",
+      userEmail,
+      sortedSparks?.map((s) => s.id)
+   )
+
+   // Leaving const to allow debugging
+   return sortedSparks
+}
 
 /**
  * Converts a string timestamp to a Date object. If the string is not a valid timestamp, it falls back to the current time.

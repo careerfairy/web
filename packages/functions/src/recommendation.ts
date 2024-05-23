@@ -13,7 +13,7 @@ import { logAndThrow } from "./lib/validations"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
-import { getUserWatchedSparks } from "./sparks"
+import { getUserWatchedSparks } from "./userSparks"
 
 type GetUserImplicitDataSchema = {
    watchedEventsLimit: number
@@ -108,13 +108,11 @@ export const getUserImplicitData = functions
                ] = await Promise.all(promises)
 
                return {
-                  watchedLivestreams:
-                     interactedEvents as unknown as LivestreamEvent[],
-                  watchedSparks: (watchedSparks as unknown as Spark[]) || [],
-                  appliedJobs:
-                     (appliedJobs as unknown as CustomJobApplicant[]) || [],
+                  watchedLivestreams: interactedEvents as LivestreamEvent[],
+                  watchedSparks: (watchedSparks as Spark[]) || [],
+                  appliedJobs: (appliedJobs as CustomJobApplicant[]) || [],
                   followedCompanies:
-                     (followedCompanies as unknown as CompanyFollowed[]) || [],
+                     (followedCompanies as CompanyFollowed[]) || [],
                }
             } catch (error) {
                logAndThrow(

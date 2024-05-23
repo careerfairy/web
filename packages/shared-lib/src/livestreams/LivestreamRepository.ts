@@ -1503,7 +1503,6 @@ export class FirebaseLivestreamRepository
       const promises = chunks.map(async (chunk) => {
          const batch = this.firestore.batch()
          chunk.forEach((doc) => {
-            // TODO: Check if ok, since it should be from all livestream groups
             const metadataFromHost = getMetaDataFromEventHosts([group])
             const toUpdate: MetaData = {
                companyCountries: metadataFromHost.companyCountries,
@@ -1537,11 +1536,12 @@ export class FirebaseLivestreamRepository
 
       const snap = await query.get()
 
-      return (
+      const userStreamDataWithoutIgnoredStreams =
          mapFirestoreDocuments<UserLivestreamData>(snap)?.filter((data) => {
             return !ignoreIds?.includes(data.livestreamId)
-         }) || []
-      )
+         })
+
+      return userStreamDataWithoutIgnoredStreams || []
    }
 
    async getUserRecordingStats(
@@ -1556,14 +1556,14 @@ export class FirebaseLivestreamRepository
       const data = await query.get()
       const recordingStatsData = mapFirestoreDocuments<RecordingStatsUser>(data)
 
-      const recordingStats = recordingStatsData ? recordingStatsData : []
+      const recordingStats = recordingStatsData ?? []
 
       if (!unique) return recordingStats
       // Filtering the results, to only consider the more recent hourly watched recording
-      // Meaning if a user has watched multiple recordings for the same livestream in several hours
+      // Meaning if a user has watched multiple recordings for the same live stream in several hours
       // only the last hour data will be considered
       const filteredStats = recordingStats.filter((stat) => {
-         // Find other recording stats for the same user and livestream
+         // Find other recording stats for the same user and live stream
          const otherHourViews = recordingStats.filter((recordingStat) => {
             return (
                recordingStat.userId == stat.userId &&

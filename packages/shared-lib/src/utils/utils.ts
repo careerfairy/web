@@ -352,16 +352,17 @@ export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
 }
 
 /**
- * Returns the difference between two arrays as a new array, containing only the differing elements.
- * @param array1 Base array for difference
- * @param array2 Comparison array to be used against @param array1 (Base) for differences
- * @returns New array containing only differing elements
+ * Returns a new sorted array taken into consideration an index getter function. The items position
+ * are determined by the number value returned by @param getIndexOf.
+ * @param array Base array for sorting
+ * @param getIndexOf Function which receives an item and returns its supposed index
+ * @returns New sorted array
  */
 export const arraySortByIndex = <T>(
-   array2: T[],
+   array: T[],
    getIndexOf: (item: T) => number
 ): T[] => {
-   const sortedItems = array2.sort((baseItem, comparisonItem) => {
+   const sortedItems = array.sort((baseItem, comparisonItem) => {
       const baseSortedIndex = getIndexOf(baseItem)
       const comparisonSortedIndex = getIndexOf(comparisonItem)
 
