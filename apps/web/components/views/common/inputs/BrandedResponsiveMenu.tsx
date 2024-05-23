@@ -102,27 +102,16 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
       >
          <List>
             {options.map((option, index) => {
-               if (option.wrapperComponent) {
-                  const WrapperComponent = option.wrapperComponent
-                  return (
-                     <Fragment key={index}>
-                        {index !== 0 && <Divider sx={styles.listItemDivider} />}
-                        <WrapperComponent>
-                           <MobileMenuItem
-                              option={option}
-                              handleClose={handleClose}
-                           />
-                        </WrapperComponent>
-                     </Fragment>
-                  )
-               }
+               const WrapperComponent = option.wrapperComponent || Fragment
                return (
                   <Fragment key={index}>
                      {index !== 0 && <Divider sx={styles.listItemDivider} />}
-                     <MobileMenuItem
-                        option={option}
-                        handleClose={handleClose}
-                     />
+                     <WrapperComponent>
+                        <MobileMenuItem
+                           option={option}
+                           handleClose={handleClose}
+                        />
+                     </WrapperComponent>
                   </Fragment>
                )
             })}
@@ -177,29 +166,17 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
          }}
       >
          {options.map((option, index) => {
-            if (option.wrapperComponent) {
-               const WrapperComponent = option.wrapperComponent
-               return (
-                  <Box key={index}>
-                     <WrapperComponent>
-                        <DesktopMenuItem
-                           option={option}
-                           handleClose={handleClose}
-                           singleOption={options.length == 1}
-                           hasDivider={index !== options.length - 1}
-                        />
-                     </WrapperComponent>
-                  </Box>
-               )
-            }
+            const WrapperComponent = option.wrapperComponent || Fragment
             return (
                <Box key={index}>
-                  <DesktopMenuItem
-                     option={option}
-                     handleClose={handleClose}
-                     singleOption={options.length == 1}
-                     hasDivider={index !== options.length - 1}
-                  />
+                  <WrapperComponent>
+                     <DesktopMenuItem
+                        option={option}
+                        handleClose={handleClose}
+                        singleOption={options.length == 1}
+                        hasDivider={index !== options.length - 1}
+                     />
+                  </WrapperComponent>
                </Box>
             )
          })}
@@ -255,7 +232,12 @@ const Loader = () => {
    return <CircularProgress sx={styles.loader} size={LOADER_SIZE} />
 }
 
-const MobileMenuItem = ({ option, handleClose }) => {
+type MobileMenuItemProps = {
+   option: MenuOption
+   handleClose: () => void
+}
+
+const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
    return (
       <ListItemButton
          onClick={async (args) => {
@@ -283,7 +265,19 @@ const MobileMenuItem = ({ option, handleClose }) => {
    )
 }
 
-const DesktopMenuItem = ({ option, handleClose, singleOption, hasDivider }) => {
+type DesktopMenuItemProps = {
+   option: MenuOption
+   handleClose: () => void
+   singleOption: boolean
+   hasDivider: boolean
+}
+
+const DesktopMenuItem: FC<DesktopMenuItemProps> = ({
+   option,
+   handleClose,
+   singleOption,
+   hasDivider,
+}) => {
    return (
       <MenuItem
          onClick={async (args) => {
