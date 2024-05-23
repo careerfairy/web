@@ -1,4 +1,5 @@
 import { CustomJobStats } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useGroupCustomJobsStats from "../../../../custom-hook/custom-job/useGroupCustomJobsStats"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import EmptyJobsView from "../../../admin/jobs/empty-jobs-view/EmptyJobsView"
@@ -6,10 +7,13 @@ import JobList from "./JobList"
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
-   const allJobsWithStats = sortJobs(useGroupCustomJobsStats(group.groupId))
+   const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
+   const { newJobHub } = useFeatureFlags()
+
+   const sortedJobs = newJobHub ? sortJobs(allJobsWithStats) : allJobsWithStats
 
    return allJobsWithStats.length > 0 ? (
-      <JobList jobsWithStats={allJobsWithStats} />
+      <JobList jobsWithStats={sortedJobs} />
    ) : (
       <EmptyJobsView />
    )
@@ -27,18 +31,18 @@ export default JobsContent
 const sortJobs = (jobs: CustomJobStats[]): CustomJobStats[] => {
    const now = new Date()
 
-   return jobs.sort(({ job: a }, { job: b }) => {
+   return jobs.sort(({ job: jobA }, { job: jobB }) => {
       // Sort by 'published' flag
-      if (a.published && !b.published) {
+      if (jobA.published && !jobB.published) {
          return -1
       }
-      if (!a.published && b.published) {
+      if (!jobA.published && jobB.published) {
          return 1
       }
 
       // Both have the same 'published' status, so sort by 'deadline'
-      const aDeadlineValid = a.deadline.toDate() > now
-      const bDeadlineValid = b.deadline.toDate() > now
+      const aDeadlineValid = jobA.deadline.toDate() > now
+      const bDeadlineValid = jobB.deadline.toDate() > now
 
       if (aDeadlineValid && !bDeadlineValid) {
          return -1
