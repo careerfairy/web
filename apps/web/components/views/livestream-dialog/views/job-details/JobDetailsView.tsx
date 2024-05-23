@@ -3,7 +3,7 @@ import {
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Grid, Typography } from "@mui/material"
+import { ButtonProps, Grid, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
@@ -230,13 +230,14 @@ type JobButtonProps = {
    livestreamId: string
    isSecondary?: boolean
    handleOpen: () => void
-}
+} & ButtonProps
 
 export const JobButton: FC<JobButtonProps> = ({
    job,
    livestreamId,
    isSecondary = false,
    handleOpen,
+   ...props
 }) => {
    const isAtsJob = useIsAtsJob(job)
    const { isLoggedOut } = useAuth()
@@ -249,6 +250,7 @@ export const JobButton: FC<JobButtonProps> = ({
                   livestreamId={livestreamId}
                   job={job as Job}
                   isSecondary={isSecondary}
+                  {...props}
                />
             )
          ) : (
@@ -257,6 +259,7 @@ export const JobButton: FC<JobButtonProps> = ({
                job={job as PublicCustomJob}
                handleClick={handleOpen}
                isSecondary={isSecondary}
+               {...props}
             />
          )}
       </>
