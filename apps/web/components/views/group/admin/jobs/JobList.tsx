@@ -218,13 +218,14 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                               sx={styles.infoWrapper}
                            >
                               <Box sx={styles.mobileHeader}>
-                                 <Grid item display={"flex"} xs={10} md={12}>
+                                 <Grid item display={"flex"} xs={11} md={12}>
                                     <Typography
                                        variant={"h5"}
                                        sx={styles.title}
                                     >
                                        {job.title}
                                     </Typography>
+
                                     {newJobHub &&
                                     isValidButNoLinkedContent(job) ? (
                                        <Tooltip
@@ -250,9 +251,8 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                  </Grid>
 
                                  {isMobile ? (
-                                    <Grid display={"flex"} item xs={2} md={0}>
-                                       {" "}
-                                       <JobMenu jobId={job.id} />{" "}
+                                    <Grid item xs={1} height={25}>
+                                       <JobMenu jobId={job.id} />
                                     </Grid>
                                  ) : null}
                               </Box>
