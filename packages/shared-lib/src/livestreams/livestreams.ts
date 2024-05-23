@@ -416,6 +416,7 @@ export interface Speaker extends Identifiable {
    position?: string
    rank?: number
    email?: string
+   linkedInUrl?: string
 }
 
 export interface LiveSpeaker extends Identifiable {
