@@ -1,4 +1,8 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   Creator,
+   CreatorRole,
+   CreatorRoles,
+} from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -247,6 +251,16 @@ const CreatorFormDialog = ({
    )
 }
 
+const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
+   if (!creator || creator?.roles?.length === 0) {
+      return [CreatorRoles.Speaker]
+   }
+   const hasSpeakerRole = creator.roles?.includes(CreatorRoles.Speaker)
+   return hasSpeakerRole
+      ? creator.roles
+      : [...creator.roles, CreatorRoles.Speaker]
+}
+
 const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
@@ -257,6 +271,7 @@ const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    story: creator?.story || "",
    email: creator?.email || "",
    id: creator?.id || "",
+   roles: getInitialRolesValues(creator),
 })
 
 export default CreatorFormDialog
