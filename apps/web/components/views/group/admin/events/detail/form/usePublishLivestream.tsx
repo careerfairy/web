@@ -1,4 +1,3 @@
-import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useGroup } from "layouts/GroupDashboardLayout"
@@ -38,13 +37,6 @@ export const usePublishLivestream = () => {
       livestreamObject.questionsDisabled = false
       livestreamObject.denyRecordingAccess = false
       livestreamObject.type = "upcoming"
-
-      const metaData = getMetaDataFromEventHosts(values.questions.hosts)
-      if (metaData) {
-         livestreamObject.companySizes = metaData.companySizes
-         livestreamObject.companyIndustries = metaData.companyIndustries
-         livestreamObject.companyCountries = metaData.companyCountries
-      }
 
       const ratings = values.questions.feedbackQuestions
          .filter(
