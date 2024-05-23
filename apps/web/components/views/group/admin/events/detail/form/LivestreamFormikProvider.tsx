@@ -87,7 +87,7 @@ const mapSpeakerToCreator = (speaker: Speaker): Creator => {
       avatarUrl: speaker.avatar || null,
       createdAt: null,
       updatedAt: null,
-      linkedInUrl: "",
+      linkedInUrl: speaker.linkedInUrl || "",
       story: speaker.background || null,
       roles: [CreatorRoles.Speaker],
    }
