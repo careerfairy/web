@@ -46,7 +46,7 @@ type SpeakersProps = {
 }
 
 const Speakers = ({ speakers }: SpeakersProps) => {
-   if (!speakers) {
+   if (!speakers || speakers.length === 0) {
       return <SpeakersSkeleton />
    }
 
