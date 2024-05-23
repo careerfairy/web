@@ -4,6 +4,7 @@ import { UserData } from "../../users"
 import { Logger } from "../../utils/types"
 import { sortDocumentByPopularity } from "../../utils/utils"
 import { sortRankedByPoints } from "../utils"
+import { ImplicitLivestreamRecommendationData } from "./ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./services/UserBasedRecommendationsBuilder"
@@ -128,8 +129,13 @@ export default class RecommendationServiceCore {
    protected getRecommendedEventsBasedOnUserData(
       userData: UserData,
       livestreams: LivestreamEvent[],
-      limit: number
+      limit: number,
+      implicitData?: ImplicitLivestreamRecommendationData // TODO: Use implicit data for implicit data usage in recommendation
    ): RankedLivestreamEvent[] {
+      this.log.info(
+         "🚀 ~ RecommendationServiceCore ~ implicitData:",
+         implicitData
+      )
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          userData,
