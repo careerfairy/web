@@ -4,7 +4,7 @@ import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { PublicCustomJob } from "../customJobs/customJobs"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Group, GroupQuestion } from "../groups"
-import { Creator } from "../groups/creators"
+import { Creator, CreatorRole } from "../groups/creators"
 import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
@@ -417,6 +417,7 @@ export interface Speaker extends Identifiable {
    rank?: number
    email?: string
    linkedInUrl?: string
+   roles: CreatorRole[]
 }
 
 export interface LiveSpeaker extends Identifiable {
