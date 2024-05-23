@@ -2,10 +2,18 @@ import {
    CustomJob,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, Divider, Grid, ListItem, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Divider,
+   Grid,
+   ListItem,
+   Stack,
+   Tooltip,
+   Typography,
+} from "@mui/material"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
-import { CheckCircle, User } from "react-feather"
+import { AlertCircle, CheckCircle, User } from "react-feather"
 import DateUtil from "util/DateUtil"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
@@ -23,6 +31,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       width: "100%",
+      maxWidth: "calc(100% - 8px)",
       p: { md: 3 },
       borderRadius: "0 16px 16px 0",
       background: "white",
@@ -40,6 +49,9 @@ const styles = sxStyles({
       color: "text.primary",
       fontWeight: "bold",
       fontSize: "20px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
       px: { xs: 1, md: 0 },
    },
    subtitle: {
@@ -141,6 +153,14 @@ const styles = sxStyles({
       flexDirection: "row",
       width: "100%",
    },
+   tooltip: {
+      width: "202px",
+      px: 2,
+   },
+   warningAlert: {
+      ml: 2,
+      color: (theme) => theme.palette.warning["600"],
+   },
 })
 
 type Props = {
@@ -163,6 +183,8 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
       [jobsWithStats]
    )
 
+   const newJobHub = group.newJobHub
+
    return (
       <Box sx={styles.wrapper}>
          <Stack spacing={2} sx={styles.searchWrapper}>
@@ -179,12 +201,14 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                >
                   <Grid key={job.id} container>
                      <Box sx={styles.listItemContainer}>
-                        <Box
-                           sx={[
-                              styles.jobState,
-                              { background: getStateColor(job) },
-                           ]}
-                        />
+                        {newJobHub ? (
+                           <Box
+                              sx={[
+                                 styles.jobState,
+                                 { background: getStateColor(job) },
+                              ]}
+                           />
+                        ) : null}
                         <Box sx={styles.itemWrapper}>
                            <Grid
                               item
@@ -194,12 +218,43 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                               sx={styles.infoWrapper}
                            >
                               <Box sx={styles.mobileHeader}>
-                                 <Typography variant={"h5"} sx={styles.title}>
-                                    {" "}
-                                    {job.title}{" "}
-                                    {job.deadline.toDate().toDateString()}
-                                 </Typography>
-                                 {isMobile ? <JobMenu jobId={job.id} /> : null}
+                                 <Grid item display={"flex"} xs={10} md={12}>
+                                    <Typography
+                                       variant={"h5"}
+                                       sx={styles.title}
+                                    >
+                                       {job.title}
+                                    </Typography>
+                                    {newJobHub &&
+                                    isValidButNoLinkedContent(job) ? (
+                                       <Tooltip
+                                          title={
+                                             <Typography sx={styles.subtitle}>
+                                                No content linked to this job
+                                                opening
+                                             </Typography>
+                                          }
+                                          placement="top"
+                                          componentsProps={{
+                                             tooltip: {
+                                                sx: styles.tooltip,
+                                             },
+                                          }}
+                                       >
+                                          <Box
+                                             component={AlertCircle}
+                                             sx={styles.warningAlert}
+                                          />
+                                       </Tooltip>
+                                    ) : null}
+                                 </Grid>
+
+                                 {isMobile ? (
+                                    <Grid display={"flex"} item xs={2} md={0}>
+                                       {" "}
+                                       <JobMenu jobId={job.id} />{" "}
+                                    </Grid>
+                                 ) : null}
                               </Box>
 
                               <Stack
@@ -332,12 +387,22 @@ const getStateColor = (job: CustomJob): string => {
       return "#7FD6C9"
    }
 
-   const jobHasNoContent = job.livestreams.length == 0 && job.sparks.length == 0
-
    // Job has no content associated to it and it's not expired
-   if (jobHasNoContent && !DateUtil.isDeadlineExpired(job.deadline.toDate())) {
+   if (isValidButNoLinkedContent(job)) {
       return "#FE9B0E"
    } else {
       return "#E1E1E1"
    }
+}
+
+/**
+ * Checks if a job has no linked content (livestreams or sparks) and if its deadline has not expired.
+ *
+ * @param job {CustomJob}
+ * @returns {boolean}
+ */
+const isValidButNoLinkedContent = (job: CustomJob): boolean => {
+   const jobHasNoContent = job.livestreams.length == 0 && job.sparks.length == 0
+
+   return jobHasNoContent && !DateUtil.isDeadlineExpired(job.deadline.toDate())
 }
