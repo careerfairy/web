@@ -1,9 +1,9 @@
-import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
-import { convertDictToDocArray } from "../BaseFirebaseRepository"
-import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
-import { UserData } from "../users"
+import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
+import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
+import { UserData } from "../users"
+import { dynamicSort } from "../utils"
 
 // CareerCenterData collection
 export interface Group extends Identifiable {
@@ -75,6 +75,11 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+
+   /**
+    *
+    */
+   newJobHub?: boolean
 }
 
 /**

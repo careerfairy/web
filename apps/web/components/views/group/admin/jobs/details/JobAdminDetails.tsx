@@ -82,12 +82,6 @@ const styles = sxStyles({
    },
 })
 
-enum TabsEnum {
-   APPLICATION = 0,
-   LINKED_CONTENT = 1,
-   JOB_POSTING = 2,
-}
-
 type Props = {
    job: CustomJob
 }
@@ -96,6 +90,14 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
+
+   const newJobHub = group.newJobHub
+
+   enum TabsEnum {
+      APPLICATION = 0,
+      LINKED_CONTENT = newJobHub ? 1 : -1,
+      JOB_POSTING = newJobHub ? 2 : 1,
+   }
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -107,12 +109,12 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-   const jobHasNoContent = Boolean(
-      job.livestreams.length == 0 && job.sparks.length == 0
-   )
+   const jobHasNoContent = newJobHub
+      ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
+      : false
 
-   const tabs = useMemo(
-      () => [
+   const tabs = useMemo(() => {
+      const tabs = [
          {
             label: "Applicants",
             component: () =>
@@ -122,7 +124,10 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
-         {
+      ]
+
+      if (newJobHub) {
+         tabs.push({
             label: "Linked content",
             component: () =>
                jobHasNoContent ? (
@@ -130,14 +135,16 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                ) : (
                   <LinkedContent job={job} />
                ),
-         },
-         {
-            label: "Job Opening",
-            component: () => <JobPosting job={job} group={group} />,
-         },
-      ],
-      [allowToDisplayApplicantsData, group, job, jobHasNoContent]
-   )
+         })
+      }
+
+      tabs.push({
+         label: "Job Opening",
+         component: () => <JobPosting job={job} group={group} />,
+      })
+
+      return tabs
+   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, newJobHub])
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
@@ -179,7 +186,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                      <Typography
                         sx={{
                            ...styles.tabsLabel,
-                           ...(activeTabIndex === 0 && styles.activeTab),
+                           ...(activeTabIndex === TabsEnum.APPLICATION &&
+                              styles.activeTab),
                         }}
                      >
                         Applicants
@@ -195,32 +203,39 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   </Box>
                }
             />
-            <Tab
-               key={"Linked content"}
-               label={
-                  <Box sx={styles.applicantsTab}>
-                     <Typography
-                        sx={{
-                           ...styles.tabsLabel,
-                           ...(activeTabIndex === 1 && styles.activeTab),
-                           ...(jobHasNoContent && styles.warningTab),
-                        }}
-                     >
-                        Linked content
-                     </Typography>
-                     {jobHasNoContent ? (
-                        <Box component={AlertCircle} sx={styles.warningAlert} />
-                     ) : null}
-                  </Box>
-               }
-            />
+            {newJobHub ? (
+               <Tab
+                  key={"Linked content"}
+                  label={
+                     <Box sx={styles.applicantsTab}>
+                        <Typography
+                           sx={{
+                              ...styles.tabsLabel,
+                              ...(activeTabIndex === TabsEnum.LINKED_CONTENT &&
+                                 styles.activeTab),
+                              ...(jobHasNoContent && styles.warningTab),
+                           }}
+                        >
+                           Linked content
+                        </Typography>
+                        {jobHasNoContent ? (
+                           <Box
+                              component={AlertCircle}
+                              sx={styles.warningAlert}
+                           />
+                        ) : null}
+                     </Box>
+                  }
+               />
+            ) : null}
             <Tab
                key={"Job posting"}
                label={
                   <Typography
                      sx={{
                         ...styles.tabsLabel,
-                        ...(activeTabIndex === 2 && styles.activeTab),
+                        ...(activeTabIndex === TabsEnum.JOB_POSTING &&
+                           styles.activeTab),
                      }}
                   >
                      Job posting
