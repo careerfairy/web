@@ -10,18 +10,11 @@ import BrandedResponsiveMenu, {
 } from "components/views/common/inputs/BrandedResponsiveMenu"
 import { useRouter } from "next/router"
 import { FC, useState } from "react"
-import { Trash2 as DeleteIcon } from "react-feather"
+import { Trash2 as DeleteIcon, Eye } from "react-feather"
 
 import useDeleteCV from "components/custom-hook/user/useDeleteCV"
-import { UserDataEntry } from "components/views/group/admin/common/table/UserLivestreamDataTable"
-import { useDownloadCV } from "components/views/group/admin/common/table/hooks"
 import { CircularButton } from "components/views/streaming-page/components/TopBar/CircularButton"
-import {
-   CheckCircle,
-   DownloadCloud,
-   FileText,
-   UploadCloud,
-} from "react-feather"
+import { CheckCircle, FileText, UploadCloud } from "react-feather"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
@@ -40,6 +33,8 @@ const styles = sxStyles({
       alignItems: "center",
       border: `1px solid ${theme.palette.neutral[200]}`,
       color: theme.brand.black["700"],
+      height: "auto",
+      width: "auto",
    }),
    dragActive: {
       backgroundColor: (theme) => alpha(theme.palette.secondary.main, 0.2),
@@ -47,6 +42,7 @@ const styles = sxStyles({
    },
    menuOption: {
       color: (theme) => theme.palette.neutral[700],
+      textDecoration: "none",
    },
    deleteOption: {
       color: "error.main",
@@ -130,11 +126,6 @@ const UploadCVButton: FC<{ isSecondary: boolean }> = ({ isSecondary }) => {
 const ManageCVButton = () => {
    const { userData } = useAuth()
    const { anchorEl, handleClick, handleClose } = useMenuState()
-   const { handleDownloadCV, downloadingPDF } = useDownloadCV({
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      resumeUrl: userData.userResume,
-   } as UserDataEntry)
    const { fileUploaderProps, dragActive, isLoading } = useUploadCV({
       onSuccess: handleClose,
    })
@@ -146,13 +137,20 @@ const ManageCVButton = () => {
 
    const options: MenuOption[] = [
       {
-         label: "Download your CV",
-         icon: <DownloadCloud />,
-         handleClick: () => {
-            handleDownloadCV()
-         },
+         label: "View current CV",
+         icon: <Eye />,
+         handleClick: () => {},
          menuItemSxProps: [styles.menuOption],
-         loading: downloadingPDF,
+         wrapperComponent: ({ children, ...props }) => (
+            <Link
+               href={userData.userResume}
+               target="_blank"
+               sx={styles.menuOption}
+               {...props}
+            >
+               {children}
+            </Link>
+         ),
       },
       {
          label: "Upload new CV",
