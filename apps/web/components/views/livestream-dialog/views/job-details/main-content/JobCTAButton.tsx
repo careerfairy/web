@@ -47,6 +47,9 @@ const styles = sxStyles({
    deleteOption: {
       color: "error.main",
    },
+   overflow: {
+      overflow: "auto",
+   },
 })
 
 type Props = {
@@ -107,7 +110,7 @@ const UploadCVButton: FC<{ isSecondary: boolean }> = ({ isSecondary }) => {
    return (
       <FileUploader
          {...fileUploaderProps}
-         sx={[dragActive && styles.dragActive]}
+         sx={[dragActive && styles.dragActive, styles.overflow]}
       >
          <LoadingButton
             disabled={isLoading}
