@@ -136,7 +136,9 @@ const NextLiveStreamsWithFilter = ({
                (id) => allFieldsOfStudy?.some((item) => item.id === id) || false
             ),
             languageCode: languages,
+            ...(companyId && { groupIds: [companyId] }),
          },
+
          booleanFilters: {
             denyRecordingAccess,
             hidden: false,
@@ -152,6 +154,7 @@ const NextLiveStreamsWithFilter = ({
          companyIndustries,
          fieldsOfStudy,
          languages,
+         companyId,
          denyRecordingAccess,
          initialTabValue,
          hasPastEvents,
