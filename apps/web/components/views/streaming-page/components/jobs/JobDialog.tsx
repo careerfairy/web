@@ -109,6 +109,7 @@ const styles = sxStyles({
       gap: 1.25,
       textWrap: "noWrap",
       minWidth: "fit-content",
+      alignItems: "center",
    },
    drawer: {
       borderRadius: "12px 12px 0 0",
