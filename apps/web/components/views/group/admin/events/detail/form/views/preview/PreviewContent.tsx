@@ -13,7 +13,6 @@ import HostInfo from "./HostInfo"
 import Jobs from "./Jobs"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import LivestreamTitle from "./LivestreamTitle"
-import Questions from "./Questions"
 import Section from "./Section"
 import ShareButton from "./ShareButton"
 import Speakers from "./Speakers"
@@ -44,6 +43,7 @@ const styles = sxStyles({
       fontWeight: 600,
       color: "#000",
       textTransform: "none",
+      cursor: "initial",
    },
    mainContent: {
       px: 2,
@@ -66,7 +66,7 @@ const PreviewContent = forwardRef(
          values: { general, speakers, jobs },
       } = useLivestreamFormValues()
       const { group } = useGroup()
-      const hasJobs = false
+      const hasJobs = jobs.customJobs.length > 0
 
       const scaledStyles = useMemo(() => {
          if (!scale) return {}
@@ -122,10 +122,23 @@ const PreviewContent = forwardRef(
                      variant={centeredNav ? "standard" : "scrollable"}
                      value={Boolean(isInDialog) && 0}
                   >
-                     <Tab sx={styles.tab} label={"Linked jobs"} value={0} />
-                     <Tab sx={styles.tab} label={"About The Live Stream"} />
-                     <Tab sx={styles.tab} label={"About The Company"} />
-                     <Tab sx={styles.tab} label={"Questions"} />
+                     <Tab
+                        disableRipple
+                        sx={styles.tab}
+                        label={"Linked jobs"}
+                        value={0}
+                     />
+                     <Tab
+                        disableRipple
+                        sx={styles.tab}
+                        label={"About The Live Stream"}
+                     />
+                     <Tab
+                        disableRipple
+                        sx={styles.tab}
+                        label={"About The Company"}
+                     />
+                     <Tab disableRipple sx={styles.tab} label={"Questions"} />
                   </Tabs>
                </Box>
                <Box sx={styles.mainContent}>
@@ -151,9 +164,6 @@ const PreviewContent = forwardRef(
                         companyLogoUrl={general.companyLogoUrl}
                         companyName={general.company}
                      />
-                  </Section>
-                  <Section>
-                     <Questions companyName={general.company} />
                   </Section>
                </Box>
             </Stack>
