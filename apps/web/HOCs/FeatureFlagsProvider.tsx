@@ -7,6 +7,7 @@ type FlagKeys =
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
    | "livestreamCreationFlowV2"
+   | "newJobHub"
 
 const testGoups = ["rTUGXDAG2XAtpVcgvAcc", "qENR2aNDhehkLDYryTRN"]
 
@@ -64,6 +65,13 @@ export const flagsInitialState = {
     */
    livestreamCreationFlowV2: {
       enabled: true,
+   },
+   /**
+    * New Job hub implementation
+    * Hide or Show
+    */
+   newJobHub: {
+      enabled: false,
    },
 } satisfies Record<FlagKeys, FeatureFlag>
 

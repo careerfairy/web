@@ -3,6 +3,7 @@ import ChevronLeft from "@mui/icons-material/ChevronLeft"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { AlertCircle } from "react-feather"
@@ -90,14 +91,16 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
+   const { newJobHub } = useFeatureFlags()
 
-   const newJobHub = group.newJobHub
-
-   enum TabsEnum {
-      APPLICATION = 0,
-      LINKED_CONTENT = newJobHub ? 1 : -1,
-      JOB_POSTING = newJobHub ? 2 : 1,
-   }
+   const TabsEnum = useMemo(
+      () => ({
+         APPLICATION: 0,
+         LINKED_CONTENT: newJobHub ? 1 : -1,
+         JOB_POSTING: newJobHub ? 2 : 1,
+      }),
+      [newJobHub]
+   )
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
 
@@ -124,25 +127,24 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
+         ...(newJobHub
+            ? [
+                 {
+                    label: "Linked content",
+                    component: () =>
+                       jobHasNoContent ? (
+                          <PendingContent job={job} group={group} />
+                       ) : (
+                          <LinkedContent job={job} />
+                       ),
+                 },
+              ]
+            : []),
+         {
+            label: "Job Opening",
+            component: () => <JobPosting job={job} group={group} />,
+         },
       ]
-
-      if (newJobHub) {
-         tabs.push({
-            label: "Linked content",
-            component: () =>
-               jobHasNoContent ? (
-                  <PendingContent job={job} group={group} />
-               ) : (
-                  <LinkedContent job={job} />
-               ),
-         })
-      }
-
-      tabs.push({
-         label: "Job Opening",
-         component: () => <JobPosting job={job} group={group} />,
-      })
-
       return tabs
    }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, newJobHub])
 

@@ -11,6 +11,7 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
 import { AlertCircle, CheckCircle, User } from "react-feather"
@@ -170,6 +171,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
+   const { newJobHub } = useFeatureFlags()
 
    const handleJobClick = useCallback(
       (jobId: string) => {
@@ -182,8 +184,6 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
       () => jobsWithStats.map((jobWithStats) => jobWithStats.job),
       [jobsWithStats]
    )
-
-   const newJobHub = group.newJobHub
 
    return (
       <Box sx={styles.wrapper}>
