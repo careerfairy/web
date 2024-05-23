@@ -1,6 +1,6 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, ButtonBase, Stack, Typography } from "@mui/material"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import { useCallback } from "react"
 import { Briefcase } from "react-feather"
@@ -17,6 +17,9 @@ const styles = sxStyles({
       border: `1px solid ${theme.brand.white[500]}`,
       background: theme.brand.white[100],
       overflow: "hidden",
+      width: "100%",
+      textAlign: "left",
+      font: "inherit",
    }),
    jobCardSide: {
       width: "8px",
@@ -72,8 +75,7 @@ const styles = sxStyles({
       overflow: "hidden",
       textAlign: "right",
       textOverflow: "ellipsis",
-      bgcolor: "transparent !important",
-      padding: 0,
+      color: (theme) => theme.palette.primary.main,
    },
 })
 
@@ -106,7 +108,7 @@ const JobCard = ({ job, handleSelectJob }: Props) => {
    }, [handleSelectJob, job, jobName])
 
    return (
-      <Box sx={styles.jobCard}>
+      <ButtonBase onClick={handleClick} sx={styles.jobCard}>
          <Box sx={styles.jobCardSide} />
          <Box sx={styles.jobInfo}>
             <Stack spacing={1}>
@@ -139,19 +141,14 @@ const JobCard = ({ job, handleSelectJob }: Props) => {
                         Apply until {jobDeadline}
                      </Typography>
                   ) : null}
-                  <Button
-                     variant="text"
-                     color="primary"
-                     sx={styles.seeMore}
-                     disableTouchRipple
-                     onClick={handleClick}
-                  >
-                     <Typography variant="xsmall">See more</Typography>
-                  </Button>
+
+                  <Typography sx={styles.seeMore} variant="xsmall">
+                     See more
+                  </Typography>
                </Box>
             </Stack>
          </Box>
-      </Box>
+      </ButtonBase>
    )
 }
 
