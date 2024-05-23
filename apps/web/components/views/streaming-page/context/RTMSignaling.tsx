@@ -3,7 +3,6 @@ import AgoraRTM, { RtmChannel, RtmClient } from "agora-rtm-sdk"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
 import { useForcedProxyMode } from "components/custom-hook/streaming/useForcedProxyMode"
-import { EmoteType } from "context/agora/RTMContext"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
@@ -88,23 +87,6 @@ export const RTMSignalingProvider = ({
          }
       }
    }, [login, logout, token])
-
-   /**
-    * For demo purposes, will be moved to the emotes button
-    */
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const sendEmote = async (emoteType: EmoteType) => {
-      const message = rtmState?.client.createMessage({
-         text: emoteType,
-         messageType: "TEXT",
-      })
-      // 1. Optimistically dispatch emote locally to the UI
-
-      // 2. Emit the emote event into the signaling API
-      await rtmState?.channel.sendMessage(message)
-
-      // 3. Save the emote document in firestore
-   }
 
    return (
       <AgoraRTMClientProvider client={rtmState.client}>
