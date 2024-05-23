@@ -188,7 +188,7 @@ const CreatorFormDialog = ({
                                     name="linkedInUrl"
                                     type="text"
                                     label="LinkedIn link"
-                                    placeholder="E.g.,: linkedin.com/in/user"
+                                    placeholder="E.g.,: https://linkedin.com/in/user"
                                     autoComplete="url"
                                     fullWidth
                                  />
