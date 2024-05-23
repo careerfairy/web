@@ -75,11 +75,6 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
-
-   /**
-    *
-    */
-   newJobHub?: boolean
 }
 
 /**
