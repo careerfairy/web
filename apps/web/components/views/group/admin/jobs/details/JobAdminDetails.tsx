@@ -65,7 +65,6 @@ const styles = sxStyles({
       color: (theme) => theme.brand.black[700],
    },
    tabs: {
-<<<<<<< HEAD
       borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",
@@ -85,12 +84,6 @@ const styles = sxStyles({
       mt: 4,
    },
 })
-
-enum TabsEnum {
-   APPLICATION = 0,
-   LINKED_CONTENT = 1,
-   JOB_POSTING = 2,
-}
 
 type Props = {
    job: CustomJob
@@ -121,7 +114,6 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-<<<<<<< HEAD
    const jobHasNoContent = jobHubV1
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
@@ -274,12 +266,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <Typography
                      sx={{
                         ...styles.tabsLabel,
-<<<<<<< HEAD
                         ...(activeTabIndex === TabsEnum.JOB_POSTING &&
                            styles.activeTab),
-=======
-                        ...(activeTabIndex === 2 && styles.activeTab),
->>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
                      }}
                   >
                      Job posting
