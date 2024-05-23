@@ -8,7 +8,7 @@ import { alpha } from "@mui/material/styles"
 import { useUpdateLivestreamVideoState } from "components/custom-hook/streaming/video/useUpdateLivestreamVideoState"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { Play } from "react-feather"
-import ReactPlayer, { YouTubePlayerProps } from "react-player/youtube"
+import ReactPlayer, { ReactPlayerProps } from "react-player"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import DateUtil from "util/DateUtil"
@@ -47,8 +47,6 @@ type Props = {
    video: LivestreamVideo
 }
 
-type ReactPlayerInstance = Parameters<YouTubePlayerProps["onReady"]>[0]
-
 export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    const { trigger: updateVideoState } =
       useUpdateLivestreamVideoState(livestreamId)
@@ -66,7 +64,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
    const [muted, setMuted] = useState(autoPlayFailed)
 
    const [reactPlayerInstance, setReactPlayerInstance] =
-      useState<ReactPlayerInstance | null>(null)
+      useState<ReactPlayer | null>(null)
 
    const playerReady = Boolean(reactPlayerInstance)
 
@@ -124,12 +122,12 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
       }
    }
 
-   const handleError: YouTubePlayerProps["onError"] = (error) => {
+   const handleError: ReactPlayerProps["onError"] = (error) => {
       errorLogAndNotify(error, "Error playing video")
       setAutoPlayFailed(true)
    }
 
-   const handleOnReady: YouTubePlayerProps["onReady"] = (player) => {
+   const handleOnReady: ReactPlayerProps["onReady"] = (player) => {
       setReactPlayerInstance(player)
    }
 
@@ -158,7 +156,7 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
                width="100%"
                height="100%"
                style={{
-                  pointerEvents: isVideoSharer ? "visibleFill" : "none",
+                  pointerEvents: isVideoSharer ? "visibleFill" : "visibleFill",
                }}
             />
             {Boolean(autoPlayFailed) && (
@@ -184,16 +182,4 @@ export const SynchronizedVideo = ({ livestreamId, userId, video }: Props) => {
          </Box>
       </Fragment>
    )
-}
-
-const getConfig = (isVideoSharer: boolean): YouTubePlayerProps["config"] => {
-   return {
-      // https://developers.google.com/youtube/player_parameters
-      playerVars: {
-         controls: isVideoSharer ? 1 : 0,
-         fs: 0,
-         disablekb: isVideoSharer ? 0 : 1,
-         rel: 0,
-      },
-   }
 }

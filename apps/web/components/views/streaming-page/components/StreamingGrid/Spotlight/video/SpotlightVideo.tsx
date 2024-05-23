@@ -2,8 +2,16 @@ import { Box, CircularProgress, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useLivestreamVideo } from "components/custom-hook/streaming/useLivestreamVideo"
 import { useStreamingContext } from "components/views/streaming-page/context"
+import dynamic from "next/dynamic"
 import { sxStyles } from "types/commonTypes"
-import { SynchronizedVideo } from "./SynchronizedVideo"
+
+// Lazy load the SynchronizedVideo component as react-player has a large bundle size
+const SynchronizedVideo = dynamic(
+   () => import("./SynchronizedVideo").then((mod) => mod.SynchronizedVideo),
+   {
+      loading: () => <CircularProgress />,
+   }
+)
 
 const styles = sxStyles({
    root: {
@@ -43,8 +51,8 @@ export const Content = () => {
    return (
       <SynchronizedVideo
          video={video}
-         userId={agoraUserId}
          livestreamId={livestreamId}
+         userId={agoraUserId}
       />
    )
 }

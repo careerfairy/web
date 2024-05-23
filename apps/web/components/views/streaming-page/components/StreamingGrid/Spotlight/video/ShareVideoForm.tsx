@@ -4,7 +4,7 @@ import { Box, Stack, Typography } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { YOUTUBE_URL_REGEX } from "components/util/constants"
+import { VIMEO_URL_REGEX, YOUTUBE_URL_REGEX } from "components/util/constants"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { livestreamService } from "data/firebase/LivestreamService"
@@ -30,12 +30,14 @@ const styles = sxStyles({
    },
 })
 
-const videoUrlSchema = yup.object().shape({
+const videoUrlSchema = yup.object({
    videoUrl: yup
       .string()
-      .matches(YOUTUBE_URL_REGEX, {
-         message: "Must be a valid youtube video url",
-      })
+      .test(
+         "is-valid-video-url",
+         "Must be a valid YouTube or Vimeo video URL",
+         (value) => YOUTUBE_URL_REGEX.test(value) || VIMEO_URL_REGEX.test(value)
+      )
       .required("Must be a valid youtube video url"),
 })
 
@@ -54,15 +56,24 @@ export const ShareVideoForm = ({ onClose }: Props) => {
 
    const formMethods = useYupForm({
       schema: videoUrlSchema,
-      mode: "all",
       reValidateMode: "onChange",
+      defaultValues: {
+         videoUrl: "",
+      },
    })
 
    const onSubmit: SubmitHandler<FormValues> = async (data) => {
       try {
+         // Ensure the URL is properly formatted
+         const url = new URL(
+            data.videoUrl.startsWith("http")
+               ? data.videoUrl
+               : `https://${data.videoUrl}`
+         )
+
          await livestreamService.setLivestreamVideo({
             livestreamId,
-            url: data.videoUrl,
+            url: url.href,
             updater: agoraUserId,
          })
 
@@ -82,7 +93,8 @@ export const ShareVideoForm = ({ onClose }: Props) => {
    }
 
    return (
-      <FormProvider {...formMethods}>
+      // key is added to trigger re-render, fixes form not validating on paste/auto-fill events
+      <FormProvider {...formMethods} key={`${formMethods.formState.isValid}`}>
          <Box component="form" onSubmit={formMethods.handleSubmit(onSubmit)}>
             <Stack
                sx={styles.header}
@@ -109,16 +121,16 @@ export const ShareVideoForm = ({ onClose }: Props) => {
                      color="neutral.700"
                      textAlign="center"
                   >
-                     {`When sharing a video, the player actions (play, pause, etc) will be replayed
- on the viewer's screens as well.`}
+                     {`When sharing a video, the player actions, e.g., play or pause, will be reflected in the viewer's screens as well.`}
                   </Typography>
                </Stack>
             </Stack>
             <ControlledBrandedTextField
                name="videoUrl"
                label="Insert video URL"
-               placeholder="Ex: https://www.youtube.com/watch?=123hre"
+               placeholder="E.g., youtube.com/watch?v=123hre or vimeo.com/123456"
                fullWidth
+               autoFocus
             />
             <Stack
                sx={styles.actions}
@@ -138,7 +150,10 @@ export const ShareVideoForm = ({ onClose }: Props) => {
                <LoadingButton
                   type="submit"
                   fullWidth
-                  disabled={!formMethods.formState.isDirty}
+                  disabled={
+                     !formMethods.formState.isDirty ||
+                     !formMethods.formState.isValid
+                  }
                   loading={formMethods.formState.isSubmitting}
                   variant="contained"
                   color="primary"
