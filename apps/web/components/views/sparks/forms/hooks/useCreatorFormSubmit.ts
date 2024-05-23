@@ -1,4 +1,4 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { Creator, CreatorRole } from "@careerfairy/shared-lib/groups/creators"
 import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
 import { groupRepo } from "data/RepositoryInstances"
 import { FormikHelpers } from "formik"
@@ -14,6 +14,7 @@ export type CreatorFormValues = {
    story: string
    email: string
    id?: string
+   roles: CreatorRole[]
 }
 
 type UseCreatorFormSubmit = {
@@ -86,6 +87,7 @@ const useCreatorFormSubmit = (
                position: values.position,
                linkedInUrl: values.linkedInUrl,
                story: values.story,
+               roles: values.roles,
             })
          }
 
