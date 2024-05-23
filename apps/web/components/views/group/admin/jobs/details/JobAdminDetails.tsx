@@ -65,12 +65,7 @@ const styles = sxStyles({
       color: (theme) => theme.brand.black[700],
    },
    tabs: {
-<<<<<<< HEAD
       borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
-=======
-      borderBottom: "1px solid #D6D6E0",
->>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
-
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",
       },
@@ -89,12 +84,6 @@ const styles = sxStyles({
       mt: 4,
    },
 })
-
-enum TabsEnum {
-   APPLICATION = 0,
-   LINKED_CONTENT = 1,
-   JOB_POSTING = 2,
-}
 
 type Props = {
    job: CustomJob
@@ -125,21 +114,17 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-<<<<<<< HEAD
    const jobHasNoContent = jobHubV1
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
 
    const tabs = useMemo(() => {
-      const tabs = [
-=======
-   const jobHasNoContent = Boolean(
+      const jobHasNoContent = Boolean(
       job.livestreams.length == 0 && job.sparks.length == 0
    )
 
    const tabs = useMemo(
       () => [
->>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
          {
             label: "Applicants",
             component: () =>
@@ -175,15 +160,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
             label: "Job Opening",
             component: () => <JobPosting job={job} group={group} />,
          },
-<<<<<<< HEAD
       ]
-      return tabs
    }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
-=======
-      ],
-      [allowToDisplayApplicantsData, group, job, jobHasNoContent]
-   )
->>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
@@ -292,12 +270,8 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <Typography
                      sx={{
                         ...styles.tabsLabel,
-<<<<<<< HEAD
                         ...(activeTabIndex === TabsEnum.JOB_POSTING &&
                            styles.activeTab),
-=======
-                        ...(activeTabIndex === 2 && styles.activeTab),
->>>>>>> dee34cdc2 (migration to add new fields to customJob; Add Linked content tab on admin jobDetails and add empty view)
                      }}
                   >
                      Job posting
