@@ -1,6 +1,7 @@
 import { FieldOfStudy } from "../../fieldOfStudy"
 import { LivestreamEvent } from "../../livestreams"
 import { sortElementsByFrequency } from "../utils"
+import { RECOMMENDATION_POINTS } from "./constants"
 
 export class RankedLivestreamEvent {
    public points: number
@@ -10,11 +11,54 @@ export class RankedLivestreamEvent {
       this.model = model
       this.id = model.id
       // Divide popularity by the median value and ensure the minimum value is 1
+      //TODO: Confirm persistance of rule
       this.points = model?.popularity
          ? model.popularity / 120 < 1
             ? 1
             : model.popularity / 120
          : 1
+
+      this.points = this.calculateInitialPoints(this, this.points)
+   }
+
+   private additionalPopularityPoints = (
+      points: number,
+      popularity: number
+   ): number => {
+      if (!popularity) {
+         return points
+      }
+
+      // using const to allow debugging if needed
+      const resultPoints =
+         points + RECOMMENDATION_POINTS.POPULARITY_NUMERATOR / popularity
+
+      return resultPoints
+   }
+
+   private additionalPointsIfJobsLinked = (points: number): number => {
+      const resultPoints = points + RECOMMENDATION_POINTS.POINTS_IF_JOBS_LINKED
+
+      return resultPoints
+   }
+
+   private calculateInitialPoints(
+      rankedLivestream: RankedLivestreamEvent,
+      calculatedPoints: number
+   ): number {
+      let points = calculatedPoints
+
+      if (rankedLivestream.model?.hasJobs) {
+         points = this.additionalPointsIfJobsLinked(points)
+      } else {
+         // Place holder for debugging when not having jobs
+      }
+
+      points = this.additionalPopularityPoints(
+         points,
+         rankedLivestream.model?.popularity
+      )
+      return points
    }
 
    static create(livestream: LivestreamEvent) {
@@ -43,6 +87,37 @@ export class RankedLivestreamEvent {
 
    getLanguage(): string {
       return this.model.language.code || ""
+   }
+
+   getGroupIds(): string[] {
+      return this.model?.groupIds
+   }
+
+   getTargetUniversities(): string[] {
+      return this.model?.targetUniversities || []
+   }
+
+   getTargetCountries(): string[] {
+      return this.model?.targetCountries || []
+   }
+
+   getTargetLevelOfStudyIds(): string[] {
+      return this.model?.targetLevelsOfStudy?.map((level) => level.id) || []
+   }
+
+   getCompanyTargetCountries(): string[] {
+      return this.model?.companyTargetedCountries || []
+   }
+
+   getCompanyTargetUniversities(): string[] {
+      return this.model?.companyTargetedUniversities || []
+   }
+
+   /* Not to be confused with "this.getFieldOfStudyIds", since this (getCompanyTargetFieldsOfStudies) uses values
+    * from backfilled company (group) values
+    */
+   getCompanyTargetFieldsOfStudies(): string[] {
+      return this.model?.companyTargetedFieldsOfStudies || []
    }
 
    addPoints(points: number) {

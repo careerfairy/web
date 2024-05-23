@@ -53,21 +53,27 @@ export default class RecommendationServiceCore {
          this.log?.info("Metadata", {
             userMetaData: {
                userId: user?.id || "N/A",
-               userInterestIds: user?.interestsIds || [],
-               userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
-               userCountriesOfInterest: user?.countriesOfInterest || [],
                userUniversityCountryCode: user?.universityCountryCode || "N/A",
+               userUniversityCode: user?.university?.code || "N/A",
+               userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
+               userLevelOfStudyId: user?.levelOfStudy?.id || "N/A",
                userSpokenLanguages: user?.spokenLanguages || [],
+               userFollowedCompanies: user?.companyUserFollowsIds || [],
+               userCountriesOfInterest: user?.countriesOfInterest || [],
             },
             eventMetaData: deDupedEvents.map((e) => ({
                id: e.id,
                numPoints: e.points,
-               fieldsOfStudyIds: e.getFieldOfStudyIds(),
-               interestIds: e.getInterestIds(),
-               companyCountries: e.getCompanyCountries(),
-               companyIndustries: e.getCompanyIndustries(),
-               companySizes: e.getCompanySizes(),
+               targetCountries: e.getTargetCountries(),
+               targetUniversities: e.getTargetUniversities(),
+               targetFieldsOfStudy: e.getFieldOfStudyIds(),
+               targetLevelOfStudies: e.getTargetLevelOfStudyIds(),
                language: e.getLanguage(),
+               groupIds: e.getGroupIds(),
+               companyTargetCountries: e.getCompanyTargetCountries(),
+               companyTargetUniversities: e.getCompanyTargetUniversities(),
+               companyTargetFieldsOfStudies:
+                  e.getCompanyTargetFieldsOfStudies(),
             })),
          })
       }
@@ -132,7 +138,7 @@ export default class RecommendationServiceCore {
       limit: number,
       implicitData?: ImplicitLivestreamRecommendationData // TODO: Use implicit data for implicit data usage in recommendation
    ): RankedLivestreamEvent[] {
-      this.log.info(
+      console.log(
          "🚀 ~ RecommendationServiceCore ~ implicitData:",
          implicitData
       )
@@ -143,11 +149,16 @@ export default class RecommendationServiceCore {
       )
 
       return userRecommendationBuilder
-         .userInterests()
-         .userFieldsOfStudy()
-         .userCountriesOfInterest()
          .userUniversityCountry()
+         .userUniversity()
+         .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
+         .userLevelsOfStudy()
          .userSpokenLanguages()
+         .userFollowedCompanies()
+         .userUniversityCompanyTargetCountry()
+         .userCountriesOfInterest()
+         .userCompanyTargetUniversity()
+         .userCompanyTargetFieldsOfStudy()
          .get()
    }
 }
