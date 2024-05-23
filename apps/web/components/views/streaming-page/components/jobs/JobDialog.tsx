@@ -8,6 +8,7 @@ import {
    DialogContent,
    DialogTitle,
    Stack,
+   SwipeableDrawer,
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
@@ -15,6 +16,10 @@ import Typography from "@mui/material/Typography"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
+import {
+   useStreamIsLandscape,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -25,7 +30,7 @@ import CustomJobApplyConfirmation from "components/views/livestream-dialog/views
 import JobDescription from "components/views/livestream-dialog/views/job-details/main-content/JobDescription"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useState } from "react"
-import { Briefcase } from "react-feather"
+import { Briefcase, ChevronLeft } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { JobDialogSkeleton } from "./JobDialogSkeleton"
@@ -34,14 +39,33 @@ const styles = sxStyles({
    dialogTitle: {
       padding: "16px 16px 2px 0",
    },
+   dialogTitleMobile: (theme) => ({
+      display: "flex",
+      padding: "17px 16px",
+      position: "sticky",
+      top: 0,
+      justifyContent: "flex-start",
+      alignItems: "center",
+      borderRadius: "12px 12px 0px 0px",
+      borderBottom: `1px solid ${theme.brand.white[400]}`,
+      background: theme.brand.white[100],
+      zIndex: 1,
+   }),
    title: {
       display: "flex",
       justifyContent: "flex-end",
    },
+
    closeButton: {
       width: "32px",
       height: "32px",
       flexShrink: 0,
+   },
+   closeButtonMobile: {
+      display: "flex",
+      alignItems: "center",
+      flexShrink: 0,
+      p: 0,
    },
    header: {
       display: "flex",
@@ -73,13 +97,28 @@ const styles = sxStyles({
    },
    dialogActions: (theme) => ({
       display: "flex",
+      position: "sticky",
+      bottom: 0,
       padding: 2,
       justifyContent: "flex-end",
       alignItems: "center",
-      gap: 1.25,
       borderTop: `1px solid ${theme.brand.black[300]}`,
       background: theme.brand.white[200],
    }),
+   dialogActionsContent: {
+      gap: 1.25,
+      textWrap: "noWrap",
+      minWidth: "fit-content",
+   },
+   drawer: {
+      borderRadius: "12px 12px 0 0",
+      maxHeight: "calc(100vh - 88px)",
+   },
+   drawerContent: {
+      display: "flex",
+      padding: "0px 16px",
+      flexDirection: "column",
+   },
 })
 
 type Props = {
@@ -93,6 +132,20 @@ const JobDialog = ({ job, handleDialogClose, livestreamId, open }: Props) => {
    const isMobile = useIsMobile()
    const [isOpen, handleOpen, handleClose] = useDialogStateHandler()
    const { isHost } = useStreamingContext()
+
+   if (isMobile) {
+      return (
+         <MobileDrawer
+            job={job}
+            livestreamId={livestreamId}
+            isConfirmationDialogOpen={isOpen}
+            handleCloseConfirmationDialog={handleClose}
+            handleOpenConfirmationDialog={handleOpen}
+            handleDialogClose={handleDialogClose}
+            open={open}
+         />
+      )
+   }
 
    return (
       <Dialog
@@ -139,6 +192,58 @@ const JobDialog = ({ job, handleDialogClose, livestreamId, open }: Props) => {
    )
 }
 
+const MobileDrawer = ({
+   job,
+   livestreamId,
+   isConfirmationDialogOpen,
+   handleCloseConfirmationDialog,
+   handleOpenConfirmationDialog,
+   handleDialogClose,
+   open,
+}) => {
+   const { isHost } = useStreamingContext()
+
+   return (
+      <SwipeableDrawer
+         onClose={handleDialogClose}
+         open={open}
+         anchor="bottom"
+         PaperProps={{
+            sx: styles.drawer,
+         }}
+         onOpen={() => {}}
+      >
+         <Box sx={styles.dialogTitleMobile}>
+            <IconButton
+               color="inherit"
+               onClick={handleDialogClose}
+               aria-label="close"
+               sx={styles.closeButtonMobile}
+            >
+               <ChevronLeft size={24} />
+            </IconButton>
+         </Box>
+         <Box sx={styles.drawerContent}>
+            <JobDialogContent
+               job={job}
+               livestreamId={livestreamId}
+               isConfirmationDialogOpen={isConfirmationDialogOpen}
+               handleCloseConfirmationDialog={handleCloseConfirmationDialog}
+            />
+         </Box>
+         {!isHost && (
+            <Box sx={styles.dialogActions}>
+               <JobDialogActions
+                  job={job}
+                  livestreamId={livestreamId}
+                  handleOpenConfirmationDialog={handleOpenConfirmationDialog}
+               />
+            </Box>
+         )}
+      </SwipeableDrawer>
+   )
+}
+
 const JobDialogContent = ({
    job,
    livestreamId,
@@ -146,6 +251,8 @@ const JobDialogContent = ({
    handleCloseConfirmationDialog,
 }) => {
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
+   const isMobile = useStreamIsMobile()
+   const isLandscape = useStreamIsLandscape()
 
    const isAtsJob = useIsAtsJob(job)
    let jobName: string, jobDepartment: string
@@ -159,7 +266,7 @@ const JobDialogContent = ({
    }
 
    return (
-      <Stack spacing={3}>
+      <Stack spacing={3} marginTop={isMobile ? 1 : 0}>
          <Stack sx={styles.header}>
             <Stack direction="row" spacing={1}>
                <CircularLogo
@@ -203,6 +310,10 @@ const JobDialogContent = ({
                handleClose={handleCloseConfirmationDialog}
                job={job as PublicCustomJob}
                livestreamId={livestreamId}
+               sx={{
+                  bottom:
+                     isMobile && !isLandscape ? { xs: "130px", sm: "90px" } : 0,
+               }}
             />
          ) : null}
       </Stack>
@@ -239,7 +350,21 @@ const JobDialogActions = ({
       }
    }
    return (
-      <>
+      <Stack
+         direction={
+            !isAtsJob && {
+               xs: "column-reverse",
+               sm: "row",
+            }
+         }
+         width={
+            !isAtsJob && {
+               xs: "100%",
+               sm: "unset",
+            }
+         }
+         sx={[styles.dialogActionsContent]}
+      >
          <JobButton
             job={job}
             handleOpen={handleOpenConfirmationDialog}
@@ -250,14 +375,16 @@ const JobDialogActions = ({
             <>
                <LoadingButton
                   variant="contained"
+                  fullWidth
                   loading={isSendingEmail}
                   onClick={sendEmailReminderForApplication}
+                  sx={styles.dialogActionsContent}
                >
                   Send email reminder
                </LoadingButton>
             </>
          )}
-      </>
+      </Stack>
    )
 }
 
