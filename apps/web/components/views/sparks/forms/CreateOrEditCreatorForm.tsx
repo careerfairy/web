@@ -1,4 +1,8 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   Creator,
+   CreatorRole,
+   CreatorRoles,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Grid } from "@mui/material"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
@@ -136,6 +140,14 @@ const CreateOrEditCreatorForm: FC<Props> = ({
    )
 }
 
+const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
+   if (!creator || creator?.roles?.length === 0) {
+      return [CreatorRoles.Spark]
+   }
+   const hasSparkRole = creator.roles?.includes(CreatorRoles.Spark)
+   return hasSparkRole ? creator.roles : [...creator.roles, CreatorRoles.Spark]
+}
+
 const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
@@ -146,6 +158,7 @@ const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    story: creator?.story || "",
    email: creator?.email || "",
    id: creator?.id || "",
+   roles: getInitialRolesValues(creator),
 })
 
 export default CreateOrEditCreatorForm
