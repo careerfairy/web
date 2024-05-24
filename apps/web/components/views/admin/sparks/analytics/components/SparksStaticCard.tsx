@@ -1,4 +1,3 @@
-import { FC, ReactElement } from "react"
 import {
    Box,
    Card,
@@ -8,17 +7,18 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
-import CircularLogo from "components/views/common/logos/CircularLogo"
-import ShareIcon from "components/views/common/icons/ShareIcon"
-import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
-import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
-import LikeIcon from "components/views/common/icons/LikeIcon"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import useGroupSpark from "components/custom-hook/spark/useGroupSpark"
 import useSparkStats from "components/custom-hook/spark/useSparkStats"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import ImpressionsIcon from "components/views/common/icons/ImpressionsIcon"
+import LikeIcon from "components/views/common/icons/LikeIcon"
+import ShareIcon from "components/views/common/icons/ShareIcon"
+import TotalPlaysIcon from "components/views/common/icons/TotalPlaysIcon"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import SparkCategoryChip from "components/views/sparks/components/spark-card/SparkCategoryChip"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC, ReactElement } from "react"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    card: {
@@ -157,7 +157,7 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
    const spark = useGroupSpark(group.id, sparkId)
    const { data: sparkStats } = useSparkStats(sparkId)
 
-   const impressions = sparkStats?.impressions || "0"
+   const plays = sparkStats?.plays || "0"
    const likes = sparkStats?.likes || "0"
    const shareCTA = sparkStats?.shareCTA || "0"
    const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || "0"
@@ -196,7 +196,7 @@ const SparksStaticCard: FC<SparksStaticCardProps> = ({ sparkId }) => {
          <CardActions sx={styles.cardActions}>
             <StatContainer
                icon={<ImpressionsIcon sx={styles.impressionsIcon} />}
-               value={impressions}
+               value={plays}
             />
             <StatContainer icon={<LikeIcon />} value={likes} />
             <StatContainer icon={<ShareIcon />} value={shareCTA} />
