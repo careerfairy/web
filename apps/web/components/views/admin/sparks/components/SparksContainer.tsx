@@ -21,14 +21,14 @@ const styles = sxStyles({
    },
 })
 
-const SparksContainer: FC<ContainerProps & { hide?: boolean }> = ({
+const SparksContainer: FC<ContainerProps & { show?: boolean }> = ({
    children,
    sx,
-   hide,
+   show,
    ...props
 }) => {
    return (
-      <ConditionalWrapper condition={!hide}>
+      <ConditionalWrapper condition={show}>
          <Container
             sx={combineStyles(styles.root, sx)}
             maxWidth="xl"

@@ -26,7 +26,7 @@ const GeneralSparksView: FC = () => {
             showDayOne={planDays < 1}
             showDaySeven={planDays > 0 && planDays <= 7}
          />
-         <SparksContainer hide={!planExpired && !group.publicSparks}>
+         <SparksContainer show={!planExpired && !group.publicSparks}>
             <SparksProgressIndicator />
          </SparksContainer>
          <SparksContainer>
