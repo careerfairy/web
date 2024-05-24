@@ -1,7 +1,9 @@
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useTalentPool from "components/custom-hook/live-stream/useTalentPool"
 import { useLivestreamData } from "components/custom-hook/streaming"
+import { useRouter } from "next/router"
 import { Check, User } from "react-feather"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { ResponsiveStreamButton } from "../Buttons"
 
@@ -12,6 +14,26 @@ const styles = sxStyles({
 })
 
 export const JoinTalentPoolButton = () => {
+   const { push, asPath } = useRouter()
+   const isOpenStream = useOpenStream()
+
+   if (isOpenStream) {
+      return (
+         <ResponsiveStreamButton
+            onClick={() => {
+               return push({
+                  query: { absolutePath: asPath },
+                  pathname: "/login",
+               })
+            }}
+            startIcon={<User />}
+            variant="outlined"
+         >
+            Join talent pool
+         </ResponsiveStreamButton>
+      )
+   }
+
    return (
       <SuspenseWithBoundary fallback={<></>}>
          <Button />

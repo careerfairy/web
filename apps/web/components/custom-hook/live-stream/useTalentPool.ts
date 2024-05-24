@@ -7,29 +7,26 @@ import * as actions from "store/actions"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useUserLivestreamData } from "../streaming/useUserLivestreamData"
 
-
 /**
- * A hook for joining and leaving a live stream talent pool. This hook replaces the outdated 
- * custom-hook/useJoinTalentPool, using the userLivestreamData to fetch the talent pool data. 
+ * A hook for joining and leaving a live stream talent pool. This hook replaces the outdated
+ * custom-hook/useJoinTalentPool, using the userLivestreamData to fetch the talent pool data.
  * The companyId is still being used here for backwards compatibility, but it is not put to use anywhere.
- * @param livestream 
+ * @param livestream
  * @returns An object with handlers and information on the operation
  */
 const useTalentPool = (livestream) => {
-   const {
-      push,
-      asPath,
-   } = useRouter()
+   const { push, asPath } = useRouter()
    const { userData, isLoggedOut } = useAuth()
    const dispatch = useDispatch()
-   const {
-      joinCompanyTalentPool,
-      leaveCompanyTalentPool,
-   } = useFirebaseService()
-   
+   const { joinCompanyTalentPool, leaveCompanyTalentPool } =
+      useFirebaseService()
+
    const [loading, setLoading] = useState(false)
 
-   const {data: userLivestreamData} = useUserLivestreamData(livestream.id, userData.id)
+   const { data: userLivestreamData } = useUserLivestreamData(
+      livestream.id,
+      userData.id
+   )
 
    const userIsInTalentPool = Boolean(userLivestreamData?.talentPool?.date)
 
@@ -38,10 +35,7 @@ const useTalentPool = (livestream) => {
          joinTalentPool: async () => {
             try {
                if (isLoggedOut) {
-                  dataLayerLivestreamEvent(
-                     "talent_pool_join_login",
-                     livestream
-                  )
+                  dataLayerLivestreamEvent("talent_pool_join_login", livestream)
                   return push({
                      query: { absolutePath: asPath },
                      pathname: "/login",
@@ -49,16 +43,13 @@ const useTalentPool = (livestream) => {
                }
                setLoading(true)
                const companyId = livestream.companyId
-               await joinCompanyTalentPool(
-                  companyId,
-                  userData,
-                  livestream
-               )
+               await joinCompanyTalentPool(companyId, userData, livestream)
                dataLayerLivestreamEvent("talent_pool_joined", livestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
+            } finally {
+               setLoading(false)
             }
-            setLoading(false)
          },
          leaveTalentPool: async () => {
             try {
@@ -71,16 +62,13 @@ const useTalentPool = (livestream) => {
                setLoading(true)
                const companyId = livestream.companyId
 
-               await leaveCompanyTalentPool(
-                  companyId,
-                  userData,
-                  livestream
-               )
+               await leaveCompanyTalentPool(companyId, userData, livestream)
                dataLayerLivestreamEvent("talent_pool_leave", livestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
+            } finally {
+               setLoading(false)
             }
-            setLoading(false)
          },
       }),
       [
@@ -91,11 +79,9 @@ const useTalentPool = (livestream) => {
          leaveCompanyTalentPool,
          push,
          livestream,
-         isLoggedOut
+         isLoggedOut,
       ]
    )
-
-
 
    return { handlers, userIsInTalentPool, loading }
 }
