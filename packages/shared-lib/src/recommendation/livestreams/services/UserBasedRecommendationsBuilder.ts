@@ -170,11 +170,6 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
                values,
                this.limit
             )
-            console.log(
-               "🚀 ~ IMPLICIT FOLLOWED COMPANIES~ values, res:",
-               values,
-               res?.map((r) => r.model.id)
-            )
             return res
          }
       )

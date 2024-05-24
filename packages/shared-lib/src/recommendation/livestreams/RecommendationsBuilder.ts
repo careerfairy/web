@@ -21,15 +21,6 @@ export class RecommendationsBuilder {
          uniqueEvents
       ).slice(0, this.limit)
 
-      rankedLivestreams.forEach((l) => {
-         console.log(
-            `🚀 ~ RecommendationsBuilder POINTS ~ ${
-               l.model.id
-            }: {companySizes: ${l.getCompanySizes()},companyCountries: ${l.getCompanyCountries()} } -> `,
-            l.getPoints()
-         )
-      })
-
       return rankedLivestreams
    }
 }

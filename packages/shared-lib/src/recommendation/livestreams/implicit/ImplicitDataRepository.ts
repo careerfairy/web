@@ -76,11 +76,6 @@ export class ImplicitDataRepository {
             .filter(Boolean) || []
       )
 
-      console.log(
-         "🚀 ~ ImplicitDataRepository ~ getWatchedSparksCompanyCountries ~ countryIds:",
-         countryIds
-      )
-
       return countryIds
    }
 

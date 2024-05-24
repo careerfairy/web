@@ -395,11 +395,6 @@ export class RankedLivestreamRepository {
          countryCodes,
          limit
       )
-      console.log(
-         "🚀 ~ WATCHED SPARKS COUNTRIES ~ countryCodes,events:",
-         countryCodes,
-         events?.map((e) => e.id)
-      )
 
       return this.rankEvents({
          pointsPerMatch:
@@ -440,11 +435,7 @@ export class RankedLivestreamRepository {
          companySizes,
          limit
       )
-      console.log(
-         "🚀 ~ WATCHED SPARKS COMPANY SIZES ~ companySizes,events:",
-         companySizes,
-         events?.map((e) => e.id)
-      )
+
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
@@ -505,12 +496,6 @@ export class RankedLivestreamRepository {
          limit
       )
 
-      console.log(
-         "🚀 ~ APPLIED JOBS COMPANY SIZES ~ companySizes,events:",
-         companySizes,
-         events?.map((e) => e.id)
-      )
-
       return this.rankEvents({
          pointsPerMatch:
             RECOMMENDATION_POINTS.IMPLICIT
@@ -529,13 +514,6 @@ export class RankedLivestreamRepository {
       return this.livestreams
          .filter((stream) => {
             const streamArrayField = stream.model[field]
-            // if (field == "companyIndustries")
-            //    console.log(
-            //       "🚀 ~ RankedLivestreamRepository ~ .filter ~ id,streamArrayField,values:",
-            //       stream.model.id,
-            //       streamArrayField,
-            //       values
-            //    )
             if (!streamArrayField || !Array.isArray(streamArrayField))
                return false
 
