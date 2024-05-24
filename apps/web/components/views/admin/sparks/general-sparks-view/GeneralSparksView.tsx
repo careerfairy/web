@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
@@ -26,9 +27,11 @@ const GeneralSparksView: FC = () => {
             showDayOne={planDays < 1}
             showDaySeven={planDays > 0 && planDays <= 7}
          />
-         <SparksContainer show={!planExpired && !group.publicSparks}>
-            <SparksProgressIndicator />
-         </SparksContainer>
+         <ConditionalWrapper condition={!planExpired && !group.publicSparks}>
+            <SparksContainer>
+               <SparksProgressIndicator />
+            </SparksContainer>
+         </ConditionalWrapper>
          <SparksContainer>
             <HeaderActions />
          </SparksContainer>
