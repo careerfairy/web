@@ -1,13 +1,34 @@
 import functions = require("firebase-functions")
-import { logAndThrow } from "./lib/validations"
-import { number } from "yup"
-import { middlewares } from "./middlewares/middlewares"
-import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
-import { dataValidation, userAuthExists } from "./middlewares/validations"
-import { livestreamsRepo, userRepo } from "./api/repositories"
-import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { CompanyFollowed } from "@careerfairy/shared-lib/users"
+import { SchemaOf, number, object } from "yup"
+import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
+import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
+import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { logAndThrow } from "./lib/validations"
+import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
+import { middlewares } from "./middlewares/middlewares"
+import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { getUserWatchedSparks } from "./userSparks"
+
+type GetUserImplicitDataSchema = {
+   watchedEventsLimit: number
+   watchedSparksLimit: number
+   appliedJobsLimit: number
+   followedCompaniesLimit: number
+}
+
+const getUserImplicitDataSchema: SchemaOf<GetUserImplicitDataSchema> =
+   object().shape({
+      watchedEventsLimit: number().default(10),
+      watchedSparksLimit: number().default(20),
+      appliedJobsLimit: number().default(10),
+      followedCompaniesLimit: number().default(10),
+   })
 
 /**
  * Get Recommended Events
@@ -33,17 +54,74 @@ export const getRecommendedEvents = functions
                const dataFetcher = new UserDataFetcher(
                   context.auth.token.email,
                   livestreamsRepo,
-                  userRepo
+                  userRepo,
+                  sparkRepo
                )
-               const recomendationService =
-                  await UserEventRecommendationService.create(dataFetcher)
 
-               return await recomendationService.getRecommendations(data.limit)
+               const recommendationService =
+                  await UserEventRecommendationService.create(dataFetcher)
+               return await recommendationService.getRecommendations(data.limit)
             } catch (error) {
                logAndThrow("Error in getting recommended events", {
                   data,
                   error,
                })
+            }
+         }
+      )
+   )
+
+export const getUserImplicitData = functions
+   .region(config.region)
+   .runWith({ memory: "512MB" })
+   .https.onCall(
+      middlewares(
+         dataValidation(getUserImplicitDataSchema),
+
+         userAuthExists(),
+         async (
+            data: GetUserImplicitDataSchema,
+            context
+         ): Promise<ImplicitLivestreamRecommendationData> => {
+            try {
+               const promises = [
+                  livestreamsRepo.getUserInteractedLivestreams(
+                     context.auth.token.email,
+                     data.watchedEventsLimit
+                  ),
+                  getUserWatchedSparks(
+                     context.auth.token.email,
+                     data.watchedSparksLimit
+                  ),
+                  userRepo.getCustomJobApplications(
+                     context.auth.token.email,
+                     data.appliedJobsLimit
+                  ),
+                  userRepo.getCompaniesUserFollows(context.auth.token.email),
+               ]
+
+               const [
+                  interactedEvents,
+                  watchedSparks,
+                  appliedJobs,
+                  followedCompanies,
+               ] = await Promise.all(promises)
+
+               return {
+                  watchedLivestreams: interactedEvents as LivestreamEvent[],
+                  watchedSparks: (watchedSparks as Spark[]) || [],
+                  appliedJobs: (appliedJobs as CustomJobApplicant[]) || [],
+                  followedCompanies:
+                     (followedCompanies as CompanyFollowed[]) || [],
+               }
+            } catch (error) {
+               logAndThrow(
+                  "Error in getting user implicit data for recommendation",
+                  {
+                     data,
+                     error,
+                  }
+               )
             }
          }
       )

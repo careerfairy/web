@@ -350,3 +350,23 @@ export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
       return !array1.includes(element)
    })
 }
+
+/**
+ * Returns a new sorted array taken into consideration an index getter function. The items position
+ * are determined by the number value returned by @param getIndexOf.
+ * @param array Base array for sorting
+ * @param getIndexOf Function which receives an item and returns its supposed index
+ * @returns New sorted array
+ */
+export const arraySortByIndex = <T>(
+   array: T[],
+   getIndexOf: (item: T) => number
+): T[] => {
+   const sortedItems = array.sort((baseItem, comparisonItem) => {
+      const baseSortedIndex = getIndexOf(baseItem)
+      const comparisonSortedIndex = getIndexOf(comparisonItem)
+
+      return baseSortedIndex - comparisonSortedIndex
+   })
+   return sortedItems
+}

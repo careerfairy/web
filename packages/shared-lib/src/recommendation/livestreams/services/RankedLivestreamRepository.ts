@@ -191,14 +191,14 @@ export class RankedLivestreamRepository {
    ): RankedLivestreamEvent[] {
       const events = this.getEventsFilteredByArrayField(
          "groupIds",
-         [groupIds],
+         groupIds,
          limit
       )
 
       return this.rankEvents({
          pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_COMPANY_MATCH,
          rankedLivestreams: events,
-         targetUserIds: [groupIds],
+         targetUserIds: groupIds,
          targetLivestreamIdsGetter: (stream) => stream.getGroupIds(),
       })
    }
@@ -270,11 +270,234 @@ export class RankedLivestreamRepository {
          pointsPerMatch: RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_MATCH,
          pointsPerMissingMatch:
             -RECOMMENDATION_POINTS.POINTS_PER_SPOKEN_LANGUAGE_DEDUCT, // decrease points if the user does not speak the language
-         // use all livestreams since we want to decrease the points if the user does not speak the language
+         // use all live streams since we want to decrease the points if the user does not speak the language
          missingMatchesMultiplier: 1, // Ensures that pointsPerMissingMatch is deducted only once for this case
          rankedLivestreams: this.livestreams,
          targetUserIds: spokenLanguages,
          targetLivestreamIdsGetter: (stream) => [stream.getLanguage()],
+      })
+   }
+
+   /**
+    * Even though its very similar to other methods, this one uses implicit points, reason
+    * why its a separate method. This allows independent logic for implicit points without having to change
+    * current implementation for explicit recommendation.
+    */
+   public getEventsBasedOnImplicitEventsCompanyCountries(
+      countryCodes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyCountries",
+         countryCodes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_COUNTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: countryCodes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitEventsCompanyIndustries(
+      industryIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyIndustries",
+         industryIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_INDUSTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: industryIds,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitEventsCompanySize(
+      companySizes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companySizes",
+         companySizes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_SIZE_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: companySizes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
+      })
+   }
+
+   public getEventsBasedOnImplicitEventsInterests(
+      interestIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "interestsIds",
+         interestIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_INTERESTS_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: interestIds,
+         targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
+      })
+   }
+
+   public getEventsBasedOnImplicitEventsLanguages(
+      languageCodes: string[]
+   ): RankedLivestreamEvent[] {
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_LANGUAGE_MATCH,
+         pointsPerMissingMatch:
+            -RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_INTERACTED_EVENT_COMPANY_LANGUAGE_DEDUCT, // decrease points if the user does not speak the language
+         // use all live streams since we want to decrease the points if the user does not speak the language
+         missingMatchesMultiplier: 1, // Ensures that pointsPerMissingMatch is deducted only once for this case
+         rankedLivestreams: this.livestreams,
+         targetUserIds: languageCodes,
+         targetLivestreamIdsGetter: (stream) => [stream.getLanguage()],
+      })
+   }
+
+   public getEventsBasedOnImplicitSparksCompanyCountries(
+      countryCodes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyCountries",
+         countryCodes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_COUNTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: countryCodes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitSparksCompanyIndustries(
+      industryIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyIndustries",
+         industryIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_INDUSTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: industryIds,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitSparksCompanySize(
+      companySizes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companySizes",
+         companySizes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_WATCHED_SPARKS_COMPANY_SIZE_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: companySizes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
+      })
+   }
+
+   public getEventsBasedOnImplicitAppliedJobsCompanyCountries(
+      countryCodes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyCountries",
+         countryCodes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_APPLIED_JOB_COMPANY_COUNTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: countryCodes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitAppliedJobsCompanyIndustries(
+      industryIds: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyIndustries",
+         industryIds,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_APPLIED_JOB_COMPANY_INDUSTRY_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: industryIds,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyIndustries(),
+      })
+   }
+
+   public getEventsBasedOnImplicitAppliedJobsCompanySize(
+      companySizes: string[],
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companySizes",
+         companySizes,
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch:
+            RECOMMENDATION_POINTS.IMPLICIT
+               .POINTS_PER_APPLIED_JOB_COMPANY_SIZE_MATCH,
+         rankedLivestreams: events,
+         targetUserIds: companySizes,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanySizes(),
       })
    }
 
@@ -320,16 +543,7 @@ export class RankedLivestreamRepository {
                   ? missingMatchesMultiplier
                   : numMissingMatches
             const mismatchPoints = mismatchMultiplier * pointsPerMissingMatch
-            console.log(
-               "🚀 ~ RankedLivestreamRepository ~ rankedLivestreams.forEach ~ missingMatchesMultiplier,numMissingMatches,pointsPerMissingMatch,mismatches,id: ",
-               missingMatchesMultiplier,
-               numMissingMatches,
-               pointsPerMissingMatch == 0 ? "-00" : pointsPerMissingMatch, // For formatting purposes only
-               pointsPerMissingMatch != 0
-                  ? `{ targetIds[${targetIds}] <> targetUserIds[${targetUserIds}] }`
-                  : "{ no pointsPerMissingMatch }",
-               rankedLivestream.model.id
-            )
+
             rankedLivestream.addPoints(mismatchPoints)
          }
 

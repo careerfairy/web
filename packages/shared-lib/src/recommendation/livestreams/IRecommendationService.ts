@@ -58,7 +58,6 @@ export default class RecommendationServiceCore {
                userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
                userLevelOfStudyId: user?.levelOfStudy?.id || "N/A",
                userSpokenLanguages: user?.spokenLanguages || [],
-               userFollowedCompanies: user?.companyUserFollowsIds || [],
                userCountriesOfInterest: user?.countriesOfInterest || [],
             },
             eventMetaData: deDupedEvents.map((e) => ({
@@ -136,29 +135,41 @@ export default class RecommendationServiceCore {
       userData: UserData,
       livestreams: LivestreamEvent[],
       limit: number,
-      implicitData?: ImplicitLivestreamRecommendationData // TODO: Use implicit data for implicit data usage in recommendation
+      implicitData?: ImplicitLivestreamRecommendationData
    ): RankedLivestreamEvent[] {
-      console.log(
-         "🚀 ~ RecommendationServiceCore ~ implicitData:",
-         implicitData
-      )
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          userData,
          new RankedLivestreamRepository(livestreams)
       )
 
+      if (implicitData) {
+         userRecommendationBuilder.setImplicitData(implicitData)
+      }
+
       return userRecommendationBuilder
+         .userInterests()
          .userUniversityCountry()
          .userUniversity()
          .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
          .userLevelsOfStudy()
          .userSpokenLanguages()
-         .userFollowedCompanies()
          .userUniversityCompanyTargetCountry()
          .userCountriesOfInterest()
          .userCompanyTargetUniversity()
          .userCompanyTargetFieldsOfStudy()
+         .userImplicitFollowedCompanies()
+         .userImplicitInteractedEventsCompanyCountry()
+         .userImplicitInteractedEventsCompanyIndustries()
+         .userImplicitInteractedEventsCompanySize()
+         .userImplicitInteractedEventsInterests()
+         .userImplicitInteractedEventsLanguage()
+         .userImplicitWatchedSparksCompanyCountry()
+         .userImplicitWatchedSparksCompanyIndustries()
+         .userImplicitWatchedSparksCompanySize()
+         .userImplicitAppliedJobsCompanyCountry()
+         .userImplicitAppliedJobsCompanyIndustries()
+         .userImplicitAppliedJobsCompanySize()
          .get()
    }
 }
