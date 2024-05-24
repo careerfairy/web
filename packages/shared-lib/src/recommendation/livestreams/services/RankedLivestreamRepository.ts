@@ -292,11 +292,6 @@ export class RankedLivestreamRepository {
          countryCodes,
          limit
       )
-      console.log(
-         "🚀 ~ INTERACTED EVENTS COMPANY CODES ~ countryCodes,events:",
-         countryCodes,
-         events?.map((e) => e.id)
-      )
 
       return this.rankEvents({
          pointsPerMatch:
