@@ -34,7 +34,7 @@ const styles = sxStyles({
       color: "black !important",
    },
    indicator: {
-      backgroundColor: "#6749EA !important",
+      backgroundColor: (theme) => `${theme.palette.secondary.main} !important`,
    },
    jobWarningIndicator: {
       backgroundColor: (theme) => `${theme.palette.warning["600"]} !important`,
@@ -59,10 +59,10 @@ const styles = sxStyles({
    },
    tooltip: {
       ml: 1,
-      color: "#8E8E8E",
+      color: (theme) => theme.brand.black[700],
    },
    tabs: {
-      borderBottom: "1px solid #D6D6E0",
+      borderBottom: (theme) => `1px solid ${theme.palette.neutral[100]}`,
 
       "& .MuiTabs-scrollButtons": {
          width: "auto !important",

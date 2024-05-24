@@ -11,6 +11,7 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
@@ -68,23 +69,23 @@ const styles = sxStyles({
       px: { xs: 1.5, md: 0 },
       pb: { xs: 1.5, md: 0 },
    },
-   stats: {
-      background: "#FAFAFE",
-      border: "#F6F6FA",
+   stats: (theme) => ({
+      background: theme.brand.white[300],
+      border: theme.brand.white[400],
       borderRadius: "62px",
       p: "12px 20px",
       alignItems: "center",
       justifyContent: "space-between",
-   },
-   mobileStats: {
+   }),
+   mobileStats: (theme) => ({
       display: "flex",
       flexDirection: "column",
       width: "100%",
-      background: "#FAFAFE",
-      border: "#F6F6FA",
+      background: theme.brand.white[300],
+      border: theme.brand.white[400],
       borderRadius: "12px",
       p: "12px 12px",
-   },
+   }),
    mobileStatsValues: {
       display: "flex",
       alignItems: "center",
@@ -168,6 +169,7 @@ type Props = {
    jobsWithStats: CustomJobStats[]
 }
 const JobList: FC<Props> = ({ jobsWithStats }) => {
+   const theme = useTheme()
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
@@ -183,6 +185,22 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    const jobsOptions = useMemo(
       () => jobsWithStats.map((jobWithStats) => jobWithStats.job),
       [jobsWithStats]
+   )
+
+   const getStateColor = useCallback(
+      (job: CustomJob): string => {
+         if (job.published) {
+            return theme.palette.primary[300]
+         }
+
+         // Job has no content associated to it and it's not expired
+         if (isValidButNoLinkedContent(job)) {
+            return theme.palette.warning.main
+         }
+
+         return theme.brand.black[500]
+      },
+      [theme]
    )
 
    return (
@@ -376,27 +394,7 @@ const formatJobPostingUrl = (postingUrl: string): string => {
 export default JobList
 
 /**
- *
- * This function determines the color state of a job based on its publication status and deadline.
- *
- * @param job {CustomJob}
- * @returns color {string}
- */
-const getStateColor = (job: CustomJob): string => {
-   if (job.published) {
-      return "#7FD6C9"
-   }
-
-   // Job has no content associated to it and it's not expired
-   if (isValidButNoLinkedContent(job)) {
-      return "#FE9B0E"
-   } else {
-      return "#E1E1E1"
-   }
-}
-
-/**
- * Checks if a job has no linked content (livestreams or sparks) and if its deadline has not expired.
+ * Checks if a job has no linked content (live streams or sparks) and if its deadline has not expired.
  *
  * @param job {CustomJob}
  * @returns {boolean}
