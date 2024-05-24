@@ -1,35 +1,34 @@
+import { GroupPlanType } from "@careerfairy/shared-lib/groups"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
 import {
    Box,
    BoxProps,
+   Dialog,
    IconButton,
    Typography,
    TypographyProps,
-   Dialog,
 } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import GroupPlanCheckoutView from "components/views/checkout/views/GroupPlanCheckoutView"
+import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
+import { useRouter } from "next/router"
 import { FC, useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { combineStyles, sxStyles } from "types/commonTypes"
-import { GroupPlanType } from "@careerfairy/shared-lib/groups"
 import {
    closeGroupPlansDialog,
-   setPlan as setPlanAction,
    setSecret as setClientSecretAction,
+   setPlan as setPlanAction,
 } from "store/reducers/groupPlanReducer"
 import {
    clientSecret,
    plansDialogOpenSelector,
 } from "store/selectors/groupSelectors"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import React from "react"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "../common/transitions"
-import GroupPlanCheckoutView from "components/views/checkout/views/GroupPlanCheckoutView"
-import SelectGroupPlanView from "components/views/checkout/views/SelectGroupPlanView"
 import GroupPlansMobileView from "./views/GroupPlansMobileView"
 import PlanActivationConfirmationDialog from "./views/PlanActivationConfirmationDialog"
-import { useRouter } from "next/router"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -218,25 +217,27 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    const open = useSelector(plansDialogOpenSelector)
 
    return (
-      <Box sx={combineStyles(styles.containerWrapper, sx)}>
-         <Dialog
-            sx={styles.container}
-            scroll="paper"
-            open={open}
-            maxWidth={false}
-            PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
-            TransitionComponent={SlideUpTransition}
-         >
-            {children}
-            {hideCloseButton ? null : (
-               <Box sx={styles.closeBtn}>
-                  <IconButton onClick={handleClose}>
-                     <CloseIcon />
-                  </IconButton>
-               </Box>
-            )}
-         </Dialog>
-      </Box>
+      <ConditionalWrapper condition={open}>
+         <Box sx={combineStyles(styles.containerWrapper, sx)}>
+            <Dialog
+               sx={styles.container}
+               scroll="paper"
+               open={open}
+               maxWidth={false}
+               PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+               TransitionComponent={SlideUpTransition}
+            >
+               {children}
+               {hideCloseButton ? null : (
+                  <Box sx={styles.closeBtn}>
+                     <IconButton onClick={handleClose}>
+                        <CloseIcon />
+                     </IconButton>
+                  </Box>
+               )}
+            </Dialog>
+         </Box>
+      </ConditionalWrapper>
    )
 }
 
