@@ -1,4 +1,5 @@
 import Container, { ContainerProps } from "@mui/material/Container"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { FC } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
@@ -20,11 +21,22 @@ const styles = sxStyles({
    },
 })
 
-const SparksContainer: FC<ContainerProps> = ({ children, sx, ...props }) => {
+const SparksContainer: FC<ContainerProps & { hide?: boolean }> = ({
+   children,
+   sx,
+   hide,
+   ...props
+}) => {
    return (
-      <Container sx={combineStyles(styles.root, sx)} maxWidth="xl" {...props}>
-         {children}
-      </Container>
+      <ConditionalWrapper condition={!hide}>
+         <Container
+            sx={combineStyles(styles.root, sx)}
+            maxWidth="xl"
+            {...props}
+         >
+            {children}
+         </Container>
+      </ConditionalWrapper>
    )
 }
 
