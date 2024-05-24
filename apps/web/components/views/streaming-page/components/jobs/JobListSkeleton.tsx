@@ -70,12 +70,10 @@ const styles = sxStyles({
 
 export const JobListSkeleton = () => {
    return (
-      <>
-         <Stack sx={styles.jobList}>
-            <JobCardSkeleton />
-            <JobCardSkeleton />
-         </Stack>
-      </>
+      <Stack sx={styles.jobList}>
+         <JobCardSkeleton />
+         <JobCardSkeleton />
+      </Stack>
    )
 }
 

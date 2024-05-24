@@ -23,7 +23,7 @@ export const BrandedTooltip = styled(
          placement={placement}
          classes={{ popper: className }}
       >
-         <div>{children}</div>
+         <span>{children}</span>
       </Tooltip>
    )
 )({
