@@ -30,8 +30,16 @@ export class RankedLivestreamEvent {
       }
 
       // using const to allow debugging if needed
-      const resultPoints =
-         points + RECOMMENDATION_POINTS.POPULARITY_NUMERATOR / popularity
+      const calculatedPopularityPoints =
+         RECOMMENDATION_POINTS.POPULARITY_NUMERATOR / popularity
+
+      const additionalPoints =
+         calculatedPopularityPoints >
+         RECOMMENDATION_POINTS.MAX_POPULARITY_POINTS
+            ? RECOMMENDATION_POINTS.MAX_POPULARITY_POINTS
+            : calculatedPopularityPoints
+
+      const resultPoints = points + additionalPoints
 
       return resultPoints
    }

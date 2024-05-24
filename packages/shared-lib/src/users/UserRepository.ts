@@ -1,27 +1,30 @@
+import firebase from "firebase/compat/app"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
+   mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
+import { Application } from "../ats/Application"
+import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
+import { Create } from "../commonTypes"
+import { CustomJobApplicant } from "../customJobs/customJobs"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
+import { SeenSparks } from "../sparks/sparks"
 import {
    CompanyFollowed,
    IUserReminder,
    RegistrationStep,
    SavedRecruiter,
-   UserActivity,
    UserATSDocument,
    UserATSRelations,
+   UserActivity,
    UserData,
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
    UserStats,
 } from "./users"
-import firebase from "firebase/compat/app"
-import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
-import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
-import { Application } from "../ats/Application"
-import { FieldOfStudy } from "../fieldOfStudy"
-import { Create } from "../commonTypes"
-import { Timestamp } from "../firebaseTypes"
 
 export interface IUserRepository {
    updateUserData(userId: string, data: Partial<UserData>): Promise<void>
@@ -134,6 +137,11 @@ export interface IUserRepository {
       limit: number
    ): firebase.firestore.Query<CompanyFollowed>
 
+   getCompaniesUserFollows(
+      userEmail: string,
+      limit?: number
+   ): Promise<CompanyFollowed[]>
+
    /**
     * Creates a user activity document and updates his lastActivityAt field
     */
@@ -180,6 +188,13 @@ export interface IUserRepository {
       userEmail: string,
       notificationId: string
    ): Promise<void>
+
+   getUserSeenSparks(userEmail: string): Promise<SeenSparks[]>
+
+   getCustomJobApplications(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]>
 }
 
 export class FirebaseUserRepository
@@ -582,6 +597,21 @@ export class FirebaseUserRepository
       return this.addIdToDocs<UserJobApplicationDocument>(data.docs)
    }
 
+   async getCustomJobApplications(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]> {
+      const collectionRef = this.firestore
+         .collection("jobApplications")
+         .where("user.id", "==", userId)
+         .orderBy("appliedAt", "desc")
+         .limit(limit)
+
+      const data = await collectionRef.get()
+
+      return this.addIdToDocs<CustomJobApplicant>(data.docs)
+   }
+
    updateAdditionalInformation(userEmail, fields): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -771,6 +801,23 @@ export class FirebaseUserRepository
          .limit(limit)
    }
 
+   async getCompaniesUserFollows(
+      userId: string,
+      limit?: number
+   ): Promise<CompanyFollowed[]> {
+      let query = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("companiesUserFollows")
+         .orderBy("createdAt", "desc")
+         .withConverter(createCompatGenericConverter<CompanyFollowed>())
+
+      if (limit) query = query.limit(limit)
+
+      const snapshot = await query.get()
+      return mapFirestoreDocuments<CompanyFollowed>(snapshot)
+   }
+
    updateResume(userEmail: string, resumeUrl: string): Promise<void> {
       const docRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -810,6 +857,25 @@ export class FirebaseUserRepository
       return ref.update({
          readAt: this.fieldValue.serverTimestamp() as Timestamp,
       })
+   }
+
+   async getUserSeenSparks(userEmail: string): Promise<SeenSparks[]> {
+      const query = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("seenSparks")
+         .where("userId", "==", userEmail)
+
+      const dataSnapshot = await query.get()
+
+      const sortedSeenSparks = mapFirestoreDocuments<SeenSparks>(
+         dataSnapshot
+      )?.sort(
+         (baseDoc, comparisonDoc) =>
+            Number(comparisonDoc.id) - Number(baseDoc.id)
+      )
+
+      return sortedSeenSparks
    }
 }
 

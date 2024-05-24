@@ -1,46 +1,47 @@
-import React, { useMemo } from "react"
-import { useRouter } from "next/router"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { Box } from "@mui/material"
 import Container from "@mui/material/Container"
-import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import { useRouter } from "next/router"
+import { useMemo } from "react"
+import SEO from "../../components/util/SEO"
+import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
+import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
 import WidgetsWrapper from "../../components/views/portal/WidgetsWrapper"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
-import SEO from "../../components/util/SEO"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
-import DateUtil from "../../util/DateUtil"
-import { Box } from "@mui/material"
+import { livestreamRepo } from "../../data/RepositoryInstances"
+import { useAuth } from "../../HOCs/AuthProvider"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import DateUtil from "../../util/DateUtil"
 import {
-   getServerSideUserData,
    getServerSideUserStats,
    getUserTokenFromCookie,
    mapFromServerSide,
 } from "../../util/serverUtil"
-import CarouselContentService, {
-   type CarouselContent,
-} from "../../components/views/portal/content-carousel/CarouselContentService"
 
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
+import useLivestreamsCarouselContentSWR from "components/custom-hook/live-stream/useLivestreamCarouselContent"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserImplicitRecommendationData from "components/custom-hook/user/useUserImplicitRecommendationData"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import Heading from "components/views/portal/common/Heading"
+import CarouselContentService, {
+   CarouselContent,
+} from "components/views/portal/content-carousel/CarouselContentService"
+import EventsPreviewCarousel, {
+   EventsTypes,
+} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
+import { sxStyles } from "types/commonTypes"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
 import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import SparksCarouselWithSuspenseComponent from "components/views/portal/sparks/SparksCarouselWithSuspenseComponent"
-import Heading from "components/views/portal/common/Heading"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import useIsMobile from "components/custom-hook/useIsMobile"
-import { sxStyles } from "types/commonTypes"
-import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 
 const styles = sxStyles({
    sparksCarouselHeader: {
@@ -51,13 +52,17 @@ const styles = sxStyles({
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
-   serializedCarouselContent,
+   recordedEventsToShare,
    serverUserStats,
    livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
+
    const router = useRouter()
    const isMobile = useIsMobile()
+
+   const { data: implicitRecommendationData } =
+      useUserImplicitRecommendationData()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -70,11 +75,24 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
+   const carouselServiceContent = useLivestreamsCarouselContentSWR({
+      userData: userData,
+      userStats: serverUserStats,
+      pastLivestreams: pastEvents || [],
+      upcomingLivestreams: comingUpNextEvents || [],
+      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+      watchedSparks: implicitRecommendationData?.watchedSparks || [],
+      watchedLivestreams: implicitRecommendationData?.watchedLivestreams || [],
+      appliedJobs: implicitRecommendationData?.appliedJobs || [],
+      userFollowedCompanies:
+         implicitRecommendationData?.followedCompanies || [],
+   })
+
    const carouselContent = useMemo<CarouselContent[]>(() => {
       return CarouselContentService.deserializeContent(
-         serializedCarouselContent
+         CarouselContentService.serializeContent(carouselServiceContent)
       )
-   }, [serializedCarouselContent])
+   }, [carouselServiceContent])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
@@ -171,8 +189,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    if (token?.email) {
       promises.push(
          livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
-         getServerSideUserStats(token.email),
-         getServerSideUserData(token.email)
+         getServerSideUserStats(token.email)
       )
    }
 
@@ -184,7 +201,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       livestreamDialogData,
       recordedEvents,
       userStats,
-      userData,
    ] = results.map((result) =>
       result.status === "fulfilled" ? result.value : null
    )
@@ -192,16 +208,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
-
-   const carouselContentService = new CarouselContentService({
-      userData: userData,
-      userStats: userStats,
-      pastLivestreams: pastEvents || [],
-      upcomingLivestreams: comingUpNextEvents || [],
-      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-   })
-
-   const carouselContent = await carouselContentService.getCarouselContent()
 
    return {
       props: {
@@ -214,9 +220,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         ...(carouselContent && {
-            serializedCarouselContent:
-               CarouselContentService.serializeContent(carouselContent),
+         ...(recordedEventsToShare && {
+            recordedEventsToShare: recordedEventsToShare.map(
+               LivestreamPresenter.serializeDocument
+            ),
          }),
          livestreamDialogData,
       },

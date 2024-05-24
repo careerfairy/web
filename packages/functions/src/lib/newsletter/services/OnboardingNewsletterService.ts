@@ -1,28 +1,28 @@
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
-import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository"
+import {
+   LivestreamEvent,
+   LivestreamRecordingDetails,
+} from "@careerfairy/shared-lib/livestreams"
+import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
+import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
+import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
 import { SeenSparks } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import {
+   addUtmTagsToLink,
+   getDateDifferenceInDays,
+} from "@careerfairy/shared-lib/utils"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import { DateTime } from "luxon"
+import { IRecommendationDataFetcher } from "src/lib/recommendation/services/DataFetcherRecommendations"
+import { IUserFunctionsRepository } from "../../UserFunctionsRepository"
+import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
+import { ISparkFunctionsRepository } from "../../sparks/SparkFunctionsRepository"
 import {
    LivestreamDiscoveryData,
    OnboardingNewsletterEmailBuilder,
    OnboardingNewsletterEvents,
 } from "../onboarding/OnboardingNewsletterEmailBuilder"
-import { EmailNotification } from "@careerfairy/shared-lib/notifications/notifications"
-import { IEmailNotificationRepository as IEmailFunctionsNotificationRepository } from "@careerfairy/shared-lib/notifications/IEmailNotificationRepository"
-import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import {
-   LivestreamEvent,
-   LivestreamRecordingDetails,
-} from "@careerfairy/shared-lib/livestreams"
-import { IRecommendationDataFetcher } from "src/lib/recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "../../recommendation/UserEventRecommendationService"
-import { DateTime } from "luxon"
-import {
-   addUtmTagsToLink,
-   getDateDifferenceInDays,
-} from "@careerfairy/shared-lib/utils"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const FEEDBACK_DISCOVERY_TRIGGER_DAY_FROM_SKIPPED = 25
 const MAX_SPARKS_COUNT = 5
@@ -359,6 +359,7 @@ export class OnboardingNewsletterService {
             onboardingUser.user,
             this.futureLivestreams,
             this.pastLivestreams,
+            null,
             false
          )
 

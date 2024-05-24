@@ -1,14 +1,14 @@
 import functions = require("firebase-functions")
+import { array, string } from "yup"
+import { customJobRepo, userRepo } from "./api/repositories"
 import config from "./config"
-import { onCallWrapper } from "./util"
 import { middlewares } from "./middlewares/middlewares"
 import {
    dataValidation,
    userAuthExists,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
-import { string, array } from "yup"
-import { userRepo, customJobRepo } from "./api/repositories"
+import { onCallWrapper } from "./util"
 
 export const userApplyToCustomJob = functions
    .region(config.region)
