@@ -7,9 +7,9 @@ import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 const now = new Date()
 
 /**
- * Custom hook to check if a group has any livestreams.
- * @param {string} groupId - The ID of the group to check for livestreams.
- * @returns {boolean} - Returns true if the group has livestreams, otherwise false.
+ * Custom hook to check if a group has any live streams.
+ * @param {string} groupId - The ID of the group to check for live streams.
+ * @returns {boolean} - Returns true if the group has live streams, otherwise false.
  */
 const useGroupHasUpcomingLivestreams = (groupId: string) => {
    const livestreamsQuery = useMemo(() => {
