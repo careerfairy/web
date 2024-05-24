@@ -50,7 +50,7 @@ const SparkStats: FC<Props> = ({ spark }) => {
 const Component: FC<Props> = ({ spark }) => {
    const { data: sparkStats } = useSparkStats(spark.id)
 
-   const impressions = sparkStats?.impressions || 0
+   const plays = sparkStats?.plays || 0
    const numberOfCareerPageClicks = sparkStats?.numberOfCareerPageClicks || 0
    const likes = sparkStats?.likes || 0
    const shareCTA = sparkStats?.shareCTA || 0
@@ -59,8 +59,8 @@ const Component: FC<Props> = ({ spark }) => {
       <Stack spacing={1.5}>
          <StatChip
             icon={<ImpressionsIcon />}
-            value={impressions}
-            tooltip={`This Spark has been seen ${impressions} times.`}
+            value={plays}
+            tooltip={`This Spark has been seen ${plays} times.`}
          />
          <StatChip
             icon={<TotalPlaysIcon />}
