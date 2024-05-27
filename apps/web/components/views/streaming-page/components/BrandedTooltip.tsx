@@ -9,6 +9,9 @@ export const tooltipStyles = sxStyles({
       fontWeight: 400,
       py: 1,
    },
+   wrapper: {
+      lineHeight: 0,
+   },
 })
 
 export const BrandedTooltip = styled(
