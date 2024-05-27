@@ -122,28 +122,28 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
          node: <ClapEmote />,
          tooltip: "Applause",
          onClick: () => {
-            handleSendEmote(EmoteType.Clapping)
+            handleSendEmote(EmoteType.CLAPPING)
          },
       },
       {
          node: <HeartEmote />,
          tooltip: "Love",
          onClick: () => {
-            handleSendEmote(EmoteType.Heart)
+            handleSendEmote(EmoteType.HEART)
          },
       },
       {
          node: <LikeEmote />,
          tooltip: "Like",
          onClick: () => {
-            handleSendEmote(EmoteType.Like)
+            handleSendEmote(EmoteType.LIKE)
          },
       },
       {
          node: <ConfusedEmote />,
          tooltip: "Confused",
          onClick: () => {
-            handleSendEmote(EmoteType.Confused)
+            handleSendEmote(EmoteType.CONFUSED)
          },
       },
    ]
