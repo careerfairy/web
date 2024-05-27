@@ -47,8 +47,10 @@ const styles = sxStyles({
    deleteOption: {
       color: "error.main",
    },
-   overflow: {
-      overflow: "auto",
+   uploaderInput: {
+      "& > input": {
+         display: "none",
+      },
    },
 })
 
@@ -110,10 +112,10 @@ const UploadCVButton: FC<{ isSecondary: boolean }> = ({ isSecondary }) => {
    return (
       <FileUploader
          {...fileUploaderProps}
-         sx={[dragActive && styles.dragActive, styles.overflow]}
+         sx={[dragActive && styles.dragActive, styles.uploaderInput]}
       >
          <LoadingButton
-            disabled={isLoading}
+            loading={isLoading}
             startIcon={<UploadIcon />}
             {...baseButtonProps}
             color={isSecondary ? "grey" : "primary"}

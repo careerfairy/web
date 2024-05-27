@@ -113,7 +113,7 @@ const styles = sxStyles({
    },
    drawer: {
       borderRadius: "12px 12px 0 0",
-      maxHeight: "calc(100vh - 88px)",
+      maxHeight: "calc(100vh - 66px)",
    },
    drawerContent: {
       display: "flex",
