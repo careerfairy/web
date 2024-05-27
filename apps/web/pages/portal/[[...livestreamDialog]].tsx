@@ -6,7 +6,6 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import SEO from "../../components/util/SEO"
-import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
@@ -24,14 +23,10 @@ import {
 
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
-import useLivestreamsCarouselContentSWR from "components/custom-hook/live-stream/useLivestreamCarouselContent"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import useUserImplicitRecommendationData from "components/custom-hook/user/useUserImplicitRecommendationData"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import Heading from "components/views/portal/common/Heading"
-import CarouselContentService, {
-   CarouselContent,
-} from "components/views/portal/content-carousel/CarouselContentService"
+import ContentCarouselWithSuspenseComponent from "components/views/portal/content-carousel/ContentCarouselWithSuspenseComponent"
 import EventsPreviewCarousel, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
@@ -61,9 +56,6 @@ const PortalPage = ({
    const router = useRouter()
    const isMobile = useIsMobile()
 
-   const { data: implicitRecommendationData } =
-      useUserImplicitRecommendationData()
-
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
@@ -74,25 +66,6 @@ const PortalPage = ({
       () => mapFromServerSide(comingUpNextEvents),
       [comingUpNextEvents]
    )
-
-   const carouselServiceContent = useLivestreamsCarouselContentSWR({
-      userData: userData,
-      userStats: serverUserStats,
-      pastLivestreams: pastEvents || [],
-      upcomingLivestreams: comingUpNextEvents || [],
-      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-      watchedSparks: implicitRecommendationData?.watchedSparks || [],
-      watchedLivestreams: implicitRecommendationData?.watchedLivestreams || [],
-      appliedJobs: implicitRecommendationData?.appliedJobs || [],
-      userFollowedCompanies:
-         implicitRecommendationData?.followedCompanies || [],
-   })
-
-   const carouselContent = useMemo<CarouselContent[]>(() => {
-      return CarouselContentService.deserializeContent(
-         CarouselContentService.serializeContent(carouselServiceContent)
-      )
-   }, [carouselServiceContent])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
@@ -117,8 +90,7 @@ const PortalPage = ({
          />
          <GenericDashboardLayout
             pageDisplayName={""}
-            topBarFixed={carouselContent?.length > 0}
-            headerScrollThreshold={carouselContent?.length ? 250 : 10}
+            topBarFixed={true}
             isPortalPage={true}
          >
             <>
@@ -127,8 +99,10 @@ const PortalPage = ({
                >
                   <>
                      <Box position="relative" mb={4}>
-                        <ContentCarousel
-                           content={carouselContent}
+                        <ContentCarouselWithSuspenseComponent
+                           comingUpNextEvents={comingUpNextEvents}
+                           pastEvents={pastEvents}
+                           recordedEventsToShare={recordedEventsToShare}
                            serverUserStats={serverUserStats}
                         />
                      </Box>

@@ -44,7 +44,7 @@ export const useUserImplicitRecommendationData = () => {
             key,
          }),
       ...reducedRemoteCallsOptions,
-      suspense: false,
+      suspense: true,
    })
 
    return useMemo(
