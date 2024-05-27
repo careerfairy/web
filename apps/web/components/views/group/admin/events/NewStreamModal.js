@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
+/* eslint-disable react/jsx-no-leaked-render */
+import PublishIcon from "@mui/icons-material/Publish"
+import SaveIcon from "@mui/icons-material/Save"
 import {
    AppBar,
    Button,
@@ -11,8 +12,14 @@ import {
    Toolbar,
    Typography,
 } from "@mui/material"
-import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm"
+import makeStyles from "@mui/styles/makeStyles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useSnackbar } from "notistack"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { customJobServiceInstance } from "../../../../../data/firebase/CustomJobService"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 import {
    buildLivestreamObject,
    buildPromotionObj,
@@ -22,14 +29,8 @@ import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../../../../util/constants"
-import SaveIcon from "@mui/icons-material/Save"
-import { useSnackbar } from "notistack"
-import PublishIcon from "@mui/icons-material/Publish"
-import { v4 as uuidv4 } from "uuid"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
+import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm"
 import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { customJobServiceInstance } from "../../../../../data/firebase/CustomJobService"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -189,8 +190,7 @@ const NewStreamModal = ({
       status,
       setStatus,
       selectedJobs,
-      selectedCustomJobs,
-      metaData
+      selectedCustomJobs
    ) => {
       let livestream
 
@@ -220,12 +220,6 @@ const NewStreamModal = ({
 
          livestream.hasJobs =
             selectedJobs?.length > 0 || selectedCustomJobs?.length > 0
-
-         if (metaData) {
-            livestream.companySizes = metaData.companySizes
-            livestream.companyIndustries = metaData.companyIndustries
-            livestream.companyCountries = metaData.companyCountries
-         }
 
          // only save the promotions if the start date is after 30 days from now
          const promotion = buildPromotionObj(values, livestream.id)
