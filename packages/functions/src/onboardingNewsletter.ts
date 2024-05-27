@@ -1,17 +1,17 @@
+import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
 import { RuntimeOptions } from "firebase-functions"
-import functions = require("firebase-functions")
 import { PostmarkEmailSender } from "./api/postmark"
 import {
-   userRepo,
+   emailNotificationsRepo,
    livestreamsRepo,
    sparkRepo,
-   emailNotificationsRepo,
+   userRepo,
 } from "./api/repositories"
 import config from "./config"
 import { OnboardingNewsletterEmailBuilder } from "./lib/newsletter/onboarding/OnboardingNewsletterEmailBuilder"
 import { OnboardingNewsletterService } from "./lib/newsletter/services/OnboardingNewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import { isWithinNormalizationLimit } from "@careerfairy/shared-lib/utils"
+import functions = require("firebase-functions")
 
 /**
  * OnboardingNewsletter functions runtime settings

@@ -1,11 +1,17 @@
-import React, {
-   MutableRefObject,
-   useCallback,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   LivestreamJobAssociation,
+   LivestreamPromotions,
+   Speaker,
+} from "@careerfairy/shared-lib/livestreams"
+import PublishIcon from "@mui/icons-material/Publish"
+import SaveIcon from "@mui/icons-material/Save"
+import WarningIcon from "@mui/icons-material/Warning"
 import {
    Box,
    Button,
@@ -14,53 +20,46 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
-import { Formik, FormikHelpers, FormikValues } from "formik"
-import { v4 as uuidv4 } from "uuid"
-import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { createStyles } from "@mui/styles"
 import makeStyles from "@mui/styles/makeStyles"
+import { Formik, FormikHelpers, FormikValues } from "formik"
+import _ from "lodash"
 import { useRouter } from "next/router"
-import WarningIcon from "@mui/icons-material/Warning"
+import { useSnackbar } from "notistack"
+import {
+   MutableRefObject,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
+import { v4 as uuidv4 } from "uuid"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
+import { useInterests } from "../../custom-hook/useCollection"
+import { copyStringToClipboard } from "../../helperFunctions/HelperFunctions"
 import {
    getStreamSubCollectionSpeakers,
    handleFlattenOptions,
    languageCodes,
    validateStreamForm,
 } from "../../helperFunctions/streamFormFunctions"
-import { copyStringToClipboard } from "../../helperFunctions/HelperFunctions"
-import { useSnackbar } from "notistack"
 import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../../util/constants"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
-import { useInterests } from "../../custom-hook/useCollection"
-import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
-import {
-   LivestreamEvent,
-   LivestreamGroupQuestionsMap,
-   LivestreamJobAssociation,
-   LivestreamPromotions,
-   Speaker,
-} from "@careerfairy/shared-lib/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import StreamInfo from "./StreamForm/StreamInfo"
-import SpeakersInfo from "./StreamForm/SpeakersInfo"
-import TargetStudentsInfo from "./StreamForm/TargetStudentsInfo"
 import EventCategoriesInfo from "./StreamForm/EventCategoriesInfo"
 import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
+import SpeakersInfo from "./StreamForm/SpeakersInfo"
+import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import StreamFormNavigator, {
    IStreamFormNavigatorSteps,
 } from "./StreamForm/StreamFormNavigator"
-import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
-import PublishIcon from "@mui/icons-material/Publish"
-import SaveIcon from "@mui/icons-material/Save"
-import _ from "lodash"
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
-import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import StreamInfo from "./StreamForm/StreamInfo"
+import TargetStudentsInfo from "./StreamForm/TargetStudentsInfo"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -124,11 +123,6 @@ const useStyles = makeStyles((theme) =>
       },
    })
 )
-
-type MetaData = Pick<
-   LivestreamEvent,
-   "companyCountries" | "companyIndustries" | "companySizes"
->
 
 export type ISpeakerObj = {
    avatar: string
@@ -199,8 +193,7 @@ interface Props {
       status: string,
       setStatus: (status: string) => void,
       selectedJobs: LivestreamJobAssociation[],
-      selectedCustomJobs: CustomJob[],
-      metaData: MetaData
+      selectedCustomJobs: CustomJob[]
    ) => void
    isActualLivestream?: boolean
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -324,11 +317,6 @@ const DraftStreamForm = ({
    const [existingGroups, setExistingGroups] = useState([])
    const [formData, setFormData] = useState<DraftFormValues>(
       getLivestreamInitialValues(group)
-   )
-
-   const metaData = useMemo<MetaData>(
-      () => getMetaDataFromEventHosts(selectedGroups),
-      [selectedGroups]
    )
 
    const [steps, setSteps] = useState(initialSteps)
@@ -801,8 +789,7 @@ const DraftStreamForm = ({
                               status,
                               setStatus,
                               selectedJobs,
-                              selectedCustomJobs,
-                              metaData
+                              selectedCustomJobs
                            )
                         }}
                      >

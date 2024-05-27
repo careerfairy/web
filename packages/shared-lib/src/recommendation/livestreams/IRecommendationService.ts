@@ -4,6 +4,7 @@ import { UserData } from "../../users"
 import { Logger } from "../../utils/types"
 import { sortDocumentByPopularity } from "../../utils/utils"
 import { sortRankedByPoints } from "../utils"
+import { ImplicitLivestreamRecommendationData } from "./ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./services/UserBasedRecommendationsBuilder"
@@ -52,21 +53,26 @@ export default class RecommendationServiceCore {
          this.log?.info("Metadata", {
             userMetaData: {
                userId: user?.id || "N/A",
-               userInterestIds: user?.interestsIds || [],
-               userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
-               userCountriesOfInterest: user?.countriesOfInterest || [],
                userUniversityCountryCode: user?.universityCountryCode || "N/A",
+               userUniversityCode: user?.university?.code || "N/A",
+               userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
+               userLevelOfStudyId: user?.levelOfStudy?.id || "N/A",
                userSpokenLanguages: user?.spokenLanguages || [],
+               userCountriesOfInterest: user?.countriesOfInterest || [],
             },
             eventMetaData: deDupedEvents.map((e) => ({
                id: e.id,
                numPoints: e.points,
-               fieldsOfStudyIds: e.getFieldOfStudyIds(),
-               interestIds: e.getInterestIds(),
-               companyCountries: e.getCompanyCountries(),
-               companyIndustries: e.getCompanyIndustries(),
-               companySizes: e.getCompanySizes(),
+               targetCountries: e.getTargetCountries(),
+               targetUniversities: e.getTargetUniversities(),
+               targetFieldsOfStudy: e.getFieldOfStudyIds(),
+               targetLevelOfStudies: e.getTargetLevelOfStudyIds(),
                language: e.getLanguage(),
+               groupIds: e.getGroupIds(),
+               companyTargetCountries: e.getCompanyTargetCountries(),
+               companyTargetUniversities: e.getCompanyTargetUniversities(),
+               companyTargetFieldsOfStudies:
+                  e.getCompanyTargetFieldsOfStudies(),
             })),
          })
       }
@@ -128,7 +134,8 @@ export default class RecommendationServiceCore {
    protected getRecommendedEventsBasedOnUserData(
       userData: UserData,
       livestreams: LivestreamEvent[],
-      limit: number
+      limit: number,
+      implicitData?: ImplicitLivestreamRecommendationData
    ): RankedLivestreamEvent[] {
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
@@ -136,12 +143,33 @@ export default class RecommendationServiceCore {
          new RankedLivestreamRepository(livestreams)
       )
 
+      if (implicitData) {
+         userRecommendationBuilder.setImplicitData(implicitData)
+      }
+
       return userRecommendationBuilder
          .userInterests()
-         .userFieldsOfStudy()
-         .userCountriesOfInterest()
          .userUniversityCountry()
+         .userUniversity()
+         .userFieldsOfStudy() // Uses livestream.targetFieldsOfStudy
+         .userLevelsOfStudy()
          .userSpokenLanguages()
+         .userUniversityCompanyTargetCountry()
+         .userCountriesOfInterest()
+         .userCompanyTargetUniversity()
+         .userCompanyTargetFieldsOfStudy()
+         .userImplicitFollowedCompanies()
+         .userImplicitInteractedEventsCompanyCountry()
+         .userImplicitInteractedEventsCompanyIndustries()
+         .userImplicitInteractedEventsCompanySize()
+         .userImplicitInteractedEventsInterests()
+         .userImplicitInteractedEventsLanguage()
+         .userImplicitWatchedSparksCompanyCountry()
+         .userImplicitWatchedSparksCompanyIndustries()
+         .userImplicitWatchedSparksCompanySize()
+         .userImplicitAppliedJobsCompanyCountry()
+         .userImplicitAppliedJobsCompanyIndustries()
+         .userImplicitAppliedJobsCompanySize()
          .get()
    }
 }

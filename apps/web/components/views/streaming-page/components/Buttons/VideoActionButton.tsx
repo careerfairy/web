@@ -1,10 +1,12 @@
-import { Video, VideoOff } from "react-feather"
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
 import { forwardRef } from "react"
+import { Video, VideoOff } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useLocalTracks } from "../../context/LocalTracks"
 import { getCameraErrorMessage, getDeviceButtonColor } from "../../util"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { DeviceErrorWrapper } from "../DeviceErrorWrapper"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
    off: {
@@ -17,7 +19,7 @@ const styles = sxStyles({
 export const VideoActionButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const {
       toggleCamera,
       cameraOn,
@@ -30,16 +32,26 @@ export const VideoActionButton = forwardRef<
       <DeviceErrorWrapper
          errorMessage={getCameraErrorMessage(cameraError || fetchCamerasError)}
       >
-         <ActionBarButtonStyled
-            color={getDeviceButtonColor(cameraOn, isLoading, cameraError)}
-            ref={ref}
-            onClick={toggleCamera}
-            sx={cameraOn ? undefined : styles.off}
-            disabled={Boolean(cameraError) || isLoading}
-            {...props}
+         <BrandedTooltip
+            title={
+               enableTooltip
+                  ? cameraOn
+                     ? ActionTooltips.VideoTurnOff
+                     : ActionTooltips.VideoTurnOn
+                  : null
+            }
          >
-            {cameraOn ? <Video /> : <VideoOff />}
-         </ActionBarButtonStyled>
+            <ActionBarButtonStyled
+               color={getDeviceButtonColor(cameraOn, isLoading, cameraError)}
+               ref={ref}
+               onClick={toggleCamera}
+               sx={cameraOn ? undefined : styles.off}
+               disabled={Boolean(cameraError) || isLoading}
+               {...props}
+            >
+               {cameraOn ? <Video /> : <VideoOff />}
+            </ActionBarButtonStyled>
+         </BrandedTooltip>
       </DeviceErrorWrapper>
    )
 })

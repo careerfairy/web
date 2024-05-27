@@ -1,4 +1,4 @@
-import React, { memo } from "react"
+import { HandRaise } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
@@ -7,7 +7,7 @@ import {
    CategorySubtitle,
    ThemedPermanentMarker,
 } from "materialUI/GlobalTitles"
-import { HandRaise } from "types/handraise"
+import { memo } from "react"
 
 const HandRaiseAcquiringMedia = memo(({ handRaiseState }: Props) => {
    const shouldRender = () => Boolean(handRaiseState?.state === "acquire_media")

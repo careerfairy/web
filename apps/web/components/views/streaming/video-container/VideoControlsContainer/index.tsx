@@ -1,21 +1,16 @@
-import React, {
-   memo,
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
-import MicOffIcon from "@mui/icons-material/MicOff"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
+import CheckIcon from "@mui/icons-material/Check"
+import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import MicIcon from "@mui/icons-material/Mic"
-import YouTubeIcon from "@mui/icons-material/YouTube"
-import VideocamIcon from "@mui/icons-material/Videocam"
-import VideocamOffIcon from "@mui/icons-material/VideocamOff"
+import MicOffIcon from "@mui/icons-material/MicOff"
+import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver"
 import ScreenShareIcon from "@mui/icons-material/ScreenShare"
 import SettingsIcon from "@mui/icons-material/Settings"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useTheme } from "@mui/material/styles"
+import VideocamIcon from "@mui/icons-material/Videocam"
+import VideocamOffIcon from "@mui/icons-material/VideocamOff"
+import YouTubeIcon from "@mui/icons-material/YouTube"
+import LoadingButton from "@mui/lab/LoadingButton"
 import {
    Box,
    CircularProgress,
@@ -26,9 +21,14 @@ import {
    DialogContentText,
    DialogTitle,
 } from "@mui/material"
+import Button from "@mui/material/Button"
 import SpeedDial from "@mui/material/SpeedDial"
-import SpeedDialIcon from "@mui/material/SpeedDialIcon"
 import SpeedDialAction from "@mui/material/SpeedDialAction"
+import SpeedDialIcon from "@mui/material/SpeedDialIcon"
+import { useTheme } from "@mui/material/styles"
+import useHandRaiseState from "components/custom-hook/useHandRaiseState"
+import useStreamRef from "components/custom-hook/useStreamRef"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import TutorialContext from "context/tutorials/TutorialContext"
 import {
    TooltipButtonComponent,
@@ -36,24 +36,24 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "materialUI/GlobalTooltips"
-import useStreamRef from "components/custom-hook/useStreamRef"
-import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons"
-import ShareMenu from "./ShareMenu"
-import CallToActionDrawer from "./CallToActionDrawer"
-import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened"
-import NewFeatureHint from "../../../../util/NewFeatureHint"
-import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver"
-import StudentViewIcon from "@mui/icons-material/FaceRounded"
-import Button from "@mui/material/Button"
-import CheckIcon from "@mui/icons-material/Check"
+import React, {
+   memo,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as storeActions from "store/actions"
-import LoadingButton from "@mui/lab/LoadingButton"
-import useHandRaiseState from "components/custom-hook/useHandRaiseState"
-import { HandRaiseState } from "types/handraise"
-import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
 import { showActionButtonsSelector } from "../../../../../store/selectors/streamSelectors"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import useSliderFullyOpened from "../../../../custom-hook/useSliderFullyOpened"
+import NewFeatureHint from "../../../../util/NewFeatureHint"
+import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
+import CallToActionDrawer from "./CallToActionDrawer"
+import { CallToActionIcon, ShareIcon, SharePdfIcon } from "./Icons"
+import ShareMenu from "./ShareMenu"
 
 const styles = {
    root: {
@@ -182,6 +182,7 @@ const VideoControlsContainer = ({
       if (isOpen(16)) {
          setOpen(true)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [tutorialSteps])
 
    const handleOpenShareVideoModal = () => setShareVideoModalOpen(true)
@@ -377,6 +378,7 @@ const VideoControlsContainer = ({
          })
       }
       setActions(newActions)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       isPublishing,
       togglingMicrophone,
@@ -397,12 +399,15 @@ const VideoControlsContainer = ({
       } else {
          handleOpenShareVideoModal()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [streamRef, videoMode])
+
+   const shouldShowScreenShareButtons = showScreenShareButtons()
 
    useEffect(() => {
       const newShareActions: Action[] = []
 
-      if (showScreenShareButtons()) {
+      if (shouldShowScreenShareButtons) {
          newShareActions.unshift({
             icon: (
                <ScreenShareIcon color={desktopMode ? "primary" : "inherit"} />
@@ -442,8 +447,9 @@ const VideoControlsContainer = ({
       }
 
       setShareActions(newShareActions)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
-      showScreenShareButtons(),
+      shouldShowScreenShareButtons,
       desktopMode,
       handleClickScreenShareButton,
       viewer,
@@ -551,6 +557,7 @@ const VideoControlsContainer = ({
                                     "data-testid": action.name,
                                     disabled: action.disabled,
                                  }}
+                                 // eslint-disable-next-line react/jsx-handler-names
                                  onClick={action.onClick}
                               />
                            )
@@ -603,7 +610,7 @@ const VideoControlsContainer = ({
                </LoadingButton>
             </DialogActions>
          </Dialog>
-         {shareVideoModalOpen && (
+         {Boolean(shareVideoModalOpen) && (
             <ShareYoutubeVideoModal
                open={shareVideoModalOpen}
                onClose={handleCloseShareVideoModal}

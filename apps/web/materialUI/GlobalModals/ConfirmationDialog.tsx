@@ -45,8 +45,8 @@ const styles = sxStyles({
       right: 0,
       p: 2.5,
       "& svg": {
-         width: 32,
-         height: 32,
+         width: "32px !important",
+         height: "32px !important",
       },
    },
    titleWrapper: {
@@ -138,6 +138,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
          maxWidth="xs"
+         TransitionProps={{ unmountOnExit: true }}
          fullScreen={isMobile}
          PaperProps={{
             sx: styles.dialogPaper,
@@ -160,6 +161,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
                   fontWeight={700}
                   variant="desktopBrandedH4"
                   component="h4"
+                  textAlign="center"
                >
                   {title}
                </Typography>
@@ -222,7 +224,11 @@ const MobileDrawer = ({
             sx={styles.iconWrapper}
          >
             {icon}
-            <Typography fontWeight={600} variant="desktopBrandedH4">
+            <Typography
+               fontWeight={600}
+               variant="desktopBrandedH4"
+               textAlign="center"
+            >
                {title}
             </Typography>
          </Stack>

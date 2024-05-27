@@ -1,39 +1,43 @@
-import {
-   CategoryDataOption as LivestreamCategoryDataOption,
-   FilterLivestreamsOptions,
-   LivestreamQueryOptions,
-   LivestreamMode,
-   LivestreamEvent,
-   LivestreamModes,
-   UserLivestreamData,
-   LivestreamChatEntry,
-   DeleteLivestreamChatEntryRequest,
-   CreateLivestreamPollRequest,
-   UpdateLivestreamPollRequest,
-   DeleteLivestreamPollRequest,
-   MarkLivestreamPollAsCurrentRequest,
-   LivestreamPollVoter,
-   ResetLivestreamQuestionRequest,
-   MarkLivestreamQuestionAsCurrentRequest,
-   LivestreamQuestion,
-   LivestreamQuestionComment,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
-import { Functions, httpsCallable } from "firebase/functions"
-import { mapFromServerSide } from "util/serverUtil"
-import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    AgoraRTCTokenRequest,
-   AgoraRTMTokenRequest,
    AgoraRTCTokenResponse,
+   AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
-import FirebaseService from "./FirebaseService"
-import GroupsUtil from "data/util/GroupsUtil"
-import { groupRepo } from "data/RepositoryInstances"
-import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   CreateLivestreamPollRequest,
+   DeleteLivestreamChatEntryRequest,
+   DeleteLivestreamPollRequest,
+   FilterLivestreamsOptions,
+   CategoryDataOption as LivestreamCategoryDataOption,
+   LivestreamChatEntry,
+   LivestreamEvent,
+   LivestreamMode,
+   LivestreamModes,
+   LivestreamPollVoter,
+   LivestreamQueryOptions,
+   LivestreamQuestion,
+   LivestreamQuestionComment,
+   MarkLivestreamPollAsCurrentRequest,
+   MarkLivestreamQuestionAsCurrentRequest,
+   MarkLivestreamQuestionAsDoneRequest,
+   ResetLivestreamQuestionRequest,
+   ToggleHandRaiseRequest,
+   UpdateLivestreamPollRequest,
+   UserLivestreamData,
+   hasUpvotedLivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/livestreams/hand-raise"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+import { groupRepo } from "data/RepositoryInstances"
+import GroupsUtil from "data/util/GroupsUtil"
 import {
    DocumentReference,
    PartialWithFieldValue,
@@ -49,6 +53,7 @@ import {
    getDocs,
    increment,
    limit,
+   orderBy,
    query,
    runTransaction,
    setDoc,
@@ -56,9 +61,11 @@ import {
    where,
    writeBatch,
 } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
+import { Functions, httpsCallable } from "firebase/functions"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { mapFromServerSide } from "util/serverUtil"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
+import FirebaseService from "./FirebaseService"
 
 type StreamerDetails = {
    firstName: string
@@ -667,6 +674,16 @@ export class LivestreamService {
    }
 
    /**
+    * Marks a question as done for a livestream
+    */
+   async markQuestionAsDone(options: MarkLivestreamQuestionAsDoneRequest) {
+      await httpsCallable<MarkLivestreamQuestionAsDoneRequest>(
+         this.functions,
+         "markQuestionAsDone"
+      )(options)
+   }
+
+   /**
     * Deletes a question from a livestream along with all its comments
     * @param livestreamRef - Livestream document reference
     * @param questionId - Question ID
@@ -700,28 +717,53 @@ export class LivestreamService {
       commentId: string
    ) => {
       return runTransaction(FirestoreInstance, async (transaction) => {
-         const ref = this.getCommentRef(livestreamRef, questionId, commentId)
+         const commentRef = this.getCommentRef(
+            livestreamRef,
+            questionId,
+            commentId
+         )
 
          const questionRef = this.getQuestionRef(livestreamRef, questionId)
 
          const questionDoc = await transaction.get(questionRef)
-         const commentDoc = await transaction.get(ref)
+         const commentDoc = await transaction.get(commentRef)
 
          if (!commentDoc.exists()) {
             throw new Error("Comment does not exist")
          }
 
          if (questionDoc.exists()) {
-            const firstComment = questionDoc.data().firstComment
-            transaction.update(questionRef, {
+            const replacementFirstCommentsSnap = await getDocs(
+               query(
+                  collection(questionRef, "comments"),
+                  orderBy("timestamp", "asc"),
+                  limit(2)
+               ).withConverter(
+                  createGenericConverter<LivestreamQuestionComment>()
+               )
+            )
+
+            const currentFirstComment = questionDoc.data().firstComment
+
+            const isFirstCommentDeleted = currentFirstComment?.id === commentId
+
+            const updateData: PartialWithFieldValue<LivestreamQuestion> = {
                numberOfComments: increment(-1),
-               ...(firstComment?.id === commentId
-                  ? { firstComment: null }
-                  : {}),
-            })
+            }
+
+            if (isFirstCommentDeleted) {
+               const replacementFirstComment =
+                  replacementFirstCommentsSnap.docs
+                     .find((comment) => comment.id !== commentId)
+                     ?.data() || null
+
+               updateData.firstComment = replacementFirstComment
+            }
+
+            transaction.update(questionRef, updateData)
          }
 
-         transaction.delete(ref)
+         transaction.delete(commentRef)
       })
    }
 
@@ -731,7 +773,7 @@ export class LivestreamService {
     * @param questionId - Question ID
     * @returns Document reference for the question.
     */
-   private getQuestionRef(
+   getQuestionRef(
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string
    ) {
@@ -769,7 +811,7 @@ export class LivestreamService {
       livestreamRef: DocumentReference<LivestreamEvent>,
       options: Pick<
          LivestreamQuestion,
-         "title" | "displayName" | "author" | "badges"
+         "title" | "displayName" | "author" | "badges" | "agoraUserId"
       >
    ) => {
       const newQuestionRef = doc(
@@ -778,10 +820,11 @@ export class LivestreamService {
 
       const newQuestion = {
          id: newQuestionRef.id,
-         badges: options.badges,
+         badges: options.badges || [],
          title: options.title,
          displayName: options.displayName,
-         author: options.author,
+         author: options.author || "",
+         agoraUserId: options.agoraUserId || "",
          timestamp: Timestamp.now(),
          voterIds: [],
          emailOfVoters: [],
@@ -806,7 +849,7 @@ export class LivestreamService {
    toggleUpvoteQuestion = async (
       livestreamRef: DocumentReference<LivestreamEvent>,
       questionId: string,
-      args: { email: string; uid: string }
+      args: { email: string; uid: string; deprecatedSessionUuid?: string }
    ) => {
       return runTransaction(FirestoreInstance, async (transaction) => {
          const questionRef = this.getQuestionRef(livestreamRef, questionId)
@@ -821,9 +864,11 @@ export class LivestreamService {
             if (hasUpvoted) {
                transaction.update(questionRef, {
                   votes: increment(-1),
-                  voterIds: arrayRemove(args.uid),
+                  ...(args.uid ? { voterIds: arrayRemove(args.uid) } : {}),
                   // Take the chance to remove the user's email from deprecated emailOfVoters
-                  emailOfVoters: arrayRemove(args.email),
+                  ...(args.email
+                     ? { emailOfVoters: arrayRemove(args.email) }
+                     : {}),
                })
                return "downvoted"
             } else {
@@ -889,6 +934,72 @@ export class LivestreamService {
             )
          }
       })
+   }
+
+   /**
+    * Gets the company host of a live stream.
+    * @param livestreamId - Livestream id.
+    * @returns A promise resolved with the company Group or null if there are
+    * multiple hosts or the host is a university.
+    */
+   async getLivestreamHost(livestreamId: string) {
+      const livestreamRef = this.getLivestreamRef(livestreamId)
+      const livestreamSnapshot = await getDoc(livestreamRef)
+
+      if (!livestreamSnapshot.exists()) return null
+
+      const livestreamData = livestreamSnapshot.data()
+      if (!livestreamData.groupIds) return null
+
+      const groups = await groupRepo.getGroupsByIds(livestreamData.groupIds)
+      const companyGroups = groups.filter((group) => !group.universityCode)
+
+      const isSingleCompany = companyGroups?.length === 1
+
+      if (isSingleCompany) {
+         return companyGroups[0]
+      }
+
+      return null
+   }
+
+   /**
+    * Starts a hand raise in
+    * @param options - Hand raise options.
+    * @returns A promise resolved with the result of the hand raise operation.
+    */
+   async toggleHandRaise(options: ToggleHandRaiseRequest) {
+      await httpsCallable<ToggleHandRaiseRequest>(
+         this.functions,
+         "toggleHandRaise"
+      )(options)
+      return
+   }
+
+   async setUserHandRaiseState(
+      livestreamId: string,
+      handRaiseId: string,
+      displayName: string,
+      newState: HandRaiseState
+   ) {
+      const handRaiseStateRef = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "handRaises",
+         handRaiseId
+      ).withConverter(createGenericConverter<HandRaise>())
+
+      return setDoc(
+         handRaiseStateRef,
+         {
+            id: handRaiseStateRef.id,
+            name: displayName,
+            state: newState,
+            timeStamp: Timestamp.now(),
+         },
+         { merge: true }
+      )
    }
 }
 

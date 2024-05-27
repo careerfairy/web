@@ -1,12 +1,15 @@
-import React, { memo } from "react"
-import { Button, Grow } from "@mui/material"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded"
+import { Button, Grow } from "@mui/material"
 import {
    CategoryContainerCentered,
    CategoryContainerContent,
 } from "materialUI/GlobalContainers"
 import { ThemedPermanentMarker } from "materialUI/GlobalTitles"
-import { HandRaise, HandRaiseState } from "types/handraise"
+import { memo } from "react"
 
 const HandRaiseRequested = memo(
    ({ handRaiseState, updateHandRaiseRequest }: Props) => {

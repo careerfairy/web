@@ -1,14 +1,17 @@
-import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
 import SpeedDial from "@mui/material/SpeedDial"
 import SpeedDialAction from "@mui/material/SpeedDialAction"
 import SpeedDialIcon from "@mui/material/SpeedDialIcon"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
 import { useStreamingContext } from "components/views/streaming-page/context"
-import { useState, useRef, ReactNode } from "react"
+import { ReactNode, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
-import { AllActions, ActionName } from "./AllActionComponents"
+import { useNumberOfHandRaiseNotifications } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
+import { tooltipStyles } from "../BrandedTooltip"
+import { ActionName, ActionTooltips, AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -100,6 +103,7 @@ const getViewerActions = (
 }
 
 export const ActionsSpeedDial = () => {
+   const numberOfHandRaiseNotifications = useNumberOfHandRaiseNotifications()
    const [open, setOpen] = useState(false)
    const ref = useRef(null)
 
@@ -119,32 +123,51 @@ export const ActionsSpeedDial = () => {
       ? getStreamerActions(isMobile)
       : getViewerActions(isMobile, shouldStream)
 
+   const hasHandRaiseButton = actions.includes("Hand raise")
+
    return (
-      <Box sx={[styles.root, styles.responsive]}>
-         <SpeedDial
-            ref={ref}
-            sx={[styles.speedDial, open && styles.speedDialOpen]}
-            ariaLabel="Stream additional actions"
-            color="secondary"
-            icon={<SpeedDialIcon icon={<MoreHorizontal />} openIcon={<X />} />}
-            onClick={handleToggle}
-            open={open}
-            FabProps={{
-               sx: styles.noShadow,
-            }}
-         >
-            {actions.map((action) => (
-               <SpeedDialAction
-                  key={action}
-                  icon={AllActions[action]}
-                  tooltipTitle={action}
-                  FabProps={{
-                     sx: [styles.noShadow, styles.speedDialAction],
-                     component: "div",
-                  }}
-               />
-            ))}
-         </SpeedDial>
-      </Box>
+      <BrandedBadge
+         color="error"
+         badgeContent={
+            open
+               ? null
+               : (hasHandRaiseButton && numberOfHandRaiseNotifications) || null
+         }
+      >
+         <Box sx={[styles.root, styles.responsive]}>
+            <SpeedDial
+               ref={ref}
+               sx={[styles.speedDial, open && styles.speedDialOpen]}
+               ariaLabel="Stream additional actions"
+               color="secondary"
+               icon={
+                  <SpeedDialIcon icon={<MoreHorizontal />} openIcon={<X />} />
+               }
+               onClick={handleToggle}
+               open={open}
+               FabProps={{
+                  sx: styles.noShadow,
+               }}
+            >
+               {actions.map((action) => {
+                  const Icon = AllActions[action]
+                  return (
+                     <SpeedDialAction
+                        key={action}
+                        icon={<Icon />}
+                        tooltipTitle={ActionTooltips[action]}
+                        FabProps={{
+                           sx: [styles.noShadow, styles.speedDialAction],
+                           component: "div",
+                        }}
+                        slotProps={{
+                           tooltip: { sx: tooltipStyles.tooltip },
+                        }}
+                     />
+                  )
+               })}
+            </SpeedDial>
+         </Box>
+      </BrandedBadge>
    )
 }

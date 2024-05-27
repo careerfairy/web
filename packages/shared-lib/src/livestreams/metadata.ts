@@ -1,12 +1,18 @@
-import { Group } from "../groups"
+import { uniq } from "lodash"
+import { Group, GroupOption } from "../groups"
+import { getArrayDifference } from "../utils"
 import { LivestreamEvent } from "./livestreams"
 
-const uniq = require("lodash.uniq")
-
-type MetaData = Pick<
+export type MetaData = Pick<
    LivestreamEvent,
-   "companyCountries" | "companyIndustries" | "companySizes"
+   | "companyCountries"
+   | "companyIndustries"
+   | "companySizes"
+   | "companyTargetedCountries"
+   | "companyTargetedFieldsOfStudies"
+   | "companyTargetedUniversities"
 >
+
 export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
    const companies = eventHosts?.filter((group) => !group.universityCode)
 
@@ -38,12 +44,36 @@ export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
             acc.companySizes = [...acc.companySizes, group.companySize]
          }
 
+         if (group.targetedCountries) {
+            acc.companyTargetedCountries = [
+               ...acc.companyTargetedCountries,
+               ...group.targetedCountries.map(({ id }) => id),
+            ]
+         }
+
+         if (group.targetedFieldsOfStudy) {
+            acc.companyTargetedFieldsOfStudies = [
+               ...acc.companyTargetedFieldsOfStudies,
+               ...group.targetedFieldsOfStudy.map(({ id }) => id),
+            ]
+         }
+
+         if (group.targetedUniversities) {
+            acc.companyTargetedUniversities = [
+               ...acc.companyTargetedUniversities,
+               ...group.targetedUniversities.map(({ id }) => id),
+            ]
+         }
+
          return acc
       },
       {
          companyCountries: [],
          companyIndustries: [],
          companySizes: [],
+         companyTargetedCountries: [],
+         companyTargetedUniversities: [],
+         companyTargetedFieldsOfStudies: [],
       }
    )
 
@@ -51,6 +81,66 @@ export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
    meta.companyCountries = uniq(meta.companyCountries ?? [])
    meta.companyIndustries = uniq(meta.companyIndustries ?? [])
    meta.companySizes = uniq(meta.companySizes ?? [])
+   meta.companyTargetedCountries = uniq(meta.companyTargetedCountries ?? [])
+   meta.companyTargetedFieldsOfStudies = uniq(
+      meta.companyTargetedFieldsOfStudies ?? []
+   )
+   meta.companyTargetedUniversities = uniq(
+      meta.companyTargetedUniversities ?? []
+   )
 
    return meta
+}
+
+export const hasMetadataChanged = (
+   previousValue: Group,
+   currentValue: Group
+): boolean => {
+   const countryChanged =
+      previousValue?.companyCountry?.id != currentValue?.companyCountry?.id
+
+   const industriesDifference = getArrayDifference(
+      previousValue?.companyIndustries?.map(groupOptionId),
+      currentValue?.companyIndustries?.map(groupOptionId)
+   )
+
+   const industriesChanged = Boolean(industriesDifference?.length)
+
+   const sizeChanged = previousValue?.companySize != currentValue?.companySize
+
+   const targetCountriesDifference = getArrayDifference(
+      previousValue?.targetedCountries?.map(groupOptionId),
+      currentValue?.targetedCountries?.map(groupOptionId)
+   )
+
+   const targetCountriesChanged = Boolean(targetCountriesDifference.length)
+
+   const targetUniversitiesDifference = getArrayDifference(
+      previousValue?.targetedUniversities?.map(groupOptionId),
+      currentValue?.targetedUniversities?.map(groupOptionId)
+   )
+
+   const targetUniversitiesChanged = Boolean(
+      targetUniversitiesDifference.length
+   )
+
+   const fieldsOfStudyDifferences = getArrayDifference(
+      previousValue?.targetedFieldsOfStudy?.map(groupOptionId),
+      currentValue?.targetedFieldsOfStudy?.map(groupOptionId)
+   )
+
+   const targetFieldsOfStudiesChanged = Boolean(fieldsOfStudyDifferences.length)
+
+   return (
+      countryChanged ||
+      industriesChanged ||
+      sizeChanged ||
+      targetCountriesChanged ||
+      targetUniversitiesChanged ||
+      targetFieldsOfStudiesChanged
+   )
+}
+
+const groupOptionId = (option: GroupOption): string => {
+   return option.id
 }

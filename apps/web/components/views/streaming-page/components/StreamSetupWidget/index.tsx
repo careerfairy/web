@@ -5,20 +5,25 @@ import {
    DialogContent,
    Drawer,
    Grid,
+   Stack,
 } from "@mui/material"
-import { CameraSelect, MicrophoneSelect } from "../streaming/DeviceSelect"
 import {
    MicActionButton,
    ResponsiveStreamButton,
    VideoActionButton,
 } from "../Buttons"
+import { CameraSelect, MicrophoneSelect } from "../streaming/DeviceSelect"
 
-import { Fragment } from "react"
-import { SetupCameraVideo } from "./SetupCameraVideo"
-import { sxStyles } from "types/commonTypes"
+import { HandRaiseState } from "@careerfairy/shared-lib/livestreams/hand-raise"
+import { LoadingButton } from "@mui/lab"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useUpdateUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUpdateUserHandRaiseState"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
+import { Fragment } from "react"
+import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { VideoEffectsButtons } from "../VideoEffectsButtons"
+import { SetupCameraVideo } from "./SetupCameraVideo"
 
 const styles = sxStyles({
    dialog: {
@@ -38,9 +43,18 @@ const styles = sxStyles({
       px: 4,
       pb: 2.5,
    },
+   actionsMobile: {
+      pt: 0,
+      p: 1.5,
+   },
    dialogContent: {
       p: 4,
       pb: 3,
+      borderBottom: "none",
+   },
+   dialogContentMobile: {
+      p: 1.5,
+      pb: 2,
       borderBottom: "none",
    },
 })
@@ -50,14 +64,16 @@ export const StreamSetupWidget = () => {
 
    const { shouldStream, isReady } = useStreamingContext()
 
-   if (!shouldStream || isReady) {
+   const showSetupWidget = shouldStream && !isReady
+
+   if (!showSetupWidget) {
       // If the user is not streaming, we don't want to show the setup widget
       return null
    }
 
    if (isMobile) {
       return (
-         <Drawer open={!isReady} sx={styles.drawer} anchor="bottom">
+         <Drawer open={showSetupWidget} sx={styles.drawer} anchor="bottom">
             <Box>
                <Content />
             </Box>
@@ -65,18 +81,39 @@ export const StreamSetupWidget = () => {
       )
    }
    return (
-      <Dialog maxWidth={false} sx={styles.dialog} open={!isReady}>
+      <Dialog maxWidth={false} sx={styles.dialog} open={showSetupWidget}>
          <Content />
       </Dialog>
    )
 }
 
 const Content = () => {
-   const { setIsReady } = useStreamingContext()
+   const { setIsReady, agoraUserId, livestreamId, isHost } =
+      useStreamingContext()
+
+   const { userHandRaiseIsActive: isHandRaiseActive, userCanJoinPanel } =
+      useUserHandRaiseState(livestreamId, agoraUserId)
+
+   const streamIsMobile = useStreamIsMobile()
+
+   const {
+      trigger: updateUserHandRaiseState,
+      isMutating: isUpdatingUserHandRaiseState,
+   } = useUpdateUserHandRaiseState(livestreamId)
+
+   // To help brain understand the code
+   const isViewer = !isHost
 
    return (
       <Fragment>
-         <DialogContent sx={styles.dialogContent} dividers>
+         <DialogContent
+            sx={
+               streamIsMobile
+                  ? styles.dialogContentMobile
+                  : styles.dialogContent
+            }
+            dividers
+         >
             <Box>
                <SetupCameraVideo />
                <Box pb={1.5} />
@@ -92,18 +129,56 @@ const Content = () => {
                </Grid>
             </Box>
          </DialogContent>
-         <DialogActions sx={styles.actions} disableSpacing>
+         <DialogActions
+            sx={streamIsMobile ? styles.actionsMobile : styles.actions}
+            disableSpacing
+         >
             <MicActionButton />
             <Box mr={2.5} ml={1.5}>
                <VideoActionButton />
             </Box>
-            <ResponsiveStreamButton
-               variant="contained"
-               color="primary"
-               onClick={() => setIsReady(true)}
-            >
-               Join live stream
-            </ResponsiveStreamButton>
+            <Stack direction="row" spacing={1}>
+               {Boolean(isHandRaiseActive && isViewer) && (
+                  <LoadingButton
+                     variant="outlined"
+                     color="grey"
+                     size="small"
+                     onClick={async () => {
+                        await updateUserHandRaiseState({
+                           state: HandRaiseState.unrequested,
+                           handRaiseId: agoraUserId,
+                        })
+                     }}
+                     loading={isUpdatingUserHandRaiseState}
+                  >
+                     Cancel
+                  </LoadingButton>
+               )}
+               <LoadingButton
+                  component={ResponsiveStreamButton}
+                  variant="contained"
+                  color="primary"
+                  loading={isUpdatingUserHandRaiseState}
+                  onClick={async () => {
+                     if (isViewer) {
+                        if (!isHandRaiseActive) return
+
+                        if (!userCanJoinPanel) {
+                           // Request to join the panel if hand raiser
+                           await updateUserHandRaiseState({
+                              state: HandRaiseState.requested,
+                              handRaiseId: agoraUserId,
+                           })
+                        }
+                     }
+                     setIsReady(true)
+                  }}
+               >
+                  {isHandRaiseActive && isViewer && !userCanJoinPanel
+                     ? "Raise hand"
+                     : "Join live stream"}
+               </LoadingButton>
+            </Stack>
          </DialogActions>
       </Fragment>
    )

@@ -1,11 +1,12 @@
-import { ActionButtonProps, ActionBarButtonStyled } from "./ActionBarButton"
-import { forwardRef } from "react"
-import { StopIcon } from "components/views/common/icons/StopIcon"
-import { sxStyles } from "types/commonTypes"
-import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
-import { useStreamingContext } from "../../context"
 import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
-import { Tooltip } from "@mui/material"
+import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
+import { StopIcon } from "components/views/common/icons/StopIcon"
+import { forwardRef } from "react"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
+import { ActionTooltips } from "../BottomBar/AllActionComponents"
+import { BrandedTooltip } from "../BrandedTooltip"
+import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
    root: {
@@ -24,13 +25,13 @@ const styles = sxStyles({
 export const StopSharingButton = forwardRef<
    HTMLButtonElement,
    ActionButtonProps
->((props, ref) => {
+>(({ enableTooltip, ...props }, ref) => {
    const { livestreamId } = useStreamingContext()
    const { trigger: setLivestreamMode, isMutating } =
       useSetLivestreamMode(livestreamId)
 
    return (
-      <Tooltip placement="top" title="Stop sharing">
+      <BrandedTooltip title={enableTooltip ? ActionTooltips.StopShare : null}>
          <ActionBarButtonStyled
             {...props}
             disabled={isMutating}
@@ -42,7 +43,7 @@ export const StopSharingButton = forwardRef<
          >
             <StopIcon color="inherit" />
          </ActionBarButtonStyled>
-      </Tooltip>
+      </BrandedTooltip>
    )
 })
 
