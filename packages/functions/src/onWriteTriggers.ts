@@ -1,29 +1,32 @@
 import functions = require("firebase-functions")
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/groups/metadata"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { UserStats } from "@careerfairy/shared-lib/src/users"
+import { firestore } from "./api/firestoreAdmin"
 import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
    sparkRepo,
 } from "./api/repositories"
-import { getChangeTypes } from "./util"
+
+import config from "./config"
+import { handleUserStatsBadges } from "./lib/badge"
+import { rewardSideEffectsUserStats } from "./lib/reward"
+import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
+import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks/notifications/userNotifications"
+import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
 import {
+   defaultTriggerRunTimeConfig,
    handleSideEffects,
    logStart,
-   defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
-import config from "./config"
-import { rewardSideEffectsUserStats } from "./lib/reward"
-import { handleUserStatsBadges } from "./lib/badge"
-import { UserStats } from "@careerfairy/shared-lib/src/users"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { getChangeTypes } from "./util"
 import { validateGroupSparks } from "./util/sparks"
-import { removeGroupNotificationsAndSyncSparksNotifications } from "./lib/sparks/notifications/userNotifications"
-import { firestore } from "./api/firestoreAdmin"
-import { handleEventStartDateChangeTrigger } from "./lib/sparks/notifications/publicNotifications"
-import { getGroupIdsToBeUpdatedFromChangedEvent } from "./lib/sparks/util"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 
 export const syncLivestreams = functions
    .runWith({ ...defaultTriggerRunTimeConfig, memory: "1GB" })
@@ -226,13 +229,30 @@ export const onWriteGroup = functions
       // Run side effects for all creator changes
       sideEffectPromises.push(sparkRepo.syncGroupDataToSpark(change, groupId))
 
+      const newValue = change.after?.data() as Group
+      const previousValue = change.before?.data() as Group
+
       if (changeTypes.isUpdate) {
          // In case the publicProfile flag changes we must validate the group sparks
-         const newValue = change.after?.data() as Group
-         const previousValue = change.before?.data() as Group
 
          if (newValue.publicProfile !== previousValue.publicProfile) {
             sideEffectPromises.push(validateGroupSparks(newValue))
+         }
+      }
+
+      if (changeTypes.isUpdate || changeTypes.isCreate) {
+         // In case any of the backfills change
+
+         if (hasGroupMetadataChanged(previousValue, newValue)) {
+            sideEffectPromises.push(
+               livestreamsRepo.syncLivestreamMetadata(groupId, newValue)
+            )
+         }
+
+         if (hasCustomJobsGroupMetaDataChanged(previousValue, newValue)) {
+            sideEffectPromises.push(
+               customJobRepo.syncCustomJobDataGroupMetaData(groupId, newValue)
+            )
          }
       }
 

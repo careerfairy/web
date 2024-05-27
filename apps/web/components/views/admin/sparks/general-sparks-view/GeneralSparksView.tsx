@@ -1,12 +1,12 @@
 import { Stack } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import SparksContainer from "../components/SparksContainer"
 import CreatorSparksCollection from "./CreatorSparksCollection"
 import HeaderActions from "./header/HeaderActions"
 import SparksProgressIndicator from "./header/SparksProgressIndicator"
-import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import SparksPlanBanner from "./plans-banner/SparksPlanBanner"
 
 const styles = sxStyles({

@@ -1,13 +1,20 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/livestreams/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   CompanyFollowed,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/users"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import { sparkService } from "data/firebase/SparksService"
 import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
-import { firebaseServiceInstance } from "data/firebase/FirebaseService"
-import { sparkService } from "data/firebase/SparksService"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -15,6 +22,10 @@ export type GetContentOptions = {
    registeredRecordedLivestreamsForUser: LivestreamEvent[]
    userData?: UserData
    userStats?: UserStats
+   watchedLivestreams?: LivestreamEvent[]
+   watchedSparks?: Spark[]
+   appliedJobs?: CustomJobApplicant[]
+   followedCompanies?: CompanyFollowed[]
 }
 
 export type LivestreamEventWithType = LivestreamEvent & {
@@ -41,7 +52,7 @@ export type SerializedContent =
 
 /**
  *
- * A service that provides a list of recommended livestream events for a carousel UI,
+ * A service that provides a list of recommended live stream events for a carousel UI,
  * based on the user's past activity and options passed as arguments.
  *  @class
  * @param {Object} options - An object containing various options to be used for getting
@@ -51,14 +62,22 @@ export type SerializedContent =
  *   upcomingLivestreams: LivestreamEvent[],
  *   registeredRecordedLivestreamsForUser: LivestreamEvent[],
  *   userData?: UserData,
- *   userStats?: UserStats
+ *   userStats?: UserStats,
+ *   watchedLivestreams?: LivestreamEvent[],
+ *   watchedSparks?: Spark[],
+ *   appliedJobs?: CustomJobApplicant[]
+ *   followedCompanies?: CompanyFollowed[]
  *   }
- *   - pastLivestreams: An array of past livestream events
- *   - upcomingLivestreams: An array of upcoming livestream events
- *   - registeredRecordedLivestreamsForUser: An array of recorded livestream events that the user has registered for
+ *   - pastLivestreams: An array of past live stream events
+ *   - upcomingLivestreams: An array of upcoming live stream events
+ *   - registeredRecordedLivestreamsForUser: An array of recorded live stream events that the user has registered for
  *   - userData: The user's data
  *   - userStats: The user's stats
- *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended livestream events
+ *   - watchedLivestreams: The user's latest watched live streams, including recordings
+ *   - watchedSparks: The user's latest watched sparks
+ *   - appliedJobs: The user's latest applied jobs
+ *   - followedCompanies: The companies the user currently follows
+ *   @returns {Promise<LivestreamEvent[]>} - A promise that resolves to an array of recommended live stream events
  *   */
 export class CarouselContentService {
    private options: GetContentOptions
@@ -67,13 +86,22 @@ export class CarouselContentService {
 
    constructor(options: GetContentOptions) {
       this.options = options
+      const implicitRecommendationData: ImplicitLivestreamRecommendationData = {
+         watchedLivestreams: options.watchedLivestreams,
+         watchedSparks: options.watchedSparks,
+         appliedJobs: options.appliedJobs,
+         followedCompanies: options.followedCompanies,
+      }
+
       this.pastEventsService = ExistingDataRecommendationService.create(
          console,
          options.userData,
          filterStreamsForUnregisteredUsersAndNonBuyers(
             options.pastLivestreams,
             options.userStats
-         )
+         ),
+         false,
+         implicitRecommendationData
       )
       this.upcomingEventsService = ExistingDataRecommendationService.create(
          console,
@@ -81,7 +109,9 @@ export class CarouselContentService {
          filterNonRegisteredStreams(
             options.upcomingLivestreams,
             options.userStats
-         )
+         ),
+         false,
+         implicitRecommendationData
       )
    }
 
@@ -329,7 +359,7 @@ const filterStreamsForUnregisteredUsersAndNonBuyers = (
 
       const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
       // We only want to show past streams that are recorded and the user has not bought the recording
-      // and the user has not registered for the livestream
+      // and the user has not registered for the live stream
       return allowedToWatchRecording && !hasRegistered && !hasBoughtRecording
    })
 }
