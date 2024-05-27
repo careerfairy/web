@@ -216,27 +216,23 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
    const open = useSelector(plansDialogOpenSelector)
 
    return (
-      <ConditionalWrapper condition={open}>
-         <Box>
-            <Dialog
-               sx={styles.container}
-               scroll="paper"
-               open={open}
-               maxWidth={false}
-               PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
-               TransitionComponent={SlideUpTransition}
-            >
-               {children}
-               {hideCloseButton ? null : (
-                  <Box sx={styles.closeBtn}>
-                     <IconButton onClick={handleClose}>
-                        <CloseIcon />
-                     </IconButton>
-                  </Box>
-               )}
-            </Dialog>
-         </Box>
-      </ConditionalWrapper>
+      <Dialog
+         sx={styles.container}
+         scroll="paper"
+         open={open}
+         maxWidth={false}
+         PaperProps={isMobile ? { sx: styles.dialogPaperMobile } : {}}
+         TransitionComponent={SlideUpTransition}
+      >
+         {children}
+         {hideCloseButton ? null : (
+            <Box sx={styles.closeBtn}>
+               <IconButton onClick={handleClose}>
+                  <CloseIcon />
+               </IconButton>
+            </Box>
+         )}
+      </Dialog>
    )
 }
 
