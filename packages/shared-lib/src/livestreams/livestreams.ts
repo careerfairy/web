@@ -784,19 +784,19 @@ export enum EmoteType {
    /**
     * The user pressed the clapping button
     */
-   Clapping = "clapping",
+   CLAPPING = "clapping",
    /**
     * The user pressed the like button
     */
-   Like = "like",
+   LIKE = "like",
    /**
     * The user pressed the heart button
     */
-   Heart = "heart",
+   HEART = "heart",
    /**
     * The user pressed the confused button
     */
-   Confused = "confused",
+   CONFUSED = "confused",
 }
 
 export interface LivestreamEmote extends Identifiable {
