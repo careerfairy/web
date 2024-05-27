@@ -1,6 +1,9 @@
-import { EmoteType } from "context/agora/RTMContext"
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
+import { livestreamService } from "data/firebase/LivestreamService"
 import useSWRMutation, { MutationFetcher } from "swr/mutation"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { useRTMChannel, useRTMClient } from "../providers"
 
 type SendEmoteRequest = {
@@ -9,9 +12,10 @@ type SendEmoteRequest = {
 
 type Fetcher = MutationFetcher<void, unknown, SendEmoteRequest>
 
-export const useSendEmote = () => {
+export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
    const rtmClient = useRTMClient()
    const rtmChannel = useRTMChannel()
+   const { authenticatedUser } = useAuth()
 
    const sendEmoteFetcher: Fetcher = async (_, opts) => {
       if (!rtmClient || !rtmChannel) {
@@ -24,18 +28,41 @@ export const useSendEmote = () => {
          messageType: "TEXT",
       })
 
-      // 1. Optimistically dispatch emote locally to the UI
+      // TODO: Optimistically dispatch emote locally to the UI
 
-      // 2. Emit the emote event into the signaling API
       await rtmChannel.sendMessage(message)
 
-      // 3. Save the emote document in firestore
+      // Save the emote document in firestore for pdf reporting, we don't need to await this
+      livestreamService
+         .addEmote(
+            livestreamId,
+            opts.arg.emoteType,
+            agoraUserId,
+            authenticatedUser.uid
+         )
+         .catch(errorLogAndNotify)
+
+      switch (opts.arg.emoteType) {
+         case "clapping":
+            dataLayerEvent("livestream_viewer_reaction_clap")
+            break
+         case "confused":
+            dataLayerEvent("livestream_viewer_reaction_confused")
+            break
+         case "heart":
+            dataLayerEvent("livestream_viewer_reaction_heart")
+            break
+         case "like":
+            dataLayerEvent("livestream_viewer_reaction_like")
+            break
+      }
    }
 
    return useSWRMutation("sendEmote", sendEmoteFetcher, {
-      onError: (error) => {
+      onError: (error, key) => {
          errorLogAndNotify(error, {
             message: "Failed to send emote",
+            key,
          })
       },
    })

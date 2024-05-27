@@ -776,3 +776,36 @@ export interface LivestreamVideo extends Identifiable {
    /** The ID of the user that can update the video */
    updater: string
 }
+
+/**
+ * The type of the emote reactions viewers can send to the stream
+ */
+export enum EmoteType {
+   /**
+    * The user pressed the clapping button
+    */
+   Clapping = "clapping",
+   /**
+    * The user pressed the like button
+    */
+   Like = "like",
+   /**
+    * The user pressed the heart button
+    */
+   Heart = "heart",
+   /**
+    * The user pressed the confused button
+    */
+   Confused = "confused",
+}
+
+export interface LivestreamEmote extends Identifiable {
+   name: EmoteType
+   timestamp: firebase.firestore.Timestamp
+   userUid: string | null
+   agoraUserId: string
+   /** @deprecated */
+   authorEmail?: string
+   /** @deprecated */
+   streamerId?: string
+}

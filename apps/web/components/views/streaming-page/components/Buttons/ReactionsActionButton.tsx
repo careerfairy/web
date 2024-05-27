@@ -1,48 +1,62 @@
-import { Box, CircularProgress, Fade, speedDialClasses } from "@mui/material"
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
+import {
+   Box,
+   CircularProgress,
+   Fade,
+   speedDialClasses,
+   speedDialIconClasses,
+} from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import {
    BrandedSpeedDial,
    BrandedSpeedDialAction,
 } from "components/views/common/BrandedSpeedDial"
 import { ReactionsIcon } from "components/views/common/icons"
-import { EmoteType } from "context/agora/RTMContext"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import { X } from "react-feather"
 import { useClickAway } from "react-use"
 import { sxStyles } from "types/commonTypes"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { useStreamingContext } from "../../context"
 import { useSendEmote } from "../../context/rtm/hooks/useSendEmote"
 import { ClapEmote, ConfusedEmote, HeartEmote, LikeEmote } from "../emotes"
-import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
 const styles = sxStyles({
    root: {
       position: "relative",
-      [`& .${speedDialClasses.fab}`]: {
-         transition: (theme) => theme.transitions.create("color"),
+   },
+   speedDial: {
+      [`& .${speedDialIconClasses.root}`]: {
+         display: "flex",
+         justifyContent: "center",
+         alignItems: "center",
+      },
+      [`& .${speedDialIconClasses.icon}`]: {
+         fontSize: 24,
+         width: {
+            xs: 24,
+            tablet: 28,
+         },
+         height: {
+            xs: 24,
+            tablet: 28,
+         },
       },
    },
    closeIcon: {
       p: 0.4,
       strokeWidth: 2.5,
    },
-   disabled: {
-      pointerEvents: "none",
-      zIndex: 1,
+   speedDialDisabled: {
       [`& .${speedDialClasses.fab}`]: {
          color: "#A8AEAD !important",
       },
    },
-   iconDisabled: {
-      color: "#A8AEAD !important",
-   },
    progress: {
-      color: "primary.main",
-      position: "absolute",
       inset: 0,
-      width: "100%",
-      height: "100%",
-      left: 0.5,
-      top: 1,
+      position: "absolute",
+      color: "primary.main",
+      width: "100% !important",
+      height: "100% !important",
       "& svg": {
          width: "100%",
          height: "100%",
@@ -54,17 +68,16 @@ const DELAY = 2500 // 2.5 seconds
 const TICK_RATE = 100 // 100 ms per tick
 const INTERVAL = 100 / (DELAY / TICK_RATE) // Progress increment per tick
 
-export const ReactionsActionButton = forwardRef<
-   HTMLButtonElement,
-   ActionButtonProps
->((props, ref) => {
+export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
+   const { userData } = useAuth()
    const [open, setOpen] = useState(false)
    const [iconsDisabled, setIconsDisabled] = useState(false)
-   const [progress, setProgress] = useState(INTERVAL)
+   const [progress, setProgress] = useState(0)
+   const { agoraUserId, livestreamId } = useStreamingContext()
 
    const reactionsRef = useRef(null)
 
-   const { trigger: sendEmote } = useSendEmote()
+   const { trigger: sendEmote } = useSendEmote(livestreamId, agoraUserId)
 
    useClickAway(reactionsRef, () => {
       if (open) {
@@ -76,9 +89,10 @@ export const ReactionsActionButton = forwardRef<
       if (iconsDisabled) {
          setProgress(0)
          const timer = setInterval(() => {
-            setProgress((prevProgress) =>
-               prevProgress >= 100 ? 100 : prevProgress + INTERVAL
-            )
+            setProgress((prevProgress) => {
+               const newProgress = prevProgress + INTERVAL
+               return newProgress >= 100 ? 100 : newProgress
+            })
          }, TICK_RATE)
          const timeout = setTimeout(() => {
             setIconsDisabled(false)
@@ -96,9 +110,11 @@ export const ReactionsActionButton = forwardRef<
 
    const handleSendEmote = (emoteType: EmoteType) => {
       sendEmote({ emoteType })
+
+      if (userData?.isAdmin) return // Do not disable the buttons for admins
+      handleClose()
       setIconsDisabled(true)
       setProgress(0)
-      handleClose()
    }
 
    const ACTIONS: BrandedSpeedDialAction[] = [
@@ -106,64 +122,58 @@ export const ReactionsActionButton = forwardRef<
          node: <ClapEmote />,
          tooltip: "Applause",
          onClick: () => {
-            handleSendEmote("clapping")
-            dataLayerEvent("livestream_viewer_reaction_clap")
+            handleSendEmote(EmoteType.Clapping)
          },
       },
       {
          node: <HeartEmote />,
          tooltip: "Love",
          onClick: () => {
-            handleSendEmote("heart")
-            dataLayerEvent("livestream_viewer_reaction_heart")
+            handleSendEmote(EmoteType.Heart)
          },
       },
       {
          node: <LikeEmote />,
          tooltip: "Like",
          onClick: () => {
-            handleSendEmote("like")
-            dataLayerEvent("livestream_viewer_reaction_like")
+            handleSendEmote(EmoteType.Like)
          },
       },
       {
          node: <ConfusedEmote />,
          tooltip: "Confused",
          onClick: () => {
-            handleSendEmote("confused")
-            dataLayerEvent("livestream_viewer_reaction_confused")
+            handleSendEmote(EmoteType.Confused)
          },
       },
    ]
 
    return (
-      <ActionBarButtonStyled ref={ref} {...props}>
-         <Box
-            sx={[styles.root, iconsDisabled && styles.disabled]}
-            component="span"
-         >
-            <BrandedSpeedDial
-               actions={ACTIONS}
-               open={open}
-               onOpen={handleOpen}
-               onClose={handleClose}
-               disabled={iconsDisabled}
-               speedDialIcon={
-                  <ReactionsIcon sx={[iconsDisabled && styles.iconDisabled]} />
-               }
-               speedDialOpenIcon={<Box sx={styles.closeIcon} component={X} />}
-               ref={reactionsRef}
+      <Box
+         ref={ref}
+         sx={[styles.root, iconsDisabled && styles.speedDialDisabled]}
+         component="span"
+      >
+         <BrandedSpeedDial
+            actions={ACTIONS}
+            open={iconsDisabled === false && open}
+            onOpen={handleOpen}
+            onClose={handleClose}
+            disabled={iconsDisabled}
+            speedDialIcon={<ReactionsIcon />}
+            speedDialOpenIcon={<Box sx={styles.closeIcon} component={X} />}
+            ref={reactionsRef}
+            speedDialSx={styles.speedDial}
+         />
+         <Fade timeout={500} in={iconsDisabled} mountOnEnter unmountOnExit>
+            <CircularProgress
+               sx={styles.progress}
+               variant="determinate"
+               thickness={3}
+               value={progress}
             />
-            <Fade timeout={500} in={iconsDisabled} mountOnEnter unmountOnExit>
-               <CircularProgress
-                  sx={styles.progress}
-                  variant="determinate"
-                  thickness={3}
-                  value={progress}
-               />
-            </Fade>
-         </Box>
-      </ActionBarButtonStyled>
+         </Fade>
+      </Box>
    )
 })
 
