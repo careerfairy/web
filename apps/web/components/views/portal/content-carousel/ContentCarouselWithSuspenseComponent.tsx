@@ -66,16 +66,15 @@ const ContentCarouselWithSuspenseComponent: FC<Props> = (props: Props) => {
 
 const ContentCarouselSkeleton = () => {
    return (
-      <Box sx={[styles.wrapper, { border: "1px solid red" }]}>
+      <Box sx={styles.wrapper}>
          <Stack alignItems={"start"} spacing={2} ml={5} pt={8}>
             <Box>
                <Skeleton
                   variant="rounded"
                   animation="wave"
                   sx={{
-                     minWidth: { xs: "50vw", m: "10vw" },
-                     maxWidth: { xs: "50vw", m: "10vw" },
-                     minHeight: "50px",
+                     minWidth: { xs: "50vw" },
+                     height: "50px",
                   }}
                />
             </Box>
@@ -84,9 +83,8 @@ const ContentCarouselSkeleton = () => {
                   variant="rounded"
                   animation="wave"
                   sx={{
-                     minWidth: { xs: "40vw", m: "20vw" },
-                     maxWidth: { xs: "40vw", m: "20vw" },
-                     minHeight: "50px",
+                     minWidth: { xs: "40vw" },
+                     height: "50px",
                   }}
                />
             </Box>
@@ -95,9 +93,8 @@ const ContentCarouselSkeleton = () => {
                   variant="rounded"
                   animation="wave"
                   sx={{
-                     minWidth: { xs: "60vw", m: "40vw" },
-                     maxWidth: { xs: "60vw", m: "40vw" },
-                     minHeight: "90px",
+                     minWidth: { xs: "60vw" },
+                     height: "90px",
                   }}
                />
             </Box>
