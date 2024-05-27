@@ -31,7 +31,6 @@ import GroupPlansMobileView from "./views/GroupPlansMobileView"
 import PlanActivationConfirmationDialog from "./views/PlanActivationConfirmationDialog"
 
 const actionsHeight = 87
-const mobileTopPadding = 20
 const mobileBreakpoint = "md"
 
 export const GROUP_PLANS_DIALOG_TITLE = "Select your "
@@ -58,20 +57,6 @@ const styles = sxStyles({
       textAlign: "center",
       fontStyle: "normal",
       fontWeight: "400",
-   },
-   containerWrapper: {
-      flexDirection: "column",
-      py: `${mobileTopPadding}px`,
-      position: "relative",
-      height: "100%",
-      justifyContent: {
-         xs: "flex-start",
-         [mobileBreakpoint]: "center",
-      },
-      display: "flex",
-      placeItems: {
-         [mobileBreakpoint]: "center",
-      },
    },
    container: {
       width: "100%",
