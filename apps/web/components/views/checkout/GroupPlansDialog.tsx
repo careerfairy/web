@@ -208,7 +208,6 @@ type GroupPlansDialogContainerProps = BoxProps & {
 }
 
 const Container: FC<GroupPlansDialogContainerProps> = ({
-   sx,
    hideCloseButton,
    children,
 }) => {
@@ -218,7 +217,7 @@ const Container: FC<GroupPlansDialogContainerProps> = ({
 
    return (
       <ConditionalWrapper condition={open}>
-         <Box sx={combineStyles(styles.containerWrapper, sx)}>
+         <Box>
             <Dialog
                sx={styles.container}
                scroll="paper"
