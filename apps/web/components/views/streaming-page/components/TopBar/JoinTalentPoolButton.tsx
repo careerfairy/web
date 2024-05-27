@@ -1,3 +1,4 @@
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useTalentPool from "components/custom-hook/live-stream/useTalentPool"
 import { useLivestreamData } from "components/custom-hook/streaming"
@@ -16,8 +17,9 @@ const styles = sxStyles({
 export const JoinTalentPoolButton = () => {
    const { push, asPath } = useRouter()
    const isOpenStream = useOpenStream()
+   const { userData } = useAuth()
 
-   if (isOpenStream) {
+   if (isOpenStream && !userData) {
       return (
          <ResponsiveStreamButton
             onClick={() => {
