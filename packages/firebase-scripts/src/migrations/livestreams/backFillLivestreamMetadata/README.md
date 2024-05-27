@@ -8,6 +8,9 @@ The metadata that is cascaded is:
 -  companyIndustry
 -  companySize
 -  companyCountry
+-  companyTargetedCountries
+-  companyTargetFieldsOfStudies
+-  companyTargetUniversities
 
 ## Rules
 

@@ -81,7 +81,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             userId: userData?.userEmail,
          })
       }
-   }, [minutesWatched, userData?.userEmail])
+   }, [activeStep, content, minutesWatched, userData?.userEmail, videoUrl])
 
    const handleStepChange = useCallback(
       (step) => {

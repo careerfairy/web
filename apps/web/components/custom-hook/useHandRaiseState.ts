@@ -1,13 +1,13 @@
+import { HandRaise } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
+import { useAuth } from "HOCs/AuthProvider"
+import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useCurrentStream } from "context/stream/StreamContext"
+import { rewardService } from "data/firebase/RewardService"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import { useSelector } from "react-redux"
-import { useCurrentStream } from "context/stream/StreamContext"
-import { useAuth } from "HOCs/AuthProvider"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useStreamRef from "./useStreamRef"
-import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams"
 import { RootState } from "store"
-import { HandRaise } from "types/handraise"
-import { rewardService } from "data/firebase/RewardService"
+import useStreamRef from "./useStreamRef"
 
 const useHandRaiseState = () => {
    const { currentLivestream, handRaiseId, presenter } = useCurrentStream()
@@ -42,7 +42,7 @@ const useHandRaiseState = () => {
                   currentLivestream.openStream ||
                   !authenticatedUser?.email
             )
-            let checkedUserData = isAnon
+            const checkedUserData = isAnon
                ? {
                     firstName: userData?.firstName || "Hand Raiser",
                     lastName: userData?.lastName || "Streamer",
@@ -55,7 +55,7 @@ const useHandRaiseState = () => {
                   if (userData && state === "requested") {
                      rewardService
                         .userAction("LIVESTREAM_USER_HAND_RAISED", mainStreamId)
-                        .then((_) => console.log("Rewarded Hand Raised"))
+                        .then(() => console.log("Rewarded Hand Raised"))
                         .catch(console.error)
                   }
                } else {
@@ -70,6 +70,7 @@ const useHandRaiseState = () => {
                console.error(e)
             }
          },
+         // eslint-disable-next-line react-hooks/exhaustive-deps
          [
             mainStreamId,
             currentLivestream.test,

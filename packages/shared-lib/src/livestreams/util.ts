@@ -57,6 +57,7 @@ export const checkIsQuestionAuthor = (
 export const checkIsQuestionCommentAuthor = (
    comment: LivestreamQuestionComment,
    identifiers: {
+      email: string
       uid: string
       agoraUid?: string
    }

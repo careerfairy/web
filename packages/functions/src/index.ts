@@ -1,5 +1,4 @@
 import * as ModuleAlias from "module-alias"
-
 /**
  * Fix runtime import of local packages
  * Required to avoid importing from the /dist folder
@@ -31,7 +30,6 @@ import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
 import livestreams = require("./livestreams")
-// import algolia = require("./algolia")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
@@ -211,7 +209,7 @@ exports.periodicallyRemoveCachedDocument =
 // exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
@@ -294,3 +292,5 @@ exports.updatePoll = streaming.updatePoll
 exports.markPollAsCurrent = streaming.markPollAsCurrent
 exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
+exports.markQuestionAsDone = streaming.markQuestionAsDone
+exports.toggleHandRaise = streaming.toggleHandRaise

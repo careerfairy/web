@@ -10,18 +10,19 @@ import {
    universityCountryMap,
 } from "@careerfairy/shared-lib/universities"
 import { Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import {
    useFieldsOfStudy,
    useLevelsOfStudy,
    useUniversityCountries,
 } from "components/custom-hook/useCollection"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import FormSectionHeader from "../../FormSectionHeader"
+import { getFieldsOfStudyWithoutOtherOption } from "../../commons"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
 import InputSkeleton from "../questions/InputSkeleton"
 import MultiChipSelect from "./components/MultiChipSelect"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
 
 type UniversityOption = University & {
    country: string
@@ -92,6 +93,11 @@ const AudienceTargetingContent = () => {
       [universitiesByCountry]
    )
 
+   // We are excluding the "Other" option only in B2B because we have the "Any field of study" option
+   const allFieldsOfStudyWithoutOther = useMemo(() => {
+      return getFieldsOfStudyWithoutOtherOption(allFieldsOfStudy)
+   }, [allFieldsOfStudy])
+
    if (
       universitiesByCountryError ||
       allFieldsOfStudyError ||
@@ -155,9 +161,8 @@ const AudienceTargetingContent = () => {
          )}
          <MultiChipSelect
             id="general.targetFieldsOfStudy"
-            options={allFieldsOfStudy}
+            options={allFieldsOfStudyWithoutOther}
             value={general.targetFieldsOfStudy}
-            limit={GROUP_CONSTANTS.MAX_TARGET_FIELD_OF_STUDY_COUNT}
             multiple
             disableCloseOnSelect
             textFieldProps={{
@@ -165,6 +170,7 @@ const AudienceTargetingContent = () => {
                placeholder: "Select fields of study",
                required: true,
             }}
+            selectAllFieldLabel="Any field of study"
          />
          <MultiChipSelect
             id="general.targetLevelsOfStudy"

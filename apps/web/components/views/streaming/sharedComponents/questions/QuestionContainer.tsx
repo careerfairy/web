@@ -346,6 +346,7 @@ const QuestionContainer = ({
       livestreamService.toggleUpvoteQuestion(streamingRef, question.id, {
          email: authenticatedUser.email,
          uid: sessionUuid,
+         deprecatedSessionUuid: sessionUuid,
       })
    }
 

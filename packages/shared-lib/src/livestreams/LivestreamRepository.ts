@@ -1,12 +1,18 @@
 import firebase from "firebase/compat/app"
-import { UserPublicData } from "../users"
+import { OrderByDirection } from "firebase/firestore"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
+import { Job, JobIdentifier } from "../ats/Job"
+import { Create, ImageType } from "../commonTypes"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
+import { Group } from "../groups"
+import { UserPublicData } from "../users"
+import { arraySortByIndex, chunkArray, containsAny } from "../utils"
 import {
-   getEarliestEventBufferTime,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -21,18 +27,14 @@ import {
    RecordingToken,
    UserLivestreamData,
    UserParticipatingStats,
+   getEarliestEventBufferTime,
 } from "./livestreams"
-import { FieldOfStudy } from "../fieldOfStudy"
-import { Job, JobIdentifier } from "../ats/Job"
-import { chunkArray, containsAny } from "../utils"
+import { MetaData, getMetaDataFromEventHosts } from "./metadata"
 import {
-   createLiveStreamStatsDoc,
    LiveStreamStats,
    LivestreamStatsToUpdate,
+   createLiveStreamStatsDoc,
 } from "./stats"
-import { OrderByDirection } from "firebase/firestore"
-import { Create, ImageType } from "../commonTypes"
-import { Timestamp } from "../firebaseTypes"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -333,6 +335,13 @@ export interface ILivestreamRepository {
    answerQuestion(livestreamId: string, questionId: string): Promise<void>
 
    /**
+    * Marks a question as done for a livestream
+    * @param livestreamId - The ID of the livestream
+    * @param questionId - The ID of the question to mark as done
+    */
+   markQuestionAsDone(livestreamId: string, questionId: string): Promise<void>
+
+   /**
     * Resets a question for a livestream back to unanswered
     * @param livestreamId - The ID of the livestream
     * @param questionId - The ID of the question to reset
@@ -344,6 +353,28 @@ export interface ILivestreamRepository {
     * @param livestreamId - The ID of the livestream
     */
    resetAllQuestions(livestreamId: string): Promise<void>
+
+   /**
+    * Synchs metadata to be cascaded to the livestream.
+    * @param groupId Group ID, used mainly because it group.id might be empty
+    * @param group Group object containing details about the company
+    */
+   syncLivestreamMetadata(groupId: string, group: Group): Promise<void>
+
+   /**
+    * Fetches the users latest interacted live streams, with interacted meaning all live streams which the user
+    * has either participated or watched a recording of.
+    * This method implements sorting of the interacted live streams via the participation date or recording viewing date.
+    * A precedence is taken for the recording date if the user has participated in the live stream as well. Meaning all the fetched participated
+    * user live streams MUST IGNORE the live streams for which the user has seen the recordings, since the recordings will always be more recent than the
+    * live stream participation date.
+    * @param userId ID of the user
+    * @param limit Limit number of items to retrieve
+    */
+   getUserInteractedLivestreams(
+      userId: string,
+      limit?: number
+   ): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -1410,6 +1441,23 @@ export class FirebaseLivestreamRepository
       return batch.commit()
    }
 
+   async markQuestionAsDone(
+      livestreamId: string,
+      questionId: string
+   ): Promise<void> {
+      const questionsRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("questions")
+         .doc(questionId)
+
+      const updateData: Pick<LivestreamQuestion, "type"> = {
+         type: "done",
+      }
+
+      return questionsRef.update(updateData)
+   }
+
    async resetAllQuestions(livestreamId: string): Promise<void> {
       const questionsRef = this.firestore
          .collection("livestreams")
@@ -1444,6 +1492,149 @@ export class FirebaseLivestreamRepository
       }
 
       return questionsRef.update(updateData)
+   }
+
+   async syncLivestreamMetadata(groupId: string, group: Group): Promise<void> {
+      const query = this.eventsOfGroupQuery(groupId)
+      if (group.universityCode) return
+
+      const snapshots = await query.get()
+      const chunks = chunkArray(snapshots.docs, 450)
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+         chunk.forEach((doc) => {
+            const metadataFromHost = getMetaDataFromEventHosts([group])
+            const toUpdate: MetaData = {
+               companyCountries: metadataFromHost.companyCountries,
+               companyIndustries: metadataFromHost.companyIndustries,
+               companyTargetedCountries:
+                  metadataFromHost.companyTargetedCountries,
+               companyTargetedFieldsOfStudies:
+                  metadataFromHost.companyTargetedFieldsOfStudies,
+               companyTargetedUniversities:
+                  metadataFromHost.companyTargetedUniversities,
+            }
+            batch.update(doc.ref, toUpdate)
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
+   }
+
+   async getUserLivestreamData(
+      userId: string,
+      limit: number,
+      ignoreIds?: string[]
+   ): Promise<UserLivestreamData[]> {
+      const query = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("user.id", "==", userId)
+         .orderBy("participated.date", "desc")
+         .limit(limit)
+
+      const snap = await query.get()
+
+      const userStreamDataWithoutIgnoredStreams =
+         mapFirestoreDocuments<UserLivestreamData>(snap)?.filter((data) => {
+            return !ignoreIds?.includes(data.livestreamId)
+         })
+
+      return userStreamDataWithoutIgnoredStreams || []
+   }
+
+   async getUserRecordingStats(
+      userEmail: string,
+      unique: boolean
+   ): Promise<RecordingStatsUser[]> {
+      const query = this.firestore
+         .collectionGroup("recordingStatsUser")
+         .where("userId", "==", userEmail)
+         .orderBy("date", "desc")
+
+      const data = await query.get()
+      const recordingStatsData = mapFirestoreDocuments<RecordingStatsUser>(data)
+
+      const recordingStats = recordingStatsData ?? []
+
+      if (!unique) return recordingStats
+      // Filtering the results, to only consider the more recent hourly watched recording
+      // Meaning if a user has watched multiple recordings for the same live stream in several hours
+      // only the last hour data will be considered
+      const filteredStats = recordingStats.filter((stat) => {
+         // Find other recording stats for the same user and live stream
+         const otherHourViews = recordingStats.filter((recordingStat) => {
+            return (
+               recordingStat.userId == stat.userId &&
+               recordingStat.livestreamId == stat.livestreamId &&
+               recordingStat.id != stat.id
+            )
+         })
+         if (otherHourViews.length) {
+            // Check if any other recording stats has a more recent date
+            const hasMoreRecent = otherHourViews.find((recordingStat) => {
+               return recordingStat.date.toMillis() > stat.date.toMillis()
+            })
+            // Keep if there isn't a more recent recording
+            return !hasMoreRecent
+         }
+         // Keep this recording
+         return true
+      })
+
+      return filteredStats
+   }
+
+   async getUserInteractedLivestreams(
+      userId: string,
+      limit = 10
+   ): Promise<LivestreamEvent[]> {
+      // Limit in memory
+      const recordingData = await this.getUserRecordingStats(userId, true)
+      const userRecordingData = recordingData.slice(0, limit)
+
+      const ignoreIds = userRecordingData.map((data) => data.livestreamId)
+
+      const userLivestreamParticipatingData = await this.getUserLivestreamData(
+         userId,
+         limit,
+         ignoreIds
+      )
+
+      const allLivestreamData = userRecordingData
+         .map((recording) => {
+            return {
+               livestreamId: recording.livestreamId,
+               date: recording.date,
+            }
+         })
+         .concat(
+            userLivestreamParticipatingData.map((participatingData) => {
+               return {
+                  livestreamId: participatingData.livestreamId,
+                  date: participatingData?.participated?.date,
+               }
+            })
+         )
+
+      const sortedLivestreamsIds = allLivestreamData
+         .sort((baseLivestreamData, comparisonLivestreamData) => {
+            return (
+               comparisonLivestreamData.date.toMillis() -
+               baseLivestreamData.date.toMillis()
+            )
+         })
+         .slice(0, limit)
+         .map((data) => data.livestreamId)
+
+      // Will need to re sort as the query might not respect the order
+      const livestreams =
+         (await this.getLivestreamsByIds(sortedLivestreamsIds)) || []
+      const sortedLivestreams = arraySortByIndex(livestreams, (event) =>
+         sortedLivestreamsIds.indexOf(event.id)
+      )
+      return sortedLivestreams
    }
 }
 

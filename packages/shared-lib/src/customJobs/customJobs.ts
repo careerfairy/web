@@ -1,5 +1,5 @@
-import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat"
+import { Identifiable } from "../commonTypes"
 import { UserData } from "../users"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
@@ -40,6 +40,11 @@ export type PublicCustomJob = Pick<
    | "deleted"
 >
 
+export type PublicCustomJobApplicant = Pick<
+   CustomJobApplicant,
+   "id" | "jobId" | "companyCountry" | "companyIndustries" | "companySize"
+>
+
 export type JobType =
    | "Full-time"
    | "Part-time"
@@ -73,6 +78,18 @@ export const pickPublicDataFromCustomJob = (
    }
 }
 
+export const pickPublicDataFromCustomJobApplicant = (
+   jobApplicant: CustomJobApplicant
+): PublicCustomJobApplicant => {
+   return {
+      id: jobApplicant.id,
+      jobId: jobApplicant.jobId ?? null,
+      companyCountry: jobApplicant?.companyCountry,
+      companyIndustries: jobApplicant?.companyIndustries ?? [],
+      companySize: jobApplicant?.companySize,
+   }
+}
+
 // collection path /customJobStats
 export interface CustomJobStats extends Identifiable {
    documentType: "customJobStats" // simplify groupCollection Queries
@@ -96,4 +113,8 @@ export interface CustomJobApplicant extends Identifiable {
    appliedAt: firebase.firestore.Timestamp
    livestreamId: string // The associated livestream where the user applied to the job
    job: CustomJob
+   // cascaded properties from groups (collection /careerCenterData)
+   companyCountry?: string
+   companyIndustries?: string[]
+   companySize?: string
 }

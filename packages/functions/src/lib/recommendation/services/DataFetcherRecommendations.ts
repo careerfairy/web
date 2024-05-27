@@ -1,16 +1,19 @@
+import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
-import { BundleLoader } from "../../bundleLoader"
 import {
    LikedSparks,
    SeenSparks,
    SharedSparks,
+   Spark,
    SparkStats,
+   sortSeenSparks,
+   sortSparksByIds,
 } from "@careerfairy/shared-lib/sparks/sparks"
+import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
+import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
-
+import { BundleLoader } from "../../bundleLoader"
 /**
  * Interface that holds the contract that fetches data for
  * the recommendation service
@@ -21,6 +24,13 @@ export interface IRecommendationDataFetcher {
    getPastLivestreams(): Promise<LivestreamEvent[]>
 
    getUser(): Promise<UserData>
+
+   getWatchedSparks(userId: string): Promise<Spark[]>
+
+   getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]>
+
+   getAppliedJobs(userId: string): Promise<CustomJobApplicant[]>
+   getFollowedCompanies(userId: string): Promise<CompanyFollowed[]>
 }
 
 /**
@@ -43,6 +53,30 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
 
    getPastLivestreams(): Promise<LivestreamEvent[]> {
       return this.loader.getDocs<LivestreamEvent>("past-livestreams-query")
+   }
+
+   async getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + userId)
+   }
+
+   async getAppliedJobs(userId: string): Promise<CustomJobApplicant[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + userId)
+   }
+
+   async getWatchedSparks(userId: string): Promise<Spark[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + userId)
+   }
+
+   async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
+      // Not implemented for newsletter, since data fetching would be per
+      // user meaning an excess number requests would be made for each subscribed user
+      throw new Error("Not implemented: " + userId)
    }
 
    static async create(): Promise<NewsletterDataFetcher> {
@@ -68,7 +102,8 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
    constructor(
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
-      private readonly userRepo: IUserRepository
+      private readonly userRepo: IUserRepository,
+      private readonly sparksRepo: ISparkFunctionsRepository
    ) {
       this.loader = new BundleLoader()
    }
@@ -90,6 +125,36 @@ export class UserDataFetcher implements IRecommendationDataFetcher {
          orderByDirection: "desc",
          limit: 10,
       })
+   }
+
+   async getInteractedLivestreams(userId: string): Promise<LivestreamEvent[]> {
+      return this.livestreamRepo.getUserInteractedLivestreams(userId, 10)
+   }
+
+   async getAppliedJobs(userId: string): Promise<CustomJobApplicant[]> {
+      return this.userRepo.getCustomJobApplications(userId, 10)
+   }
+
+   async getWatchedSparks(userId: string): Promise<Spark[]> {
+      // fetch the last 20 registered livestreams for this user only
+      const seenSparks = await this.userRepo.getUserSeenSparks(userId)
+
+      if (!seenSparks) return []
+
+      const sparkIds = sortSeenSparks(seenSparks, 20)
+
+      const sparks = (await this.sparksRepo.getSparksByIds(sparkIds)) || []
+
+      // Re sort ensuring order stays the same after fetching data
+      const sortedSparks = sortSparksByIds(sparkIds, sparks)
+
+      // Using const to allow easier debugging
+      return sortedSparks
+   }
+
+   async getFollowedCompanies(userId: string): Promise<CompanyFollowed[]> {
+      const companies = await this.userRepo.getCompaniesUserFollows(userId)
+      return companies || []
    }
 }
 

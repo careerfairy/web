@@ -1,0 +1,143 @@
+import {
+   Stack,
+   Tab,
+   Tabs,
+   Typography,
+   tabClasses,
+   tabsClasses,
+} from "@mui/material"
+import { swipeableTabA11yProps } from "materialUI/GlobalPanels/GlobalPanels"
+import { SyntheticEvent } from "react"
+import { sxStyles } from "types/commonTypes"
+import { MIN_QUESTIONS_TO_SHOW } from "./util"
+
+const BORDER_RADIUS = 51
+const BORDER_THICKNESS = 1
+const HEIGHT = 40
+
+const styles = sxStyles({
+   tabs: (theme) => ({
+      [`& .${tabsClasses.indicator}`]: {
+         height: "100%",
+         zIndex: 0,
+         borderRadius: `${BORDER_RADIUS}px`,
+      },
+      [`& .${tabsClasses.flexContainer}`]: {
+         background: theme.brand.white[300],
+      },
+      border: `${BORDER_THICKNESS}px solid ${theme.brand.white[500]}`,
+      borderRadius: `${BORDER_RADIUS}px`,
+      overflow: "hidden",
+      minHeight: HEIGHT,
+      height: HEIGHT,
+   }),
+   tab: (theme) => ({
+      p: 0,
+      flexWrap: "wrap",
+      minHeight: "auto",
+      height: HEIGHT - BORDER_THICKNESS * 2,
+      borderRadius: `${BORDER_RADIUS}px`,
+      textTransform: "none",
+      zIndex: 1,
+      color: theme.brand.black[700],
+      [`&.${tabClasses.selected}`]: {
+         color: theme.brand.white[100],
+      },
+      transition: theme.transitions.create("color"),
+   }),
+
+   count: {
+      mt: "auto !important",
+      mb: "3px !important",
+      lineHeight: "16px",
+   },
+})
+
+export enum QuestionTab {
+   UPCOMING,
+   ANSWERED,
+}
+
+type PanelTabsProps = {
+   value: QuestionTab
+   setValue: (value: QuestionTab) => void
+   upcomingQuestionsCount: number
+   answeredQuestionsCount: number
+}
+
+const formatCount = (count: number) => {
+   if (!count) return ""
+
+   if (count < MIN_QUESTIONS_TO_SHOW) {
+      return ""
+   }
+
+   if (count > 99) {
+      return "(99+)"
+   }
+
+   if (count < 1) {
+      return ""
+   }
+
+   return `(${count})`
+}
+
+export const PanelTabs = ({
+   value,
+   setValue,
+   upcomingQuestionsCount,
+   answeredQuestionsCount,
+}: PanelTabsProps) => {
+   const upcomingCountString = formatCount(upcomingQuestionsCount)
+   const answeredCountString = formatCount(answeredQuestionsCount)
+
+   const handleChange = (_event: SyntheticEvent, newValue: QuestionTab) => {
+      setValue(newValue)
+   }
+
+   return (
+      <Tabs
+         value={value}
+         onChange={handleChange}
+         indicatorColor="primary"
+         textColor="inherit"
+         variant="fullWidth"
+         sx={styles.tabs}
+         aria-label="Q&A Tabs"
+      >
+         <Tab
+            label={
+               <Stack direction="row" spacing={0.5}>
+                  <Typography variant="medium">Upcoming</Typography>
+                  {Boolean(upcomingCountString) && (
+                     <Typography sx={styles.count} variant="xsmall">
+                        {upcomingCountString}
+                     </Typography>
+                  )}
+               </Stack>
+            }
+            value={QuestionTab.UPCOMING}
+            {...swipeableTabA11yProps(0)}
+            sx={styles.tab}
+            disableTouchRipple
+         />
+         <Tab
+            label={
+               <Stack direction="row" spacing={0.5}>
+                  <Typography variant="medium">Answered</Typography>
+                  {Boolean(answeredCountString) && (
+                     <Typography sx={styles.count} variant="xsmall">
+                        {answeredCountString}
+                     </Typography>
+                  )}
+               </Stack>
+            }
+            disableTouchRipple
+            value={QuestionTab.ANSWERED}
+            {...swipeableTabA11yProps(1)}
+            sx={styles.tab}
+         />
+      </Tabs>
+   )
+}

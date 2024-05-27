@@ -1,6 +1,6 @@
+import { useAppDispatch } from "components/custom-hook/store"
 import { ActiveView, setActiveView } from "store/reducers/streamingAppReducer"
-import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
-import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
+import { useSidePanel } from "store/selectors/streamingAppSelectors"
 
 /**
  * Custom hook for setting and checking the active view.
@@ -12,7 +12,7 @@ import { sidePanelSelector } from "store/selectors/streamingAppSelectors"
  * <button onClick={handleSetActive} active={isActive}>Activate Chat View</button>
  */
 export const useActiveSidePanelView = (viewName: ActiveView) => {
-   const { isOpen, activeView } = useAppSelector(sidePanelSelector)
+   const { isOpen, activeView } = useSidePanel()
    const dispatch = useAppDispatch()
 
    const isActive = activeView === viewName && isOpen

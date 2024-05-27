@@ -1,4 +1,5 @@
-import React, { memo, useCallback, useMemo, useState } from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
 import {
    Avatar,
    ListItemIcon,
@@ -6,7 +7,7 @@ import {
    Menu,
    MenuItem,
 } from "@mui/material"
-import { makeUrls } from "../../../../util/makeUrls"
+import { memo, useCallback, useMemo, useState } from "react"
 import {
    appleIcon,
    googleIcon,
@@ -15,7 +16,7 @@ import {
    yahooIcon,
 } from "../../../../constants/svgs"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { makeUrls } from "../../../../util/makeUrls"
 import { buildExternalDialogLink } from "../../livestream-dialog"
 
 const styles = {
@@ -130,7 +131,10 @@ export const createCalendarEvent = (
       location: "Hosted virtually on CareerFairy (link in the description)",
       startsAt: new Date(time).toISOString(),
       endsAt: new Date(
-         new Date(time).getTime() + (livestream.duration || 45) * 60 * 1000
+         new Date(time).getTime() +
+            (livestream.duration || UPCOMING_STREAM_THRESHOLD_MINUTES) *
+               60 *
+               1000
       ).toISOString(),
    }
 }
