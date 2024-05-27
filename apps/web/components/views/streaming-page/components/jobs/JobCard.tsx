@@ -20,6 +20,9 @@ const styles = sxStyles({
       width: "100%",
       textAlign: "left",
       font: "inherit",
+      "&:hover": {
+         background: theme.brand.white[300],
+      },
    }),
    jobCardSide: {
       width: "8px",
@@ -108,7 +111,7 @@ const JobCard = ({ job, handleSelectJob }: Props) => {
    }, [handleSelectJob, job, jobName])
 
    return (
-      <ButtonBase onClick={handleClick} sx={styles.jobCard}>
+      <ButtonBase onClick={handleClick} sx={styles.jobCard} focusRipple>
          <Box sx={styles.jobCardSide} />
          <Box sx={styles.jobInfo}>
             <Stack spacing={1}>
