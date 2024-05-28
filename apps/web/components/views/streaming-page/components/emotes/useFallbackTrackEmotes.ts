@@ -50,17 +50,17 @@ export const useFallbackTrackEmotes = (
             (snapshot) => {
                initialSnapsLoadedRef.current = true
 
-               // Only start dispatching emotes after the initial snaps have been loaded to prevent the inittal emotes from being dispatched
+               // Dispatch emotes only after initial snaps are loaded; focus on new additions.
                if (!initialSnapsLoadedRef.current) return
+
+               // Don't queue up emotes that have added when you're not focused on the window
+               if (!isWindowVisibleRef.current) return
 
                const newEmotes = snapshot.docChanges().filter(
                   (change) =>
                      change.type === "added" && // only new additions
                      change.doc.data().agoraUserId !== agoraUserId // not from the current user
                )
-
-               // prevent emote queue overflow when window is restored after being in the background
-               if (!isWindowVisibleRef.current) return
 
                newEmotes.forEach((emote) => {
                   dispatch(addEmote(emote.doc.data().name))

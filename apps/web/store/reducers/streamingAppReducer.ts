@@ -13,8 +13,8 @@ import { RtmStatusCode } from "agora-rtm-sdk"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { v4 as uuidv4 } from "uuid"
 
-// Max number of emote nodes to display on the UI
-const MAX_EMOTES = 20
+/** Max number of emote nodes that can be rendered at once */
+const MAX_EMOTES_TO_RENDER = 30
 
 export const ActiveViews = {
    CHAT: "chat",
@@ -337,7 +337,7 @@ const streamingAppSlice = createSlice({
          state.shareVideoDialogOpen = action.payload
       },
       addEmote(state, action: PayloadAction<EmoteType>) {
-         if (state.emotes.length >= MAX_EMOTES) {
+         if (state.emotes.length >= MAX_EMOTES_TO_RENDER) {
             state.emotes.shift()
          }
          state.emotes.push({ type: action.payload, id: uuidv4() })

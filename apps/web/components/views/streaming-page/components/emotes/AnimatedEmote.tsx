@@ -6,6 +6,7 @@ import { MotionProps } from "framer-motion"
 import { ReactNode, memo, useMemo } from "react"
 import { removeEmote } from "store/reducers/streamingAppReducer"
 import { sxStyles } from "types/commonTypes"
+import { Bubble } from "./Bubble"
 import { ClapEmote, ConfusedEmote, HeartEmote, LikeEmote } from "./icons"
 
 const styles = sxStyles({
@@ -15,12 +16,12 @@ const styles = sxStyles({
       right: 5,
       width: 45,
       height: 45,
-      zIndex: 1,
+      zIndex: (theme) => theme.zIndex.drawer + 1,
    },
 })
 
-const DESKTOP_WIGGLE_ROOM = 100
-const MOBILE_WIGGLE_ROOM = 50
+const DESKTOP_WIGGLE_ROOM = 70
+const MOBILE_WIGGLE_ROOM = 30
 
 const EMOTES: Record<EmoteType, ReactNode> = {
    [EmoteType.CONFUSED]: <ConfusedEmote />,
@@ -46,12 +47,6 @@ const getAnimate = (randomDuration: number): MotionProps["animate"] => ({
    },
 })
 
-const transition: MotionProps["transition"] = {
-   type: "spring",
-   stiffness: 1000, // Increase stiffness for faster acceleration
-   damping: 12, // Adjust damping to control overshoot
-}
-
 type Props = {
    emote: {
       id: string
@@ -64,10 +59,11 @@ export const AnimatedEmote = memo(
       const streamIsMobile = useStreamIsMobile()
       const dispatch = useAppDispatch()
 
-      const initial = useMemo(
-         () => getInitial(getRandomXPosition(streamIsMobile)),
+      const wiggleRoom = useMemo(
+         () => getRandomXPosition(streamIsMobile),
          [streamIsMobile]
       )
+      const initial = useMemo(() => getInitial(wiggleRoom), [wiggleRoom])
 
       const animate = useMemo(() => getAnimate(getRandomInteger(4.7, 5)), [])
 
@@ -80,10 +76,9 @@ export const AnimatedEmote = memo(
             sx={styles.root}
             initial={initial}
             animate={animate}
-            transition={transition}
             onAnimationComplete={removeEmoteFromStore}
          >
-            {EMOTES[emote.type]}
+            <Bubble>{EMOTES[emote.type]}</Bubble>
          </FramerBox>
       )
    },
