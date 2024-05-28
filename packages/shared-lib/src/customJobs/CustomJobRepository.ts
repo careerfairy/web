@@ -2,7 +2,12 @@ import firebase from "firebase/compat"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
-import { CustomJob, CustomJobApplicant, PublicCustomJob } from "./customJobs"
+import {
+   CustomJob,
+   CustomJobApplicant,
+   PublicCustomJob,
+   getMaxDaysAfterDeadline,
+} from "./customJobs"
 
 export interface ICustomJobRepository {
    /**
@@ -78,6 +83,22 @@ export interface ICustomJobRepository {
       jobIdsToUpdate: string[],
       toRemove?: boolean
    ): Promise<void>
+
+   /**
+    * Delete all expired custom jobs
+    */
+   deleteExpiredCustomJobs(): Promise<void>
+
+   /**
+    * Update all custom jobs that have expired
+    */
+   syncExpiredCustomJobs(): Promise<void>
+
+   /**
+    * Get all group custom jobs
+    * @param groupId
+    */
+   getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -109,6 +130,7 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: Boolean(linkedLivestreamId),
       }
+      console.log("🚀 ~ newJob:", newJob)
 
       await ref.set(newJob, { merge: true })
 
@@ -118,9 +140,13 @@ export class FirebaseCustomJobRepository
    async updateCustomJob(job: CustomJob): Promise<void> {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc(job.id)
 
+      const isJobPublished =
+         !job?.deleted && (job.livestreams.length > 0 || job.sparks.length > 0)
+
       const updatedJob: CustomJob = {
          ...job,
          updatedAt: this.fieldValue.serverTimestamp() as Timestamp,
+         published: isJobPublished,
       }
 
       await ref.update(updatedJob)
@@ -245,5 +271,52 @@ export class FirebaseCustomJobRepository
       })
 
       return batch.commit()
+   }
+
+   async deleteExpiredCustomJobs(): Promise<void> {
+      const customJobRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("deadline", "<", getMaxDaysAfterDeadline())
+
+      const snapshot = await customJobRef.get()
+
+      const batch = this.firestore.batch()
+
+      snapshot.forEach((doc) => {
+         batch.delete(doc.ref)
+      })
+
+      return batch.commit()
+   }
+
+   async syncExpiredCustomJobs(): Promise<void> {
+      const customJobRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("deadline", "<", new Date())
+
+      const snapshot = await customJobRef.get()
+
+      const batch = this.firestore.batch()
+
+      snapshot.forEach((doc) => {
+         batch.update(doc.ref, {
+            published: false,
+         })
+      })
+
+      return batch.commit()
+   }
+
+   async getCustomJobsByGroupId(groupId: string): Promise<CustomJob[]> {
+      const docs = await this.firestore
+         .collection(this.COLLECTION_NAME)
+         .where("groupId", "==", groupId)
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<CustomJob>(docs.docs)
    }
 }
