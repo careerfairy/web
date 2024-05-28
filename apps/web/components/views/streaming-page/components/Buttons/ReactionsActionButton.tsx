@@ -18,7 +18,12 @@ import { useClickAway } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useSendEmote } from "../../context/rtm/hooks/useSendEmote"
-import { ClapEmote, ConfusedEmote, HeartEmote, LikeEmote } from "../emotes"
+import {
+   ClapEmote,
+   ConfusedEmote,
+   HeartEmote,
+   LikeEmote,
+} from "../emotes/icons"
 
 const styles = sxStyles({
    root: {
