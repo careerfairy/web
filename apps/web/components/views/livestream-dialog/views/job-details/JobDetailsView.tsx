@@ -3,7 +3,7 @@ import {
    PublicCustomJob,
    pickPublicDataFromCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { ButtonProps, Grid, Typography } from "@mui/material"
+import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
@@ -34,17 +34,19 @@ import JobDescription from "./main-content/JobDescription"
 import JobHeader from "./main-content/JobHeader"
 
 const styles = sxStyles({
-   btnGrid: {
-      justifyContent: { xs: "center", sm: "flex-end" },
+   btnWrapper: {
+      display: "flex",
       gap: "10px",
-      flexDirection: { xs: "column", sm: "row" },
-      alignItems: "center",
+      alignItems: { xs: "center", sm: "flex-end" },
+      width: "100%",
    },
-   btnGridPrimary: {
-      order: { xs: 1, sm: 2 },
+   btnPrimary: {
+      flexDirection: { xs: "column", sm: "row-reverse" },
+      justifyContent: { xs: "center", sm: "flex-start" },
    },
-   btnGridSecondary: {
-      order: { xs: 2, sm: 1 },
+   btnSecondary: {
+      flexDirection: { xs: "column-reverse", sm: "row" },
+      justifyContent: { xs: "center", sm: "flex-end" },
    },
    livestreamCopy: {
       fontWeight: 700,
@@ -191,35 +193,27 @@ const JobDetails: FC<Props> = ({ jobId }) => {
             </MainContent>
          }
          fixedBottomContent={
-            <Grid container sx={styles.btnGrid}>
-               <Grid
-                  item
-                  sx={
-                     isLiveStreamButtonDisabled
-                        ? styles.btnGridSecondary
-                        : styles.btnGridPrimary
-                  }
-               >
-                  <LiveStreamButton
-                     setIsDisabled={setIsLiveStreamButtonDisabled}
-                  />
-               </Grid>
-               <Grid
-                  item
-                  sx={
-                     isLiveStreamButtonDisabled
-                        ? styles.btnGridPrimary
-                        : styles.btnGridSecondary
-                  }
-               >
+            <Stack
+               sx={[
+                  styles.btnWrapper,
+                  isLiveStreamButtonDisabled
+                     ? styles.btnSecondary
+                     : styles.btnPrimary,
+               ]}
+            >
+               <LiveStreamButton
+                  setIsDisabled={setIsLiveStreamButtonDisabled}
+               />
+
+               <Stack direction="row" spacing="10px">
                   <JobButton
                      job={job as Job}
                      livestreamId={livestream.id}
                      isSecondary={!isLiveStreamButtonDisabled}
                      handleOpen={handleOpen}
                   />
-               </Grid>
-            </Grid>
+               </Stack>
+            </Stack>
          }
       />
    )
