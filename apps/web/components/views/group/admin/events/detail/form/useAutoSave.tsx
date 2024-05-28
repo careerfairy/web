@@ -1,6 +1,9 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
+import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { customJobRepo } from "data/RepositoryInstances"
+import { customJobRepo, groupRepo } from "data/RepositoryInstances"
 import { FormikErrors } from "formik"
 import { cloneDeep, omit } from "lodash"
 import { useSnackbar } from "notistack"
@@ -11,6 +14,7 @@ import { mapFormValuesToLivestreamObject } from "./commons"
 import {
    LivestreamFormJobsTabValues,
    LivestreamFormQuestionsTabValues,
+   LivestreamFormSpeakersTabValues,
    LivestreamFormValues,
 } from "./types"
 import { useLivestreamFormValues } from "./useLivestreamFormValues"
@@ -78,6 +82,18 @@ const getFormValuesWithoutErrors = (
    return omit(values, onlyNestedKeyPathThatDiffer)
 }
 
+const getSpeakersThatAreCreators = (
+   speakers: LivestreamFormSpeakersTabValues["values"] | Speaker[],
+   options: LivestreamFormSpeakersTabValues["options"]
+) => {
+   return speakers.filter((speaker) => {
+      const isCreator = options.some(
+         (option) => option.id === speaker.id && option.isCreator
+      )
+      return isCreator
+   })
+}
+
 export const useAutoSave = () => {
    const firebaseService = useFirebaseService()
    const { livestream, targetLivestreamCollection } =
@@ -92,6 +108,67 @@ export const useAutoSave = () => {
    const haveValuesChanged = useMemo(
       () => !isEqual(previousValues, values),
       [previousValues, values]
+   )
+
+   const updateCreatorsRoles = useCallback(
+      async (
+         previousSpeakers: LivestreamFormSpeakersTabValues["values"],
+         newSpeakers: Speaker[],
+         options: LivestreamFormSpeakersTabValues["options"],
+         groupId: Group["id"]
+      ) => {
+         const removedSpeakers = previousSpeakers.filter(
+            (prevSpeaker) =>
+               !newSpeakers.some(
+                  (newSpeaker) => newSpeaker.id === prevSpeaker.id
+               )
+         )
+
+         const removedSpeakersThatAreCreators = getSpeakersThatAreCreators(
+            removedSpeakers,
+            options
+         ).map((speakerCreator) => {
+            return {
+               ...speakerCreator,
+               roles: speakerCreator.roles.filter(
+                  (role) => role !== CreatorRoles.Speaker
+               ),
+            }
+         })
+
+         const deletePromises = removedSpeakersThatAreCreators.map(
+            async (speakerCreator) =>
+               groupRepo.updateCreatorRolesInGroup(
+                  groupId,
+                  speakerCreator.id,
+                  speakerCreator.roles
+               )
+         )
+
+         const addedSpeakers = newSpeakers.filter(
+            (newSpeaker) =>
+               !previousSpeakers.some(
+                  (prevSpeaker) => newSpeaker.id === prevSpeaker.id
+               )
+         )
+
+         const speakersThatAreCreators = getSpeakersThatAreCreators(
+            addedSpeakers,
+            options
+         )
+
+         const updatePromises = speakersThatAreCreators.map(
+            async (speakerCreator) =>
+               groupRepo.updateCreatorRolesInGroup(
+                  groupId,
+                  speakerCreator.id,
+                  speakerCreator.roles
+               )
+         )
+
+         await Promise.all([...deletePromises, ...updatePromises])
+      },
+      []
    )
 
    const updateFeedbackQuestions = useCallback(
@@ -171,12 +248,20 @@ export const useAutoSave = () => {
    const updateLivestream = useCallback(
       async (
          newValues: Partial<LivestreamFormValues>,
+         previousSpeakers: LivestreamFormSpeakersTabValues["values"],
          previousJobs: LivestreamFormJobsTabValues
       ) => {
          const mappedObject = mapFormValuesToLivestreamObject(
             newValues,
             allFieldsOfStudy,
             firebaseService
+         )
+
+         updateCreatorsRoles(
+            previousSpeakers,
+            mappedObject.speakers,
+            newValues.speakers.options,
+            livestream.groupIds[0]
          )
 
          if (newValues?.questions?.feedbackQuestions?.length > 0) {
@@ -194,8 +279,10 @@ export const useAutoSave = () => {
       [
          allFieldsOfStudy,
          firebaseService,
+         livestream.groupIds,
          livestream.id,
          targetLivestreamCollection,
+         updateCreatorsRoles,
          updateCustomJobs,
          updateFeedbackQuestions,
       ]
@@ -203,6 +290,7 @@ export const useAutoSave = () => {
 
    const handleAutoSave = useCallback(async () => {
       const previousJobs = cloneDeep(previousValues.jobs)
+      const previousSpeakers = cloneDeep(previousValues.speakers.values)
       if (haveValuesChanged) {
          setPreviousValues(values)
          if (livestream.isDraft) {
@@ -211,9 +299,13 @@ export const useAutoSave = () => {
                errors
             )
 
-            updateLivestream(formValuesWithoutErrors, previousJobs)
+            updateLivestream(
+               formValuesWithoutErrors,
+               previousSpeakers,
+               previousJobs
+            )
          } else if (isValid) {
-            updateLivestream(values, previousJobs)
+            updateLivestream(values, previousSpeakers, previousJobs)
          }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
