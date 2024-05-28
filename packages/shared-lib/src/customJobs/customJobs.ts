@@ -1,6 +1,7 @@
 import firebase from "firebase/compat"
 import { Identifiable } from "../commonTypes"
 import { UserData } from "../users"
+import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
  * Collection path: /careerCenterData/[groupId]/customJobs/[jobId]
  * CustomJob is attached to a single group but can be related to multiple live streams
@@ -117,4 +118,8 @@ export interface CustomJobApplicant extends Identifiable {
    companyCountry?: string
    companyIndustries?: string[]
    companySize?: string
+}
+
+export const getMaxDaysAfterDeadline = (): Date => {
+   return new Date(Date.now() - CUSTOM_JOB_CONSTANTS.MAX_DAYS_AFTER_DEADLINE)
 }
