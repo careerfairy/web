@@ -984,7 +984,7 @@ export class FirebaseGroupRepository
          .doc(creatorId)
 
       await creatorRef.update({
-         roles: roles,
+         roles: this.fieldValue.arrayUnion(...roles),
          updatedAt: this.fieldValue.serverTimestamp(),
       })
    }
