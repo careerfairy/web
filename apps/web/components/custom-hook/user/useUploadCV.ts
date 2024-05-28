@@ -27,7 +27,7 @@ type UseUploadCVOptions = {
  * Hook that provides functionality to upload a user's CV to Firebase storage.
  * @returns An object containing upload related state and methods.
  */
-const useUploadCV = ({onSuccess}: UseUploadCVOptions = {})  => {
+const useUploadCV = ({ onSuccess }: UseUploadCVOptions = {}) => {
    const { userPresenter, userData } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -52,7 +52,14 @@ const useUploadCV = ({onSuccess}: UseUploadCVOptions = {})  => {
             setLoading(false)
          }
       },
-      [upload, userPresenter, userData, errorNotification, successNotification, onSuccess]
+      [
+         upload,
+         userPresenter,
+         userData,
+         errorNotification,
+         successNotification,
+         onSuccess,
+      ]
    )
 
    const handleError = useCallback(
@@ -82,7 +89,7 @@ const useUploadCV = ({onSuccess}: UseUploadCVOptions = {})  => {
             types: ["pdf"],
             multiple: false,
             maxSize: 10,
-            disabled: isLoading || cvUploaded,
+            disabled: isLoading,
             onDraggingStateChange: setDragActive,
             handleChange: handleUploadCV,
          },

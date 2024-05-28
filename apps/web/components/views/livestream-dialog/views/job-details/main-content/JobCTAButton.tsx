@@ -169,7 +169,6 @@ const ManageCVButton = () => {
             <FileUploader
                {...fileUploaderProps}
                sx={[dragActive && styles.dragActive]}
-               disabled={false}
                {...props}
             >
                {children}
