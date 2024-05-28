@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { HandRaise } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import { firebaseReducer as reducer } from "react-redux-firebase"
-import { HandRaise } from "types/handraise"
 
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
@@ -10,6 +10,6 @@ type FirebaseSchema = {
    handRaises: HandRaise
 }
 
-const firebaseReducer = reducer<{}, FirebaseSchema>
+const firebaseReducer = reducer<Record<string, never>, FirebaseSchema>
 
 export default firebaseReducer

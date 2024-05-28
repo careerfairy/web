@@ -4,6 +4,7 @@ import { Logger } from "../../utils/types"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "./IRecommendationService"
+import { ImplicitLivestreamRecommendationData } from "./ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 
 /**
@@ -13,6 +14,7 @@ export default class ExistingDataRecommendationService
    extends RecommendationServiceCore
    implements IRecommendationService
 {
+   private implicitData: ImplicitLivestreamRecommendationData
    constructor(
       logger: Logger,
       private readonly livestreams: LivestreamEvent[],
@@ -33,24 +35,33 @@ export default class ExistingDataRecommendationService
          eventsBasedOnUser = this.getRecommendedEventsBasedOnUserData(
             this.user,
             this.livestreams,
-            limit
+            limit,
+            this.implicitData
          )
       }
 
       return this.process(eventsBasedOnUser, limit, this.livestreams, this.user)
    }
 
+   usingImplicitData(
+      implicitData: ImplicitLivestreamRecommendationData
+   ): ExistingDataRecommendationService {
+      this.implicitData = implicitData
+      return this
+   }
+
    static create(
       logger: Logger,
       user: UserData,
       livestreams: LivestreamEvent[],
-      debug = false
+      debug = false,
+      implicitRecommendationData?: ImplicitLivestreamRecommendationData
    ): IRecommendationService {
       return new ExistingDataRecommendationService(
          logger,
          livestreams,
          user,
          debug
-      )
+      ).usingImplicitData(implicitRecommendationData)
    }
 }

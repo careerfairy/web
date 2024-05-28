@@ -302,7 +302,7 @@ const EventsTable = ({
                   ? "Needs Approval"
                   : "Publish Stream",
                onClick: !rowData.status?.pendingApproval
-                  ? () => handleEditStream(rowData)
+                  ? () => handleEditStreamV2(group.groupId, rowData.id)
                   : () => handlePublishStream(rowData),
                hidden: !isDraft,
                disabled: publishingDraft,
@@ -380,7 +380,7 @@ const EventsTable = ({
                <CompanyLogo
                   onClick={(event) => {
                      event.stopPropagation()
-                     handleEditStream(rowData)
+                     handleEditStreamV2(group.groupId, rowData.id)
                   }}
                   livestream={rowData}
                />
@@ -450,7 +450,8 @@ const EventsTable = ({
          handleSpeakerSearch,
          handleHostsSearch,
          theme.shadows,
-         handleEditStream,
+         handleEditStreamV2,
+         group.groupId,
          getNumberOfRegisteredStudents,
          clickedRows,
          isDraft,

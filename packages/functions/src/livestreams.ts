@@ -1,18 +1,19 @@
-import * as functions from "firebase-functions"
-import { client } from "./api/postmark"
-import config from "./config"
-import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
-import { setCORSHeaders, isLocalEnvironment } from "./util"
-// @ts-ignore (required when building the project inside docker)
-import ical from "ical-generator"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { DateTime } from "luxon"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
-import { firestore } from "./api/firestoreAdmin"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
+import { UPCOMING_STREAM_THRESHOLD_MINUTES } from "@careerfairy/shared-lib/livestreams/constants"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import * as functions from "firebase-functions"
+import { client } from "./api/postmark"
+import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
+import config from "./config"
+import { isLocalEnvironment, setCORSHeaders } from "./util"
+// @ts-ignore (required when building the project inside docker)
+import ical from "ical-generator"
+import { DateTime } from "luxon"
 import { InferType, array, boolean, mixed, object, string } from "yup"
+import { firestore } from "./api/firestoreAdmin"
 import { livestreamsRepo } from "./api/repositories"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation } from "./middlewares/validations"
@@ -53,7 +54,9 @@ export const getLivestreamICalendarEvent = functions
                      {
                         start: livestreamStartDate,
                         end: livestreamStartDate.plus({
-                           minutes: livestream.duration || 45,
+                           minutes:
+                              livestream.duration ||
+                              UPCOMING_STREAM_THRESHOLD_MINUTES,
                         }),
                         location: `${linkWithUTM}`,
                         summary: livestream.title,

@@ -1,8 +1,12 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { ClientRole, useJoin, useRTCClient } from "agora-rtc-react"
-import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
+import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-raise/useUserHandRaiseState"
 import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { agoraCredentials } from "data/agora/AgoraInstance"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { DocumentReference } from "firebase/firestore"
 import { useRouter } from "next/router"
 import {
    FC,
@@ -15,10 +19,10 @@ import {
 } from "react"
 import { ActiveViews, setActiveView } from "store/reducers/streamingAppReducer"
 import {
-   sidePanelSelector,
    useHasEnded,
    useHasStarted,
    useIsConnectedOnDifferentBrowser,
+   useSidePanel,
 } from "store/selectors/streamingAppSelectors"
 
 type StreamContextProps = {
@@ -37,6 +41,8 @@ type StreamContextProps = {
    setIsReady: (isReady: boolean) => void
    isJoining: boolean
    currentRole: ClientRole
+   // The livestream or breakout-room document reference
+   streamRef: DocumentReference<LivestreamEvent>
 }
 
 const StreamContext = createContext<StreamContextProps | undefined>(undefined)
@@ -61,8 +67,13 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const hostAuthToken = query.token?.toString() || null
 
-   const { activeView } = useAppSelector(sidePanelSelector)
+   const { activeView } = useSidePanel()
    const isLoggedInOnDifferentBrowser = useIsConnectedOnDifferentBrowser()
+
+   const {
+      userHandRaiseIsActive: isUserHandRaiseActive,
+      userCanJoinPanel: viewerCanJoinPanel,
+   } = useUserHandRaiseState(livestreamId, agoraUserId)
 
    const dispatch = useAppDispatch()
 
@@ -76,8 +87,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
       }
    }, [isHost, isHandRaiseActive, dispatch])
 
-   const shouldStream = isHost
-   // TODO: OR Viewer has raised their hand and the host has accepted them
+   const shouldStream = Boolean(isHost || isUserHandRaiseActive)
 
    const response = useAgoraRtcToken({
       channelName: livestreamId,
@@ -106,7 +116,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
    const client = useRTCClient()
 
    const config = useClientConfig(client, {
-      hostCondition: shouldStream && isReady,
+      hostCondition: shouldStream && isReady && (isHost || viewerCanJoinPanel),
    })
 
    const value = useMemo<StreamContextProps>(
@@ -121,6 +131,7 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          setIsReady,
          isJoining: isLoading,
          currentRole: config.currentRole,
+         streamRef: livestreamService.getLivestreamRef(livestreamId),
       }),
       [
          livestreamId,

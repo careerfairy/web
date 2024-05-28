@@ -1,40 +1,43 @@
-import { forwardRef, ReactNode, useCallback } from "react"
-import { SnackbarContent, useSnackbar, VariantType } from "notistack"
-import Typography from "@mui/material/Typography"
-import Card from "@mui/material/Card"
-import CardActions from "@mui/material/CardActions"
-import IconButton from "@mui/material/IconButton"
 import CloseIcon from "@mui/icons-material/Close"
-import { sxStyles } from "../../../types/commonTypes"
 import { Box } from "@mui/material"
+import Card from "@mui/material/Card"
+import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import { SnackbarContent, useSnackbar, VariantType } from "notistack"
+import { forwardRef, ReactNode, useCallback } from "react"
+import { sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    root: {
       "@media (min-width:600px)": {
          minWidth: "344px !important",
       },
-      maxWidth: 450,
+      maxWidth: 460,
    },
    card: {
       width: "100%",
-      p: 1,
+      p: 2,
    },
    actionRoot: {
       padding: [1, 1, 1, 2],
       justifyContent: "space-between",
    },
    icons: {
-      marginLeft: "auto",
-      alignSelf: "flex-start",
+      position: "absolute",
+      right: 0,
+      top: 0,
+      p: 2,
    },
    expand: {
-      padding: [1, 1],
+      p: 0.5,
+      m: -0.5,
+      color: "#CACACA",
    },
 })
 
 interface ReportCompleteProps {
-   message: string | ReactNode
+   content: string | ReactNode
    title: string | ReactNode
    id: string | number
    variant?: VariantType
@@ -51,30 +54,30 @@ const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
       return (
          <Box component={SnackbarContent} ref={ref} sx={styles.root}>
             <Card sx={styles.card}>
-               <CardActions sx={styles.actionRoot}>
-                  <Stack spacing={1.5}>
-                     {props.title ? (
-                        <Typography
-                           fontSize="1.42rem"
-                           fontWeight={700}
-                           variant="h4"
-                           color={getColor(variant)}
-                        >
-                           {props.title}
-                        </Typography>
-                     ) : null}
-                     <Typography variant="body1">{props.message}</Typography>
-                  </Stack>
-                  <Box sx={styles.icons}>
-                     <IconButton
-                        size="small"
-                        sx={styles.expand}
-                        onClick={handleDismiss}
+               <Stack spacing={1.25}>
+                  {props.title ? (
+                     <Typography
+                        fontWeight={700}
+                        variant="brandedH5"
+                        component="h5"
+                        color={getColor(variant)}
                      >
-                        <CloseIcon fontSize="small" />
-                     </IconButton>
-                  </Box>
-               </CardActions>
+                        {props.title}
+                     </Typography>
+                  ) : null}
+                  {Boolean(props.content) && (
+                     <Typography variant="small">{props.content}</Typography>
+                  )}
+               </Stack>
+               <Box sx={styles.icons}>
+                  <IconButton
+                     size="small"
+                     sx={styles.expand}
+                     onClick={handleDismiss}
+                  >
+                     <CloseIcon color="inherit" fontSize="small" />
+                  </IconButton>
+               </Box>
             </Card>
          </Box>
       )
@@ -84,7 +87,7 @@ const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
 const getColor = (variant: VariantType) => {
    switch (variant) {
       case "success":
-         return "success.main"
+         return "primary.main"
       case "error":
          return "error.main"
       case "warning":

@@ -1,19 +1,19 @@
 import { RuntimeOptions } from "firebase-functions"
-import functions = require("firebase-functions")
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
 import {
-   groupRepo,
-   userRepo,
-   livestreamsRepo,
    emailNotificationsRepo,
+   groupRepo,
+   livestreamsRepo,
+   userRepo,
 } from "./api/repositories"
 import config from "./config"
+import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
+import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
 import { NewsletterEmailBuilder } from "./lib/newsletter/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/newsletter/services/NewsletterService"
 import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import { ManualTemplatedEmailBuilder } from "./lib/ManualTemplatedEmailBuilder"
-import { ManualTemplatedEmailService } from "./lib/ManualTemplatedEmailService"
+import functions = require("firebase-functions")
 
 /**
  * To be sure we only send 1 newsletter when manually triggered

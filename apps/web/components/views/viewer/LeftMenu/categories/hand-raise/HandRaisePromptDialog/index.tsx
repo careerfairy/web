@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react"
-import { GlassDialog } from "materialUI/GlobalModals"
+import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    Button,
    DialogActions,
@@ -9,14 +8,15 @@ import {
    Slide,
    Typography,
 } from "@mui/material"
-import { useCurrentStream } from "context/stream/StreamContext"
 import { useAuth } from "HOCs/AuthProvider"
+import useHandRaiseState from "components/custom-hook/useHandRaiseState"
+import { useCurrentStream } from "context/stream/StreamContext"
+import { GlassDialog } from "materialUI/GlobalModals"
+import { useRouter } from "next/router"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "store"
-import useHandRaiseState from "components/custom-hook/useHandRaiseState"
-import { HandRaiseState } from "types/handraise"
 import * as actions from "store/actions"
-import { useRouter } from "next/router"
 
 const styles = {
    title: {

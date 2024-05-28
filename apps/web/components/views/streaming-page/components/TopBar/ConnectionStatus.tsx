@@ -1,6 +1,6 @@
 import { combineStyles, sxStyles } from "types/commonTypes"
 
-import { Box, Stack, SxProps, Tooltip } from "@mui/material"
+import { Box, Stack, SxProps } from "@mui/material"
 import {
    ConnectionState,
    useConnectionState,
@@ -10,6 +10,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { ConnectionStates } from "constants/streaming"
 import { useMemo } from "react"
 import { AlertCircle, CheckCircle, XCircle } from "react-feather"
+import { BrandedTooltip } from "../BrandedTooltip"
 import { ResponsiveStreamButton } from "../Buttons"
 import { WifiIcon } from "./WifiIcon"
 
@@ -41,13 +42,6 @@ const styles = sxStyles({
    },
    warning: {
       color: (theme) => theme.palette.warning["600"],
-   },
-   tooltip: {
-      textAlign: "center",
-      color: (theme) => theme.palette.neutral["700"],
-      fontSize: "12px",
-      fontWeight: 400,
-      py: 1,
    },
 })
 
@@ -146,32 +140,17 @@ const Component = () => {
          disableTouchRipple
       >
          <Stack spacing={1.25} direction="row">
-            <Tooltip
-               arrow
-               placement="bottom"
-               title={uplinkInfo.description}
-               componentsProps={{
-                  tooltip: {
-                     sx: styles.tooltip,
-                  },
-               }}
-            >
+            <BrandedTooltip title={uplinkInfo.description} placement="bottom">
                <Box sx={combineStyles(styles.iconWrapper, uplinkInfo.style)}>
                   <WifiIcon barsNumber={uplinkInfo.barsNumber} />
                </Box>
-            </Tooltip>
-            <Tooltip
-               arrow
-               placement="bottom"
+            </BrandedTooltip>
+            <BrandedTooltip
                title={rtcConnectionInfo.description}
-               componentsProps={{
-                  tooltip: {
-                     sx: styles.tooltip,
-                  },
-               }}
+               placement="bottom"
             >
                {rtcConnectionInfo.icon}
-            </Tooltip>
+            </BrandedTooltip>
          </Stack>
       </ResponsiveStreamButton>
    )

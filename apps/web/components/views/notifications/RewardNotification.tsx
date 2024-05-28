@@ -1,6 +1,6 @@
 import { forwardRef, ReactNode, useEffect } from "react"
-import { responsiveConfetti } from "../../util/confetti"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import { responsiveConfetti } from "../../util/confetti"
 import CustomNotification from "./CustomNotification"
 
 interface ReportCompleteProps {
@@ -9,7 +9,7 @@ interface ReportCompleteProps {
 }
 
 const RewardNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
-   (props, ref) => {
+   ({ message, ...props }, ref) => {
       const isMobile = useIsMobile()
 
       useEffect(() => {
@@ -20,6 +20,7 @@ const RewardNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
       return (
          <CustomNotification
             {...props}
+            content={message}
             variant="success"
             title={"Congratulations!"}
             ref={ref}

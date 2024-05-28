@@ -1,16 +1,15 @@
+import * as Sentry from "@sentry/nextjs"
+import { GENERAL_ERROR } from "../../components/util/constants"
+import { getCtaSnackBarProps } from "../../components/util/constants/callToActions"
+import CustomNotification from "../../components/views/notifications/CustomNotification"
+import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
+import { careerfairyLogo } from "../../constants/images"
 import {
    CLOSE_SNACKBAR,
    ENQUEUE_SNACKBAR,
    REMOVE_SNACKBAR,
 } from "./actionTypes"
-import { GENERAL_ERROR } from "../../components/util/constants"
-import { getCtaSnackBarProps } from "../../components/util/constants/callToActions"
-import { careerfairyLogo } from "../../constants/images"
 import * as actions from "./index"
-import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
-import React from "react"
-import * as Sentry from "@sentry/nextjs"
-import CustomNotification from "../../components/views/notifications/CustomNotification"
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -93,7 +92,7 @@ export const sendSuccessMessage =
                      title={title}
                      variant="success"
                      id={key}
-                     message={message}
+                     content={message}
                   />
                ),
             },

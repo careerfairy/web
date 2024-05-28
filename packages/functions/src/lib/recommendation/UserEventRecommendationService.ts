@@ -1,19 +1,20 @@
 import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "@careerfairy/shared-lib/recommendation/livestreams/IRecommendationService"
+import { UserData } from "@careerfairy/shared-lib/users"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { ImplicitLivestreamRecommendationData } from "@careerfairy/shared-lib/recommendation/livestreams/ImplicitLivestreamRecommendationData"
 import { RankedLivestreamEvent } from "@careerfairy/shared-lib/recommendation/livestreams/RankedLivestreamEvent"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
 import {
    handlePromisesAllSettled,
    sortRankedByPoints,
 } from "@careerfairy/shared-lib/recommendation/utils"
-import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
-import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/livestreams/services/RankedLivestreamRepository"
+import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 
 /**
  * Best livestreams for a user based on their Metadata
@@ -27,6 +28,7 @@ export default class UserEventRecommendationService
       private readonly user: UserData,
       private readonly futureLivestreams: LivestreamEvent[],
       private readonly pastLivestreams: LivestreamEvent[],
+      private readonly implicitData?: ImplicitLivestreamRecommendationData,
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
       debug = true
@@ -50,7 +52,8 @@ export default class UserEventRecommendationService
                this.getRecommendedEventsBasedOnUserData(
                   this.user,
                   this.futureLivestreams,
-                  10
+                  limit,
+                  this.implicitData
                )
             )
          ),
@@ -138,10 +141,26 @@ export default class UserEventRecommendationService
          dataFetcher.getPastLivestreams(),
       ])
 
+      const [watchedSparks, interactedEvents, appliedJobs, followedCompanies] =
+         await Promise.all([
+            dataFetcher.getWatchedSparks(user.userEmail),
+            dataFetcher.getInteractedLivestreams(user.userEmail),
+            dataFetcher.getAppliedJobs(user.userEmail),
+            dataFetcher.getFollowedCompanies(user.userEmail),
+         ])
+
+      const implicitData: ImplicitLivestreamRecommendationData = {
+         watchedSparks: watchedSparks,
+         watchedLivestreams: interactedEvents,
+         appliedJobs: appliedJobs,
+         followedCompanies: followedCompanies,
+      }
+
       return new UserEventRecommendationService(
          user,
          futureLivestreams,
-         pastLivestreams
+         pastLivestreams,
+         implicitData
       )
    }
 }
