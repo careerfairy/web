@@ -14,15 +14,24 @@ const styles = sxStyles({
       fontSize: "24px",
       color: "white",
    },
+   inactive: {
+      "> *": {
+         cursor: "initial !important",
+      },
+   },
 })
 
 type BackAndCloseButtonProps = {
+   isInDialog: boolean
    handleCloseDialog?: () => void
 }
 
-const BackAndCloseButton = ({ handleCloseDialog }: BackAndCloseButtonProps) => {
+const BackAndCloseButton = ({
+   isInDialog,
+   handleCloseDialog,
+}: BackAndCloseButtonProps) => {
    return (
-      <Box sx={styles.backButton}>
+      <Box sx={[styles.backButton, !isInDialog && styles.inactive]}>
          <IconButton onClick={handleCloseDialog}>
             <CloseIcon sx={styles.closeIcon} />
          </IconButton>

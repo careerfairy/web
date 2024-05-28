@@ -49,12 +49,14 @@ const styles = sxStyles({
 })
 
 type HeroContentProps = {
+   isInDialog: boolean
    backgroundImage: string
    children: ReactNode
    handleCloseDialog?: () => void
 }
 
 const HeroContent = ({
+   isInDialog,
    backgroundImage,
    handleCloseDialog,
    children,
@@ -84,7 +86,10 @@ const HeroContent = ({
                sx={styles.backgroundImgOverlaySkeleton}
             />
          )}
-         <BackAndCloseButton handleCloseDialog={handleCloseDialog} />
+         <BackAndCloseButton
+            isInDialog={isInDialog}
+            handleCloseDialog={handleCloseDialog}
+         />
       </Box>
    )
 }
