@@ -57,8 +57,8 @@ type PreviewContentProps = {
    scale?: number
 }
 
-const PreviewContent = forwardRef(
-   ({ isInDialog, handleCloseDialog, scale }: PreviewContentProps, ref) => {
+const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
+   ({ isInDialog, handleCloseDialog, scale }, ref) => {
       const isMobile = useIsMobile()
       const theme = useTheme()
       const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
