@@ -86,6 +86,7 @@ const PreviewContent = forwardRef(
          >
             <Stack spacing={4.75}>
                <HeroContent
+                  isInDialog={isInDialog}
                   backgroundImage={general.backgroundImageUrl}
                   handleCloseDialog={handleCloseDialog}
                >
