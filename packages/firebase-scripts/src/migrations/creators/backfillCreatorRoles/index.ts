@@ -1,5 +1,6 @@
+import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
 import * as cliProgress from "cli-progress"
-import { BulkWriter, Timestamp } from "firebase-admin/firestore"
+import { BulkWriter, FieldValue, Timestamp } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
@@ -10,7 +11,6 @@ import {
 } from "../../../util/bulkWriter"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
-import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
 
 const WRITE_BATCH = 50
 const counter = new Counter()
@@ -84,7 +84,7 @@ const backfillCreatorRoles = async (
 
       bulkWriter
          .update(creator._ref, {
-            roles: [...creator.roles, CreatorRoles.Speaker],
+            roles: FieldValue.arrayUnion(CreatorRoles.Speaker),
             lastModifiedByScript: Timestamp.fromMillis(Date.now()),
          })
          .then(() => handleBulkWriterSuccess(counter))
