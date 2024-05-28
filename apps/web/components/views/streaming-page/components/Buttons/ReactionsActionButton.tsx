@@ -19,7 +19,6 @@ import { ReactionsIcon } from "components/views/common/icons"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import { X } from "react-feather"
 import { useClickAway } from "react-use"
-import { addEmote } from "store/reducers/streamingAppReducer"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useSendEmote } from "../../context/rtm/hooks/useSendEmote"
@@ -139,14 +138,6 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
 
    const handleSendEmote = (emoteType: EmoteType) => {
       sendEmote({ emoteType })
-
-      dispatch(
-         addEmote({
-            id: Date.now().toString(),
-            type: emoteType,
-         })
-      )
-
       if (userData?.isAdmin) return // Do not disable and close the buttons for admins
       handleClose()
       setIconsDisabled(true)

@@ -94,3 +94,6 @@ export const useUploadPDFPresentationDialogOpen = () =>
 
 export const useShareVideoDialogOpen = () =>
    useAppSelector((state) => state.streamingApp.shareVideoDialogOpen)
+
+export const useEmotes = () =>
+   useAppSelector((state) => state.streamingApp.emotes)

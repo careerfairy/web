@@ -1,7 +1,7 @@
 import { EmoteType } from "@careerfairy/shared-lib/livestreams"
 import AgoraRTC, { useClientEvent, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch } from "components/custom-hook/store"
-import { useSnackbar } from "notistack"
+import { useWindowVisibility } from "components/custom-hook/utils/useWindowVisibility"
 import { useEffect } from "react"
 import {
    addEmote,
@@ -24,7 +24,8 @@ export const AgoraTrackers = () => {
    const rtmClient = useRTMClient()
 
    const dispatch = useAppDispatch()
-   const { enqueueSnackbar } = useSnackbar()
+
+   const isWindowVisible = useWindowVisibility()
 
    /**
     * A hook that tracks and dispatches the audio levels of users in a streaming session.
@@ -58,22 +59,16 @@ export const AgoraTrackers = () => {
       }
    }, [rtcClient])
 
-   useRTMChannelEvent(rtmChannel, "ChannelMessage", (message, memberId) => {
-      enqueueSnackbar(`Emote sent by ${memberId}: ${message.text}`, {
-         variant: "success",
-      })
-
-      const isValidEmote = Object.values(EmoteType).includes(
-         message.text as EmoteType
-      )
-
-      if (message.messageType === "TEXT" && isValidEmote) {
-         dispatch(
-            addEmote({
-               id: Date.now().toString(),
-               type: message.text as EmoteType,
-            })
+   useRTMChannelEvent(rtmChannel, "ChannelMessage", (message) => {
+      if (message.messageType === "TEXT") {
+         const isValidEmote = Object.values(EmoteType).includes(
+            message.text as EmoteType
          )
+
+         if (isValidEmote && isWindowVisible) {
+            // prevent emote queue overflow when window is restored
+            dispatch(addEmote(message.text as EmoteType))
+         }
       }
    })
 

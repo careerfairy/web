@@ -1,8 +1,22 @@
-import { Box } from "@mui/material"
-import { sxStyles } from "types/commonTypes"
-
-const styles = sxStyles({ root: {} })
+import { TransitionGroup } from "react-transition-group"
+import { useEmotes } from "store/selectors/streamingAppSelectors"
+import { useStreamingContext } from "../../context"
+import { AnimatedEmote } from "./AnimatedEmote"
+import { useFallbackTrackEmotes } from "./useFallbackTrackEmotes"
 
 export const EmotesRenderer = () => {
-   return <Box sx={styles.root}>EmotesRenderer</Box>
+   const { livestreamId, agoraUserId } = useStreamingContext()
+   const emotes = useEmotes()
+
+   useFallbackTrackEmotes(livestreamId, agoraUserId)
+
+   if (!emotes.length) return null
+
+   return (
+      <TransitionGroup>
+         {emotes.map((emote) => (
+            <AnimatedEmote key={emote.id} emote={emote} />
+         ))}
+      </TransitionGroup>
+   )
 }

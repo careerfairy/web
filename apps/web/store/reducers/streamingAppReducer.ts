@@ -11,6 +11,7 @@ import {
 } from "agora-rtc-react"
 import { RtmStatusCode } from "agora-rtm-sdk"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { v4 as uuidv4 } from "uuid"
 
 // Max number of emote nodes to display on the UI
 const MAX_EMOTES = 20
@@ -335,11 +336,16 @@ const streamingAppSlice = createSlice({
       setShareVideoDialogOpen(state, action: PayloadAction<boolean>) {
          state.shareVideoDialogOpen = action.payload
       },
-      addEmote(state, action: PayloadAction<{ type: EmoteType; id: string }>) {
+      addEmote(state, action: PayloadAction<EmoteType>) {
          if (state.emotes.length >= MAX_EMOTES) {
             state.emotes.shift()
          }
-         state.emotes.push(action.payload)
+         state.emotes.push({ type: action.payload, id: uuidv4() })
+      },
+      removeEmote(state, action: PayloadAction<string>) {
+         state.emotes = state.emotes.filter(
+            (emote) => emote.id !== action.payload
+         )
       },
       clearEmotes(state) {
          state.emotes = []
@@ -375,6 +381,7 @@ export const {
       setUploadPDFPresentationDialogOpen,
       setShareVideoDialogOpen,
       addEmote,
+      removeEmote,
       clearEmotes,
    },
    reducer: streamingAppReducer,
