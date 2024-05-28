@@ -15,6 +15,7 @@ const styles = sxStyles({
       right: 5,
       width: 45,
       height: 45,
+      zIndex: 1,
    },
 })
 
