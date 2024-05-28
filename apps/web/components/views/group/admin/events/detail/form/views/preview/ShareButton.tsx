@@ -1,6 +1,6 @@
 import { sxStyles } from "@careerfairy/shared-ui"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
-import { IconButton, Tooltip } from "@mui/material"
+import { IconButton } from "@mui/material"
 import Box from "@mui/material/Box"
 
 const styles = sxStyles({
@@ -13,17 +13,18 @@ const styles = sxStyles({
       "& svg": {
          fontSize: "24px",
       },
+      "> *": {
+         cursor: "initial !important",
+      },
    },
 })
 
 const ShareButton = () => {
    return (
       <Box sx={styles.root}>
-         <Tooltip title="Share">
-            <IconButton color="info">
-               <ShareIcon fontSize="inherit" />
-            </IconButton>
-         </Tooltip>
+         <IconButton disableRipple color="info">
+            <ShareIcon fontSize="inherit" />
+         </IconButton>
       </Box>
    )
 }
