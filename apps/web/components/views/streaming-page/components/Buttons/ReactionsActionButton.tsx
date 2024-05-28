@@ -3,6 +3,7 @@ import {
    Box,
    CircularProgress,
    Fade,
+   speedDialActionClasses,
    speedDialClasses,
    speedDialIconClasses,
 } from "@mui/material"
@@ -44,6 +45,13 @@ const styles = sxStyles({
          height: {
             xs: 24,
             tablet: 28,
+         },
+      },
+      [`& .${speedDialActionClasses.fab}`]: {
+         [`&:hover, &:focus`]: {
+            transform: "rotate(-10deg) scale(1.05)",
+            transition: (theme) =>
+               theme.transitions.create(["transform", "scale"]),
          },
       },
    },
