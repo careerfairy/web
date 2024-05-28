@@ -1,3 +1,4 @@
+import { Creator, CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import {
    Avatar,
@@ -18,7 +19,6 @@ import CreatorAvatar from "components/views/sparks/components/CreatorAvatar"
 import { SyntheticEvent, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 
 const styles = sxStyles({
    menuItem: {
@@ -111,7 +111,17 @@ const SelectSpeakersDropDown = ({
       event: SyntheticEvent,
       selectedOptions: Creator[]
    ) => {
-      await setFieldValue(props.id, selectedOptions)
+      const newSelectedOptions = selectedOptions.map((option) => {
+         const newRoles = option.roles.includes(CreatorRoles.Speaker)
+            ? option.roles
+            : [...option.roles, CreatorRoles.Speaker]
+         return {
+            ...option,
+            roles: newRoles,
+         }
+      })
+
+      await setFieldValue(props.id, newSelectedOptions)
    }
 
    return (
