@@ -66,7 +66,8 @@ const PreviewContent = forwardRef(
          values: { general, speakers, jobs },
       } = useLivestreamFormValues()
       const { group } = useGroup()
-      const hasJobs = jobs.customJobs.length > 0
+      const hasJobs = jobs.jobs.length > 0 || jobs.customJobs.length > 0
+      const isAtsJobs = jobs.jobs.length > 0
 
       const scaledStyles = useMemo(() => {
          if (!scale) return {}
@@ -145,7 +146,7 @@ const PreviewContent = forwardRef(
                <Box sx={styles.mainContent}>
                   {hasJobs ? (
                      <Section navOffset={6}>
-                        <Jobs jobs={jobs.customJobs} />
+                        <Jobs jobs={isAtsJobs ? jobs.jobs : jobs.customJobs} />
                      </Section>
                   ) : null}
                   <Section navOffset={!hasJobs ? 6 : undefined}>
