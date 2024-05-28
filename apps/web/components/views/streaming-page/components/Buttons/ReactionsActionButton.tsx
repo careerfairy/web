@@ -9,6 +9,7 @@ import {
    speedDialIconClasses,
 } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    BrandedSpeedDial,
@@ -18,6 +19,7 @@ import { ReactionsIcon } from "components/views/common/icons"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import { X } from "react-feather"
 import { useClickAway } from "react-use"
+import { addEmote } from "store/reducers/streamingAppReducer"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { useSendEmote } from "../../context/rtm/hooks/useSendEmote"
@@ -100,6 +102,7 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
    const [progress, setProgress] = useState(0)
    const { agoraUserId, livestreamId } = useStreamingContext()
    const streamIsMobile = useStreamIsMobile()
+   const dispatch = useAppDispatch()
 
    const reactionsRef = useRef(null)
 
@@ -137,7 +140,14 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
    const handleSendEmote = (emoteType: EmoteType) => {
       sendEmote({ emoteType })
 
-      if (userData?.isAdmin) return // Do not disable the buttons for admins
+      dispatch(
+         addEmote({
+            id: Date.now().toString(),
+            type: emoteType,
+         })
+      )
+
+      if (userData?.isAdmin) return // Do not disable and close the buttons for admins
       handleClose()
       setIconsDisabled(true)
       setProgress(0)

@@ -1,7 +1,10 @@
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
 import AgoraRTC, { useClientEvent, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch } from "components/custom-hook/store"
+import { useSnackbar } from "notistack"
 import { useEffect } from "react"
 import {
+   addEmote,
    setAudioLevels,
    setRTCConnectionState,
    setRTMConnectionState,
@@ -13,7 +16,6 @@ import {
    useRTMClient,
    useRTMClientEvent,
 } from "../../context/rtm"
-import { useSnackbar } from "notistack"
 
 export const AgoraTrackers = () => {
    const rtcClient = useRTCClient()
@@ -60,6 +62,19 @@ export const AgoraTrackers = () => {
       enqueueSnackbar(`Emote sent by ${memberId}: ${message.text}`, {
          variant: "success",
       })
+
+      const isValidEmote = Object.values(EmoteType).includes(
+         message.text as EmoteType
+      )
+
+      if (message.messageType === "TEXT" && isValidEmote) {
+         dispatch(
+            addEmote({
+               id: Date.now().toString(),
+               type: message.text as EmoteType,
+            })
+         )
+      }
    })
 
    useRTMChannelEvent(rtmChannel, "MemberCountUpdated", (newCount) => {
