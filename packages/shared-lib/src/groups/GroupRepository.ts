@@ -14,7 +14,12 @@ import {
    UserData,
 } from "../users"
 import { containsAny } from "../utils/utils"
-import { AddCreatorData, Creator, UpdateCreatorData } from "./creators"
+import {
+   AddCreatorData,
+   Creator,
+   CreatorRole,
+   UpdateCreatorData,
+} from "./creators"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
 import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 import {
@@ -203,6 +208,7 @@ export interface IGroupRepository {
     * Updates a creator in a group.
     *
     * @param  groupId - The ID of the group.
+    * @param  creatorId - The ID of the creator.
     * @param  creatorData - The updated data for the creator.
     * @returns A Promise that resolves with the updated creator.
     */
@@ -211,6 +217,19 @@ export interface IGroupRepository {
       creatorId: string,
       creator: UpdateCreatorData
    ): Promise<Creator>
+
+   /**
+    * Updates a creator in a group.
+    *
+    * @param  groupId - The ID of the group.
+    * @param  creatorId - The ID of the creator.
+    * @param  returns A Promise that resolves with the updated creator.
+    */
+   updateCreatorRolesInGroup(
+      groupId: string,
+      creatorId: string,
+      roles: CreatorRole[]
+   ): Promise<void>
 
    /**
     * Checks if a creator's email is unique in a group
@@ -951,6 +970,23 @@ export class FirebaseGroupRepository
       const creatorSnap = await creatorRef.get()
 
       return this.addIdToDoc<Creator>(creatorSnap)
+   }
+
+   async updateCreatorRolesInGroup(
+      groupId: string,
+      creatorId: string,
+      roles: CreatorRole[]
+   ): Promise<void> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creatorId)
+
+      await creatorRef.update({
+         roles: roles,
+         updatedAt: this.fieldValue.serverTimestamp(),
+      })
    }
 
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {
