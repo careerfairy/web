@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react"
+import ClockIcon from "@mui/icons-material/AccessTime"
+import EventIcon from "@mui/icons-material/Event"
 import {
    Avatar,
    Box,
@@ -9,29 +10,28 @@ import {
    Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import EventIcon from "@mui/icons-material/Event"
-import ClockIcon from "@mui/icons-material/AccessTime"
-import DateUtil from "../../../../../util/DateUtil"
-import Link from "materialUI/NextNavLink"
 import debounce from "lodash.debounce"
+import Link from "materialUI/NextNavLink"
+import { useEffect, useMemo, useState } from "react"
+import DateUtil from "../../../../../util/DateUtil"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import LowerPreviewContent from "./LowerPreviewContent"
-import LowerMainContent from "./LowerMainContent"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { speakerPlaceholder } from "../../../../util/constants"
-import UserUtil from "../../../../../data/util/UserUtil"
-import { useRouter } from "next/router"
-import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import useTrackLivestreamImpressions from "../../../../custom-hook/useTrackLivestreamImpressions"
 import {
    ImpressionLocation,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+} from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { useRouter } from "next/router"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import UserUtil from "../../../../../data/util/UserUtil"
+import useTrackLivestreamImpressions from "../../../../custom-hook/useTrackLivestreamImpressions"
+import { speakerPlaceholder } from "../../../../util/constants"
+import LowerMainContent from "./LowerMainContent"
+import LowerPreviewContent from "./LowerPreviewContent"
 
 const backgroundImageHeight = 200
 const cardBorderRadius = 6
@@ -206,7 +206,7 @@ const styles = {
 }
 
 const fortyFiveMinutesAgo = new Date(
-   Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS
+   Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
 )
 
 const throttle_speed = 50
@@ -260,6 +260,7 @@ const UpcomingLivestreamCard = ({
       useFirebaseService()
 
    useEffect(() => {
+      // eslint-disable-next-line no-extra-semi
       ;(async function () {
          if (livestream.groupIds) {
             try {
@@ -279,6 +280,7 @@ const UpcomingLivestreamCard = ({
             }
          }
       })()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    useEffect(() => {
@@ -344,6 +346,7 @@ const UpcomingLivestreamCard = ({
          numberOfSpotsRemaining,
          isPastLivestream,
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestream.maxRegistrants,
       livestream.start,
@@ -396,7 +399,9 @@ const UpcomingLivestreamCard = ({
             livestream.id,
             authenticatedUser.uid
          )
-      } catch (e) {}
+      } catch (e) {
+         /* empty */
+      }
    }
 
    return (
@@ -504,7 +509,7 @@ const UpcomingLivestreamCard = ({
                   {!hovered && (
                      <LowerPreviewContent speakers={speakers} groups={groups} />
                   )}
-                  {hovered && (
+                  {Boolean(hovered) && (
                      <LowerMainContent
                         groups={groups}
                         handleOpenJoinModal={handleOpenJoinModal}

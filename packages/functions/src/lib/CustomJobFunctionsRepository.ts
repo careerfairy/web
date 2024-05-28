@@ -6,6 +6,9 @@ import {
    CustomJob,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
+import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
 import { Timestamp } from "../api/firestoreAdmin"
 
@@ -51,6 +54,13 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
    syncDeletedCustomJobDataToJobApplications(
       deletedCustomJob: CustomJob
    ): Promise<void>
+
+   /**
+    * Cascades data from Group to the custom jobApplications from the input Group.
+    * @param groupId ID of the group, used as a parameter since some groups might not have a groupId
+    * @param group Group object
+    */
+   syncCustomJobDataGroupMetaData(groupId: string, group: Group): Promise<void>
 }
 
 export class CustomJobFunctionsRepository
@@ -192,5 +202,38 @@ export class CustomJobFunctionsRepository
       })
 
       return batch.commit()
+   }
+
+   groupCustomJobsApplicationsQuery(groupId: string) {
+      return this.firestore
+         .collection("jobApplications")
+         .where("groupId", "==", groupId)
+   }
+
+   // TODO: Improvement duplicated code on metadata synching
+   async syncCustomJobDataGroupMetaData(
+      groupId: string,
+      group: Group
+   ): Promise<void> {
+      const groupJobsQuery = this.groupCustomJobsApplicationsQuery(groupId)
+
+      const snapshots = await groupJobsQuery.get()
+      const chunks = chunkArray(snapshots.docs, 450)
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+         chunk.forEach((doc) => {
+            const toUpdate: CustomJobMetaData = {
+               companyCountry: group.companyCountry?.id,
+               companyIndustries: group.companyIndustries?.map(
+                  (industry) => industry.id
+               ),
+               companySize: group.companySize,
+            }
+            batch.update(doc.ref, toUpdate)
+         })
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
    }
 }

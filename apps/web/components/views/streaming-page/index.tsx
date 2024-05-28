@@ -13,6 +13,14 @@ import { useRouter } from "next/router"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/viewer/WaitingRoom"
 
+const ThanksForJoiningHandRaiseDialog = dynamic(
+   () =>
+      import("./components/hand-raise/ThanksForJoiningHandRaiseDialog").then(
+         (mod) => mod.ThanksForJoiningHandRaiseDialog
+      ),
+   { ssr: false }
+)
+
 const SessionConflictModal = dynamic(
    () =>
       import("./components/SessionConflictModal").then(
@@ -131,6 +139,11 @@ const ViewerTrackers = dynamic(
    { ssr: false }
 )
 
+const HostTrackers = dynamic(
+   () => import("./components/HostTrackers").then((mod) => mod.HostTrackers),
+   { ssr: false }
+)
+
 const OngoingPollTracker = dynamic(
    () =>
       import("./components/streaming/OngoingPollTracker").then(
@@ -209,8 +222,9 @@ const Component = ({ isHost }: Props) => {
                            </LocalTracksProvider>
                         </AgoraDevicesProvider>
                         <AgoraTrackers />
-                        {isHost ? null : <ViewerTrackers />}
+                        {isHost ? <HostTrackers /> : <ViewerTrackers />}
                         {isHost ? null : <OngoingPollTracker />}
+                        {isHost ? null : <ThanksForJoiningHandRaiseDialog />}
                         <SessionConflictModal />
                         <SessionDisconnectedModal />
                      </RTMSignalingProvider>

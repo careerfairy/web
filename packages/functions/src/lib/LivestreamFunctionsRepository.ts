@@ -1,49 +1,53 @@
-import {
-   FirebaseLivestreamRepository,
-   ILivestreamRepository,
-} from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import {
-   EventRating,
-   EventRatingAnswer,
-   getEarliestEventBufferTime,
-   LivestreamChatEntry,
-   LivestreamEvent,
-   LivestreamQueryOptions,
-   pickPublicDataFromLivestream,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
-import {
-   calculateNewAverage,
-   normalizeRating,
-} from "@careerfairy/shared-lib/livestreams/ratings"
-import {
-   getPopularityPoints,
-   PopularityEventData,
-} from "@careerfairy/shared-lib/livestreams/popularity"
-import type { OperationsToMake } from "./stats/util"
-import type { Change } from "firebase-functions"
-import * as functions from "firebase-functions"
-import {
-   createLiveStreamStatsDoc,
-   LiveStreamStats,
-} from "@careerfairy/shared-lib/livestreams/stats"
-import { isEmpty } from "lodash"
-import { addOperations } from "./stats/livestream"
-import type { FunctionsLogger } from "../util"
-import {
-   FieldValue,
-   Timestamp,
-   DocumentSnapshot,
-   firestore as firestoreAdmin,
-} from "../api/firestoreAdmin"
-import { DateTime } from "luxon"
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    GroupAdmin,
    GroupAdminNewEventEmailInfo,
 } from "@careerfairy/shared-lib/groups"
+import {
+   EventRating,
+   EventRatingAnswer,
+   LivestreamChatEntry,
+   LivestreamEvent,
+   LivestreamQueryOptions,
+   UserLivestreamData,
+   getEarliestEventBufferTime,
+   pickPublicDataFromLivestream,
+} from "@careerfairy/shared-lib/livestreams"
+import {
+   FirebaseLivestreamRepository,
+   ILivestreamRepository,
+} from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
+import {
+   HandRaise,
+   HandRaiseState,
+} from "@careerfairy/shared-lib/livestreams/hand-raise"
+import {
+   PopularityEventData,
+   getPopularityPoints,
+} from "@careerfairy/shared-lib/livestreams/popularity"
+import {
+   calculateNewAverage,
+   normalizeRating,
+} from "@careerfairy/shared-lib/livestreams/ratings"
+import {
+   LiveStreamStats,
+   createLiveStreamStatsDoc,
+} from "@careerfairy/shared-lib/livestreams/stats"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
+import type { Change } from "firebase-functions"
+import * as functions from "firebase-functions"
+import { isEmpty } from "lodash"
+import { DateTime } from "luxon"
+import {
+   DocumentSnapshot,
+   FieldValue,
+   Timestamp,
+   firestore as firestoreAdmin,
+} from "../api/firestoreAdmin"
+import type { FunctionsLogger } from "../util"
+import { addOperations } from "./stats/livestream"
+import type { OperationsToMake } from "./stats/util"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -166,6 +170,13 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    createLivestreamStartUserNotifications(
       livestream: LivestreamEvent
    ): Promise<void>
+
+   /**
+    * Update the hand raise state for a user in a live stream
+    * @param livestreamId - The ID of the live stream.
+    * @param handRaise - The new hand raise state.
+    */
+   updateHandRaise(livestreamId: string, handRaise: boolean): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -604,5 +615,42 @@ export class LivestreamFunctionsRepository
       }
 
       return snap.data()
+   }
+
+   async updateHandRaise(
+      livestreamId: string,
+      handRaise: boolean
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      const livestreamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+
+      if (handRaise === false) {
+         // Un-request all current hand raise requests
+         const handRaiseRequestsRef = livestreamRef
+            .collection("handRaises")
+            .withConverter(createCompatGenericConverter<HandRaise>())
+         const handRaiseRequestsSnap = await handRaiseRequestsRef.get()
+
+         handRaiseRequestsSnap.docs.forEach((doc) => {
+            const updateData: Partial<HandRaise> = {
+               state: HandRaiseState.unrequested,
+               timeStamp: Timestamp.now(),
+            }
+
+            batch.update(doc.ref, updateData)
+         })
+      }
+
+      const updateData: Partial<LivestreamEvent> = {
+         handRaiseActive: handRaise,
+      }
+
+      batch.update(livestreamRef, updateData)
+
+      return batch.commit()
    }
 }

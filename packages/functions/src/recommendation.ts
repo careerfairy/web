@@ -1,13 +1,13 @@
 import functions = require("firebase-functions")
-import { logAndThrow } from "./lib/validations"
 import { number } from "yup"
-import { middlewares } from "./middlewares/middlewares"
-import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
-import { dataValidation, userAuthExists } from "./middlewares/validations"
-import { livestreamsRepo, userRepo } from "./api/repositories"
-import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
+import { livestreamsRepo, sparkRepo, userRepo } from "./api/repositories"
 import config from "./config"
+import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
+import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import { logAndThrow } from "./lib/validations"
+import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
+import { middlewares } from "./middlewares/middlewares"
+import { dataValidation, userAuthExists } from "./middlewares/validations"
 
 /**
  * Get Recommended Events
@@ -33,12 +33,13 @@ export const getRecommendedEvents = functions
                const dataFetcher = new UserDataFetcher(
                   context.auth.token.email,
                   livestreamsRepo,
-                  userRepo
+                  userRepo,
+                  sparkRepo
                )
-               const recomendationService =
-                  await UserEventRecommendationService.create(dataFetcher)
 
-               return await recomendationService.getRecommendations(data.limit)
+               const recommendationService =
+                  await UserEventRecommendationService.create(dataFetcher)
+               return await recommendationService.getRecommendations(data.limit)
             } catch (error) {
                logAndThrow("Error in getting recommended events", {
                   data,
