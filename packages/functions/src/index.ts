@@ -210,7 +210,6 @@ exports.periodicallyRemoveCachedDocument =
 
 // Recommendations
 exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
-exports.getUserImplicitData = recommendation.getUserImplicitData
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
