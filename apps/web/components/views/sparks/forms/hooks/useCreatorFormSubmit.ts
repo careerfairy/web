@@ -77,6 +77,7 @@ const useCreatorFormSubmit = (
                linkedInUrl: values.linkedInUrl,
                story: values.story,
                id: values.id,
+               roles: values.roles,
             })
          } else {
             creator = await groupRepo.addCreatorToGroup(groupId, {
