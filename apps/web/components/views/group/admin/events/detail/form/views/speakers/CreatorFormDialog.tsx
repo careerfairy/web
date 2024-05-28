@@ -17,6 +17,7 @@ import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
+import { getRoles } from "./commons"
 
 const styles = sxStyles({
    content: {
@@ -84,6 +85,8 @@ const CreatorFormDialog = ({
 
    const onSuccessfulSubmit = (newCreator: Creator) => {
       let updatedOptions: Creator[], updatedValues: Creator[]
+
+      newCreator.roles = getRoles(newCreator)
 
       if (isEdit) {
          updatedOptions = speakers.options.map((option) =>
@@ -255,10 +258,8 @@ const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
    if (!creator || creator?.roles?.length === 0) {
       return [CreatorRoles.Speaker]
    }
-   const hasSpeakerRole = creator.roles?.includes(CreatorRoles.Speaker)
-   return hasSpeakerRole
-      ? creator.roles
-      : [...creator.roles, CreatorRoles.Speaker]
+
+   return getRoles(creator)
 }
 
 const getInitialValues = (creator?: Creator): CreatorFormValues => ({
