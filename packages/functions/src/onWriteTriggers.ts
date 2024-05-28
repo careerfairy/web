@@ -291,6 +291,9 @@ export const onWriteSpark = functions
       if (changeTypes.isDelete) {
          // Remove spark from all user feeds
          sideEffectPromises.push(sparkRepo.removeSparkFromAllUserFeeds(sparkId))
+
+         // Remove linked jobs
+         sideEffectPromises.push(customJobRepo.removeLinkedSpark(sparkId))
       }
 
       if (changeTypes.isUpdate || changeTypes.isCreate) {
@@ -367,7 +370,8 @@ export const onWriteCustomJobs = functions
             ),
             customJobRepo.syncDeletedCustomJobDataToJobApplications(
                deletedCustomJob
-            )
+            ),
+            customJobRepo.syncDeletedCustomJobToLinkedContent(deletedCustomJob)
          )
       }
 
