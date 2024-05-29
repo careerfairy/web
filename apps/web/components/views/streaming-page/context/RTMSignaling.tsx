@@ -42,15 +42,33 @@ export const RTMSignalingProvider = ({
 
    const login = useCallback(async () => {
       try {
+         console.log(
+            "🚀 Creating Agora RTM client instance with appID:",
+            agoraCredentials.appID
+         )
          const newClient = AgoraRTM.createInstance(agoraCredentials.appID, {
             enableCloudProxy,
          })
+         console.log(
+            "🚀 Logging in to Agora RTM with UID:",
+            uid.toString(),
+            "and token:",
+            token
+         )
          await newClient.login({ uid: uid.toString(), token })
+         console.log(
+            "🚀 Creating Agora RTM channel with livestreamId:",
+            livestreamId
+         )
          const newChannel = newClient.createChannel(livestreamId)
+         console.log("🚀 Joining Agora RTM channel")
          await newChannel.join()
+         console.log("🚀 Setting RTM state with new client and channel")
          setRtmState({ channel: newChannel, client: newClient })
          dispatch(setRTMFailedToConnect(false))
+         console.log("🚀 Successfully logged in and joined channel")
       } catch (e) {
+         console.log("🚀 Error during Agora RTM login/join process:", e)
          dispatch(setRTMFailedToConnect(true))
          errorLogAndNotify(e, {
             message: "Failed to login to Agora RTM",
