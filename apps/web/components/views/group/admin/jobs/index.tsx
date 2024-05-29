@@ -8,9 +8,9 @@ import JobList from "./JobList"
 const JobsContent = () => {
    const { group } = useGroupFromState()
    const allJobsWithStats = useGroupCustomJobsStats(group.groupId)
-   const { newJobHub } = useFeatureFlags()
+   const { jobHubV1 } = useFeatureFlags()
 
-   const sortedJobs = newJobHub ? sortJobs(allJobsWithStats) : allJobsWithStats
+   const sortedJobs = jobHubV1 ? sortJobs(allJobsWithStats) : allJobsWithStats
 
    return allJobsWithStats.length > 0 ? (
       <JobList jobsWithStats={sortedJobs} />
@@ -31,7 +31,10 @@ export default JobsContent
 const sortJobs = (jobs: CustomJobStats[]): CustomJobStats[] => {
    const now = new Date()
 
-   return jobs.sort(({ job: jobA }, { job: jobB }) => {
+   // Create a new array to avoid mutating the original 'jobs' array
+   const sortedJobs = [...jobs]
+
+   return sortedJobs.sort(({ job: jobA }, { job: jobB }) => {
       // Sort by 'published' flag
       if (jobA.published && !jobB.published) {
          return -1

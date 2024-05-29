@@ -91,15 +91,15 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const { group } = useGroup()
    const { push } = useRouter()
-   const { newJobHub } = useFeatureFlags()
+   const { jobHubV1 } = useFeatureFlags()
 
    const TabsEnum = useMemo(
       () => ({
          APPLICATION: 0,
-         LINKED_CONTENT: newJobHub ? 1 : -1,
-         JOB_POSTING: newJobHub ? 2 : 1,
+         LINKED_CONTENT: jobHubV1 ? 1 : -1,
+         JOB_POSTING: jobHubV1 ? 2 : 1,
       }),
-      [newJobHub]
+      [jobHubV1]
    )
 
    const allowToDisplayApplicantsData = group.privacyPolicyActive
@@ -112,7 +112,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
       []
    )
 
-   const jobHasNoContent = newJobHub
+   const jobHasNoContent = jobHubV1
       ? Boolean(job.livestreams.length == 0 && job.sparks.length == 0)
       : false
 
@@ -127,7 +127,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   <NoApplicantsData />
                ),
          },
-         ...(newJobHub
+         ...(jobHubV1
             ? [
                  {
                     label: "Linked content",
@@ -146,7 +146,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
          },
       ]
       return tabs
-   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, newJobHub])
+   }, [allowToDisplayApplicantsData, group, job, jobHasNoContent, jobHubV1])
 
    if (!job) {
       return void push(`/group/${group.id}/admin/jobs`)
@@ -205,7 +205,7 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                   </Box>
                }
             />
-            {newJobHub ? (
+            {jobHubV1 ? (
                <Tab
                   key={"Linked content"}
                   label={

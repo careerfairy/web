@@ -173,7 +173,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
    const { group } = useGroupFromState()
-   const { newJobHub } = useFeatureFlags()
+   const { jobHubV1 } = useFeatureFlags()
 
    const handleJobClick = useCallback(
       (jobId: string) => {
@@ -219,7 +219,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                >
                   <Grid key={job.id} container>
                      <Box sx={styles.listItemContainer}>
-                        {newJobHub ? (
+                        {jobHubV1 ? (
                            <Box
                               sx={[
                                  styles.jobState,
@@ -244,7 +244,7 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                        {job.title}
                                     </Typography>
 
-                                    {newJobHub &&
+                                    {jobHubV1 &&
                                     isValidButNoLinkedContent(job) ? (
                                        <Tooltip
                                           title={
