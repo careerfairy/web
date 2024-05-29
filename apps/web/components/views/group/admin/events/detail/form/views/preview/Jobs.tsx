@@ -6,7 +6,6 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
 import { alpha } from "@mui/material/styles"
-import Link from "components/views/common/Link"
 import SectionTitle from "components/views/livestream-dialog/views/livestream-details/main-content/SectionTitle"
 import { Briefcase as JobIcon } from "react-feather"
 import StaticSkeleton from "./StaticSkeleton"
@@ -38,6 +37,11 @@ const styles = sxStyles({
       width: {
          xs: "100%",
          sm: "max-content",
+      },
+      cursor: "initial",
+      "&:hover": {
+         bgcolor: "primary.main",
+         boxShadow: "none",
       },
    },
    skeleton: {
@@ -102,15 +106,11 @@ const JobItem = ({ jobName }: JobItemProps) => {
          </Stack>
          <Box>
             <Button
-               component={Link}
-               shallow
-               scroll={false}
                variant="contained"
-               disableElevation
+               disableRipple
                color="primary"
                size="small"
                sx={styles.seeMoreBtn}
-               href={"#"}
             >
                {"See more"}
             </Button>
