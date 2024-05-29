@@ -34,7 +34,6 @@ export const useFallbackTrackEmotes = (
    const isWindowVisible = useWindowVisibility()
    const failedToConnectToRTM = useFailedToConnectToRTM()
 
-   const initialSnapsLoadedRef = useRef(false)
    const isWindowVisibleRef = useRef(isWindowVisible)
    isWindowVisibleRef.current = isWindowVisible
 
@@ -48,11 +47,6 @@ export const useFallbackTrackEmotes = (
                limit(30)
             ).withConverter(createGenericConverter<LivestreamEmote>()),
             (snapshot) => {
-               initialSnapsLoadedRef.current = true
-
-               // Dispatch emotes only after initial snaps are loaded; focus on new additions.
-               if (!initialSnapsLoadedRef.current) return
-
                // Don't queue up emotes that have added when you're not focused on the window
                if (!isWindowVisibleRef.current) return
 
