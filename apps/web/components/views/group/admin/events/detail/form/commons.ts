@@ -105,6 +105,7 @@ const mapCreatorToSpeaker = (creator: Creator): Speaker => {
       position: creator.position,
       email: creator.email,
       linkedInUrl: creator.linkedInUrl,
+      roles: creator.roles,
    }
 }
 

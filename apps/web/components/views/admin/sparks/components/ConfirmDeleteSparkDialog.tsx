@@ -1,5 +1,10 @@
+import {
+   CreatorRoles,
+   PublicCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import Box from "@mui/material/Box"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
@@ -20,6 +25,7 @@ const styles = sxStyles({
 type Props = {
    sparkId: string
    groupId: string
+   creator: PublicCreator
    open: boolean
    handleClose: () => void
    onDeleted: () => void
@@ -28,6 +34,7 @@ type Props = {
 const ConfirmDeleteSparkDialog: FC<Props> = ({
    sparkId,
    groupId,
+   creator,
    handleClose,
    onDeleted,
    open,
@@ -46,6 +53,23 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
                   groupId,
                })
 
+               const creatorSparks = await sparkService.getCreatorSparks(
+                  creator.id,
+                  groupId
+               )
+
+               const udpatedCreatorSparks = creatorSparks.filter(
+                  (spark) => spark.id !== sparkId
+               )
+
+               if (udpatedCreatorSparks.length === 0) {
+                  await groupRepo.updateCreatorRolesInGroup(
+                     groupId,
+                     creator.id,
+                     creator.roles.filter((role) => role !== CreatorRoles.Spark)
+                  )
+               }
+
                onDeleted()
             } catch (error) {
                errorNotification(error, "Error deleting Spark", {
@@ -63,6 +87,8 @@ const ConfirmDeleteSparkDialog: FC<Props> = ({
          loading: isDeletingSpark,
       }),
       [
+         creator.id,
+         creator.roles,
          errorNotification,
          groupId,
          handleClose,

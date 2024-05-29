@@ -1,3 +1,4 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { IconButton, MenuItem } from "@mui/material"
 import Divider from "@mui/material/Divider"
@@ -31,9 +32,10 @@ const styles = sxStyles({
 type Props = {
    sparkId: string
    groupId: string
+   creator: PublicCreator
 }
 
-const SparkOptionsButton: FC<Props> = ({ sparkId, groupId }) => {
+const SparkOptionsButton: FC<Props> = ({ sparkId, groupId, creator }) => {
    const dispatch = useDispatch()
 
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
@@ -69,6 +71,7 @@ const SparkOptionsButton: FC<Props> = ({ sparkId, groupId }) => {
          <ConfirmDeleteSparkDialog
             sparkId={sparkId}
             groupId={groupId}
+            creator={creator}
             open={confirmDialogOpen}
             handleClose={handleCloseConfirm}
             onDeleted={handleCloseConfirm}
