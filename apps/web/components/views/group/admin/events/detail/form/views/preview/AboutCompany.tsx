@@ -12,7 +12,6 @@ import {
    Typography,
 } from "@mui/material"
 import SanitizedHTML from "components/util/SanitizedHTML"
-import Link from "components/views/common/Link"
 import {
    CompanyCountryTag,
    CompanyIndustryTag,
@@ -79,6 +78,11 @@ const styles = sxStyles({
       zIndex: 1,
       textDecoration: "none !important",
       boxShadow: "none !important",
+      cursor: "initial",
+      "&:hover": {
+         bgcolor: "primary.main",
+         boxShadow: "none",
+      },
    },
    button: {
       borderRadius: 1,
@@ -92,14 +96,19 @@ const styles = sxStyles({
       fontWeight: 400,
       mt: 1.875,
    },
+   companyCtaWrapper: {
+      display: "flex",
+      alignItems: "center",
+      color: "primary.main",
+      fontWeight: 500,
+      mt: 2.687,
+   },
    companyCta: {
       fontSize: "1.142rem",
       fontWeight: "in",
       color: "inherit",
-      "&:hover": {
-         mr: 1,
-         transition: (theme) => theme.transitions.create("margin-right"),
-      },
+      cursor: "default",
+      userSelect: "none",
    },
    badge: {
       height: 32,
@@ -110,7 +119,12 @@ const styles = sxStyles({
 
 const FollowCompanyButton = () => {
    return (
-      <Button variant={"contained"} size={"small"} sx={styles.followButton}>
+      <Button
+         variant={"contained"}
+         size={"small"}
+         sx={styles.followButton}
+         disableRipple
+      >
          Follow
       </Button>
    )
@@ -215,16 +229,7 @@ const AboutCompanyComponent = ({
                   sx={styles.companyDescription}
                />
                {showCompanyPageCta ? (
-                  <Box
-                     display="flex"
-                     component={Link}
-                     noLinkStyle
-                     href={"#"}
-                     alignItems={"center"}
-                     color={"primary.main"}
-                     fontWeight={500}
-                     mt={2.687}
-                  >
+                  <Box sx={styles.companyCtaWrapper}>
                      <Typography mr={0.5} sx={styles.companyCta}>
                         Discover {company.universityName}
                      </Typography>
