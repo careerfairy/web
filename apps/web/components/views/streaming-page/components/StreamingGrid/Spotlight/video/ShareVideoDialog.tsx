@@ -1,4 +1,9 @@
-import { Dialog, SwipeableDrawer } from "@mui/material"
+import {
+   Dialog,
+   SwipeableDrawer,
+   dialogClasses,
+   drawerClasses,
+} from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import { setShareVideoDialogOpen } from "store/reducers/streamingAppReducer"
@@ -8,7 +13,7 @@ import { ShareVideoForm } from "./ShareVideoForm"
 
 const styles = sxStyles({
    dialog: {
-      "& .MuiDialog-paper": {
+      [`& .${dialogClasses.paper}`]: {
          minWidth: 589,
          maxWidth: 589,
          p: 4,
@@ -16,7 +21,7 @@ const styles = sxStyles({
       },
    },
    drawer: {
-      "& .MuiDrawer-paper": {
+      [`& .${drawerClasses.paper}`]: {
          p: 2.5,
          borderTopLeftRadius: 12,
          borderTopRightRadius: 12,
