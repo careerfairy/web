@@ -18,16 +18,16 @@ const styles = sxStyles({
       backdropFilter: "blur(25px)",
       p: 1,
    },
-   button: {
+   button: (theme) => ({
       p: 0,
       borderRadius: "4px",
       width: 24,
       height: 24,
-      backgroundColor: (theme) => theme.brand.white[500],
+      backgroundColor: theme.brand.white[500],
       "& svg": {
-         color: (theme) => theme.palette.neutral[800] + " !important",
+         color: theme.palette.neutral[800] + " !important",
       },
-   },
+   }),
    pageNumber: {
       userSelect: "none",
    },

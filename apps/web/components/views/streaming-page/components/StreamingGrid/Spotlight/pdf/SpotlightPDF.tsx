@@ -44,7 +44,7 @@ export const Content = () => {
                fontWeight={700}
                textAlign="center"
             >
-               Please wait for the host to load the presentation
+               The host is loading a presentation...
             </Typography>
          </Box>
       )
