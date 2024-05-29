@@ -2,13 +2,13 @@ import { Skeleton, Stack, Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       p: 1.5,
       borderRadius: "8px",
-      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-      bgcolor: (theme) => theme.brand.white[300],
+      border: `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: theme.brand.white[300],
       overflow: "hidden",
-   },
+   }),
 })
 
 export const PDFDetailsSkeleton = () => {

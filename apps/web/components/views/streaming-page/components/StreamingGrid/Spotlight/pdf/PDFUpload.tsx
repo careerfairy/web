@@ -9,17 +9,17 @@ import { sxStyles } from "types/commonTypes"
 import { SelectablePDFDetails } from "./PDFDetails"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       p: 3,
       display: "flex",
-      transition: (theme) => theme.transitions.create("background-color"),
+      transition: theme.transitions.create("background-color"),
       width: "100%",
       cursor: "pointer",
       borderRadius: "8px",
-      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-      bgcolor: (theme) => theme.brand.white[300],
+      border: `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: theme.brand.white[300],
       overflow: "hidden",
-   },
+   }),
    active: {
       backgroundColor: "neutral.100",
    },
@@ -76,7 +76,7 @@ export const PDFUpload = forwardRef<HTMLDivElement, Props>(
                            color="neutral.400"
                            maxWidth={280}
                         >
-                           Documents must be in PDF format (.pdf). Maximum size:
+                           Document must be in PDF format (.pdf). Maximum size:
                            20MB.
                         </Typography>
                         <Button
