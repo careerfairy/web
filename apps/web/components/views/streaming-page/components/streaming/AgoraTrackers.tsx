@@ -1,10 +1,7 @@
-import { EmoteType } from "@careerfairy/shared-lib/livestreams"
 import AgoraRTC, { useClientEvent, useRTCClient } from "agora-rtc-react"
 import { useAppDispatch } from "components/custom-hook/store"
-import { useWindowVisibility } from "components/custom-hook/utils/useWindowVisibility"
 import { useEffect } from "react"
 import {
-   addEmote,
    setAudioLevels,
    setRTCConnectionState,
    setRTMConnectionState,
@@ -24,8 +21,6 @@ export const AgoraTrackers = () => {
    const rtmClient = useRTMClient()
 
    const dispatch = useAppDispatch()
-
-   const isWindowVisible = useWindowVisibility()
 
    /**
     * A hook that tracks and dispatches the audio levels of users in a streaming session.
@@ -58,19 +53,6 @@ export const AgoraTrackers = () => {
          // ticket: https://linear.app/careerfairy/issue/CF-816/handle-videoaudio-track-autoplay-faliure
       }
    }, [rtcClient])
-
-   useRTMChannelEvent(rtmChannel, "ChannelMessage", (message) => {
-      if (message.messageType === "TEXT") {
-         const isValidEmote = Object.values(EmoteType).includes(
-            message.text as EmoteType
-         )
-
-         if (isValidEmote && isWindowVisible) {
-            // prevent emote queue overflow when window is restored
-            dispatch(addEmote(message.text as EmoteType))
-         }
-      }
-   })
 
    useRTMChannelEvent(rtmChannel, "MemberCountUpdated", (newCount) => {
       dispatch(setViewCount(newCount))

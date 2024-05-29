@@ -3,12 +3,15 @@ import { useEmotes } from "store/selectors/streamingAppSelectors"
 import { useStreamingContext } from "../../context"
 import { AnimatedEmote } from "./AnimatedEmote"
 import { useFallbackTrackEmotes } from "./useFallbackTrackEmotes"
+import { useTrackEmotes } from "./useTrackEmotes"
 
 export const EmotesRenderer = () => {
    const { livestreamId, agoraUserId } = useStreamingContext()
-   const emotes = useEmotes()
 
+   useTrackEmotes()
    useFallbackTrackEmotes(livestreamId, agoraUserId)
+
+   const emotes = useEmotes()
 
    if (!emotes.length) return null
 
