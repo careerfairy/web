@@ -124,16 +124,19 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                      variant={centeredNav ? "standard" : "scrollable"}
                      value={Boolean(isInDialog) && 0}
                   >
-                     <Tab
-                        disableRipple
-                        sx={styles.tab}
-                        label={"Linked jobs"}
-                        value={0}
-                     />
+                     {Boolean(hasJobs) && (
+                        <Tab
+                           disableRipple
+                           sx={styles.tab}
+                           label={"Linked jobs"}
+                           value={0}
+                        />
+                     )}
                      <Tab
                         disableRipple
                         sx={styles.tab}
                         label={"About The Live Stream"}
+                        value={!hasJobs && 0}
                      />
                      <Tab
                         disableRipple
