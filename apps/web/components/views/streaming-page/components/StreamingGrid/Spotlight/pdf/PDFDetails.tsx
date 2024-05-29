@@ -19,30 +19,29 @@ import { sxStyles } from "types/commonTypes"
 import { convertBytesToMB } from "util/CommonUtil"
 import { BrandedTooltip } from "../../../BrandedTooltip"
 import { PDFDetailsSkeleton } from "./PDFDetailsSkeleton"
-import { ProgressBar } from "./ProgressBar"
+import { UploadProgressBar } from "./ProgressBar"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       p: 1.5,
       width: "100%",
       justifyContent: "space-between",
       position: "relative",
       borderRadius: "8px",
-      border: (theme) => `1px solid ${theme.brand.purple[100]}`,
-      bgcolor: (theme) => theme.brand.white[300],
+      border: `1px solid ${theme.brand.purple[100]}`,
+      bgcolor: theme.brand.white[300],
       overflow: "hidden",
-      transition: (theme) =>
-         theme.transitions.create(["border"], {
-            duration: 100,
-         }),
-   },
+      transition: theme.transitions.create(["border"], {
+         duration: 100,
+      }),
+   }),
    selected: {
       border: (theme) => `1.5px solid ${theme.palette.primary.main}`,
    },
-   iconWrapper: {
+   iconWrapper: (theme) => ({
       borderRadius: "50%",
-      background: (theme) => theme.brand.white[500],
-      border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      background: theme.brand.white[500],
+      border: `1px solid ${theme.palette.neutral[50]}`,
       width: 41,
       height: 41,
       display: "flex",
@@ -53,7 +52,7 @@ const styles = sxStyles({
          width: 25.625,
          height: 25.625,
       },
-   },
+   }),
    deleteButton: {
       "& button": {
          p: 0.5,
@@ -67,10 +66,12 @@ const styles = sxStyles({
    fileNameWrapper: {
       display: "flex",
       alignItems: "baseline",
+      justifyContent: "start",
    },
    fileName: {
       wordBreak: "break-word",
       textAlign: "left",
+      color: "neutral.700",
    },
    viewIcon: {
       position: "relative",
@@ -84,7 +85,7 @@ const styles = sxStyles({
          height: 16,
       },
    },
-   checkbox: {
+   checkbox: (theme) => ({
       ml: 2,
       p: 0.375,
       width: 24,
@@ -92,12 +93,11 @@ const styles = sxStyles({
       bgcolor: "neutral.50",
       borderRadius: "4px",
       display: "flex",
-      color: (theme) => theme.palette.common.white,
+      color: theme.palette.common.white,
       justifyContent: "center",
       alignItems: "center",
-      transition: (theme) =>
-         theme.transitions.create(["background-color", "color"]),
-   },
+      transition: theme.transitions.create(["background-color", "color"]),
+   }),
    selectedCheckbox: {
       bgcolor: (theme) => theme.palette.primary.main,
    },
@@ -154,7 +154,7 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                   </Box>
                </Stack>
                {Boolean(uploadProgress) && (
-                  <ProgressBar
+                  <UploadProgressBar
                      progress={uploadProgress}
                      fileUpLoaded={fileUpLoaded}
                   />
@@ -217,23 +217,12 @@ const PDFDetails = ({ data, allowDownload }: PDFDetailsProps) => {
 
    return (
       <Stack direction="row" spacing={1}>
-         <span>
-            <Box sx={styles.iconWrapper}>
-               <FileIcon />
-            </Box>
-         </span>
+         <Box sx={styles.iconWrapper}>
+            <FileIcon />
+         </Box>
          <Stack alignItems="flex-start">
-            <Stack
-               direction="row"
-               justifyContent="start"
-               spacing={1}
-               sx={styles.fileNameWrapper}
-            >
-               <Typography
-                  variant="medium"
-                  sx={styles.fileName}
-                  color="neutral.700"
-               >
+            <Stack direction="row" spacing={1} sx={styles.fileNameWrapper}>
+               <Typography variant="medium" sx={styles.fileName}>
                   {details.fileName}
                </Typography>
                {Boolean(allowDownload) && (

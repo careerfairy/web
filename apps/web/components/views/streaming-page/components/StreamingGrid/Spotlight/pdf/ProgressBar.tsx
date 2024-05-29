@@ -41,20 +41,14 @@ type Props = {
    fileUpLoaded: boolean
 }
 
-export const ProgressBar = ({ progress, fileUpLoaded }: Props) => {
+export const UploadProgressBar = ({ progress, fileUpLoaded }: Props) => {
    if (!progress) {
       return null
    }
 
    if (fileUpLoaded) {
       return (
-         <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            spacing={1}
-            sx={styles.root}
-         >
+         <Stack direction="row" spacing={1} sx={styles.root}>
             <Box sx={styles.checkCircle} component={CheckCircle} />
             <Typography
                sx={styles.uploadedText}
@@ -68,7 +62,7 @@ export const ProgressBar = ({ progress, fileUpLoaded }: Props) => {
    }
 
    return (
-      <Stack sx={styles.root} direction="row" alignItems="center" spacing={2}>
+      <Stack sx={styles.root} direction="row" spacing={2}>
          <LinearProgress
             sx={styles.progress}
             variant="determinate"
