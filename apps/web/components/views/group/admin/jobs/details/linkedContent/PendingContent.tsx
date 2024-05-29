@@ -54,12 +54,12 @@ const PendingContent: FC<Props> = ({ job, group }) => {
 
    // The group has no live streams and has no sparks plan
    if (!groupHasLivestreams && !group.sparksAdminPageFlag) {
-      return renderNoLivestreamsAndNoSparksPlan()
+      return <NoLivestreamsAndNoSparksPlan />
    }
 
    // The group has no live streams nor sparks
    if (!groupHasLivestreams && !groupHasSparks) {
-      return renderNoLivestreamsAndSparks()
+      return <NoLivestreamsAndSparks />
    }
 
    return (
@@ -79,7 +79,7 @@ const PendingContent: FC<Props> = ({ job, group }) => {
                size="medium"
                color="warning"
                sx={styles.btn}
-               onChange={handleClick}
+               onClick={handleClick}
             >
                Link job to content now
             </Button>
@@ -90,7 +90,7 @@ const PendingContent: FC<Props> = ({ job, group }) => {
 
 export default PendingContent
 
-const renderNoLivestreamsAndNoSparksPlan = () => (
+const NoLivestreamsAndNoSparksPlan = () => (
    <Box sx={styles.wrapper}>
       <Stack spacing={2} sx={styles.content}>
          <AlertTriangle size={48} color={"#FE9B0E"} />
@@ -111,7 +111,7 @@ const renderNoLivestreamsAndNoSparksPlan = () => (
    </Box>
 )
 
-const renderNoLivestreamsAndSparks = () => (
+const NoLivestreamsAndSparks = () => (
    <Box sx={styles.wrapper}>
       <Stack spacing={2} sx={styles.content}>
          <AlertTriangle size={48} color={"#FE9B0E"} />

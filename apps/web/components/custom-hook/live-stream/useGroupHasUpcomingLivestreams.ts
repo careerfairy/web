@@ -4,8 +4,6 @@ import { collection, limit, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
-const now = new Date()
-
 /**
  * Custom hook to check if a group has any live streams.
  * @param {string} groupId - The ID of the group to check for live streams.
@@ -13,6 +11,8 @@ const now = new Date()
  */
 const useGroupHasUpcomingLivestreams = (groupId: string) => {
    const livestreamsQuery = useMemo(() => {
+      const now = new Date()
+
       return query(
          collection(FirestoreInstance, "livestreams"),
          where("groupIds", "array-contains", groupId),
