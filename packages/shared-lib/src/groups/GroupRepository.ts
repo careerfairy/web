@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
+import { Create, ImageType } from "../commonTypes"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import {
    CompanyFollowed,
@@ -12,10 +13,11 @@ import {
    UserAdminGroup,
    UserData,
 } from "../users"
+import { containsAny } from "../utils/utils"
 import {
    AddCreatorData,
    Creator,
-   CreatorRoles,
+   CreatorRole,
    UpdateCreatorData,
 } from "./creators"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
@@ -33,8 +35,6 @@ import {
    Testimonial,
    UserGroupData,
 } from "./groups"
-import { Create, ImageType } from "../commonTypes"
-import { containsAny } from "../utils/utils"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cloneDeep = require("lodash.clonedeep")
@@ -208,6 +208,7 @@ export interface IGroupRepository {
     * Updates a creator in a group.
     *
     * @param  groupId - The ID of the group.
+    * @param  creatorId - The ID of the creator.
     * @param  creatorData - The updated data for the creator.
     * @returns A Promise that resolves with the updated creator.
     */
@@ -216,6 +217,19 @@ export interface IGroupRepository {
       creatorId: string,
       creator: UpdateCreatorData
    ): Promise<Creator>
+
+   /**
+    * Updates a creator in a group.
+    *
+    * @param  groupId - The ID of the group.
+    * @param  creatorId - The ID of the creator.
+    * @param  returns A Promise that resolves with the updated creator.
+    */
+   updateCreatorRolesInGroup(
+      groupId: string,
+      creatorId: string,
+      roles: CreatorRole[]
+   ): Promise<void>
 
    /**
     * Checks if a creator's email is unique in a group
@@ -917,7 +931,7 @@ export class FirebaseGroupRepository
          id: creator.email, // We use the email as the id and not firestore's auto generated id
          documentType: "groupCreator",
          groupId,
-         roles: [CreatorRoles.Spark], // By default, all creators are sparks for now
+         roles: creator.roles,
       }
 
       const creatorRef = this.firestore
@@ -956,6 +970,23 @@ export class FirebaseGroupRepository
       const creatorSnap = await creatorRef.get()
 
       return this.addIdToDoc<Creator>(creatorSnap)
+   }
+
+   async updateCreatorRolesInGroup(
+      groupId: string,
+      creatorId: string,
+      roles: CreatorRole[]
+   ): Promise<void> {
+      const creatorRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("creators")
+         .doc(creatorId)
+
+      await creatorRef.update({
+         roles: this.fieldValue.arrayUnion(...roles),
+         updatedAt: this.fieldValue.serverTimestamp(),
+      })
    }
 
    removeCreatorFromGroup(groupId: string, creatorId: string): Promise<void> {

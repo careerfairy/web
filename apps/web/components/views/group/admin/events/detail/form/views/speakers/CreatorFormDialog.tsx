@@ -1,4 +1,8 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   Creator,
+   CreatorRole,
+   CreatorRoles,
+} from "@careerfairy/shared-lib/groups/creators"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -13,6 +17,7 @@ import { EMAIL_TOOLTIP_INFO } from "constants/pages"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useLivestreamFormValues } from "../../useLivestreamFormValues"
+import { getRoles } from "./commons"
 
 const styles = sxStyles({
    content: {
@@ -80,6 +85,8 @@ const CreatorFormDialog = ({
 
    const onSuccessfulSubmit = (newCreator: Creator) => {
       let updatedOptions: Creator[], updatedValues: Creator[]
+
+      newCreator.roles = getRoles(newCreator)
 
       if (isEdit) {
          updatedOptions = speakers.options.map((option) =>
@@ -247,6 +254,14 @@ const CreatorFormDialog = ({
    )
 }
 
+const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
+   if (!creator || creator?.roles?.length === 0) {
+      return [CreatorRoles.Speaker]
+   }
+
+   return getRoles(creator)
+}
+
 const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
@@ -257,6 +272,7 @@ const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    story: creator?.story || "",
    email: creator?.email || "",
    id: creator?.id || "",
+   roles: getInitialRolesValues(creator),
 })
 
 export default CreatorFormDialog
