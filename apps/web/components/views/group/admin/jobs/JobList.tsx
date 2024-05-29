@@ -35,9 +35,6 @@ const styles = sxStyles({
       width: "100%",
       maxWidth: "calc(100% - 8px)",
       p: { md: 3 },
-      borderRadius: "0 16px 16px 0",
-      background: "white",
-      border: "1px solid #ECECEC",
    },
    infoWrapper: {
       p: { xs: 2, md: 0 },
@@ -149,15 +146,24 @@ const styles = sxStyles({
       display: "flex",
       width: "8px",
       borderRadius: "16px 0 0 16px",
+      p: "8px",
+      m: "1px 0 1px 2px",
    },
    listItemContainer: {
       display: "flex",
       flexDirection: "row",
       width: "100%",
+      borderRadius: "16px",
+      background: "white",
+      border: "1px solid #ECECEC",
    },
    tooltip: {
-      width: "202px",
-      px: 2,
+      width: "200px",
+      textAlign: "center",
+   },
+   tooltipMessage: {
+      fontSize: "14px",
+      color: "text.secondary",
    },
    warningAlert: {
       ml: 2,
@@ -248,7 +254,9 @@ const JobList: FC<Props> = ({ jobsWithStats }) => {
                                     isValidButNoLinkedContent(job) ? (
                                        <Tooltip
                                           title={
-                                             <Typography sx={styles.subtitle}>
+                                             <Typography
+                                                sx={styles.tooltipMessage}
+                                             >
                                                 No content linked to this job
                                                 opening
                                              </Typography>
