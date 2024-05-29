@@ -21,6 +21,7 @@ import {
 } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    SparkEvent,
+   SparkInteractionSources,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/telemetry"
 import {
@@ -943,7 +944,7 @@ export class SparkFunctionsRepository
 
          const newNotification: UserNotification = {
             documentType: "userNotification",
-            actionUrl: `/sparks/${spark.id}`,
+            actionUrl: `/sparks/${spark.id}?interactionSource=${SparkInteractionSources.New_Spark_Notification}`,
             companyId: group.id,
             sparkId: spark.id,
             imageFormat: "circular",
