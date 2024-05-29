@@ -18,20 +18,6 @@ export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
    const { authenticatedUser } = useAuth()
 
    const sendEmoteFetcher: Fetcher = async (_, opts) => {
-      if (!rtmClient || !rtmChannel) {
-         console.warn("RTM client or channel not available")
-         return
-      }
-
-      const message = rtmClient.createMessage({
-         text: opts.arg.emoteType,
-         messageType: "TEXT",
-      })
-
-      // TODO: Optimistically dispatch emote locally to the UI
-
-      await rtmChannel.sendMessage(message)
-
       // Save the emote document in firestore for pdf reporting, we don't need to await this
       livestreamService
          .addEmote(
@@ -56,6 +42,24 @@ export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
             dataLayerEvent("livestream_viewer_reaction_like")
             break
       }
+
+      if (!rtmClient || !rtmChannel) {
+         errorLogAndNotify(
+            new Error(
+               "RTM client or channel not available, possibly due to firewall restrictions"
+            )
+         )
+         return
+      }
+
+      const message = rtmClient.createMessage({
+         text: opts.arg.emoteType,
+         messageType: "TEXT",
+      })
+
+      // TODO: Optimistically dispatch emote locally to the UI
+
+      await rtmChannel.sendMessage(message)
    }
 
    return useSWRMutation("sendEmote", sendEmoteFetcher, {

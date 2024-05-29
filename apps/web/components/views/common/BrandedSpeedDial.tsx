@@ -147,10 +147,10 @@ export const BrandedSpeedDial = forwardRef<HTMLDivElement, Props>(
                   disableTouchRipple: disabled,
                }}
             >
-               {actions.map((action) => {
+               {actions.map((action, index) => {
                   return (
                      <SpeedDialAction
-                        key={action.tooltip}
+                        key={`${action.tooltip}-${index}`}
                         icon={action.node}
                         tooltipTitle={action.tooltip}
                         FabProps={{
