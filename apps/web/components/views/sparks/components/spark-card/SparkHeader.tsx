@@ -72,6 +72,7 @@ const SparkHeader: FC<Props> = ({ spark, showAdminOptions }) => {
                   <SparkOptionsButton
                      groupId={spark.group.id}
                      sparkId={spark.id}
+                     creator={spark.creator}
                   />
                </Fragment>
             ) : null}
