@@ -136,7 +136,7 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                         disableRipple
                         sx={styles.tab}
                         label={"About The Live Stream"}
-                        value={!hasJobs && 0}
+                        value={!hasJobs && isInDialog ? 0 : null}
                      />
                      <Tab
                         disableRipple
