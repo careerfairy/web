@@ -8,9 +8,19 @@ const ActionButton = () => {
             <Button
                color={"secondary"}
                variant={"contained"}
-               sx={styles.btn}
+               sx={[
+                  styles.btn,
+                  {
+                     cursor: "initial",
+                     "&:hover": {
+                        bgcolor: "secondary.main",
+                        boxShadow: "none",
+                     },
+                  },
+               ]}
                fullWidth
                disableElevation
+               disableRipple
                size="large"
             >
                Register to live stream
