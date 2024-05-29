@@ -37,14 +37,9 @@ export const LivestreamStateTrackers = (): null => {
    }, [dispatch, livestream.screenSharerId])
 
    useEffect(() => {
-      console.log(
-         "🚀 ~ file: livestream.participatingStudents",
-         livestream.participatingStudents
-      )
       dispatch(
          setNumberOfParticipants(livestream.participatingStudents?.length ?? 0)
       )
-      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [dispatch, livestream.participatingStudents?.length])
 
    // convert to primitive for comparison
