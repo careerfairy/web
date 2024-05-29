@@ -15,21 +15,21 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
-   root: {
+   root: (theme) => ({
       width: "100%",
       height: "100%",
       backgroundColor: "black",
       position: "relative",
       "& button": {
-         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
+         backgroundColor: alpha(theme.palette.common.black, 0.4),
          color: "white",
          "&:hover": {
-            backgroundColor: (theme) => alpha(theme.palette.common.black, 0.8),
+            backgroundColor: alpha(theme.palette.common.black, 0.8),
             opacity: 1,
             color: "white",
          },
       },
-   },
+   }),
    muteButton: {
       position: "absolute",
       bottom: 5,
