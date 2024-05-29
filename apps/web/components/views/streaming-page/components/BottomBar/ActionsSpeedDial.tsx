@@ -29,7 +29,7 @@ const getViewerActions = (
    isStreaming: boolean
 ): ActionName[] => {
    if (isMobile && isStreaming) {
-      return ["Chat", "Reactions", "Settings"]
+      return ["Chat", "Settings"]
    }
 
    return []

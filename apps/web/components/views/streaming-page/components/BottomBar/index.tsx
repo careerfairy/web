@@ -85,31 +85,33 @@ const getViewerActionNames = (
    if (isStreaming) {
       if (isMobile) {
          return [
-            "Mic",
-            "Video",
+            ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
             "Divider",
             "Q&A",
             ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
             "Polls",
-            "SpeedDial",
+            ...(userCanJoinPanel
+               ? (["SpeedDial"] as const)
+               : (["Chat"] as const)),
             ...(userCanJoinPanel
                ? (["Divider", "Stop hand raise"] as const)
-               : []),
+               : (["Reactions"] as const)),
          ]
       }
 
       return [
-         "Mic",
-         "Video",
+         ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
          "Divider",
          "Q&A",
          ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
          "Polls",
          "Chat",
-         "Reactions",
+         ...(userCanJoinPanel ? [] : (["Reactions"] as const)),
          "Divider",
-         "Settings",
-         ...(userCanJoinPanel ? (["Stop hand raise"] as const) : []),
+
+         ...(userCanJoinPanel
+            ? (["Settings", "Stop hand raise"] as const)
+            : []),
       ]
    }
    return [

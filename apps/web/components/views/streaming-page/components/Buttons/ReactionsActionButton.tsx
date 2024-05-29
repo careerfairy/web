@@ -3,11 +3,13 @@ import {
    Box,
    CircularProgress,
    Fade,
+   buttonBaseClasses,
    speedDialActionClasses,
    speedDialClasses,
    speedDialIconClasses,
 } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    BrandedSpeedDial,
    BrandedSpeedDialAction,
@@ -54,6 +56,16 @@ const styles = sxStyles({
                theme.transitions.create(["transform", "scale"]),
          },
       },
+      [`& .${buttonBaseClasses.root}`]: {
+         width: {
+            xs: "30px !important",
+            tablet: "44px !important",
+         },
+         height: {
+            xs: "30px !important",
+            tablet: "44px !important",
+         },
+      },
    },
    closeIcon: {
       p: 0.4,
@@ -87,6 +99,7 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
    const [iconsDisabled, setIconsDisabled] = useState(false)
    const [progress, setProgress] = useState(0)
    const { agoraUserId, livestreamId } = useStreamingContext()
+   const streamIsMobile = useStreamIsMobile()
 
    const reactionsRef = useRef(null)
 
@@ -132,28 +145,28 @@ export const ReactionsActionButton = forwardRef<HTMLDivElement>((_, ref) => {
 
    const ACTIONS: BrandedSpeedDialAction[] = [
       {
-         node: <ClapEmote />,
+         node: <ClapEmote size={streamIsMobile ? 35 : undefined} />,
          tooltip: "Applause",
          onClick: () => {
             handleSendEmote(EmoteType.CLAPPING)
          },
       },
       {
-         node: <HeartEmote />,
+         node: <HeartEmote size={streamIsMobile ? 35 : undefined} />,
          tooltip: "Love",
          onClick: () => {
             handleSendEmote(EmoteType.HEART)
          },
       },
       {
-         node: <LikeEmote />,
+         node: <LikeEmote size={streamIsMobile ? 35 : undefined} />,
          tooltip: "Like",
          onClick: () => {
             handleSendEmote(EmoteType.LIKE)
          },
       },
       {
-         node: <ConfusedEmote />,
+         node: <ConfusedEmote size={streamIsMobile ? 35 : undefined} />,
          tooltip: "Confused",
          onClick: () => {
             handleSendEmote(EmoteType.CONFUSED)
