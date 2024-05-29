@@ -1,15 +1,16 @@
-import { v4 as uuidv4 } from "uuid"
+import { CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import {
    LivestreamEvent,
    LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/livestreams"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
-import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
-import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
-import { FormikErrors, FormikTouched } from "formik"
 import { BrandedTextFieldProps } from "components/views/common/inputs/BrandedTextField"
+import { FormikErrors, FormikTouched } from "formik"
+import { v4 as uuidv4 } from "uuid"
+import { shouldUseEmulators } from "../../../util/CommonUtil"
+import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 
 export const speakerObj = {
    avatar: "",
@@ -18,6 +19,7 @@ export const speakerObj = {
    position: "",
    background: "",
    email: "",
+   roles: [CreatorRoles.Speaker],
 }
 
 export const getStreamSubCollectionSpeakers = (
@@ -31,6 +33,7 @@ export const getStreamSubCollectionSpeakers = (
          const speaker = query.data()
          speaker.id = query.id
          speakersObj[speaker.id] = speaker
+         speaker.roles = query.roles || [CreatorRoles.Speaker]
       })
       return speakersObj
    } else if (livestream.speakers?.length) {
@@ -121,6 +124,7 @@ const buildSpeakersArray = (values) => {
          position: values.speakers[key].position,
          email: values.speakers[key].email || "",
          rank: index,
+         roles: values.speakers[key].roles || [CreatorRoles.Speaker],
       }
    })
 }

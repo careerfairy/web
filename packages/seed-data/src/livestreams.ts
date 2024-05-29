@@ -6,13 +6,14 @@ import {
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 
+import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import { faker } from "@faker-js/faker"
-import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
-import { firestore } from "./lib/firebase"
+import { v4 as uuidv4 } from "uuid"
 import { groupQuestions } from "./groups"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { firestore } from "./lib/firebase"
 
 type SetupUserLivestreamDataOptions = {
    user: UserData
@@ -460,6 +461,7 @@ const generateSpeaker = (): Speaker => ({
    lastName: faker.name.lastName(),
    position: faker.name.jobTitle(),
    email: faker.internet.email(),
+   roles: [CreatorRoles.Speaker],
 })
 
 type LivestreamEventWithSubcollections = {

@@ -1,7 +1,10 @@
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
+import {
+   CreatorRoles,
+   PublicCreator,
+} from "@careerfairy/shared-lib/groups/creators"
 import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { useSparksFeedTracker } from "context/spark/SparksFeedTrackerProvider"
+import { groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
@@ -41,8 +44,6 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
 
    const [formSubmitting, setFormSubmitting] = useState(false)
 
-   const { trackEvent } = useSparksFeedTracker()
-
    const dispatch = useDispatch()
 
    const handleClose = useCallback(() => {
@@ -64,7 +65,14 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                return
             }
 
-            let sparkId = values?.id
+            const sparkId = values?.id
+
+            const creatorHasSparkRole = values.creator.roles.includes(
+               CreatorRoles.Spark
+            )
+            const creatorRoles = creatorHasSparkRole
+               ? values.creator.roles
+               : [...values.creator.roles, CreatorRoles.Spark]
 
             if (sparkId) {
                // update spark
@@ -87,6 +95,12 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                   creatorId: values.creator.id,
                })
             }
+
+            await groupRepo.updateCreatorRolesInGroup(
+               groupId,
+               values.creator.id,
+               creatorRoles
+            )
 
             setSubmitting(false)
             successNotification("Spark created successfully")
