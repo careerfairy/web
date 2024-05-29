@@ -117,7 +117,7 @@ export const useAutoSave = () => {
          options: LivestreamFormSpeakersTabValues["options"],
          groupId: Group["id"]
       ) => {
-         const removedSpeakers = previousSpeakers.filter(
+         const removedSpeakers = previousSpeakers?.filter(
             (prevSpeaker) =>
                !newSpeakers.some(
                   (newSpeaker) => newSpeaker.id === prevSpeaker.id
@@ -136,7 +136,7 @@ export const useAutoSave = () => {
             }
          })
 
-         const deletePromises = removedSpeakersThatAreCreators.map(
+         const deletePromises = removedSpeakersThatAreCreators?.map(
             async (speakerCreator) =>
                groupRepo.updateCreatorRolesInGroup(
                   groupId,
@@ -145,7 +145,7 @@ export const useAutoSave = () => {
                )
          )
 
-         const addedSpeakers = newSpeakers.filter(
+         const addedSpeakers = newSpeakers?.filter(
             (newSpeaker) =>
                !previousSpeakers.some(
                   (prevSpeaker) => newSpeaker.id === prevSpeaker.id
@@ -157,7 +157,7 @@ export const useAutoSave = () => {
             options
          )
 
-         const updatePromises = speakersThatAreCreators.map(
+         const updatePromises = speakersThatAreCreators?.map(
             async (speakerCreator) =>
                groupRepo.updateCreatorRolesInGroup(
                   groupId,
