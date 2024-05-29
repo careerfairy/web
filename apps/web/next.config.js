@@ -118,6 +118,8 @@ const csp = {
       "https://vimeo.com",
       "https://api.stripe.com",
       "https://www.google.com", // Google Ads services
+      "https://capig.stape.tech", // Pixel Conversion API Gateway
+      "https://www.googletagmanager.com",
    ],
    "img-src": [
       "'self'",
