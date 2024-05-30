@@ -13,7 +13,10 @@ import { useAppDispatch } from "components/custom-hook/store"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { forwardRef } from "react"
-import { setUploadPDFPresentationDialogOpen } from "store/reducers/streamingAppReducer"
+import {
+   setShareVideoDialogOpen,
+   setUploadPDFPresentationDialogOpen,
+} from "store/reducers/streamingAppReducer"
 import { useLivestreamMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
@@ -96,15 +99,11 @@ export const ShareMenu = forwardRef<HTMLDivElement, Props>(
                }
                break
             case LivestreamModes.VIDEO:
-               /**
-                * TODO:
-                * 1. Open the youtube video URL dialog form
-                * 2. Save the youtube video URL at /livestreams/{id}/videos/video. Look at old implementation for reference
-                * 3. Set the mode to video
-                *
-                * Maybe we want to unify all video/PDFs into one collection of different types of "content" at /livestreams/{id}/content
-                */
-               alert("Share Youtube video not implemented yet")
+               if (active) {
+                  setLivestreamMode({ mode: LivestreamModes.DEFAULT })
+               } else {
+                  dispatch(setShareVideoDialogOpen(true))
+               }
                break
             default:
                break
