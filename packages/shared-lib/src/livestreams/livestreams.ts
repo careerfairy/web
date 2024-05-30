@@ -749,3 +749,17 @@ export type CategoryDataOption = {
    livestream: LivestreamEvent
    userData: UserData
 }
+
+/**
+ * A PDF presentation for a live stream
+ * Document Path: livestreams/{livestreamId}/presentations/presentation
+ */
+export interface LivestreamPresentation extends Identifiable {
+   downloadUrl: string
+   page: number
+   fileName?: string
+   /** The path to the PDF in the storage */
+   storagePath?: string
+   /** The size of the PDF in bytes */
+   fileSize?: number
+}
