@@ -10,9 +10,11 @@ import {
    CreateLivestreamPollRequest,
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
+   EmoteType,
    FilterLivestreamsOptions,
    CategoryDataOption as LivestreamCategoryDataOption,
    LivestreamChatEntry,
+   LivestreamEmote,
    LivestreamEvent,
    LivestreamMode,
    LivestreamModes,
@@ -1092,6 +1094,29 @@ export class LivestreamService {
          ...(updateData.state === "playing"
             ? { lastPlayed: Timestamp.now() }
             : {}),
+      })
+   }
+
+   /**
+    * Saves the emote to the database to be used in the PDF Report
+    * to show number of reactions/engagement
+    */
+   addEmote = async (
+      livestreamId: string,
+      emoteType: EmoteType,
+      agoraUserId: string,
+      userUid: string
+   ) => {
+      const ref = doc(
+         collection(FirestoreInstance, "livestreams", livestreamId, "icons")
+      ).withConverter(createGenericConverter<LivestreamEmote>())
+
+      return setDoc(ref, {
+         id: ref.id,
+         name: emoteType,
+         timestamp: Timestamp.now(),
+         agoraUserId,
+         userUid: userUid || null,
       })
    }
 }

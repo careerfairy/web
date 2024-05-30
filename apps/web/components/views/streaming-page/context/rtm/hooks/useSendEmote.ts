@@ -1,0 +1,73 @@
+import { EmoteType } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
+import { livestreamService } from "data/firebase/LivestreamService"
+import useSWRMutation, { MutationFetcher } from "swr/mutation"
+import { errorLogAndNotify } from "util/CommonUtil"
+import { dataLayerEvent } from "util/analyticsUtils"
+import { useRTMChannel, useRTMClient } from "../providers"
+
+type SendEmoteRequest = {
+   emoteType: EmoteType
+}
+
+type Fetcher = MutationFetcher<void, unknown, SendEmoteRequest>
+
+export const useSendEmote = (livestreamId: string, agoraUserId: string) => {
+   const rtmClient = useRTMClient()
+   const rtmChannel = useRTMChannel()
+   const { authenticatedUser } = useAuth()
+
+   const sendEmoteFetcher: Fetcher = async (_, opts) => {
+      // Save the emote document in firestore for pdf reporting, we don't need to await this
+      livestreamService
+         .addEmote(
+            livestreamId,
+            opts.arg.emoteType,
+            agoraUserId,
+            authenticatedUser.uid
+         )
+         .catch(errorLogAndNotify)
+
+      switch (opts.arg.emoteType) {
+         case "clapping":
+            dataLayerEvent("livestream_viewer_reaction_clap")
+            break
+         case "confused":
+            dataLayerEvent("livestream_viewer_reaction_confused")
+            break
+         case "heart":
+            dataLayerEvent("livestream_viewer_reaction_heart")
+            break
+         case "like":
+            dataLayerEvent("livestream_viewer_reaction_like")
+            break
+      }
+
+      if (!rtmClient || !rtmChannel) {
+         errorLogAndNotify(
+            new Error(
+               "RTM client or channel not available, possibly due to firewall restrictions"
+            )
+         )
+         return
+      }
+
+      const message = rtmClient.createMessage({
+         text: opts.arg.emoteType,
+         messageType: "TEXT",
+      })
+
+      // TODO: Optimistically dispatch emote locally to the UI
+
+      await rtmChannel.sendMessage(message)
+   }
+
+   return useSWRMutation("sendEmote", sendEmoteFetcher, {
+      onError: (error, key) => {
+         errorLogAndNotify(error, {
+            message: "Failed to send emote",
+            key,
+         })
+      },
+   })
+}
