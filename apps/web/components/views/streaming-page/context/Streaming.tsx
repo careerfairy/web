@@ -39,7 +39,6 @@ type StreamContextProps = {
    // Whether the user is ready to start streaming
    isReady: boolean
    setIsReady: (isReady: boolean) => void
-   isJoining: boolean
    currentRole: ClientRole
    // The livestream or breakout-room document reference
    streamRef: DocumentReference<LivestreamEvent>
@@ -99,25 +98,18 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
 
    const viewerCanJoin = !isHost && !hasEnded && hasStarted
 
-   const { isLoading } = useJoin(
-      {
-         appid: agoraCredentials.appID,
-         channel: livestreamId,
-         token: response.token,
-         uid: agoraUserId,
-      },
-      (isHost || viewerCanJoin) &&
-         // Join channel if not logged in on another browser and token is available
-         !isLoggedInOnDifferentBrowser &&
-         !response.isLoading &&
-         Boolean(response.token)
-   )
-
    const client = useRTCClient()
 
    const config = useClientConfig(client, {
       hostCondition: shouldStream && isReady && (isHost || viewerCanJoinPanel),
    })
+
+   const shouldJoinChannel =
+      (isHost || viewerCanJoin) &&
+      // Join channel if not logged in on another browser and token is available
+      !isLoggedInOnDifferentBrowser &&
+      !response.isLoading &&
+      Boolean(response.token)
 
    const value = useMemo<StreamContextProps>(
       () => ({
@@ -129,7 +121,6 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          agoraUserToken: response.token,
          isReady,
          setIsReady,
-         isJoining: isLoading,
          currentRole: config.currentRole,
          streamRef: livestreamService.getLivestreamRef(livestreamId),
       }),
@@ -141,14 +132,46 @@ export const StreamingProvider: FC<StreamProviderProps> = ({
          agoraUserId,
          response.token,
          isReady,
-         isLoading,
          config.currentRole,
       ]
    )
 
    return (
-      <StreamContext.Provider value={value}>{children}</StreamContext.Provider>
+      <StreamContext.Provider value={value}>
+         {children}
+         {Boolean(shouldJoinChannel) && (
+            <JoinComponent
+               livestreamId={livestreamId}
+               agoraUserId={agoraUserId}
+               joinToken={response.token}
+            />
+         )}
+      </StreamContext.Provider>
    )
+}
+interface JoinComponentProps {
+   livestreamId: string
+   agoraUserId: string
+   joinToken: string
+}
+
+/**
+ * The `JoinComponent` utilizes the `useJoin` hook from the Agora React SDK, which automatically handles
+ * joining the channel when the component mounts. It is crucial that this component unmounts properly
+ * to ensure the user leaves the channel, preventing any session persistence issues.
+ */
+const JoinComponent = ({
+   livestreamId,
+   agoraUserId,
+   joinToken,
+}: JoinComponentProps) => {
+   useJoin({
+      appid: agoraCredentials.appID,
+      channel: livestreamId,
+      token: joinToken,
+      uid: agoraUserId,
+   })
+   return null
 }
 
 export const useStreamingContext = () => {

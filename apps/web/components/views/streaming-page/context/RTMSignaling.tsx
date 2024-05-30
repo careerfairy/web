@@ -1,6 +1,8 @@
 import { useCurrentUID, useIsConnected } from "agora-rtc-react"
+import AgoraRTM, { RtmChannel, RtmClient } from "agora-rtm-sdk"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useAgoraRtmToken } from "components/custom-hook/streaming/useAgoraRtmToken"
+import { useForcedProxyMode } from "components/custom-hook/streaming/useForcedProxyMode"
 import { EmoteType } from "context/agora/RTMContext"
 import { agoraCredentials } from "data/agora/AgoraInstance"
 import { ReactNode, useCallback, useEffect, useState } from "react"
@@ -8,7 +10,6 @@ import { setRTMFailedToConnect } from "store/reducers/streamingAppReducer"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useStreamingContext } from "./Streaming"
 import { AgoraRTMChannelProvider, AgoraRTMClientProvider } from "./rtm"
-import AgoraRTM, { RtmChannel, RtmClient } from "agora-rtm-sdk"
 
 type RTMSignalingProviderProps = {
    children: ReactNode
@@ -22,6 +23,8 @@ type RTMState = {
 export const RTMSignalingProvider = ({
    children,
 }: RTMSignalingProviderProps) => {
+   const forcedProxyMode = useForcedProxyMode()
+
    const { livestreamId } = useStreamingContext()
    const rtcIsConnected = useIsConnected()
    const uid = useCurrentUID()
@@ -36,9 +39,13 @@ export const RTMSignalingProvider = ({
       rtcIsConnected && uid ? uid.toString() : null
    )
 
+   const enableCloudProxy = Boolean(forcedProxyMode)
+
    const login = useCallback(async () => {
       try {
-         const newClient = AgoraRTM.createInstance(agoraCredentials.appID)
+         const newClient = AgoraRTM.createInstance(agoraCredentials.appID, {
+            enableCloudProxy,
+         })
          await newClient.login({ uid: uid.toString(), token })
          const newChannel = newClient.createChannel(livestreamId)
          await newChannel.join()
@@ -54,7 +61,7 @@ export const RTMSignalingProvider = ({
             },
          })
       }
-   }, [dispatch, livestreamId, token, uid])
+   }, [dispatch, enableCloudProxy, livestreamId, token, uid])
 
    const logout = useCallback(async () => {
       try {
