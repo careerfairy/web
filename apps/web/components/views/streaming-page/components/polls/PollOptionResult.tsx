@@ -1,8 +1,9 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 import { LoadingButton } from "@mui/lab"
-import { Grow, Collapse } from "@mui/material"
 import {
    Box,
+   Collapse,
+   Grow,
    LinearProgress,
    Stack,
    Typography,
@@ -153,7 +154,9 @@ export const PollOptionResult = ({
                   color="neutral.800"
                   justifyContent="space-between"
                >
-                  <Typography variant="small">{option.text}</Typography>
+                  <Typography variant="small" textAlign="start">
+                     {option.text}
+                  </Typography>
                   <Grow in={showResults}>
                      <Typography variant="small" fontWeight={600}>
                         {stats.percentage}%

@@ -1,0 +1,58 @@
+import { Box, CircularProgress, Typography } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useLivestreamVideo } from "components/custom-hook/streaming/useLivestreamVideo"
+import { useStreamingContext } from "components/views/streaming-page/context"
+import dynamic from "next/dynamic"
+import { sxStyles } from "types/commonTypes"
+
+// Lazy load the SynchronizedVideo component as react-player has a large bundle size
+const SynchronizedVideo = dynamic(
+   () => import("./SynchronizedVideo").then((mod) => mod.SynchronizedVideo),
+   {
+      loading: () => <CircularProgress />,
+   }
+)
+
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100%",
+      width: "100%",
+      borderRadius: "12px",
+      overflow: "hidden",
+      backgroundColor: (theme) => theme.brand.white[500],
+   },
+})
+
+export const SpotlightVideo = () => {
+   return (
+      <Box sx={styles.root}>
+         <SuspenseWithBoundary fallback={<CircularProgress />}>
+            <Content />
+         </SuspenseWithBoundary>
+      </Box>
+   )
+}
+
+export const Content = () => {
+   const { livestreamId, agoraUserId } = useStreamingContext()
+   const { data: video } = useLivestreamVideo(livestreamId)
+
+   if (!video) {
+      return (
+         <Typography variant="mobileBrandedH4" textAlign="center">
+            Please wait for the host to load the video
+         </Typography>
+      )
+   }
+
+   return (
+      <SynchronizedVideo
+         video={video}
+         livestreamId={livestreamId}
+         userId={agoraUserId}
+      />
+   )
+}

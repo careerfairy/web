@@ -13,7 +13,10 @@ export const EMAIL_REGEX =
    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i
 
 export const YOUTUBE_URL_REGEX =
-   /^(https?:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/
+   /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$|^(youtube\.com)\/.+$/
+
+export const VIMEO_URL_REGEX =
+   /^(https?:\/\/)?(www\.)?(vimeo\.com\/)([0-9]+)(\/.*)?$/
 
 export const LINKEDIN_URL_REGEX = /^(https?:\/\/)?(www\.linkedin\.com)\/.+$/
 

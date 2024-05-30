@@ -1,16 +1,18 @@
-import { Fragment, useCallback, useEffect, useState } from "react"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import ReactPlayer from "react-player/youtube"
+import CloseIcon from "@mui/icons-material/Close"
 import MuteIcon from "@mui/icons-material/VolumeOff"
 import UnmuteIcon from "@mui/icons-material/VolumeUp"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
+import { alpha } from "@mui/material/styles"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Fragment, useCallback, useEffect, useState } from "react"
+import ReactPlayer from "react-player"
 import { useDispatch, useSelector } from "react-redux"
+import DateUtil from "util/DateUtil"
+import AreYouSureModal from "../../materialUI/GlobalModals/AreYouSureModal"
 import * as actions from "../../store/actions"
 import useStreamRef from "../custom-hook/useStreamRef"
-import AreYouSureModal from "../../materialUI/GlobalModals/AreYouSureModal"
-import CloseIcon from "@mui/icons-material/Close"
-import { alpha } from "@mui/material/styles"
+import { getConfig } from "./reactPlayer"
 
 const styles = {
    root: {
@@ -60,7 +62,6 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
    const [reactPlayerInstance, setReactPlayerInstance] = useState(null)
    const [removeYoutubeVideoModalOpen, setRemoveYoutubeVideoModalOpen] =
       useState(false)
-   const [loading, setLoading] = useState(false)
    const [muted, setMuted] = useState(viewer)
    const [initialized, setInitialized] = useState(false)
    const [videoData, setVideoData] = useState(null)
@@ -79,6 +80,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
       if (viewer && !unpauseFailedPlayRemoteVideos) {
          dispatch(actions.setVideoIsPaused())
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [dispatch])
 
    useEffect(() => {
@@ -96,22 +98,25 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
       ) {
          handleInitialize()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(videoData), Boolean(reactPlayerInstance)])
 
    useEffect(() => {
       if (!initialized && videoData?.state === "paused") {
          setInitialized(true)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [videoData?.state])
 
    useEffect(() => {
       if (initialized && !isVideoSharer) {
          handleSeek(videoData.second)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [videoData?.second])
 
    const handleInitialize = () => {
-      const secondsDiff = getSecondsBetweenDates(
+      const secondsDiff = DateUtil.getSecondsBetweenDates(
          videoData.lastPlayed.toDate(),
          new Date()
       )
@@ -120,20 +125,20 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
 
    useEffect(() => {
       if (livestreamId) {
-         setLoading(true)
          const unsubscribe = listenToCurrentVideo(
             streamRef,
             (querySnapshot) => {
                if (querySnapshot.exists) {
                   setVideoData(querySnapshot.data())
                }
-               setLoading(false)
             }
          )
          return () => unsubscribe()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [livestreamId])
 
+   // eslint-disable-next-line react-hooks/exhaustive-deps
    const updateYoutubeVideoState = (state) => {
       return updateCurrentVideoState(streamRef, state)
    }
@@ -151,6 +156,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
          second: reactPlayerInstance?.getCurrentTime() || 0,
          updater: streamerId,
       })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [reactPlayerInstance, initialized, streamerId])
 
    const handlePause = useCallback(() => {
@@ -158,7 +164,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
          return
       }
       updateYoutubeVideoState({ state: "paused" })
-   }, [isVideoSharer, streamRef])
+   }, [isVideoSharer, updateYoutubeVideoState])
 
    const handleError = useCallback((error) => {
       console.error(error)
@@ -176,12 +182,12 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
       } catch (e) {
          console.error(e)
       }
-   }, [])
+   }, [stopSharingYoutubeVideo, streamRef])
 
    return (
       <Fragment>
          <Box sx={styles.root}>
-            {!isVideoSharer && reactPlayerInstance && videoData && (
+            {Boolean(!isVideoSharer && reactPlayerInstance && videoData) && (
                <Button
                   sx={styles.muteButton}
                   color={"grey"}
@@ -191,7 +197,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
                   {muted ? "Unmute" : "Mute"}
                </Button>
             )}
-            {(isVideoSharer || !viewer) && videoData && (
+            {Boolean((isVideoSharer || !viewer) && videoData) && (
                <Button
                   color={"grey"}
                   size={"large"}
@@ -211,15 +217,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
                   transform: "translateY(-50%)",
                   pointerEvents: isVideoSharer ? "visibleFill" : "none",
                }}
-               config={{
-                  // https://developers.google.com/youtube/player_parameters
-                  playerVars: {
-                     controls: isVideoSharer ? 1 : 0,
-                     fs: 0,
-                     disablekb: isVideoSharer ? 0 : 1,
-                     rel: 0,
-                  },
-               }}
+               config={getConfig(isVideoSharer)}
                muted={muted}
                controls={isVideoSharer}
                url={videoData?.url}
@@ -231,7 +229,7 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
                onPause={handlePause}
             />
          </Box>
-         {removeYoutubeVideoModalOpen && (
+         {Boolean(removeYoutubeVideoModalOpen) && (
             <AreYouSureModal
                title="Are you sure you want to stop sharing the video?"
                handleConfirm={handleStopSharingVideo}
@@ -243,10 +241,6 @@ const SynchronisedVideoViewer = ({ livestreamId, streamerId, viewer }) => {
          )}
       </Fragment>
    )
-}
-
-const getSecondsBetweenDates = (startDate: Date, endDate: Date) => {
-   return (endDate.getTime() - startDate.getTime()) / 1000
 }
 
 export default SynchronisedVideoViewer
