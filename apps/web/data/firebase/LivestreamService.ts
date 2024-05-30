@@ -36,6 +36,7 @@ import {
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 import { groupRepo } from "data/RepositoryInstances"
@@ -65,7 +66,7 @@ import {
    writeBatch,
 } from "firebase/firestore"
 import { Functions, httpsCallable } from "firebase/functions"
-import { errorLogAndNotify, getQueryStringFromUrl } from "util/CommonUtil"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 import FirebaseService from "./FirebaseService"
@@ -1065,15 +1066,32 @@ export class LivestreamService {
       updater: string
    }) => {
       const ref = this.getVideoRef(livestreamId)
-      const secondsInUrl = Number(getQueryStringFromUrl(url, "t"))
 
       return setDoc(ref, {
          id: ref.id,
          url,
-         second: secondsInUrl || 0,
+         second: getSecondsPassedFromYoutubeUrl(url),
          state: "playing",
          lastPlayed: Timestamp.now(),
          updater,
+      })
+   }
+
+   removeLivestreamVideo = async (livestreamId: string) => {
+      const ref = this.getVideoRef(livestreamId)
+      return deleteDoc(ref).then(() => alert("deleted"))
+   }
+
+   updateVideoState = async (
+      livestreamId: string,
+      updateData: Partial<Pick<LivestreamVideo, "state" | "second" | "updater">>
+   ) => {
+      const ref = this.getVideoRef(livestreamId)
+      return updateDoc(ref, {
+         ...updateData,
+         ...(updateData.state === "playing"
+            ? { lastPlayed: Timestamp.now() }
+            : {}),
       })
    }
 }
